@@ -89,6 +89,9 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Opdatere delt indhold"
   },
+  "app.action-bar.installs": {
+    "message": "Installeringer"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Gør til primære instance"
   },
@@ -131,20 +134,14 @@
   "app.ads-consent.reject": {
     "message": "Afvis alle"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Aktiverer avanceret gengivelse som sløringseffekter, der kan forårsage ydelsesproblemer uden hardwareaccelereret gengivelse."
+  "app.ads-consent.title": {
+    "message": "Dit privatliv og hvordan reklamer hjælper Modrinth"
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Avanceret rendering"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Vælg dit foretrukne farvetema til Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Farvetema"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Skift hvilken side launcheren åbner i."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hjem"
@@ -155,38 +152,23 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Standard startside"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Slår nametagget over din spiller på skins siden fra."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gem nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Inkluderer de sidste verdener i afsnittet \"Hop tilbage\" på startsiden."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Hop tilbage ind i verdener"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimer launcheren når Minecraft starter."
-  },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimer launcher"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Vis hvor meget tid du har brugt på at spille en instance."
+    "message": "Minimer app"
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis tid spillet"
   },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Aktivere muligheden for at slå sidepanelet til og fra."
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Spring ikke nødvendige advarseler over"
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Slå sidepanel til og fra"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Hvis du prøver at installere en Modrinth Pack fil (.mrpack) som ikke er hosted på Modrinth, så skal vi nok sikre os du forstår riskoen før du installere den."
+    "message": "Gem højre sidebar"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Advar mig før jeg installere en ukendt modpacks"
@@ -266,8 +248,41 @@
   "app.install.phase.preparing_java.downloading": {
     "message": "Downloader Java {version}"
   },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Henter Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Forbereder Java {version}"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Tilføjet"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Skub opdatering"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Skubber..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Fjernet"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Skub opdatering"
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Gennemså ændringer"
+  },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Gennemgå opdatering"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "Gennemgår..."
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "En opdatering er krævet for at spille {name}. Venligst opdater til den seneste version for at køre spillet."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "En opdatering er tilgængelig"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Al' data for din instance vil blive permanent slettet, dette inkludere dine verdener, konfigurationer, og alt installeret indhold."
@@ -299,6 +314,9 @@
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
+  "app.instance.mods.locked-content": {
+    "message": "Indhold i låste instances kan ikke blive ændret."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" blev tilføjet"
   },
@@ -313,6 +331,18 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uploadet"
+  },
+  "app.instance.share.empty.description": {
+    "message": "Du kan ændre denne instance med dine venner!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Ingen venner inviteret"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Inviter venner"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Del {name}"
   },
   "app.instance.share.locked.empty-description-suffix": {
     "message": "for at tilgå denne side."
@@ -460,9 +490,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Udseende"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standardindstillinger for instans"
   },
   "app.settings.tabs.java-installations": {
     "message": "Javainstallationer"
@@ -1084,9 +1111,6 @@
   },
   "minecraft-required.sign-in": {
     "message": "Log ind på Microsoft"
-  },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Annuller"
   },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Fortsæt i din browser"

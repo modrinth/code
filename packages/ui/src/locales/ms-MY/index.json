@@ -386,6 +386,9 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Dikemas Kini"
   },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Ditambah"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} dialih keluar"
   },
@@ -910,9 +913,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Fail disimpan"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Tutup"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Cari"
@@ -2401,6 +2401,9 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Sekat"
   },
   "profile.label.badges": {
     "defaultMessage": "Lencana"
@@ -4442,8 +4445,26 @@
   "settings.pats.title": {
     "defaultMessage": "Token akses peribadi"
   },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Bio"
+  },
   "settings.sessions.title": {
     "defaultMessage": "Sesi"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Pengguna"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Tambah"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Ditambah"
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Terapkan"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Simpan"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

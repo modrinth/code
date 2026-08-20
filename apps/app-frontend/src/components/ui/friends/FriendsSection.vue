@@ -3,9 +3,9 @@ import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	Avatar,
-	ButtonStyled,
 	defineMessages,
-	OverflowMenu,
+	IconButton,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
@@ -30,6 +30,11 @@ const props = withDefaults(
 		openByDefault: false,
 	},
 )
+
+const emit = defineEmits<{
+	onOpen: []
+	onClose: []
+}>()
 
 function createContextMenuOptions(friend: FriendWithUserData) {
 	if (friend.accepted) {
@@ -112,6 +117,8 @@ const messages = defineMessages({
 				? ''
 				: ' cursor-pointer hover:brightness-[--hover-brightness] active:scale-[0.98] transition-all')
 		"
+		@on-open="emit('onOpen')"
+		@on-close="emit('onClose')"
 	>
 		<template #title>
 			<h3 class="text-base text-primary font-medium m-0">
@@ -159,29 +166,35 @@ const messages = defineMessages({
 							<span v-else-if="friend.status" class="m-0 text-xs">{{ friend.status }}</span>
 						</div>
 					</RouterLink>
-					<ButtonStyled v-if="friend.accepted" circular type="transparent">
-						<OverflowMenu
-							class="opacity-0 group-hover:opacity-100 transition-opacity"
-							:options="[
-								{
-									id: 'remove-friend',
-									action: () => removeFriend(friend),
-									color: 'red',
-								},
-							]"
-						>
-							<MoreVerticalIcon />
-							<template #remove-friend>
-								<TrashIcon />
-								{{ formatMessage(messages.removeFriend) }}
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-					<ButtonStyled v-else type="transparent" circular>
-						<button v-tooltip="formatMessage(messages.cancelRequest)" @click="removeFriend(friend)">
-							<XIcon />
-						</button>
-					</ButtonStyled>
+					<TeleportOverflowMenu
+						v-if="friend.accepted"
+						type="quiet"
+						label="More options"
+						class="opacity-0 group-hover:opacity-100 transition-opacity"
+						:options="[
+							{
+								id: 'remove-friend',
+								label: formatMessage(messages.removeFriend),
+								action: () => removeFriend(friend),
+								tone: 'red',
+							},
+						]"
+					>
+						<MoreVerticalIcon />
+						<template #remove-friend>
+							<TrashIcon />
+							{{ formatMessage(messages.removeFriend) }}
+						</template>
+					</TeleportOverflowMenu>
+					<IconButton
+						v-else
+						v-tooltip="formatMessage(messages.cancelRequest)"
+						type="quiet"
+						:label="formatMessage(messages.cancelRequest)"
+						@click="removeFriend(friend)"
+					>
+						<XIcon />
+					</IconButton>
 				</div>
 			</div>
 		</template>

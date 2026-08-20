@@ -161,6 +161,9 @@
   "button.enable": {
     "defaultMessage": "Aktiver"
   },
+  "button.extract": {
+    "defaultMessage": "Pak ud"
+  },
   "button.follow": {
     "defaultMessage": "Følg"
   },
@@ -272,11 +275,23 @@
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
   },
+  "changelog.product.web": {
+    "defaultMessage": "Platform"
+  },
   "collection-widget.loading-projects": {
     "defaultMessage": "Indlæser projekter..."
   },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Søg efter projekter"
+  },
   "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "indhold"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {genstand} other {genstande}}"
   },
   "content.card.select-project": {
     "defaultMessage": "Vælg {project}"
@@ -541,9 +556,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Fil gemt"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Luk"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Find"

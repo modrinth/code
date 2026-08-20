@@ -566,6 +566,9 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "Welt"
   },
+  "content.modpack-card.installation-settings": {
+    "defaultMessage": "Installationseinstellungen"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Zusätzliche Inhalte"
   },
@@ -1300,9 +1303,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Datei gespeichert"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Schließen"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Finden"
@@ -2240,6 +2240,9 @@
   "label.details": {
     "defaultMessage": "Details"
   },
+  "label.discover-content": {
+    "defaultMessage": "Inhalte erkunden"
+  },
   "label.done": {
     "defaultMessage": "Fertig"
   },
@@ -2317,6 +2320,9 @@
   },
   "label.password": {
     "defaultMessage": "Passwort"
+  },
+  "label.permissions": {
+    "defaultMessage": "Berechtigungen"
   },
   "label.plan-custom": {
     "defaultMessage": "Benutzerdefiniert"
@@ -2849,8 +2855,146 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Ein Modrinth-Ersteller."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Ein Modrinth-Nutzer."
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} wird dir keine Freundschaftsanfragen mehr senden können, dich nicht zu geteilten Instanzen einladen können und dich nicht mehr zu Modrinth-Hosting Servern einladen können."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Bist du dir sicher, dass du diesen Nutzer blockieren willst?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Beim Blockieren dieses Nutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Blockierung fehlgeschlagen"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} wurde blockiert."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Nutzer blockiert"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "Blockiere {username}"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Benutzeranalysen anzeigen"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "Benutzerabrechnung verwalten"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Blockieren"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "Sammlung erstellen"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "Projekt erstellen"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Nutzerdetails anzeigen"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "Projekte verwalten"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "Als Partner entfernen"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "Als Partner festlegen"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Freigeben"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, one {# Projekt} other {# Projekte}}"
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "Authentifizierungsanbieter"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "E-Mail verifiziert"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "Hat Passwort"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "Hat TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "Zahlungsmethoden"
+  },
+  "profile.details.title": {
+    "defaultMessage": "Nutzerdetails"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "E-Mail nicht verifiziert"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "E-Mail verifiziert"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Das Nutzerprofil konnte nicht geladen werden."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "Nutzer nicht gefunden"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "Partner"
+  },
   "profile.label.badges": {
     "defaultMessage": "Abzeichen"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "Kollektion"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, one {Download} other {Downloads}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "Beigetreten"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "Dieser Nutzer hat keine Kollektionen!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "Du hast noch keine Kollektionen."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "Dieser Nutzer hat keine Projekte!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "Du hast noch keine Projekte."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "Organisationen"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, one {Projekt} other {Projekte}}"
+  },
+  "profile.official-account": {
+    "defaultMessage": "Offizielles Modrinth-Konto"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Das offizielle Benutzerkonto von Modrinth. Erhalte Hilfe unter <support-link></support-link> oder per E-Mail unter <email></email>"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "Beim Freigeben dieses Nutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "Nutzer konnte nicht freigegeben werden"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username} wurde freigegeben."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "Nutzer Freigegeben"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Veröffentlicht am {date}"
@@ -2878,6 +3022,9 @@
   },
   "project-type.all": {
     "defaultMessage": "Alle"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "Kollektionen"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, one {Datenpaket} other {Datenpakete}}"
@@ -5105,8 +5252,119 @@
   "settings.pats.title": {
     "defaultMessage": "Persönliche Zugangstoken"
   },
+  "settings.profile.bio.description": {
+    "defaultMessage": "Eine kurze Beschreibung um allen ein bisschen von dir zu erzählen."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Bio"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "Profil"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "Profilbild"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "Deine Profilinformationen sind öffentlich auf <profile-link>Modrinth sichtbar</profile-link> und durch die <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "Profil konnte nicht aktualisiert werden"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "Beim Aktualisieren deines Profils ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "Melde dich mit einem Modrinth-Konto an, um dein öffentliches Profil anzupassen."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Modrinth-Konto benötigt"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "Ein eindeutiger Name für dein Profil, bei dem Groß- und Kleinschreibung nicht unterschieden wird."
+  },
   "settings.sessions.title": {
     "defaultMessage": "Sitzungen"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Aktionen"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Nutzer"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Das sind die Nutzer, die du auf Modrinth blockiert hast. Sie können nicht:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "Du hast niemanden blockiert."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "Blockierte Nutzer konnten nicht geladen werden."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "Blockierte Nutzer werden geladen…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "Dir Freundschaftsanfragen senden"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "Dich zu einem Modrinth-Hosting Server einladen."
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "Dich zu geteilten Instanzen einladen"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "Blockierte Nutzer"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "Freigeben"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "Benutzer konnte nicht freigegeben werden"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "Beim Freigeben dieses Nutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "Freigeben {username}"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "{username}'s Avatar"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Steuere wer dir auf Modrinth Freundschaftsanfragen senden kann."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "Freundschaftsanfragen"
+  },
+  "settings.social.interaction-source.coming-soon": {
+    "defaultMessage": "Bald verfügbar!"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "Jeder"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "Freunde"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "Freunde von Freunden"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "Niemand"
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "Steuere, wer dir Einladungen zu geteilten Instanzen und Modrinth-Hosting-Panels senden kann."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Einladungen"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "Du kannst mit einem Modrinth-Konto steuern wer mit dir interagieren kann, und geblockte Nutzer verwalten"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Modrinth-Konto benötigt"
+  },
+  "settings.social.title": {
+    "defaultMessage": "Sozial"
   },
   "sharing.invite-players-modal.add": {
     "defaultMessage": "Hinzufügen"
@@ -5117,20 +5375,41 @@
   "sharing.invite-players-modal.already-invited": {
     "defaultMessage": "Dieser Benutzer wurde bereits eingeladen."
   },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Anwenden"
+  },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar von {username}"
   },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Abbrechen"
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Benutzerdefiniert..."
   },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Abbrechen"
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Benutzerdefiniert: {date}"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Einladungslink bearbeiten."
   },
   "sharing.invite-players-modal.edit-invite-link-title": {
     "defaultMessage": "Einladungslink bearbeiten"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "In 1 Tag"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "In 1 Stunde"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "In 7 Tagen"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "In 6 Stunden"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "In 3 Tagen"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "In 12 Stunden"
   },
   "sharing.invite-players-modal.expiry-label": {
     "defaultMessage": "Ablaufdatum"

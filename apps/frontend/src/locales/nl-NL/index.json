@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Verberg {name} in de grafiek"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Geen gegevens"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Grafiek tooltip vastgepind"
   },
@@ -1475,9 +1478,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Recentelijk geüpdate"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Sluiten"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
   },
@@ -1599,7 +1599,7 @@
     "message": "Bankrekeninghouder"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
-    "message": "Voer de naam in van de persoon die bevoegd is om dit bank account namens het bedrijf te beheren."
+    "message": "Vul de naam in van de persoon die bevoegd is om namens het bedrijf deze bankrekening te beheren."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Munt"
@@ -2978,9 +2978,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Niet gelukt om alle groepen te wissen: {error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Wissen"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Alle groepen zijn succesvol gewist."
   },
@@ -3019,9 +3016,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Scannen..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Gelukt"
   },
   "modpack-scan-modal.title": {
     "message": "Modpack-scan ({scanned}/{total} bestanden)"
@@ -3932,9 +3926,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Uitgelichte tags"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Je kunt maximaal 3 van je meest relevante tags als uitgelichte tags selecteren. Als je niet alle 3 selecteert, kunnen andere tags als uitgelichte tags worden weergegeven."
-  },
   "project.settings.tags.features-description": {
     "message": "Selecteer alle functies waarvan je {type} gebruikmaakt."
   },
@@ -3949,9 +3940,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecteer minstens één categorie om een categorie uit te lichten."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Nauwkeurige tags zijn belangrijk om mensen te helpen je {type} te vinden. Zorg ervoor dat je alle relevante tags selecteert."
   },
   "project.settings.tags.title": {
     "message": "Tags"
@@ -4787,11 +4775,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Over deze app"
   },
+  "settings.authorizations.created-by": {
+    "message": "Gemaakt door {user}"
+  },
   "settings.authorizations.description": {
     "message": "Wanneer je een app via je Modrinth-account autoriseert, verleen je die app toegang tot je account. Je kunt de toegang tot je account hier op elk moment beheren en bekijken."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "De apps die je autoriseert, worden hier weergegeven."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Geen geautoriseerde apps"
+  },
   "settings.authorizations.head-title": {
     "message": "Toestemmingen"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Deze app is gemaakt door een officieel Modrinth-account."
   },
   "settings.authorizations.revoke.action": {
     "message": "Intrekken"
@@ -4801,6 +4801,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Weet u zeker dat u deze aanvraag wilt intrekken?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Deze app heeft, ondanks de naam, op geen enkele manier verband met Modrinth."
   },
   "settings.billing.charges.description": {
     "message": "Al je eerdere afschrijvingen van je Modrinth-account worden hier weergegeven:"

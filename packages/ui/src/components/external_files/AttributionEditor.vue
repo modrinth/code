@@ -14,8 +14,9 @@ import { builtinLicenses } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { ButtonStyled, Chips, Combobox, type ComboboxOption, StyledInput } from '#ui/components'
+import { Chips, Combobox, type ComboboxOption, StyledInput } from '#ui/components'
 import { FileInput } from '#ui/components/base'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import { commonMessages } from '#ui/utils'
 
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
@@ -577,15 +578,14 @@ function cancelEditing() {
 									class="flex w-full object-contain bg-surface-3"
 								/>
 								<div class="absolute top-2 right-2">
-									<ButtonStyled circular>
-										<button
-											v-tooltip="formatMessage(messages.proofImageRemove)"
-											type="button"
-											@click="removeProofImage(idx)"
-										>
-											<TrashIcon />
-										</button>
-									</ButtonStyled>
+									<IconButton
+										v-tooltip="formatMessage(messages.proofImageRemove)"
+										:label="formatMessage(messages.proofImageRemove)"
+										native-type="button"
+										@click="removeProofImage(idx)"
+									>
+										<TrashIcon />
+									</IconButton>
 								</div>
 							</div>
 						</div>
@@ -633,29 +633,29 @@ function cancelEditing() {
 
 		<hr class="mt-1 bg-surface-5 border-none h-[1px] w-full" />
 		<div class="flex items-center gap-2 justify-end">
-			<ButtonStyled v-if="isAttributed" type="outlined">
-				<button
-					:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
-					@click="cancelEditing"
-				>
-					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled color="brand">
-				<button
-					:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
-					@click="handleSave"
-				>
-					<template v-if="saveMutation.isPending.value">
-						<SpinnerIcon class="animate-spin" />
-						{{ formatMessage(commonMessages.savingButton) }}
-					</template>
-					<template v-else-if="isAttributed">
-						<SaveIcon /> {{ formatMessage(messages.saveAttribution) }}
-					</template>
-					<template v-else> <CheckIcon /> {{ formatMessage(messages.addAttribution) }} </template>
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="isAttributed"
+				type="outlined"
+				:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
+				@click="cancelEditing"
+			>
+				<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+			</Button>
+			<Button
+				type="colored"
+				color="brand"
+				:disabled="saveMutation.isPending.value || uploadProofImageMutation.isPending.value"
+				@click="handleSave"
+			>
+				<template v-if="saveMutation.isPending.value">
+					<SpinnerIcon class="animate-spin" />
+					{{ formatMessage(commonMessages.savingButton) }}
+				</template>
+				<template v-else-if="isAttributed">
+					<SaveIcon /> {{ formatMessage(messages.saveAttribution) }}
+				</template>
+				<template v-else> <CheckIcon /> {{ formatMessage(messages.addAttribution) }} </template>
+			</Button>
 		</div>
 	</div>
 </template>

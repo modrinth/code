@@ -2,15 +2,24 @@
 	<div>
 		<span class="flex flex-row items-center gap-2 text-sm text-secondary">
 			<GlobeIcon
-				v-if="props.global"
+				v-if="props.scope === 'project'"
 				v-tooltip="'Can be used without the checklist open if setting enabled.'"
 			/>
+			<ShieldCheckIcon
+				v-if="props.scope === 'tech-review'"
+				v-tooltip="'Used within the tech review pages'"
+			/>
 			{{ props.title }}
-			<ButtonStyled size="small" circular type="transparent">
-				<Button :disabled="!hasChanged" @click="resetToDefault">
-					<RotateCounterClockwiseIcon />
-				</Button>
-			</ButtonStyled>
+			<IconButton
+				type="quiet"
+				size="xs"
+				class="!size-6"
+				label="Reset to default"
+				:disabled="!hasChanged"
+				@click="resetToDefault"
+			>
+				<RotateCounterClockwiseIcon />
+			</IconButton>
 		</span>
 		<div class="flex flex-row items-center gap-2">
 			<kbd
@@ -40,14 +49,14 @@
 </template>
 
 <script setup lang="ts">
-import { GlobeIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
+import { GlobeIcon, RotateCounterClockwiseIcon, ShieldCheckIcon } from '@modrinth/assets'
 import { type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
-import { Button, ButtonStyled } from '@modrinth/ui'
+import { IconButton } from '@modrinth/ui'
 import { onUnmounted } from 'vue'
 
 const props = defineProps<{
 	title: string
-	global: boolean
+	scope: string
 	definitions: KeybindDefinition[]
 	default: KeybindDefinition[]
 	onChange: (definitions: KeybindDefinition[]) => void

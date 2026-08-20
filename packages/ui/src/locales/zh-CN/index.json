@@ -566,6 +566,9 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
+  "content.modpack-card.installation-settings": {
+    "defaultMessage": "安装设置"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "附加内容"
   },
@@ -1300,9 +1303,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "文件已保存"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "关闭"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "查找"
@@ -2240,6 +2240,9 @@
   "label.details": {
     "defaultMessage": "信息"
   },
+  "label.discover-content": {
+    "defaultMessage": "发现内容"
+  },
   "label.done": {
     "defaultMessage": "完成"
   },
@@ -2317,6 +2320,9 @@
   },
   "label.password": {
     "defaultMessage": "密码"
+  },
+  "label.permissions": {
+    "defaultMessage": "权限"
   },
   "label.plan-custom": {
     "defaultMessage": "自定义"
@@ -2849,8 +2855,161 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "一位 Modrinth 创作者。"
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "一位 Modrinth 用户。"
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} 将无法向你发送好友请求、将你邀请到共享实例或 Modrinth Hosting 服务器。"
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "你确定要屏蔽该用户吗？"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "屏蔽该用户时发生了错误。请重试。"
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "屏蔽用户失败"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} 已被屏蔽。"
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "用户已屏蔽"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "屏蔽 {username}"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "查看用户分析"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "管理用户财务"
+  },
+  "profile.button.block": {
+    "defaultMessage": "屏蔽"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "创建收藏夹"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "创建项目"
+  },
+  "profile.button.info": {
+    "defaultMessage": "查看用户详情"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "管理项目"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "解除作为联盟伙伴"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "设置为联盟伙伴"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "解除屏蔽"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, other {# 个项目}}"
+  },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "请在来自 Modrinth 的弹出窗口中选择允许，然后重试。"
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "无法获取 GitHub 个人资料。请重试。"
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "无法打开 GitHub 个人主页"
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "身份验证提供器"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "电子邮箱已验证"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "是否有密码"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "是否有 TOTP"
+  },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "正在加载……"
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "支付方式"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "查看个人资料"
+  },
+  "profile.details.title": {
+    "defaultMessage": "用户详情"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "电子邮箱未验证"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "电子邮箱已验证"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "无法加载该用户的个人资料。"
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "未找到用户"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "联盟"
+  },
   "profile.label.badges": {
     "defaultMessage": "荣誉徽章"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "收藏"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, other {次下载}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "加入于"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "该用户没有收藏夹！"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "你还没有任何收藏夹。"
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "该用户没有项目！"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "你还没有任何项目。"
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "组织"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, other {项目}}"
+  },
+  "profile.official-account": {
+    "defaultMessage": "官方 Modrinth 账户"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Modrinth 的官方用户账号。可通过 <support-link></support-link> 或电子邮件 <email></email> 获取支持"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "解除屏蔽该用户时发生了错误。请重试。"
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "解除屏蔽用户失败"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username} 已被解除屏蔽。"
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "用户已解除屏蔽"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "发布于 {date}"
@@ -2878,6 +3037,9 @@
   },
   "project-type.all": {
     "defaultMessage": "全部"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "收藏夹"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, other {数据包}}"
@@ -3564,10 +3726,10 @@
     "defaultMessage": "视图"
   },
   "project.stats.downloads-label": {
-    "defaultMessage": "{count, plural, other {下载量}}"
+    "defaultMessage": "{count, plural, other {次下载}}"
   },
   "project.stats.followers-label": {
-    "defaultMessage": "{count, plural, other {关注者}}"
+    "defaultMessage": "{count, plural, other {人关注}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -3969,7 +4131,7 @@
     "defaultMessage": "角色：{role}"
   },
   "servers.access-page.role.editor": {
-    "defaultMessage": "编辑"
+    "defaultMessage": "编辑者"
   },
   "servers.access-page.role.editor-description": {
     "defaultMessage": "管理实例内容、文件、备份及其他设置。"
@@ -3984,13 +4146,13 @@
     "defaultMessage": "受限"
   },
   "servers.access-page.role.viewer-description": {
-    "defaultMessage": "可启动、停止并查看服务器状态，但无法进行更改。"
+    "defaultMessage": "可启动、停止和查看服务器，但无法进行更改。"
   },
   "servers.access-page.search-users-placeholder": {
     "defaultMessage": "搜索 {count} {count, plural, one {用户} other {用户}}………"
   },
   "servers.access-role.editor": {
-    "defaultMessage": "编辑"
+    "defaultMessage": "编辑者"
   },
   "servers.access-role.owner": {
     "defaultMessage": "所有者"
@@ -4467,7 +4629,7 @@
     "defaultMessage": "邀请"
   },
   "servers.grant-access-modal.permissions-help": {
-    "defaultMessage": "在<link>这里</link>查看各职务的完整清单。"
+    "defaultMessage": "在<link>这里</link>查看各角色权限的完整列表。"
   },
   "servers.grant-access-modal.role.editor": {
     "defaultMessage": "编辑"
@@ -4476,13 +4638,13 @@
     "defaultMessage": "管理实例内容、文件、备份及其他设置。"
   },
   "servers.grant-access-modal.role.label": {
-    "defaultMessage": "选择职能"
+    "defaultMessage": "选择角色"
   },
   "servers.grant-access-modal.role.viewer": {
-    "defaultMessage": "受制"
+    "defaultMessage": "受限"
   },
   "servers.grant-access-modal.role.viewer-description": {
-    "defaultMessage": "可以启动、停止与查看服务器，但无法进行任何更改。"
+    "defaultMessage": "可启动、停止和查看服务器，但无法进行更改。"
   },
   "servers.grant-access-modal.suggestion-avatar-alt": {
     "defaultMessage": "{username}的头像"
@@ -5105,8 +5267,119 @@
   "settings.pats.title": {
     "defaultMessage": "个人访问令牌"
   },
+  "settings.profile.bio.description": {
+    "defaultMessage": "用一段简短的描述，向大家展示你自己。"
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "简介"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "个人资料"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "头像"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "您的个人资料信息可以在 <profile-link>Modrinth 上公开查看</profile-link>，也可通过 <docs-link>Modrinth API</docs-link> 获取。"
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "更新档案失败"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "更新个人资料失败，请稍后重试。"
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "登录 Modrinth 账号以自定义您的公开资料。"
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "需要 Modrinth 账户"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "用于识别您个人资料的唯一名称。"
+  },
   "settings.sessions.title": {
     "defaultMessage": "会话"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "活动"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "用户"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "这些是你在 Modrinth 中屏蔽的用户。他们无法："
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "你还没有屏蔽任何人。"
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "无法加载被屏蔽的用户。"
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "正在加载被屏蔽的用户…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "给你发送好友邀请"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "邀请你管理 Modrinth 托管服务器。"
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "邀请你加入共享实例"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "被屏蔽的用户"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "解除屏蔽"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "解除屏蔽用户失败"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "解除屏蔽该用户时发生了错误。请重试。"
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "解除屏蔽 {username}"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "{username} 的头像"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "控制谁可以在 Modrinth 上向你发送好友申请。"
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "好友邀请"
+  },
+  "settings.social.interaction-source.coming-soon": {
+    "defaultMessage": "即将到来！"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "所有人"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "好友"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "好友的好友"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "无"
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "控制谁可以向您发送共享实例和 Modrinth 托管面板的邀请。"
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "邀请"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "使用 Modrinth 账号，你可以控制谁能与你互动，并管理黑名单用户"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "需要登录 Modrinth 账号"
+  },
+  "settings.social.title": {
+    "defaultMessage": "社交"
   },
   "sharing.invite-players-modal.add": {
     "defaultMessage": "添加"
@@ -5117,20 +5390,41 @@
   "sharing.invite-players-modal.already-invited": {
     "defaultMessage": "此用户已被邀请。"
   },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "应用"
+  },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} 的头像"
   },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "取消"
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "自定义……"
   },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "取消"
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "自定义：{date}"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "编辑邀请链接。"
   },
   "sharing.invite-players-modal.edit-invite-link-title": {
     "defaultMessage": "编辑邀请链接"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "1 天"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "1 小时"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "7 天"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "6 小时"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "3 天"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "12 小时"
   },
   "sharing.invite-players-modal.expiry-label": {
     "defaultMessage": "过期日期"

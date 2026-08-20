@@ -1,6 +1,8 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::models::ids::ProjectId;
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
@@ -51,7 +53,8 @@ async fn get_webhook_metadata(
         pool,
         redis,
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching webhook project")?;
 
     if let Some(mut project) = project {
         let mut owner = None;
@@ -62,7 +65,7 @@ async fn get_webhook_metadata(
                 pool,
                 redis,
             )
-            .await?;
+            .await.wrap_internal_err("fetching organization from database")?;
 
             if let Some(organization) = organization {
                 owner = Some(WebhookAuthor {
@@ -81,7 +84,7 @@ async fn get_webhook_metadata(
                 pool,
                 redis,
             )
-            .await?;
+            .await.wrap_internal_err("fetching team member from database")?;
 
             if let Some(member) = team.into_iter().find(|x| x.is_owner) {
                 let user = crate::database::models::user_item::DBUser::get_id(
@@ -89,7 +92,8 @@ async fn get_webhook_metadata(
                     pool,
                     redis,
                 )
-                .await?;
+                .await
+                .wrap_internal_err("fetching user from database")?;
 
                 if let Some(user) = user {
                     owner = Some(WebhookAuthor {
@@ -106,7 +110,11 @@ async fn get_webhook_metadata(
         };
 
         let all_game_versions =
-            MinecraftGameVersion::list(None, None, pool, redis).await?;
+            MinecraftGameVersion::list(None, None, pool, redis)
+                .await
+                .wrap_internal_err(
+                    "fetching minecraft game version from Redis",
+                )?;
 
         let versions = project
             .aggregate_version_fields
@@ -249,9 +257,7 @@ pub async fn send_slack_payout_source_alert_webhook(
         }))
         .send()
         .await
-        .map_err(|_| {
-            ApiError::Slack("Error while sending projects webhook".to_string())
-        })?;
+        .map_err(|err| eyre::eyre!(err)).wrap_internal_err("error while sending projects webhook".to_string())?;
 
     Ok(())
 }
@@ -263,7 +269,9 @@ pub async fn send_slack_project_webhook(
     webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let metadata = get_webhook_metadata(project_id, pool, redis).await?;
+    let metadata = get_webhook_metadata(project_id, pool, redis)
+        .await
+        .wrap_api_err("fetching webhook metadata")?;
 
     if let Some(metadata) = metadata {
         let mut blocks = vec![];
@@ -365,11 +373,10 @@ pub async fn send_slack_project_webhook(
             }))
             .send()
             .await
-            .map_err(|_| {
-                ApiError::Slack(
-                    "Error while sending projects webhook".to_string(),
-                )
-            })?;
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_internal_err(
+                "error while sending projects webhook".to_string(),
+            )?;
     }
 
     Ok(())
@@ -434,7 +441,9 @@ pub async fn send_discord_webhook(
     webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let metadata = get_webhook_metadata(project_id, pool, redis).await?;
+    let metadata = get_webhook_metadata(project_id, pool, redis)
+        .await
+        .wrap_api_err("fetching webhook metadata")?;
 
     if let Some(project) = metadata {
         let mut fields = vec![];
@@ -503,11 +512,10 @@ pub async fn send_discord_webhook(
             })
             .send()
             .await
-            .map_err(|_| {
-                ApiError::Discord(
-                    "Error while sending projects webhook".to_string(),
-                )
-            })?;
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "error while sending projects webhook".to_string(),
+            )?;
     }
 
     Ok(())

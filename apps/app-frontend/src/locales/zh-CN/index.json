@@ -42,7 +42,7 @@
     "message": "无法下载文件"
   },
   "app.action-bar.install.summary.corrupt-download": {
-    "message": "下载的文件是损坏的"
+    "message": "下载的文件已损坏"
   },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "无法保存文件"
@@ -69,16 +69,16 @@
     "message": "加载器配置失败"
   },
   "app.action-bar.install.summary.local-data-error": {
-    "message": "无法更新本地的数据"
+    "message": "无法更新本地数据"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
     "message": "Minecraft 配置失败"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
-    "message": "无法连接Modrinth"
+    "message": "无法连接 Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "没有写入的权限"
+    "message": "没有写入权限"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "无法下载整合包"
@@ -108,7 +108,7 @@
     "message": "主实例"
   },
   "app.action-bar.reload-to-update": {
-    "message": "重新加载以更新"
+    "message": "重启以完成更新"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "显示更多运行中的实例"
@@ -156,7 +156,7 @@
     "message": "色彩主题"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "更改启动器打开的页面。"
+    "message": "选择 Modrinth App 启动时显示的页面。"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首页"
@@ -168,7 +168,7 @@
     "message": "默认起始页"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "在皮肤页面中禁用你玩家头顶上的名牌。"
+    "message": "在皮肤选择器页面的玩家预览上隐藏用户名。"
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "隐藏名牌"
@@ -180,16 +180,16 @@
     "message": "快速回到世界"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "当 Minecraft 进程启动时，将启动器最小化。"
+    "message": "当 Minecraft 进程启动时，将 Modrinth App 最小化。"
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "最小化启动器"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "使用系统窗口边框（需要重启应用）。"
+    "message": "使用操作系统的标题栏和窗口控件。需要重启应用。"
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "原生窗口"
+    "message": "系统窗口框架"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "显示你在每个实例中游玩的时间。"
@@ -204,13 +204,13 @@
     "message": "跳过非必要的警告"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "启用切换侧边栏的功能。"
+    "message": "默认隐藏右侧边栏，并添加一个按钮来显示或隐藏它。"
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "切换侧边栏"
+    "message": "隐藏右侧边栏"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "如果你尝试安装一个未托管在 Modrinth 上的 Modrinth 整合包文件（.mrpack），我们会确保你在安装之前了解相关风险。"
+    "message": "在安装非 Modrinth 托管的 Modrinth 整合包文件 (.mrpack) 前显示安全警告。"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "安装未知整合包前提醒我"
@@ -221,8 +221,17 @@
   "app.auth-servers.unreachable.header": {
     "message": "无法连接到身份验证服务器"
   },
+  "app.behavior-settings.confirmations.title": {
+    "message": "安全确认"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "主页及内容"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "启动与导航"
+  },
   "app.browse.add-servers-to-instance": {
-    "message": "添加实例到服务器"
+    "message": "添加服务器到实例"
   },
   "app.browse.add-to-an-instance": {
     "message": "添加到实例"
@@ -242,11 +251,17 @@
   "app.browse.back-to-instance": {
     "message": "返回实例"
   },
+  "app.browse.discover-project-type": {
+    "message": "探索{projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "发现服务器"
   },
   "app.browse.hide-added-servers": {
     "message": "隐藏已添加的服务器"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "隐藏已安装内容"
   },
   "app.browse.project-type.modpacks": {
     "message": "整合包"
@@ -294,7 +309,7 @@
     "message": "正在解压覆盖项"
   },
   "app.install.phase.finalizing": {
-    "message": "完成"
+    "message": "即将完成"
   },
   "app.install.phase.preparing_instance": {
     "message": "已加入安装队列"
@@ -315,7 +330,7 @@
     "message": "正在准备 Java {version}"
   },
   "app.install.phase.preparing_java.validating": {
-    "message": "正在校验 Java {version}"
+    "message": "正在验证 Java {version}"
   },
   "app.install.phase.reading_pack_manifest": {
     "message": "正在读取整合包清单"
@@ -330,10 +345,10 @@
     "message": "正在解析内容"
   },
   "app.install.phase.rolling_back": {
-    "message": "回滚中"
+    "message": "正在回滚"
   },
   "app.install.phase.running_loader_processors": {
-    "message": "正在运行加载处理器"
+    "message": "正在运行加载器处理程序"
   },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "新增内容"
@@ -348,7 +363,7 @@
     "message": "推送更新"
   },
   "app.instance.admonitions.shared-instance.publishing-button": {
-    "message": "推送中……"
+    "message": "正在推送…"
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "移除内容"
@@ -360,10 +375,19 @@
     "message": "预览即将同步给所有使用该实例用户的变更内容。"
   },
   "app.instance.admonitions.shared-instance.review-header": {
-    "message": "审核变更"
+    "message": "查看变更"
+  },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "查看更新"
   },
   "app.instance.admonitions.shared-instance.reviewing-button": {
-    "message": "正在审核……"
+    "message": "正在审查…"
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "{name}需要更新。请更新到最新版本以启动游戏。"
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "有更新可用"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "你实例的所有数据将被永久删除，包括你的世界、配置和所有已安装的内容。"
@@ -384,7 +408,7 @@
     "message": "创建"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "整合包已安装"
+    "message": "该整合包已安装"
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "实例"
@@ -431,6 +455,9 @@
   "app.instance.share.invite-modal.heading": {
     "message": "分享 {name}"
   },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "该实例已达{limit}人数上限。"
+  },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "你需要登录账号"
   },
@@ -448,6 +475,12 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "账号错误"
+  },
+  "app.instance.share.members.empty": {
+    "message": "暂无用户加入"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "没有符合您筛选条件的用户。"
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "对方将不再收到该共享实例的后续更新"
@@ -479,6 +512,12 @@
   "app.instance.share.sign-in.button": {
     "message": "登录"
   },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "共享实例服务暂时无法访问，请稍后再试"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "连接失败"
+  },
   "app.instance.share.unlink.body": {
     "message": "你必须先取消关联此整合包才能分享你的实例"
   },
@@ -498,13 +537,13 @@
     "message": "实例"
   },
   "app.instance.shared-instance-wrong-account.fallback-username": {
-    "message": "已关联的账号"
+    "message": "已关联的账户"
   },
   "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
     "message": "才能管理此共享实例。否则你将无法向其他用户推送更新。"
   },
   "app.instance.shared-instance-wrong-account.sign-in-as-label": {
-    "message": "登录账号"
+    "message": "登录账户"
   },
   "app.instance.shared-instance-wrong-account.signed-out-header": {
     "message": "你需要登录 Modrinth"
@@ -513,7 +552,7 @@
     "message": "才能接收此共享实例的更新。"
   },
   "app.instance.shared-instance-wrong-account.warning-header": {
-    "message": "你当前使用的 Modrinth 账号不正确"
+    "message": "你当前使用的 Modrinth 账户不正确"
   },
   "app.instance.worlds.add-server": {
     "message": "添加服务器"
@@ -534,7 +573,7 @@
     "message": "正在删除 {name}"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "适配模组"
+    "message": "可安装 Mod"
   },
   "app.instance.worlds.filter-offline": {
     "message": "离线"
@@ -551,6 +590,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "未添加服务器或世界"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "正在刷新……"
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "删除服务器"
   },
@@ -564,13 +606,61 @@
     "message": "正在删除 {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "搜索 {count} 个世界……"
+    "message": "搜索 {count} 个世界…"
+  },
+  "app.java-detection.cancel": {
+    "message": "取消"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "操作"
+  },
+  "app.java-detection.columns.path": {
+    "message": "路径"
+  },
+  "app.java-detection.columns.version": {
+    "message": "版本"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "未找到Java配置"
+  },
+  "app.java-detection.select": {
+    "message": "选择"
+  },
+  "app.java-detection.selected": {
+    "message": "已选择"
+  },
+  "app.java-detection.title": {
+    "message": "选择Java配置"
+  },
+  "app.java-selector.already-installed": {
+    "message": "已安装"
+  },
+  "app.java-selector.browse": {
+    "message": "浏览"
+  },
+  "app.java-selector.detect": {
+    "message": "检测"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "安装推荐版本"
+  },
+  "app.java-selector.installing": {
+    "message": "正在安装…"
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "Java安装路径"
+  },
+  "app.java-selector.test-installation": {
+    "message": "测试"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "补充说明"
   },
   "app.modal.install-to-play.additional-context-placeholder": {
     "message": "如有必要，请尽量附上相关链接与图片"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "屏蔽该用户"
   },
   "app.modal.install-to-play.content-you-are-reporting": {
     "message": "所举报的实例"
@@ -592,6 +682,9 @@
   },
   "app.modal.install-to-play.invite-warning": {
     "message": "这个邀请是由另一位 Modrinth 用户创建的，而不是 Modrinth 官方。只接受你信任的人的邀请。"
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "此邀请由 <creator>{username}</creator> 创建，而非 Modrinth。只接受您信任的人发出的邀请。"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} 个模组"
@@ -650,6 +743,9 @@
   "app.modal.install-to-play.unrecognized-files": {
     "message": "未识别文件"
   },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "用户已屏蔽"
+  },
   "app.modal.install-to-play.view-contents": {
     "message": "查看内容"
   },
@@ -677,6 +773,36 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "为了玩{name}你需要更新。"
   },
+  "app.nav.create-new-instance": {
+    "message": "创建实例"
+  },
+  "app.nav.home": {
+    "message": "首页"
+  },
+  "app.nav.library": {
+    "message": "库"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Modrinth账户"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "登录Modrinth账户"
+  },
+  "app.nav.signed-in-as": {
+    "message": "以<user>{username}</user>身份登录"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "升级至Modrinth+"
+  },
+  "app.news.title": {
+    "message": "新闻"
+  },
+  "app.news.view-all": {
+    "message": "查看所有新闻"
+  },
   "app.project.install-button.already-installed": {
     "message": "此项目已安装"
   },
@@ -685,6 +811,9 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "返回发现页"
+  },
+  "app.project.install-context.back-to-instance": {
+    "message": "返回实例"
   },
   "app.project.version.all-versions": {
     "message": "所有版本"
@@ -698,20 +827,188 @@
   "app.project.versions.already-installed": {
     "message": "已安装"
   },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "拖动以显示最近的实例"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "拖拽以调整大小"
+  },
+  "app.restarting": {
+    "message": "正在重启…"
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth App {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "启动实例时设置的环境变量。"
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "输入环境变量…"
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "环境变量"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "通过更新实例的options.txt文件以全屏方式启动实例。"
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "全屏"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "游戏窗口启动时的高度。"
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "输入高度…"
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "高度"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "启动实例时传递给 Java 的参数。"
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "输入Java参数…"
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java参数"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "每个实例的最大可用内存。"
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "内存分配"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "在游戏关闭后运行。"
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "输入退出后命令..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "退出后执行命令"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "在实例启动前运行。"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "输入启动前命令……"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "启动前执行命令"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "游戏窗口启动时的宽度。"
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "输入宽度…"
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "宽度"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "用来包装 Minecraft 启动过程的命令。"
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "输入包装器命令……"
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "包装器命令"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "切换开发者模式"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"
   },
   "app.settings.downloading": {
     "message": "正在下载 v{version}"
   },
+  "app.settings.java-installations.location.title": {
+    "message": "Java {version, number} 位置"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
     "message": "广告使 Modrinth 得以运营，并为创作者报酬提供资金支持。我们的合作伙伴可能会在应用中存储或访问 Cookie，以便实现广告个性化和效果衡量。您可以在下方选择退出或管理您的偏好设置。"
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "在 Discord 上将 Modrinth App 显示为您当前的活动。这不会影响模组为游戏实例添加的 Rich Presence。需要重启应用生效。"
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth 收集匿名分析和使用数据，以提升用户体验并为您提供个性化服务。若禁用此选项，即表示您选择退出，您的数据将不再被收集。"
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "遥测"
+  },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "在安装排队或运行时显示“复制详细信息”选项。对于失败或中断的安装，该选项始终可用。"
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "始终显示复制详情"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "在缓存重建之前，应用加载可能会更慢。"
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "清除App缓存？"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "清除缓存数据，然后从Modrinth重新下载。在缓存重建之前，应用加载可能会更慢。"
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "清除缓存"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "App缓存"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "这里存储了重要的应用数据的备份，以备日后需要恢复。"
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "打开备份文件夹"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "应用数据库备份"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "浏览应用目录"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Modrinth App存储实例和其他文件的位置。更改会在重启程序后生效。"
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "选择新的应用目录"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "应用目录"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "应用可同时下载的文件数量。如果您的连接下载不稳定，请降低该值。需要重新启动应用程序。"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "最大并发下载量"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "应用可同时写入磁盘的文件数。如果经常出现 I/O 错误，请降低该值。需要重启应用程序。"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "最大并发写入数"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "实例"
   },
   "app.settings.tabs.appearance": {
     "message": "外观"
   },
+  "app.settings.tabs.behavior": {
+    "message": "行为"
+  },
   "app.settings.tabs.default-instance-options": {
-    "message": "默认实例选项"
+    "message": "默认游戏选项"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java 管理"
@@ -724,6 +1021,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "资源管理"
+  },
+  "app.sidebar.playing-as": {
+    "message": "游玩账户"
   },
   "app.skins.add-button": {
     "message": "添加皮肤"
@@ -883,6 +1183,21 @@
   },
   "app.skins.toggle-ears-features-on": {
     "message": "切换至开"
+  },
+  "app.survey.body": {
+    "message": "您是否介意回答一些关于使用 Modrinth App 的问题？"
+  },
+  "app.survey.footer": {
+    "message": "此反馈将直接发送给Modrinth团队，为今后的更新提供指导！"
+  },
+  "app.survey.no-thanks": {
+    "message": "不，谢谢"
+  },
+  "app.survey.take-survey": {
+    "message": "参与调研"
+  },
+  "app.survey.title": {
+    "message": "嗨，Modrinth用户！"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
@@ -1160,6 +1475,45 @@
   "instance.server-modal.resource-pack": {
     "message": "资源包"
   },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "操作"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "邀请链接"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "只要邀请链接有效，任何拥有该链接的人均可加入。"
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "暂无有效邀请。"
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "有效期"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "撤销邀请码"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "撤销邀请码 {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "有效邀请"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "使用次数"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "邀请链接 <monospace>{code}</monospace> 将立即失效。已加入的成员将保留访问权限。"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "这一操作无法撤销"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "撤销邀请"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "撤销邀请"
+  },
   "instance.settings.tabs.general": {
     "message": "通用"
   },
@@ -1239,13 +1593,13 @@
     "message": "选择更新渠道"
   },
   "instance.settings.tabs.hooks": {
-    "message": "启动 Hooks"
+    "message": "启动钩子"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "自定义启动 Hooks"
+    "message": "自定义启动钩子"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Hooks允许高级用户在启动游戏前后运行特定的系统命令。"
+    "message": "钩子供高级用户使用，可设置游戏启动前后运行的特定系统命令。"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "退出后执行"
@@ -1275,7 +1629,7 @@
     "message": "用于启动 Minecraft 的包装器命令。"
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "输入封装命令……"
+    "message": "输入包装器命令……"
   },
   "instance.settings.tabs.installation": {
     "message": "安装"
@@ -1311,7 +1665,7 @@
     "message": "环境变量"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Hooks"
+    "message": "钩子"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Java 参数"
@@ -1360,6 +1714,12 @@
   },
   "instance.shared-instance.error.title": {
     "message": "出错了"
+  },
+  "instance.shared-instance.network-error.text": {
+    "message": "无法连接到共享实例API"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "网络错误"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "此实例的内容正在共享给其他用户。"
@@ -1496,9 +1856,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "一个新的标签页已打开，你需要在那里完成登录，然后回到Modrinth app。"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "取消"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "请在你的浏览器中继续"
   },
@@ -1552,5 +1909,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "加载器由服务器提供"
+  },
+  "settings.sidebar.label.account": {
+    "message": "账户"
+  },
+  "settings.sidebar.label.display": {
+    "message": "显示"
   }
 }

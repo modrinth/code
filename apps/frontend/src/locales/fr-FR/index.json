@@ -102,7 +102,7 @@
     "message": "Annotations"
   },
   "analytics.chart.controls.aria": {
-    "message": "Contrôles du graphique d’analytique, {activeCount}"
+    "message": "Contrôles du graphique de statistiques, {activeCount}"
   },
   "analytics.chart.controls.button": {
     "message": "Contrôles"
@@ -190,6 +190,9 @@
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Masquer {name} dans le graphique"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Aucune donnée"
   },
   "analytics.chart.tooltip.pinned": {
     "message": "Infobulle du graphique épinglée"
@@ -417,7 +420,7 @@
     "message": "Téléchargements"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "Seuls les vues et les téléchargements effectués via Modrinth sont éligibles à la monétisation et doivent passer un filtrage de prévention de la fraude. Les téléchargements de l'application Modrinth exigent également que l'utilisateur soit connecté. Parce que tous les projets ont un ratio similaire de téléchargements monétisés, vos revenus ne changeraient pas de manière significative si tous les téléchargements étaient comptés."
+    "message": "Seuls les vues et les téléchargements effectués via Modrinth sont éligibles à la monétisation et doivent passer un filtrage de prévention de la fraude. Les téléchargements de Modrinth App exigent également que l'utilisateur soit connecté. Parce que tous les projets ont un ratio similaire de téléchargements monétisés, vos revenus ne changeraient pas de manière significative si tous les téléchargements étaient comptés."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "En savoir plus"
@@ -1478,9 +1481,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Mis à jour récemment"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Fermer"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Télécharger {formType}"
   },
@@ -1714,6 +1714,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
     "message": "Aucun montant disponible pour votre solde actuel"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "Aucune dénomination proche de ce montant"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "Aucune dénomination proche de ce montant. Le maximum disponible est {max}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Méthode de paiement"
@@ -2019,7 +2025,7 @@
     "message": "Signalements actifs"
   },
   "dashboard.sidebar.label.analytics": {
-    "message": "Analytiques"
+    "message": "Statistiques"
   },
   "dashboard.sidebar.label.creators": {
     "message": "Créateurs"
@@ -2928,19 +2934,19 @@
     "message": "Gardez le contenu partagé à jour dès qu'il change"
   },
   "modal.shared-instance.open-in-app.get-app": {
-    "message": "Obtenir l'application Modrinth"
+    "message": "Obtenir Modrinth App"
   },
   "modal.shared-instance.open-in-app.managed-by": {
     "message": "Géré par"
   },
   "modal.shared-instance.open-in-app.opening-automatically": {
-    "message": "L'application Modrinth va automatiquement ouvrir..."
+    "message": "Modrinth App va automatiquement ouvrir..."
   },
   "modal.shared-instance.open-in-app.title": {
-    "message": "Ouverture de l'application Modrinth"
+    "message": "Ouverture de Modrinth App"
   },
   "modal.shared-instance.open-in-app.why-use": {
-    "message": "Pourquoi utiliser l'application Modrinth"
+    "message": "Pourquoi utiliser Modrinth App"
   },
   "moderation.exclude-technical-review": {
     "message": "Exclure la révision technique"
@@ -2963,8 +2969,20 @@
   "moderation.page.technicalReview": {
     "message": "Revue technique"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Effacer"
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} par lot"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Quantité de lot"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Ceci va supprimer de façon permanente tous les groupes d'attribut pour ce projet et tous les fichiers à l'intérieur. Cette action ne peut pas être défaite."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Le nettoyage des groupes a échoué : {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Tous les groupes ont été nettoyés avec succès."
   },
   "modpack-scan-modal.failed": {
     "message": "Échec"
@@ -3001,9 +3019,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Scan en cours..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Succès"
   },
   "modpack-scan-modal.title": {
     "message": "Scan du modpack ({scanned}/{total} fichiers)"
@@ -3668,6 +3683,12 @@
   "project.moderation.admonition.under-review.body.3": {
     "message": "Vous pouvez toujours modifier votre projet, cela n'affectera pas votre position dans la file d'attente."
   },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Nous visons à examiner les soumissions en 24-48 heures, mais certains projets peuvent faire face à des délais. Cela ne reflète pas un problème avec votre soumission."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Nous visons à examiner les soumissions en une semaine, mais certains projets peuvent faire face à des délais. Cela ne reflète pas un problème avec votre soumission."
+  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Nous apprécions votre patience pendant que nos modérateurs travaillent dur pour garder Modrinth en sécurité, et nous sommes impatients de vous aider à partager votre contenu !</emphasis>"
   },
@@ -3794,6 +3815,12 @@
   "project.settings.permissions.delete-all-groups-confirmation.title": {
     "message": "Supprimer tous les groupes d'attribution ?"
   },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Impossible de supprimer tous les groupes d'attribution"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "Tous les groupes d’attribution ont été supprimés."
+  },
   "project.settings.permissions.empty-state.description": {
     "message": "Aucune des versions de votre projet ne contient de contenu externe, vous n'avez donc pas à vous soucier d'obtenir des autorisations."
   },
@@ -3887,6 +3914,12 @@
   "project.settings.server.server-online": {
     "message": "Le serveur est en ligne !"
   },
+  "project.settings.server.srv-records-hint": {
+    "message": "Si vous avez des <srv-tooltip>[enregistrements SRV]</srv-tooltip>, vous n’avez pas besoin d’ajouter de port. Sinon, si vous avez un port qui n’est pas 25565, vous pouvez l’inclure sous la forme :12345"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "L’adresse que vous saisissez ici peut avoir des enregistrements DNS SRV _minecraft._tcp.(votre domaine) qui redirigent vers l’adresse et le port de votre serveur Minecraft."
+  },
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Vous avez sélectionné tous les {count} tags disponibles. Merci de seulement sélectionner les tags qui s'appliquent réellement à votre projet."
   },
@@ -3895,9 +3928,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Tags mis en avant"
-  },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Vous pouvez mettre en avant jusqu'à 3 de vos tags les plus pertinents. D'autres tags peuvent être mis en avant si vous ne sélectionnez pas les 3."
   },
   "project.settings.tags.features-description": {
     "message": "Sélectionnez toutes les fonctionnalités que votre {type} utilise."
@@ -3913,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Sélectionnez au moins une catégorie afin de pouvoir mettre en avant une catégorie."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Un étiquetage correct est important pour aider les gens à trouver votre {type}. Faites en sorte de sélectionner tous les tags qui s'appliquent."
   },
   "project.settings.tags.title": {
     "message": "Tags"
@@ -4077,7 +4104,7 @@
     "message": "Lire les analyses"
   },
   "scopes.category.analytics": {
-    "message": "Analytique"
+    "message": "Statistiques"
   },
   "scopes.category.collections": {
     "message": "Collections"
@@ -4402,6 +4429,9 @@
   },
   "servers.purchase.step.plan.most-popular": {
     "message": "Le plus populaire"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ mois{interval, select, monthly {} other {, facturé {interval, select, quarterly {trimestriellement} yearly {annuellement} other {{interval}}}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Terminer la configuration"
@@ -4748,11 +4778,23 @@
   "settings.authorizations.about-this-app": {
     "message": "À propos de cette application"
   },
+  "settings.authorizations.created-by": {
+    "message": "Créé par {user}"
+  },
   "settings.authorizations.description": {
     "message": "Lorsque vous autorisez une application avec votre compte Modrinth, vous lui accordez l’accès à votre compte. Vous pouvez gérer et consulter les accès à votre compte ici à tout moment."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Les applications que vous autorisez vont apparaître ici."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Aucune application autorisée"
+  },
   "settings.authorizations.head-title": {
     "message": "Autorisations"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Cette application est créée par un compte Modrinth officiel."
   },
   "settings.authorizations.revoke.action": {
     "message": "Révoquer"
@@ -4762,6 +4804,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Êtes-vous sûr·e de vouloir révoquer cette application ?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Cette application n'est pas affiliée avec Modrinth de quelque manière que ce soit, malgré le nom."
   },
   "settings.billing.charges.description": {
     "message": "Toutes vos transactions passées sur votre compte Modrinth seront affichées ici :"

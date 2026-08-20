@@ -3,7 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
 import { computed, ref, toValue } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
@@ -20,6 +20,7 @@ import type { SortType } from '#ui/utils/search'
 import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
 import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
+import type { CardAction } from './types'
 
 const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
@@ -66,6 +67,27 @@ const messages = defineMessages({
 		defaultMessage: 'No results found for your query!',
 	},
 })
+
+function cardActionType(action: CardAction) {
+	if (action.type === 'transparent') return 'quiet'
+	if (action.type === 'outlined') return 'outlined'
+	return action.color && action.color !== 'standard' ? 'colored' : 'base'
+}
+
+function cardActionColor(action: CardAction) {
+	const type = cardActionType(action)
+	return type === 'colored' || type === 'quiet' ? action.color : undefined
+}
+
+function cardActionClass(action: CardAction) {
+	if (action.type !== 'outlined' || !action.color || action.color === 'standard') return undefined
+
+	return {
+		brand: '!text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]',
+		red: '!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]',
+		green: '!text-green [&>svg]:!text-green !shadow-[inset_0_0_0_1px_var(--color-green)]',
+	}[action.color]
+}
 
 function getLoaderFieldValues(
 	result: Labrinth.Search.v3.ResultSearchProject,
@@ -133,6 +155,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		<Combobox
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
+			trigger-type="base"
 			:class="
 				ctx.variant === 'web'
 					? '!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0'
@@ -150,6 +173,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		<Combobox
 			:model-value="ctx.maxResults.value"
 			:options="maxResultsOptions"
+			trigger-type="base"
 			:class="
 				ctx.variant === 'web'
 					? '!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0'
@@ -164,18 +188,18 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		</Combobox>
 
 		<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
-			<ButtonStyled>
-				<button @click="ctx.filtersMenuOpen.value = true">
-					{{ formatMessage(messages.filterResults) }}
-				</button>
-			</ButtonStyled>
+			<Button @click="ctx.filtersMenuOpen.value = true">
+				{{ formatMessage(messages.filterResults) }}
+			</Button>
 		</div>
 
-		<ButtonStyled v-if="ctx.cycleDisplayMode" circular>
-			<button @click="ctx.cycleDisplayMode!()">
-				<slot name="display-mode-icon" />
-			</button>
-		</ButtonStyled>
+		<IconButton
+			v-if="ctx.cycleDisplayMode"
+			label="Change display mode"
+			@click="ctx.cycleDisplayMode!()"
+		>
+			<slot name="display-mode-icon" />
+		</IconButton>
 
 		<Pagination
 			:page="ctx.currentPage.value"
@@ -253,22 +277,35 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 				>
 					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
-							<ButtonStyled
+							<template
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
 								:key="action.key"
-								:color="action.color"
-								:type="action.type"
-								:circular="action.circular"
 							>
-								<button
+								<IconButton
+									v-if="action.circular"
 									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
+									:label="action.label || action.tooltip || action.key"
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
 									<component :is="action.icon" :class="action.iconClass" />
-									<template v-if="!action.circular">{{ action.label }}</template>
-								</button>
-							</ButtonStyled>
+								</IconButton>
+								<Button
+									v-else
+									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
+									:disabled="action.disabled"
+									@click.stop="action.onClick"
+								>
+									<component :is="action.icon" :class="action.iconClass" />
+									{{ action.label }}
+								</Button>
+							</template>
 						</div>
 					</template>
 				</ProjectCard>
@@ -315,22 +352,35 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 				>
 					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
-							<ButtonStyled
+							<template
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
 								:key="action.key"
-								:color="action.color"
-								:type="action.type"
-								:circular="action.circular"
 							>
-								<button
+								<IconButton
+									v-if="action.circular"
 									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
+									:label="action.label || action.tooltip || action.key"
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
 									<component :is="action.icon" :class="action.iconClass" />
-									<template v-if="!action.circular">{{ action.label }}</template>
-								</button>
-							</ButtonStyled>
+								</IconButton>
+								<Button
+									v-else
+									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
+									:disabled="action.disabled"
+									@click.stop="action.onClick"
+								>
+									<component :is="action.icon" :class="action.iconClass" />
+									{{ action.label }}
+								</Button>
+							</template>
 						</div>
 					</template>
 				</ProjectCard>

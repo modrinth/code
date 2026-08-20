@@ -463,6 +463,16 @@ export namespace Labrinth {
 	}
 
 	export namespace Analytics {
+		export namespace Internal {
+			export type AnalyticsEventUpsert = {
+				announcement_url: string | null
+				for_metric_kind: v3.AnalyticsEventMetricKind[] | null
+				title: string
+				ends: string
+				starts: string
+			}
+		}
+
 		export namespace v3 {
 			export type AnalyticsEventId = number
 			export type AnalyticsEventMetricKind = 'views' | 'revenue' | 'downloads' | 'playtime'
@@ -473,14 +483,6 @@ export namespace Labrinth {
 				title: string
 				ends: string
 				id: AnalyticsEventId
-				starts: string
-			}
-
-			export type AnalyticsEventUpsert = {
-				announcement_url: string | null
-				for_metric_kind: AnalyticsEventMetricKind[] | null
-				title: string
-				ends: string
 				starts: string
 			}
 
@@ -1151,9 +1153,10 @@ export namespace Labrinth {
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
 
-				minecraft_server?: MinecraftServer
-				minecraft_java_server?: MinecraftJavaServer
-				minecraft_bedrock_server?: MinecraftBedrockServer
+				minecraft_server?: MinecraftServer | null
+				minecraft_java_server?: MinecraftJavaServer | null
+				minecraft_bedrock_server?: MinecraftBedrockServer | null
+				minecraft_mod?: unknown | null
 
 				/**
 				 * @deprecated Not recommended to use.

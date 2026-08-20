@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "{name} im Diagramm ausblenden"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Keine Daten"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Diagramm-Tooltip angeheftet"
   },
@@ -1203,7 +1206,7 @@
     "message": "Details"
   },
   "create-project-version.create-modal.stage.metadata.detected-loaders": {
-    "message": "Erkannte Loader"
+    "message": "Erkannte Plattformen"
   },
   "create-project-version.create-modal.stage.metadata.detected-versions": {
     "message": "Erkannte Versionen"
@@ -1218,7 +1221,7 @@
     "message": "Dateien"
   },
   "create-project-version.create-modal.stage.metadata.loaders": {
-    "message": "Loader"
+    "message": "Plattformen"
   },
   "create-project-version.create-modal.stage.metadata.metadata-tab": {
     "message": "Metadaten"
@@ -1230,13 +1233,13 @@
     "message": "Modpack-Versionen können nicht bearbeitet werden"
   },
   "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
-    "message": "Keine Abhängigkeiten hinzugefügt."
+    "message": "Es wurden keine Abhängigkeiten hinzugefügt."
   },
   "create-project-version.create-modal.stage.metadata.no-environment-set": {
-    "message": "Keine Umgebung wurde festgelegt."
+    "message": "Es wurde keine Umgebung festgelegt."
   },
   "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
-    "message": "Keine Loader ausgewählt."
+    "message": "Es wurden keine Plattformen ausgewählt."
   },
   "create-project-version.create-modal.stage.metadata.no-mod-loader": {
     "message": "Kein Modloader"
@@ -1477,9 +1480,6 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "Kürzlich aktualisiert"
-  },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Schließen"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} herunterladen"
@@ -2969,6 +2969,21 @@
   "moderation.page.technicalReview": {
     "message": "Technische Überprüfung"
   },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} pro Stapel"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Stapelanzahl"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Hierdurch werden alle Zuordnungsgruppen für dieses Projekt und alle darin enthaltenen Dateien dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Fehler beim Löschen aller Gruppen: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Alle Gruppen wurden gelöscht."
+  },
   "modpack-scan-modal.failed": {
     "message": "Fehlgeschlagen"
   },
@@ -2998,6 +3013,9 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Alle Dateien scannen"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Einige Dateien konnten nicht gescannt werden: \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Wird gescannt..."
@@ -3665,6 +3683,12 @@
   "project.moderation.admonition.under-review.body.3": {
     "message": "Du kannst dein Projekt weiterhin ändern, dies hat keinen Einfluss auf deine Position in der Warteschlange."
   },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Wir bemühen uns, Einsendungen innerhalb von 24 bis 48 Stunden zu überprüfen, doch bei einigen Projekten kann es zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Wir bemühen uns, Einsendungen innerhalb von einer Woche zu überprüfen, doch bei einigen Projekten kann es zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
+  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Wir schätzen deine Geduld, während unsere Moderatoren hart daran arbeiten, Modrinth sicher zu halten, und freuen uns darauf, dir dabei zu helfen, deine Inhalte zu teilen! 💚</emphasis>"
   },
@@ -3905,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Hervorgehobene Tags"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Du kannst bis zu 3 deiner relevantesten Tags als hervorheben. Andere Tags werden möglicherweise hervorgehoben, falls du nicht alle 3 auswählst."
-  },
   "project.settings.tags.features-description": {
     "message": "Wähle alle Funktionen aus, die dein {type} nutzt."
   },
@@ -3922,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Wähle mindestens eine Kategorie aus, um eine Kategorie hervorzuheben."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Genaue Tags sind wichtig, damit Nutzer dein {type} leichter finden können. Achte darauf, alle zutreffenden Tags auszuwählen."
   },
   "project.settings.tags.title": {
     "message": "Tags"
@@ -4760,11 +4778,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Über diese Anwendung"
   },
+  "settings.authorizations.created-by": {
+    "message": "Erstellt von {user}"
+  },
   "settings.authorizations.description": {
     "message": "Wenn du eine Anwendung mit deinem Modrinth-Konto autorisierst, gewährst du dieser Zugriff auf dein Konto. Du kannst den Zugriff auf dein Konto hier jederzeit verwalten und überprüfen."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Von dir autorisierte Anwendungen werden hier angezeigt."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Keine autorisierten Apps"
+  },
   "settings.authorizations.head-title": {
     "message": "Autorisierungen"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Diese App wurde von einem offiziellen Modrinth Konto erstellt."
   },
   "settings.authorizations.revoke.action": {
     "message": "Widerrufen"
@@ -4774,6 +4804,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Möchtest du diese Anwendung wirklich widerrufen?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Diese App steht in keiner Verbindung zu Modrinth, trotz ihres Namens."
   },
   "settings.billing.charges.description": {
     "message": "Hier werden alle bisherigen Belastungen deines Modrinth-Kontos aufgeführt:"

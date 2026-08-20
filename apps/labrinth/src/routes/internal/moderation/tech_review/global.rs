@@ -148,7 +148,8 @@ pub async fn search_global_issue_details(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating global issue search")?;
 
     let query = search_req
         .query
@@ -170,6 +171,16 @@ pub async fn search_global_issue_details(
         WHERE (
             $1::text IS NULL
             OR dgdv.detail_key ILIKE '%' || $1 || '%'
+            OR EXISTS (
+                SELECT 1
+                FROM delphi_issue_details_with_statuses matching_didws
+                INNER JOIN delphi_report_issues matching_dri
+                    ON matching_dri.id = matching_didws.issue_id
+                WHERE
+                    matching_didws.key = dgdv.detail_key
+                    AND matching_dri.issue_type != '__dummy'
+                    AND matching_didws.file_path ILIKE '%' || $1 || '%'
+            )
         )
         "#,
         query,
@@ -194,6 +205,16 @@ pub async fn search_global_issue_details(
         WHERE (
             $1::text IS NULL
             OR dgdv.detail_key ILIKE '%' || $1 || '%'
+            OR EXISTS (
+                SELECT 1
+                FROM delphi_issue_details_with_statuses matching_didws
+                INNER JOIN delphi_report_issues matching_dri
+                    ON matching_dri.id = matching_didws.issue_id
+                WHERE
+                    matching_didws.key = dgdv.detail_key
+                    AND matching_dri.issue_type != '__dummy'
+                    AND matching_didws.file_path ILIKE '%' || $1 || '%'
+            )
         )
         GROUP BY dgdv.detail_key, dgdv.verdict
         ORDER BY dgdv.detail_key
@@ -249,6 +270,11 @@ pub async fn search_global_issue_details(
             WHERE
                 didws.key = ANY($1::text[])
                 AND dri.issue_type != '__dummy'
+                AND (
+                    $3::text IS NULL
+                    OR didws.key ILIKE '%' || $3 || '%'
+                    OR didws.file_path ILIKE '%' || $3 || '%'
+                )
         )
         SELECT
             detail_key AS "detail_key!",
@@ -273,6 +299,7 @@ pub async fn search_global_issue_details(
         "#,
         &detail_keys,
         LOCAL_TRACE_PREVIEW_LIMIT,
+        query,
     )
     .fetch_all(&**pool)
     .await
@@ -344,7 +371,8 @@ pub async fn get_global_issue_detail(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating global issue detail request")?;
 
     let detail_key = get_req.detail_key.trim();
     if detail_key.is_empty() {
@@ -378,7 +406,7 @@ pub async fn get_global_issue_detail(
     .fetch_optional(&**pool)
     .await
     .wrap_internal_err("failed to fetch global issue detail")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("resource not found")?;
 
     let local_rows = sqlx::query!(
         r#"

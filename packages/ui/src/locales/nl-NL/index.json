@@ -3,22 +3,22 @@
     "defaultMessage": "Je hebt geen toestemming."
   },
   "affiliate.create.button": {
-    "defaultMessage": "Maak een affiliatelink"
+    "defaultMessage": "Partnerlink aanmaken"
   },
   "affiliate.create.header": {
-    "defaultMessage": "Nieuwe affiliate aanmaken"
+    "defaultMessage": "Nieuwe partnercode aanmaken"
   },
   "affiliate.create.title.description": {
-    "defaultMessage": "Geef je affiliate-link een naam, zodat je weet waar mensen vandaan komen!"
+    "defaultMessage": "Geef je partnerlink een naam, zodat je weet waar mensen vandaan komen!"
   },
   "affiliate.create.title.label": {
-    "defaultMessage": "Titel van affiliate-link"
+    "defaultMessage": "Titel van de partnerlink"
   },
   "affiliate.create.title.placeholder": {
-    "defaultMessage": "bijvoorbeeld YouTube"
+    "defaultMessage": "bijv. YouTube"
   },
   "affiliate.create.user.description": {
-    "defaultMessage": "De gebruikersnaam van de gebruiker voor wie de affiliatecode moet worden aangemaakt"
+    "defaultMessage": "De gebruikersnaam van de gebruiker voor wie de partnercode moet worden aangemaakt"
   },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Voer gebruikersnaam in..."
@@ -27,13 +27,13 @@
     "defaultMessage": "Gemaakt door {user}"
   },
   "affiliate.creating.button": {
-    "defaultMessage": "Affiliate-link maken..."
+    "defaultMessage": "Partnerlink maken..."
   },
   "affiliate.revoke": {
-    "defaultMessage": "Affiliatie-link intrekken"
+    "defaultMessage": "Partnerlink intrekken"
   },
   "affiliate.viewAnalytics": {
-    "defaultMessage": "Bekijk analyses"
+    "defaultMessage": "Statistieken bekijken"
   },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Serverinstellingen konden niet worden geladen"
@@ -135,7 +135,7 @@
     "defaultMessage": "Voeg server toevoegen aan instantie"
   },
   "button.affiliate-links": {
-    "defaultMessage": "Affiliatelinks"
+    "defaultMessage": "Partnerlinks"
   },
   "button.analytics": {
     "defaultMessage": "Analytica"
@@ -1301,9 +1301,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Bestand opgeslagen"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Sluiten"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Vind"
   },
@@ -2309,6 +2306,9 @@
   "label.password": {
     "defaultMessage": "Wachtwoord"
   },
+  "label.permissions": {
+    "defaultMessage": "Machtigingen"
+  },
   "label.plan-custom": {
     "defaultMessage": "Op maat"
   },
@@ -2840,8 +2840,104 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Een maker op Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Een gebruiker van Modrinth."
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Gebruikersstatistieken bekijken"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "Gebruikersfacturering beheren"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "Een collectie aanmaken"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "Een project aanmaken"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Gebruikersgegevens bekijken"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "Projecten beheren"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "Als partner verwijderen"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "Als partner instellen"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, one {# project} other {# projecten}}"
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "Authenticatieproviders"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "E-mailadres geverifieerd"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "Heeft wachtwoord"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "Heeft TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "Betaalmethoden"
+  },
+  "profile.details.title": {
+    "defaultMessage": "Gebruikersgegevens"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "E-mailadres niet geverifieerd"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "E-mailadres geverifieerd"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Het profiel kon niet worden geladen."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "Gebruiker niet gevonden"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "Partner"
+  },
   "profile.label.badges": {
     "defaultMessage": "Badges"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "Collectie"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, one {download} other {downloads}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "Lid sinds"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "Deze gebruiker heeft geen collecties!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "Je hebt nog geen collecties."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "Deze gebruiker heeft geen projecten!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "Je hebt nog geen projecten."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "Organisaties"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, one {project} other {projecten}}"
+  },
+  "profile.official-account": {
+    "defaultMessage": "Officieel Modrinth-account"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Gepubliceerd op {date}"
@@ -2869,6 +2965,9 @@
   },
   "project-type.all": {
     "defaultMessage": "Alles"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "Collecties"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, one {Gegevenspakket} other {Gegevenspakketten}}"
@@ -3546,7 +3645,7 @@
     "defaultMessage": "Upload"
   },
   "project.settings.versions.permissions": {
-    "defaultMessage": "Toestemmingen"
+    "defaultMessage": "Machtigingen"
   },
   "project.settings.versions.title": {
     "defaultMessage": "Versies"
@@ -4632,7 +4731,7 @@
     "defaultMessage": "Je abonnement wordt op <date>{formattedDate}</date> opgezegd. "
   },
   "servers.listing.notice.suspended": {
-    "defaultMessage": "Je server is opgeschort. Neem contact op met de klantenservice van Modrinth voor meer informatie."
+    "defaultMessage": "Je server is opgeschort. Neem contact op met Modrinth-ondersteuning voor meer informatie."
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "De hardware van uw server wordt momenteel geüpgraded en zal binnenkort weer online zijn."
@@ -4665,7 +4764,7 @@
     "defaultMessage": "Bezig met uploaden"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Neem contact op met de klantenservice van Modrinth"
+    "defaultMessage": "Contact opnemen met Modrinth-ondersteuning"
   },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Onze systemen waarschuwen ons team automatisch wanneer er een probleem is. We zijn al bezig om ze weer online te krijgen."
@@ -4680,7 +4779,7 @@
     "defaultMessage": "Als je kort geleden een Modrinth Hosting-server hebt gekocht, staat deze momenteel in de wachtrij en zal hij hier verschijnen zodra hij klaar is. <warning>Probeer geen nieuwe server aan te schaffen.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "Als je persoonlijke ondersteuning nodig hebt met betrekking tot de status van uw server, neem dan contact op met Modrinth Support."
+    "defaultMessage": "Als je persoonlijke ondersteuning nodig hebt met de status van je server, neem dan contact op met Modrinth-ondersteuning."
   },
   "servers.manage.error.title": {
     "defaultMessage": "De servers konden niet worden geladen"
@@ -4758,10 +4857,10 @@
     "defaultMessage": "De proefperiode van je Medal-server is afgelopen en je server is opgeschort. Voer een upgrade uit om je server te kunnen blijven gebruiken."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Je server is opgeschort. Werk je factuurgegevens bij of neem contact op met de klantenservice van Modrinth voor meer informatie."
+    "defaultMessage": "Je server is opgeschort. Werk je factuurgegevens bij of neem contact op met Modrinth-ondersteuning voor meer informatie."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Je server is opgeschort met de reden: {reason}. Werk je factuurgegevens bij of neem contact op met de klantenservice van Modrinth voor meer informatie."
+    "defaultMessage": "Je server is opgeschort met de reden: {reason}. Werk je factuurgegevens bij of neem contact op met Modrinth-ondersteuning voor meer informatie."
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "De hardware van je server wordt momenteel geüpgraded en zal binnenkort weer online zijn."
@@ -5110,12 +5209,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar van {username}"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Annuleren"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Annuleren"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Uitnodigingslink bewerken."

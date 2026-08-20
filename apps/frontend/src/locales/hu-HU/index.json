@@ -423,7 +423,7 @@
     "message": "{hours} óra"
   },
   "analytics.stat.previous-period-comparison": {
-    "message": "az előző időszakhoz képest"
+    "message": "az elő. idősz. kép."
   },
   "analytics.stat.previous-period-comparison-short": {
     "message": "az előzőhöz képest"
@@ -558,7 +558,7 @@
     "message": "A Modrinth App letöltésével elfogadod a <terms-link>feltételeket</terms-link> és a <privacy-link>biztonsági szabályzatot</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Modrinth App letöltése (béta)"
+    "message": "A Modrinth App letöltése (béta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -699,13 +699,13 @@
     "message": "A Modrinth App egy egyedülálló, nyílt forráskódú kliens, amely lehetővé teszi, hogy kedvenc modjaidat játssz, és naprakészen tartsd őket, mindezt egy kis, praktikus csomagban."
   },
   "app-marketing.hero.download-button": {
-    "message": "Modrinth App letöltése"
+    "message": "A Modrinth App letöltése"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Modrinth App letöltése"
+    "message": "A Modrinth App letöltése"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Modrinth App letöltése {os} rendszerre"
+    "message": "A Modrinth App letöltése {os} rendszerre"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon modcsomag főmenüjének képernyőképe."
@@ -846,7 +846,7 @@
     "message": "Folytatás e-maillel"
   },
   "auth.sign-in.continue-with-passkey": {
-    "message": "Továbblépés biztonsági kulccsal"
+    "message": "Továbblépés azonosítókulccsal"
   },
   "auth.sign-in.create-account": {
     "message": "Regisztráció"
@@ -1415,9 +1415,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Nemrég frissített"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Bezárás"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Letöltés {formType}"
   },
@@ -1674,19 +1671,19 @@
     "message": "Elérted a(z) <b>{withdrawLimit}</b> kifizetési limitet. További kifizetésekhez ki kell töltened egy adózási űrlapot."
   },
   "dashboard.discord-roles.banner.body": {
-    "message": "Jogosult vagy a következő rangokra: {roles}. Kapcsold össze a Discord fiókodat a Modrinth-en keresztül, és automatikusan szinkronizáljuk őket."
+    "message": "Jogosult vagy a következő rangokra: {roles}. Kapcsold össze a Discord fiókodat a Modrinthon keresztül, és automatikusan szinkronizáljuk őket."
   },
   "dashboard.discord-roles.banner.cta": {
-    "message": "Discord Linkelése"
+    "message": "Link a Discordra"
   },
   "dashboard.discord-roles.banner.title": {
-    "message": "Discord Rangjaid Beváltása"
+    "message": "Vedd át a Discord-rangjaidat!"
   },
   "dashboard.discord-roles.role.big-creator": {
-    "message": "1M+ letöltést"
+    "message": "1M+ letöltés"
   },
   "dashboard.discord-roles.role.creator": {
-    "message": "Készítő"
+    "message": "Fejlesztő"
   },
   "dashboard.discord-roles.role.pride": {
     "message": "Pride 2026"
@@ -2035,6 +2032,9 @@
   },
   "discover.install.error.no-server-world": {
     "message": "Nem található szerver világ ami letölthető."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Ez a tartalomtípus nem telepíthető a szerverre a Felfedezésből."
   },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed linkjét."
@@ -2685,7 +2685,7 @@
     "message": "Tölts le Minecraft modokat, bővítményeket, adatcsomagokat, shadereket, forráscsomagokat és modcsomagokat a Modrinthról. Fedezd fel és tedd közzé projektjeidet a Modrinthon egy modern, könnyen használható felületen és API-n keresztül."
   },
   "layout.meta.og-description": {
-    "message": "Fedezd fel és tegyél közzé Minecraft tartalmakat!"
+    "message": "Fedezz fel és tegyél közzé Minecraft tartalmakat!"
   },
   "layout.mobile.close-menu": {
     "message": "Menü bezárása"
@@ -2744,6 +2744,30 @@
   "layout.publish.email-verification-required.title": {
     "message": "E-mail hitelesítés szükséges"
   },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Automatikusan letölt mindent, amivel ők játszanak"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Ugyanazzal a tartalommal játszhatsz, mint a barátaid"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "A megosztott tartalmakat automatikusan naprakészen tartja"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Szerezd meg a Modrinth Appot"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Kezelő:"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "A Modrinth App automatikusan megnyílik..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "A Modrinth App megnyitása…"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Miért érdemes a Modrinth Appot használni?"
+  },
   "moderation.moderate": {
     "message": "Moderálás"
   },
@@ -2758,6 +2782,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Technikai áttekintés"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Ezzel véglegesen törlődik a projekt összes hozzárendelési csoportja és a hozzá tartozó összes fájl. Ez a művelet NEM vonható vissza!"
   },
   "modpack-scan-modal.failed": {
     "message": "Sikertelen"
@@ -3296,6 +3323,9 @@
   "project.download.no-game-versions-found": {
     "message": "Játékverzió nem található"
   },
+  "project.download.no-versions-available": {
+    "message": "Nem érhető el verzió ehhez: {platform} {gameVersion}."
+  },
   "project.download.platform-unsupported-tooltip": {
     "message": "A(z) {title} nem támogatja ezt a verziót: {platform} {gameVersion}"
   },
@@ -3395,6 +3425,9 @@
   "project.moderation.admonition.under-review.header": {
     "message": "Projekt áttekintés alatt"
   },
+  "project.moderation.admonition.withheld.body": {
+    "message": "A projekted nem fog nyilvánosan megjelenni, és csak közvetlen hivatkozással lesz elérhető.{requestedStatus, select, unlisted { A kiválasztott <visibility-settings-link>láthatósági beállítások</visibility-settings-link> alapján valószínűleg nincs szükség további teendőre.} other { Kérjük, a projekt újbóli beküldése előtt oldj meg minden moderálási problémát, beleértve az alábbi üzenetekben felsoroltakat is.}}"
+  },
   "project.moderation.thread.title": {
     "message": "Moderációs üzenetek"
   },
@@ -3467,8 +3500,14 @@
   "project.settings.permissions.attention-needed.description.proj-draft": {
     "message": "Kélek mielőtt benyújtanád a projekedet felülvizsgálatra, igazold, hogy rendelkezel az alábbi fájlok mindegyikének továbbterjesztésére vonatkozó engedéllyel."
   },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Ismeretlen külső tartalom"
+  },
   "project.settings.permissions.bad-proof.description": {
     "message": "A Modrinth moderátori csapata elutasította az általad bizonyos külső tartalmakhoz megadott engedélyezési információkat. Kérlek tekintsd át az alábbi elutasított elemeket, és nyújts be elfogadható igazolást, vagy távolítsd el a tartalmat."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Néhány bizonyítást elutasítottak"
   },
   "project.settings.permissions.collapse-all": {
     "message": "Összes becsukása"
@@ -3479,14 +3518,53 @@
   "project.settings.permissions.completed.title": {
     "message": "Engedélyek beállítva!"
   },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Az összes csoport törlése"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Ezzel véglegesen törlődik a projekt összes hozzárendelési csoportja, valamint az azokban található összes fájl. Ez a művelet visszafordíthatatlan."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Az összes hozzárendelési csoport törlése?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Nem sikerült az összes hozzárendelési csoportot törölni"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "Az összes hozzárendelési csoport törölve lett."
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "A projekted egyetlen verziója sem tartalmaz külső tartalmat, ezért nem kell aggódnod a jogosultságok beszerzése miatt."
+  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Kész is van!"
   },
   "project.settings.permissions.expand-all": {
     "message": "Összes kinyitása"
   },
+  "project.settings.permissions.fail.description": {
+    "message": "Lehet, hogy nincs engedélyed a projektedben szereplő egyes külső tartalmak továbbterjesztésére. A Modrinthon való közzétételhez kérjük, távolítsd el ezeket a tartalmakat, vagy nyújts be igazolást arról, hogy rendelkezel a felhasználásukhoz szükséges engedéllyel."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Egyes tartalmak nem szerepelhetnek a projektben"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Ha olyan tartalmat tesz közzé, amely nem a Modrinthon van tárolva, akkor jelezned kell nekünk, honnan származik, és igazolnod kell, hogy rendelkezel a fájlok terjesztéséhez szükséges engedéllyel. További információkért nézd meg <link>az új rendszerről szóló bejelentésünket</link>!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Ismerd meg a terjesztési engedélyeket"
+  },
   "project.settings.permissions.learn-more": {
     "message": "További információ"
+  },
+  "project.settings.permissions.no-results": {
+    "message": "Egy külső fájl sem egyezik a kereséssel."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "A felvett külső tartalmak közül néhányat nem lehet a Modrinthon terjeszteni, mivel azok megsértik a tartalmi szabályzatunkat, ezért azokat el kell távolítani."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural,\n=0 {Nincs jóváhagyásra váró hozzárendelés}\none {# hozzárendelés vár jóváhagyásra}\nother {# hozzárendelés vár jóváhagyásra}\n}"
   },
   "project.settings.permissions.search-placeholder": {
     "message": "Keresés {count} projekt között..."
@@ -3503,8 +3581,95 @@
   "project.settings.permissions.sort.status": {
     "message": "Állapot"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Bedrock cím"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "A mentés előtt elérhetőnek kell lennie a Java szervernek. Kérjük, győződj meg arról, hogy a ping-parancs sikeres."
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Nem lehet menteni"
+  },
+  "project.settings.server.details-heading": {
+    "message": "A szerver adatai"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Cím beírása"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Java cím"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Nyelvek"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Késleltetés: {latency} ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "opcionális"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "Nem sikerült pingelnünk ezt a szervert. Lehet, hogy a szolgáltatód blokkolja, ezért próbáld meg néhányszor frissíteni az oldalt. Ha továbbra sem válaszol, kérjük, <support-link>fordulj az ügyfélszolgálathoz</support-link>."
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Újrapróbálkozás"
+  },
+  "project.settings.server.region-label": {
+    "message": "Régió"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Nyelvek kiválasztása"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Régió kiválasztása"
+  },
+  "project.settings.server.server-online": {
+    "message": "A szerver elérhető!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "Ha rendelkezel <srv-tooltip>[SRV-rekordokkal]</srv-tooltip>, akkor nem kell portot hozzáadnod. Ellenkező esetben, ha a port száma nem 25565, akkor azt a következő formában adhatod meg: :12345"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "Az itt megadott címhez tartozhatnak olyan DNS SRV-bejegyzések, mint például _minecraft._tcp.(a domainod), amelyek a Minecraft-szerver címére és portjára mutatnak."
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "Mind a {count} elérhető címkét kiválasztottad. Kérjük, csak azokat a címkéket válaszd ki, amelyek valóban vonatkoznak a projektedre."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "Jelöld ki az összes olyan kategóriát, amely tükrözi a {type} témáit vagy funkcióját."
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Kiemelt címkék"
+  },
+  "project.settings.tags.features-description": {
+    "message": "Jelöld ki az összes olyan funkciót, amelyet a {type} használ."
+  },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "{count} felbontási címkét választottál ki ({tags}). A forráscsomagoknak általában csak egy felbontási címkéjük lehet."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "Válaszd ki a shadered teljesítményre való hatását. Válassz ki többet, ha a shader különböző teljesítményhatás-szintekre állítható be."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Válaszd ki a {type} textúráinak felbontását (vagy felbontásait)."
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Válassz ki legalább egy kategóriát ahhoz, hogy kiemelj egy kategóriát."
+  },
+  "project.settings.tags.title": {
+    "message": "Címkék"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "{count} címkét választottál ki. Fontold meg, hogy 8-ra vagy annál kevesebbre csökkentsd a számukat, hogy a projekted célzott maradjon és könnyebben megtalálható legyen."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "{count} címkét választottál ki. Kérjük, csökkentsd a számukat 18-ra vagy annál kevesebbre, hogy a szervered célzott maradjon és könnyebben megtalálható legyen."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "{count} címkét választottál ki. Fontold meg, hogy 12-re vagy annál kevesebbre csökkentsd a számukat, hogy a szervered célzott maradjon és könnyebben megtalálható legyen."
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "A címkék kiválasztásához előbb tölts fel egy verziót!"
   },
   "project.settings.title": {
     "message": "Beállítások"
@@ -3514,6 +3679,21 @@
   },
   "project.status.archived.message": {
     "message": "A(z) {title} archiválásra került. A(z) {title} nem kap további frissítéseket, kivéve, ha a fejlesztő úgy dönt, hogy visszavonja a projekt archiválását."
+  },
+  "project.versions.copy-id-option": {
+    "message": "Azonosító másolása"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Link másolása"
+  },
+  "project.versions.delete-button": {
+    "message": "Törlés"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Ezzel a verzió véglegesen (tényleg véglegesen) törlésre kerül."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Biztos, hogy le akarod törölni ezt a verziót?"
   },
   "project.versions.edit-details-option": {
     "message": "Részletek szerkesztése"
@@ -3527,8 +3707,20 @@
   "project.versions.edit-version-tooltip": {
     "message": "Verzió szerkesztése"
   },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Megnytás új lapon"
+  },
+  "project.versions.share-option": {
+    "message": "Megosztás"
+  },
   "project.versions.title": {
     "message": "Verziók"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "A verzió törlése sikeresen megtörtént."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Verzió törölve"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Ez a verzió} other {Ezek a verziók}} jelenleg vissza van tartva, és nem érhető{count, plural, one {} other {k}} el nyilvánosan. Kérjük, igazold, hogy engedéllyel rendelkezel a modcsomag {count, plural, one {verziójában} other {verzióiban}} található bizonyos fájlok terjesztésére."
@@ -3914,6 +4106,12 @@
   "servers.plan.small.description": {
     "message": "Tökéletes 1–5 barát számára, néhány kisebb moddal."
   },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Legnépszerűbb"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ month{interval, select, monthly {} other {, billed {interval, select, quarterly {quarterly} yearly {yearly} other {{interval}}}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Beállítás befejezése"
   },
@@ -3927,7 +4125,7 @@
     "message": "Exportálás..."
   },
   "settings.account.data-export.description": {
-    "message": "Másolatot kér az összes személyes adatról, amelyet a Modrinthra feltöltött. A feldolgozás néhány percig is eltarthat."
+    "message": "Másolatot kér az összes személyes adatról, amelyet a Modrinthra feltöltöttél. A feldolgozás néhány percig is eltarthat."
   },
   "settings.account.data-export.title": {
     "message": "Adatok exportálása"
@@ -4037,8 +4235,56 @@
   "settings.account.security.email.title": {
     "message": "E-mail cím"
   },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Ügyelj rá, hogy valami könnyen megjegyezhetőt válassz, hogy később is fel tudd idézni ezt az azonosítókulcsot."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Név"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Az azonosítókulcsom"
+  },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "Azonosítókulcs hozzáadása"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "Azonosítókulcs hozzáadása"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "Azonosítókulcsok kezelése"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Kezeld a regisztrált azonosítókulcsokat, vagy adj hozzá újat."
+  },
   "settings.account.security.passkey.modal.added": {
-    "message": "Hozzá adva {ago}"
+    "message": "Hozzáadva {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Utoljára használva {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Azonosítókulcsok betöltése..."
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Sohasem volt használva"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Nincs regisztrált azonosítókulcsod."
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Azonosítókulcs törlése"
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "Ez véglegesen eltávolítja a(z) „{name}” azonosítókulcsot. Ezután már nem tudsz majd ezzel bejelentkezni."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Biztosan el akarod távolítani ezt az azonosítókulcsot?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Azonosítókulcs átnevezése"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Azonosítókulcsok kezelése"
   },
   "settings.account.security.password.action.add": {
     "message": "Jelszó hozzáadása"
@@ -4113,7 +4359,7 @@
     "message": "Ha a QR-kód nem olvassa be a kódot, manuálisan is megadhatja a titkos kódot:"
   },
   "settings.account.two-factor.setup.scan": {
-    "message": "Olvassa be a QR-kódot az <authy-link>Authy</authy-link>, a <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> vagy bármely más kétlépcsős hitelesítési alkalmazás segítségével a folyamat megkezdéséhez."
+    "message": "Olvasd be a QR-kódot az <authy-link>Authy</authy-link>, a <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> vagy bármely más kétlépcsős hitelesítési alkalmazás segítségével a folyamat megkezdéséhez."
   },
   "settings.account.two-factor.verify.description": {
     "message": "Írja be az hitelesítőalkalmazásból kapott egyszeri kódot a hozzáférés igazolásához."
@@ -4210,6 +4456,9 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "Az alkalmazásról"
+  },
+  "settings.authorizations.created-by": {
+    "message": "Létrehozta: {user}"
   },
   "settings.authorizations.description": {
     "message": "Amikor engedélyezel egy alkalmazást a Modrinth fiókoddal, hozzáférést biztosítasz számára a fiókodhoz. A fiókodhoz való hozzáférést bármikor kezelheted és ellenőrizheted itt."
@@ -4332,13 +4581,13 @@
     "message": "Fizetési módok"
   },
   "settings.billing.plan.title": {
-    "message": "{size} terv"
+    "message": "{size} csomag"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
   "settings.billing.pyro.cpu": {
-    "message": "{shared} Megosztott CPU-k (maximum {bursts} CPU-ig terjedő löketek)"
+    "message": "{shared} megosztott CPU (maximum {bursts} CPU-ig terjedő löketek)"
   },
   "settings.billing.pyro.linked-server.not-found": {
     "message": "Nem található ehhez az előfizetéshez csatolt szerver. Ennek több lehetséges magyarázata is van. Ha nemrég vásároltad meg a szervert, ez normális. A szerver kiépítése akár egy órát is igénybe vehet. Ellenkező esetben, ha egy ideje vásároltad meg ezt a szervert, valószínűleg azóta felfüggesztették. Ha nem erre számítottál, kérjük, vedd fel a kapcsolatot a Modrinth ügyfélszolgálatával a következő információkkal:"
@@ -4402,6 +4651,12 @@
   },
   "settings.billing.subscription.title": {
     "message": "Előfizetések"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Átváltás {interval, select, monthly {havontaira} yearly {éventeire} other {{interval}}}..."
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Átváltás {interval, select, monthly {havontaira} yearly {éventeire} other {{interval}}}"
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "A havi számlázás évente további {amount} költséggel jár"
@@ -4592,8 +4847,32 @@
   "settings.sidebar.label.display": {
     "message": "Megjelenés"
   },
+  "shared-instance.invite.accept": {
+    "message": "Meghívó elfogadása"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Egy Modrinth felhasználó"
+  },
   "shared-instance.invite.joined-count": {
     "message": "{count} személy már csatlakozott"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Meghívó betöltése…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} meghívott egy játékprofilba"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "Ezt a meghívót nem a Modrinth, hanem egy másik Modrinth-felhasználó hozta létre. Csak olyan személyektől fogadd el a meghívókat, akikben megbízol."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "Ismered ezt a felhasználót?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "Lehet, hogy lejárt, elérte a felhasználási korlátját, vagy eltávolította az, aki megosztotta."
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "Ez a meghívó nem érhető el"
   },
   "ui.latest-news-row.latest-news": {
     "message": "A legújabb hírek a Modrinthról"
@@ -4610,8 +4889,14 @@
   "ui.newsletter-button.tooltip": {
     "message": "Feliratkozás a Modrinth hírlevelére"
   },
+  "version.confirm-delete.proceed": {
+    "message": "Verzió törlése"
+  },
   "version.confirm-delete.title": {
     "message": "Biztos, hogy le akarod törölni ezt a verziót?"
+  },
+  "version.dependency.view-project": {
+    "message": "Projekt megtekintése"
   },
   "version.download.download-dependency": {
     "message": "Válassz ki egy verziót a letöltéshez"

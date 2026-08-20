@@ -49,6 +49,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/v3")
             .wrap(default_cors())
+            .configure(analytics_event::config)
             .configure(limits::config)
             .configure(collections::config)
             .configure(images::config)
@@ -80,6 +81,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		description = include_str!("../../api_v3_description.md"),
 	),
 	paths(
+		analytics_event::analytics_events_get,
 		analytics_get::fetch_analytics,
 		analytics_get::facets::fetch_facets,
 		analytics_get::old::playtimes_get,

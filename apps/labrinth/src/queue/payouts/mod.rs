@@ -8,6 +8,7 @@ use crate::models::payouts::{
 };
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
@@ -207,19 +208,17 @@ impl PayoutsQueue {
             .form(&form)
             .send()
             .await
-            .map_err(|_| {
-                ApiError::Payments(
-                    "Error while authenticating with PayPal".to_string(),
-                )
-            })?
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "error while authenticating with PayPal".to_string(),
+            )?
             .json()
             .await
-            .map_err(|_| {
-                ApiError::Payments(
-                    "Error while authenticating with PayPal (deser error)"
-                        .to_string(),
-                )
-            })?;
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "error while authenticating with PayPal (deser error)"
+                    .to_string(),
+            )?;
 
         let new_creds = PayPalCredentials {
             access_token: credential.access_token,
@@ -244,21 +243,23 @@ impl PayoutsQueue {
         let credentials = if let Some(credentials) = read.as_ref() {
             if credentials.expires < Utc::now() {
                 drop(read);
-                self.refresh_token().await.map_err(|_| {
-                    ApiError::Payments(
-                        "Error while authenticating with PayPal".to_string(),
-                    )
-                })?
+                self.refresh_token()
+                    .await
+                    .map_err(|err| eyre::eyre!(err))
+                    .wrap_failed_dependency_err(
+                        "error while authenticating with PayPal".to_string(),
+                    )?
             } else {
                 credentials.clone()
             }
         } else {
             drop(read);
-            self.refresh_token().await.map_err(|_| {
-                ApiError::Payments(
-                    "Error while authenticating with PayPal".to_string(),
-                )
-            })?
+            self.refresh_token()
+                .await
+                .map_err(|err| eyre::eyre!(err))
+                .wrap_failed_dependency_err(
+                    "error while authenticating with PayPal".to_string(),
+                )?
         };
 
         let client = reqwest::Client::new();
@@ -287,17 +288,23 @@ impl PayoutsQueue {
                 .body(body);
         }
 
-        let resp = request.send().await.map_err(|_| {
-            ApiError::Payments("could not communicate with PayPal".to_string())
-        })?;
+        let resp = request
+            .send()
+            .await
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "could not communicate with PayPal".to_string(),
+            )?;
 
         let status = resp.status();
 
-        let value = resp.json::<Value>().await.map_err(|_| {
-            ApiError::Payments(
+        let value = resp
+            .json::<Value>()
+            .await
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
                 "could not retrieve PayPal response body".to_string(),
-            )
-        })?;
+            )?;
 
         if !status.is_success() {
             #[derive(Deserialize)]
@@ -318,27 +325,28 @@ impl PayoutsQueue {
                 if error.name == "INSUFFICIENT_FUNDS" {
                     error.message = "We're currently transferring funds to our PayPal account. Please try again in a couple days.".to_string();
                 }
-                return Err(ApiError::Payments(format!(
+                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
                     "error name: {}, message: {}",
                     error.name, error.message
-                )));
+                ))));
             }
 
             if let Ok(error) =
                 serde_json::from_value::<PayPalIdentityError>(value)
             {
-                return Err(ApiError::Payments(format!(
+                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
                     "error name: {}, message: {}",
                     error.error, error.error_description
-                )));
+                ))));
             }
 
-            return Err(ApiError::Payments(
-                "could not retrieve PayPal error body".to_string(),
-            ));
+            return Err(ApiError::FailedDependency(eyre::eyre!(
+                "could not retrieve PayPal error body",
+            )));
         }
 
-        Ok(serde_json::from_value(value)?)
+        serde_json::from_value(value)
+            .wrap_request_err("deserializing JSON data")
     }
 
     pub async fn make_tremendous_request<T: Serialize, X: DeserializeOwned>(
@@ -359,19 +367,23 @@ impl PayoutsQueue {
             request = request.json(&body);
         }
 
-        let resp = request.send().await.map_err(|_| {
-            ApiError::Payments(
+        let resp = request
+            .send()
+            .await
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
                 "could not communicate with Tremendous".to_string(),
-            )
-        })?;
+            )?;
 
         let status = resp.status();
 
-        let value = resp.json::<Value>().await.map_err(|_| {
-            ApiError::Payments(
+        let value = resp
+            .json::<Value>()
+            .await
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
                 "could not retrieve Tremendous response body".to_string(),
-            )
-        })?;
+            )?;
 
         if !status.is_success()
             && let Some(obj) = value.as_object()
@@ -385,25 +397,25 @@ impl PayoutsQueue {
 
                 let err =
                     serde_json::from_value::<TremendousError>(array.clone())
-                        .map_err(|_| {
-                            ApiError::Payments(
-                                "could not retrieve Tremendous error json body"
-                                    .to_string(),
-                            )
-                        })?;
+                        .map_err(|err| eyre::eyre!(err))
+                        .wrap_failed_dependency_err(
+                            "could not retrieve Tremendous error json body"
+                                .to_string(),
+                        )?;
 
-                return Err(ApiError::Payments(format!(
+                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
                     "Tremendous error: {} ({:?})",
                     err.message, err.payload
-                )));
+                ))));
             }
 
-            return Err(ApiError::Payments(
-                "could not retrieve Tremendous error body".to_string(),
-            ));
+            return Err(ApiError::FailedDependency(eyre::eyre!(
+                "could not retrieve Tremendous error body",
+            )));
         }
 
-        Ok(serde_json::from_value(value)?)
+        serde_json::from_value(value)
+            .wrap_request_err("deserializing JSON data")
     }
 
     pub async fn get_payout_methods(
@@ -469,13 +481,17 @@ impl PayoutsQueue {
         let options = if let Some(options) = read.as_ref() {
             if options.expires < Utc::now() {
                 drop(read);
-                refresh_payout_methods(self).await?
+                refresh_payout_methods(self)
+                    .await
+                    .wrap_api_err("executing `refresh_payout_methods`")?
             } else {
                 options.clone()
             }
         } else {
             drop(read);
-            refresh_payout_methods(self).await?
+            refresh_payout_methods(self)
+                .await
+                .wrap_api_err("executing `refresh_payout_methods`")?
         };
 
         Ok(options.options)
@@ -876,12 +892,18 @@ pub async fn make_aditude_request(
             "interval": interval
         }))
         .send()
-        .await?
-        .error_for_status()?;
+        .await
+        .wrap_internal_err("deserializing HTTP response")?
+        .error_for_status()
+        .wrap_internal_err("deserializing HTTP response")?;
 
-    let text = request.text().await?;
+    let text = request
+        .text()
+        .await
+        .wrap_internal_err("reading HTTP response body")?;
 
-    let json: Vec<AditudePoints> = serde_json::from_str(&text)?;
+    let json: Vec<AditudePoints> = serde_json::from_str(&text)
+        .wrap_request_err("deserializing JSON data")?;
 
     Ok(json)
 }
@@ -900,7 +922,8 @@ pub async fn process_payout(
         crate::models::payouts::PayoutStatus::InTransit.as_str(),
     )
     .execute(pool)
-    .await?;
+    .await
+    .wrap_internal_err("writing analytics data to ClickHouse")?;
 
     let start: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
         (Utc::now() - Duration::days(1))
@@ -915,7 +938,8 @@ pub async fn process_payout(
         start,
     )
     .fetch_one(pool)
-    .await?;
+    .await
+    .wrap_internal_err("querying database for `process_payout`")?;
 
     if results.exists.unwrap_or(false) {
         return Ok(());
@@ -966,9 +990,12 @@ pub async fn process_payout(
             .bind(end.timestamp())
             .fetch_one::<u64>(),
     )
-        .await?;
+        .await.wrap_internal_err("querying database for `process_payout`")?;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     struct PayoutMultipliers {
         sum: u64,
@@ -1029,7 +1056,7 @@ pub async fn process_payout(
             .insert(r.user_id, r.payouts_split);
         async move { Ok(acc) }
     })
-    .await?;
+    .await.wrap_internal_err("inserting project org members into database")?;
 
     let project_team_members = sqlx::query!(
         "
@@ -1055,7 +1082,7 @@ pub async fn process_payout(
             async move { Ok(acc) }
         },
     )
-    .await?;
+    .await.wrap_internal_err("inserting project team members into database")?;
 
     for project_id in project_ids {
         let team_members: HashMap<i64, Decimal> = project_team_members
@@ -1098,7 +1125,8 @@ pub async fn process_payout(
         "Yesterday",
         "1d",
     )
-    .await?;
+    .await
+    .wrap_api_err("executing `make_aditude_request`")?;
 
     let aditude_amount: Decimal = aditude_res
         .iter()
@@ -1193,9 +1221,12 @@ pub async fn process_payout(
         &insert_availables[..]
     )
     .execute(&mut transaction)
-    .await?;
+    .await.wrap_internal_err("inserting database records for `process_payout`")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(())
 }
@@ -1230,14 +1261,18 @@ pub async fn index_payouts_notifications(
 ) -> Result<(), ApiError> {
     info!("Updating payout notifications");
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     payouts_values_notifications::synchronize_future_payout_values(
         &mut transaction,
         200,
     )
-    .await?;
-    let items = payouts_values_notifications::PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit(&mut transaction, 200).await?;
+    .await
+    .wrap_internal_err("executing `payouts_values_notifications::synchronize_future_payout_values`")?;
+    let items = payouts_values_notifications::PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit(&mut transaction, 200).await.wrap_internal_err("executing `PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit`")?;
 
     let payout_ref_ids = items.iter().map(|x| x.id).collect::<Vec<_>>();
     let dates_available =
@@ -1250,14 +1285,23 @@ pub async fn index_payouts_notifications(
         &mut transaction,
         redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err(
+        "inserting database records for `index_payouts_notifications`",
+    )?;
     payouts_values_notifications::PayoutsValuesNotification::set_notified_many(
         &payout_ref_ids,
         &mut transaction,
     )
-    .await?;
+    .await
+    .wrap_internal_err(
+        "updating database records for `index_payouts_notifications`",
+    )?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(())
 }

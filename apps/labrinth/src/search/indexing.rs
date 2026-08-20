@@ -45,7 +45,7 @@ struct PartialProject {
     components: exp::ProjectSerial,
 }
 
-fn normalize_for_search(s: &str) -> String {
+pub(crate) fn normalize_for_search(s: &str) -> String {
     static SPECIAL_CHARS_RE: LazyLock<Regex> =
         LazyLock::new(|| Regex::new(r"[^a-zA-Z0-9-.\s]").expect("valid regex"));
 
@@ -394,11 +394,13 @@ async fn build_search_documents(
 
     let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> =
         sqlx::query!(
-            "
-        SELECT DISTINCT id, enum_id, value, ordering, created, metadata
+            r#"
+        SELECT DISTINCT id, enum_id, value, ordering, created,
+        metadata->>'type' AS "ty?",
+        (metadata->>'major')::boolean AS "major?"
         FROM loader_field_enum_values lfev
         ORDER BY enum_id, ordering, created DESC
-        "
+        "#
         )
         .fetch(pool)
         .map_ok(|m| QueryLoaderFieldEnumValue {
@@ -407,7 +409,8 @@ async fn build_search_documents(
             value: m.value,
             ordering: m.ordering,
             created: m.created,
-            metadata: m.metadata,
+            ty: m.ty,
+            major: m.major,
         })
         .try_collect()
         .await?;

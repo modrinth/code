@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} 삭제"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "{itemType} 비활성화"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {다운그레이드 진행 중} other {업데이트 진행 중}}에는 호환성 문제가 발생할 수 있습니다. 모드팩에 추가한 모드나 콘텐츠는 유지되지만, 새 버전과 호환되지 않을 수 있습니다."
   },
@@ -446,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count}개 추가됨"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "변경된 설정 파일"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "추가됨 (종속성)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "비활성화"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "제거됨 (비활성화됨)"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "업데이트됨"
@@ -467,11 +476,35 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "업데이트됨"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {#개 파일} other {#개 파일}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "게임 버전"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "무시하고 설치"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "로더"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "연동된 모드팩"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "연동 해제된 모드팩"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "업데이트된 모드팩"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "콘텐츠 변경 사항 없음"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count}개 제거됨"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} 제거됨 (비활성화됨)"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "모든 파일은 형식(.mrpack 포함)에 무관하게 Modrinth에 게시되어야만 검수를 거칩니다."
@@ -532,6 +565,9 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "세계"
+  },
+  "content.modpack-card.installation-settings": {
+    "defaultMessage": "설치 설정"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "추가 콘텐츠"
@@ -1160,6 +1196,21 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "이 작업물을 모드팩에 재배포할 수 있는 특별 허가를 받았습니다."
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "그룹 삭제"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "이 작업은 해당 출처 표시 그룹 및 내부의 모든 파일을 영구 삭제합니다. 이 작업은 되돌릴 수 없습니다."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "{title}를 삭제하시겠습니까?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "그룹을 삭제할 수 없습니다"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Shift 키를 누른 채 클릭하면 확인 절차를 생략합니다."
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "그룹에서 제거"
   },
@@ -1252,9 +1303,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "파일 저장됨"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "닫다"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "찾다"
@@ -2039,6 +2087,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "콘텐츠를 찾을 수 없습니다"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "외부"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "이 파일은 Modrinth에 게시되지 않았습니다."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "모드팩 콘텐츠"
   },
@@ -2047,6 +2101,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "검색 결과와 일치하는 프로젝트가 없습니다."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Slicer에서 열기"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "{count, number}개의 프로젝트 검색"
@@ -2183,6 +2240,9 @@
   "label.details": {
     "defaultMessage": "세부 사항"
   },
+  "label.discover-content": {
+    "defaultMessage": "콘텐츠 둘러보기"
+  },
   "label.done": {
     "defaultMessage": "완료"
   },
@@ -2260,6 +2320,9 @@
   },
   "label.password": {
     "defaultMessage": "비밀번호"
+  },
+  "label.permissions": {
+    "defaultMessage": "권한"
   },
   "label.plan-custom": {
     "defaultMessage": "사용자 지정"
@@ -2792,8 +2855,146 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Modrinth 크리에이터입니다."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Modrinth 사용자입니다."
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} 님은 친구 요청을 보내거나, 공유 인스턴스 초대 및 Modrinth Hosting 서버 초대를 할 수 없게 됩니다."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "이 사용자를 차단하시겠습니까?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "이 사용자를 차단하는 중 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "사용자 차단 실패"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} 님을 차단했습니다."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "사용자 차단됨"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "{username} 차단"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "사용자 분석 보기"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "사용자 결제 관리"
+  },
+  "profile.button.block": {
+    "defaultMessage": "차단"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "컬렉션 만들기"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "프로젝트 만들기"
+  },
+  "profile.button.info": {
+    "defaultMessage": "사용자 상세 정보 보기"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "프로젝트 관리"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "제휴 자격 해제"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "제휴 자격 부여"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "차단 해제"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, one {프로젝트 #개} other {프로젝트 #개}}"
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "인증 제공자"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "이메일 인증됨"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "비밀번호 설정됨"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "TOTP 설정됨"
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "결제 수단"
+  },
+  "profile.details.title": {
+    "defaultMessage": "사용자 상세 정보"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "이메일 미인증"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "이메일 인증됨"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "사용자 프로필을 불러올 수 없습니다."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "사용자를 찾을 수 없음"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "제휴 파트너"
+  },
   "profile.label.badges": {
     "defaultMessage": "배지"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "컬렉션"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, other {다운로드}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "가입일"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "이 사용자는 컬렉션이 없습니다!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "아직 컬렉션이 없습니다."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "이 사용자는 프로젝트가 없습니다!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "아직 프로젝트가 없습니다."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "조직"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, other {프로젝트}}"
+  },
+  "profile.official-account": {
+    "defaultMessage": "공식 Modrinth 계정"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Modrinth의 공식 사용자 계정입니다. <support-link></support-link> 또는 <email></email> 을 통해 문의해 주세요"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "이 사용자의 차단을 해제하는 동안 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "사용자 차단 해제 실패"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username}님의 차단이 해제되었습니다."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "사용자 차단 해제됨"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "{date}에 게시됨"
@@ -2810,11 +3011,20 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "클라이언트 또는 서버"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "전용 서버"
+  },
   "project-card.environment.server": {
     "defaultMessage": "서버"
   },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "싱글플레이어"
+  },
   "project-type.all": {
     "defaultMessage": "모두"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "컬렉션"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, other {데이터 팩}}"
@@ -5039,8 +5249,215 @@
   "settings.pats.title": {
     "defaultMessage": "개인 액세스 토큰"
   },
+  "settings.profile.bio.description": {
+    "defaultMessage": "자신을 알릴 수 있는 간단한 소개글입니다."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "자기소개"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "프로필"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "프로필 사진"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "프로필 정보는 Modrinth에서 <profile-link>누구나 볼 수 있게 공개</profile-link>되며, <docs-link>Modrinth API</docs-link>를 통해서도 확인할 수 있습니다."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "프로필 업데이트 실패"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "프로필을 업데이트하는 동안 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "공개 프로필을 맞춤 설정하려면 Modrinth 계정에 로그인하세요."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Modrinth 계정 필요"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "프로필을 식별하기 위한 대소문자 구분 없는 고유한 이름입니다."
+  },
   "settings.sessions.title": {
     "defaultMessage": "세션"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "작업"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "사용자"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Modrinth에서 차단한 사용자 목록입니다. 해당 사용자는 다음 행위를 할 수 없습니다:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "차단한 사용자가 없습니다."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "차단된 사용자 목록을 불러올 수 없습니다."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "차단된 사용자 목록 불러오는 중…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "나에게 친구 요청 전송"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "Modrinth 호스팅 서버 관리 초대."
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "공유 인스턴스에 초대"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "차단된 사용자"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "차단 해제"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "사용자 차단 해제 실패"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "이 사용자의 차단을 해제하는 중 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "{username} 차단 해제"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "{username} 님의 아바타"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Modrinth에서 본인에게 친구 요청을 보낼 수 있는 사람을 설정합니다."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "친구 요청"
+  },
+  "settings.social.interaction-source.coming-soon": {
+    "defaultMessage": "곧 제공할 예정입니다!"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "모든 사람"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "친구"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "친구의 친구"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "아무도 없음"
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "공유 인스턴스 및 Modrinth Hosting 패널 초대를 보낼 수 있는 사람을 설정합니다."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "초대"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "Modrinth 계정이 있으면 본인과 소통 가능한 사람을 설정하고 차단된 사용자를 관리할 수 있습니다"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Modrinth 계정이 필요합니다"
+  },
+  "settings.social.title": {
+    "defaultMessage": "소셜"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "추가"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "추가됨"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "이 사용자는 이미 초대되었습니다."
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "선택"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username} 님의 아바타"
+  },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "커스텀..."
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "커스텀: {date}"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "초대 링크 수정."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "초대 링크 수정"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "1일 후"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "1시간 후"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "7일 후"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "6시간 후"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "3일 후"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "12시간 후"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "만료일"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "당신의 친구 - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "초대"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "초대 링크는 {duration} 후 만료됩니다."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "또는 초대 링크 사용"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "초대 링크가 클립보드에 복사되었습니다."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "링크 복사됨"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "링크 복사 실패"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "최대 사용 횟수"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "친구가 없습니다."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "일치하는 사용자를 찾을 수 없습니다."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "요청 전송됨"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username}님이 먼저 친구 요청을 수락해야 합니다"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "저장"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Modrinth 사용자 이름 입력"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "검색 중..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "초대 링크 업데이트 실패"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

@@ -1,8 +1,7 @@
 import { defineMessage, formatProjectTypeSentence, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
-import { licenseRequiresSource, licensesRequiringSource, notSourceAsDistributed } from '../../utils'
-import license from '../stages/license'
+import { licenseRequiresSource, notSourceAsDistributed } from '../../utils'
 
 export const commonLinkDomains = {
 	source: [

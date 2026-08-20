@@ -66,8 +66,8 @@ pub async fn ingest_click(
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = ingest_click.url;
-    let domain = url.host_str().ok_or_else(|| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+    let domain = url.host_str().wrap_request_err_with(|| {
+        "invalid page view URL specified!".to_string()
     })?;
     let url_origin = url.origin().ascii_serialization();
 
@@ -77,9 +77,9 @@ pub async fn ingest_click(
         .any(|origin| origin == "*" || url_origin == *origin);
 
     if !is_valid_url_origin {
-        return Err(ApiError::InvalidInput(
-            "invalid page view URL specified!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "invalid page view URL specified!",
+        )));
     }
 
     let exists = sqlx::query!(
@@ -159,7 +159,8 @@ pub async fn get_all(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     if user.role.is_admin() {
         let codes = DBAffiliateCode::get_all(&**pool)
@@ -181,9 +182,9 @@ pub async fn get_all(
             .collect::<Vec<_>>();
         Ok(web::Json(codes))
     } else {
-        Err(ApiError::CustomAuthentication(
-            "You do not have permission to view affiliate codes!".to_string(),
-        ))
+        Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to view affiliate codes!",
+        )))
     }
 }
 
@@ -214,16 +215,16 @@ pub async fn create(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let is_admin = creator.role.is_admin();
     let is_affiliate = creator.badges.contains(Badges::AFFILIATE);
 
     if !is_admin && !is_affiliate {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to create an affiliate code!"
-                .to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to create an affiliate code!",
+        )));
     }
 
     let creator_id = DBUserId::from(creator.id);
@@ -239,19 +240,25 @@ pub async fn create(
 
     if affiliate_id != creator_id {
         let Some(_affiliate_user) =
-            DBUser::get_id(affiliate_id, &**pool, &redis).await?
+            DBUser::get_id(affiliate_id, &**pool, &redis)
+                .await
+                .wrap_internal_err("fetching user from database")?
         else {
-            return Err(ApiError::CustomAuthentication(
-                "Affiliate user not found!".to_string(),
-            ));
+            return Err(ApiError::Auth(eyre::eyre!(
+                "Affiliate user not found!",
+            )));
         };
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let affiliate_code_id =
         crate::database::models::generate_affiliate_code_id(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("generating affiliate code ID")?;
 
     let code = DBAffiliateCode {
         id: affiliate_code_id,
@@ -293,13 +300,15 @@ pub async fn get(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
-    if let Some(model) =
-        DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
+    if let Some(model) = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
+        .await
+        .wrap_internal_err("fetching affiliate code from database")?
     {
         let is_admin = user.role.is_admin();
         let is_owner = model.affiliate == DBUserId::from(user.id);
@@ -307,10 +316,10 @@ pub async fn get(
         if is_admin || is_owner {
             Ok(web::Json(AffiliateCode::from(model, is_admin)))
         } else {
-            Err(ApiError::NotFound)
+            Err(ApiError::NotFound(eyre::eyre!("resource not found")))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -335,30 +344,33 @@ pub async fn delete(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
-    if let Some(model) =
-        DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
+    if let Some(model) = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
+        .await
+        .wrap_internal_err("fetching affiliate code from database")?
     {
         let is_admin = user.role.is_admin();
         let is_owner = model.affiliate == DBUserId::from(user.id);
 
         if is_admin || is_owner {
-            let result =
-                DBAffiliateCode::remove(affiliate_code_id, &**pool).await?;
+            let result = DBAffiliateCode::remove(affiliate_code_id, &**pool)
+                .await
+                .wrap_internal_err("deleting affiliate code from database")?;
             if result.is_some() {
                 Ok(())
             } else {
-                Err(ApiError::NotFound)
+                Err(ApiError::NotFound(eyre::eyre!("resource not found")))
             }
         } else {
-            Err(ApiError::NotFound)
+            Err(ApiError::NotFound(eyre::eyre!("resource not found")))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -389,26 +401,28 @@ pub async fn patch(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
     let existing_code = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
-        .await?
-        .ok_or(ApiError::NotFound)?;
+        .await
+        .wrap_internal_err("fetching affiliate code from database")?
+        .wrap_not_found_err("resource not found")?;
 
     let is_admin = user.role.is_admin();
     let is_owner = existing_code.affiliate == DBUserId::from(user.id);
 
     if !is_admin && !is_owner {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
     if !is_admin && !user.badges.contains(Badges::AFFILIATE) {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to update affiliate codes!".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to update affiliate codes!",
+        )));
     }
 
     DBAffiliateCode::update_source_name(

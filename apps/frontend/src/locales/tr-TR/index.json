@@ -8,6 +8,15 @@
   "admin.billing.error.not-found": {
     "message": "Kullanıcı bulunamadı"
   },
+  "ads-consent.accept": {
+    "message": "Tümünü kabul et"
+  },
+  "ads-consent.manage": {
+    "message": "Tercihleri yönet"
+  },
+  "ads-consent.reject": {
+    "message": "Tümünü reddet"
+  },
   "analytics.action.add": {
     "message": "Ekle"
   },
@@ -932,6 +941,12 @@
   "auth.verify-email.title": {
     "message": "E-postayı Doğrula"
   },
+  "collection.aria-label.upload-icon": {
+    "message": "Simge yükle"
+  },
+  "collection.button.discover-mods": {
+    "message": "Modları keşfedin"
+  },
   "collection.button.edit-icon": {
     "message": "Simgeyi düzenle"
   },
@@ -1106,6 +1121,27 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ek dosyalar, alternatif sürümler veya varyantlar için değil, kaynak kodu gibi destekleyici kaynaklar içindir."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Detaylar"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Dosyalar"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Dosyaları sürükleyip bırakın ya da göz atmak için tıklayın"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Detaylar"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Dosyalar"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Düzenle"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Önerilen"
+  },
   "create.collection.collection-info": {
     "message": "Yeni koleksiyonunuz herkese açık olarak {count, plural, =0 {projesiz hâlde} other {# proje ile}} oluşturulacaktır."
   },
@@ -1202,6 +1238,9 @@
   "create.project.name-placeholder": {
     "message": "Projenin ismini girin..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "{name} İkon"
+  },
   "create.project.owner-description": {
     "message": "Proje sahibini kendin ya da üyesi olduğun bir organizasyon olarak ayarla."
   },
@@ -1231,6 +1270,9 @@
   },
   "create.project.type-server": {
     "message": "Sunucu"
+  },
+  "create.project.unknown-user": {
+    "message": "Bilinmeyen kullanıcı"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1540,6 +1582,9 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Miktar arayın"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "{category} Seç"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Birim seçin:"
@@ -2609,6 +2654,9 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.footer.unknown-commit": {
+    "message": "bilinmeyen"
+  },
   "layout.menu-toggle.action": {
     "message": "Menü aç/kapa"
   },
@@ -2992,6 +3040,33 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "Cüzdan adresinizi iki kez kontrol edin. Yanlış adrese gönderilen fonlar kurtarılamaz."
+  },
+  "organization.button.manage": {
+    "message": "Yönet"
+  },
+  "organization.button.manage-projects": {
+    "message": "Projeleri yönet"
+  },
+  "organization.label.downloads": {
+    "message": "indirmeler"
+  },
+  "organization.label.members": {
+    "message": "üyeler"
+  },
+  "organization.label.organization": {
+    "message": "Organizasyon"
+  },
+  "organization.label.projects": {
+    "message": "projeler"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "İsim"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Tür"
   },
   "project-member-header.error-decline": {
     "message": "Ekip daveti reddedilemedi"
@@ -3443,6 +3518,21 @@
   "project.settings.permissions.sort.status": {
     "message": "Durum"
   },
+  "project.settings.server.region-label": {
+    "message": "Bölge"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Dilleri seç"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Bölge seç"
+  },
+  "project.settings.server.server-online": {
+    "message": "Sunucu çevrimiçi!"
+  },
+  "project.settings.tags.title": {
+    "message": "Etiketler"
+  },
   "project.settings.title": {
     "message": "Ayarlar"
   },
@@ -3451,6 +3541,15 @@
   },
   "project.status.archived.message": {
     "message": "{title} arşivlenmiş. {title}, yapımcı fikrini değiştirmediği sürece daha fazla güncelleme almayacak."
+  },
+  "project.versions.copy-id-option": {
+    "message": "ID'yi Kopyala"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Bağlantıyı kopyala"
+  },
+  "project.versions.delete-button": {
+    "message": "Sil"
   },
   "project.versions.title": {
     "message": "Sürümler"
@@ -3869,6 +3968,9 @@
   "servers.plan.small.description": {
     "message": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
   },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "En popüler"
+  },
   "settings.account.button.complete-setup": {
     "message": "Kurulumu tamamla"
   },
@@ -4001,6 +4103,15 @@
   "settings.account.security.passkey.add-modal.name.placeholder": {
     "message": "Giriş anahtarım"
   },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "Geçiş anahtarı ekle"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "Geçiş anahtarı ekle"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "Geçiş anahtalarını yönet"
+  },
   "settings.account.security.passkey.description": {
     "message": "Giriş anahtarlarınızı yönetin, veya yeni bir tane ekleyin."
   },
@@ -4015,6 +4126,9 @@
   },
   "settings.account.security.passkey.modal.no-passkeys": {
     "message": "Hiçbir giriş anahtarın kayıtlı değil."
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Geçiş anahtarını sil"
   },
   "settings.account.security.passkey.remove.description": {
     "message": "Bu hesabınızdan \"{name}\" geçiş anahtarını silecek. Artık bu geçiş anahtarı ile giriş yapamayacaksınız."
@@ -4198,6 +4312,9 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "Bu uygulama hakkında"
+  },
+  "settings.authorizations.created-by": {
+    "message": "{user} tarafından oluşturuldu"
   },
   "settings.authorizations.description": {
     "message": "Modrinth hesabınızla bir uygulamayı yetkilendirdiğinizde, ona hesabınıza erişim izni vermiş olursunuz. Hesabınıza verilen erişimi dilediğiniz zaman burada yönetebilir ve gözden geçirebilirsiniz."
@@ -4588,6 +4705,12 @@
   },
   "settings.sidebar.label.display": {
     "message": "Ekran"
+  },
+  "shared-instance.invite.accept": {
+    "message": "Daveti kabul et"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Bir Modrinth kullanıcısı"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth'ten haberler"

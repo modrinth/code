@@ -43,18 +43,14 @@
 				<Toggle id="unprovision" v-model="unprovision" />
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="refunding" @click="refundCharge">
-						<CheckIcon aria-hidden="true" />
-						Refund charge
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="refundModal.hide()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="refunding" @click="refundCharge">
+					<CheckIcon aria-hidden="true" />
+					Refund charge
+				</Button>
+				<Button @click="refundModal.hide()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -82,18 +78,14 @@
 				<Toggle id="cancel" v-model="cancel" />
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="modifying" @click="modifyCharge">
-						<CheckIcon aria-hidden="true" />
-						Modify charge
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="modifyModal.hide()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="modifying" @click="modifyCharge">
+					<CheckIcon aria-hidden="true" />
+					Modify charge
+				</Button>
+				<Button @click="modifyModal.hide()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -117,18 +109,14 @@
 				<Toggle id="sendEmail" v-model="creditSendEmail" />
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="crediting" @click="applyCredit">
-						<CheckIcon aria-hidden="true" />
-						Apply credit
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="creditModal.hide()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="crediting" @click="applyCredit">
+					<CheckIcon aria-hidden="true" />
+					Apply credit
+				</Button>
+				<Button @click="creditModal.hide()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -141,13 +129,11 @@
 				<h1 class="m-0 text-2xl font-extrabold">{{ user?.username }}'s subscriptions</h1>
 			</div>
 			<div class="flex items-center gap-2">
-				<ButtonStyled>
-					<nuxt-link :to="`/user/${user?.id}`">
-						<UserIcon aria-hidden="true" />
-						User profile
-						<ExternalIcon class="h-4 w-4" />
-					</nuxt-link>
-				</ButtonStyled>
+				<ButtonLink :to="`/user/${user?.id}`">
+					<UserIcon aria-hidden="true" />
+					User profile
+					<ExternalIcon class="h-4 w-4" />
+				</ButtonLink>
 			</div>
 		</div>
 		<div>
@@ -176,25 +162,20 @@
 					</div>
 					<div v-if="subscription.metadata?.id" class="flex flex-col items-end gap-2">
 						<CopyCode :text="subscription.metadata.id" />
-						<ButtonStyled
+						<ButtonLink
 							v-if="
 								subscription.metadata?.type === 'pyro' || subscription.metadata?.type === 'medal'
 							"
+							:href="`/hosting/manage/${subscription.metadata.id}`"
+							target="_blank"
+							class="w-fit"
 						>
-							<nuxt-link
-								:to="`/hosting/manage/${subscription.metadata.id}`"
-								target="_blank"
-								class="w-fit"
-							>
-								<ServerIcon /> Server panel <ExternalIcon class="h-4 w-4" />
-							</nuxt-link>
-						</ButtonStyled>
-						<ButtonStyled>
-							<button @click="showCreditModal(subscription)">
-								<CurrencyIcon />
-								Credit
-							</button>
-						</ButtonStyled>
+							<ServerIcon /> Server panel <ExternalIcon class="h-4 w-4" />
+						</ButtonLink>
+						<Button @click="showCreditModal(subscription)">
+							<CurrencyIcon />
+							Credit
+						</Button>
 					</div>
 				</div>
 				<div class="flex flex-col gap-2">
@@ -226,7 +207,8 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	CopyCode,
 	defineMessages,
 	DropdownSelect,

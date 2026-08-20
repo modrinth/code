@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "在圖表中隱藏 {name}"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "沒有數據"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "圖表工具提示已固定"
   },
@@ -975,7 +978,7 @@
     "message": "取消追蹤專案"
   },
   "collection.delete-modal.description": {
-    "message": "這將永久刪除這個收藏。此動作無法復原。"
+    "message": "這會永久刪除這個收藏，這項動作無法復原。"
   },
   "collection.delete-modal.title": {
     "message": "確定要刪除這個收藏嗎？"
@@ -996,7 +999,7 @@
     "message": "建立時間：{ago}"
   },
   "collection.label.curated-by": {
-    "message": "策劃者"
+    "message": "策展人"
   },
   "collection.label.no-projects": {
     "message": "收藏中暫無專案"
@@ -1477,9 +1480,6 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "最近更新"
-  },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "關閉"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "下載 {formType}"
@@ -2973,16 +2973,13 @@
     "message": "每批 {amount} 個"
   },
   "modpack-scan-modal.batch.placeholder": {
-    "message": "批量數量"
+    "message": "批次數量"
   },
   "modpack-scan-modal.delete-all-groups-confirmation.description": {
     "message": "這會永久刪除這個專案的所有引用標註群組及其中的所有檔案，這項動作無法復原。"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "無法清除所有群組：{error}"
-  },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "清除"
   },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "已成功清除所有群組。"
@@ -3022,9 +3019,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "正在掃描..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "成功"
   },
   "modpack-scan-modal.title": {
     "message": "模組包掃描（{scanned}/{total} 個檔案）"
@@ -3935,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "精選標籤"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "你可以選擇最多 3 個最相關的標籤作為精選標籤。如果沒有選完 3 個標籤，系統可能會自動將其他標籤選為精選標籤。"
-  },
   "project.settings.tags.features-description": {
     "message": "請選擇你的{type}包含的功能。"
   },
@@ -3952,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "請選擇至少一個類別再選擇精選標籤。"
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "精確的標籤對於協助使用者找到你的{type}非常重要。請務必選擇所有合適的標籤。"
   },
   "project.settings.tags.title": {
     "message": "標籤"
@@ -4790,11 +4778,23 @@
   "settings.authorizations.about-this-app": {
     "message": "關於這個應用程式"
   },
+  "settings.authorizations.created-by": {
+    "message": "由 {user} 建立"
+  },
   "settings.authorizations.description": {
-    "message": "當你使用 Modrinth 帳號授權應用程式時，即代表你授予該應用程式存取你帳戶的權限。你可以隨時在這裡管理並審查帳號的存取權。"
+    "message": "當你使用 Modrinth 帳號授權應用程式時，即代表你授予該應用程式存取你帳號的權限。你可以隨時在這裡管理並審查帳號的存取權。"
+  },
+  "settings.authorizations.empty-state.description": {
+    "message": "你授權的應用程式將顯示在這裡。"
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "沒有授權任何應用程式"
   },
   "settings.authorizations.head-title": {
     "message": "授權"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "這個應用程式由 Modrinth 官方帳號建立。"
   },
   "settings.authorizations.revoke.action": {
     "message": "撤銷"
@@ -4804,6 +4804,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "確定要撤銷這個應用程式的授權嗎？"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "儘管名稱如此，這個應用程式與 Modrinth 沒有任何關聯。"
   },
   "settings.billing.charges.description": {
     "message": "你對 Modrinth 帳號的所有過往支付紀錄皆會列於這裡："

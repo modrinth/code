@@ -11,6 +11,12 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Ocultar más instancias en ejecución"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Copiado"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Copiar detalles"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Descartar"
   },
@@ -19,6 +25,21 @@
   },
   "app.action-bar.install.retry": {
     "message": "Reintentar"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Cancelado por cierre de la aplicación"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "No se pudo leer el modpack"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "No se pudieron guardar los archivos"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "La descarga no pudo terminar"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "La instancia no se pudo encontrar"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Instancia desconocida"
@@ -59,20 +80,11 @@
   "app.action-bar.view-logs": {
     "message": "Ver registros"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Habilita el renderizado avanzado, como los efectos de desenfoque, que pueden causar problemas de rendimiento sin renderizado acelerado por hardware."
-  },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Renderizado avanzado"
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Selecciona tu tema de color preferido para la Modrinth App."
-  },
   "app.appearance-settings.color-theme.title": {
     "message": "Tema de color"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Cambia la página en la que el launcher inicia."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Inicio"
@@ -83,50 +95,17 @@
   "app.appearance-settings.default-landing-page.title": {
     "message": "Página de inicio predeterminada"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Desactiva la etiqueta arriba de tu personaje en la página de skins."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar etiqueta de nombre"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Incluye los mundos recientes en la sección \"Volver a jugar\" de la página de inicio."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Volver a jugar en tus mundos"
   },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiza el lanzador cuando se inicia un proceso de Minecraft."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimizar lanzador"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Usa el marco de ventana del sistema (requiere reiniciar la aplicación)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Decoraciones nativas"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Muestra cuánto tiempo has estado jugando en una instancia."
-  },
   "app.appearance-settings.show-play-time.title": {
     "message": "Mostrar tiempo de juego"
   },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Automáticamente omite confirmaciones de bajo riesgo como modpacks duplicados, eliminación de contenido normal, actualizaciones masivas, desvinculando modpacks, y mensajes de reparación. Advertencias importantes seguirán siendo mostradas."
-  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Omitir advertencias no esenciales"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Activa la posibilidad de alternar la barra lateral."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Alternar barra lateral"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Si intentas instalar un archivo de paquete de Modrinth (.mrpack) que no esté alojado en Modrinth, debes comprender los riesgos que esto conlleva antes de instalarlo."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Adviérteme antes de instalarme modpacks desconocidos"
@@ -183,7 +162,7 @@
     "message": "Exportar modpack"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Nombre del modpack"
+    "message": "Nombre del Conjunto de modificadores"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nombre del modpack"
@@ -295,9 +274,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Apariencia"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Opciones predeterminadas de la instancia"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalaciones de Java"

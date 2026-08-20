@@ -53,7 +53,6 @@ export default function () {
 				toggle('invalid-link', 'Invalid Link')
 					.shown(computed(() => !!project.value.license?.url))
 					.suggestedStatus('flagged')
-					.severity('medium')
 					.message()
 					.children(check('custom-license', 'Invalid Link: Custom License').message())
 					.collect(),
@@ -61,12 +60,11 @@ export default function () {
 				toggle('no-source', 'No Source')
 					.shown(needSource)
 					.suggestedStatus('rejected')
-					.severity('medium')
 					.rawMessage(async (state) => {
 						if (state.fork) return noSourceForkMsg(state)
 						return noSourceMsg(state)
 					})
-					.children(check('fork', 'No Source: Fork').severity('high')),
+					.children(check('fork', 'No Source: Fork')),
 			),
 		)
 }

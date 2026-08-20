@@ -14,6 +14,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::globals::tax_compliance_payout_threshold;
 use crate::util::avalara1099;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::gotenberg::GotenbergClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
@@ -70,16 +71,21 @@ pub async fn post_compliance_form(
         &session_queue,
         Scopes::PAYOUTS_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let user_id = DBUserId(user.id.0 as i64);
 
-    let mut txn = pool.begin().await?;
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let maybe_compliance =
         users_compliance::UserCompliance::get_by_user_id(&mut txn, user_id)
-            .await?;
+            .await
+            .wrap_internal_err("fetching user compliance from Redis")?;
 
     let mut compliance = match maybe_compliance {
         Some(c) => {
@@ -87,9 +93,9 @@ pub async fn post_compliance_form(
                 && c.form_type.is_some_and(|f| f.requires_domestic_tin_match())
                 && !c.tin_matched
             {
-                return Err(ApiError::InvalidInput(
+                return Err(ApiError::Request(eyre::eyre!(
                     "Your TIN/SSN did not match the IRS records. Please contact support https://support.modrinth.com".to_owned(),
-                ));
+                )));
             }
 
             c
@@ -109,7 +115,9 @@ pub async fn post_compliance_form(
         },
     };
 
-    let result = avalara1099::request_form(user_id, body.0.form_type).await?;
+    let result = avalara1099::request_form(user_id, body.0.form_type)
+        .await
+        .wrap_api_err("executing `avalara1099::request_form`")?;
 
     match result {
         Ok(
@@ -132,15 +140,20 @@ pub async fn post_compliance_form(
             compliance.form_type = Some(body.0.form_type);
             compliance.last_checked = Utc::now() - COMPLIANCE_CHECK_DEBOUNCE;
 
-            compliance.upsert_partial(&mut txn).await?;
-            txn.commit().await?;
+            compliance
+                .upsert_partial(&mut txn)
+                .await
+                .wrap_internal_err("updating user compliance request")?;
+            txn.commit()
+                .await
+                .wrap_internal_err("committing database transaction")?;
 
             Ok(HttpResponse::Ok().json(toplevel))
         }
 
         Ok(_) => {
             error!("Missing form request ID in Avalara response");
-            Err(ApiError::TaxComplianceApi)
+            Err(ApiError::Internal(eyre::eyre!("tax compliance API failed")))
         }
 
         Err(json_error) => {
@@ -148,7 +161,7 @@ pub async fn post_compliance_form(
                 "Error sending request to Avalara: {}",
                 serde_json::to_string_pretty(&json_error).unwrap()
             );
-            Err(ApiError::TaxComplianceApi)
+            Err(ApiError::Internal(eyre::eyre!("tax compliance API failed")))
         }
     }
 }
@@ -171,37 +184,27 @@ pub async fn paypal_webhook(
         .headers()
         .get("PAYPAL-AUTH-ALGO")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| {
-            ApiError::InvalidInput("missing auth algo".to_string())
-        })?;
+        .wrap_request_err_with(|| "missing auth algo".to_string())?;
     let cert_url = req
         .headers()
         .get("PAYPAL-CERT-URL")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| {
-            ApiError::InvalidInput("missing cert url".to_string())
-        })?;
+        .wrap_request_err_with(|| "missing cert url".to_string())?;
     let transmission_id = req
         .headers()
         .get("PAYPAL-TRANSMISSION-ID")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| {
-            ApiError::InvalidInput("missing transmission ID".to_string())
-        })?;
+        .wrap_request_err_with(|| "missing transmission ID".to_string())?;
     let transmission_sig = req
         .headers()
         .get("PAYPAL-TRANSMISSION-SIG")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| {
-            ApiError::InvalidInput("missing transmission sig".to_string())
-        })?;
+        .wrap_request_err_with(|| "missing transmission sig".to_string())?;
     let transmission_time = req
         .headers()
         .get("PAYPAL-TRANSMISSION-TIME")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| {
-            ApiError::InvalidInput("missing transmission time".to_string())
-        })?;
+        .wrap_request_err_with(|| "missing transmission time".to_string())?;
 
     #[derive(Deserialize)]
     struct WebHookResponse {
@@ -228,12 +231,13 @@ pub async fn paypal_webhook(
             )),
             None,
         )
-        .await?;
+        .await
+        .wrap_api_err("verifying PayPal webhook signature")?;
 
     if &webhook_res.verification_status != "SUCCESS" {
-        return Err(ApiError::InvalidInput(
-            "Invalid webhook signature".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "Invalid webhook signature",
+        )));
     }
 
     #[derive(Deserialize)]
@@ -247,7 +251,8 @@ pub async fn paypal_webhook(
         pub resource: PayPalResource,
     }
 
-    let webhook = serde_json::from_str::<PayPalWebhook>(&body)?;
+    let webhook = serde_json::from_str::<PayPalWebhook>(&body)
+        .wrap_request_err("deserializing JSON data")?;
 
     match &*webhook.event_type {
         "PAYMENT.PAYOUTS-ITEM.BLOCKED"
@@ -255,7 +260,10 @@ pub async fn paypal_webhook(
         | "PAYMENT.PAYOUTS-ITEM.REFUNDED"
         | "PAYMENT.PAYOUTS-ITEM.RETURNED"
         | "PAYMENT.PAYOUTS-ITEM.CANCELED" => {
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
 
             let result = sqlx::query!(
                 "SELECT user_id, amount, fee FROM payouts WHERE platform_id = $1 AND status = $2",
@@ -263,7 +271,7 @@ pub async fn paypal_webhook(
                 PayoutStatus::InTransit.as_str()
             )
             .fetch_optional(&mut transaction)
-            .await?;
+            .await.wrap_internal_err("querying database for `paypal_webhook`")?;
 
             if let Some(result) = result {
                 sqlx::query!(
@@ -281,9 +289,13 @@ pub async fn paypal_webhook(
                     webhook.resource.payout_item_id
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err("querying database for `paypal_webhook`")?;
 
-                transaction.commit().await?;
+                transaction
+                    .commit()
+                    .await
+                    .wrap_internal_err("committing database transaction")?;
 
                 crate::database::models::user_item::DBUser::clear_caches(
                     &[(
@@ -292,11 +304,15 @@ pub async fn paypal_webhook(
                     )],
                     &redis,
                 )
-                .await?;
+                .await
+                .wrap_internal_err("clearing cached data from Redis")?;
             }
         }
         "PAYMENT.PAYOUTS-ITEM.SUCCEEDED" => {
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
             sqlx::query!(
                 "
                 UPDATE payouts
@@ -307,8 +323,12 @@ pub async fn paypal_webhook(
                 webhook.resource.payout_item_id
             )
             .execute(&mut transaction)
-            .await?;
-            transaction.commit().await?;
+            .await
+            .wrap_internal_err("querying database for `paypal_webhook`")?;
+            transaction
+                .commit()
+                .await
+                .wrap_internal_err("committing database transaction")?;
         }
         _ => {}
     }
@@ -334,21 +354,21 @@ pub async fn tremendous_webhook(
         .get("Tremendous-Webhook-Signature")
         .and_then(|x| x.to_str().ok())
         .and_then(|x| x.split('=').next_back())
-        .ok_or_else(|| {
-            ApiError::InvalidInput("missing webhook signature".to_string())
-        })?;
+        .wrap_request_err_with(|| "missing webhook signature".to_string())?;
 
-    let mut mac: Hmac<Sha256> = Hmac::new_from_slice(
-        ENV.TREMENDOUS_PRIVATE_KEY.as_bytes(),
-    )
-    .map_err(|_| ApiError::Payments("error initializing HMAC".to_string()))?;
+    let mut mac: Hmac<Sha256> =
+        Hmac::new_from_slice(ENV.TREMENDOUS_PRIVATE_KEY.as_bytes())
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "error initializing HMAC".to_string(),
+            )?;
     mac.update(body.as_bytes());
     let request_signature = mac.finalize().into_bytes().encode_hex::<String>();
 
     if &*request_signature != signature {
-        return Err(ApiError::InvalidInput(
-            "Invalid webhook signature".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "Invalid webhook signature",
+        )));
     }
 
     #[derive(Deserialize)]
@@ -367,11 +387,15 @@ pub async fn tremendous_webhook(
         pub payload: TremendousPayload,
     }
 
-    let webhook = serde_json::from_str::<TremendousWebhook>(&body)?;
+    let webhook = serde_json::from_str::<TremendousWebhook>(&body)
+        .wrap_request_err("deserializing JSON data")?;
 
     match &*webhook.event {
         "REWARDS.CANCELED" | "REWARDS.DELIVERY.FAILED" => {
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
 
             let result = sqlx::query!(
                 "SELECT user_id, amount, fee FROM payouts WHERE platform_id = $1 AND status = $2",
@@ -379,7 +403,7 @@ pub async fn tremendous_webhook(
                 PayoutStatus::InTransit.as_str()
             )
             .fetch_optional(&mut transaction)
-            .await?;
+            .await.wrap_internal_err("querying database for `tremendous_webhook`")?;
 
             if let Some(result) = result {
                 sqlx::query!(
@@ -397,9 +421,15 @@ pub async fn tremendous_webhook(
                     webhook.payload.resource.id
                 )
                 .execute(&mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err(
+                    "querying database for `tremendous_webhook`",
+                )?;
 
-                transaction.commit().await?;
+                transaction
+                    .commit()
+                    .await
+                    .wrap_internal_err("committing database transaction")?;
 
                 crate::database::models::user_item::DBUser::clear_caches(
                     &[(
@@ -408,11 +438,15 @@ pub async fn tremendous_webhook(
                     )],
                     &redis,
                 )
-                .await?;
+                .await
+                .wrap_internal_err("clearing cached data from Redis")?;
             }
         }
         "REWARDS.DELIVERY.SUCCEEDED" => {
-            let mut transaction = pool.begin().await?;
+            let mut transaction = pool
+                .begin()
+                .await
+                .wrap_internal_err("starting database transaction")?;
             sqlx::query!(
                 "
                 UPDATE payouts
@@ -423,8 +457,12 @@ pub async fn tremendous_webhook(
                 webhook.payload.resource.id
             )
             .execute(&mut transaction)
-            .await?;
-            transaction.commit().await?;
+            .await
+            .wrap_internal_err("querying database for `tremendous_webhook`")?;
+            transaction
+                .commit()
+                .await
+                .wrap_internal_err("committing database transaction")?;
         }
         _ => {}
     }
@@ -463,12 +501,14 @@ pub async fn calculate_fees(
         &session_queue,
         false,
     )
-    .await?
-    .ok_or_else(|| {
-        ApiError::Authentication(AuthenticationError::InvalidCredentials)
-    })?;
+    .await
+    .wrap_auth_err("authenticating API request")?
+    .wrap_auth_err_with(|| AuthenticationError::InvalidCredentials)?;
 
-    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
+    let payout_flow = payouts_queue
+        .create_payout_flow(body.0)
+        .await
+        .wrap_api_err("creating payout flow")?;
 
     Ok(web::Json(WithdrawalFees {
         net_usd: payout_flow.net_usd,
@@ -500,18 +540,20 @@ pub async fn create_payout(
         &session_queue,
         false,
     )
-    .await?
-    .ok_or_else(|| {
-        ApiError::Authentication(AuthenticationError::InvalidCredentials)
-    })?;
+    .await
+    .wrap_auth_err("authenticating API request")?
+    .wrap_auth_err_with(|| AuthenticationError::InvalidCredentials)?;
 
     if !scopes.contains(Scopes::PAYOUTS_WRITE) {
-        return Err(ApiError::Authentication(
+        return Err(ApiError::Auth(eyre::eyre!(
             AuthenticationError::InvalidCredentials,
-        ));
+        )));
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     sqlx::query!(
         "
@@ -528,8 +570,8 @@ pub async fn create_payout(
         .wrap_internal_err("failed to calculate user balance")?;
 
     if body.amount < Decimal::ZERO {
-        return Err(ApiError::InvalidInput(
-            "Amount must be positive!".to_string(),
+        return Err(ApiError::Request(
+            eyre::eyre!("Amount must be positive!",),
         ));
     }
 
@@ -537,13 +579,18 @@ pub async fn create_payout(
     // for tax threshold checks. body.amount may be in local currency for
     // gift cards (e.g. INR), so we must not compare it directly against
     // USD thresholds.
-    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
+    let payout_flow = payouts_queue
+        .create_payout_flow(body.0)
+        .await
+        .wrap_api_err("creating payout flow")?;
     let amount_usd = payout_flow.net_usd.get();
 
     let requires_manual_review;
 
     if let Some(threshold) = tax_compliance_payout_threshold() {
-        let maybe_compliance = update_compliance_status(&pool, user.id).await?;
+        let maybe_compliance = update_compliance_status(&pool, user.id)
+            .await
+            .wrap_api_err("updating compliance status")?;
 
         let (tin_matched, signed, requested, api_check_failed) =
             match maybe_compliance {
@@ -575,14 +622,16 @@ pub async fn create_payout(
             // error with the API, as this is more accurate than saying the form wasn't completed
             // properly as this might be wrong!
             if api_check_failed {
-                return Err(ApiError::TaxComplianceApi);
+                return Err(ApiError::Internal(eyre::eyre!(
+                    "tax compliance API failed"
+                )));
             }
 
-            return Err(ApiError::InvalidInput(match (tin_matched, signed, requested) {
+            return Err(ApiError::Request(eyre::eyre!(match (tin_matched, signed, requested) {
                 (_, false, true) => "Tax form isn't signed yet!",
                 (false, true, true) => "Tax form is signed, but the Tax Identification Number/SSN didn't match the IRS records. Withdrawals are blocked until the TIN/SSN matches.",
                 _ => "Tax compliance form is required to withdraw more!",
-            }.to_owned()));
+            }.to_owned())));
         }
     } else {
         requires_manual_review = None;
@@ -592,19 +641,22 @@ pub async fn create_payout(
         r
     } else {
         users_compliance::UserCompliance::get_by_user_id(&**pool, user.id)
-            .await?
+            .await
+            .wrap_internal_err("fetching user compliance from database")?
             .is_some_and(|x| x.requires_manual_review)
     };
 
     if requires_manual_review {
-        return Err(ApiError::InvalidInput(
-            "More information is required to proceed. Please contact support (https://support.modrinth.com, support@modrinth.com)".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "More information is required to proceed. Please contact support (https://support.modrinth.com, support@modrinth.com)",
+        )));
     }
 
     let payout_flow = match payout_flow.validate(balance.available) {
         Ok(flow) => flow,
-        Err(err) => return Err(ApiError::InvalidInput(err.to_string())),
+        Err(err) => {
+            return Err(ApiError::Request(eyre::eyre!("{err}")));
+        }
     };
 
     let payout_id = generate_payout_id(&mut transaction)
@@ -613,7 +665,8 @@ pub async fn create_payout(
 
     payout_flow
         .execute(&payouts_queue, &user, payout_id, transaction, &gotenberg)
-        .await?;
+        .await
+        .wrap_api_err("executing `execute`")?;
 
     crate::database::models::DBUser::clear_caches(&[(user.id, None)], &redis)
         .await
@@ -714,19 +767,22 @@ pub async fn transaction_history(
         &session_queue,
         Scopes::PAYOUTS_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let payout_ids =
         crate::database::models::payout_item::DBPayout::get_all_for_user(
             user.id.into(),
             &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching payouts from database")?;
     let payouts = crate::database::models::payout_item::DBPayout::get_many(
         &payout_ids,
         &**pool,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching payouts from database")?;
     let withdrawals =
         payouts
             .into_iter()
@@ -802,13 +858,15 @@ pub async fn cancel_payout(
         &session_queue,
         Scopes::PAYOUTS_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let id = info.into_inner().0;
     let payout =
         crate::database::models::payout_item::DBPayout::get(id.into(), &**pool)
-            .await?;
+            .await
+            .wrap_internal_err("fetching payout from database")?;
 
     if let Some(payout) = payout {
         if payout.user_id != user.id.into() && !user.role.is_admin() {
@@ -818,9 +876,9 @@ pub async fn cancel_payout(
         if let Some(platform_id) = payout.platform_id {
             if let Some(method) = payout.method {
                 if payout.status != PayoutStatus::InTransit {
-                    return Err(ApiError::InvalidInput(
-                        "Payout cannot be cancelled!".to_string(),
-                    ));
+                    return Err(ApiError::Request(eyre::eyre!(
+                        "Payout cannot be cancelled!",
+                    )));
                 }
 
                 match method {
@@ -835,7 +893,8 @@ pub async fn cancel_payout(
                                 None,
                                 None,
                             )
-                            .await?;
+                            .await
+                            .wrap_api_err("cancelling PayPal payout")?;
                     }
                     PayoutMethodType::Tremendous => {
                         payouts
@@ -844,7 +903,8 @@ pub async fn cancel_payout(
                                 &format!("rewards/{platform_id}/cancel"),
                                 None,
                             )
-                            .await?;
+                            .await
+                            .wrap_api_err("cancelling Tremendous payout")?;
                     }
                     PayoutMethodType::MuralPay => {
                         let payout_request_id = platform_id
@@ -859,7 +919,10 @@ pub async fn cancel_payout(
                     }
                 }
 
-                let mut transaction = pool.begin().await?;
+                let mut transaction = pool
+                    .begin()
+                    .await
+                    .wrap_internal_err("starting database transaction")?;
                 sqlx::query!(
                     "
                     UPDATE payouts
@@ -870,19 +933,23 @@ pub async fn cancel_payout(
                     platform_id
                 )
                 .execute(&mut transaction)
-                .await?;
-                transaction.commit().await?;
+                .await
+                .wrap_internal_err("querying database for `cancel_payout`")?;
+                transaction
+                    .commit()
+                    .await
+                    .wrap_internal_err("committing database transaction")?;
 
                 Ok(HttpResponse::NoContent().finish())
             } else {
-                Err(ApiError::InvalidInput(
-                    "Payout cannot be cancelled!".to_string(),
-                ))
+                Err(ApiError::Request(eyre::eyre!(
+                    "Payout cannot be cancelled!",
+                )))
             }
         } else {
-            Err(ApiError::InvalidInput(
-                "Payout cannot be cancelled!".to_string(),
-            ))
+            Err(ApiError::Request(eyre::eyre!(
+                "Payout cannot be cancelled!",
+            )))
         }
     } else {
         Ok(HttpResponse::NotFound().finish())
@@ -920,7 +987,8 @@ pub async fn payment_methods(
 ) -> Result<HttpResponse, ApiError> {
     let methods = payouts_queue
         .get_payout_methods()
-        .await?
+        .await
+        .wrap_api_err("fetching payout methods")?
         .into_iter()
         .filter(|x| {
             let mut val = true;
@@ -973,10 +1041,13 @@ pub async fn get_balance(
         &session_queue,
         Scopes::PAYOUTS_READ,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
-    let balance = get_user_balance(user.id.into(), &pool).await?;
+    let balance = get_user_balance(user.id.into(), &pool)
+        .await
+        .wrap_api_err("fetching user balance")?;
 
     let mut requested_form_type = None;
     let mut form_completion_status = None;
@@ -985,7 +1056,8 @@ pub async fn get_balance(
     if tax_compliance_payout_threshold().is_some() {
         form_completion_status = Some(
             update_compliance_status(&pool, user.id.into())
-                .await?
+                .await
+                .wrap_api_err("updating compliance status")?
                 .filter(|x| x.model.form_type.is_some())
                 .map_or(FormCompletionStatus::Unrequested, |compliance| {
                     requested_form_type = compliance.model.form_type;
@@ -1031,7 +1103,8 @@ async fn get_user_balance(
         user_id.0
     )
     .fetch_all(pool)
-    .await?;
+    .await
+    .wrap_internal_err("fetching payouts from database")?;
 
     let available = payouts
         .iter()
@@ -1054,7 +1127,7 @@ async fn get_user_balance(
         user_id.0
     )
     .fetch_optional(pool)
-    .await?;
+    .await.wrap_internal_err("fetching withdrawn from database")?;
 
     let (withdrawn, fees, withdrawn_this_year) =
         withdrawn.map_or((Decimal::ZERO, Decimal::ZERO, Decimal::ZERO), |x| {
@@ -1152,7 +1225,9 @@ async fn update_compliance_status(
             }
         }
 
-        compliance.update(pg).await?;
+        compliance.update(pg).await.wrap_internal_err(
+            "updating database records for `update_compliance_status`",
+        )?;
 
         Ok(Some(ComplianceCheck {
             model: compliance,
@@ -1202,7 +1277,8 @@ pub async fn platform_revenue(
         ",
     )
     .fetch_optional(&**pool)
-    .await?
+    .await
+    .wrap_internal_err("fetching all time payouts from database")?
     .and_then(|x| x.sum)
     .unwrap_or(Decimal::ZERO);
 
@@ -1212,7 +1288,8 @@ pub async fn platform_revenue(
         ",
     )
     .fetch_optional(&**pool)
-    .await?
+    .await
+    .wrap_internal_err("fetching all available from database")?
     .and_then(|x| x.sum)
     .unwrap_or(Decimal::ZERO);
 
@@ -1232,7 +1309,8 @@ pub async fn platform_revenue(
         end
     )
     .fetch_all(&**pool)
-    .await?
+    .await
+    .wrap_internal_err("fetching revenue from database")?
     .into_iter()
     .map(|x| RevenueData {
         time: x.created.timestamp() as u64,

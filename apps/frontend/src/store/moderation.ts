@@ -4,8 +4,8 @@ import type {
 	LockStatusResponse,
 	ModerationQueue,
 	ModerationQueueService,
-} from '~/services/moderation-queue.ts'
-import { useModerationQueue } from '~/services/moderation-queue.ts'
+} from '~/services/moderation/queue.ts'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
 
 export type {
 	LockAcquireResponse,

@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Radera {itemType}"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Inaktivera {itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Att {action, select, downgrade {nedgradera} other {uppdatera}} kan orsaka kompatibilitetsproblem. Moddar eller innehåller du själv lagt till kommer behållas, men är kanske inte kompatibel med den nya versionen."
   },
@@ -455,6 +458,9 @@
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Inaktiverade"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Tog bort (inaktiverad)"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Uppdaterade"
   },
@@ -470,11 +476,23 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Uppdaterad"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# fil} other {# filer}}"
+  },
   "content.diff-modal.game-version-updated": {
     "defaultMessage": "Spelversion"
   },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Installera ändå"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Länkat modpaket"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Avlänkat modpaket"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Uppdaterat modpaket"
   },
   "content.diff-modal.no-content-changes": {
     "defaultMessage": "Inga innehållsändringar"
@@ -869,8 +887,14 @@
   "creation-flow.title.reset-server": {
     "defaultMessage": "Starta om server"
   },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "Ställ in server"
+  },
   "external-files.permissions-card.add-files-modal.confirm": {
     "defaultMessage": "Lägg till {count, plural, one {# fil} other {# filer}}"
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Kunde inte ladda filer"
   },
   "external-files.permissions-card.add-files-modal.no-search-results": {
     "defaultMessage": "Inga filer matchade din sökning."
@@ -896,8 +920,14 @@
   "external-files.permissions-card.attribution.moderation-status.passed": {
     "defaultMessage": "Godkänd"
   },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "Ingen tillåtelse"
+  },
   "external-files.permissions-card.badge.not-allowed": {
     "defaultMessage": "Inte tillåten"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Väntar"
   },
   "external-files.permissions-card.custom-license-option": {
     "defaultMessage": "Annan"
@@ -962,6 +992,12 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# fil} other {# filer}}"
   },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Inkluderade filer:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "Inkuderad i {count, plural, one {# verion} other {# versioner}}:"
+  },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Senast uppdaterad den {date} av {user}"
   },
@@ -1009,6 +1045,18 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Du har erhållit speciell tillåtelse för att distribuera detta verk i ditt modpaket."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Radera grupp"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Radera {title}?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Kunde inte radera grupp"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Håll skift medan du klickar för att hoppa över bekräftelsen."
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Ta bort från grupp"
@@ -1094,9 +1142,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "Filen sparades"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Stäng"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Hitta"
   },
@@ -1145,11 +1190,17 @@
   "files.image_viewer.image_too_large": {
     "defaultMessage": "Bilden är för stor för att se (högst {maxDimension}x{maxDimension} pixlar)"
   },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Ogiltig eller tom bildfil."
+  },
   "files.image_viewer.load_failed": {
     "defaultMessage": "Kunde inte ladda bilden"
   },
   "files.image_viewer.reset_zoom": {
     "defaultMessage": "Återställ zoom"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "Visad bild"
   },
   "files.image_viewer.zoom_in": {
     "defaultMessage": "Zooma in"
@@ -1190,6 +1241,9 @@
   "files.move-modal.header": {
     "defaultMessage": "Flytta {type}"
   },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Tillbaka hem"
+  },
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Länkstigsnavigering"
   },
@@ -1220,8 +1274,23 @@
   "files.navbar.upload-from-zip": {
     "defaultMessage": "Ladda upp .zip-fil"
   },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Uppladdad från .zip-URL"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Nuvarande fil: {file}"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} packas upp"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "Packar upp {source}"
+  },
+  "files.operations.extracting-completed": {
+    "defaultMessage": "Uppackning {source} slutförd"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "Uppackning {source} misslyckad"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpaket från en webbadress"
@@ -1437,7 +1506,7 @@
     "defaultMessage": "Prestandapåverkan"
   },
   "header.category.resolutions": {
-    "defaultMessage": "Kvalitet"
+    "defaultMessage": "Upplösning"
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Kunde inte radera innehållet"
@@ -1495,6 +1564,9 @@
   },
   "hosting.loader.loader-version": {
     "defaultMessage": "{loader, select, null {Loader} other {{loader}}} version"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Återställ server"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Ökar upp till {cpus} CPU:er"
@@ -1571,8 +1643,14 @@
   "installation-settings.incompatible-content.auto-fix-button": {
     "defaultMessage": "Auto-fix"
   },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "Länkat {projectType}"
+  },
   "installation-settings.linked.modpack": {
     "defaultMessage": "modpaket"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "serverprojekt"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} version"
@@ -1581,7 +1659,7 @@
     "defaultMessage": "Du kommer att behöva ställa om din server för att ändra loader."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Ominstallering av modpaketet återställer {type} innehåll till dess ursprungliga skick, vilket tar bort moddar eller innehåll du lagt till."
+    "defaultMessage": "Ominstallering av modpaketet återställer {type}innehållet till dess ursprungliga skick, vilket tar bort moddar eller innehåll du lagt till."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Ominstallera modpaket"
@@ -1715,6 +1793,9 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Inget innehåll hittades"
   },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "Den här filen är inte publiserad på Modrinth."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpaketets innehåll"
   },
@@ -1723,6 +1804,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Inga projekt matchar din sökning."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Öppna i Slicer"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Sök genom {count, number} projekt"
@@ -1823,6 +1907,9 @@
   "label.copied-path": {
     "defaultMessage": "Kopiera sökväg"
   },
+  "label.create-failed": {
+    "defaultMessage": "Skapning misslyckades"
+  },
   "label.created-ago": {
     "defaultMessage": "Skapad {ago}"
   },
@@ -1844,6 +1931,9 @@
   "label.details": {
     "defaultMessage": "Detaljer"
   },
+  "label.discover-content": {
+    "defaultMessage": "Upptäck innehåll"
+  },
   "label.done": {
     "defaultMessage": "Klart"
   },
@@ -1859,6 +1949,9 @@
   "label.error": {
     "defaultMessage": "Fel"
   },
+  "label.extract-failed": {
+    "defaultMessage": "Uppackning misslyckades"
+  },
   "label.filter-by": {
     "defaultMessage": "Filtrera efter"
   },
@@ -1873,6 +1966,9 @@
   },
   "label.hide-installed-content": {
     "defaultMessage": "Göm redan installerat innehåll"
+  },
+  "label.hide-selected-content": {
+    "defaultMessage": "Göm valt innehåll"
   },
   "label.installation-info": {
     "defaultMessage": "Installationsinfo"
@@ -1898,6 +1994,9 @@
   "label.modpack": {
     "defaultMessage": "Modpaket"
   },
+  "label.move-failed": {
+    "defaultMessage": "Flytt misslyckades"
+  },
   "label.no": {
     "defaultMessage": "Nej"
   },
@@ -1912,6 +2011,9 @@
   },
   "label.password": {
     "defaultMessage": "Lösenord"
+  },
+  "label.permissions": {
+    "defaultMessage": "Behörigheter"
   },
   "label.plan-custom": {
     "defaultMessage": "Anpassad"
@@ -1943,6 +2045,9 @@
   "label.rejected": {
     "defaultMessage": "Nekad"
   },
+  "label.rename-failed": {
+    "defaultMessage": "Namnbyte misslyckades"
+  },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "Jag godkänner <terms-link>Belöningsprogrammets Villkor</terms-link>"
   },
@@ -1958,11 +2063,17 @@
   "label.select-all": {
     "defaultMessage": "Välj alla"
   },
+  "label.selected": {
+    "defaultMessage": "Vald"
+  },
   "label.selection-actions": {
     "defaultMessage": "Valåtgärder"
   },
   "label.server": {
     "defaultMessage": "Server"
+  },
+  "label.server-only": {
+    "defaultMessage": "Endast server"
   },
   "label.servers": {
     "defaultMessage": "Servrar"
@@ -1993,6 +2104,9 @@
   },
   "label.updating": {
     "defaultMessage": "Uppdaterar..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "Uppladdning misslyckades"
   },
   "label.username": {
     "defaultMessage": "Användarnamn"
@@ -2161,6 +2275,9 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Denna redigerare stödjer <markdown-link>markdown formatering</markdown-link>."
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "Max längd:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Obegränsad"
@@ -2420,6 +2537,108 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "En Modrinth-användare."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Är du säker på att du vill blocka den här användaren?"
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Användare blockerad"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "Blocka {username}"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Visa användarstatistik"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Blockera"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "Skapa ett projekt"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Visa användardetaljer"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "Hantera projekt"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Avblockera"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "projekt"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "E-post verifierad"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "Har lösenord"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "Har TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "Betalningsmetoder"
+  },
+  "profile.details.title": {
+    "defaultMessage": "Användardetaljer"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "E-post ej verifierad"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "E-post verifierad"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Användarprofilen kunde inte laddas in."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "Användare hittades inte"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "Sammling"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, one {nedladdning} other {nedladdningar}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "Gick med"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "Den här användaren har inga samlingar!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "Du har inga samlingar än."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "Den här användaren har inga projekt!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "Du har inga projekt än."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "Organisationer"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "Projekt"
+  },
+  "profile.official-account": {
+    "defaultMessage": "Officiellt Modrinth-konto"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "Ett fel inträffade under avblockeringen av den här användaren. Vänligen försök igen."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "Misslyckades att avblockera användare"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username} har avblockerats."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "Användare avblockerad"
+  },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Skapades {date}"
   },
@@ -2438,8 +2657,14 @@
   "project-card.environment.server": {
     "defaultMessage": "Server"
   },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Enspelarläge"
+  },
   "project-type.all": {
     "defaultMessage": "Alla"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "Samlingar"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, one {Datapaket} other {Datapaket}}"
@@ -2539,6 +2764,9 @@
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "Plattformar"
+  },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "Platform{count, plural, one {} other {ar}}"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "Kompatibilitet"
@@ -2707,6 +2935,9 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} följare"
+  },
+  "project.license.title": {
+    "defaultMessage": "Licens"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
@@ -3112,6 +3343,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "Visa"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "nedladdning{count, plural, one {} other {ar}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "följare"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -3695,6 +3932,9 @@
   "servers.audit-log.event.server-properties-modified-label": {
     "defaultMessage": "Modifierade serveregenskaper"
   },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "Återställ server"
+  },
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Startade om server"
   },
@@ -3767,8 +4007,14 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Din säkerhetskopia"
   },
+  "servers.backups.admonition.restore-cancelled.title": {
+    "defaultMessage": "Återställning avbröts"
+  },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Något gick fel när vi försökte återställa från säkerhetskopian {backupName}. Vänligen försök igen eller kontakta support om felet återkommer."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Återställning misslyckades"
   },
   "servers.backups.admonition.restore-queued.description": {
     "defaultMessage": "Återställning från {backupName} är köad och kommer att börja strax."
@@ -3776,20 +4022,59 @@
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Din server har återställts till {backupName} och är redo för att startas."
   },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Återställning slutförd"
+  },
   "servers.backups.admonition.restoring-backup.description": {
     "defaultMessage": "Återställer din server från {backupName}. Detta kan ta några minuter."
   },
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Återställer från säkerhetskopia"
   },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "Raderar {total, plural, one {# säkerhetskopia} other {# säkerhetskopior}}..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# säkerhetskopia vald} other {# säkerhetskopior valda}}"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "När {count, plural, one {denna säkerhetskopia raderas kan den} other {dessa säkerhetskopior raderas kan de}} inte återställas. Radering är permanent."
+  },
+  "servers.backups.delete-modal.admonition-header": {
+    "defaultMessage": "Raderingsvarning"
+  },
+  "servers.backups.delete-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Säkerhetskopia} other {Säkerhetskopior ({count})}}"
+  },
+  "servers.backups.delete-modal.confirm": {
+    "defaultMessage": "Radera {count, plural, one {säkerhetskopia} other {# säkerhetskopior}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "Radera {count, plural, one {säkerhetskopia} other {säkerhetskopior}}"
+  },
+  "servers.backups.empty.description": {
+    "defaultMessage": "Skapa din första säkerhetskopia"
+  },
+  "servers.backups.empty.heading": {
+    "defaultMessage": "Inga säkerhetskopior än"
+  },
+  "servers.backups.filtered-empty.clear-filters": {
+    "defaultMessage": "Töm filter"
+  },
+  "servers.backups.filtered-empty.description": {
+    "defaultMessage": "Prova ett annat filer eller töm filtren för att se alla säkerhetskopior."
+  },
+  "servers.backups.filtered-empty.heading": {
+    "defaultMessage": "Inga säkerhetskopior matchar"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Säkerhetskopieringschema"
+  },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "{username}s avatar"
   },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel säkerhetskopiering"
@@ -3799,6 +4084,9 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Återställ"
+  },
+  "servers.backups.select-backup-aria": {
+    "defaultMessage": "Välj säkerhetskopia {name}"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Skapa säkerhetskopia"
@@ -3906,7 +4194,7 @@
     "defaultMessage": "Ny server"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Installera moddar, bjud in vänner och spela tillsammans, allt från Modrinth-appen."
+    "defaultMessage": "Installera moddar, bjud in vänner och spela tillsammans, allt från Modrinth App."
   },
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Inga servrar än"
@@ -3983,6 +4271,9 @@
   "servers.manage.error.details": {
     "defaultMessage": "Feldetaljer:"
   },
+  "servers.manage.error.title": {
+    "defaultMessage": "Servrar kunde inte laddas in"
+  },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Ett fel inträffade"
   },
@@ -4000,6 +4291,9 @@
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Betalningsinformation laddar fortfarande. Öppnar kassan så snart som möjligt."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "Köp otillgängligt"
   },
   "servers.manage.reload-button": {
     "defaultMessage": "Ladda om"
@@ -4034,8 +4328,14 @@
   "servers.manage.your-servers-title": {
     "defaultMessage": "Dina servrar"
   },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {dag} other {dagar}} <hours-count>{hours}</hours-count> {hours, plural, one {timme} other {timmar}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minut} other {minuter}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {sekund} other {sekunder}} återstår..."
+  },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Ny server"
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "Din servers hårdvara uppgraderas just nu och kommer snart vara online igen."
   },
   "servers.medal-listing.owner-avatar-alt": {
     "defaultMessage": "{username}s avatar"
@@ -4232,6 +4532,9 @@
   "servers.setup.onboarding.modpack-upload-failed.title": {
     "defaultMessage": "Modpaket-uppladdning misslyckades"
   },
+  "servers.setup.onboarding.setup-server.button": {
+    "defaultMessage": "Ställ in server"
+  },
   "servers.setup.onboarding.step.choose.title": {
     "defaultMessage": "Välj vad du vill spela"
   },
@@ -4240,6 +4543,9 @@
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Bjud in dina vänner"
+  },
+  "servers.setup.onboarding.steps.heading": {
+    "defaultMessage": "Ställ in din server (≈ 2 min)"
   },
   "servers.setup.onboarding.uploading.progress": {
     "defaultMessage": "Laddar upp ({percent, number}%)"
@@ -4275,7 +4581,7 @@
     "defaultMessage": "Dina applikationer"
   },
   "settings.authorized-apps.title": {
-    "defaultMessage": "Auktoriserade appar"
+    "defaultMessage": "Behöriga appar"
   },
   "settings.billing.title": {
     "defaultMessage": "Prenumerationer"
@@ -4293,10 +4599,10 @@
     "defaultMessage": "OLED"
   },
   "settings.display.theme.preferred-dark-theme": {
-    "defaultMessage": "Önskat mörkt tema"
+    "defaultMessage": "Föredraget mörkt tema"
   },
   "settings.display.theme.preferred-light-theme": {
-    "defaultMessage": "Önskat ljust tema"
+    "defaultMessage": "Föredraget ljust tema"
   },
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
@@ -4340,8 +4646,176 @@
   "settings.pats.title": {
     "defaultMessage": "Personliga åtkomstnycklar"
   },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Biografi"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "Profil"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "Profilbild"
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "Misslyckades att uppdatera profil"
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "Logga in på ett Modrinth-konto för att anpassa din offentliga profil."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Modrinth-konto behövs"
+  },
   "settings.sessions.title": {
     "defaultMessage": "Sessioner"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Åtgärder"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Användare"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Det här är användare du har blockat på Modrinth. De kan inte:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "Du har inte blockerat någon."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "Blockerade användare kunde inte laddas in."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "Laddar in blockerade användare…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "Skicka vänförfrågan till dig"
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "Bjuda in dig till en delad instans"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "Blockerade användare"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "Avblockera"
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "Avblockera {username}"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "{username}s avatar"
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "Vänförfrågningar"
+  },
+  "settings.social.interaction-source.coming-soon": {
+    "defaultMessage": "Kommer snart!"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "Alla"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "Vänner"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "Vänners vänner"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "Ingen"
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Inbjudningar"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Modrinth-konto krävs"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Lägg till"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Tillagd"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Den här användaren har redan bjudits in."
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Tillämpa"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username}s avatar"
+  },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Anpassat..."
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Anpassat: {date}"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "Om 1 dag"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "Om 1 timme"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "Om 7 dagar"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "Om 6 timmar"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "Om 3 dagar"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "Om 12 timmar"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Utgångsdatum"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Dina vänner – {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Bjud in"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Din inbjudningslänk går ut om {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Eller använd en inbjudningslänk"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "Inbjudningslänken har kopierats till urklippet."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Länk kopierad"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Kunde inte kopiera länk"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Högst antal användningar"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Inga vänner hittades."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Inga matchande användare hittades."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Förfrågan skickad"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} behöver acceptera din vänförfrågan först"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Spara"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Ange Modrinth-användarnamn"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Söker..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Kunde inte uppdatera inbjudningslänken"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -4844,6 +5318,9 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Lämna sidan?"
   },
+  "ui.stacked-admonitions.dismiss-all": {
+    "defaultMessage": "Avvisa alla"
+  },
   "unknown-file-warning-modal.dont-install": {
     "defaultMessage": "Installera inte"
   },
@@ -4889,11 +5366,17 @@
   "user.profile.badge.pride.about.1": {
     "defaultMessage": "Denna användare har deltagit i åtminstone ett av Modrinths Pride-insamlingar för LGBTQ+ gemenskapen."
   },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth-team"
+  },
   "version.content.name": {
     "defaultMessage": "Namn"
   },
   "version.content.version": {
     "defaultMessage": "Version"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Primär"
   },
   "version.file-type.signature": {
     "defaultMessage": "Signaturfil"

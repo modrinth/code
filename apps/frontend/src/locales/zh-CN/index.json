@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "在图中隐藏{name}"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "暂无数据"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "图表已固定"
   },
@@ -1440,7 +1443,7 @@
     "message": "总下载量"
   },
   "dashboard.analytics.total-followers": {
-    "message": "总关注者"
+    "message": "总关注人数"
   },
   "dashboard.collections.button.create-new": {
     "message": "新建"
@@ -1477,9 +1480,6 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "最近更新"
-  },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "关闭"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "下载{formType}"
@@ -1611,10 +1611,10 @@
     "message": "确认你的钱包地址"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
-    "message": "国民身份证号码"
+    "message": "国家身份证号码"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "输入居民身份证号码"
+    "message": "输入国家身份证号码"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "护照号码"
@@ -1776,16 +1776,16 @@
     "message": "你已用尽<b>{withdrawLimit}</b>的提现额度。若需继续提现，请先完成税务表格填写。"
   },
   "dashboard.discord-roles.banner.body": {
-    "message": "你符合获取 {roles} 的条件。通过 Modrinth 关联你的 Discord 账户，我们将自动同步这些身份。"
+    "message": "你符合获取 {roles} 的条件。通过 Modrinth 关联你的 Discord 账户，我们将自动同步相关身份组。"
   },
   "dashboard.discord-roles.banner.cta": {
     "message": "关联 Discord 账户"
   },
   "dashboard.discord-roles.banner.title": {
-    "message": "领取你的 Discord 身分组"
+    "message": "领取你的 Discord 身份组"
   },
   "dashboard.discord-roles.role.big-creator": {
-    "message": "1OO万+ 下载"
+    "message": "破百万下载"
   },
   "dashboard.discord-roles.role.creator": {
     "message": "创作者"
@@ -2981,9 +2981,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "未能清除所有组:{error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "清除"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "所有组均已成功清除。"
   },
@@ -3022,9 +3019,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "扫描中……"
-  },
-  "modpack-scan-modal.success": {
-    "message": "成功"
   },
   "modpack-scan-modal.title": {
     "message": "模组包扫描 ({scanned}/{total} 个文件)"
@@ -3090,7 +3084,7 @@
     "message": "斯洛伐克"
   },
   "muralpay.document-type.national-id": {
-    "message": "国民身份证"
+    "message": "国家身份证"
   },
   "muralpay.document-type.passport": {
     "message": "护照"
@@ -3354,7 +3348,7 @@
     "message": "加入项目邀请"
   },
   "project-member-header.invitation-with-role": {
-    "message": "你收到了加入此项目的邀请，其中你的身份为“{role}”。"
+    "message": "你收到了加入此项目的邀请，其中你的角色为“{role}”。"
   },
   "project-member-header.success-decline": {
     "message": "你拒绝了团队邀请"
@@ -3935,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "精选标签"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "你可以设置最多 3 个精选标签，标示出最相关的特点。如果没有选完 3 个标签，其他标签也可能提升为精选标签。"
-  },
   "project.settings.tags.features-description": {
     "message": "选择你的{type}作用于哪类特性。"
   },
@@ -3952,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "请先至少选择一个分类，再设置精选分类。"
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "准确选好标签，能极大帮助别人找到你的{type}。请确保选择所有合适的标签。"
   },
   "project.settings.tags.title": {
     "message": "标签"
@@ -4548,7 +4536,7 @@
     "message": "添加"
   },
   "settings.account.providers.modal.header": {
-    "message": "身份验证提供程序"
+    "message": "身份验证提供器"
   },
   "settings.account.providers.table.actions": {
     "message": "行动"
@@ -4692,7 +4680,7 @@
     "message": "如果二维码无法扫描，你可以手动输入密码："
   },
   "settings.account.two-factor.setup.scan": {
-    "message": "使用 <authy-link>Authy</authy-link>、<microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 等2次验证应用，扫描二维码即可开始。"
+    "message": "使用 <authy-link>Authy</authy-link>、<microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 等双因素验证应用，扫描二维码即可开始。"
   },
   "settings.account.two-factor.verify.description": {
     "message": "输入验证器提供的一次性验证码以验证访问权限。"
@@ -4790,11 +4778,23 @@
   "settings.authorizations.about-this-app": {
     "message": "关于此应用"
   },
+  "settings.authorizations.created-by": {
+    "message": "由 {user}创建"
+  },
   "settings.authorizations.description": {
     "message": "当您使用 Modrinth 账户授权某个应用程序时，即表示您授予其访问您账户的权限。您可以随时在此处管理和审查对您账户的访问权限。"
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "您授权的应用将显示在此。"
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "无已授权的应用"
+  },
   "settings.authorizations.head-title": {
     "message": "授权"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "此应用由 Modrinth 官方账号创建。"
   },
   "settings.authorizations.revoke.action": {
     "message": "撤销"
@@ -4804,6 +4804,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "您确定要撤销此申请吗？"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "尽管名字如此，这个应用与Modrinth没有任何关联。"
   },
   "settings.billing.charges.description": {
     "message": "您过去所有支付给Modrinth账户的款项都将列在这里："

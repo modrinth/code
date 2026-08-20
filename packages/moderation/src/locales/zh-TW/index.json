@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "需要至少一張圖庫圖片來展示你的{type}。"
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "資源包（音效包或在地化語言包除外）。如果你的資源包屬於上述類型，請選擇對應的標籤"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "前往連結設定"
   }
 }
-

@@ -144,19 +144,19 @@
     "message": "Votre vie privée et comment les publicités soutiennent Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Permet un rendu avancé tel que des effets de flou qui peuvent causer des problèmes de performance sans rendu accéléré par le matériel."
+    "message": "Activer les effets visuels tel que le flou d'arrière-plan. Ceci peut réduire les performances sans accélération matérielle."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Rendu avancé"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Sélectionnez votre couleur préférée pour le thème de Modrinth App."
+    "message": "Choisir la couleur de thème utilisée par Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Couleur du thème"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Modifier la page sur laquelle le launcher s'ouvre."
+    "message": "Choisir la page affichée quand Modrinth App s'ouvre."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Accueil"
@@ -168,49 +168,49 @@
     "message": "Page d'ouverture"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Désactive le nom au-dessus du joueur sur la page skins."
+    "message": "Cache votre nom d'utilisateur au-dessus de la prévisualisation du joueur sur la page de sélection de Skins."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Cacher le pseudo"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Inclut les mondes récents dans la section « Partie rapide » sur la page d'accueil."
+    "message": "Affiche les mondes récemment joués dans la section \"Sautez à nouveau dans\" de la page principale."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Mondes sur partie rapide"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiser le launcher quand a processus Minecraft démarre."
+    "message": "Minimiser Modrinth App quand Minecraft se lance."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimiser le lanceur"
+    "message": "Minimiser l'application"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Utiliser le cadre fenêtre du système (redémarrage de l'application requis)."
+    "message": "Utilise la barre de titre et les contrôles de fenêtre de votre système d'exploitation. Nécessite le redémarrage de l'application."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Décorations natives"
+    "message": "Cadre de fenêtre système"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Affiche combien de temps vous avez passé sur une instance."
+    "message": "Montre combien de temps vous avez joué à chaque instance."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Afficher le temps de jeu"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Ignore automatiquement les confirmations à faible risque, comme l'installation de modpacks en double, la suppression de contenu standard, les mises à jour groupées, la dissociation des modpacks et les demandes de réparation. Les avertissements concernant les actions dangereuses continueront d'être affichés."
+    "message": "Passe les confirmations pour des actions moins risquées comme dupliquer des installations, suppression de contenu normal, grosses mises à jour, rupture de liens et réparations. Les avertissements pour les actions dangereuses seront toujours affichés."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Cacher les alertes non essentielles"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Permet d'ouvrir ou de fermer la barre latérale."
+    "message": "Cache la barre à droite par défaut et ajouter un bouton pour la montrer ou cacher."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Tiroir latéral"
+    "message": "Cache la barre latérale droite"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Si vous essayez d'installer un fichier Modrinth Pack (.mrpack) qui n'est pas hébergé sur Modrinth, nous nous assurerons que vous comprenez les risques avant de l'installer."
+    "message": "Montre un avertissement de sécurité avant d'installer un Modrinth Pack (.mrpack) qui n'est pas sur Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "M'avertir avant d'installer des modpacks inconnus"
@@ -220,6 +220,15 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Impossible de contacter les serveurs d'authentification"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Confirmations"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Accueil et contenu"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Démarrage et navigation"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Ajouter le serveur à l'instance"
@@ -242,11 +251,17 @@
   "app.browse.back-to-instance": {
     "message": "Retour à l'instance"
   },
+  "app.browse.discover-project-type": {
+    "message": "Découvrir des {projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "Découvrir des serveurs"
   },
   "app.browse.hide-added-servers": {
     "message": "Masquer les serveurs déjà installés"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Cacher ce qui est déjà installé"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -362,8 +377,17 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Examiner les modifications"
   },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Télécharger la mise à jour"
+  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Examination..."
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "Une mise à jour est nécessaire pour jouer à {name}. Veuillez mettre à jour vers la dernière version pour lancer le jeu."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "Une mise à jour est disponible"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Toutes les données pour votre instance seront supprimées à jamais, y compris vos mondes, vos configurations, et le contenu installé."
@@ -431,6 +455,9 @@
   "app.instance.share.invite-modal.heading": {
     "message": "Partager {name}"
   },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Cette instance a atteint la limite de {limit} utilisateurs."
+  },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Vous devez vous connecter en tant que"
   },
@@ -448,6 +475,12 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Mauvais compte"
+  },
+  "app.instance.share.members.empty": {
+    "message": "Aucun utilisateur n'a encore rejoint"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Aucun utilisateur ne correspond à vos filtres."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ils vont désormais cesser de recevoir des mises à jour pour cette instance partagée"
@@ -478,6 +511,9 @@
   },
   "app.instance.share.sign-in.button": {
     "message": "Se connecter"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Impossible de se connecter"
   },
   "app.instance.share.unlink.body": {
     "message": "Vous devez délier ce modpack pour partager votre instance"
@@ -566,11 +602,59 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Rechercher {count} mondes..."
   },
+  "app.java-detection.cancel": {
+    "message": "Annuler"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Actions"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Chemin"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Version"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Aucune installation Java trouvée."
+  },
+  "app.java-detection.select": {
+    "message": "Sélectionner"
+  },
+  "app.java-detection.selected": {
+    "message": "Sélectionné"
+  },
+  "app.java-detection.title": {
+    "message": "Sélectionner l'installation Java"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Déjà installé"
+  },
+  "app.java-selector.browse": {
+    "message": "Naviguer"
+  },
+  "app.java-selector.detect": {
+    "message": "Détecter"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Télécharger les fichiers recommandés"
+  },
+  "app.java-selector.installing": {
+    "message": "Installation..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/chemin/vers/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Tester l'installation Java"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Contexte additionnel"
   },
   "app.modal.install-to-play.additional-context-placeholder": {
     "message": "Si possible, incluez des liens et des images pertinentes"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Bloquer l'utilisateur"
   },
   "app.modal.install-to-play.content-you-are-reporting": {
     "message": "L'instance que vous signalez"
@@ -592,6 +676,9 @@
   },
   "app.modal.install-to-play.invite-warning": {
     "message": "Cette invitation a été crée par un autre utilisateur Modrinth, pas par Modrinth. N'acceptez seulement les invitations de personnes en qui vous avez confiance."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "Cette invitation a été crée par <creator>{username}</creator>, pas par Modrinth. N'acceptez seulement les invitations de personnes en qui vous avez confiance."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
@@ -650,6 +737,9 @@
   "app.modal.install-to-play.unrecognized-files": {
     "message": "Fichiers non reconnus"
   },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "Utilisateur bloqué"
+  },
   "app.modal.install-to-play.view-contents": {
     "message": "Voir le contenu"
   },
@@ -677,6 +767,36 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Une mise à jour est requise pour jouer à {name}. Veuillez mettre à jour vers la dernière version pour lancer le jeu."
   },
+  "app.nav.create-new-instance": {
+    "message": "Créer une nouvelle instance"
+  },
+  "app.nav.home": {
+    "message": "Accueil"
+  },
+  "app.nav.library": {
+    "message": "Bibliothèque"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Compte Modrinth"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Se connecter à un compte Modrinth"
+  },
+  "app.nav.signed-in-as": {
+    "message": "Connecté en tant que <user>{username}</user>"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Passer à Modrinth+"
+  },
+  "app.news.title": {
+    "message": "Nouveautés"
+  },
+  "app.news.view-all": {
+    "message": "Voir toutes les nouveautés"
+  },
   "app.project.install-button.already-installed": {
     "message": "Ce projet a déjà été installé"
   },
@@ -685,6 +805,9 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Retour vers la page découvrir"
+  },
+  "app.project.install-context.back-to-instance": {
+    "message": "Retour à l'instance"
   },
   "app.project.version.all-versions": {
     "message": "Toutes les versions"
@@ -698,20 +821,113 @@
   "app.project.versions.already-installed": {
     "message": "Déjà installé"
   },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "Faites glisser pour montrer les instances récentes"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Faire glisser pour redimensionner"
+  },
+  "app.restarting": {
+    "message": "Redémarrage..."
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth App {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Entrer les variables d'environnement..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Variables d'environnement"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "Démarre les instances en plein écran en modifiant leur fichier options.txt."
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Plein écran"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "La hauteur de la fenêtre de jeu lors du lancement."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Entrer la hauteur"
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Hauteur"
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Entrer les arguments Java..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Arguments Java"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Mémoire maximale disponible pour chaque instance."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Allocation de la mémoire"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "S'exécute après que le jeu se ferme."
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "La largeur de la fenêtre de jeu lors du lancement."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Entrer la largeur..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Largeur"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Basculer le mode développeur"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Mode développeur activé."
   },
   "app.settings.downloading": {
     "message": "Téléchargement de la version {version}"
   },
+  "app.settings.java-installations.location.title": {
+    "message": "Emplacement de Java {version, number}"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
     "message": "Les publicités rendent Modrinth possible et financent les rémunérations des créateurs. Nos partenaires peuvent stocker des cookies ou y accéder au sein de l'application afin de personnaliser les publicités et de mesurer les performances. Vous pouvez refuser ou gérer vos préférences ci-dessous."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Télémétrie"
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Toujours afficher les détails de copie"
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Purger le cache"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "Cache de l'application"
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Ouvrir le dossier de sauvegardes"
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Sélectionner un nouveau répertoire pour l'application"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "Répertoire de l'application"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Instance"
   },
   "app.settings.tabs.appearance": {
     "message": "Apparence"
   },
+  "app.settings.tabs.behavior": {
+    "message": "Comportement"
+  },
   "app.settings.tabs.default-instance-options": {
-    "message": "Options d’instance par défaut"
+    "message": "Options de jeu par défaut"
   },
   "app.settings.tabs.java-installations": {
     "message": "Installations de Java"
@@ -724,6 +940,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestion des ressources"
+  },
+  "app.sidebar.playing-as": {
+    "message": "Joue en tant que"
   },
   "app.skins.add-button": {
     "message": "Ajouter un skin"
@@ -883,6 +1102,12 @@
   },
   "app.skins.toggle-ears-features-on": {
     "message": "Activer"
+  },
+  "app.survey.no-thanks": {
+    "message": "Non merci"
+  },
+  "app.survey.take-survey": {
+    "message": "Participer au sondage"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
@@ -1059,7 +1284,7 @@
     "message": "Dissocier l'instance partagée"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "Cela supprime l'instance partagée des serveurs de Modrinth. Les personnes l'utilisant dans l'application Modrinth vont cesser de recevoir des mises à jour, mais votre instance locale et son contenu resteront sur cet appareil."
+    "message": "Cela supprime l'instance partagée des serveurs de Modrinth. Les personnes l'utilisant dans Modrinth App vont cesser de recevoir des mises à jour, mais votre instance locale et son contenu resteront sur cet appareil."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "Dépublication de l'instance partagée"
@@ -1156,6 +1381,39 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Pack de ressources"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Actions"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Lien d'invitation"
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "Il n'y a aucune invitation active."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Expire"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Révoquer l'invitation"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Révoquer l'invitation {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Invitations actives"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Utilisations"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "Cette action ne peut pas être annulée"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Révoquer l'invitation"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Révoquer l'invitation"
   },
   "instance.settings.tabs.general": {
     "message": "Général"
@@ -1358,6 +1616,9 @@
   "instance.shared-instance.error.title": {
     "message": "Quelque chose s'est mal passé"
   },
+  "instance.shared-instance.network-error.title": {
+    "message": "Erreur de réseau"
+  },
   "instance.shared-instance.owner-tooltip": {
     "message": "Le contenu de cette instance est partagé à d'autres utilisateurs."
   },
@@ -1493,9 +1754,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "A nouvel onglet a été ouvert pour vous connecter. Finissez la connexion, puis retournez dans l'application."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Annuler"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Continuer dans votre navigateur"
   },
@@ -1549,5 +1807,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Le loader est procuré par le serveur"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Compte"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Affichage"
   }
 }

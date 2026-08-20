@@ -19,7 +19,8 @@ pub use self::content::{
     list_content_sets, sync_content_files,
 };
 pub use self::export_mrpack::{
-    create_mrpack_json, export_mrpack, get_pack_export_candidates,
+    PackExportCandidate, create_mrpack_json, export_mrpack,
+    get_pack_export_candidates, get_pack_export_candidates_for_parent,
 };
 pub use self::get::{get, get_many, list};
 pub use self::icon::edit_icon;

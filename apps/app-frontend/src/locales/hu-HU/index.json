@@ -9,7 +9,7 @@
     "message": "Letöltések"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "További futó játékpéldányok elrejtése"
+    "message": "További futó játékprofilok elrejtése"
   },
   "app.action-bar.install.copied-details": {
     "message": "Másolva"
@@ -21,7 +21,7 @@
     "message": "Elutasítás"
   },
   "app.action-bar.install.open-instance": {
-    "message": "Játékpéldány megnyitása"
+    "message": "Játékprofil megnyitása"
   },
   "app.action-bar.install.retry": {
     "message": "Újra"
@@ -51,7 +51,7 @@
     "message": "A letöltés nem fejeződött be"
   },
   "app.action-bar.install.summary.instance-not-found": {
-    "message": "A játékpéldány nem található"
+    "message": "A játékprofil nem található"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "A fájl elérési útja érvénytelen"
@@ -84,10 +84,10 @@
     "message": "Nem sikerült letölteni a csomagot"
   },
   "app.action-bar.install.summary.unexpected-error": {
-    "message": "Valami hiba történt"
+    "message": "Valami félrement"
   },
   "app.action-bar.install.unknown-instance": {
-    "message": "Ismeretlen játékpéldány"
+    "message": "Ismeretlen játékprofil"
   },
   "app.action-bar.install.updating-shared-content": {
     "message": "Megosztott tartalom frissítése"
@@ -96,16 +96,16 @@
     "message": "Telepítések"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Beállítás elsődleges játékpéldányként"
+    "message": "Beállítás elsődleges játékprofilként"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Nincsenek futó játékpéldányok"
+    "message": "Nincsenek futó játékprofilok"
   },
   "app.action-bar.offline": {
     "message": "Offline"
   },
   "app.action-bar.primary-instance": {
-    "message": "Elsődleges játékpéldány"
+    "message": "Elsődleges játékprofil"
   },
   "app.action-bar.reload-to-update": {
     "message": "Frissítés elérhető"
@@ -114,7 +114,7 @@
     "message": "További futó pédányok megjelenítése"
   },
   "app.action-bar.stop-instance": {
-    "message": "Játékpéldány leállítása"
+    "message": "Játékprofil leállítása"
   },
   "app.action-bar.update": {
     "message": "Frissítés"
@@ -123,7 +123,7 @@
     "message": "Aktív letöltések megtekintése"
   },
   "app.action-bar.view-instance": {
-    "message": "Játékpéldány megtekintése"
+    "message": "Játékprofil megtekintése"
   },
   "app.action-bar.view-logs": {
     "message": "Naplók megtekintése"
@@ -144,19 +144,19 @@
     "message": "Adataid védelme és a hirdetések szerepe a Modrinth működésében"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Lehetővé teszi olyan speciális megjelenítési effektusok használatát, mint például az elmosódás, amelyek hardveres gyorsítás nélkül teljesítménycsökkenést okozhatnak."
+    "message": "Engedélyezi a vizuális effektusokat, például a háttér elmosását. Hardveres gyorsítás nélkül ez ronthatja a rendszer teljesítményét."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Haladó megjelenítési beállítások"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Válaszd ki a Modrinth Apphoz a kívánt színsémát."
+    "message": "Válaszd ki a Modrinth App által használt színsémát."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Téma"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Állítsd be, hogy az indító melyik oldalon nyíljon meg."
+    "message": "Válaszd ki, hogy a Modrinth App megnyitásakor melyik oldal jelenjen meg."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Kezdőlap"
@@ -168,52 +168,52 @@
     "message": "Alapértelmezett nyitóoldal"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Letiltja a játékosod felett megjelenő névcímkét a Kinézetek oldalon."
+    "message": "Elrejti a játékosod előnézete felett megjelenő névcímkét a Kinézetváltó oldalon."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Névcímke eltüntetése"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "A kezdőlap „Folytasd itt” részében a legújabb világok is megtalálhatók."
+    "message": "A legutóbb játszott világok megjelenítése a kezdőlap „Folytasd itt” részében."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "„Folytasd itt” a világokat is"
+    "message": "Ugorj vissza a világokba"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimalizáld az indítót a Minecraft indításakor."
+    "message": "A Modrinth App bezáródik a Minecraft indításakor"
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Indító minimalizálása"
+    "message": "Alkalmazás bezárása"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "A rendszer ablakkeret használata (az alkalmazás újraindítása szükséges)."
+    "message": "Az operációs rendszer címsorának és ablakvezérlőinek használata. A módosítás érvénybe lépéséhez újra kell indítani az alkalmazást."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Rendszer ablakkeret használata"
+    "message": "Rendszerablakkeret"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Megmutatja, mennyi időt töltöttél egy játékpéldányban."
+    "message": "Megjeleníti, hogy mennyi időt töltöttél egy játékprofilban."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Játékidő megjelenítése"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Az alacsony kockázatú megerősítéseket – például a modcsomagok ismételt telepítését, a szokásos tartalomtörlést, a tömeges frissítéseket, a modcsomagok kapcsolatának megszüntetését és a javítási felhívásokat – a rendszer automatikusan kihagyja. A veszélyes figyelmeztetéseket továbbra is megjeleníti."
+    "message": "Megerősítés kihagyása az alacsony kockázatú műveletek – például az ismételt telepítések, a szokásos tartalomtörlések, a tömeges frissítések, a leválasztás és a javítások – esetében. A veszélyes műveletekre vonatkozó figyelmeztetéseket mindig megjeleníti a rendszer."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
-    "message": "Hagyd ki a lényegtelen figyelmeztetéseket"
+    "message": "Lényegtelen figyelmeztetések kihagyása"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Lehetővé teszi az oldalsáv be- és kikapcsolását."
+    "message": "Alapértelmezés szerint elrejti a jobb oldalsávot, és hozzáad egy gombot a megjelenítéséhez vagy elrejtéséhez."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Oldalsáv megjelenítése/elrejtése"
+    "message": "Jobb oldalsáv elrejtése"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Ha olyan Modrinth Csomagfájlt (.mrpack) próbálsz telepíteni, amely nem a Modrinth szerverén található, a telepítés előtt gondoskodunk arról, hogy tisztában legyél a kockázatokkal."
+    "message": "Biztonsági figyelmeztetést jelenít meg, mielőtt olyan Modrinth Csomagfájlt (.mrpack) telepítenél, amely nem a Modrinthról származik."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Figyelmeztess, mielőtt ismeretlen modcsomagokat telepítenék"
+    "message": "Figyelmeztetés ismeretlen modcsomagok telepítése előtt"
   },
   "app.auth-servers.unreachable.body": {
     "message": "A Minecraft hitelesítő szerverek lehet, hogy nem üzemelnek. Bizonyosodj meg róla, hogy van internetkapcsolatod és próbáld meg újra."
@@ -221,14 +221,23 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
   },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Megerősítések"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Kezdőlap és tartalom"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Indítás és navigáció"
+  },
   "app.browse.add-servers-to-instance": {
-    "message": "Szerver hozzáadása a játékpéldányhoz"
+    "message": "Szerver hozzáadása a játékprofilhoz"
   },
   "app.browse.add-to-an-instance": {
-    "message": "Hozzáadás egy játékpéldányhoz"
+    "message": "Hozzáadás egy játékprofilhoz"
   },
   "app.browse.add-to-instance": {
-    "message": "Hozzáadás a játékpéldányhoz"
+    "message": "Hozzáadás a játékprofilhoz"
   },
   "app.browse.add-to-instance-name": {
     "message": "Hozzáadás ehhez: {instanceName}"
@@ -240,7 +249,10 @@
     "message": "Már hozzá van adva"
   },
   "app.browse.back-to-instance": {
-    "message": "Vissza a játékpéldányhoz"
+    "message": "Vissza a játékprofilhoz"
+  },
+  "app.browse.discover-project-type": {
+    "message": "{projectType} keresése"
   },
   "app.browse.discover-servers": {
     "message": "Szerverek böngészése"
@@ -248,17 +260,20 @@
   "app.browse.hide-added-servers": {
     "message": "A már hozzáadott szerverek elrejtése"
   },
+  "app.browse.hide-installed-modpacks": {
+    "message": "A már telepítettek elrejtése"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modcsomagok"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "A tartalom hozzáadása ronthatja a kompatibilitást a szerverhez való csatlakozáskor. A hozzáadott tartalom elveszik, ha frissíted a szerverpéldány tartalmát."
+    "message": "A tartalom hozzáadása ronthatja a kompatibilitást a szerverhez való csatlakozáskor. A hozzáadott tartalom elveszik, ha frissíted a szerverprofil tartalmát."
   },
   "app.browse.server.installing": {
-    "message": "Letöltés"
+    "message": "Telepítés"
   },
   "app.content-install.no-compatible-versions": {
-    "message": "Nincs a(z) {compatibilityLabel} verziónak megfelelő elérhető verzió. Válassz ki egy verziót, ha mégis telepíteni szeretnéd. A függőségek nem települnek automatikusan."
+    "message": "Nincs olyan elérhető verzió, amely kompatibilis a(z) {compatibilityLabel} értékkel. Válassz ki egy verziót a telepítés mindenképp történő folytatásához. A függőségek nem lesznek automatikusan telepítve."
   },
   "app.export-modal.description-placeholder": {
     "message": "Írd be a modcsomag leírását..."
@@ -270,7 +285,7 @@
     "message": "Modcsomag exportálása"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Modcsamag neve"
+    "message": "A modcsomag neve"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "A modcsomag neve"
@@ -339,7 +354,7 @@
     "message": "Hozzáadva"
   },
   "app.instance.admonitions.shared-instance.changes-body": {
-    "message": "A te gépeden lévő játékpéldány újabb, mint azoké a felhasználóké, akikkel megosztottad."
+    "message": "A te gépeden lévő játékprofil újabb, mint azoké a felhasználóké, akikkel megosztottad."
   },
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "A változtatásaid még nem lettek megosztva"
@@ -357,28 +372,37 @@
     "message": "Frissítés közzététele"
   },
   "app.instance.admonitions.shared-instance.review-description": {
-    "message": "A játékpéldányt használó összes résztvevővel megosztásra kerülő tartalomváltoztatások áttekintése."
+    "message": "A játékprofilt használó összes résztvevővel megosztásra kerülő tartalomváltoztatások áttekintése."
   },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Változtatások áttekintése"
   },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Frissítés áttekintése"
+  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Áttekintés..."
   },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "Egy frssítés szükséges a(z) {name} játékprofilhoz. Kérjük, frissítsd a játékot a legújabb verzióra az indításhoz."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "Frissítés érhető el"
+  },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "A játékpéldányhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."
+    "message": "A játékprofilhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Ezt a műveletet nem lehet visszavonni"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Játékpéldány törlése"
+    "message": "Játékprofil törlése"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Játékpéldány törlése"
+    "message": "Játékprofil törlése"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Ez a modcsomag már telepítve van a(z) <bold>{instanceName}</bold> játékpéldányban. Biztosan duplikálni szeretnéd?"
+    "message": "Ez a modcsomag már telepítve van a(z) <bold>{instanceName}</bold> játékprofilban. Biztosan duplikálni szeretnéd?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Létrehozás"
@@ -387,7 +411,7 @@
     "message": "A modcsomag már telepítve van"
   },
   "app.instance.modpack-already-installed.instance": {
-    "message": "Játékpéldány"
+    "message": "Játékprofil"
   },
   "app.instance.mods.bulk-update.downloading-projects": {
     "message": "{current, number}/{total, number} projekt letöltése..."
@@ -402,7 +426,7 @@
     "message": "projekt"
   },
   "app.instance.mods.locked-content": {
-    "message": "Zárolt játékpéldányokban a tartalom nem változtatható meg."
+    "message": "Zárolt játékprofilokban a tartalom nem változtatható meg."
   },
   "app.instance.mods.project-was-added": {
     "message": "„{name}” hozzá lett adva"
@@ -420,7 +444,7 @@
     "message": "Sikeresen feltöltve"
   },
   "app.instance.share.empty.description": {
-    "message": "Ezt a játékpéldányt megoszthatod a barátaiddal!"
+    "message": "Ezt a játékprofilt megoszthatod a barátaiddal!"
   },
   "app.instance.share.empty.heading": {
     "message": "Nincsenek barátok meghívva"
@@ -430,6 +454,9 @@
   },
   "app.instance.share.invite-modal.heading": {
     "message": "{name} megosztása"
+  },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Ez a játékprofil elérte a {limit} felhasználós korlátot."
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Be kell jelentkezned mint"
@@ -449,53 +476,71 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Helytelen fiók"
   },
+  "app.instance.share.members.empty": {
+    "message": "Még senki sem csatlakozott"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Nem található a keresésnek megfelelő felhasználó"
+  },
   "app.instance.share.remove-user-modal.effect-access": {
-    "message": "Többé nem fog frissítéseket kapni ehhez a megosztott játékpéldányhoz"
+    "message": "Többé nem fog frissítéseket kapni ehhez a megosztott játékprofilhoz"
   },
   "app.instance.share.remove-user-modal.effect-installed-copy": {
-    "message": "A már telepített játékpéldányok megmaradnak az eszközén"
+    "message": "A már telepített játékprofilok megmaradnak az eszközén"
   },
   "app.instance.share.remove-user-modal.effect-invite-again": {
     "message": "Később újra meghívhatod"
   },
   "app.instance.share.remove-user-modal.effect-last-user": {
-    "message": "Ő az utolsó felhasználó, a megosztás ezen az játékpéldányon le lesz tiltva"
+    "message": "Ő az utolsó felhasználó, a megosztás ezen az játékprofilon le lesz állítva"
   },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "Mi fog történni?"
   },
   "app.instance.share.remove-user-modal.header": {
-    "message": "Hozzáférés visszavonása"
+    "message": "Hozzáférés megvonása"
   },
   "app.instance.share.remove-user-modal.remove-button": {
-    "message": "Hozzáférés visszavonása"
+    "message": "Hozzáférés megvonása"
   },
   "app.instance.share.remove-user-modal.user-avatar-alt": {
     "message": "{username} avatárja"
   },
   "app.instance.share.remove-user-modal.warning-body": {
-    "message": "Ha visszavonod {username} hozzáférését ehhez a megosztott játékpéldányhoz, újra meg kell hívnod, mielőtt frissítéseket kaphatna."
+    "message": "Ha visszavonod {username} hozzáférését ehhez a megosztott játékprofilhoz, újra meg kell hívnod, mielőtt frissítéseket kaphatna."
   },
   "app.instance.share.sign-in.button": {
     "message": "Bejelentkezés"
   },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "A megosztott játékprofilok szolgáltatás pillanatnyilag nem érhető el. Kérjük, próbáld újra később"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Nem sikerült csatlakozni"
+  },
   "app.instance.share.unlink.body": {
-    "message": "A játékpéldány megosztásához le kell választanod ezt a modcsomagot"
+    "message": "A játékprofil megosztásához le kell választanod ezt a modcsomagot"
   },
   "app.instance.share.unlink.header": {
     "message": "A megosztáshoz le kell választani"
   },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "Ez a megosztott játékprofil már telepítve van <bold>{instanceName} </bold> néven. Biztosan telepíteni szeretnél egy másik másolatot?"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "A megosztott játékprofil már telepítve van"
+  },
   "app.instance.shared-instance-already-installed.install-anyway": {
-    "message": "Telepítés mindenképpen"
+    "message": "Telepítés mindenképp"
   },
   "app.instance.shared-instance-already-installed.instance": {
-    "message": "Játékpéldány"
+    "message": "Játékprofil"
   },
   "app.instance.shared-instance-wrong-account.fallback-username": {
     "message": "az összekapcsolt fiók"
   },
   "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
-    "message": ", hogy kezelhesd ezt a megosztott játékpéldányt. Nem fogod tudni a frissítéseket eljuttatni a felhasználókhoz."
+    "message": ", hogy kezelhesd ezt a megosztott játékprofilt. Nem fogod tudni közzétenni a frissítéseket."
   },
   "app.instance.shared-instance-wrong-account.sign-in-as-label": {
     "message": "Jelentkezz be mint"
@@ -504,7 +549,7 @@
     "message": "Be kell jelentkezned a Modrinthba"
   },
   "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
-    "message": ", hogy értesítéseket kapj erről a megosztott játékpéldányról."
+    "message": ", hogy frissítéseket kapj ehhez a megosztott játékprofilhoz."
   },
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "Nem a megfelelő Modrinth-fiókot használod"
@@ -522,7 +567,7 @@
     "message": "Világ törlése"
   },
   "app.instance.worlds.delete-world-modal.warning-body": {
-    "message": "Ez a világ véglegesen törölve lesz ebből a játékpéldányból. Ezt NEM tudod visszavonni!"
+    "message": "Ez a világ véglegesen törölve lesz ebből a játékprofilból. Ezt NEM tudod visszavonni!"
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
     "message": "{name} törlése"
@@ -545,6 +590,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nincs szerver vagy világ"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Újratöltés..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Szerver eltávolítása"
   },
@@ -560,14 +608,65 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Keresés {count} világ között..."
   },
+  "app.java-detection.cancel": {
+    "message": "Mégse"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Műveletek"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Elérési útvonal"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Verzió"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Nem találtunk Java-telepítést."
+  },
+  "app.java-detection.select": {
+    "message": "Kiválasztás"
+  },
+  "app.java-detection.selected": {
+    "message": "Kiválasztva"
+  },
+  "app.java-detection.title": {
+    "message": "Java-telepítés kiválasztása"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Már telepítve van"
+  },
+  "app.java-selector.browse": {
+    "message": "Tallózás"
+  },
+  "app.java-selector.detect": {
+    "message": "Észlelés"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Ajánlott verzió telepítése"
+  },
+  "app.java-selector.installing": {
+    "message": "Telepítés..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/eleresi/ut/a/javahoz"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Java-telepítés tesztelése"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "További kontextus"
   },
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "Ha lehetséges és hasznos, adj meg linkeket és képeket is"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Felhasználó letiltása"
+  },
   "app.modal.install-to-play.content-you-are-reporting": {
-    "message": "A játékpéldány, amelyet bejelenteni kívánsz"
+    "message": "A játékprofil, amelyet bejelenteni kívánsz"
   },
   "app.modal.install-to-play.delete-instance": {
-    "message": "Játékpéldány törlése"
+    "message": "Játékprofil törlése"
   },
   "app.modal.install-to-play.external-files-dont-install": {
     "message": "Ne telepítse"
@@ -576,7 +675,7 @@
     "message": "Telepítés a játékhoz"
   },
   "app.modal.install-to-play.install-anyway": {
-    "message": "Telepítés mindenképpen"
+    "message": "Telepítés mindenképp"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Telepítés"
@@ -584,17 +683,56 @@
   "app.modal.install-to-play.invite-warning": {
     "message": "Ezt a meghívót nem a Modrinth, hanem egy másik Modrinth-felhasználó hozta létre. Csak olyan személyektől fogadd el a meghívásokat, akikben megbízol."
   },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "Ezt a meghívót <creator>{username}</creator> készítette, nem pedig a Modrinth. Csak olyan személyektől fogadd el a meghívásokat, akikben megbízol."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"
   },
+  "app.modal.install-to-play.report-description": {
+    "message": "Ezzel az űrlapmal jelentsd be azokat az eseteket, amelyek megsérthetik a <rules-link>Szabályzatunkat</rules-link> vagy a <terms-link>Felhasználási feltételeinket</terms-link>."
+  },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "A fájl nem támogatott képfájlformátumot használ"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "A fájl meghaladja az 1 MiB-os méretkorlátot"
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "A DMCA-bejelentésekkel és egyéb jogi igényekkel kapcsolatban lásd a <copyright-link>Szerzői jogi szabályzatunkat</copyright-link>."
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "Melyik szabályt sérti meg ez az adott játékprofil?"
+  },
+  "app.modal.install-to-play.report-reason.inappropriate": {
+    "message": "Nem megfelelő"
+  },
+  "app.modal.install-to-play.report-reason.malicious": {
+    "message": "Káros"
+  },
   "app.modal.install-to-play.report-reason.spam": {
     "message": "Spam"
+  },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "Megosztott játékprofil jelentése"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Jelentés elküldve"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "Ha segítségre van szükséged, vedd fel a kapcsolatot a <support-link>támogatási csapatunkkal</support-link>. Hibajelentésekhez nyiss egy <github-link>GitHub-issue-t</github-link>."
   },
   "app.modal.install-to-play.reviewed-files": {
     "message": "Egy fájlt csak akkor vizsgálnak meg, ha azt a Modrinth-en közzétették, függetlenül a fájlformátumtól (beleértve a .mrpack formátumot is)."
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "Megosztott játékpéldány"
+    "message": "Megosztott játékprofil"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "A megosztott játékprofil tartalma"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "Ez a megosztott játékprofil olyan fájlokat tartalmaz, amelyek nincsenek közzétéve a Modrinthon. Határozottan javasoljuk, hogy kizárólag olyan forrásokból telepíts fájlokat, amelyekben megbízol."
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ez a szerver-modpack olyan fájlokat tartalmaz, amelyek nem szerepelnek a Modrinth oldalon. Határozottan javasoljuk, hogy kizárólag olyan forrásokból telepíts fájlokat, amelyekben megbízol."
@@ -605,6 +743,9 @@
   "app.modal.install-to-play.unrecognized-files": {
     "message": "Felismerhetetlen fájlok"
   },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "Felhasználó letiltva"
+  },
   "app.modal.install-to-play.view-contents": {
     "message": "Tartalom megtekintése"
   },
@@ -612,16 +753,67 @@
     "message": "Frissítsd a játékhoz"
   },
   "app.modal.update-to-play.removed": {
-    "message": "Törölve"
+    "message": "Eltávolítva"
+  },
+  "app.modal.update-to-play.server-modpack-unknown-files-description": {
+    "message": "Ez a szervermodcsomag-frissítés olyan fájlokat tartalmaz, amelyek nem találhatók meg a Modrinthen. Erősen javasoljuk, hogy csak megbízható forrásokból telepíts fájlokat."
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Hozzáadva"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "Eltávolítva"
+  },
+  "app.modal.update-to-play.shared-instance-unknown-files-description": {
+    "message": "Ez a megosztott játékprofil-frissítés olyan fájlokat tartalmaz, amelyek nincsenek közzétéve a Modrinthon. Határozottan javasoljuk, hogy kizárólag olyan forrásokból telepíts fájlokat, amelyekben megbízol."
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Frissítés szükséges"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Egy frssítés szükséges a(z) {name} játékprofilhoz. Kérjük, frissítsd a játékot a legújabb verzióra az indításhoz."
+  },
+  "app.nav.create-new-instance": {
+    "message": "Új játékprofil létrehozása"
+  },
+  "app.nav.home": {
+    "message": "Kezdőlap"
+  },
+  "app.nav.library": {
+    "message": "Könyvtár"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Modrinth fiók"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Bejelentkezés egy Modrinth-fiókba"
+  },
+  "app.nav.signed-in-as": {
+    "message": "Bejelentkezve mint <user>{username}</user>"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Frissíts a Modrinth+-ra"
+  },
+  "app.news.title": {
+    "message": "Hírek"
+  },
+  "app.news.view-all": {
+    "message": "Összes hír"
   },
   "app.project.install-button.already-installed": {
     "message": "Ez a projekt már telepítve van"
   },
   "app.project.install-button.switch-version": {
-    "message": "Verzió váltása"
+    "message": "Verzió váltás"
   },
   "app.project.install-context.back-to-browse": {
     "message": "Vissza a böngészéshez"
+  },
+  "app.project.install-context.back-to-instance": {
+    "message": "Vissza a játékprofilhoz"
   },
   "app.project.version.all-versions": {
     "message": "Összes verzió"
@@ -633,7 +825,97 @@
     "message": "Telepítés..."
   },
   "app.project.versions.already-installed": {
-    "message": "Már le van töltve"
+    "message": "Már telepítve van"
+  },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "Húzd el a legutóbbi játékprofilok megjelenítéséhez"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Átméretezés húzással"
+  },
+  "app.restarting": {
+    "message": "Újraindítás..."
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth App {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "A játékprofil indításakor beállított környezeti változók."
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Adj meg környezeti változókat..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Környezeti változók"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "A játékprofilok elindítása teljes képernyős módban az options.txt fájl frissítésével."
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Teljes képernyő"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "A játék ablakának magassága indításkor."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Magasság megadása..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Magasság"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "A Javának a játékprofil indításakor átadott paraméterek."
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Java-indítási paraméterek megadása..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java-indítási paraméterek"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Az egyes játékprofilok számára rendelkezésre álló maximális memória."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Memóriakeret"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "A játék bezárása után fut le."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Adj meg egy kilépés utáni parancsot..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Kilépés utáni parancs"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "A játékprofil indítása előtt fut le."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Adj meg egy indítás előtti parancsot..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Indítás előtti parancs"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "A játék ablakának szélessége indításkor."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Szélesség megadása..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Szélesség"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "A Minecraft indítási folyamatát körbefogó parancs."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Adj meg egy indítást körbefogó parancsot..."
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Indítást körbefogó parancs"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Fejlesztői mód bekapcsolása/kikapcsolása"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
@@ -641,14 +923,92 @@
   "app.settings.downloading": {
     "message": "v{version} letöltése"
   },
+  "app.settings.java-installations.location.title": {
+    "message": "A Java {version, number} helye"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
-    "message": "A hirdetések teszik lehetővé a Modrinth működését, és biztosítják a tartalomkészítők juttatásait. Partnereink sütiket tárolhatnak vagy érhetnek el az alkalmazásban a hirdetések személyre szabása és a teljesítmény mérése céljából. Az alábbiakban leiratkozhatsz erről, illetve beállíthatod a preferenciáidat."
+    "message": "A hirdetések teszik lehetővé a Modrinth működését, és biztosítják a tartalomkészítők juttatásait. Partnereink sütiket tárolhatnak vagy érhetnek el az alkalmazásban a hirdetések személyre szabása és a teljesítmény mérése céljából. Alább leiratkozhatsz erről, illetve beállíthatod a preferenciáidat."
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "A Modrinth App megjelenítése aktuális tevékenységként a Discordon. Ez nem érinti a modok által a játékprofilokhoz hozzáadott Rich Presence-t. Az alkalmazás újraindítását igényli."
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "A Modrinth névtelen használati és telemetriai adatokat gyűjt a felhasználói élmény javítása és személyre szabása érdekében. Ha kikapcsolod ezt a beállítást, leiratkozol erről, és a rendszer többé nem gyűjti az adataidat."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetria"
+  },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "A „Részletek másolása” művelet megjelenítése, amíg a telepítés várólistán van vagy fut. A művelet mindig elérhető a sikertelen vagy megszakított telepítések esetén."
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Mindig mutasd a Részletek másolását"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "Az alkalmazás betöltése lassabb lehet, amíg a gyorsítótár újra nem települ."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Törlöd az alkalmazás gyorsítótárát?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Letörli a gyorsítótárban tárolt adatokat, majd újra letölti azokat a Modrinthról. Az alkalmazás betöltése lassabb lehet, amíg a gyorsítótár újra nem települ."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Gyorsítótár törlése"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "Az alkalmazás gyorsítótára"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "A fontos alkalmazásadatok biztonsági mentései itt kerülnek tárolásra arra az esetre, ha később vissza kellene állítanod őket."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "A biztonsági mentések mappájának megnyitása"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Alkalmazásadatbázis-biztonsági mentések"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Alkalmazáskönyvtár tallózása"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "A Modrinth App ebben a mappában tárolja a játékprofilokat és az egyéb fájlokat. A módosítások az alkalmazás újraindítása után lépnek érvénybe."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Új alkalmazáskönyvtár kiválasztása"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "Alkalmazáskönyvtár"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Az egyszerre letölthető fájlok száma. Csökkentsd ezt az értéket, ha a letöltések gyakran sikertelenek a hálózati kapcsolatod miatt. Az alkalmazás újraindítása szükséges."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Maximális egyidejű letöltések"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Az egyszerre lemezre írható fájlok száma. Csökkentsd ezt az értéket, ha gyakran tapasztalsz I/O-hibákat. Az alkalmazás újraindítása szükséges."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Maximális egyidejű írási műveletek"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Játékprofilok"
   },
   "app.settings.tabs.appearance": {
     "message": "Megjelenés"
   },
+  "app.settings.tabs.behavior": {
+    "message": "Működés"
+  },
   "app.settings.tabs.default-instance-options": {
-    "message": "Alapértelmezett profil beállítások"
+    "message": "A játék alapbeállításai"
   },
   "app.settings.tabs.java-installations": {
     "message": "Telepített Java példányok"
@@ -662,14 +1022,17 @@
   "app.settings.tabs.resource-management": {
     "message": "Erőforráskezelés"
   },
+  "app.sidebar.playing-as": {
+    "message": "Játékfiók"
+  },
   "app.skins.add-button": {
     "message": "Kinézet hozzáadása"
   },
   "app.skins.add-button.drag-and-drop": {
-    "message": "Húzd ide a fájlt"
+    "message": "Húzd és ejtsd ide a fájlt"
   },
   "app.skins.apply-button": {
-    "message": "Alkalmazás"
+    "message": "Alkalmaz"
   },
   "app.skins.delete-button": {
     "message": "Kinézet törlése"
@@ -684,7 +1047,7 @@
     "message": "Nem sikerült beolvasni a feltöltött fájlt."
   },
   "app.skins.dropped-file-error.title": {
-    "message": "Hiba a fájl feldolgozása közben"
+    "message": "Hiba történt a fájl feldolgozása közben"
   },
   "app.skins.ears-feature-notice": {
     "message": "Ez a kinézet az {ears} mod funkcióit használja"
@@ -821,6 +1184,21 @@
   "app.skins.toggle-ears-features-on": {
     "message": "Bekapcsolás"
   },
+  "app.survey.body": {
+    "message": "Megosztanád velünk a tapasztalataidat a Modrinth App használatáról néhány kérdés megválaszolásával?"
+  },
+  "app.survey.footer": {
+    "message": "A visszajelzésed közvetlenül a Modrinth csapatához kerül, és segít a jövőbeli frissítések alakításában!"
+  },
+  "app.survey.no-thanks": {
+    "message": "Nem, köszönöm"
+  },
+  "app.survey.take-survey": {
+    "message": "Kérdőív kitöltése"
+  },
+  "app.survey.title": {
+    "message": "Hali, Modrinth-felhasználó!"
+  },
   "app.update-popup.body.download-complete": {
     "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez válaszd ki a Frissítés opciót, vagy az alkalmazás a bezárásakor automatikusan frissül."
   },
@@ -837,7 +1215,7 @@
     "message": "Letöltés ({size})"
   },
   "app.update-popup.download-complete": {
-    "message": "Sikeres letöltés"
+    "message": "Letöltés befejezve"
   },
   "app.update-popup.reload": {
     "message": "Frissítés"
@@ -858,16 +1236,49 @@
     "message": "Válassz egy lehetőséget"
   },
   "app.world.world-item.incompatible-version": {
-    "message": "Inkompatibilis verzió: {version}"
+    "message": "Nem kompatibilis verzió: {version}"
   },
   "app.world.world-item.not-played-yet": {
-    "message": "Még nem játszottál"
+    "message": "Még nem játszott"
   },
   "app.world.world-item.offline": {
     "message": "Offline"
   },
   "app.world.world-item.players-online": {
     "message": "{count} online"
+  },
+  "content.shared-instance.change-version-body": {
+    "message": "A verzió módosítása csak a helyi játékprofilt érinti. A megosztott játékprofil jövőbeli frissítései felülírhatják vagy ismét megváltoztathatják azt."
+  },
+  "content.shared-instance.delete-bulk-body": {
+    "message": "A kiválasztott projektek egy része a megosztott játékprofil része. Törlésük csak a helyi játékprofilt módosítja, és a megosztott játékprofil jövőbeli frissítései visszaállíthatják vagy ismét módosíthatják őket."
+  },
+  "content.shared-instance.delete-button": {
+    "message": "Törlés mindenképp"
+  },
+  "content.shared-instance.delete-many-button": {
+    "message": "{count, number} projekt törlése mindenképp"
+  },
+  "content.shared-instance.delete-single-body": {
+    "message": "A törlése csak a helyi játékprofilt módosítja. A megosztott játékprofil jövőbeli frissítései visszaállíthatják vagy ismét módosíthatják."
+  },
+  "content.shared-instance.disable-bulk-body": {
+    "message": "A kiválasztott projektek egy része a megosztott játékprofil része. Letiltásuk csak a helyi játékprofilt módosítja, és a megosztott játékprofil jövőbeli frissítései újra engedélyezhetik, visszaállíthatják vagy ismét módosíthatják őket."
+  },
+  "content.shared-instance.disable-button": {
+    "message": "Letíltás mindenképp"
+  },
+  "content.shared-instance.disable-many-button": {
+    "message": "{count, number} projekt letíltása mindenképp"
+  },
+  "content.shared-instance.disable-single-body": {
+    "message": "A letiltása csak a helyi játékprofilt módosítja. A megosztott játékprofil jövőbeli frissítései újra engedélyezhetik, visszaállíthatják vagy ismét módosíthatják."
+  },
+  "content.shared-instance.unlink-body": {
+    "message": "A leválasztás csak a helyi játékprofilt érinti. A megosztott játékprofil jövőbeli frissítései felülírhatják vagy ismét megváltoztathatják azt."
+  },
+  "content.shared-instance.warning-header": {
+    "message": "Ez egy megosztott játékprofil része"
   },
   "friends.action.add-friend": {
     "message": "Barát hozzáadása"
@@ -932,14 +1343,47 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Lépj be Modrinth fiókodba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
   },
+  "installation-settings.shared-instance.linked-title": {
+    "message": "Összekapcsolt megosztott játékprofil"
+  },
+  "installation-settings.shared-instance.title": {
+    "message": "Játékprofil megosztásának visszavonása"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "message": "Megosztott játékprofil leválasztása"
+  },
+  "installation-settings.shared-instance.unlink-description": {
+    "message": "Leválasztja ezt a helyi játékprofilt a jövőbeli megosztott frissítésekről."
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "Leválasztás..."
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Megosztott játékprofil megosztásának visszavonása"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Eltávolítja ezt a megosztott játékprofilt a Modrinthból, és nem küld többé frissítéseket azoknak, akik használják. A helyi játékprofilodat ez nem érinti."
+  },
   "installation-settings.shared-instance.unpublishing-button": {
     "message": "Közzététel visszavonása..."
   },
+  "installation-settings.unlink-shared-instance.modal.admonition-body": {
+    "message": "Ez kizárólag a helyi játékprofilodra vonatkozik. A telepített tartalmaid ezen az eszközön maradnak, és ez nem érinti a megosztott játékprofilt, illetve az azt használó többi felhasználót."
+  },
   "installation-settings.unlink-shared-instance.modal.admonition-header": {
-    "message": "Megosztott játékpéldány leválasztása"
+    "message": "Megosztott játékprofil leválasztása"
   },
   "installation-settings.unlink-shared-instance.modal.header": {
-    "message": "Megosztott játékpéldány leválasztása"
+    "message": "Megosztott játékprofil leválasztása"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "Ezzel a megosztott játékprofil törlődik a Modrinth szervereiről. A Modrinth Appban az ezt használók többé nem kapnak frissítéseket, de a helyi játékprofil és annak tartalma továbbra is ezen az eszközön marad."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Visszavonod a megosztott játékprofil megosztását"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Megosztott játékprofil megosztásának visszavonása"
   },
   "instance.action.create-shortcut": {
     "message": "Parancsikon létrehozása"
@@ -948,7 +1392,7 @@
     "message": "Modcsomag exportálása"
   },
   "instance.action.launch-instance": {
-    "message": "Játékpéldány elindítása"
+    "message": "Játékprofil elindítása"
   },
   "instance.action.more-actions": {
     "message": "További műveletek"
@@ -960,7 +1404,7 @@
     "message": "Javítás"
   },
   "instance.action.settings": {
-    "message": "Játékpéldány-beállítások"
+    "message": "Játékprofil beállításai"
   },
   "instance.action.starting": {
     "message": "Indítás..."
@@ -1011,7 +1455,10 @@
     "message": "Mentés másként..."
   },
   "instance.locked.delete-button": {
-    "message": "Játékpéldány törlése"
+    "message": "Játékprofil törlése"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "Ez a játékprofil zárolva van"
   },
   "instance.playtime.never-played": {
     "message": "Még nem játszott"
@@ -1028,17 +1475,56 @@
   "instance.server-modal.resource-pack": {
     "message": "Forráscsomag"
   },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Műveletek"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Meghívó link"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "Bárki, akinek van ilyen meghívó linkje, csatlakozhat, amíg az aktív marad."
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "Nincsenek aktív meghívások."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Lejár"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Meghívó törlése"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "A(z) {code} meghívó törlése"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Aktív meghívások"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Használatok"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "A(z) <monospace>{code}</monospace> meghívó link azonnal érvényét veszti. Azok, akik már csatlakoztak, továbbra is hozzáférhetnek."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "Ezt a műveletet nem lehet visszavonni"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Meghívó törlése"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Meghívó törlése"
+  },
   "instance.settings.tabs.general": {
     "message": "Általános"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Játékpéldány törlése"
+    "message": "Játékprofil törlése"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Játékpéldány törlése"
+    "message": "Játékprofil törlése"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Örökké eltávolít egy játékpéldányt az eszközről, beleértve a világait, beállításait és minden telepített tartalmat. Legyél óvatos, mert ha egyszer kitörölsz egy játékpéldányt, azt többé nem lehet visszaállítani."
+    "message": "Örökké eltávolít egy játékprofilt az eszközről, beleértve a világait, beállításait és minden telepített tartalmat. Legyél óvatos, mert ha egyszer kitörölsz egy játékprofilt, azt többé nem lehet visszaállítani."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Törlés..."
@@ -1050,10 +1536,10 @@
     "message": "Telepítés közben nem lehet duplikálni."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Játékpéldány duplikálása"
+    "message": "Játékprofil duplikálása"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Készít egy másolatot erről a játékpéldányról, beleértve a világokat, beállításokat, modokat stb."
+    "message": "Készít egy másolatot erről a játékprofilról, beleértve a világokat, beállításokat, modokat stb."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Ikon szerkesztése"
@@ -1074,7 +1560,7 @@
     "message": "Új gyűjtemény létrehozása"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "A könyvtárgyűjtemények segítenek külön kategóriákba rendszerezni a játékpéldányokat."
+    "message": "A könyvtárgyűjtemények segítenek külön kategóriákba rendszerezni a játékprofilokat."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Add meg a gyűjtemény nevét"
@@ -1128,7 +1614,7 @@
     "message": "Indítás előtt"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Futtatás a játékpéldány futtatása előtt."
+    "message": "Futtatás a játékprofil futtatása előtt."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Írjon be indítás előtti parancsokat..."
@@ -1151,6 +1637,9 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} verzió"
   },
+  "instance.settings.tabs.installation.locked": {
+    "message": "A telepítési beállítások nem érhetők el, amíg ez a játékprofil zárolva van."
+  },
   "instance.settings.tabs.java": {
     "message": "Java és memória"
   },
@@ -1158,7 +1647,7 @@
     "message": "Egyéni környezeti változók"
   },
   "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Egyéni Java argumentumok"
+    "message": "Egyéni Java-indítási paraméterek"
   },
   "instance.settings.tabs.java.custom-java-installation": {
     "message": "Egyedi Java telepítés"
@@ -1167,10 +1656,10 @@
     "message": "Egyéni memóriakiosztás"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
-    "message": "Írja be a környezeti változókat..."
+    "message": "Környezeti változók megadása..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Java argumentumok megadása..."
+    "message": "Java-indítási paraméterek megadása..."
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Környezeti változók"
@@ -1179,7 +1668,7 @@
     "message": "Horgok"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Java argumentumok"
+    "message": "Java-indítási paraméterek"
   },
   "instance.settings.tabs.java.java-installation": {
     "message": "Java telepítés"
@@ -1223,17 +1712,62 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Szélesség megadása..."
   },
+  "instance.shared-instance.error.title": {
+    "message": "Valami hiba történt"
+  },
+  "instance.shared-instance.network-error.text": {
+    "message": "Nem sikerült csatlakozni a megosztott játékprofilok API-jához"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Hálózati hiba"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "Ennek a játékprofilnak a tartalma meg van osztva más felhasználókkal."
+  },
   "instance.shared-instance.publish-review.added-label": {
-    "message": "Hozzáadva"
+    "message": "Hozzáadva:"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Frissítés közzététele a játékosoknak"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Konfigurációs fájlok kiválasztása"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "Ellenőrizd a tartalmi módosításokat, és válaszd ki azokat a konfigurációs fájlokat, amelyeket be szeretnél vonni ebbe a frissítésbe."
   },
   "instance.shared-instance.publish-review.header": {
     "message": "Változtatások áttekintése"
   },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "Frissítés közzététele"
+  },
   "instance.shared-instance.publish-review.removed-label": {
-    "message": "Eltávolítva"
+    "message": "Eltávolítva:"
+  },
+  "instance.shared-instance.tooltip": {
+    "message": "Ennek a játékprofilynak a tartalmát más kezeli."
+  },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "A megosztott játékprofilhoz való hozzáférésedet visszavonták. Ez a játékprofil továbbra is elérhető, de már nincs összekapcsolva, és többé nem kap frissítéseket."
+  },
+  "instance.shared-instance.unavailable.deleted-text": {
+    "message": "Az elsődleges játékprofilt törölték. Ez a játékprofil továbbra is elérhető, de már nincs összekapcsolva, és többé nem kap frissítéseket."
+  },
+  "instance.shared-instance.unavailable.locked-text": {
+    "message": "Ezt a megosztott játékprofilt a Tartalommoderációs csapat zárolta. Többé nem kap frissítéseket az elsődleges játékprofiltól, és nem lehet játszani vele."
   },
   "instance.shared-instance.unavailable.locked-title": {
-    "message": "Pédány lezárva"
+    "message": "Játékprofil zárolva"
+  },
+  "instance.shared-instance.unavailable.manager-fallback": {
+    "message": "a játékprofil-kezelő"
+  },
+  "instance.shared-instance.unavailable.text": {
+    "message": "A te gépeden lévő játékprofil továbbra is elérhető, de már nincs összekapcsolva, és többé nem kap frissítéseket."
+  },
+  "instance.shared-instance.unavailable.title": {
+    "message": "A megosztott játékprofil már nem elérhető"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Egy Minecraft szerver"
@@ -1251,7 +1785,7 @@
     "message": "Ne mutasd a kezdőlapon"
   },
   "instance.worlds.game_already_open": {
-    "message": "A játékpéldány már el van indítva"
+    "message": "A játékprofil már el van indítva"
   },
   "instance.worlds.hardcore": {
     "message": "Hardcore mód"
@@ -1272,10 +1806,10 @@
     "message": "Csak Minecraft 1.20+-tól tudsz egyből egyjátékos világba belépni"
   },
   "instance.worlds.play_instance": {
-    "message": "Játékpéldány indítása"
+    "message": "Játékprofil indítása"
   },
   "instance.worlds.view_instance": {
-    "message": "Játékpéldány megtekintése"
+    "message": "Játékprofil megtekintése"
   },
   "instance.worlds.world_in_use": {
     "message": "A világ használatban van"
@@ -1290,7 +1824,7 @@
     "message": "Nem vagy bejelentkezve"
   },
   "minecraft-account.remove-account": {
-    "message": "Fiók törlése"
+    "message": "Fiók eltávolítása"
   },
   "minecraft-account.select-account": {
     "message": "Fiók kiválasztása"
@@ -1299,7 +1833,7 @@
     "message": "Bejelentkezés a Minecraftba"
   },
   "minecraft-required.description": {
-    "message": "A játék elindításához és játszásához szükséged van egy olyan Microsoft-fiókra, amelyhez a Minecraft tartozik."
+    "message": "A játék indítása és használata előtt rendelkezned kell egy Microsoft-fiókkal, amelyhez Minecraft tartozik."
   },
   "minecraft-required.description-header": {
     "message": "Bejelentkezés egy Microsoft-fiókba"
@@ -1311,7 +1845,7 @@
     "message": "Szerezd be a Minecraftot!"
   },
   "minecraft-required.get-support": {
-    "message": "Támogatás"
+    "message": "Segítség kérése"
   },
   "minecraft-required.header": {
     "message": "Minecraft szükséges"
@@ -1319,17 +1853,26 @@
   "minecraft-required.sign-in": {
     "message": "Bejelentkezés a Microsft-ba"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Mégse"
+  "modal.modrinth-account-required.browser-description": {
+    "message": "Megnyílt egy új lap a bejelentkezéshez. Végezd el ott a bejelentkezést, majd térj vissza az alkalmazásba."
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Folytatás a böngészőben"
   },
   "modal.modrinth-account-required.create-account-button": {
     "message": "Fiók létrehozása"
   },
+  "modal.modrinth-account-required.description": {
+    "message": "Ahhoz, hogy ezt a funkciót használhas, be kell jelentkeznie a Modrinth-fiókjába."
+  },
   "modal.modrinth-account-required.header": {
     "message": "Fiók szükséges"
   },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Böngésző megnyitása újra"
+  },
   "modal.modrinth-account-required.sign-in-button": {
-    "message": "Jelentkezz be a Modrinth-be"
+    "message": "Jelentkezz be a Modrinthbe"
   },
   "modal.modrinth-account-required.sign-in-heading": {
     "message": "Jelentkezz be egy Modrinth-fiókba"
@@ -1337,17 +1880,20 @@
   "modal.modrinth-account-required.signing-in-header": {
     "message": "Bejelentkezés"
   },
+  "modal.modrinth-account-required.support-prompt": {
+    "message": "Problémád van a bejelentkezéssel? <support>Segítség</support>"
+  },
   "modal.modrinth-account-required.waiting-for-browser": {
     "message": "Várakozás a böngésző megerősítésére..."
   },
   "search.filter.locked.instance": {
-    "message": "A játékpéldány által van megadva"
+    "message": "A játékprofil által van megadva"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "A játékverziót az adott játékpéldány biztosítja"
+    "message": "A játékverziót az adott játékprofil biztosítja"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "A betöltőt az adott játékpéldány biztosítja"
+    "message": "A betöltőt az adott játékprofil biztosítja"
   },
   "search.filter.locked.instance.sync": {
     "message": "Szinkronizálás a játékpéldánnyal"
@@ -1356,12 +1902,18 @@
     "message": "A szerver által van megadva"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "Csak kliensoldali modok adhatók hozzá a szerverpéldányhoz"
+    "message": "Csak kliensoldali modok adhatók hozzá a szerverprofilhoz"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "A játékverziót az adott szerver biztosítja"
   },
   "search.filter.locked.server-loader.title": {
     "message": "A betöltőt az adott szerver biztosítja"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Fiók"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Kijelző"
   }
 }

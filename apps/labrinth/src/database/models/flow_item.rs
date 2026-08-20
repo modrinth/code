@@ -8,14 +8,14 @@ use rand::Rng;
 use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
-use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use url::Url;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
 use xredis::RedisPool;
 
-const FLOWS_NAMESPACE: &str = "flows:v3";
+const FLOWS_NAMESPACE: &str = "flows:v4";
 
-#[derive(Deserialize, Serialize)]
+#[serde_binhum]
 pub enum DBFlow {
     OAuth {
         user_id: Option<DBUserId>,
@@ -60,11 +60,37 @@ pub enum DBFlow {
     },
     RegisterPasskey {
         user_id: DBUserId,
+        #[serde_binhum(binary(with = "json_string"))]
         state: PasskeyRegistration,
     },
     AuthenticatePasskey {
+        #[serde_binhum(binary(with = "json_string"))]
         state: DiscoverableAuthentication,
     },
+}
+
+mod json_string {
+    use serde::de::DeserializeOwned;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn serialize<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        T: Serialize,
+        S: Serializer,
+    {
+        let value =
+            serde_json::to_string(value).map_err(serde::ser::Error::custom)?;
+        value.serialize(serializer)
+    }
+
+    pub fn deserialize<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+    where
+        T: DeserializeOwned,
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        serde_json::from_str(&value).map_err(serde::de::Error::custom)
+    }
 }
 
 impl DBFlow {

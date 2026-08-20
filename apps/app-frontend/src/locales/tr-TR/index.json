@@ -144,19 +144,19 @@
     "message": "Sizin mahremiyetiniz ve reklamlar Modrinth'i nasıl destekler"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Donanım hızlandırmalı işleme kapalıyken, performans sorunlarına yol açabilecek bulanıklık efektleri gibi gelişmiş işlemeleri aktif eder."
+    "message": "Arka plan bulanıklığı gibi görsel efektleri etkinleştirin. Bu, donanım ivmelendirme yokken performansı etkileyebilir."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Gelişmiş işleme"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Modrinth App için tercih ettiğiniz temayı seçin."
+    "message": "Modrinth App tarafından kullanılacak renk şemasını seçin."
   },
   "app.appearance-settings.color-theme.title": {
-    "message": "Tema Rengi"
+    "message": "Renk teması"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Launcher açıldığında varsayılan olarak açılacak sayfayı seçin."
+    "message": "Modrinth App açıldığında gözüken sayfayı seçin."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Ana Sayfa"
@@ -168,49 +168,40 @@
     "message": "Varsayılan karşılama sayfası"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Kostümler sayfasındaki karakterinizin üzerindeki isim etiketini devre dışı bırakır."
+    "message": "Dış görünüm seçici sayfasında oyuncu önizlemesinin üzerindeki kullanıcı adınızı gizleyin."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "İsim etiketini gizle"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Ana sayfadaki 'Hızlıca Geri Dön' bölümünde son oynanan dünyaları gösterir."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Dünyalara hızlıca geri dön"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minecraft başlatıldığında launcher'i simge durumuna at."
+    "message": "Minecraft başladığında Modrinth uygulamasını küçült."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Launcher'i simge durumuna at"
+    "message": "Uygulamayı küçült"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Sistem pencere kenarlıklarını kullan (Yeniden başlatma gerekli)."
+    "message": "İşletim sisteminizin başlık çubuğu ve pencere kontrollerini kullanın. Uygulamanın yeniden başlatılmasını gerektirir."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Yerel pencere öğeleri"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Bir oyun oturumunda ne kadar zaman geçirdiğinizi gösterir."
+    "message": "Sistem pencere çerçevesi"
   },
   "app.appearance-settings.show-play-time.title": {
-    "message": "Oynama Süresini Göster"
-  },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Mükerrer mod paketi kurulumları, normal içerik silme, toplu güncellemeler, mod paketi bağlantısını kesme ve onarım uyarıları gibi düşük riskli onayları otomatik olarak atlar. Tehlikeli uyarılar gösterilmeye devam edecektir."
+    "message": "Oynama süresini göster"
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Gerekli olmayan uyarıları atla"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Kenar çubuğunu ayarlama özelliğini aktifleştirir."
+    "message": "Sağ kenar çubuğunu varsayılan olarak gizleyin ve onu göstermek ya da gizlemek için bir düğme ekleyin."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Kenar çubuğunu ayarla"
+    "message": "Sağ kenar çubuğunu gizle"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Modrinth üzerinde barındırılmayan bir Modrinth Paket dosyasını (.mrpack) yüklemeye çalışırsanız, yükleme öncesinde riskleri anladığınızdan emin oluruz."
+    "message": "Modrinth'te yayınlanmayan bir Modrinth Pack (.mrpack) kurulmadan önce bir güvenlik uyarısı göster."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Bilinmeyen mod paketlerini indirmeden önce beni uyar"
@@ -220,6 +211,9 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Doğrulama sunucularına erişilemedi"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Onaylamalar"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Sunucuyu kuruluma ekle"
@@ -241,6 +235,9 @@
   },
   "app.browse.back-to-instance": {
     "message": "Kuruluma dön"
+  },
+  "app.browse.discover-project-type": {
+    "message": "Keşfet {projectType}"
   },
   "app.browse.discover-servers": {
     "message": "Sunucuları keşfet"
@@ -339,13 +336,13 @@
     "message": "Eklendi"
   },
   "app.instance.admonitions.shared-instance.changes-body": {
-    "message": "Yerel instance, paylaştığın kullanıcıların kurulumundan daha güncel."
+    "message": "Yerel kurulumunuz paylaştığınız kullanıcılardan daha ileride."
   },
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Değişiklikler henüz paylaşılmadı"
   },
   "app.instance.admonitions.shared-instance.publish-button": {
-    "message": "Güncellemeyi Yayınla"
+    "message": "Güncellemeyi gönder"
   },
   "app.instance.admonitions.shared-instance.publishing-button": {
     "message": "Yayınlıyor..."
@@ -362,8 +359,17 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Değişimleri inceleniyor"
   },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Güncellemeyi gözden geçir"
+  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "İnceleniyor..."
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "{name}'i oynamak için bir güncelleme gerekli. Oyunu açabilmek için lütfen son sürüme güncelleyin."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "Bir güncelleme mevcut"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Dünyalarınız, yapılandırmalarınız ve yüklü tüm içerikler ve tüm veriler kalıcı olarak silinecek."
@@ -423,13 +429,16 @@
     "message": "Bu instance'ı arkadaşlarınla paylaşabilirsin!"
   },
   "app.instance.share.empty.heading": {
-    "message": "Hiçbir arkadaş davet edilmedi"
+    "message": "Henüz davet edilen arkadaş yok"
   },
   "app.instance.share.empty.invite-friends-button": {
     "message": "Arkadaşlarını davet et"
   },
   "app.instance.share.invite-modal.heading": {
     "message": "Paylaş {name}"
+  },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Bu örnek {limit} kullanıcı sınırına ulaştı."
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Giriş yapmanız gerekiyor"
@@ -449,20 +458,53 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Hatalı hesap"
   },
+  "app.instance.share.members.empty": {
+    "message": "Henüz katılan kullanıcı yok"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Filtrelerinizle eşleşen kullanıcı yok."
+  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Artık bu paylaşılan kurulum için güncelleme almayacaklar"
   },
   "app.instance.share.remove-user-modal.effect-installed-copy": {
     "message": "Daha önce yükledikleri kopyalar cihazlarında kalmaya devam edecek"
   },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "Onları sonradan tekrar davet edebilirsiniz"
+  },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "Ne olur?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Erişimi geri çek"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Erişimi geri çek"
   },
   "app.instance.share.remove-user-modal.user-avatar-alt": {
     "message": "{username} nın avatarı"
   },
   "app.instance.share.sign-in.button": {
     "message": "Giriş yap"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Bağlanılamıyor"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Yine de kur"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Kurulum"
+  },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "bağlı hesap"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "Modrinth'e giriş yapmanız gerek"
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "Yanlış Modrinth hesabını kullanıyorsunuz"
   },
   "app.instance.worlds.add-server": {
     "message": "Sunucu Ekle"
@@ -515,6 +557,66 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} dünya ara..."
   },
+  "app.java-detection.cancel": {
+    "message": "İptal"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Eylemler"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Yol"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Sürüm"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Java kurulumu bulunamadı."
+  },
+  "app.java-detection.select": {
+    "message": "Seç"
+  },
+  "app.java-detection.selected": {
+    "message": "Seçildi"
+  },
+  "app.java-detection.title": {
+    "message": "Java kurulumunu seç"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Zaten kuruldu"
+  },
+  "app.java-selector.browse": {
+    "message": "Göz at"
+  },
+  "app.java-selector.detect": {
+    "message": "Tespit et"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Önerileni kur"
+  },
+  "app.java-selector.installing": {
+    "message": "Kuruluyor..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/java/kurulum/yolu"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Java kurulumunu dene"
+  },
+  "app.modal.install-to-play.additional-context": {
+    "message": "Ek bağlam"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Kullanıcıyı engelle"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "Raporladığınız kurulum"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Kurulumu sil"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "Kurma"
+  },
   "app.modal.install-to-play.header": {
     "message": "Oynamak için yükleyin"
   },
@@ -530,11 +632,32 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {#mod} other {#mods}}"
   },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "Dosya kabul edilen bir resim türü değil"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "Dosya 1 MiB boyut sınırını aşıyor"
+  },
+  "app.modal.install-to-play.report-reason.inappropriate": {
+    "message": "Uygunsuz"
+  },
+  "app.modal.install-to-play.report-reason.malicious": {
+    "message": "Kötü niyetli"
+  },
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "Spam"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Rapor sunuldu"
+  },
   "app.modal.install-to-play.reviewed-files": {
     "message": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Paylaşılan Kurulum"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "Paylaşılan kurulum içeriği"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
@@ -545,6 +668,9 @@
   "app.modal.install-to-play.unrecognized-files": {
     "message": "Tanımlanamayan dosyalar"
   },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "Kullanıcı engellendi"
+  },
   "app.modal.install-to-play.view-contents": {
     "message": "İçeriği görüntüle"
   },
@@ -553,6 +679,42 @@
   },
   "app.modal.update-to-play.removed": {
     "message": "Silindi"
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Eklendi"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "Kaldırıldı"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Güncelleme gerekiyor"
+  },
+  "app.nav.home": {
+    "message": "Ana Sayfa"
+  },
+  "app.nav.library": {
+    "message": "Kütüphane"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Modrinth hesabı"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Bir Modrinth hesabıyla oturum açın"
+  },
+  "app.nav.signed-in-as": {
+    "message": "<user>{username}</user> olarak oturum açıldı"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Modrinth+'a yükselt"
+  },
+  "app.news.title": {
+    "message": "Haberler"
+  },
+  "app.news.view-all": {
+    "message": "Tüm haberleri göster"
   },
   "app.project.install-button.already-installed": {
     "message": "Bu proje zaten kurulu"
@@ -575,20 +737,50 @@
   "app.project.versions.already-installed": {
     "message": "Zaten yüklenmiş"
   },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Yeniden boyutlandırmak için kaydırın"
+  },
+  "app.restarting": {
+    "message": "Yeniden Başlatılıyor..."
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth Uygulaması {version}"
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Yükseklik"
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Java Argümanları girin..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java Argümanları"
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Genişlik gir..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Genişlik"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Geliştirici modu açıldı."
   },
   "app.settings.downloading": {
     "message": "v{version} indiriliyor"
   },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
     "message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir. Aşağıdan tercihinizi yönetebilir veya vazgeçebilirsiniz."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetri"
   },
   "app.settings.tabs.appearance": {
     "message": "Görünüm"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Varsayılan profil seçenekleri"
+  "app.settings.tabs.behavior": {
+    "message": "Davranış"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java kurulumları"
@@ -603,7 +795,7 @@
     "message": "Kaynak yönetimi"
   },
   "app.skins.add-button": {
-    "message": "Skin ekle"
+    "message": "Dış görünüm ekle"
   },
   "app.skins.add-button.drag-and-drop": {
     "message": "Sürükle ve bırak"
@@ -612,13 +804,13 @@
     "message": "Uygula"
   },
   "app.skins.delete-button": {
-    "message": "Skin'i sil"
+    "message": "Dış görünümü sil"
   },
   "app.skins.delete-modal.description": {
-    "message": "Bu seçilmiş skin'i kalıcı olarak silecektir. Bu işlem geri alınamaz."
+    "message": "Bu işlem seçili dış görünümü kalıcı olarak silecektir. Bu işlem geri alınamaz."
   },
   "app.skins.delete-modal.title": {
-    "message": "Bu skin'i silmek istediğinize gerçekten emin misiniz?"
+    "message": "Bu dış görünümü silmek istediğinden emin misiniz?"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Bıraktığınız dosya okunamadı."
@@ -627,16 +819,16 @@
     "message": "Dosya işlenirken hata oluştu"
   },
   "app.skins.ears-feature-notice": {
-    "message": "Bu skin {ears} modundan özellikler içeriyor"
+    "message": "Bu dış görünüm {ears} modunun özelliklerini kullanıyor"
   },
   "app.skins.edit-button": {
-    "message": "Skin'i düzenle"
+    "message": "Dış görünümü düzenle"
   },
   "app.skins.modal.add-skin-button": {
-    "message": "Skin ekle"
+    "message": "Dış görünüm ekle"
   },
   "app.skins.modal.add-title": {
-    "message": "Skin ekleme"
+    "message": "Dış görünüm ekleniyor"
   },
   "app.skins.modal.arm-style-section": {
     "message": "Kol stili"
@@ -654,10 +846,10 @@
     "message": "Pelerin"
   },
   "app.skins.modal.edit-title": {
-    "message": "Skin düzenleme"
+    "message": "Dış görünüm düzenleniyor"
   },
   "app.skins.modal.make-edit-first-tooltip": {
-    "message": "Önce skin'e bir düzenleme yapın!"
+    "message": "Önce dış görünümde bir düzenleme yapın!"
   },
   "app.skins.modal.no-cape-tooltip": {
     "message": "Pelerin yok"
@@ -669,7 +861,7 @@
     "message": "Dokuyu değiştir"
   },
   "app.skins.modal.save-skin-button": {
-    "message": "Skin'i kaydet"
+    "message": "Dış görünümü kaydet"
   },
   "app.skins.modal.saving-tooltip": {
     "message": "Kaydediliyor..."
@@ -678,25 +870,25 @@
     "message": "Doku"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "İlk başta skin yükleyin!"
+    "message": "Önce bir dış görünüm yükleyin!"
   },
   "app.skins.preview.edit-button": {
-    "message": "Skin'i düzenle"
+    "message": "Dış görünümü düzenle"
   },
   "app.skins.previewing-badge": {
     "message": "Önizleme"
   },
   "app.skins.rate-limit.text": {
-    "message": "Skin'inizi çok hızlı değiştiriyorsunuz. Mojang'ın sunucuları geçici olarak diğer istekleri engelledi. Lütfen tekrar denemeden önce biraz bekleyin."
+    "message": "Dış görünümünüzü çok sık değiştiriyorsunuz. Mojang sunucuları geçici olarak daha fazla isteği engelledi. Lütfen tekrar denemeden önce biraz bekleyin."
   },
   "app.skins.rate-limit.title": {
     "message": "Yavaşla!"
   },
   "app.skins.reorder-error.text": {
-    "message": "Skinini kaydedemedik."
+    "message": "Dış görünüm sıralamanız kaydedilemedi."
   },
   "app.skins.reorder-error.title": {
-    "message": "Skinler sıralanamadı"
+    "message": "Dış görünümler sıralanamadı"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "İnşaatçılar & Biyomlar"
@@ -747,19 +939,22 @@
     "message": "Modrinth appdeki skin yönetim özelliklerini kullanmak için lütfen Minecraft hesabınıza giriş yapın."
   },
   "app.skins.sign-in.rinthbot-alt": {
-    "message": "Heyecanlı Modrinth Bot'u"
+    "message": "Heyecanlı Modrinth Botu"
   },
   "app.skins.sign-in.title": {
     "message": "Lütfen giriş yapın"
   },
   "app.skins.title": {
-    "message": "Skin seçici"
+    "message": "Dış görünüm seçici"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "Kapat"
   },
   "app.skins.toggle-ears-features-on": {
     "message": "Aç"
+  },
+  "app.survey.no-thanks": {
+    "message": "Hayır teşekkürler"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecektir."
@@ -956,6 +1151,12 @@
   "instance.server-modal.resource-pack": {
     "message": "Kaynak paketi"
   },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Eylemler"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Davet bağlantısı"
+  },
   "instance.settings.tabs.general": {
     "message": "Genel"
   },
@@ -978,7 +1179,7 @@
     "message": "Kurulurken çoğaltılamaz."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Profili çoğalt"
+    "message": "Kurulumu çoğalt"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
     "message": "Bu profilin dünyalarını, yapılandırmalarını, modlarını vb. içeren bir kopyasını oluşturur."
@@ -1148,6 +1349,30 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Genişlik gir..."
   },
+  "instance.shared-instance.network-error.title": {
+    "message": "Bağlantı hatası"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "Bu kurulumun içeriği diğer kullanıcılarla paylaşılıyor."
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Eklendi"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Oyunculara güncellemeyi gönder"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Yapılandırma dosyalarını seç"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "İçerik değişikliklerini gözden geçirin ve bu güncellemeye dahil edilecek yapılandırma dosyalarını seçin."
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Kaldırıldı"
+  },
+  "instance.shared-instance.tooltip": {
+    "message": "Bu kurulumun içeriği başka biri tarafından yönetiliyor."
+  },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft Sunucusu"
   },
@@ -1232,6 +1457,18 @@
   "minecraft-required.sign-in": {
     "message": "Microsoft'a giriş yap"
   },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Tarayıcında devam et"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Bir hesap oluştur"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Tarayıcıyı yeniden aç"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Giriş yapılıyor"
+  },
   "search.filter.locked.instance": {
     "message": "Kurulum tarafından sağlanan"
   },
@@ -1242,7 +1479,7 @@
     "message": "Yükleyici veren kurulumlar"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Kurulumla senkronize et"
+    "message": "Kurulum ile eşitle"
   },
   "search.filter.locked.server": {
     "message": "Sunucu tarafından sağlanmıştır"
@@ -1255,5 +1492,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Yükleyici sunucu tarafından sağlanıyor"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Hesap"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Göster"
   }
 }

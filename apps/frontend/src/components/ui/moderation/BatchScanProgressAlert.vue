@@ -7,9 +7,12 @@
 				<span class="text-xl font-semibold">Batch scan in progress</span>
 				<span>{{ progress?.complete }} of {{ progress?.total }} projects completed</span>
 			</div>
-			<ButtonStyled circular color="blue" type="outlined">
-				<button class="!px-4" @click="emit('cancel-scan')">Cancel scan</button>
-			</ButtonStyled>
+			<Button
+				type="outlined"
+				class="!rounded-full !px-4 !text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)] [&>svg]:!text-blue"
+				@click="emit('cancel-scan')"
+				>Cancel scan</Button
+			>
 		</div>
 		<div class="w-full rounded-full bg-highlight-blue">
 			<div
@@ -21,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { defineProps } from 'vue'
 
 export interface BatchScanProgress {

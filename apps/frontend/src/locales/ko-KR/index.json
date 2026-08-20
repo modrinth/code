@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "그래프에서 {name} 숨기기"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "데이터 없음"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "차트 툴팁 고정됨"
   },
@@ -1478,9 +1481,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "최근 업데이트"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "닫기"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} 다운로드"
   },
@@ -2131,6 +2131,12 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "금액이 너무 적습니다"
+  },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "이 정산 수단은 결제 서비스 제공업체에서 비활성화했습니다. 다른 정산 수단을 사용하거나 고객 지원팀에 문의하세요."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "정산 수단을 사용할 수 없음"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "귀하의 지역에 맞는 올바른 PayPal 송금 옵션을 사용해 주세요."
@@ -2918,6 +2924,30 @@
   "layout.publish.email-verification-required.title": {
     "message": "이메일 승인이 필요합니다"
   },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "친구들이 플레이 중인 모든 콘텐츠 자동 설치"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "친구와 동일한 콘텐츠 플레이"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "공유된 콘텐츠가 변경될 때마다 최신 상태 유지"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Modrinth App 받기"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "관리자:"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "Modrinth App이 자동으로 열립니다..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Modrinth App 실행 중"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Modrinth App을 사용해야 하는 이유"
+  },
   "moderation.exclude-technical-review": {
     "message": "기술 검토 제외"
   },
@@ -2938,6 +2968,21 @@
   },
   "moderation.page.technicalReview": {
     "message": "기술 리뷰"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "배치당 {amount}개"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "배치 수량"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "이 프로젝트의 모든 기여 그룹 및 내부 파일이 영구 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "모든 그룹 삭제 실패: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "모든 그룹 삭제 완료."
   },
   "modpack-scan-modal.failed": {
     "message": "실패"
@@ -2968,6 +3013,9 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "전체 파일 스캔"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "일부 파일 스캔 실패: {error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "스캔중..."
@@ -3635,6 +3683,12 @@
   "project.moderation.admonition.under-review.body.3": {
     "message": "프로젝트를 수정해도 대기열 우선 순위에는 영향을 미치지 않습니다."
   },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "24~48시간 이내에 제출 항목을 검토하고자 하나, 일부 프로젝트 검토가 지연될 수 있습니다. 제출 항목의 문제를 의미하지는 않습니다."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "1주일 이내에 제출 항목을 검토하고자 하나, 일부 프로젝트 검토가 지연될 수 있습니다. 제출 항목의 문제를 의미하지는 않습니다."
+  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>운영진들이 Modrinth의 안전한 환경을 유지하기 위해 최선을 다하고 있는 동안 기다려 주셔서 감사합니다. 여러분의 콘텐츠를 공유하실 수 있도록 도와드릴 수 있기를 기대합니다! 💚</emphasis>"
   },
@@ -3752,6 +3806,21 @@
   "project.settings.permissions.completed.title": {
     "message": "권한 확인 완료!"
   },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "모든 그룹 삭제"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "이 프로젝트의 모든 {count, plural, other {#개 기여 그룹}} 및 내부 파일이 영구 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "모든 기여 그룹을 삭제하시겠습니까?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "모든 기여 그룹을 삭제할 수 없습니다"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "모든 기여 그룹이 삭제되었습니다."
+  },
   "project.settings.permissions.empty-state.description": {
     "message": "해당 프로젝트의 어떤 버전에도 외부 콘텐츠가 포함되어 있지 않으므로, 권한 증명 절차를 진행하지 않으셔도 됩니다. 또는 프로젝트의 모든 버전에 외부 콘텐츠가 포함되어 있지 않아, 별도의 권한 획득이 필요하지 않습니다."
   },
@@ -3860,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "추천 태그"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "가장 적합한 태그를 최대 3개까지 지정할 수 있습니다. 3개를 모두 선택하지 않으면 다른 태그가 추천 태그로 표시될 수 있습니다."
-  },
   "project.settings.tags.features-description": {
     "message": " {type}에서 사용하는 모든 기능을 선택하세요."
   },
@@ -3877,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "추천 카테고리를 지정하려면 적어도 하나의 카테고리를 선택해야 합니다."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "정확한 태그 선택은 {type}을 쉽게 찾을 수 있도록 돕습니다. 관련된 모든 태그를 선택해 주세요."
   },
   "project.settings.tags.title": {
     "message": "태그"
@@ -4712,11 +4775,23 @@
   "settings.authorizations.about-this-app": {
     "message": "이 앱에 대해"
   },
+  "settings.authorizations.created-by": {
+    "message": "{user}님이 작성함"
+  },
   "settings.authorizations.description": {
     "message": "Modrinth 계정으로 애플리케이션에 권한을 부여하면, 해당 앱이 귀하의 계정에 접근할 수 있게 됩니다. 여기에서 언제든지 계정 접근 권한을 관리하고 확인할 수 있습니다."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "승인한 애플리케이션이 이곳에 표시됩니다."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "승인된 앱이 없습니다"
+  },
   "settings.authorizations.head-title": {
     "message": "승인"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "이 앱은 공식 Modrinth 계정에서 제작했습니다."
   },
   "settings.authorizations.revoke.action": {
     "message": "취소"
@@ -4726,6 +4801,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "정말로 이 애플리케이션의 접근 권한을 취소하시겠습니까?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "이 앱은 이름과 달리 Modrinth와 아무런 관련이 없습니다."
   },
   "settings.billing.charges.description": {
     "message": "Modrinth 계정의 과거 결제 내역을 여기서 확인할 수 있습니다:"
@@ -5101,6 +5179,33 @@
   },
   "settings.sidebar.label.display": {
     "message": "디스플레이"
+  },
+  "shared-instance.invite.accept": {
+    "message": "초대 수락"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Modrinth 사용자"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "이미 {count, plural, other {#명}}이 참여함"
+  },
+  "shared-instance.invite.loading": {
+    "message": "초대 불러오는 중…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name}님이 플레이 초대를 보냈습니다"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "이 초대는 Modrinth가 아닌 다른 Modrinth 사용자가 생성했습니다. 신뢰할 수 있는 사람의 초대만 수락하세요."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "이 사용자를 알고 계십니까?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "만료되었거나, 사용 한도에 도달했거나, 공유한 사용자가 삭제했을 수 있습니다."
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "이 초대는 사용할 수 없습니다"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth의 최신 뉴스"

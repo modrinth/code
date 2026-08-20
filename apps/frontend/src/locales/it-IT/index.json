@@ -185,6 +185,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Nascondi {name} dal grafico"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Nessun dato"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Suggerimento del grafico fissato"
   },
@@ -1471,9 +1474,6 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "Ultima modifica"
-  },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Chiudi"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Scarica {formType}"
@@ -2972,9 +2972,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Errore nell'eliminazione dei gruppi: {error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Procedi"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Tutti i gruppi eliminati con successo."
   },
@@ -3013,9 +3010,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Scansione..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Successo"
   },
   "modpack-scan-modal.title": {
     "message": "Scansione del pacchetto ({scanned}/{total} file)"
@@ -3534,7 +3528,7 @@
     "message": "Scarica come .zip"
   },
   "project.download.download-version": {
-    "message": "Scarica {version}"
+    "message": "Scarica la {version}"
   },
   "project.download.download-with-dependencies": {
     "message": "Scarica con dipendenze"
@@ -3923,9 +3917,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Tag in evidenza"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Puoi mettere in evidenza fino a 3 tag. Altri tag potrebbero aggiungersi se non bastassero."
-  },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero averne solo uno."
   },
@@ -4242,7 +4233,7 @@
     "message": "Creare segnalazioni"
   },
   "scopes.reportDelete.description": {
-    "message": "Permetti l'eliminazione di segnalazioni"
+    "message": "Permetti l'eliminazione delle segnalazioni"
   },
   "scopes.reportDelete.label": {
     "message": "Eliminare segnalazioni"
@@ -4748,11 +4739,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Info sull'app"
   },
+  "settings.authorizations.created-by": {
+    "message": "Creato da {user}"
+  },
   "settings.authorizations.description": {
     "message": "Quando autorizzi un'applicazione, le concedi l'accesso al tuo account Modrinth. Qui puoi gestirne e controllarne l'accesso in qualsiasi momento."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Le applicazioni autorizzate appariranno qui."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Nessuna app autorizzata"
+  },
   "settings.authorizations.head-title": {
     "message": "Autorizzazioni"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Questa app è stata creata da un account Modrinth ufficiale."
   },
   "settings.authorizations.revoke.action": {
     "message": "Revoca"
@@ -4762,6 +4765,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Vuoi davvero revocare questa applicazione?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Questa app non è affiliata con Modrinth, nonostante il suo nome."
   },
   "settings.billing.charges.description": {
     "message": "Tutti gli addebiti passati del tuo account Modrinth saranno mostrati qui:"
@@ -5211,7 +5217,7 @@
     "message": "Pacchetto di risorse obbligatorio"
   },
   "version.download.version": {
-    "message": "Scarica {version} ({size})"
+    "message": "Scarica la {version} ({size})"
   },
   "version.edit.button": {
     "message": "Modifica"

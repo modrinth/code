@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT v.id, v.mod_id\n        FROM versions v\n        INNER JOIN mods m ON m.id = v.mod_id\n        WHERE\n            v.id = ANY($1)\n            AND jsonb_typeof(m.components -> 'minecraft_server') IS DISTINCT FROM 'object'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "93b19a49ae305ab760792d22c5b955a75323663880b47aa9ed42c9f33cd65f16"
+}

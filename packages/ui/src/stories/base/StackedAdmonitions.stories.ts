@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import Admonition from '../../components/base/Admonition.vue'
-import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import { Button } from '../../components/base/buttons'
 import StackedAdmonitionsRaw, {
 	type StackedAdmonitionItem,
 } from '../../components/base/StackedAdmonitions.vue'
@@ -383,7 +383,7 @@ interface RichItem extends StackedAdmonitionItem {
 
 export const RichContent: Story = {
 	render: () => ({
-		components: { StackedAdmonitions, Admonition, ButtonStyled },
+		components: { StackedAdmonitions, Admonition, Button },
 		setup() {
 			const items = ref<RichItem[]>([
 				{
@@ -429,12 +429,8 @@ export const RichContent: Story = {
 					>
 						{{ item.body }}
 						<template #top-right-actions>
-							<ButtonStyled v-if="item.canCancel" type="outlined" color="blue">
-								<button class="!border" type="button" @click="dismiss(item.id)">Cancel</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="item.canRetry" color="red">
-								<button type="button" @click="dismiss(item.id)">Retry</button>
-							</ButtonStyled>
+							<Button type="outlined" v-if="item.canCancel" class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]" native-type="button" @click="dismiss(item.id)">Cancel</Button>
+							<Button type="colored" color="red" v-if="item.canRetry" native-type="button" @click="dismiss(item.id)">Retry</Button>
 						</template>
 					</Admonition>
 				</template>

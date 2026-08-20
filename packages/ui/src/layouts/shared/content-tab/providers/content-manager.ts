@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
-import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import { createContext } from '#ui/providers/create-context'
 
 import type {

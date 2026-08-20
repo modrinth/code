@@ -7,7 +7,7 @@ import {
 	StopCircleIcon,
 	TimerIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectNotificationManager, useRelativeTime } from '@modrinth/ui'
+import { Avatar, IconButton, injectNotificationManager, useRelativeTime } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
@@ -168,30 +168,37 @@ onUnmounted(() => unlisten())
 				<span class="line-clamp-2">{{ instance.name }}</span>
 			</div>
 			<div class="flex items-center">
-				<ButtonStyled v-if="playing" color="red" circular @mousehover="checkProcess">
-					<button v-tooltip="'Stop'" @click="(e) => stop(e, 'InstanceCard')">
-						<StopCircleIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else-if="modLoading" color="standard" circular>
-					<button v-tooltip="'Instance is loading...'" disabled>
-						<SpinnerIcon class="animate-spin" />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled
-					v-else-if="!instance.quarantined"
-					:color="first ? 'brand' : 'standard'"
-					circular
+				<IconButton
+					v-if="playing"
+					v-tooltip="'Stop'"
+					type="colored"
+					color="red"
+					:label="'Stop'"
+					@mouseenter="checkProcess"
+					@click="(e) => stop(e, 'InstanceCard')"
 				>
-					<button
-						v-tooltip="'Play'"
-						@click="(e) => play(e, 'InstanceCard')"
-						@mousehover="checkProcess"
-					>
-						<!-- Translate for optical centering -->
-						<PlayIcon class="translate-x-[1px]" />
-					</button>
-				</ButtonStyled>
+					<StopCircleIcon />
+				</IconButton>
+				<IconButton
+					v-else-if="modLoading"
+					v-tooltip="'Instance is loading...'"
+					:label="'Instance is loading...'"
+					disabled
+				>
+					<SpinnerIcon class="animate-spin" />
+				</IconButton>
+				<IconButton
+					v-else-if="!instance.quarantined"
+					v-tooltip="'Play'"
+					:type="first ? 'colored' : 'base'"
+					:color="first ? 'brand' : undefined"
+					label="Play"
+					@click="(e) => play(e, 'InstanceCard')"
+					@mouseenter="checkProcess"
+				>
+					<!-- Translate for optical centering -->
+					<PlayIcon class="translate-x-[1px]" />
+				</IconButton>
 			</div>
 			<div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
 				<TimerIcon />
@@ -219,47 +226,51 @@ onUnmounted(() => unlisten())
 					:class="`transition-all ${modLoading || installing ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
 				/>
 				<div class="absolute inset-0 flex items-center justify-center">
-					<ButtonStyled v-if="playing" size="large" color="red" circular>
-						<button
-							v-tooltip="'Stop'"
-							:class="{ 'scale-100 opacity-100': playing }"
-							class="transition-all scale-75 origin-bottom opacity-0 card-shadow"
-							@click="(e) => stop(e, 'InstanceCard')"
-							@mousehover="checkProcess"
-						>
-							<StopCircleIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-if="playing"
+						v-tooltip="'Stop'"
+						type="colored"
+						color="red"
+						size="xl"
+						:label="'Stop'"
+						:class="{ 'scale-100 opacity-100': playing }"
+						class="transition-all scale-75 origin-bottom opacity-0 card-shadow"
+						@click="(e) => stop(e, 'InstanceCard')"
+						@mouseenter="checkProcess"
+					>
+						<StopCircleIcon />
+					</IconButton>
 					<SpinnerIcon
 						v-else-if="modLoading || installing"
 						v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
 						class="animate-spin w-8 h-8"
 						tabindex="-1"
 					/>
-					<ButtonStyled
+					<IconButton
 						v-else-if="!installed && !instance.quarantined"
-						size="large"
+						v-tooltip="'Repair'"
+						type="colored"
 						color="brand"
-						circular
+						size="xl"
+						:label="'Repair'"
+						class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
+						@click="(e) => repair(e)"
 					>
-						<button
-							v-tooltip="'Repair'"
-							class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
-							@click="(e) => repair(e)"
-						>
-							<DownloadIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else-if="!instance.quarantined" size="large" color="brand" circular>
-						<button
-							v-tooltip="'Play'"
-							class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
-							@click="(e) => play(e, 'InstanceCard')"
-							@mousehover="checkProcess"
-						>
-							<PlayIcon class="translate-x-[2px]" />
-						</button>
-					</ButtonStyled>
+						<DownloadIcon />
+					</IconButton>
+					<IconButton
+						v-else-if="!instance.quarantined"
+						v-tooltip="'Play'"
+						type="colored"
+						color="brand"
+						size="xl"
+						:label="'Play'"
+						class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
+						@click="(e) => play(e, 'InstanceCard')"
+						@mouseenter="checkProcess"
+					>
+						<PlayIcon class="translate-x-[2px]" />
+					</IconButton>
 				</div>
 			</div>
 			<div class="flex flex-col gap-1">

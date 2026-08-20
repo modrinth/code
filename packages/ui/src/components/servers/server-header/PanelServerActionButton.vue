@@ -1,60 +1,75 @@
 <template>
 	<div class="contents">
 		<div class="flex flex-row items-center gap-2 rounded-lg">
-			<ButtonStyled v-if="isInstalling" type="standard" color="brand" size="large">
-				<button disabled class="flex-shrink-0">
-					<LoaderCircleIcon class="size-5 animate-spin" /> Installing...
-				</button>
-			</ButtonStyled>
+			<Button
+				v-if="isInstalling"
+				type="colored"
+				color="brand"
+				size="xl"
+				disabled
+				class="flex-shrink-0"
+			>
+				<LoaderCircleIcon class="size-5 animate-spin" /> Installing...
+			</Button>
 
 			<template v-else-if="showRestartButton">
-				<ButtonStyled type="standard" color="orange" size="large">
-					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
-						<UpdatedIcon />
-						<span>{{ primaryActionText }}</span>
-					</button>
-				</ButtonStyled>
-
-				<JoinedButtons
-					color="red"
-					size="large"
-					:actions="stopSplitActions"
-					:primary-disabled="!canTakeAction"
-					:dropdown-disabled="!canKill"
-					:primary-tooltip="busyTooltip"
-					:dropdown-tooltip="busyTooltip"
+				<Button
+					v-tooltip="busyTooltip"
+					type="colored"
+					color="orange"
+					size="xl"
+					:disabled="!canTakeAction"
+					@click="handlePrimaryAction"
 				>
-					<template #kill_server>
-						<SlashIcon class="h-5 w-5" />
-						Kill server
-					</template>
-				</JoinedButtons>
+					<UpdatedIcon />
+					<span>{{ primaryActionText }}</span>
+				</Button>
+
+				<SplitButton
+					v-tooltip="busyTooltip"
+					type="colored"
+					color="red"
+					size="xl"
+					:options="stopMenuOptions"
+					menu-label="Force stop options"
+					:primary-disabled="!canTakeAction"
+					:menu-disabled="!canKill"
+					@click="initiateAction('Stop')"
+				>
+					<StopCircleIcon />
+					{{ isStopping ? 'Stopping' : 'Stop' }}
+				</SplitButton>
 			</template>
 
 			<template v-else-if="isStopping">
-				<JoinedButtons
+				<SplitButton
+					v-tooltip="busyTooltip"
+					type="colored"
 					color="red"
-					size="large"
-					:actions="stopSplitActions"
+					size="xl"
+					:options="stopMenuOptions"
+					menu-label="Force stop options"
 					:primary-disabled="true"
-					:dropdown-disabled="!canKill"
-					:primary-muted="true"
-					:dropdown-tooltip="busyTooltip"
+					:menu-disabled="!canKill"
+					class="opacity-60"
 				>
-					<template #kill_server>
-						<SlashIcon class="h-5 w-5" />
-						Kill server
-					</template>
-				</JoinedButtons>
+					<StopCircleIcon />
+					Stopping
+				</SplitButton>
 			</template>
 
 			<template v-else>
-				<ButtonStyled type="standard" color="brand" size="large">
-					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
-						<PlayIcon />
-						<span>{{ primaryActionText }}</span>
-					</button>
-				</ButtonStyled>
+				<Button
+					v-tooltip="busyTooltip"
+					type="colored"
+					color="brand"
+					size="xl"
+					:disabled="!canTakeAction"
+					@click="handlePrimaryAction"
+				>
+					<PlayIcon />
+					<span>{{ primaryActionText }}</span>
+				</Button>
 			</template>
 		</div>
 	</div>
@@ -70,7 +85,8 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { ButtonStyled, type JoinedButtonAction, JoinedButtons } from '#ui/components'
+import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import { Button, SplitButton } from '#ui/components/base/buttons'
 
 import { useServerPowerAction } from './use-server-power-action'
 
@@ -97,13 +113,7 @@ const {
 	disabled: computed(() => props.disabled),
 })
 
-const stopSplitActions = computed<JoinedButtonAction[]>(() => [
-	{
-		id: 'stop',
-		label: isStopping.value ? 'Stopping' : 'Stop',
-		icon: StopCircleIcon,
-		action: () => initiateAction('Stop'),
-	},
+const stopMenuOptions = computed<OverflowMenuOption[]>(() => [
 	{
 		id: 'kill_server',
 		label: 'Kill server',

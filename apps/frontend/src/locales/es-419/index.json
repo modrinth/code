@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "Usuario no encontrado"
   },
+  "ads-consent.accept": {
+    "message": "Aceptar todas"
+  },
+  "ads-consent.body": {
+    "message": "Los anuncios hacen posible a Modrinth y financian los pagos a los creadores. Nuestros socios pueden guardar o acceder a cookies en la aplicación para personalizar anuncios y medir su rendimiento."
+  },
+  "ads-consent.manage": {
+    "message": "Gestionar preferencias"
+  },
+  "ads-consent.reject": {
+    "message": "Rechazar todas"
+  },
+  "ads-consent.title": {
+    "message": "Tu privacidad y como los anuncios apoyan a Modrinth"
+  },
   "analytics.action.add": {
     "message": "Añadir"
   },
@@ -176,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Ocultar {name} en la gráfica"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Sin datos"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Información sobre herramientas del gráfico fijada"
   },
@@ -235,6 +253,9 @@
   },
   "analytics.empty.select-project": {
     "message": "Selecciona al menos un proyecto para ver los datos"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Error al cargar los proyectos dependientes"
   },
   "analytics.filter.game-version-type": {
     "message": "Tipo de versión de juego"
@@ -932,6 +953,12 @@
   "auth.verify-email.title": {
     "message": "Verificar correo electrónico"
   },
+  "collection.aria-label.upload-icon": {
+    "message": "Ícono de subida"
+  },
+  "collection.button.discover-mods": {
+    "message": "Descubrir mods"
+  },
   "collection.button.edit-icon": {
     "message": "Editar ícono"
   },
@@ -1106,6 +1133,135 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Los archivos complementarios sirven para recursos de apoyo, como código fuente, no para versiones o variantes alternativas."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Detalles"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Archivos"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadatos"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "El archivo principal es el archivo por defecto que descargan los usuarios al instalar el proyecto."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Archivo principal"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "Opcionalmente puedes añadir archivos suplementarios como el código fuente, la documentación o los paquetes de recursos requeridos."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Archivos suplementarios"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Subir archivo adicional"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Subir archivo"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Subir archivos principales y suplementarios"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Arrastra y suelta archivos o haz clic para buscar"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Detalles"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Archivos"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metadatos"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Registro de cambios de versión"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Número de versión"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "El número de versión diferencia a esta versión específica de las demás."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Introduce el número de versión, ej. 1.2.3-alfa.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Subtítulo de versión"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Introduce subtítulo..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Tipo de versión"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Añadir dependencia"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Dependencias"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Detalles"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "Loaders detectados"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "Versiones detectadas"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Editar"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Ambiente"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Archivos"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "Loaders"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metadatos"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "No se pueden editar los loaders de un modpack"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "No se pueden editar las versiones de un modpack"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "No se han añadido dependencias."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "No se ha seleccionado ningún ambiente."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "Ningún loader seleccionado."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "Ningún mod loader"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "No se ha seleccionado ninguna versión."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "Pre-llenado de una versión similar previa"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "No se pueden editar los loaders de un paquete de recursos"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Sugerido"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Archivos subidos"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Versiones"
+  },
   "create.collection.collection-info": {
     "message": "Tu nueva colección se creará como una colección pública con {count, plural, =0 {ningún proyecto} one {# proyecto} other {# proyectos}}."
   },
@@ -1202,6 +1358,9 @@
   "create.project.name-placeholder": {
     "message": "Introduce el nombre del proyecto..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "Ícono de {name}"
+  },
   "create.project.owner-description": {
     "message": "Establécete como propietario del proyecto a ti o a una organización de la que seas miembro."
   },
@@ -1232,8 +1391,14 @@
   "create.project.type-server": {
     "message": "Servidor"
   },
+  "create.project.unknown-user": {
+    "message": "Usuario desconocido"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Avatar del usuario"
   },
   "create.project.visibility-description": {
     "message": "La visibilidad de tu proyecto después de que sea aprobado."
@@ -1343,6 +1508,12 @@
   "dashboard.creator-tax-form-modal.header": {
     "message": "Formulario fiscal"
   },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "No has completado el formulario fiscal. Por favor inténtalo otra vez."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Formulario fiscal incompleto"
+  },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth utiliza al proveedor externo Track1099 para recopilar y almacenar de forma segura tus formularios fiscales. <security-link>Más información aquí.</security-link>"
   },
@@ -1382,6 +1553,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Entidad comercial"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Seleccionar fecha de nacimiento"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Una entidad comercial se refiere a una organización registrada, como una sociedad anónima, una sociedad colectiva o una sociedad de responsabilidad limitada."
   },
@@ -1390,6 +1564,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Particular"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Buscar países..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Buscar subdivisiones..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Selecciona tu país"
@@ -1526,6 +1706,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Introduce la cantidad"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "La denominación mínima es {min}, la cual excede tu balance de {balance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "Necesitas al menos {min} para usar esta tarjeta de regalo."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "No hay denominaciones disponibles para tu actual balance"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "No hay denominaciones cerca de esta cantidad"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "No hay denominaciones cerca de esta cantidad. La más alta disponible es {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Método de pago"
   },
@@ -1540,6 +1735,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Buscar cantidad"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Buscar {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Seleccionar {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Selecciona una denominación:"
@@ -1558,6 +1759,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "Has seleccionado USD para PayPal Internacional. <direct-paypal-link>Cambia a PayPal directo</direct-paypal-link> para obtener mejores tarifas (≈2 % en lugar de ≈6 %)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "Puedes retirar mínimo {min}, y máximo {max}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "Puedes retirar mínimo {min}."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Retirar"
@@ -1925,6 +2132,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Monto demasiado bajo"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "Este método de retiro ha sido desactivado por el proveedor de pagos. Por favor use un método diferente o contacte a soporte."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "Método de retiro no disponible"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Por favor, usa el método de transferencia de PayPal para tu region (USA o internacional)."
   },
@@ -2221,6 +2434,24 @@
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "Oferta por tiempo limitado. No se requiere tarjeta de crédito. Disponible para servidores en EE. UU."
+  },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Error al conseguir datos de pago"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "El producto seleccionado se encontró, pero le faltan datos necesarios. Por favor contacte a soporte."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Producto inválido"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "Ahora mismo estamos en capacidad máxima. Por favor inténtalo otra vez más tarde."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "Capacidad de Servidor Llena"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "Un error inesperado occurrió"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "Elige un plan personalizado con solo las especificaciones que necesites."
@@ -2540,6 +2771,21 @@
   "layout.footer.about.status": {
     "message": "Estado"
   },
+  "layout.footer.based-on-label": {
+    "message": "Basado en"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "El modo desarrollador ha sido activado"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Modo desarrollador activado"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "El modo desarrollador ha sido desactivado"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Modo desarrollador desactivado"
+  },
   "layout.footer.legal": {
     "message": "Legal"
   },
@@ -2609,6 +2855,9 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.footer.unknown-commit": {
+    "message": "desconocido"
+  },
   "layout.menu-toggle.action": {
     "message": "Alternar menú"
   },
@@ -2669,6 +2918,36 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Actualizar a Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Debes verificar tu email antes de empezar a publicar en Modrinth."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "Verificación de email requerida"
+  },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Instala automáticamente todo lo que estén jugando"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Juega el mismo contenido que tus amigos"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Mantiene el contenido compartido actualizado apenas cambia"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Obtener la App de Modrinth"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Gestionado por"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "La App de Modrinth se abrirá automáticamente..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Abriendo la App de Modrinth"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Por qué usar la App de Modrinth"
+  },
   "moderation.exclude-technical-review": {
     "message": "Excluir RT"
   },
@@ -2689,6 +2968,21 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revisión técnica"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} por página"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Cantidad por página"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Esto borrará permanentemente todos los grupos de atribución para este proyecto y todos los archivos dentro. Esta acción no se puede deshacer."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Error al borrar todos los grupos: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Todos los grupos fueron borrados exitosamente."
   },
   "modpack-scan-modal.failed": {
     "message": "Error"
@@ -2719,6 +3013,9 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Escanear todos los archivos"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Algunos archivos no aparecieron en el scan:\n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Escaneando..."
@@ -2993,6 +3290,51 @@
   "muralpay.warning.wallet-address": {
     "message": "Verifica dos veces la dirección de tu billetera. Los fondos enviados a una dirección incorrecta no se pueden recuperar."
   },
+  "organization.button.manage": {
+    "message": "Gestionar"
+  },
+  "organization.button.manage-projects": {
+    "message": "Gestionar proyectos"
+  },
+  "organization.label.downloads": {
+    "message": "descargas"
+  },
+  "organization.label.members": {
+    "message": "miembros"
+  },
+  "organization.label.organization": {
+    "message": "Organización"
+  },
+  "organization.label.projects": {
+    "message": "proyectos"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Nombre"
+  },
+  "organization.project-transfer.no-projects-available": {
+    "message": "No hay proyectos disponibles para transferir."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "Ícono de {name}"
+  },
+  "organization.project-transfer.title": {
+    "message": "Transferir proyectos"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "Transferir {count, plural, one {# proyecto} other {# proyectos}}"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Tipo"
+  },
+  "organization.projects.none": {
+    "message": "Esta organización aún no tiene proyectos."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Esta organización aún no tiene proyectos. ¿Te gustaría <create-link>crear uno</create-link>?"
+  },
   "project-member-header.error-decline": {
     "message": "Error al rechazar la invitación del equipo"
   },
@@ -3115,6 +3457,12 @@
   },
   "project.actions.dont-show-again": {
     "message": "No mostrar de nuevo"
+  },
+  "project.actions.edit-project": {
+    "message": "Editar proyecto"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "Re-escanear modpack"
   },
   "project.actions.review-project": {
     "message": "Revisar proyecto"
@@ -3258,7 +3606,7 @@
     "message": "No se pudieron descargar uno o más archivos. Inténtalo de nuevo."
   },
   "project.download.zip-failed-title": {
-    "message": "No se pudieron descargar los archivos"
+    "message": "Error al descargar los archivos"
   },
   "project.environment.migration-no-permission.message": {
     "message": "Acabamos de renovar el sistema de entornos en Modrinth y ahora hay nuevas opciones disponibles. No tienes permiso para modificar estos ajustes, pero avisa a otro miembro del proyecto que los metadatos del entorno necesitan ser verificados."
@@ -3289,6 +3637,9 @@
   },
   "project.gallery.title": {
     "message": "Galería"
+  },
+  "project.install-context.back-to-discover": {
+    "message": "De vuelta a descubrir"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Tu proyecto es privado, lo que significa que solo pueden acceder tú y las personas a las que invites."
@@ -3331,6 +3682,12 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Aún puedes modificar tu proyecto, no afectará tu posición en la cola."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Esperamos revisar envíos en 24–48 horas; sin embargo, algunos proyectos pueden sufrir atrasos. Esto no refleja ningún problema con tu envío."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Esperamos revisar envíos en un plazo de una semana; sin embargo, algunos proyectos pueden sufrir atrasos. Esto no refleja ningún problema con tu envío."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>¡Apreciamos tu paciencia mientras nuestros moderadores trabajan duro para mantener Modrinth seguro, y estaremos encantados de poder ayudarte a compartir tu contenido! 💚</emphasis>"
@@ -3449,6 +3806,21 @@
   "project.settings.permissions.completed.title": {
     "message": "¡Permisos completados!"
   },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Borrar todos los grupos"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Esto borrará permanentemente {count,  plural, one {el grupo de atribución} other {los # grupos de atribución}} de este proyecto y todos los archivos dentro. Esta acción no se puede deshacer."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "¿Borrar todos los grupos de atribución?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Error al borrar los grupos de atribución"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "Todos los grupos de atribución fueron borrados."
+  },
   "project.settings.permissions.empty-state.description": {
     "message": "Ninguna de las versiones de tu proyecto contiene contenido externo, así que no necesitas preocuparte por obtener permisos."
   },
@@ -3465,7 +3837,7 @@
     "message": "No se puede incluir parte del contenido"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "Si incluyes contenido que no esté alojado en Modrinth, debes informarnos de dónde proviene y verificar que tienes permiso para distribuir los archivos. Consulta <link>nuestro anuncio de este nuevo sistema</link> para obtener más información."
+    "message": "Si incluyes contenido que no esté alojado en Modrinth, debes informarnos de dónde proviene y verificar que tienes permiso para distribuir los archivos. ¡Consulta <link>nuestro anuncio de este nuevo sistema</link> para obtener más información!"
   },
   "project.settings.permissions.info-banner.title": {
     "message": "Aprende sobre los permisos de distribución"
@@ -3497,6 +3869,96 @@
   "project.settings.permissions.sort.status": {
     "message": "Estado"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Dirección en Bedrock"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "El servidor de Java debe ser alcanzable antes de poder guardar. Por favor asegúrate de que el ping sea exitoso."
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "No se puede guardar"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Detalles del servidor"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Introducir dirección"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Dirección en Java"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Idiomas"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Latencia: {latency}ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "opcional"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "No pudimos pingear a este servidor. Puede estar bloqueado por tu host, así que vuelve a reintentar unas cuantas veces. Si todavía no responde, por favor <support-link>contacte a soporte</support-link>."
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Reintentar ping"
+  },
+  "project.settings.server.region-label": {
+    "message": "Región"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Seleccionar idiomas"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Seleccionar región"
+  },
+  "project.settings.server.server-online": {
+    "message": "¡El servidor está en línea!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "Si tienes un <srv-tooltip>[registro SRV]</srv-tooltip> no necesitas añadir un puerto. Si no, si tienes un puerto que no sea 25565, puedes incluirlo como :12345"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "La dirección que ingreses aquí puede tener registros DNS SRV _minecraft._tcp.(tu dominio) que apuntan a la dirección y el puerto de tu servidor de Minecraft."
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "Has seleccionado las {count} etiquetas disponibles. Por favor, selecciona solo las etiquetas que de verdad apliquen en tu proyecto."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "Selecciona todas las categorías que reflejen los temas o la función de tu {type}."
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Etiquetas destacadas"
+  },
+  "project.settings.tags.features-description": {
+    "message": "Selecciona todas las características que tu {type} usa."
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "Has seleccionado {count} etiquetas de resolución ({tags}). Típicamente los paquetes de recursos solo deberían de tener una."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "Selecciona el impacto al rendimiento realista de tu {type}. Selecciona varias si el {type} es configurable para tener diferentes niveles de impacto al rendimiento."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Selecciona la(s) resolución(es) de las texturas de tu {type}."
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Selecciona al menos una categoría para destacar una categoría."
+  },
+  "project.settings.tags.title": {
+    "message": "Etiquetas"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 8 o menos para mantener tu proyecto enfocado y que sea más fácil de descubrir."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 18 o menos para mantener tu servidor enfocado y que sea más fácil de descubrir."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 12 o menos para mantener tu servidor enfocado y que sea más fácil de descubrir."
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "Por favor, ¡sube una versión primero para poder seleccionar etiquetas!"
+  },
   "project.settings.title": {
     "message": "Configuración"
   },
@@ -3506,8 +3968,50 @@
   "project.status.archived.message": {
     "message": "{title} se ha archivado. {title} no recibirá más actualizaciones hasta que el autor decida desarchivar el proyecto."
   },
+  "project.versions.copy-id-option": {
+    "message": "Copiar ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Copiar link"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Copiar coordenadas de Maven"
+  },
+  "project.versions.delete-button": {
+    "message": "Borrar"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Esto borrará esta versión para siempre (¡mucho tiempo!)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "¿Estás seguro de querer borrar esta versión?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Editar detalles"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Editar archivos"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Editar metadatos"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Editar versión"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Abrir en una pestaña nueva"
+  },
+  "project.versions.share-option": {
+    "message": "Compartir"
+  },
   "project.versions.title": {
     "message": "Versiones"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "La versión fue borrada exitosamente."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Versión borrada"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Esta versión está retenida y no listada} other {Estas versiones están retenidas y no listadas}} públicamente. Por favor, proporciona pruebas de que tienes permiso para redistribuir algunos de los archivos incluidos en {count, plural, one {la versión} other {las versiones}} del modpack."
@@ -3923,6 +4427,12 @@
   "servers.plan.small.description": {
     "message": "Perfecto para 1–5 amigos con algunos mods ligeros."
   },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "La más popular"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ mes{interval, select, monthly {} other {, facturado {interval, select, quarterly {trimestralmente} yearly {anualmente} other {{interval}}}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Finalizar configuración"
   },
@@ -4056,10 +4566,10 @@
     "message": "Mi clave de acceso"
   },
   "settings.account.security.passkey.add-modal.title": {
-    "message": "Agregar clave de acceso"
+    "message": "Añadir clave de acceso"
   },
   "settings.account.security.passkey.add.button": {
-    "message": "Agregar clave de acceso"
+    "message": "Añadir clave de acceso"
   },
   "settings.account.security.passkey.button": {
     "message": "Administrar claves de acceso"
@@ -4185,7 +4695,7 @@
     "message": "Añadir más"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Agregar un URI de redirección"
+    "message": "Añadir un URI de redirección"
   },
   "settings.applications.button.create": {
     "message": "Crear aplicación"
@@ -4268,11 +4778,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Acerca de esta aplicación"
   },
+  "settings.authorizations.created-by": {
+    "message": "Creado por {user}"
+  },
   "settings.authorizations.description": {
     "message": "Cuando autorizas una aplicación con tu cuenta de Modrinth, le concedes acceso a tu cuenta. Puedes gestionar y revisar los accesos a tu cuenta aquí en cualquier momento."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Las aplicaciones que autorices aparecerán aquí."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Sin aplicaciones autorizadas"
+  },
   "settings.authorizations.head-title": {
     "message": "Autorizaciones"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Esta app fue creada por una cuenta oficial de Modrinth."
   },
   "settings.authorizations.revoke.action": {
     "message": "Revocar"
@@ -4282,6 +4804,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "¿Estás seguro que quieres revocar esta aplicación?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Esta app no está afiliada con Modrinth de ninguna forma, a pesar de su nombre."
   },
   "settings.billing.charges.description": {
     "message": "Todos los cargos realizados a tu cuenta de Modrinth se mostrarán aquí:"
@@ -4368,7 +4893,7 @@
     "message": "O {price} / año (¡ahorra {percent}%!)"
   },
   "settings.billing.payment_method.action.add": {
-    "message": "Agregar método de pago"
+    "message": "Añadir método de pago"
   },
   "settings.billing.payment_method.action.history": {
     "message": "Ver cargos anteriores"
@@ -4658,6 +5183,33 @@
   "settings.sidebar.label.display": {
     "message": "Visualización"
   },
+  "shared-instance.invite.accept": {
+    "message": "Aceptar invitación"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Un usuario de Modrinth"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# persona se ha} other {# personas se han}} unido"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Cargando invitación…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} te ha invitado a jugar"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "Esta invitación fue creada por un usuario de Modrinth y no por Modrinth Oficial. Nunca aceptes invitaciones de gente que no conozcas."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "¿Conoces a este usuario?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "Puede haber expirado, llegado a su límite de usos o haber sido eliminado por la persona que lo compartió."
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "Esta invitación no está disponible"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Últimas noticias de Modrinth"
   },
@@ -4729,6 +5281,18 @@
   },
   "version.environment.unknown.title": {
     "message": "Entorno desconocido"
+  },
+  "version.notification.deleted-text": {
+    "message": "La versión fue borrada existosamente."
+  },
+  "version.notification.deleted-title": {
+    "message": "Versión borrada"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "¡Tu data pack se empaquetó exitosamente como mod! Asegúrate de probarlo para revisar si hay errores."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "Empaquetado exitoso"
   },
   "version.package-as-mod.button": {
     "message": "Empaquetar como mod"

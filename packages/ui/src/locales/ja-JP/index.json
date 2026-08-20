@@ -1220,9 +1220,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "保存済み"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "閉じる"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "検索"
   },
@@ -4998,16 +4995,16 @@
     "defaultMessage": "一般的にマルウェアは、Discord等のプラットフォーム上でModファイルを配布して拡散されます"
   },
   "user.profile.badge.alpha.about.1": {
-    "defaultMessage": "2020年11月までのModrinthがAlpha版だった頃から活動しています"
+    "defaultMessage": "2020年11月までのModrinthがAlpha版の頃から活動しています"
   },
   "user.profile.badge.alpha.name": {
     "defaultMessage": "Alpha Tester"
   },
   "user.profile.badge.beta.about.1": {
-    "defaultMessage": "2022年2月までのModrinthがBeta版だった頃から活動しています"
+    "defaultMessage": "2022年2月までのModrinthがBeta版の頃から活動しています"
   },
   "user.profile.badge.beta.link": {
-    "defaultMessage": "クリックすると、ModrinthのBeta版のリリース記事を読むことができます。"
+    "defaultMessage": "クリックするとModrinthのBeta版リリース記事を読むことができます"
   },
   "user.profile.badge.beta.name": {
     "defaultMessage": "Beta Tester"
@@ -5020,6 +5017,12 @@
   },
   "user.profile.badge.moderator.name": {
     "defaultMessage": "コンテンツモデレーター"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Modrinthとクリエイターに特別なサポートを贈っています！"
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "クリックしてModrinth+のメンバーになる方法を知る"
   },
   "user.profile.badge.plus.name": {
     "defaultMessage": "Modrinth+ Member"

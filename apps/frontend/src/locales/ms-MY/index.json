@@ -893,6 +893,18 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Fail tambahan adalah untuk sumber sokongan seperti kod sumber, bukan untuk versi atau varian alternatif."
   },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Fail"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Fail"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Sunting"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Fail"
+  },
   "create.collection.collection-info": {
     "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
   },
@@ -2681,6 +2693,15 @@
   "muralpay.warning.wallet-address": {
     "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
   },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Nama"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Jenis"
+  },
   "project-member-header.error-decline": {
     "message": "Gagal menolak jemputan pasukan"
   },
@@ -3038,6 +3059,9 @@
   "project.settings.permissions.sort.status": {
     "message": "Status"
   },
+  "project.settings.tags.title": {
+    "message": "Tag"
+  },
   "project.settings.title": {
     "message": "Tetapan"
   },
@@ -3046,6 +3070,9 @@
   },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
+  },
+  "project.versions.share-option": {
+    "message": "Kongsi"
   },
   "project.versions.title": {
     "message": "Versi"

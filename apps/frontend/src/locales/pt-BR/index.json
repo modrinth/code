@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Ocultar {name} no gráfico"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Sem dados"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Dica de ferramenta do gráfico fixada"
   },
@@ -1477,9 +1480,6 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "Atualizado recentemente"
-  },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Fechar"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Baixar {formType}"
@@ -2981,9 +2981,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Falhou ao excluir todos os grupos: {error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Excluir"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Todos os grupos excluídos com sucesso."
   },
@@ -3022,9 +3019,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Verificando..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Sucesso"
   },
   "modpack-scan-modal.title": {
     "message": "Verificação do pacote de mods ({scanned}/{total} Arquivos)"
@@ -3918,7 +3912,7 @@
     "message": "Selecionar região"
   },
   "project.settings.server.server-online": {
-    "message": "O servidor está ativo!"
+    "message": "O servidor está online!"
   },
   "project.settings.server.srv-records-hint": {
     "message": "Se você tiver <srv-tooltip>[registros SRV]</srv-tooltip>, não precisará adicionar uma porta. Caso contrário, se você tiver uma porta que não seja 25565, poderá incluí-la como :12345"
@@ -3935,9 +3929,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas em destaque"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Você pode destacar até 3 das suas etiquetas mais relevantes. Outras etiquetas poderão ser promovidas a destaque caso você não selecione todas as 3."
-  },
   "project.settings.tags.features-description": {
     "message": "Selecione todas as funcionalidades que o seu {type} utiliza."
   },
@@ -3952,9 +3943,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecione pelo menos uma categoria para ela ser destacada."
-  },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Etiquetar corretamente é importante para ajudar as pessoas a encontrarem seu {type}. Certifique-se de selecionar todas as etiquetas aplicáveis."
   },
   "project.settings.tags.title": {
     "message": "Etiquetas"
@@ -4790,11 +4778,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre este aplicativo"
   },
+  "settings.authorizations.created-by": {
+    "message": "Criado por {user}"
+  },
   "settings.authorizations.description": {
     "message": "Ao autorizar um aplicativo com sua conta do Modrinth, você concede acesso à sua conta. Você pode gerenciar e revisar o acesso à sua conta aqui a qualquer momento."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Os aplicativos que você autorizar aparecerão aqui."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Nenhum aplicativo autorizado"
+  },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Este aplicativo foi criado por uma conta oficial do Modrinth."
   },
   "settings.authorizations.revoke.action": {
     "message": "Revogar"
@@ -4804,6 +4804,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Tem certeza de que deseja revogar este aplicativo?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Este aplicativo não é afiliado ao Modrinth em nenhum modo, apesar do nome."
   },
   "settings.billing.charges.description": {
     "message": "Todas as suas cobranças anteriores na sua conta Modrinth serão listadas aqui:"

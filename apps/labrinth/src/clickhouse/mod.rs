@@ -19,29 +19,44 @@ pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
 pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
-    const MINECRAFT_JAVA_SERVER_PINGS: &str = server_ping::CLICKHOUSE_TABLE;
+    Ok(connect()?.with_database(database))
+}
 
-    let client = {
-        let https_connector = HttpsConnectorBuilder::new()
-            .with_native_roots()?
-            .https_or_http()
-            .enable_all_versions()
-            .build();
-        let hyper_client =
-            hyper_util::client::legacy::Client::builder(TokioExecutor::new())
-                .build(https_connector);
+fn connect() -> clickhouse::error::Result<clickhouse::Client> {
+    let https_connector = HttpsConnectorBuilder::new()
+        .with_native_roots()?
+        .https_or_http()
+        .enable_all_versions()
+        .build();
+    let hyper_client =
+        hyper_util::client::legacy::Client::builder(TokioExecutor::new())
+            .build(https_connector);
 
-        clickhouse::Client::with_http_client(hyper_client)
-            .with_url(&ENV.CLICKHOUSE_URL)
-            .with_user(&ENV.CLICKHOUSE_USER)
-            .with_password(&ENV.CLICKHOUSE_PASSWORD)
-            .with_validation(false)
-    };
+    Ok(clickhouse::Client::with_http_client(hyper_client)
+        .with_url(&ENV.CLICKHOUSE_URL)
+        .with_user(&ENV.CLICKHOUSE_USER)
+        .with_password(&ENV.CLICKHOUSE_PASSWORD)
+        .with_validation(false))
+}
 
-    client
+#[cfg(feature = "test")]
+pub async fn create_database(database: &str) -> clickhouse::error::Result<()> {
+    connect()?
         .query(&format!("CREATE DATABASE IF NOT EXISTS {database}"))
         .execute()
-        .await?;
+        .await
+}
+
+pub async fn run_migrations() -> clickhouse::error::Result<()> {
+    run_migrations_on_database(&ENV.CLICKHOUSE_DATABASE).await
+}
+
+pub async fn run_migrations_on_database(
+    database: &str,
+) -> clickhouse::error::Result<()> {
+    const MINECRAFT_JAVA_SERVER_PINGS: &str = server_ping::CLICKHOUSE_TABLE;
+
+    let client = connect()?;
 
     let clickhouse_replicated = ENV.CLICKHOUSE_REPLICATED;
     let cluster_line = if clickhouse_replicated {
@@ -270,5 +285,5 @@ pub async fn init_client_with_database(
         .execute()
         .await?;
 
-    Ok(client.with_database(database))
+    Ok(())
 }

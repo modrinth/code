@@ -254,9 +254,6 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "至少需要一个图像来展示你的 {type}的内容。"
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "资源包，但不包括音频包或本地化包。如果你的内容符合这一描述，请选择相应的标签"
-  },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上传图片至项目图库"
   },
@@ -279,4 +276,3 @@
     "defaultMessage": "访问链接设置"
   }
 }
-

@@ -144,19 +144,19 @@
     "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Activeert geavanceerde weergaves zoals blur effecten die mogelijke prestatieproblemen opleveren zonder hardware-versnelde weergeving."
+    "message": "Schakel visuele effecten zoals achtergrondvervaging in. Zonder hardwareversnelling kan dit ten koste gaan van de prestaties."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Geavanceerde weergave"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Selecteer je voorkeur kleurenthema voor de Modrinth App."
+    "message": "Kies het kleurenthema dat door de Modrinth-app wordt gebruikt."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Kleurenthema"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Wijzig de pagina waarop de launcher opent."
+    "message": "Kies de pagina die wordt weergegeven wanneer de Modrinth-app wordt geopend."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
@@ -168,49 +168,49 @@
     "message": "Standaard openingspagina"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Schakelt het nametag boven jouw speler op de skins pagina uit."
+    "message": "Verberg je gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Verberg nametag"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Inclusief recente werelden in het gedeelte \"Ga terug\" op de startpagina."
+    "message": "Toon recent gespeelde werelden in het Ga terug-gedeelte op de startpagina."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Ga terug in werelden"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimaliseer de launcher als een Minecraft proces wordt gestart."
+    "message": "Minimaliseer de Modrinth-app zodra Minecraft opstart."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimaliseer launcher"
+    "message": "App minimaliseren"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Gebruik systeem venster frame (app opnieuw starten vereist)."
+    "message": "Gebruik de titelbalk en vensterbedieningselementen van je besturingssysteem. Hiervoor moet de app opnieuw worden opgestart."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Oorspronkelijke versieringen"
+    "message": "Systeemvensterframe"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Toont hoeveel tijd je aan een instantie hebt besteed."
+    "message": "Laat zien hoe lang je elke instantie hebt gespeeld."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Speeltijd laten zien"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Bevestigingen met een laag risico, zoals het installeren van dubbele modpacks, het verwijderen van normale inhoud, bulkupdates, het ontkoppelen van modpacks en reparatieverzoeken, worden automatisch overgeslagen. Waarschuwingen voor gevaarlijke dingen worden nog steeds weergegeven."
+    "message": "Sla bevestigingen over voor acties met een laag risico, zoals het installeren van dubbele exemplaren, het verwijderen van normale inhoud, bulkupdates, het opheffen van koppelingen en herstelbewerkingen. Waarschuwingen voor gevaarlijke handelingen worden altijd weergegeven."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Niet-essentiële waarschuwingen overslaan"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Schakelt de mogelijkheid om de zijbalk in- of uit te schakelen in."
+    "message": "Verberg de rechterzijbalk standaard en voeg een knop toe om deze weer te geven of te verbergen."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Schakel zijbalk"
+    "message": "Rechterzijbalk verbergen"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Als je probeert een Modrinth Pack-bestand (.mrpack) te installeren dat niet op Modrinth zelf wordt gehost, zorgen we ervoor dat je de risico's begrijpt voordat je het installeert."
+    "message": "Geef een veiligheidswaarschuwing weer voordat een Modrinth-pakket (.mrpack) wordt geïnstalleerd dat niet op Modrinth wordt gehost."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Waarschuw mij voordat ik onbekende modpacks installeer"
@@ -220,6 +220,15 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Bevestigingen"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Startpagina en inhoud"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Opstarten en navigeren"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Server toevoegen aan instantie"
@@ -242,11 +251,17 @@
   "app.browse.back-to-instance": {
     "message": "Terug naar instantie"
   },
+  "app.browse.discover-project-type": {
+    "message": "Ontdek {projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "Ontdek servers"
   },
   "app.browse.hide-added-servers": {
     "message": "Al toegevoegde servers verbergen"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Verberg al geïnstalleerd"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -362,8 +377,17 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Wijzigingen bekijken"
   },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Update bekijken"
+  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Controleren..."
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "Er is een update nodig om {name} te kunnen spelen. Werk het spel bij naar de nieuwste versie om het te kunnen starten."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "Update is beschikbaar"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Alle gegevens van je instantie worden definitief verwijderd, inclusief je werelden, configuraties en alle geïnstalleerde inhoud."
@@ -431,6 +455,9 @@
   "app.instance.share.invite-modal.heading": {
     "message": "{name} delen"
   },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Deze instantie heeft de limiet van {limit} gebruikers bereikt."
+  },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Je moet je aanmelden als"
   },
@@ -448,6 +475,12 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Verkeerd account"
+  },
+  "app.instance.share.members.empty": {
+    "message": "Nog geen gebruikers zijn lid geworden"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Geen gebruikers voldoen aan je filters."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ze zullen geen updates meer ontvangen voor deze gedeelde instantie"
@@ -478,6 +511,12 @@
   },
   "app.instance.share.sign-in.button": {
     "message": "Aanmelden"
+  },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "De dienst voor gedeelde instanties is momenteel niet beschikbaar, probeer het later nog eens"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Kan geen verbinding maken"
   },
   "app.instance.share.unlink.body": {
     "message": "Je moet dit modpack ontkoppelen om je instantie te kunnen delen"
@@ -566,11 +605,59 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Zoek werelden"
   },
+  "app.java-detection.cancel": {
+    "message": "Annuleren"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Acties"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Pad"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Versie"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Geen Java-installaties gevonden."
+  },
+  "app.java-detection.select": {
+    "message": "Selecteren"
+  },
+  "app.java-detection.selected": {
+    "message": "Geselecteerd"
+  },
+  "app.java-detection.title": {
+    "message": "Selecteer Java-installatie"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Al geïnstalleerd"
+  },
+  "app.java-selector.browse": {
+    "message": "Bladeren"
+  },
+  "app.java-selector.detect": {
+    "message": "Detecteren"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Aanbevolen instantie"
+  },
+  "app.java-selector.installing": {
+    "message": "Installeren..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/pad/naar/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Java-installatie testen"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Aanvullende context"
   },
   "app.modal.install-to-play.additional-context-placeholder": {
     "message": "Voeg links en afbeeldingen toe als dat mogelijk en relevant is"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Gebruiker blokkeren"
   },
   "app.modal.install-to-play.content-you-are-reporting": {
     "message": "Instantie die je meldt"
@@ -592,6 +679,9 @@
   },
   "app.modal.install-to-play.invite-warning": {
     "message": "Deze uitnodiging is aangemaakt door een andere Modrinth-gebruiker, niet door Modrinth zelf. Accepteer alleen uitnodigingen van mensen die je vertrouwt."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "Deze uitnodiging is aangemaakt door <creator>{username}</creator>, niet door Modrinth. Accepteer alleen uitnodigingen van mensen die je vertrouwt."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {# mod}other {# mods}}"
@@ -650,6 +740,9 @@
   "app.modal.install-to-play.unrecognized-files": {
     "message": "Onbekende bestanden"
   },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "Gebruiker geblokkeerd"
+  },
   "app.modal.install-to-play.view-contents": {
     "message": "Inhoud bekijken"
   },
@@ -677,6 +770,36 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Er is een update nodig om {name} te spelen. Werk het spel bij naar de nieuwste versie om het te kunnen starten."
   },
+  "app.nav.create-new-instance": {
+    "message": "Nieuwe instantie aanmaken"
+  },
+  "app.nav.home": {
+    "message": "Start"
+  },
+  "app.nav.library": {
+    "message": "Bibliotheek"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Modrinth-account"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Meld je aan bij een Modrinth-account"
+  },
+  "app.nav.signed-in-as": {
+    "message": "Aangemeld als <user>{username}</user>"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Upgrade naar Modrinth+"
+  },
+  "app.news.title": {
+    "message": "Nieuws"
+  },
+  "app.news.view-all": {
+    "message": "Al het nieuws bekijken"
+  },
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
   },
@@ -685,6 +808,9 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Terug naar Ontdekken"
+  },
+  "app.project.install-context.back-to-instance": {
+    "message": "Terug naar de instantie"
   },
   "app.project.version.all-versions": {
     "message": "Alle versies"
@@ -698,20 +824,119 @@
   "app.project.versions.already-installed": {
     "message": "Al geïnstalleerd"
   },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "Sleep om recente instanties weer te geven"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Sleep om formaat aan te passen"
+  },
+  "app.restarting": {
+    "message": "Opnieuw opstarten..."
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth-app {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "Omgevingsvariabelen die bij het opstarten van een instantie worden ingesteld."
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Omgevingsvariabelen invoeren..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Omgevingsvariabelen"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "Start instanties in volledig scherm door het bestand options.txt aan te passen."
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Volledig scherm"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "De hoogte van het spelvenster bij het opstarten."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Hoogte invoeren..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Hoogte"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "Argumenten die bij het starten van een instantie aan Java worden doorgegeven."
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Voer Java-argumenten in..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java-argumenten"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Maximaal beschikbaar geheugen voor elke instantie."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Geheugentoewijzing"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Wordt uitgevoerd nadat het spel is afgesloten."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Voer commando voor na het afsluiten in..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Hook voor na het afsluiten"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "Wordt uitgevoerd voordat de instantie wordt gestart."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Voer commando voor het opstarten in..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Hook voor het opstarten"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "De breedte van het spelvenster bij het opstarten."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Voer breedte in..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Breedte"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Commando gebruikt om het Minecraft proces te om wikkelen."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Type een omwikkelcommando in..."
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Omwikkel haak"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Schakel ontwikkelaars modus"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
   },
   "app.settings.downloading": {
     "message": "v{version} wordt gedownload"
   },
+  "app.settings.java-installations.location.title": {
+    "message": "Java {version, number} locatie"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
     "message": "Advertenties maken Modrinth mogelijk en financieren de uitbetalingen aan makers. Onze partners kunnen cookies in de app opslaan of gebruiken om advertenties te personaliseren en de prestaties te meten. Je kunt je hieronder afmelden of je voorkeuren beheren."
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Laat Modrinth als jouw activiteit op Discord. Dit verandert niet activiteiten toegevoegd door mods."
   },
   "app.settings.tabs.appearance": {
     "message": "Uiterlijk"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Standaardopties voor instantie"
+    "message": "Standaard spelopties"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
@@ -724,6 +949,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Bronnenbeheer"
+  },
+  "app.sidebar.playing-as": {
+    "message": "Spelen als"
   },
   "app.skins.add-button": {
     "message": "Skin toevoegen"
@@ -883,6 +1111,21 @@
   },
   "app.skins.toggle-ears-features-on": {
     "message": "Inschakelen"
+  },
+  "app.survey.body": {
+    "message": "Zou je een paar vragen willen beantwoorden over je ervaringen met de Modrinth-app?"
+  },
+  "app.survey.footer": {
+    "message": "Deze feedback wordt rechtstreeks doorgestuurd naar het Modrinth-team en zal als leidraad dienen voor toekomstige updates!"
+  },
+  "app.survey.no-thanks": {
+    "message": "Nee, bedankt"
+  },
+  "app.survey.take-survey": {
+    "message": "Aan enquête meedoen"
+  },
+  "app.survey.title": {
+    "message": "Hoi, Modrinth-gebruiker!"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
@@ -1159,6 +1402,30 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Bronpakket"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Acties"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Uitnodigingslink"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "Iedereen die zo'n uitnodigingslink heeft, kan meedoen zolang deze actief is."
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "Er zijn geen actieve uitnodigingen."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Vervalt"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Uitnodiging intrekken"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Uitnodiging {code} intrekken"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Actieve uitnodigingen"
   },
   "instance.settings.tabs.general": {
     "message": "Algemeen"
@@ -1495,9 +1762,6 @@
   },
   "modal.modrinth-account-required.browser-description": {
     "message": "Er is een nieuw tabblad geopend om je aan te melden. Log daar in en ga vervolgens terug naar de app."
-  },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Annuleren"
   },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Doorgaan in je browser"

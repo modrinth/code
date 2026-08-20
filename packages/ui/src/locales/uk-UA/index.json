@@ -374,6 +374,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Видалити {itemType}"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Вимкнути {itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Пониження} other {Підвищення}} може спричинити проблеми сумісности. Моди чи вміст, який ви додали в збірку, буде збережено, але може бути несумісним із новою версією."
   },
@@ -443,11 +446,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "Додано {count}"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Змінені конфігураційні файли"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Додано (залежності)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Вимкнено"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Видалено (вимкнено)"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Оновлено"
@@ -464,11 +473,35 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Оновлено"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Версія гри"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Усе одно встановити"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Завантажувач"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Прив'язана збірка"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Відв'язана збірка"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Оновлена збірка"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Без змін у вмісті"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "Видалено {count}"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "Видалено (вимкнено): {count}"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Файл перевірятиметься, лише якщо його опубліковано на Modrinth, незалежно від його формату (включно з .mrpack)."
@@ -529,6 +562,9 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "світ"
+  },
+  "content.modpack-card.installation-settings": {
+    "defaultMessage": "Налаштування інсталяції"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Додатковий уміст"
@@ -810,7 +846,7 @@
     "defaultMessage": "Переглянути збірки"
   },
   "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Імпортувати збірку"
+    "defaultMessage": "Перенести збірку"
   },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Уже знаєте яку збірку хочете встановити?"
@@ -831,13 +867,13 @@
     "defaultMessage": "Власне налаштування"
   },
   "creation-flow.modal.setup-type.option.import-instance.description": {
-    "defaultMessage": "Імпортуйте збірку з Prism, CurseForge або подібних програм."
+    "defaultMessage": "Перенесіть збірку з Prism, CurseForge абощо."
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Імпорт збірки"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Перегляньте збірки на Modrinth або імпортуйте їх з файлу."
+    "defaultMessage": "Перегляньте збірки на Modrinth або перенесіть їх із файлу."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Установити збірку"
@@ -1115,6 +1151,21 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Ви отримали особливі дозволи для поширення цієї роботи у вашій збірці."
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Видалити групу"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Це назавжди видалить цю групу атрибуції та всі файли в ній. Цю дію неможливо скасувати."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Видалити {title}?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Групу не видалено"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Утримуйте Shift під час кліку, щоб пропустити підтвердження."
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Видалити з групи"
   },
@@ -1207,9 +1258,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Файл збережено"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Закрити"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Знайти"
@@ -1994,6 +2042,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Умісту не знайдено"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "Зовнішні"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "Цей файл не опубліковано на Modrinth."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Уміст збірки"
   },
@@ -2002,6 +2056,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "За вашим запитом не знайдено жодного проєкту."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Відкрити в Slicer"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Пошук {count, number} {count, plural, one {проєкту} other {проєктів}}"
@@ -2138,6 +2195,9 @@
   "label.details": {
     "defaultMessage": "Деталі"
   },
+  "label.discover-content": {
+    "defaultMessage": "Огляд вмісту"
+  },
   "label.done": {
     "defaultMessage": "Готово"
   },
@@ -2215,6 +2275,9 @@
   },
   "label.password": {
     "defaultMessage": "Пароль"
+  },
+  "label.permissions": {
+    "defaultMessage": "Дозволи"
   },
   "label.plan-custom": {
     "defaultMessage": "Власний"
@@ -2747,8 +2810,155 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Творець Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Користувач Modrinth."
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} Не зможе надсилати вам запити в друзі, запрошувати до спільних збірок або запрошувати на сервери Modrinth Hosting."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Дійсно заблокувати цього користувача?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Виникла помилка під час блокування користувача. Спробуйте знову."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Не вдалося заблокувати користувача"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} заблоковано."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Користувача заблоковано"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "Заблокувати {username}"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Переглянути аналітику користувача"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "Керувати виплатами користувача"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Заблокувати"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "Створити добірку"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "Створити проєкт"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Деталі про користувача"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "Керувати проєктами"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "Видалити як партнера"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "Призначити партнером"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Розблокувати"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
+  },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Дозвольте спливні вікна для Modrinth, потім спробуйте знову."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Не вдалося отримати профіль GitHub. Спробуйте знову."
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "Сервіси автентифікації"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "Підтверджена електронна пошта"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "Має пароль"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "Має TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "Способи оплати"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Переглянути профіль"
+  },
+  "profile.details.title": {
+    "defaultMessage": "Деталі користувача"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "Пошту не підтверджено"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "Пошту підтверджено"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Не вдалося завантажити профіль користувача."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "Користувача не знайдено"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "Партнер"
+  },
   "profile.label.badges": {
     "defaultMessage": "Значки"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "Добірка"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, one {завантаження} few {завантаження} many {завантажень} other {завантаження}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "Приєднався"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "Цей користувач не має добірок!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "Ви поки не маєте добірок."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "Цей користувач не має проєктів!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "Ви поки не маєте проєктів."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "Організації"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
+  },
+  "profile.official-account": {
+    "defaultMessage": "Офіційний обліковий запис Modrinth"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Офіційний обліковий запис Modrinth. Зв'язатися з підтримкою можна за <support-link></support-link> або через електронну пошту за <email></email>"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "Виникла помилка під час розблокування користувача. Спробуйте знову."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "Не вдалося розблокувати користувача"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username} розблоковано."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "Користувача розблоковано"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Опубліковано {date}"
@@ -2765,11 +2975,20 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Клієнт чи сервер"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Виділений сервер"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Сервер"
   },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Одиночна гра"
+  },
   "project-type.all": {
     "defaultMessage": "Усі"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "Добірки"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, one {Пакет даних} few {Пакети даних} many {Пакетів даних} other {Пакетів даних}}"
@@ -4997,8 +5216,215 @@
   "settings.pats.title": {
     "defaultMessage": "Особистий токен доступу"
   },
+  "settings.profile.bio.description": {
+    "defaultMessage": "Короткий опис, щоб розповісти іншим трохи про себе."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Про себе"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "Профіль"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "Зображення профілю"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "Інформація з вашого профілю є <profile-link>загальнодоступною на Modrinth</profile-link> та через <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "Не вдалося оновити профіль"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "Виникла помилка під час оновлення вашого профілю Спробуйте знову."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "Увійдіть за допомогою облікового запису Modrinth, щоб налаштувати свій публічний профіль."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Потрібен обліковий запис Modrinth"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "Унікальне ім'я для ідентифікації вашого профілю."
+  },
   "settings.sessions.title": {
     "defaultMessage": "Сеанси"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Дії"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Користувач"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Це користувачі, яких ви заблокували на Modrinth. Вони не можуть:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "Ви нікого не заблокували."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "Не вдалося завантажити заблокованих користувачів."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "Завантаження заблокованих користувачів…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "Надсилати вам запити в друзі"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "Запрошувати вас керувати сервером Modrinth Hosting."
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "Запрошувати вас до спільних збірок"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "Заблоковані користувачі"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "Розблокувати"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "Не вдалося розблокувати користувача"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "Сталася помилка під час розблокування цього користувача. Будь ласка, спробуйте ще раз."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "Розблокувати {username}"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "Аватар користувача {username}"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Керуйте тим, хто може надсилати вам запити в друзі на Modrinth."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "Запити в друзі"
+  },
+  "settings.social.interaction-source.coming-soon": {
+    "defaultMessage": "Незабаром!"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "Усі"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "Друзі"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "Друзі друзів"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "Ніхто"
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "Керуйте тим, хто може надсилати вам запрошення до спільних збірок та панелей Modrinth Hosting."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Запрошення"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "З обліковим записом Modrinth ви можете налаштувати, хто може взаємодіяти з вами, або керувати заблокованими користувачами"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Потрібен обліковий запис Modrinth"
+  },
+  "settings.social.title": {
+    "defaultMessage": "Соціальні мережі"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Додати"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Додано"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Цього користувача вже запрошено."
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Застосувати"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Аватар користувача {username}"
+  },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Власна…"
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Власна: {date}"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Редагувати посилання-запрошення."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Редагувати посилання-запрошення"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "Через 1 день"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "Через 1 годину"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "Через 7 днів"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "Через 6 годин"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "Через 3 дні"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "Через 12 годин"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Термін дії"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Ваші друзі — {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Запросити"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Термін дії вашого посилання-запрошення закінчується через {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Або використайте посилання-запрошення"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "Посилання-запрошення скопійовано до буфера обміну."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Посилання скопійовано"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Не вдалося скопіювати посилання"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Максимальна кількість використань"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Не знайдено друзів."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Відповідних користувачів не знайдено."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Запит відправлено"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} спочатку має прийняти ваш запит у друзі"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Зберегти"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Уведіть ім’я користувача Modrinth"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Шукаємо…"
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Не вдалося оновити посилання"
   },
   "tag.category.128x": {
     "defaultMessage": "×128"

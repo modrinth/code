@@ -96,19 +96,28 @@
     "message": "Annoteringar"
   },
   "analytics.chart.controls.aria": {
-    "message": "Statistik diagram kontroller, {activeCount}"
+    "message": "Statistik-graf-kontroller, {activeCount}"
   },
   "analytics.chart.controls.button": {
     "message": "Kontroller"
   },
   "analytics.chart.controls.dialog-aria": {
-    "message": "Statistik diagram kontroller"
+    "message": "Statistik-graf-kontroller"
   },
   "analytics.chart.controls.display": {
-    "message": "Skärm"
+    "message": "Visa"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Inga Modrinth-händelser i grafen."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Inga projekthändelser i grafen."
   },
   "analytics.chart.controls.previous-period": {
     "message": "Tidigare period"
+  },
+  "analytics.chart.controls.project-events": {
+    "message": "Projekthändelser"
   },
   "analytics.chart.controls.ratio": {
     "message": "Proportion"
@@ -126,7 +135,7 @@
     "message": "{name} (förhandsvisa)"
   },
   "analytics.chart.render-limit.header": {
-    "message": "Visa alla {count} linjer i diagram?"
+    "message": "Visa alla {count} linjer i grafen?"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dag} other {# dagar}}"
@@ -138,7 +147,7 @@
     "message": "{count, plural, one {# minut} other {# minuter}}"
   },
   "analytics.chart.tooltip.hide-entry": {
-    "message": "Visa {name} i diagram"
+    "message": "Visa {name} i grafen"
   },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Fästa"
@@ -147,7 +156,7 @@
     "message": "(förhandsvisa)"
   },
   "analytics.chart.tooltip.show-entry": {
-    "message": "Visa {name} i diagram"
+    "message": "Visa {name} i grafen"
   },
   "analytics.chart.tooltip.total": {
     "message": "Totalt"
@@ -364,6 +373,12 @@
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours} h"
+  },
+  "analytics.stat.previous-period-comparison": {
+    "message": "jfr tidigare period"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "jfr tidigare"
   },
   "analytics.stat.revenue": {
     "message": "Intäkter"
@@ -639,13 +654,13 @@
     "message": "Visa andra paket"
   },
   "auth.authorize.action.authorize": {
-    "message": "Auktorisera"
+    "message": "Tillåt"
   },
   "auth.authorize.action.decline": {
     "message": "Neka"
   },
   "auth.authorize.app-info": {
-    "message": "<strong>{appName}</strong> av <creator-link>{creator}</creator-link> kommer kunna:"
+    "message": "<strong>{appName}</strong> av <creator-link>{creator}</creator-link> kommer att kunna:"
   },
   "auth.authorize.authorize-app-name": {
     "message": "Auktorisera {appName}"
@@ -1058,6 +1073,12 @@
   "create-project-version.create-modal.stage.details.version-number-placeholder": {
     "message": "Ange versionsnummer, t.ex. 1.2.3-alfa.1"
   },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Detaljer"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Miljö"
+  },
   "create-project-version.create-modal.stage.metadata.files-tab": {
     "message": "Filer"
   },
@@ -1292,9 +1313,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Nyligen uppdaterade"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Stäng"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Ladda ner {formType}"
   },
@@ -1407,7 +1425,7 @@
     "message": "Bankkontoägare"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
-    "message": "Ange namn på personen med rättigheter att hantera detta bankkonto för företaget."
+    "message": "Ange namn på personen med behörighet att hantera detta bankkonto för företaget."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Mynt"
@@ -1880,6 +1898,15 @@
   "discover.install.back-to-server": {
     "message": "Tillbaka till server"
   },
+  "discover.install.cancel-reset": {
+    "message": "Avbryt återställning"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "Ingen servervärld är tillgänglig att installera."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Väljer modpaket att installera efter återställning"
+  },
   "discover.seo.description": {
     "message": "Sök och bläddra bland tusen av Minecraft {projectType} på Modrinth med snabba, träffsäkra resultat. Våra filter hjälper dig att snabbt hitta de bästa Minecraft {projectType}."
   },
@@ -2143,6 +2170,9 @@
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "Tidsbegränsat erbjudande. Inget kreditkort krävs. Tillgängligt för servrar i USA."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Ogiltig produkt"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "Välj en anpassad plan med just de specifikationer du behöver."
@@ -2609,6 +2639,9 @@
   "moderation.page.reports": {
     "message": "Rapporter"
   },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Misslyckades att tömma alla grupper: {error}"
+  },
   "modpack-scan-modal.failed": {
     "message": "Misslyckades"
   },
@@ -2629,6 +2662,9 @@
   },
   "modpack-scan-modal.not-scanned": {
     "message": "Inte skannad"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "Paket-filnamn"
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Skanna alla filer"
@@ -2795,6 +2831,9 @@
   "muralpay.rail.fiat-zar.name": {
     "message": "Banköverföring (ZAR)"
   },
+  "organization.button.manage-projects": {
+    "message": "Hantera projekt"
+  },
   "organization.label.downloads": {
     "message": "nedladdningar"
   },
@@ -2813,8 +2852,20 @@
   "organization.project-transfer.name-column": {
     "message": "Namn"
   },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "Ikon för {name}"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "För över {count} projekt"
+  },
   "organization.project-transfer.type-column": {
     "message": "Typ"
+  },
+  "organization.projects.none": {
+    "message": "Den här organisationen har inga projekt än."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Den här organisationen har inga projekt än. Vill du <create-link>skapa ett</create-link>?"
   },
   "project-member-header.error-decline": {
     "message": "Misslyckades att neka inbjudan"
@@ -2981,8 +3032,11 @@
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} stöttar inte {gameVersion} för {platform}"
   },
+  "project.download.manually": {
+    "message": "Ladda ner manuellt"
+  },
   "project.download.no-app": {
-    "message": "Har du inte Modrinth appen?"
+    "message": "Har du inte Modrinth App?"
   },
   "project.download.no-game-versions-found": {
     "message": "Inga spelversioner hittades"
@@ -3049,6 +3103,12 @@
   },
   "project.gallery.title": {
     "message": "Galleri"
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Ditt projekt är publicerat och upptäckbart på Modrinth."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Projekt godkänt"
   },
   "project.moderation.admonition.under-review.header": {
     "message": "Projekt under granskning"
@@ -3158,6 +3218,9 @@
   "project.settings.server.server-online": {
     "message": "Servern är online!"
   },
+  "project.settings.tags.resolutions-description": {
+    "message": "Välj upplösning(en/arna) på dina texturer i ditt {type}."
+  },
   "project.settings.title": {
     "message": "Inställningar"
   },
@@ -3170,8 +3233,23 @@
   "project.versions.copy-link-option": {
     "message": "Kopiera länk"
   },
+  "project.versions.delete-button": {
+    "message": "Radera"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Det här kommer radera versioner för evigt (asså för evigt)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Är du säker på att du vill radera den här versionen?"
+  },
   "project.versions.edit-files-option": {
     "message": "Redigera filer"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Öppna i ny tabb"
+  },
+  "project.versions.share-option": {
+    "message": "Dela"
   },
   "project.versions.title": {
     "message": "Versioner"
@@ -3779,11 +3857,26 @@
   "settings.authorizations.about-this-app": {
     "message": "Om appen"
   },
+  "settings.authorizations.created-by": {
+    "message": "Skapad av {user}"
+  },
+  "settings.authorizations.description": {
+    "message": "När du tillåter en applikation med ditt Modrinth-konto, ger du den åtkomst till ditt konto. Du kan hantera och granska åtkomst till konto här när som helst."
+  },
+  "settings.authorizations.empty-state.description": {
+    "message": "Applikationer du tillåter kommer att synas här."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Inga behöriga appar"
+  },
   "settings.authorizations.head-title": {
     "message": "Autentiseringar"
   },
   "settings.authorizations.revoke.action": {
     "message": "Återkalla"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Det här kommer återkalla applikationernas åtkomst till ditt konto. Du kan alltid ge tillåtelse igen senare."
   },
   "settings.billing.charges.description": {
     "message": "Alla dina tidigare Modrinth fakturor listas här:"
@@ -3813,7 +3906,7 @@
     "message": "år"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Annonsfritt surfande på modrinth.com och Modrinth App"
+    "message": "Surfa annonsfritt på modrinth.com och Modrinth App"
   },
   "settings.billing.midas.benefits.badge": {
     "message": "Modrinth+ märke på din profil"
@@ -4038,7 +4131,7 @@
     "message": "Döljer \"Installera Modrinth App\" knappen från primär navigering. Modrinth App-sidan kan fortfarande hittas på landningssidan eller i sidfoten."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Dölj \"Installera Modrinth\" knapp"
+    "message": "Dölj \"Installera Modrinth App\" knapp"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Vänsterjusterad sidofält på innehållssidor"
@@ -4147,6 +4240,9 @@
   },
   "shared-instance.invite.inviter.unknown": {
     "message": "En Modrinth-användare"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# person} other {# personer}} har redan gått med"
   },
   "shared-instance.invite.loading": {
     "message": "Laddar inbjudan…"

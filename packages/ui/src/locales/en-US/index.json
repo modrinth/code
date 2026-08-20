@@ -1304,9 +1304,6 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "File saved"
   },
-  "files.editor.find-close": {
-    "defaultMessage": "Close"
-  },
   "files.editor.find-in-file": {
     "defaultMessage": "Find"
   },
@@ -2900,9 +2897,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Create a project"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Edit role"
-  },
   "profile.button.info": {
     "defaultMessage": "View user details"
   },
@@ -2921,6 +2915,15 @@
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# project} other {# projects}}"
   },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Allow pop-ups for Modrinth, then try again."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "The GitHub profile could not be retrieved. Please try again."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Unable to open GitHub profile"
+  },
   "profile.details.label.auth-providers": {
     "defaultMessage": "Auth providers"
   },
@@ -2933,8 +2936,14 @@
   "profile.details.label.has-totp": {
     "defaultMessage": "Has TOTP"
   },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Loading..."
+  },
   "profile.details.label.payment-methods": {
     "defaultMessage": "Payment methods"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "View profile"
   },
   "profile.details.title": {
     "defaultMessage": "User details"
@@ -2984,23 +2993,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {project} other {projects}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Saving..."
-  },
   "profile.official-account": {
     "defaultMessage": "Official Modrinth account"
   },
   "profile.official-account.bio": {
     "defaultMessage": "The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Select a role"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "An error occurred while updating the user role. Please try again."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Failed to update role"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "An error occurred while unblocking this user. Please try again."
@@ -5398,12 +5395,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username}'s avatar"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Cancel"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Cancel"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Custom..."

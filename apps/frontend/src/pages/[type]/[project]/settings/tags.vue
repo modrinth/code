@@ -1,174 +1,23 @@
-<template>
-	<div>
-		<ConfirmLeaveModal ref="confirmLeaveModal" />
-		<section class="universal-card">
-			<div class="label">
-				<h3>
-					<span class="label__title size-card-header">{{ formatMessage(messages.tagsTitle) }}</span>
-				</h3>
-			</div>
-
-			<div
-				v-if="tooManyTagsWarning && !allTagsSelectedWarning"
-				class="my-2 flex items-center gap-1.5 text-orange"
-			>
-				<TriangleAlertIcon class="my-auto" />
-				{{ tooManyTagsWarning }}
-			</div>
-
-			<div v-if="multipleResolutionTagsWarning" class="my-2 flex items-center gap-1.5 text-orange">
-				<TriangleAlertIcon class="my-auto" />
-				{{ multipleResolutionTagsWarning }}
-			</div>
-
-			<div v-if="allTagsSelectedWarning" class="my-2 flex items-center gap-1.5 text-red">
-				<TriangleAlertIcon class="my-auto" />
-				<span>{{ allTagsSelectedWarning }}</span>
-			</div>
-
-			<p>
-				{{
-					formatMessage(messages.taggingImportanceDescription, {
-						type: formatProjectType(project.project_type).toLowerCase(),
-					})
-				}}
-			</p>
-
-			<p
-				v-if="project.versions.length === 0 && projectV3?.minecraft_server == null"
-				class="known-errors"
-			>
-				{{ formatMessage(messages.uploadVersionFirst) }}
-			</p>
-			<template v-else>
-				<template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
-					<div class="label mb-3">
-						<h4>
-							<span class="label__title">{{ formatCategoryHeader(formatMessage, header) }}</span>
-						</h4>
-						<span class="label__description">
-							<template v-if="header === 'categories'">
-								{{
-									formatMessage(messages.categoriesDescription, {
-										type: formatProjectType(project.project_type).toLowerCase(),
-									})
-								}}
-							</template>
-							<template v-else-if="header === 'features'">
-								{{
-									formatMessage(messages.featuresDescription, {
-										type: formatProjectType(project.project_type).toLowerCase(),
-									})
-								}}
-							</template>
-							<template v-else-if="header === 'resolutions'">
-								{{
-									formatMessage(messages.resolutionsDescription, {
-										type: formatProjectType(project.project_type).toLowerCase(),
-									})
-								}}
-							</template>
-							<template v-else-if="header === 'performance impact'">
-								{{
-									formatMessage(messages.performanceImpactDescription, {
-										type: formatProjectType(project.project_type).toLowerCase(),
-									})
-								}}
-							</template>
-						</span>
-					</div>
-					<div class="category-list input-div">
-						<Checkbox
-							v-for="category in categoryLists[header]"
-							:key="`category-${header}-${category.name}`"
-							:model-value="current.selectedTags.includes(category)"
-							:description="formatCategory(formatMessage, category.name)"
-							class="category-selector"
-							@update:model-value="toggleCategory(category)"
-						>
-							<div class="category-selector__label">
-								<component
-									:is="getTagIcon(category.name)"
-									v-if="header !== 'resolutions' && getTagIcon(category.name)"
-									aria-hidden="true"
-									class="icon"
-								/>
-								<span aria-hidden="true">
-									<FormattedTag :tag="category.name" enforce-type="category" />
-								</span>
-							</div>
-						</Checkbox>
-					</div>
-				</template>
-				<div class="label">
-					<h4>
-						<span class="label__title"
-							><StarIcon /> {{ formatMessage(messages.featuredTags) }}</span
-						>
-					</h4>
-					<span class="label__description">{{
-						formatMessage(messages.featuredTagsDescription)
-					}}</span>
-				</div>
-				<p v-if="current.selectedTags.length < 1">
-					{{ formatMessage(messages.selectAtLeastOneCategory) }}
-				</p>
-				<div class="category-list input-div">
-					<Checkbox
-						v-for="category in current.selectedTags"
-						:key="`featured-category-${category.name}`"
-						class="category-selector"
-						:model-value="current.featuredTags.includes(category)"
-						:description="formatCategory(formatMessage, category.name)"
-						:disabled="current.featuredTags.length >= 3 && !current.featuredTags.includes(category)"
-						@update:model-value="toggleFeaturedCategory(category)"
-					>
-						<div class="category-selector__label">
-							<component
-								:is="getTagIcon(category.name)"
-								v-if="category.header !== 'resolutions' && getTagIcon(category.name)"
-								aria-hidden="true"
-								class="icon"
-							/>
-							<span aria-hidden="true">
-								<FormattedTag :tag="category.name" enforce-type="category" />
-							</span>
-						</div>
-					</Checkbox>
-				</div>
-			</template>
-		</section>
-		<UnsavedChangesPopup
-			:original="saved"
-			:modified="current"
-			:saving="saving"
-			@reset="reset"
-			@save="save"
-		/>
-	</div>
-</template>
-
 <script setup lang="ts">
 import {
-	getCategoryIcon,
-	SERVER_CATEGORY_ICON_MAP,
-	StarIcon,
-	TriangleAlertIcon,
-} from '@modrinth/assets'
-import {
+	Admonition,
 	Checkbox,
 	ConfirmLeaveModal,
 	defineMessages,
 	formatCategory,
 	formatCategoryHeader,
+	formatProjectTypeSentence,
 	FormattedTag,
 	injectProjectPageContext,
+	type MessageDescriptor,
+	sortProjectTypes,
+	TagItem,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatProjectType, sortedCategories } from '@modrinth/utils'
+import { capitalizeString, sortedCategories } from '@modrinth/utils'
 import { computed } from 'vue'
 
 interface Category {
@@ -178,18 +27,29 @@ interface Category {
 	project_type: string
 }
 
+interface CategoryGroup {
+	id: string
+	title: string
+	description?: string
+	categories: Category[]
+}
+
+const MAX_FEATURED_TAGS = 3
+
+const RESOLUTION_TAGS = ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+']
+
+const SHARED_CATEGORY_PROJECT_TYPES: Record<string, string> = {
+	plugin: 'mod',
+	datapack: 'mod',
+}
+
 const tags = useGeneratedState()
 const { formatMessage, locale } = useVIntl()
 
 const messages = defineMessages({
-	tagsTitle: {
+	title: {
 		id: 'project.settings.tags.title',
 		defaultMessage: 'Tags',
-	},
-	taggingImportanceDescription: {
-		id: 'project.settings.tags.tagging-importance-description',
-		defaultMessage:
-			'Accurate tagging is important to help people find your {type}. Make sure to select all tags that apply.',
 	},
 	uploadVersionFirst: {
 		id: 'project.settings.tags.upload-version-first',
@@ -217,13 +77,17 @@ const messages = defineMessages({
 		defaultMessage: 'Featured tags',
 	},
 	featuredTagsDescription: {
-		id: 'project.settings.tags.featured-tags-description',
+		id: 'project.settings.tags.featured-tags-select-description',
 		defaultMessage:
-			'You can feature up to 3 of your most relevant tags. Other tags may be promoted to featured if you do not select all 3.',
+			'Select your most relevant tags. These are displayed before the rest of your tags.',
 	},
 	selectAtLeastOneCategory: {
 		id: 'project.settings.tags.select-at-least-one-category',
 		defaultMessage: 'Select at least one category in order to feature a category.',
+	},
+	featuredTagsRequired: {
+		id: 'project.settings.tags.featured-tags-required',
+		defaultMessage: 'You must have at least one featured tag.',
 	},
 	tooManyTagsServerHardWarning: {
 		id: 'project.settings.tags.too-many-tags-server-hard-warning',
@@ -252,72 +116,183 @@ const messages = defineMessages({
 	},
 })
 
+const groupTitleMessages: Record<string, MessageDescriptor> = defineMessages({
+	categories: {
+		id: 'project.settings.tags.group-title.categories',
+		defaultMessage: '{showType, select, yes {{types} categories} other {Categories}}',
+	},
+	features: {
+		id: 'project.settings.tags.group-title.features',
+		defaultMessage: '{showType, select, yes {{types} features} other {Features}}',
+	},
+	resolutions: {
+		id: 'project.settings.tags.group-title.resolutions',
+		defaultMessage: '{showType, select, yes {{types} resolutions} other {Resolutions}}',
+	},
+	'performance impact': {
+		id: 'project.settings.tags.group-title.performance-impact',
+		defaultMessage:
+			'{showType, select, yes {{types} performance impact} other {Performance impact}}',
+	},
+})
+
+const groupDescriptionMessages: Record<string, MessageDescriptor> = {
+	categories: messages.categoriesDescription,
+	features: messages.featuresDescription,
+	resolutions: messages.resolutionsDescription,
+	'performance impact': messages.performanceImpactDescription,
+}
+
 const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
 
-const formatCategoryName = (categoryName: string) => {
-	return formatCategory(formatMessage, categoryName)
-}
+const formatCategoryName = (categoryName: string) => formatCategory(formatMessage, categoryName)
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
-const getTagIcon = (categoryName: string) => {
-	const iconName = isServerProject.value
-		? (SERVER_CATEGORY_ICON_MAP[categoryName] ?? categoryName)
-		: categoryName
-	return getCategoryIcon(iconName)
+const canSelectTags = computed(() => project.value.versions.length > 0 || isServerProject.value)
+
+const projectTypes = computed(() => {
+	if (isServerProject.value) {
+		return ['minecraft_java_server']
+	}
+
+	const types = projectV3.value?.project_types?.length
+		? projectV3.value.project_types
+		: [project.value.actualProjectType]
+
+	return sortProjectTypes(new Set(types))
+})
+
+const allCategories = computed(
+	() => sortedCategories(tags.value, formatCategoryName, locale.value) as Category[],
+)
+
+const projectTypesByCategoryList = computed(() => {
+	const lists = new Map<string, string[]>()
+	for (const projectType of projectTypes.value) {
+		const source = SHARED_CATEGORY_PROJECT_TYPES[projectType] ?? projectType
+		lists.set(source, [...(lists.get(source) ?? []), projectType])
+	}
+	return lists
+})
+
+const projectTypeListFormatter = computed(
+	() => new Intl.ListFormat(locale.value, { style: 'long', type: 'conjunction' }),
+)
+
+function formatProjectTypeName(type: string) {
+	return formatProjectTypeSentence(
+		formatMessage,
+		type === 'minecraft_java_server' ? 'server' : type,
+	)
 }
 
-const matchesProjectType = (x: Category) => {
-	if (isServerProject.value) {
-		return x.project_type === 'minecraft_java_server'
-	} else {
-		return x.project_type === project.value.actualProjectType
+function formatGroupTitle(header: string, types: string[]) {
+	const message = groupTitleMessages[header]
+	if (!message) {
+		return formatCategoryHeader(formatMessage, header)
 	}
+
+	const showType = projectTypes.value.length > 1
+	return formatMessage(message, {
+		showType: showType ? 'yes' : 'other',
+		types: showType
+			? capitalizeString(projectTypeListFormatter.value.format(types.map(formatProjectTypeName)))
+			: '',
+	})
+}
+
+function formatGroupDescription(header: string, types: string[]) {
+	const message = groupDescriptionMessages[header]
+	if (!message) {
+		return undefined
+	}
+
+	// listing out every type gets unwieldy, fallback to the generic term when there's more than one
+	return formatMessage(message, {
+		type: formatProjectTypeName(types.length > 1 ? 'project' : types[0]),
+	})
+}
+
+const categorySections = computed(() => {
+	const sections: {
+		categoryList: string
+		header: string
+		types: string[]
+		categories: Category[]
+	}[] = []
+
+	for (const [categoryList, types] of projectTypesByCategoryList.value) {
+		const byHeader = new Map<string, Category[]>()
+		for (const category of allCategories.value) {
+			if (category.project_type !== categoryList) continue
+			byHeader.set(category.header, [...(byHeader.get(category.header) ?? []), category])
+		}
+
+		for (const [header, categories] of byHeader) {
+			sections.push({
+				categoryList,
+				header,
+				types,
+				categories:
+					header === 'minecraft_server_features' ? withPokemonFirst(categories) : categories,
+			})
+		}
+	}
+
+	return sections
+})
+
+const categoryGroups = computed<CategoryGroup[]>(() =>
+	categorySections.value.map((section) => ({
+		id: `${section.categoryList}-${section.header}`,
+		title: formatGroupTitle(section.header, section.types),
+		description: formatGroupDescription(section.header, section.types),
+		categories: section.categories,
+	})),
+)
+
+function withPokemonFirst(categories: Category[]) {
+	return categories.slice().sort((a, b) => {
+		if (a.name === 'pokemon') return -1
+		if (b.name === 'pokemon') return 1
+		return 0
+	})
+}
+
+const availableTags = computed(() => [
+	...new Set(categorySections.value.flatMap((section) => section.categories.map((x) => x.name))),
+])
+
+function hasSameTags(a: string[], b: string[]) {
+	return a.length === b.length && a.every((tag) => b.includes(tag))
 }
 
 const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	() => ({
-		selectedTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
-			(x: Category) =>
-				matchesProjectType(x) &&
-				(project.value.categories.includes(x.name) ||
-					project.value.additional_categories.includes(x.name)),
-		) as Category[],
-		featuredTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
-			(x: Category) => matchesProjectType(x) && project.value.categories.includes(x.name),
-		) as Category[],
+		selectedTags: availableTags.value.filter(
+			(tag) =>
+				project.value.categories.includes(tag) || project.value.additional_categories.includes(tag),
+		),
+		featuredTags: availableTags.value.filter((tag) => project.value.categories.includes(tag)),
 	}),
 	async () => {
-		// Promote selected categories to featured if there are less than 3 featured
-		const newFeaturedTags = current.value.featuredTags.slice()
-		if (newFeaturedTags.length < 1 && current.value.selectedTags.length > newFeaturedTags.length) {
-			const nonFeaturedCategories = current.value.selectedTags.filter(
-				(x) => !newFeaturedTags.includes(x),
-			)
-			nonFeaturedCategories
-				.slice(0, Math.min(nonFeaturedCategories.length, 3 - newFeaturedTags.length))
-				.forEach((x) => newFeaturedTags.push(x))
+		if (!canSave.value) {
+			throw new Error('At least one tag must be featured')
 		}
 
-		// Convert selected and featured categories to backend-usable arrays
-		const categories = newFeaturedTags.map((x) => x.name)
-		const additionalCategories = current.value.selectedTags
-			.filter((x) => !newFeaturedTags.includes(x))
-			.map((x) => x.name)
+		const featuredTags = current.value.featuredTags
+		const additionalCategories = current.value.selectedTags.filter(
+			(tag) => !featuredTags.includes(tag),
+		)
 
 		const data: Record<string, string[]> = {}
 
-		if (
-			categories.length !== project.value.categories.length ||
-			categories.some((value) => !project.value.categories.includes(value))
-		) {
-			data.categories = categories
+		if (!hasSameTags(featuredTags, project.value.categories)) {
+			data.categories = featuredTags
 		}
 
-		if (
-			additionalCategories.length !== project.value.additional_categories.length ||
-			additionalCategories.some((value) => !project.value.additional_categories.includes(value))
-		) {
+		if (!hasSameTags(additionalCategories, project.value.additional_categories)) {
 			data.additional_categories = additionalCategories
 		}
 
@@ -327,31 +302,15 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
-const categoryLists = computed(() => {
-	const lists: Record<string, Category[]> = {}
-	sortedCategories(tags.value, formatCategoryName, locale.value).forEach((x: Category) => {
-		if (matchesProjectType(x)) {
-			const header = x.header
-			if (!lists[header]) {
-				lists[header] = []
-			}
-			lists[header].push(x)
-		}
-	})
-	const featuresKey = 'minecraft_server_features'
-	if (lists[featuresKey]) {
-		lists[featuresKey].sort((a, b) => {
-			if (a.name === 'pokemon') return -1
-			if (b.name === 'pokemon') return 1
-			return 0
-		})
-	}
-	return lists
-})
+const isFeaturedLimitReached = computed(
+	() => current.value.featuredTags.length >= MAX_FEATURED_TAGS,
+)
+
+const canSave = computed(() => current.value.featuredTags.length > 0)
 
 const tooManyTagsWarning = computed(() => {
 	const tagCount = current.value.selectedTags.length
-	if (projectV3?.value?.minecraft_server != null) {
+	if (isServerProject.value) {
 		if (tagCount > 18) {
 			return formatMessage(messages.tooManyTagsServerHardWarning, { count: tagCount })
 		} else if (tagCount > 12) {
@@ -364,127 +323,140 @@ const tooManyTagsWarning = computed(() => {
 })
 
 const multipleResolutionTagsWarning = computed(() => {
-	if (project.value.actualProjectType !== 'resourcepack') return null
+	if (!projectTypes.value.includes('resourcepack')) return null
 
-	const resolutionTags = current.value.selectedTags.filter((tag) =>
-		['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'].includes(tag.name),
-	)
+	const resolutionTags = current.value.selectedTags.filter((tag) => RESOLUTION_TAGS.includes(tag))
+	if (resolutionTags.length < 2) return null
 
-	if (resolutionTags.length > 1) {
-		const tagsList = resolutionTags
-			.map((t) => t.name)
+	return formatMessage(messages.multipleResolutionTagsWarning, {
+		count: resolutionTags.length,
+		tags: resolutionTags
 			.join(', ')
 			.replace('8x-', '8x or lower')
-			.replace('512x+', '512x or higher')
-		return formatMessage(messages.multipleResolutionTagsWarning, {
-			count: resolutionTags.length,
-			tags: tagsList,
-		})
-	}
-	return null
+			.replace('512x+', '512x or higher'),
+	})
 })
 
 const allTagsSelectedWarning = computed(() => {
-	const categoriesForProjectType = sortedCategories(
-		tags.value,
-		formatCategoryName,
-		locale.value,
-	).filter((x: Category) => x.project_type === project.value.actualProjectType)
-	const totalSelectedTags = current.value.selectedTags.length
-
 	if (
-		totalSelectedTags === categoriesForProjectType.length &&
-		categoriesForProjectType.length > 0
+		availableTags.value.length < 1 ||
+		availableTags.value.length < 1 ||
+		current.value.selectedTags.length !== availableTags.value.length
 	) {
-		return formatMessage(messages.allTagsSelectedWarning, {
-			count: categoriesForProjectType.length,
-		})
+		return null
 	}
-	return null
+
+	return formatMessage(messages.allTagsSelectedWarning, { count: availableTags.value.length })
 })
 
-const toggleCategory = (category: Category) => {
-	if (current.value.selectedTags.includes(category)) {
-		current.value.selectedTags = current.value.selectedTags.filter((x) => x !== category)
-		if (current.value.featuredTags.includes(category)) {
-			current.value.featuredTags = current.value.featuredTags.filter((x) => x !== category)
-		}
-	} else {
-		current.value.selectedTags = [...current.value.selectedTags, category]
+function toggleTagRaw(selection: string[], tag: string) {
+	if (selection.includes(tag)) {
+		return selection.filter((x) => x !== tag)
+	}
+	return availableTags.value.filter((x) => x === tag || selection.includes(x))
+}
+
+const toggleTag = (tag: string) => {
+	current.value.selectedTags = toggleTagRaw(current.value.selectedTags, tag)
+	if (!current.value.selectedTags.includes(tag)) {
+		current.value.featuredTags = current.value.featuredTags.filter((x) => x !== tag)
 	}
 }
 
-const toggleFeaturedCategory = (category: Category) => {
-	if (current.value.featuredTags.includes(category)) {
-		current.value.featuredTags = current.value.featuredTags.filter((x) => x !== category)
-	} else {
-		current.value.featuredTags = [...current.value.featuredTags, category]
-	}
+const toggleFeatured = (tag: string) => {
+	current.value.featuredTags = toggleTagRaw(current.value.featuredTags, tag)
 }
 </script>
+<template>
+	<div>
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
+		<h2 class="mb-4 mt-0 text-2xl font-semibold">
+			{{ formatMessage(messages.title) }}
+		</h2>
+		<p v-if="!canSelectTags" class="known-errors">
+			{{ formatMessage(messages.uploadVersionFirst) }}
+		</p>
+		<div v-else class="flex flex-col gap-4">
+			<Admonition v-if="allTagsSelectedWarning" type="critical" :body="allTagsSelectedWarning" />
+			<Admonition v-else-if="tooManyTagsWarning" type="warning" :body="tooManyTagsWarning" />
+			<Admonition
+				v-if="multipleResolutionTagsWarning"
+				type="warning"
+				:body="multipleResolutionTagsWarning"
+			/>
 
-<style lang="scss" scoped>
-.label__title {
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-card-xs);
-	margin-top: var(--spacing-card-bg);
+			<div
+				v-for="group in categoryGroups"
+				:key="group.id"
+				class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
+			>
+				<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+					{{ group.title }}
+				</h3>
+				<p v-if="group.description" class="mb-3 mt-0 text-sm">
+					{{ group.description }}
+				</p>
+				<div class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
+					<Checkbox
+						v-for="category in group.categories"
+						:key="`${group.id}-${category.name}`"
+						:model-value="current.selectedTags.includes(category.name)"
+						:description="formatCategoryName(category.name)"
+						@update:model-value="toggleTag(category.name)"
+					>
+						<span aria-hidden="true">
+							<FormattedTag :tag="category.name" enforce-type="category" />
+						</span>
+					</Checkbox>
+				</div>
+			</div>
 
-	svg {
-		vertical-align: top;
-	}
-}
-
-.button-group {
-	justify-content: flex-start;
-}
-
-.category-list {
-	column-count: 4;
-	column-gap: var(--spacing-card-lg);
-	margin-bottom: var(--spacing-card-md);
-
-	:deep(.category-selector) {
-		margin-bottom: 0.75rem;
-
-		.category-selector__label {
-			display: flex;
-			align-items: center;
-			text-align: left;
-
-			.icon {
-				height: 1rem;
-				width: 1rem;
-				margin-right: 0.25rem;
-				display: flex;
-				align-items: center;
-
-				svg {
-					width: 1rem;
-					height: 1rem;
-				}
-			}
-		}
-
-		span {
-			user-select: none;
-		}
-	}
-
-	@media only screen and (max-width: 1250px) {
-		column-count: 3;
-	}
-	@media only screen and (max-width: 1024px) {
-		column-count: 4;
-	}
-	@media only screen and (max-width: 960px) {
-		column-count: 3;
-	}
-	@media only screen and (max-width: 750px) {
-		column-count: 2;
-	}
-	@media only screen and (max-width: 530px) {
-		column-count: 1;
-	}
-}
-</style>
+			<div class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4">
+				<div class="mb-1 flex items-center gap-2">
+					<h3 class="m-0 text-base font-semibold text-contrast">
+						{{ formatMessage(messages.featuredTags) }}
+					</h3>
+					<TagItem
+						v-tooltip="
+							current.featuredTags.length === 0
+								? formatMessage(messages.featuredTagsRequired)
+								: undefined
+						"
+						:style="canSave ? undefined : { '--_color': 'var(--color-red)' }"
+					>
+						{{ current.featuredTags.length }}/{{ MAX_FEATURED_TAGS }}
+					</TagItem>
+				</div>
+				<p class="mb-3 mt-0 text-sm">
+					{{ formatMessage(messages.featuredTagsDescription) }}
+				</p>
+				<p v-if="current.selectedTags.length < 1" class="m-0 text-sm text-secondary">
+					{{ formatMessage(messages.selectAtLeastOneCategory) }}
+				</p>
+				<div v-else class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
+					<Checkbox
+						v-for="name in current.selectedTags"
+						:key="`featured-${name}`"
+						:model-value="current.featuredTags.includes(name)"
+						:description="formatCategoryName(name)"
+						:disabled="isFeaturedLimitReached && !current.featuredTags.includes(name)"
+						@update:model-value="toggleFeatured(name)"
+					>
+						<span aria-hidden="true">
+							<FormattedTag :tag="name" enforce-type="category" />
+						</span>
+					</Checkbox>
+				</div>
+			</div>
+		</div>
+		<UnsavedChangesPopup
+			:original="saved"
+			:modified="current"
+			:saving="saving"
+			:can-save="canSave"
+			:save-disabled-reason="messages.featuredTagsRequired"
+			@reset="reset"
+			@save="save"
+		/>
+	</div>
+</template>
