@@ -3494,6 +3494,15 @@
   "project.actions.servers-promo.title": {
     "message": "Create a server"
   },
+  "project.actions.view-dependents": {
+    "message": "View dependents"
+  },
+  "project.actions.view-modpacks": {
+    "message": "View modpacks"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "View {projectType} dependents"
+  },
   "project.ai-image-warning-modal.body.1": {
     "message": "Using AI-generated images to represent your project is not allowed. Attempting to work around detection may lead to your Modrinth account being suspended."
   },
