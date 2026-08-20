@@ -27,6 +27,7 @@ import {
 	DEFAULT_SYMBOL_ID,
 	RANDOM_CONFIG_BLACKLIST,
 	type SymbolId,
+	type SymbolOption,
 	symbolOptions,
 } from './editor-catalog'
 
@@ -202,7 +203,8 @@ function surpriseMe() {
 	const configurations = backgroundOptions.flatMap((background) =>
 		symbolOptions
 			.filter(
-				(symbol) =>
+				(symbol: SymbolOption) =>
+					!symbol.excludeFromRandomization &&
 					background.id !== selectedBackground.value &&
 					symbol.id !== selectedSymbol.value &&
 					!RANDOM_CONFIG_BLACKLIST.some(

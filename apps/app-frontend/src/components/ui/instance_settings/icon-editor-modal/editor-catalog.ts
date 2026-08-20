@@ -1,4 +1,4 @@
-import { defineMessages } from '@modrinth/ui'
+import { defineMessages, type MessageDescriptor } from '@modrinth/ui'
 
 import backpack from '@/assets/instance-icons/backpack.png'
 import beacon from '@/assets/instance-icons/beacon.png'
@@ -207,6 +207,14 @@ const names = defineMessages({
 	quilt: { id: 'instance.icon-editor.symbol.quilt', defaultMessage: 'Quilt' },
 })
 
+export interface SymbolOption {
+	id: string
+	name: MessageDescriptor
+	asset: string
+	category: 'loader' | 'modded' | 'vanilla'
+	excludeFromRandomization?: boolean
+}
+
 export const backgroundOptions = [
 	{
 		id: 'rose',
@@ -351,10 +359,34 @@ export const symbolOptions = [
 	// loaders
 	/////////////////////////
 
-	{ id: 'fabric', name: names.fabric, asset: fabric, category: 'loader' },
-	{ id: 'forge', name: names.forge, asset: forge, category: 'loader' },
-	{ id: 'neoforge', name: names.neoForge, asset: neoForge, category: 'loader' },
-	{ id: 'quilt', name: names.quilt, asset: quilt, category: 'loader' },
+	{
+		id: 'fabric',
+		name: names.fabric,
+		asset: fabric,
+		category: 'loader',
+		excludeFromRandomization: true,
+	},
+	{
+		id: 'forge',
+		name: names.forge,
+		asset: forge,
+		category: 'loader',
+		excludeFromRandomization: true,
+	},
+	{
+		id: 'neoforge',
+		name: names.neoForge,
+		asset: neoForge,
+		category: 'loader',
+		excludeFromRandomization: true,
+	},
+	{
+		id: 'quilt',
+		name: names.quilt,
+		asset: quilt,
+		category: 'loader',
+		excludeFromRandomization: true,
+	},
 
 	// Cobblemon: Poké Ball
 	{ id: 'poke_ball', name: names.pokeBall, asset: pokeBall, category: 'modded' },
@@ -455,7 +487,7 @@ export const symbolOptions = [
 	{ id: 'lantern', name: names.lantern, asset: lantern, category: 'vanilla' },
 	{ id: 'tnt', name: names.tnt, asset: tnt, category: 'vanilla' },
 	{ id: 'command_block', name: names.commandBlock, asset: commandBlock, category: 'vanilla' },
-] as const
+] as const satisfies readonly SymbolOption[]
 
 export type BackgroundId = (typeof backgroundOptions)[number]['id']
 export type SymbolId = (typeof symbolOptions)[number]['id']
