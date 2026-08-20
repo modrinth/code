@@ -3,7 +3,7 @@ name: Frontend Docker
 on:
   push:
     branches:
-      - main
+      # - main
       - prod
     paths:
       - 'apps/frontend/**/*'
@@ -15,7 +15,6 @@ on:
       - 'packages/blog/**/*'
       - '**/pnpm-*.yaml'
       - .github/workflows/frontend-docker.yml
-  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
