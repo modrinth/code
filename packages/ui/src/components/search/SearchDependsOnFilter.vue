@@ -147,8 +147,8 @@ import {
 	formatDependencyProjectFilterOption,
 	parseDependencyProjectFilterOption,
 } from '../../utils/search'
-import MultiSelect, { type MultiSelectOption } from '../base/MultiSelect.vue'
 import { IconButton } from '../base/buttons'
+import MultiSelect, { type MultiSelectOption } from '../base/MultiSelect.vue'
 import ProjectCombobox, {
 	type ProjectType as ProjectComboboxProjectType,
 	type SearchHit,

@@ -4097,9 +4097,6 @@
   "s.bg": {
     "defaultMessage": "Background task running"
   },
-  "search.filter.clear": {
-    "defaultMessage": "Clear"
-  },
   "search.filter.dependency_type.any": {
     "defaultMessage": "Any dependency type"
   },
@@ -4121,11 +4118,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Required or optional"
   },
-  "search.filter.dependent_count": {
-    "defaultMessage": "{count, plural, one {# dependent} other {# dependents}}"
-  },
   "search.filter.dependent_project": {
     "defaultMessage": "Depends on: {project}"
+  },
+  "search.filter.dependent_project.clear": {
+    "defaultMessage": "Clear dependency filter"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Search for a project..."
