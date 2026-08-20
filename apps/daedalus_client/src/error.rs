@@ -11,7 +11,7 @@ pub enum ErrorKind {
     #[error("Error while deserializing JSON: {0}")]
     SerdeJSON(#[from] serde_json::Error),
     #[error("Error while deserializing XML: {0}")]
-    SerdeXML(#[from] serde_xml_rs::Error),
+    QuickXML(#[from] quick_xml::DeError),
     #[error(
         "Failed to validate file checksum at url {url} with hash {hash} after {tries} tries"
     )]
