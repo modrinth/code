@@ -828,6 +828,7 @@ export const financialMessages = defineMessages({
 
 const PROJECT_TYPE_ALIASES: Record<string, string> = {
 	shaderpack: 'shader',
+	minecraft_java_server: 'server',
 }
 
 export function normalizeProjectType(type: string): string {

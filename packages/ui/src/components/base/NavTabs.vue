@@ -2,8 +2,11 @@
 	<nav
 		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
-		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
-		:class="{ 'drop-shadow-xl border border-solid border-surface-4': mode === 'navigation' }"
+		class="relative flex w-fit rounded-full bg-bg-raised p-1 text-xs sm:text-sm font-bold"
+		:class="{
+			'card-shadow border border-solid border-surface-4': mode === 'navigation',
+			'tab-color-delayed': colorChangeDelayed,
+		}"
 	>
 		<template v-if="mode === 'navigation'">
 			<RouterLink
@@ -18,8 +21,13 @@
 				@mouseenter="link.onHover?.()"
 				@focus="link.onHover?.()"
 			>
-				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
-				<span class="text-nowrap" :class="getLabelClasses(index)">
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="tab-color hidden sm:block size-5"
+					:class="getIconClasses(index)"
+				/>
+				<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
 					{{ link.label }}
 				</span>
 			</RouterLink>
@@ -35,17 +43,21 @@
 				:class="getSSRFallbackClasses(index)"
 				@click="emit('tabClick', index, link)"
 			>
-				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
-				<span class="text-nowrap" :class="getLabelClasses(index)">
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="tab-color size-5"
+					:class="getIconClasses(index)"
+				/>
+				<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
 					{{ link.label }}
 				</span>
 			</div>
 		</template>
 
-		<!-- Animated slider background -->
 		<div
 			v-if="sliderReady && currentActiveIndex !== -1"
-			class="pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1"
+			class="pointer-events-none absolute rounded-full"
 			:class="[
 				subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected',
 				{ 'navtabs-transition': transitionsEnabled },
@@ -58,7 +70,7 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -95,21 +107,18 @@ const emit = defineEmits<{
 const scrollContainer = ref<HTMLElement | null>(null)
 const tabLinkElements = ref<HTMLElement[]>()
 
-// Slider pos state
-const sliderLeft = ref(4)
-const sliderTop = ref(4)
-const sliderRight = ref(4)
-const sliderBottom = ref(4)
+const sliderLeft = ref(0)
+const sliderTop = ref(0)
+const sliderRight = ref(0)
+const sliderBottom = ref(0)
 
-// active tab state
 const currentActiveIndex = ref(-1)
 const subpageSelected = ref(false)
 
-// SSR state
 const sliderReady = ref(false)
 const transitionsEnabled = ref(false)
+const colorChangeDelayed = ref(false)
 
-// Stagger delays for the trailing edges of the slider animation
 const sliderDelays = ref({ left: '0ms', top: '0ms', right: '0ms', bottom: '0ms' })
 
 const filteredLinks = computed(() => props.links.filter((link) => link.shown ?? true))
@@ -119,7 +128,6 @@ const sliderStyle = computed(() => ({
 	top: `${sliderTop.value}px`,
 	right: `${sliderRight.value}px`,
 	bottom: `${sliderBottom.value}px`,
-	opacity: sliderReady.value && currentActiveIndex.value !== -1 ? 1 : 0,
 }))
 
 const leftDelay = computed(() => sliderDelays.value.left)
@@ -208,34 +216,29 @@ function getTabElement(index: number): HTMLElement | null {
 	return element
 }
 
-function positionSlider() {
+function getSliderPosition() {
 	const el = getTabElement(currentActiveIndex.value)
-	if (!el?.offsetParent) return
+	const parent = scrollContainer.value
+	if (!el || !parent) return null
 
-	const parent = el.offsetParent as HTMLElement
-	const newPosition = {
+	return {
 		left: el.offsetLeft,
 		top: el.offsetTop,
-		right: parent.offsetWidth - el.offsetLeft - el.offsetWidth,
-		bottom: parent.offsetHeight - el.offsetTop - el.offsetHeight,
+		right: parent.clientWidth - el.offsetLeft - el.offsetWidth,
+		bottom: parent.clientHeight - el.offsetTop - el.offsetHeight,
 	}
+}
 
-	const isInitialPosition = sliderLeft.value === 4 && sliderRight.value === 4
-
-	if (!sliderReady.value || isInitialPosition) {
-		sliderLeft.value = newPosition.left
-		sliderRight.value = newPosition.right
-		sliderTop.value = newPosition.top
-		sliderBottom.value = newPosition.bottom
-
-		sliderReady.value = true
-
-		requestAnimationFrame(() => {
-			transitionsEnabled.value = true
-		})
-	} else {
-		animateSliderTo(newPosition)
-	}
+function applySliderPosition(newPosition: {
+	left: number
+	top: number
+	right: number
+	bottom: number
+}) {
+	sliderLeft.value = newPosition.left
+	sliderTop.value = newPosition.top
+	sliderRight.value = newPosition.right
+	sliderBottom.value = newPosition.bottom
 }
 
 function animateSliderTo(newPosition: {
@@ -253,23 +256,54 @@ function animateSliderTo(newPosition: {
 		bottom: newPosition.top < sliderTop.value ? STAGGER_DELAY : '0ms',
 	}
 
-	sliderLeft.value = newPosition.left
-	sliderRight.value = newPosition.right
-	sliderTop.value = newPosition.top
-	sliderBottom.value = newPosition.bottom
+	applySliderPosition(newPosition)
+}
+
+function positionSlider(animate = true) {
+	const newPosition = getSliderPosition()
+	if (!newPosition) {
+		return
+	}
+
+	if (!sliderReady.value) {
+		applySliderPosition(newPosition)
+		sliderReady.value = true
+		nextTick(() => {
+			requestAnimationFrame(() => {
+				transitionsEnabled.value = true
+			})
+		})
+		return
+	}
+
+	if (!animate) {
+		transitionsEnabled.value = false
+		applySliderPosition(newPosition)
+		requestAnimationFrame(() => {
+			transitionsEnabled.value = true
+		})
+		return
+	}
+
+	animateSliderTo(newPosition)
+}
+
+function resetSliderPosition() {
+	if (!sliderReady.value || currentActiveIndex.value === -1) {
+		return
+	}
+	positionSlider(false)
 }
 
 async function updateActiveTab() {
 	await nextTick()
 	const { index, isSubpage } = computeActiveIndex()
+	colorChangeDelayed.value = sliderReady.value && index !== currentActiveIndex.value
 	currentActiveIndex.value = index
 	subpageSelected.value = isSubpage
 
 	if (index !== -1) {
 		positionSlider()
-	} else {
-		sliderLeft.value = 0
-		sliderRight.value = 0
 	}
 }
 
@@ -277,7 +311,19 @@ const initialActive = computeActiveIndex()
 currentActiveIndex.value = initialActive.index
 subpageSelected.value = initialActive.isSubpage
 
-onMounted(updateActiveTab)
+let resizeObserver: ResizeObserver | undefined
+
+onMounted(() => {
+	updateActiveTab()
+	resizeObserver = new ResizeObserver(resetSliderPosition)
+	if (scrollContainer.value) {
+		resizeObserver.observe(scrollContainer.value)
+	}
+})
+
+onUnmounted(() => {
+	resizeObserver?.disconnect()
+})
 
 watch(
 	() => [route.path, route.query],
@@ -313,7 +359,14 @@ watch(
 		left 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(leftDelay),
 		right 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(rightDelay),
 		top 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(topDelay),
-		bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(bottomDelay),
-		opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
+		bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(bottomDelay);
+}
+
+.tab-color {
+	transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-color-delayed .tab-color {
+	transition-delay: 150ms;
 }
 </style>

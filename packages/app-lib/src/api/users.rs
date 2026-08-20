@@ -57,10 +57,10 @@ pub async fn get_user_projects(user_id: &str) -> crate::Result<Value> {
 
     fetch_json(
         Method::GET,
-        &format!("{}user/{}/projects", env!("MODRINTH_API_URL"), user_id),
+        &format!("{}user/{}/projects", env!("MODRINTH_API_URL_V3"), user_id),
         None,
         None,
-        Some("/v2/user/:id/projects"),
+        Some("/v3/user/:id/projects"),
         &state.api_semaphore,
         &state.pool,
     )

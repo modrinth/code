@@ -230,7 +230,7 @@
 			<template v-else>
 				<div
 					data-pyro-navigation
-					class="server-stagger-item isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
+					class="server-stagger-item -mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2"
 					:class="containedLayout ? 'shrink-0' : ''"
 					:style="{ '--si': 1 }"
 				>

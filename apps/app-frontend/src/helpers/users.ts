@@ -25,8 +25,8 @@ export async function get_user_profile(userId: string): Promise<Labrinth.Users.v
 	return await invoke<Labrinth.Users.v3.User>('plugin:users|get_user_profile', { userId })
 }
 
-export async function get_user_projects(userId: string): Promise<Labrinth.Projects.v2.Project[]> {
-	return await invoke<Labrinth.Projects.v2.Project[]>('plugin:users|get_user_projects', {
+export async function get_user_projects(userId: string): Promise<Labrinth.Projects.v3.Project[]> {
+	return await invoke<Labrinth.Projects.v3.Project[]>('plugin:users|get_user_projects', {
 		userId,
 	})
 }
