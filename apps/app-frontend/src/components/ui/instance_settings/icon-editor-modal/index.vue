@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, InfoIcon, RefreshCwIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
+	Avatar,
 	Button,
 	commonMessages,
 	defineMessages,
@@ -66,6 +67,7 @@ const selectedSymbolOption = computed(
 	() => symbolOptions.find((option) => option.id === selectedSymbol.value)!,
 )
 const vanillaSymbolStartIndex = symbolOptions.findIndex((option) => option.category === 'vanilla')
+const loaderSymbolStartIndex = symbolOptions.findIndex((option) => option.category === 'loader')
 const selectedConfig = computed<InstanceIconConfig>(() => ({
 	background: { ...selectedBackgroundOption.value.background },
 	symbol: selectedSymbol.value,
@@ -342,37 +344,37 @@ const messages = defineMessages({
 				class="flex w-[244px] shrink-0 flex-col gap-4 overflow-y-auto border-0 border-r border-solid border-surface-5 p-6"
 			>
 				<div
-					class="flex w-full flex-col items-center gap-3 rounded-[20px] border border-solid border-surface-4 bg-surface-2 p-4"
+					class="flex w-full flex-col items-center gap-3.5 rounded-[20px] border border-solid border-surface-4 bg-surface-2 p-5"
 				>
-					<div
-						class="icon-outline relative size-[132px] overflow-hidden rounded-[20px]"
+					<Avatar
+						:src="selectedSymbolOption.asset"
+						size="132px"
 						:style="backgroundStyle(selectedBackgroundOption.background)"
-					>
-						<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
-					</div>
+						no-shadow
+					/>
 					<div class="flex items-center gap-2.5">
-						<div
-							class="icon-outline relative size-12 overflow-hidden rounded-2xl"
+						<Avatar
+							:src="selectedSymbolOption.asset"
+							size="40px"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
-						>
-							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
-						</div>
-						<div
-							class="icon-outline relative size-8 overflow-hidden rounded-[10px]"
+							no-shadow
+						/>
+						<Avatar
+							:src="selectedSymbolOption.asset"
+							size="30px"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
-						>
-							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
-						</div>
-						<div
-							class="icon-outline relative size-4 overflow-hidden rounded-[5px]"
+							no-shadow
+						/>
+						<Avatar
+							:src="selectedSymbolOption.asset"
+							size="20px"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
-						>
-							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
-						</div>
+							no-shadow
+						/>
 					</div>
 				</div>
 
-				<Button class="w-full !shadow-none" @click="surpriseMe">
+				<Button class="w-full" @click="surpriseMe">
 					<RefreshCwIcon />
 					{{ formatMessage(messages.surpriseMe) }}
 				</Button>
@@ -452,7 +454,7 @@ const messages = defineMessages({
 					<div class="grid grid-cols-6 gap-2.5">
 						<template v-for="(option, index) in symbolOptions" :key="option.id">
 							<hr
-								v-if="index === vanillaSymbolStartIndex"
+								v-if="index === vanillaSymbolStartIndex || index === loaderSymbolStartIndex"
 								class="col-span-6 my-2.5 mx-1 w-full border-0 border-t border-solid border-surface-5"
 							/>
 							<button

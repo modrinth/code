@@ -34,7 +34,7 @@
 						<div
 							class="flex items-center gap-2 rounded-2xl border border-solid border-surface-5 bg-surface-4 p-4"
 						>
-							<Avatar :src="auth.user.avatar_url" size="32px" />
+							<Avatar :src="auth.user.avatar_url" size="32px" circle />
 							<span class="font-medium text-contrast">{{ auth.user.username }}</span>
 
 							<Button type="quiet" color="red" native-type="button" class="ml-auto" @click="logout">

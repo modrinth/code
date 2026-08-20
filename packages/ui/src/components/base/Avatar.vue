@@ -8,7 +8,7 @@
 			circle: circle,
 			detecting: !hasDetectedCorners,
 			'no-shadow': noShadow,
-			padded: hasTransparentCorners,
+			padded: hasTransparentCorners && !circle && !disableConditionalIconPadding,
 			raised: raised,
 			pixelated: pixelated,
 		}"
@@ -72,6 +72,7 @@ const props = withDefaults(
 		size?: string
 		circle?: boolean
 		noShadow?: boolean
+		disableConditionalIconPadding?: boolean
 		loading?: 'eager' | 'lazy'
 		raised?: boolean
 		tintBy?: string | null
@@ -82,6 +83,7 @@ const props = withDefaults(
 		size: '2rem',
 		circle: false,
 		noShadow: false,
+		disableConditionalIconPadding: false,
 		loading: 'eager',
 		raised: false,
 		tintBy: null,

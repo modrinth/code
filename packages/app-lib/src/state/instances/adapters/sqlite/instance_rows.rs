@@ -730,7 +730,7 @@ pub(crate) async fn update_recent_instance_icon_config(
 				SELECT rowid
 				FROM recent_instance_icon_configs
 				ORDER BY used_at DESC, background, symbol
-				LIMIT 8
+				LIMIT 16
 			)
 			",
     )
@@ -748,7 +748,7 @@ pub(crate) async fn get_recent_instance_icon_configs(
 		SELECT background, symbol
 		FROM recent_instance_icon_configs
 		ORDER BY used_at DESC, background, symbol
-		LIMIT 8
+		LIMIT 16
 		",
     )
     .fetch_all(pool)

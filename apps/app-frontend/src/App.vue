@@ -1007,6 +1007,7 @@ watch(
 				if (behavior && appSettings.syncBehaviorAcrossDevices) {
 					const behaviorFeatureFlags = {
 						worlds_in_home: behavior.show_jump_in,
+						compact_instance_cards: behavior.compact_instance_cards,
 						show_instance_play_time: behavior.show_play_time,
 						skip_unknown_pack_warning: !behavior.warn_on_unknown_modpacks,
 						skip_non_essential_warnings: behavior.skip_non_essential_warnings,

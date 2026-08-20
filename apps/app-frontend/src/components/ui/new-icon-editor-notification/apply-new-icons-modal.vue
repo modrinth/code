@@ -154,7 +154,7 @@ defineExpose({ show, hide })
 		:disable-close="applying"
 		class="!overflow-hidden !rounded-[20px]"
 	>
-		<div class="grid h-[384px] w-[768px] max-w-full grid-cols-2">
+		<div class="grid w-[768px] max-w-full grid-cols-2">
 			<section class="flex min-w-0 flex-col gap-6 bg-surface-3 p-8">
 				<div
 					class="flex h-8 w-fit items-center rounded-full border border-solid border-brand bg-brand-highlight px-2.5 text-sm font-base leading-5 text-brand"

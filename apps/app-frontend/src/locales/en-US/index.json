@@ -149,6 +149,12 @@
   "app.ads-consent.title": {
     "message": "Your privacy and how ads support Modrinth"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Display library instances in a compact row layout."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Compact mode"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
@@ -322,6 +328,9 @@
   },
   "app.home.jump-back-in.new-instance": {
     "message": "New instance"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "Drag to resize"
   },
   "app.home.jump-back-in.title": {
     "message": "Jump in"
@@ -1739,6 +1748,9 @@
   "app.world.world-item.offline": {
     "message": "Offline"
   },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
+  },
   "content.shared-instance.change-version-body": {
     "message": "Changing the version only changes your local copy. Future shared instance updates may restore or change it again."
   },
@@ -2066,6 +2078,12 @@
   "instance.icon-editor.symbol.engine": {
     "message": "Engine"
   },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
   "instance.icon-editor.symbol.furnace": {
     "message": "Furnace"
   },
@@ -2087,6 +2105,9 @@
   "instance.icon-editor.symbol.mr-pack": {
     "message": "Mr Pack"
   },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
   "instance.icon-editor.symbol.orb": {
     "message": "Orb"
   },
@@ -2101,6 +2122,9 @@
   },
   "instance.icon-editor.symbol.poke-ball": {
     "message": "Poke Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
   },
   "instance.icon-editor.symbol.redstone-block": {
     "message": "Redstone Block"
