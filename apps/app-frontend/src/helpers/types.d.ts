@@ -16,6 +16,9 @@ export type GameInstance = {
 	loader_version?: string
 
 	group_ids: string[]
+	synced_options: {
+		screenshots: boolean
+	}
 
 	link?: InstanceLink | null
 	shared_instance?: SharedInstanceAttachment | null

@@ -1,0 +1,182 @@
+<script setup lang="ts">
+import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
+import { CheckIcon, ClipboardCopyIcon, ExternalIcon, TrashIcon } from '@modrinth/assets'
+import {
+	commonMessages,
+	defineMessages,
+	IconButton,
+	useFormatDateTime,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed, ref } from 'vue'
+
+import type { InstanceScreenshot } from '@/helpers/instance'
+
+const props = defineProps<{
+	screenshot: InstanceScreenshot
+	selectionKey: string
+	selected: boolean
+	selectionActive: boolean
+	activeDragged: boolean
+	canDrag: boolean
+	showInstanceName: boolean
+}>()
+
+const emit = defineEmits<{
+	(e: 'activate', event: MouseEvent | KeyboardEvent): void
+	(e: 'copy' | 'open' | 'delete' | 'toggle-selection'): void
+}>()
+
+const card = ref<HTMLElement>()
+const loaded = ref(false)
+const { formatMessage } = useVIntl()
+const formatTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+const messages = defineMessages({
+	select: { id: 'app.screenshots.select', defaultMessage: 'Select {name}' },
+	deselect: { id: 'app.screenshots.deselect', defaultMessage: 'Deselect {name}' },
+	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
+	showInFolder: { id: 'app.screenshots.show-in-folder', defaultMessage: 'Show in folder' },
+	instanceAndTime: {
+		id: 'app.screenshots.card.instance-and-time',
+		defaultMessage: '{instance} · {time}',
+	},
+})
+
+const sensors = [
+	PointerSensor.configure({
+		preventActivation: () => false,
+	}),
+	KeyboardSensor,
+]
+
+useDraggable({
+	id: computed(() => `screenshot:${props.selectionKey}`),
+	element: card,
+	disabled: computed(() => !props.canDrag),
+	sensors,
+	data: computed(() => ({
+		selectionKey: props.selectionKey,
+		instanceId: props.screenshot.instance_id,
+	})),
+})
+
+function activate(event: MouseEvent | KeyboardEvent) {
+	if (event instanceof KeyboardEvent) {
+		if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) {
+			return
+		}
+		event.preventDefault()
+	}
+	emit('activate', event)
+}
+</script>
+
+<template>
+	<article
+		ref="card"
+		role="button"
+		tabindex="0"
+		class="group relative aspect-video min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition hover:border-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+		:class="{
+			'!border-contrast': selected,
+			'opacity-50': activeDragged,
+			'cursor-grab active:cursor-grabbing': canDrag,
+		}"
+		data-screenshot-card
+		:data-selection-key="selectionKey"
+		:aria-label="
+			selectionActive
+				? formatMessage(selected ? messages.deselect : messages.select, {
+						name: screenshot.file_name,
+					})
+				: screenshot.file_name
+		"
+		:aria-pressed="selectionActive ? selected : undefined"
+		@click="activate"
+		@keydown="activate"
+	>
+		<button
+			type="button"
+			class="selection-button group/selection absolute right-0.5 top-0 z-[2] flex size-[50px] cursor-pointer items-start justify-center border-0 bg-transparent p-0 pt-4"
+			:aria-label="
+				formatMessage(selected ? messages.deselect : messages.select, {
+					name: screenshot.file_name,
+				})
+			"
+			:aria-pressed="selected"
+			@click.stop="emit('toggle-selection')"
+		>
+			<span
+				class="relative flex size-6 items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-hover/selection:brightness-125"
+				:class="
+					selected ? 'border-0 !opacity-100' : 'border-2 border-solid border-primary bg-transparent'
+				"
+			>
+				<span v-if="selected" class="absolute inset-0 rounded-full bg-contrast" />
+				<CheckIcon v-if="selected" class="relative size-4 invert [stroke-width:3]" />
+			</span>
+		</button>
+		<div v-if="!loaded" class="absolute inset-0 animate-pulse bg-surface-3" />
+		<img
+			:src="screenshot.url"
+			:alt="screenshot.file_name"
+			loading="lazy"
+			draggable="false"
+			class="h-full w-full object-cover transition duration-200 group-hover:scale-[1.02]"
+			:class="loaded ? 'opacity-100' : 'opacity-0'"
+			@load="loaded = true"
+		/>
+		<div
+			class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-surface-1 to-transparent p-3 pt-[120px] text-contrast opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
+		>
+			<div class="min-w-0">
+				<div v-tooltip="screenshot.file_name" class="truncate text-sm font-semibold">
+					{{ screenshot.file_name }}
+				</div>
+				<div class="truncate text-xs text-secondary">
+					{{
+						showInstanceName
+							? formatMessage(messages.instanceAndTime, {
+									instance: screenshot.instance_name,
+									time: formatTime(screenshot.created_at),
+								})
+							: formatTime(screenshot.created_at)
+					}}
+				</div>
+			</div>
+			<div
+				v-if="!selectionActive"
+				class="flex shrink-0 translate-y-1 gap-1 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
+				@click.stop
+			>
+				<IconButton
+					v-tooltip="formatMessage(messages.copy)"
+					:label="formatMessage(messages.copy)"
+					type="quiet"
+					class="bg-surface-2 text-contrast hover:bg-surface-3"
+					@click="emit('copy')"
+				>
+					<ClipboardCopyIcon />
+				</IconButton>
+				<IconButton
+					v-tooltip="formatMessage(messages.showInFolder)"
+					:label="formatMessage(messages.showInFolder)"
+					type="quiet"
+					class="bg-surface-2 text-contrast hover:bg-surface-3"
+					@click="emit('open')"
+				>
+					<ExternalIcon />
+				</IconButton>
+				<IconButton
+					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					:label="formatMessage(commonMessages.deleteLabel)"
+					type="quiet"
+					class="bg-surface-2 text-contrast hover:bg-surface-3"
+					@click="emit('delete')"
+				>
+					<TrashIcon />
+				</IconButton>
+			</div>
+		</div>
+	</article>
+</template>

@@ -4,8 +4,9 @@ use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSetSyncStatus, ContentSourceKind,
     Instance, InstanceIconBackground, InstanceIconConfig,
     InstanceLaunchContext, InstanceLaunchOverrides,
-    InstanceLaunchOverridesData, InstanceLink, SharedInstanceAttachment,
-    SharedInstanceRole, playtime_to_storage,
+    InstanceLaunchOverridesData, InstanceLink, InstanceSyncedOption,
+    InstanceSyncedOptions, SharedInstanceAttachment, SharedInstanceRole,
+    playtime_to_storage,
 };
 use crate::state::{
     InstanceInstallStage, LauncherFeatureVersion, ModLoader, ReleaseChannel,
@@ -168,6 +169,7 @@ pub(crate) struct InstanceMetadataRecord {
     pub link: InstanceLink,
     pub shared_instance: Option<SharedInstanceAttachment>,
     pub group_ids: Vec<String>,
+    pub synced_options: InstanceSyncedOptions,
     pub launch_overrides: InstanceLaunchOverrides,
 }
 
@@ -175,6 +177,13 @@ pub(crate) struct InstanceMetadataRecord {
 pub(crate) struct InstanceDisplayInfo {
     pub id: String,
     pub name: String,
+}
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub(crate) struct InstanceScreenshotSource {
+    pub id: String,
+    pub name: String,
+    pub path: String,
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -363,6 +372,7 @@ impl InstanceMetadataRow {
             link,
             shared_instance,
             group_ids,
+            synced_options: InstanceSyncedOptions::default(),
             launch_overrides,
         })
     }
@@ -464,6 +474,107 @@ where
     .await?;
 
     Ok(row)
+}
+
+pub(crate) async fn get_instance_screenshot_source(
+    instance_id: &str,
+    pool: &SqlitePool,
+) -> crate::Result<Option<InstanceScreenshotSource>> {
+    let source = sqlx::query_as::<_, InstanceScreenshotSource>(
+        "
+		SELECT id, name, path
+		FROM instances
+		WHERE id = ?
+		",
+    )
+    .bind(instance_id)
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(source)
+}
+
+pub(crate) async fn list_synced_screenshot_sources(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<InstanceScreenshotSource>> {
+    let sources = sqlx::query_as::<_, InstanceScreenshotSource>(
+        "
+		SELECT instances.id, instances.name, instances.path
+		FROM instances
+		INNER JOIN instance_synced_options synced_options
+			ON synced_options.instance_id = instances.id
+		WHERE synced_options.option = 'screenshots'
+			AND synced_options.enabled = 1
+		ORDER BY instances.name, instances.id
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(sources)
+}
+
+pub(crate) async fn list_screenshot_sources(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<InstanceScreenshotSource>> {
+    let sources = sqlx::query_as::<_, InstanceScreenshotSource>(
+        "
+		SELECT id, name, path
+		FROM instances
+		ORDER BY name, id
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(sources)
+}
+
+pub(crate) async fn get_instance_synced_options(
+    instance_id: &str,
+    pool: &SqlitePool,
+) -> crate::Result<InstanceSyncedOptions> {
+    let screenshots = sqlx::query_scalar::<_, bool>(
+        "
+		SELECT EXISTS(
+			SELECT 1
+			FROM instance_synced_options
+			WHERE instance_id = ?
+				AND option = 'screenshots'
+				AND enabled = 1
+		)
+		",
+    )
+    .bind(instance_id)
+    .fetch_one(pool)
+    .await?;
+
+    Ok(InstanceSyncedOptions { screenshots })
+}
+
+async fn attach_synced_options(
+    records: &mut [InstanceMetadataRecord],
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let screenshot_instance_ids = sqlx::query_scalar::<_, String>(
+        "
+		SELECT instance_id
+		FROM instance_synced_options
+		WHERE option = 'screenshots'
+			AND enabled = 1
+		",
+    )
+    .fetch_all(pool)
+    .await?
+    .into_iter()
+    .collect::<HashSet<_>>();
+
+    for record in records {
+        record.synced_options.screenshots =
+            screenshot_instance_ids.contains(&record.instance.id);
+    }
+
+    Ok(())
 }
 
 pub(crate) async fn is_instance_quarantined<'e, E>(
@@ -791,7 +902,13 @@ pub(crate) async fn get_instance_metadata_by_id(
             .fetch_optional(pool)
             .await?;
 
-    row.map(InstanceMetadataRow::into_record).transpose()
+    let mut record = row.map(InstanceMetadataRow::into_record).transpose()?;
+    if let Some(record) = record.as_mut() {
+        record.synced_options =
+            get_instance_synced_options(&record.instance.id, pool).await?;
+    }
+
+    Ok(record)
 }
 
 pub(crate) async fn get_instance_metadata_many(
@@ -821,9 +938,12 @@ pub(crate) async fn get_instance_metadata_many(
     .fetch_all(pool)
     .await?;
 
-    rows.into_iter()
+    let mut records = rows
+        .into_iter()
         .map(InstanceMetadataRow::into_record)
-        .collect()
+        .collect::<crate::Result<Vec<_>>>()?;
+    attach_synced_options(&mut records, pool).await?;
+    Ok(records)
 }
 
 pub(crate) async fn list_instance_metadata(
@@ -834,9 +954,12 @@ pub(crate) async fn list_instance_metadata(
             .fetch_all(pool)
             .await?;
 
-    rows.into_iter()
+    let mut records = rows
+        .into_iter()
         .map(InstanceMetadataRow::into_record)
-        .collect()
+        .collect::<crate::Result<Vec<_>>>()?;
+    attach_synced_options(&mut records, pool).await?;
+    Ok(records)
 }
 
 pub(crate) async fn get_instance_launch_context(
@@ -1133,6 +1256,60 @@ pub(crate) async fn insert_instance(
         submitted_time_played,
         recent_time_played,
     )
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn set_instance_synced_option(
+    instance_id: &str,
+    option: InstanceSyncedOption,
+    enabled: bool,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let instance_exists = sqlx::query_scalar::<_, bool>(
+        "SELECT EXISTS(SELECT 1 FROM instances WHERE id = ?)",
+    )
+    .bind(instance_id)
+    .fetch_one(pool)
+    .await?;
+
+    if !instance_exists {
+        return Err(crate::ErrorKind::InputError(
+            "Unknown instance".to_string(),
+        )
+        .into());
+    }
+
+    sqlx::query(
+        "
+		INSERT INTO instance_synced_options (instance_id, option, enabled)
+		VALUES (?, ?, ?)
+		ON CONFLICT (instance_id, option) DO UPDATE SET
+			enabled = excluded.enabled
+		",
+    )
+    .bind(instance_id)
+    .bind(option.as_str())
+    .bind(enabled)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn insert_default_instance_synced_options(
+    instance_id: &str,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    sqlx::query(
+        "
+		INSERT INTO instance_synced_options (instance_id, option, enabled)
+		VALUES (?, 'screenshots', 1)
+		",
+    )
+    .bind(instance_id)
     .execute(&mut **tx)
     .await?;
 
