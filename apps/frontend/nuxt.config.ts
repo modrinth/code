@@ -290,6 +290,7 @@ export default defineNuxtConfig({
 			external: ['cloudflare:workers'],
 		},
 		preset: 'cloudflare_module',
+		noExternals: true,
 		cloudflare: {
 			nodeCompat: true,
 		},
