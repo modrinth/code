@@ -71,14 +71,29 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "ไลบรารี"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "หน้าเริ่มต้น"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "ซ่อนป้ายชื่อบนศีรษะของผู้เล่นในหน้าแสดงสกิน"
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "ซ่อนป้ายชื่อ"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "เล่นต่อ"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "ย่อลันเชอร์เมื่อกระบวนการการรัน Minecraft เริ่มต้นแล้ว"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "ย่อลันเชอร์"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "ใช้กรอบหน้าต่างระบบ (ต้องรีสตาร์ทแอป)"
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "ของตกแต่งดั้งเดิม"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "แสดงเวลาที่คุณใช้เล่นในแต่ละอินสแตนซ์"
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "แสดงระยะเวลาที่เล่น"
@@ -395,15 +410,6 @@
   "app.skins.sign-in.button": {
     "message": "ลงชื่อเข้าใช้"
   },
-  "app.skins.sign-in.description": {
-    "message": "โปรดลงชื่อเข้าใช้บัญชี Minecraft ของคุณเพื่อใช้งานฟีเจอร์จัดการสกินของแอป Modrinth"
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "บอท Modrinth ที่กำลังตื่นเต้น"
-  },
-  "app.skins.sign-in.title": {
-    "message": "โปรดลงชื่อเข้าใช้"
-  },
   "app.update-popup.body.download-complete": {
     "message": "ดาวน์โหลด Modrinth v{version} สำเร็จแล้ว เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม Modrinth"
   },
@@ -445,9 +451,6 @@
   },
   "app.world.world-item.offline": {
     "message": "ออฟไลน์"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} ออนไลน์"
   },
   "friends.action.add-friend": {
     "message": "เพิ่มเพื่อน"
@@ -604,18 +607,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "เลือกรูปสัญลักษณ์"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "จัดกลุ่ม"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "สร้างกลุ่มใหม่"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "การจัดกลุ่มจะช่วยจัดระเบียบโปรแกรมของคุณภายในหน้ารายการให้เป็นหมวดหมู่"
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "ใส่ชื่อกลุ่ม"
   },
   "instance.settings.tabs.general.name": {
     "message": "ชื่อ"

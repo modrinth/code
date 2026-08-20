@@ -10,5 +10,5 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	stageContent: markRaw(SetupTypeStage),
 	leftButtonConfig: null,
 	rightButtonConfig: null,
-	maxWidth: '520px',
+	maxWidth: '560px',
 }

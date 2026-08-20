@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Color de la interfaz"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Escoge la página mostrada al abrir la aplicación de Modrinth."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Inicio"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Librería"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Página de inicio predeterminada"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Esconde tu nombre de usuario encima de tu personaje en la página del selector de Skin."
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "Inicio"
   },
-  "app.nav.library": {
-    "message": "Biblioteca"
-  },
   "app.nav.modrinth-account": {
     "message": "Cuenta Modrinth"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "Iniciar sesión"
   },
-  "app.skins.sign-in.description": {
-    "message": "Por favor, inicia sesión en tu cuenta de Minecraft para poder utilizar las funciones de gestión de skins de la Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Modrinth Bot emocionado"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Por favor, inicia sesión"
-  },
   "app.skins.title": {
     "message": "Selector de skin"
   },
@@ -1228,9 +1210,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Desconectado"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} en línea"
   },
   "content.shared-instance.change-version-body": {
     "message": "Cambiar la versión solo cambiará tu copia local. Las actualizaciones futuras a la instancia pueden restablecerla o cambiarla de nuevo."
@@ -1537,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selecionar ícono"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupos de la librería"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Crear nuevo grupo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Los grupos de la librería te ayudan a organizar tus instancias en diferentes secciones en tu librería."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Escribe nombre del grupo"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nombre"

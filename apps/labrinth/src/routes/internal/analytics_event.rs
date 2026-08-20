@@ -36,7 +36,7 @@ pub struct AnalyticsEventUpsert {
     pub ends: DateTime<Utc>,
 }
 
-/// Create an analytics event.  
+/// Create an analytics event.
 #[utoipa::path(
 	context_path = "/analytics-event",
 	tag = "analytics events", responses((status = OK, body = AnalyticsEvent))
@@ -96,7 +96,7 @@ pub async fn analytics_event_create(
     Ok(web::Json(event.into()))
 }
 
-/// Update an analytics event.  
+/// Update an analytics event.
 #[utoipa::path(
 	context_path = "/analytics-event",
 	tag = "analytics events", responses((status = OK, body = AnalyticsEvent))
@@ -148,7 +148,7 @@ pub async fn analytics_event_edit(
     Ok(web::Json(event.into()))
 }
 
-/// Delete an analytics event.  
+/// Delete an analytics event.
 #[utoipa::path(
 	context_path = "/analytics-event",
 	tag = "analytics events", responses((status = NO_CONTENT))

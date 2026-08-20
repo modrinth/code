@@ -48,8 +48,6 @@ export type AppSettings = {
 	discord_rpc: boolean
 	personalized_ads: boolean
 
-	onboarded: boolean
-
 	extra_launch_args: string[]
 	custom_env_vars: [string, string][]
 	memory: MemorySettings
@@ -70,6 +68,26 @@ export type AppSettings = {
 	auto_download_updates: boolean | null
 
 	version: number
+}
+
+export function serializeEnvVars(vars: [string, string][] | undefined | null): string {
+	return (vars ?? []).map(([key, value]) => `${key}=${value}`).join(' ')
+}
+
+export function parseEnvVars(input: string | undefined | null): [string, string][] {
+	if (!input?.trim()) {
+		return []
+	}
+
+	const vars: [string, string][] = []
+	for (const entry of input.trim().split(/\s+/)) {
+		const separator = entry.indexOf('=')
+		if (separator <= 0) {
+			continue
+		}
+		vars.push([entry.slice(0, separator), entry.slice(separator + 1)])
+	}
+	return vars
 }
 
 // Get full settings object

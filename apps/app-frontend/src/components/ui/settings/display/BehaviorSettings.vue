@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Chips, defineMessages, Toggle, useVIntl } from '@modrinth/ui'
+import { defineMessages, Toggle, useVIntl } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
@@ -13,9 +13,6 @@ const worldsInHomeFlag: FeatureFlag = 'worlds_in_home'
 const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
 const skipUnknownPackWarningFlag: FeatureFlag = 'skip_unknown_pack_warning'
 const showPlayTimeFlag: FeatureFlag = 'show_instance_play_time'
-
-type LandingPage = 'Home' | 'Library'
-const landingPageOptions: LandingPage[] = ['Home', 'Library']
 
 const messages = defineMessages({
 	startupAndNavigationTitle: {
@@ -38,14 +35,6 @@ const messages = defineMessages({
 		id: 'app.appearance-settings.minimize-launcher.description',
 		defaultMessage: 'Minimize Modrinth App when Minecraft starts.',
 	},
-	defaultLandingPageTitle: {
-		id: 'app.appearance-settings.default-landing-page.title',
-		defaultMessage: 'Default landing page',
-	},
-	defaultLandingPageDescription: {
-		id: 'app.appearance-settings.default-landing-page.description',
-		defaultMessage: 'Choose the page shown when Modrinth App opens.',
-	},
 	defaultLandingPageHome: {
 		id: 'app.appearance-settings.default-landing-page.home',
 		defaultMessage: 'Home',
@@ -64,11 +53,12 @@ const messages = defineMessages({
 	},
 	jumpBackIntoWorldsTitle: {
 		id: 'app.appearance-settings.jump-back-into-worlds.title',
-		defaultMessage: 'Jump back into worlds',
+		defaultMessage: 'Jump into worlds or instances',
 	},
 	jumpBackIntoWorldsDescription: {
 		id: 'app.appearance-settings.jump-back-into-worlds.description',
-		defaultMessage: 'Show recently played worlds in the "Jump back in" section on the Home page.',
+		defaultMessage:
+			'Show recently played worlds or instances in the "Jump in" section on the Home page.',
 	},
 	showPlayTimeTitle: {
 		id: 'app.appearance-settings.show-play-time.title',
@@ -106,15 +96,6 @@ const messages = defineMessages({
 	},
 })
 
-function formatLandingPageLabel(page: LandingPage) {
-	switch (page) {
-		case 'Home':
-			return formatMessage(messages.defaultLandingPageHome)
-		case 'Library':
-			return formatMessage(messages.defaultLandingPageLibrary)
-	}
-}
-
 const settings = ref(await get())
 
 watch(
@@ -131,22 +112,6 @@ watch(
 			{{ formatMessage(messages.startupAndNavigationTitle) }}
 		</h2>
 		<div class="mt-4 flex flex-col gap-6">
-			<div class="flex flex-col gap-2.5">
-				<h3 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.defaultLandingPageTitle) }}
-				</h3>
-				<Chips
-					v-model="settings.default_page"
-					:items="landingPageOptions"
-					:format-label="formatLandingPageLabel"
-					:capitalize="false"
-					:aria-label="formatMessage(messages.defaultLandingPageTitle)"
-				/>
-				<p class="m-0">
-					{{ formatMessage(messages.defaultLandingPageDescription) }}
-				</p>
-			</div>
-
 			<div class="flex items-center justify-between gap-4">
 				<div>
 					<h3 class="m-0 text-lg font-semibold text-contrast">

@@ -1,12 +1,14 @@
 use super::{FriendPayload, LoadingBarId};
 #[cfg(feature = "tauri")]
 use crate::event::{
-    AppEvent, InstancePayload, LoadingPayload, ProcessPayload, WarningPayload,
+    AppEvent, InstanceGroupsChangedPayload, InstancePayload, LoadingPayload,
+    ProcessPayload, WarningPayload,
 };
 use crate::event::{
     CommandPayload, EventError, InstanceBulkUpdateProgressPayload,
     InstancePayloadType, LoadingBar, LoadingBarType, ProcessPayloadType,
 };
+use crate::state::OnboardingChecklist;
 use futures::prelude::*;
 use serde_json::Value;
 #[cfg(feature = "tauri")]
@@ -228,6 +230,34 @@ pub async fn emit_instance(
             instance_id: instance_id.to_string(),
             event,
         }))?;
+    }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_instance_groups_changed(
+    instance_ids: &[String],
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::InstanceGroupsChanged(
+            InstanceGroupsChangedPayload {
+                instance_ids: instance_ids.to_vec(),
+            },
+        ))?;
+    }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_onboarding_checklist(
+    checklist: OnboardingChecklist,
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::OnboardingChecklist(checklist))?;
     }
     Ok(())
 }

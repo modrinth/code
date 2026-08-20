@@ -114,6 +114,8 @@ pub enum AppEvent {
     Loading(LoadingPayload),
     Process(ProcessPayload),
     Instance(InstancePayload),
+    InstanceGroupsChanged(InstanceGroupsChangedPayload),
+    OnboardingChecklist(crate::state::OnboardingChecklist),
     InstanceBulkUpdateProgress(InstanceBulkUpdateProgressPayload),
     InstallJob(std::sync::Arc<InstallJobSnapshot>),
     Command(CommandPayload),
@@ -161,6 +163,8 @@ pub fn export_app_event_bindings(
             ProcessPayloadType,
             InstancePayload,
             InstancePayloadType,
+            InstanceGroupsChangedPayload,
+            crate::state::OnboardingChecklist,
             FriendPayload,
             FriendStatusPayload,
             LogEvent,
@@ -444,6 +448,16 @@ pub struct InstancePayload {
     #[serde(flatten)]
     #[cfg_attr(feature = "export-ts", ts(flatten))]
     pub event: InstancePayloadType,
+}
+
+#[derive(Clone)]
+#[cfg_attr(
+    feature = "export-ts",
+    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
+)]
+#[serde_binhum::serde_binhum]
+pub struct InstanceGroupsChangedPayload {
+    pub instance_ids: Vec<String>,
 }
 
 #[derive(Clone)]

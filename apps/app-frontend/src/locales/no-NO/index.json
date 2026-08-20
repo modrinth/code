@@ -68,11 +68,17 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Åpningsside"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Skjuler navnelappen over din spiller på utseende siden."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gjøm navnelapp"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimer launcheren"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Viser hvor lenge du har spilt et tilfelle."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis spilletid"
@@ -370,18 +376,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Velg ikon"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Bibliotekgrupper"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Lag ny gruppe"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Bibliotekgrupper lar deg organisere instansene dine inn i ulike seksjoner i biblioteket ditt."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Skriv inn gruppenavn"
   },
   "instance.settings.tabs.general.name": {
     "message": "Navn"

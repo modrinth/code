@@ -707,9 +707,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Rechercher une version de jeu..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Retirer l'icône"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Sélectionner l'icône"
   },
@@ -872,24 +869,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Effacer tout"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Rechercher un modpack"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importer un modpack"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Vous avez déjà le modpack en tête ?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Aucun résultat"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Rechercher un modpack"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Une instance est un setup Minecraft avec un mod loader, une version, et des mods spécifiques."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Partez de zéro en choisissant un loader et une version de jeu."
   },
@@ -922,9 +901,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Sélectionner le type de monde"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Choisir un modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Créer une instance"
@@ -2051,14 +2027,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Aucune instance compatible n'a été trouvée"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Supprimer l'icône"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Rechercher une instance"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Sélectionnez l'icône"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Actuel"
@@ -4616,9 +4586,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Vous avez déjà un serveur ?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "En savoir plus à propos de Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4627,9 +4594,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Des mods, des potes, et beaucoup de fun, tout depuis Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Aucun serveur pour le moment"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Choisissez vos mods préférés et nous nous occupons du reste."
@@ -4645,12 +4609,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Se connecter"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Mettez votre serveur en place tout comme un monde solo."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Setup simple"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Copié"

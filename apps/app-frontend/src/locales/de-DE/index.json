@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Farbschema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Wähle die Seite, die beim Öffnen der Modrinth App erscheint."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliothek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standard-Startseite"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Verbirgt deinen Benutzernamen über der Spielervorschau auf der Skin-Auswahlseite."
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "Startseite"
   },
-  "app.nav.library": {
-    "message": "Bibliothek"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth-Konto"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "Anmelden"
   },
-  "app.skins.sign-in.description": {
-    "message": "Bitte melde dich bei deinem Minecraft-Konto an, um die Funktionen zur Skin-Verwaltung der Modrinth-App nutzen zu können."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Begeisterter Modrinth-Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Bitte melde dich an"
-  },
   "app.skins.title": {
     "message": "Skin-Auswahl"
   },
@@ -1228,9 +1210,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Das Ändern der Version wirkt sich nur auf deine lokale Kopie aus. Zukünftige Updates der geteilten Instanz können diese wiederherstellen oder erneut ändern."
@@ -1537,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Icon auswählen"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Bibliotheksgruppen"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Neue Gruppe erstellen"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Bibliotheksgruppen ermöglichen es dir, deine Instanzen in verschiedene Abschnitte deiner Bibliothek zu organisieren."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Gruppenname eingeben"
   },
   "instance.settings.tabs.general.name": {
     "message": "Name"

@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "テーマ"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Modrinth Appを開いたときに表示するページを選択します。"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "ホーム"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "ライブラリ"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "デフォルトの起動ページ"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "スキン選択画面のプレイヤープレビュー上にあるユーザー名を非表示にします。"
@@ -761,9 +755,6 @@
   "app.nav.home": {
     "message": "ホーム"
   },
-  "app.nav.library": {
-    "message": "ライブラリ"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinthアカウント"
   },
@@ -1148,15 +1139,6 @@
   "app.skins.sign-in.button": {
     "message": "サイン審"
   },
-  "app.skins.sign-in.description": {
-    "message": "Modrinthアプリのスキン管理機能を使用するには、マインクラフトアカウントにサインインしてください。"
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "ワクワクしている Modrinth ボット"
-  },
-  "app.skins.sign-in.title": {
-    "message": "サインインしてください"
-  },
   "app.skins.title": {
     "message": "スキンセレクター"
   },
@@ -1228,9 +1210,6 @@
   },
   "app.world.world-item.offline": {
     "message": "オフライン"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} 人がオンライン"
   },
   "content.shared-instance.change-version-body": {
     "message": "バージョンの変更はローカルコピーにのみ影響します。今後共有された起動構成がアップデートされた際に、元の状態に戻ったり、別のバージョンに変更されたりする場合があります。"
@@ -1537,18 +1516,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "アイコンを選択"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "ライブラリグループ"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "新しいグループを作成"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "ライブラリグループを使用することで、インスタンスをライブラリ内で整理することができます。"
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "グループ名を入力"
   },
   "instance.settings.tabs.general.name": {
     "message": "名前"

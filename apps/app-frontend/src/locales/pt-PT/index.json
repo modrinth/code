@@ -152,14 +152,29 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Livraria"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Página de carregamento principal"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Desativa o nametag acima do seu player na página de skins."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar nametag"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Volte aos mundos"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimiza o inicializador quando um processo Minecraft é iniciado."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimizar launcher"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "Utilizar a moldura da janela do sistema (é necessário reiniciar a aplicação)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "Decorações nativas"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Apresenta quanto tempo passou a jogar uma instância."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Mostrar tempo de jogo"
@@ -551,9 +566,6 @@
   "app.world.world-item.offline": {
     "message": "Offline"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
-  },
   "friends.action.add-friend": {
     "message": "Adicionar um amigo"
   },
@@ -709,18 +721,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selecionar ícone"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupos da biblioteca"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Criar novo grupo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupos da biblioteca permitem-te organizar as tuas instâncias em secções diferentes da tua biblioteca."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Insere o nome do grupo"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nome"

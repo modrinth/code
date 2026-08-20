@@ -740,7 +740,7 @@ watch(
 				}),
 				ogTitle: formatMessage(messages.collectionTitle, { name: col.name }),
 				ogDescription: col.description,
-				ogImage: col.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+				ogImage: col.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png',
 				ogUrl: canonicalUrl,
 				robots: col.status === 'listed' ? 'all' : 'noindex',
 			})

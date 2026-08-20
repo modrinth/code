@@ -146,14 +146,29 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "مكتبة"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "الصفحة الرئيسة الافتراضية"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "ألغ تفعيل عرض الاسم فوق لاعبك في صفحة المظاهر."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "إخفاء عرض الاسم"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "العودة إلى العوالم"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "قم بتصغير نافذة المشغل عند بدء تشغيل عملية Minecraft."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "تصغير نافذة المشغل"
+  },
+  "app.appearance-settings.native-decorations.description": {
+    "message": "استخدام إطار نافذة النظام (يتطلب إعادة تشغيل التطبيق)."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "message": "الزخارف التقليدية"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "يعرض مقدار الوقت الذي قضيته في لعب إحدى المهام."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "إظهار مدة التشغيل"
@@ -602,15 +617,6 @@
   "app.skins.sign-in.button": {
     "message": "تسجيل الدخول"
   },
-  "app.skins.sign-in.description": {
-    "message": "يرجى تسجيل الدخول إلى حسابك في Minecraft لاستخدام ميزات إدارة أشكال الشخصيات في تطبيق Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "روبوت Modrinth المتحمس"
-  },
-  "app.skins.sign-in.title": {
-    "message": "الرجاء تسجيل الدخول"
-  },
   "app.skins.title": {
     "message": "اختيار المظهر"
   },
@@ -664,9 +670,6 @@
   },
   "app.world.world-item.offline": {
     "message": "مفصول"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} متصل حاليا"
   },
   "friends.action.add-friend": {
     "message": "إضافة صديق"
@@ -844,18 +847,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "اختر الأيقونة"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "مجموعات المكتبة"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "إنشاء مجموعة جديدة"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "مجموعات المكتبة تساعدك على ترتيب حالاتك على أقسام مختلفة في مكتبتك."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "إدخال اسم المجموعة"
   },
   "instance.settings.tabs.general.name": {
     "message": "الاسم"

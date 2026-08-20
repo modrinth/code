@@ -47,6 +47,7 @@ pub struct InstallCreateInstanceRequest {
     pub loader: ModLoader,
     pub loader_version: Option<String>,
     pub icon_path: Option<String>,
+    pub icon_config: Option<theseus::data::InstanceIconConfig>,
     pub link: Option<InstanceLink>,
 }
 
@@ -90,6 +91,7 @@ pub async fn install_create_instance(
         request.loader,
         request.loader_version,
         request.icon_path,
+        request.icon_config,
         match request.link {
             Some(link) => link.into_core()?,
             None => theseus::data::InstanceLink::Unmanaged,

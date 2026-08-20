@@ -149,8 +149,8 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standard startside"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Slår nametagget over din spiller på skins siden fra."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gem nametag"
@@ -160,6 +160,9 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer app"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Vis hvor meget tid du har brugt på at spille en instance."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis tid spillet"
@@ -647,15 +650,6 @@
   "app.skins.sign-in.button": {
     "message": "Log Ind"
   },
-  "app.skins.sign-in.description": {
-    "message": "Venligst log ind til din Minecraft konto for at kunne funktionerne til at administrere dit skin i Modrinth appen."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Overrasket Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Venligst log ind"
-  },
   "app.skins.title": {
     "message": "Skin vælger"
   },
@@ -709,9 +703,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.delete-button": {
     "message": "Slet alligevel"
@@ -901,18 +892,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Vælg ikon"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Biblioteks grupper"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Opret ny gruppe"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Biblioteksgrupper lader dig organisere dine instanser i forskellige sektioner i dit bibliotek."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Indtast gruppenavn"
   },
   "instance.settings.tabs.general.name": {
     "message": "Navn"

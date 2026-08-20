@@ -29,8 +29,12 @@ use crate::{
 };
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use ariadne::ids::UserId;
+use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+
+use crate::database::models::user_preferences_item::DBUserPreferences;
+use crate::models::v3::preferences::{PartialUserPreferences, UserPreferences};
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(user_auth_get_route)
@@ -49,6 +53,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(user_delete_route)
         .service(user_follows_route)
         .service(user_notifications_route)
+        .service(get_user_preferences)
+        .service(edit_user_preferences)
         .service(get_user_clients);
 }
 
@@ -365,6 +371,108 @@ pub async fn user_auth_get(
     }
 
     Ok(HttpResponse::Ok().json(user))
+}
+
+#[utoipa::path(tag = "users", responses((status = OK, body = UserPreferences)))]
+#[get("/user/{id}/preferences")]
+pub async fn get_user_preferences(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<UserPreferences>, ApiError> {
+    let (_, requester) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let target = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?
+        .wrap_not_found_err("resource not found")?;
+
+    let can_access =
+        requester.id == target.id.into() || requester.role.is_mod();
+    if !can_access {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to access this user's preferences"
+        )));
+    }
+
+    let preference_overrides = DBUserPreferences::get(target.id, &**pool)
+        .await
+        .wrap_internal_err("failed to fetch user preferences")?;
+
+    Ok(web::Json(UserPreferences::resolve(preference_overrides)))
+}
+
+#[utoipa::path(
+	tag = "users",
+	request_body = PartialUserPreferences,
+	responses((status = OK, body = UserPreferences))
+)]
+#[patch("/user/{id}/preferences")]
+pub async fn edit_user_preferences(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<PartialUserPreferences>,
+) -> Result<web::Json<UserPreferences>, ApiError> {
+    let (_, requester) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let target = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?
+        .wrap_not_found_err("resource not found")?;
+
+    let can_access =
+        requester.id == target.id.into() || requester.role.is_mod();
+    if !can_access {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to access this user's preferences"
+        )));
+    }
+
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+
+    let stored = DBUserPreferences::get_for_update(target.id, &mut txn)
+        .await
+        .wrap_internal_err("failed to fetch user preferences")?;
+
+    let mut preferences = UserPreferences::resolve(stored);
+    body.into_inner().apply_to(&mut preferences);
+
+    let overrides = preferences.into_diff_from(&UserPreferences::default());
+    DBUserPreferences::upsert(target.id, &overrides, &mut txn)
+        .await
+        .wrap_internal_err("failed to update user preferences")?;
+
+    txn.commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
+
+    let preferences = UserPreferences::resolve(Some(overrides));
+
+    Ok(web::Json(preferences))
 }
 
 #[derive(Serialize, Deserialize)]

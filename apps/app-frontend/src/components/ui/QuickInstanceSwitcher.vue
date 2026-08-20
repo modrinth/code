@@ -2,13 +2,12 @@
 import { SpinnerIcon } from '@modrinth/assets'
 import { Avatar, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
-import { list } from '@/helpers/instance'
+import { getInstanceIconUrl, list } from '@/helpers/instance'
 import { instanceKeys } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
@@ -201,7 +200,7 @@ const dividerTooltip = computed(() => {
 		>
 			<NavButton :to="`/instance/${encodeURIComponent(instance.id)}`" class="relative">
 				<Avatar
-					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+					:src="getInstanceIconUrl(instance.icon_path)"
 					size="28px"
 					:tint-by="instance.id"
 					:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"

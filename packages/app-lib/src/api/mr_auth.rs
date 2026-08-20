@@ -30,6 +30,15 @@ pub async fn authenticate_finish_flow(
     .await?;
 
     creds.upsert(&state.pool).await?;
+
+    if let Err(error) =
+        crate::onboarding_checklist::mark_logged_into_modrinth().await
+    {
+        tracing::warn!(
+            "Failed to mark Modrinth login in onboarding checklist: {error}"
+        );
+    }
+
     state.friends_socket.disconnect().await?;
     state
         .friends_socket

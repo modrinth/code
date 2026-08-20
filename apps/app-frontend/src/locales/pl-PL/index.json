@@ -155,17 +155,11 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Motyw"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Wybierz stronę, która pojawi się po uruchomieniu Modrinth App."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Strona główna"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Biblioteka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Domyślna strona główna"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Ukryj nazwę użytkownika pokazaną nad podglądem wyglądu gracza na stronie wyboru skórki."
@@ -190,6 +184,9 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Systemowa ramka okna"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Pokazuje czas gry spędzony w danej instancji."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Pokaż czas gry"
@@ -725,9 +722,6 @@
   "app.nav.home": {
     "message": "Strona główna"
   },
-  "app.nav.library": {
-    "message": "Biblioteka"
-  },
   "app.nav.modrinth-account": {
     "message": "Konto Modrinth"
   },
@@ -1031,15 +1025,6 @@
   "app.skins.sign-in.button": {
     "message": "Zaloguj się"
   },
-  "app.skins.sign-in.description": {
-    "message": "Zaloguj się na konto Minecraft, by móc zarządzać skórkami poprzez Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Podekscytowany Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Zaloguj się"
-  },
   "app.skins.title": {
     "message": "Wybór skórki"
   },
@@ -1105,9 +1090,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.delete-button": {
     "message": "Usuń mimo to"
@@ -1357,18 +1339,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Wybierz ikonę"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupy bibliotek"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Utwórz nową grupę"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupy bibliotek pozwalają ci organizować twoje instancje w różne sekcje w twojej bibliotece."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Wpisz nazwę grupy"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nazwa"

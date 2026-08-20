@@ -10,7 +10,7 @@ import {
 	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
-	type ModpackSearchResult,
+	type ProjectSearchResult,
 	readStoredServerInstallQueue,
 	resolveServerAddonInstallPlans,
 	useServerContextRuntime,
@@ -69,7 +69,7 @@ export interface ServerInstallContentContext {
 	installQueuedServerInstallsAndBack: () => Promise<boolean>
 	initServerContext: () => Promise<void>
 	watchServerContextChanges: () => void
-	searchServerModpacks: (query: string, limit?: number) => Promise<ModpackSearchResult>
+	searchServerModpacks: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	getServerProjectVersions: (projectId: string) => Promise<{ id: string }[]>
 	enforceSetupModpackRoute: (currentProjectType: string | undefined) => void
 	getQueuedServerInstallPlans: () => Map<string, BrowseInstallPlan<InstallableSearchResult>>
