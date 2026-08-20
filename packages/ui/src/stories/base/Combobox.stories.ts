@@ -58,6 +58,19 @@ export const Searchable: Story = {
 	},
 }
 
+export const SearchableButtonVariant: Story = {
+	args: {
+		options: [
+			{ value: '1', label: 'Minecraft' },
+			{ value: '2', label: 'Fabric' },
+			{ value: '3', label: 'Forge' },
+		],
+		searchable: true,
+		searchInputVariant: 'button',
+		searchPlaceholder: 'Search projects...',
+	},
+}
+
 export const SearchableEmpty: Story = {
 	args: {
 		options: [],

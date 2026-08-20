@@ -8,6 +8,10 @@
 		:no-options-message="searchLoading ? loadingMessage : noResultsMessage"
 		:disable-search-filter="true"
 		:disabled="disabled"
+		:clearable="clearable"
+		:search-input-variant="searchInputVariant"
+		:sync-with-selection="syncWithSelection"
+		:select-search-text-on-focus="selectSearchTextOnFocus"
 		show-icon-in-selected
 		@search-input="(query) => handleSearch(query)"
 	/>
@@ -20,7 +24,7 @@ import Fuse from 'fuse.js'
 import { defineAsyncComponent, h, markRaw, ref, watch } from 'vue'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
-import type { ComboboxOption } from '../base/Combobox.vue'
+import type { ComboboxOption, ComboboxSearchInputVariant } from '../base/Combobox.vue'
 import Combobox from '../base/Combobox.vue'
 
 export type ProjectType =
@@ -32,12 +36,13 @@ export type ProjectType =
 	| 'plugin'
 	| 'server'
 
-interface SearchHit {
+export interface SearchHit {
 	project_id: string
 	title: string
 	icon_url?: string
 	project_type: string
 	slug: string
+	author?: string
 }
 
 const props = withDefaults(
@@ -54,6 +59,14 @@ const props = withDefaults(
 		noResultsMessage?: string
 		/** Whether the combobox is disabled */
 		disabled?: boolean
+		/** Whether to show a button for clearing the search input */
+		clearable?: boolean
+		/** Visual treatment for the search input */
+		searchInputVariant?: ComboboxSearchInputVariant
+		/** Keep the selected project's label in the search input */
+		syncWithSelection?: boolean
+		/** Select all search text when the input receives focus */
+		selectSearchTextOnFocus?: boolean
 		/** Maximum number of results to show */
 		limit?: number
 		/** Project IDs to exclude from results */
@@ -69,6 +82,8 @@ const props = withDefaults(
 		loadingMessage: 'Loading...',
 		noResultsMessage: 'No results found',
 		disabled: false,
+		searchInputVariant: 'surface',
+		syncWithSelection: true,
 		limit: 20,
 	},
 )
@@ -82,6 +97,10 @@ const selectedProject = ref<SearchHit | null>(null)
 const searchResultsCache = ref<Map<string, SearchHit>>(new Map())
 
 const { labrinth } = injectModrinthClient()
+
+function isAllowedProjectType(projectType: string): boolean {
+	return !props.projectTypes || props.projectTypes.includes(projectType as ProjectType)
+}
 
 const userProjectHits = ref<SearchHit[]>([])
 const userProjectsFuse = ref<Fuse<SearchHit> | null>(null)
@@ -163,7 +182,7 @@ watch(
 		} else {
 			try {
 				const project = await labrinth.projects_v2.get(newId)
-				if (project) {
+				if (project && isAllowedProjectType(project.project_type)) {
 					hit = {
 						project_id: project.id,
 						title: project.title,
@@ -177,6 +196,9 @@ watch(
 				selectedProject.value = null
 				return
 			}
+		}
+		if (hit && !isAllowedProjectType(hit.project_type)) {
+			hit = null
 		}
 
 		selectedProject.value = hit
@@ -220,7 +242,11 @@ const search = async (query: string) => {
 		const uniqueHits: SearchHit[] = []
 
 		for (const hit of allHits) {
-			if (!seenIds.has(hit.project_id) && !excludeSet.has(hit.project_id)) {
+			if (
+				isAllowedProjectType(hit.project_type) &&
+				!seenIds.has(hit.project_id) &&
+				!excludeSet.has(hit.project_id)
+			) {
 				seenIds.add(hit.project_id)
 				uniqueHits.push(hit)
 				searchResultsCache.value.set(hit.project_id, hit)
