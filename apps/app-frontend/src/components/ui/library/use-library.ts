@@ -36,6 +36,8 @@ export const librarySortOptions = [
 	'Hours played',
 	'Date created',
 	'Date modified',
+	'Loader',
+	'Game version',
 ] as const
 
 export const libraryGroupOptions = [
@@ -327,6 +329,18 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		switch (displayState.value.sortBy) {
 			case 'Name':
 				visibleInstances.sort((a, b) => a.name.localeCompare(b.name))
+				break
+			case 'Loader':
+				visibleInstances.sort((a, b) =>
+					formatLoader(formatMessage, a.loader).localeCompare(
+						formatLoader(formatMessage, b.loader),
+					),
+				)
+				break
+			case 'Game version':
+				visibleInstances.sort((a, b) =>
+					a.game_version.localeCompare(b.game_version, undefined, { numeric: true }),
+				)
 				break
 			case 'Last played':
 				visibleInstances.sort((a, b) => dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0)))

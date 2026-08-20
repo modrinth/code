@@ -1073,6 +1073,9 @@
   "app.library.sort.date-modified": {
     "message": "Date modified"
   },
+  "app.library.sort.game-version": {
+    "message": "Game version"
+  },
   "app.library.sort.hours-played": {
     "message": "Hours played"
   },
@@ -1081,6 +1084,9 @@
   },
   "app.library.sort.last-played": {
     "message": "Last played"
+  },
+  "app.library.sort.loader": {
+    "message": "Loader"
   },
   "app.library.sort.name": {
     "message": "Name"
