@@ -6,6 +6,7 @@ use super::*;
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use futures::StreamExt;
+use sha2::Digest;
 use std::collections::BTreeMap;
 
 #[tracing::instrument]
@@ -1018,12 +1019,18 @@ pub(super) async fn upload_external_files(
                 "Invalid shared instance external file upload URL: {error}"
             ))
         })?;
+        let (bytes, file_sha512) = tokio::task::spawn_blocking(move || {
+            let hash = format!("{:x}", sha2::Sha512::digest(&bytes));
+            (bytes, hash)
+        })
+        .await?;
         let response = send_bytes_request_to_url(
             "upload_external_file",
             Method::PUT,
             upload_url.path(),
             &upload.url,
             bytes,
+            Some(&file_sha512),
             state,
         )
         .await?;
