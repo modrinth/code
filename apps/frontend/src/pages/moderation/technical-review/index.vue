@@ -5,10 +5,12 @@ import {
 	ListFilterIcon,
 	LoaderCircleIcon,
 	SearchIcon,
+	SettingsIcon,
 	SortAscIcon,
 	SortDescIcon,
 } from '@modrinth/assets'
 import {
+	ButtonLink,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
@@ -652,6 +654,11 @@ onUnmounted(() => {
 			<div
 				class="flex flex-col items-stretch justify-end gap-2 sm:flex-row sm:items-center lg:flex-shrink-0"
 			>
+				<ButtonLink to="/moderation/technical-review/rules">
+					<SettingsIcon class="size-5" />
+					Rules
+				</ButtonLink>
+
 				<Combobox
 					v-model="currentResponseFilter"
 					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"

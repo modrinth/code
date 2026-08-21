@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH removed AS (\n            DELETE FROM delphi_tech_review_queue\n            WHERE project_id = ANY($1::bigint[])\n            RETURNING project_id\n        )\n        SELECT\n            removed.project_id AS \"project_id!: DBProjectId\",\n            (\n                SELECT thread.id\n                FROM threads thread\n                WHERE thread.mod_id = removed.project_id\n                ORDER BY thread.id\n                LIMIT 1\n            ) AS \"thread_id!: DBThreadId\"\n        FROM removed\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "thread_id!: DBThreadId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "d4d04f7cfd6efa582970ec0636f16df646df14ec647f7f2017d59fe786b9ad5b"
+}

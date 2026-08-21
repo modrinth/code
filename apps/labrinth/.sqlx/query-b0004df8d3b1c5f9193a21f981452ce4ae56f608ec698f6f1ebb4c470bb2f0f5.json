@@ -1,0 +1,73 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tINSERT INTO delphi_rules (\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\trevision,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t)\n\t\tVALUES (\n\t\t\t$1,\n\t\t\t$2,\n\t\t\t$3,\n\t\t\t(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),\n\t\t\t$4,\n\t\t\t$4\n\t\t)\n\t\tRETURNING\n\t\t\tid AS \"id!: DelphiRuleId\",\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\trevision,\n\t\t\tcreated_at,\n\t\t\tupdated_at,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!: DelphiRuleId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "rule",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "priority",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "revision",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "updated_by",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "b0004df8d3b1c5f9193a21f981452ce4ae56f608ec698f6f1ebb4c470bb2f0f5"
+}

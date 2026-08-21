@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM delphi_rule_effects WHERE revision <> $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "50a5f3a116ebe5cf88452a9aac89f73135491f170e3d619a93144b36ef429705"
+}

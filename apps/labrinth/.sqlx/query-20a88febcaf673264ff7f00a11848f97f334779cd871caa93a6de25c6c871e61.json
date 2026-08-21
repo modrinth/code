@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM delphi_rules WHERE delete_on_next_revision",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "20a88febcaf673264ff7f00a11848f97f334779cd871caa93a6de25c6c871e61"
+}

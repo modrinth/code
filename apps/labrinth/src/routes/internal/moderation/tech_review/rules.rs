@@ -1,0 +1,664 @@
+use actix_web::{HttpRequest, delete, get, post, put, web};
+use chrono::{DateTime, Utc};
+use eyre::eyre;
+use serde::{Deserialize, Serialize};
+use validator::Validate;
+use xredis::RedisPool;
+
+use super::rules_scan::RuleInput;
+use crate::{
+    auth::check_is_moderator_from_headers,
+    database::{
+        PgPool, ReadOnlyPgPool,
+        models::{
+            DBProjectId, DBVersionId, DelphiReportIssueDetailsId,
+            DelphiReportIssueId, DelphiRuleId,
+            delphi_report_item::DelphiSeverity,
+        },
+    },
+    models::{
+        ids::{ProjectId, VersionId},
+        pats::Scopes,
+    },
+    queue::session::AuthQueue,
+    routes::ApiError,
+    util::{error::Context, validate::validation_errors_to_string},
+};
+
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(get_rules)
+        .service(test_rule)
+        .service(get_rule_affected_details)
+        .service(create_rule)
+        .service(update_rule)
+        .service(delete_rule);
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct DelphiRule {
+    pub id: DelphiRuleId,
+    pub name: String,
+    pub rule: String,
+    pub priority: i32,
+    pub revision: i64,
+    pub current_revision: i64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub created_by: Option<i64>,
+    pub updated_by: Option<i64>,
+    pub affected_details_count: i64,
+    pub affected_details: Vec<DelphiRuleAffectedDetail>,
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct DelphiRuleAffectedDetail {
+    pub detail_id: DelphiReportIssueDetailsId,
+    pub issue_id: DelphiReportIssueId,
+    pub project_id: Option<ProjectId>,
+    pub project_name: Option<String>,
+    pub project_icon_url: Option<String>,
+    pub version_id: Option<VersionId>,
+    pub version_name: Option<String>,
+    pub version_number: Option<String>,
+    pub issue_type: String,
+    pub key: String,
+    pub jar: Option<String>,
+    pub file_path: String,
+    pub original_severity: DelphiSeverity,
+    pub severity: DelphiSeverity,
+}
+
+#[derive(Debug, Deserialize, Validate, utoipa::ToSchema)]
+pub struct WriteDelphiRule {
+    #[validate(length(min = 1, max = 256))]
+    pub name: String,
+    #[validate(length(min = 1, max = 65536))]
+    pub rule: String,
+    #[serde(default)]
+    pub priority: i32,
+}
+
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
+pub struct TestDelphiRule {
+    #[validate(length(min = 1, max = 65536))]
+    pub rule: String,
+    #[validate(length(max = 10))]
+    pub inputs: Vec<RuleInput>,
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct TestDelphiRuleResponse {
+    pub effects: Vec<Option<DelphiRuleEffect>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, utoipa::ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct DelphiRuleEffect {
+    pub severity: DelphiSeverity,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+#[serde(untagged)]
+pub enum DelphiRuleOutput {
+    Severity(DelphiSeverity),
+    Effect(DelphiRuleEffect),
+}
+
+struct ValidatedRule {
+    name: String,
+    rule: String,
+    priority: i32,
+}
+
+impl WriteDelphiRule {
+    async fn validate(mut self) -> Result<ValidatedRule, ApiError> {
+        self.name = self.name.trim().to_string();
+        self.rule = self.rule.trim().to_string();
+        Validate::validate(&self).map_err(|error| {
+            ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+        })?;
+
+        let expression = self.rule.clone();
+        tokio::task::spawn_blocking(move || cel::Program::compile(&expression))
+            .await
+            .wrap_internal_err("failed to join cel compilation task")?
+            .map_err(|error| {
+                ApiError::Request(
+                    eyre!(error).wrap_err("invalid cel expression"),
+                )
+            })?;
+
+        Ok(ValidatedRule {
+            name: self.name,
+            rule: self.rule,
+            priority: self.priority,
+        })
+    }
+}
+
+/// Evaluate a CEL rule against caller-provided issue traces without saving it.
+#[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
+	security(("bearer_auth" = [])),
+	request_body = TestDelphiRule,
+	responses((status = OK, body = TestDelphiRuleResponse))
+)]
+#[post("/rules/test")]
+pub async fn test_rule(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<TestDelphiRule>,
+) -> Result<web::Json<TestDelphiRuleResponse>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let mut request = body.into_inner();
+    request.rule = request.rule.trim().to_string();
+    request.validate().map_err(|error| {
+        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+    })?;
+
+    let rule = request.rule;
+    let expression = rule.clone();
+    let program =
+        tokio::task::spawn_blocking(move || cel::Program::compile(&expression))
+            .await
+            .wrap_internal_err("failed to join cel compilation task")?
+            .map_err(|error| {
+                ApiError::Request(
+                    eyre!(error).wrap_err("invalid cel expression"),
+                )
+            })?;
+    let mut effects = Vec::with_capacity(request.inputs.len());
+
+    for (index, input) in request.inputs.iter().enumerate() {
+        let evaluation =
+            super::rules_scan::evaluate_rule(&program, &rule, input);
+        let effect = evaluation.wrap_request_err(format!(
+            "failed to evaluate test input {index}"
+        ))?;
+        effects.push(effect);
+    }
+
+    Ok(web::Json(TestDelphiRuleResponse { effects }))
+}
+
+/// List all Delphi rules that are not pending deletion.
+#[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
+	security(("bearer_auth" = [])),
+	responses((status = OK, body = Vec<DelphiRule>))
+)]
+#[get("/rules")]
+pub async fn get_rules(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<DelphiRule>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let rules = sqlx::query!(
+        r#"
+		SELECT
+			delphi_rule.id AS "id!: DelphiRuleId",
+			delphi_rule.name,
+			delphi_rule.rule,
+			delphi_rule.priority,
+			delphi_rule.revision,
+			(
+				SELECT revision FROM delphi_rule_revisions LIMIT 1
+			) AS "current_revision!",
+			delphi_rule.created_at,
+			delphi_rule.updated_at,
+			delphi_rule.created_by,
+			delphi_rule.updated_by,
+			COALESCE(preview.affected_details_count, 0)
+				AS "affected_details_count!",
+			preview.detail_id AS "detail_id?: DelphiReportIssueDetailsId",
+			preview.issue_id AS "issue_id?: DelphiReportIssueId",
+			preview.project_id AS "project_id?: DBProjectId",
+			preview.project_name AS "project_name?",
+			preview.project_icon_url AS "project_icon_url?",
+			preview.version_id AS "version_id?: DBVersionId",
+			preview.version_name AS "version_name?",
+			preview.version_number AS "version_number?",
+			preview.issue_type AS "issue_type?",
+			preview.key AS "key?",
+			preview.jar AS "jar?",
+			preview.file_path AS "file_path?",
+			preview.original_severity AS "original_severity?: DelphiSeverity",
+			preview.severity AS "effect_severity?: DelphiSeverity"
+		FROM delphi_rules delphi_rule
+		LEFT JOIN LATERAL (
+			SELECT
+				effect.detail_id,
+				detail.issue_id,
+				version.mod_id AS project_id,
+				project.name AS project_name,
+				project.icon_url AS project_icon_url,
+				version.id AS version_id,
+				version.name AS version_name,
+				version.version_number,
+				issue.issue_type,
+				detail.key,
+				detail.jar,
+				detail.file_path,
+				detail.severity AS original_severity,
+				effect.severity,
+				COUNT(*) OVER () AS affected_details_count
+			FROM delphi_rule_effects effect
+			INNER JOIN delphi_rule_revisions published
+				ON published.revision = effect.revision
+			INNER JOIN delphi_report_issue_details detail
+				ON detail.id = effect.detail_id
+			INNER JOIN delphi_report_issues issue
+				ON issue.id = detail.issue_id
+			INNER JOIN delphi_reports report
+				ON report.id = issue.report_id
+			LEFT JOIN files file ON file.id = report.file_id
+			LEFT JOIN versions version ON version.id = file.version_id
+			LEFT JOIN mods project ON project.id = version.mod_id
+			WHERE effect.rule_id = delphi_rule.id
+			ORDER BY effect.detail_id DESC
+			LIMIT 3
+		) preview ON TRUE
+		WHERE NOT delphi_rule.delete_on_next_revision
+		ORDER BY
+			delphi_rule.priority DESC,
+			delphi_rule.id,
+			preview.detail_id DESC
+		"#,
+    )
+    .fetch_all(&***ro_pool)
+    .await
+    .wrap_internal_err("failed to fetch delphi rules")?;
+
+    let mut response = Vec::<DelphiRule>::new();
+    for rule in rules {
+        let affected_detail = if let (
+            Some(detail_id),
+            Some(issue_id),
+            Some(issue_type),
+            Some(key),
+            Some(file_path),
+            Some(original_severity),
+            Some(severity),
+        ) = (
+            rule.detail_id,
+            rule.issue_id,
+            rule.issue_type,
+            rule.key,
+            rule.file_path,
+            rule.original_severity,
+            rule.effect_severity,
+        ) {
+            Some(DelphiRuleAffectedDetail {
+                detail_id,
+                issue_id,
+                project_id: rule.project_id.map(ProjectId::from),
+                project_name: rule.project_name,
+                project_icon_url: rule.project_icon_url,
+                version_id: rule.version_id.map(VersionId::from),
+                version_name: rule.version_name,
+                version_number: rule.version_number,
+                issue_type,
+                key,
+                jar: rule.jar,
+                file_path,
+                original_severity,
+                severity,
+            })
+        } else {
+            None
+        };
+
+        if let Some(existing) = response.last_mut()
+            && existing.id == rule.id
+        {
+            if let Some(affected_detail) = affected_detail {
+                existing.affected_details.push(affected_detail);
+            }
+            continue;
+        }
+
+        response.push(DelphiRule {
+            id: rule.id,
+            name: rule.name,
+            rule: rule.rule,
+            priority: rule.priority,
+            revision: rule.revision,
+            current_revision: rule.current_revision,
+            created_at: rule.created_at,
+            updated_at: rule.updated_at,
+            created_by: rule.created_by,
+            updated_by: rule.updated_by,
+            affected_details_count: rule.affected_details_count,
+            affected_details: affected_detail.into_iter().collect(),
+        });
+    }
+
+    Ok(web::Json(response))
+}
+
+/// List all details affected by a Delphi rule in the published revision.
+#[utoipa::path(
+    context_path = "/moderation/tech-review",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = Vec<DelphiRuleAffectedDetail>))
+)]
+#[get("/rules/{id}/effects")]
+pub async fn get_rule_affected_details(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(DelphiRuleId,)>,
+) -> Result<web::Json<Vec<DelphiRuleAffectedDetail>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+    let (rule_id,) = path.into_inner();
+
+    let details = sqlx::query!(
+        r#"
+		SELECT
+			effect.detail_id AS "detail_id!: DelphiReportIssueDetailsId",
+			detail.issue_id AS "issue_id!: DelphiReportIssueId",
+			version.mod_id AS "project_id?: DBProjectId",
+			project.name AS "project_name?",
+			project.icon_url AS "project_icon_url?",
+			version.id AS "version_id?: DBVersionId",
+			version.name AS "version_name?",
+			version.version_number AS "version_number?",
+			issue.issue_type,
+			detail.key,
+			detail.jar,
+			detail.file_path,
+			detail.severity AS "original_severity!: DelphiSeverity",
+			effect.severity AS "effect_severity!: DelphiSeverity"
+		FROM delphi_rule_effects effect
+		INNER JOIN delphi_rule_revisions published
+			ON published.revision = effect.revision
+		INNER JOIN delphi_report_issue_details detail
+			ON detail.id = effect.detail_id
+		INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
+		INNER JOIN delphi_reports report ON report.id = issue.report_id
+		LEFT JOIN files file ON file.id = report.file_id
+		LEFT JOIN versions version ON version.id = file.version_id
+		LEFT JOIN mods project ON project.id = version.mod_id
+		WHERE effect.rule_id = $1
+		ORDER BY effect.detail_id DESC
+		"#,
+        rule_id as DelphiRuleId,
+    )
+    .fetch_all(&***ro_pool)
+    .await
+    .wrap_internal_err("failed to fetch details affected by delphi rule")?;
+
+    Ok(web::Json(
+        details
+            .into_iter()
+            .map(|detail| DelphiRuleAffectedDetail {
+                detail_id: detail.detail_id,
+                issue_id: detail.issue_id,
+                project_id: detail.project_id.map(ProjectId::from),
+                project_name: detail.project_name,
+                project_icon_url: detail.project_icon_url,
+                version_id: detail.version_id.map(VersionId::from),
+                version_name: detail.version_name,
+                version_number: detail.version_number,
+                issue_type: detail.issue_type,
+                key: detail.key,
+                jar: detail.jar,
+                file_path: detail.file_path,
+                original_severity: detail.original_severity,
+                severity: detail.effect_severity,
+            })
+            .collect(),
+    ))
+}
+
+/// Create a Delphi rule. It will be applied by the next manual rule scan.
+#[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
+	security(("bearer_auth" = [])),
+	request_body = WriteDelphiRule,
+	responses((status = OK, body = DelphiRule))
+)]
+#[post("/rules")]
+pub async fn create_rule(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<WriteDelphiRule>,
+) -> Result<web::Json<DelphiRule>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+    let rule = body.into_inner().validate().await?;
+    let user_id = user.id.0 as i64;
+
+    let rule = sqlx::query!(
+        r#"
+		INSERT INTO delphi_rules (
+			name,
+			rule,
+			priority,
+			revision,
+			created_by,
+			updated_by
+		)
+		VALUES (
+			$1,
+			$2,
+			$3,
+			(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),
+			$4,
+			$4
+		)
+		RETURNING
+			id AS "id!: DelphiRuleId",
+			name,
+			rule,
+			priority,
+			revision,
+			created_at,
+			updated_at,
+			created_by,
+			updated_by
+		"#,
+        rule.name,
+        rule.rule,
+        rule.priority,
+        user_id,
+    )
+    .fetch_one(&**pool)
+    .await
+    .wrap_internal_err("failed to create delphi rule")?;
+
+    Ok(web::Json(DelphiRule {
+        id: rule.id,
+        name: rule.name,
+        rule: rule.rule,
+        priority: rule.priority,
+        revision: rule.revision,
+        current_revision: rule.revision - 1,
+        created_at: rule.created_at,
+        updated_at: rule.updated_at,
+        created_by: rule.created_by,
+        updated_by: rule.updated_by,
+        affected_details_count: 0,
+        affected_details: Vec::new(),
+    }))
+}
+
+/// Update a Delphi rule. Its materialized effects remain unchanged until the next scan.
+#[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
+	security(("bearer_auth" = [])),
+	request_body = WriteDelphiRule,
+	responses((status = OK, body = DelphiRule), (status = NOT_FOUND))
+)]
+#[put("/rules/{id}")]
+pub async fn update_rule(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(DelphiRuleId,)>,
+    body: web::Json<WriteDelphiRule>,
+) -> Result<web::Json<DelphiRule>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+    let (id,) = path.into_inner();
+    let rule = body.into_inner().validate().await?;
+    let user_id = user.id.0 as i64;
+
+    let rule = sqlx::query!(
+        r#"
+		UPDATE delphi_rules
+		SET
+			name = $2,
+			rule = $3,
+			priority = $4,
+			revision = (
+				SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1
+			),
+			updated_at = CURRENT_TIMESTAMP,
+			updated_by = $5
+		WHERE id = $1 AND NOT delete_on_next_revision
+		RETURNING
+			id AS "id!: DelphiRuleId",
+			name,
+			rule,
+			priority,
+			revision,
+			created_at,
+			updated_at,
+			created_by,
+			updated_by
+		"#,
+        id as DelphiRuleId,
+        rule.name,
+        rule.rule,
+        rule.priority,
+        user_id,
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("failed to update delphi rule")?
+    .wrap_not_found_err("delphi rule not found")?;
+
+    Ok(web::Json(DelphiRule {
+        id: rule.id,
+        name: rule.name,
+        rule: rule.rule,
+        priority: rule.priority,
+        revision: rule.revision,
+        current_revision: rule.revision - 1,
+        created_at: rule.created_at,
+        updated_at: rule.updated_at,
+        created_by: rule.created_by,
+        updated_by: rule.updated_by,
+        affected_details_count: 0,
+        affected_details: Vec::new(),
+    }))
+}
+
+/// Mark a Delphi rule for deletion when the next rule scan is published.
+#[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
+	security(("bearer_auth" = [])),
+	responses((status = OK), (status = NOT_FOUND))
+)]
+#[delete("/rules/{id}")]
+pub async fn delete_rule(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(DelphiRuleId,)>,
+) -> Result<(), ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+    let (id,) = path.into_inner();
+
+    let deleted = sqlx::query!(
+        r#"
+		UPDATE delphi_rules
+		SET
+			delete_on_next_revision = TRUE,
+			revision = (
+				SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1
+			),
+			updated_at = CURRENT_TIMESTAMP,
+			updated_by = $2
+		WHERE id = $1 AND NOT delete_on_next_revision
+		RETURNING id
+		"#,
+        id as DelphiRuleId,
+        user.id.0 as i64,
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("failed to mark delphi rule for deletion")?;
+
+    if deleted.is_none() {
+        return Err(ApiError::NotFound(eyre!("delphi rule not found")));
+    }
+
+    Ok(())
+}
