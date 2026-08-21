@@ -397,4 +397,13 @@ vars! {
     SERVER_PING_MAX_FAIL_COUNT: u64 = 3u64;
 
     WEBAUTHN_RP_NAME: String = "Modrinth";
+
+    // Contributor/translator/proofreader profile badges
+    GITHUB_CONTRIBUTOR_PAT: String = "none";
+    GITHUB_CONTRIBUTOR_REPO: String = "modrinth/code";
+    GITHUB_CONTRIBUTOR_MERGED_PR_THRESHOLD: u32 = 3u32;
+    CROWDIN_CLIENT_ID: String = "none";
+    CROWDIN_CLIENT_SECRET: String = "none";
+    CROWDIN_PROJECT_ID: String = "none";
+    CROWDIN_PROJECT_API_TOKEN: String = "none";
 }

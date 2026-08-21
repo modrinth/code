@@ -67,6 +67,11 @@ pub enum DBFlow {
         #[serde_binhum(binary(with = "json_string"))]
         state: DiscoverableAuthentication,
     },
+    /// State for the on-demand Crowdin verification used to award the
+    /// Translator/Proofreader badges.
+    CrowdinVerify {
+        user_id: DBUserId,
+    },
 }
 
 mod json_string {

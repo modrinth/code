@@ -145,6 +145,22 @@ pub fn app_setup(
             }
         });
 
+        let pool_ref = pool.clone();
+        let redis_pool_ref = redis_pool.clone();
+        scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
+            let pool_ref = pool_ref.clone();
+            let redis_ref = redis_pool_ref.clone();
+            async move {
+                if let Err(e) = background_task::recheck_contributor_badges(
+                    pool_ref, redis_ref,
+                )
+                .await
+                {
+                    warn!("Rechecking contributor badges failed: {e:#}");
+                }
+            }
+        });
+
         let version_index_interval =
             Duration::from_secs(ENV.VERSION_INDEX_INTERVAL);
         let pool_ref = pool.clone();
