@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "WITH random_id_point AS (\n                SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point\n            )\n            SELECT id FROM mods\n            WHERE status = ANY($1)\n            AND EXISTS (\n                SELECT 1 FROM versions v\n                INNER JOIN loaders_versions lv ON v.id = lv.version_id\n                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = lv.loader_id\n                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id\n                WHERE v.mod_id = mods.id AND pt.name = $3\n                -- prevents decorrelation, so this stops at the first match instead\n                -- of scanning all versions before the outer sort/limit applies\n                OFFSET 0\n            )\n            ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)\n            LIMIT $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c97315540d36355668a1fdd33175b946cd026c718bf4c7d16b23953f6ec5b840"
+}
