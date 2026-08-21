@@ -823,7 +823,8 @@ pub(super) async fn send_bytes_request(
 ) -> crate::Result<reqwest::Response> {
     let base_url = service_base_url();
     let url = service_url(base_url, path);
-    send_bytes_request_to_url(operation, method, path, &url, body, state).await
+    send_bytes_request_to_url(operation, method, path, &url, body, None, state)
+        .await
 }
 
 pub(super) async fn send_bytes_request_to_url(
@@ -832,6 +833,7 @@ pub(super) async fn send_bytes_request_to_url(
     path: &str,
     url: &str,
     body: Vec<u8>,
+    file_sha512: Option<&str>,
     state: &State,
 ) -> crate::Result<reqwest::Response> {
     let service_origin = url::Url::parse(service_base_url())
@@ -872,18 +874,20 @@ pub(super) async fn send_bytes_request_to_url(
         "Sending shared instances API request"
     );
 
-    let response = shared_instances_client(url)
+    let mut request = shared_instances_client(url)
         .request(method.clone(), url)
         .bearer_auth(credentials.session)
         .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
-        .body(body)
-        .send()
-        .await
-        .map_err(|error| {
-            crate::ErrorKind::SharedInstancesApiError(
-                error.without_url().to_string(),
-            )
-        })?;
+        .body(body);
+    if let Some(file_sha512) = file_sha512 {
+        request = request.header("x-file-sha512", file_sha512);
+    }
+
+    let response = request.send().await.map_err(|error| {
+        crate::ErrorKind::SharedInstancesApiError(
+            error.without_url().to_string(),
+        )
+    })?;
 
     if response.status().is_success() {
         let request_id = response_request_id(&response);
