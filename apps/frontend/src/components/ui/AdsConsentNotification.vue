@@ -32,6 +32,11 @@ type GppCallback = (data: GppData, success: boolean) => void
 type GppApi = (command: string, callback: GppCallback, parameter?: unknown) => void
 
 const CMP_HIDDEN_CLASS = 'modrinth-cmp-summary-hidden'
+const TCF_ACTION_BUTTON_IDS: Record<ConsentAction, string> = {
+	accept: 'accept-btn',
+	reject: 'disagree-btn',
+	manage: 'more-options-btn',
+}
 const notificationManager = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -116,14 +121,8 @@ function detectConsentVariant(): ConsentVariant | null {
 	return variant
 }
 
-function getConsentContainers(): ParentNode[] {
-	const containers = Array.from(
-		document.querySelectorAll<HTMLElement>(
-			'#qc-cmp2-container, #qc-cmp2-main, #qc-cmp2-ui, #qc-cmp2-usp',
-		),
-	)
-
-	return containers.length > 0 ? containers : [document]
+function isButtonEnabled(button: HTMLButtonElement | null): button is HTMLButtonElement {
+	return button !== null && !button.disabled && button.getAttribute('aria-disabled') !== 'true'
 }
 
 function getUspConsentControls(): UspControls | null {
@@ -141,11 +140,11 @@ function getUspConsentControls(): UspControls | null {
 
 	if (
 		toggles.length === 0 ||
-		!confirmButton ||
-		confirmButton.disabled ||
+		!isButtonEnabled(confirmButton) ||
 		toggles.some(
 			(toggle) =>
-				toggle.disabled || !['true', 'false'].includes(toggle.getAttribute('aria-checked') ?? ''),
+				!isButtonEnabled(toggle) ||
+				!['true', 'false'].includes(toggle.getAttribute('aria-checked') ?? ''),
 		)
 	) {
 		return null
@@ -205,75 +204,12 @@ async function setUspToggleStates(
 	return controls
 }
 
-function matchesButtonText(button: HTMLButtonElement, terms: string[]): boolean {
-	const text = [button.textContent, button.getAttribute('aria-label')]
-		.filter(Boolean)
-		.join(' ')
-		.trim()
-		.toLowerCase()
-
-	return terms.some((term) => text.includes(term))
-}
-
 function findConsentButton(action: ConsentAction): HTMLButtonElement | null {
-	const containers = getConsentContainers()
-	const summaryButtons = containers.flatMap((container) =>
-		Array.from(container.querySelectorAll<HTMLButtonElement>('.qc-cmp2-summary-buttons button')),
-	)
-	const queryButton = (selector: string) =>
-		containers
-			.map((container) => container.querySelector<HTMLButtonElement>(selector))
-			.find((button) => button && !button.disabled) ?? null
+	const dialog = document.getElementById('qc-cmp2-ui')
+	if (!dialog) return null
 
-	if (action === 'accept') {
-		const explicitAcceptButton = queryButton(
-			'[data-testid="accept-all"], [data-testid="agree-button"], #accept-btn',
-		)
-		if (explicitAcceptButton) return explicitAcceptButton
-
-		const textMatch = summaryButtons.find((button) =>
-			matchesButtonText(button, ['accept all', 'agree to all', 'allow all']),
-		)
-		if (textMatch) return textMatch
-		if (summaryButtons.length >= 3 && !summaryButtons[2].disabled) return summaryButtons[2]
-
-		return queryButton('.qc-cmp2-summary-buttons button[mode="primary"]')
-	}
-
-	if (action === 'reject') {
-		const explicitRejectButton = queryButton(
-			'[data-testid="reject-all"], [data-testid="disagree-button"], #disagree-btn, #reject-btn',
-		)
-		if (explicitRejectButton) return explicitRejectButton
-
-		const textMatch = summaryButtons.find((button) =>
-			matchesButtonText(button, ['reject all', 'disagree', 'deny all']),
-		)
-		if (textMatch) return textMatch
-		if (summaryButtons.length >= 3 && !summaryButtons[1].disabled) return summaryButtons[1]
-
-		const secondaryButtons = containers.flatMap((container) =>
-			Array.from(
-				container.querySelectorAll<HTMLButtonElement>(
-					'.qc-cmp2-summary-buttons button[mode="secondary"]',
-				),
-			),
-		)
-		if (secondaryButtons.length > 1 && !secondaryButtons[1].disabled) return secondaryButtons[1]
-
-		return null
-	}
-
-	return (
-		queryButton(
-			'[data-testid="manage-preferences"], [data-testid="show-options"], .qc-cmp2-summary-buttons > button[mode="secondary"]:first-of-type',
-		) ??
-		summaryButtons.find((button) =>
-			matchesButtonText(button, ['manage', 'preference', 'settings', 'options']),
-		) ??
-		summaryButtons.find((button) => !button.disabled) ??
-		null
-	)
+	const button = dialog.querySelector<HTMLButtonElement>(`#${TCF_ACTION_BUTTON_IDS[action]}`)
+	return isButtonEnabled(button) ? button : null
 }
 
 function clickConsentButtonWhenReady(action: ConsentAction, timeoutMs: number): Promise<boolean> {
@@ -551,7 +487,7 @@ onMounted(() => {
 		childList: true,
 		subtree: true,
 		attributes: true,
-		attributeFilter: ['aria-label', 'disabled'],
+		attributeFilter: ['aria-label', 'aria-disabled', 'disabled'],
 	})
 	syncConsentUi()
 	installTcfConsentListener()
