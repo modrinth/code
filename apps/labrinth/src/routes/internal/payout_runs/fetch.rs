@@ -30,12 +30,12 @@ use crate::{
     },
 };
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct PayoutRuns {
     pub periods: Vec<PayoutRunPeriod>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct PayoutRunPeriod {
     pub period: YearMonth,
     pub status: PayoutPeriodStatus,
@@ -44,7 +44,9 @@ pub struct PayoutRunPeriod {
 }
 
 /// Has revenue been distributed for a specific payout period month yet?
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum PayoutPeriodStatus {
     /// We are still waiting on the NET 60 cycle to complete for this month;
@@ -61,13 +63,18 @@ pub enum PayoutPeriodStatus {
     Paid,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct PayoutRunDay {
     pub date: NaiveDate,
     pub estimated: DayDistribution,
     pub actual: Option<DayDistribution>,
 }
 
+/// Fetch all payout runs.
+#[utoipa::path(
+    tag = "payout runs",
+    responses((status = OK, body = PayoutRuns)),
+)]
 #[get("")]
 pub async fn get_runs(
     req: HttpRequest,
@@ -150,10 +157,11 @@ pub async fn get_runs(
         .map(|estimate| -> Result<_, ApiError> {
             if let Some(period) = stored_periods.get(&estimate.period.date()) {
                 let mut adjustments =
-                    serde_json::from_value::<Vec<Adjustment>>(
-                        period.adjustments.clone(),
-                    )
-                    .wrap_internal_err("deserializing payout adjustments")?;
+                    if let Some(payload) = &period.active_run_payload {
+                        payload.adjustments.clone()
+                    } else {
+                        period.adjustments.clone()
+                    };
                 if !show_adjustment_descriptions {
                     for adjustment in &mut adjustments {
                         adjustment.description = None;

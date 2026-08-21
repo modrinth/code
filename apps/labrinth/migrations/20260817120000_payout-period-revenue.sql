@@ -20,6 +20,7 @@ CREATE TABLE payout_period_days (
 CREATE TABLE payout_runs (
 	id BIGINT PRIMARY KEY,
 	period DATE NOT NULL REFERENCES payout_periods(period),
+	payload JSONB NOT NULL,
 	status TEXT NOT NULL,
 	started_at TIMESTAMPTZ NOT NULL,
 	started_by BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

@@ -2,14 +2,17 @@ use std::collections::HashMap;
 
 use chrono::NaiveDate;
 use rust_decimal::Decimal;
+use sqlx::types::Json;
 
 use super::DatabaseError;
+use crate::queue::payout_run::{Adjustment, PayoutRunPayload};
 
 #[derive(Debug, Clone)]
 pub struct DBPayoutPeriod {
     pub period: NaiveDate,
     pub raw_actual_aditude_revenue_usd: Decimal,
-    pub adjustments: serde_json::Value,
+    pub adjustments: Vec<Adjustment>,
+    pub active_run_payload: Option<PayoutRunPayload>,
     pub days: Vec<DBPayoutPeriodDay>,
     pub has_scheduled_run: bool,
     pub has_running_run: bool,
@@ -37,7 +40,14 @@ impl DBPayoutPeriod {
 			SELECT
 				payout_periods.period,
 				payout_periods.raw_actual_aditude_revenue_usd,
-				payout_periods.adjustments,
+				payout_periods.adjustments AS "adjustments: Json<Vec<Adjustment>>",
+				(
+					SELECT payout_runs.payload
+					FROM payout_runs
+					WHERE payout_runs.period = payout_periods.period
+						AND payout_runs.status IN ('scheduled', 'running')
+					LIMIT 1
+				) AS "active_run_payload: Json<PayoutRunPayload>",
 				EXISTS (
 					SELECT 1
 					FROM payout_runs
@@ -73,7 +83,10 @@ impl DBPayoutPeriod {
                         period: row.period,
                         raw_actual_aditude_revenue_usd: row
                             .raw_actual_aditude_revenue_usd,
-                        adjustments: row.adjustments,
+                        adjustments: row.adjustments.0,
+                        active_run_payload: row
+                            .active_run_payload
+                            .map(|payload| payload.0),
                         days: Vec::new(),
                         has_scheduled_run: row.has_scheduled_run,
                         has_running_run: row.has_running_run,

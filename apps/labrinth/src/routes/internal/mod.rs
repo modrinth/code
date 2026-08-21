@@ -185,6 +185,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		analytics_event::analytics_event_create,
 		analytics_event::analytics_event_edit,
 		analytics_event::analytics_event_delete,
+		payout_runs::get_runs,
+		payout_runs::start_run,
+		payout_runs::cancel_runs,
 	),
 	modifiers(&InternalPathModifier, &SecurityAddon)
 )]

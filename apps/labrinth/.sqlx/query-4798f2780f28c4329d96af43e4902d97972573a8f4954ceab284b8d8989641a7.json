@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO payout_periods (\n            period,\n            raw_actual_aditude_revenue_usd,\n            adjustments\n        )\n        VALUES ($1, $2, '[]'::jsonb)\n        ON CONFLICT (period) DO UPDATE SET\n            raw_actual_aditude_revenue_usd =\n                EXCLUDED.raw_actual_aditude_revenue_usd\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Date",
+        "Numeric"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4798f2780f28c4329d96af43e4902d97972573a8f4954ceab284b8d8989641a7"
+}

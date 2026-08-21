@@ -4,6 +4,7 @@ use sqlx::types::Json;
 use strum::{EnumString, IntoStaticStr};
 
 use super::{DBPayoutRunId, DBUserId, DatabaseError};
+use crate::queue::payout_run::PayoutRunPayload;
 
 #[derive(
     Debug,
@@ -48,6 +49,7 @@ impl From<crate::models::error::ApiError<'_>> for PayoutRunError {
 pub struct DBPayoutRun {
     pub id: DBPayoutRunId,
     pub period: NaiveDate,
+    pub payload: PayoutRunPayload,
     pub status: PayoutRunStatus,
     pub started_at: DateTime<Utc>,
     pub started_by: DBUserId,
@@ -69,6 +71,7 @@ impl DBPayoutRun {
 			INSERT INTO payout_runs (
 				id,
 				period,
+				payload,
 				status,
 				started_at,
 				started_by,
@@ -79,9 +82,10 @@ impl DBPayoutRun {
 				cancelled_by,
 				error
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 			ON CONFLICT (id) DO UPDATE SET
 				period = EXCLUDED.period,
+				payload = EXCLUDED.payload,
 				status = EXCLUDED.status,
 				started_at = EXCLUDED.started_at,
 				started_by = EXCLUDED.started_by,
@@ -94,6 +98,7 @@ impl DBPayoutRun {
 			"#,
             self.id.0,
             self.period,
+            Json(&self.payload) as Json<&PayoutRunPayload>,
             <&'static str>::from(self.status),
             self.started_at,
             self.started_by.0,

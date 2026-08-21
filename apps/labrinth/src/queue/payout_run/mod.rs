@@ -71,13 +71,36 @@ mod estimate;
 
 pub use estimate::*;
 
+/// Inputs supplied by an admin when scheduling a payout run.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct PayoutRunPayload {
+    /// Actual raw revenue received from the ad provider for the period.
+    #[serde(with = "rust_decimal::serde::float")]
+    pub raw_actual_revenue_usd: Decimal,
+    /// Manual adjustments to apply on top of actual revenue.
+    pub adjustments: Vec<Adjustment>,
+}
+
+/// Manual admin-input adjustment to a payout period.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct Adjustment {
+    /// Total value of the adjustment.
+    #[serde(with = "rust_decimal::serde::float")]
+    pub amount_usd: Decimal,
+    /// Why this adjustment was applied.
+    ///
+    /// Only visible to admins.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+}
+
 /// Fraction defining much of the net revenue goes to the platform.
 const PLATFORM_REVENUE_SPLIT: Decimal = dec!(0.25);
 
 /// How input revenue is distributed for a specific day.
 ///
 /// This may refer to either estimated or actual revenue.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DayDistribution {
     /// Amount of revenue input into the algorithm.
     #[serde(with = "rust_decimal::serde::float")]

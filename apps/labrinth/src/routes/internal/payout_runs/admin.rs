@@ -4,7 +4,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-use super::Adjustment;
+use super::{Adjustment, PayoutRunPayload};
 use crate::{
     auth::{
         AuthenticationError, get_user_from_headers, two_factor::verify_2fa_code,
@@ -25,7 +25,7 @@ use crate::{
     },
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, utoipa::ToSchema)]
 pub struct StartPayoutRun {
     pub period: YearMonth,
     pub two_factor_code: Option<String>,
@@ -40,12 +40,26 @@ pub struct StartPayoutRun {
     pub adjustments: Vec<Adjustment>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, utoipa::ToSchema)]
 pub struct StartPayoutRunResponse {
     pub id: PayoutRunId,
     pub execute_at: DateTime<Utc>,
 }
 
+/// Start a payout run.
+///
+/// Admin-only.
+#[utoipa::path(
+    tag = "payout runs",
+    request_body = StartPayoutRun,
+    responses(
+        (status = OK, body = StartPayoutRunResponse),
+        (status = BAD_REQUEST, description = "Invalid payout run input"),
+        (status = UNAUTHORIZED, description = "Invalid authentication or TOTP code"),
+        (status = CONFLICT, description = "Payout period is unavailable or another run is active"),
+    ),
+    security(("bearer_auth" = ["SESSION_ACCESS"])),
+)]
 #[post("/start")]
 pub async fn start_run(
     req: HttpRequest,
@@ -126,8 +140,10 @@ pub async fn start_run(
     let estimate = estimates
         .pop()
         .wrap_internal_err("missing requested payout estimate")?;
-    let adjustments = serde_json::to_value(&body.adjustments)
-        .wrap_internal_err("serializing payout adjustments")?;
+    let payload = PayoutRunPayload {
+        raw_actual_revenue_usd: body.raw_actual_revenue_usd,
+        adjustments: body.adjustments.clone(),
+    };
 
     let mut transaction = pool
         .begin()
@@ -141,15 +157,13 @@ pub async fn start_run(
             raw_actual_aditude_revenue_usd,
             adjustments
         )
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2, '[]'::jsonb)
         ON CONFLICT (period) DO UPDATE SET
             raw_actual_aditude_revenue_usd =
-                EXCLUDED.raw_actual_aditude_revenue_usd,
-            adjustments = EXCLUDED.adjustments
+                EXCLUDED.raw_actual_aditude_revenue_usd
         "#,
         body.period.date(),
         body.raw_actual_revenue_usd,
-        &adjustments,
     )
     .execute(&mut transaction)
     .await
@@ -175,9 +189,14 @@ pub async fn start_run(
     .fetch_one(&mut transaction)
     .await
     .wrap_internal_err("checking payout period run status")?;
-    if run_state.has_active_run || run_state.has_succeeded_run {
+    if run_state.has_active_run {
         return Err(ApiError::Conflict(eyre::eyre!(
-            "payout period already has an active or succeeded run",
+            "another payout run is already scheduled or running",
+        )));
+    }
+    if run_state.has_succeeded_run {
+        return Err(ApiError::Conflict(eyre::eyre!(
+            "payout period already has a succeeded run",
         )));
     }
 
@@ -231,6 +250,7 @@ pub async fn start_run(
     let run = DBPayoutRun {
         id,
         period: body.period.date(),
+        payload,
         status: PayoutRunStatus::Scheduled,
         started_at: timing.started_at,
         started_by: user_id,
@@ -256,11 +276,22 @@ pub async fn start_run(
     }))
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, utoipa::ToSchema)]
 pub struct CancelPayoutRunsResponse {
     pub cancelled: u64,
 }
 
+/// Cancel all scheduled payout runs.
+///
+/// Admin-only.
+#[utoipa::path(
+    tag = "payout runs",
+    responses(
+        (status = OK, body = CancelPayoutRunsResponse),
+        (status = UNAUTHORIZED, description = "Invalid authentication"),
+    ),
+    security(("bearer_auth" = ["SESSION_ACCESS"])),
+)]
 #[post("/cancel")]
 pub async fn cancel_runs(
     req: HttpRequest,
