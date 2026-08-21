@@ -47,7 +47,7 @@ function createLockStatuses(
 	) as Record<DisclosureType, DisclosureLockStatus>
 
 	for (const disclosure of disclosures) {
-		lockStatuses[disclosure.type] = disclosure.lock_status
+		lockStatuses[disclosure.type] = disclosure.lock_status ?? 'unlocked'
 	}
 
 	return lockStatuses

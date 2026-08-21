@@ -1352,8 +1352,8 @@ export namespace Labrinth {
 				  }
 
 			export type ProjectDisclosureData = ProjectDisclosure & {
-				set_by_moderator: boolean
-				lock_status: DisclosureLockStatus
+				set_by_moderator?: boolean | null
+				lock_status?: DisclosureLockStatus | null
 				updated_at: string
 				updated_by?: string | null
 				deleted_at?: string | null

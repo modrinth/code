@@ -73,14 +73,15 @@ pub async fn get_project_disclosures(
     let viewer_is_moderator =
         user_option.as_ref().is_some_and(|user| user.role.is_mod());
 
-    let include_deleted = viewer_is_moderator
+    // Moderators can see regardless of membership, short circuit to avoid extra db call
+    let viewer_is_member = viewer_is_moderator
         || is_team_member_project(&project.inner, &user_option, &pool)
             .await
             .wrap_internal_err("failed to check project team membership")?;
 
     let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
         project.inner.id,
-        include_deleted,
+        viewer_is_moderator || viewer_is_member,
         &***ro_pool,
     )
     .await
@@ -90,7 +91,11 @@ pub async fn get_project_disclosures(
         disclosures: disclosures
             .into_iter()
             .map(|disclosure| {
-                ProjectDisclosureData::from_db(disclosure, viewer_is_moderator)
+                ProjectDisclosureData::from_db(
+                    disclosure,
+                    viewer_is_moderator,
+                    viewer_is_member,
+                )
             })
             .collect(),
     }))
