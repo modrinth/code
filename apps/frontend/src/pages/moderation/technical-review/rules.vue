@@ -45,10 +45,31 @@
 					<LoaderCircleIcon class="size-8 animate-spin text-secondary" />
 				</div>
 			</div>
-			<p class="m-0 text-sm text-secondary">
-				Return <code>null</code> when the rule does not match, or return a severity string such as
-				<code>"low"</code>. A map containing <code>severity</code> is also supported.
-			</p>
+			<div
+				v-if="ruleTestError"
+				role="alert"
+				class="border-red/40 max-h-64 overflow-auto rounded-lg border bg-highlight-red p-3 text-red"
+			>
+				<code class="rule-test-error">
+					<span>{{ ruleTestError.summary }}</span>
+					<span
+						v-for="(detail, index) in ruleTestError.details"
+						:key="index"
+						class="rule-test-error-detail"
+					>
+						{{ detail }}
+					</span>
+				</code>
+			</div>
+			<a
+				class="text-link flex w-fit items-center gap-1 text-sm"
+				href="https://cel.dev/reference/api-reference"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				<BookOpenIcon class="size-4" />
+				CEL API reference
+			</a>
 
 			<details class="rounded-xl border border-divider bg-bg-raised p-3">
 				<summary class="cursor-pointer font-semibold text-contrast">
@@ -90,23 +111,6 @@
 						</p>
 					</div>
 					<LoaderCircleIcon v-if="isTestingRule" class="size-5 animate-spin text-secondary" />
-				</div>
-
-				<div
-					v-if="ruleTestError"
-					role="alert"
-					class="border-red/40 max-h-64 overflow-auto rounded-lg border bg-highlight-red p-3 text-red"
-				>
-					<code class="rule-test-error">
-						<span>{{ ruleTestError.summary }}</span>
-						<span
-							v-for="(detail, index) in ruleTestError.details"
-							:key="index"
-							class="rule-test-error-detail"
-						>
-							{{ detail }}
-						</span>
-					</code>
 				</div>
 
 				<div
@@ -406,6 +410,7 @@
 import { type Labrinth, ModrinthServerError, SseParser } from '@modrinth/api-client'
 import {
 	ArrowLeftIcon,
+	BookOpenIcon,
 	EditIcon,
 	ExternalIcon,
 	EyeOffIcon,
