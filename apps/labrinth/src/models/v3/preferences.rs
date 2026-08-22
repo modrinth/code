@@ -7,6 +7,8 @@ pub struct UserPreferences {
     #[component(nested)]
     pub appearance: AppearancePreferences,
     #[component(nested)]
+    pub behavior: BehaviorPreferences,
+    #[component(nested)]
     pub localization: LocalizationPreferences,
     #[component(nested)]
     pub layouts: LayoutPreferences,
@@ -32,6 +34,33 @@ impl UserPreferences {
 pub struct AppearancePreferences {
     pub auto: bool,
     pub theme: Theme,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq, Component)]
+pub struct BehaviorPreferences {
+    pub minimize_app: bool,
+    pub hide_right_sidebar: bool,
+    pub show_jump_in: bool,
+    pub compact_instance_cards: bool,
+    pub show_play_time: bool,
+    pub hide_nametag: bool,
+    pub warn_on_unknown_modpacks: bool,
+    pub skip_non_essential_warnings: bool,
+}
+
+impl Default for BehaviorPreferences {
+    fn default() -> Self {
+        Self {
+            minimize_app: false,
+            hide_right_sidebar: false,
+            show_jump_in: true,
+            compact_instance_cards: false,
+            show_play_time: true,
+            hide_nametag: false,
+            warn_on_unknown_modpacks: true,
+            skip_non_essential_warnings: false,
+        }
+    }
 }
 
 #[derive(

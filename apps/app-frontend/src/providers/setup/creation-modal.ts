@@ -9,6 +9,7 @@ import { useRouter } from 'vue-router'
 
 import type UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { trackEvent } from '@/helpers/analytics'
 import { get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
@@ -22,7 +23,6 @@ import {
 import { list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
 import type { InstanceIconConfig, InstanceLoader } from '@/helpers/types'
-import { useTheming } from '@/store/state'
 
 export function setupCreationModal(
 	notificationManager: AbstractWebNotificationManager,
@@ -30,7 +30,7 @@ export function setupCreationModal(
 ) {
 	const { handleError } = notificationManager
 	const router = useRouter()
-	const themeStore = useTheming()
+	const appSettings = useAppSettings()
 
 	const installationModal =
 		useTemplateRef<ComponentExposed<typeof CreationFlowModal>>('installationModal')
@@ -97,7 +97,7 @@ export function setupCreationModal(
 				const instances = await list().catch(handleError)
 				const existingInstance = instances?.find((i) => i.link?.project_id === projectId)
 
-				if (existingInstance && !themeStore.getFeatureFlag('skip_non_essential_warnings')) {
+				if (existingInstance && !appSettings.getFeatureFlag('skip_non_essential_warnings')) {
 					pendingModpackCreation.value = { projectId, versionId, name, iconUrl }
 					installationModal.value?.hide()
 					modpackAlreadyInstalledModal.value?.show(existingInstance.name, existingInstance.id)

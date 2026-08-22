@@ -4994,95 +4994,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Ontwikkelaarsmodus</strong> is ingeschakeld. Hiermee kun je de interne ID's bekijken van verschillende elementen in Modrinth, wat handig kan zijn als je als ontwikkelaar gebruikmaakt van de Modrinth-API. Klik vijf keer op het Modrinth-logo onderaan de pagina om de ontwikkelaarsmodus in of uit te schakelen."
   },
-  "settings.display.flags.description": {
-    "message": "Schakel bepaalde functies op dit apparaat in of uit."
-  },
-  "settings.display.flags.title": {
-    "message": "Functies in en uitschakelen"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "De ontwikkelaarsmodus is uitgeschakeld"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Ontwikkelaarsmodus uitgeschakeld"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Data Packs pagina"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Kies de gewenste lay-out voor elke pagina waarop projectlijsten op dit apparaat worden weergegeven."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods pagina"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Gallerij"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Raster"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Rijen"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modpacks pagina"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins pagina"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Resource Packs pagina"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Servers pagina"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shaders pagina"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Indelingen van projectlijsten"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Profielpagina's voor gebruikers"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Collectie"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Schakelt geavanceerde rendering in zoals vervaging effecten die prestatieproblemen kunnen veroorzaken zonder hardware-acceleratie."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Geavanceerde weergave"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Maak links die buiten Modrinth gaan open in een nieuw tabblad. Ongeacht deze instelling, links op hetzelfde domein en in Markdown beschrijvingen zullen worden geopend in hetzelfde tabblad, en links naar advertenties en bewerken pagina's worden geopend in een nieuw tabblad."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Externe links openen in nieuw tabblad"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Verbergt de \"Modrinth-app downloaden\" knoppen in de hoofdnavigatie. De Modrinth App-pagina is nog steeds te vinden op de startpagina of in de voettekst."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Promoties voor de Modrinth-app verbergen"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Links uitgelijnde zijbalk voor inhoudspagina's"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Lijn de project-details zijbalk uit naar de rechterkant van de paginainhoud."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Lijn de zoekfilters zijbalk uit aan de rechterkant van de zoekresultaten."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Rechts uitgelijnde zijbalk voor zoek pagina's"
-  },
-  "settings.display.theme.description": {
-    "message": "Kies het kleurenthema dat je het mooist vindt voor Modrinth op dit apparaat."
-  },
-  "settings.display.theme.title": {
-    "message": "Kleurschema"
   },
   "settings.head-title": {
     "message": "Weergave instellingen"

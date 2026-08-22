@@ -55,7 +55,7 @@
 			<InstanceIndicator v-if="instance && !projectInstallContext" :instance="instance" />
 			<template v-if="data">
 				<Teleport
-					v-if="themeStore.featureFlags.project_background"
+					v-if="appSettings.featureFlags.project_background"
 					to="#background-teleport-target"
 				>
 					<ProjectBackgroundGradient :project="data" />
@@ -287,13 +287,14 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ContextMenu from '@/components/ui/context-menu/index.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import {
 	get_organization,
 	get_project,
@@ -317,7 +318,6 @@ import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
-import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
 
@@ -348,7 +348,7 @@ const projectBreadcrumbTo = computed(() => {
 	return currentRoute.fullPath
 })
 const queryClient = useQueryClient()
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -702,11 +702,16 @@ function reportProject() {
 }
 
 async function fetchProjectData() {
-	projectBreadcrumbLabel.value = getProjectBreadcrumbLabel(route.params.id)
+	const requestedId = String(route.params.id ?? '')
+	projectBreadcrumbLabel.value = getProjectBreadcrumbLabel(requestedId)
 	const [project, projectV3Result] = await Promise.all([
-		get_project(route.params.id, 'must_revalidate').catch(handleError),
-		get_project_v3(route.params.id, 'must_revalidate').catch(handleError),
+		get_project(requestedId, 'must_revalidate').catch(handleError),
+		get_project_v3(requestedId, 'must_revalidate').catch(handleError),
 	])
+	if (String(route.params.id ?? '') !== requestedId) {
+		return
+	}
+
 	projectV3.value = projectV3Result
 
 	if (!project) {
@@ -724,6 +729,9 @@ async function fetchProjectData() {
 			route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
 			route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),
 		])
+	if (String(route.params.id ?? '') !== requestedId) {
+		return
+	}
 
 	for (const member of members.value ?? []) {
 		for (const identifier of [member.user.id, member.user.username]) {
@@ -735,18 +743,21 @@ async function fetchProjectData() {
 
 	versions.value = versions.value.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
-	if (instanceProjects.value) {
-		const installedFile = Object.values(instanceProjects.value).find(
-			(x) => x.metadata && x.metadata.project_id === data.value.id,
-		)
-		if (installedFile) {
-			installed.value = true
-			installedVersion.value = installedFile.metadata.version_id
-		}
-	}
+	const installedFile = instanceProjects.value
+		? Object.values(instanceProjects.value).find(
+				(x) => x.metadata && x.metadata.project_id === data.value.id,
+			)
+		: undefined
+	installed.value = !!installedFile
+	installedVersion.value = installedFile?.metadata.version_id ?? null
 
 	if (project.organization) {
 		organization.value = await get_organization(project.organization).catch(handleError)
+	} else {
+		organization.value = null
+	}
+	if (String(route.params.id ?? '') !== requestedId) {
+		return
 	}
 
 	isServerProject.value = projectV3.value?.minecraft_server != null

@@ -20,7 +20,7 @@
 					<ButtonLink
 						v-else-if="item.link ?? item.to"
 						type="quiet"
-						interaction="surface"
+						:interaction="isActive(item as NavStackLinkItem) ? 'none' : 'surface'"
 						:to="(item.link ?? item.to) as string"
 						class="nav-item !h-auto !w-full !justify-start !rounded-xl !px-4 !py-2.5 text-left leading-tight"
 						:class="{ 'is-active': isActive(item as NavStackLinkItem) }"
@@ -31,10 +31,16 @@
 							aria-hidden="true"
 							class="h-5 w-5 shrink-0"
 						/>
-						<span class="text-contrast">{{ item.label }}</span>
+						<span
+							:ref="(element) => setItemLabelRef(getKey(item, idx), element)"
+							v-tooltip="itemLabelTooltip(getKey(item, idx), item.label)"
+							class="min-w-0 flex-1 truncate text-contrast"
+						>
+							{{ item.label }}
+						</span>
 						<span
 							v-if="item.badge != null"
-							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
+							class="shrink-0 rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
 						>
 							{{ String(item.badge) }}
 						</span>
@@ -55,10 +61,16 @@
 							aria-hidden="true"
 							class="h-5 w-5 shrink-0"
 						/>
-						<span class="text-contrast">{{ item.label }}</span>
+						<span
+							:ref="(element) => setItemLabelRef(getKey(item, idx), element)"
+							v-tooltip="itemLabelTooltip(getKey(item, idx), item.label)"
+							class="min-w-0 flex-1 truncate text-contrast"
+						>
+							{{ item.label }}
+						</span>
 						<span
 							v-if="item.badge != null"
-							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
+							class="shrink-0 rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
 						>
 							{{ String(item.badge) }}
 						</span>
@@ -73,8 +85,8 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { Button, ButtonLink } from '@modrinth/ui'
-import { type Component, computed, useSlots } from 'vue'
+import { Button, ButtonLink, truncatedTooltip } from '@modrinth/ui'
+import { type Component, type ComponentPublicInstance, computed, ref, useSlots } from 'vue'
 
 type NavStackBaseItem = {
 	label: string
@@ -113,6 +125,16 @@ const hasSlotContent = computed(() => {
 	const content = slots.default?.()
 	return !!(content && content.length)
 })
+
+const itemLabelRefs = ref<Record<string, HTMLElement | null>>({})
+
+function setItemLabelRef(key: string, element: Element | ComponentPublicInstance | null) {
+	itemLabelRefs.value[key] = element instanceof HTMLElement ? element : null
+}
+
+function itemLabelTooltip(key: string, label: string) {
+	return truncatedTooltip(itemLabelRefs.value[key], label)
+}
 
 function isSeparator(item: NavStackEntry): item is NavStackSeparator {
 	return (item as any).type === 'separator'

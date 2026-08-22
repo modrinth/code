@@ -2,10 +2,11 @@
 
 <script setup lang="ts">
 import { RightArrowIcon } from '@modrinth/assets'
-import { type Component, computed, nextTick, ref } from 'vue'
+import { type Component, type ComponentPublicInstance, computed, nextTick, ref } from 'vue'
 
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
+import { truncatedTooltip } from '../../utils/truncate'
 import NewModal from './NewModal.vue'
 export interface Tab {
 	name: MessageDescriptor
@@ -48,6 +49,15 @@ const props = withDefaults(
 const visibleTabs = computed(() => props.tabs.filter((tab) => tab.shown !== false))
 
 const selectedTab = ref(0)
+const tabLabelRefs = ref<Record<number, HTMLElement | null>>({})
+
+function setTabLabelRef(index: number, element: Element | ComponentPublicInstance | null) {
+	tabLabelRefs.value[index] = element instanceof HTMLElement ? element : null
+}
+
+function tabLabelTooltip(index: number, label: string) {
+	return truncatedTooltip(tabLabelRefs.value[index], label)
+}
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, checkScrollState, forceCheck } =
@@ -99,9 +109,9 @@ defineExpose({ show, hide, selectedTab, setTab })
 		<template v-if="$slots.title" #title>
 			<slot name="title" />
 		</template>
-		<div class="grid grid-cols-[auto_1fr] p-6 pb-3 pr-0">
+		<div class="grid grid-cols-[minmax(12.5rem,18rem)_minmax(0,1fr)] p-6 pb-3 pr-0">
 			<div
-				class="flex min-w-[200px] max-h-[min(65vh,600px)] flex-col border-0 border-r-[1px] border-solid border-divider pr-4"
+				class="flex min-w-0 max-h-[min(65vh,600px)] flex-col border-0 border-r-[1px] border-solid border-divider pr-4"
 			>
 				<div class="relative min-h-0 flex-1">
 					<Transition
@@ -126,7 +136,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 						<template v-for="(tab, index) in visibleTabs" :key="index">
 							<div
 								v-if="startsCategory(index) && tab.category"
-								class="px-4 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary"
+								class="truncate px-4 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary"
 							>
 								{{ formatMessage(tab.category) }}
 							</div>
@@ -135,18 +145,24 @@ defineExpose({ show, hide, selectedTab, setTab })
 								:href="tab.href ?? undefined"
 								:target="tab.href ? '_blank' : undefined"
 								:rel="tab.href ? 'noopener noreferrer' : undefined"
-								:class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${!tab.href && selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
+								:class="`flex min-w-0 gap-2 items-center text-left rounded-xl px-4 py-2 border-none font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${!tab.href && selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
 								@click="!tab.href && setTab(index)"
 							>
 								<component :is="tab.icon" class="w-4 h-4 flex-shrink-0" />
-								<span>{{ formatMessage(tab.name) }}</span>
+								<span
+									:ref="(element) => setTabLabelRef(index, element)"
+									v-tooltip="tabLabelTooltip(index, formatMessage(tab.name))"
+									class="min-w-0 flex-1 truncate"
+								>
+									{{ formatMessage(tab.name) }}
+								</span>
 								<span
 									v-if="tab.badge"
-									class="rounded-full px-1.5 py-0.5 text-xs font-bold bg-brand-highlight text-brand-green"
+									class="shrink-0 rounded-full px-1.5 py-0.5 text-xs font-bold bg-brand-highlight text-brand-green"
 								>
 									{{ formatMessage(tab.badge) }}
 								</span>
-								<RightArrowIcon v-if="tab.href" class="size-4 ml-auto" />
+								<RightArrowIcon v-if="tab.href" class="ml-auto size-4 shrink-0" />
 							</component>
 						</template>
 					</div>

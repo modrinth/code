@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Adataid védelme és a hirdetések szerepe a Modrinth működésében"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Engedélyezi a vizuális effektusokat, például a háttér elmosását. Hardveres gyorsítás nélkül ez ronthatja a rendszer teljesítményét."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Haladó megjelenítési beállítások"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Válaszd ki a Modrinth App által használt színsémát."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Téma"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Kezdőlap"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Alkalmazás bezárása"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Az operációs rendszer címsorának és ablakvezérlőinek használata. A módosítás érvénybe lépéséhez újra kell indítani az alkalmazást."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Rendszerablakkeret"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Megjeleníti, hogy mennyi időt töltöttél egy példányban."

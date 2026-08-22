@@ -11,6 +11,7 @@ import dayjs from 'dayjs'
 import { nextTick, type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { trackEvent } from '@/helpers/analytics'
 import {
 	get_organization,
@@ -38,7 +39,6 @@ import {
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
 import type { AppEvents } from '@/providers/app-events'
-import { useTheming } from '@/store/state'
 interface ModalRef {
 	show: (initialVersionId?: string) => void
 	hide: () => void
@@ -188,7 +188,7 @@ export function createContentInstall(opts: {
 	appEvents: AppEvents
 }): ContentInstallContext {
 	const { formatMessage } = useVIntl()
-	const themeStore = useTheming()
+	const appSettings = useAppSettings()
 	const instances = ref<ContentInstallInstance[]>([])
 	const compatibleLoaders = ref<string[]>([])
 	const gameVersions = ref<string[]>([])
@@ -858,7 +858,7 @@ export function createContentInstall(opts: {
 			const packs = await list()
 			const existingPack = packs.find((pack) => pack.link?.project_id === project.id)
 
-			if (existingPack && !themeStore.getFeatureFlag('skip_non_essential_warnings')) {
+			if (existingPack && !appSettings.getFeatureFlag('skip_non_essential_warnings')) {
 				pendingModpackInstall = { project, version, source, callback, createInstanceCallback }
 				modpackAlreadyInstalledModalRef?.show(existingPack.name, existingPack.id)
 				return

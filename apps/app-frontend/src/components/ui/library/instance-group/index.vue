@@ -21,7 +21,7 @@ import {
 } from '@modrinth/ui'
 import { computed, inject, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
 
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ContextMenu from '@/components/ui/context-menu/index.vue'
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
 import type {
@@ -29,6 +29,7 @@ import type {
 	InstanceGroup as InstanceGroupType,
 } from '@/components/ui/library/use-library'
 import { useLibrary } from '@/components/ui/library/use-library'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { FAVORITES_GROUP_ID, MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
 
 const INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY = 500
@@ -48,6 +49,8 @@ const props = withDefaults(
 )
 
 const { formatMessage } = useVIntl()
+const appSettings = useAppSettings()
+const compactMode = computed(() => appSettings.getFeatureFlag('compact_instance_cards'))
 const { addNotification } = injectNotificationManager()
 const {
 	isSectionCollapsed,
@@ -83,6 +86,9 @@ const isUngrouped = computed(() => props.instanceGroup.id === 'group:none')
 const isFavorites = computed(() => props.instanceGroup.id === FAVORITES_GROUP_ID)
 const isCustomGroup = computed(
 	() => displayState.value.group === 'Group' && !isUngrouped.value && !isFavorites.value,
+)
+const isReorderableGroup = computed(
+	() => displayState.value.group === 'Group' && !isFavorites.value,
 )
 const groupContextMenuOpen = ref(false)
 const isGroupToggleBlocked = computed(
@@ -383,7 +389,7 @@ onMounted(startInstanceGridResizeObserver)
 			v-if="!hideHeader"
 			class="group/header h-10 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
 			:class="{
-				'instance-group-reorder-handle': isCustomGroup && canDragReorder,
+				'instance-group-reorder-handle': isReorderableGroup && canDragReorder,
 			}"
 		>
 			<div
@@ -442,7 +448,7 @@ onMounted(startInstanceGridResizeObserver)
 			</div>
 			<div class="min-w-0 flex-1" />
 			<GroupActionButtons
-				v-if="isCustomGroup"
+				v-if="isCustomGroup || isUngrouped"
 				:can-move-down="canMoveGroupDown(instanceGroup.id)"
 				:can-move-up="canMoveGroupUp(instanceGroup.id)"
 				:deleting="deletingGroup"
@@ -451,6 +457,8 @@ onMounted(startInstanceGridResizeObserver)
 				:on-edit-group-name="() => groupNameInput?.startEditing()"
 				:on-move-down="() => moveGroup(instanceGroup.id, 1)"
 				:on-move-up="() => moveGroup(instanceGroup.id, -1)"
+				:show-delete="!isUngrouped"
+				:show-edit="!isUngrouped"
 			/>
 		</div>
 		<Accordion
@@ -470,7 +478,12 @@ onMounted(startInstanceGridResizeObserver)
 				<div ref="instanceGridContent">
 					<TransitionGroup
 						tag="section"
-						class="grid min-h-[45px] w-full grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] max-xl:grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))] gap-3 overflow-y-auto scroll-smooth"
+						class="grid min-h-[45px] w-full gap-3 overflow-y-auto scroll-smooth"
+						:class="
+							compactMode
+								? 'grid-cols-[repeat(auto-fill,minmax(min(15rem,100%),1fr))]'
+								: 'grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] max-xl:grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))]'
+						"
 						move-class="transition-transform duration-200 ease-out motion-reduce:transition-none"
 						enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
 						enter-from-class="opacity-0"

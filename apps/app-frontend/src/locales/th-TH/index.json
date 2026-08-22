@@ -59,12 +59,6 @@
   "app.action-bar.view-logs": {
     "message": "ดู Log"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "การเรนเดอร์ขั้นสูง"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "ธีมสี"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "หน้าหลัก"
   },
@@ -85,12 +79,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "ย่อลันเชอร์"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "ใช้กรอบหน้าต่างระบบ (ต้องรีสตาร์ทแอป)"
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "ของตกแต่งดั้งเดิม"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "แสดงเวลาที่คุณใช้เล่นในแต่ละอินสแตนซ์"

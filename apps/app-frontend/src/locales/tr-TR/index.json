@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Sizin mahremiyetiniz ve reklamlar Modrinth'i nasıl destekler"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Arka plan bulanıklığı gibi görsel efektleri etkinleştirin. Bu, donanım ivmelendirme yokken performansı etkileyebilir."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Gelişmiş işleme"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Modrinth App tarafından kullanılacak renk şemasını seçin."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Renk teması"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Ana Sayfa"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Uygulamayı küçült"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "İşletim sisteminizin başlık çubuğu ve pencere kontrollerini kullanın. Uygulamanın yeniden başlatılmasını gerektirir."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Sistem pencere çerçevesi"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Her bir örneği ne kadar süreyle oynadığını göster."

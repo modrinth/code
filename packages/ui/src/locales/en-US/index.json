@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "View analytics"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "Use your operating system's title bar and window controls. Requires an app restart."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "System window frame"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Failed to load server settings"
   },
@@ -2246,6 +2252,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Show unavailable"
   },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "Download File"
+  },
   "instances.managed-content-modal.empty-description": {
     "defaultMessage": "This source does not include any managed content."
   },
@@ -4097,6 +4106,57 @@
   "s.bg": {
     "defaultMessage": "Background task running"
   },
+  "search.filter.dependency_type.any": {
+    "defaultMessage": "Any dependency type"
+  },
+  "search.filter.dependency_type.embedded": {
+    "defaultMessage": "Embedded"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "Optional"
+  },
+  "search.filter.dependency_type.optional_or_embedded": {
+    "defaultMessage": "Optional or embedded"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "Required"
+  },
+  "search.filter.dependency_type.required_or_embedded": {
+    "defaultMessage": "Required or embedded"
+  },
+  "search.filter.dependency_type.required_or_optional": {
+    "defaultMessage": "Required or optional"
+  },
+  "search.filter.dependent_project": {
+    "defaultMessage": "Depends on: {project}"
+  },
+  "search.filter.dependent_project.clear": {
+    "defaultMessage": "Clear dependency filter"
+  },
+  "search.filter.dependent_project.search_placeholder": {
+    "defaultMessage": "Search for a project..."
+  },
+  "search.filter.excluded_projects": {
+    "defaultMessage": "Excludes: {projects}"
+  },
+  "search.filter.included_content.exclude": {
+    "defaultMessage": "Exclude"
+  },
+  "search.filter.included_content.excluded": {
+    "defaultMessage": "Excluded"
+  },
+  "search.filter.included_content.remove_project": {
+    "defaultMessage": "Remove {project}"
+  },
+  "search.filter.included_content.remove_project.tooltip": {
+    "defaultMessage": "Remove project"
+  },
+  "search.filter.included_content.search_placeholder": {
+    "defaultMessage": "Search content..."
+  },
+  "search.filter.included_projects": {
+    "defaultMessage": "Includes: {projects}"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
   },
@@ -4163,6 +4223,9 @@
   "search.filter_type.advanced.disclosure.telemetry": {
     "defaultMessage": "Telemetry"
   },
+  "search.filter_type.compatible_dependency_project_ids": {
+    "defaultMessage": "Depends on"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
   },
@@ -4177,6 +4240,9 @@
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "Show all versions"
+  },
+  "search.filter_type.included_content": {
+    "defaultMessage": "Included content"
   },
   "search.filter_type.license": {
     "defaultMessage": "License"
@@ -5540,11 +5606,71 @@
   "settings.billing.title": {
     "defaultMessage": "Billing and subscriptions"
   },
+  "settings.display.project-list-layouts.datapack": {
+    "defaultMessage": "Data Packs page"
+  },
+  "settings.display.project-list-layouts.description": {
+    "defaultMessage": "Select your preferred layout for each page that displays project lists."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "defaultMessage": "Mods page"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "defaultMessage": "Grid"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "defaultMessage": "Rows"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "defaultMessage": "Modpacks page"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "defaultMessage": "Plugins page"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "defaultMessage": "Resource Packs page"
+  },
+  "settings.display.project-list-layouts.server": {
+    "defaultMessage": "Servers page"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "defaultMessage": "Shaders page"
+  },
+  "settings.display.project-list-layouts.title": {
+    "defaultMessage": "Project list layouts"
+  },
+  "settings.display.project-list-layouts.user": {
+    "defaultMessage": "User profile pages"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "defaultMessage": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "defaultMessage": "Advanced rendering"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "defaultMessage": "Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "defaultMessage": "Open external links in new tab"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.description": {
+    "defaultMessage": "Aligns the sidebar to the left of the page's content."
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "defaultMessage": "Left-aligned sidebar on content pages"
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "defaultMessage": "Aligns the filters sidebar to the right of the search results."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "defaultMessage": "Right-aligned filters sidebar on search pages"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "Dark"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Select your preferred color theme for Modrinth on this device."
+    "defaultMessage": "Select your preferred color theme across Modrinth."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Light"
@@ -5560,6 +5686,15 @@
   },
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
+  },
+  "settings.display.theme.sync-across-devices": {
+    "defaultMessage": "Sync theme across devices"
+  },
+  "settings.display.theme.sync-across-devices.description": {
+    "defaultMessage": "Use this theme everywhere you're signed in. Turn this off to keep a separate theme on this device."
+  },
+  "settings.display.theme.sync-across-devices.sign-in-tooltip": {
+    "defaultMessage": "Sign into Modrinth to sync theme"
   },
   "settings.display.theme.system": {
     "defaultMessage": "Sync with system"
@@ -5578,6 +5713,15 @@
   },
   "settings.language.categories.search-result": {
     "defaultMessage": "Search results"
+  },
+  "settings.language.coverage.app-tooltip": {
+    "defaultMessage": "About {percentage}% of the Modrinth App is available in this language."
+  },
+  "settings.language.coverage.label": {
+    "defaultMessage": "{percentage}% supported"
+  },
+  "settings.language.coverage.website-tooltip": {
+    "defaultMessage": "About {percentage}% of the website is available in this language."
   },
   "settings.language.description": {
     "defaultMessage": "Choose your preferred language for the {platform}. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
@@ -5605,6 +5749,12 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Personal access tokens"
+  },
+  "settings.preferences.update-failed.description": {
+    "defaultMessage": "Your settings could not be saved to your Modrinth account. Please try again."
+  },
+  "settings.preferences.update-failed.title": {
+    "defaultMessage": "Failed to sync settings"
   },
   "settings.profile.bio.description": {
     "defaultMessage": "A short description to tell everyone a little bit about you."
@@ -5690,8 +5840,11 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Friend requests"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Coming soon!"
+  "settings.social.hosting-access.description": {
+    "defaultMessage": "Control who can invite you to manage a Modrinth Hosting server."
+  },
+  "settings.social.hosting-access.title": {
+    "defaultMessage": "Hosting access invites"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Everyone"
@@ -5702,14 +5855,23 @@
   "settings.social.interaction-source.friends-of-friends": {
     "defaultMessage": "Friends of friends"
   },
+  "settings.social.interaction-source.loading": {
+    "defaultMessage": "Loading your preferences…"
+  },
   "settings.social.interaction-source.no-one": {
     "defaultMessage": "No one"
   },
+  "settings.social.interaction-source.saving": {
+    "defaultMessage": "Saving your preferences…"
+  },
+  "settings.social.interaction-source.unavailable": {
+    "defaultMessage": "Your preferences are currently unavailable."
+  },
   "settings.social.shared-instance-invites.description": {
-    "defaultMessage": "Control who can send you invites to shared instances and Modrinth Hosting panels."
+    "defaultMessage": "Control who can send you invites to shared instances."
   },
   "settings.social.shared-instance-invites.title": {
-    "defaultMessage": "Invitations"
+    "defaultMessage": "Shared instance invites"
   },
   "settings.social.sign-in-required.description": {
     "defaultMessage": "You can control who can interact with you, and manage blocked users with a Modrinth Account"
@@ -6367,6 +6529,15 @@
   },
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Leave page?"
+  },
+  "ui.pagination.go-to-page": {
+    "defaultMessage": "Go to page"
+  },
+  "ui.pagination.next-page": {
+    "defaultMessage": "Next page"
+  },
+  "ui.pagination.previous-page": {
+    "defaultMessage": "Previous page"
   },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count, plural, one {# alert} other {# alerts}}"

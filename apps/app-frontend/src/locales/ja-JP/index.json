@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "プライバシーと広告がModrinthを支える仕組み"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "背景のぼかしなどの視覚効果を有効にします。ハードウェアアクセラレーションが無効の場合、パフォーマンスが低下する可能性があります。"
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "高度なレンダリング"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Modrinth Appのテーマを選びましょう。"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "テーマ"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "ホーム"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "ランチャーを最小化"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "OS標準のタイトルバーとウィンドウ操作ボタンを使用します。反映にはアプリの再起動が必要です。"
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "システムウィンドウフレーム"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "各インスタンスのプレイ時間を表示します。"

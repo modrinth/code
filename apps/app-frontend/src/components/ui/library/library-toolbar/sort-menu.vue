@@ -15,6 +15,8 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	name: { id: 'app.library.sort.name', defaultMessage: 'Name' },
+	loaderSort: { id: 'app.library.sort.loader', defaultMessage: 'Loader' },
+	gameVersionSort: { id: 'app.library.sort.game-version', defaultMessage: 'Game version' },
 	lastPlayed: { id: 'app.library.sort.last-played', defaultMessage: 'Last played' },
 	hoursPlayed: { id: 'app.library.sort.hours-played', defaultMessage: 'Hours played' },
 	dateCreated: { id: 'app.library.sort.date-created', defaultMessage: 'Date created' },
@@ -34,6 +36,8 @@ const sortLabels = {
 	'Hours played': messages.hoursPlayed,
 	'Date created': messages.dateCreated,
 	'Date modified': messages.dateModified,
+	Loader: messages.loaderSort,
+	'Game version': messages.gameVersionSort,
 }
 
 const groupLabels = {
@@ -60,6 +64,7 @@ const groupOptions: ComboboxOption<LibraryGroupBy>[] = libraryGroupOptions.map((
 		class="w-max"
 		:options="sortOptions"
 		:show-icon-in-selected="false"
+		:max-height="320"
 		dropdown-min-width="160px"
 	>
 		<template #prefix>

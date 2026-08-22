@@ -44,6 +44,7 @@ use chrono::Utc;
 use eyre::eyre;
 use futures::TryStreamExt;
 use itertools::Itertools;
+use rand::seq::SliceRandom;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -104,11 +105,15 @@ pub async fn clear_project_cache_and_queue_search(
 pub struct RandomProjects {
     #[validate(range(min = 1, max = 100))]
     pub count: u32,
+    pub project_type: Option<String>,
 }
 
 #[utoipa::path(
 	tag = "projects",
-	params(("count" = u32, Query)),
+	params(
+		("count" = u32, Query),
+		("project_type" = Option<String>, Query),
+	),
 	responses((status = OK))
 )]
 #[get("/projects_random")]
@@ -120,37 +125,84 @@ pub async fn random_projects_get_route(
     random_projects_get(count, pool, redis).await
 }
 
+// Filtered candidates are sparser and unevenly spaced, so the nearest-point pick
+// tends to repeat; oversample a neighborhood and shuffle it down to counter that.
+const RANDOM_PROJECT_TYPE_OVERSAMPLE_FACTOR: u32 = 20;
+
 pub async fn random_projects_get(
-    web::Query(count): web::Query<RandomProjects>,
+    web::Query(params): web::Query<RandomProjects>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    count
+    params
         .validate()
         .map_err(|err| eyre::eyre!(err))
         .wrap_request_err("validating request")?;
 
-    let project_ids = sqlx::query!(
-        // IDs are randomly generated (see the `generate_ids` macro), so fetching a
-        // number of mods nearest to a random point in the ID space is equivalent to
-        // random sampling
-        "WITH random_id_point AS (
-            SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point
+    let statuses = crate::models::projects::ProjectStatus::iterator()
+        .filter(|x| x.is_searchable())
+        .map(|x| x.to_string())
+        .collect::<Vec<String>>();
+
+    let mut project_ids = if let Some(project_type) = &params.project_type {
+        let fetch_limit = params.count * RANDOM_PROJECT_TYPE_OVERSAMPLE_FACTOR;
+
+        sqlx::query!(
+            // IDs are randomly generated (see the `generate_ids` macro), so fetching a
+            // number of mods nearest to a random point in the ID space is equivalent to
+            // random sampling
+            "WITH random_id_point AS (
+                SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point
+            )
+            SELECT id FROM mods
+            WHERE status = ANY($1)
+            AND EXISTS (
+                SELECT 1 FROM versions v
+                INNER JOIN loaders_versions lv ON v.id = lv.version_id
+                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = lv.loader_id
+                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
+                WHERE v.mod_id = mods.id AND pt.name = $3
+                -- prevents decorrelation, so this stops at the first match instead
+                -- of scanning all versions before the outer sort/limit applies
+                OFFSET 0
+            )
+            ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)
+            LIMIT $2",
+            &statuses,
+            fetch_limit as i32,
+            project_type,
         )
-        SELECT id FROM mods
-        WHERE status = ANY($1)
-        ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)
-        LIMIT $2",
-        &*crate::models::projects::ProjectStatus::iterator()
-            .filter(|x| x.is_searchable())
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>(),
-        count.count as i32,
-    )
-    .fetch(&**pool)
-    .map_ok(|m| db_ids::DBProjectId(m.id))
-    .try_collect::<Vec<_>>()
-    .await.wrap_internal_err("querying random project IDs")?;
+        .fetch(&**pool)
+        .map_ok(|m| db_ids::DBProjectId(m.id))
+        .try_collect::<Vec<_>>()
+        .await
+        .wrap_internal_err("querying random project IDs")?
+    } else {
+        sqlx::query!(
+            // IDs are randomly generated (see the `generate_ids` macro), so fetching a
+            // number of mods nearest to a random point in the ID space is equivalent to
+            // random sampling
+            "WITH random_id_point AS (
+                SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point
+            )
+            SELECT id FROM mods
+            WHERE status = ANY($1)
+            ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)
+            LIMIT $2",
+            &statuses,
+            params.count as i32,
+        )
+        .fetch(&**pool)
+        .map_ok(|m| db_ids::DBProjectId(m.id))
+        .try_collect::<Vec<_>>()
+        .await
+        .wrap_internal_err("querying random project IDs")?
+    };
+
+    if params.project_type.is_some() {
+        project_ids.shuffle(&mut rand::thread_rng());
+        project_ids.truncate(params.count as usize);
+    }
 
     let projects_data =
         db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)

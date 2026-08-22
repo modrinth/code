@@ -4,6 +4,7 @@ import { createContext } from '@modrinth/ui'
 import { type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
+import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import {
@@ -18,7 +19,6 @@ import type { GameInstance } from '@/helpers/types'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import { start_join_server } from '@/helpers/worlds.ts'
 import type { AppEvents } from '@/providers/app-events'
-import { handleSevereError } from '@/store/error.js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface ModalRef<TShow extends (...args: any[]) => void = () => void> {

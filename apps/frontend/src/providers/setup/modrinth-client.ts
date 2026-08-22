@@ -8,6 +8,7 @@ export function setupModrinthClientProvider(auth: Awaited<ReturnType<typeof useA
 		apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
 		archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
 		sharedInstancesBaseUrl: config.public.sharedInstancesBaseUrl,
+		commitHash: config.public.hash,
 		rateLimitKey: config.rateLimitKey,
 	})
 	provideModrinthClient(client)

@@ -1,3 +1,4 @@
+export * from './shared/appearance-settings'
 export * from './shared/browse-tab'
 export * from './shared/console'
 export * from './shared/content-tab'

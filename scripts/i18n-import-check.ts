@@ -4,6 +4,9 @@ import type { TSESTree } from '@typescript-eslint/typescript-estree'
 import chalk from 'chalk'
 import * as fs from 'fs'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // i18n symbols that should be imported from @modrinth/ui
 const I18N_SYMBOLS = ['useVIntl', 'defineMessage', 'defineMessages', 'IntlFormatted'] as const

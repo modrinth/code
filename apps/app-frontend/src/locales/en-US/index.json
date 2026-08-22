@@ -149,17 +149,11 @@
   "app.ads-consent.title": {
     "message": "Your privacy and how ads support Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Enable visual effects such as background blur. This may reduce performance without hardware acceleration."
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Display library instances in a compact row layout."
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Advanced rendering"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Choose the color theme used by Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Color theme"
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Compact mode"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
@@ -184,12 +178,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimize app"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Use your operating system's title bar and window controls. Requires an app restart."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "System window frame"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Show how long you've played each instance."
@@ -229,6 +217,15 @@
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Startup and navigation"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Use these behavior settings everywhere you're signed in. Turn this off to keep separate settings on this device."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Sign into a Modrinth account to sync settings."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Sync behavior across devices"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Adding server to instance"
@@ -331,6 +328,9 @@
   },
   "app.home.jump-back-in.new-instance": {
     "message": "New instance"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "Drag to resize"
   },
   "app.home.jump-back-in.title": {
     "message": "Jump in"
@@ -1082,6 +1082,9 @@
   "app.library.sort.date-modified": {
     "message": "Date modified"
   },
+  "app.library.sort.game-version": {
+    "message": "Game version"
+  },
   "app.library.sort.hours-played": {
     "message": "Hours played"
   },
@@ -1090,6 +1093,9 @@
   },
   "app.library.sort.last-played": {
     "message": "Last played"
+  },
+  "app.library.sort.loader": {
+    "message": "Loader"
   },
   "app.library.sort.name": {
     "message": "Name"
@@ -1742,6 +1748,9 @@
   "app.world.world-item.offline": {
     "message": "Offline"
   },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
+  },
   "content.shared-instance.change-version-body": {
     "message": "Changing the version only changes your local copy. Future shared instance updates may restore or change it again."
   },
@@ -2069,6 +2078,12 @@
   "instance.icon-editor.symbol.engine": {
     "message": "Engine"
   },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
   "instance.icon-editor.symbol.furnace": {
     "message": "Furnace"
   },
@@ -2090,6 +2105,9 @@
   "instance.icon-editor.symbol.mr-pack": {
     "message": "Mr Pack"
   },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
   "instance.icon-editor.symbol.orb": {
     "message": "Orb"
   },
@@ -2104,6 +2122,9 @@
   },
   "instance.icon-editor.symbol.poke-ball": {
     "message": "Poke Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
   },
   "instance.icon-editor.symbol.redstone-block": {
     "message": "Redstone Block"

@@ -143,18 +143,6 @@
   "app.ads-consent.title": {
     "message": "Tvoja bezbednost i kako reklame pomažu Modrinth-u"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Uključi vizuelne efekte kao što je blur pozadine. Ovo može da pogorša performanse bez hardverskog ubrzanja."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Napredno renderovanje"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Izaberi boju teme koju koristi Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema boje"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Početna stranica"
   },
@@ -178,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Smanji aplikaciju"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Koristi naslovnu traku i kontrole prozora tvog operativnog sistema. Restart aplikacije obavezan."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Sistemski okvir prozora"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Prikaži koliko dugo ste igrali svaku instancu."

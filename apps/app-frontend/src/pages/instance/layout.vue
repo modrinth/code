@@ -122,7 +122,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, type ComputedRef, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ContextMenu from '@/components/ui/context-menu/index.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
@@ -133,6 +133,8 @@ import {
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
@@ -159,8 +161,6 @@ import type { ServerStatus } from '@/helpers/worlds'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectServerInstall } from '@/providers/server-install'
-import { handleSevereError } from '@/store/error.js'
-import { useTheming } from '@/store/state'
 
 import InstanceAdmonitions from './components/admonitions/index.vue'
 import InstancePageHeader from './components/page-header/index.vue'
@@ -216,8 +216,8 @@ watch(
 	},
 	{ immediate: true },
 )
-const themeStore = useTheming()
-const showInstancePlayTime = computed(() => themeStore.getFeatureFlag('show_instance_play_time'))
+const appSettings = useAppSettings()
+const showInstancePlayTime = computed(() => appSettings.getFeatureFlag('show_instance_play_time'))
 
 const online = useOnline()
 const offline = computed(() => !online.value)

@@ -11,6 +11,65 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-20T22:10:10+00:00`,
+		product: 'app',
+		version: '0.18.2',
+		body: `## Security
+- Fixed .mrpack exports replacing the original file with the primary file of a version previously detected on hash lookup.`,
+	},
+	{
+		date: `2026-08-20T21:46:49+00:00`,
+		product: 'app',
+		version: '0.18.1',
+		body: `## Added
+- Added ability to click on the ellipses in pagination controls to go to a specific page.
+- Added compact mode for instances in library.
+- Added drag handle to resize the amount of items in the "Jump in" section.
+- Added icon editing actions for instance context menu.
+- Added back sort by loader and game version.
+- Added new loader symbols for icon editor.
+- Depends on search filter, which filters all projects that depends on the project you've selected.
+- Modpack included content filter, which filters projects that includes a set of projects you've selected.
+- Enabled friend request controls in Social settings - you can now limit who can send you friend requests on Modrinth.
+- Enabled shared instance invite controls in Social settings, letting you limit who can send you shared instance invites.
+- Enabled Modrinth Hosting access invite controls in Social settings - you can now limit who can invite you to manage a Modrinth Hosting server.
+- Added a new option to sync your behaviour & appearance settings across Modrinth App sessions on multiple devices.
+- Added language coverage to the Language settings page.
+
+## Changed
+- Expanded quick instance area now that there is more vertical height in the navbar.
+- Tab bars now display with smaller text and without icons on mobile.
+
+## Fixed
+- Fixed issue where projects not installed display as installed.
+- Fixed tab bars displaying weirdly on mobile.
+- Fixed tab bar shadows being cut off.
+- Fixed tab bars showing the highlight as the wrong size or position sometimes.
+- Fixed missing signal icon and players online in "Jump in" cards.
+- Stopped applying conditional icon padding for user avatars.
+- Fixed memory leak on Discover page`,
+	},
+	{
+		date: `2026-08-20T21:46:49+00:00`,
+		product: 'web',
+		body: `## Added
+- Added ability to click on the ellipses in pagination controls to go to a specific page.
+- Depends on search filter, which filters all projects that depends on the project you've selected.
+- Modpack included content filter, which filters projects that includes a set of projects you've selected.
+- Enabled friend request controls in Social settings - you can now limit who can send you friend requests on Modrinth.
+- Enabled shared instance invite controls in Social settings, letting you limit who can send you shared instance invites.
+- Enabled Modrinth Hosting access invite controls in Social settings - you can now limit who can invite you to manage a Modrinth Hosting server.
+- Added a new option to sync your appearance settings across website sessions on multiple devices.
+- Added language coverage to the Language settings page.
+
+## Fixed
+- Fixed server projects not displaying properly in orgs and collections.
+- Fixed tab bars displaying weirdly on mobile.
+- Fixed tab bar shadows being cut off.
+- Fixed tab bars showing the highlight as the wrong size or position sometimes.
+- Stopped applying conditional icon padding for user avatars.`,
+	},
+	{
 		date: `2026-08-18T03:40:19+00:00`,
 		product: 'web',
 		body: `## Changed

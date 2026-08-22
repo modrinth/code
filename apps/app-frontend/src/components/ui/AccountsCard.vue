@@ -20,6 +20,7 @@
 			<div class="flex gap-2 w-full min-w-0">
 				<Avatar
 					size="36px"
+					disable-conditional-icon-padding
 					:src="
 						selectedAccount
 							? avatarUrl
@@ -46,7 +47,11 @@
 							class="w-5 h-5 text-brand shrink-0"
 						/>
 						<RadioButtonIcon v-else class="w-5 h-5 text-secondary shrink-0" />
-						<Avatar :src="getAccountAvatarUrl(account)" size="24px" />
+						<Avatar
+							:src="getAccountAvatarUrl(account)"
+							size="24px"
+							disable-conditional-icon-padding
+						/>
 						<p
 							class="m-0 truncate min-w-0"
 							:class="
@@ -107,6 +112,7 @@ import type { Ref } from 'vue'
 import { computed, ref } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
+import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import {
 	get_default_user,
@@ -118,7 +124,6 @@ import {
 import { getPlayerHeadUrl } from '@/helpers/rendering/batch-skin-renderer.ts'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
-import { handleSevereError } from '@/store/error.js'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()

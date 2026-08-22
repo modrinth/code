@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, InfoIcon, RefreshCwIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
+	Avatar,
 	Button,
 	commonMessages,
 	defineMessages,
@@ -26,6 +27,7 @@ import {
 	DEFAULT_SYMBOL_ID,
 	RANDOM_CONFIG_BLACKLIST,
 	type SymbolId,
+	type SymbolOption,
 	symbolOptions,
 } from './editor-catalog'
 
@@ -201,7 +203,8 @@ function surpriseMe() {
 	const configurations = backgroundOptions.flatMap((background) =>
 		symbolOptions
 			.filter(
-				(symbol) =>
+				(symbol: SymbolOption) =>
+					!symbol.excludeFromRandomization &&
 					background.id !== selectedBackground.value &&
 					symbol.id !== selectedSymbol.value &&
 					!RANDOM_CONFIG_BLACKLIST.some(
@@ -342,37 +345,37 @@ const messages = defineMessages({
 				class="flex w-[244px] shrink-0 flex-col gap-4 overflow-y-auto border-0 border-r border-solid border-surface-5 p-6"
 			>
 				<div
-					class="flex w-full flex-col items-center gap-3 rounded-[20px] border border-solid border-surface-4 bg-surface-2 p-4"
+					class="flex w-full flex-col items-center gap-3.5 rounded-[20px] border border-solid border-surface-4 bg-surface-2 p-5"
 				>
-					<div
-						class="icon-outline relative size-[132px] overflow-hidden rounded-[20px]"
+					<Avatar
+						:src="selectedSymbolOption.asset"
+						size="132px"
 						:style="backgroundStyle(selectedBackgroundOption.background)"
-					>
-						<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
-					</div>
+						no-shadow
+					/>
 					<div class="flex items-center gap-2.5">
-						<div
-							class="icon-outline relative size-12 overflow-hidden rounded-2xl"
+						<Avatar
+							:src="selectedSymbolOption.asset"
+							size="40px"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
-						>
-							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
-						</div>
-						<div
-							class="icon-outline relative size-8 overflow-hidden rounded-[10px]"
+							no-shadow
+						/>
+						<Avatar
+							:src="selectedSymbolOption.asset"
+							size="30px"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
-						>
-							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
-						</div>
-						<div
-							class="icon-outline relative size-4 overflow-hidden rounded-[5px]"
+							no-shadow
+						/>
+						<Avatar
+							:src="selectedSymbolOption.asset"
+							size="20px"
 							:style="backgroundStyle(selectedBackgroundOption.background)"
-						>
-							<img :src="selectedSymbolOption.asset" alt="" class="size-full object-cover" />
-						</div>
+							no-shadow
+						/>
 					</div>
 				</div>
 
-				<Button class="w-full !shadow-none" @click="surpriseMe">
+				<Button class="w-full" @click="surpriseMe">
 					<RefreshCwIcon />
 					{{ formatMessage(messages.surpriseMe) }}
 				</Button>

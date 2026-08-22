@@ -3,7 +3,10 @@
  * This composable is kept for legacy code that hasn't been migrated yet.
  */
 
+import { useVisitorUserAgent } from '~/composables/visitor-user-agent.ts'
 import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
+import { readEnv } from '~/helpers/env.ts'
+import { getFrontendUserAgent, VISITOR_USER_AGENT_HEADER } from '~/helpers/user-agent.ts'
 
 let cachedRateLimitKey = undefined
 let rateLimitKeyPromise = undefined
@@ -13,15 +16,7 @@ async function getRateLimitKey(config) {
 	if (cachedRateLimitKey !== undefined) return cachedRateLimitKey
 
 	if (!rateLimitKeyPromise) {
-		rateLimitKeyPromise = (async () => {
-			try {
-				const mod = 'cloudflare:workers'
-				const { env } = await import(/* @vite-ignore */ mod)
-				return await env.RATE_LIMIT_IGNORE_KEY?.get()
-			} catch {
-				return undefined
-			}
-		})()
+		rateLimitKeyPromise = readEnv('RATE_LIMIT_IGNORE_KEY')
 	}
 
 	cachedRateLimitKey = await rateLimitKeyPromise
@@ -40,6 +35,12 @@ export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
 
 	if (import.meta.server) {
 		options.headers['x-ratelimit-key'] = await getRateLimitKey(config)
+		options.headers['User-Agent'] = getFrontendUserAgent(config.public.hash)
+
+		const visitorUserAgent = useVisitorUserAgent()
+		if (visitorUserAgent) {
+			options.headers[VISITOR_USER_AGENT_HEADER] = visitorUserAgent
+		}
 	}
 
 	if (!skipAuth) {

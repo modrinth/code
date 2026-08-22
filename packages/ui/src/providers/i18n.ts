@@ -5,7 +5,7 @@ import { inject, provide } from 'vue'
 export interface I18nContext {
 	locale: Ref<string>
 	t: (key: string, values?: Record<string, unknown>) => string
-	setLocale: (locale: string) => Promise<void> | void
+	setLocale: (locale: string, options?: { persist?: boolean }) => Promise<void> | void
 }
 
 export const I18N_INJECTION_KEY: InjectionKey<I18nContext> = Symbol('i18n')

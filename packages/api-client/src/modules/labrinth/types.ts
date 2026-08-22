@@ -1352,8 +1352,8 @@ export namespace Labrinth {
 				  }
 
 			export type ProjectDisclosureData = ProjectDisclosure & {
-				set_by_moderator: boolean
-				lock_status: DisclosureLockStatus
+				set_by_moderator?: boolean | null
+				lock_status?: DisclosureLockStatus | null
 				updated_at: string
 				updated_by?: string | null
 				deleted_at?: string | null
@@ -1710,6 +1710,70 @@ export namespace Labrinth {
 			export type Role = Common.Role
 			export type AuthProvider = Common.AuthProvider
 			export type UserPayoutData = Common.UserPayoutData
+			export type Theme = 'light' | 'dark' | 'oled' | 'retro'
+			export type LayoutOption = 'grid' | 'rows'
+			export type FriendPrivacy = 'none' | 'mutual' | 'everyone'
+			export type InvitePrivacy = 'none' | 'friends' | 'everyone'
+
+			export type AppearancePreferences = {
+				auto: boolean
+				theme: Theme
+			}
+
+			export type BehaviorPreferences = {
+				minimize_app: boolean
+				hide_right_sidebar: boolean
+				show_jump_in: boolean
+				compact_instance_cards: boolean
+				show_play_time: boolean
+				hide_nametag: boolean
+				warn_on_unknown_modpacks: boolean
+				skip_non_essential_warnings: boolean
+			}
+
+			export type LocalizationPreferences = {
+				locale: string
+			}
+
+			export type LayoutPreferences = {
+				mods: LayoutOption
+				plugins: LayoutOption
+				datapacks: LayoutOption
+				shaders: LayoutOption
+				resourcepacks: LayoutOption
+				modpacks: LayoutOption
+				servers: LayoutOption
+				users: LayoutOption
+			}
+
+			export type SidebarPreferences = {
+				right_aligned_search: boolean
+				left_aligned_content: boolean
+			}
+
+			export type SocialPreferences = {
+				friend_privacy: FriendPrivacy
+				shared_instances_privacy: InvitePrivacy
+				hosting_access_privacy: InvitePrivacy
+			}
+
+			export type UserPreferences = {
+				appearance: AppearancePreferences
+				behavior: BehaviorPreferences
+				localization: LocalizationPreferences
+				layouts: LayoutPreferences
+				sidebars: SidebarPreferences
+				social: SocialPreferences
+			}
+
+			export type PartialUserPreferences = {
+				appearance?: Partial<AppearancePreferences>
+				behavior?: Partial<BehaviorPreferences>
+				localization?: Partial<LocalizationPreferences>
+				layouts?: Partial<LayoutPreferences>
+				sidebars?: Partial<SidebarPreferences>
+				social?: Partial<SocialPreferences>
+			}
 
 			export type Pride26CampaignDonation = {
 				last_donated_at: string
@@ -1884,6 +1948,7 @@ export namespace Labrinth {
 				license: string
 				client_side: string
 				server_side: string
+				disclosure_types: string[]
 				gallery: string[]
 				featured_gallery: string | null
 				color: number | null
@@ -1929,6 +1994,7 @@ export namespace Labrinth {
 				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
 				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
 				minecraft_mod?: unknown | null
+				disclosure_types: string[]
 			}
 
 			export interface SearchResults {

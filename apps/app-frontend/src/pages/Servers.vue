@@ -16,7 +16,7 @@ const client = injectModrinthClient()
 useRootBreadcrumb({
 	slot: 'root',
 	id: 'servers',
-	label: 'Servers',
+	label: 'Hosting',
 	to: '/hosting/manage/',
 	visual: { type: 'icon', component: ServerStackIcon },
 })

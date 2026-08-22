@@ -19,6 +19,8 @@ pub struct Settings {
     pub advanced_rendering: bool,
     pub native_decorations: bool,
     pub toggle_sidebar: bool,
+    pub sync_theme_across_devices: bool,
+    pub sync_behavior_across_devices: bool,
 
     pub telemetry: bool,
     pub discord_rpc: bool,
@@ -60,6 +62,7 @@ pub enum FeatureFlag {
     ServerProjectQa,
     I18nDebug,
     ShowInstancePlayTime,
+    CompactInstanceCards,
     SkipNonEssentialWarnings,
     AdvancedFiltersCollapsed,
     AlwaysShowCopyDetails,
@@ -88,6 +91,7 @@ impl Settings {
                 hook_pre_launch, hook_wrapper, hook_post_exit,
                 custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
                 skipped_update, pending_update_toast_for_version, auto_download_updates,
+                sync_theme_across_devices, sync_behavior_across_devices,
                 version
             FROM settings
             "
@@ -146,6 +150,8 @@ impl Settings {
             pending_update_toast_for_version: res
                 .pending_update_toast_for_version,
             auto_download_updates: res.auto_download_updates.map(|x| x == 1),
+            sync_theme_across_devices: res.sync_theme_across_devices == 1,
+            sync_behavior_across_devices: res.sync_behavior_across_devices == 1,
             version: res.version as usize,
         })
     }
@@ -206,7 +212,10 @@ impl Settings {
                 pending_update_toast_for_version = $30,
                 auto_download_updates = $31,
 
-                version = $32
+                sync_theme_across_devices = $32,
+                sync_behavior_across_devices = $33,
+
+                version = $34
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -239,6 +248,8 @@ impl Settings {
             self.skipped_update,
             self.pending_update_toast_for_version,
             self.auto_download_updates,
+            self.sync_theme_across_devices,
+            self.sync_behavior_across_devices,
             version,
         )
         .execute(exec)
