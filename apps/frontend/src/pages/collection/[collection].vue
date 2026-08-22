@@ -410,6 +410,10 @@ import { onServerPrefetch } from 'vue'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 
+useSeoMeta({
+	robots: 'noindex',
+})
+
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
 const { formatMessage } = useVIntl()
