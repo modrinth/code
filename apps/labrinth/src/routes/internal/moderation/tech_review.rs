@@ -14,7 +14,7 @@ use crate::{
     database::{
         DBProject,
         models::{
-            DBFileId, DBProjectId, DBThread, DBThreadId, DBUser, DBVersion,
+            DBFileId, DBProjectId, DBThread, DBThreadId, DBUser, DBUserId, DBVersion,
             DBVersionId, DelphiReportId, DelphiReportIssueDetailsId,
             DelphiReportIssueId,
             delphi_report_item::{
@@ -26,7 +26,7 @@ use crate::{
         },
     },
     models::{
-        ids::{FileId, ProjectId, ThreadId, VersionId},
+        ids::{FileId, ProjectId, ThreadId, ThreadMessageId, VersionId},
         pats::Scopes,
         projects::{Project, ProjectStatus},
         threads::{MessageBody, Thread},
@@ -43,6 +43,11 @@ use crate::{
     util::error::Context,
 };
 use eyre::eyre;
+use futures_util::future::try_join_all;
+use ariadne::ids::UserId;
+use crate::database::models::{DBOrganization, DBOrganizationId};
+use crate::models::ids::OrganizationId;
+use crate::routes::v3::users::UserIds;
 
 pub mod global;
 
@@ -55,7 +60,11 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(submit_report)
         .service(update_issue_details)
         .service(update_global_issue_details)
-        .service(add_report);
+        .service(add_report)
+        .service(get_user_flagged_projects)
+        .service(get_users_flagged_projects)
+        .service(get_organization_flagged_projects)
+        .service(get_organizations_flagged_projects);
 }
 
 /// Arguments for searching project technical reviews.
@@ -204,7 +213,7 @@ pub enum FlagReason {
     Delphi,
 }
 
-/// Get a Delphi report issue.  
+/// Get a Delphi report issue.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -268,7 +277,7 @@ pub async fn get_issue(
     Ok(web::Json(row.data.0))
 }
 
-/// Get a project technical report.  
+/// Get a project technical report.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -684,7 +693,7 @@ async fn fetch_project_reports(
     Ok(project_reports)
 }
 
-/// Search projects awaiting technical review.  
+/// Search projects awaiting technical review.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -896,7 +905,7 @@ pub async fn search_projects(
     }))
 }
 
-/// Get a project technical review report.  
+/// Get a project technical review report.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -992,7 +1001,7 @@ pub struct SubmitReport {
     pub message: Option<String>,
 }
 
-/// Submit a technical review verdict.  
+/// Submit a technical review verdict.
 ///
 /// Before this is called, all issues for this project's reports must have been
 /// marked as either safe or unsafe. Otherwise, this will error with
@@ -1210,7 +1219,7 @@ pub struct UpdateGlobalIssue {
     pub verdict: DelphiStatus,
 }
 
-/// Update technical review issue details.  
+/// Update technical review issue details.
 ///
 /// This will not automatically reject the project for malware, but just flag
 /// this issue with a verdict.
@@ -1497,7 +1506,7 @@ pub struct AddReport {
     pub file_id: FileId,
 }
 
-/// Add a technical review report.  
+/// Add a technical review report.
 /// does not already exist for it.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
@@ -1565,4 +1574,341 @@ pub async fn add_report(
         .wrap_internal_err("failed to commit transaction")?;
 
     Ok(web::Json(report_id))
+}
+
+/// A user's project that is stuck in `processing` or `rejected` because the
+/// most recent technical review verdict posted to its thread was `unsafe`.
+#[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
+pub struct FlaggedProject {
+    pub project_id: ProjectId,
+    pub thread_id: ThreadId,
+    pub status: ProjectStatus,
+    /// The `tech_review` message that carried the `unsafe` verdict.
+    pub message_id: ThreadMessageId,
+    /// When that verdict was posted.
+    pub reviewed: DateTime<Utc>,
+}
+
+/// Get all of a user's `processing`/`rejected` projects whose most recent
+/// `tech_review` thread message was an `unsafe` verdict.
+#[utoipa::path(
+    context_path = "/moderation/tech-review",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = Vec<FlaggedProject>))
+)]
+#[get("/user/{user_id}/flagged-projects")]
+pub async fn get_user_flagged_projects(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<FlaggedProject>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+        .await
+        .wrap_auth_err("authenticating API request")?;
+
+    let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?
+        .wrap_not_found_err("resource not found")?;
+
+    let flagged =
+        user_flagged_projects(target_user.id, &**pool, &redis).await?;
+
+    Ok(web::Json(flagged))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FlaggedProjectsIds {
+    pub ids: String,
+}
+
+/// Get all of multiple users' `processing`/`rejected` projects whose most
+/// recent `tech_review` thread message was an `unsafe` verdict. Users that
+/// don't exist are silently omitted from the response; users that exist
+/// but have no matching projects are included with an empty list.
+#[utoipa::path(
+    context_path = "/moderation/tech-review",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("ids" = String, Query)),
+    responses((status = OK, body = HashMap<UserId, Vec<FlaggedProject>>))
+)]
+#[get("/users/flagged-projects")]
+pub async fn get_users_flagged_projects(
+    req: HttpRequest,
+    ids: web::Query<FlaggedProjectsIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<HashMap<UserId, Vec<FlaggedProject>>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+        .await
+        .wrap_auth_err("authenticating API request")?;
+
+    let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing JSON data")?;
+
+    if user_ids.is_empty() {
+        return Ok(web::Json(HashMap::new()));
+    }
+
+    let target_users = DBUser::get_many(&user_ids, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching users from database")?;
+
+    let pool_ref = &**pool;
+    let redis_ref = &*redis;
+
+    let flagged_by_user = try_join_all(target_users.into_iter().map(
+        |target_user| async move {
+            let flagged =
+                user_flagged_projects(target_user.id, pool_ref, redis_ref)
+                    .await?;
+
+            Ok::<_, ApiError>((UserId::from(target_user.id), flagged))
+        },
+    ))
+        .await?
+        .into_iter()
+        .collect::<HashMap<_, _>>();
+
+    Ok(web::Json(flagged_by_user))
+}
+
+/// Get all of an organization's `processing`/`rejected` projects whose most
+/// recent `tech_review` thread message was an `unsafe` verdict.
+#[utoipa::path(
+    context_path = "/moderation/tech-review",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = Vec<FlaggedProject>))
+)]
+#[get("/organization/{organization_id}/flagged-projects")]
+pub async fn get_organization_flagged_projects(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<FlaggedProject>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+        .await
+        .wrap_auth_err("authenticating API request")?;
+
+    let target_org =
+        DBOrganization::get(&info.into_inner().0, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching organization from database")?
+            .wrap_not_found_err("resource not found")?;
+
+    let flagged =
+        organization_flagged_projects(target_org.id, &**pool, &redis).await?;
+
+    Ok(web::Json(flagged))
+}
+
+/// Get all of multiple organizations' `processing`/`rejected` projects
+/// whose most recent `tech_review` thread message was an `unsafe` verdict.
+/// Organizations that don't exist are silently omitted from the response;
+/// organizations that exist but have no matching projects are included
+/// with an empty list.
+#[utoipa::path(
+    context_path = "/moderation/tech-review",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("ids" = String, Query)),
+    responses((status = OK, body = HashMap<OrganizationId, Vec<FlaggedProject>>))
+)]
+#[get("/organizations/flagged-projects")]
+pub async fn get_organizations_flagged_projects(
+    req: HttpRequest,
+    ids: web::Query<FlaggedProjectsIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<HashMap<OrganizationId, Vec<FlaggedProject>>>, ApiError>
+{
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+        .await
+        .wrap_auth_err("authenticating API request")?;
+
+    let organization_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing JSON data")?;
+
+    if organization_ids.is_empty() {
+        return Ok(web::Json(HashMap::new()));
+    }
+
+    let target_orgs =
+        DBOrganization::get_many(&organization_ids, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching organizations from database")?;
+
+    let pool_ref = &**pool;
+    let redis_ref = &*redis;
+
+    let flagged_by_org = try_join_all(target_orgs.into_iter().map(
+        |target_org| async move {
+            let flagged = organization_flagged_projects(
+                target_org.id,
+                pool_ref,
+                redis_ref,
+            )
+                .await?;
+
+            Ok::<_, ApiError>((OrganizationId::from(target_org.id), flagged))
+        },
+    ))
+        .await?
+        .into_iter()
+        .collect::<HashMap<_, _>>();
+
+    Ok(web::Json(flagged_by_org))
+}
+
+/// Finds a single user's `processing`/`rejected` projects whose most recent
+/// `tech_review` thread message was an `unsafe` verdict. Shared by the
+/// single- and multi-user flagged-projects endpoints.
+async fn user_flagged_projects<'a, E>(
+    user_id: DBUserId,
+    pool: E,
+    redis: &RedisPool,
+) -> Result<Vec<FlaggedProject>, ApiError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres>
+    + crate::database::Acquire<'a, Database = sqlx::Postgres>
+    + Copy,
+{
+    let project_ids = DBUser::get_projects(user_id, pool, redis)
+        .await
+        .wrap_internal_err("fetching user's projects from database")?;
+
+    flagged_projects_among(&project_ids, pool, redis).await
+}
+
+/// Finds a single organization's `processing`/`rejected` projects whose
+/// most recent `tech_review` thread message was an `unsafe` verdict.
+/// Shared by the single- and multi-organization flagged-projects
+/// endpoints.
+async fn organization_flagged_projects<'a, E>(
+    organization_id: DBOrganizationId,
+    pool: E,
+    redis: &RedisPool,
+) -> Result<Vec<FlaggedProject>, ApiError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres>
+    + crate::database::Acquire<'a, Database = sqlx::Postgres>
+    + Copy,
+{
+    let project_ids = DBOrganization::get_projects(organization_id, pool)
+        .await
+        .wrap_internal_err("fetching project IDs from database")?;
+
+    flagged_projects_among(&project_ids, pool, redis).await
+}
+
+/// Finds `processing`/`rejected` projects (from the given ids) whose most
+/// recent `tech_review` thread message was an `unsafe` verdict. Shared by
+/// the user- and organization-scoped flagged-projects helpers above.
+async fn flagged_projects_among<'a, E>(
+    project_ids: &[DBProjectId],
+    pool: E,
+    redis: &RedisPool,
+) -> Result<Vec<FlaggedProject>, ApiError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres>
+    + crate::database::Acquire<'a, Database = sqlx::Postgres>
+    + Copy,
+{
+    if project_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    // Only `processing`/`rejected` projects are relevant, so narrow down
+    // before pulling any thread data.
+    let candidate_projects = DBProject::get_many_ids(project_ids, pool, redis)
+        .await
+        .wrap_internal_err("fetching projects from database")?
+        .into_iter()
+        .filter(|project| {
+            matches!(
+                project.inner.status,
+                ProjectStatus::Processing | ProjectStatus::Rejected
+            )
+        })
+        .collect::<Vec<_>>();
+
+    if candidate_projects.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let thread_ids = candidate_projects
+        .iter()
+        .map(|project| project.thread_id)
+        .collect::<Vec<_>>();
+
+    let threads = DBThread::get_many(&thread_ids, pool)
+        .await
+        .wrap_internal_err("fetching threads from database")?
+        .into_iter()
+        .map(|thread| (thread.id, thread))
+        .collect::<HashMap<_, _>>();
+
+    Ok(candidate_projects
+        .into_iter()
+        .filter_map(|project| {
+            let thread = threads.get(&project.thread_id)?;
+
+            // `DBThread::get_many` returns messages sorted oldest-first, so
+            // walking backwards finds the most recent `tech_review` entry
+            // regardless of what (if anything) was posted after it.
+            let last_review = thread.messages.iter().rev().find(|message| {
+                matches!(message.body, MessageBody::TechReview { .. })
+            })?;
+
+            let verdict = match &last_review.body {
+                MessageBody::TechReview { verdict } => *verdict,
+                _ => return None,
+            };
+
+            if verdict != DelphiVerdict::Unsafe {
+                return None;
+            }
+
+            Some(FlaggedProject {
+                project_id: project.inner.id.into(),
+                thread_id: project.thread_id.into(),
+                status: project.inner.status,
+                message_id: last_review.id.into(),
+                reviewed: last_review.created,
+            })
+        })
+        .collect())
 }

@@ -206,6 +206,31 @@ impl DBOrganization {
         }
     }
 
+    pub async fn get_projects<'a, E>(
+        organization_id: DBOrganizationId,
+        exec: E,
+    ) -> Result<Vec<DBProjectId>, super::DatabaseError>
+    where
+        E: database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use futures::TryStreamExt;
+
+        let db_projects = sqlx::query!(
+            "
+            SELECT m.id FROM organizations o
+            INNER JOIN mods m ON m.organization_id = o.id
+            WHERE o.id = $1
+            ",
+            organization_id as DBOrganizationId,
+        )
+                .fetch(exec)
+                .map_ok(|m| DBProjectId(m.id))
+                .try_collect::<Vec<_>>()
+                .await?;
+
+        Ok(db_projects)
+    }
+
     pub async fn remove(
         id: DBOrganizationId,
         transaction: &mut PgTransaction<'_>,
