@@ -361,17 +361,18 @@ function getCardActions(
 			serverData.value.upstream?.project_id === result.project_id
 		const isInstalling = installingProjectIds.value.has(result.project_id)
 		const isInstallingSelection = isInstallingQueuedServerInstalls.value
+		const showAsInstalling = isInstalling || (isInstallingSelection && isQueuedRoot)
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
 		const installLabel = isInstalled
 			? formatMessage(commonMessages.installedLabel)
 			: isQueued
-				? isInstalling || isInstallingSelection
+				? showAsInstalling
 					? validatingInstall
 						? formatMessage(commonMessages.validatingLabel)
 						: formatMessage(commonMessages.installingLabel)
 					: formatMessage(commonMessages.selectedLabel)
-				: isInstalling || isInstallingSelection
+				: showAsInstalling
 					? validatingInstall
 						? formatMessage(commonMessages.validatingLabel)
 						: formatMessage(commonMessages.installingLabel)
@@ -382,15 +383,15 @@ function getCardActions(
 				key: 'install',
 				label: installLabel,
 				icon:
-					isInstalling || isInstallingSelection
+					showAsInstalling
 						? SpinnerIcon
 						: isQueued || isInstalled
 							? CheckIcon
 							: DownloadIcon,
-				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
+				iconClass: showAsInstalling ? 'animate-spin' : undefined,
 				disabled:
 					!!isInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),
-				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
+				color: isQueued && !showAsInstalling ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),
 			},
