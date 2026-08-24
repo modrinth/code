@@ -9,3 +9,7 @@ CREATE TABLE instance_synced_options (
 
 CREATE INDEX instance_synced_options_option_enabled
 	ON instance_synced_options(option, enabled);
+
+INSERT INTO instance_synced_options (instance_id, option, enabled)
+SELECT id, 'screenshots', 1
+FROM instances;

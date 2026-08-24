@@ -107,7 +107,7 @@ function activate(event: MouseEvent | KeyboardEvent) {
 			@click.stop="emit('toggle-selection')"
 		>
 			<span
-				class="relative flex size-6 items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-hover/selection:brightness-125"
+				class="relative flex size-6 items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-focus-within:opacity-100 group-hover/selection:brightness-125"
 				:class="
 					selected ? 'border-0 !opacity-100' : 'border-2 border-solid border-primary bg-transparent'
 				"
