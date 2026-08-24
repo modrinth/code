@@ -57,7 +57,6 @@ export interface ContentEnabledForState {
 	player: boolean
 	locked: boolean
 	disabledSides?: ContentSide[]
-	disabledTooltip?: string | null
 	warningTooltip?: string | null
 }
 

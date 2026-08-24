@@ -104,14 +104,10 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-install',
 		defaultMessage: 'Failed to install content',
 	},
-	sideLocked: {
-		id: 'hosting.content.enabled-for.side-locked',
-		defaultMessage: 'This option conflicts with the detected environment.',
-	},
 	unknownEnvironment: {
 		id: 'hosting.content.enabled-for.unknown-environment',
 		defaultMessage:
-			'We could not determine where this content should run. Check that the selected environments are correct.',
+			"We couldn't tell where this content should be enabled. Review the Server and Player choices.",
 	},
 	lockEnvironment: {
 		id: 'hosting.content.enabled-for.lock-environment',
@@ -331,19 +327,29 @@ function hasDetectedEnvironment(addon: Archon.Content.v1.Addon) {
 	return environment !== undefined && environment !== 'unknown'
 }
 
-function getLockedSides(addon: Archon.Content.v1.Addon): ContentSide[] {
-	if (addon.side_toggle_unlocked || !hasDetectedEnvironment(addon)) return []
-
+function getEnvironmentLockedSides(addon: Archon.Content.v1.Addon): ContentSide[] {
 	switch (getAddonEnvironment(addon)) {
+		case 'client_and_server':
 		case 'client_only':
 		case 'singleplayer_only':
-			return ['server']
 		case 'server_only':
 		case 'dedicated_server_only':
+			return ['server', 'player']
+		case 'client_only_server_optional':
 			return ['player']
+		case 'server_only_client_optional':
+			return ['server']
 		default:
 			return []
 	}
+}
+
+function getLockedSides(addon: Archon.Content.v1.Addon): ContentSide[] {
+	return addon.side_toggle_unlocked ? [] : getEnvironmentLockedSides(addon)
+}
+
+function hasEnvironmentLock(addon: Archon.Content.v1.Addon) {
+	return getEnvironmentLockedSides(addon).length > 0
 }
 
 function getEnabledForWarning(addon: Archon.Content.v1.Addon) {
@@ -618,24 +624,26 @@ const deleteMutation = useMutation({
 
 type SetEnabledForVariables = {
 	addon: Archon.Content.v1.Addon
-	side: ContentSide
+	sides: ContentSide[]
 	enabled: boolean
 }
 
 const setEnabledForMutation = useMutation({
-	mutationFn: async ({ addon, side, enabled }: SetEnabledForVariables) => {
+	mutationFn: async ({ addon, sides, enabled }: SetEnabledForVariables) => {
 		const request: Archon.Content.v1.SetAddonEnabledRequest = {
 			filename: addon.filename,
 			kind: addon.kind,
 			enabled,
 		}
-		if (side === 'server') {
-			await client.archon.content_v1.setAddonEnabledServer(serverId, worldId.value!, request)
-		} else {
-			await client.archon.content_v1.setAddonEnabledPlayer(serverId, worldId.value!, request)
-		}
+		await Promise.all(
+			sides.map((side) =>
+				side === 'server'
+					? client.archon.content_v1.setAddonEnabledServer(serverId, worldId.value!, request)
+					: client.archon.content_v1.setAddonEnabledPlayer(serverId, worldId.value!, request),
+			),
+		)
 	},
-	onMutate: async ({ addon, side, enabled }) => {
+	onMutate: async ({ addon, sides, enabled }) => {
 		const targetQueryKey = getAddonQueryKey(addon)
 		await queryClient.cancelQueries({ queryKey: targetQueryKey })
 		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(targetQueryKey)
@@ -645,9 +653,11 @@ const setEnabledForMutation = useMutation({
 				...oldData,
 				addons: (oldData.addons ?? []).map((candidate) => {
 					if (candidate.filename !== addon.filename || candidate.kind !== addon.kind) return candidate
-					return side === 'server'
-						? { ...candidate, disabled_server: !enabled }
-						: { ...candidate, disabled_player: !enabled }
+					return {
+						...candidate,
+						...(sides.includes('server') ? { disabled_server: !enabled } : {}),
+						...(sides.includes('player') ? { disabled_player: !enabled } : {}),
+					}
 				}),
 			}
 		})
@@ -718,7 +728,19 @@ async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled
 	if (contentActionDisabled.value) return
 	const addon = getAddonForItem(item)
 	if (!addon) return
-	await setEnabledForMutation.mutateAsync({ addon, side, enabled })
+	await setEnabledForMutation.mutateAsync({ addon, sides: [side], enabled })
+}
+
+async function handleToggleEnabled(item: ContentItem) {
+	if (contentActionDisabled.value || !item.enabledFor) return
+	if (item.enabledFor.server !== item.enabledFor.player) return
+	const addon = getAddonForItem(item)
+	if (!addon) return
+	await setEnabledForMutation.mutateAsync({
+		addon,
+		sides: ['server', 'player'],
+		enabled: !item.enabledFor.server,
+	})
 }
 
 async function handleModpackSetEnabledFor(
@@ -726,13 +748,18 @@ async function handleModpackSetEnabledFor(
 	side: ContentSide,
 	enabled: boolean,
 ) {
-	modpackContentModal.value?.updateItem(item.file_name, { disabled: true })
 	try {
 		await handleSetEnabledFor(item, side, enabled)
 	} catch {
 		return
-	} finally {
-		modpackContentModal.value?.updateItem(item.file_name, { disabled: false })
+	}
+}
+
+async function handleModpackToggleEnabled(item: ContentItem) {
+	try {
+		await handleToggleEnabled(item)
+	} catch {
+		return
 	}
 }
 
@@ -946,6 +973,7 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 			: undefined
 	const serverEnabled = !addon.disabled_server
 	const playerEnabled = !addon.disabled_player
+	const lockedSides = getLockedSides(addon)
 	return {
 		project: {
 			...(projectMetadata ?? {}),
@@ -976,9 +1004,8 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 		enabledFor: {
 			server: serverEnabled,
 			player: playerEnabled,
-			locked: hasDetectedEnvironment(addon) && !addon.side_toggle_unlocked,
-			disabledSides: getLockedSides(addon),
-			disabledTooltip: formatMessage(messages.sideLocked),
+			locked: lockedSides.length > 0,
+			disabledSides: lockedSides,
 			warningTooltip: getEnabledForWarning(addon),
 		},
 		embeddedIcon,
@@ -1265,7 +1292,7 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 		})
 	}
 
-	if (addon && hasDetectedEnvironment(addon)) {
+	if (addon && hasEnvironmentLock(addon)) {
 		if (options.length > 0) options.push({ type: 'divider' })
 		options.push({
 			id: 'toggle-side-lock',
@@ -1291,7 +1318,10 @@ provideContentManager({
 	disableAddContent: computed(() => !canSetup.value),
 	disableAddContentTooltip: permissionDeniedMessage.value,
 	contentTypeLabel: type,
+	toggleEnabled: handleToggleEnabled,
 	setEnabledFor: handleSetEnabledFor,
+	canToggleItem: (item) =>
+		item.enabledFor !== undefined && item.enabledFor.server === item.enabledFor.player,
 	deleteItem: handleDeleteItem,
 	bulkDeleteItems: handleBulkDelete,
 	refresh: async () => {
@@ -1332,7 +1362,6 @@ provideContentManager({
 			enabled: item.enabled,
 			enabledFor: item.enabledFor,
 			embeddedIcon: item.embeddedIcon,
-			hideToggle: true,
 		}
 	},
 	filterPersistKey: `server:${serverId}:${worldId.value}`,
@@ -1367,6 +1396,7 @@ provideContentManager({
 					:get-overflow-options="getOverflowOptions"
 					:action-disabled="contentActionDisabled"
 					:action-disabled-tooltip="contentActionBusyMessage ?? undefined"
+					@update:enabled="handleModpackToggleEnabled"
 					@update:enabled-for="handleModpackSetEnabledFor"
 					@hide="isModpackContentModalOpen = false"
 				/>

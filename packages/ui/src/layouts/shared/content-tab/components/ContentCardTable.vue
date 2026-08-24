@@ -24,8 +24,7 @@ const messages = defineMessages({
 	},
 	enabledForDescription: {
 		id: 'content.enabled-for.description',
-		defaultMessage:
-			'Choose whether this content runs on the server, is sent to players, or is disabled in both places.',
+		defaultMessage: 'Choose where this content is enabled. Turn both off to disable it.',
 	},
 })
 
@@ -300,7 +299,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				v-if="hasAnyActions"
 				role="columnheader"
 				class="shrink-0 text-right"
-				:class="hasEnabledForColumn ? 'w-[112px]' : 'min-w-[160px]'"
+				:class="hasEnabledForColumn ? 'w-[168px]' : 'min-w-[160px]'"
 			>
 				<span class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.actionsLabel)

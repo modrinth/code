@@ -17,7 +17,15 @@ const messages = defineMessages({
 	},
 	locked: {
 		id: 'content.enabled-for.locked',
-		defaultMessage: 'Unlock the environment controls from the row menu to change this selection.',
+		defaultMessage: 'These choices are locked. Select Unlock from the row menu to change them.',
+	},
+	requiredHere: {
+		id: 'content.enabled-for.required-here',
+		defaultMessage: 'This content needs to be enabled here to work correctly.',
+	},
+	notSupportedHere: {
+		id: 'content.enabled-for.not-supported-here',
+		defaultMessage: "This content isn't designed to be enabled here.",
 	},
 })
 
@@ -50,6 +58,12 @@ function isDisabled(side: ContentSide) {
 	return props.disabled || disabledSides.value.has(side)
 }
 
+function getDisabledTooltip(side: ContentSide) {
+	if (props.disabled) return props.disabledTooltip
+	if (!disabledSides.value.has(side)) return undefined
+	return formatMessage(isSelected(side) ? messages.requiredHere : messages.notSupportedHere)
+}
+
 function toggle(side: ContentSide) {
 	if (isDisabled(side)) return
 	emit('update:model-value', side, !isSelected(side))
@@ -61,11 +75,7 @@ function toggle(side: ContentSide) {
 		<button
 			v-for="side in sides"
 			:key="side"
-			v-tooltip="
-				isDisabled(side)
-					? (disabledTooltip ?? modelValue.disabledTooltip ?? formatMessage(messages.locked))
-					: undefined
-			"
+			v-tooltip="getDisabledTooltip(side)"
 			type="button"
 			class="flex h-8 items-center rounded-xl border border-solid px-3 text-sm font-medium transition-[background-color,border-color,color,opacity,transform] duration-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 			:class="[

@@ -119,8 +119,7 @@ const messages = defineMessages({
 	},
 	enabledForDescription: {
 		id: 'content.enabled-for.description',
-		defaultMessage:
-			'Choose whether this content runs on the server, is sent to players, or is disabled in both places.',
+		defaultMessage: 'Choose where this content is enabled. Turn both off to disable it.',
 	},
 	pleaseWait: {
 		id: 'content.enabled-for.please-wait',
@@ -300,7 +299,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 					link: item.source.link ?? sourceProjectLink(item.source.project),
 				}
 			: undefined,
-		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		...(props.enableToggle || props.enableEnabledFor ? { enabled: item.enabled } : {}),
 		...(props.enableEnabledFor ? { enabledFor: item.enabledFor } : {}),
 		locked: item.locked,
 		installing: item.installing === true,
@@ -638,7 +637,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						<div
 							v-if="showTableActions"
 							class="shrink-0 text-right"
-							:class="props.enableEnabledFor ? 'w-[112px]' : 'min-w-[160px]'"
+							:class="props.enableEnabledFor ? 'w-[168px]' : 'min-w-[160px]'"
 						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.actionsLabel)
@@ -656,7 +655,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							hide-header
 							flat
 							v-on="
-								props.enableToggle
+								props.enableToggle || props.enableEnabledFor
 									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
 									: {}
 							"

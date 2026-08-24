@@ -54,6 +54,10 @@ const messages = defineMessages({
 		id: 'content.card.frozen',
 		defaultMessage: 'This project is locked to its current version until unfrozen.',
 	},
+	useEnabledForControls: {
+		id: 'content.card.use-enabled-for-controls',
+		defaultMessage: 'Use the Enabled for controls to enable or disable this content.',
+	},
 })
 
 interface Props {
@@ -137,7 +141,20 @@ const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
-const isToggleDisabled = computed(() => isDisabled.value || props.toggleDisabled)
+const isToggleIndeterminate = computed(
+	() =>
+		props.enabledFor !== undefined && props.enabledFor.server !== props.enabledFor.player,
+)
+const isToggleDisabled = computed(
+	() => isDisabled.value || props.toggleDisabled || isToggleIndeterminate.value,
+)
+const toggleTooltip = computed(() => {
+	if (isToggleIndeterminate.value) {
+		return formatMessage(messages.useEnabledForControls)
+	}
+	if (!isToggleDisabled.value) return undefined
+	return props.toggleDisabledTooltip ?? props.disabledTooltip ?? undefined
+})
 const isEnabledForDisabled = computed(() => !props.enabledFor?.server && !props.enabledFor?.player)
 
 const clientWarningMessage = computed(() => {
@@ -368,7 +385,7 @@ const installTooltip = computed(() => {
 		<div
 			v-if="!hideActions"
 			class="flex shrink-0 items-center justify-end gap-2 transition-colors duration-200"
-			:class="enabledFor ? 'w-[112px]' : 'min-w-[160px]'"
+			:class="enabledFor ? 'w-[168px]' : 'min-w-[160px]'"
 		>
 			<slot name="additionalButtonsLeft" />
 
@@ -431,14 +448,11 @@ const installTooltip = computed(() => {
 			</div>
 
 			<Toggle
-				v-if="enabled !== undefined && !hideToggle && !enabledFor"
-				v-tooltip="
-					isToggleDisabled && (toggleDisabledTooltip || disabledTooltip)
-						? (toggleDisabledTooltip ?? disabledTooltip)
-						: undefined
-				"
+				v-if="enabled !== undefined && !hideToggle"
+				v-tooltip="toggleTooltip"
 				:model-value="enabled"
 				:disabled="isToggleDisabled"
+				:indeterminate="isToggleIndeterminate"
 				:aria-label="project.title"
 				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
