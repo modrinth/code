@@ -69,17 +69,6 @@
 				/>
 				<LinkCheckMessage :check="discordInviteCheck" />
 			</div>
-			<div class="mt-3 flex flex-wrap justify-start gap-2">
-				<Button
-					type="colored"
-					color="brand"
-					:disabled="!hasServerChanges"
-					@click="saveServerChanges()"
-				>
-					<SaveIcon />
-					Save changes
-				</Button>
-			</div>
 		</section>
 
 		<!-- Standard Project Links -->
@@ -190,13 +179,7 @@
 					class="platform-selector !w-80"
 					@update:model-value="updateDonationLinks"
 				/>
-			</div>
-			<LinkCheckMessage :check="donationCheckState(donationLink, index)" />
-			<div class="mt-3 flex flex-wrap justify-start gap-2">
-				<Button type="colored" color="brand" :disabled="!hasChanges" @click="saveChanges()">
-					<SaveIcon />
-					Save changes
-				</Button>
+				<LinkCheckMessage :check="donationCheckState(donationLink, index)" />
 			</div>
 		</section>
 		<UnsavedChangesPopup
@@ -354,16 +337,25 @@ function donationCheckState(row, index) {
 	return getLinkCheckState(donationContext(row))
 }
 
-const donationCheckTimers = new Map()
+const donationCheckTimers = reactive(new Map())
+onScopeDispose(() => {
+	for (const timeout of donationCheckTimers.values()) clearTimeout(timeout)
+})
+
 watch(
 	donationLinks,
 	(rows) => {
+		for (const timeout of donationCheckTimers.values()) clearTimeout(timeout)
+		donationCheckTimers.clear()
+
 		rows.forEach((row, index) => {
 			if (!row.id || !row.url) return
-			clearTimeout(donationCheckTimers.get(index))
 			donationCheckTimers.set(
 				index,
-				setTimeout(() => checkLink(donationContext(row)), 500),
+				setTimeout(() => {
+					donationCheckTimers.delete(index)
+					void checkLink(donationContext(row))
+				}, 500),
 			)
 		})
 	},
@@ -411,14 +403,21 @@ function donationRowsToObject(rows) {
 
 const donationsSavedRows = computed(() => donationRowsFromLinks(project.value?.link_urls))
 
-const original = computed(() => ({
-	...saved.value,
-	...(isServerProject.value ? {} : donationRowsToObject(donationsSavedRows.value)),
-}))
-const modified = computed(() => ({
-	...current.value,
-	...(isServerProject.value ? {} : donationRowsToObject(donationLinks.value)),
-}))
+const originalDonationRows = computed(() =>
+	isServerProject.value ? {} : donationRowsToObject(donationsSavedRows.value),
+)
+const modifiedDonationRows = computed(() =>
+	isServerProject.value ? {} : donationRowsToObject(donationLinks.value),
+)
+
+const original = computed(() => ({ ...saved.value, ...originalDonationRows.value }))
+const modified = computed(() => {
+	const donations = { ...modifiedDonationRows.value }
+	for (const key of Object.keys(originalDonationRows.value)) {
+		if (!(key in donations)) donations[key] = undefined
+	}
+	return { ...current.value, ...donations }
+})
 
 const hasChanges = computed(() =>
 	Object.keys(modified.value).some((key) => modified.value[key] !== original.value[key]),
@@ -459,9 +458,11 @@ const canSave = computed(() => {
 		donationLinks.value.some((row, index) => donationCheckState(row, index)?.severity === 'error')
 	const donationsPending =
 		!isServerProject.value &&
-		donationLinks.value.some((row) => isLinkCheckPending(donationContext(row)))
+		(donationCheckTimers.size > 0 ||
+			donationLinks.value.some((row) => isLinkCheckPending(donationContext(row))))
 
 	return (
+		hasPermission.value &&
 		!fieldsInvalid &&
 		!fieldsPending &&
 		!donationsInvalid &&
@@ -473,6 +474,7 @@ const canSave = computed(() => {
 const saving = ref(false)
 
 async function save() {
+	if (!canSave.value) return
 	const data = patchData.value
 	if (Object.keys(data).length === 0) return
 

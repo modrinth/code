@@ -141,14 +141,7 @@
 			:original="saved"
 			:modified="current"
 			:saving="saving"
-			:can-save="
-				hasPermission &&
-				!(
-					current.license.friendly === 'Custom' &&
-					(current.license.short === '' || current.licenseUrl === '')
-				) &&
-				effectiveLicenseCheck?.severity !== 'error'
-			"
+			:can-save="canSave"
 			@reset="reset"
 			@save="save"
 		/>
@@ -156,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLinkCheck } from '@modrinth/moderation'
+import { isLinkCheckPending, useLinkCheck } from '@modrinth/moderation'
 import {
 	Checkbox,
 	Combobox,
@@ -207,7 +200,14 @@ function getInitialLicense() {
 	)
 }
 
-const { saved, current, saving, hasChanges, reset, save } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	hasChanges,
+	reset,
+	save: saveLicense,
+} = useSavable(
 	() => ({
 		license: getInitialLicense(),
 		licenseUrl: project.value.license.url ?? '',
@@ -232,14 +232,13 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	},
 )
 
-const effectiveLicenseCheck = useLinkCheck(
-	computed(() => ({
-		field: 'license',
-		url: current.value.licenseUrl,
-		expectedLicense: current.value.license.short,
-		isCustom: current.value.license.friendly === 'Custom',
-	})),
-)
+const licenseContext = computed(() => ({
+	field: 'license',
+	url: current.value.licenseUrl,
+	expectedLicense: current.value.license.short,
+	isCustom: current.value.license.friendly === 'Custom',
+}))
+const effectiveLicenseCheck = useLinkCheck(licenseContext)
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
@@ -254,6 +253,22 @@ const selectedLicense = computed({
 const hasPermission = computed(() => {
 	return (currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS
 })
+
+const canSave = computed(
+	() =>
+		Boolean(hasPermission.value) &&
+		!(
+			current.value.license.friendly === 'Custom' &&
+			(current.value.license.short === '' || current.value.licenseUrl === '')
+		) &&
+		effectiveLicenseCheck.value?.severity !== 'error' &&
+		!isLinkCheckPending(licenseContext.value),
+)
+
+async function save() {
+	if (!canSave.value) return
+	await saveLicense()
+}
 
 const licenseId = computed(() => {
 	let id = ''
