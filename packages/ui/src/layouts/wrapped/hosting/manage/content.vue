@@ -5,8 +5,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -652,7 +652,8 @@ const setEnabledForMutation = useMutation({
 			return {
 				...oldData,
 				addons: (oldData.addons ?? []).map((candidate) => {
-					if (candidate.filename !== addon.filename || candidate.kind !== addon.kind) return candidate
+					if (candidate.filename !== addon.filename || candidate.kind !== addon.kind)
+						return candidate
 					return {
 						...candidate,
 						...(sides.includes('server') ? { disabled_server: !enabled } : {}),
@@ -743,11 +744,7 @@ async function handleToggleEnabled(item: ContentItem) {
 	})
 }
 
-async function handleModpackSetEnabledFor(
-	item: ContentItem,
-	side: ContentSide,
-	enabled: boolean,
-) {
+async function handleModpackSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
 	try {
 		await handleSetEnabledFor(item, side, enabled)
 	} catch {
@@ -980,12 +977,15 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 			id: addon.project_id ?? addon.filename,
 			slug: projectMetadata?.slug ?? addon.project_id ?? addon.filename,
 			title: projectMetadata?.title ?? friendlyAddonName(addon),
-			icon_url: addon.icon_url ?? (embeddedIcon ? undefined : projectMetadata?.icon_url) ?? undefined,
+			icon_url:
+				addon.icon_url ?? (embeddedIcon ? undefined : projectMetadata?.icon_url) ?? undefined,
 		},
 		version: {
 			id: addon.version?.id ?? addon.filename,
 			version_number:
-				addon.version?.name ?? addon.manifest?.version ?? formatMessage(commonMessages.unknownLabel),
+				addon.version?.name ??
+				addon.manifest?.version ??
+				formatMessage(commonMessages.unknownLabel),
 			file_name: addon.filename,
 		},
 		owner: addon.owner

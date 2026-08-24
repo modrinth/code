@@ -1787,12 +1787,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Не вдалося видалити вміст"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Не вдалося вимкнути вміст"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Не вдалося ввімкнути вміст"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Не вдалося оновити вміст"
   },
@@ -1807,9 +1801,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не вдалося видалити вміст"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Не вдалося перемкнути {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Не вдалося відв’язати збірку"

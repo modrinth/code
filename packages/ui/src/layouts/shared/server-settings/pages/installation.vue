@@ -962,9 +962,7 @@ provideInstallationSettings({
 				incompatibleItems.map((item) => `${item.kind}:${item.filename}`),
 			)
 			await disableAddonsEverywhere(
-				activeAddons.filter((addon) =>
-					incompatibleKeys.has(`${addon.kind}:${addon.filename}`),
-				),
+				activeAddons.filter((addon) => incompatibleKeys.has(`${addon.kind}:${addon.filename}`)),
 			)
 		}
 		debug('disableIncompatibleContent: done')

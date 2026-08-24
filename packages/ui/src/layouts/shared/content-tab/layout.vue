@@ -179,11 +179,7 @@ function getItemId(item: ContentItem) {
 	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
 }
 
-type SortMode =
-	| 'alphabetical-asc'
-	| 'alphabetical-desc'
-	| 'date-added-newest'
-	| 'date-added-oldest'
+type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
 const defaultSortMode: SortMode = 'alphabetical-asc'
 const sortMode = ctx.filterPersistKey
 	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, defaultSortMode)
@@ -835,11 +831,7 @@ function handleSwitchVersionById(id: string) {
 	}
 }
 
-async function handleSetEnabledForById(
-	id: string,
-	side: 'server' | 'player',
-	enabled: boolean,
-) {
+async function handleSetEnabledForById(id: string, side: 'server' | 'player', enabled: boolean) {
 	if (ctx.isBusy.value || !ctx.setEnabledFor) return
 	const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
 	if (!item) return

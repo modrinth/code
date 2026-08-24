@@ -380,6 +380,9 @@
   "content.card.uploaded": {
     "defaultMessage": "Uploaded"
   },
+  "content.card.use-enabled-for-controls": {
+    "defaultMessage": "Use the Enabled for controls to enable or disable this content."
+  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version? It's recommended to update content one-by-one."
   },
@@ -553,6 +556,30 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} updated"
+  },
+  "content.enabled-for.description": {
+    "defaultMessage": "Choose where this content is enabled. Turn both off to disable it."
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Enabled for"
+  },
+  "content.enabled-for.locked": {
+    "defaultMessage": "These choices are locked. Select Unlock from the row menu to change them."
+  },
+  "content.enabled-for.not-supported-here": {
+    "defaultMessage": "This content isn't designed to be enabled here."
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Player"
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Please wait"
+  },
+  "content.enabled-for.required-here": {
+    "defaultMessage": "This content needs to be enabled here to work correctly."
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Server"
   },
   "content.filter.disabled": {
     "defaultMessage": "Disabled"
@@ -1901,14 +1928,17 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
+  "hosting.content.enabled-for.lock-environment": {
+    "defaultMessage": "Lock"
+  },
+  "hosting.content.enabled-for.unknown-environment": {
+    "defaultMessage": "We couldn't tell where this content should be enabled. Review the Server and Player choices."
+  },
+  "hosting.content.enabled-for.unlock-environment": {
+    "defaultMessage": "Unlock"
+  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Failed to delete content"
-  },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Failed to disable content"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Failed to enable content"
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Failed to update content"
@@ -1925,8 +1955,11 @@
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Failed to remove content"
   },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Failed to toggle {name}"
+  "hosting.content.failed-to-set-enabled-for": {
+    "defaultMessage": "Failed to change where {name} is enabled"
+  },
+  "hosting.content.failed-to-set-side-lock": {
+    "defaultMessage": "Failed to change the environment lock for {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Failed to unlink modpack"

@@ -929,12 +929,7 @@ function getCardActions(
 			{
 				key: 'install',
 				label: formatMessage(installLabel),
-				icon:
-					showAsInstalling
-						? SpinnerIcon
-						: isQueued || showAsInstalled
-							? CheckIcon
-							: PlusIcon,
+				icon: showAsInstalling ? SpinnerIcon : isQueued || showAsInstalled ? CheckIcon : PlusIcon,
 				iconClass: showAsInstalling ? 'animate-spin' : undefined,
 				disabled:
 					showAsInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),

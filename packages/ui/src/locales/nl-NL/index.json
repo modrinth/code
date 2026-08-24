@@ -1712,12 +1712,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Het verwijderen van inhoud is mislukt"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Het uitschakelen van inhoud is mislukt"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Het inschakelen van inhoud is mislukt"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Het bijwerken van inhoud is mislukt"
   },
@@ -1732,9 +1726,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Het verwijderen van inhoud is mislukt"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Het omschakelen van {name} is mislukt"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Het ontkoppelen van het modpack is mislukt"

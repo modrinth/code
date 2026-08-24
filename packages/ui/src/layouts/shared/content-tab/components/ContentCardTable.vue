@@ -185,7 +185,6 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 	emit('sort', column, newDirection)
 }
-
 </script>
 
 <template>
@@ -267,11 +266,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 			<div
 				class="hidden @[800px]:flex"
 				:class="
-					hasAnyActions
-						? hasEnabledForColumn
-							? 'min-w-0 flex-1'
-							: 'flex-1 min-w-0'
-						: 'flex-1'
+					hasAnyActions ? (hasEnabledForColumn ? 'min-w-0 flex-1' : 'flex-1 min-w-0') : 'flex-1'
 				"
 			>
 				<button
@@ -361,9 +356,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 							toggleItemSelection(item.id, val ?? false, visibleRange.start + idx, event)
 					"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
-					@update:enabled-for="
-						(side, val) => emit('update:enabled-for', item.id, side, val)
-					"
+					@update:enabled-for="(side, val) => emit('update:enabled-for', item.id, side, val)"
 					@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 					@update="emit('update', item.id)"
 					v-on="
@@ -431,9 +424,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				]"
 				@select="(val, event) => toggleItemSelection(item.id, val ?? false, index, event)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
-				@update:enabled-for="
-					(side, val) => emit('update:enabled-for', item.id, side, val)
-				"
+				@update:enabled-for="(side, val) => emit('update:enabled-for', item.id, side, val)"
 				@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 				@update="emit('update', item.id)"
 				@switch-version="emit('switchVersion', item.id)"

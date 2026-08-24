@@ -382,12 +382,7 @@ function getCardActions(
 			{
 				key: 'install',
 				label: installLabel,
-				icon:
-					showAsInstalling
-						? SpinnerIcon
-						: isQueued || isInstalled
-							? CheckIcon
-							: DownloadIcon,
+				icon: showAsInstalling ? SpinnerIcon : isQueued || isInstalled ? CheckIcon : DownloadIcon,
 				iconClass: showAsInstalling ? 'animate-spin' : undefined,
 				disabled:
 					!!isInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),

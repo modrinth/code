@@ -1664,12 +1664,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Greška sa brisanjem sadržaja"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Nije uspelo onemogućavanje sadržaja"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Nije uspelo omogućavanje sadržaja"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Ažuriranje sadržaja nije uspelo"
   },
@@ -1684,9 +1678,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Greška sa brisanjem sadržaja"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Greška sa preklapanjem {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Greška sa uklanjanjem veze od modpacka"
@@ -5658,4 +5649,3 @@
     "defaultMessage": "Tip"
   }
 }
-

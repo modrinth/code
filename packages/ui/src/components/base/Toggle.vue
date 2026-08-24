@@ -31,9 +31,9 @@
 					? ''
 					: indeterminate
 						? 'group-hover:scale-x-110 group-active:scale-x-75'
-					: small
-						? 'group-hover:w-[14px] group-hover:h-[14px] group-hover:m-[-1px] group-active:w-[10px] group-active:h-[10px] group-active:m-[1px]'
-						: 'group-hover:w-[18px] group-hover:h-[18px] group-hover:m-[-1px] group-active:w-[14px] group-active:h-[14px] group-active:m-[1px]',
+						: small
+							? 'group-hover:w-[14px] group-hover:h-[14px] group-hover:m-[-1px] group-active:w-[10px] group-active:h-[10px] group-active:m-[1px]'
+							: 'group-hover:w-[18px] group-hover:h-[18px] group-hover:m-[-1px] group-active:w-[14px] group-active:h-[14px] group-active:m-[1px]',
 			]"
 		/>
 	</button>

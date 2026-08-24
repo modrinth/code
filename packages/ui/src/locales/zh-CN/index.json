@@ -1901,12 +1901,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "删除内容失败"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "禁用内容失败"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "启用内容失败"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "更新内容失败"
   },
@@ -1921,9 +1915,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "移除内容失败"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "无法切换 {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "链接整合包失败"

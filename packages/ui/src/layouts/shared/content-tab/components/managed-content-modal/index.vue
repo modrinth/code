@@ -31,7 +31,12 @@ import {
 } from '#ui/utils/common-messages'
 
 import { getClientWarningType } from '../../composables/content-filtering'
-import type { ContentCardProject, ContentCardTableItem, ContentItem, ContentSide } from '../../types'
+import type {
+	ContentCardProject,
+	ContentCardTableItem,
+	ContentItem,
+	ContentSide,
+} from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
 
@@ -306,8 +311,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		isClientOnly:
-			!props.enableEnabledFor &&
-			getClientWarningType(item, props.showEnvironmentWarnings) !== null,
+			!props.enableEnabledFor && getClientWarningType(item, props.showEnvironmentWarnings) !== null,
 		clientWarning: props.enableEnabledFor
 			? null
 			: getClientWarningType(item, props.showEnvironmentWarnings),
@@ -510,14 +514,10 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 	<NewModal
 		ref="modal"
 		:max-width="
-			props.enableEnabledFor
-				? 'min(1080px, calc(95vw - 4rem))'
-				: 'min(928px, calc(95vw - 10rem))'
+			props.enableEnabledFor ? 'min(1080px, calc(95vw - 4rem))' : 'min(928px, calc(95vw - 10rem))'
 		"
 		:width="
-			props.enableEnabledFor
-				? 'min(1080px, calc(95vw - 4rem))'
-				: 'min(928px, calc(95vw - 10rem))'
+			props.enableEnabledFor ? 'min(1080px, calc(95vw - 4rem))' : 'min(928px, calc(95vw - 10rem))'
 		"
 		:on-hide="handleHide"
 		no-padding

@@ -142,8 +142,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
 const isToggleIndeterminate = computed(
-	() =>
-		props.enabledFor !== undefined && props.enabledFor.server !== props.enabledFor.player,
+	() => props.enabledFor !== undefined && props.enabledFor.server !== props.enabledFor.player,
 )
 const isToggleDisabled = computed(
 	() => isDisabled.value || props.toggleDisabled || isToggleIndeterminate.value,
@@ -328,10 +327,7 @@ const installTooltip = computed(() => {
 			</div>
 		</div>
 
-		<div
-			v-if="enabledFor"
-			class="hidden w-[200px] shrink-0 @[800px]:block"
-		>
+		<div v-if="enabledFor" class="hidden w-[200px] shrink-0 @[800px]:block">
 			<ContentEnabledFor
 				:model-value="enabledFor"
 				:disabled="isDisabled"
@@ -343,11 +339,7 @@ const installTooltip = computed(() => {
 		<div
 			class="hidden flex-col gap-0.5 transition-[filter,opacity] duration-200 @[800px]:flex"
 			:class="[
-				hideActions
-					? 'flex-1'
-					: enabledFor
-						? 'min-w-0 flex-1'
-						: 'flex-1 min-w-0',
+				hideActions ? 'flex-1' : enabledFor ? 'min-w-0 flex-1' : 'flex-1 min-w-0',
 				!enabledFor && enabled === false && !disabled ? 'grayscale opacity-50' : '',
 			]"
 		>

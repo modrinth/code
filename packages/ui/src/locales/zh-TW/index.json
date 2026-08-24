@@ -1901,12 +1901,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "無法刪除內容"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "無法停用內容"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "無法啟用內容"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "無法更新內容"
   },
@@ -1921,9 +1915,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "無法移除內容"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "無法切換「{name}」"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "無法取消連結模組包"
