@@ -248,9 +248,7 @@ const inviterAvatar = computed(() => {
 	if (!inviter.value) return null
 	return inviter.value.type === 'user' ? inviter.value.avatar : inviter.value.icon
 })
-const moderationUserId = computed(() =>
-	inviter.value?.type === 'user' ? inviter.value.id : null,
-)
+const moderationUserId = computed(() => (inviter.value?.type === 'user' ? inviter.value.id : null))
 const isStaff = computed(() => {
 	const role = auth.value.user?.role
 	return role === 'admin' || role === 'moderator'

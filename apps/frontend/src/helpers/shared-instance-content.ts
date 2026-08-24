@@ -21,10 +21,7 @@ export function createSharedInstanceContentLoader(client: AbstractModrinthClient
 		const cachedVersion = instanceVersions.get(cacheKey)
 		if (cachedVersion) return cachedVersion
 
-		const version = await client.sharedinstances.instances_v1.getVersion(
-			instanceId,
-			versionNumber,
-		)
+		const version = await client.sharedinstances.instances_v1.getVersion(instanceId, versionNumber)
 		instanceVersions.set(cacheKey, version)
 		return version
 	}
@@ -65,9 +62,7 @@ export function createSharedInstanceContentLoader(client: AbstractModrinthClient
 			: []
 		const versionsById = new Map(versions.map((version) => [version.id, version]))
 		const projectsById = new Map(projects.map((project) => [project.id, project]))
-		const modpackProject = modpackVersion
-			? projectsById.get(modpackVersion.project_id)
-			: undefined
+		const modpackProject = modpackVersion ? projectsById.get(modpackVersion.project_id) : undefined
 
 		const directContent: ContentItem[] = [...new Set(directVersionIds)].flatMap((versionId) => {
 			const version = versionsById.get(versionId)

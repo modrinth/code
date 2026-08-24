@@ -1,7 +1,9 @@
 <template>
 	<NewModal
 		ref="contextModal"
-		:header="selectedInstance ? `${selectedInstance.name} moderation context` : 'Shared instance context'"
+		:header="
+			selectedInstance ? `${selectedInstance.name} moderation context` : 'Shared instance context'
+		"
 		no-padding
 		scrollable
 		max-width="90rem"
@@ -60,9 +62,7 @@
 						<h1 class="m-0 truncate text-2xl font-extrabold text-contrast">
 							{{ user?.username ?? userId }}'s shared instances
 						</h1>
-						<p class="m-0 text-secondary">
-							All shared instances this user owns or belongs to.
-						</p>
+						<p class="m-0 text-secondary">All shared instances this user owns or belongs to.</p>
 					</div>
 				</div>
 
@@ -345,10 +345,7 @@ const banOwnerMutation = useMutation({
 		addNotification({
 			type: 'error',
 			title: 'Failed to ban shared instance owner',
-			text: getErrorMessage(
-				requestError,
-				`Could not ban ${owner.username} from shared instances.`,
-			),
+			text: getErrorMessage(requestError, `Could not ban ${owner.username} from shared instances.`),
 		})
 	},
 })
@@ -403,7 +400,7 @@ async function loadSharedInstances(): Promise<{
 	const unavailableCount = results.length - instances.length
 
 	if (instanceIds.length > 0 && instances.length === 0) {
-		throw new Error('None of this user\'s shared instances could be loaded.')
+		throw new Error("None of this user's shared instances could be loaded.")
 	}
 
 	return { instances, unavailableCount }
@@ -433,9 +430,7 @@ async function loadSharedInstanceContext(
 	const memberIds = [...new Set(instanceUsers.users.map((membership) => membership.id))]
 	const members = memberIds.length ? await client.labrinth.users_v2.getMultiple(memberIds) : []
 	const membersById = new Map(members.map((member) => [member.id, member]))
-	const ownerMembership = instanceUsers.users.find(
-		(membership) => membership.join_type === 'owner',
-	)
+	const ownerMembership = instanceUsers.users.find((membership) => membership.join_type === 'owner')
 	if (!ownerMembership) throw new Error('The shared instance has no owner.')
 
 	const toContextUser = (membership: InstanceMembership): SharedInstanceReportUser => {
