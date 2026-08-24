@@ -3,6 +3,7 @@ use crate::database::PgPool;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, post, web};
 use xredis::RedisPool;
 
@@ -30,46 +31,52 @@ pub async fn export(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let user_id = user.id.into();
 
     let collection_ids =
         crate::database::models::DBUser::get_collections(user_id, &**pool)
-            .await?;
+            .await
+            .wrap_internal_err("fetching users from database")?;
     let collections = crate::database::models::DBCollection::get_many(
         &collection_ids,
         &**pool,
         &redis,
     )
-    .await?
+    .await
+    .wrap_internal_err("fetching collections from database")?
     .into_iter()
     .map(crate::models::collections::Collection::from)
     .collect::<Vec<_>>();
 
     let follows =
         crate::database::models::DBUser::get_follows(user_id, &**pool)
-            .await?
+            .await
+            .wrap_internal_err("fetching users from database")?
             .into_iter()
             .map(crate::models::ids::ProjectId::from)
             .collect::<Vec<_>>();
 
     let projects =
         crate::database::models::DBUser::get_projects(user_id, &**pool, &redis)
-            .await?
+            .await
+            .wrap_internal_err("fetching users from database")?
             .into_iter()
             .map(crate::models::ids::ProjectId::from)
             .collect::<Vec<_>>();
 
     let org_ids =
         crate::database::models::DBUser::get_organizations(user_id, &**pool)
-            .await?;
+            .await
+            .wrap_internal_err("fetching users from database")?;
     let orgs =
         crate::database::models::organization_item::DBOrganization::get_many_ids(
             &org_ids, &**pool, &redis,
         )
-        .await?
+        .await.wrap_internal_err("fetching organizations from database")?
         .into_iter()
         // TODO: add team members
         .map(|x| crate::models::organizations::Organization::from(x, vec![]))
@@ -78,7 +85,7 @@ pub async fn export(
     let notifs = crate::database::models::notification_item::DBNotification::get_all_user(
         user_id, &**pool,
     )
-    .await?
+    .await.wrap_internal_err("fetching notifications from database")?
     .into_iter()
     .map(crate::models::notifications::Notification::from)
     .collect::<Vec<_>>();
@@ -86,7 +93,7 @@ pub async fn export(
     let notifs_deliveries = crate::database::models::notifications_deliveries_item::DBNotificationDelivery::get_all_user(
         user_id, &**pool,
     )
-    .await?
+    .await.wrap_internal_err("fetching notification deliveries from database")?
     .into_iter()
     .map(crate::models::notifications::NotificationDelivery::from)
     .collect::<Vec<_>>();
@@ -95,7 +102,7 @@ pub async fn export(
         crate::database::models::oauth_client_item::DBOAuthClient::get_all_user_clients(
             user_id, &**pool,
         )
-        .await?
+        .await.wrap_internal_err("fetching OAuth clients from database")?
         .into_iter()
         .map(crate::models::oauth_clients::OAuthClient::from)
         .collect::<Vec<_>>();
@@ -103,7 +110,7 @@ pub async fn export(
     let oauth_authorizations = crate::database::models::oauth_client_authorization_item::DBOAuthClientAuthorization::get_all_for_user(
         user_id, &**pool,
     )
-        .await?
+        .await.wrap_internal_err("fetching OAuth client authorizations from database")?
         .into_iter()
         .map(crate::models::oauth_clients::OAuthClientAuthorization::from)
         .collect::<Vec<_>>();
@@ -112,12 +119,13 @@ pub async fn export(
         crate::database::models::pat_item::DBPersonalAccessToken::get_user_pats(
             user_id, &**pool, &redis,
         )
-        .await?;
+        .await.wrap_internal_err("fetching personal access tokens from database")?;
     let pats =
         crate::database::models::pat_item::DBPersonalAccessToken::get_many_ids(
             &pat_ids, &**pool, &redis,
         )
-        .await?
+        .await
+        .wrap_internal_err("fetching personal access tokens from database")?
         .into_iter()
         .map(|x| crate::models::pats::PersonalAccessToken::from(x, false))
         .collect::<Vec<_>>();
@@ -126,13 +134,15 @@ pub async fn export(
         crate::database::models::payout_item::DBPayout::get_all_for_user(
             user_id, &**pool,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching payouts from database")?;
 
     let payouts = crate::database::models::payout_item::DBPayout::get_many(
         &payout_ids,
         &**pool,
     )
-    .await?
+    .await
+    .wrap_internal_err("fetching payouts from database")?
     .into_iter()
     .map(crate::models::payouts::Payout::from)
     .collect::<Vec<_>>();
@@ -140,12 +150,14 @@ pub async fn export(
     let report_ids = crate::database::models::user_item::DBUser::get_reports(
         user_id, &**pool,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching users from database")?;
     let reports = crate::database::models::report_item::DBReport::get_many(
         &report_ids,
         &**pool,
     )
-    .await?
+    .await
+    .wrap_internal_err("fetching reports from database")?
     .into_iter()
     .map(crate::models::reports::Report::from)
     .collect::<Vec<_>>();
@@ -157,7 +169,7 @@ pub async fn export(
         user_id.0
     )
     .fetch_all(pool.as_ref())
-    .await?
+    .await.wrap_internal_err("fetching message IDs from database")?
     .into_iter()
     .map(|x| crate::database::models::ids::DBThreadMessageId(x.id))
     .collect::<Vec<_>>();
@@ -167,7 +179,8 @@ pub async fn export(
             &message_ids,
             &**pool,
         )
-        .await?
+        .await
+        .wrap_internal_err("fetching thread messages from database")?
         .into_iter()
         .map(|x| crate::models::threads::ThreadMessage::from(x, &user))
         .collect::<Vec<_>>();
@@ -177,7 +190,8 @@ pub async fn export(
         user_id.0
     )
     .fetch_all(pool.as_ref())
-    .await?
+    .await
+    .wrap_internal_err("fetching uploaded images IDs from database")?
     .into_iter()
     .map(|x| crate::database::models::ids::DBImageId(x.id))
     .collect::<Vec<_>>();
@@ -188,7 +202,8 @@ pub async fn export(
             &**pool,
             &redis,
         )
-        .await?
+        .await
+        .wrap_internal_err("fetching images from database")?
         .into_iter()
         .map(crate::models::images::Image::from)
         .collect::<Vec<_>>();
@@ -197,7 +212,7 @@ pub async fn export(
         crate::database::models::user_subscription_item::DBUserSubscription::get_all_user(
             user_id, &**pool,
         )
-        .await?
+        .await.wrap_internal_err("fetching user subscriptions from database")?
         .into_iter()
         .map(crate::models::billing::UserSubscription::from)
         .collect::<Vec<_>>();

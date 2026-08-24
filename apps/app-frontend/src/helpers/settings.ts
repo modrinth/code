@@ -5,8 +5,9 @@
  */
 import { invoke } from '@tauri-apps/api/core'
 
+import type { FeatureFlag } from '@/composables/use-app-settings.ts'
+import type { ColorTheme } from '@/composables/use-theme.ts'
 import type { Hooks, MemorySettings, WindowSize } from '@/helpers/types'
-import type { ColorTheme, FeatureFlag } from '@/store/theme.ts'
 
 // Settings object
 /*
@@ -43,12 +44,12 @@ export type AppSettings = {
 	advanced_rendering: boolean
 	native_decorations: boolean
 	toggle_sidebar: boolean
+	sync_theme_across_devices: boolean
+	sync_behavior_across_devices: boolean
 
 	telemetry: boolean
 	discord_rpc: boolean
 	personalized_ads: boolean
-
-	onboarded: boolean
 
 	extra_launch_args: string[]
 	custom_env_vars: [string, string][]
@@ -70,6 +71,26 @@ export type AppSettings = {
 	auto_download_updates: boolean | null
 
 	version: number
+}
+
+export function serializeEnvVars(vars: [string, string][] | undefined | null): string {
+	return (vars ?? []).map(([key, value]) => `${key}=${value}`).join(' ')
+}
+
+export function parseEnvVars(input: string | undefined | null): [string, string][] {
+	if (!input?.trim()) {
+		return []
+	}
+
+	const vars: [string, string][] = []
+	for (const entry of input.trim().split(/\s+/)) {
+		const separator = entry.indexOf('=')
+		if (separator <= 0) {
+			continue
+		}
+		vars.push([entry.slice(0, separator), entry.slice(separator + 1)])
+	}
+	return vars
 }
 
 // Get full settings object

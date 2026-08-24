@@ -24,3 +24,7 @@ gam = "gam"
 consts = "consts"
 # short for "Copy"
 Cpy = "Cpy"
+
+[default.extend-identifiers]
+# Constant from the `zip` crate
+ZIP64_BYTES_THR = "ZIP64_BYTES_THR"

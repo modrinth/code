@@ -17,10 +17,12 @@
 						{{ item.label }}
 					</div>
 
-					<NuxtLink
+					<ButtonLink
 						v-else-if="item.link ?? item.to"
+						type="quiet"
+						:interaction="isActive(item as NavStackLinkItem) ? 'none' : 'surface'"
 						:to="(item.link ?? item.to) as string"
-						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
+						class="nav-item !h-auto !w-full !justify-start !rounded-xl !px-4 !py-2.5 text-left leading-tight"
 						:class="{ 'is-active': isActive(item as NavStackLinkItem) }"
 					>
 						<component
@@ -29,20 +31,28 @@
 							aria-hidden="true"
 							class="h-5 w-5 shrink-0"
 						/>
-						<span class="text-contrast">{{ item.label }}</span>
+						<span
+							:ref="(element) => setItemLabelRef(getKey(item, idx), element)"
+							v-tooltip="itemLabelTooltip(getKey(item, idx), item.label)"
+							class="min-w-0 flex-1 truncate text-contrast"
+						>
+							{{ item.label }}
+						</span>
 						<span
 							v-if="item.badge != null"
-							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
+							class="shrink-0 rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
 						>
 							{{ String(item.badge) }}
 						</span>
 						<span v-if="item.chevron" class="ml-auto"><ChevronRightIcon /></span>
-					</NuxtLink>
+					</ButtonLink>
 
-					<button
+					<Button
 						v-else-if="item.action"
-						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
-						:class="{ 'danger-button': item.danger }"
+						type="quiet"
+						interaction="surface"
+						:color="item.danger ? 'red' : undefined"
+						class="nav-item !h-auto !w-full !justify-start !rounded-xl !px-4 !py-2.5 text-left leading-tight"
 						@click="item.action"
 					>
 						<component
@@ -51,14 +61,20 @@
 							aria-hidden="true"
 							class="h-5 w-5 shrink-0"
 						/>
-						<span class="text-contrast">{{ item.label }}</span>
+						<span
+							:ref="(element) => setItemLabelRef(getKey(item, idx), element)"
+							v-tooltip="itemLabelTooltip(getKey(item, idx), item.label)"
+							class="min-w-0 flex-1 truncate text-contrast"
+						>
+							{{ item.label }}
+						</span>
 						<span
 							v-if="item.badge != null"
-							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
+							class="shrink-0 rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
 						>
 							{{ String(item.badge) }}
 						</span>
-					</button>
+					</Button>
 
 					<span v-else>You frog. 🐸</span>
 				</li>
@@ -69,7 +85,8 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { type Component, computed, useSlots } from 'vue'
+import { Button, ButtonLink, truncatedTooltip } from '@modrinth/ui'
+import { type Component, type ComponentPublicInstance, computed, ref, useSlots } from 'vue'
 
 type NavStackBaseItem = {
 	label: string
@@ -108,6 +125,16 @@ const hasSlotContent = computed(() => {
 	const content = slots.default?.()
 	return !!(content && content.length)
 })
+
+const itemLabelRefs = ref<Record<string, HTMLElement | null>>({})
+
+function setItemLabelRef(key: string, element: Element | ComponentPublicInstance | null) {
+	itemLabelRefs.value[key] = element instanceof HTMLElement ? element : null
+}
+
+function itemLabelTooltip(key: string, label: string) {
+	return truncatedTooltip(itemLabelRefs.value[key], label)
+}
 
 function isSeparator(item: NavStackEntry): item is NavStackSeparator {
 	return (item as any).type === 'separator'

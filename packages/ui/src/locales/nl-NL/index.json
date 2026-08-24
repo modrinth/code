@@ -617,18 +617,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projectnamen"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetisch"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nieuwste eerst"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Oudste eerst"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorteer op {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Werk alles bij"
   },
@@ -718,9 +706,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Spelversie zoeken..."
-  },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Pictogram verwijderen"
   },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Pictogram selecteren"
@@ -884,24 +869,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Alles wissen"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Modpacks bekijken"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Modpack importeren"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Weet je al welk modpack je wilt installeren?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Geen resultaten gevonden"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Modpack zoeken"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Een instantie is een Minecraft-installatie met een specifieke loader, versie en mods."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Begin helemaal opnieuw door een loader en een spelversie te kiezen."
   },
@@ -934,9 +901,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Wereldtype selecteren"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modpack kiezen"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Instantie aanmaken"
@@ -1300,9 +1264,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Bestand opgeslagen"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Sluiten"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Vind"
@@ -2069,41 +2030,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Er zijn geen compatibele instanties gevonden"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Pictogram verwijderen"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Zoek instantie"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selecteer pictogram"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Deze modpack bevat geen extra inhoud."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Geen inhoud gevonden"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Dit bestand is niet gepubliceerd op Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Inhoud van modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Inhoud aan het laden..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Geen projecten voldoen aan je zoekopdracht."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "In Slicer openen"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Zoek naar {count, number} {count, plural, one {project} other {projecten}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"
@@ -2230,6 +2158,9 @@
   },
   "label.details": {
     "defaultMessage": "Details"
+  },
+  "label.discover-content": {
+    "defaultMessage": "Ontdek inhoud"
   },
   "label.done": {
     "defaultMessage": "Klaar"
@@ -2849,20 +2780,41 @@
   "profile.bio.fallback.user": {
     "defaultMessage": "Een gebruiker van Modrinth."
   },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} zal je geen vriendschapsverzoeken kunnen sturen, je niet kunnen uitnodigen voor gedeelde instanties en je ook niet kunnen uitnodigen voor Modrinth Hosting-servers."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Weet je zeker dat je deze gebruiker wilt blokkeren?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Er is een fout opgetreden bij het blokkeren van deze gebruiker. Probeer het nog eens."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Gebruiker blokkeren mislukt"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} is geblokkeerd."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Gebruiker geblokkeerd"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "{username} blokkeren"
+  },
   "profile.button.analytics": {
     "defaultMessage": "Gebruikersstatistieken bekijken"
   },
   "profile.button.billing": {
     "defaultMessage": "Gebruikersfacturering beheren"
   },
+  "profile.button.block": {
+    "defaultMessage": "Blokkeren"
+  },
   "profile.button.create-collection": {
     "defaultMessage": "Een collectie aanmaken"
   },
   "profile.button.create-project": {
     "defaultMessage": "Een project aanmaken"
-  },
-  "profile.button.edit-role": {
-    "defaultMessage": "Rol bewerken"
   },
   "profile.button.info": {
     "defaultMessage": "Gebruikersgegevens bekijken"
@@ -2876,8 +2828,20 @@
   "profile.button.set-affiliate": {
     "defaultMessage": "Als partner instellen"
   },
+  "profile.button.unblock": {
+    "defaultMessage": "Deblokkeren"
+  },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# project} other {# projecten}}"
+  },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Schakel pop-ups voor Modrinth in en probeer het vervolgens opnieuw."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Het GitHub-profiel kon niet worden opgehaald. Probeer het nog eens."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Kan GitHub-profiel niet openen"
   },
   "profile.details.label.auth-providers": {
     "defaultMessage": "Authenticatieproviders"
@@ -2891,8 +2855,14 @@
   "profile.details.label.has-totp": {
     "defaultMessage": "Heeft TOTP"
   },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Laden..."
+  },
   "profile.details.label.payment-methods": {
     "defaultMessage": "Betaalmethoden"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Profiel bekijken"
   },
   "profile.details.title": {
     "defaultMessage": "Gebruikersgegevens"
@@ -2942,11 +2912,23 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {project} other {projecten}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Opslaan..."
-  },
   "profile.official-account": {
     "defaultMessage": "Officieel Modrinth-account"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Het officiële gebruikersaccount van Modrinth. Neem contact op met het Helpcentrum via <support-link></support-link> of per e-mail via <email></email>"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "Er is een fout opgetreden bij het deblokkeren van deze gebruiker. Probeer het nog eens."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "Kan gebruiker niet deblokkeren"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username} is gedeblokkeerd."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "Gebruiker gedeblokkeerd"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Gepubliceerd op {date}"
@@ -3770,15 +3752,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Gevorderd"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Gegevenspakketten uitsluiten"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Mods uitsluiten"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Plug-ins uitsluiten"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Omgeving"
   },
@@ -4547,9 +4520,6 @@
   "servers.busy.installing": {
     "defaultMessage": "De server wordt geïnstalleerd"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Inhoud wordt gesynchroniseerd"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Ook een vriendschapsverzoek sturen"
   },
@@ -4604,56 +4574,14 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installeren is mislukt"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Er is een interne fout opgetreden tijdens het installeren van het platform. Probeer het nog eens."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "De opgegeven loader of Minecraft-versie kon niet worden geïnstalleerd. Deze is mogelijk ongeldig of wordt niet ondersteund."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Het modpack kon niet worden geïnstalleerd. Het is mogelijk beschadigd of niet compatibel."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Deze versie van het modpack bevat geen downloadbaar bestand. Mogelijk is het pakket niet correct samengesteld."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Tijdens de installatie is er een onverwachte fout opgetreden."
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Deze versie van Minecraft of loader wordt nog niet ondersteund door Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Add-ons aan het installeren..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Modpack aan het installeren..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Platform aan het installeren..."
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "We zijn je server aan het klaarmaken"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java toevoegen..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Server wordt geconfigureerd..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Mods worden gedownload..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Bestanden worden geordend..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Omgeving wordt opgezet..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Heb je al een server?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Meer informatie over Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4663,9 +4591,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installeer mods, nodig vrienden uit en speel samen – allemaal via de Modrinth app."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Nog geen servers"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Kies je favoriete mods en wij regelen de rest."
@@ -4681,12 +4606,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Inloggen"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Stel je server in net zoals een eigen wereld."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Eenvoudige set-up"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Gekopieerd"
@@ -5204,8 +5123,116 @@
   "settings.pats.title": {
     "defaultMessage": "Persoonlijke toegangstokens"
   },
+  "settings.profile.bio.description": {
+    "defaultMessage": "Een korte beschrijving om iedereen iets over jezelf te vertellen."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Bio"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "Profiel"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "Profielfoto"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "Je profielgegevens zijn openbaar <profile-link>te bekijken op Modrinth</profile-link> en via de <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "Het bijwerken van het profiel is mislukt"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "Er is een fout opgetreden bij het bijwerken van je profiel. Probeer het nog eens."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "Log in met een Modrinth-account om je openbare profiel aan te passen."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Modrinth-account vereist"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "Een unieke, hoofdletterongevoelige naam waarmee je profiel wordt geïdentificeerd."
+  },
   "settings.sessions.title": {
     "defaultMessage": "Sessies"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Acties"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Gebruiker"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Dit zijn de gebruikers die je op Modrinth hebt geblokkeerd. Zij kunnen jou niet:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "Je hebt niemand geblokkeerd."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "De geblokkeerde gebruikers konden niet worden geladen."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "Geblokkeerde gebruikers laden…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "Een vriendschapsverzoek sturen"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "Uitnodigen om een Modrinth Hosting-server te beheren."
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "Uitnodigen voor gedeelde instanties"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "Geblokkeerde gebruikers"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "Deblokkeren"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "Kan gebruiker niet deblokkeren"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "Er is een fout opgetreden bij het deblokkeren van deze gebruiker. Probeer het nog eens."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "{username} deblokkeren"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "Avatar van {username}"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Bepaal zelf wie je vriendschapsverzoeken kan sturen op Modrinth."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "Vriendschapsverzoeken"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "Iedereen"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "Vrienden"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "Vrienden van vrienden"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "Niemand"
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "Bepaal zelf wie je uitnodigingen kan sturen voor gedeelde instanties en Modrinth Hosting-panelen."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Uitnodigingen"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "Met een Modrinth-account kun je bepalen wie er contact met je kan opnemen en kun je geblokkeerde gebruikers beheren"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Modrinth-account vereist"
+  },
+  "settings.social.title": {
+    "defaultMessage": "Sociaal"
   },
   "sharing.invite-players-modal.add": {
     "defaultMessage": "Toevoegen"
@@ -5216,20 +5243,41 @@
   "sharing.invite-players-modal.already-invited": {
     "defaultMessage": "Deze gebruiker is al uitgenodigd."
   },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Toepassen"
+  },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar van {username}"
   },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Annuleren"
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Aangepast..."
   },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Annuleren"
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Aangepast: {date}"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Uitnodigingslink bewerken."
   },
   "sharing.invite-players-modal.edit-invite-link-title": {
     "defaultMessage": "Uitnodigingslink bewerken"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "Over 1 dag"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "Over 1 uur"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "Over 7 dagen"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "Over 6 uur"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "Over 3 dagen"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "Over 12 uur"
   },
   "sharing.invite-players-modal.expiry-label": {
     "defaultMessage": "Vervaldatum"

@@ -4,6 +4,15 @@ import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
+import {
+	compatibleAdvancedFilters,
+	getAdvancedOptionIds,
+	getAvailableAdvancedIds,
+	mergeAdvancedPrefs,
+	replaceAdvancedFilters,
+	sameOptionIds,
+	useAdvancedPrefs,
+} from '#ui/utils/advanced-filter-preferences'
 import type {
 	EnvironmentSearchOverride,
 	FilterType,
@@ -49,6 +58,7 @@ export interface BrowseSearchState {
 	effectiveCurrentSortType: Ref<SortType>
 
 	loading: Ref<boolean>
+	refreshing: Ref<boolean>
 	projectHits: ShallowRef<BrowseSearchResponse['projectHits']>
 	serverHits: ShallowRef<BrowseSearchResponse['serverHits']>
 	totalHits: Ref<number>
@@ -66,6 +76,9 @@ export interface BrowseSearchState {
 	setPage: (page: number) => Promise<void>
 	clearSearch: () => void
 	onFilterChange: () => void
+
+	linkOverridesAdvancedPrefs: Ref<boolean>
+	applySavedAdvancedPrefs: () => void
 }
 
 export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchState {
@@ -174,6 +187,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	])
 
 	const loading = ref(true)
+	const refreshing = ref(false)
 	const projectHits = shallowRef<BrowseSearchResponse['projectHits']>([])
 	const serverHits = shallowRef<BrowseSearchResponse['serverHits']>([])
 	const totalHits = ref(0)
@@ -197,6 +211,76 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	const effectiveCurrentFilters = computed(() =>
 		isServerType.value ? serverCurrentFilters.value : currentFilters.value,
 	)
+	const effectiveFilterTypes = computed(() =>
+		isServerType.value ? serverFilterTypes.value : filters.value,
+	)
+
+	const advancedPrefs = useAdvancedPrefs()
+	const linkOverridesAdvancedPrefs = ref(false)
+	const selectedAdvancedIds = computed(() => getAdvancedOptionIds(effectiveCurrentFilters.value))
+
+	function hasSearchQuery(): boolean {
+		return Object.keys(route.query).some((key) => !options.persistentQueryParams.includes(key))
+	}
+
+	function getCompatiblePrefs(): FilterValue[] {
+		return compatibleAdvancedFilters(advancedPrefs.value, effectiveFilterTypes.value)
+	}
+
+	function setEffectiveFilters(nextFilters: FilterValue[]) {
+		if (isServerType.value) {
+			serverCurrentFilters.value = nextFilters
+		} else {
+			currentFilters.value = nextFilters
+		}
+	}
+
+	function applyAdvancedPrefs(prefs: FilterValue[]) {
+		setEffectiveFilters(replaceAdvancedFilters(effectiveCurrentFilters.value, prefs))
+	}
+
+	function syncLinkOverride() {
+		const prefIds = getAdvancedOptionIds(getCompatiblePrefs())
+		linkOverridesAdvancedPrefs.value =
+			prefIds.length > 0 && !sameOptionIds(selectedAdvancedIds.value, prefIds)
+	}
+
+	function initAdvancedPrefs() {
+		const prefs = getCompatiblePrefs()
+
+		if (!hasSearchQuery()) {
+			if (prefs.length > 0) {
+				applyAdvancedPrefs(prefs)
+			}
+			linkOverridesAdvancedPrefs.value = false
+			return
+		}
+
+		syncLinkOverride()
+	}
+
+	function applySavedAdvancedPrefs() {
+		applyAdvancedPrefs(getCompatiblePrefs())
+		linkOverridesAdvancedPrefs.value = false
+	}
+
+	initAdvancedPrefs()
+
+	watch(selectedAdvancedIds, (selected, previous) => {
+		if (previous && sameOptionIds(selected, previous)) {
+			return
+		}
+
+		const nextPrefs = mergeAdvancedPrefs(
+			advancedPrefs.value,
+			selected,
+			getAvailableAdvancedIds(effectiveFilterTypes.value),
+		)
+		if (!sameOptionIds(advancedPrefs.value, nextPrefs)) {
+			advancedPrefs.value = nextPrefs
+		}
+		linkOverridesAdvancedPrefs.value = false
+	})
 
 	watch(
 		[
@@ -215,6 +299,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	)
 
 	watch(effectiveRequestParams, (newVal, oldVal) => {
+		refreshing.value = true
 		debug('effectiveRequestParams changed', {
 			from: oldVal?.substring(0, 80),
 			to: newVal?.substring(0, 80),
@@ -241,6 +326,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		}
 
 		const version = ++searchVersion
+		refreshing.value = true
 		debug('refreshSearch start', {
 			version,
 			projectType: options.projectType.value,
@@ -281,11 +367,13 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 			updateUrlParams()
 			loading.value = false
+			refreshing.value = false
 		} catch (err) {
 			debug('refreshSearch error', err)
 			console.error('Browse search error:', err)
 			if (version === searchVersion) {
 				loading.value = false
+				refreshing.value = false
 			}
 		}
 	}
@@ -340,6 +428,10 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 				effectiveSortTypes.value.find((sortType) => sortType.name === 'relevance') ??
 				effectiveSortTypes.value[0]
 			query.value = ''
+
+			void nextTick(() => {
+				initAdvancedPrefs()
+			})
 		},
 	)
 
@@ -355,6 +447,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		effectiveSortTypes,
 		effectiveCurrentSortType,
 		loading,
+		refreshing,
 		projectHits,
 		serverHits,
 		totalHits,
@@ -369,5 +462,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		setPage,
 		clearSearch,
 		onFilterChange,
+		linkOverridesAdvancedPrefs,
+		applySavedAdvancedPrefs,
 	}
 }

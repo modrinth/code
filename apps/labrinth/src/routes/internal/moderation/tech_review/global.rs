@@ -148,7 +148,8 @@ pub async fn search_global_issue_details(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating global issue search")?;
 
     let query = search_req
         .query
@@ -370,7 +371,8 @@ pub async fn get_global_issue_detail(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating global issue detail request")?;
 
     let detail_key = get_req.detail_key.trim();
     if detail_key.is_empty() {
@@ -404,7 +406,7 @@ pub async fn get_global_issue_detail(
     .fetch_optional(&**pool)
     .await
     .wrap_internal_err("failed to fetch global issue detail")?
-    .ok_or(ApiError::NotFound)?;
+    .wrap_not_found_err("resource not found")?;
 
     let local_rows = sqlx::query!(
         r#"

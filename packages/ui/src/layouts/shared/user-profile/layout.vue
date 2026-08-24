@@ -37,41 +37,7 @@
 			</template>
 		</NewModal>
 
-		<NewModal
-			v-if="variant === 'web'"
-			ref="editRoleModal"
-			:header="formatMessage(messages.editRoleButton)"
-		>
-			<div class="flex w-80 flex-col gap-4">
-				<Combobox
-					v-model="selectedRole"
-					:options="roleOptions"
-					:placeholder="formatMessage(messages.selectRolePlaceholder)"
-				/>
-				<div class="flex justify-end gap-2">
-					<Button native-type="button" @click="cancelRoleEdit">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						native-type="button"
-						:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
-						@click="saveRoleEdit"
-					>
-						<template v-if="isSavingRole">
-							<SpinnerIcon class="animate-spin" />
-							{{ formatMessage(messages.savingLabel) }}
-						</template>
-						<template v-else>
-							<SaveIcon />
-							{{ formatMessage(commonMessages.saveChangesButton) }}
-						</template>
-					</Button>
-				</div>
-			</div>
-		</NewModal>
+		<EditUserModal v-if="variant === 'web'" ref="editUserModal" :user="user" :user-id="userId" />
 
 		<NewModal
 			v-if="variant === 'web' && isStaffViewing"
@@ -226,7 +192,7 @@
 					@open-analytics="
 						openPath(`/dashboard/analytics?user=${encodeURIComponent(user.username)}`)
 					"
-					@edit-role="openRoleEditModal"
+					@edit-user="editUserModal?.show()"
 				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
@@ -255,144 +221,117 @@
 				</UserPageHeader>
 			</template>
 
-			<div class="flex flex-col gap-4">
-				<div v-if="navLinks.length > 2" class="max-w-full overflow-x-auto">
-					<NavTabs :links="navLinks" replace />
-				</div>
+			<NavTabs v-if="navLinks.length > 2" :links="navLinks" replace page-nav />
 
-				<div class="flex flex-col gap-3">
-					<ProjectCardList
-						v-if="selectedProjectType !== 'collection' && filteredProjects.length > 0"
-						:layout="displayMode"
-					>
-						<ProjectCard
-							v-for="project in filteredProjects"
-							:key="project.id"
-							:link="projectLink(project)"
-							:title="project.title"
-							:icon-url="project.icon_url"
-							:date-updated="project.updated"
-							:downloads="project.downloads"
-							:summary="project.description"
-							:tags="[...project.categories, ...project.loaders]"
-							:all-tags="[
-								...project.categories,
-								...project.loaders,
-								...project.additional_categories,
-							]"
-							:followers="project.followers"
-							:banner="project.gallery?.find((image) => image.featured)?.url"
-							:color="project.color"
-							:environment="{
-								clientSide: project.client_side,
-								serverSide: project.server_side,
-							}"
-							:layout="displayMode === 'list' ? 'list' : 'grid'"
-							:status="project.status"
-						>
-							<template v-if="$slots['project-actions']" #actions>
-								<slot name="project-actions" :project="project" />
-							</template>
-						</ProjectCard>
-					</ProjectCardList>
+			<div class="flex flex-col gap-3">
+				<ProjectList
+					v-if="selectedProjectType !== 'collection' && filteredProjects.length > 0"
+					:projects="filteredProjects"
+					:layout="displayMode"
+					:link-mode="projectLinkMode"
+					show-status
+				>
+					<template v-if="$slots['project-actions']" #actions="{ project }">
+						<slot name="project-actions" :project="project" />
+					</template>
+				</ProjectList>
 
-					<EmptyState
-						v-if="showProjectsEmptyState"
-						type="empty"
-						:heading="formatMessage(messages.profileNoProjectsLabel)"
-						:description="
-							isSelf ? formatMessage(messages.profileNoProjectsAuthDescription) : undefined
-						"
+				<EmptyState
+					v-if="showProjectsEmptyState"
+					type="empty"
+					:heading="formatMessage(messages.profileNoProjectsLabel)"
+					:description="
+						isSelf ? formatMessage(messages.profileNoProjectsAuthDescription) : undefined
+					"
+				>
+					<template v-if="isSelf" #actions>
+						<Button type="colored" color="brand" native-type="button" @click="createProject">
+							{{ formatMessage(messages.createProjectButton) }}
+						</Button>
+					</template>
+				</EmptyState>
+
+				<ProjectCardList
+					v-if="selectedProjectType === null || selectedProjectType === 'collection'"
+					layout="grid"
+				>
+					<SmartClickable
+						v-for="collection in sortedCollections"
+						:key="collection.id"
+						class="h-full w-full"
 					>
-						<template v-if="isSelf" #actions>
-							<Button type="colored" color="brand" native-type="button" @click="createProject">
-								{{ formatMessage(messages.createProjectButton) }}
-							</Button>
+						<template #clickable>
+							<AutoLink
+								:to="collectionLink(collection.id)"
+								class="no-click-animation custom-focus-indicator rounded-xl no-outline"
+							/>
 						</template>
-					</EmptyState>
-
-					<ProjectCardList
-						v-if="selectedProjectType === null || selectedProjectType === 'collection'"
-						layout="grid"
-					>
-						<SmartClickable
-							v-for="collection in sortedCollections"
-							:key="collection.id"
-							class="h-full w-full"
+						<div
+							class="smart-clickable:outline-on-focus smart-clickable:highlight-on-hover flex h-full w-full flex-col gap-4 overflow-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all"
 						>
-							<template #clickable>
-								<AutoLink
-									:to="collectionLink(collection.id)"
-									class="no-click-animation custom-focus-indicator rounded-xl no-outline"
-								/>
-							</template>
-							<div
-								class="smart-clickable:outline-on-focus smart-clickable:highlight-on-hover flex h-full w-full flex-col gap-4 overflow-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all"
-							>
-								<div class="grid grid-cols-[auto_1fr] gap-4">
-									<Avatar :src="collection.icon_url" size="64px" no-shadow />
-									<div class="flex min-w-0 flex-col gap-2">
-										<h2
-											class="smart-clickable:underline-on-hover m-0 truncate text-lg font-semibold text-contrast"
-										>
-											{{ collection.name }}
-										</h2>
-										<div class="flex items-center gap-1">
-											<LibraryIcon aria-hidden="true" />
-											{{ formatMessage(messages.collectionLabel) }}
-										</div>
-									</div>
-								</div>
-								<div class="grow text-primary">
-									{{ collection.description }}
-								</div>
-								<div class="mt-auto flex flex-wrap items-center gap-4">
+							<div class="grid grid-cols-[auto_1fr] gap-4">
+								<Avatar :src="collection.icon_url" size="64px" no-shadow />
+								<div class="flex min-w-0 flex-col gap-2">
+									<h2
+										class="smart-clickable:underline-on-hover m-0 truncate text-lg font-semibold text-contrast"
+									>
+										{{ collection.name }}
+									</h2>
 									<div class="flex items-center gap-1">
-										<BoxIcon />
-										{{
-											formatMessage(messages.collectionProjectsCount, {
-												count: collection.projects.length,
-											})
-										}}
-									</div>
-									<div class="flex items-center gap-1">
-										<template v-if="collection.status === 'listed'">
-											<GlobeIcon />
-											{{ formatMessage(commonMessages.publicLabel) }}
-										</template>
-										<template v-else-if="collection.status === 'unlisted'">
-											<LinkIcon />
-											{{ formatMessage(commonMessages.unlistedLabel) }}
-										</template>
-										<template v-else-if="collection.status === 'private'">
-											<LockIcon />
-											{{ formatMessage(commonMessages.privateLabel) }}
-										</template>
-										<template v-else-if="collection.status === 'rejected'">
-											<XIcon />
-											{{ formatMessage(commonMessages.rejectedLabel) }}
-										</template>
+										<LibraryIcon aria-hidden="true" />
+										{{ formatMessage(messages.collectionLabel) }}
 									</div>
 								</div>
 							</div>
-						</SmartClickable>
-					</ProjectCardList>
+							<div class="grow text-primary">
+								{{ collection.description }}
+							</div>
+							<div class="mt-auto flex flex-wrap items-center gap-4">
+								<div class="flex items-center gap-1">
+									<BoxIcon />
+									{{
+										formatMessage(messages.collectionProjectsCount, {
+											count: collection.projects.length,
+										})
+									}}
+								</div>
+								<div class="flex items-center gap-1">
+									<template v-if="collection.status === 'listed'">
+										<GlobeIcon />
+										{{ formatMessage(commonMessages.publicLabel) }}
+									</template>
+									<template v-else-if="collection.status === 'unlisted'">
+										<LinkIcon />
+										{{ formatMessage(commonMessages.unlistedLabel) }}
+									</template>
+									<template v-else-if="collection.status === 'private'">
+										<LockIcon />
+										{{ formatMessage(commonMessages.privateLabel) }}
+									</template>
+									<template v-else-if="collection.status === 'rejected'">
+										<XIcon />
+										{{ formatMessage(commonMessages.rejectedLabel) }}
+									</template>
+								</div>
+							</div>
+						</div>
+					</SmartClickable>
+				</ProjectCardList>
 
-					<EmptyState
-						v-if="showCollectionsEmptyState"
-						type="empty"
-						:heading="formatMessage(messages.profileNoCollectionsLabel)"
-						:description="
-							isSelf ? formatMessage(messages.profileNoCollectionsAuthDescription) : undefined
-						"
-					>
-						<template v-if="isSelf" #actions>
-							<Button type="colored" color="brand" native-type="button" @click="createCollection">
-								{{ formatMessage(messages.createCollectionButton) }}
-							</Button>
-						</template>
-					</EmptyState>
-				</div>
+				<EmptyState
+					v-if="showCollectionsEmptyState"
+					type="empty"
+					:heading="formatMessage(messages.profileNoCollectionsLabel)"
+					:description="
+						isSelf ? formatMessage(messages.profileNoCollectionsAuthDescription) : undefined
+					"
+				>
+					<template v-if="isSelf" #actions>
+						<Button type="colored" color="brand" native-type="button" @click="createCollection">
+							{{ formatMessage(messages.createCollectionButton) }}
+						</Button>
+					</template>
+				</EmptyState>
 			</div>
 
 			<template #sidebar>
@@ -460,11 +399,11 @@ import {
 	LibraryIcon,
 	LinkIcon,
 	LockIcon,
-	SaveIcon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	getPrimaryProjectType,
 	isModrinthUser as checkIsModrinthUser,
 	isOfficialAccount as checkIsOfficialAccount,
 	UserBadge,
@@ -477,15 +416,14 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import { Button } from '#ui/components/base/buttons'
-import Combobox from '#ui/components/base/Combobox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import SmartClickable from '#ui/components/base/SmartClickable.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import NormalPage from '#ui/components/page/NormalPage.vue'
-import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
+import ProjectList from '#ui/components/project/ProjectList.vue'
 import UserBadges from '#ui/components/user/UserBadges.vue'
 import UserPageHeader from '#ui/components/user/UserPageHeader.vue'
 import { defineMessages, useVIntl } from '#ui/composables'
@@ -494,25 +432,24 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectPageContext,
-	injectTags,
 } from '#ui/providers'
-import { commonMessages, getProjectTypeTitleMessage } from '#ui/utils'
-
-import { blockedUsersQueryKey, injectUserProfile } from './providers'
 import {
-	hasActivePride26Midas,
-	hasPride26Badge,
-	projectUserSorting,
-	resolveProjectType,
-} from './utils'
+	catalogProjectTypes,
+	commonMessages,
+	filterProjectsByType,
+	getProjectTypeTitleMessage,
+	parseProjectTypeRouteParam,
+	sortProjectTypes,
+} from '#ui/utils'
+
+import EditUserModal from './components/edit-user-modal.vue'
+import { blockedUsersQueryKey, injectUserProfile } from './providers'
+import { hasActivePride26Midas, hasPride26Badge, projectUserSorting } from './utils'
 
 type DisplayMode = 'list' | 'grid' | 'gallery'
 type ModalRef = {
 	show: () => void
 	hide: () => void
-}
-type ResolvedProject = Labrinth.Projects.v2.Project & {
-	resolvedProjectType: string
 }
 type EarlyAdopterProjectType =
 	| 'modpack'
@@ -552,7 +489,6 @@ const props = withDefaults(
 
 const userProfile = injectUserProfile()
 const auth = injectAuth()
-const tags = injectTags(null)
 const pageContext = injectPageContext()
 const notificationManager = injectNotificationManager()
 const client = injectModrinthClient()
@@ -570,18 +506,6 @@ const messages = defineMessages({
 	collectionProjectsCount: {
 		id: 'profile.collection.projects-count',
 		defaultMessage: '{count, plural, one {# project} other {# projects}}',
-	},
-	savingLabel: {
-		id: 'profile.label.saving',
-		defaultMessage: 'Saving...',
-	},
-	editRoleButton: {
-		id: 'profile.button.edit-role',
-		defaultMessage: 'Edit role',
-	},
-	selectRolePlaceholder: {
-		id: 'profile.role.select-placeholder',
-		defaultMessage: 'Select a role',
 	},
 	userDetailsTitle: {
 		id: 'profile.details.title',
@@ -692,14 +616,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>',
 	},
-	roleUpdateErrorTitle: {
-		id: 'profile.role.update-error-title',
-		defaultMessage: 'Failed to update role',
-	},
-	roleUpdateErrorDescription: {
-		id: 'profile.role.update-error-description',
-		defaultMessage: 'An error occurred while updating the user role. Please try again.',
-	},
 	blockButton: {
 		id: 'profile.button.block',
 		defaultMessage: 'Block',
@@ -751,28 +667,33 @@ const messages = defineMessages({
 	},
 })
 
+const canLoadProfile = computed(() => props.userId.length > 0)
 const userQuery = useQuery({
 	queryKey: computed(() => ['user', props.userId]),
 	queryFn: () => userProfile.getUser(props.userId),
-	enabled: computed(() => Boolean(props.userId)),
+	enabled: canLoadProfile,
+	placeholderData: (previousData) => previousData,
 	staleTime: 30_000,
 })
 const projectsQuery = useQuery({
 	queryKey: computed(() => ['user', props.userId, 'projects']),
 	queryFn: () => userProfile.getProjects(props.userId),
-	enabled: computed(() => Boolean(props.userId)),
+	enabled: canLoadProfile,
+	placeholderData: (previousData) => previousData,
 	staleTime: 30_000,
 })
 const organizationsQuery = useQuery({
 	queryKey: computed(() => ['user', props.userId, 'organizations']),
 	queryFn: () => userProfile.getOrganizations(props.userId),
-	enabled: computed(() => Boolean(props.userId)),
+	enabled: canLoadProfile,
+	placeholderData: (previousData) => previousData,
 	staleTime: 30_000,
 })
 const collectionsQuery = useQuery({
 	queryKey: computed(() => ['user', props.userId, 'collections']),
 	queryFn: () => userProfile.getCollections(props.userId),
-	enabled: computed(() => Boolean(props.userId)),
+	enabled: canLoadProfile,
+	placeholderData: (previousData) => previousData,
 	staleTime: 30_000,
 })
 const blockedUsersQuery = useQuery({
@@ -783,12 +704,7 @@ const blockedUsersQuery = useQuery({
 })
 
 const user = computed(() => userQuery.data.value)
-const projects = computed<ResolvedProject[]>(() =>
-	(projectsQuery.data.value ?? []).map((project) => ({
-		...project,
-		resolvedProjectType: resolveProjectType(project, tags?.loaders.value ?? []),
-	})),
-)
+const projects = computed(() => projectsQuery.data.value ?? [])
 watch(
 	() => projectsQuery.data.value,
 	(projects) => {
@@ -810,20 +726,11 @@ const isBlocked = computed(() =>
 	user.value ? (blockedUsersQuery.data.value ?? []).includes(user.value.id) : false,
 )
 
-const selectedProjectType = computed(() => {
-	const projectType = props.projectType
-	if (!projectType) return null
-	if (projectType === 'collections' || projectType === 'collection') return 'collection'
-	return projectType.endsWith('s') ? projectType.slice(0, -1) : projectType
-})
+const selectedProjectType = computed(() => parseProjectTypeRouteParam(props.projectType))
 
-const filteredProjects = computed(() => {
-	const selected = selectedProjectType.value
-	return projects.value
-		.filter((project) => !selected || project.resolvedProjectType === selected)
-		.slice()
-		.sort(projectUserSorting)
-})
+const filteredProjects = computed(() =>
+	filterProjectsByType(projects.value, selectedProjectType.value).slice().sort(projectUserSorting),
+)
 
 const sortedOrganizations = computed(() =>
 	organizations.value.slice().sort((first, second) => first.name.localeCompare(second.name)),
@@ -837,10 +744,9 @@ const sortedCollections = computed(() =>
 )
 
 const projectTypes = computed(() => {
-	const types = new Set(projects.value.map((project) => project.resolvedProjectType))
-	if (collections.value.length > 0) types.add('collection')
-	types.delete('project')
-	return [...types]
+	const types = catalogProjectTypes(projects.value)
+	if (collections.value.length > 0) types.push('collection')
+	return sortProjectTypes(types)
 })
 
 const navLinks = computed(() => {
@@ -851,15 +757,13 @@ const navLinks = computed(() => {
 			label: formatMessage(commonMessages.allProjectType),
 			href: profilePath,
 		},
-		...projectTypes.value
-			.map((projectType) => ({
-				label:
-					projectType === 'collection'
-						? formatMessage(messages.collectionsLabel)
-						: formatMessage(getProjectTypeTitleMessage(projectType), { count: 2 }),
-				href: `${profilePath}/${projectType}s`,
-			}))
-			.sort((first, second) => first.label.localeCompare(second.label)),
+		...projectTypes.value.map((projectType) => ({
+			label:
+				projectType === 'collection'
+					? formatMessage(messages.collectionsLabel)
+					: formatMessage(getProjectTypeTitleMessage(projectType), { count: 2 }),
+			href: `${profilePath}/${projectType}s`,
+		})),
 	]
 })
 
@@ -876,7 +780,7 @@ const profileHeaderSummary = computed(() => {
 const earliestProjectByType = computed(() => {
 	const earliest = {} as Record<EarlyAdopterProjectType, Date>
 	for (const project of projects.value) {
-		const projectType = project.resolvedProjectType as EarlyAdopterProjectType
+		const projectType = getPrimaryProjectType(project) as EarlyAdopterProjectType
 		const published = new Date(project.published)
 		if (!earliest[projectType] || published < earliest[projectType]) {
 			earliest[projectType] = published
@@ -936,13 +840,6 @@ function openPath(path: string): void {
 	} else {
 		void router.push(target)
 	}
-}
-
-function projectLink(project: ResolvedProject): string | (() => void) {
-	if (props.projectLinkMode === 'app') {
-		return `/project/${project.id}`
-	}
-	return `/${project.resolvedProjectType}/${project.slug || project.id}`
 }
 
 function organizationLink(slug: string): string | (() => void) {
@@ -1045,33 +942,13 @@ async function retryQueries(): Promise<void> {
 }
 
 const userDetailsModal = ref<ModalRef | null>(null)
-const editRoleModal = ref<ModalRef | null>(null)
+const editUserModal = ref<InstanceType<typeof EditUserModal> | null>(null)
 const blockUserModal = ref<ModalRef | null>(null)
-const selectedRole = ref<Labrinth.Users.v3.Role | null>(null)
-const isSavingRole = ref(false)
 const isBlockingUser = ref(false)
 const isUnblockingUser = ref(false)
-const roleOptions = [
-	{ value: 'developer', label: 'Developer' },
-	{ value: 'moderator', label: 'Moderator' },
-	{ value: 'admin', label: 'Admin' },
-] satisfies { value: Labrinth.Users.v3.Role; label: string }[]
-
-watch(
-	user,
-	(currentUser) => {
-		selectedRole.value = currentUser?.role ?? null
-	},
-	{ immediate: true },
-)
 
 function openUserDetails(): void {
 	userDetailsModal.value?.show()
-}
-
-function openRoleEditModal(): void {
-	selectedRole.value = user.value?.role ?? null
-	editRoleModal.value?.show()
 }
 
 async function handleBlockAction(): Promise<void> {
@@ -1150,35 +1027,11 @@ async function unblockCurrentUser(): Promise<void> {
 	}
 }
 
-function cancelRoleEdit(): void {
-	selectedRole.value = user.value?.role ?? null
-	editRoleModal.value?.hide()
-}
-
 async function toggleAffiliate(): Promise<void> {
 	if (!user.value) return
 	await userProfile.patchUser(user.value.id, {
 		badges: user.value.badges ^ UserBadge.AFFILIATE,
 	})
 	await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
-}
-
-async function saveRoleEdit(): Promise<void> {
-	if (!user.value || !selectedRole.value || selectedRole.value === user.value.role) return
-
-	isSavingRole.value = true
-	try {
-		await userProfile.patchUser(user.value.id, { role: selectedRole.value })
-		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
-		editRoleModal.value?.hide()
-	} catch {
-		notificationManager.addNotification({
-			type: 'error',
-			title: formatMessage(messages.roleUpdateErrorTitle),
-			text: formatMessage(messages.roleUpdateErrorDescription),
-		})
-	} finally {
-		isSavingRole.value = false
-	}
 }
 </script>

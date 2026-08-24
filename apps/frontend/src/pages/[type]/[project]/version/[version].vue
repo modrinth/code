@@ -145,6 +145,22 @@
 							{{ formatMessage(commonMessages.downloadButton) }}
 						</ButtonLink>
 						<ButtonLink
+							v-if="
+								!!primaryFile?.url &&
+								isStaff(auth.user) &&
+								modSettings.get(moderationSettings.General.SlicerButtonInVersions)
+							"
+							v-tooltip="`Open in Slicer`"
+							type="quiet"
+							target="_blank"
+							:href="`https://slicer.run/?url=${encodeURIComponent(primaryFile?.url)}`"
+							class="!bg-button-bg"
+							aria-label="Open in Slicer"
+						>
+							<ExternalIcon aria-hidden="true" />
+							Open
+						</ButtonLink>
+						<ButtonLink
 							v-for="file in promotedFiles.filter(
 								(x) =>
 									!!x &&
@@ -502,6 +518,7 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
 	Button,
@@ -545,6 +562,7 @@ const emit = defineEmits<{
 const data = useNuxtApp()
 const route = useNativeRoute()
 const router = useRouter()
+const modSettings = useModerationSettings()
 const auth = await useAuth()
 const tags = useGeneratedState()
 const client = injectModrinthClient()

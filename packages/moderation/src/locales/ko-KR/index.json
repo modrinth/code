@@ -269,10 +269,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "외부 링크 인증"
   },
-  "nags.versions.title": {
-    "defaultMessage": "버전 페이지 방문"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "링크 설정 방문"
   }
 }
+

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE onboarding_checklist\n                SET has_logged_into_minecraft = TRUE\n                WHERE id = 0 AND has_logged_into_minecraft = FALSE\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "c715a78bfe15b58f7a14c9eaf3bb59c6d9d83486ccadae7351b1516d3387834f"
+}

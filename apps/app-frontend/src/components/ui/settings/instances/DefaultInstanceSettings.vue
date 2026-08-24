@@ -10,7 +10,7 @@ import {
 import { ref, watch } from 'vue'
 
 import useMemorySlider from '@/composables/useMemorySlider'
-import { get, set } from '@/helpers/settings.ts'
+import { get, parseEnvVars, serializeEnvVars, set } from '@/helpers/settings.ts'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -116,11 +116,40 @@ const messages = defineMessages({
 		id: 'app.settings.default-instance-options.post-exit-hook.description',
 		defaultMessage: 'Runs after the game closes.',
 	},
+	hookVariablesDescription: {
+		id: 'instance.settings.tabs.hooks.variables.description',
+		defaultMessage:
+			'Hooks run in the working directory of the instance, with the following variables:',
+	},
+	instanceNameDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-name.description',
+		defaultMessage: '$INST_NAME: The name of the instance',
+	},
+	instanceIdDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-id.description',
+		defaultMessage: "$INST_ID: The name of the instance's folder",
+	},
+	instanceDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-dir.description',
+		defaultMessage: "$INST_DIR: The absolute path to the instance's folder",
+	},
+	instanceMcDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-mc-dir.description',
+		defaultMessage: '$INST_MC_DIR: An alias for $INST_DIR',
+	},
+	instanceJavaDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java.description',
+		defaultMessage: '$INST_JAVA: The absolute path to the java binary',
+	},
+	instanceJavaArgsDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java-args.description',
+		defaultMessage: '$INST_JAVA_ARGS: The JVM Arguments provided to the game',
+	},
 })
 
 const fetchSettings = await get()
 fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')
-fetchSettings.envVars = fetchSettings.custom_env_vars.map((x) => x.join('=')).join(' ')
+fetchSettings.envVars = serializeEnvVars(fetchSettings.custom_env_vars)
 
 const settings = ref(fetchSettings)
 
@@ -135,27 +164,15 @@ watch(
 		const setSettings = JSON.parse(JSON.stringify(settings.value))
 
 		setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
-		setSettings.custom_env_vars = setSettings.envVars
-			.trim()
-			.split(/\s+/)
-			.filter(Boolean)
-			.map((x) => x.split('=').filter(Boolean))
-
-		if (!setSettings.hooks.pre_launch) {
-			setSettings.hooks.pre_launch = null
-		}
-		if (!setSettings.hooks.wrapper) {
-			setSettings.hooks.wrapper = null
-		}
-		if (!setSettings.hooks.post_exit) {
-			setSettings.hooks.post_exit = null
-		}
+		setSettings.custom_env_vars = parseEnvVars(setSettings.envVars)
+		delete setSettings.launchArgs
+		delete setSettings.envVars
 
 		if (!setSettings.custom_dir) {
 			setSettings.custom_dir = null
 		}
 
-		await set(setSettings)
+		await set(setSettings).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -327,6 +344,18 @@ watch(
 				<p class="m-0 leading-tight">
 					{{ formatMessage(messages.postExitHookDescription) }}
 				</p>
+			</div>
+
+			<div class="m-0 leading-tight">
+				{{ formatMessage(messages.hookVariablesDescription) }}
+				<ul>
+					<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
+				</ul>
 			</div>
 		</div>
 	</div>

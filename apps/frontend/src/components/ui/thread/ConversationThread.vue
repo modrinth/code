@@ -275,7 +275,6 @@
 									{{ formatMessage(messages.actionApprove) }}
 								</Button>
 								<SplitButton
-									class="!m-0 !inline-flex !flex-nowrap !justify-start !gap-0"
 									type="colored"
 									color="red"
 									:menu-label="formatMessage(commonMessages.moreOptionsButton)"

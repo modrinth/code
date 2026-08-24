@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import { GameIcon, LeftArrowIcon } from '@modrinth/assets'
-import { Avatar, ButtonLink, FormattedTag } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
+import { Avatar, ButtonLink, defineMessages, FormattedTag, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
+
+import { getInstanceIconUrl } from '@/helpers/instance'
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	backToInstance: {
+		id: 'app.instance.navigation.back-to-instance',
+		defaultMessage: 'Back to instance',
+	},
+})
 
 type Instance = {
 	game_version: string
@@ -31,11 +40,7 @@ const instanceLink = computed(() => {
 	<div class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4">
 		<router-link :to="instanceLink" tabindex="-1" class="flex flex-col gap-4 text-primary">
 			<span class="flex items-center gap-2">
-				<Avatar
-					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
-					:alt="instance.name"
-					size="48px"
-				/>
+				<Avatar :src="getInstanceIconUrl(instance.icon_path)" :alt="instance.name" size="48px" />
 				<span class="flex flex-col gap-2">
 					<span class="font-extrabold bold text-contrast">
 						{{ instance.name }}
@@ -48,7 +53,9 @@ const instanceLink = computed(() => {
 				</span>
 			</span>
 		</router-link>
-		<ButtonLink :to="instanceLink"> <LeftArrowIcon /> Back to instance </ButtonLink>
+		<ButtonLink :to="instanceLink">
+			<LeftArrowIcon /> {{ formatMessage(messages.backToInstance) }}
+		</ButtonLink>
 	</div>
 </template>
 

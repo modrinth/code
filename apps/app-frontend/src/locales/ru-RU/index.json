@@ -143,29 +143,11 @@
   "app.ads-consent.title": {
     "message": "Конфиденциальность и реклама на Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Использовать эффекты вроде размытия фона. Без аппаратного ускорения возможна потеря производительности."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Расширенные эффекты"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Выберите тему для Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Тема"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Выберите страницу для показа при запуске Modrinth App."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Главная"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Библиотека"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Стартовая страница"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Скрывать имя над игроком на странице выбора скина."
@@ -184,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Сворачивание приложения"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Использовать системное оформление заголовка и кнопок окна. Требуется перезапуск."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Системная рамка окна"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показывать проведённое время в сборке."
@@ -377,17 +353,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Проверьте изменения"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Обзор обновления"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Проверка..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-body": {
-    "message": "Необходимо обновление для игры в {name}. Обновитесь до последней версии и запустите игру."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Доступно обновление"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Все данные сборки будут удалены навсегда, в том числе миры, настройки и весь установленный контент."
@@ -695,15 +662,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Какое правило нарушает данная сборка?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Неприемлемое содержимое"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Вредоносное содержимое"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Спам"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Сообщить об общем экземпляре"
   },
@@ -769,9 +727,6 @@
   },
   "app.nav.home": {
     "message": "Главная"
-  },
-  "app.nav.library": {
-    "message": "Библиотека"
   },
   "app.nav.modrinth-account": {
     "message": "Аккаунт Modrinth"
@@ -1157,15 +1112,6 @@
   "app.skins.sign-in.button": {
     "message": "Войти"
   },
-  "app.skins.sign-in.description": {
-    "message": "Пожалуйста, войдите в свой аккаунт Minecraft, чтобы воспользоваться функциями управления скинами в приложении Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Восторженный Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Войдите"
-  },
   "app.skins.title": {
     "message": "Выбор скина"
   },
@@ -1220,6 +1166,9 @@
   "app.update.complete-toast.title": {
     "message": "Версия {version} успешно установлена!"
   },
+  "app.user.project.install-to-instance": {
+    "message": "Установить в сборку"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -1234,9 +1183,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Не в сети"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} в игре"
   },
   "content.shared-instance.change-version-body": {
     "message": "Изменение версии затрагивает только локальную копию. В будущих обновлениях общего экземпляра она может быть восстановлена ​​или изменена снова."
@@ -1338,7 +1284,7 @@
     "message": "Связанная сборка"
   },
   "installation-settings.shared-instance.title": {
-    "message": "Отменить публикацию экземпляра"
+    "message": "Закрытие доступа"
   },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Отвязать сборку"
@@ -1350,13 +1296,13 @@
     "message": "Отвязка..."
   },
   "installation-settings.shared-instance.unpublish-button": {
-    "message": "Отменить публикацию общего экземпляра"
+    "message": "Закрыть доступ к сборке"
   },
   "installation-settings.shared-instance.unpublish-description": {
-    "message": "Удалите этот общий экземпляр из Modrinth и прекратите отправлять обновления всем, кто его использует. Ваш локальный экземпляр останется без изменений."
+    "message": "Удаляет сборку с серверов Modrinth и прекращает отправку обновлений. Локальная копия сборки останется нетронутой."
   },
   "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Снятие с публикации..."
+    "message": "Закрытие доступа..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Это повлияет только на ваш локальный экземпляр. Установленный контент останется на этом устройстве, и это никак не отразится на общем экземпляре и других пользователях."
@@ -1368,13 +1314,13 @@
     "message": "Отвязка сборки"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "Это удалит общий экземпляр с серверов Modrinth. Пользователи, использующие его в приложении Modrinth, перестанут получать обновления, но ваш локальный экземпляр и его содержимое останутся на этом устройстве."
+    "message": "Сборка будет удалена с серверов Modrinth. Локальная копия и её контент останутся на устройстве, а другие участники перестанут получать обновления."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Отмена публикации общего экземпляра"
+    "message": "Закрытие доступа к сборке"
   },
   "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Отменить публикацию общего экземпляра"
+    "message": "Закрытие доступа к сборке"
   },
   "instance.action.create-shortcut": {
     "message": "Создать ярлык"
@@ -1541,18 +1487,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Выбрать иконку"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Группировка"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Создать новую группу"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Позволяет организовать сборки по разным разделам в библиотеке."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Введите название группы"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Название"
   },
@@ -1609,6 +1543,27 @@
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Команды запуска игры"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Команды выполняются в рабочем каталоге сборки. Список переменных:"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: абсолютный путь к папке сборки"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: имя папки сборки"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: аргументы JVM, передаваемые игре"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: абсолютный путь к Java"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: аналог $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: название сборки"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Обёртка"
@@ -1844,9 +1799,6 @@
   "modal.modrinth-account-required.browser-description": {
     "message": "Открылась вкладка для входа. Завершение вход и вернитесь в приложение."
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Отмена"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Продолжите в браузере"
   },
@@ -1889,17 +1841,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Использовать из сборки"
   },
-  "search.filter.locked.server": {
-    "message": "Управляется сервером"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "В серверной сборке доступны только клиентские моды"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Версия игры управляется сервером"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Загрузчик управляется сервером"
   },
   "settings.sidebar.label.account": {
     "message": "Аккаунт"

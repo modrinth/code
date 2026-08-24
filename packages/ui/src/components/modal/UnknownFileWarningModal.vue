@@ -164,8 +164,7 @@ const messages = defineMessages({
 	},
 	reviewedFiles: {
 		id: 'unknown-file-warning-modal.reviewed-files',
-		defaultMessage:
-			'A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack).',
+		defaultMessage: "Files that aren't published to Modrinth aren't reviewed.",
 	},
 	unrecognizedFiles: {
 		id: 'unknown-file-warning-modal.unrecognized-files',

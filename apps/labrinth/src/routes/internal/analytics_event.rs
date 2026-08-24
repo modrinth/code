@@ -36,7 +36,7 @@ pub struct AnalyticsEventUpsert {
     pub ends: DateTime<Utc>,
 }
 
-/// Create an analytics event.  
+/// Create an analytics event.
 #[utoipa::path(
 	context_path = "/analytics-event",
 	tag = "analytics events", responses((status = OK, body = AnalyticsEvent))
@@ -56,7 +56,8 @@ pub async fn analytics_event_create(
         &session_queue,
         Scopes::empty(),
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     if !user.role.is_admin() {
@@ -95,7 +96,7 @@ pub async fn analytics_event_create(
     Ok(web::Json(event.into()))
 }
 
-/// Update an analytics event.  
+/// Update an analytics event.
 #[utoipa::path(
 	context_path = "/analytics-event",
 	tag = "analytics events", responses((status = OK, body = AnalyticsEvent))
@@ -116,7 +117,8 @@ pub async fn analytics_event_edit(
         &session_queue,
         Scopes::empty(),
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     if !user.role.is_admin() {
@@ -137,7 +139,7 @@ pub async fn analytics_event_edit(
         .await
         .wrap_internal_err("failed to update analytics event")?;
     if !updated {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
     DBAnalyticsEvent::clear_cache(&redis)
         .await
@@ -146,7 +148,7 @@ pub async fn analytics_event_edit(
     Ok(web::Json(event.into()))
 }
 
-/// Delete an analytics event.  
+/// Delete an analytics event.
 #[utoipa::path(
 	context_path = "/analytics-event",
 	tag = "analytics events", responses((status = NO_CONTENT))
@@ -166,7 +168,8 @@ pub async fn analytics_event_delete(
         &session_queue,
         Scopes::empty(),
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     if !user.role.is_admin() {
@@ -182,7 +185,7 @@ pub async fn analytics_event_delete(
     .await
     .wrap_internal_err("failed to delete analytics event")?;
     if !deleted {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
     DBAnalyticsEvent::clear_cache(&redis)
         .await

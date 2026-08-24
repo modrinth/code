@@ -103,7 +103,7 @@ import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
-import { useGeneratedState } from '~/composables/generated'
+import { tremendousIdMap } from '~/generated/state.json'
 import { findRail } from '~/utils/muralpay-rails'
 
 const { formatMessage } = useVIntl()
@@ -114,7 +114,6 @@ const formatMonth = useFormatDateTime({
 })
 
 const client = injectModrinthClient()
-const generatedState = useGeneratedState()
 
 const messages = defineMessages({
 	transactionsHeader: {
@@ -281,7 +280,7 @@ function transactionsToCSV() {
 					break
 				case 'tremendous':
 					if (txn.method_id) {
-						const info = generatedState.value.tremendousIdMap?.[txn.method_id]
+						const info = tremendousIdMap?.[txn.method_id]
 						if (info) {
 							methodOrSource = `Tremendous (${info.name})`
 							break

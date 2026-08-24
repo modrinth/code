@@ -14,8 +14,13 @@
 			:members="members"
 			:dependency-link-creator="createDependencyLink"
 		>
-			<template #headerActions>
+			<template #headerActions="{ primaryFile }">
 				<Button
+					v-tooltip="
+						primaryFile?.url
+							? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
+							: undefined
+					"
 					type="colored"
 					color="brand"
 					:disabled="installing || (installed && installedVersion === version.id)"
@@ -92,6 +97,7 @@ import {
 	commonMessages,
 	defineMessages,
 	type DependencyContext,
+	useFormatBytes,
 	useVIntl,
 	VersionPage,
 } from '@modrinth/ui'
@@ -103,6 +109,7 @@ import { get_project_many, get_version_many } from '@/helpers/cache.js'
 import { useBreadcrumb } from '@/providers/breadcrumbs'
 
 const { formatMessage } = useVIntl()
+const formatBytes = useFormatBytes()
 
 const messages = defineMessages({
 	allVersions: {

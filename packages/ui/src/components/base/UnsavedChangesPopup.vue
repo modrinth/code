@@ -15,6 +15,8 @@ const emit = defineEmits<{
 	(e: 'reset' | 'save', event: MouseEvent): void
 }>()
 
+type SaveDisabledReason = MessageDescriptor | string
+
 const props = withDefaults(
 	defineProps<{
 		canReset?: boolean
@@ -25,6 +27,7 @@ const props = withDefaults(
 		text?: MessageDescriptor | string
 		saveLabel?: MessageDescriptor | string
 		savingLabel?: MessageDescriptor | string
+		saveDisabledReason?: SaveDisabledReason | SaveDisabledReason[]
 		saveIcon?: Component
 		inline?: boolean
 	}>(),
@@ -39,18 +42,37 @@ const props = withDefaults(
 			}),
 		saveLabel: () => commonMessages.saveButton,
 		savingLabel: () => commonMessages.savingButton,
+		saveDisabledReason: undefined,
 		saveIcon: SaveIcon,
 		inline: false,
 	},
 )
 
-const shown = computed(() =>
-	Object.keys(props.modified).some((key) => !isEqual(props.original[key], props.modified[key])),
+const shown = computed(
+	() =>
+		props.saving ||
+		Object.keys(props.modified).some((key) => !isEqual(props.original[key], props.modified[key])),
 )
 
 function localizeIfPossible(message: MessageDescriptor | string) {
 	return typeof message === 'string' ? message : formatMessage(message)
 }
+
+const saveDisabled = computed(() => props.saving || !props.canSave)
+
+const saveDisabledTooltip = computed(() => {
+	if (!saveDisabled.value || props.saving || !props.saveDisabledReason) {
+		return undefined
+	}
+
+	const reasons = (
+		Array.isArray(props.saveDisabledReason) ? props.saveDisabledReason : [props.saveDisabledReason]
+	).map(localizeIfPossible)
+
+	return reasons.length > 0
+		? { content: reasons.join('\n'), popperClass: 'unsaved-changes-save-tooltip' }
+		: undefined
+})
 
 const actionBar = ref<InstanceType<typeof FloatingActionBar> | null>(null)
 
@@ -68,11 +90,32 @@ defineExpose({ nudge })
 			<Button v-if="canReset" type="quiet" :disabled="saving" @click="(e) => emit('reset', e)">
 				<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
 			</Button>
-			<Button type="colored" color="brand" :disabled="saving || !canSave" @click="(e) => emit('save', e)">
-				<SpinnerIcon v-if="saving" class="animate-spin" />
-				<component :is="saveIcon" v-else />
-				{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
-			</Button>
+			<span
+				v-tooltip="saveDisabledTooltip"
+				class="flex"
+				:class="{ 'cursor-not-allowed': saveDisabled }"
+			>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="saveDisabled"
+					:class="{ 'pointer-events-none': saveDisabled }"
+					@click="(e) => emit('save', e)"
+				>
+					<SpinnerIcon v-if="saving" class="animate-spin" />
+					<component :is="saveIcon" v-else />
+					{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
+				</Button>
+			</span>
 		</div>
 	</FloatingActionBar>
 </template>
+
+<style lang="scss">
+/* unscoped because floating-vue teleports the tooltip outside of scope */
+.v-popper__popper.v-popper--theme-tooltip.unsaved-changes-save-tooltip .v-popper__inner {
+	max-width: 22rem;
+	white-space: pre-line;
+	line-height: 1.4;
+}
+</style>

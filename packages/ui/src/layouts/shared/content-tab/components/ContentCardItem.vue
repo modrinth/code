@@ -2,11 +2,13 @@
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	SpinnerIcon,
 	TrashExclamationIcon,
 	TrashIcon,
 	TriangleAlertIcon,
+	UploadIcon,
 } from '@modrinth/assets'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, getCurrentInstance, ref } from 'vue'
@@ -18,6 +20,7 @@ import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
+import ProgressSpinner from '#ui/components/base/ProgressSpinner.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -38,6 +41,14 @@ const messages = defineMessages({
 		id: 'content.card.select-project',
 		defaultMessage: 'Select {project}',
 	},
+	uploaded: {
+		id: 'content.card.uploaded',
+		defaultMessage: 'Uploaded',
+	},
+	frozen: {
+		id: 'content.card.frozen',
+		defaultMessage: 'This project is locked to its current version until unfrozen.',
+	},
 })
 
 interface Props {
@@ -47,8 +58,11 @@ interface Props {
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	source?: ContentSource
+	external?: boolean
 	enabled?: boolean
+	locked?: boolean
 	installing?: boolean
+	installProgress?: number | null
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
@@ -58,6 +72,7 @@ interface Props {
 	disabledTooltip?: string | null
 	toggleDisabled?: boolean
 	toggleDisabledTooltip?: string | null
+	hideToggle?: boolean
 	showCheckbox?: boolean
 	hideDelete?: boolean
 	hideActions?: boolean
@@ -70,8 +85,11 @@ const props = withDefaults(defineProps<Props>(), {
 	versionLink: undefined,
 	owner: undefined,
 	source: undefined,
+	external: false,
 	enabled: undefined,
+	locked: false,
 	installing: false,
+	installProgress: undefined,
 	hasUpdate: false,
 	isClientOnly: false,
 	clientWarning: null,
@@ -81,6 +99,7 @@ const props = withDefaults(defineProps<Props>(), {
 	disabledTooltip: undefined,
 	toggleDisabled: false,
 	toggleDisabledTooltip: undefined,
+	hideToggle: false,
 	showCheckbox: false,
 	hideDelete: false,
 	hideActions: false,
@@ -123,6 +142,11 @@ const clientWarningMessage = computed(() => {
 
 const { shift: shiftHeld } = useMagicKeys()
 const deleteHovered = ref(false)
+const installTooltip = computed(() => {
+	if (!props.installing) return undefined
+	if (props.installProgress == null) return formatMessage(commonMessages.installingLabel)
+	return `${formatMessage(commonMessages.installingLabel)} (${Math.round(props.installProgress)}%)`
+})
 </script>
 
 <template>
@@ -146,6 +170,7 @@ const deleteHovered = ref(false)
 				v-if="showCheckbox"
 				:model-value="selected ?? false"
 				:aria-label="formatMessage(messages.selectProject, { project: project.title })"
+				:disabled="isDisabled"
 				class="shrink-0"
 				@update:model-value="(value, event) => emit('select', value, event)"
 			/>
@@ -154,10 +179,7 @@ const deleteHovered = ref(false)
 				class="flex min-w-0 items-center gap-3 transition-[filter,opacity] duration-200"
 				:class="enabled === false && !disabled ? 'grayscale opacity-50' : ''"
 			>
-				<div
-					v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined"
-					class="relative flex shrink-0 items-center"
-				>
+				<div v-tooltip="installTooltip" class="relative flex shrink-0 items-center">
 					<Avatar
 						:src="project.icon_url"
 						:alt="project.title"
@@ -169,7 +191,13 @@ const deleteHovered = ref(false)
 						v-if="installing"
 						class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20"
 					>
-						<SpinnerIcon class="size-5 animate-spin text-white" />
+						<ProgressSpinner
+							v-if="installProgress != null && installProgress > 0"
+							:progress="installProgress"
+							:max="100"
+							class="size-5 text-white"
+						/>
+						<SpinnerIcon v-else class="size-5 animate-spin text-white" />
 					</div>
 				</div>
 				<div class="flex min-w-0 flex-col gap-0.5">
@@ -243,7 +271,11 @@ const deleteHovered = ref(false)
 							/>
 							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>
-						<template v-if="version">
+						<span v-else-if="external" class="flex items-center gap-1 text-secondary">
+							<UploadIcon class="size-4 shrink-0" />
+							<span class="text-sm leading-5">{{ formatMessage(messages.uploaded) }}</span>
+						</span>
+						<template v-if="version && !external">
 							<BulletDivider class="shrink-0 @[800px]:hidden" />
 							<AutoLink
 								:target="
@@ -277,7 +309,7 @@ const deleteHovered = ref(false)
 						typeof versionLink === 'string' && versionLink.startsWith('http') ? '_blank' : undefined
 					"
 					:to="versionLink"
-					class="inline-flex min-w-0 font-medium leading-6 text-contrast !decoration-contrast"
+					class="inline-flex min-w-0 font-semibold leading-6 text-contrast !decoration-contrast"
 					:class="{ 'hover:underline': versionLink, 'cursor-pointer': versionLink }"
 				>
 					<span ref="versionNumberRef" class="truncate">{{
@@ -309,11 +341,24 @@ const deleteHovered = ref(false)
 
 			<!-- Fixed width container to reserve space for update/switch version button -->
 			<div
-				v-if="hasUpdateListener || hasSwitchVersionListener"
+				v-if="
+					locked ||
+					(hasUpdateListener && hasUpdate) ||
+					(hasSwitchVersionListener && version && !hideSwitchVersion)
+				"
 				class="flex w-8 items-center justify-center"
 			>
 				<IconButton
-					v-if="hasUpdate"
+					v-if="locked"
+					v-tooltip="formatMessage(messages.frozen)"
+					type="quiet"
+					:label="formatMessage(messages.frozen)"
+					disabled
+				>
+					<LockIcon class="size-5" />
+				</IconButton>
+				<IconButton
+					v-else-if="hasUpdate"
 					v-tooltip="
 						isDisabled && disabledTooltip
 							? disabledTooltip
@@ -353,7 +398,7 @@ const deleteHovered = ref(false)
 			</div>
 
 			<Toggle
-				v-if="enabled !== undefined"
+				v-if="enabled !== undefined && !hideToggle"
 				v-tooltip="
 					isToggleDisabled && (toggleDisabledTooltip || disabledTooltip)
 						? (toggleDisabledTooltip ?? disabledTooltip)

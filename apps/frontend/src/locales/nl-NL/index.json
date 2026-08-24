@@ -1478,9 +1478,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Recentelijk geüpdate"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Sluiten"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
   },
@@ -2846,9 +2843,6 @@
   "layout.footer.social.discord": {
     "message": "Discord "
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2981,9 +2975,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Niet gelukt om alle groepen te wissen: {error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Wissen"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Alle groepen zijn succesvol gewist."
   },
@@ -3022,9 +3013,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Scannen..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Gelukt"
   },
   "modpack-scan-modal.title": {
     "message": "Modpack-scan ({scanned}/{total} bestanden)"
@@ -3935,11 +3923,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Uitgelichte tags"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Je kunt maximaal 3 van je meest relevante tags als uitgelichte tags selecteren. Als je niet alle 3 selecteert, kunnen andere tags als uitgelichte tags worden weergegeven."
+  "project.settings.tags.featured-tags-required": {
+    "message": "Je moet minstens één uitgelichte tag hebben."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Kies je meest relevante tags. Deze worden vóór de overige tags weergegeven."
   },
   "project.settings.tags.features-description": {
     "message": "Selecteer alle functies waarvan je {type} gebruikmaakt."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} categorieën} other {Categorieën}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} functies} other {Functies}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} invloed op de prestaties} other {Invloed op de prestaties}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} resoluties} other {Resoluties}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Je hebt {count} resolutietags ({tags}) geselecteerd. Bronpakketten zouden normaal gesproken slechts één resolutietag moeten hebben."
@@ -3953,9 +3956,6 @@
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecteer minstens één categorie om een categorie uit te lichten."
   },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Nauwkeurige tags zijn belangrijk om mensen te helpen je {type} te vinden. Zorg ervoor dat je alle relevante tags selecteert."
-  },
   "project.settings.tags.title": {
     "message": "Tags"
   },
@@ -3967,18 +3967,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Je hebt {count} tags geselecteerd. Overweeg om dit aantal terug te brengen tot 12 of minder, zodat je project gericht blijft en gemakkelijker te vinden is."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Upload eerst een versie om tags te kunnen selecteren!"
-  },
-  "project.settings.title": {
-    "message": "Instellingen"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Bezoek het project dashboard"
-  },
-  "project.status.archived.message": {
-    "message": "{title} is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."
   },
   "project.versions.copy-id-option": {
     "message": "ID kopiëren"
@@ -5006,95 +4994,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Ontwikkelaarsmodus</strong> is ingeschakeld. Hiermee kun je de interne ID's bekijken van verschillende elementen in Modrinth, wat handig kan zijn als je als ontwikkelaar gebruikmaakt van de Modrinth-API. Klik vijf keer op het Modrinth-logo onderaan de pagina om de ontwikkelaarsmodus in of uit te schakelen."
   },
-  "settings.display.flags.description": {
-    "message": "Schakel bepaalde functies op dit apparaat in of uit."
-  },
-  "settings.display.flags.title": {
-    "message": "Functies in en uitschakelen"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "De ontwikkelaarsmodus is uitgeschakeld"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Ontwikkelaarsmodus uitgeschakeld"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Data Packs pagina"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Kies de gewenste lay-out voor elke pagina waarop projectlijsten op dit apparaat worden weergegeven."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods pagina"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Gallerij"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Raster"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Rijen"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modpacks pagina"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins pagina"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Resource Packs pagina"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Servers pagina"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shaders pagina"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Indelingen van projectlijsten"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Profielpagina's voor gebruikers"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Collectie"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Schakelt geavanceerde rendering in zoals vervaging effecten die prestatieproblemen kunnen veroorzaken zonder hardware-acceleratie."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Geavanceerde weergave"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Maak links die buiten Modrinth gaan open in een nieuw tabblad. Ongeacht deze instelling, links op hetzelfde domein en in Markdown beschrijvingen zullen worden geopend in hetzelfde tabblad, en links naar advertenties en bewerken pagina's worden geopend in een nieuw tabblad."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Externe links openen in nieuw tabblad"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Verbergt de \"Modrinth-app downloaden\" knoppen in de hoofdnavigatie. De Modrinth App-pagina is nog steeds te vinden op de startpagina of in de voettekst."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Promoties voor de Modrinth-app verbergen"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Links uitgelijnde zijbalk voor inhoudspagina's"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Lijn de project-details zijbalk uit naar de rechterkant van de paginainhoud."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Lijn de zoekfilters zijbalk uit aan de rechterkant van de zoekresultaten."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Rechts uitgelijnde zijbalk voor zoek pagina's"
-  },
-  "settings.display.theme.description": {
-    "message": "Kies het kleurenthema dat je het mooist vindt voor Modrinth op dit apparaat."
-  },
-  "settings.display.theme.title": {
-    "message": "Kleurschema"
   },
   "settings.head-title": {
     "message": "Weergave instellingen"

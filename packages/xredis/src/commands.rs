@@ -1,9 +1,8 @@
 use std::fmt::Debug;
 
+use eyre::{Result, WrapErr};
 use redis::aio::ConnectionLike;
 use redis::{FromRedisValue, ToRedisArgs};
-
-use crate::Error;
 
 use super::cache::CacheSettings;
 use super::connection::RoutableConnection;
@@ -18,7 +17,7 @@ pub async fn set<C, D>(
     key: &str,
     data: D,
     expiry: i64,
-) -> Result<(), Error>
+) -> Result<()>
 where
     C: ConnectionLike,
     D: ToRedisArgs + Send + Sync + Debug,
@@ -29,7 +28,8 @@ where
         .arg("EX")
         .arg(expiry)
         .query_async::<()>(connection)
-        .await?;
+        .await
+        .wrap_err("writing to Redis")?;
     Ok(())
 }
 
@@ -40,7 +40,7 @@ pub async fn set_serialized<C, D>(
     data: D,
     expiry: Option<i64>,
     settings: &CacheSettings,
-) -> Result<(), Error>
+) -> Result<()>
 where
     C: ConnectionLike,
     D: serde::Serialize,
@@ -48,21 +48,24 @@ where
     set(
         connection,
         key,
-        settings.encode_value(&data)?,
+        settings
+            .encode_value(&data)
+            .wrap_err("serializing Redis value")?,
         expiry.unwrap_or(settings.default_expiry),
     )
     .await
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn get<C>(
-    connection: &mut C,
-    key: &str,
-) -> Result<Option<String>, Error>
+pub async fn get<C>(connection: &mut C, key: &str) -> Result<Option<String>>
 where
     C: ConnectionLike,
 {
-    Ok(cmd("GET").arg(key).query_async(connection).await?)
+    cmd("GET")
+        .arg(key)
+        .query_async(connection)
+        .await
+        .wrap_err("fetching from Redis")
 }
 
 /// Issues ordinary `MGET` commands in bounded chunks. Cluster routing and
@@ -72,7 +75,7 @@ where
 pub async fn get_many<C>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<Vec<u8>>>, Error>
+) -> Result<Vec<Option<Vec<u8>>>>
 where
     C: ConnectionLike,
 {
@@ -83,7 +86,7 @@ where
 pub async fn get_many_strings<C>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<String>>, Error>
+) -> Result<Vec<Option<String>>>
 where
     C: ConnectionLike,
 {
@@ -93,7 +96,7 @@ where
 pub(super) async fn get_many_primary<C>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<Vec<u8>>>, Error>
+) -> Result<Vec<Option<Vec<u8>>>>
 where
     C: RoutableConnection,
 {
@@ -103,7 +106,7 @@ where
 pub(super) async fn get_many_strings_primary<C>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<String>>, Error>
+) -> Result<Vec<Option<String>>>
 where
     C: RoutableConnection,
 {
@@ -113,7 +116,7 @@ where
 pub(super) async fn get_many_as<C, T>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<T>>, Error>
+) -> Result<Vec<Option<T>>>
 where
     C: ConnectionLike,
     T: FromRedisValue,
@@ -123,7 +126,8 @@ where
         let part = cmd("MGET")
             .arg(chunk)
             .query_async::<Vec<Option<T>>>(connection)
-            .await?;
+            .await
+            .wrap_err("fetching multiple values from Redis")?;
         values.extend(part);
     }
     Ok(values)
@@ -132,7 +136,7 @@ where
 async fn get_many_primary_as<C, T>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<T>>, Error>
+) -> Result<Vec<Option<T>>>
 where
     C: RoutableConnection,
     T: FromRedisValue,
@@ -143,10 +147,14 @@ where
         command.arg(chunk);
         let value = connection
             .route_command(command, primary_mget_routing(chunk))
-            .await?;
-        let part =
-            redis::from_redis_value::<Vec<Option<T>>>(value.extract_error()?)
-                .map_err(redis::RedisError::from)?;
+            .await
+            .wrap_err("fetching multiple values from primary Redis nodes")?;
+        let value = value
+            .extract_error()
+            .wrap_err("extracting Redis response")?;
+        let part = redis::from_redis_value::<Vec<Option<T>>>(value)
+            .map_err(redis::RedisError::from)
+            .wrap_err("decoding Redis response")?;
         values.extend(part);
     }
     Ok(values)
@@ -157,13 +165,16 @@ pub async fn get_deserialized<C, R>(
     connection: &mut C,
     key: &str,
     settings: &CacheSettings,
-) -> Result<Option<R>, Error>
+) -> Result<Option<R>>
 where
     C: ConnectionLike,
     R: for<'a> serde::Deserialize<'a>,
 {
-    let value: Option<Vec<u8>> =
-        cmd("GET").arg(key).query_async(connection).await?;
+    let value: Option<Vec<u8>> = cmd("GET")
+        .arg(key)
+        .query_async(connection)
+        .await
+        .wrap_err("fetching serialized value from Redis")?;
     Ok(value.and_then(|value| settings.decode_value(&value)))
 }
 
@@ -172,47 +183,49 @@ pub async fn get_many_deserialized<C, R>(
     connection: &mut C,
     keys: &[String],
     settings: &CacheSettings,
-) -> Result<Vec<Option<R>>, Error>
+) -> Result<Vec<Option<R>>>
 where
     C: ConnectionLike,
     R: for<'a> serde::Deserialize<'a>,
 {
     Ok(get_many(connection, keys)
-        .await?
+        .await
+        .wrap_err("fetching serialized values from Redis")?
         .into_iter()
         .map(|value| value.and_then(|value| settings.decode_value(&value)))
         .collect())
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn delete<C>(connection: &mut C, key: &str) -> Result<(), Error>
+pub async fn delete<C>(connection: &mut C, key: &str) -> Result<()>
 where
     C: ConnectionLike,
 {
-    cmd("DEL").arg(key).query_async::<()>(connection).await?;
+    cmd("DEL")
+        .arg(key)
+        .query_async::<()>(connection)
+        .await
+        .wrap_err("deleting from Redis")?;
     Ok(())
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn delete_many<C>(
-    connection: &mut C,
-    keys: &[String],
-) -> Result<(), Error>
+pub async fn delete_many<C>(connection: &mut C, keys: &[String]) -> Result<()>
 where
     C: ConnectionLike,
 {
     if !keys.is_empty() {
-        cmd("DEL").arg(keys).query_async::<()>(connection).await?;
+        cmd("DEL")
+            .arg(keys)
+            .query_async::<()>(connection)
+            .await
+            .wrap_err("deleting multiple values from Redis")?;
     }
     Ok(())
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn lpush<C, D>(
-    connection: &mut C,
-    key: &str,
-    value: D,
-) -> Result<(), Error>
+pub async fn lpush<C, D>(connection: &mut C, key: &str, value: D) -> Result<()>
 where
     C: ConnectionLike,
     D: ToRedisArgs + Send + Sync + Debug,
@@ -221,17 +234,19 @@ where
         .arg(key)
         .arg(value)
         .query_async::<()>(connection)
-        .await?;
+        .await
+        .wrap_err("pushing to Redis list")?;
     Ok(())
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn incr<C>(
-    connection: &mut C,
-    key: &str,
-) -> Result<Option<u64>, Error>
+pub async fn incr<C>(connection: &mut C, key: &str) -> Result<Option<u64>>
 where
     C: ConnectionLike,
 {
-    Ok(cmd("INCR").arg(key).query_async(connection).await?)
+    cmd("INCR")
+        .arg(key)
+        .query_async(connection)
+        .await
+        .wrap_err("incrementing Redis value")
 }

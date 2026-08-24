@@ -11,7 +11,7 @@ import { computed, ref, watch } from 'vue'
 import { edit } from '@/helpers/instance'
 import { get } from '@/helpers/settings.ts'
 
-import type { AppSettings, Hooks } from '../../../../helpers/types'
+import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
 
 const { handleError } = injectNotificationManager()
@@ -26,23 +26,31 @@ const overrideHooks = ref(
 		!!instance.value.hooks.wrapper ||
 		!!instance.value.hooks.post_exit,
 )
-const hooks = ref(instance.value.hooks ?? globalSettings.hooks)
-
-const editInstanceObject = computed(() => {
-	const editInstancePatch: {
-		hooks?: Hooks
-	} = {}
-
-	// When hooks are not overridden per-instance, we want to clear them
-	editInstancePatch.hooks = overrideHooks.value ? hooks.value : {}
-
-	return editInstancePatch
+const hooksRaw = instance.value.hooks ?? globalSettings.hooks
+const hooks = ref({
+	pre_launch: hooksRaw.pre_launch ?? '',
+	wrapper: hooksRaw.wrapper ?? '',
+	post_exit: hooksRaw.post_exit ?? '',
 })
+
+const editInstanceObject = computed(() => ({
+	hooks: overrideHooks.value
+		? {
+				pre_launch: hooks.value.pre_launch ?? '',
+				wrapper: hooks.value.wrapper ?? '',
+				post_exit: hooks.value.post_exit ?? '',
+			}
+		: {
+				pre_launch: '',
+				wrapper: '',
+				post_exit: '',
+			},
+}))
 
 watch(
 	[overrideHooks, hooks],
 	async () => {
-		await edit(instance.value.id, editInstanceObject.value)
+		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -55,6 +63,35 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.hooks.description',
 		defaultMessage:
 			'Hooks allow advanced users to run certain system commands before and after launching the game.',
+	},
+	hookVariablesDescription: {
+		id: 'instance.settings.tabs.hooks.variables.description',
+		defaultMessage:
+			'Hooks run in the working directory of the instance, with the following variables:',
+	},
+	instanceNameDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-name.description',
+		defaultMessage: '$INST_NAME: The name of the instance',
+	},
+	instanceIdDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-id.description',
+		defaultMessage: "$INST_ID: The name of the instance's folder",
+	},
+	instanceDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-dir.description',
+		defaultMessage: "$INST_DIR: The absolute path to the instance's folder",
+	},
+	instanceMcDirDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-mc-dir.description',
+		defaultMessage: '$INST_MC_DIR: An alias for $INST_DIR',
+	},
+	instanceJavaDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java.description',
+		defaultMessage: '$INST_JAVA: The absolute path to the java binary',
+	},
+	instanceJavaArgsDescription: {
+		id: 'instance.settings.tabs.hooks.variables.inst-java-args.description',
+		defaultMessage: '$INST_JAVA_ARGS: The JVM Arguments provided to the game',
 	},
 	customHooks: {
 		id: 'instance.settings.tabs.hooks.custom-hooks',
@@ -153,5 +190,17 @@ const messages = defineMessages({
 		<p class="m-0">
 			{{ formatMessage(messages.postExitDescription) }}
 		</p>
+
+		<div class="m-0 mt-6">
+			{{ formatMessage(messages.hookVariablesDescription) }}
+		</div>
+		<ul class="m-0 mt-2">
+			<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
+			<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
+		</ul>
 	</div>
 </template>

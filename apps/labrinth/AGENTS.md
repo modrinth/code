@@ -12,8 +12,10 @@
   - no trailing punctuation
   - wrap code items e.g. type names in backticks
 - Prefer `wrap_internal_err`, `wrap_request_err` when attaching context to an existing error (like Anyhow `context` or Eyre `wrap_err`)
+- Prefer importing `eyre::Result` and using `Result<T>` instead of `eyre::Result<T>`
+- Prefer `eyre::Ok(value)` instead of `Ok::<_, eyre::Report>(value)` when an explicit Eyre result type is needed
 - All operations should ideally have some context attached
-  - Database operations can have a message like `.wrap_internal_err("failed to fetch XYZ")`
+  - Database operations can have a message like `.wrap_internal_err("fetching XYZ")`
 - You can perform real-time queries against the databases in the Docker Compose
   - `docker exec labrinth-postgres psql -c "select 1"`
   - `docker exec labrinth-redis redis-cli flushall`

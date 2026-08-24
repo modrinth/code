@@ -9,6 +9,7 @@ pub mod metadata;
 pub mod minecraft_auth;
 pub mod minecraft_skins;
 pub mod mr_auth;
+pub mod onboarding_checklist;
 pub mod pack;
 pub mod process;
 pub mod reports;
@@ -23,13 +24,15 @@ pub mod data {
         AppliedContentSetPatch, CacheBehaviour, CacheValueType, ContentFile,
         ContentItem, ContentItemOwner, ContentItemProject, ContentItemVersion,
         CreateInstance, Credentials, Dependency, DirectoryInfo, EditInstance,
-        Hooks, InstanceInstallCandidate, InstanceInstallTarget,
+        Hooks, InstanceIconBackground, InstanceIconConfig,
+        InstanceInstallCandidate, InstanceInstallTarget,
         InstanceLaunchOverridesPatch, InstanceLink, InstanceMetadata,
         JavaVersion, LinkedModpackInfo, MemorySettings, ModLoader,
-        ModrinthCredentials, Organization, OwnerType, ProcessMetadata, Project,
-        ProjectType, ProjectV3, SearchResult, SearchResults, SearchResultsV3,
-        Settings, SharedInstanceAttachment, SharedInstanceRole, TeamMember,
-        Theme, User, UserFriend, Version, WindowSize,
+        ModrinthCredentials, OnboardingChecklist, Organization, OwnerType,
+        ProcessMetadata, Project, ProjectType, ProjectV3, SearchResult,
+        SearchResults, SearchResultsV3, Settings, SharedInstanceAttachment,
+        SharedInstanceRole, TeamMember, Theme, User, UserFriend, Version,
+        WindowSize,
     };
     pub use ariadne::users::UserStatus;
     pub use modrinth_content_management::{
@@ -43,8 +46,8 @@ pub mod prelude {
         State,
         data::*,
         event::CommandPayload,
-        install, instance, jre, metadata, minecraft_auth, mr_auth, pack,
-        process, settings,
+        install, instance, jre, metadata, minecraft_auth, mr_auth,
+        onboarding_checklist, pack, process, settings,
         state::{ReleaseChannel, db_backup::app_db_backup_dir},
         util::{
             io::{IOError, canonicalize},

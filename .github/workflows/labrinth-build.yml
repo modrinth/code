@@ -8,6 +8,9 @@ on:
     paths:
       - .github/workflows/labrinth-build.yml
       - 'apps/labrinth/**'
+      - 'packages/**'
+      - '!packages/api-client/**'
+      - '!packages/app-lib/**'
       - Cargo.toml
       - Cargo.lock
   pull_request:
@@ -15,6 +18,9 @@ on:
     paths:
       - .github/workflows/labrinth-build.yml
       - 'apps/labrinth/**'
+      - 'packages/**'
+      - '!packages/api-client/**'
+      - '!packages/app-lib/**'
       - Cargo.toml
       - Cargo.lock
   merge_group:
@@ -141,7 +147,7 @@ jobs:
 
   deploy:
     needs: [skip-if-clean, docker-build]
-    if: ${{ needs.skip-if-clean.outputs.internal == 'true' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/prod') }}
+    if: ${{ needs.skip-if-clean.outputs.internal == 'true' && github.ref == 'refs/heads/prod' }}
     uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}

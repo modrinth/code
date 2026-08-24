@@ -566,9 +566,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "monde"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Paramètres d'installation"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenu supplémentaire"
   },
@@ -619,18 +616,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Noms des projets"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alphabétique"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Plus récent en premier"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Plus ancien en premier"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Trier par {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Tout mettre à jour"
@@ -721,9 +706,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Rechercher une version de jeu..."
-  },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Retirer l'icône"
   },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Sélectionner l'icône"
@@ -887,24 +869,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Effacer tout"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Rechercher un modpack"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importer un modpack"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Vous avez déjà le modpack en tête ?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Aucun résultat"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Rechercher un modpack"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Une instance est un setup Minecraft avec un mod loader, une version, et des mods spécifiques."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Partez de zéro en choisissant un loader et une version de jeu."
   },
@@ -937,9 +901,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Sélectionner le type de monde"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Choisir un modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Créer une instance"
@@ -1300,9 +1261,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Fichier sauvegardé"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Fermer"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Trouver"
@@ -2069,41 +2027,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Aucune instance compatible n'a été trouvée"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Supprimer l'icône"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Rechercher une instance"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Sélectionnez l'icône"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Aucun contenu supplémentaire n'est inclus dans ce modpack."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Aucun contenu trouvé"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Externe"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Ce fichier n'est pas publié sur Modrinth."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Contenu du modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Chargement du contenu..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Aucun projet correspond à votre recherche."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Ouvrir dans Slicer"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Rechercher {count, number} {count, plural, one {projet} other {projets}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Actuel"
@@ -2894,9 +2819,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Créer un projet"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Modifier le rôle"
-  },
   "profile.button.info": {
     "defaultMessage": "Voir les détails de l'utilisateur"
   },
@@ -2915,6 +2837,15 @@
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural,one {# projet} other {# projets}}"
   },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Autorisez les pop-ups pour Modrinth, puis réessayez."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Le profil GitHub n'a pas pu être récupéré. Veuillez réessayer."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Impossible d'ouvrir le profil GitHub"
+  },
   "profile.details.label.auth-providers": {
     "defaultMessage": "Fournisseurs d’authentification"
   },
@@ -2927,8 +2858,14 @@
   "profile.details.label.has-totp": {
     "defaultMessage": "Dispose d'un TOTP"
   },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Chargement..."
+  },
   "profile.details.label.payment-methods": {
     "defaultMessage": "Moyens de paiements"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Voir le profil"
   },
   "profile.details.title": {
     "defaultMessage": "Détails de l'utilisateur"
@@ -2978,23 +2915,11 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural,one {projet}other {projets}}"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Enregistrement..."
-  },
   "profile.official-account": {
     "defaultMessage": "Compte Modrinth officiel"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Le compte utilisateur officiel de Modrinth. Obtenez de l’aide via <support-link></support-link> ou par e-mail à <email></email>"
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Sélectionner un rôle"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Une erreur s'est produite lors de la mise à jour du rôle utilisateur. Veuillez réessayer."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "Impossible de mettre à jour le rôle"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Une erreur s'est produite pendant le déblocage de cet utilisateur. Veuillez réessayer."
@@ -3830,15 +3755,6 @@
   "search.filter_type.advanced": {
     "defaultMessage": "Avancé"
   },
-  "search.filter_type.advanced.exclude_datapack": {
-    "defaultMessage": "Exclure les data packs"
-  },
-  "search.filter_type.advanced.exclude_mod": {
-    "defaultMessage": "Exclure les mods"
-  },
-  "search.filter_type.advanced.exclude_plugin": {
-    "defaultMessage": "Exclure les plugins"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Environnement"
   },
@@ -4607,9 +4523,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Le serveur est en cours d'installation"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Synchronisation du contenu en cours"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Envoyer également une demande d'ami"
   },
@@ -4664,56 +4577,14 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Impossible d'installer"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Une erreur interne est survenue lors de l'installation de la platforme. Veuillez réessayer plus tard."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Le loader ou la version Minecraft spécifiée n'a pas pu être installée. Elle est peut-être invalide ou non prise en charge."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Le modpack n'a pas pu être installé. Il est peut-être corrompu ou incompatible."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Cette version de modpack ne contient pas de fichier téléchargeable. Il a peut-être été empaqueté incorrectement."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Une erreur inattendue est survenue lors de l'installation."
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Cette version de Minecraft ou ce loader n'est peut-être pas encore bien pris en charge par Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Installation des add-ons..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Installation du modpack..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Installation de la platforme..."
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Nous préparons votre serveur"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Ajout de Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Configuration du serveur..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Téléchargement de mods..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organisation des fichiers..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Mise en place de l'environnement..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Vous avez déjà un serveur ?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "En savoir plus à propos de Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4723,9 +4594,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Des mods, des potes, et beaucoup de fun, tout depuis Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Aucun serveur pour le moment"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Choisissez vos mods préférés et nous nous occupons du reste."
@@ -4741,12 +4609,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Se connecter"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Mettez votre serveur en place tout comme un monde solo."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Setup simple"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Copié"
@@ -5345,9 +5207,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Demandes d'ami"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "À venir !"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Tout le monde"
   },
@@ -5389,12 +5248,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar de {username}"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Annuler"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Annuler"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Personnaliser..."

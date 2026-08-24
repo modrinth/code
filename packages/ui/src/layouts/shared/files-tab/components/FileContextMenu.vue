@@ -1,18 +1,11 @@
 <template>
 	<Teleport to="#teleports">
-		<Transition
-			enter-active-class="transition duration-125 ease-out"
-			enter-from-class="transform scale-75 opacity-0"
-			enter-to-class="transform scale-100 opacity-100"
-			leave-active-class="transition duration-125 ease-in"
-			leave-from-class="transform scale-100 opacity-100"
-			leave-to-class="transform scale-75 opacity-0"
-		>
+		<Transition name="floating-expand">
 			<div
 				v-if="visible"
 				ref="menuRef"
 				class="fixed isolate z-[9999] flex w-fit min-w-[180px] flex-col gap-2 overflow-hidden rounded-2xl border border-solid border-surface-5 bg-bg-raised p-2 shadow-lg"
-				:style="{ left: `${position.x}px`, top: `${position.y}px` }"
+				:style="{ left: `${position.x}px`, top: `${position.y}px`, transformOrigin: 'top left' }"
 				role="menu"
 				tabindex="-1"
 				@mousedown.stop

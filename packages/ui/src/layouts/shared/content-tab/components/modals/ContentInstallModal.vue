@@ -74,9 +74,13 @@
 					class="flex-1"
 				/>
 				<IconButton
-					v-tooltip="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
+					v-tooltip="
+						formatMessage(hideUninstallable ? messages.showUnavailable : messages.hideUnavailable)
+					"
 					type="outlined"
-					:label="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
+					:label="
+						formatMessage(hideUninstallable ? messages.showUnavailable : messages.hideUnavailable)
+					"
 					@click="hideUninstallable = !hideUninstallable"
 				>
 					<EyeOffIcon v-if="hideUninstallable" />
@@ -139,16 +143,42 @@
 
 		<!-- New instance tab -->
 		<div v-else class="flex flex-col gap-6 p-6">
-			<div class="flex items-center gap-4">
-				<Avatar :src="iconPreviewUrl ?? undefined" size="5rem" rounded="2xl" />
-				<div class="flex flex-col gap-2">
+			<div class="flex items-center gap-2.5">
+				<div class="group relative size-[7.75rem] shrink-0">
+					<Avatar :src="iconPreviewUrl ?? undefined" size="100%" no-shadow />
+					<div
+						v-if="iconPreviewUrl"
+						class="pointer-events-none absolute right-1.5 top-1.5 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+					>
+						<Button
+							size="sm"
+							class="!p-2"
+							:aria-label="formatMessage(commonMessages.removeImageButton)"
+							@click="removeIcon"
+						>
+							<XIcon />
+						</Button>
+					</div>
+				</div>
+				<div class="flex flex-col gap-1.5">
 					<Button type="outlined" @click="selectIcon">
 						<UploadIcon />
 						{{ formatMessage(messages.selectIcon) }}
 					</Button>
-					<Button type="outlined" :disabled="!iconPreviewUrl" @click="removeIcon">
-						<XIcon />
-						{{ formatMessage(messages.removeIcon) }}
+					<Button
+						v-if="props.randomizeIcon"
+						type="outlined"
+						:disabled="randomizing"
+						class="disabled:!cursor-default"
+						@click="randomizeInstanceIcon"
+					>
+						<SpinnerIcon v-if="randomizing" class="animate-spin" />
+						<RefreshCwIcon v-else />
+						{{ formatMessage(messages.randomizeIcon) }}
+					</Button>
+					<Button v-if="props.customizeIcon" type="outlined" @click="props.customizeIcon?.()">
+						<PaletteIcon />
+						{{ formatMessage(messages.customizeIcon) }}
 					</Button>
 				</div>
 			</div>
@@ -245,7 +275,10 @@ import {
 	DownloadIcon,
 	EyeIcon,
 	EyeOffIcon,
+	PaletteIcon,
+	RefreshCwIcon,
 	SearchIcon,
+	SpinnerIcon,
 	TriangleAlertIcon,
 	UploadIcon,
 	XIcon,
@@ -288,6 +321,14 @@ const messages = defineMessages({
 		id: 'instances.content-install.search-placeholder',
 		defaultMessage: 'Search instance',
 	},
+	showUnavailable: {
+		id: 'instances.content-install.show-unavailable',
+		defaultMessage: 'Show unavailable',
+	},
+	hideUnavailable: {
+		id: 'instances.content-install.hide-unavailable',
+		defaultMessage: 'Hide unavailable',
+	},
 	installedBadge: {
 		id: 'instances.content-install.installed-badge',
 		defaultMessage: 'Installed',
@@ -302,12 +343,16 @@ const messages = defineMessages({
 			'This instance uses a different loader or game version than this project supports.',
 	},
 	selectIcon: {
-		id: 'instances.content-install.select-icon',
-		defaultMessage: 'Select icon',
+		id: 'creation-flow.modal.custom-setup.icon.select',
+		defaultMessage: 'Upload',
 	},
-	removeIcon: {
-		id: 'instances.content-install.remove-icon',
-		defaultMessage: 'Remove icon',
+	randomizeIcon: {
+		id: 'creation-flow.modal.custom-setup.icon.randomize',
+		defaultMessage: 'Randomize',
+	},
+	customizeIcon: {
+		id: 'creation-flow.modal.custom-setup.icon.customize',
+		defaultMessage: 'Customize',
 	},
 	nameLabel: {
 		id: 'instances.content-install.name-label',
@@ -368,6 +413,8 @@ const props = defineProps<{
 	preferredLoader?: string | null
 	preferredGameVersion?: string | null
 	projectInfo?: ContentInstallProjectInfo | null
+	randomizeIcon?: () => Promise<{ path: string; previewUrl: string } | null>
+	customizeIcon?: () => void
 }>()
 
 const emit = defineEmits<{
@@ -424,6 +471,7 @@ const selectedLoader = ref<string | null>(null)
 const selectedGameVersion = ref<string | null>(null)
 const iconPath = ref<string | null>(null)
 const iconPreviewUrl = ref<string | null>(null)
+const randomizing = ref(false)
 const showSnapshots = ref(false)
 
 const hasReleaseData = computed(
@@ -454,6 +502,20 @@ function removeIcon() {
 	iconPreviewUrl.value = null
 }
 
+async function randomizeInstanceIcon() {
+	if (!props.randomizeIcon || randomizing.value) return
+
+	randomizing.value = true
+	try {
+		const generated = await props.randomizeIcon()
+		if (!generated) return
+		iconPath.value = generated.path
+		iconPreviewUrl.value = generated.previewUrl
+	} finally {
+		randomizing.value = false
+	}
+}
+
 function resetState() {
 	tab.value = props.defaultTab ?? 'existing'
 	searchFilter.value = ''
@@ -461,6 +523,7 @@ function resetState() {
 	instanceName.value = `New instance (${props.instances.length + 1})`
 	iconPath.value = null
 	iconPreviewUrl.value = null
+	void randomizeInstanceIcon()
 	selectedLoader.value = props.preferredLoader ?? props.compatibleLoaders[0] ?? null
 
 	const preferred = props.preferredGameVersion
@@ -497,6 +560,11 @@ function hide() {
 	modal.value?.hide()
 }
 
+function setIcon(path: string, previewUrl: string) {
+	iconPath.value = path
+	iconPreviewUrl.value = previewUrl
+}
+
 function handleCreateAndInstall() {
 	if (!instanceName.value || !selectedLoader.value || !selectedGameVersion.value) return
 	emit('create-and-install', {
@@ -509,5 +577,5 @@ function handleCreateAndInstall() {
 	hide()
 }
 
-defineExpose({ show, hide })
+defineExpose({ show, hide, setIcon })
 </script>

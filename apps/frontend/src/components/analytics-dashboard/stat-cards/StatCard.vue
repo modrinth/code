@@ -5,7 +5,7 @@
 		class="flex h-full appearance-none flex-col gap-2.5 rounded-2xl border border-solid p-5 px-4 text-left transition-colors sm:gap-4"
 		:class="{
 			'cursor-not-allowed border-surface-5 bg-surface-2 opacity-60': disabled,
-			'cursor-default border-brand bg-highlight-green': !disabled && active,
+			'cursor-default border-brand bg-brand-highlight': !disabled && active,
 			'border-surface-5 bg-surface-3 hover:bg-surface-4 active:scale-95': !disabled && !active,
 		}"
 		:disabled="disabled"

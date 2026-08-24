@@ -143,29 +143,11 @@
   "app.ads-consent.title": {
     "message": "Twoja prywatność i jak reklamy wspierają Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Włącz efekty wizualne, takie jak rozmycie tła. Może to negatywnie wpłynąć na wydajność, jeżeli akceleracja sprzętowa jest wyłączona."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Zaawansowane renderowanie"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Wybierz motyw użyty przez Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Motyw"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Wybierz stronę, która pojawi się po uruchomieniu Modrinth App."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Strona główna"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Biblioteka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Domyślna strona główna"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Ukryj nazwę użytkownika pokazaną nad podglądem wyglądu gracza na stronie wyboru skórki."
@@ -185,11 +167,8 @@
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimalizuj aplikację"
   },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Używaj pasek tytułu i kontrolki okna systemu operacyjnego. Wymaga ponownego uruchomienia aplikacji."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Systemowa ramka okna"
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Pokazuje czas gry spędzony w danej instancji."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Pokaż czas gry"
@@ -371,14 +350,8 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Sprawdź zmiany"
   },
-  "app.instance.admonitions.shared-instance.review-update-button": {
-    "message": "Sprawdź aktualizację"
-  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Trwa przegląd..."
-  },
-  "app.instance.admonitions.shared-instance.update-available-header": {
-    "message": "Dostępna aktualizacja"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
@@ -461,8 +434,17 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Złe konto"
   },
+  "app.instance.share.members.empty": {
+    "message": "Żaden użytkownik jeszcze nie dołączył"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Nie znaleziono użytkowników pasujących do tych filtrów."
+  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Nie będzie w stanie otrzymywać aktualizacji dla tej udostępnionej instancji"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "To jest ostatni użytkownik, udostępnianie zostanie wyłączone dla tej instancji"
   },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "Co się stanie?"
@@ -545,6 +527,9 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nie dodano żadnych światów ani serwerów"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Odświeżanie..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Usuń serwer"
   },
@@ -602,6 +587,9 @@
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
   },
+  "app.java-selector.test-installation": {
+    "message": "Testuj instalację Java"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Dodatkowy kontekst"
   },
@@ -632,6 +620,9 @@
   "app.modal.install-to-play.invite-warning": {
     "message": "To zaproszenie zostało utworzone przez innego użytkownika Modrinth, nie przez firmę Modrinth. Tylko akceptuj zaproszenia od osób, którym ufasz."
   },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "To zaproszenie zostało utworzone przez <creator>{username}</creator>, nie przez firmę Modrinth. Akceptuj zaproszenia tylko od osób, którym ufasz."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
   },
@@ -650,15 +641,6 @@
   "app.modal.install-to-play.report-reason": {
     "message": "Którą zasadę narusza ta instancja?"
   },
-  "app.modal.install-to-play.report-reason.inappropriate": {
-    "message": "Treści nieodpowiednie"
-  },
-  "app.modal.install-to-play.report-reason.malicious": {
-    "message": "Zawiera Złośliwy kod"
-  },
-  "app.modal.install-to-play.report-reason.spam": {
-    "message": "Spam"
-  },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Zgłoś przesłaną Instalacje"
   },
@@ -676,6 +658,9 @@
   },
   "app.modal.install-to-play.shared-instance-content": {
     "message": "Treści w przesłanej ci instalacji"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "Ta udostępniona instancja zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ta serwerowa paczka modów zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
@@ -705,7 +690,7 @@
     "message": "Usunięto"
   },
   "app.modal.update-to-play.shared-instance-unknown-files-description": {
-    "message": "Ta aktualizacja przesłanej instancji zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie tych plików z źródła, któremu ufasz."
+    "message": "Ta aktualizacja udostępnionej instancji zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
   },
   "app.modal.update-to-play.update-required": {
     "message": "Wymagana jest aktualizacja"
@@ -718,9 +703,6 @@
   },
   "app.nav.home": {
     "message": "Strona główna"
-  },
-  "app.nav.library": {
-    "message": "Biblioteka"
   },
   "app.nav.modrinth-account": {
     "message": "Konto Modrinth"
@@ -862,6 +844,9 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Wygląd"
+  },
+  "app.settings.tabs.behavior": {
+    "message": "Zachowanie"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Domyślne opcje gry"
@@ -1022,15 +1007,6 @@
   "app.skins.sign-in.button": {
     "message": "Zaloguj się"
   },
-  "app.skins.sign-in.description": {
-    "message": "Zaloguj się na konto Minecraft, by móc zarządzać skórkami poprzez Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Podekscytowany Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Zaloguj się"
-  },
   "app.skins.title": {
     "message": "Wybór skórki"
   },
@@ -1079,6 +1055,9 @@
   "app.update.complete-toast.title": {
     "message": "Wersja {version} została pomyślnie zainstalowana!"
   },
+  "app.user.project.install-to-instance": {
+    "message": "Zainstaluj do instancji"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -1093,9 +1072,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.delete-button": {
     "message": "Usuń mimo to"
@@ -1178,6 +1154,9 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Powiązana udostępniona instancja"
   },
+  "installation-settings.shared-instance.title": {
+    "message": "Wycofaj instancję"
+  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Odłącz udostępnioną instancję"
   },
@@ -1187,8 +1166,20 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Odłączanie..."
   },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Wycofaj udostępnioną instancję"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Usuń tę udostępnioną instancję z Modrinth i przestań wysyłać aktualizacje do użytkowników, którym jest udostępniona. Nie wpłynie to na twoją lokalną instancję."
+  },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Spowoduje to usunięcie przesyłanej instalacji z serwerów Modrith. Użytkownicy korzystający z niej na Modrinth App przestaną otrzymywać aktualizacje, ale twoja lokalna instalacja zostanie na tym urządzeniu."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Wycofywanie udostępnionej instancji"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Wycofaj udostępnioną instancję"
   },
   "instance.action.create-shortcut": {
     "message": "Utwórz skrót"
@@ -1259,6 +1250,9 @@
   "instance.files.save-as": {
     "message": "Zapisz jako..."
   },
+  "instance.locked.delete-button": {
+    "message": "Usuń instancję"
+  },
   "instance.playtime.never-played": {
     "message": "Nigdy nie grano"
   },
@@ -1327,18 +1321,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Wybierz ikonę"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupy bibliotek"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Utwórz nową grupę"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupy bibliotek pozwalają ci organizować twoje instancje w różne sekcje w twojej bibliotece."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Wpisz nazwę grupy"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nazwa"
@@ -1619,9 +1601,6 @@
   "minecraft-required.sign-in": {
     "message": "Zaloguj się do Microsoft"
   },
-  "modal.modrinth-account-required.cancel-button": {
-    "message": "Anuluj"
-  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Kontynuuj w przeglądarce"
   },
@@ -1661,17 +1640,8 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchronizuj z instancją"
   },
-  "search.filter.locked.server": {
-    "message": "Dostarczone przez serwer"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Tylko mody po stronie klienta mogą być dodane do instancji serwera"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Wersja gry jest dostarczona przez serwer"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader jest dostarczony przez serwer"
   },
   "settings.sidebar.label.account": {
     "message": "Konto"

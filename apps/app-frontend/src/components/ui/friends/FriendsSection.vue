@@ -11,7 +11,7 @@ import {
 import { useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ContextMenu from '@/components/ui/context-menu/index.vue'
 import type { FriendWithUserData } from '@/helpers/friends.ts'
 
 const { formatMessage } = useVIntl()

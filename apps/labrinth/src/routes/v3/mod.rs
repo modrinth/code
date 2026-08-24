@@ -9,6 +9,7 @@ pub mod analytics_get;
 pub mod blocked_users;
 pub mod collections;
 pub mod content;
+pub mod disclosures;
 pub mod friends;
 pub mod images;
 pub mod limits;
@@ -38,13 +39,16 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/v3/payout")
             .wrap(default_cors())
-            .configure(payouts::config),
+            .configure(payouts::config)
+            .service(payouts::paypal_webhook)
+            .service(payouts::tremendous_webhook),
     );
     cfg.service(
         web::scope("/v3/project")
             .wrap(default_cors())
             .configure(projects::project_config)
-            .configure(project_creation::config),
+            .configure(project_creation::config)
+            .configure(disclosures::config),
     );
     cfg.service(
         web::scope("/v3")
@@ -56,8 +60,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(notifications::config)
             .configure(oauth_clients::config)
             .configure(organizations::config)
-            .service(payouts::paypal_webhook)
-            .service(payouts::tremendous_webhook)
             .configure(projects::config)
             .configure(reports::config)
             .configure(statistics::config)
@@ -111,6 +113,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		projects::project_unfollow,
 		projects::project_get_organization,
 		projects::dependency_list,
+		disclosures::get_project_disclosures,
+		disclosures::modify_project_disclosures,
 		project_creation::project_create,
 		project_creation::project_create_with_id,
 		project_creation::new::create,
@@ -213,6 +217,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		users::user_delete_route,
 		users::user_follows_route,
 		users::user_notifications_route,
+		users::get_user_preferences,
+		users::edit_user_preferences,
 		version_creation::version_create_route,
 		version_creation::upload_file_to_version_route,
 		version_file::get_version_from_hash_route,

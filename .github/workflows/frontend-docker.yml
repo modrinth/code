@@ -1,0 +1,99 @@
+name: Frontend Docker
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+    paths:
+      - 'apps/frontend/**/*'
+      - 'packages/ui/**/*'
+      - 'packages/utils/**/*'
+      - 'packages/assets/**/*'
+      - 'packages/moderation/**/*'
+      - 'packages/api-client/**/*'
+      - 'packages/blog/**/*'
+      - '**/pnpm-*.yaml'
+      - .github/workflows/frontend-docker.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
+jobs:
+  build:
+    name: Build frontend
+    runs-on: namespace-profile-modrinth-frontend
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Configure environment
+        id: meta
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" = "refs/heads/main" ]; then
+            echo "env=staging" >> $GITHUB_OUTPUT
+          else
+            echo "env=production" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up caches
+        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        with:
+          cache: |
+            pnpm
+
+      - name: Inject build variables
+        working-directory: ./apps/frontend
+        run: |
+          if [ "${{ steps.meta.outputs.env }}" == "staging" ]; then
+            echo "Injecting staging variables from wrangler.jsonc..."
+            jq -r '.env.staging.vars | to_entries[] | "\(.key)=\(.value)"' wrangler.jsonc >> $GITHUB_ENV
+          else
+            echo "Injecting production variables from wrangler.jsonc..."
+            jq -r '.vars | to_entries[] | "\(.key)=\(.value)"' wrangler.jsonc >> $GITHUB_ENV
+          fi
+
+      - name: Install dependencies
+        working-directory: ./apps/frontend
+        run: pnpm install
+
+      - name: Build frontend
+        run: pnpm web:build
+        env:
+          NITRO_PRESET: node-server
+          BUILD_ENV: ${{ steps.meta.outputs.env }}
+          CF_PAGES_BRANCH: ${{ github.ref_name }}
+          CF_PAGES_COMMIT_SHA: ${{ github.sha }}
+
+      - name: Stage Docker context
+        run: |
+          mkdir -p apps/frontend/docker-stage
+          cp -r apps/frontend/.output apps/frontend/docker-stage/.output
+
+      - name: Upload Docker context
+        uses: namespace-actions/upload-artifact@f6ccaacc655aec41b93af180d1d7eef21af862d2 # v1.0.3
+        with:
+          name: frontend-docker-context
+          retention-days: 1
+          path: apps/frontend/docker-stage
+
+  docker-build:
+    needs: [build]
+    uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
+    with:
+      image-name: frontend
+      dockerfile-path: apps/frontend/Dockerfile
+      artifacts-name: frontend-docker-context

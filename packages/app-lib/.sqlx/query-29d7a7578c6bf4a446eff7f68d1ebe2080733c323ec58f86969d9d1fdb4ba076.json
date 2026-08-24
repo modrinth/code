@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instance_groups\n\t\tSET name = ?\n\t\tWHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "29d7a7578c6bf4a446eff7f68d1ebe2080733c323ec58f86969d9d1fdb4ba076"
+}

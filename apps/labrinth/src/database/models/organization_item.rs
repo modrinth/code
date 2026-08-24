@@ -9,8 +9,8 @@ use xredis::RedisPool;
 use super::{DBTeamMember, ids::*};
 use serde::{Deserialize, Serialize};
 
-const ORGANIZATIONS_NAMESPACE: &str = "organizations:v3";
-const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles:v3";
+const ORGANIZATIONS_NAMESPACE: &str = "organizations:v4";
+const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles:v4";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 /// An organization of users who together control one or more projects and organizations.

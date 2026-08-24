@@ -49,6 +49,12 @@ export default [
 		private: false,
 	},
 	{
+		label: '🤖 AI Content',
+		message: async () =>
+			(await import('../messages/quick-replies/externals-permissions/ai-content.md?raw')).default,
+		private: false,
+	},
+	{
 		label: '🍴 Forks',
 		message: async () =>
 			(await import('../messages/quick-replies/externals-permissions/forks.md?raw')).default,

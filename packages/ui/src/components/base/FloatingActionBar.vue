@@ -225,7 +225,7 @@ defineOptions({
 							'bar-compact': compact,
 							'floating-action-bar-attention': attentionRequested,
 						},
-						inline ? 'w-full' : 'mx-auto md:max-w-[60vw]',
+						inline ? 'w-full' : 'mx-auto md:max-w-[min(calc(100vw-120px),1050px)]',
 					]"
 					@animationend="attentionRequested = false"
 				>

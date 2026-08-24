@@ -12,6 +12,7 @@ use crate::routes::ApiError;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
@@ -151,7 +152,8 @@ impl NotificationType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
+#[serde_binhum]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum NotificationBody {
     ProjectUpdate {
@@ -765,8 +767,8 @@ impl NotificationDeliveryStatus {
             NotificationDeliveryStatus::Delivered => Ok(()),
             NotificationDeliveryStatus::SkippedPreferences |
             NotificationDeliveryStatus::SkippedDefault |
-            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occurred while sending an email to your email address. Please try again later.".to_owned())),
-            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::InvalidInput("This email address doesn't exist! Please try another one.".to_owned())),
+            NotificationDeliveryStatus::Pending => Err(ApiError::Request(eyre::eyre!("An error occurred while sending an email to your email address. Please try again later.".to_owned()))),
+            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::Request(eyre::eyre!("This email address doesn't exist! Please try another one.".to_owned()))),
         }
     }
 

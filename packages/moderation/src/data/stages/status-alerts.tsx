@@ -1,11 +1,11 @@
-import { TriangleAlertIcon } from '@modrinth/assets'
+import { MegaphoneIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-import type { NodeState, StageNodeBuilder } from '../../types/node'
+import type { AnyNode, ChildNode, NodeState, StageNode } from '../../types/node'
 import {
-	NodeBuilder,
+	externalGroup,
 	getBooleanChildState,
 	group,
 	isNodeActive,
@@ -18,7 +18,7 @@ import {
 import { Priorities } from '../priorities.ts'
 
 export default function (
-	mainStages: StageNodeBuilder[],
+	mainStages: StageNode[],
 	globalState: Ref<Record<string, Record<string, NodeState>>>,
 ) {
 	const { projectV3: project } = injectProjectPageContext()
@@ -28,7 +28,7 @@ export default function (
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
 		)
-		.icon(TriangleAlertIcon)
+		.icon(MegaphoneIcon)
 		.navigate('/moderation')
 		.children(
 			() => (
@@ -47,23 +47,26 @@ export default function (
 					.priority(Priorities.alerts)
 					.applyFixes()
 					.children(
-						computed<NodeBuilder | null>(() => {
-							const fixNodes: NodeBuilder[] = []
+						computed<AnyNode | null>(() => {
+							const fixGroups: ChildNode[] = []
 							walkNodes(
 								[group().children(...mainStages)],
 								(globalState.value ?? {}) as unknown as Record<string, NodeState>,
-								(node, nodeState) => {
-									if (!node._fixes.length) return
+								(node, nodeState, _localState, path) => {
+									if (!('_fixes' in node) || !(node as { _fixes: unknown[] })._fixes.length) return
 									if (!isNodeActive(node, nodeState)) return
-									const childState = getBooleanChildState(nodeState)
-									fixNodes.push(
-										...resolveChildren(node, childState).filter(
-											(c): c is NodeBuilder => c instanceof NodeBuilder,
-										),
+									const children = resolveChildren(
+										node as never,
+										getBooleanChildState(nodeState),
+									).filter(
+										(c): c is Exclude<ChildNode, string | (() => unknown)> =>
+											typeof c === 'object' && c !== null,
 									)
+									if (children.length === 0) return
+									fixGroups.push(externalGroup(path).children(...children))
 								},
 							)
-							return fixNodes.length > 0 ? group().children(...fixNodes) : null
+							return fixGroups.length > 0 ? group().children(...fixGroups) : null
 						}),
 					),
 
@@ -96,6 +99,18 @@ export default function (
 
 						return msg
 					}),
+
+				toggle('temporary-server', 'Temporary server')
+					.shown(
+						!!project.value.minecraft_java_server &&
+							!!project.value.minecraft_java_server.address &&
+							(project.value.minecraft_java_server.address.includes('aternos') ||
+								project.value.minecraft_java_server.address.includes('minekeep') ||
+								project.value.minecraft_java_server.address.includes('minehut')),
+					)
+					.suggestedStatus('flagged')
+					.priority(Priorities.alerts)
+					.message(),
 
 				toggle('server-use', 'Server use')
 					.shown(

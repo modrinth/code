@@ -69,6 +69,17 @@
 				/>
 				<LinkCheckMessage :check="discordInviteCheck" />
 			</div>
+			<div class="mt-3 flex flex-wrap justify-start gap-2">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!hasServerChanges"
+					@click="saveServerChanges()"
+				>
+					<SaveIcon />
+					Save changes
+				</Button>
+			</div>
 		</section>
 
 		<!-- Standard Project Links -->
@@ -171,15 +182,21 @@
 				/>
 				<Combobox
 					v-model="donationLink.id"
-          :options="donationPlatformOptions"
-          placeholder="Select platform"
+					:options="donationPlatformOptions"
+					placeholder="Select platform"
 					:disabled="!hasPermission"
 					force-direction="up"
 					trigger-type="base"
 					class="platform-selector !w-80"
 					@update:model-value="updateDonationLinks"
 				/>
-				<LinkCheckMessage :check="donationCheckState(donationLink, index)" />
+			</div>
+			<LinkCheckMessage :check="donationCheckState(donationLink, index)" />
+			<div class="mt-3 flex flex-wrap justify-start gap-2">
+				<Button type="colored" color="brand" :disabled="!hasChanges" @click="saveChanges()">
+					<SaveIcon />
+					Save changes
+				</Button>
 			</div>
 		</section>
 		<UnsavedChangesPopup
@@ -194,11 +211,14 @@
 </template>
 
 <script setup>
-import { checkLink, getLinkCheckState, isLinkCheckPending, useLinkCheck } from '@modrinth/moderation'
+import {
+	checkLink,
+	getLinkCheckState,
+	isLinkCheckPending,
+	useLinkCheck,
+} from '@modrinth/moderation'
 import {
 	Combobox,
-	ConfirmLeaveModal,
-	defineMessage,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -223,9 +243,15 @@ const { projectV3: project, currentMember, invalidate } = injectProjectPageConte
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.links)
+
 const isServerProject = computed(() => project.value?.minecraft_server != null)
 
-const { saved, current, reset: resetFields } = useSavable(
+const {
+	saved,
+	current,
+	reset: resetFields,
+} = useSavable(
 	() => {
 		if (isServerProject.value) {
 			return {
@@ -268,7 +294,9 @@ function fieldContext(field, getUrl, extra) {
 	return computed(() => ({ field, url: getUrl(), ...extra }))
 }
 
-const discordContext = fieldContext('discord', () => current.value.discord, { platformName: 'Discord' })
+const discordContext = fieldContext('discord', () => current.value.discord, {
+	platformName: 'Discord',
+})
 const issuesContext = fieldContext('issues', () => current.value.issues)
 const sourceContext = fieldContext('source', () => current.value.source)
 const wikiContext = fieldContext('wiki', () => current.value.wiki)

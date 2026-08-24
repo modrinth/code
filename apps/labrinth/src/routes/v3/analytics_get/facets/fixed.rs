@@ -3,6 +3,7 @@ use super::{
     AnalyticsFacets, ProjectDownloadsFacets, ProjectPlaytimeFacets,
     ProjectViewsFacets,
 };
+use crate::util::error::ApiContext as _;
 use crate::{
     database::PgPool, models::v3::analytics::DownloadReason, routes::ApiError,
     util::tags::valid_download_tags,
@@ -13,7 +14,9 @@ pub async fn fetch(
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<AnalyticsFacets, ApiError> {
-    let tags = valid_download_tags(pool, redis).await?;
+    let tags = valid_download_tags(pool, redis)
+        .await
+        .wrap_api_err("executing `valid_download_tags`")?;
     let mut loaders = tags.loaders.iter().cloned().collect::<Vec<_>>();
     loaders.sort();
     let mut game_versions =

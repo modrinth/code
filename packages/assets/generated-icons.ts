@@ -80,7 +80,10 @@ import _ChevronUpIcon from './icons/chevron-up.svg?component'
 import _CircleAlertIcon from './icons/circle-alert.svg?component'
 import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
 import _CircleDashedIcon from './icons/circle-dashed.svg?component'
+import _CircleDollarSignIcon from './icons/circle-dollar-sign.svg?component'
+import _CircleSlashIcon from './icons/circle-slash.svg?component'
 import _CircleUserIcon from './icons/circle-user.svg?component'
+import _CircuitBoardIcon from './icons/circuit-board.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
@@ -135,6 +138,7 @@ import _GapIcon from './icons/gap.svg?component'
 import _GaugeIcon from './icons/gauge.svg?component'
 import _GenericListIcon from './icons/generic-list.svg?component'
 import _GiftIcon from './icons/gift.svg?component'
+import _GitForkIcon from './icons/git-fork.svg?component'
 import _GitGraphIcon from './icons/git-graph.svg?component'
 import _GlassesIcon from './icons/glasses.svg?component'
 import _GlobeIcon from './icons/globe.svg?component'
@@ -164,6 +168,7 @@ import _KeyboardIcon from './icons/keyboard.svg?component'
 import _LandmarkIcon from './icons/landmark.svg?component'
 import _LanguagesIcon from './icons/languages.svg?component'
 import _LayersIcon from './icons/layers.svg?component'
+import _LayoutGridIcon from './icons/layout-grid.svg?component'
 import _LayoutTemplateIcon from './icons/layout-template.svg?component'
 import _LeftArrowIcon from './icons/left-arrow.svg?component'
 import _LibraryIcon from './icons/library.svg?component'
@@ -174,6 +179,7 @@ import _ListBulletedIcon from './icons/list-bulleted.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
 import _ListFilterIcon from './icons/list-filter.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
+import _ListPlusIcon from './icons/list-plus.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _LoaderCircleIcon from './icons/loader-circle.svg?component'
 import _LockIcon from './icons/lock.svg?component'
@@ -182,7 +188,9 @@ import _LogInIcon from './icons/log-in.svg?component'
 import _LogOutIcon from './icons/log-out.svg?component'
 import _MailIcon from './icons/mail.svg?component'
 import _ManageIcon from './icons/manage.svg?component'
+import _MapPinIcon from './icons/map-pin.svg?component'
 import _MaximizeIcon from './icons/maximize.svg?component'
+import _MegaphoneIcon from './icons/megaphone.svg?component'
 import _MemoryStickIcon from './icons/memory-stick.svg?component'
 import _MessageIcon from './icons/message.svg?component'
 import _MessagesSquareIcon from './icons/messages-square.svg?component'
@@ -205,6 +213,8 @@ import _PackageIcon from './icons/package.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PackagePlusIcon from './icons/package-plus.svg?component'
+import _PackageSearchIcon from './icons/package-search.svg?component'
+import _PageRoundIcon from './icons/page-round.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
 import _PauseIcon from './icons/pause.svg?component'
@@ -218,6 +228,7 @@ import _PowerIcon from './icons/power.svg?component'
 import _PowerOffIcon from './icons/power-off.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
+import _RadioTowerIcon from './icons/radio-tower.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _RedoIcon from './icons/redo.svg?component'
 import _RefreshCwIcon from './icons/refresh-cw.svg?component'
@@ -253,6 +264,7 @@ import _SortDescIcon from './icons/sort-desc.svg?component'
 import _SparklesIcon from './icons/sparkles.svg?component'
 import _SpinnerIcon from './icons/spinner.svg?component'
 import _SplitIcon from './icons/split.svg?component'
+import _SquarePlusIcon from './icons/square-plus.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _StoreIcon from './icons/store.svg?component'
@@ -512,7 +524,10 @@ export const ChevronUpIcon = _ChevronUpIcon
 export const CircleAlertIcon = _CircleAlertIcon
 export const CircleArrowRightIcon = _CircleArrowRightIcon
 export const CircleDashedIcon = _CircleDashedIcon
+export const CircleDollarSignIcon = _CircleDollarSignIcon
+export const CircleSlashIcon = _CircleSlashIcon
 export const CircleUserIcon = _CircleUserIcon
+export const CircuitBoardIcon = _CircuitBoardIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
@@ -567,6 +582,7 @@ export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
 export const GenericListIcon = _GenericListIcon
 export const GiftIcon = _GiftIcon
+export const GitForkIcon = _GitForkIcon
 export const GitGraphIcon = _GitGraphIcon
 export const GlassesIcon = _GlassesIcon
 export const GlobeIcon = _GlobeIcon
@@ -596,6 +612,7 @@ export const KeyboardIcon = _KeyboardIcon
 export const LandmarkIcon = _LandmarkIcon
 export const LanguagesIcon = _LanguagesIcon
 export const LayersIcon = _LayersIcon
+export const LayoutGridIcon = _LayoutGridIcon
 export const LayoutTemplateIcon = _LayoutTemplateIcon
 export const LeftArrowIcon = _LeftArrowIcon
 export const LibraryIcon = _LibraryIcon
@@ -606,6 +623,7 @@ export const ListBulletedIcon = _ListBulletedIcon
 export const ListEndIcon = _ListEndIcon
 export const ListFilterIcon = _ListFilterIcon
 export const ListOrderedIcon = _ListOrderedIcon
+export const ListPlusIcon = _ListPlusIcon
 export const LoaderIcon = _LoaderIcon
 export const LoaderCircleIcon = _LoaderCircleIcon
 export const LockIcon = _LockIcon
@@ -614,7 +632,9 @@ export const LogInIcon = _LogInIcon
 export const LogOutIcon = _LogOutIcon
 export const MailIcon = _MailIcon
 export const ManageIcon = _ManageIcon
+export const MapPinIcon = _MapPinIcon
 export const MaximizeIcon = _MaximizeIcon
+export const MegaphoneIcon = _MegaphoneIcon
 export const MemoryStickIcon = _MemoryStickIcon
 export const MessageIcon = _MessageIcon
 export const MessagesSquareIcon = _MessagesSquareIcon
@@ -637,6 +657,8 @@ export const PackageIcon = _PackageIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PackageOpenIcon = _PackageOpenIcon
 export const PackagePlusIcon = _PackagePlusIcon
+export const PackageSearchIcon = _PackageSearchIcon
+export const PageRoundIcon = _PageRoundIcon
 export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
 export const PauseIcon = _PauseIcon
@@ -650,6 +672,7 @@ export const PowerIcon = _PowerIcon
 export const PowerOffIcon = _PowerOffIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
+export const RadioTowerIcon = _RadioTowerIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const RedoIcon = _RedoIcon
 export const RefreshCwIcon = _RefreshCwIcon
@@ -685,6 +708,7 @@ export const SortDescIcon = _SortDescIcon
 export const SparklesIcon = _SparklesIcon
 export const SpinnerIcon = _SpinnerIcon
 export const SplitIcon = _SplitIcon
+export const SquarePlusIcon = _SquarePlusIcon
 export const StarIcon = _StarIcon
 export const StopCircleIcon = _StopCircleIcon
 export const StoreIcon = _StoreIcon

@@ -16,6 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import {
@@ -32,8 +33,8 @@ import {
 } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { injectAppEvents } from '@/providers/app-events'
 import { provideInstanceBackup } from '@/providers/instance-backup'
-import { useTheming } from '@/store/state'
 
 import type { Manifest } from '../../../../helpers/types'
 import { instanceKeys } from '../../query-options.ts'
@@ -41,16 +42,17 @@ import { injectInstanceSettings } from './instance-settings-context.ts'
 import SharedInstanceInstallationSettingsControls from './shared-instance-installation-settings-controls.vue'
 
 const { handleError } = injectNotificationManager()
+const appEvents = injectAppEvents()
 const filePicker = injectFilePicker()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('AppInstallationSettings')
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
 const managedContentPolicy = useManagedContentPolicy(instance)
 const skipNonEssentialWarnings = computed(() =>
-	themeStore.getFeatureFlag('skip_non_essential_warnings'),
+	appSettings.getFeatureFlag('skip_non_essential_warnings'),
 )
 
 debug('metadata load: start', {
@@ -198,7 +200,7 @@ async function installLocalModpackFromPicker() {
 	}).catch(handleError)
 	if (!job) return false
 
-	const completed = await wait_for_install_job(job.job_id).catch(handleError)
+	const completed = await wait_for_install_job(appEvents, job.job_id).catch(handleError)
 	return !!completed
 }
 
@@ -232,6 +234,7 @@ provideInstallationSettings({
 		() =>
 			isModrinthLinkedModpack.value ||
 			isImportedModpack.value ||
+			instance.value.link?.type === 'server_project' ||
 			isSharedInstanceManagedModpack.value,
 	),
 	isBusy: installationSettingsBusy,

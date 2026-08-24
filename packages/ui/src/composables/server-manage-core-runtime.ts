@@ -5,19 +5,23 @@ import {
 	type UploadState,
 } from '@modrinth/api-client'
 import type { ComputedRef, Ref } from 'vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import type { FileOperation } from '../layouts/shared/files-tab/types'
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
 import type { BusyReason, CancelUploadHandler, ServerStats } from '../providers/server-context'
 import { defineMessage } from './i18n'
 import { useModrinthServersConsole } from './server-console'
+import {
+	retainServerContextRuntime,
+	type ServerContextRuntimeLease,
+} from './server-context-runtime'
+import { useServerInstallationTracker } from './server-installation-tracker'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
 type SocketUnsubscriber = () => void
 
 type ConnectSocketOptions = {
-	force?: boolean
 	extraSubscriptions?: (targetServerId: string) => SocketUnsubscriber[]
 }
 
@@ -26,7 +30,7 @@ type UseServerManageCoreRuntimeOptions = {
 	worldId: ReadableRef<string | null>
 	server: ReadableRef<Archon.Servers.v0.Server | null | undefined>
 	serverFull?: ReadableRef<Archon.Servers.v1.ServerFull | null | undefined>
-	isSyncingContent: ReadableRef<boolean>
+	content?: ReadableRef<Archon.Content.v1.Addons | null | undefined>
 	extraBusyReasons?: ComputedRef<BusyReason[]>
 	setDisconnectedOnAuthIncorrect?: boolean
 	syncUptimeFromState?: boolean
@@ -96,10 +100,25 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const fsAuth = ref<{ url: string; token: string } | null>(null)
 	const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
 	const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
+	const {
+		begin: beginInstallation,
+		cancelOptimistic: cancelOptimisticInstallation,
+		dismiss: dismissInstallation,
+		handleProgress: handleInstallProgress,
+		installation,
+		installProgressItems,
+		isBlocking: isInstallationBlocking,
+		reset: resetInstallation,
+	} = useServerInstallationTracker({
+		worldId: options.worldId,
+		server: options.server,
+		content: options.content,
+	})
 	const connectedSocketServerId = ref<string | null>(null)
 	const socketUnsubscribers = ref<SocketUnsubscriber[]>([])
 	const cpuData = ref<number[]>([])
 	const ramData = ref<number[]>([])
+	let serverContextRuntimeLease: ServerContextRuntimeLease | null = null
 
 	let uptimeIntervalId: ReturnType<typeof setInterval> | null = null
 	let staleStatsTimeoutId: ReturnType<typeof setTimeout> | null = null
@@ -107,19 +126,11 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	const busyReasons = computed<BusyReason[]>(() => {
 		const reasons: BusyReason[] = []
-		if (options.server.value?.status === 'installing') {
+		if (isInstallationBlocking.value) {
 			reasons.push({
 				reason: defineMessage({
 					id: 'servers.busy.installing',
 					defaultMessage: 'Server is installing',
-				}),
-			})
-		}
-		if (options.isSyncingContent.value) {
-			reasons.push({
-				reason: defineMessage({
-					id: 'servers.busy.syncing-content',
-					defaultMessage: 'Content sync in progress',
 				}),
 			})
 		}
@@ -265,20 +276,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		startUptimeTicker()
 	}
 
-	const handleAuthIncorrect = () => {
-		if (!shouldProcessEvent()) return
-		isWsAuthIncorrect.value = true
-		if (options.setDisconnectedOnAuthIncorrect) {
-			isConnected.value = false
-		}
-	}
-
-	const handleAuthOk = () => {
-		if (!shouldProcessEvent()) return
-		isWsAuthIncorrect.value = false
-		isConnected.value = true
-	}
-
 	const clearSocketListeners = () => {
 		for (const unsub of socketUnsubscribers.value) unsub()
 		socketUnsubscribers.value = []
@@ -288,10 +285,8 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		if (!targetServerId && !connectedSocketServerId.value) return
 
 		clearSocketListeners()
-
-		if (targetServerId) {
-			client.archon.sockets.disconnect(targetServerId)
-		}
+		serverContextRuntimeLease?.release()
+		serverContextRuntimeLease = null
 
 		stopUptimeTicker()
 		clearStaleStatsTimers()
@@ -301,6 +296,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		serverPowerState.value = 'stopped'
 		powerStateDetails.value = undefined
 		uptimeSeconds.value = 0
+		resetInstallation()
 	}
 
 	const connectSocket = async (
@@ -317,14 +313,11 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		disconnectSocket(connectedSocketServerId.value ?? undefined)
 
 		try {
-			const safeConnectOptions = connectOptions.force ? { force: true } : undefined
-			await client.archon.sockets.safeConnect(targetServerId, safeConnectOptions)
+			const runtimeLease = retainServerContextRuntime(client, targetServerId, {
+				connect: false,
+			})
+			serverContextRuntimeLease = runtimeLease
 			connectedSocketServerId.value = targetServerId
-			isConnected.value = true
-			isWsAuthIncorrect.value = false
-
-			modrinthServersConsole.clear()
-			modrinthServersConsole.beginInitialLogHydration()
 
 			const baseSubscriptions: SocketUnsubscriber[] = [
 				client.archon.sockets.on(targetServerId, 'log', handleLog),
@@ -333,15 +326,45 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 				client.archon.sockets.on(targetServerId, 'state', handleState),
 				client.archon.sockets.on(targetServerId, 'power-state', handlePowerState),
 				client.archon.sockets.on(targetServerId, 'uptime', handleUptime),
-				client.archon.sockets.on(targetServerId, 'auth-incorrect', handleAuthIncorrect),
-				client.archon.sockets.on(targetServerId, 'auth-ok', handleAuthOk),
+				watch(
+					runtimeLease.installProgressItems,
+					(items) => {
+						if (shouldProcessEvent()) handleInstallProgress(items)
+					},
+					{ immediate: true },
+				),
+				watch(
+					runtimeLease.isSocketAuthenticated,
+					(authenticated) => {
+						if (!shouldProcessEvent()) return
+						if (authenticated || options.setDisconnectedOnAuthIncorrect) {
+							isConnected.value = authenticated
+						}
+					},
+					{ immediate: true },
+				),
+				watch(
+					runtimeLease.isSocketAuthIncorrect,
+					(authIncorrect) => {
+						if (shouldProcessEvent()) isWsAuthIncorrect.value = authIncorrect
+					},
+					{ immediate: true },
+				),
 			]
 			const extraSubscriptions = connectOptions.extraSubscriptions?.(targetServerId) ?? []
 			socketUnsubscribers.value = [...baseSubscriptions, ...extraSubscriptions]
+
+			modrinthServersConsole.clear()
+			modrinthServersConsole.beginInitialLogHydration()
+
+			await runtimeLease.waitUntilReady()
+			isConnected.value = true
+			isWsAuthIncorrect.value = false
+
 			return true
 		} catch (error) {
 			console.error('[hosting/manage] Failed to connect server socket:', error)
-			isConnected.value = false
+			disconnectSocket(targetServerId)
 			return false
 		}
 	}
@@ -402,7 +425,11 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		isServerRunning,
 		stats,
 		uptimeSeconds,
-		isSyncingContent: options.isSyncingContent as Ref<boolean>,
+		installProgressItems,
+		installation,
+		beginInstallation,
+		cancelOptimisticInstallation,
+		dismissInstallation,
 		busyReasons,
 		fsAuth,
 		fsOps,
@@ -423,20 +450,25 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	return {
 		activeOperations,
+		beginInstallation,
 		busyReasons,
 		cancelUpload,
+		cancelOptimisticInstallation,
 		cleanupCoreRuntime,
 		connectSocket,
 		connectedSocketServerId,
 		cpuData,
 		disconnectSocket,
+		dismissInstallation,
 		dismissOperation,
 		fsAuth,
 		fsOps,
 		fsQueuedOps,
+		installation,
 		isConnected,
 		isServerRunning,
 		isWsAuthIncorrect,
+		installProgressItems,
 		powerStateDetails,
 		ramData,
 		refreshFsAuth,

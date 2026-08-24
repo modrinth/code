@@ -1,0 +1,1 @@
+- Content that may be dangerous to users with photosensitive epilepsy.

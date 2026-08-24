@@ -1,5 +1,5 @@
 <template>
-	<div v-if="hasContent" class="flex flex-col gap-3">
+	<div v-if="loading || hasContent" class="flex flex-col gap-3">
 		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 
 		<div
@@ -15,6 +15,10 @@
 				<CopyIcon class="shrink-0" />
 			</div>
 		</div>
+		<div
+			v-else-if="loading && !projectV3"
+			class="h-12 rounded-2xl bg-surface-4 animate-pulse"
+		></div>
 
 		<section v-if="requiredContent" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.requiredContent) }}</h3>
@@ -26,7 +30,12 @@
 				:onclick-version="requiredContent.onclickVersion"
 				:onclick-download="requiredContent.onclickDownload"
 				:show-custom-modpack-tooltip="requiredContent.showCustomModpackTooltip"
+				:loading-version="loading"
 			/>
+		</section>
+		<section v-else-if="loading" class="flex flex-col gap-2">
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.requiredContent) }}</h3>
+			<div class="h-[52px] rounded-2xl bg-surface-4 animate-pulse"></div>
 		</section>
 		<section v-if="recommendedVersions.length" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
@@ -55,6 +64,17 @@
 					<component :is="getLoaderIcon(loader)" v-if="getLoaderIcon(loader)" />
 					<FormattedTag :tag="loader" enforce-type="loader" />
 				</TagItem>
+			</div>
+		</section>
+		<section v-else-if="loading" class="flex flex-col gap-2">
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
+			<div class="flex flex-wrap gap-1.5">
+				<div
+					v-for="width in ['w-16', 'w-20']"
+					:key="`version-skeleton-${width}`"
+					class="h-[26px] rounded-full bg-surface-4 animate-pulse"
+					:class="width"
+				></div>
 			</div>
 		</section>
 		<section v-if="props.ping !== undefined || region" class="flex flex-col gap-2">
@@ -115,6 +135,7 @@ interface Props {
 	loaders?: string[]
 	ping?: number
 	statusOnline?: boolean
+	loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {

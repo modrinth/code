@@ -7,14 +7,15 @@ members = [
   "apps/labrinth",
   "packages/app-lib",
   "packages/ariadne",
+  "packages/component-derive",
   "packages/daedalus",
-  "packages/labrinth-derive",
   "packages/modrinth-content-management",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
+  "packages/serde-binhum",
   "packages/xredis",
 ]
 
@@ -67,6 +68,7 @@ clap = "4.5.48"
 clickhouse = "0.14.0"
 color-eyre = "0.6.5"
 color-thief = "0.2.2"
+component-derive = { path = "packages/component-derive" }
 const_format = "0.2.34"
 core-foundation = "0.10.1"
 core-graphics = "0.24.0"
@@ -112,6 +114,7 @@ indicatif = "0.18.0"
 itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }
+json5 = "1.3.1"
 lettre = { version = "0.11.19", default-features = false, features = [
   "aws-lc-rs",
   "builder",
@@ -130,7 +133,6 @@ lz4_flex = { version = "0.11.5", default-features = false, features = [
   "std",
 ] }
 maxminddb = "0.26.0"
-meilisearch-sdk = { version = "0.30.0", default-features = false }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
 modrinth-util = { path = "packages/modrinth-util" }
@@ -148,6 +150,7 @@ path-util = { path = "packages/path-util" }
 phf = { version = "0.13.1", features = ["macros"] }
 png = "0.18.0"
 postcard = { version = "1.1.3", default-features = false, features = ["alloc"] }
+postcard-bindgen = "0.8.0"
 proc-macro2 = { version = "1.0" }
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
@@ -183,12 +186,12 @@ sentry = { version = "0.45.0", default-features = false, features = [
   "rustls",
 ] }
 serde = "1.0.228"
+serde-binhum = { path = "packages/serde-binhum" }
 serde_bytes = "0.11.19"
 serde_cbor = "0.11.2"
 serde_ini = "0.2.0"
 serde_json = "1.0.145"
 serde_with = "3.15.0"
-serde-xml-rs = "0.8.1"  # Also an XML (de)serializer, consider dropping yaserde in favor of this
 sha1 = "0.10.6"
 sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.10.9"
@@ -223,12 +226,14 @@ tikv-jemallocator = "0.6.0"
 tokio = "1.47.1"
 tokio-stream = "0.1.17"
 tokio-util = "0.7.16"
+toml = "0.9.8"
 totp-rs = "5.7.0"
 tracing = "0.1.41"
 tracing-actix-web = { version = "0.7.19", default-features = false }
 tracing-ecs = "0.5.0"
 tracing-error = "0.2.1"
 tracing-subscriber = "0.3.20"
+ts-rs = "12.0.1"
 typed-path = "0.12.0"
 url = "2.5.7"
 urlencoding = "2.1.3"

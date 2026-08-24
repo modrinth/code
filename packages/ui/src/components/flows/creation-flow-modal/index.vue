@@ -19,7 +19,9 @@ import {
 	type CreationFlowContextValue,
 	type FlowType,
 	type LoaderManifestResolver,
-	type ModpackSearchResult,
+	type ProjectInstallCreateData,
+	type ProjectInstallSelection,
+	type ProjectSearchResult,
 	provideCreationFlowContext,
 } from './creation-flow-context'
 
@@ -35,9 +37,16 @@ const props = withDefaults(
 		fetchExistingInstanceNames?: () => Promise<string[]>
 		onBack?: (() => void) | null
 		fade?: 'standard' | 'warning' | 'danger'
-		searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
+		searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>
+		prepareProjectInstall?: (
+			projectId: string,
+			projectType: string,
+		) => Promise<ProjectInstallSelection | null>
+		createProjectInstall?: (data: ProjectInstallCreateData) => Promise<void>
 		getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 		getLoaderManifest?: LoaderManifestResolver
+		randomizeInstanceIcon?: () => Promise<{ path: string; previewUrl: string } | null>
+		customizeInstanceIcon?: () => void
 		finishDisabled?: boolean
 		finishDisabledTooltip?: string
 	}>(),
@@ -51,6 +60,8 @@ const props = withDefaults(
 		initialGameVersion: undefined,
 		fetchExistingInstanceNames: undefined,
 		onBack: null,
+		randomizeInstanceIcon: undefined,
+		customizeInstanceIcon: undefined,
 	},
 )
 
@@ -77,9 +88,13 @@ const ctx = createCreationFlowContext(
 		initialGameVersion: props.initialGameVersion,
 		fetchExistingInstanceNames: props.fetchExistingInstanceNames,
 		onBack: props.onBack ?? undefined,
-		searchModpacks: props.searchModpacks,
+		searchProjects: props.searchProjects,
+		prepareProjectInstall: props.prepareProjectInstall,
+		createProjectInstall: props.createProjectInstall,
 		getProjectVersions: props.getProjectVersions,
 		getLoaderManifest: props.getLoaderManifest,
+		randomizeInstanceIcon: props.randomizeInstanceIcon,
+		customizeInstanceIcon: props.customizeInstanceIcon,
 		finishDisabled: computed(() => props.finishDisabled ?? false),
 		finishDisabledTooltip: computed(() => props.finishDisabledTooltip),
 	},

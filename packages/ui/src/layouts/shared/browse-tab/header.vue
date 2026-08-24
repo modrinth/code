@@ -10,7 +10,7 @@ import { IconButton } from '#ui/components/base/buttons'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
-import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
+import TagIcon from '#ui/components/base/TagIcon.vue'
 import { useServerImage } from '#ui/composables/use-server-image'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
@@ -77,8 +77,8 @@ const metadataItems = computed(() => {
 		items.push({
 			id: 'loader',
 			label: loaderLabel,
-			icon: LoaderIcon,
-			iconProps: { loader: loaderName },
+			icon: TagIcon,
+			iconProps: { tag: loaderName, enforceType: 'loader' },
 			class: '!text-primary',
 		})
 	}
@@ -178,7 +178,7 @@ async function handleSelectedProjectsLeaveResult(
 				</PageHeaderMetadata>
 			</template>
 		</PageHeader>
-		<Admonition v-if="installContext.warning" type="warning" class="mb-1">
+		<Admonition v-if="installContext.warning" type="warning" class="mt-4 mb-1">
 			{{ installContext.warning }}
 		</Admonition>
 	</template>

@@ -14,6 +14,9 @@
   "app.action-bar.install.copied-details": {
     "message": "Zkopírováno"
   },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopírovat detaily"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Zavřít"
   },
@@ -25,6 +28,9 @@
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Zrušeno"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Čištění nebylo dokončeno"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Neznámá instance"
@@ -65,11 +71,8 @@
   "app.action-bar.view-logs": {
     "message": "Zobrazit logy"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Pokročilé vykreslování"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Barevný motiv"
+  "app.ads-consent.title": {
+    "message": "Vaše soukromí a způsob, jakým reklamy podporují Modrinth"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Domů"
@@ -77,14 +80,23 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Knihovna"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Výchozí stránka po spuštění"
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Zakáže zobrazení jmenovky nad vaší postavou na stránce skinů."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Skrýt jmenovku"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Rychlý návrat do světů"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimalizovat launcher při spuštění Minecraftu."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimalizovat launcher"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Zobrazuje, kolik času jsi strávil hraním instance."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Zobrazit odehraný čas"
@@ -211,6 +223,9 @@
   },
   "app.install.phase.running_loader_processors": {
     "message": "Spuštění loader procesů"
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Odstraněno"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Všechna data tvé instance budou trvale smazána, včetně světů, konfigurací a veškerého nainstalovaného obsahu."
@@ -509,15 +524,6 @@
   "app.skins.sign-in.button": {
     "message": "Přihlásit se"
   },
-  "app.skins.sign-in.description": {
-    "message": "Přihlas se prosím ke svému Minecraft účtu, abys mohl/a využívat funkce pro správu skinů v aplikaci Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Nadšený Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Přihlaš se prosím"
-  },
   "app.skins.title": {
     "message": "Výběr skinu"
   },
@@ -565,9 +571,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Přidat přítele"
@@ -724,18 +727,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Vybrat ikonu"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Skupiny knihovny"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Vytvořit novou skupinu"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Skupiny knihovny ti umožňují uspořádat instance do různých sekcí v knihovně."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Zadej název skupiny"
   },
   "instance.settings.tabs.general.name": {
     "message": "Jméno"
@@ -953,16 +944,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchronizováno s instancí"
   },
-  "search.filter.locked.server": {
-    "message": "Poskytováno serverem"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Pouze módy ze strany klientu mohou být přidány na server"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Verze hry je poskytována serverem"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader zprostředkovává server"
   }
 }

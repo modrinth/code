@@ -161,6 +161,7 @@ import {
 	Checkbox,
 	Combobox,
 	type ComboboxOption,
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	injectProjectPageContext,
 	StyledInput,
@@ -174,6 +175,8 @@ import { computed } from 'vue'
 import LinkCheckMessage from '@/components/LinkCheckMessage.vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.license)
 
 const licenseOptions: ComboboxOption<string>[] = builtinLicenses.map((license) => ({
 	value: license.short,

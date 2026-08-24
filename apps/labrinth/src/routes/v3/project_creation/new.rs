@@ -138,13 +138,13 @@ pub async fn create(
         Scopes::PROJECT_CREATE,
     )
     .await
-    .map_err(ApiError::from)?;
+    .wrap_auth_err("authenticating project creator")?;
 
     require_verified_email(&user)?;
 
     let limits = UserLimits::get_for_projects(&user, &db)
         .await
-        .map_err(ApiError::from)?;
+        .wrap_internal_err("fetching project limits")?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }

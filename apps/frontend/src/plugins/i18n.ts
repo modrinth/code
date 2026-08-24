@@ -178,7 +178,10 @@ export default defineNuxtPlugin({
 			return msg
 		}
 
-		async function setLocale(newLocale: string): Promise<void> {
+		async function setLocale(
+			newLocale: string,
+			{ persist = true }: { persist?: boolean } = {},
+		): Promise<void> {
 			debug('setLocale: called', { newLocale, currentLocale: locale.value })
 
 			if (!LOCALES.some((l) => l.code === newLocale)) {
@@ -197,7 +200,9 @@ export default defineNuxtPlugin({
 			})
 
 			locale.value = newLocale
-			useCookie('locale', { maxAge: 31536000, path: '/' }).value = newLocale
+			if (persist) {
+				useCookie('locale', { maxAge: 31536000, path: '/' }).value = newLocale
+			}
 		}
 
 		// Detect initial locale (cookie > Accept-Language > default)

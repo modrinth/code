@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement Figma Design"
+  short_description: "Build Modrinth Vue UI from Figma designs"
+  default_prompt: "Use $figma-mcp to implement this Figma design as a Modrinth Vue component."

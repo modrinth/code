@@ -55,18 +55,26 @@ Thumbs.db
 
 # frontend generated files
 apps/frontend/src/generated
+/packages/ui/src/layouts/wrapped/settings/language-settings/language-settings-coverage.generated.ts
 
 .turbo
 target
 generated
+!apps/app-frontend/src/generated/
+!apps/app-frontend/src/generated/app-events/
+!apps/app-frontend/src/generated/app-events/*.ts
+!apps/app-frontend/src/generated/app-events/README.md
+!apps/app-frontend/src/generated/app-events/postcard/
+!apps/app-frontend/src/generated/app-events/postcard/index.d.ts
+!apps/app-frontend/src/generated/app-events/postcard/index.js
+!apps/app-frontend/src/generated/app-events/postcard/package.json
 .env
 
 # app testing dir
 app-playground-data/*
 
 .astro
-.claude/*
-!.claude/skills/
+.claude/
 .letta
 
 # labrinth demo fixtures

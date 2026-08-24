@@ -17,7 +17,7 @@ const projectStatusPriority: Record<Labrinth.Projects.v2.ProjectStatus, ProjectS
 }
 
 function getProjectSortValue(
-	project: Labrinth.Projects.v2.Project,
+	project: Labrinth.Projects.v3.Project,
 	sorting: ProjectSorting,
 ): number {
 	switch (sorting) {
@@ -31,8 +31,8 @@ function getProjectSortValue(
 }
 
 export function projectUserSorting(
-	first: Labrinth.Projects.v2.Project,
-	second: Labrinth.Projects.v2.Project,
+	first: Labrinth.Projects.v3.Project,
+	second: Labrinth.Projects.v3.Project,
 ): number {
 	const firstPriority = projectStatusPriority[first.status] ?? projectStatusPriority.unknown
 	const secondPriority = projectStatusPriority[second.status] ?? projectStatusPriority.unknown
@@ -48,25 +48,6 @@ export function projectUserSorting(
 		getProjectSortValue(second, secondPriority.sort) -
 		getProjectSortValue(first, firstPriority.sort)
 	)
-}
-
-export function resolveProjectType(
-	project: Labrinth.Projects.v2.Project,
-	loaders: Labrinth.Tags.v2.Loader[],
-): string {
-	if (project.project_type !== 'mod') {
-		return project.project_type
-	}
-
-	const projectLoaders = new Set(project.loaders)
-	const supportsType = (type: string) =>
-		loaders.some(
-			(loader) => projectLoaders.has(loader.name) && loader.supported_project_types.includes(type),
-		)
-
-	if (supportsType('datapack')) return 'datapack'
-	if (supportsType('plugin')) return 'plugin'
-	return 'mod'
 }
 
 const PRIDE_26_MIDAS_DURATION_MS = 30 * 24 * 60 * 60 * 1000

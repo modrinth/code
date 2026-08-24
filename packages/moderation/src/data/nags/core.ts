@@ -42,10 +42,11 @@ export const coreNags: Nag[] = [
 		link: {
 			path: 'settings/versions',
 			title: defineMessage({
-				id: 'nags.versions.title',
-				defaultMessage: 'Visit versions page',
+				id: 'nags.settings.versions.title',
+				defaultMessage: 'Visit versions settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-versions',
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-versions',
 		},
 	},
 	{
@@ -279,6 +280,35 @@ export const coreNags: Nag[] = [
 			}),
 			shouldShow: (context: NagContext) =>
 				context.currentRoute !== 'type-project-settings-permissions',
+		},
+	},
+	{
+		id: 'check-disclosures',
+		title: defineMessage({
+			id: 'nags.check-disclosures.title',
+			defaultMessage: 'Check content disclosures',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			return formatMessage(
+				defineMessage({
+					id: 'nags.check-disclosures.description',
+					defaultMessage:
+						'Make sure users are aware of any important details by filling in content disclosures that apply to your {type}.',
+				}),
+				{ type: formatProjectTypeSentence(formatMessage, context.project.project_type) },
+			)
+		},
+		status: 'suggestion',
+		shouldShow: () => true,
+		link: {
+			path: 'settings/disclosures',
+			title: defineMessage({
+				id: 'nags.settings.disclosures.title',
+				defaultMessage: 'Visit disclosure settings',
+			}),
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-disclosures',
 		},
 	},
 ]

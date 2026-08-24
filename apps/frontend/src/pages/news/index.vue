@@ -44,7 +44,7 @@ useSeoMeta({
 	<div class="page py-6">
 		<div class="flex flex-wrap items-center justify-between gap-4 px-6">
 			<div>
-				<h1 class="m-0 text-3xl font-extrabold">News</h1>
+				<h1 class="m-0 text-3xl font-semibold">News</h1>
 			</div>
 			<div class="flex gap-2">
 				<NewsletterButton />

@@ -165,7 +165,7 @@ vars! {
     REDIS_BLOCKING_MAX_CONNECTIONS: u32 = 256u32;
 
     // The encoding format used for Redis cache values.
-    REDIS_ENCODING_FORMAT: xredis::EncodingFormat = xredis::EncodingFormat::Json;
+    REDIS_ENCODING_FORMAT: xredis::EncodingFormat = xredis::EncodingFormat::Postcard;
     // The level of LZ4 compression used for Redis cache values. A value of 0 disables compression (supports 1-12)
     REDIS_COMPRESSION_LEVEL: i32 = 0i32;
     // The compression algorithm used for Redis cache values. Currently only LZ4 is supported.
@@ -318,6 +318,7 @@ vars! {
     NEVERBOUNCE_BASE_URL: String = neverbounce::DEFAULT_API_URL;
 
     EMAIL_DOMAIN_BLACKLIST: StringCsv = StringCsv(vec![]);
+    EMAIL_DOMAIN_WHITELIST: StringCsv = StringCsv(vec![]);
 
     CLICKHOUSE_REPLICATED: bool = false;
     CLICKHOUSE_URL: String = "http://localhost:8123";

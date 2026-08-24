@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE onboarding_checklist\n                SET has_created_instance = TRUE\n                WHERE id = 0 AND has_created_instance = FALSE\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "04b62cdfd635acb3d700211a104706fce514b070987a4ff2047afa18ee60d237"
+}

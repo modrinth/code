@@ -25,7 +25,7 @@
 			<h2>
 				{{ formatMessage(messages.discoverHeading) }}
 			</h2>
-			<div class="button-group">
+			<div class="mx-auto mb-20 flex w-fit flex-wrap justify-center gap-5">
 				<ButtonLink type="colored" color="brand" size="xl" to="/discover/mods">
 					<CompassIcon aria-hidden="true" />
 					{{ formatMessage(messages.discoverMods) }}
@@ -50,10 +50,12 @@
 			<div v-if="rows" class="projects-showcase">
 				<div v-for="(row, index) in rows" :key="index" class="row">
 					<div v-for="n in 2" :key="n" class="row__content" :class="{ offset: index % 2 }">
-						<nuxt-link
+						<ButtonLink
 							v-for="project in row"
 							:key="project.id"
-							class="project button-animation"
+							type="quiet"
+							interaction="none"
+							class="project !h-auto !shrink !items-stretch !justify-start !whitespace-normal !p-4 !font-normal !leading-normal"
 							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
 						>
 							<Avatar :src="project.icon_url" :alt="project.title" size="sm" loading="lazy" />
@@ -65,7 +67,7 @@
 									{{ project.description }}
 								</span>
 							</div>
-						</nuxt-link>
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
@@ -737,13 +739,6 @@ const creatorFeatureMessages = defineMessages({
 		line-break: loose;
 		color: var(--landing-color-subheading);
 		max-width: 50rem;
-	}
-
-	.button-group {
-		width: fit-content;
-		gap: 1.25rem;
-		margin: 0 auto 5rem;
-		justify-content: center;
 	}
 }
 

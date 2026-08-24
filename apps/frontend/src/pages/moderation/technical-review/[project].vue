@@ -12,6 +12,7 @@ import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevC
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const route = useRoute()
+const keybinds = useModerationKeybinds()
 
 const projectId = String(useRouteId('project'))
 
@@ -269,6 +270,34 @@ function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
 function refetch() {
 	queryClient.invalidateQueries({ queryKey: ['tech-review-project-report', projectId] })
 }
+
+function handleKeybinds(event: KeyboardEvent) {
+	keybinds.value.handle(event, {
+		scope: 'tech-review',
+		actions: {
+			goToTop: () => {
+				window.scrollTo({
+					top: 0,
+					behavior: 'smooth',
+				})
+			},
+			goToBottom: () => {
+				window.scrollTo({
+					top: document.body.scrollHeight,
+					behavior: 'smooth',
+				})
+			},
+		},
+	})
+}
+
+onMounted(() => {
+	window.addEventListener('keydown', handleKeybinds)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('keydown', handleKeybinds)
+})
 </script>
 
 <template>

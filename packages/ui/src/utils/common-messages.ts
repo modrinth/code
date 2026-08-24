@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { capitalizeString } from '@modrinth/utils'
 
 import { defineMessage, defineMessages, type MessageDescriptor } from '../composables/i18n'
 
@@ -34,6 +35,10 @@ export const commonMessages = defineMessages({
 	allProjectType: {
 		id: 'project-type.all',
 		defaultMessage: 'All',
+	},
+	addAnotherButton: {
+		id: 'button.add-another',
+		defaultMessage: 'Add another',
 	},
 	addServerToInstanceButton: {
 		id: 'button.add-server-to-instance',
@@ -143,6 +148,10 @@ export const commonMessages = defineMessages({
 		id: 'notification.error.title',
 		defaultMessage: 'An error occurred',
 	},
+	explanationLabel: {
+		id: 'label.explanation',
+		defaultMessage: 'Explanation',
+	},
 	filterByLabel: {
 		id: 'label.filter-by',
 		defaultMessage: 'Filter by',
@@ -166,6 +175,10 @@ export const commonMessages = defineMessages({
 	gridInputView: {
 		id: 'input.view.grid',
 		defaultMessage: 'Grid view',
+	},
+	iUnderstandButton: {
+		id: 'button.i-understand',
+		defaultMessage: 'I understand',
 	},
 	listInputView: {
 		id: 'input.view.list',
@@ -577,6 +590,10 @@ export const commonMessages = defineMessages({
 		id: 'label.upload-failed',
 		defaultMessage: 'Upload failed',
 	},
+	uploadVersionsEmptyStateDescription: {
+		id: 'empty-state.upload-versions.description',
+		defaultMessage: `Come back once you've uploaded your versions.`,
+	},
 	renameFailedLabel: {
 		id: 'label.rename-failed',
 		defaultMessage: 'Rename failed',
@@ -811,6 +828,7 @@ export const financialMessages = defineMessages({
 
 const PROJECT_TYPE_ALIASES: Record<string, string> = {
 	shaderpack: 'shader',
+	minecraft_java_server: 'server',
 }
 
 export function normalizeProjectType(type: string): string {
@@ -1007,6 +1025,51 @@ export function formatReportItemType(
 	return formatMessage(reportItemTypeMessages[key])
 }
 
+export const reportTypeMessages = defineMessages({
+	spam: {
+		id: 'report.type.spam',
+		defaultMessage: 'Spam',
+	},
+	copyright: {
+		id: 'report.type.copyright',
+		defaultMessage: 'Reuploaded work',
+	},
+	inappropriate: {
+		id: 'report.type.inappropriate',
+		defaultMessage: 'Inappropriate',
+	},
+	malicious: {
+		id: 'report.type.malicious',
+		defaultMessage: 'Malicious',
+	},
+	'name-squatting': {
+		id: 'report.type.name-squatting',
+		defaultMessage: 'Name squatting',
+	},
+	'missing-disclosure': {
+		id: 'report.type.missing-disclosure',
+		defaultMessage: 'Missing or incorrect disclosure',
+	},
+	'ai-images': {
+		id: 'report.type.ai-images',
+		defaultMessage: 'AI-generated images in icon, gallery, or description',
+	},
+	'fully-ai-generated': {
+		id: 'report.type.fully-ai-generated',
+		defaultMessage: 'Fully AI-generated project',
+	},
+})
+
+export function formatReportType(formatMessage: FormatMessage, type: string | undefined): string {
+	if (!type) return ''
+
+	if (type in reportTypeMessages) {
+		return formatMessage(reportTypeMessages[type as keyof typeof reportTypeMessages])
+	}
+
+	return capitalizeString(type.replace('-', ' '))
+}
+
 export const fileItemTypeMessages = defineMessages({
 	file: {
 		id: 'files.item-type.file',
@@ -1094,6 +1157,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.content.title',
 		defaultMessage: 'Content',
 	},
+	disclosures: {
+		id: 'project.settings.disclosures.title',
+		defaultMessage: 'Disclosures',
+	},
 	description: {
 		id: 'project.settings.description.title',
 		defaultMessage: 'Description',
@@ -1157,6 +1224,40 @@ export const commonProjectSettingsMessages = defineMessages({
 	withheldVersionsWarningResolve: {
 		id: 'project.versions.withheld-versions-warning.resolve-button',
 		defaultMessage: 'Resolve',
+	},
+})
+
+export const disclosureAiUsageMessages = defineMessages({
+	code: {
+		id: 'project.settings.disclosures.ai.types-code',
+		defaultMessage: 'Code',
+	},
+	assets: {
+		id: 'project.settings.disclosures.ai.types-assets',
+		defaultMessage: 'Assets',
+	},
+	text: {
+		id: 'project.settings.disclosures.ai.types-text',
+		defaultMessage: 'Text',
+	},
+	functionality: {
+		id: 'project.settings.disclosures.ai.types-functionality',
+		defaultMessage: 'Functionality',
+	},
+})
+
+export const disclosureTelemetryConsentMessages = defineMessages({
+	opt_in: {
+		id: 'project.settings.disclosures.telemetry.consent-opt-in',
+		defaultMessage: 'Opt-in',
+	},
+	opt_out: {
+		id: 'project.settings.disclosures.telemetry.consent-opt-out',
+		defaultMessage: 'Opt-out',
+	},
+	always_active: {
+		id: 'project.settings.disclosures.telemetry.consent-always-active',
+		defaultMessage: 'Always active',
 	},
 })
 

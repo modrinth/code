@@ -1,7 +1,27 @@
 import { invoke } from '@tauri-apps/api/core'
 
-import { install_job_listener } from './events'
-import type { InstanceLink, InstanceLoader } from './types'
+import type { InstallErrorView } from '@/generated/app-events/InstallErrorView'
+import type { InstallJavaStep } from '@/generated/app-events/InstallJavaStep'
+import type { InstallJobSnapshot } from '@/generated/app-events/InstallJobSnapshot'
+import type { InstallJobStatus } from '@/generated/app-events/InstallJobStatus'
+import type { InstallPhaseId } from '@/generated/app-events/InstallPhaseId'
+import type { InstallProgress } from '@/generated/app-events/InstallProgress'
+import type { InstallProgressSecondary } from '@/generated/app-events/InstallProgressSecondary'
+import type { SharedInstanceUnavailableReason } from '@/generated/app-events/SharedInstanceUnavailableReason'
+import type { AppEvents } from '@/providers/app-events'
+
+import type { InstanceIconConfig, InstanceLink, InstanceLoader } from './types'
+
+export type {
+	InstallErrorView,
+	InstallJavaStep,
+	InstallJobSnapshot,
+	InstallJobStatus,
+	InstallPhaseId,
+	InstallProgress,
+	InstallProgressSecondary,
+	SharedInstanceUnavailableReason,
+}
 
 export interface PackLocationVersionId {
 	type: 'fromVersionId'
@@ -36,6 +56,7 @@ export interface InstallCreateInstanceRequest {
 	loader: InstanceLoader
 	loaderVersion: string | null
 	iconPath: string | null
+	iconConfig?: InstanceIconConfig | null
 	link?: InstanceLink | null
 }
 
@@ -104,8 +125,6 @@ export interface SharedInstanceUpdateDiff {
 export const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE = 'shared_instance_unavailable'
 export const SHARED_INSTANCES_API_ERROR_CODE = 'shared_instances_api_error'
 
-export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked' | 'quarantined'
-
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null
 }
@@ -134,116 +153,6 @@ export function getErrorMessage(error: unknown): string {
 	if (error instanceof Error) return error.message || 'Unknown error'
 	if (isRecord(error) && typeof error.message === 'string') return error.message
 	return 'Unknown error'
-}
-
-export type InstallJobStatus =
-	| 'queued'
-	| 'running'
-	| 'succeeded'
-	| 'failed'
-	| 'interrupted'
-	| 'canceled'
-
-export type InstallPhaseId =
-	| 'preparing_instance'
-	| 'resolving_pack'
-	| 'downloading_pack_file'
-	| 'reading_pack_manifest'
-	| 'downloading_content'
-	| 'extracting_overrides'
-	| 'resolving_minecraft'
-	| 'resolving_loader'
-	| 'preparing_java'
-	| 'downloading_minecraft'
-	| 'running_loader_processors'
-	| 'finalizing'
-	| 'rolling_back'
-
-export interface InstallProgress {
-	current: number
-	total: number
-	secondary?: InstallProgressSecondary | null
-}
-
-export interface InstallProgressSecondary {
-	current: number
-	total: number
-}
-
-export type InstallJavaStep =
-	| 'resolving'
-	| 'fetching_metadata'
-	| 'downloading'
-	| 'extracting'
-	| 'validating'
-
-export interface InstallErrorView {
-	code: string
-	phase?: InstallPhaseId | null
-	message: string
-	reason?: SharedInstanceUnavailableReason | null
-	api?: {
-		error: string
-		status?: number | null
-		method?: string | null
-		url?: string | null
-		route?: string | null
-	} | null
-	context?: {
-		operation: string
-		source_path?: string | null
-		target_path?: string | null
-		file_path?: string | null
-		entry_path?: string | null
-		urls?: string[]
-		expected_hash?: string | null
-		expected_size?: number | null
-		project_id?: string | null
-		version_id?: string | null
-		minecraft_version?: string | null
-		loader?: string | null
-		java_version?: number | null
-		os?: string | null
-		arch?: string | null
-	} | null
-}
-
-export interface InstallJobSnapshot {
-	job_id: string
-	instance_id?: string | null
-	kind:
-		| 'create_instance'
-		| 'create_modpack_instance'
-		| 'create_shared_instance'
-		| 'update_shared_instance'
-		| 'import_instance'
-		| 'duplicate_instance'
-		| 'install_existing_instance'
-		| 'install_pack_to_existing_instance'
-	status: InstallJobStatus
-	target:
-		| { type: 'new_instance'; instance_id?: string | null }
-		| { type: 'existing_instance'; instance_id: string }
-	phase: InstallPhaseId
-	progress?: InstallProgress | null
-	details:
-		| { type: 'empty' }
-		| { type: 'instance'; name: string }
-		| { type: 'minecraft'; game_version: string; loader: InstanceLoader }
-		| { type: 'java'; major_version: number; step: InstallJavaStep }
-		| {
-				type: 'modpack'
-				project_id?: string | null
-				version_id?: string | null
-				title?: string | null
-		  }
-		| { type: 'import'; launcher_type: string; instance_folder: string }
-	display?: { title: string; icon?: string | null } | null
-	error?: InstallErrorView | null
-	rollback_error?: InstallErrorView | null
-	created: string
-	modified: string
-	finished?: string | null
 }
 
 export async function install_get_modpack_preview(location: CreatePackLocation) {
@@ -399,7 +308,7 @@ function settleInstallJob(job: InstallJobSnapshot) {
 	throw new Error(`Install job ${job.job_id} ${job.status}`)
 }
 
-export async function wait_for_install_job(jobId: string) {
+export async function wait_for_install_job(events: AppEvents, jobId: string) {
 	const current = await install_job_get(jobId)
 	if (isInstallJobFinished(current.status)) return settleInstallJob(current)
 
@@ -434,16 +343,7 @@ export async function wait_for_install_job(jobId: string) {
 			reject(err)
 		}
 
-		install_job_listener(resolveJob)
-			.then((listener) => {
-				if (finished) {
-					listener()
-					return
-				}
-
-				unlisten = listener
-				install_job_get(jobId).then(resolveJob).catch(rejectWait)
-			})
-			.catch(rejectWait)
+		unlisten = events.on('install_job', resolveJob)
+		install_job_get(jobId).then(resolveJob).catch(rejectWait)
 	})
 }

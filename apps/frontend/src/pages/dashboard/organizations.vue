@@ -13,11 +13,13 @@
 			</div>
 			<template v-if="orgs?.length > 0">
 				<div class="orgs-grid">
-					<nuxt-link
+					<ButtonLink
 						v-for="org in sortedOrgs"
 						:key="org.id"
+						type="quiet"
+						interaction="none"
 						:to="`/organization/${org.slug}`"
-						class="universal-card button-base recessed org"
+						class="universal-card recessed org !h-auto !w-full !shrink !items-stretch !justify-start !whitespace-normal !p-[var(--spacing-card-bg)]"
 						:class="{ 'is-disabled': onlyAcceptedMembers(org.members).length === 0 }"
 					>
 						<Avatar :src="org.icon_url" :alt="org.name" class="icon" />
@@ -41,7 +43,7 @@
 								</div>
 							</span>
 						</div>
-					</nuxt-link>
+					</ButtonLink>
 				</div>
 			</template>
 			<template v-else> {{ formatMessage(messages.makeOrganization) }} </template>
@@ -51,7 +53,14 @@
 
 <script setup>
 import { PlusIcon, UsersIcon } from '@modrinth/assets'
-import { Avatar, Button, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	ButtonLink,
+	defineMessages,
+	injectModrinthClient,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'

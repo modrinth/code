@@ -1,181 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type {
-	Action,
-	AdditionalTextInput,
-	ButtonAction,
-	ConditionalMessage,
-	ToggleAction,
-} from './types/actions'
-
-export interface ActionState {
-	selected: boolean
-	value?: Set<string | number> | number | string | unknown
-}
-
-export interface MessagePart {
-	weight: number
-	content: string
-	actionId: string
-	stageIndex: number
-}
-
-export function getActionIdForStage(
-	action: Action,
-	stageIndex: number,
-	actionIndex?: number,
-	enabledIndex?: number,
-): string {
-	if (action.id) {
-		return `stage-${stageIndex}-${action.id}`
-	}
-	const suffix = enabledIndex !== undefined ? `-enabled-${enabledIndex}` : ''
-	return `stage-${stageIndex}-action-${actionIndex}${suffix}`
-}
-
-export function getActionId(action: Action, currentStage: number, index?: number): string {
-	return getActionIdForStage(action, currentStage, index)
-}
-
-export function getActionKey(
-	action: Action,
-	currentStage: number,
-	visibleActions: Action[],
-): string {
-	const index = visibleActions.indexOf(action)
-	return `${currentStage}-${index}-${getActionId(action, currentStage)}`
-}
-
-export function initializeActionState(action: Action): ActionState {
-	if (action.type === 'toggle') {
-		return {
-			selected: action.defaultChecked || false,
-		}
-	} else if (action.type === 'dropdown') {
-		return {
-			selected: true,
-			value: action.defaultOption || 0,
-		}
-	} else if (action.type === 'multi-select-chips') {
-		return {
-			selected: false,
-			value: new Set<string | number>(),
-		}
-	} else {
-		return {
-			selected: false,
-		}
-	}
-}
-
-export function processMessage(
-	message: string,
-	action: Action,
-	stageIndex: number,
-	textInputValues: Record<string, string>,
-): string {
-	let processedMessage = message
-
-	if (action.relevantExtraInput) {
-		action.relevantExtraInput.forEach((input, index) => {
-			if (input.variable) {
-				const inputKey = `stage-${stageIndex}-${action.id || `action-${index}`}-${index}`
-				const value = textInputValues[inputKey] || ''
-
-				const regex = new RegExp(`%${input.variable}%`, 'g')
-				processedMessage = processedMessage.replace(regex, value)
-			}
-		})
-	}
-
-	return processedMessage
-}
-
-export function findMatchingVariant(
-	variants: ConditionalMessage[],
-	selectedActionIds: string[],
-	allValidActionIds?: string[],
-	currentStageIndex?: number,
-): ConditionalMessage | null {
-	for (const variant of variants) {
-		const conditions = variant.conditions
-
-		const meetsRequired =
-			!conditions.requiredActions ||
-			conditions.requiredActions.every((id) => {
-				let fullId = id
-				if (currentStageIndex !== undefined && !id.startsWith('stage-')) {
-					fullId = `stage-${currentStageIndex}-${id}`
-				}
-
-				if (allValidActionIds && !allValidActionIds.includes(fullId)) {
-					return false
-				}
-				return selectedActionIds.includes(fullId)
-			})
-
-		const meetsExcluded =
-			!conditions.excludedActions ||
-			!conditions.excludedActions.some((id) => {
-				let fullId = id
-				if (currentStageIndex !== undefined && !id.startsWith('stage-')) {
-					fullId = `stage-${currentStageIndex}-${id}`
-				}
-				return selectedActionIds.includes(fullId)
-			})
-
-		if (meetsRequired && meetsExcluded) {
-			return variant
-		}
-	}
-
-	return null
-}
-
-export async function getActionMessage(
-	action: ButtonAction | ToggleAction,
-	selectedActionIds: string[],
-	allValidActionIds?: string[],
-): Promise<string> {
-	if (action.conditionalMessages && action.conditionalMessages.length > 0) {
-		const matchingConditional = findMatchingVariant(
-			action.conditionalMessages,
-			selectedActionIds,
-			allValidActionIds,
-		)
-		if (matchingConditional) {
-			return (await matchingConditional.message()) as string
-		}
-	}
-
-	return (await action.message()) as string
-}
-
-export function getVisibleInputs(
-	action: Action,
-	actionStates: Record<string, ActionState>,
-): AdditionalTextInput[] {
-	if (!action.relevantExtraInput) return []
-
-	const selectedActionIds = Object.entries(actionStates)
-		.filter(([, state]) => state.selected)
-		.map(([id]) => id)
-
-	return action.relevantExtraInput.filter((input) => {
-		if (!input.showWhen) return true
-
-		const meetsRequired =
-			!input.showWhen.requiredActions ||
-			input.showWhen.requiredActions.every((id) => selectedActionIds.includes(id))
-
-		const meetsExcluded =
-			!input.showWhen.excludedActions ||
-			!input.showWhen.excludedActions.some((id) => selectedActionIds.includes(id))
-
-		return meetsRequired && meetsExcluded
-	})
-}
-
 export function expandVariables(
 	template: string,
 	project: Labrinth.Projects.v2.Project,
@@ -283,35 +107,6 @@ export function formatProjectTypes(type: string, lower: boolean = false) {
 	return value
 }
 
-export function formatEnvironments(environment: string, lower: boolean = false) {
-	let value = environment
-	try {
-		value = value
-			.replaceAll('client_only_server_optional', 'Client and server: Optional on server')
-			.replaceAll('client_and_server', 'Required on both')
-			.replaceAll('client_only', 'Client-side only')
-			.replaceAll('server_only_client_optional', 'Client optional')
-			.replaceAll('dedicated_server_only', 'Dedicated server only')
-			.replaceAll('server_only', 'Servers and Singleplayer')
-			.replaceAll('singleplayer_only', 'Singleplayer only')
-			.replaceAll(
-				'client_or_server_prefers_both',
-				'Optional on both, works best when installed on both sides',
-			)
-			.replaceAll(
-				'client_or_server',
-				'Optional on both, works the same if installed on either side',
-			)
-			// This shouldn't come up for this use but yk
-			.replaceAll('unknown', 'Unknown')
-	} catch {
-		return 'No project environment'
-	}
-
-	if (lower === true) value = value.toLowerCase()
-	return value
-}
-
 export function requiresEnvironmentInfo(projectTypes): boolean {
 	return projectTypes.includes('mod') || projectTypes.includes('modpack')
 }
@@ -320,6 +115,65 @@ export function flattenStaticVariables(): Record<string, string> {
 	const vars: Record<string, string> = {}
 
 	vars[`RULES`] = `[Modrinth's Content Rules](https://modrinth.com/legal/rules)`
+	vars[`R1`] =
+		`Per section 1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-content)`
+	const rule1subs = 12
+	for (let n = 1; n <= rule1subs; n++) {
+		vars[`R1.${n}`] =
+			`Per section 1.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-content)`
+	}
+	vars[`R2`] =
+		`Per section 2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#clear-and-honest-function)`
+	vars[`R2.1`] =
+		`Per section 2.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#general-expectations)`
+	const rule2sub1subs = 3
+	for (let n = 1; n <= rule2sub1subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R2.1${l}`] =
+			`Per section 2.1${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#general-expectations)`
+	}
+	vars[`R2.2`] =
+		`Per section 2.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#accessibility)`
+	vars[`R3`] =
+		`Per section 3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	const rule3subs = 3
+	for (let n = 1; n <= rule3subs; n++) {
+		vars[`R3.${n}`] =
+			`Per section 3.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	}
+	const rule3sub3subs = 6
+	for (let n = 1; n <= rule3sub3subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R3.3${l}`] =
+			`Per section 3.3${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	}
+	vars[`R4`] =
+		`Per section 4 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#copyright-and-legality-of-content)`
+	vars[`R5`] =
+		`Per section 5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
+	const rule5subs = 9
+	for (let n = 1; n <= rule5subs; n++) {
+		vars[`R5.${n}`] =
+			`Per section 5.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
+	}
+	vars[`R6`] =
+		`Per section 6 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#generative-ai)`
+	vars[`R6.1`] =
+		`Per section 6.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#disclosure-of-ai-generated-content)`
+	const rule6sub1subs = 2
+	for (let n = 1; n <= rule6sub1subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R6.1${l}`] =
+			`Per section 6.1${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#disclosure-of-ai-generated-content)`
+	}
+	vars[`R6.2`] =
+		`Per section 6.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-usage-of-ai)`
+	const rule6sub2subs = 4
+	for (let n = 1; n <= rule6sub2subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R6.2${l}`] =
+			`Per section 6.2${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-usage-of-ai)`
+	}
 	vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
 	vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
 	vars[`SUPPORT`] =
@@ -412,6 +266,7 @@ export function flattenProjectVariables(
 	vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
 	vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
 	vars[`PROJECT_SETTINGS_FLINK`] = `[Settings](https://modrinth.com/project/${project.id}/settings)`
+	vars[`PROJECT_ICON_FLINK`] = `[Icon](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_TITLE_FLINK`] = `[Name](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
@@ -451,6 +306,10 @@ export function flattenProjectVariables(
 	vars[`PROJECT_MONETIZATION_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
 	vars[`PROJECT_MONETIZATION_SETTINGS_FLINK`] =
 		`[Monetization settings](https://modrinth.com/project/${project.id}/settings)`
+	vars[`PROJECT_CONTENT_DISCLOSURES_LINK`] =
+		`https://modrinth.com/project/${project.id}/settings/disclosures`
+	vars[`PROJECT_CONTENT_DISCLOSURES_FLINK`] =
+		`[Content Disclosures](https://modrinth.com/project/${project.id}/settings/disclosures)`
 
 	return vars
 }

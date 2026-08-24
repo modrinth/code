@@ -270,9 +270,11 @@
 					</nuxt-link>
 					. You may override them below.
 				</p>
-				<nuxt-link
+				<ButtonLink
+					type="quiet"
+					interaction="none"
 					:to="`/organization/${organization.slug}`"
-					class="universal-card button-base recessed org"
+					class="universal-card recessed org !h-auto !w-full !shrink !items-stretch !justify-start !whitespace-normal !p-[var(--spacing-card-bg)]"
 				>
 					<Avatar :src="organization.icon_url" :alt="organization.name" size="md" />
 					<div class="details">
@@ -294,7 +296,7 @@
 							</div>
 						</span>
 					</div>
-				</nuxt-link>
+				</ButtonLink>
 			</div>
 			<p v-else>
 				This project is not managed by an organization. If you are the member of any organizations,
@@ -562,9 +564,11 @@ import {
 	Avatar,
 	Badge,
 	Button,
+	ButtonLink,
 	Card,
 	Checkbox,
 	Combobox,
+	commonProjectSettingsMessages,
 	ConfirmModal,
 	IconButton,
 	injectModrinthClient,
@@ -588,6 +592,8 @@ const {
 	currentMember,
 	invalidate,
 } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.members)
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 

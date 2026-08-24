@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use std::{collections::HashMap, fmt::Write, time::Instant};
 use xredis::RedisPool;
 
@@ -156,7 +157,7 @@ pub async fn ingest_report(
     let report = serde_json::from_value::<DelphiReport>(report.clone())
         .wrap_internal_err_with(|| {
             eyre!(
-                "Delphi sent a response which does not match our schema\n\n{}",
+                "received a Delphi response which does not match our schema\n\n{}",
                 serde_json::to_string_pretty(&report).unwrap()
             )
         })?;
@@ -251,7 +252,8 @@ async fn ingest_report_deserialized(
         tech_review_sync::TechReviewExitReason::Resolved,
         &mut transaction,
     )
-    .await?;
+    .await
+    .wrap_api_err("synchronizing project technical-review state")?;
 
     transaction
         .commit()
@@ -278,7 +280,7 @@ pub async fn run(
         run_parameters.file_id.0 as i64
     )
     .fetch_one(exec)
-    .await?;
+    .await.wrap_internal_err("fetching file from database")?;
 
     tracing::debug!(
         "Running Delphi for project {}, version {}, file {}",
@@ -297,7 +299,7 @@ pub async fn run(
         .send()
         .await
         .and_then(|res| res.error_for_status())
-        .map_err(ApiError::delphi)?;
+        .wrap_internal_err("requesting a Delphi scan")?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -325,7 +327,8 @@ pub async fn _run(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     run(&**pool, run_parameters.into_inner(), &http).await
 }
@@ -350,12 +353,14 @@ pub async fn version(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     Ok(HttpResponse::Ok().json(
         sqlx::query_scalar!("SELECT MAX(delphi_version) FROM delphi_reports")
             .fetch_one(&**pool)
-            .await?,
+            .await
+            .wrap_internal_err("deserializing HTTP response")?,
     ))
 }
 
@@ -380,7 +385,8 @@ pub async fn issue_type_schema(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-    .await?;
+    .await
+    .wrap_auth_err("deserializing HTTP response")?;
 
     // This route is expected to be called often by the frontend, and Delphi is not necessarily
     // built to scale beyond malware analysis, so cache the result of its quasi-constant-valued
@@ -401,10 +407,10 @@ pub async fn issue_type_schema(
                         .send()
                         .await
                         .and_then(|res| res.error_for_status())
-                        .map_err(ApiError::delphi)?
+                        .wrap_internal_err("fetching the Delphi schema")?
                         .json::<serde_json::Map<String, serde_json::Value>>()
                         .await
-                        .map_err(ApiError::delphi)?,
+                        .wrap_internal_err("deserializing the Delphi schema")?,
                     Instant::now(),
                 ))
                 .0,

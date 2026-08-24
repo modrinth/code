@@ -4,6 +4,7 @@ mod content;
 mod content_set_diff;
 mod export_mrpack;
 mod get;
+mod groups;
 mod icon;
 mod install;
 mod lifecycle;
@@ -16,14 +17,22 @@ pub use self::content::{
     get_content_items, get_dependencies_as_content_items,
     get_install_candidates, get_installed_project_ids,
     get_linked_modpack_content, get_linked_modpack_info, get_projects,
-    list_content_sets, sync_content_files,
+    list_content_sets, refresh_content_updates, sync_content_files,
 };
 pub use self::export_mrpack::{
     PackExportCandidate, create_mrpack_json, export_mrpack,
     get_pack_export_candidates, get_pack_export_candidates_for_parent,
 };
 pub use self::get::{get, get_many, list};
-pub use self::icon::edit_icon;
+pub use self::groups::{
+    FAVORITES_GROUP_ID, InstanceGroup, InstanceGroupMembershipUpdate,
+    create_group, delete_group, list_groups, rename_group,
+    set_group_memberships, set_group_order,
+};
+pub use self::icon::{
+    cache_generated_icon, edit_generated_icon, edit_generated_icon_if_empty,
+    edit_icon, get_recent_icon_configs,
+};
 pub(crate) use self::icon::{
     cache_icon, cache_icon_from_path, migrate_legacy_icons,
 };
@@ -35,8 +44,9 @@ pub use self::projects::{
     InstallProjectWithDependenciesRequest, add_project_from_path,
     add_project_from_version, install_project_with_dependencies,
     is_file_on_modrinth, remove_project, repair_managed_modrinth,
-    switch_project_version_with_dependencies, toggle_disable_project,
-    update_all_projects, update_managed_modrinth_version, update_project,
+    set_project_locked, switch_project_version_with_dependencies,
+    toggle_disable_project, update_all_projects,
+    update_managed_modrinth_version, update_project,
 };
 pub use self::run::{
     QuickPlayType, kill, run, try_update_playtime_by_instance_id,

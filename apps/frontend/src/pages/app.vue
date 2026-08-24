@@ -18,6 +18,7 @@ import {
 	Avatar,
 	Badge,
 	Button,
+	ButtonLink,
 	Checkbox,
 	commonMessages,
 	defineMessages,
@@ -532,7 +533,7 @@ useSeoMeta({
 	<div>
 		<div class="landing-hero">
 			<div
-				class="relative mt-4 h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+				class="relative mt-4 h-fit w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 			>
 				{{ formatMessage(commonMessages.betaRelease) }}
 			</div>
@@ -546,7 +547,7 @@ useSeoMeta({
 			<h2 class="main-subheader">
 				{{ formatMessage(messages.description) }}
 			</h2>
-			<div class="button-group">
+			<div class="mx-auto flex w-fit flex-wrap justify-center gap-2 [mask-image:none]">
 				<Button v-if="os" type="colored" color="brand" size="xl" @click="handleDownload">
 					<LinuxIcon v-if="os === 'Linux'" />
 					<WindowsIcon v-else-if="os === 'Windows'" />
@@ -745,10 +746,12 @@ useSeoMeta({
 					<div class="projects-showcase">
 						<div v-for="(row, index) in rows" :key="index" class="row">
 							<div v-for="n in 2" :key="n" class="row__content" :class="{ offset: index % 2 }">
-								<nuxt-link
+								<ButtonLink
 									v-for="project in row"
 									:key="project.id"
-									class="project button-animation gradient-border"
+									type="quiet"
+									interaction="none"
+									class="project gradient-border !h-auto !shrink !items-stretch !justify-start !whitespace-normal !p-4 !font-normal !leading-normal"
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
 								>
 									<Avatar :src="project.icon_url!" alt="" size="sm" />
@@ -760,7 +763,7 @@ useSeoMeta({
 											{{ project.description }}
 										</span>
 									</div>
-								</nuxt-link>
+								</ButtonLink>
 							</div>
 						</div>
 					</div>
@@ -1225,13 +1228,6 @@ useSeoMeta({
 		line-break: loose;
 		color: var(--landing-color-subheading);
 		max-width: 1096px;
-		mask-image: none;
-	}
-
-	.button-group {
-		width: fit-content;
-		margin: 0 auto;
-		justify-content: center;
 		mask-image: none;
 	}
 

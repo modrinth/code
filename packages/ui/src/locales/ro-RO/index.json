@@ -425,18 +425,6 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nume ale proiectului"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alfabetic"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Cele noi mai întâi"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Cele vechi mai întâi"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortează cu {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Actualizează tot"
   },
@@ -550,9 +538,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Fișier salvat"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Închide"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Caută"
@@ -1016,32 +1001,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nu s-au găsit instanțe compatibile"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Înlăturare iconiță"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Căutare instanță"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selectează iconița"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Acest modpack nu include niciun conținut suplimentar."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nu a fost găsit niciun conținut"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Conținutul Modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Se încarcă materialul..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Niciun proiect nu corespunde căutării dvs."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Căutare {count, number}{count, plural,one {proiect}other {proiecte}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Curent"

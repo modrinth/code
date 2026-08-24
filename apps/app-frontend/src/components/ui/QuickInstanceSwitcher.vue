@@ -2,17 +2,16 @@
 import { SpinnerIcon } from '@modrinth/assets'
 import { Avatar, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
-import { instance_listener } from '@/helpers/events.js'
-import { list } from '@/helpers/instance'
+import { useAppEvent } from '@/composables/use-app-event'
+import { getInstanceIconUrl, list } from '@/helpers/instance'
 import { instanceKeys } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
-const APPROX_USED_VERTICAL_SPACE = 513 // doesn't need to be exact lol just close enough so there's a little gap and no overflow
+const APPROX_USED_VERTICAL_SPACE = 475 // doesn't need to be exact lol just close enough so there's a little gap and no overflow
 const STORAGE_KEY = 'modrinth-quick-instance-count'
 
 const { handleError } = injectNotificationManager()
@@ -148,7 +147,7 @@ const getInstances = async () => {
 await getInstances()
 updateMaxAuto()
 
-const unlistenInstance = await instance_listener(async (event) => {
+useAppEvent('instance', async (event) => {
 	if (event.event !== 'synced') {
 		await getInstances()
 	}
@@ -162,7 +161,6 @@ onUnmounted(() => {
 	window.removeEventListener('resize', updateMaxAuto)
 	document.body.classList.remove('quick-instance-dragging')
 	clearOverdragFlash()
-	unlistenInstance()
 })
 
 const messages = defineMessages({
@@ -202,7 +200,7 @@ const dividerTooltip = computed(() => {
 		>
 			<NavButton :to="`/instance/${encodeURIComponent(instance.id)}`" class="relative">
 				<Avatar
-					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+					:src="getInstanceIconUrl(instance.icon_path)"
 					size="28px"
 					:tint-by="instance.id"
 					:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"

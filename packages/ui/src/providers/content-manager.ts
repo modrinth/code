@@ -1,7 +1,7 @@
 export {
 	type ContentManagerContext,
-	type ContentModpackData,
 	injectContentManager,
+	type ManagedContentData,
 	provideContentManager,
 	type UploadState,
 } from '../layouts/shared/content-tab/providers/content-manager'

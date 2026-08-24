@@ -1481,9 +1481,6 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Atualizado recentemente"
   },
-  "dashboard.creator-tax-form-modal.close-button": {
-    "message": "Fechar"
-  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Baixar {formType}"
   },
@@ -2849,9 +2846,6 @@
   "layout.footer.social.discord": {
     "message": "Discord"
   },
-  "layout.footer.social.github": {
-    "message": "GitHub"
-  },
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
@@ -2984,9 +2978,6 @@
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Falhou ao excluir todos os grupos: {error}"
   },
-  "modpack-scan-modal.delete-all-groups.proceed": {
-    "message": "Excluir"
-  },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Todos os grupos excluídos com sucesso."
   },
@@ -3025,9 +3016,6 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "Verificando..."
-  },
-  "modpack-scan-modal.success": {
-    "message": "Sucesso"
   },
   "modpack-scan-modal.title": {
     "message": "Verificação do pacote de mods ({scanned}/{total} Arquivos)"
@@ -3938,11 +3926,26 @@
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas em destaque"
   },
-  "project.settings.tags.featured-tags-description": {
-    "message": "Você pode destacar até 3 das suas etiquetas mais relevantes. Outras etiquetas poderão ser promovidas a destaque caso você não selecione todas as 3."
+  "project.settings.tags.featured-tags-required": {
+    "message": "Você deve ter pelo menos uma marcação em destaque."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Selecione suas marcações mais relevantes. Estas serão exibidas antes das outras marcações."
   },
   "project.settings.tags.features-description": {
     "message": "Selecione todas as funcionalidades que o seu {type} utiliza."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} categorias} other {Categorias}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} recursos} other {Recursos}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} impacto no desempenho} other {Impacto no desempenho}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} resoluções} other {Resoluções}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Você selecionou {count} etiquetas de resolução ({tags}). Os pacotes de recursos devem normalmente ter apenas uma etiqueta de resolução."
@@ -3956,9 +3959,6 @@
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecione pelo menos uma categoria para ela ser destacada."
   },
-  "project.settings.tags.tagging-importance-description": {
-    "message": "Etiquetar corretamente é importante para ajudar as pessoas a encontrarem seu {type}. Certifique-se de selecionar todas as etiquetas aplicáveis."
-  },
   "project.settings.tags.title": {
     "message": "Etiquetas"
   },
@@ -3970,18 +3970,6 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Você selecionou {count} etiquetas. Considere reduzir para 12 ou menos para manter seu projeto focado e mais fácil de encontrar."
-  },
-  "project.settings.tags.upload-version-first": {
-    "message": "Por favor, envie uma versão primeiro para que as etiquetas possam ser selecionadas!"
-  },
-  "project.settings.title": {
-    "message": "Configurações"
-  },
-  "project.settings.visit-dashboard": {
-    "message": "Visitar painel de projetos"
-  },
-  "project.status.archived.message": {
-    "message": "{title} foi arquivado. {title} não receberá atualizações a menos que o autor decida desarquivar o projeto."
   },
   "project.versions.copy-id-option": {
     "message": "Copiar ID"
@@ -5024,95 +5012,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "O <strong>modo desenvolvedor</strong> está ativado. Isto permite que você veja os IDs internos de várias coisas no Modrinth, que podem ser úteis se você for um desenvolvedor usando a API do Modrinth. Clique 5 vezes no logotipo do Modrinth na parte inferior da página para alternar o modo de desenvolvedor."
   },
-  "settings.display.flags.description": {
-    "message": "Ative ou desative certos recursos neste dispositivo."
-  },
-  "settings.display.flags.title": {
-    "message": "Alternar recursos"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "O modo de desenvolvedor foi desativado"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Modo de desenvolvedor desativado"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Página dos pacotes de dados"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Selecione seu layout preferido para cada página que exibe listas de projetos neste dispositivo."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Página dos mods"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galeria"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Grade"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Linhas"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Página dos pacotes de mods"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Página dos plugins"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Página dos pacotes de recursos"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Página dos servidores"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Página dos sombreadores"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Exibição da lista de projetos"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Páginas de perfil do usuário"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Coleção"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Ativa a renderização avançada, como efeitos de desfoque que podem causar problemas de desempenho sem a renderização acelerada de hardware."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Renderização avançada"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Faz com que os links que estão fora do Modrinth sejam abertos em uma nova aba. Independentemente dessa configuração, links no mesmo domínio e nas descrições do Markdown serão abertos na mesma aba, e links em anúncios e páginas de edição serão abertos em uma nova aba."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Abrir links externos em uma nova aba"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Oculta os botões \"Baixe o Modrinth App\" da navegação principal. A página do Modrinth App ainda pode ser encontrada na página inicial ou no rodapé."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ocultar promoções do Modrinth App"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Barra lateral alinhada à esquerda nas páginas de conteúdo"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Alinha a barra lateral à esquerda do conteúdo da página."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Alinha a barra lateral de filtros à direita dos resultados da pesquisa."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Barra lateral de filtros alinhada à direita nas páginas de pesquisa"
-  },
-  "settings.display.theme.description": {
-    "message": "Selecione seu tema de cor preferido para o Modrinth neste dispositivo."
-  },
-  "settings.display.theme.title": {
-    "message": "Tema"
   },
   "settings.head-title": {
     "message": "Configurações de exibição"

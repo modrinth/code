@@ -494,9 +494,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "világ"
   },
-  "content.modpack-card.installation-settings": {
-    "defaultMessage": "Telepítési beállítások"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "További tartalom"
   },
@@ -547,18 +544,6 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projektnevek"
-  },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Ábécé sorrendben"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Legújabbak elöl"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Legrégebbiek elöl"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Rendezés {mode} szerint"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Összes frissítése"
@@ -634,9 +619,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Játékverzió keresése..."
-  },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Ikon eltávolítása"
   },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Ikon feltöltése"
@@ -812,9 +794,6 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Modcsomag keresése"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "A játékprofil egy külön Minecraft-környezet egy adott modbetöltővel, verzióval és modokkal."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Kezdés alapoktól: válassz betöltőt és játékverziót."
   },
@@ -847,9 +826,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Világ típusa"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modcsomag kiválasztása"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Játékprofil létrehozása"
@@ -1027,9 +1003,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "A fájl mentve"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Bezárás"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Keresés"
@@ -1665,7 +1638,7 @@
     "defaultMessage": "{type} javítása"
   },
   "instance.confirm-repair.instance-label": {
-    "defaultMessage": "Játékprofil"
+    "defaultMessage": "Példány"
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Javítás"
@@ -1727,41 +1700,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nem található kompatibilis profil"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Ikon eltávolítása"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Profilok keresése"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Ikon feltöltése"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Ez a modcsomag nem tartalmaz további tartalmakat."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Nincsen tartalom"
-  },
-  "instances.modpack-content-modal.external-content": {
-    "defaultMessage": "Külső"
-  },
-  "instances.modpack-content-modal.external-content-description": {
-    "defaultMessage": "Ez a fájl nem szerepel a Modrinthon."
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Modcsomag tartalma"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Tartalmak betöltése..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Nincsen olyan projekt ami keresnél."
-  },
-  "instances.modpack-content-modal.open-in-slicer": {
-    "defaultMessage": "Megnyitás a Slicer-ben"
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Keresés {count, number} projekt között"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Jelenlegi"
@@ -2537,9 +2477,6 @@
   "profile.button.create-project": {
     "defaultMessage": "Projekt létrehozása"
   },
-  "profile.button.edit-role": {
-    "defaultMessage": "Szerep szerkesztése"
-  },
   "profile.button.info": {
     "defaultMessage": "Felhasználói adatok megtekintése"
   },
@@ -2612,23 +2549,11 @@
   "profile.label.project-count": {
     "defaultMessage": "projekt"
   },
-  "profile.label.saving": {
-    "defaultMessage": "Mentés..."
-  },
   "profile.official-account": {
     "defaultMessage": "Hivatalos Modrinth-fiók"
   },
   "profile.official-account.bio": {
     "defaultMessage": "A Modrinth hivatalos felhasználói fiókja. Támogatás a <support-link></support-link> oldalon kaphatsz vagy e-mailben a <email></email> címen."
-  },
-  "profile.role.select-placeholder": {
-    "defaultMessage": "Válassz egy rangot"
-  },
-  "profile.role.update-error-description": {
-    "defaultMessage": "Hiba történt a felhasználói szerepkör frissítése közben. Kérlek próbáld meg újra."
-  },
-  "profile.role.update-error-title": {
-    "defaultMessage": "A szerepkör frissítése nem sikerült"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Hiba történt a felhasználó letiltásának feloldása közben. Kérlek próbáld meg újra."
@@ -3953,38 +3878,8 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "A telepítés nem sikerült"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Egy internal hiba történt a telepítés közben. Kérlek probáld újra."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Ez a modcsomag-verzió nem tartalmaz letölthető fájlt. Lehet, hogy hibásan lett összeállítva."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Kiegészítők telepítése..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "A modcsomag telepítése..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "A platform telepítése..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Előkészítjük a szervered"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java hozzáadása..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "A szerver beállítása..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Modok letöltése..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Fájlok rendezése..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Környezet beállítása..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Már van egy szervered?"
@@ -4000,9 +3895,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Telepíts modokat, hívd meg a barátaidat, és játsszatok együtt, mindezt a Modrinth Appban."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Még nincsenek szerverek"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Válaszd ki a kedvenc modjaidat, a többit bízd ránk!"
@@ -4502,9 +4394,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Barátkérelmek"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Hamarosan érkezik!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Bárki"
   },
@@ -4543,12 +4432,6 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} avatárja"
-  },
-  "sharing.invite-players-modal.cancel": {
-    "defaultMessage": "Mégse"
-  },
-  "sharing.invite-players-modal.cancel-button": {
-    "defaultMessage": "Mégse"
   },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Meghívólink szerkesztése."
