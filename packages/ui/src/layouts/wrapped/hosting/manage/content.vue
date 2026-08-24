@@ -106,8 +106,7 @@ const messages = defineMessages({
 	},
 	sideLocked: {
 		id: 'hosting.content.enabled-for.side-locked',
-		defaultMessage:
-			'This option conflicts with the detected environment. Unlock the environment controls from the row menu to change it.',
+		defaultMessage: 'This option conflicts with the detected environment.',
 	},
 	unknownEnvironment: {
 		id: 'hosting.content.enabled-for.unknown-environment',
