@@ -14,13 +14,23 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 
+import ValidationMessage from '~/components/ValidationMessage.vue'
+import { validateProjectText } from '~/composables/project-text-validation'
+
 const { formatMessage } = useVIntl()
 
 const { projectV2: project, patchProject } = injectProjectPageContext()
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
-const { saved, current, saving, hasChanges, reset, save } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	hasChanges,
+	reset,
+	save: saveForm,
+} = useSavable(
 	() => ({
 		title: project.value.title,
 		tagline: project.value.description,
@@ -37,6 +47,15 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
+
+const titleValidation = computed(() => validateProjectText(current.value.title))
+const taglineValidation = computed(() => validateProjectText(current.value.tagline))
+const canSave = computed(() => !titleValidation.value && !taglineValidation.value)
+
+async function save() {
+	if (!canSave.value) return
+	await saveForm()
+}
 
 const messages = defineMessages({
 	nameTitle: {
@@ -129,6 +148,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 			:original="saved"
 			:modified="current"
 			:saving="saving"
+			:can-save="canSave"
 			@reset="reset"
 			@save="save"
 		/>
@@ -152,6 +172,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 						wrapper-class="flex-grow"
 					/>
 				</div>
+				<ValidationMessage :check="titleValidation" class="mt-2" />
 			</div>
 			<div class="mt-4">
 				<SettingsLabel
@@ -167,6 +188,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 					:maxlength="120"
 					wrapper-class="w-full"
 				/>
+				<ValidationMessage :check="taglineValidation" class="mt-2" />
 			</div>
 			<div class="mt-4">
 				<SettingsLabel id="project-url" :title="messages.urlTitle" />

@@ -57,6 +57,9 @@ test('allows ordinary emoji and valid emoji joiner sequences', () => {
 	assert.equal(validateNonStandardText('Family: 👨‍👩‍👧‍👦').valid, true)
 	assert.equal(validateNonStandardText('Developer: 🧑🏽‍💻').valid, true)
 	assert.equal(validateNonStandardText('Heart: ❤️').valid, true)
+	assert.equal(validateNonStandardText('Information: ℹ️').valid, true)
+	assert.equal(validateNonStandardText('A button: 🅰️').valid, true)
+	assert.equal(validateNonStandardText('Scotland: 🏴󠁧󠁢󠁳󠁣󠁴󠁿').valid, true)
 })
 
 test('detects suspicious invisible and directional characters', () => {

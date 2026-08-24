@@ -28,6 +28,7 @@
 						:maxlength="2048"
 						:disabled="!hasPermission"
 					/>
+					<ValidationMessage :check="nameValidation" class="mt-2" />
 				</div>
 
 				<div>
@@ -60,6 +61,7 @@
 						:disabled="!hasPermission"
 						resize="vertical"
 					/>
+					<ValidationMessage :check="summaryValidation" class="mt-2" />
 					<div v-if="summaryWarning" class="my-2">
 						<SettingsInlineWarning>
 							{{ summaryWarning }}
@@ -289,6 +291,7 @@
 			:original="original"
 			:modified="modified"
 			:saving="saving"
+			:can-save="canSave"
 			@reset="resetChanges"
 			@save="handleSave"
 		/>
@@ -325,7 +328,9 @@ import {
 import { fileIsValid, formatProjectStatus } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'
+import { validateProjectText } from '~/composables/project-text-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
@@ -396,6 +401,12 @@ const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
 	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
 })
+
+const nameValidation = computed(() => validateProjectText(name.value))
+const summaryValidation = computed(() => validateProjectText(summary.value))
+const canSave = computed(
+	() => hasPermission.value && !nameValidation.value && !summaryValidation.value,
+)
 
 const monetizationToggleDisabled = computed(() => !hasPermission.value || isForceDemonetized.value)
 
@@ -529,6 +540,7 @@ async function updateMonetizationStatus(status) {
 }
 
 async function handleSave() {
+	if (!canSave.value) return
 	saving.value = true
 	try {
 		const hasPatchChanges = Object.keys(basePatchData.value).length > 0

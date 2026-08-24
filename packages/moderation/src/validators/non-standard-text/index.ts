@@ -47,6 +47,7 @@ const PRIVATE_USE_PATTERN = /\p{Co}/u
 const UNASSIGNED_PATTERN = /\p{Cn}/u
 const LETTER_PATTERN = /\p{L}/u
 const EXTENDED_PICTOGRAPHIC_PATTERN = /\p{Extended_Pictographic}/u
+const EMOJI_PRESENTATION_PATTERN = /\p{Emoji_Presentation}/u
 const UNIFIED_IDEOGRAPH_PATTERN = /\p{Unified_Ideograph}/u
 
 function createCounts(): Record<NonStandardTextIssueKind, number> {
@@ -73,6 +74,10 @@ function isVariationSelector(codePoint: number) {
 
 function isEmojiModifier(codePoint: number) {
 	return codePoint >= 0x1f3fb && codePoint <= 0x1f3ff
+}
+
+function isEmojiTag(codePoint: number) {
+	return codePoint >= 0xe0020 && codePoint <= 0xe007f
 }
 
 function isAscii(character: string) {
@@ -127,6 +132,24 @@ function isAllowedVariationSelector(
 		return EXTENDED_PICTOGRAPHIC_PATTERN.test(previous) || /^[0-9#*]$/u.test(previous)
 	}
 	return UNIFIED_IDEOGRAPH_PATTERN.test(previous)
+}
+
+function isAllowedEmojiTagSequence(characters: readonly string[], characterIndex: number) {
+	let start = characterIndex - 1
+	while (start >= 0 && isEmojiTag(characters[start].codePointAt(0)!)) start--
+	if (characters[start]?.codePointAt(0) !== 0x1f3f4) return false
+
+	let end = characterIndex
+	while (end < characters.length && isEmojiTag(characters[end].codePointAt(0)!)) end++
+	return characters[end - 1]?.codePointAt(0) === 0xe007f
+}
+
+function isPresentedAsEmoji(characters: readonly string[], characterIndex: number) {
+	const character = characters[characterIndex]
+	return (
+		EMOJI_PRESENTATION_PATTERN.test(character) ||
+		characters[characterIndex + 1]?.codePointAt(0) === 0xfe0f
+	)
 }
 
 function codePointLabel(codePoint: number) {
@@ -200,7 +223,8 @@ export function validateNonStandardText(
 		if (FORMAT_PATTERN.test(character)) {
 			const allowed =
 				(codePoint === 0x200c && isAllowedZeroWidthNonJoiner(characters, characterIndex)) ||
-				(codePoint === 0x200d && isAllowedZeroWidthJoiner(characters, characterIndex))
+				(codePoint === 0x200d && isAllowedZeroWidthJoiner(characters, characterIndex)) ||
+				(isEmojiTag(codePoint) && isAllowedEmojiTagSequence(characters, characterIndex))
 			if (!allowed) addIssue('invisible', character, codePoint, currentIndex)
 			hasBaseCharacter = false
 			combiningMarkCount = 0
@@ -225,7 +249,7 @@ export function validateNonStandardText(
 		combiningMarkCount = 0
 		hasBaseCharacter = !/^\s$/u.test(character)
 
-		if (isInRanges(codePoint, FANCY_RANGES)) {
+		if (isInRanges(codePoint, FANCY_RANGES) && !isPresentedAsEmoji(characters, characterIndex)) {
 			addIssue('fancy', character, codePoint, currentIndex)
 		}
 	}

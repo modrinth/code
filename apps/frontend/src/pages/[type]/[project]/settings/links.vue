@@ -17,7 +17,7 @@
 					maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<LinkCheckMessage :check="siteCheck" />
+				<ValidationMessage :check="siteCheck" />
 			</div>
 			<div class="adjacent-input">
 				<label id="server-store" title="Your server's store page.">
@@ -32,7 +32,7 @@
 					maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<LinkCheckMessage :check="storeCheck" />
+				<ValidationMessage :check="storeCheck" />
 			</div>
 			<div class="adjacent-input">
 				<label
@@ -52,7 +52,7 @@
 					maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<LinkCheckMessage :check="wikiCheck" />
+				<ValidationMessage :check="wikiCheck" />
 			</div>
 			<div class="adjacent-input">
 				<label id="server-discord" title="An invitation link to your Discord server.">
@@ -67,7 +67,7 @@
 					maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<LinkCheckMessage :check="discordInviteCheck" />
+				<ValidationMessage :check="discordInviteCheck" />
 			</div>
 		</section>
 
@@ -92,7 +92,7 @@
 					:maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<LinkCheckMessage :check="issuesCheck" />
+				<ValidationMessage :check="issuesCheck" />
 			</div>
 			<div class="adjacent-input">
 				<label
@@ -112,7 +112,7 @@
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
-				<LinkCheckMessage :check="sourceCheck" />
+				<ValidationMessage :check="sourceCheck" />
 			</div>
 			<div class="adjacent-input">
 				<label
@@ -132,7 +132,7 @@
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
-				<LinkCheckMessage :check="wikiCheck" />
+				<ValidationMessage :check="wikiCheck" />
 			</div>
 			<div class="adjacent-input">
 				<label id="project-discord-invite" title="An invitation link to your Discord server.">
@@ -147,7 +147,7 @@
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
-				<LinkCheckMessage :check="discordInviteCheck" />
+				<ValidationMessage :check="discordInviteCheck" />
 			</div>
 			<span class="label">
 				<span class="label__title">Donation links</span>
@@ -179,7 +179,7 @@
 					class="platform-selector !w-80"
 					@update:model-value="updateDonationLinks"
 				/>
-				<LinkCheckMessage :check="donationCheckState(donationLink, index)" />
+				<ValidationMessage :check="donationCheckState(donationLink, index)" />
 			</div>
 		</section>
 		<UnsavedChangesPopup
@@ -214,7 +214,7 @@ import {
 	useSavable,
 } from '@modrinth/ui'
 
-import LinkCheckMessage from '@/components/LinkCheckMessage.vue'
+import ValidationMessage from '@/components/ValidationMessage.vue'
 
 const tags = useGeneratedState()
 

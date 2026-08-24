@@ -84,7 +84,7 @@
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
-					<LinkCheckMessage :check="effectiveLicenseCheck" />
+					<ValidationMessage :check="effectiveLicenseCheck" />
 				</div>
 			</div>
 
@@ -165,7 +165,7 @@ import {
 import { builtinLicenses, formatProjectType, TeamMemberPermission } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import LinkCheckMessage from '@/components/LinkCheckMessage.vue'
+import ValidationMessage from '@/components/ValidationMessage.vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
