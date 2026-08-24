@@ -301,6 +301,25 @@ export namespace Archon {
 				environment?: Labrinth.Projects.v3.Environment | null
 			}
 
+			export type AddonManifestEnvironment =
+				| 'client_and_server'
+				| 'client_only'
+				| 'dedicated_server_only'
+
+			export type AddonManifestWarnings = {
+				multiple_mod_entries: number | null
+				malformed: boolean
+			}
+
+			export type AddonManifest = {
+				platform: Modloader
+				name: string | null
+				version: string | null
+				environment: AddonManifestEnvironment | null
+				icon_embedded: boolean
+				warnings: AddonManifestWarnings
+			}
+
 			export type AddonStatus =
 				| 'pending'
 				| 'installed'
@@ -316,6 +335,10 @@ export namespace Archon {
 				filesize: number
 				btime?: string
 				disabled: boolean
+				disabled_server: boolean
+				disabled_player: boolean
+				side_toggle_unlocked: boolean
+				manifest: AddonManifest | null
 				kind: AddonKind
 				from_modpack: boolean
 				status: AddonStatus
@@ -352,6 +375,14 @@ export namespace Archon {
 			export type RemoveAddonRequest = {
 				kind: AddonKind
 				filename: string
+			}
+
+			export type SetAddonEnabledRequest = RemoveAddonRequest & {
+				enabled: boolean
+			}
+
+			export type SetAddonSideToggleLockedRequest = RemoveAddonRequest & {
+				locked: boolean
 			}
 
 			export type UpdateAddonRequest = {
@@ -1063,6 +1094,7 @@ export namespace Archon {
 				project_id: string | null
 				pack_client_retained: boolean
 				pack_client_depends: boolean
+				manifest?: Archon.Content.v1.AddonManifest | null
 				status: Archon.Content.v1.AddonStatus
 				filesize: number | null
 				name: string | null

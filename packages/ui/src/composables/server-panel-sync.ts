@@ -233,15 +233,46 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 		}
 
 		const content = worldContentUpdateToAddons(event)
-		queryClient.setQueryData<Archon.Content.v1.Addons>(contentListKey(serverId), {
+		queryClient.setQueryData<Archon.Content.v1.Addons>(contentListKey(serverId), (current) => ({
 			...content,
-			addons: content.addons?.filter((addon) => !addon.from_modpack) ?? null,
-		})
-		queryClient.setQueryData<Archon.Content.v1.Addons>(modpackContentListKey(serverId), {
-			...content,
-			addons: content.addons?.filter((addon) => addon.from_modpack) ?? null,
-		})
+			addons: mergeWorldContentSideState(
+				current?.addons ?? [],
+				content.addons?.filter((addon) => !addon.from_modpack) ?? [],
+			),
+		}))
+		queryClient.setQueryData<Archon.Content.v1.Addons>(
+			modpackContentListKey(serverId),
+			(current) => ({
+				...content,
+				addons: mergeWorldContentSideState(
+					current?.addons ?? [],
+					content.addons?.filter((addon) => addon.from_modpack) ?? [],
+				),
+			}),
+		)
+		void queryClient.invalidateQueries({ queryKey: contentListKey(serverId) })
+		void queryClient.invalidateQueries({ queryKey: modpackContentListKey(serverId) })
 		void queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) })
+	}
+
+	function mergeWorldContentSideState(
+		currentAddons: Archon.Content.v1.Addon[],
+		incomingAddons: Archon.Content.v1.Addon[],
+	) {
+		const currentByFilename = new Map(
+			currentAddons.map((addon) => [normalizeAddonFilename(addon.filename), addon] as const),
+		)
+		return incomingAddons.map((incoming) => {
+			const current = currentByFilename.get(normalizeAddonFilename(incoming.filename))
+			return current
+				? {
+						...incoming,
+						disabled_server: current.disabled_server,
+						disabled_player: current.disabled_player,
+						side_toggle_unlocked: current.side_toggle_unlocked,
+					}
+				: incoming
+		})
 	}
 
 	function worldContentUpdateToAddons(
@@ -297,7 +328,11 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			filename: item.filename,
 			filesize: item.filesize ?? 0,
 			btime: item.btime,
-			disabled: item.filename.endsWith('.disabled'),
+			disabled: false,
+			disabled_server: false,
+			disabled_player: false,
+			side_toggle_unlocked: false,
+			manifest: item.manifest ?? null,
 			kind: parentDirectoryToAddonKind(item.parent_directory),
 			from_modpack: item.from_modpack,
 			status: item.status,

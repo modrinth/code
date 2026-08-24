@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
+import { ChevronDownIcon, ChevronUpIcon, InfoIcon } from '@modrinth/assets'
 import { computed, getCurrentInstance, ref, toRef } from 'vue'
 
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { useVirtualScroll } from '#ui/composables/virtual-scroll'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -17,6 +17,22 @@ import ContentCardItem from './ContentCardItem.vue'
 
 const { formatMessage } = useVIntl()
 
+const messages = defineMessages({
+	enabledFor: {
+		id: 'content.enabled-for.label',
+		defaultMessage: 'Enabled for',
+	},
+	enabledForDescription: {
+		id: 'content.enabled-for.description',
+		defaultMessage:
+			'Choose whether this content runs on the server, is sent to players, or is disabled in both places.',
+	},
+	sortEnabledFor: {
+		id: 'content.enabled-for.sort',
+		defaultMessage: 'Sort by where content is enabled',
+	},
+})
+
 interface Props {
 	items: ContentCardTableItem[]
 	showSelection?: boolean
@@ -28,6 +44,8 @@ interface Props {
 	hideHeader?: boolean
 	flat?: boolean
 	showItemActions?: boolean
+	showEnabledForColumn?: boolean
+	enabledForSortDirection?: ContentCardTableSortDirection
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -40,6 +58,8 @@ const props = withDefaults(defineProps<Props>(), {
 	hideHeader: false,
 	flat: false,
 	showItemActions: false,
+	showEnabledForColumn: false,
+	enabledForSortDirection: undefined,
 })
 
 const stickyHeaderRef = ref<HTMLElement | null>(null)
@@ -49,10 +69,12 @@ const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
 
 const emit = defineEmits<{
 	'update:enabled': [id: string, value: boolean]
+	'update:enabled-for': [id: string, side: 'server' | 'player', value: boolean]
 	delete: [id: string, event: MouseEvent]
 	update: [id: string]
 	switchVersion: [id: string]
 	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
+	'sort-enabled-for': [direction: ContentCardTableSortDirection]
 }>()
 
 // Check if any actions are available
@@ -64,6 +86,9 @@ const hasSwitchVersionListener = computed(
 )
 const hasEnabledListener = computed(
 	() => typeof instance?.vnode.props?.['onUpdate:enabled'] === 'function',
+)
+const hasEnabledForColumn = computed(
+	() => props.showEnabledForColumn || props.items.some((item) => item.enabledFor !== undefined),
 )
 
 const hasAnyActions = computed(() => {
@@ -80,17 +105,18 @@ const hasAnyActions = computed(() => {
 		(item) =>
 			(item.overflowOptions && item.overflowOptions.length > 0) ||
 			item.hasUpdate ||
-			item.enabled !== undefined,
+			(item.enabled !== undefined && !item.hideToggle),
 	)
 
 	return hasListeners || hasItemActions || props.showItemActions
 })
 
 // Virtualization
+const itemHeight = computed(() => (hasEnabledForColumn.value ? 72 : 74))
 const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
 	toRef(props, 'items'),
 	{
-		itemHeight: 74,
+		itemHeight,
 		bufferSize: 5,
 		initialItemCount: 20,
 		enabled: toRef(props, 'virtualized'),
@@ -167,6 +193,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 	emit('sort', column, newDirection)
 }
+
+function handleEnabledForSort() {
+	const newDirection: ContentCardTableSortDirection =
+		props.enabledForSortDirection === 'desc' ? 'asc' : 'desc'
+	emit('sort-enabled-for', newDirection)
+}
 </script>
 
 <template>
@@ -191,7 +223,11 @@ function handleSort(column: ContentCardTableSortColumn) {
 				role="row"
 				class="flex min-w-0 items-center gap-4"
 				:class="
-					hasAnyActions ? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none' : 'flex-1'
+					hasAnyActions
+						? hasEnabledForColumn
+							? 'flex-1 @[800px]:w-[340px] @[800px]:shrink-0 @[800px]:flex-none'
+							: 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
+						: 'flex-1'
 				"
 			>
 				<Checkbox
@@ -225,7 +261,53 @@ function handleSort(column: ContentCardTableSortColumn) {
 				}}</span>
 			</div>
 
-			<div class="hidden @[800px]:flex" :class="hasAnyActions ? 'flex-1 min-w-0' : 'flex-1'">
+			<div
+				v-if="hasEnabledForColumn"
+				role="columnheader"
+				:aria-sort="
+					enabledForSortDirection
+						? enabledForSortDirection === 'asc'
+							? 'ascending'
+							: 'descending'
+						: 'none'
+				"
+				class="hidden w-[200px] shrink-0 items-center gap-1.5 font-semibold text-secondary @[800px]:flex"
+			>
+				<button
+					type="button"
+					class="cursor-pointer border-0 bg-transparent p-0 font-semibold text-secondary"
+					@click="handleEnabledForSort"
+				>
+					{{ formatMessage(messages.enabledFor) }}
+				</button>
+				<span
+					v-tooltip="formatMessage(messages.enabledForDescription)"
+					class="inline-flex size-4 cursor-help items-center justify-center"
+					tabindex="0"
+				>
+					<InfoIcon class="size-4" />
+				</span>
+				<button
+					type="button"
+					class="flex cursor-pointer items-center border-0 bg-transparent p-0 text-secondary"
+					:aria-label="formatMessage(messages.sortEnabledFor)"
+					@click="handleEnabledForSort"
+				>
+					<ChevronUpIcon v-if="enabledForSortDirection === 'asc'" class="size-4" />
+					<ChevronDownIcon v-else class="size-4" />
+				</button>
+			</div>
+
+			<div
+				class="hidden @[800px]:flex"
+				:class="
+					hasAnyActions
+						? hasEnabledForColumn
+							? 'w-[250px] min-w-0 shrink-0'
+							: 'flex-1 min-w-0'
+						: 'flex-1'
+				"
+			>
 				<button
 					v-if="sortable"
 					role="columnheader"
@@ -247,7 +329,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 				}}</span>
 			</div>
 
-			<div v-if="hasAnyActions" role="columnheader" class="min-w-[160px] shrink-0 text-right">
+			<div
+				v-if="hasAnyActions"
+				role="columnheader"
+				class="shrink-0 text-right"
+				:class="hasEnabledForColumn ? 'w-[112px]' : 'min-w-[160px]'"
+			>
 				<span class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.actionsLabel)
 				}}</span>
@@ -288,6 +375,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:toggle-disabled="item.toggleDisabled"
 					:toggle-disabled-tooltip="item.toggleDisabledTooltip"
 					:hide-toggle="item.hideToggle"
+					:enabled-for="item.enabledFor"
+					:embedded-icon="item.embeddedIcon"
 					:show-checkbox="showSelection"
 					:hide-delete="hideDelete || item.hideDelete"
 					:hide-actions="!hasAnyActions"
@@ -306,6 +395,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 							toggleItemSelection(item.id, val ?? false, visibleRange.start + idx, event)
 					"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
+					@update:enabled-for="
+						(side, val) => emit('update:enabled-for', item.id, side, val)
+					"
 					@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 					@update="emit('update', item.id)"
 					v-on="
@@ -356,6 +448,8 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:toggle-disabled="item.toggleDisabled"
 				:toggle-disabled-tooltip="item.toggleDisabledTooltip"
 				:hide-toggle="item.hideToggle"
+				:enabled-for="item.enabledFor"
+				:embedded-icon="item.embeddedIcon"
 				:show-checkbox="showSelection"
 				:hide-delete="hideDelete || item.hideDelete"
 				:hide-actions="!hasAnyActions"
@@ -371,6 +465,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 				]"
 				@select="(val, event) => toggleItemSelection(item.id, val ?? false, index, event)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
+				@update:enabled-for="
+					(side, val) => emit('update:enabled-for', item.id, side, val)
+				"
 				@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 				@update="emit('update', item.id)"
 				@switch-version="emit('switchVersion', item.id)"

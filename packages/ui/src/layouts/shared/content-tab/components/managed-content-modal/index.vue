@@ -30,7 +30,7 @@ import {
 } from '#ui/utils/common-messages'
 
 import { getClientWarningType } from '../../composables/content-filtering'
-import type { ContentCardProject, ContentCardTableItem, ContentItem } from '../../types'
+import type { ContentCardProject, ContentCardTableItem, ContentItem, ContentSide } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
 
@@ -42,6 +42,7 @@ interface Props {
 	sourceName?: string
 	sourceIconUrl?: string
 	enableToggle?: boolean
+	enableEnabledFor?: boolean
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string | null
 	getOverflowOptions?: (item: ContentItem) => ButtonMenuOption[]
@@ -54,6 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
 	sourceName: undefined,
 	sourceIconUrl: undefined,
 	enableToggle: false,
+	enableEnabledFor: false,
 	actionDisabled: false,
 	actionDisabledTooltip: undefined,
 	getOverflowOptions: undefined,
@@ -63,6 +65,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
 	'update:enabled': [item: ContentItem, value: boolean]
+	'update:enabled-for': [item: ContentItem, side: ContentSide, value: boolean]
 	'bulk:enable': [items: ContentItem[]]
 	'bulk:disable': [items: ContentItem[]]
 	hide: []
@@ -108,6 +111,14 @@ const messages = defineMessages({
 	downloadFile: {
 		id: 'instances.managed-content-modal.download-file',
 		defaultMessage: 'Download File',
+	},
+	enabledFor: {
+		id: 'content.enabled-for.label',
+		defaultMessage: 'Enabled for',
+	},
+	pleaseWait: {
+		id: 'content.enabled-for.please-wait',
+		defaultMessage: 'Please wait',
 	},
 })
 
@@ -262,6 +273,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			icon_url: item.embedded_metadata?.icon_url ?? null,
 		},
 		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
+		embeddedIcon: item.embeddedIcon,
 		version: item.version ?? {
 			id: item.id,
 			version_number: contentVersionLabel(item),
@@ -283,15 +295,24 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		...(props.enableEnabledFor ? { enabledFor: item.enabledFor } : {}),
 		locked: item.locked,
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
-		isClientOnly: getClientWarningType(item, props.showEnvironmentWarnings) !== null,
-		clientWarning: getClientWarningType(item, props.showEnvironmentWarnings),
+		isClientOnly:
+			!props.enableEnabledFor &&
+			getClientWarningType(item, props.showEnvironmentWarnings) !== null,
+		clientWarning: props.enableEnabledFor
+			? null
+			: getClientWarningType(item, props.showEnvironmentWarnings),
 		disabled:
 			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
-		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
+		disabledTooltip: props.actionDisabled
+			? props.actionDisabledTooltip
+			: disabledIds.value.has(item.file_name)
+				? formatMessage(messages.pleaseWait)
+				: undefined,
 		overflowOptions: [
 			...(props.switchVersion && !item.locked
 				? [
@@ -329,7 +350,9 @@ const externalUrls = computed(() => {
 	return urls
 })
 const hasExternalSlicerUrls = computed(() => Object.keys(externalSlicerUrls.value).length > 0)
-const showTableActions = computed(() => props.enableToggle || hasExternalSlicerUrls.value)
+const showTableActions = computed(
+	() => props.enableToggle || props.enableEnabledFor || hasExternalSlicerUrls.value,
+)
 
 function getTypeIcon(type: string) {
 	switch (type) {
@@ -370,6 +393,13 @@ function handleEnabledChange(id: string, value: boolean) {
 	const item = items.value.find((item) => item.id === id)
 	if (!item) return
 	emit('update:enabled', item, value)
+}
+
+function handleEnabledForChange(id: string, side: ContentSide, value: boolean) {
+	if (props.actionDisabled || !props.enableEnabledFor) return
+	const item = items.value.find((item) => item.id === id)
+	if (!item) return
+	emit('update:enabled-for', item, side, value)
 }
 
 function bulkEnable() {
@@ -474,8 +504,16 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 <template>
 	<NewModal
 		ref="modal"
-		:max-width="'min(928px, calc(95vw - 10rem))'"
-		:width="'min(928px, calc(95vw - 10rem))'"
+		:max-width="
+			props.enableEnabledFor
+				? 'min(1080px, calc(95vw - 4rem))'
+				: 'min(928px, calc(95vw - 10rem))'
+		"
+		:width="
+			props.enableEnabledFor
+				? 'min(1080px, calc(95vw - 4rem))'
+				: 'min(928px, calc(95vw - 10rem))'
+		"
 		:on-hide="handleHide"
 		no-padding
 	>
@@ -545,7 +583,9 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							class="flex min-w-0 items-center gap-4"
 							:class="
 								showTableActions
-									? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
+									? props.enableEnabledFor
+										? 'flex-1 @[800px]:w-[340px] @[800px]:shrink-0 @[800px]:flex-none'
+										: 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 									: 'flex-1'
 							"
 						>
@@ -562,14 +602,32 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							}}</span>
 						</div>
 						<div
+							v-if="props.enableEnabledFor"
+							class="hidden w-[200px] shrink-0 @[800px]:flex"
+						>
+							<span class="font-semibold text-secondary">{{
+								formatMessage(messages.enabledFor)
+							}}</span>
+						</div>
+						<div
 							class="hidden @[800px]:flex"
-							:class="showTableActions ? 'flex-1 min-w-0' : 'flex-1'"
+							:class="
+								showTableActions
+									? props.enableEnabledFor
+										? 'w-[250px] min-w-0 shrink-0'
+										: 'flex-1 min-w-0'
+									: 'flex-1'
+							"
 						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.versionLabel)
 							}}</span>
 						</div>
-						<div v-if="showTableActions" class="min-w-[160px] shrink-0 text-right">
+						<div
+							v-if="showTableActions"
+							class="shrink-0 text-right"
+							:class="props.enableEnabledFor ? 'w-[112px]' : 'min-w-[160px]'"
+						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.actionsLabel)
 							}}</span>
@@ -580,7 +638,8 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							v-model:selected-ids="selectedIds"
 							:items="tableItems"
 							:show-selection="props.enableToggle"
-							:show-item-actions="hasExternalSlicerUrls"
+							:show-enabled-for-column="props.enableEnabledFor"
+							:show-item-actions="props.enableEnabledFor || hasExternalSlicerUrls"
 							hide-delete
 							hide-header
 							flat
@@ -589,6 +648,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
 									: {}
 							"
+							@update:enabled-for="handleEnabledForChange"
 						>
 							<template #itemTitleBadges="{ item }">
 								<span

@@ -14,6 +14,7 @@ import {
 	OrganizationIcon,
 	RefreshCwIcon,
 	SearchIcon,
+	ServerIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
@@ -110,6 +111,14 @@ const messages = defineMessages({
 		id: 'content.page-layout.sort.date-added-oldest',
 		defaultMessage: 'Oldest first',
 	},
+	sortEnabledForDescending: {
+		id: 'content.page-layout.sort.enabled-for-descending',
+		defaultMessage: 'Enabled for (most first)',
+	},
+	sortEnabledForAscending: {
+		id: 'content.page-layout.sort.enabled-for-ascending',
+		defaultMessage: 'Enabled for (least first)',
+	},
 	filter: {
 		id: 'content.page-layout.filter.add',
 		defaultMessage: 'Filter',
@@ -179,45 +188,76 @@ function getItemId(item: ContentItem) {
 	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
 }
 
-type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
+type SortMode =
+	| 'alphabetical-asc'
+	| 'alphabetical-desc'
+	| 'date-added-newest'
+	| 'date-added-oldest'
+	| 'enabled-for-desc'
+	| 'enabled-for-asc'
+const defaultSortMode: SortMode = ctx.setEnabledFor ? 'enabled-for-desc' : 'alphabetical-asc'
 const sortMode = ctx.filterPersistKey
-	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, 'alphabetical-asc')
-	: ref<SortMode>('alphabetical-asc')
+	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, defaultSortMode)
+	: ref<SortMode>(defaultSortMode)
 
 const sortLabels: Record<SortMode, () => string> = {
 	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),
 	'alphabetical-desc': () => formatMessage(messages.sortAlphabeticalDescending),
 	'date-added-newest': () => formatMessage(messages.sortDateAddedNewest),
 	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
+	'enabled-for-desc': () => formatMessage(messages.sortEnabledForDescending),
+	'enabled-for-asc': () => formatMessage(messages.sortEnabledForAscending),
 }
 
-const sortOptions = computed<ButtonMenuOption[]>(() => [
-	{
-		id: 'alphabetical-asc',
-		label: formatMessage(messages.sortAlphabeticalAscending),
-		icon: ArrowDownAZIcon,
-		action: () => (sortMode.value = 'alphabetical-asc'),
-	},
-	{
-		id: 'alphabetical-desc',
-		label: formatMessage(messages.sortAlphabeticalDescending),
-		icon: ArrowUpZAIcon,
-		action: () => (sortMode.value = 'alphabetical-desc'),
-	},
-	{
-		id: 'date-added-newest',
-		label: formatMessage(messages.sortDateAddedNewest),
-		icon: ClockArrowDownIcon,
-		action: () => (sortMode.value = 'date-added-newest'),
-	},
-	{
-		id: 'date-added-oldest',
-		label: formatMessage(messages.sortDateAddedOldest),
-		icon: ClockArrowUpIcon,
-		action: () => (sortMode.value = 'date-added-oldest'),
-	},
-])
+const sortOptions = computed<ButtonMenuOption[]>(() => {
+	const options: ButtonMenuOption[] = [
+		{
+			id: 'alphabetical-asc',
+			label: formatMessage(messages.sortAlphabeticalAscending),
+			icon: ArrowDownAZIcon,
+			action: () => (sortMode.value = 'alphabetical-asc'),
+		},
+		{
+			id: 'alphabetical-desc',
+			label: formatMessage(messages.sortAlphabeticalDescending),
+			icon: ArrowUpZAIcon,
+			action: () => (sortMode.value = 'alphabetical-desc'),
+		},
+		{
+			id: 'date-added-newest',
+			label: formatMessage(messages.sortDateAddedNewest),
+			icon: ClockArrowDownIcon,
+			action: () => (sortMode.value = 'date-added-newest'),
+		},
+		{
+			id: 'date-added-oldest',
+			label: formatMessage(messages.sortDateAddedOldest),
+			icon: ClockArrowUpIcon,
+			action: () => (sortMode.value = 'date-added-oldest'),
+		},
+	]
 
+	if (ctx.setEnabledFor) {
+		options.push(
+			{
+				id: 'enabled-for-desc',
+				label: formatMessage(messages.sortEnabledForDescending),
+				action: () => (sortMode.value = 'enabled-for-desc'),
+			},
+			{
+				id: 'enabled-for-asc',
+				label: formatMessage(messages.sortEnabledForAscending),
+				action: () => (sortMode.value = 'enabled-for-asc'),
+			},
+		)
+	}
+
+	return options
+})
+
+function getEnabledForRank(item: ContentItem) {
+	return Number(item.enabledFor?.server) * 2 + Number(item.enabledFor?.player)
+}
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
 	switch (sortMode.value) {
@@ -242,6 +282,16 @@ const sortedItems = computed(() => {
 				const dateB = b.date_added ?? ''
 				return dateA.localeCompare(dateB) || a.file_name.localeCompare(b.file_name)
 			})
+		case 'enabled-for-desc':
+			return items.sort(
+				(a, b) =>
+					getEnabledForRank(b) - getEnabledForRank(a) || a.file_name.localeCompare(b.file_name),
+			)
+		case 'enabled-for-asc':
+			return items.sort(
+				(a, b) =>
+					getEnabledForRank(a) - getEnabledForRank(b) || a.file_name.localeCompare(b.file_name),
+			)
 		default:
 			return items.sort((a, b) => {
 				const nameA = a.project?.title ?? a.file_name
@@ -424,14 +474,22 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 		const base = ctx.mapToTableItem(item)
 		const id = getItemId(item)
 		const locked = base.locked ?? item.locked ?? false
-		const clientWarning = getClientWarningType(item, ctx.showEnvironmentWarnings)
+		const clientWarning = base.enabledFor
+			? null
+			: getClientWarningType(item, ctx.showEnvironmentWarnings)
 		return {
 			...base,
 			id,
 			locked,
 			disabled:
 				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
-			disabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
+			disabledTooltip: ctx.isBusy.value
+				? (ctx.busyMessage?.value ?? null)
+				: isChanging(id)
+					? formatMessage(messages.pleaseWait)
+					: item.installing
+						? formatMessage(commonMessages.installingLabel)
+						: null,
 			toggleDisabled: ctx.isBusy.value || base.toggleDisabled,
 			toggleDisabledTooltip: ctx.isBusy.value
 				? (ctx.busyMessage?.value ?? null)
@@ -505,7 +563,10 @@ function canDeleteItem(item: ContentItem) {
 }
 
 function canToggleItem(item: ContentItem) {
-	return ctx.canToggleItem?.(item) ?? true
+	return (
+		ctx.canToggleItem?.(item) ??
+		!!(ctx.toggleEnabled || ctx.bulkEnableItems || ctx.bulkDisableItems)
+	)
 }
 
 const deletableSelectedItems = computed(() => selectedItems.value.filter(canDeleteItem))
@@ -617,6 +678,7 @@ async function disableItemsWithoutWarning(items: ContentItem[]) {
 		await ctx.bulkDisableItems(items)
 		return
 	}
+	if (!ctx.toggleEnabled) return
 
 	for (const item of items) {
 		const id = getItemId(item)
@@ -730,7 +792,7 @@ async function confirmDisable() {
 			if (ctx.bulkDisableItems) {
 				await ctx.bulkDisableItems(itemsToDisable)
 			} else {
-				await ctx.toggleEnabled(item)
+				await ctx.toggleEnabled?.(item)
 			}
 		} finally {
 			unmarkChanging(id)
@@ -744,7 +806,7 @@ async function confirmDisable() {
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
-	if (ctx.isBusy.value) return
+	if (ctx.isBusy.value || !ctx.toggleEnabled) return
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (!item) return
 	if (!canToggleItem(item)) return
@@ -782,7 +844,8 @@ async function bulkEnable() {
 		}
 		return
 	}
-	await runBulk('enable', items, (item) => ctx.toggleEnabled(item), { onComplete: clearSelection })
+	if (!ctx.toggleEnabled) return
+	await runBulk('enable', items, (item) => ctx.toggleEnabled!(item), { onComplete: clearSelection })
 }
 
 async function bulkDisable() {
@@ -803,6 +866,27 @@ function handleSwitchVersionById(id: string) {
 	if (item && !item.locked) {
 		ctx.switchVersion?.(item)
 	}
+}
+
+async function handleSetEnabledForById(
+	id: string,
+	side: 'server' | 'player',
+	enabled: boolean,
+) {
+	if (ctx.isBusy.value || !ctx.setEnabledFor) return
+	const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
+	if (!item) return
+
+	markChanging(id)
+	try {
+		await ctx.setEnabledFor(item, side, enabled)
+	} finally {
+		unmarkChanging(id)
+	}
+}
+
+function handleEnabledForSort(direction: 'asc' | 'desc') {
+	sortMode.value = direction === 'asc' ? 'enabled-for-asc' : 'enabled-for-desc'
 }
 
 // Bulk updating
@@ -1006,6 +1090,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" />
 										<ClockArrowDownIcon v-else-if="sortMode === 'date-added-newest'" />
 										<ClockArrowUpIcon v-else-if="sortMode === 'date-added-oldest'" />
+										<ServerIcon v-else-if="sortMode.startsWith('enabled-for')" />
 										<ArrowDownAZIcon v-else />
 										{{ sortLabels[sortMode]() }}
 										<DropdownIcon />
@@ -1220,7 +1305,17 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							class="mt-2"
 							:items="tableItems"
 							:show-selection="true"
+							:show-enabled-for-column="!!ctx.setEnabledFor"
+							:enabled-for-sort-direction="
+								sortMode === 'enabled-for-asc'
+									? 'asc'
+									: sortMode === 'enabled-for-desc'
+										? 'desc'
+										: undefined
+							"
 							@update:enabled="handleToggleEnabledById"
+							@update:enabled-for="handleSetEnabledForById"
+							@sort-enabled-for="handleEnabledForSort"
 							@delete="handleDeleteById"
 							@update="handleUpdateById"
 							@switch-version="handleSwitchVersionById"
