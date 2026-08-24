@@ -14,7 +14,6 @@ import {
 	OrganizationIcon,
 	RefreshCwIcon,
 	SearchIcon,
-	ServerIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
@@ -111,14 +110,6 @@ const messages = defineMessages({
 		id: 'content.page-layout.sort.date-added-oldest',
 		defaultMessage: 'Oldest first',
 	},
-	sortEnabledForDescending: {
-		id: 'content.page-layout.sort.enabled-for-descending',
-		defaultMessage: 'Enabled for (most first)',
-	},
-	sortEnabledForAscending: {
-		id: 'content.page-layout.sort.enabled-for-ascending',
-		defaultMessage: 'Enabled for (least first)',
-	},
 	filter: {
 		id: 'content.page-layout.filter.add',
 		defaultMessage: 'Filter',
@@ -193,20 +184,24 @@ type SortMode =
 	| 'alphabetical-desc'
 	| 'date-added-newest'
 	| 'date-added-oldest'
-	| 'enabled-for-desc'
-	| 'enabled-for-asc'
-const defaultSortMode: SortMode = ctx.setEnabledFor ? 'enabled-for-desc' : 'alphabetical-asc'
+const defaultSortMode: SortMode = 'alphabetical-asc'
 const sortMode = ctx.filterPersistKey
 	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, defaultSortMode)
 	: ref<SortMode>(defaultSortMode)
+
+const validSortModes: readonly string[] = [
+	'alphabetical-asc',
+	'alphabetical-desc',
+	'date-added-newest',
+	'date-added-oldest',
+]
+if (!validSortModes.includes(sortMode.value)) sortMode.value = defaultSortMode
 
 const sortLabels: Record<SortMode, () => string> = {
 	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),
 	'alphabetical-desc': () => formatMessage(messages.sortAlphabeticalDescending),
 	'date-added-newest': () => formatMessage(messages.sortDateAddedNewest),
 	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
-	'enabled-for-desc': () => formatMessage(messages.sortEnabledForDescending),
-	'enabled-for-asc': () => formatMessage(messages.sortEnabledForAscending),
 }
 
 const sortOptions = computed<ButtonMenuOption[]>(() => {
@@ -237,27 +232,9 @@ const sortOptions = computed<ButtonMenuOption[]>(() => {
 		},
 	]
 
-	if (ctx.setEnabledFor) {
-		options.push(
-			{
-				id: 'enabled-for-desc',
-				label: formatMessage(messages.sortEnabledForDescending),
-				action: () => (sortMode.value = 'enabled-for-desc'),
-			},
-			{
-				id: 'enabled-for-asc',
-				label: formatMessage(messages.sortEnabledForAscending),
-				action: () => (sortMode.value = 'enabled-for-asc'),
-			},
-		)
-	}
-
 	return options
 })
 
-function getEnabledForRank(item: ContentItem) {
-	return Number(item.enabledFor?.server) * 2 + Number(item.enabledFor?.player)
-}
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
 	switch (sortMode.value) {
@@ -282,16 +259,6 @@ const sortedItems = computed(() => {
 				const dateB = b.date_added ?? ''
 				return dateA.localeCompare(dateB) || a.file_name.localeCompare(b.file_name)
 			})
-		case 'enabled-for-desc':
-			return items.sort(
-				(a, b) =>
-					getEnabledForRank(b) - getEnabledForRank(a) || a.file_name.localeCompare(b.file_name),
-			)
-		case 'enabled-for-asc':
-			return items.sort(
-				(a, b) =>
-					getEnabledForRank(a) - getEnabledForRank(b) || a.file_name.localeCompare(b.file_name),
-			)
 		default:
 			return items.sort((a, b) => {
 				const nameA = a.project?.title ?? a.file_name
@@ -885,10 +852,6 @@ async function handleSetEnabledForById(
 	}
 }
 
-function handleEnabledForSort(direction: 'asc' | 'desc') {
-	sortMode.value = direction === 'asc' ? 'enabled-for-asc' : 'enabled-for-desc'
-}
-
 // Bulk updating
 const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal>>()
 const pendingBulkUpdateItems = ref<ContentItem[]>([])
@@ -1090,7 +1053,6 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" />
 										<ClockArrowDownIcon v-else-if="sortMode === 'date-added-newest'" />
 										<ClockArrowUpIcon v-else-if="sortMode === 'date-added-oldest'" />
-										<ServerIcon v-else-if="sortMode.startsWith('enabled-for')" />
 										<ArrowDownAZIcon v-else />
 										{{ sortLabels[sortMode]() }}
 										<DropdownIcon />
@@ -1306,16 +1268,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							:items="tableItems"
 							:show-selection="true"
 							:show-enabled-for-column="!!ctx.setEnabledFor"
-							:enabled-for-sort-direction="
-								sortMode === 'enabled-for-asc'
-									? 'asc'
-									: sortMode === 'enabled-for-desc'
-										? 'desc'
-										: undefined
-							"
 							@update:enabled="handleToggleEnabledById"
 							@update:enabled-for="handleSetEnabledForById"
-							@sort-enabled-for="handleEnabledForSort"
 							@delete="handleDeleteById"
 							@update="handleUpdateById"
 							@switch-version="handleSwitchVersionById"

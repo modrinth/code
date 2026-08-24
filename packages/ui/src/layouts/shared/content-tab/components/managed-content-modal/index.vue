@@ -8,6 +8,7 @@ import {
 	PaintbrushIcon,
 	SearchIcon,
 	SpinnerIcon,
+	UnknownIcon,
 } from '@modrinth/assets'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, watchSyncEffect } from 'vue'
@@ -115,6 +116,11 @@ const messages = defineMessages({
 	enabledFor: {
 		id: 'content.enabled-for.label',
 		defaultMessage: 'Enabled for',
+	},
+	enabledForDescription: {
+		id: 'content.enabled-for.description',
+		defaultMessage:
+			'Choose whether this content runs on the server, is sent to players, or is disabled in both places.',
 	},
 	pleaseWait: {
 		id: 'content.enabled-for.please-wait',
@@ -577,7 +583,8 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 
 				<div v-else class="@container flex-1 min-h-0 flex flex-col">
 					<div
-						class="flex h-12 shrink-0 items-center justify-between gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
+						class="flex h-12 shrink-0 items-center border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
+						:class="props.enableEnabledFor ? 'gap-2' : 'justify-between gap-4'"
 					>
 						<div
 							class="flex min-w-0 items-center gap-4"
@@ -603,18 +610,23 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						</div>
 						<div
 							v-if="props.enableEnabledFor"
-							class="hidden w-[200px] shrink-0 @[800px]:flex"
+							class="hidden w-[200px] shrink-0 items-center gap-1.5 @[800px]:flex"
 						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(messages.enabledFor)
 							}}</span>
+							<UnknownIcon
+								v-tooltip="formatMessage(messages.enabledForDescription)"
+								class="size-4 cursor-help text-secondary"
+								tabindex="0"
+							/>
 						</div>
 						<div
 							class="hidden @[800px]:flex"
 							:class="
 								showTableActions
 									? props.enableEnabledFor
-										? 'w-[250px] min-w-0 shrink-0'
+										? 'min-w-0 flex-1'
 										: 'flex-1 min-w-0'
 									: 'flex-1'
 							"

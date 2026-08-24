@@ -163,11 +163,12 @@ const installTooltip = computed(() => {
 <template>
 	<div
 		role="row"
-		class="flex items-center justify-between"
+		class="flex items-center"
 		:class="{
 			'h-[74px] gap-4 px-3': !inline && !enabledFor,
-			'h-[72px] gap-4 px-3': !inline && enabledFor,
+			'h-[72px] gap-2 px-3': !inline && enabledFor,
 			'gap-3': inline,
+			'justify-between': !enabledFor,
 			'opacity-50 grayscale': disabled && !installing,
 			'opacity-50': installing || (enabledFor && isEnabledForDisabled && !disabled),
 		}"
@@ -328,7 +329,7 @@ const installTooltip = computed(() => {
 				hideActions
 					? 'flex-1'
 					: enabledFor
-						? 'w-[250px] min-w-0 shrink-0'
+						? 'min-w-0 flex-1'
 						: 'flex-1 min-w-0',
 				!enabledFor && enabled === false && !disabled ? 'grayscale opacity-50' : '',
 			]"

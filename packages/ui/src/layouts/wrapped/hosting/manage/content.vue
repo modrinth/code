@@ -116,11 +116,11 @@ const messages = defineMessages({
 	},
 	lockEnvironment: {
 		id: 'hosting.content.enabled-for.lock-environment',
-		defaultMessage: 'Lock detected environment',
+		defaultMessage: 'Lock',
 	},
 	unlockEnvironment: {
 		id: 'hosting.content.enabled-for.unlock-environment',
-		defaultMessage: 'Unlock environment controls',
+		defaultMessage: 'Unlock',
 	},
 })
 

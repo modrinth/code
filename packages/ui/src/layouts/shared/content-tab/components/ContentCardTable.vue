@@ -27,10 +27,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'Choose whether this content runs on the server, is sent to players, or is disabled in both places.',
 	},
-	sortEnabledFor: {
-		id: 'content.enabled-for.sort',
-		defaultMessage: 'Sort by where content is enabled',
-	},
 })
 
 interface Props {
@@ -45,7 +41,6 @@ interface Props {
 	flat?: boolean
 	showItemActions?: boolean
 	showEnabledForColumn?: boolean
-	enabledForSortDirection?: ContentCardTableSortDirection
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -59,7 +54,6 @@ const props = withDefaults(defineProps<Props>(), {
 	flat: false,
 	showItemActions: false,
 	showEnabledForColumn: false,
-	enabledForSortDirection: undefined,
 })
 
 const stickyHeaderRef = ref<HTMLElement | null>(null)
@@ -74,7 +68,6 @@ const emit = defineEmits<{
 	update: [id: string]
 	switchVersion: [id: string]
 	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
-	'sort-enabled-for': [direction: ContentCardTableSortDirection]
 }>()
 
 // Check if any actions are available
@@ -194,11 +187,6 @@ function handleSort(column: ContentCardTableSortColumn) {
 	emit('sort', column, newDirection)
 }
 
-function handleEnabledForSort() {
-	const newDirection: ContentCardTableSortDirection =
-		props.enabledForSortDirection === 'desc' ? 'asc' : 'desc'
-	emit('sort-enabled-for', newDirection)
-}
 </script>
 
 <template>
@@ -211,8 +199,9 @@ function handleEnabledForSort() {
 			v-if="!hideHeader"
 			ref="stickyHeaderRef"
 			role="rowgroup"
-			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-3"
+			class="sticky top-0 z-10 flex h-12 items-center bg-surface-3 px-3"
 			:class="[
+				hasEnabledForColumn ? 'gap-2' : 'justify-between gap-4',
 				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
 				isStuck
 					? 'transition-[border-radius] duration-100 border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
@@ -264,22 +253,9 @@ function handleEnabledForSort() {
 			<div
 				v-if="hasEnabledForColumn"
 				role="columnheader"
-				:aria-sort="
-					enabledForSortDirection
-						? enabledForSortDirection === 'asc'
-							? 'ascending'
-							: 'descending'
-						: 'none'
-				"
 				class="hidden w-[200px] shrink-0 items-center gap-1.5 font-semibold text-secondary @[800px]:flex"
 			>
-				<button
-					type="button"
-					class="cursor-pointer border-0 bg-transparent p-0 font-semibold text-secondary"
-					@click="handleEnabledForSort"
-				>
-					{{ formatMessage(messages.enabledFor) }}
-				</button>
+				<span>{{ formatMessage(messages.enabledFor) }}</span>
 				<span
 					v-tooltip="formatMessage(messages.enabledForDescription)"
 					class="inline-flex size-4 cursor-help items-center justify-center"
@@ -287,15 +263,6 @@ function handleEnabledForSort() {
 				>
 					<InfoIcon class="size-4" />
 				</span>
-				<button
-					type="button"
-					class="flex cursor-pointer items-center border-0 bg-transparent p-0 text-secondary"
-					:aria-label="formatMessage(messages.sortEnabledFor)"
-					@click="handleEnabledForSort"
-				>
-					<ChevronUpIcon v-if="enabledForSortDirection === 'asc'" class="size-4" />
-					<ChevronDownIcon v-else class="size-4" />
-				</button>
 			</div>
 
 			<div
@@ -303,7 +270,7 @@ function handleEnabledForSort() {
 				:class="
 					hasAnyActions
 						? hasEnabledForColumn
-							? 'w-[250px] min-w-0 shrink-0'
+							? 'min-w-0 flex-1'
 							: 'flex-1 min-w-0'
 						: 'flex-1'
 				"
