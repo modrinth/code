@@ -1,9 +1,20 @@
 <template>
 	<div v-if="subtleLauncherRedirectUri">
-		<iframe
-			:src="subtleLauncherRedirectUri"
-			class="fixed left-0 top-0 z-[9999] m-0 h-full w-full border-0 p-0"
-		></iframe>
+		<iframe :src="subtleLauncherRedirectUri" class="hidden"></iframe>
+		<div
+			class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6 text-center"
+		>
+			<div class="flex flex-col gap-2">
+				<h1 class="m-0 text-2xl font-semibold text-contrast">Opening Modrinth App...</h1>
+				<p class="m-0 text-left text-primary">
+					If the app doesn’t open, use the button below to finish signing in.
+				</p>
+			</div>
+			<Button type="colored" color="brand" class="" @click="sendLauncherCallback">
+				{{ formatMessage(messages.returnToLauncherButton) }}
+				<RightArrowIcon />
+			</Button>
+		</div>
 	</div>
 	<div
 		v-else
@@ -239,6 +250,10 @@ const onOAuthProviderClick = (provider: AuthProvider) => {
 	pendingSignInOAuthProvider.value = provider
 }
 
+async function sendLauncherCallback() {
+	await fetch(subtleLauncherRedirectUri, { mode: 'no-cors' }).catch(() => undefined)
+}
+
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -286,6 +301,19 @@ const messages = defineMessages({
 	continueWithPasskey: {
 		id: 'auth.sign-in.continue-with-passkey',
 		defaultMessage: 'Continue with passkey',
+	},
+	launcherSignInCompleteTitle: {
+		id: 'auth.sign-in.launcher.complete.title',
+		defaultMessage: 'You’re signed in',
+	},
+	launcherSignInCompleteDescription: {
+		id: 'auth.sign-in.launcher.complete.description',
+		defaultMessage:
+			'We’re returning you to the Modrinth App. If nothing happens, use the button below.',
+	},
+	returnToLauncherButton: {
+		id: 'auth.sign-in.launcher.complete.return-button',
+		defaultMessage: 'Open Modrinth App',
 	},
 })
 </script>
