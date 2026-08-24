@@ -35,7 +35,10 @@ import { readFile } from '@tauri-apps/plugin-fs'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
+import ContextMenu from '@/components/ui/context-menu/index.vue'
+import type { ContextMenuOption, ContextMenuSelection } from '@/components/ui/context-menu/types'
 import { useAppEvent } from '@/composables/use-app-event'
 import {
 	create_screenshot_group,
@@ -48,6 +51,7 @@ import {
 	move_screenshots,
 	open_screenshot,
 	rename_screenshot_group,
+	save_edited_screenshot,
 	type ScreenshotGroup,
 	type ScreenshotGroupImport,
 	type ScreenshotKey,
@@ -64,6 +68,7 @@ import {
 
 import ScreenshotDragGather from './drag-gather.vue'
 import ScreenshotDragPreview from './drag-preview.vue'
+import ScreenshotEditorModal from './editor-modal.vue'
 import ScreenshotGroupSection from './group.vue'
 import ScreenshotPreviewModal from './preview-modal.vue'
 import ScreenshotToolbar from './toolbar.vue'
@@ -150,17 +155,27 @@ const deleteFromPreview = ref(false)
 const activeDrag = ref<ActiveScreenshotDrag | null>(null)
 const activeDropGroupId = ref<string | null>(null)
 const previewModal = ref<InstanceType<typeof ScreenshotPreviewModal>>()
+const editorModal = ref<InstanceType<typeof ScreenshotEditorModal>>()
+const screenshotOptionsMenu = ref<InstanceType<typeof ContextMenu>>()
 const deleteModal = ref<InstanceType<typeof ConfirmModal>>()
 const bulkDeleteModal = ref<InstanceType<typeof ConfirmModal>>()
 const deleteGroupModal = ref<InstanceType<typeof ConfirmModal>>()
 const customGroupToDelete = ref<ScreenshotGroup>()
 const groupIdPendingNameEdit = ref<string>()
 const migratingLegacyGroups = ref(false)
+const revealedScreenshotId = ref<string>()
+const highlightedScreenshotId = ref<string>()
 const queryClient = useQueryClient()
+const route = useRoute()
+const router = useRouter()
 const { formatMessage } = useVIntl()
 const { addNotification, handleError } = injectNotificationManager()
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 const formatMonth = useFormatDateTime({ month: 'long', year: 'numeric' })
+const screenshotOptions: ContextMenuOption[] = [
+	{ name: 'open' },
+	{ name: 'delete', color: 'danger' },
+]
 
 const messages = defineMessages({
 	heading: { id: 'app.screenshots.heading', defaultMessage: 'Screenshots' },
@@ -208,6 +223,12 @@ const messages = defineMessages({
 		defaultMessage: '{instance} · {date}',
 	},
 	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
+	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
+	viewOriginal: { id: 'app.screenshots.view-original', defaultMessage: 'View original' },
+	editSaved: {
+		id: 'app.screenshots.editor.saved',
+		defaultMessage: 'Edited screenshot saved',
+	},
 	showInFolder: { id: 'app.screenshots.show-in-folder', defaultMessage: 'Show in folder' },
 	deleteTitle: { id: 'app.screenshots.delete-title', defaultMessage: 'Delete screenshot' },
 	deleteDescription: {
@@ -349,6 +370,7 @@ const groupOptions = computed<ComboboxOption<string>[]>(() => [
 const filteredScreenshots = computed(() => {
 	const query = search.value.trim().toLocaleLowerCase()
 	const filtered = screenshots.value.filter((screenshot) => {
+		if (screenshot.id === revealedScreenshotId.value) return true
 		const instance = instancesById.value.get(screenshot.instance_id)
 		const matchesSearch =
 			!query ||
@@ -511,6 +533,21 @@ const moveMutation = useMutation({
 		selectedKeys.value = new Set()
 	},
 })
+const saveEditMutation = useMutation({
+	mutationFn: (payload: {
+		screenshot: InstanceScreenshot
+		pngBytes: Uint8Array
+		mode: 'create_copy' | 'replace_edit'
+	}) =>
+		save_edited_screenshot(getScreenshotKey(payload.screenshot), payload.pngBytes, payload.mode),
+	onSuccess: async (saved) => {
+		await invalidateScreenshots([saved.instance_id])
+		await editorModal.value?.markSavedAndHide()
+		await revealScreenshot(saved.id)
+		addNotification({ type: 'success', title: formatMessage(messages.editSaved) })
+	},
+	onError: handleError,
+})
 const bulkBusy = computed(
 	() =>
 		deleteMutation.isPending.value ||
@@ -546,6 +583,23 @@ watch(groupBy, (currentGroupBy) => {
 		groupIdPendingNameEdit.value = undefined
 	}
 })
+
+let handledFocus: string | undefined
+
+watch(
+	[() => route.query.focus, screenshots],
+	([focus]) => {
+		if (typeof focus !== 'string') {
+			handledFocus = undefined
+			return
+		}
+		if (handledFocus === focus) return
+		if (!screenshots.value.some((screenshot) => screenshot.id === focus)) return
+		handledFocus = focus
+		void revealScreenshot(focus)
+	},
+	{ immediate: true },
+)
 
 watch(
 	() => screenshotGroupsQuery.isSuccess.value,
@@ -776,6 +830,19 @@ function requestDelete(screenshot: InstanceScreenshot, fromPreview = false) {
 	deleteModal.value?.show()
 }
 
+function showScreenshotOptions(screenshot: InstanceScreenshot, event: MouseEvent) {
+	screenshotOptionsMenu.value?.showMenu(event, screenshot, screenshotOptions)
+}
+
+function handleScreenshotOption({ item, option }: ContextMenuSelection) {
+	const screenshot = item as InstanceScreenshot
+	if (option === 'open') {
+		void openScreenshot(screenshot)
+	} else if (option === 'delete') {
+		requestDelete(screenshot)
+	}
+}
+
 function screenshotBySelectionKey(selectionKey: string) {
 	return screenshots.value.find((screenshot) => getSelectionKey(screenshot) === selectionKey)
 }
@@ -793,6 +860,65 @@ function openScreenshotBySelectionKey(selectionKey: string) {
 function requestPreviewDelete(selectionKey: string) {
 	const screenshot = screenshotBySelectionKey(selectionKey)
 	if (screenshot) requestDelete(screenshot, true)
+}
+
+function editScreenshot(screenshot: InstanceScreenshot) {
+	previewModal.value?.hide()
+	void editorModal.value?.show(screenshot)
+}
+
+function editScreenshotBySelectionKey(selectionKey: string) {
+	const screenshot = screenshotBySelectionKey(selectionKey)
+	if (screenshot) editScreenshot(screenshot)
+}
+
+function showOriginalBySelectionKey(selectionKey: string) {
+	const screenshot = screenshotBySelectionKey(selectionKey)
+	if (!screenshot) return
+	previewModal.value?.hide()
+	void showOriginal(screenshot)
+}
+
+async function showOriginal(screenshot: InstanceScreenshot) {
+	const originalId = screenshot.original_screenshot_id
+	if (!originalId) return
+
+	if (screenshots.value.some((item) => item.id === originalId)) {
+		await revealScreenshot(originalId)
+		return
+	}
+
+	if (screenshot.original_instance_id) {
+		await router.push({
+			name: 'InstanceScreenshots',
+			params: { id: screenshot.original_instance_id },
+			query: { focus: originalId },
+		})
+	}
+}
+
+let revealTimeout: ReturnType<typeof setTimeout> | undefined
+
+async function revealScreenshot(id: string) {
+	if (revealTimeout) clearTimeout(revealTimeout)
+	revealedScreenshotId.value = id
+	await nextTick()
+
+	const group = groupedScreenshots.value.find((candidate) =>
+		candidate.screenshots.some((screenshot) => screenshot.id === id),
+	)
+	if (group) setGroupCollapsed(group.id, false)
+
+	await nextTick()
+	const card = document.querySelector<HTMLElement>(`[data-screenshot-id="${CSS.escape(id)}"]`)
+	card?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+	card?.focus()
+	highlightedScreenshotId.value = id
+	revealTimeout = setTimeout(() => {
+		if (highlightedScreenshotId.value === id) highlightedScreenshotId.value = undefined
+		if (revealedScreenshotId.value === id) revealedScreenshotId.value = undefined
+		revealTimeout = undefined
+	}, 2400)
 }
 
 async function confirmDelete() {
@@ -977,7 +1103,10 @@ watch(activeDropGroupId, (groupId) => {
 	}, GROUP_HOVER_OPEN_DELAY)
 })
 
-onBeforeUnmount(clearGroupHoverOpenTimeout)
+onBeforeUnmount(() => {
+	clearGroupHoverOpenTimeout()
+	if (revealTimeout) clearTimeout(revealTimeout)
+})
 </script>
 
 <template>
@@ -1009,8 +1138,38 @@ onBeforeUnmount(clearGroupHoverOpenTimeout)
 		:markdown="false"
 		@proceed="deleteCustomGroup"
 	/>
+	<ScreenshotEditorModal
+		ref="editorModal"
+		:saving="saveEditMutation.isPending.value"
+		@save="saveEditMutation.mutate"
+	/>
+	<ContextMenu ref="screenshotOptionsMenu" @option-clicked="handleScreenshotOption">
+		<template #open>
+			<ExternalIcon />
+			{{ formatMessage(messages.showInFolder) }}
+		</template>
+		<template #delete>
+			<TrashIcon />
+			{{ formatMessage(commonMessages.deleteLabel) }}
+		</template>
+	</ContextMenu>
 	<ScreenshotPreviewModal ref="previewModal" :items="previewItems">
 		<template #actions="{ item }">
+			<IconButton
+				v-tooltip="formatMessage(messages.edit)"
+				:label="formatMessage(messages.edit)"
+				@click="editScreenshotBySelectionKey(item.id)"
+			>
+				<EditIcon />
+			</IconButton>
+			<IconButton
+				v-if="screenshotBySelectionKey(item.id)?.original_screenshot_id"
+				v-tooltip="formatMessage(messages.viewOriginal)"
+				:label="formatMessage(messages.viewOriginal)"
+				@click="showOriginalBySelectionKey(item.id)"
+			>
+				<EditIcon />
+			</IconButton>
 			<IconButton
 				v-tooltip="formatMessage(messages.copy)"
 				:label="formatMessage(messages.copy)"
@@ -1102,6 +1261,7 @@ onBeforeUnmount(clearGroupHoverOpenTimeout)
 						:drop-custom-group="groupBy === 'custom'"
 						:drop-custom-group-id="group.customGroupId ?? undefined"
 						:show-instance-name="isGlobal && groupBy !== 'instance'"
+						:highlighted-screenshot-id="highlightedScreenshotId"
 						:force-open="search.length > 0"
 						:hide-header="groupBy === 'none'"
 						:editable-title="Boolean(group.customGroupId)"
@@ -1114,8 +1274,9 @@ onBeforeUnmount(clearGroupHoverOpenTimeout)
 						@activate="activateScreenshot"
 						@toggle-selection="toggleScreenshotSelection"
 						@copy="copyScreenshot"
-						@open="openScreenshot"
-						@delete="requestDelete"
+						@edit="editScreenshot"
+						@more="showScreenshotOptions"
+						@show-original="showOriginal"
 					>
 						<template v-if="group.customGroupId" #actions="{ startEditing }">
 							<div

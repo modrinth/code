@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
-import { CheckIcon, ClipboardCopyIcon, ExternalIcon, TrashIcon } from '@modrinth/assets'
-import {
-	commonMessages,
-	defineMessages,
-	IconButton,
-	useFormatDateTime,
-	useVIntl,
-} from '@modrinth/ui'
+import { CheckIcon, ClipboardCopyIcon, EditIcon, MoreHorizontalIcon } from '@modrinth/assets'
+import { defineMessages, IconButton, useFormatDateTime, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import type { InstanceScreenshot } from '@/helpers/instance'
@@ -20,11 +14,13 @@ const props = defineProps<{
 	activeDragged: boolean
 	canDrag: boolean
 	showInstanceName: boolean
+	highlighted: boolean
 }>()
 
 const emit = defineEmits<{
 	(e: 'activate', event: MouseEvent | KeyboardEvent): void
-	(e: 'copy' | 'open' | 'delete' | 'toggle-selection'): void
+	(e: 'copy' | 'edit' | 'show-original' | 'toggle-selection'): void
+	(e: 'more', event: MouseEvent): void
 }>()
 
 const card = ref<HTMLElement>()
@@ -35,7 +31,9 @@ const messages = defineMessages({
 	select: { id: 'app.screenshots.select', defaultMessage: 'Select {name}' },
 	deselect: { id: 'app.screenshots.deselect', defaultMessage: 'Deselect {name}' },
 	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
-	showInFolder: { id: 'app.screenshots.show-in-folder', defaultMessage: 'Show in folder' },
+	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
+	edited: { id: 'app.screenshots.edited', defaultMessage: 'Edited' },
+	moreActions: { id: 'app.screenshots.more-actions', defaultMessage: 'More actions' },
 	instanceAndTime: {
 		id: 'app.screenshots.card.instance-and-time',
 		defaultMessage: '{instance} · {time}',
@@ -79,10 +77,12 @@ function activate(event: MouseEvent | KeyboardEvent) {
 		class="group relative aspect-video min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition hover:border-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
 		:class="{
 			'!border-contrast': selected,
+			'!border-brand ring-2 ring-brand animate-pulse': highlighted,
 			'opacity-50': activeDragged,
 			'cursor-grab active:cursor-grabbing': canDrag,
 		}"
 		data-screenshot-card
+		:data-screenshot-id="screenshot.id"
 		:data-selection-key="selectionKey"
 		:aria-label="
 			selectionActive
@@ -95,6 +95,15 @@ function activate(event: MouseEvent | KeyboardEvent) {
 		@click="activate"
 		@keydown="activate"
 	>
+		<button
+			v-if="screenshot.original_screenshot_id"
+			type="button"
+			class="absolute left-2 top-2 z-[3] flex cursor-pointer items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-1/90 px-2 py-1 text-xs font-semibold text-contrast shadow-sm backdrop-blur hover:bg-surface-2"
+			@click.stop="emit('show-original')"
+		>
+			<EditIcon class="size-3.5" />
+			<span>{{ formatMessage(messages.edited) }}</span>
+		</button>
 		<button
 			type="button"
 			class="selection-button group/selection absolute right-0.5 top-0 z-[2] flex size-[50px] cursor-pointer items-start justify-center border-0 bg-transparent p-0 pt-4"
@@ -150,6 +159,15 @@ function activate(event: MouseEvent | KeyboardEvent) {
 				@click.stop
 			>
 				<IconButton
+					v-tooltip="formatMessage(messages.edit)"
+					:label="formatMessage(messages.edit)"
+					type="quiet"
+					class="bg-surface-2 text-contrast hover:bg-surface-3"
+					@click="emit('edit')"
+				>
+					<EditIcon />
+				</IconButton>
+				<IconButton
 					v-tooltip="formatMessage(messages.copy)"
 					:label="formatMessage(messages.copy)"
 					type="quiet"
@@ -159,22 +177,13 @@ function activate(event: MouseEvent | KeyboardEvent) {
 					<ClipboardCopyIcon />
 				</IconButton>
 				<IconButton
-					v-tooltip="formatMessage(messages.showInFolder)"
-					:label="formatMessage(messages.showInFolder)"
+					v-tooltip="formatMessage(messages.moreActions)"
+					:label="formatMessage(messages.moreActions)"
 					type="quiet"
 					class="bg-surface-2 text-contrast hover:bg-surface-3"
-					@click="emit('open')"
+					@click="emit('more', $event)"
 				>
-					<ExternalIcon />
-				</IconButton>
-				<IconButton
-					v-tooltip="formatMessage(commonMessages.deleteLabel)"
-					:label="formatMessage(commonMessages.deleteLabel)"
-					type="quiet"
-					class="bg-surface-2 text-contrast hover:bg-surface-3"
-					@click="emit('delete')"
-				>
-					<TrashIcon />
+					<MoreHorizontalIcon />
 				</IconButton>
 			</div>
 		</div>

@@ -33,6 +33,7 @@
 		"@types/three": "^0.172.0",
 		"@vueuse/core": "^11.1.0",
 		"dayjs": "^1.11.10",
+		"fabric": "^7.4.0",
 		"floating-vue": "^5.2.2",
 		"fuse.js": "^6.6.2",
 		"intl-messageformat": "^10.7.7",

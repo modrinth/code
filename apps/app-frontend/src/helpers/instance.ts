@@ -176,6 +176,9 @@ export type InstanceScreenshot = ScreenshotKey & {
 	id: string
 	instance_name: string
 	created_at: string
+	modified_at: number
+	original_screenshot_id?: string | null
+	original_instance_id?: string | null
 	group_id?: string | null
 	path: string
 	url: string
@@ -205,6 +208,18 @@ export async function list_all_screenshots(): Promise<InstanceScreenshot[]> {
 
 export async function list_synced_screenshots(): Promise<InstanceScreenshot[]> {
 	return await invoke('plugin:instance|instance_list_synced_screenshots')
+}
+
+export async function save_edited_screenshot(
+	key: ScreenshotKey,
+	pngBytes: Uint8Array,
+	mode: 'create_copy' | 'replace_edit',
+): Promise<InstanceScreenshot> {
+	return await invoke('plugin:instance|instance_save_edited_screenshot', {
+		key,
+		pngBytes: Array.from(pngBytes),
+		mode,
+	})
 }
 
 export async function list_screenshot_groups(): Promise<ScreenshotGroup[]> {
