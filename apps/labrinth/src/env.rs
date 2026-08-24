@@ -317,8 +317,9 @@ vars! {
     NEVERBOUNCE_API_KEY: String = "";
     NEVERBOUNCE_BASE_URL: String = neverbounce::DEFAULT_API_URL;
 
-    EMAIL_DOMAIN_BLACKLIST: StringCsv = StringCsv(vec![]);
-    EMAIL_DOMAIN_WHITELIST: StringCsv = StringCsv(vec![]);
+    USERCHECK_API_KEY: String = "";
+    USERCHECK_GATE_ID: String = "";
+    USERCHECK_BASE_URL: String = crate::util::usercheck::DEFAULT_API_URL;
 
     CLICKHOUSE_REPLICATED: bool = false;
     CLICKHOUSE_URL: String = "http://localhost:8123";

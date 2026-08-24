@@ -24,7 +24,9 @@ use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
+use crate::util::ip::client_ip;
 use crate::util::neverbounce::{check_email, email_check_error_generic};
+use crate::util::usercheck::{DecisionAction, check_email_gate};
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
 use actix_web::http::StatusCode;
@@ -61,10 +63,6 @@ use webauthn_rs::prelude::{
 };
 use xredis::RedisPool;
 use zxcvbn::Score;
-
-/// Sourced from <https://github.com/disposable-email-domains/disposable-email-domains>.
-const DISPOSABLE_EMAIL_BLOCKLIST: &str =
-    include_str!("../../../assets/disposable_email_blocklist.txt");
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
@@ -1510,8 +1508,9 @@ pub async fn create_oauth_account(
     };
 
     if let Some(email) = &user.email {
-        ensure_email_domain_is_allowed(email)
-            .wrap_api_err("validating email domain is allowed")?;
+        ensure_email_passes_gate(&req, email)
+            .await
+            .wrap_api_err("validating email passes the signup gate")?;
     }
 
     let mut txn = db
@@ -1847,80 +1846,27 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
-#[derive(PartialEq, Eq)]
-enum EmailDomainStatus {
-    Whitelisted,
-    Neutral,
-}
-
-/// Environment list entries are matched literally, unless they begin with `*.`,
-/// in which case they match any subdomain of the remaining suffix.
-fn matches_domain_entry(domain: &str, entry: &str) -> bool {
-    let entry = entry.trim().to_ascii_lowercase();
-
-    match entry.strip_prefix("*.") {
-        Some(suffix) => domain
-            .strip_suffix(suffix)
-            .is_some_and(|subdomain| subdomain.ends_with('.')),
-        None => entry == domain,
-    }
-}
-
-fn is_whitelisted_domain(domain: &str) -> bool {
-    let domain = domain.to_ascii_lowercase();
-
-    ENV.EMAIL_DOMAIN_WHITELIST
-        .iter()
-        .any(|entry| matches_domain_entry(&domain, entry))
-}
-
-/// The bundled disposable domain list is checked first, then the environment
-/// blacklist.
-fn is_blacklisted_domain(domain: &str) -> bool {
-    let domain = domain.to_ascii_lowercase();
-
-    if DISPOSABLE_EMAIL_BLOCKLIST.lines().any(|entry| {
-        // The upstream list expects listed domains to match subdomains too.
-        domain == entry
-            || domain
-                .strip_suffix(entry)
-                .is_some_and(|subdomain| subdomain.ends_with('.'))
-    }) {
-        return true;
-    }
-
-    ENV.EMAIL_DOMAIN_BLACKLIST
-        .iter()
-        .any(|entry| matches_domain_entry(&domain, entry))
-}
-
-fn ensure_email_domain_is_allowed(
+/// Runs the UserCheck gate, which covers both password and OAuth signups.
+async fn ensure_email_passes_gate(
+    req: &HttpRequest,
     email: &str,
-) -> Result<EmailDomainStatus, ApiError> {
-    let Some((_, domain)) = email.rsplit_once('@') else {
-        return Err(ApiError::Request(email_check_error_generic()));
-    };
+) -> Result<(), ApiError> {
+    let action = check_email_gate(email, client_ip(req).as_deref())
+        .await
+        .wrap_request_err("checking email address")?;
 
-    if is_whitelisted_domain(domain) {
-        info!(email.domain = domain, "whitelisted email domain, allowing");
-        return Ok(EmailDomainStatus::Whitelisted);
-    }
-
-    if is_blacklisted_domain(domain) {
-        info!(email.domain = domain, "blacklisted email domain, denying");
+    if action == DecisionAction::Block {
         return Err(ApiError::Request(email_check_error_generic()));
     }
 
-    Ok(EmailDomainStatus::Neutral)
+    Ok(())
 }
 
-async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
-    let status = ensure_email_domain_is_allowed(email)
-        .wrap_api_err("validating email domain is allowed")?;
-
-    if status == EmailDomainStatus::Whitelisted {
-        return Ok(());
-    }
+async fn ensure_email_is_usable(
+    req: &HttpRequest,
+    email: &str,
+) -> Result<(), ApiError> {
+    ensure_email_passes_gate(req, email).await?;
 
     let result = check_email(email)
         .await
@@ -2165,7 +2111,7 @@ pub async fn create_account_with_password(
         )));
     }
 
-    ensure_email_is_usable(&new_account.email)
+    ensure_email_is_usable(&req, &new_account.email)
         .await
         .wrap_api_err("validating email is usable")?;
 
@@ -3150,7 +3096,7 @@ pub async fn set_email(
         )));
     }
 
-    ensure_email_is_usable(&email_address.email)
+    ensure_email_is_usable(&req, &email_address.email)
         .await
         .wrap_api_err("validating email is usable")?;
 
