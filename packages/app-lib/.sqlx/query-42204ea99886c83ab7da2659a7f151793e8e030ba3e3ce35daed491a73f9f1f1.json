@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\tSELECT\n\t\t\tscreenshots.id,\n\t\t\tscreenshots.instance_id,\n\t\t\tscreenshots.file_name,\n\t\t\tscreenshots.content_hash,\n\t\t\tscreenshots.file_size,\n\t\t\tscreenshots.modified_at,\n\t\t\tscreenshots.created_at,\n\t\t\tscreenshots.original_screenshot_id,\n\t\t\toriginal.instance_id AS \"original_instance_id?\",\n\t\t\tmemberships.group_id AS \"group_id?\"\n\t\tFROM screenshots\n\t\tLEFT JOIN screenshots original\n\t\t\tON original.id = screenshots.original_screenshot_id\n\t\tLEFT JOIN screenshot_group_memberships memberships\n\t\t\tON memberships.screenshot_id = screenshots.id\n\t\tWHERE screenshots.id = ?\n\t\t",
+  "query": "\n\t\tSELECT\n\t\t\tscreenshots.id,\n\t\t\tscreenshots.instance_id,\n\t\t\tscreenshots.file_name,\n\t\t\tscreenshots.content_hash,\n\t\t\tscreenshots.file_size,\n\t\t\tscreenshots.modified_at,\n\t\t\tscreenshots.created_at,\n\t\t\tscreenshots.original_screenshot_id,\n\t\t\tscreenshots.editor_state,\n\t\t\toriginal.instance_id AS \"original_instance_id?\",\n\t\t\tmemberships.group_id AS \"group_id?\"\n\t\tFROM screenshots\n\t\tLEFT JOIN screenshots original\n\t\t\tON original.id = screenshots.original_screenshot_id\n\t\tLEFT JOIN screenshot_group_memberships memberships\n\t\t\tON memberships.screenshot_id = screenshots.id\n\t\tWHERE screenshots.id = ?\n\t\t",
   "describe": {
     "columns": [
       {
@@ -44,13 +44,18 @@
         "type_info": "Text"
       },
       {
-        "name": "original_instance_id?",
+        "name": "editor_state",
         "ordinal": 8,
         "type_info": "Text"
       },
       {
-        "name": "group_id?",
+        "name": "original_instance_id?",
         "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "group_id?",
+        "ordinal": 10,
         "type_info": "Text"
       }
     ],
@@ -66,9 +71,10 @@
       false,
       false,
       true,
+      true,
       false,
       false
     ]
   },
-  "hash": "b5634862ed1d07d60224665364fab3690a1e2655eedf10a73995c343fad0429d"
+  "hash": "42204ea99886c83ab7da2659a7f151793e8e030ba3e3ce35daed491a73f9f1f1"
 }

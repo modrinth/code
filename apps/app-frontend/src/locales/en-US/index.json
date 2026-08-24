@@ -1397,11 +1397,11 @@
   "app.screenshots.edited": {
     "message": "Edited"
   },
-  "app.screenshots.editor.cancel": {
-    "message": "Cancel"
+  "app.screenshots.editor.censor.blur": {
+    "message": "Blur"
   },
-  "app.screenshots.editor.censor.pixelate": {
-    "message": "Pixelate"
+  "app.screenshots.editor.censor.mode": {
+    "message": "Censor type"
   },
   "app.screenshots.editor.censor.solid": {
     "message": "Solid"
@@ -1412,26 +1412,38 @@
   "app.screenshots.editor.delete-selection": {
     "message": "Delete selected annotation"
   },
+  "app.screenshots.editor.editing-title": {
+    "message": "Editing {name}"
+  },
+  "app.screenshots.editor.eraser.area": {
+    "message": "Area"
+  },
+  "app.screenshots.editor.eraser.element": {
+    "message": "Element"
+  },
+  "app.screenshots.editor.eraser.mode": {
+    "message": "Eraser mode"
+  },
+  "app.screenshots.editor.more-save-options": {
+    "message": "More save options"
+  },
   "app.screenshots.editor.redo": {
     "message": "Redo"
   },
   "app.screenshots.editor.save-as-new": {
-    "message": "Save as new edit"
+    "message": "Save as copy"
   },
   "app.screenshots.editor.save-changes": {
     "message": "Save changes"
   },
   "app.screenshots.editor.save-copy": {
-    "message": "Save edited copy"
+    "message": "Save copy"
   },
-  "app.screenshots.editor.saved": {
-    "message": "Edited screenshot saved"
+  "app.screenshots.editor.save-screenshot": {
+    "message": "Save screenshot"
   },
   "app.screenshots.editor.size": {
     "message": "Size"
-  },
-  "app.screenshots.editor.title": {
-    "message": "Edit screenshot"
   },
   "app.screenshots.editor.tool.arrow": {
     "message": "Arrow"
@@ -1441,6 +1453,9 @@
   },
   "app.screenshots.editor.tool.ellipse": {
     "message": "Ellipse"
+  },
+  "app.screenshots.editor.tool.eraser": {
+    "message": "Eraser"
   },
   "app.screenshots.editor.tool.highlight": {
     "message": "Highlight"

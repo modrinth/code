@@ -22,6 +22,7 @@ use uuid::Uuid;
 
 const SCREENSHOTS_DIRECTORY: &str = "screenshots";
 const SCREENSHOT_SCAN_CONCURRENCY: usize = 8;
+const MAX_SCREENSHOT_EDITOR_STATE_SIZE: usize = 16 * 1024 * 1024;
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct ScreenshotKey {
@@ -42,6 +43,12 @@ pub struct InstanceScreenshot {
     pub group_id: Option<String>,
     #[serde(skip)]
     pub path: PathBuf,
+}
+
+#[derive(Clone, Debug)]
+pub struct ScreenshotEditorData {
+    pub background_path: PathBuf,
+    pub editor_state: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize)]
@@ -335,12 +342,55 @@ pub async fn get_screenshot_path(
     Ok(canonical_path)
 }
 
+pub async fn get_screenshot_editor_data(
+    key: ScreenshotKey,
+) -> crate::Result<ScreenshotEditorData> {
+    validate_file_name(&key.file_name)?;
+
+    let state = State::get().await?;
+    let current_path = get_screenshot_path(&key).await?;
+    let source_row = screenshot_rows::get_screenshot_by_key(
+        &key.instance_id,
+        &key.file_name,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown screenshot".to_string())
+    })?;
+
+    if let (Some(editor_state), Some(original_id)) =
+        (source_row.editor_state, source_row.original_screenshot_id)
+        && let Some(original) =
+            screenshot_rows::get_screenshot_by_id(&original_id, &state.pool)
+                .await?
+    {
+        let original_key = ScreenshotKey {
+            instance_id: original.instance_id,
+            file_name: original.file_name,
+        };
+        if let Ok(background_path) = get_screenshot_path(&original_key).await {
+            return Ok(ScreenshotEditorData {
+                background_path,
+                editor_state: Some(editor_state),
+            });
+        }
+    }
+
+    Ok(ScreenshotEditorData {
+        background_path: current_path,
+        editor_state: None,
+    })
+}
+
 pub async fn save_edited_screenshot(
     key: ScreenshotKey,
     png_bytes: Vec<u8>,
+    editor_state: Option<String>,
     mode: ScreenshotEditSaveMode,
 ) -> crate::Result<InstanceScreenshot> {
     validate_file_name(&key.file_name)?;
+    validate_editor_state(editor_state.as_deref())?;
 
     let state = State::get().await?;
     let source = instance_rows::get_instance_screenshot_source(
@@ -455,6 +505,12 @@ pub async fn save_edited_screenshot(
                 &mut tx,
             )
             .await?;
+            screenshot_rows::set_editor_state(
+                &saved.id,
+                editor_state.as_deref(),
+                &mut tx,
+            )
+            .await?;
             tx.commit().await?;
             Ok(())
         }
@@ -479,19 +535,27 @@ pub async fn save_edited_screenshot(
                     "Could not load edited screenshot".to_string(),
                 )
             })?;
-    if !copy_group && saved_row.created_at != source_row.created_at {
-        saved_row.created_at = source_row.created_at;
+    if !copy_group {
         let mut tx = state.pool.begin().await?;
-        screenshot_rows::update_screenshot(&saved_row, &mut tx).await?;
-        tx.commit().await?;
-        saved.created_at = DateTime::from_timestamp_millis(
-            source_row.created_at,
+        if saved_row.created_at != source_row.created_at {
+            saved_row.created_at = source_row.created_at;
+            screenshot_rows::update_screenshot(&saved_row, &mut tx).await?;
+            saved.created_at =
+                DateTime::from_timestamp_millis(source_row.created_at)
+                    .ok_or_else(|| {
+                        crate::ErrorKind::InputError(
+                            "Screenshot creation time is out of range"
+                                .to_string(),
+                        )
+                    })?;
+        }
+        screenshot_rows::set_editor_state(
+            &saved.id,
+            editor_state.as_deref(),
+            &mut tx,
         )
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Screenshot creation time is out of range".to_string(),
-            )
-        })?;
+        .await?;
+        tx.commit().await?;
     }
     saved.modified_at = saved_row.modified_at;
     saved.original_screenshot_id = saved_row.original_screenshot_id;
@@ -631,6 +695,9 @@ async fn reconcile_source_screenshots(
             || row.created_at != scanned.created_at.timestamp_millis();
         if metadata_changed {
             let (_, hash) = sha1_file_async(&scanned.path).await?;
+            if hash != row.content_hash {
+                row.editor_state = None;
+            }
             row.content_hash = hash;
             row.file_size = scanned.file_size;
             row.modified_at = scanned.modified_at;
@@ -687,6 +754,7 @@ async fn reconcile_source_screenshots(
                     modified_at: scanned.modified_at,
                     created_at: scanned.created_at.timestamp_millis(),
                     original_screenshot_id: None,
+                    editor_state: None,
                     original_instance_id: None,
                     group_id: None,
                 },
@@ -881,6 +949,33 @@ fn validate_file_name(file_name: &str) -> crate::Result<()> {
     if !is_single_file || !has_png_extension(path) {
         return Err(crate::ErrorKind::InputError(
             "Invalid screenshot file name".to_string(),
+        )
+        .into());
+    }
+
+    Ok(())
+}
+
+fn validate_editor_state(editor_state: Option<&str>) -> crate::Result<()> {
+    let Some(editor_state) = editor_state else {
+        return Ok(());
+    };
+    if editor_state.len() > MAX_SCREENSHOT_EDITOR_STATE_SIZE {
+        return Err(crate::ErrorKind::InputError(
+            "Screenshot editor state is too large".to_string(),
+        )
+        .into());
+    }
+
+    let value = serde_json::from_str::<serde_json::Value>(editor_state)
+        .map_err(|error| {
+            crate::ErrorKind::InputError(format!(
+                "Screenshot editor state is not valid JSON: {error}",
+            ))
+        })?;
+    if !value.is_object() {
+        return Err(crate::ErrorKind::InputError(
+            "Screenshot editor state must be a JSON object".to_string(),
         )
         .into());
     }

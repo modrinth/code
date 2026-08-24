@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE screenshots SET editor_state = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "0b2c44e13e3226d3f10dab1fe34281e92732734d6d0e422ec60161217e3f3ce2"
+}
