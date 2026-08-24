@@ -143,29 +143,11 @@
   "app.ads-consent.title": {
     "message": "Конфиденциальность и реклама на Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Использовать эффекты вроде размытия фона. Без аппаратного ускорения возможна потеря производительности."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Расширенные эффекты"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Выберите тему для Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Тема"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Выберите страницу для показа при запуске Modrinth App."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Главная"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Библиотека"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Стартовая страница"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Скрывать имя над игроком на странице выбора скина."
@@ -184,12 +166,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Сворачивание приложения"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Использовать системное оформление заголовка и кнопок окна. Требуется перезапуск."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Системная рамка окна"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показывать проведённое время в сборке."
@@ -752,9 +728,6 @@
   "app.nav.home": {
     "message": "Главная"
   },
-  "app.nav.library": {
-    "message": "Библиотека"
-  },
   "app.nav.modrinth-account": {
     "message": "Аккаунт Modrinth"
   },
@@ -1139,15 +1112,6 @@
   "app.skins.sign-in.button": {
     "message": "Войти"
   },
-  "app.skins.sign-in.description": {
-    "message": "Пожалуйста, войдите в свой аккаунт Minecraft, чтобы воспользоваться функциями управления скинами в приложении Modrinth."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Восторженный Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Войдите"
-  },
   "app.skins.title": {
     "message": "Выбор скина"
   },
@@ -1219,9 +1183,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Не в сети"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} в игре"
   },
   "content.shared-instance.change-version-body": {
     "message": "Изменение версии затрагивает только локальную копию. В будущих обновлениях общего экземпляра она может быть восстановлена ​​или изменена снова."
@@ -1525,18 +1486,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Выбрать иконку"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Группировка"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Создать новую группу"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Позволяет организовать сборки по разным разделам в библиотеке."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Введите название группы"
   },
   "instance.settings.tabs.general.name": {
     "message": "Название"

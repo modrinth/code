@@ -8,7 +8,7 @@
 			:layout-mode="isContainedServerRoute ? 'contained' : 'page'"
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
-			:show-copy-id-action="themeStore.devMode"
+			:show-copy-id-action="appSettings.devMode"
 			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
@@ -61,17 +61,17 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
 import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
-import { useTheming } from '@/store/theme'
 
 const route = useRoute()
 const router = useRouter()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
 
 const isContainedServerRoute = computed(() => route.name === 'ServerManageOverview')

@@ -572,9 +572,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Cari versi permainan..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Hapus ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Pilih ikon"
   },
@@ -727,9 +724,6 @@
   },
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Kosongkan semua"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Hasil pencarian tidak ditemukan"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Minecraft klasik tanpa mod atau pasang-masuk."

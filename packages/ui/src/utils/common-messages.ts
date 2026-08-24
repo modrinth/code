@@ -828,6 +828,7 @@ export const financialMessages = defineMessages({
 
 const PROJECT_TYPE_ALIASES: Record<string, string> = {
 	shaderpack: 'shader',
+	minecraft_java_server: 'server',
 }
 
 export function normalizeProjectType(type: string): string {
@@ -1048,6 +1049,14 @@ export const reportTypeMessages = defineMessages({
 	'missing-disclosure': {
 		id: 'report.type.missing-disclosure',
 		defaultMessage: 'Missing or incorrect disclosure',
+	},
+	'ai-images': {
+		id: 'report.type.ai-images',
+		defaultMessage: 'AI-generated images in icon, gallery, or description',
+	},
+	'fully-ai-generated': {
+		id: 'report.type.fully-ai-generated',
+		defaultMessage: 'Fully AI-generated project',
 	},
 })
 

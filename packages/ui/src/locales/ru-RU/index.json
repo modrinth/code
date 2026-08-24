@@ -647,9 +647,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Поиск версии игры..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Удалить иконку"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Выбрать иконку"
   },
@@ -812,24 +809,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Очистить всë"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Найти сборки"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Импортировать сборку"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Уже знаете, какую сборку хотите скачать?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Ничего не найдено"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Поиск сборки"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Сборка — это установка Minecraft с определённым загрузчиком модов, версией и модами."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Начать с нуля, выбрав загрузчик и версию игры."
   },
@@ -862,9 +841,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Выберите тип мира"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Выберите сборку"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Создание сборки"
@@ -1973,14 +1949,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Совместимые сборки не найдены"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Удалить иконку"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Поиск сборки"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Выбрать иконку"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Текущая"
@@ -4472,9 +4442,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Сервер устанавливается"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Синхронизация контента в процессе"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Также отправить запрос в друзья"
   },
@@ -4529,56 +4496,14 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Установка не удалась"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Во время установки платформы произошла внутренняя ошибка. Попробуйте ещё раз."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Не удалось установить указанную версию загрузчика или Minecraft. Возможно, она недействительна или не поддерживается."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Не удалось установить сборку модов. Возможно, она повреждена или несовместима."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Эта версия сборки не содержит загрузочного файла. Возможно, она была собрана неправильно."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Во время установки произошла непредвиденная ошибка."
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Эта версия Minecraft или загрузчика пока не поддерживается Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Установка дополнений..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Установка сборки..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Установка платформы..."
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Подготовка сервера"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Добавление Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Настройка сервера..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Скачивание модов..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Упорядочивание файлов..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Настройка среды..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже есть сервер?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Подробнее о Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4588,9 +4513,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Играйте в сборки вместе с друзьями через Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Серверов ещё нет"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Выбирайте любимые моды, а мы сделаем всё остальное."
@@ -4606,12 +4528,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Войти"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Настраивайте сервер подобно одиночному миру."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Простая настройка"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Скопировано"
@@ -5212,9 +5128,6 @@
   },
   "settings.social.friend-requests.title": {
     "defaultMessage": "Запросы в друзья"
-  },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Скоро будет!"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Все"

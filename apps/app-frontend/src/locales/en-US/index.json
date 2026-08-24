@@ -149,29 +149,17 @@
   "app.ads-consent.title": {
     "message": "Your privacy and how ads support Modrinth"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Enable visual effects such as background blur. This may reduce performance without hardware acceleration."
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Display library instances in a compact row layout."
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Advanced rendering"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Choose the color theme used by Modrinth App."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Color theme"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Choose the page shown when Modrinth App opens."
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Compact mode"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Library"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Default landing page"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Hide your username above the player preview on the Skin selector page."
@@ -180,22 +168,16 @@
     "message": "Hide nametag"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Show recently played worlds in the \"Jump back in\" section on the Home page."
+    "message": "Show recently played worlds or instances in the \"Jump in\" section on the Home page."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Jump back into worlds"
+    "message": "Jump into worlds or instances"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimize Modrinth App when Minecraft starts."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimize app"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Use your operating system's title bar and window controls. Requires an app restart."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "System window frame"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Show how long you've played each instance."
@@ -236,6 +218,15 @@
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Startup and navigation"
   },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Use these behavior settings everywhere you're signed in. Turn this off to keep separate settings on this device."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Sign into a Modrinth account to sync settings."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Sync behavior across devices"
+  },
   "app.browse.add-servers-to-instance": {
     "message": "Adding server to instance"
   },
@@ -269,8 +260,23 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Hide already installed"
   },
+  "app.browse.project-type.data-packs": {
+    "message": "Data Packs"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Mods"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Resource Packs"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Servers"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shaders"
   },
   "app.browse.server-instance-content-warning": {
     "message": "Adding content may prevent you from joining this server. Any content you add will be removed when the managed server content is updated."
@@ -308,6 +314,30 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "This instance has been locked"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "Instance is already open"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "More options"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Never played"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "New instance"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "Drag to resize"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "Jump in"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "View instance"
+  },
   "app.hosting.update-required.description": {
     "message": "You need to update to use Modrinth Hosting through the Modrinth App"
   },
@@ -319,6 +349,48 @@
   },
   "app.hosting.update-required.title": {
     "message": "Modrinth App update required"
+  },
+  "app.icon-editor.apply-icons-modal.apply-error": {
+    "message": "Failed to apply random icons to instances."
+  },
+  "app.icon-editor.apply-icons-modal.apply-success": {
+    "message": "Randomized icon for {num, plural, one {# instance} other {# instances}}."
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "New this update"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "Close"
+  },
+  "app.icon-editor.apply-icons-modal.description": {
+    "message": "Create custom icons for your instances right in the Modrinth App. Mix and match backgrounds with symbols from Minecraft and popular mods!"
+  },
+  "app.icon-editor.apply-icons-modal.instances-without-icons": {
+    "message": "{count, plural, one {# instance doesn’t} other {# instances don’t}} have icons yet. Want us to give {count, plural, one {it} other {them}} random ones to get started?"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "Random icons"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "Skip"
+  },
+  "app.icon-editor.apply-icons-modal.title": {
+    "message": "Custom icon editor"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "Close"
+  },
+  "app.icon-editor.notification.description": {
+    "message": "Personalize your instances!"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "Dismiss"
+  },
+  "app.icon-editor.notification.title": {
+    "message": "New icon editor"
+  },
+  "app.icon-editor.notification.view-update": {
+    "message": "View update"
   },
   "app.install.phase.downloading_content": {
     "message": "Downloading content"
@@ -374,6 +446,45 @@
   "app.install.phase.running_loader_processors": {
     "message": "Running loader processors"
   },
+  "app.instance.action.add-content": {
+    "message": "Add content"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Copy path"
+  },
+  "app.instance.action.edit": {
+    "message": "Edit"
+  },
+  "app.instance.action.open-folder": {
+    "message": "Open folder"
+  },
+  "app.instance.action.play": {
+    "message": "Play"
+  },
+  "app.instance.action.stop": {
+    "message": "Stop"
+  },
+  "app.instance.add-server.add": {
+    "message": "Add"
+  },
+  "app.instance.add-server.added": {
+    "message": "Added"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Adding..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Cancel"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "This server may not be compatible with all instances."
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "Search for an instance"
+  },
+  "app.instance.add-server.title": {
+    "message": "Add server to instance"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Added"
   },
@@ -404,17 +515,53 @@
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Reviewing..."
   },
+  "app.instance.card.icon-alt": {
+    "message": "Instance icon"
+  },
+  "app.instance.card.installing": {
+    "message": "Installing..."
+  },
+  "app.instance.card.loading": {
+    "message": "Instance is loading..."
+  },
+  "app.instance.card.never-played": {
+    "message": "Never played"
+  },
+  "app.instance.card.play": {
+    "message": "Play"
+  },
+  "app.instance.card.played": {
+    "message": "Played {relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "Repair"
+  },
+  "app.instance.card.stop": {
+    "message": "Stop"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "This action cannot be undone"
   },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "All data for these {count} instances will be permanently deleted, including their worlds, configs, and all installed content."
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "Delete {count} instances"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "Delete {count} instances"
+  },
   "app.instance.confirm-delete.delete-button": {
     "message": "Delete instance"
   },
   "app.instance.confirm-delete.header": {
     "message": "Delete instance"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {Instance} other {Instances ({count})}}"
   },
   "app.instance.content.managed-content.modpack-header": {
     "message": "Modpack content"
@@ -469,6 +616,9 @@
   },
   "app.instance.mods.unfreeze-content": {
     "message": "Unfreeze version"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "Back to instance"
   },
   "app.instance.share.empty.description": {
     "message": "You can share this instance with your friends!"
@@ -581,6 +731,27 @@
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "You are using the wrong Modrinth account"
   },
+  "app.instance.shortcut.created": {
+    "message": "Shortcut created"
+  },
+  "app.instance.shortcut.creation-error": {
+    "message": "Error creating shortcut"
+  },
+  "app.instance.tab.content": {
+    "message": "Content"
+  },
+  "app.instance.tab.files": {
+    "message": "Files"
+  },
+  "app.instance.tab.logs": {
+    "message": "Logs"
+  },
+  "app.instance.tab.share": {
+    "message": "Share"
+  },
+  "app.instance.tab.worlds": {
+    "message": "Worlds"
+  },
   "app.instance.worlds.add-server": {
     "message": "Add server"
   },
@@ -679,6 +850,258 @@
   },
   "app.java-selector.test-installation": {
     "message": "Test Java installation"
+  },
+  "app.library.context-menu.create-instance": {
+    "message": "New instance"
+  },
+  "app.library.filter.add": {
+    "message": "Add filter"
+  },
+  "app.library.filter.clear": {
+    "message": "Clear filters"
+  },
+  "app.library.filter.game-version": {
+    "message": "Game version"
+  },
+  "app.library.filter.instance-type": {
+    "message": "Instance type"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "Custom"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "Modpack"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "Server"
+  },
+  "app.library.filter.label": {
+    "message": "Filter by"
+  },
+  "app.library.filter.loader": {
+    "message": "Loader"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "Custom group"
+  },
+  "app.library.group-by.game-version": {
+    "message": "Game version"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "Instance type"
+  },
+  "app.library.group-by.label": {
+    "message": "Group by"
+  },
+  "app.library.group-by.loader": {
+    "message": "Loader"
+  },
+  "app.library.group-by.none": {
+    "message": "No grouping"
+  },
+  "app.library.group.collapse": {
+    "message": "Collapse group"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "Add to group"
+  },
+  "app.library.group.create": {
+    "message": "Create group"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Cancel"
+  },
+  "app.library.group.delete": {
+    "message": "Delete group"
+  },
+  "app.library.group.delete-description": {
+    "message": "Instances in this group will be ungrouped."
+  },
+  "app.library.group.edit-name": {
+    "message": "Edit group name"
+  },
+  "app.library.group.empty": {
+    "message": "Drag and drop to add instances."
+  },
+  "app.library.group.expand": {
+    "message": "Expand group"
+  },
+  "app.library.group.favorites": {
+    "message": "Favorites"
+  },
+  "app.library.group.instance.add": {
+    "message": "Add"
+  },
+  "app.library.group.instance.added": {
+    "message": "Added"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Add"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Added"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "No instances found"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "Search instance"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "Add instances to \"{groupName}\""
+  },
+  "app.library.group.move-down": {
+    "message": "Move group down"
+  },
+  "app.library.group.move-up": {
+    "message": "Move group up"
+  },
+  "app.library.group.name": {
+    "message": "Group name"
+  },
+  "app.library.group.name-empty": {
+    "message": "Group names cannot be empty."
+  },
+  "app.library.group.name-placeholder": {
+    "message": "Enter group name"
+  },
+  "app.library.group.name-reserved": {
+    "message": "\"None\" is reserved and cannot be used as a group name."
+  },
+  "app.library.group.name-too-long": {
+    "message": "Group names cannot be longer than {maxLength} characters."
+  },
+  "app.library.group.new": {
+    "message": "New group"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "No instances found"
+  },
+  "app.library.group.rename-failed": {
+    "message": "Unable to rename group"
+  },
+  "app.library.group.search-instance": {
+    "message": "Search instance"
+  },
+  "app.library.group.ungrouped": {
+    "message": "Ungrouped"
+  },
+  "app.library.group.unknown": {
+    "message": "Unknown group"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "Add content"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "Add to favorites"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "Copy path"
+  },
+  "app.library.instance.action.delete": {
+    "message": "Delete"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "Duplicate instance"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "Open folder"
+  },
+  "app.library.instance.action.play": {
+    "message": "Play"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "Remove from favorites"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "Remove from group"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Stop"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "View instance"
+  },
+  "app.library.instance.deselect": {
+    "message": "Deselect instance"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "Deselect {name}"
+  },
+  "app.library.instance.installing": {
+    "message": "Installing..."
+  },
+  "app.library.instance.loading": {
+    "message": "Instance is loading..."
+  },
+  "app.library.instance.new": {
+    "message": "New instance"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "Open {name}"
+  },
+  "app.library.instance.play": {
+    "message": "Play"
+  },
+  "app.library.instance.repair": {
+    "message": "Repair"
+  },
+  "app.library.instance.select": {
+    "message": "Select instance"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "Select {name}"
+  },
+  "app.library.instance.stop": {
+    "message": "Stop"
+  },
+  "app.library.search.no-results.title": {
+    "message": "No instances match your search."
+  },
+  "app.library.search.placeholder": {
+    "message": "Search"
+  },
+  "app.library.selection.aria-label": {
+    "message": "Selected instances"
+  },
+  "app.library.selection.deleting": {
+    "message": "Deleting selected instances"
+  },
+  "app.library.selection.new-group": {
+    "message": "New group"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "Remove from group"
+  },
+  "app.library.selection.selected-count": {
+    "message": "{count} selected"
+  },
+  "app.library.sort.date-created": {
+    "message": "Date created"
+  },
+  "app.library.sort.date-modified": {
+    "message": "Date modified"
+  },
+  "app.library.sort.game-version": {
+    "message": "Game version"
+  },
+  "app.library.sort.hours-played": {
+    "message": "Hours played"
+  },
+  "app.library.sort.label": {
+    "message": "Sort by"
+  },
+  "app.library.sort.last-played": {
+    "message": "Last played"
+  },
+  "app.library.sort.loader": {
+    "message": "Loader"
+  },
+  "app.library.sort.name": {
+    "message": "Name"
+  },
+  "app.library.title": {
+    "message": "Library"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Additional context"
@@ -800,9 +1223,6 @@
   "app.nav.home": {
     "message": "Home"
   },
-  "app.nav.library": {
-    "message": "Library"
-  },
   "app.nav.modrinth-account": {
     "message": "Modrinth account"
   },
@@ -818,11 +1238,32 @@
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
   },
+  "app.navigation.go-back": {
+    "message": "Go back"
+  },
+  "app.navigation.go-forward": {
+    "message": "Go forward"
+  },
+  "app.navigation.home": {
+    "message": "Home"
+  },
+  "app.navigation.more-options": {
+    "message": "More options"
+  },
+  "app.navigation.next-image": {
+    "message": "Next image"
+  },
   "app.news.title": {
     "message": "News"
   },
   "app.news.view-all": {
     "message": "View all news"
+  },
+  "app.notification.warning": {
+    "message": "Warning"
+  },
+  "app.project.coming-soon": {
+    "message": "Coming soon"
   },
   "app.project.install-button.already-installed": {
     "message": "This project is already installed"
@@ -835,6 +1276,21 @@
   },
   "app.project.install-context.back-to-instance": {
     "message": "Back to instance"
+  },
+  "app.project.load-error": {
+    "message": "Project data could not be loaded."
+  },
+  "app.project.more-options": {
+    "message": "More options"
+  },
+  "app.project.tab.description": {
+    "message": "Description"
+  },
+  "app.project.tab.gallery": {
+    "message": "Gallery"
+  },
+  "app.project.tab.versions": {
+    "message": "Versions"
   },
   "app.project.version.all-versions": {
     "message": "All versions"
@@ -1064,6 +1520,15 @@
   "app.skins.delete-modal.title": {
     "message": "Are you sure you want to delete this skin?"
   },
+  "app.skins.demo.apply-tooltip": {
+    "message": "Sign in to apply skins."
+  },
+  "app.skins.demo.description": {
+    "message": "Sign in to your Minecraft account to save and apply skins!"
+  },
+  "app.skins.demo.title": {
+    "message": "Editing with a demo account"
+  },
   "app.skins.dropped-file-error.text": {
     "message": "Failed to read the dropped file."
   },
@@ -1096,6 +1561,9 @@
   },
   "app.skins.modal.cape-section": {
     "message": "Cape"
+  },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "Sign in to save skins."
   },
   "app.skins.modal.edit-title": {
     "message": "Editing skin"
@@ -1185,16 +1653,7 @@
     "message": "Tiny Takeover"
   },
   "app.skins.sign-in.button": {
-    "message": "Sign In"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Please sign into your Minecraft account to use the skin management features of the Modrinth app."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Excited Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Please sign in"
+    "message": "Sign in to Microsoft"
   },
   "app.skins.title": {
     "message": "Skin selector"
@@ -1250,8 +1709,29 @@
   "app.update.complete-toast.title": {
     "message": "Version {version} was successfully installed!"
   },
+  "app.update.download-error.missing-version": {
+    "message": "Failed to download update: no version available"
+  },
   "app.user.project.install-to-instance": {
     "message": "Install to instance"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "Create an instance"
+  },
+  "app.welcome-screen.description": {
+    "message": "Ready to start playing?"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "Import from launcher"
+  },
+  "app.welcome-screen.import-prompt": {
+    "message": "Escaping another launcher?"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "Press <shortcut>N</shortcut> to quick create an instance"
+  },
+  "app.welcome-screen.title": {
+    "message": "Welcome to Modrinth"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -1478,6 +1958,219 @@
   "instance.files.save-as": {
     "message": "Save as..."
   },
+  "instance.icon-editor.background": {
+    "message": "Background"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "Blue"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "Dark gray"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "Dark green"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Gray"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "Green"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "Lavender"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "Light gray"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Lime"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Pink"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "Purple"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Red"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "Rose"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "Yellow"
+  },
+  "instance.icon-editor.description": {
+    "message": "Mix and match elements to create a custom icon."
+  },
+  "instance.icon-editor.recents": {
+    "message": "Recents"
+  },
+  "instance.icon-editor.save": {
+    "message": "Save icon"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "Randomize"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "Backpack"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Beacon"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Blue Shark"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Bookshelf"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Brown Bear"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Cake"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "Campfire"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "Chest"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Cogwheel"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Command Block"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Cooking Pot"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "Couch"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Crafting Table"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Wrench"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "Enchanting Table"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "Ender Chest"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "Ender Dragon"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "Engine"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "Furnace"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Globe"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "Grass Block"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "Lantern"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "Oxygen Distributor"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "Pancakes"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "Pickaxe"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "Poke Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "Redstone Block"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "Sculk Sensor"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "Skeleton"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "Skillet"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "Slime Block"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "Space Helmet"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Sticky Piston"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "Sword"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Tiny Potato"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Tire"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Modrinth Wrench"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "message": "Icon editor"
+  },
   "instance.last-played": {
     "message": "Last played"
   },
@@ -1571,6 +2264,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "Edit icon"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "Create an icon"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "Edit icon"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Remove icon"
   },
@@ -1580,17 +2279,8 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Select icon"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Library groups"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Create new group"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Library groups allow you to organize your instances into different sections in your library."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Enter group name"
+  "instance.settings.tabs.general.icon": {
+    "message": "Icon"
   },
   "instance.settings.tabs.general.name": {
     "message": "Name"
@@ -1841,8 +2531,14 @@
   "instance.worlds.incompatible_server": {
     "message": "Server is incompatible"
   },
+  "instance.worlds.instance-locked": {
+    "message": "This instance has been locked"
+  },
   "instance.worlds.linked_server": {
     "message": "Managed by server project"
+  },
+  "instance.worlds.more-options": {
+    "message": "More options"
   },
   "instance.worlds.no_contact": {
     "message": "Server couldn't be contacted"
@@ -1855,6 +2551,12 @@
   },
   "instance.worlds.play_instance": {
     "message": "Play instance"
+  },
+  "instance.worlds.shortcut-created": {
+    "message": "Shortcut created"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "Failed to create shortcut"
   },
   "instance.worlds.view_instance": {
     "message": "View instance"
@@ -1933,6 +2635,18 @@
   },
   "modal.modrinth-account-required.waiting-for-browser": {
     "message": "Waiting for browser confirmation..."
+  },
+  "onboarding-checklist.create-instance": {
+    "message": "Create first instance"
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "Sign in to Minecraft"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "Sign in to Modrinth"
+  },
+  "onboarding-checklist.title": {
+    "message": "Getting started"
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"

@@ -3458,6 +3458,12 @@
   "project.actions.back-to-project-page": {
     "message": "Back to project page"
   },
+  "project.actions.check-modpack-archives": {
+    "message": "Check modpack unzip"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "Checking..."
+  },
   "project.actions.create-server": {
     "message": "Create a server"
   },
@@ -3487,6 +3493,15 @@
   },
   "project.actions.servers-promo.title": {
     "message": "Create a server"
+  },
+  "project.actions.view-dependents": {
+    "message": "View dependents"
+  },
+  "project.actions.view-modpacks": {
+    "message": "View modpacks"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "View {projectType} dependents"
   },
   "project.ai-image-warning-modal.body.1": {
     "message": "Using AI-generated images to represent your project is not allowed. Attempting to work around detection may lead to your Modrinth account being suspended."
@@ -3743,8 +3758,23 @@
   "project.moderation.title": {
     "message": "Moderation"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "Importing this .mrpack might be broken."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "This modpack was published during export bug"
+  },
   "project.navigation.changelog": {
     "message": "Changelog"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "Some modpack files could not be unzipped"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "No .mrpack files were found for this project."
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {The modpack file can be unzipped.} other {All # modpack files can be unzipped.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "Your project's icon has been updated."
@@ -4301,11 +4331,20 @@
   "report.not-for.dmca.description": {
     "message": "See our <policy-link>Copyright Policy</policy-link>."
   },
+  "report.note.ai-images.1": {
+    "message": "We've just updated our rules to prohibit AI-generated images in icons, galleries, and descriptions. We're giving creators a grace period to remove AI images from their projects before we begin accepting reports for them."
+  },
+  "report.note.check-back-later": {
+    "message": "Check back later once the grace period has ended. Reports of this type are not being accepted at this time."
+  },
   "report.note.copyright.1": {
     "message": "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content."
   },
   "report.note.copyright.2": {
     "message": "If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <copyright-policy-link>Copyright Policy</copyright-policy-link>."
+  },
+  "report.note.fully-ai-generated.1": {
+    "message": "We've just updated our rules to prohibit fully AI-generated projects. We're giving creators a grace period to update or take down fully AI-generated projects before we begin accepting reports for them."
   },
   "report.note.malicious.1": {
     "message": "Reports for malicious or deceptive content must include substantial evidence of the behavior, such as code samples."
@@ -4315,9 +4354,6 @@
   },
   "report.note.missing-disclosure.1": {
     "message": "Content disclosures are a new feature we've just added. We're giving creators a grace period to get their disclosures up-to-date before we begin accepting reports for missing or incorrect disclosures."
-  },
-  "report.note.missing-disclosure.2": {
-    "message": "Check back later once the grace period has ended. Reports of this type are not being accepted at this time."
   },
   "report.please-report": {
     "message": "Please report:"
@@ -5255,95 +5291,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Developer mode</strong> is active. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode."
   },
-  "settings.display.flags.description": {
-    "message": "Enable or disable certain features on this device."
-  },
-  "settings.display.flags.title": {
-    "message": "Toggle features"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Developer mode has been disabled"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Developer mode deactivated"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Data Packs page"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Select your preferred layout for each page that displays project lists on this device."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods page"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Gallery"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Grid"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Rows"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modpacks page"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins page"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Resource Packs page"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Servers page"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shaders page"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Project list layouts"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "User profile pages"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Collection"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Advanced rendering"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Open external links in new tab"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Hides the \"Get Modrinth App\" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Hide Modrinth App promotions"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Left-aligned sidebar on content pages"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Aligns the sidebar to the left of the page's content."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Aligns the filters sidebar to the right of the search results."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Right-aligned filters sidebar on search pages"
-  },
-  "settings.display.theme.description": {
-    "message": "Select your preferred color theme for Modrinth on this device."
-  },
-  "settings.display.theme.title": {
-    "message": "Color theme"
   },
   "settings.head-title": {
     "message": "Display settings"

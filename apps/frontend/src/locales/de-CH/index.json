@@ -5012,95 +5012,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Entwicklermodus</strong> ist aktiviert. Dies erlaubt es dir, die internen IDs von verschiedensten Dingen in Modrinth anzusehen, welche eventuell von nutzen sein können, wenn du ein Entwickler bist, welcher die Modrinth API verwendet. Klicke 5 mal auf das Modrinth Logo am unteren Ender der Seite um den Entwicklermodus umzuschalten."
   },
-  "settings.display.flags.description": {
-    "message": "Aktiviere oder deaktiviere bestimmte Funktionen auf diesem Gerät."
-  },
-  "settings.display.flags.title": {
-    "message": "Funktionen umschalten"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Entwicklermodus wurde deaktiviert"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Entwicklermodus deaktiviert"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Datenpakete-Seite"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Wähle dein bevorzugtes Layout für jede Seite, welches Projektlisten auf diesem Gerät anzeigt."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods-Seite"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galerie"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Raster"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Zeilen"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modpakete-Seite"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins-Seite"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Ressourcenpakete-Seite"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Server-Seite"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shader-Seite"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Projeklisten-Layouts"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Benutzerprofilseiten"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Kollektionen"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Aktiviert erweiterte Renderfunktionen wie Unschärfeeffekte, welche ohne hardwarebeschleunigtes Rendering zu Leistungsproblemen führen kann."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Erweiterte Renderfunktionen"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Lasse Links, welche ausserhalb von Modrinth führen, in einem neuen Tab öffnen. Unabhängig von dieser Einstellung werden Links auf die gleiche Domain und in Markdown beschreibungen im selben Tab geöffnet, und Links in Werbung Bearbeitungsseiten öffnen in einem neuen Tab."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Öffne externe Links in neuem Tab"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Versteckt die \"Modrinth App herunterladen\" Schaltfläche von der Hauptnavigation. Die Modrinth App Seite kann immer noch auf der Startseite oder in der Fusszeile gefunden werden."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Verstecke Modrinth App Werbung"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Linksbündige Seitenleiste auf Inhaltsseiten"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Richtet die Seitenleiste links vom Seiteninhalt aus."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Richtet die Filter-Seitenleiste rechts neben den Suchergebnissen aus."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Rechtsbündige Filter-Suchleiste auf Suchseiten"
-  },
-  "settings.display.theme.description": {
-    "message": "Wähle dein bevorzugtes Farbschema für Modrinth auf diesem Gerät aus."
-  },
-  "settings.display.theme.title": {
-    "message": "Farbschema"
   },
   "settings.head-title": {
     "message": "Anzeigeeinstellungen"

@@ -19,7 +19,7 @@
 				/>
 			</div>
 
-			<div class="flex flex-col gap-4 w-full min-h-[20rem]">
+			<div class="flex flex-col gap-4 w-full min-h-[20rem] min-w-52">
 				<section v-if="mode === 'edit' && canEditTextureAndModel">
 					<h2 class="text-base font-semibold mb-2">{{ formatMessage(messages.textureSection) }}</h2>
 					<Button @click="openTextureFileBrowser">
@@ -38,7 +38,7 @@
 					<h2 class="text-base font-semibold mb-2">
 						{{ formatMessage(messages.armStyleSection) }}
 					</h2>
-					<RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']">
+					<RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']" class="!flex-row flex-wrap">
 						<template #default="{ item }">
 							{{
 								formatMessage(item === 'CLASSIC' ? messages.wideArmStyle : messages.slimArmStyle)
@@ -218,6 +218,10 @@ const messages = defineMessages({
 		id: 'app.skins.modal.make-edit-first-tooltip',
 		defaultMessage: 'Make an edit to the skin first!',
 	},
+	demoSaveTooltip: {
+		id: 'app.skins.modal.demo-save-tooltip',
+		defaultMessage: 'Sign in to save skins.',
+	},
 	addSkinButton: {
 		id: 'app.skins.modal.add-skin-button',
 		defaultMessage: 'Add skin',
@@ -244,7 +248,7 @@ const previewSkin = ref<string>('')
 
 const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
-const props = defineProps<{ capes?: Cape[] }>()
+const props = defineProps<{ capes?: Cape[]; demo?: boolean }>()
 
 const selectedCapeTexture = computed(() => selectedCape.value?.texture)
 const canEditTextureAndModel = computed(() => currentSkin.value?.source !== 'default')
@@ -322,12 +326,14 @@ const hasEdits = computed(() => {
 
 const disableSave = computed(
 	() =>
+		props.demo ||
 		(mode.value === 'new' && !uploadedTextureUrl.value) ||
 		(mode.value === 'edit' && !hasEdits.value),
 )
 
 const saveTooltip = computed(() => {
 	if (isSaving.value) return formatMessage(messages.savingTooltip)
+	if (props.demo) return formatMessage(messages.demoSaveTooltip)
 	if (mode.value === 'new' && !uploadedTextureUrl.value) {
 		return formatMessage(messages.uploadSkinFirstTooltip)
 	}
@@ -426,6 +432,8 @@ async function onTextureFileInputChange(e: Event) {
 }
 
 async function save() {
+	if (props.demo) return
+
 	isSaving.value = true
 
 	try {

@@ -608,9 +608,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Tìm phiên bản Game..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Xóa biểu tượng"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Chọn biểu tượng"
   },
@@ -773,24 +770,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Xóa hết"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Duyệt modpack"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Thêm modpack"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Biết modpack bạn định cài là gì rồi?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Không tìm thấy"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Tìm modpack"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Cấu hình là một bản cài Minecraft với mod, phiên bản và loader của riêng nó."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Cài từ đầu bằng cách lựa chọn mod loader và phiên bản game."
   },
@@ -823,9 +802,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Chọn loại thế giới"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Chọn modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Tạo cấu hình"
@@ -1688,14 +1664,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Không tìm thấy phiên chơi tương thích"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Xoá biểu tượng"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Tìm phiên chơi"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Chọn biểu tượng"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Hiện tại"
@@ -3881,62 +3851,17 @@
   "servers.busy.installing": {
     "defaultMessage": "Đang cài máy chủ"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Đang đồng bộ nội dung"
-  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Tải thất bại"
-  },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Đã xảy ra lỗi nội bộ trong quá trình cài đặt nền tảng. Thử lại."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Không thể tải loader hoặc phiên bản Minecraft đã chọn. Nó có thể không phù hợp hoặc không được hỗ trợ."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Modpack này không thể tải được. Nó có thể bị hỏng hoặc không tương thích."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Phiên bản modpack này không chứa tệp có thể tải xuống. Nó có thể không được làm đúng cách."
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Có lỗi lạ xảy ra trong khi tải."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Phiên bản minecraft hoặc loader hiện không được hỗ trợ bởi Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Đang cài addon..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Đang cài modpack..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Đang cài platform..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Chúng tôi đang sửa máy chủ của bạn"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Đang thêm Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Đang chỉnh sửa máy chủ..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Đang tải mod..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Đang sắp sếp tệp..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Đang thiết lập môi trường..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Đã có máy chủ rồi?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Tìm hiểu thêm về Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -3946,9 +3871,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Cài mod, mời bạn bè, và chơi cùng nhau mà chỉ cần Ứng dụng Modrinth."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Không máy chủ khả dụng"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Chọn bản mod mà bạn yêu thích và chúng tôi sẽ làm tất cả phần còn lại."
@@ -3964,12 +3886,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Đăng nhập"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Thiết lập máy chủ giống như thế giới chơi đơn."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Thiết lập đơn giản"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Đã sao chép"

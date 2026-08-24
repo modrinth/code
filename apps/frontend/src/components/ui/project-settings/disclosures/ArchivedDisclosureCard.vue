@@ -5,7 +5,7 @@ import {
 	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -68,10 +68,9 @@ const messages = defineMessages({
 				title-for="archived-disclosure-note"
 				optional
 			>
-				<StyledInput
+				<Textarea
 					id="archived-disclosure-note"
 					v-model="model.note"
-					multiline
 					:rows="3"
 					class="max-w-[40rem]"
 					:disabled="disabled"

@@ -15,47 +15,57 @@
 			<div class="flex min-w-0 flex-1 flex-col gap-2.5">
 				<div class="flex w-full items-start gap-1">
 					<p class="m-0 min-w-0 flex-1 break-words text-lg font-normal leading-6 text-contrast/85">
-						<template v-if="type === 'friend-request'">
-							<span class="font-semibold text-contrast">{{ actorLabel }}</span>
-							<span> sent you a friend request.</span>
-						</template>
-						<template v-else>
-							<button
-								v-if="actorName"
-								type="button"
-								class="m-0 inline border-0 bg-transparent p-0 text-lg font-semibold leading-6 text-contrast hover:underline"
-								@click="$emit('open-actor')"
-							>
-								{{ actorName }}
-							</button>
-							<span v-else class="font-semibold text-contrast">Someone</span>
-							<span class="mx-1">{{ inviteActionText }}</span>
-							<template v-if="type === 'server-invite'">
-								<span class="font-semibold text-contrast">{{ entityLabel }}</span
-								>.
+						<IntlFormatted
+							:message-id="
+								type === 'friend-request'
+									? messages.friendRequest
+									: type === 'server-invite'
+										? messages.serverInvite
+										: messages.instanceInvite
+							"
+							:values="{ actor: actorLabel, entity: entityLabel }"
+						>
+							<template #actor="{ children }">
+								<button
+									v-if="actorName && type !== 'friend-request'"
+									type="button"
+									class="m-0 inline border-0 bg-transparent p-0 text-lg font-semibold leading-6 text-contrast hover:underline"
+									@click="$emit('open-actor')"
+								>
+									<component :is="() => children" />
+								</button>
+								<span v-else class="font-semibold text-contrast">
+									<component :is="() => children" />
+								</span>
 							</template>
-							<template v-else>
-								<Avatar
-									:src="entityIconUrl"
-									:alt="entityLabel"
-									:tint-by="entityLabel"
-									size="28px"
-									no-shadow
-									raised
-									class="inline-block !rounded-lg align-middle"
-								/>
-								<span class="ml-1 font-semibold text-contrast">{{ entityLabel }}</span>
-								<span> instance.</span>
+							<template #entity="{ children }">
+								<template v-if="type === 'instance-invite'">
+									<Avatar
+										:src="entityIconUrl"
+										:alt="entityLabel"
+										:tint-by="entityLabel"
+										size="28px"
+										no-shadow
+										raised
+										class="inline-block !rounded-lg align-middle"
+									/>
+								</template>
+								<span
+									:class="{ 'ml-1': type === 'instance-invite' }"
+									class="font-semibold text-contrast"
+								>
+									<component :is="() => children" />
+								</span>
 							</template>
-						</template>
+						</IntlFormatted>
 					</p>
 					<IconButton
 						v-if="dismissible"
 						type="quiet"
-						size="xs"
-						label="Dismiss notification"
+						size="sm"
+						:label="formatMessage(messages.dismissNotification)"
 						native-type="button"
-						class="notification-toast-dismiss !size-6"
+						class="notification-toast-dismiss -m-1.5"
 						@click="$emit('dismiss')"
 					>
 						<XIcon />
@@ -70,11 +80,11 @@
 					>
 						<SpinnerIcon v-if="actionLoading === 'accept'" class="animate-spin" />
 						<CheckIcon v-else />
-						Accept
+						{{ formatMessage(messages.accept) }}
 					</Button>
 					<Button type="outlined" :disabled="actionLoading != null" @click="$emit('decline')">
 						<XIcon />
-						Decline
+						{{ formatMessage(messages.decline) }}
 					</Button>
 				</div>
 			</div>
@@ -101,10 +111,10 @@
 					<IconButton
 						v-if="dismissible"
 						type="quiet"
-						size="xs"
-						label="Dismiss notification"
+						size="sm"
+						:label="formatMessage(messages.dismissNotification)"
 						native-type="button"
-						class="notification-toast-dismiss !size-6"
+						class="notification-toast-dismiss -m-1.5"
 						@click="$emit('dismiss')"
 					>
 						<XIcon />
@@ -133,8 +143,12 @@
 					class="col-start-1 col-end-3 row-start-3 mt-2 flex min-w-0 items-center justify-between gap-2"
 				>
 					<div class="flex min-w-0 items-center gap-2">
-						<Button type="colored" color="brand" @click="$emit('launch')">Launch game</Button>
-						<Button type="outlined" @click="$emit('open-instance')">Instance</Button>
+						<Button type="colored" color="brand" @click="$emit('launch')">
+							{{ formatMessage(messages.launchGame) }}
+						</Button>
+						<Button type="outlined" @click="$emit('open-instance')">
+							{{ formatMessage(messages.instance) }}
+						</Button>
 					</div>
 					<div v-if="progressLabel" class="notification-inline-progress-label flex-none">
 						{{ progressLabel }}
@@ -147,20 +161,8 @@
 					<Button
 						v-for="(action, index) in actions"
 						:key="index"
-						:type="
-							(action.color || (index === 0 ? 'brand' : undefined)) &&
-							(action.color || (index === 0 ? 'brand' : undefined)) !== 'standard'
-								? 'colored'
-								: 'base'
-						"
-						:color="
-							(action.color || (index === 0 ? 'brand' : undefined)) &&
-							(action.color || (index === 0 ? 'brand' : undefined)) !== 'standard'
-								? (action.color || (index === 0 ? 'brand' : undefined)) === 'medal-promo'
-									? 'medal_promotion'
-									: action.color || (index === 0 ? 'brand' : undefined)
-								: undefined
-						"
+						:type="notificationButtonColor(action, index) ? 'colored' : 'base'"
+						:color="notificationButtonColor(action, index)"
 						@click="$emit('action', index)"
 					>
 						<component :is="action.icon" v-if="action.icon" />
@@ -193,12 +195,44 @@
 import { CheckIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { Button, IconButton } from '#ui/components/base/buttons'
+import { Button, type ButtonColor, IconButton } from '#ui/components/base/buttons'
 
 import { useFormatBytes, useFormatNumber } from '../../composables'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { PopupNotificationButton, PopupNotificationProgressType } from '../../providers'
 import { truncatedTooltip } from '../../utils/truncate'
 import Avatar from '../base/Avatar.vue'
+import IntlFormatted from '../base/IntlFormatted.vue'
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	friendRequest: {
+		id: 'notifications.friend-request.body',
+		defaultMessage: '<actor>{actor}</actor> sent you a friend request.',
+	},
+	serverInvite: {
+		id: 'notifications.server-invite.body',
+		defaultMessage:
+			'<actor>{actor}</actor> invited you to manage the server <entity>{entity}</entity>.',
+	},
+	instanceInvite: {
+		id: 'notifications.instance-invite.body',
+		defaultMessage: '<actor>{actor}</actor> invited you to <entity>{entity}</entity> instance.',
+	},
+	dismissNotification: {
+		id: 'notifications.dismiss',
+		defaultMessage: 'Dismiss notification',
+	},
+	accept: { id: 'notifications.invite.accept', defaultMessage: 'Accept' },
+	decline: { id: 'notifications.invite.decline', defaultMessage: 'Decline' },
+	launchGame: { id: 'notifications.instance-ready.launch-game', defaultMessage: 'Launch game' },
+	instance: { id: 'notifications.instance-ready.open-instance', defaultMessage: 'Instance' },
+	someone: { id: 'notifications.actor.unknown', defaultMessage: 'Someone' },
+	installedReady: {
+		id: 'notifications.instance-ready.status',
+		defaultMessage: 'Installed and ready to play.',
+	},
+})
 
 type NotificationToastType =
 	| 'friend-request'
@@ -258,7 +292,15 @@ const isInviteNotification = computed(
 		props.type === 'instance-invite',
 )
 
-const actorLabel = computed(() => props.actorName || 'Someone')
+function notificationButtonColor(
+	button: PopupNotificationButton,
+	index: number,
+): ButtonColor | undefined {
+	const color = button.color ?? (index === 0 ? 'brand' : undefined)
+	return color === 'standard' ? undefined : color
+}
+
+const actorLabel = computed(() => props.actorName || formatMessage(messages.someone))
 const entityLabel = computed(() => props.entityName || '')
 const inviteAvatarUrl = computed(() => props.actorAvatarUrl)
 const inviteAvatarLabel = computed(() => actorLabel.value)
@@ -269,17 +311,9 @@ const isWaitingProgress = computed(() => props.type === 'instance-download' && p
 const formatBytes = useFormatBytes()
 const formatNumber = useFormatNumber()
 
-const inviteActionText = computed(() => {
-	if (props.type === 'server-invite') {
-		return 'invited you to manage the server'
-	}
-
-	return 'invited you to'
-})
-
 const resolvedStatusText = computed(() => {
 	if (props.type === 'instance-ready') {
-		return props.statusText ?? 'Installed and ready to play.'
+		return props.statusText ?? formatMessage(messages.installedReady)
 	}
 
 	return props.statusText ?? ''

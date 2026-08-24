@@ -707,9 +707,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Spelversie zoeken..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Pictogram verwijderen"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Pictogram selecteren"
   },
@@ -872,24 +869,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Alles wissen"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Modpacks bekijken"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Modpack importeren"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Weet je al welk modpack je wilt installeren?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Geen resultaten gevonden"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Modpack zoeken"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Een instantie is een Minecraft-installatie met een specifieke loader, versie en mods."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Begin helemaal opnieuw door een loader en een spelversie te kiezen."
   },
@@ -922,9 +901,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Wereldtype selecteren"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modpack kiezen"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Instantie aanmaken"
@@ -2054,14 +2030,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Er zijn geen compatibele instanties gevonden"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Pictogram verwijderen"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Zoek instantie"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selecteer pictogram"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"
@@ -4550,9 +4520,6 @@
   "servers.busy.installing": {
     "defaultMessage": "De server wordt geïnstalleerd"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Inhoud wordt gesynchroniseerd"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Ook een vriendschapsverzoek sturen"
   },
@@ -4607,56 +4574,14 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installeren is mislukt"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Er is een interne fout opgetreden tijdens het installeren van het platform. Probeer het nog eens."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "De opgegeven loader of Minecraft-versie kon niet worden geïnstalleerd. Deze is mogelijk ongeldig of wordt niet ondersteund."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Het modpack kon niet worden geïnstalleerd. Het is mogelijk beschadigd of niet compatibel."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Deze versie van het modpack bevat geen downloadbaar bestand. Mogelijk is het pakket niet correct samengesteld."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Tijdens de installatie is er een onverwachte fout opgetreden."
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Deze versie van Minecraft of loader wordt nog niet ondersteund door Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Add-ons aan het installeren..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Modpack aan het installeren..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Platform aan het installeren..."
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "We zijn je server aan het klaarmaken"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java toevoegen..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Server wordt geconfigureerd..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Mods worden gedownload..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Bestanden worden geordend..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Omgeving wordt opgezet..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Heb je al een server?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Meer informatie over Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4666,9 +4591,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installeer mods, nodig vrienden uit en speel samen – allemaal via de Modrinth app."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Nog geen servers"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Kies je favoriete mods en wij regelen de rest."
@@ -4684,12 +4606,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Inloggen"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Stel je server in net zoals een eigen wereld."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Eenvoudige set-up"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Gekopieerd"
@@ -5290,9 +5206,6 @@
   },
   "settings.social.friend-requests.title": {
     "defaultMessage": "Vriendschapsverzoeken"
-  },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Binnenkort beschikbaar!"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Iedereen"

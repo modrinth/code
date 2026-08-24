@@ -2,8 +2,8 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
-    CreateInstance, EditInstance, InstanceLink, InstanceMetadata, ModLoader,
-    State,
+    CreateInstance, EditInstance, InstanceIconConfig, InstanceLink,
+    InstanceMetadata, ModLoader, State,
 };
 
 #[tracing::instrument]
@@ -14,9 +14,13 @@ pub(crate) async fn create(
     modloader: ModLoader,
     loader_version: Option<String>,
     icon_path: Option<String>,
+    icon_config: Option<InstanceIconConfig>,
     link: InstanceLink,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
+    if let Some(icon_config) = &icon_config {
+        super::icon::validate_generated_icon_config(icon_config)?;
+    }
     let instance = crate::state::create_instance(
         CreateInstance {
             name,
@@ -25,6 +29,7 @@ pub(crate) async fn create(
             loader: modloader,
             loader_version,
             icon_path,
+            icon_config,
             link,
         },
         &state,
@@ -47,6 +52,12 @@ pub(crate) async fn create(
 
     if result.is_err() {
         let _ = crate::state::remove_instance(&instance.id, &state).await;
+    } else if let Err(error) =
+        crate::onboarding_checklist::mark_created_instance().await
+    {
+        tracing::warn!(
+            "Failed to mark instance creation in onboarding checklist: {error}"
+        );
     }
 
     result

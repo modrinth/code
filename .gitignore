@@ -55,6 +55,7 @@ Thumbs.db
 
 # frontend generated files
 apps/frontend/src/generated
+/packages/ui/src/layouts/wrapped/settings/language-settings/language-settings-coverage.generated.ts
 
 .turbo
 target

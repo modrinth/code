@@ -123,7 +123,10 @@ const showClearButton = computed(
 	() => props.clearable && hasValue.value && !props.disabled && !props.readonly,
 )
 
-defineExpose({ focus: () => inputRef.value?.focus() })
+defineExpose({
+	focus: () => inputRef.value?.focus(),
+	select: () => inputRef.value?.select(),
+})
 
 function controlAttrs() {
 	const { class: _class, style: _style, ...rest } = attrs

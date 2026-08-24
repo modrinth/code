@@ -701,9 +701,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Sök spelversion..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Ta bort ikon"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Välj ikon"
   },
@@ -824,24 +821,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Töm allt"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Bläddra bland modpaket"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importera modpaket"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Vet du redan modpaketet du vill installera?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Inga resultat hittades"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Sök efter modpaket"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "En instans är ett Minecraft-upplägg med en specifik laddare, version och moddar."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "Anpassat upplägg"
   },
@@ -871,9 +850,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Välj världstyp"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Välj modpaket"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Skapa instans"
@@ -1778,14 +1754,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Inga kompatibla instanser hittades"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Radera ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Sök för instans"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Välj ikon"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
@@ -4145,41 +4115,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installering misslyckades"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Ett internt fel inträffade när plattformen installerades. Vänligen försök igen."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Den angivna loader eller Minecraft-versionen kunde inte installeras. Den kan vara ogiltig eller stöds inte."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Modpaketet kunde inte installeras. Det kanske är korrumperad eller inkompatibel."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Ett oväntat fel inträffade under installeringen."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Denna version av Minecraft eller loader stöds ännu inte av Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Installerar tillägg..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Vi förbereder din server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Lägger till Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurerar server..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Laddar ner moddar..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organiserar filer..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Ställer in miljö..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du redan en server?"
@@ -4189,9 +4129,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installera moddar, bjud in vänner och spela tillsammans, allt från Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Inga servrar än"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Välj dina favorit moddar så hanterar vi resten."
@@ -4702,9 +4639,6 @@
   },
   "settings.social.friend-requests.title": {
     "defaultMessage": "Vänförfrågningar"
-  },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Kommer snart!"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Alla"

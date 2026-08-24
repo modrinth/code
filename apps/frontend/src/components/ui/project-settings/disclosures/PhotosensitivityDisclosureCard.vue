@@ -4,7 +4,7 @@ import {
 	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -53,10 +53,9 @@ const messages = defineMessages({
 				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="photosensitivity-disclosure-note"
 			>
-				<StyledInput
+				<Textarea
 					id="photosensitivity-disclosure-note"
 					v-model="model.note"
-					multiline
 					:rows="3"
 					class="max-w-[40rem]"
 					:disabled="disabled"

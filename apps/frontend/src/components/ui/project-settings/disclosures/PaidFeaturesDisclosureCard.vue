@@ -5,8 +5,8 @@ import {
 	commonMessages,
 	defineMessages,
 	IconButton,
+	Input,
 	SettingsFormGroup,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
@@ -75,7 +75,7 @@ function removeFeature(index: number) {
 		<template #expanded>
 			<SettingsFormGroup :title="formatMessage(messages.featuresDescription)">
 				<div v-for="(_, index) in model.features" :key="index" class="flex items-center gap-2">
-					<StyledInput
+					<Input
 						v-model="model.features[index]"
 						class="min-w-0 flex-1"
 						:disabled="disabled"

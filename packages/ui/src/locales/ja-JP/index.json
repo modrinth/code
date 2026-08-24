@@ -704,9 +704,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "ゲームバージョンを検索…"
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "アイコンを削除"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "アイコンを選択"
   },
@@ -869,24 +866,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "全ての選択を解除"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Modパックを探す"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Modパックをインポート"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "インストールしたいMODパックは既に決まっていますか？"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "見つかりません"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Modパックを検索"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "インスタンスとは、特定のローダー、バージョン、およびModを備えたMinecraftの起動構成のことです"
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "ローダーとゲームのバージョンを選択して、最初から始めましょう"
   },
@@ -919,9 +898,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "ワールドタイプを選択してください"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modパックを選択"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "インスタンスを作成する"
@@ -2054,14 +2030,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "互換性のあるインスタンスが見つかりませんでした"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "アイコンを削除"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "インスタンスを検索"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "アイコンを選択"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "現在"
@@ -4403,9 +4373,6 @@
   "servers.busy.installing": {
     "defaultMessage": "サーバーがインストール中です"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "コンテンツの同期処理中です"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "フレンドのリクエストも送信する"
   },
@@ -4460,56 +4427,14 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "インストールが失敗しました"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "プラットフォームのインストール中、内部エラーが発生しました。もう一度お試しください。"
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "特定のModローダーMinecraftのバージョンをインストールできませんでした。いずれかが非対応または無効である可能性があります。"
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "このModパックをインストールすることができませんでした。Modが非対応または破損している可能性があります。"
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "このModパックのバージョンには、ダウンロード可能なファイルが含まれていません。パッケージ化が正しく行われていない可能性があります。"
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "インストール中に予期せぬエラーが発生しました。"
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "このMinecraftのバージョンまたはModローダーはModrinthホスティングでまだ対応されていません。"
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "アドオンをインストールしています…"
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Modパックをインストールしています…"
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "プラットフォームをインストールしています…"
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "あなたのサーバーを準備しています"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Javaを追加しています…"
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "サーバーの設定をしています…"
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Modをダウンロードしています…"
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "ファイルを整理しています…"
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "環境を整えています…"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "既にサーバーをお持ちですか？"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Modrinth Hostingについて詳しくはこちらをご覧ください"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4519,9 +4444,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Modrinth Appを使えば、MODのインストール、友達の招待、そして一緒にプレイすることなど、すべてが可能です。"
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "サーバーはまだありません"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "お好みのModを選んだら、あとはすべて対応いたします。"
@@ -4537,12 +4459,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "サインイン"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "サーバーは、シングルプレイヤーワールドと同じように設定してください。"
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "簡単なセットアップ"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "コピーしました"
@@ -4972,9 +4888,6 @@
   },
   "settings.social.blocked-users.unblock": {
     "defaultMessage": "ブロックを解除"
-  },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "近日公開！"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "全員"

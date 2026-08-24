@@ -4139,95 +4139,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Utvecklarläge</strong> är aktiverat. Detta tillåter dig att visa interna ID:n för olika saker genom Modrinth vilket kan vara användbart om du är en utvecklare och använder Modrinths API. Klicka på Modrinth-loggan längst ned fem gånger för att aktivera utvecklarläge."
   },
-  "settings.display.flags.description": {
-    "message": "Aktivera eller inaktivera vissa funktioner på denna enhet."
-  },
-  "settings.display.flags.title": {
-    "message": "Växla funktioner"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Utvecklarläge har inaktiverats"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Utvecklarläge inaktiverat"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Sidan för datapaket"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Välj en önskad layout för varje sida som visar projektlistor på denna enhet."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Sidan för moddar"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galleri"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Rutnät"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Rader"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Sidan för modpaket"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Sidan för plugins"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Sidan för resurspaket"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Sidan för servrar"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Sidan för shaders"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Projektlistans layouter"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Användarprofil-sidor"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Samling"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Aktiverar avancerad rendering som t.ex. oskärpa vilket kan leda till prestandaproblem utan hårdvaruaccelerande rendering."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Avancerad rendering"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Får länkar som leder utanför Modrinth att öppna en ny flik. Oavsett vad denna inställning har ställts in på kommer länkar med samma domän och i Markdown-beskrivningar att öppnas i samma flik, och länkar på annonser och redigeringssidor öppnas i en ny flik."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Öppna externa länkar i en ny flik"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Döljer \"Installera Modrinth App\" knappen från primär navigering. Modrinth App-sidan kan fortfarande hittas på landningssidan eller i sidfoten."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Dölj \"Installera Modrinth App\" knapp"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Vänsterjusterad sidofält på innehållssidor"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Justerar sidofältet till vänster om sidans innehåll."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Justerar filtrets sidofält till höger om sökresultaten."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Högerjusterad sidofält på innehållssidor"
-  },
-  "settings.display.theme.description": {
-    "message": "Välj färgtema för Modrinth på denna enhet."
-  },
-  "settings.display.theme.title": {
-    "message": "Färgtema"
   },
   "settings.head-title": {
     "message": "Visningsinställningar"

@@ -11,6 +11,175 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-20T22:10:10+00:00`,
+		product: 'app',
+		version: '0.18.2',
+		body: `## Security
+- Fixed .mrpack exports replacing the original file with the primary file of a version previously detected on hash lookup.`,
+	},
+	{
+		date: `2026-08-20T21:46:49+00:00`,
+		product: 'app',
+		version: '0.18.1',
+		body: `## Added
+- Added ability to click on the ellipses in pagination controls to go to a specific page.
+- Added compact mode for instances in library.
+- Added drag handle to resize the amount of items in the "Jump in" section.
+- Added icon editing actions for instance context menu.
+- Added back sort by loader and game version.
+- Added new loader symbols for icon editor.
+- Depends on search filter, which filters all projects that depends on the project you've selected.
+- Modpack included content filter, which filters projects that includes a set of projects you've selected.
+- Enabled friend request controls in Social settings - you can now limit who can send you friend requests on Modrinth.
+- Enabled shared instance invite controls in Social settings, letting you limit who can send you shared instance invites.
+- Enabled Modrinth Hosting access invite controls in Social settings - you can now limit who can invite you to manage a Modrinth Hosting server.
+- Added a new option to sync your behaviour & appearance settings across Modrinth App sessions on multiple devices.
+- Added language coverage to the Language settings page.
+
+## Changed
+- Expanded quick instance area now that there is more vertical height in the navbar.
+- Tab bars now display with smaller text and without icons on mobile.
+
+## Fixed
+- Fixed issue where projects not installed display as installed.
+- Fixed tab bars displaying weirdly on mobile.
+- Fixed tab bar shadows being cut off.
+- Fixed tab bars showing the highlight as the wrong size or position sometimes.
+- Fixed missing signal icon and players online in "Jump in" cards.
+- Stopped applying conditional icon padding for user avatars.
+- Fixed memory leak on Discover page`,
+	},
+	{
+		date: `2026-08-20T21:46:49+00:00`,
+		product: 'web',
+		body: `## Added
+- Added ability to click on the ellipses in pagination controls to go to a specific page.
+- Depends on search filter, which filters all projects that depends on the project you've selected.
+- Modpack included content filter, which filters projects that includes a set of projects you've selected.
+- Enabled friend request controls in Social settings - you can now limit who can send you friend requests on Modrinth.
+- Enabled shared instance invite controls in Social settings, letting you limit who can send you shared instance invites.
+- Enabled Modrinth Hosting access invite controls in Social settings - you can now limit who can invite you to manage a Modrinth Hosting server.
+- Added a new option to sync your appearance settings across website sessions on multiple devices.
+- Added language coverage to the Language settings page.
+
+## Fixed
+- Fixed server projects not displaying properly in orgs and collections.
+- Fixed tab bars displaying weirdly on mobile.
+- Fixed tab bar shadows being cut off.
+- Fixed tab bars showing the highlight as the wrong size or position sometimes.
+- Stopped applying conditional icon padding for user avatars.`,
+	},
+	{
+		date: `2026-08-18T03:40:19+00:00`,
+		product: 'web',
+		body: `## Changed
+- Improved loader detection logic for Fabric derivatives when uploading versions.`,
+	},
+	{
+		date: `2026-08-18T01:11:08+00:00`,
+		product: 'app',
+		version: '0.18.0',
+		body: `## Added
+- Added new Play page, replacing the old Home and Library pages.
+- Added an icon creator so you can create icons for your instances if you don't have your own art for it.
+- Added a "Getting started" checklist to help you finish setting up the app.
+
+## Changed
+- Improved the create instance menu to make the options clearer and let you search for projects right from the menu.
+- Improved the empty states to help guide you to creating an instance.
+- Improved the sign-in pop-up for when your Minecraft account is required.
+- Skin selector can now be previewed before signing in with your Minecraft account.
+- Reintroduced the modpack icon in the content tab's managed content card.
+- Renamed "Managed content" -> "Provided content"
+
+## Fixed
+- Fixed hooks and environment variables not saving.
+- Fixed hover state on the "Reload to update" button
+- Fixed header alignment issue in the browse content page
+- Fixed instance icon being deleted after a installing a server project's shared content.
+- Fixed flickering on the content tab at specific app window widths.
+- Fixed issue where some instances when unlinking a modpack or shared instance, the newly unlinked content would not have updates checked
+- Fixed broken gallery image viewer on project pages.
+- Attempted to fix bug on macOS that prevented LAN play in some cases.`,
+	},
+	{
+		date: `2026-08-18T01:11:08+00:00`,
+		product: 'web',
+		body: `## Added
+- Added placeholder report reasons for AI images and fully AI-generated content.
+
+## Changed
+- Improved site embeds on content without icons and projects/users that cannot be found.
+
+## Fixed
+- Fixed report page failing to load when user is not logged in.`,
+	},
+	{
+		date: `2026-08-15T02:19:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed error page not working`,
+	},
+	{
+		date: `2026-08-14T18:44:06+00:00`,
+		product: 'app',
+		version: '0.17.10',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
+		date: `2026-08-14T18:44:06+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'app',
+		version: '0.17.9',
+		body: `## Fixed
+- Reverted server panel change that wasn't meant to go out yet.`,
+	},
+	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Reverted server panel change that wasn't meant to go out yet.`,
+	},
+	{
+		date: `2026-08-14T17:47:21+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project pages failing to load when user is not logged in.`,
+	},
+	{
+		date: `2026-08-14T17:04:48+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- The server panel will no longer be locked while individual content is being installed when using the Browse content button.
+- Better stability when content is being installed
+
+## Fixed
+- Fixed issue when trying to upgrade a medal server from the manage servers page.`,
+	},
+	{
+		date: `2026-08-14T17:04:48+00:00`,
+		product: 'app',
+		version: '0.17.8',
+		body: `## Fixed
+- Fixed some issues rendering Ears skins
+- Fixed mrpack exports setting the wrong environment inclusion values.
+- Fixed issue where if your instance was linked to a modpack version that has been deleted from Modrinth the Managed content card on the content tab would not show up`,
+	},
+	{
 		date: `2026-08-13T17:59:06+00:00`,
 		product: 'app',
 		version: '0.17.7',

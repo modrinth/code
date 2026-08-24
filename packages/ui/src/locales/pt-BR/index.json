@@ -707,9 +707,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Procurar versão de jogo..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Remover ícone"
-  },
   "creation-flow.modal.custom-setup.icon.select": {
     "defaultMessage": "Selecionar ícone"
   },
@@ -872,24 +869,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Limpar tudo"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Navegue pelos pacotes de mods"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importar pacote de mods"
-  },
-  "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "Já sabe qual pacote de mods deseja instalar?"
-  },
-  "creation-flow.modal.modpack.search.no-results": {
-    "defaultMessage": "Nenhum resultado encontrado"
-  },
-  "creation-flow.modal.modpack.search.placeholder": {
-    "defaultMessage": "Buscar pacotes de mods"
-  },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Uma instância é uma configuração do Minecraft com um loader, versão e mods específicos."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Comece do zero, escolhendo um loader e uma versão do jogo."
   },
@@ -922,9 +901,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Selecione o tipo de mundo"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Escolha o pacote de mods"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Criar instância"
@@ -2057,14 +2033,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nenhuma instância compatível encontrada"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Remover ícone"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Buscar instância"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selecionar ícone"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Atual"
@@ -4559,9 +4529,6 @@
   "servers.busy.installing": {
     "defaultMessage": "O servidor está sendo instalado"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Sincronização de conteúdo em andamento"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Envie também um pedido de amizade"
   },
@@ -4616,56 +4583,14 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "A instalação falhou"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Ocorreu um erro interno durante a instalação da plataforma. Tente novamente."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Não foi possível instalar o carregador ou a versão do Minecraft especificada. Ela pode ser inválida ou não suportada."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "O pacote de mods não pôde ser instalado. Ele pode estar corrompido ou ser incompatível."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Esta versão do pacote de mods não inclui um arquivo para download. Ela pode ter sido empacotada incorretamente."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Um erro inesperado ocorreu durante a instalação"
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Esta versão do Minecraft ou do carregador ainda não é suportada pelo Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Instalando complementos..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Instalando pacote de mods..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Instalando plataforma"
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Nós estamos preparando seu servidor"
   },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Adicionando Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Configurando servidor..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Baixando mods..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organizando arquivos..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Configurando ambiente..."
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Já possui um servidor?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Saiba mais sobre o Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4675,9 +4600,6 @@
   },
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Instale mods, convide amigos e joguem juntos, tudo pelo Modrinth App."
-  },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Ainda não há servidores"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Escolha seus mods favoritos e nós cuidamos do resto."
@@ -4693,12 +4615,6 @@
   },
   "servers.list-empty.sign-in-button": {
     "defaultMessage": "Inicie a sessão"
-  },
-  "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "Configure seu servidor exatamente como um mundo de um jogador."
-  },
-  "servers.list-empty.simple-setup-title": {
-    "defaultMessage": "Configuração simples"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Copiado"
@@ -5299,9 +5215,6 @@
   },
   "settings.social.friend-requests.title": {
     "defaultMessage": "Solicitações de amizade"
-  },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Em breve!"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Todos"

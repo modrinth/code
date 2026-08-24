@@ -428,6 +428,14 @@
 							shown: isAdmin(auth.user),
 						},
 						{
+							id: 'servers-lookup',
+							label: 'Server lookup',
+							type: 'link',
+							to: '/admin/servers/lookup',
+							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
+						{
 							id: 'servers-notices',
 							label: formatMessage(messages.manageServerNotices),
 							type: 'link',
@@ -480,6 +488,7 @@
 					<template #file-lookup>
 						<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
 					</template>
+					<template #servers-lookup> <ServerIcon aria-hidden="true" /> Server lookup </template>
 					<template #servers-notices>
 						<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
 					</template>
@@ -877,6 +886,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectPageContext,
+	injectUserPreferences,
 	providePageContext,
 	TeleportOverflowMenu,
 	useHostingIntercom,
@@ -911,6 +921,7 @@ const country = useUserCountry()
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+const { updatePreferences } = injectUserPreferences()
 
 const auth = await useAuth()
 const user = await useUser()
@@ -1479,7 +1490,19 @@ function toggleBrowseMenu() {
 	}
 }
 
-const { cycle: changeTheme } = useTheme()
+const theme = useTheme()
+
+function changeTheme() {
+	const selectedTheme = theme.cycle()
+	if (!theme.syncAcrossDevices) return
+
+	void updatePreferences({
+		appearance: {
+			auto: false,
+			theme: selectedTheme,
+		},
+	}).catch(() => undefined)
+}
 </script>
 
 <style lang="scss">

@@ -1,7 +1,7 @@
 <template>
 	<div ref="containerRef" class="relative inline-block w-full">
 		<!-- Searchable mode: input trigger -->
-		<div v-if="searchable" class="relative w-full rounded-xl bg-surface-4">
+		<div v-if="searchable" class="relative w-full rounded-xl">
 			<!-- Selection mirror must match InputFrame's leading and trailing slot geometry. -->
 			<div
 				v-if="searchSelectionOverlayVisible"
@@ -20,20 +20,23 @@
 				:name="searchName"
 				:placeholder="searchPlaceholder || placeholder"
 				:disabled="disabled"
+				:clearable="clearable"
 				:autocomplete="searchAutocomplete"
 				:autocorrect="searchAutocorrect"
 				:autocapitalize="searchAutocapitalize"
 				:spellcheck="searchSpellcheck"
 				:inputmode="searchInputmode"
 				:input-attrs="searchInputAttrs"
+				:appearance="searchInputVariant"
 				wrapper-class="w-full"
-				:input-class="searchableInputClass"
+				:input-class="resolvedSearchInputClass"
 				class="relative z-[1]"
 				@input="handleSearchInput"
 				@keydown="handleSearchKeydown"
 				@focusin="handleSearchFocus"
 				@focusout="handleSearchFocusout"
 				@click="handleSearchClick"
+				@clear="handleSearchClear"
 			>
 				<template v-if="showChevron" #trailing>
 					<ChevronLeftIcon
@@ -230,6 +233,8 @@ export interface ComboboxOption<T> {
 	searchTerms?: string[]
 }
 
+export type ComboboxSearchInputVariant = 'surface' | 'button'
+
 type OverlayScrollbarsInstance = NonNullable<ReturnType<typeof OverlayScrollbars>>
 type ViewportRect = {
 	width: number
@@ -270,6 +275,7 @@ const props = withDefaults(
 		placeholder?: string
 		disabled?: boolean
 		searchable?: boolean
+		clearable?: boolean
 		searchPlaceholder?: string
 		listbox?: boolean
 		showChevron?: boolean
@@ -307,11 +313,13 @@ const props = withDefaults(
 		searchAutocapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters'
 		searchSpellcheck?: boolean
 		searchInputAttrs?: Record<string, string | number | boolean | undefined>
+		searchInputVariant?: ComboboxSearchInputVariant
 	}>(),
 	{
 		placeholder: 'Select an option',
 		disabled: false,
 		searchable: false,
+		clearable: false,
 		searchPlaceholder: 'Search...',
 		listbox: true,
 		showChevron: true,
@@ -323,6 +331,7 @@ const props = withDefaults(
 		selectSearchTextOnFocus: false,
 		showSearchIcon: false,
 		searchType: 'text',
+		searchInputVariant: 'surface',
 		triggerType: 'base',
 		triggerSize: 'md',
 		triggerInteraction: 'surface',
@@ -393,7 +402,7 @@ const searchSelectionOverlayVisible = computed(() => {
 	return true
 })
 
-const searchableInputClass = computed(() => {
+const resolvedSearchInputClass = computed(() => {
 	const parts: string[] = []
 	if (searchSelectionOverlayVisible.value) {
 		parts.push('!text-transparent [caret-color:var(--color-text-primary)] selection:bg-transparent')
@@ -473,7 +482,7 @@ function setInitialFocus() {
 
 function determineOpenDirection(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: { width: number; height: number },
 	viewport: ViewportRect,
 ): 'up' | 'down' {
 	if (props.forceDirection) {
@@ -494,7 +503,7 @@ function determineOpenDirection(
 
 function calculateVerticalPosition(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: { width: number; height: number },
 	direction: 'up' | 'down',
 	viewport: ViewportRect,
 ): number {
@@ -508,7 +517,7 @@ function calculateVerticalPosition(
 
 function calculateHorizontalPosition(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: { width: number; height: number },
 	viewport: ViewportRect,
 ): number {
 	const minLeft = viewport.offsetLeft + DROPDOWN_VIEWPORT_MARGIN
@@ -551,7 +560,7 @@ async function updateDropdownPosition() {
 	await nextTick()
 
 	const triggerRect = effectiveTriggerEl.value.getBoundingClientRect()
-	const width = resolveDropdownWidth(triggerRect.width)
+	const width = resolveDropdownWidth(effectiveTriggerEl.value.offsetWidth)
 	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
 
 	dropdownStyle.value = {
@@ -562,7 +571,10 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
-	const dropdownRect = dropdownRef.value.getBoundingClientRect()
+	const dropdownRect = {
+		width: dropdownRef.value.offsetWidth,
+		height: dropdownRef.value.offsetHeight,
+	}
 	const viewport = getViewportRect()
 
 	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
@@ -831,6 +843,12 @@ function handleSearchInput() {
 	if (!isOpen.value) {
 		openDropdown()
 	}
+}
+
+function handleSearchClear() {
+	userHasTyped.value = true
+	emit('searchInput', searchQuery.value)
+	closeDropdown()
 }
 
 function handleSearchFocus(event: FocusEvent) {

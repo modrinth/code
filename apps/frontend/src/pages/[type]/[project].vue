@@ -407,6 +407,36 @@
 					/>
 					<Admonition
 						v-if="
+							auth.user &&
+							tags.staffRoles.includes(auth.user.role) &&
+							project.actualProjectType === 'modpack' &&
+							hasModpackArchiveInWarningWindow
+						"
+						type="warning"
+						:header="formatMessage(messages.modpackArchiveWarningTitle)"
+						class="mt-3"
+					>
+						{{ formatMessage(messages.modpackArchiveWarningDescription) }}
+						<template #actions>
+							<Button
+								type="colored"
+								color="orange"
+								:loading="isCheckingModpackArchives"
+								@click="checkModpackArchives"
+							>
+								<FileArchiveIcon />
+								{{
+									formatMessage(
+										isCheckingModpackArchives
+											? messages.checkingModpackArchives
+											: messages.checkModpackArchives,
+									)
+								}}
+							</Button>
+						</template>
+					</Admonition>
+					<Admonition
+						v-if="
 							currentMember &&
 							projectV3?.side_types_migration_review_status === 'pending' &&
 							projectV3?.environment?.length === 1 &&
@@ -502,7 +532,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="mb-3 overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-1" /></div>
+					<NavTabs :links="navLinks" replace page-nav />
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -529,14 +559,17 @@ import {
 	ClipboardCopyIcon,
 	CompassIcon,
 	DownloadIcon,
+	FileArchiveIcon,
 	FolderSearchIcon,
 	HeartIcon,
 	LeftArrowIcon,
 	MoreVerticalIcon,
+	PackageSearchIcon,
 	PlayIcon,
 	ReportIcon,
 	ScaleIcon,
 	ScanEyeIcon,
+	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
 	XIcon,
@@ -551,6 +584,8 @@ import {
 	ButtonLink,
 	commonMessages,
 	defineMessages,
+	formatDependencyProjectFilterOption,
+	formatProjectTypeSentence,
 	getActiveDisclosures,
 	IconButton,
 	injectModrinthClient,
@@ -663,6 +698,7 @@ const downloadModal = ref()
 const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
 const scanModal = ref()
+const isCheckingModpackArchives = ref(false)
 
 const projectV3Loaded = computed(() => !projectV3Pending.value || projectV3.value != null)
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
@@ -814,9 +850,50 @@ const messages = defineMessages({
 		id: 'project.actions.review-project',
 		defaultMessage: 'Review project',
 	},
+	viewDependents: {
+		id: 'project.actions.view-dependents',
+		defaultMessage: 'View dependents',
+	},
+	viewProjectTypeDependents: {
+		id: 'project.actions.view-project-type-dependents',
+		defaultMessage: 'View {projectType} dependents',
+	},
+	viewModpacks: {
+		id: 'project.actions.view-modpacks',
+		defaultMessage: 'View modpacks',
+	},
 	rescanModpack: {
 		id: 'project.actions.rescan-modpack',
 		defaultMessage: 'Rescan modpack',
+	},
+	checkModpackArchives: {
+		id: 'project.actions.check-modpack-archives',
+		defaultMessage: 'Check modpack unzip',
+	},
+	checkingModpackArchives: {
+		id: 'project.actions.checking-modpack-archives',
+		defaultMessage: 'Checking...',
+	},
+	checkModpackArchivesSuccess: {
+		id: 'project.notification.check-modpack-archives.success',
+		defaultMessage:
+			'{count, plural, one {The modpack file can be unzipped.} other {All # modpack files can be unzipped.}}',
+	},
+	checkModpackArchivesFailed: {
+		id: 'project.notification.check-modpack-archives.failed',
+		defaultMessage: 'Some modpack files could not be unzipped',
+	},
+	checkModpackArchivesNoFiles: {
+		id: 'project.notification.check-modpack-archives.no-files',
+		defaultMessage: 'No .mrpack files were found for this project.',
+	},
+	modpackArchiveWarningTitle: {
+		id: 'project.modpack-archive-warning.title',
+		defaultMessage: 'This modpack was published during export bug',
+	},
+	modpackArchiveWarningDescription: {
+		id: 'project.modpack-archive-warning.description',
+		defaultMessage: 'Importing this .mrpack might be broken.',
 	},
 	serversPromoDescription: {
 		id: 'project.actions.servers-promo.description',
@@ -1135,7 +1212,7 @@ const {
 
 const dependencies = computed(() => dependenciesRaw.value ?? null)
 
-// V3 Versions - lazy loaded client-side only
+// V3 Versions - lazy loaded client-side only (except for staff, who need v3 versions for moderation)
 const versionsEnabled = ref(false)
 const {
 	data: versionsV3,
@@ -1149,7 +1226,7 @@ const {
 			apiVersion: 3,
 		}),
 	staleTime: STALE_TIME_LONG,
-	enabled: computed(() => !!projectId.value && versionsEnabled.value),
+	enabled: computed(() => !!projectId.value && (versionsEnabled.value || isStaff(auth.value.user))),
 })
 
 // Organization
@@ -1684,16 +1761,24 @@ const following = computed(() => {
 	return !!user.value.follows.find((x) => x.id === project.value.id)
 })
 
+const PROJECT_NOT_FOUND_DESCRIPTION =
+	"There's no project here, check that you have the right link! It may still be under review or no longer publicly available on Modrinth."
+
 const title = computed(() =>
-	project.value ? `${project.value.title} - Minecraft ${projectTypeDisplay.value}` : '',
-)
-const description = computed(() =>
 	project.value
-		? `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
-				project.value.title
-			} by ${members.value.find((x) => x.is_owner)?.user?.username || 'a creator'} on Modrinth`
-		: '',
+		? `${project.value.title} - Minecraft ${projectTypeDisplay.value}`
+		: 'Project not found',
 )
+const description = computed(() => {
+	if (!project.value) {
+		return PROJECT_NOT_FOUND_DESCRIPTION
+	}
+
+	const creator = organization.value?.name || members.value.find((x) => x.is_owner)?.user?.username
+	const byLine = creator ? ` by ${creator}` : ''
+
+	return `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${project.value.title}${byLine} on Modrinth`
+})
 
 const canCreateServerFrom = computed(() => {
 	if (!project.value) return false
@@ -1749,8 +1834,116 @@ const showProjectHeaderCreateServerAction = computed(
 const projectHeaderCreateServerTo = computed(() =>
 	project.value ? `/hosting?project=${project.value.id}#plan` : '/hosting',
 )
+
+const MRPACK_ARCHIVE_WARNING_START = new Date('2026-08-10T17:00:00.000Z').getTime()
+const MRPACK_ARCHIVE_WARNING_END = new Date('2026-08-13T20:00:00.000Z').getTime()
+const hasModpackArchiveInWarningWindow = computed(() =>
+	(versionsV3.value ?? []).some((version) => {
+		const publishedAt = new Date(version.date_published).getTime()
+		return (
+			version.files.some((file) => file.filename.toLowerCase().endsWith('.mrpack')) &&
+			publishedAt >= MRPACK_ARCHIVE_WARNING_START &&
+			publishedAt <= MRPACK_ARCHIVE_WARNING_END
+		)
+	}),
+)
+
+async function checkModpackArchives() {
+	if (!project.value || isCheckingModpackArchives.value) return
+
+	isCheckingModpackArchives.value = true
+	startLoading()
+
+	try {
+		const versions = await client.labrinth.versions_v2.getProjectVersions(project.value.id)
+		const filesByUrl = new Map(
+			versions
+				.flatMap((version) => version.files)
+				.filter((file) => file.filename.toLowerCase().endsWith('.mrpack'))
+				.map((file) => [file.url, file]),
+		)
+		const files = [...filesByUrl.values()]
+
+		if (files.length === 0) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: formatMessage(messages.checkModpackArchivesNoFiles),
+				type: 'error',
+			})
+			return
+		}
+
+		const { default: JSZip } = await import('jszip')
+		const failures = []
+
+		for (const file of files) {
+			try {
+				const response = await fetch(file.url)
+				if (!response.ok) {
+					throw new Error(`Download failed (${response.status} ${response.statusText})`)
+				}
+
+				await JSZip.loadAsync(await response.blob(), { checkCRC32: true })
+			} catch (error) {
+				failures.push({
+					filename: file.filename,
+					error: error?.message ?? String(error),
+				})
+			}
+		}
+
+		if (failures.length > 0) {
+			addNotification({
+				title: formatMessage(messages.checkModpackArchivesFailed),
+				text: failures.map((failure) => `${failure.filename}: ${failure.error}`).join('\n'),
+				type: 'error',
+			})
+			return
+		}
+
+		addNotification({
+			title: formatMessage(commonMessages.successLabel),
+			text: formatMessage(messages.checkModpackArchivesSuccess, { count: files.length }),
+			type: 'success',
+		})
+	} catch (error) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: error?.data?.description ?? error?.message ?? String(error),
+			type: 'error',
+		})
+	} finally {
+		isCheckingModpackArchives.value = false
+		stopLoading()
+	}
+}
+
 const projectHeaderMoreActions = computed(() => {
 	const isStaff = !!(auth.value.user && tags.value.staffRoles.includes(auth.value.user.role))
+	const projectId = project.value?.id
+	const dependentSearchTypes = getDependentSearchTypes()
+	const dependentSearchActions = dependentSearchTypes
+		.filter((projectType) => projectType !== 'modpack')
+		.map((projectType) => ({
+			id: `view-${projectType}-dependents`,
+			label: formatMessage(
+				dependentSearchTypes.length === 1
+					? messages.viewDependents
+					: messages.viewProjectTypeDependents,
+				{
+					projectType: formatProjectTypeSentence(formatMessage, projectType),
+				},
+			),
+			icon: SearchIcon,
+			type: 'link',
+			to: {
+				path: `/discover/${projectType}s`,
+				query: {
+					dep: formatDependencyProjectFilterOption(projectId, ['required']),
+				},
+			},
+		}))
+	const isPluginOnly = dependentSearchTypes.length === 1 && dependentSearchTypes[0] === 'plugin'
 
 	return [
 		{
@@ -1761,7 +1954,21 @@ const projectHeaderMoreActions = computed(() => {
 			to: `${projectPath.value}/settings/analytics`,
 			shown: !!auth.value.user && !!currentMember.value,
 		},
-		{ type: 'divider', shown: !!auth.value.user && !!currentMember.value },
+		...dependentSearchActions,
+		{
+			id: 'view-modpacks',
+			label: formatMessage(messages.viewModpacks),
+			icon: PackageSearchIcon,
+			type: 'link',
+			to: {
+				path: '/discover/modpacks',
+				query: {
+					dep: formatDependencyProjectFilterOption(projectId, ['required']),
+				},
+			},
+			shown: !isPluginOnly && project.value?.actualProjectType !== 'modpack',
+		},
+		{ type: 'divider' },
 		{
 			id: 'moderation-checklist',
 			label: formatMessage(messages.reviewProject),
@@ -1785,6 +1992,19 @@ const projectHeaderMoreActions = computed(() => {
 			icon: FolderSearchIcon,
 			action: () => scanModal.value?.show(),
 			tone: 'orange',
+			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
+		},
+		{
+			id: 'moderation-modpack-check-archives',
+			label: formatMessage(
+				isCheckingModpackArchives.value
+					? messages.checkingModpackArchives
+					: messages.checkModpackArchives,
+			),
+			icon: FileArchiveIcon,
+			action: checkModpackArchives,
+			tone: 'orange',
+			disabled: isCheckingModpackArchives.value,
 			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
 		},
 		{ type: 'divider', shown: !!auth.value.user && isStaff },
@@ -1811,6 +2031,29 @@ const projectHeaderMoreActions = computed(() => {
 	]
 })
 
+function getDependentSearchTypes() {
+	if (!project.value) return []
+
+	if (project.value.actualProjectType !== 'mod') {
+		return [isServerProject.value ? 'server' : project.value.actualProjectType]
+	}
+
+	const loaders = project.value.loaders ?? []
+	const projectTypes = []
+
+	if (loaders.some((loader) => tags.value.loaderData.modLoaders.includes(loader))) {
+		projectTypes.push('mod')
+	}
+	if (loaders.some((loader) => tags.value.loaderData.allPluginLoaders.includes(loader))) {
+		projectTypes.push('plugin')
+	}
+	if (loaders.some((loader) => tags.value.loaderData.dataPackLoaders.includes(loader))) {
+		projectTypes.push('datapack')
+	}
+
+	return projectTypes.length > 0 ? projectTypes : ['mod']
+}
+
 const createCanonicalUrl = () =>
 	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
 
@@ -1828,8 +2071,11 @@ if (!route.name.startsWith('type-project-settings')) {
 		title: () => title.value,
 		description: () => description.value,
 		ogTitle: () => title.value,
-		ogDescription: () => project.value?.description ?? '',
-		ogImage: () => project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+		ogDescription: () => project.value?.description ?? PROJECT_NOT_FOUND_DESCRIPTION,
+		ogImage: () =>
+			project.value
+				? (project.value?.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png')
+				: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})

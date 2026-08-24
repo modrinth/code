@@ -31,7 +31,7 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const userProfile = provideUserProfile({
 	getUser: (userId) => client.labrinth.users_v3.get(userId),
-	getProjects: (userId) => client.labrinth.users_v2.getProjects(userId),
+	getProjects: (userId) => client.labrinth.users_v3.getProjects(userId),
 	getOrganizations: (userId) => client.labrinth.users_v2.getOrganizations(userId),
 	getCollections: (userId) => client.labrinth.users_v2.getCollections(userId),
 	patchUser: (userId, patch) => client.labrinth.users_v2.patch(userId, patch),
@@ -46,11 +46,19 @@ const auth = await useAuth()
 const cosmetics = useCosmetics()
 const config = useRuntimeConfig()
 
-const userId = computed(() => String(route.params.user))
-const projectType = computed(() => {
-	const value = route.params.projectType
-	return Array.isArray(value) ? value[0] : value
-})
+function readRouteParam(param: unknown): string | undefined {
+	const value = Array.isArray(param) ? param[0] : param
+	return typeof value === 'string' && value.length > 0 ? value : undefined
+}
+
+const userId = ref(readRouteParam(route.params.user) ?? '')
+watch(
+	() => readRouteParam(route.params.user),
+	(next) => {
+		if (next) userId.value = next
+	},
+)
+const projectType = computed(() => readRouteParam(route.params.projectType))
 
 let prefetchedUser: Labrinth.Users.v3.User | undefined
 try {
@@ -85,10 +93,12 @@ if (projectsResult.status === 'fulfilled') {
 	warmProjectCheckCaches(queryClient, projectsResult.value)
 }
 const title = computed(() =>
-	prefetchedUser ? `${prefetchedUser.username} - Modrinth` : 'Modrinth',
+	prefetchedUser ? `${prefetchedUser.username} - Modrinth` : 'User not found',
 )
 const description = computed(() => {
-	if (!prefetchedUser) return ''
+	if (!prefetchedUser) {
+		return `There's no user here, check that you have the right link!`
+	}
 	return prefetchedUser.bio
 		? `${prefetchedUser.bio} - Download ${prefetchedUser.username}'s projects on Modrinth`
 		: `Download ${prefetchedUser.username}'s projects on Modrinth`
@@ -99,7 +109,10 @@ useSeoMeta({
 	description: () => description.value,
 	ogTitle: () => title.value,
 	ogDescription: () => description.value,
-	ogImage: () => prefetchedUser?.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
+	ogImage: () =>
+		prefetchedUser
+			? (prefetchedUser?.avatar_url ?? 'https://cdn-raw.modrinth.com/placeholder-circle.png')
+			: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
 })
 
 const projectCreateModal = ref<InstanceType<typeof ProjectCreateModal> | null>(null)

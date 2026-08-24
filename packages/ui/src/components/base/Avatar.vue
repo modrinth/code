@@ -6,14 +6,16 @@
 		:style="`--_size: ${cssSize}`"
 		:class="{
 			circle: circle,
+			detecting: !hasDetectedCorners,
 			'no-shadow': noShadow,
+			padded: hasTransparentCorners && !circle && !disableConditionalIconPadding,
 			raised: raised,
 			pixelated: pixelated,
 		}"
 		:src="src"
 		:alt="alt"
 		:loading="loading"
-		@load="updatePixelated"
+		@load="onLoad"
 		@error="onError"
 	/>
 	<svg
@@ -46,11 +48,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 const pixelated = ref(false)
+const hasTransparentCorners = ref(false)
+const hasDetectedCorners = ref(false)
 const img = useTemplateRef<HTMLImageElement>('img')
 const failed = ref(false)
+let detectionTimeout: number | undefined
+let detectingSource: string | undefined
+
+const DETECTION_TIMEOUT_MS = 2000
+const CORNER_SAMPLE_SIZE = 8
+
+defineExpose({
+	failed,
+})
 
 const props = withDefaults(
 	defineProps<{
@@ -59,6 +72,7 @@ const props = withDefaults(
 		size?: string
 		circle?: boolean
 		noShadow?: boolean
+		disableConditionalIconPadding?: boolean
 		loading?: 'eager' | 'lazy'
 		raised?: boolean
 		tintBy?: string | null
@@ -69,6 +83,7 @@ const props = withDefaults(
 		size: '2rem',
 		circle: false,
 		noShadow: false,
+		disableConditionalIconPadding: false,
 		loading: 'eager',
 		raised: false,
 		tintBy: null,
@@ -88,20 +103,145 @@ const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
 watch(
 	() => props.src,
 	() => {
+		clearDetectionTimeout()
+		detectingSource = undefined
 		failed.value = false
+		hasTransparentCorners.value = false
+		hasDetectedCorners.value = false
 	},
 )
 
+onMounted(() => {
+	const image = img.value
+	if (!image?.complete || hasDetectedCorners.value) return
+
+	if (image.naturalWidth > 0) {
+		onLoad()
+	} else {
+		failed.value = true
+	}
+})
+
+onBeforeUnmount(clearDetectionTimeout)
+
+function clearDetectionTimeout() {
+	if (detectionTimeout !== undefined) {
+		window.clearTimeout(detectionTimeout)
+		detectionTimeout = undefined
+	}
+}
+
 function onError(e) {
+	clearDetectionTimeout()
+	detectingSource = undefined
 	console.log('Avatar image failed to load:', props.src, e)
 	failed.value = true
 }
 
-function updatePixelated() {
-	if (img.value && img.value.naturalWidth && img.value.naturalWidth < 32) {
+function onLoad() {
+	const image = img.value
+	if (!image) return
+	const source = image.currentSrc
+	if (detectingSource === source) return
+	detectingSource = source
+	clearDetectionTimeout()
+
+	if (image.naturalWidth && image.naturalWidth < 32) {
 		pixelated.value = true
 	} else {
 		pixelated.value = false
+	}
+
+	if (canReadImagePixels(source)) {
+		const transparentCorners = detectTransparentCorners(image)
+		if (transparentCorners !== null) {
+			detectingSource = undefined
+			hasTransparentCorners.value = transparentCorners
+			hasDetectedCorners.value = true
+			return
+		}
+	}
+
+	const probe = new Image()
+	let detectionFinished = false
+	probe.crossOrigin = 'anonymous'
+	probe.onload = () => {
+		if (detectionFinished || img.value?.currentSrc !== source) return
+		detectionFinished = true
+		detectingSource = undefined
+		clearDetectionTimeout()
+		hasTransparentCorners.value = detectTransparentCorners(probe) ?? false
+		hasDetectedCorners.value = true
+	}
+	probe.onerror = () => {
+		if (detectionFinished || img.value?.currentSrc !== source) return
+		detectionFinished = true
+		detectingSource = undefined
+		clearDetectionTimeout()
+		hasDetectedCorners.value = true
+	}
+	detectionTimeout = window.setTimeout(() => {
+		if (img.value?.currentSrc !== source) return
+		detectionFinished = true
+		detectingSource = undefined
+		detectionTimeout = undefined
+		hasDetectedCorners.value = true
+	}, DETECTION_TIMEOUT_MS)
+	probe.src = source
+}
+
+function canReadImagePixels(source: string): boolean {
+	try {
+		const url = new URL(source, window.location.href)
+		return url.protocol === 'data:' || url.origin === window.location.origin
+	} catch {
+		return false
+	}
+}
+
+function detectTransparentCorners(image: HTMLImageElement): boolean | null {
+	if (image.naturalWidth < CORNER_SAMPLE_SIZE || image.naturalHeight < CORNER_SAMPLE_SIZE) {
+		return false
+	}
+
+	const canvas = document.createElement('canvas')
+	canvas.width = CORNER_SAMPLE_SIZE * 2
+	canvas.height = CORNER_SAMPLE_SIZE * 2
+	const context = canvas.getContext('2d', { willReadFrequently: true })
+	if (!context) return false
+
+	const right = image.naturalWidth - CORNER_SAMPLE_SIZE
+	const bottom = image.naturalHeight - CORNER_SAMPLE_SIZE
+	const drawCorner = (
+		sourceX: number,
+		sourceY: number,
+		destinationX: number,
+		destinationY: number,
+	) =>
+		context.drawImage(
+			image,
+			sourceX,
+			sourceY,
+			CORNER_SAMPLE_SIZE,
+			CORNER_SAMPLE_SIZE,
+			destinationX,
+			destinationY,
+			CORNER_SAMPLE_SIZE,
+			CORNER_SAMPLE_SIZE,
+		)
+
+	try {
+		drawCorner(0, 0, 0, 0)
+		drawCorner(right, 0, CORNER_SAMPLE_SIZE, 0)
+		drawCorner(0, bottom, 0, CORNER_SAMPLE_SIZE)
+		drawCorner(right, bottom, CORNER_SAMPLE_SIZE, CORNER_SAMPLE_SIZE)
+		const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data
+		for (let alpha = 3; alpha < pixels.length; alpha += 4) {
+			if (pixels[alpha] !== 0) return false
+		}
+		return true
+	} catch {
+		return null
 	}
 }
 
@@ -128,7 +268,8 @@ function hash(str: string): number {
 .avatar {
 	--_size: 2rem;
 
-	border: 1px solid var(--surface-5);
+	outline: 1px solid rgb(255 255 255 / 15%);
+	outline-offset: -1px;
 	background-color: var(--color-button-bg);
 	object-fit: contain;
 	border-radius: calc(16 / 96 * var(--_override-size, var(--_size)));
@@ -152,6 +293,14 @@ function hash(str: string): number {
 
 	&.pixelated {
 		image-rendering: pixelated;
+	}
+
+	&.detecting {
+		visibility: hidden;
+	}
+
+	&.padded {
+		padding: calc(6 / 96 * var(--_override-size, var(--_size)));
 	}
 
 	&.raised {

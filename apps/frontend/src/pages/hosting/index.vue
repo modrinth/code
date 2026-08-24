@@ -78,7 +78,7 @@
 					src="https://cdn.modrinth.com/servers/panel-right-dark.webp"
 					alt=""
 					aria-hidden="true"
-					class="pointer-events-none h-full w-fit select-none"
+					class="pointer-events-none h-full w-auto select-none"
 				/>
 			</div>
 

@@ -10,7 +10,7 @@ import {
 import { ref, watch } from 'vue'
 
 import useMemorySlider from '@/composables/useMemorySlider'
-import { get, set } from '@/helpers/settings.ts'
+import { get, parseEnvVars, serializeEnvVars, set } from '@/helpers/settings.ts'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -149,7 +149,7 @@ const messages = defineMessages({
 
 const fetchSettings = await get()
 fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')
-fetchSettings.envVars = fetchSettings.custom_env_vars.map((x) => x.join('=')).join(' ')
+fetchSettings.envVars = serializeEnvVars(fetchSettings.custom_env_vars)
 
 const settings = ref(fetchSettings)
 
@@ -164,27 +164,15 @@ watch(
 		const setSettings = JSON.parse(JSON.stringify(settings.value))
 
 		setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
-		setSettings.custom_env_vars = setSettings.envVars
-			.trim()
-			.split(/\s+/)
-			.filter(Boolean)
-			.map((x) => x.split('=').filter(Boolean))
-
-		if (!setSettings.hooks.pre_launch) {
-			setSettings.hooks.pre_launch = null
-		}
-		if (!setSettings.hooks.wrapper) {
-			setSettings.hooks.wrapper = null
-		}
-		if (!setSettings.hooks.post_exit) {
-			setSettings.hooks.post_exit = null
-		}
+		setSettings.custom_env_vars = parseEnvVars(setSettings.envVars)
+		delete setSettings.launchArgs
+		delete setSettings.envVars
 
 		if (!setSettings.custom_dir) {
 			setSettings.custom_dir = null
 		}
 
-		await set(setSettings)
+		await set(setSettings).catch(handleError)
 	},
 	{ deep: true },
 )

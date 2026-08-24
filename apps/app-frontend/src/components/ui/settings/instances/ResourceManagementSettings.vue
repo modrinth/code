@@ -14,14 +14,14 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { purge_cache_types } from '@/helpers/cache.js'
 import { get, set } from '@/helpers/settings.ts'
 import { showAppDbBackupsFolder } from '@/helpers/utils.js'
-import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const settings = ref(await get())
 const purgeCacheConfirmModal = ref(null)
 const alwaysShowCopyDetailsFlag = 'always_show_copy_details'
@@ -145,7 +145,7 @@ async function purgeCache() {
 }
 
 function handlePurgeCacheClick() {
-	if (themeStore.getFeatureFlag('skip_non_essential_warnings')) {
+	if (appSettings.getFeatureFlag('skip_non_essential_warnings')) {
 		void purgeCache()
 		return
 	}
@@ -210,11 +210,11 @@ async function findLauncherDir() {
 			</div>
 			<Toggle
 				id="always-show-copy-details"
-				:model-value="themeStore.getFeatureFlag(alwaysShowCopyDetailsFlag)"
+				:model-value="appSettings.getFeatureFlag(alwaysShowCopyDetailsFlag)"
 				@update:model-value="
 					() => {
-						const newValue = !themeStore.getFeatureFlag(alwaysShowCopyDetailsFlag)
-						themeStore.featureFlags[alwaysShowCopyDetailsFlag] = newValue
+						const newValue = !appSettings.getFeatureFlag(alwaysShowCopyDetailsFlag)
+						appSettings.featureFlags[alwaysShowCopyDetailsFlag] = newValue
 						settings.feature_flags[alwaysShowCopyDetailsFlag] = newValue
 					}
 				"

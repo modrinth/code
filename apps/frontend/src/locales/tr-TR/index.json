@@ -4520,95 +4520,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Geliştirme modu</strong> aktif. Modrinth'te bulunan çeşitli şeylerin dahilî kimliklerini gösterir, Modrinth API kullanan bir geliştiriciyseniz kullanışlı olabilir. Sayfanın en altındaki Modrinth logosuna 5 kere tıklayarak açılır ve kapanır."
   },
-  "settings.display.flags.description": {
-    "message": "Bu cihazdaki belli özellikleri etkinlestir veya devre dışı bırak."
-  },
-  "settings.display.flags.title": {
-    "message": "Özellik aç/kapa"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Geliştirme modu kapatıldı"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Geliştirme modu kapalı"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Veri Paketleri sayfası"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Bu cihazda proje listelerini gösteren her sayfa için tercih ettiğiniz düzeni seçin."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Modlar sayfası"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galeri"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Izgara"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Satırlar"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Mod paketleri sayfası"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Pluginler sayfası"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Kaynak Paketleri sayfası"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Sunucular sayfası"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shaderlar sayfası"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Proje liste düzenleri"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "Kullanıcı profili sayfaları"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Koleksiyon"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Donanım hızlandırmalı işleme olmadan performans sorunlarına yol açabilecek bulanıklık efektleri gibi gelişmiş işlemeyi etkinleştirir."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Gelişmiş işleme"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Modrinth'in dışına giden bağlantıların yeni bir sekmede açılmasını sağla. Bu ayara bakılmaksızın, aynı alan adındaki ve Markdown açıklamalarındaki bağlantılar aynı sekmede açılacak ve reklamlardaki, düzenleme sayfalarındaki bağlantılar yeni bir sekmede açılacak."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Dış bağlantıları yeni sekmede aç"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "\"Modrinth App Edin\" tuşlarını ana navigasyondan gizler. Modrinth App sayfası hala açılış sayfasında veya alt bilgide bulunabilir."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth App tanıtımlarını gizle"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "İçerik sayfalarında sola hizalı kenar çubuğu"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Kenar çubuğunu sayfa içeriğinin soluna hizalar."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Filtre kenar çubuğunu, arama sonuçlarının sağına hizalar."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Arama sayfalarında kenar çubuğunu sağa hizalar"
-  },
-  "settings.display.theme.description": {
-    "message": "Bu cihazda Modrinth için tercih ettiğiniz renk temasını seçin."
-  },
-  "settings.display.theme.title": {
-    "message": "Renk teması"
   },
   "settings.head-title": {
     "message": "Görüntü Ayarları"
