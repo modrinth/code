@@ -52,7 +52,7 @@ use sha2::Sha256;
 use std::collections::HashMap;
 use std::str::FromStr;
 use thiserror::Error;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use url::Url;
 use uuid::Uuid;
 use validator::Validate;
@@ -245,7 +245,7 @@ impl TempUser {
             totp_secret: None,
             username,
             email: self.email.clone(),
-            email_verified: self.email.is_some(),
+            email_verified: false,
             avatar_url,
             raw_avatar_url,
             bio: self.bio,
@@ -1457,6 +1457,40 @@ fn validate_account_consent(account_consent: bool) -> Result<(), ApiError> {
     Ok(())
 }
 
+async fn send_verify_email(
+    email_queue: &EmailQueue,
+    txn: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    user_id: DBUserId,
+    email_address: String,
+) -> Result<(), ApiError> {
+    let mailbox: Mailbox = email_address
+        .parse()
+        .wrap_request_err("invalid email address!".to_string())?;
+
+    let flow = DBFlow::ConfirmEmail {
+        user_id,
+        confirm_email: email_address,
+    }
+    .insert(Duration::hours(24), redis)
+    .await
+    .wrap_internal_err("storing email-verification flow in Redis")?;
+
+    email_queue
+        .send_one(
+            txn,
+            NotificationBody::VerifyEmail { flow },
+            user_id,
+            mailbox,
+        )
+        .await
+        .wrap_api_err("sending account email")?
+        .as_user_error()
+        .wrap_api_err("validating email delivery status")?;
+
+    Ok(())
+}
+
 /// Create account with OAuth.
 #[utoipa::path(
 	context_path = "/auth",
@@ -1474,6 +1508,7 @@ pub async fn create_oauth_account(
     db: Data<PgPool>,
     file_host: Data<dyn FileHost>,
     redis: Data<RedisPool>,
+    email_queue: Data<EmailQueue>,
     web::Json(new_account): web::Json<NewOAuthAccount>,
 ) -> Result<HttpResponse, ApiError> {
     new_account
@@ -1518,6 +1553,8 @@ pub async fn create_oauth_account(
         .await
         .wrap_internal_err("failed to begin transaction")?;
 
+    let account_email = user.email.clone();
+
     let user_id = user
         .create_account(
             provider,
@@ -1530,6 +1567,23 @@ pub async fn create_oauth_account(
         )
         .await
         .wrap_auth_err("inserting user ID into database")?;
+
+    if let Some(email_address) = account_email {
+        // The address comes from the OAuth provider, so the user cannot correct
+        // it here. A failed send shouldn't block signup: they can resend the
+        // verification email once they're signed in.
+        if let Err(error) = send_verify_email(
+            &email_queue,
+            &mut txn,
+            &redis,
+            user_id,
+            email_address,
+        )
+        .await
+        {
+            warn!(%error, "failed to send OAuth signup verification email");
+        }
+    }
 
     let session = issue_session(req, user_id, &mut txn, &redis, None)
         .await
@@ -2021,30 +2075,14 @@ impl ReadyAccountRegisterFlow {
             .wrap_auth_err("authenticating API request")?;
         let res = crate::models::sessions::Session::from(session, true, None);
 
-        let mailbox: Mailbox = register_flow
-            .email
-            .parse()
-            .wrap_request_err("invalid email address!".to_string())?;
-
-        let flow = DBFlow::ConfirmEmail {
+        send_verify_email(
+            email_queue,
+            transaction,
+            redis,
             user_id,
-            confirm_email: register_flow.email.clone(),
-        }
-        .insert(Duration::hours(24), redis)
-        .await
-        .wrap_internal_err("storing email-verification flow in Redis")?;
-
-        email_queue
-            .send_one(
-                transaction,
-                NotificationBody::VerifyEmail { flow },
-                user_id,
-                mailbox,
-            )
-            .await
-            .wrap_api_err("sending account email")?
-            .as_user_error()
-            .wrap_api_err("validating email delivery status")?;
+            register_flow.email,
+        )
+        .await?;
 
         Ok(res)
     }
