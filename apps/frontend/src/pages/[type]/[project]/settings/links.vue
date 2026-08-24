@@ -202,9 +202,9 @@ import {
 } from '@modrinth/moderation'
 import {
 	Combobox,
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	defineMessage,
-	commonProjectSettingsMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
