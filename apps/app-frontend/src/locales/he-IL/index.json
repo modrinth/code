@@ -11,6 +11,24 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "החבא יותר התקנים רצים"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "הועתק"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "העתקת הפרטים"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.action-bar.install.retry": {
+    "message": "נסה שוב"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "ביטול"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "לא נתן להוריד את הקבצים"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "הפוך למקרה ראשי"
   },
@@ -20,8 +38,8 @@
   "app.action-bar.stop-instance": {
     "message": ""
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "חזרה לעולמות"
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "ספרייה"
   },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."

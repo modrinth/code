@@ -530,6 +530,15 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Tên dự án"
   },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Mới nhất"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Cũ nhất"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sắp xếp theo {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Cập nhật tất cả"
   },
@@ -607,9 +616,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Tìm phiên bản Game..."
-  },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Chọn biểu tượng"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Mới nhất"
@@ -770,6 +776,21 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Xóa hết"
   },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "Duyệt modpack"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "Thêm modpack"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "Biết modpack bạn định cài là gì rồi?"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Không tìm thấy"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Tìm modpack"
+  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Cài từ đầu bằng cách lựa chọn mod loader và phiên bản game."
   },
@@ -781,12 +802,6 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Nhập cấu hình"
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Duyệt modpack trên Modrinth hoặc nhập từ tệp."
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Cài modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Minecraft thường, không mod hay plugin khác."
@@ -3857,9 +3872,6 @@
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Có lỗi lạ xảy ra trong khi tải."
   },
-  "servers.installing-banner.preparing.header": {
-    "defaultMessage": "Chúng tôi đang sửa máy chủ của bạn"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Đã có máy chủ rồi?"
   },
@@ -3878,14 +3890,14 @@
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Cài mod với một cú nhấp"
   },
-  "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Mời bạn bè và giúp họ thiết lập ngay trong ứng dụng Modrinth."
-  },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Chơi với bạn bè"
   },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Đăng nhập"
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Thiết lập máy chủ giống như thế giới chơi đơn."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Thiết lập đơn giản"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Đã sao chép"
@@ -4270,9 +4282,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Tối"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "Chọn màu nền ưa thích của bạn cho Modrinth trên thiết bị này."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Sáng"
@@ -4965,3 +4974,4 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
+

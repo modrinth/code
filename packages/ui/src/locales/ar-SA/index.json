@@ -21,7 +21,7 @@
     "defaultMessage": "اسم المستخدم الذي سيتم من خلاله إنشاء رمز الإحالة الخاص بـ"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "ادخل اسم المستخدم..."
+    "defaultMessage": "أدخل اسم المستخدم..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "صنعت من قبل {user}"
@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "جديد"
   },
+  "badge.release": {
+    "defaultMessage": "إصدار نهائي"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "إلغاء"
   },
@@ -67,6 +70,9 @@
   },
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "فشل تحميل تفاصيل الاشتراك."
+  },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 أيام} monthly {/شهر} quarterly {/ربع سنة} yearly {/سنة} other {{interval}}}"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "سيتم تحصيل الرسوم التالية في <charge-date>{date}</charge-date>."
@@ -86,8 +92,59 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "إعادة الاشتراك في الخادم"
   },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "تطبيق التفضيلات المحفوظة"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "تختلف عوامل التصفية في هذا الرابط عن الاستثناءات المتقدمة المحفوظة لديك"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "يتم حفظ الاستثناءات المتقدمة بين الجلسات. وسيؤدي فتح رابط مشترك يحتوي على عوامل تصفية إلى تجاوزها."
+  },
+  "browse.filter-results": {
+    "defaultMessage": "تصفية النتائج..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "لم يتم العثور على نتائج لبحثك!"
+  },
+  "browse.offline": {
+    "defaultMessage": "أنت غير متصل حاليًا. اتصل بالإنترنت لتصفح Modrinth!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "البحث {projectType}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "تحديد المشاريع"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "تثبيت {count, plural, one {مشروع واحد} two {مشروعان} few {# مشاريع} many {# مشروعًا} other {# مشروع}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {تم تحديد مشروع واحد} two {تم تحديد مشروعين} few {تم تحديد # مشاريع} many {تم تحديد # مشروعًا} other {تم تحديد # مشروع}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "لقد حددت {count, plural, one {مشروعًا واحدًا} two {مشروعين} few {# مشاريع} many {# مشروعًا} other {# مشروع}} للتثبيت. ثبّتها الآن أو عُد دون تثبيتها."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "المشاريع المحددة لم يتم تثبيتها بعد"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "إلغاء"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "المشاريع المحددة لم يتم تثبيتها بعد"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "عرض:"
+  },
   "button.accept": {
     "defaultMessage": "اقبل"
+  },
+  "button.add-another": {
+    "defaultMessage": "إضافة آخر"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "أضف الخادم للنسخة"
   },
   "button.affiliate-links": {
     "defaultMessage": "روابط تابعة"
@@ -116,8 +173,14 @@
   "button.copy-filename": {
     "defaultMessage": "انسخ اسم الملف"
   },
+  "button.copy-full-path": {
+    "defaultMessage": "نسخ المسار الكامل"
+  },
   "button.copy-id": {
     "defaultMessage": "نسخ المعرف"
+  },
+  "button.copy-link": {
+    "defaultMessage": "نسخ الرابط"
   },
   "button.copy-permalink": {
     "defaultMessage": "نسخ الرابط الدائم"
@@ -128,6 +191,9 @@
   "button.decline": {
     "defaultMessage": "رفض"
   },
+  "button.disable": {
+    "defaultMessage": "تعطيل"
+  },
   "button.download": {
     "defaultMessage": "تنزيل"
   },
@@ -137,11 +203,23 @@
   "button.edit": {
     "defaultMessage": "تعديل"
   },
+  "button.enable": {
+    "defaultMessage": "تفعيل"
+  },
+  "button.extract": {
+    "defaultMessage": "استخراج"
+  },
   "button.follow": {
     "defaultMessage": "متابعة"
   },
   "button.hide-snapshots": {
     "defaultMessage": "إخفاء snapshots"
+  },
+  "button.i-understand": {
+    "defaultMessage": "أفهم ذلك"
+  },
+  "button.install": {
+    "defaultMessage": "تثبيت"
   },
   "button.max": {
     "defaultMessage": "حد اقصى"
@@ -149,11 +227,23 @@
   "button.more-options": {
     "defaultMessage": "مزيد من الخيارات"
   },
+  "button.move": {
+    "defaultMessage": "نقل"
+  },
   "button.next": {
     "defaultMessage": "التالي"
   },
   "button.open-folder": {
     "defaultMessage": "فتح المجلد"
+  },
+  "button.open-in-browser": {
+    "defaultMessage": "فتح في المتصفح"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "فتح في المجلد"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "فتح في Modrinth"
   },
   "button.play": {
     "defaultMessage": "لعب"
@@ -162,10 +252,16 @@
     "defaultMessage": "تحديث"
   },
   "button.reinstall-modpack": {
-    "defaultMessage": "إعادة تثبيت حزمة التعديل"
+    "defaultMessage": "إعادة تثبيت المودباك"
+  },
+  "button.remove": {
+    "defaultMessage": "إزالة"
   },
   "button.remove-image": {
     "defaultMessage": "إزالة الصورة"
+  },
+  "button.rename": {
+    "defaultMessage": "إعادة التسمية"
   },
   "button.repair": {
     "defaultMessage": "إصلاح"
@@ -197,6 +293,9 @@
   "button.show-all-versions": {
     "defaultMessage": "عرض جميع الإصدارات"
   },
+  "button.show-file": {
+    "defaultMessage": "إظهار الملف"
+  },
   "button.sign-in": {
     "defaultMessage": "تسجيل الدخول"
   },
@@ -209,6 +308,9 @@
   "button.stop": {
     "defaultMessage": "إيقاف"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "تبديل الإصدار"
+  },
   "button.switch-version": {
     "defaultMessage": "تبديل الإصدار"
   },
@@ -216,7 +318,7 @@
     "defaultMessage": "إلغاء المتابعة"
   },
   "button.unlink-modpack": {
-    "defaultMessage": "إلغاء الربط حزمة التعديلات"
+    "defaultMessage": "إلغاء ربط المودباك"
   },
   "button.update": {
     "defaultMessage": "تحديث"
@@ -236,8 +338,38 @@
   "changelog.product.web": {
     "defaultMessage": "منصّة"
   },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "هذه المجموعة فارغة."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "جارٍ تحميل المشاريع..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "لا توجد مشاريع تطابق بحثك."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {مشروع واحد} two {مشروعان} few {# مشاريع} many {# مشروعًا} other {# مشروع}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "البحث عن المشاريع"
+  },
   "collections.label.private": {
     "defaultMessage": "خاص"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "المحتوى"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {عنصر واحد} two {عنصران} few {# عناصر} many {# عنصرًا} other {# عنصر}}"
+  },
+  "content.card.frozen": {
+    "defaultMessage": "هذا المشروع مقفل على إصداره الحالي حتى يتم إلغاء تثبيته."
+  },
+  "content.card.select-project": {
+    "defaultMessage": "تحديد {project}"
+  },
+  "content.card.uploaded": {
+    "defaultMessage": "تم الرفع"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "هل تؤكد رغبتك بتحديث {count, plural, one {# مشروع} other {# مشاريع}} لاصداراتها المتوافقة الأخيرة؟ ينصح بتحديثها واحدا تلو الاۤخر."
@@ -248,6 +380,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "حدث المشاريع"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "اضغط مع الاستمرار على مفتاح Shift أثناء النقر على «تحديث الكل» لتخطي رسالة التأكيد هذه مستقبلًا."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "حدث {count, plural, one {# مشروع} other {# مشاريع}}"
   },
@@ -257,14 +392,887 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "تحذير الحذف"
   },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "حذف {count, number} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "حذف {itemType}"
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "تعطيل {itemType}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "قد يتسبب {action, select, downgrade {الرجوع إلى إصدار أقدم} other {التحديث}} في حدوث مشكلات في التوافق. ستظل التعديلات أو المحتوى الذي أضفته إلى المودباك محفوظة، لكنها قد لا تكون متوافقة مع الإصدار الجديد."
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "تحذير {action, select, downgrade {خفض الٳصدار} other {التحديث}}"
   },
   "content.confirm-modpack-update.confirm-button": {
-    "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
+    "defaultMessage": "{action, select, downgrade {إرجاع إصدار} other {تحديث}} المودباك"
   },
   "content.confirm-modpack-update.header": {
-    "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
+    "defaultMessage": "{action, select, downgrade {إرجاع إصدار} other {تحديث}} المودباك"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "سيتم دمج المودات والمحتوى مع ما أضفته إلى المودباك، وستتوقف عن تلقي التحديثات."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "جارٍ إلغاء ربط المودباك"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "إلغاء ربط المودباك"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "إلغاء الربط"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "هذا المحتوى مطلوب من محتوى آخر"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "المتأثر {count, plural, one {مشروع واحد} two {مشروعان} few {# مشاريع} many {# مشروعًا} other {# مشروع}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "بعض المشاريع المحددة مثبتة كتبعيات. وقد يؤدي حذفها إلى تعطيل {context} أو منع تحميل المحتوى الذي يعتمد عليها بشكل صحيح."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "نسخة"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "خادم"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "حذف على أي حال"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "حذف {count, number} {itemType}"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "جارٍ الحذف"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "تعطيل العناصر التي تعتمد عليه بعد حذفه"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "قد يتعذّر تحميل المحتوى الذي يعتمد عليه، أو قد يتم تعطيله تلقائيًا"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "قد يتعطل {context} لديك، أو يرفض التشغيل، أو يعمل بشكل غير متوقع"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "تحذير بشأن التبعيات"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} مثبت كتَبعية. قد يؤدي حذفه إلى تعطّل {context} لديك أو منع تحميل المحتوى الذي يعتمد عليه بشكل صحيح."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "ماذا سيحدث؟"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "تمت إضافة {count}"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "ملفات الإعدادات التي تم تعديلها"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "تمت الإضافة (تَبعية)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "معطّل"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "تمت الإزالة (معطّل)"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "تم التحديث"
+  },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "عدم التثبيت"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "تمت الإضافة"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "تمت الإزالة"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "تم التحديث"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {ملف واحد} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "إصدار اللعبة"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "التثبيت على أي حال"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "محمّل"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "المودباك المرتبط"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "إلغاء ربط المودباك"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} تم إزالته"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "تم إزالة {count} (معطل)"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "غير معروف"
+  },
+  "content.filter.disabled": {
+    "defaultMessage": "معطّل"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "مفعّل"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "تحديثات"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "تحذيرات"
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "عالم"
+  },
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "خادم"
+  },
+  "content.managed-card.settings": {
+    "defaultMessage": "إعدادات التثبيت"
+  },
+  "content.managed-card.shared-content": {
+    "defaultMessage": "المحتوى المشترك"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "جارٍ تثبيت المحتوى..."
+  },
+  "content.managed-card.summary.loading": {
+    "defaultMessage": "جارٍ تحميل ملخص المحتوى المُدار"
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "تغيير الإصدار"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "تم المزامنة منذ {time}"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "تحديث متاح"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "تم التحديث منذ {time}"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "جارٍ التحديث..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "عرض المحتوى"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "المؤلف"
+  },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "البيئة"
+  },
+  "content.metadata-filter.open-source": {
+    "defaultMessage": "مفتوح المصدر"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "المحتوى المشترك"
+  },
+  "content.metadata-filter.source.external": {
+    "defaultMessage": "خارجي"
+  },
+  "content.metadata-filter.state": {
+    "defaultMessage": "الحالة"
+  },
+  "content.metadata-filter.state.disabled": {
+    "defaultMessage": "معطّل"
+  },
+  "content.metadata-filter.state.enabled": {
+    "defaultMessage": "مفعّل"
+  },
+  "content.metadata-filter.update.available": {
+    "defaultMessage": "التحديث المتاح"
+  },
+  "content.metadata-filter.warning.client-depends": {
+    "defaultMessage": "العميل يعتمد على الملف"
+  },
+  "content.metadata-filter.warning.client-only": {
+    "defaultMessage": "محتوى خاص بالعميل"
+  },
+  "content.metadata-filter.warning.client-retained": {
+    "defaultMessage": "تم الاحتفاظ بملف العميل"
+  },
+  "content.metadata-filter.warning.none": {
+    "defaultMessage": "لا توجد تحذيرات"
+  },
+  "content.metadata-filter.warnings": {
+    "defaultMessage": "تحذيرات"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "محتوى إضافي"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "تصفح المحتوى"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "يرجى الانتظار حتى تكتمل العملية قبل تعديل المحتوى."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "تصفّح أو ارفع {contentType} للبدء"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "إضافة محتوى إضافي إلى المودباك هذا"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "لا يوجد محتوى مثبت"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "لا يوجد محتوى إضافي مثبت"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "تعذّر تحميل المحتوى"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "تصفية"
+  },
+  "content.page-layout.filter.author-count": {
+    "defaultMessage": "{count, plural, one {مؤلف واحد} two {مؤلفان} few {# مؤلفين} many {# مؤلفًا} other {# مؤلف}}"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "جارٍ تحميل المحتوى..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "لم يتم العثور على محتوى."
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "يرجى الانتظار"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "البحث عن {count, number} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "أسماء الملفات"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "مشاركة"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "روابط Markdown"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "روابط المشاريع"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "أسماء المشاريع"
+  },
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "الاسم (A-Z)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "الاسم (Z-A)"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "الأحدث أولًا"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "الأقدم أولا"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "حدّث الكلّ"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "تحميل الملفّات"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "إنشاء عالم"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "إنهاء"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "استيراد"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "إعداد السيرفر"
+  },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "رقم الإصدار"
+  },
+  "creation-flow.modal.custom-setup.game-version.placeholder": {
+    "defaultMessage": "حدد نسخة اللعبة"
+  },
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "تخصيص"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "عشوائي"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "رفع"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "الأخير"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "غير ذلك"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "مستقر"
+  },
+  "creation-flow.modal.custom-setup.loader-version.label": {
+    "defaultMessage": "إصدار المقلع"
+  },
+  "creation-flow.modal.custom-setup.loader-version.placeholder": {
+    "defaultMessage": "اختر إصدار المقلع"
+  },
+  "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
+    "defaultMessage": "ابحث اصدار المقلع"
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "مقلع"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "الإسم"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "سهل"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "صعب"
+  },
+  "creation-flow.modal.final-config.difficulty.label": {
+    "defaultMessage": "الصعوبة"
+  },
+  "creation-flow.modal.final-config.difficulty.normal": {
+    "defaultMessage": "عادي"
+  },
+  "creation-flow.modal.final-config.difficulty.peaceful": {
+    "defaultMessage": "مسالم"
+  },
+  "creation-flow.modal.final-config.game-version.placeholder": {
+    "defaultMessage": "اختر إصدار اللعبة"
+  },
+  "creation-flow.modal.final-config.gamemode.creative": {
+    "defaultMessage": "إبداع"
+  },
+  "creation-flow.modal.final-config.gamemode.hardcore": {
+    "defaultMessage": "صعوبة شديدة"
+  },
+  "creation-flow.modal.final-config.gamemode.label": {
+    "defaultMessage": "وضع اللعب"
+  },
+  "creation-flow.modal.final-config.gamemode.survival": {
+    "defaultMessage": "البقاء"
+  },
+  "creation-flow.modal.final-config.generate-structures.description": {
+    "defaultMessage": "يتحكم في توليد القرى والحصون وغيرها من الهياكل في القطع الجديدة."
+  },
+  "creation-flow.modal.final-config.generate-structures.label": {
+    "defaultMessage": "إنشاء الهياكل"
+  },
+  "creation-flow.modal.final-config.generator-settings-json.placeholder": {
+    "defaultMessage": "أدخل إعدادات المولّد بتنسيق JSON"
+  },
+  "creation-flow.modal.final-config.generator-settings.custom": {
+    "defaultMessage": "مخصص"
+  },
+  "creation-flow.modal.final-config.generator-settings.default": {
+    "defaultMessage": "افتراضي"
+  },
+  "creation-flow.modal.final-config.generator-settings.description": {
+    "defaultMessage": "يُستخدم لتخصيص العالم بشكل متقدم، مثل تخصيص طبقات العالم المسطح."
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "مسطح"
+  },
+  "creation-flow.modal.final-config.generator-settings.label": {
+    "defaultMessage": "إعدادات المولد"
+  },
+  "creation-flow.modal.final-config.generator-settings.placeholder": {
+    "defaultMessage": "اختيار نمط العالم"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "اسم العالم"
+  },
+  "creation-flow.modal.final-config.world-name.placeholder": {
+    "defaultMessage": "ادخل اسم العالم"
+  },
+  "creation-flow.modal.final-config.world-seed.description": {
+    "defaultMessage": "اتركها فارغة لبذرة عشوائية."
+  },
+  "creation-flow.modal.final-config.world-seed.label-with-optional": {
+    "defaultMessage": "بذرة مولد العالم <optional>(اختياري)</optional>"
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "أدخل بذرة العالم"
+  },
+  "creation-flow.modal.final-config.world-type.amplified": {
+    "defaultMessage": "مضخّمة"
+  },
+  "creation-flow.modal.final-config.world-type.default": {
+    "defaultMessage": "الافتراضي"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "نمط العالم"
+  },
+  "creation-flow.modal.final-config.world-type.large-biomes": {
+    "defaultMessage": "مناطق أحيائية كبيرة"
+  },
+  "creation-flow.modal.final-config.world-type.placeholder": {
+    "defaultMessage": "اختر نمط العالم"
+  },
+  "creation-flow.modal.final-config.world-type.single-biome": {
+    "defaultMessage": "منطقة أحيائية منفردة"
+  },
+  "creation-flow.modal.final-config.world-type.superflat": {
+    "defaultMessage": "مسطح تمامًا"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "إضافة"
+  },
+  "creation-flow.modal.import-instance.custom-launcher.name": {
+    "defaultMessage": "مخصص ({pathName})"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "جارٍ اكتشاف نسخ المشغّل..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "نسخ المشغّل"
+  },
+  "creation-flow.modal.import-instance.launcher-path.add": {
+    "defaultMessage": "إضافة مسار المشغّل"
+  },
+  "creation-flow.modal.import-instance.launcher-path.placeholder": {
+    "defaultMessage": "مسار المشغّل..."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "لم يتم العثور على أي نسخ قابلة للاستيراد في المسار المحدد."
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "لم يتم العثور على أي نسخ"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "البحث عن اسم النسخة"
+  },
+  "creation-flow.modal.import-instance.selection.clear-all": {
+    "defaultMessage": "مسح الكل"
+  },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "تصفح المودباكات"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "استيراد المودباكات"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "هل تعرف بالفعل المودباك الذي تريد تثبيته؟"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "لم يتم العثور على نتائج"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "البحث عن المودباك"
+  },
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "هل تعرف بالفعل ما تريد أن تلعب؟"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "لم يتم العثور على نتائج"
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.description": {
+    "defaultMessage": "ابدأ من الصفر باختيار محمّل وإصدار اللعبة."
+  },
+  "creation-flow.modal.setup-type.option.custom-setup.title": {
+    "defaultMessage": "إعداد مخصص"
+  },
+  "creation-flow.modal.setup-type.option.import-instance.description": {
+    "defaultMessage": "استيراد نسخة من Prism أو CurseForge أو ما شابه."
+  },
+  "creation-flow.modal.setup-type.option.import-instance.title": {
+    "defaultMessage": "استيراد نسخة"
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
+    "defaultMessage": "ماينكرافت الكلاسيكية بدون تعديلات أو إضافات."
+  },
+  "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
+    "defaultMessage": "ماينكرافت الاصلي"
+  },
+  "creation-flow.modal.setup-type.title.installation": {
+    "defaultMessage": "اختر نوع التثبيت"
+  },
+  "creation-flow.modal.setup-type.title.world": {
+    "defaultMessage": "اختر نمط العالم"
+  },
+  "creation-flow.title.set-up-server": {
+    "defaultMessage": "إعداد السيرفر"
+  },
+  "empty-state.upload-versions.description": {
+    "defaultMessage": "عد مرة أخرى بمجرد تحميل الإصدارات الخاصة بك."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "لا يمكن تحميل الملفات"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "أضف ملفات…"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "مقبول"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "الدليل مرفوض"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "اكتمل"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "بدون إذن"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "غير مسموح"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "الأخرى"
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "ملاحظات"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "إزالة الصورة"
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "قد يتحقق فريق Modrinth من الإثبات المُقدَّم"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "حفظ الإسناد"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "اختر ترخيصًا..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "سبب طلب الإذن"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "يرجى تضمين رابط لترخيصك. إذا لم يكن لديك ترخيص، فمن الأفضل على الأرجح اختيار 'جميع الحقوق محفوظة/بدون ترخيص'"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "يرجى تقديم توضيح أو رفع صورة إثبات واحدة على الأقل."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "يرجى تقديم رابط."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "يرجى تقديم ملاحظة أو رفع صورة إثبات واحدة على الأقل."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "يرجى رفع صورة بصيغة PNG أو JPEG أو GIF أو WebP أو BMP."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "يرجى رفع صورة إثبات واحدة على الأقل."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "يلزم تقديم توضيح مختصر أو صور إثبات."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "التوضيح"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "مجموعة الإسناد {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, one {ملف واحد} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "الملفات المضمّنة:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "مضمّن في {count, plural, one {إصدار واحد} two {إصدارين} few {# إصدارات} many {# إصدارًا} other {# إصدار}}:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "آخر تحديث في {date} بواسطة {user}"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "غير معروف"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "الترخيص:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "رابط العمل:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "السبب"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "تعذّر حفظ مراجعة الإشراف"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "هذه الملفات غير مستخدمة حاليًا في أي إصدار."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "ملاحظات:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "لا يوجد"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "المشروع الأصلي"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "لقطة شاشة للإثبات {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "صور الإثبات:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "تم الإسناد تلقائيًا"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "لقد سبق أن رأينا هذا الملف، وأعددنا لك إسنادًا له. إذا كان هناك شيء غير صحيح، يُرجى التواصل مع دعم Modrinth عبر مركز المساعدة"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "الترخيص"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "يسمح لك ترخيص هذا العمل بإعادة توزيعه ضمن المودباك الخاصة بك."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "ارفع مستندات داعمة متعلقة بهذا الترخيص."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "مشروعي"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "عمل أصلي من إنشائك."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "ارفع ملفات تساعد في التحقق من أنك أنشأت هذا العمل."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "لا يوجد إذن"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "لقد سبق أن رأينا هذا الملف، وترخيصه لا يسمح عادةً بإعادة توزيعه."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "ليس لديك إذن لاستخدام هذا العمل."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "إذن خاص"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "لقد حصلت على إذن خاص لإعادة توزيع هذا العمل ضمن المودباك الخاصة بك."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "حذف المجموعة"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "سيؤدي هذا إلى حذف مجموعة الإسناد هذه وجميع الملفات الموجودة فيها نهائيًا. لا يمكن التراجع عن هذا الإجراء."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "هل تريد حذف {title}؟"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "تعذّر حذف المجموعة"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "اضغط باستمرار على Shift أثناء النقر لتخطي التأكيد."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "إزالة من المجموعة"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "تعذّر تقسيم الملف"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} + {count} أخرى"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "مشرف"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "حذف {name}\""
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "حذف الملف"
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "فشل في مشاركة الملف"
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "تم حفظ الملف"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "بحث"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "استبدال"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "استبدال كل شيء"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "استبدال"
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "فشل الحفظ"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "الملفات"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "المجلد"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "المجلدات"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "تم تعطيل عمليات الملفات أثناء تنفيذ العملية."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "حدث خطأ أثناء إجراء المحاكاة"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "فشلت المحاكاة"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "لا توجد ملفات أو مجلدات."
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "هذا المجلد فارغ"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "قد لا يكون المجلد موجودًا."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "تعذّر تحميل الملفات"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "بدأ الاستخراج"
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "تم تحديد {count}"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "لديك تغييرات غير محفوظة."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "الموقع الحالي"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "مسار الوجهة"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "على سبيل المثال: /my-folder"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "نقل {type}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "العودة إلى الصفحة الرئيسية"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "التنقّل التفصيلي"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "إنشاء جديد..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "التنقّل بين الملفات"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "لبحث في الملف"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "الصفحة الرئيسية"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "تثبيت مودباك CurseForge"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "ملف جديد"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "مجلد جديد"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "البحث في الملفات"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "مشاركة على mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "رفع ملف"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "رفع من ملف ‎.zip‎"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "فع من رابط ملف ‎.zip‎"
+  },
+  "files.operations.current-file": {
+    "defaultMessage": "الملف الحالي: {file}"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "تم استخراج {size}"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "جارٍ استخراج {source}"
+  },
+  "files.operations.extracting-completed": {
+    "defaultMessage": "اكتمل استخراج {source}"
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "فشل استخراج {source}"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "المودباك من الرابط"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "إعادة تسمية {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "الاسم الجديد"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {عنصر واحد} two {عنصران} few {# عناصر} many {# عنصرًا} other {# عنصر}}"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "المجلد الأصل"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "تم الإنشاء"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "تم التعديل"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "الإسم"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "الحجم"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "لديك تغييرات غير محفوظة ستفقدها إذا غادرت. هل تريد حفظها قبل المغادرة؟"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "تجاهل"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "تغييرات غير محفوظة"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "تم الإلغاء"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "فشل - الملف موجود بالفعل"
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "إسم"
   },
   "form.label.address-line": {
     "defaultMessage": "خط عنوان"
@@ -720,13 +1728,13 @@
     "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
   },
   "project-type.datapack.category": {
-    "defaultMessage": "حزم بيانات"
+    "defaultMessage": "داتاباك"
   },
   "project-type.mod.category": {
     "defaultMessage": "مودات"
   },
   "project-type.modpack.category": {
-    "defaultMessage": "حزم المودات"
+    "defaultMessage": "مودباكاتات"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "ماينكرافت: إصدار جافا"

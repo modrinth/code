@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wähle akkurate Tags aus"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Stelle sicher, dass Nutzer über alle wichtigen Details informiert sind, indem du die für dein {type} geltenden Angaben zum Inhalt ausfüllst."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Angaben zum Inhalt prüfen"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "Deine Beschreibung ist {length, plural, one {# lesbares Zeichen} other {# lesbare Zeichen}} lang. Mindestens {minChars, plural, one {1 Zeichen ist} other {# Zeichen sind}} empfohlen, um eine klare und informative Beschreibung zu erstellen."
   },
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Beschreibungseinstellungen ansehen"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Angabeneinstellungen öffnen"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Lizenzeinstellungen ansehen"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Allgemeine Einstellungen ansehen"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Versionseinstellungen ansehen"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Deine Zusammenfassung kann nicht identisch mit deinem Projektnamen sein. Es ist wichtig, eine informative und spannende Zusammenfassung zu erstellen."
