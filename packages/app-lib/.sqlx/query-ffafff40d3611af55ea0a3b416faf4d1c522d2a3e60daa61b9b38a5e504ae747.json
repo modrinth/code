@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE screenshots SET original_screenshot_id = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "ffafff40d3611af55ea0a3b416faf4d1c522d2a3e60daa61b9b38a5e504ae747"
+}

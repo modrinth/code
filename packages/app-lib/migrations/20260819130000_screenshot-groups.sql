@@ -6,15 +6,20 @@ CREATE TABLE screenshots (
 	file_size INTEGER NOT NULL,
 	modified_at INTEGER NOT NULL,
 	created_at INTEGER NOT NULL,
+	original_screenshot_id TEXT,
 
 	PRIMARY KEY (id),
 	UNIQUE (instance_id, file_name),
-	FOREIGN KEY (instance_id) REFERENCES instances(id) ON DELETE CASCADE
+	FOREIGN KEY (instance_id) REFERENCES instances(id) ON DELETE CASCADE,
+	FOREIGN KEY (original_screenshot_id) REFERENCES screenshots(id) ON DELETE SET NULL,
+	CHECK (original_screenshot_id IS NULL OR original_screenshot_id <> id)
 );
 
 CREATE INDEX screenshots_instance_id ON screenshots(instance_id);
 CREATE INDEX screenshots_instance_hash
 	ON screenshots(instance_id, content_hash, file_size);
+CREATE INDEX screenshots_original_screenshot_id
+	ON screenshots(original_screenshot_id);
 
 CREATE TABLE screenshot_groups (
 	id TEXT NOT NULL,

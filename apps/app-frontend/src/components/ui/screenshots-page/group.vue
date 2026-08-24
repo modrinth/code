@@ -20,6 +20,7 @@ const props = defineProps<{
 	dropCustomGroup?: boolean
 	dropCustomGroupId?: string
 	showInstanceName: boolean
+	highlightedScreenshotId?: string
 	forceOpen: boolean
 	hideHeader?: boolean
 	editableTitle?: boolean
@@ -34,7 +35,8 @@ const dropTarget = ref<HTMLElement>()
 
 const emit = defineEmits<{
 	(e: 'activate', screenshot: InstanceScreenshot, event: MouseEvent | KeyboardEvent): void
-	(e: 'toggle-selection' | 'copy' | 'open' | 'delete', screenshot: InstanceScreenshot): void
+	(e: 'toggle-selection' | 'copy' | 'edit' | 'show-original', screenshot: InstanceScreenshot): void
+	(e: 'more', screenshot: InstanceScreenshot, event: MouseEvent): void
 }>()
 
 useDroppable({
@@ -104,11 +106,13 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 					:active-dragged="activeDraggedKeys.has(getSelectionKey(screenshot))"
 					:can-drag="canDrag"
 					:show-instance-name="showInstanceName"
+					:highlighted="highlightedScreenshotId === screenshot.id"
 					@activate="(event) => emit('activate', screenshot, event)"
 					@toggle-selection="emit('toggle-selection', screenshot)"
 					@copy="emit('copy', screenshot)"
-					@open="emit('open', screenshot)"
-					@delete="emit('delete', screenshot)"
+					@edit="emit('edit', screenshot)"
+					@more="(event) => emit('more', screenshot, event)"
+					@show-original="emit('show-original', screenshot)"
 				/>
 			</TransitionGroup>
 		</ScreenshotSection>

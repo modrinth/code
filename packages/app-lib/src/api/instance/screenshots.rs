@@ -4,11 +4,14 @@ use chrono::{DateTime, Utc};
 use futures::stream::{self, StreamExt, TryStreamExt};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
+use std::io::Cursor;
 use std::path::{Component, Path, PathBuf};
 use tokio::fs::File;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 
 use crate::State;
+use crate::event::InstancePayloadType;
+use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::{
     instance_rows::{self, InstanceScreenshotSource},
     screenshot_rows::{self, ScreenshotRow},
@@ -33,9 +36,19 @@ pub struct InstanceScreenshot {
     pub instance_name: String,
     pub file_name: String,
     pub created_at: DateTime<Utc>,
+    pub modified_at: i64,
+    pub original_screenshot_id: Option<String>,
+    pub original_instance_id: Option<String>,
     pub group_id: Option<String>,
     #[serde(skip)]
     pub path: PathBuf,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScreenshotEditSaveMode {
+    CreateCopy,
+    ReplaceEdit,
 }
 
 struct ScannedScreenshot {
@@ -322,6 +335,178 @@ pub async fn get_screenshot_path(
     Ok(canonical_path)
 }
 
+pub async fn save_edited_screenshot(
+    key: ScreenshotKey,
+    png_bytes: Vec<u8>,
+    mode: ScreenshotEditSaveMode,
+) -> crate::Result<InstanceScreenshot> {
+    validate_file_name(&key.file_name)?;
+
+    let state = State::get().await?;
+    let source = instance_rows::get_instance_screenshot_source(
+        &key.instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
+    let _lock = state.lock_instance_screenshots(&source.id).await;
+
+    let scanned = scan_source_screenshots(&state, &source).await?;
+    let current =
+        reconcile_source_screenshots(&state, &source, scanned).await?;
+    let source_screenshot = current
+        .iter()
+        .find(|screenshot| screenshot.file_name == key.file_name)
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown screenshot".to_string())
+        })?;
+    let source_row = screenshot_rows::get_screenshot_by_key(
+        &key.instance_id,
+        &key.file_name,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown screenshot".to_string())
+    })?;
+
+    let source_dimensions =
+        png_dimensions(io::read(&source_screenshot.path).await?).await?;
+    let edited_dimensions = png_dimensions(png_bytes.clone()).await?;
+    if edited_dimensions != source_dimensions {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Edited screenshot dimensions must remain {}x{}",
+            source_dimensions.0, source_dimensions.1,
+        ))
+        .into());
+    }
+
+    let screenshots_dir = source_screenshots_dir(&state, &source).await?;
+    let (target_path, original_id, copy_group) = match mode {
+        ScreenshotEditSaveMode::CreateCopy => {
+            let original_id = source_row
+                .original_screenshot_id
+                .clone()
+                .unwrap_or_else(|| source_row.id.clone());
+            let root_file_name = match screenshot_rows::get_screenshot_by_id(
+                &original_id,
+                &state.pool,
+            )
+            .await?
+            {
+                Some(original) => original.file_name,
+                None => source_row.file_name.clone(),
+            };
+            (
+                available_edited_path(&screenshots_dir, &root_file_name)
+                    .await?,
+                original_id,
+                true,
+            )
+        }
+        ScreenshotEditSaveMode::ReplaceEdit => {
+            let original_id =
+                source_row.original_screenshot_id.clone().ok_or_else(|| {
+                    crate::ErrorKind::InputError(
+                        "Original screenshots cannot be replaced by the editor"
+                            .to_string(),
+                    )
+                })?;
+            (source_screenshot.path.clone(), original_id, false)
+        }
+    };
+    let target_file_name = target_path
+        .file_name()
+        .and_then(|file_name| file_name.to_str())
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Could not determine edited screenshot file name".to_string(),
+            )
+        })?
+        .to_string();
+
+    io::write(&target_path, png_bytes).await?;
+    let scanned = scan_source_screenshots(&state, &source).await?;
+    let reconciled =
+        reconcile_source_screenshots(&state, &source, scanned).await?;
+    let mut saved = reconciled
+        .into_iter()
+        .find(|screenshot| screenshot.file_name == target_file_name)
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Could not index edited screenshot".to_string(),
+            )
+        })?;
+
+    if copy_group {
+        let result: crate::Result<()> = async {
+            let mut tx = state.pool.begin().await?;
+            screenshot_rows::set_original_screenshot(
+                &saved.id,
+                &original_id,
+                &mut tx,
+            )
+            .await?;
+            screenshot_rows::copy_group_membership(
+                &source_row.id,
+                &saved.id,
+                &mut tx,
+            )
+            .await?;
+            tx.commit().await?;
+            Ok(())
+        }
+        .await;
+        if let Err(error) = result {
+            let _ = io::remove_file(&target_path).await;
+            let _ = screenshot_rows::delete_screenshot_by_key(
+                &source.id,
+                &target_file_name,
+                &state.pool,
+            )
+            .await;
+            return Err(error);
+        }
+    }
+
+    let mut saved_row =
+        screenshot_rows::get_screenshot_by_id(&saved.id, &state.pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(
+                    "Could not load edited screenshot".to_string(),
+                )
+            })?;
+    if !copy_group && saved_row.created_at != source_row.created_at {
+        saved_row.created_at = source_row.created_at;
+        let mut tx = state.pool.begin().await?;
+        screenshot_rows::update_screenshot(&saved_row, &mut tx).await?;
+        tx.commit().await?;
+        saved.created_at = DateTime::from_timestamp_millis(
+            source_row.created_at,
+        )
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Screenshot creation time is out of range".to_string(),
+            )
+        })?;
+    }
+    saved.modified_at = saved_row.modified_at;
+    saved.original_screenshot_id = saved_row.original_screenshot_id;
+    saved.original_instance_id = saved_row.original_instance_id;
+    saved.group_id = saved_row.group_id;
+
+    let _ = emit_instance(
+        &saved.instance_id,
+        InstancePayloadType::ScreenshotsUpdated,
+    )
+    .await;
+
+    Ok(saved)
+}
+
 async fn list_source_screenshots(
     state: &State,
     source: InstanceScreenshotSource,
@@ -501,6 +686,8 @@ async fn reconcile_source_screenshots(
                     file_size,
                     modified_at: scanned.modified_at,
                     created_at: scanned.created_at.timestamp_millis(),
+                    original_screenshot_id: None,
+                    original_instance_id: None,
                     group_id: None,
                 },
                 true,
@@ -543,6 +730,9 @@ async fn reconcile_source_screenshots(
             instance_name: source.name.clone(),
             file_name: screenshot.scanned.file_name,
             created_at: screenshot.scanned.created_at,
+            modified_at: screenshot.row.modified_at,
+            original_screenshot_id: screenshot.row.original_screenshot_id,
+            original_instance_id: screenshot.row.original_instance_id,
             group_id: screenshot.row.group_id,
             path: screenshot.scanned.path,
         })
@@ -616,6 +806,57 @@ async fn available_target_path(
     }
 
     unreachable!()
+}
+
+async fn available_edited_path(
+    target_dir: &Path,
+    file_name: &str,
+) -> crate::Result<PathBuf> {
+    validate_file_name(file_name)?;
+    let path = Path::new(file_name);
+    let stem = path.file_stem().and_then(|value| value.to_str()).unwrap();
+    let extension = path.extension().and_then(|value| value.to_str()).unwrap();
+
+    for suffix in 1_u32.. {
+        let edited_suffix = if suffix == 1 {
+            " edited".to_string()
+        } else {
+            format!(" edited ({suffix})")
+        };
+        let candidate =
+            target_dir.join(format!("{stem}{edited_suffix}.{extension}"));
+        if !tokio::fs::try_exists(&candidate)
+            .await
+            .map_err(|error| IOError::with_path(error, &candidate))?
+        {
+            return Ok(candidate);
+        }
+    }
+
+    unreachable!()
+}
+
+async fn png_dimensions(bytes: Vec<u8>) -> crate::Result<(u32, u32)> {
+    tokio::task::spawn_blocking(move || {
+        image::ImageReader::with_format(
+            Cursor::new(bytes),
+            image::ImageFormat::Png,
+        )
+        .decode()
+        .map(|image| (image.width(), image.height()))
+        .map_err(|error| {
+            crate::ErrorKind::InputError(format!(
+                "Could not decode screenshot as PNG: {error}"
+            ))
+            .into()
+        })
+    })
+    .await
+    .map_err(|error| {
+        crate::ErrorKind::InputError(format!(
+            "Could not validate screenshot: {error}"
+        ))
+    })?
 }
 
 fn ensure_unique_keys(keys: &[ScreenshotKey]) -> crate::Result<()> {

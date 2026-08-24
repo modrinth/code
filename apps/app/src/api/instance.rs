@@ -49,6 +49,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_list_screenshots,
             instance_list_all_screenshots,
             instance_list_synced_screenshots,
+            instance_save_edited_screenshot,
             instance_list_screenshot_groups,
             instance_create_screenshot_group,
             instance_rename_screenshot_group,
@@ -137,6 +138,9 @@ pub struct InstanceScreenshot {
     pub instance_name: String,
     pub file_name: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
+    pub modified_at: i64,
+    pub original_screenshot_id: Option<String>,
+    pub original_instance_id: Option<String>,
     pub group_id: Option<String>,
     pub path: PathBuf,
     pub url: url::Url,
@@ -689,6 +693,18 @@ pub async fn instance_list_synced_screenshots<R: Runtime>(
 }
 
 #[tauri::command]
+pub async fn instance_save_edited_screenshot<R: Runtime>(
+    app_handle: AppHandle<R>,
+    key: theseus::instance::ScreenshotKey,
+    png_bytes: Vec<u8>,
+    mode: theseus::instance::ScreenshotEditSaveMode,
+) -> Result<InstanceScreenshot> {
+    let screenshot =
+        theseus::instance::save_edited_screenshot(key, png_bytes, mode).await?;
+    serialize_screenshot(&app_handle, screenshot)
+}
+
+#[tauri::command]
 pub async fn instance_list_screenshot_groups()
 -> Result<Vec<theseus::instance::ScreenshotGroup>> {
     Ok(theseus::instance::list_screenshot_groups().await?)
@@ -787,28 +803,41 @@ fn serialize_screenshots<R: Runtime>(
     let mut result = Vec::with_capacity(screenshots.len());
 
     for screenshot in screenshots {
-        app_handle
-            .asset_protocol_scope()
-            .allow_file(&screenshot.path)
-            .map_err(|error| std::io::Error::other(error.to_string()))?;
-        app_handle
-            .fs_scope()
-            .allow_file(&screenshot.path)
-            .map_err(|error| std::io::Error::other(error.to_string()))?;
-        let url = super::utils::tauri_convert_file_src(&screenshot.path)?;
-        result.push(InstanceScreenshot {
-            id: screenshot.id,
-            instance_id: screenshot.instance_id,
-            instance_name: screenshot.instance_name,
-            file_name: screenshot.file_name,
-            created_at: screenshot.created_at,
-            group_id: screenshot.group_id,
-            path: screenshot.path,
-            url,
-        });
+        result.push(serialize_screenshot(app_handle, screenshot)?);
     }
 
     Ok(result)
+}
+
+fn serialize_screenshot<R: Runtime>(
+    app_handle: &AppHandle<R>,
+    screenshot: theseus::instance::InstanceScreenshot,
+) -> Result<InstanceScreenshot> {
+    app_handle
+        .asset_protocol_scope()
+        .allow_file(&screenshot.path)
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
+    app_handle
+        .fs_scope()
+        .allow_file(&screenshot.path)
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
+    let mut url = super::utils::tauri_convert_file_src(&screenshot.path)?;
+    url.query_pairs_mut()
+        .append_pair("revision", &screenshot.modified_at.to_string());
+
+    Ok(InstanceScreenshot {
+        id: screenshot.id,
+        instance_id: screenshot.instance_id,
+        instance_name: screenshot.instance_name,
+        file_name: screenshot.file_name,
+        created_at: screenshot.created_at,
+        modified_at: screenshot.modified_at,
+        original_screenshot_id: screenshot.original_screenshot_id,
+        original_instance_id: screenshot.original_instance_id,
+        group_id: screenshot.group_id,
+        path: screenshot.path,
+        url,
+    })
 }
 
 #[tauri::command]
