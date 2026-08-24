@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Sélectionnez des tags précis"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Soyez sûr que tous les utilisateurs sont avertis de tout détail importent en remplissant les avertissements sur le contenu de votre {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Regarder les avertissements sur le contenu"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "Votre description contient {length, plural, one {# caractère lisible} other {# caractères lisibles}}. Il est recommandé d’en avoir au moins {minChars, plural, one {# caractère} other {# caractères}} pour obtenir une description claire et informative."
   },
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Accéder aux paramètres de la description"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Visiter les paramètres d'avertissement sur le contenu"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Accéder aux paramètres de la licence"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Accéder aux paramètres généraux"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Accéder aux paramètres des versions"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Votre résumé ne peut pas être identique au nom de votre projet. Il est important de créer un résumé informatif et attrayant."

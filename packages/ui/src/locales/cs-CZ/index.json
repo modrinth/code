@@ -548,6 +548,15 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Názvy projektů"
   },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Od nejnovějších"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Od nejstarších"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Seřadit {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Aktualizovat vše"
   },
@@ -607,9 +616,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Hledat verzi hry..."
-  },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Vybrat ikonu"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Nejnovější"
@@ -764,6 +770,21 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Zrušit vše"
   },
+  "creation-flow.modal.modpack.action.browse": {
+    "defaultMessage": "Procházet modpacky"
+  },
+  "creation-flow.modal.modpack.action.import": {
+    "defaultMessage": "Importovat modpack"
+  },
+  "creation-flow.modal.modpack.known-modpack.prompt": {
+    "defaultMessage": "Už víš modpack, který chceš nainstalovat?"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Nenalezeny žádné výsledky"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Hledat modpack"
+  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Začněte od začátku výběrem loaderu a verze hry."
   },
@@ -775,12 +796,6 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Importovat instanci"
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Procházejte modpacky na Modrinthu nebo ho importujte ze souboru."
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Nainstalovat modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Klasický Minecraft bez módů nebo pluginů."
@@ -3629,9 +3644,6 @@
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Vyhledávání..."
   },
-  "servers.installing-banner.preparing.header": {
-    "defaultMessage": "Připravujeme váš server"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Už máte server?"
   },
@@ -3650,14 +3662,11 @@
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Instalace módů jedním klikem"
   },
-  "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Pozvěte přátele a nastavte jim vše přímo v Modrinth App."
-  },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Hrajte s přáteli"
   },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Přihlásit se"
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Nastavte si server stejně jako svět pro jednoho hráče."
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Zkopírováno"
@@ -3928,9 +3937,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Tmavý"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "Vyberte si preferovaný barevný motiv pro Modrinth na tomto zařízení."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Světlý"
@@ -4464,3 +4470,4 @@
     "defaultMessage": "Typ"
   }
 }
+

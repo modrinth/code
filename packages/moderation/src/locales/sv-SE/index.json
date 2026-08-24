@@ -12,10 +12,10 @@
     "defaultMessage": "Lägg till en ikon"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Lägg till IP-adressen och porten Java Edition-spelare kan använda för att gå med i din server."
+    "defaultMessage": "Lägg till IP-adressen och porten Java Edition-spelare kan använda för att ansluta till din server."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Lägg till Java-adress"
+    "defaultMessage": "Lägg till en Java-adress"
   },
   "nags.add-license-details.description": {
     "defaultMessage": "Lägg till en giltig URL och ett namn eller en SPDX-identifierare för din anpassade licens."
@@ -46,6 +46,12 @@
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Välj lämpliga taggar"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Se till att användare är medvetna om viktiga detaljer genom att fylla i innehållsinformation som gäller för ditt {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Läs innehållsinformation"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Din beskrivning är {length, plural, one {# tecken} other {# tecken}} lång. Minst {minChars, plural, one {# tecken} other {# tecken}} rekommenderas för en klar och informativ beskrivning."
@@ -174,7 +180,7 @@
     "defaultMessage": "Lista vilka språk som stöds av din server."
   },
   "nags.select-language.title": {
-    "defaultMessage": "Välj språk"
+    "defaultMessage": "Välj ett språk"
   },
   "nags.select-license.description": {
     "defaultMessage": "Välj licensen ditt {type} är utgiven under."
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Besök beskrivningsinställningar"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Besök informationsinställningar"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Besök licensinställningar"
   },
@@ -201,13 +210,16 @@
     "defaultMessage": "Besök länkinställningar"
   },
   "nags.settings.permissions.title": {
-    "defaultMessage": "Gå till behörighets kontrollpanel"
+    "defaultMessage": "Besök behörighetskontrollpanel"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Besök tagginställningar"
   },
   "nags.settings.title": {
     "defaultMessage": "Besök allmänna inställningar"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Besök versionsinställningar"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Din sammanfattning kan inte vara samma som projektnamnet. Det är viktigt att skriva en informativ och lockande sammanfattning."

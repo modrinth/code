@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Izaberi tačne oznake"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Uverite se da su korisnici svesni svih važnih detalja tako što ćete popuniti obaveštenja o sadržaju koja se odnose na vaš {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Proverite obaveštenja o sadržaju"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "Tvoj opis je {length, plural, one {# čitljiv karakter} few {# čitljiva karaktera} other {# čitljivih karaktera}}. Barem {minChars, plural, one {# karakter} other {# karaktera}} je preporučeno kreiranje jasnog i informativnog opisa."
   },
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Posjeti podešavanja opisa"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Posetite podešavanja sadržaja"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Posjeti podešavanja licenca"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Posjeti generalna podešavanja"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Posetite podešavanja verzija"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Tvog rezime ne može biti isti kao naziv tvog projekta. Važno je da napraviš informativan i privlačan rezime."
@@ -253,6 +265,12 @@
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Barem jedna slika u geliriji je potrebna da bi se predstavio sadržaj tvog {type}."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Potrebna je najmanje jedna slika iz galerije da bi se prikazao sadržaj vašeg resource packa, osim za audio ili packove lokalizacije. Ako ovo opisuje vaš pack, izaberite odgovarajući tag."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Potrebne su najmanje tri slike iz galerije da bi se prikazao sadržaj vašeg shadera u različitim situacijama i uslovima."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Postavi sliku za geleriju"

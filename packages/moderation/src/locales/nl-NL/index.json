@@ -75,7 +75,7 @@
     "defaultMessage": "Afbeelding uit de galerij uitlichten"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Bezoek de galerijpagina"
+    "defaultMessage": "Galerijpagina bekijken"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "Je {type} maakt gebruik van een licentie die vereist dat de broncode beschikbaar is. Geef voor elke extra versie een link naar de broncode of het bronbestand op, of overweeg om een andere licentie te gebruiken."
@@ -208,6 +208,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Bekijk algemene instellingen"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Versie-instellingen bekijken"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Je samenvatting kan niet dezelfde naam hebben als je projectnaam. Het is belangrijk om een informatieve en interessante samenvatting te maken."

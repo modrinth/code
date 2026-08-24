@@ -395,6 +395,12 @@
   "content.page-layout.share.label": {
     "defaultMessage": "Del"
   },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Ældst først"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sorter efter {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Opdater alle"
   },
@@ -430,9 +436,6 @@
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Opsæt server"
-  },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Vælg ikon"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Navn"
@@ -497,8 +500,11 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Ryd alle"
   },
-  "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Installer modpack"
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Ingen resultater fundet"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Søg efter modpack"
   },
   "external-files.permissions-card.add-files-to-group": {
     "defaultMessage": "Tilføj filer..."
@@ -1967,8 +1973,8 @@
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Spil med venner"
   },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Log ind"
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Simpel opsætning"
   },
   "servers.notice.heading.info": {
     "defaultMessage": "Information"
@@ -2068,9 +2074,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Mørk"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "Vælg dit foretrukne farvetema til Modrinth på denne enhed."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Lys"
@@ -2214,3 +2217,4 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
+
