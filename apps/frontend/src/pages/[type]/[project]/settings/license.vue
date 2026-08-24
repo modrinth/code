@@ -72,7 +72,7 @@
 					</span>
 				</label>
 
-				<div class="w-1/2">
+				<div class="flex w-1/2 flex-col gap-2">
 					<StyledInput
 						id="license-url"
 						v-model="current.licenseUrl"
@@ -84,6 +84,7 @@
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
+					<LinkCheckMessage :check="effectiveLicenseCheck" />
 				</div>
 			</div>
 
@@ -145,7 +146,8 @@
 				!(
 					current.license.friendly === 'Custom' &&
 					(current.license.short === '' || current.licenseUrl === '')
-				)
+				) &&
+				effectiveLicenseCheck?.severity !== 'error'
 			"
 			@reset="reset"
 			@save="save"
@@ -154,6 +156,7 @@
 </template>
 
 <script setup lang="ts">
+import { useLinkCheck } from '@modrinth/moderation'
 import {
 	Checkbox,
 	Combobox,
@@ -168,6 +171,8 @@ import {
 } from '@modrinth/ui'
 import { builtinLicenses, formatProjectType, TeamMemberPermission } from '@modrinth/utils'
 import { computed } from 'vue'
+
+import LinkCheckMessage from '@/components/LinkCheckMessage.vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
@@ -225,6 +230,15 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 
 		await patchProject(payload)
 	},
+)
+
+const effectiveLicenseCheck = useLinkCheck(
+	computed(() => ({
+		field: 'license',
+		url: current.value.licenseUrl,
+		expectedLicense: current.value.license.short,
+		isCustom: current.value.license.friendly === 'Custom',
+	})),
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
