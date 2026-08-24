@@ -41,6 +41,7 @@
 					:disabled="hasHitLimit"
 					@update:model-value="updatedName()"
 				/>
+				<ValidationMessage :check="nameValidation" />
 			</div>
 			<label for="slug" class="flex flex-col gap-2.5">
 				<span class="text-md font-semibold text-contrast">
@@ -108,6 +109,7 @@
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
 				/>
+				<ValidationMessage :check="summaryValidation" />
 				<span>{{ formatMessage(messages.summaryDescription) }}</span>
 			</div>
 			<div class="flex justify-end gap-2.5">
@@ -148,6 +150,8 @@ import {
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
 
+import ValidationMessage from '~/components/ValidationMessage.vue'
+import { validateProjectText } from '~/composables/project-text-validation'
 import { generateUrlSlug } from '~/utils/slugs'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
@@ -303,8 +307,12 @@ const visibilities = ref<VisibilityOption[]>([
 ])
 const visibility = ref<VisibilityOption>(visibilities.value[0])
 
+const nameValidation = computed(() => validateProjectText(name.value))
+const summaryValidation = computed(() => validateProjectText(description.value))
+
 const disableCreate = computed(() => {
 	if (hasHitLimit.value) return true
+	if (nameValidation.value || summaryValidation.value) return true
 	if (!name.value.trim() || !slug.value.trim()) return true
 	if (description.value.trim().length < 3) return true
 	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
@@ -392,6 +400,7 @@ async function fetchOrganizations() {
 }
 
 async function createProject() {
+	if (disableCreate.value) return
 	startLoading()
 
 	const formData = new FormData()

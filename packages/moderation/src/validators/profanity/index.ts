@@ -499,7 +499,7 @@ function findAt(root: TrieNode, text: string, start: number): ProfanityMatch | u
 		const matchesNegative = current.negatives.some((negative) =>
 			negativeMatches(negative, text, start, end),
 		)
-		if (matchesNegative && current.children.size === 0) return undefined
+		if (matchesNegative) continue
 
 		return {
 			kind: current.terminal.kind,

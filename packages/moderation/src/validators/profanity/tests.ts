@@ -57,7 +57,7 @@ test('uses the first terminal when one configured term prefixes another', () => 
 })
 
 test('does not match configured false-positive substrings', () => {
-	assert.equal(validateProfanity('Scunthorpe and peacock').valid, true)
+	assert.equal(validateProfanity('Scunthorpe, Clitheroe, and peacock').valid, true)
 	assert.equal(validateProfanity('cock and cunt').profanityCount, 2)
 })
 

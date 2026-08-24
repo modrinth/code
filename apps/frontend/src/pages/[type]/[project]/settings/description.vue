@@ -17,13 +17,10 @@
 			</div>
 			<MarkdownEditor
 				v-model="current.description"
-				:disabled="
-					!currentMember ||
-					(currentMember?.permissions! & TeamMemberPermission.EDIT_BODY) !==
-						TeamMemberPermission.EDIT_BODY
-				"
+				:disabled="!hasPermission"
 				:on-image-upload="onUploadHandler"
 			/>
+			<ValidationMessage :check="descriptionValidation" class="mt-2" />
 			<div v-if="descriptionWarning" class="mt-2">
 				<SettingsInlineWarning>
 					{{ descriptionWarning }}
@@ -34,6 +31,7 @@
 			:original="saved"
 			:modified="current"
 			:saving="saving"
+			:can-save="canSave"
 			@reset="reset"
 			@save="save"
 		/>
@@ -56,7 +54,9 @@ import { TeamMemberPermission } from '@modrinth/utils'
 import { computed, useTemplateRef } from 'vue'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { validateProjectText } from '~/composables/project-text-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
@@ -64,7 +64,14 @@ const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.description)
 
-const { saved, current, saving, hasChanges, reset, save } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	hasChanges,
+	reset,
+	save: saveForm,
+} = useSavable(
 	() => ({ description: project.value.body }),
 	async ({ description }) => {
 		await patchProject({ body: description })
@@ -72,6 +79,20 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
+
+const hasPermission = computed(
+	() =>
+		!!currentMember.value &&
+		(currentMember.value.permissions & TeamMemberPermission.EDIT_BODY) ===
+			TeamMemberPermission.EDIT_BODY,
+)
+const descriptionValidation = computed(() => validateProjectText(current.value.description))
+const canSave = computed(() => hasPermission.value && !descriptionValidation.value)
+
+async function save() {
+	if (!canSave.value) return
+	await saveForm()
+}
 
 const descriptionWarning = computed(() => {
 	const text = current.value.description?.trim() || ''
