@@ -2075,7 +2075,7 @@ if (!route.name.startsWith('type-project-settings')) {
 		ogImage: () =>
 			project.value
 				? (project.value?.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png')
-				: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
+				: 'https://cdn-raw.modrinth.com/not-found.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})
