@@ -35,6 +35,9 @@
   "nags.add-links.title": {
     "defaultMessage": "Přidejte externí odkazy"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "Vybrali jste všechny dostupné možnosti jazyka. Prosím uveďte pouze jazyky, které váš server aktivně podporuje."
+  },
   "nags.all-languages.title": {
     "defaultMessage": "Vyberte si přesné jazyky"
   },
@@ -43,6 +46,12 @@
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Vyberte odpovídající štítky"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Ujistěte se, že uživatelé jsou si vědomi všech důležitých detailů vyplněním informací o obsahu, které se vztahují na váš {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Zkontrolovat zveřejnění obsahu"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
@@ -191,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Přejděte do nastavení popisu"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Přejděte do nastavení zveřejnění"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Přejděte do nastavení licence"
   },
@@ -205,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Přejděte do obecného nastavení"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Přejděte do nastavení verze"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Souhrn se nesmí shodovat s názvem projektu. Je důležité vytvořit informativní a poutavý souhrn."
@@ -273,4 +288,3 @@
     "defaultMessage": "Přejděte do nastavení odkazů"
   }
 }
-

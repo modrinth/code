@@ -17,6 +17,9 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Añade una dirección Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Añade una URL válida y un nombre o identificador SPDX para su licencia personalizada."
+  },
   "nags.add-license-details.title": {
     "defaultMessage": "Agregar detalles de la licencia"
   },
@@ -43,6 +46,12 @@
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona etiquetas precisas"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Asegúrate de que los usuarios estén al tanto de cualquier detalle importante rellenando las divulgaciones de contenido que se aplican a tu {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Comprobar divulgaciones de contenido"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Tu descripción tiene {length, plural, one {# carácter legible} other {# caracteres legibles}}. Se recomienda un mínimo de {minChars, plural, one {# carácter} other {# caracteres}} para crear una descripción clara e informativa."
@@ -191,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Visitar la configuración de la descripción"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Visita la configuración de divulgación"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Visitar la configuración de la licencia"
   },
@@ -205,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Visitar la configuración general"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Visita los ajustes de versiones"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Tu resumen no puede ser igual al Nombre de tu proyecto. Es importante crear un Resumen informativo y atractivo."
@@ -250,6 +265,12 @@
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu paquete de recursos, excepto para los paquetes de audio o localización. Si este es el caso de tu paquete, selecciona la etiqueta correspondiente."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Se requieren al menos tres imágenes en la galería para mostrar el contenido de su shader en diversas situaciones y condiciones."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

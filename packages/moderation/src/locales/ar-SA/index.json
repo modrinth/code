@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "اختر علامة دقيقة"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "تأكد من اطلاع المستخدمين على أي تفاصيل مهمة من خلال تعبئة إفصاحات المحتوى التي تنطبق على {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "تحقق من إفصاحات المحتوى"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "وصفك هو {length, plural, one {# readable character} other {# readable characters}}. يُوصى بأن يكون على الأقل {minChars, plural, one {# character}other{#characters}} لإنشاء وصف واضح وغني بالمعلومات."
   },
@@ -87,7 +93,7 @@
     "defaultMessage": "بعض روابطك الإضافية تبدو متطابقة. كل رابط يجب أن يكون فريدا بنوع رابط مناسب."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Clean up identical links"
+    "defaultMessage": "تنظيف الروابط المتطابقة"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "وصفك يجب أن يحتوي على نص عادي أو نص بديل للصورة، لتكون متاحة لمستخدمي قارئ الشاشة أو من لا توجد عنده اتصال إنترنت جيد."
@@ -114,7 +120,7 @@
     "defaultMessage": "لا تستخدم مقصر روابط"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# header} other {# headers}} في وصفك {count, plural, one {طويل جدًا} other {طويلة جدًا}}.يجب أن تكون العناوين مختصرة وتعمل كعناوين للأقسام،وليست جملًا كاملة.\n"
+    "defaultMessage": "{count, plural, one {# header} other {# headers}} في وصفك {count, plural, one {طويل جدًا} other {طويلة جدًا}}.يجب أن تكون العناوين مختصرة وتعمل كعناوين للأقسام،وليست جملًا كاملة. "
   },
   "nags.long-headers.title": {
     "defaultMessage": "قصر العناوين"
@@ -147,19 +153,19 @@
     "defaultMessage": "مراجعة التعليقات."
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "لقد اخترت {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}) حزمة الموارد يجب ان تمتلك فقط علامة دقة واحدة تتطابق مع دقتهم الأساسية."
+    "defaultMessage": "لقد اخترت {count, plural, one {وسم دقة واحد} two {وسمي دقة} few {# وسوم دقة} many {# وسم دقة} other {# وسم دقة}} ({tags}). يُفضّل أن يحتوي ريسورسباك عادةً على وسم دقة واحد فقط، بحيث يتوافق مع دقته الأساسية."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "أختر قرار صحيح"
   },
   "nags.review-permissions.description": {
-    "defaultMessage": "الرجاء التأكد من توفير إثبات لحصولك على أُذون لنشر أي محتوى خارجي في حزمة التعديلات الخاصة بك."
+    "defaultMessage": "تأكد من تقديم ما يثبت حصولك على إذن لتوزيع أي محتوى خارجي ضمن المودباك الخاص بك."
   },
   "nags.review-permissions.title": {
     "defaultMessage": "مراجعة الأُذون الخارجية"
   },
   "nags.select-compatibility.description": {
-    "defaultMessage": "ماهي الإصدارات التي يدعمها خادمك. اختر مودباك, أو اضف من عندك."
+    "defaultMessage": "حدد إصدارات اللعبة التي يدعمها خادمك، واختر مودباك أو ارفع مودباكك الخاص."
   },
   "nags.select-compatibility.title": {
     "defaultMessage": "اختر التوافق."
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "زيارة إعدادات الوصف"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "انتقل إلى إعدادات الإفصاحات"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "زيارة إعدادات الحقوق"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "زيارة الإعدادات العامة"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "زيارة إعدادات الإصدارات"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "لا يمكن أن يكون ملخص مشروعك نفس اسمه. من المهم أن تصنع ملخصا واضحا وغني بالمعلومات."
@@ -253,6 +265,12 @@
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "يُطلب صورة واحدة على الأقل في المَعْرِض لعرض محتوى {type} الخاص بك."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "يجب إضافة صورة واحدة على الأقل إلى المعرض لعرض محتوى الريسورسباك الخاص بك، باستثناء ريسورساكات الصوت أو الترجمة. إذا كان هذا ينطبق على ريسورسباكك، يُرجى اختيار الوسم المناسب."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "يلزم وجود ثلاث صور معرض على الأقل لعرض محتوى المظلل (Shader) الخاص بك في مجموعة متنوعة من الحالات والظروف."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "رفع صورة من المَعْرِض"

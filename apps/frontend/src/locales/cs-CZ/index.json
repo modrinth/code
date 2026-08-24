@@ -8,6 +8,15 @@
   "admin.billing.error.not-found": {
     "message": "Uživatel nebyl nalezen"
   },
+  "ads-consent.accept": {
+    "message": "Přijmout vše"
+  },
+  "ads-consent.manage": {
+    "message": "Spravovat preference"
+  },
+  "ads-consent.reject": {
+    "message": "Odmítnout vše"
+  },
   "analytics.action.add": {
     "message": "Přidat"
   },
@@ -140,6 +149,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Skrýt {name} v grafu"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Žádná data"
+  },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Připnuto"
   },
@@ -155,11 +167,17 @@
   "analytics.chart.view.area": {
     "message": "Oblast"
   },
+  "analytics.chart.view.line": {
+    "message": "Čára"
+  },
   "analytics.download-reason.dependency": {
     "message": "Závislosti"
   },
   "analytics.download-reason.modpack": {
     "message": "Modpack"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Samostatný"
   },
   "analytics.download-reason.update": {
     "message": "Aktualizace"
@@ -266,8 +284,14 @@
   "analytics.group-by.year": {
     "message": "Rok"
   },
+  "analytics.loading.fetching-results": {
+    "message": "Načítání výsledků..."
+  },
   "analytics.options.loading": {
     "message": "Načítání..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Projekt schválen"
   },
   "analytics.project-event.project-private": {
     "message": "Projekt nastaven jako soukromý"
@@ -361,6 +385,9 @@
   },
   "analytics.stat.revenue": {
     "message": "Zisk"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
   },
   "analytics.stat.unavailable": {
     "message": "Nedostupné"

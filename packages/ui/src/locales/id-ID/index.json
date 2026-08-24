@@ -503,6 +503,15 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nama proyek"
   },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Terbaru dahulu"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Tertua dahulu"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Urutkan berdasarkan {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Perbarui semua"
   },
@@ -571,9 +580,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Cari versi permainan..."
-  },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Pilih ikon"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Terbaru"
@@ -724,6 +730,9 @@
   },
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Kosongkan semua"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Hasil pencarian tidak ditemukan"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Minecraft klasik tanpa mod atau pasang-masuk."
@@ -2471,9 +2480,6 @@
   "settings.display.theme.dark": {
     "defaultMessage": "Gelap"
   },
-  "settings.display.theme.description": {
-    "defaultMessage": "Pilih tema warna pilihan untuk Modrinth di perangkat ini."
-  },
   "settings.display.theme.light": {
     "defaultMessage": "Terang"
   },
@@ -2946,3 +2952,4 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
+

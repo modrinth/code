@@ -47,6 +47,9 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "適切なタグを選択する"
   },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "コンテンツの開示を確認"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "説明文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい説明文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
   },
@@ -193,6 +196,9 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "説明の設定を表示"
+  },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "開示設定を開く"
   },
   "nags.settings.license.title": {
     "defaultMessage": "ライセンス設定を表示"
