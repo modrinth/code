@@ -878,6 +878,15 @@
   "auth.sign-in.last-sign-in": {
     "message": "Last used"
   },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "We’re returning you to the Modrinth App. If nothing happens, use the button below."
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Open Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "You’re signed in"
+  },
   "auth.sign-in.no-account": {
     "message": "Don't have an account?"
   },
