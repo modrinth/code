@@ -1,28 +1,37 @@
+import { useDebugLogger } from '@modrinth/ui'
 import { readFile } from '@tauri-apps/plugin-fs'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
-import type { InstanceScreenshot } from '@/helpers/instance'
+import type { InstanceScreenshot, ScreenshotEditorData } from '@/helpers/instance'
 
 import { renderCensorRegion } from './censor-object'
 import type {
 	EditorHistoryEntry,
 	ScreenshotCensorMode,
+	ScreenshotEditorDocument,
 	ScreenshotEditorObjectKind,
 	ScreenshotEditorObjectState,
 	ScreenshotEditorPropertyKind,
 	ScreenshotEditorSourceRect,
 	ScreenshotEditorTool,
+	ScreenshotEraserMode,
 } from './editor-types'
 
 type FabricModule = typeof import('fabric')
 type FabricCanvas = import('fabric').Canvas
 type FabricObject = import('fabric').FabricObject
+type FabricPoint = import('fabric').Point
+type FabricPath = import('fabric').Path
+type FabricPathData = Exclude<ConstructorParameters<FabricModule['Path']>[0], string>
 type FabricImage = import('fabric').FabricImage
 type FabricGroup = import('fabric').Group
+type FabricImageOptions = ConstructorParameters<FabricModule['FabricImage']>[1]
 type EditorFabricObject = FabricObject & {
 	editorKind?: ScreenshotEditorObjectKind
 	fontSize?: number
 	sourceRect?: ScreenshotEditorSourceRect
+	censorMode?: ScreenshotCensorMode
+	censorColor?: string
 }
 
 type FabricPointerEvent = {
@@ -34,9 +43,22 @@ const MAX_ZOOM = 4
 const CONTROL_SIZE = 14
 const CONTROL_TOUCH_SIZE = 24
 const SELECTION_COLOR = '#1bd96a'
+const CENSOR_REGENERATED_PROPERTIES = new Set([
+	'type',
+	'version',
+	'src',
+	'filters',
+	'resizeFilter',
+	'clipPath',
+	'editorKind',
+	'sourceRect',
+	'censorMode',
+	'censorColor',
+])
 const TOOL_SHORTCUTS: Partial<Record<string, ScreenshotEditorTool>> = {
 	a: 'arrow',
 	c: 'censor',
+	e: 'eraser',
 	h: 'highlight',
 	o: 'ellipse',
 	p: 'pen',
@@ -48,6 +70,7 @@ const TOOL_SHORTCUTS: Partial<Record<string, ScreenshotEditorTool>> = {
 type PropertyValueKind = 'size' | 'width'
 
 export function useScreenshotEditor() {
+	const debugEraser = useDebugLogger('ScreenshotEditor:Eraser')
 	const canvas = shallowRef<FabricCanvas>()
 	const loading = ref(false)
 	const tool = ref<ScreenshotEditorTool>('select')
@@ -55,6 +78,7 @@ export function useScreenshotEditor() {
 	const strokeWidth = ref(6)
 	const fontSize = ref(30)
 	const censorMode = ref<ScreenshotCensorMode>('blur')
+	const eraserMode = ref<ScreenshotEraserMode>('element')
 	const zoom = ref(1)
 	const fitScale = ref(1)
 	const isFit = ref(true)
@@ -70,6 +94,7 @@ export function useScreenshotEditor() {
 	const propertyValueKind = computed<PropertyValueKind | undefined>(() => {
 		const kind = selectedPropertyKind.value ?? (selectionCount.value === 0 ? tool.value : undefined)
 		if (kind === 'text') return 'size'
+		if (kind === 'eraser' && eraserMode.value === 'area') return 'width'
 		if (
 			kind === 'pen' ||
 			kind === 'highlight' ||
@@ -94,12 +119,14 @@ export function useScreenshotEditor() {
 		)
 	})
 	const showCensorMode = computed(() => selectionCount.value === 0 && tool.value === 'censor')
+	const showEraserMode = computed(() => selectionCount.value === 0 && tool.value === 'eraser')
 	const canZoomOut = computed(() => zoom.value > MIN_ZOOM)
 	const canZoomIn = computed(() => zoom.value < MAX_ZOOM)
 
-	const defaultWidths: Record<Exclude<PropertyValueKind, 'size'> | 'highlight', number> = {
+	const defaultWidths: Record<'width' | 'highlight' | 'eraser', number> = {
 		width: 6,
 		highlight: 24,
+		eraser: 24,
 	}
 	let defaultColor = '#ffffff'
 	let defaultFontSize = 30
@@ -113,13 +140,27 @@ export function useScreenshotEditor() {
 	let restoringHistory = false
 	let constructingObject = false
 	let propertyEditStart: string | undefined
+	let persistEditorState = false
+	let erasing = false
+	let erasedDuringGesture = false
 
-	async function initialize(element: HTMLCanvasElement, screenshot: InstanceScreenshot) {
+	watch(eraserMode, () => {
+		finishErasing()
+		if (tool.value === 'eraser') setTool('eraser')
+	})
+
+	async function initialize(
+		element: HTMLCanvasElement,
+		screenshot: InstanceScreenshot,
+		editorData: ScreenshotEditorData,
+	) {
 		dispose()
 		loading.value = true
 		try {
 			fabric = await import('fabric')
-			const bytes = await readFile(screenshot.path)
+			const document = parseEditorDocument(editorData.editor_state)
+			persistEditorState = Boolean(document) || !screenshot.original_screenshot_id
+			const bytes = await readFile(document ? editorData.background_path : screenshot.path)
 			sourceUrl = URL.createObjectURL(new Blob([bytes], { type: 'image/png' }))
 			sourceImage = await loadImage(sourceUrl)
 			originalWidth.value = sourceImage.naturalWidth
@@ -148,6 +189,13 @@ export function useScreenshotEditor() {
 			setEditorMetadata(background, 'background')
 			nextCanvas.add(background)
 			nextCanvas.sendObjectToBack(background)
+			if (document) {
+				const restored = await enlivenEditorObjects(document.objects)
+				for (const object of restored) {
+					styleObjectControls(object)
+					nextCanvas.add(object)
+				}
+			}
 			bindCanvasEvents(nextCanvas)
 			resetHistory()
 			setTool('select')
@@ -166,6 +214,12 @@ export function useScreenshotEditor() {
 			}
 		})
 		editorCanvas.on('path:created', ({ path }) => {
+			if (tool.value === 'eraser' && eraserMode.value === 'area') {
+				void eraseAreaWithPath(path).catch((error) => {
+					debugEraser('area:error', error)
+				})
+				return
+			}
 			setEditorMetadata(path, tool.value === 'highlight' ? 'highlight' : 'pen')
 			styleObjectControls(path)
 			recordHistory()
@@ -188,6 +242,7 @@ export function useScreenshotEditor() {
 	}
 
 	function setTool(nextTool: ScreenshotEditorTool) {
+		if (nextTool !== 'eraser') finishErasing()
 		tool.value = nextTool
 		const editorCanvas = canvas.value
 		if (!editorCanvas || !fabric) return
@@ -196,11 +251,15 @@ export function useScreenshotEditor() {
 			| undefined
 		if (activeObject?.isEditing && nextTool !== 'text') activeObject.exitEditing?.()
 
-		editorCanvas.isDrawingMode = nextTool === 'pen' || nextTool === 'highlight'
+		editorCanvas.isDrawingMode =
+			nextTool === 'pen' ||
+			nextTool === 'highlight' ||
+			(nextTool === 'eraser' && eraserMode.value === 'area')
 		editorCanvas.selection = nextTool === 'select'
 		for (const object of annotationObjects()) {
 			object.selectable = nextTool === 'select'
-			object.evented = nextTool === 'select'
+			object.evented =
+				nextTool === 'select' || (nextTool === 'eraser' && eraserMode.value === 'element')
 			styleObjectControls(object)
 		}
 		if (nextTool !== 'select') editorCanvas.discardActiveObject()
@@ -219,14 +278,45 @@ export function useScreenshotEditor() {
 
 	function configureBrush(editorCanvas: FabricCanvas) {
 		if (!fabric || !editorCanvas.isDrawingMode) return
-		const brush = new fabric.PencilBrush(editorCanvas)
-		brush.color = tool.value === 'highlight' ? hexToRgba(color.value, 0.35) : color.value
+		const brush =
+			tool.value === 'eraser'
+				? createAreaEraserBrush(editorCanvas, fabric)
+				: new fabric.PencilBrush(editorCanvas)
+		brush.color =
+			tool.value === 'eraser'
+				? 'rgba(255, 255, 255, 0.45)'
+				: tool.value === 'highlight'
+					? hexToRgba(color.value, 0.35)
+					: color.value
 		brush.width = strokeWidth.value
 		editorCanvas.freeDrawingBrush = brush
 	}
 
+	function createAreaEraserBrush(editorCanvas: FabricCanvas, fabricModule: FabricModule) {
+		const editorSourceImage = sourceImage
+		return new (class extends fabricModule.PencilBrush {
+			override _setBrushStyles(context: CanvasRenderingContext2D) {
+				super._setBrushStyles(context)
+				const backgroundPattern = editorSourceImage
+					? context.createPattern(editorSourceImage, 'no-repeat')
+					: null
+				if (backgroundPattern) context.strokeStyle = backgroundPattern
+			}
+		})(editorCanvas)
+	}
+
 	function configureCursor(editorCanvas: FabricCanvas, nextTool: ScreenshotEditorTool) {
-		const cursor = nextTool === 'select' ? 'default' : nextTool === 'text' ? 'text' : 'crosshair'
+		const hasBrushCursor =
+			nextTool === 'pen' ||
+			nextTool === 'highlight' ||
+			(nextTool === 'eraser' && eraserMode.value === 'area')
+		const cursor = hasBrushCursor
+			? 'none'
+			: nextTool === 'select'
+				? 'default'
+				: nextTool === 'text'
+					? 'text'
+					: 'crosshair'
 		editorCanvas.defaultCursor = cursor
 		editorCanvas.freeDrawingCursor = cursor
 		editorCanvas.hoverCursor = nextTool === 'select' ? 'move' : cursor
@@ -262,6 +352,8 @@ export function useScreenshotEditor() {
 			fontSize.value = defaultFontSize
 		} else if (tool.value === 'highlight') {
 			strokeWidth.value = defaultWidths.highlight
+		} else if (tool.value === 'eraser') {
+			strokeWidth.value = defaultWidths.eraser
 		} else {
 			strokeWidth.value = defaultWidths.width
 		}
@@ -289,6 +381,7 @@ export function useScreenshotEditor() {
 			setObjectStrokeWidth(selected, kind, nextWidth)
 		} else if (selectionCount.value === 0) {
 			if (tool.value === 'highlight') defaultWidths.highlight = nextWidth
+			else if (tool.value === 'eraser') defaultWidths.eraser = nextWidth
 			else defaultWidths.width = nextWidth
 			refreshToolSettings()
 		}
@@ -377,10 +470,192 @@ export function useScreenshotEditor() {
 		canvas.value?.requestRenderAll()
 	}
 
+	function beginErasing(point: FabricPoint) {
+		erasing = true
+		erasedDuringGesture = false
+		constructingObject = true
+		eraseAtPoint(point)
+	}
+
+	function eraseAtPoint(point: FabricPoint) {
+		const editorCanvas = canvas.value
+		if (!editorCanvas) return
+		const { target } = editorCanvas.searchPossibleTargets(annotationObjects(), point)
+		if (!target || target === background) return
+		editorCanvas.remove(target)
+		erasedDuringGesture = true
+		editorCanvas.requestRenderAll()
+	}
+
+	function finishErasing() {
+		if (!erasing) return
+		erasing = false
+		constructingObject = false
+		if (erasedDuringGesture) recordHistory()
+		erasedDuringGesture = false
+		syncSelectionProperties()
+		canvas.value?.requestRenderAll()
+	}
+
+	async function eraseAreaWithPath(eraserPath: FabricPath) {
+		const editorCanvas = canvas.value
+		const fabricModule = fabric
+		if (!editorCanvas || !fabricModule) return
+
+		constructingObject = true
+		const eraserBounds = eraserPath.getBoundingRect()
+		const eraserMask = createAreaEraserMask(eraserPath, fabricModule)
+		editorCanvas.remove(eraserPath)
+		const targets = annotationObjects().filter((object) =>
+			boundingRectsOverlap(eraserBounds, object.getBoundingRect()),
+		)
+
+		try {
+			await Promise.all(
+				targets.map(async (object) => {
+					const clipPath = await eraserMask.clone()
+					fabricModule.util.sendObjectToPlane(clipPath, undefined, object.calcTransformMatrix())
+					const nextClipPath = object.clipPath
+						? fabricModule.util.mergeClipPaths(object.clipPath, clipPath)
+						: clipPath
+					object.set('clipPath', nextClipPath)
+				}),
+			)
+		} finally {
+			constructingObject = false
+		}
+
+		if (targets.length > 0) recordHistory()
+		editorCanvas.requestRenderAll()
+	}
+
+	function createAreaEraserMask(eraserPath: FabricPath, fabricModule: FabricModule) {
+		const points = samplePathPoints(eraserPath, fabricModule)
+		const width = Math.max(1, eraserPath.strokeWidth)
+		const radius = width / 2
+		const maskPath: FabricPathData = []
+
+		if (points.length === 1) {
+			const point = points[0]
+			maskPath.push(
+				['M', point.x + radius, point.y],
+				['A', radius, radius, 0, 1, 0, point.x - radius, point.y],
+				['A', radius, radius, 0, 1, 0, point.x + radius, point.y],
+				['Z'],
+			)
+		} else {
+			for (let index = 1; index < points.length; index++) {
+				const start = points[index - 1]
+				const end = points[index]
+				const deltaX = end.x - start.x
+				const deltaY = end.y - start.y
+				const length = Math.hypot(deltaX, deltaY)
+				if (length === 0) continue
+				const normalX = (-deltaY / length) * radius
+				const normalY = (deltaX / length) * radius
+				maskPath.push(
+					['M', start.x + normalX, start.y + normalY],
+					['L', end.x + normalX, end.y + normalY],
+					['A', radius, radius, 0, 0, 1, end.x - normalX, end.y - normalY],
+					['L', start.x - normalX, start.y - normalY],
+					['A', radius, radius, 0, 0, 1, start.x + normalX, start.y + normalY],
+					['Z'],
+				)
+			}
+		}
+
+		const brushMask = new fabricModule.Path(maskPath, {
+			absolutePositioned: false,
+			fill: '#000000',
+			inverted: true,
+			opacity: 1,
+			strokeWidth: 0,
+		})
+		const outerMask = new fabricModule.Rect({
+			left: 0,
+			top: 0,
+			originX: 'left',
+			originY: 'top',
+			width: originalWidth.value,
+			height: originalHeight.value,
+			fill: '#000000',
+			strokeWidth: 0,
+		})
+		fabricModule.util.sendObjectToPlane(brushMask, undefined, outerMask.calcTransformMatrix())
+		outerMask.set('clipPath', brushMask)
+		return outerMask
+	}
+
+	function samplePathPoints(eraserPath: FabricPath, fabricModule: FabricModule) {
+		const sampled: FabricPoint[] = []
+		const transform = eraserPath.calcTransformMatrix()
+		const pathOffset = eraserPath.pathOffset
+		const spacing = Math.max(2, eraserPath.strokeWidth / 3)
+		let current = { x: 0, y: 0 }
+
+		const addPoint = (x: number, y: number) => {
+			const point = new fabricModule.Point(x - pathOffset.x, y - pathOffset.y).transform(transform)
+			const previous = sampled.at(-1)
+			if (!previous || !previous.eq(point)) sampled.push(point)
+		}
+		const addLine = (end: { x: number; y: number }) => {
+			const steps = Math.max(
+				1,
+				Math.ceil(Math.hypot(end.x - current.x, end.y - current.y) / spacing),
+			)
+			for (let step = 1; step <= steps; step++) {
+				const progress = step / steps
+				addPoint(
+					current.x + (end.x - current.x) * progress,
+					current.y + (end.y - current.y) * progress,
+				)
+			}
+			current = end
+		}
+
+		for (const pathCommand of eraserPath.path) {
+			const command = pathCommand[0]
+			if (command === 'M') {
+				current = { x: Number(pathCommand[1]), y: Number(pathCommand[2]) }
+				addPoint(current.x, current.y)
+			} else if (command === 'L') {
+				addLine({ x: Number(pathCommand[1]), y: Number(pathCommand[2]) })
+			} else if (command === 'Q') {
+				const start = current
+				const control = { x: Number(pathCommand[1]), y: Number(pathCommand[2]) }
+				const end = { x: Number(pathCommand[3]), y: Number(pathCommand[4]) }
+				const estimatedLength =
+					Math.hypot(control.x - start.x, control.y - start.y) +
+					Math.hypot(end.x - control.x, end.y - control.y)
+				const steps = Math.max(2, Math.ceil(estimatedLength / spacing))
+				for (let step = 1; step <= steps; step++) {
+					const progress = step / steps
+					const inverse = 1 - progress
+					addPoint(
+						inverse * inverse * start.x +
+							2 * inverse * progress * control.x +
+							progress * progress * end.x,
+						inverse * inverse * start.y +
+							2 * inverse * progress * control.y +
+							progress * progress * end.y,
+					)
+				}
+				current = end
+			}
+		}
+
+		if (sampled.length === 0) addPoint(0, 0)
+		return sampled
+	}
+
 	function handleMouseDown(event: FabricPointerEvent) {
 		const editorCanvas = canvas.value
 		if (!editorCanvas || !fabric || editorCanvas.isDrawingMode || tool.value === 'select') return
 		const point = editorCanvas.getScenePoint(event.e)
+		if (tool.value === 'eraser' && eraserMode.value === 'element') {
+			beginErasing(point)
+			return
+		}
 
 		if (tool.value === 'text') {
 			constructingObject = true
@@ -451,7 +726,12 @@ export function useScreenshotEditor() {
 
 	function handleMouseMove(event: FabricPointerEvent) {
 		const editorCanvas = canvas.value
-		if (!editorCanvas || !drawingStart || !drawingObject) return
+		if (!editorCanvas) return
+		if (tool.value === 'eraser' && eraserMode.value === 'element') {
+			if (erasing) eraseAtPoint(editorCanvas.getScenePoint(event.e))
+			return
+		}
+		if (!drawingStart || !drawingObject) return
 		const point = editorCanvas.getScenePoint(event.e)
 		const rect = normalizedRect(drawingStart, point)
 
@@ -473,7 +753,13 @@ export function useScreenshotEditor() {
 
 	function handleMouseUp(event: FabricPointerEvent) {
 		const editorCanvas = canvas.value
-		if (!editorCanvas || !fabric || !drawingStart || !drawingObject) return
+		if (!editorCanvas) return
+		if (erasing) {
+			eraseAtPoint(editorCanvas.getScenePoint(event.e))
+			finishErasing()
+			return
+		}
+		if (!fabric || !drawingStart || !drawingObject) return
 		const start = drawingStart
 		const point = editorCanvas.getScenePoint(event.e)
 		const rect = normalizedRect(start, point)
@@ -504,6 +790,9 @@ export function useScreenshotEditor() {
 				evented: false,
 			})
 			setEditorMetadata(censor, 'censor', rect)
+			const editorCensor = censor as EditorFabricObject
+			editorCensor.censorMode = censorMode.value
+			editorCensor.censorColor = color.value
 			styleObjectControls(censor)
 			const censorCount = annotationObjects().filter(
 				(object) => object.editorKind === 'censor',
@@ -585,10 +874,69 @@ export function useScreenshotEditor() {
 
 	function snapshot(): EditorHistoryEntry {
 		return {
-			objects: annotationObjects().map((object) =>
-				object.toObject(['editorKind', 'sourceRect']),
-			) as ScreenshotEditorObjectState[],
+			objects: annotationObjects().map((object) => {
+				const state = object.toObject([
+					'editorKind',
+					'sourceRect',
+					'censorMode',
+					'censorColor',
+				]) as ScreenshotEditorObjectState
+				if (object.editorKind === 'censor') delete state.src
+				return state
+			}),
 		}
+	}
+
+	async function enlivenEditorObjects(states: ScreenshotEditorObjectState[]) {
+		const fabricModule = fabric
+		const editorSourceImage = sourceImage
+		if (!fabricModule || !editorSourceImage) return []
+		const enlivenObjects = fabricModule.util.enlivenObjects as unknown as (
+			objects: ScreenshotEditorObjectState[],
+		) => Promise<EditorFabricObject[]>
+
+		return await Promise.all(
+			states.map(async (state) => {
+				if (state.editorKind !== 'censor') {
+					const [object] = await enlivenObjects([state])
+					if (!object) throw new Error('Could not restore screenshot annotation')
+					return object
+				}
+
+				if (!isSourceRect(state.sourceRect)) {
+					throw new Error('Could not restore screenshot censor region')
+				}
+				const restoredMode: ScreenshotCensorMode = state.censorMode === 'solid' ? 'solid' : 'blur'
+				const restoredColor = typeof state.censorColor === 'string' ? state.censorColor : '#000000'
+				const serializedClipPath =
+					state.clipPath && typeof state.clipPath === 'object'
+						? (state.clipPath as ScreenshotEditorObjectState)
+						: undefined
+				const censorCanvas = renderCensorRegion(
+					editorSourceImage,
+					state.sourceRect,
+					restoredMode,
+					restoredColor,
+				)
+				const objectOptions = Object.fromEntries(
+					Object.entries(state).filter(
+						([property]) => !CENSOR_REGENERATED_PROPERTIES.has(property),
+					),
+				) as ScreenshotEditorObjectState
+				const censor = new fabricModule.FabricImage(
+					censorCanvas,
+					objectOptions as unknown as FabricImageOptions,
+				) as EditorFabricObject
+				setEditorMetadata(censor, 'censor', state.sourceRect)
+				censor.censorMode = restoredMode
+				censor.censorColor = restoredColor
+				if (serializedClipPath) {
+					const [clipPath] = await enlivenObjects([serializedClipPath])
+					if (clipPath) censor.clipPath = clipPath
+				}
+				return censor
+			}),
+		)
 	}
 
 	async function restoreHistory(index: number) {
@@ -599,10 +947,7 @@ export function useScreenshotEditor() {
 		try {
 			editorCanvas.discardActiveObject()
 			editorCanvas.remove(...annotationObjects())
-			const enlivenObjects = fabric.util.enlivenObjects as unknown as (
-				objects: ScreenshotEditorObjectState[],
-			) => Promise<EditorFabricObject[]>
-			const restored = await enlivenObjects(entry.objects)
+			const restored = await enlivenEditorObjects(entry.objects)
 			for (const object of restored) {
 				styleObjectControls(object)
 				editorCanvas.add(object)
@@ -714,6 +1059,15 @@ export function useScreenshotEditor() {
 		return new Uint8Array(await blob.arrayBuffer())
 	}
 
+	function exportEditorState() {
+		if (!persistEditorState) return null
+		const document: ScreenshotEditorDocument = {
+			version: 1,
+			...snapshot(),
+		}
+		return JSON.stringify(document)
+	}
+
 	function handleKeyboardShortcut(event: KeyboardEvent) {
 		const activeObject = canvas.value?.getActiveObject() as
 			| (EditorFabricObject & { isEditing?: boolean; exitEditing?: () => void })
@@ -747,6 +1101,10 @@ export function useScreenshotEditor() {
 		}
 		if (event.key === 'Escape') {
 			event.preventDefault()
+			if (erasing) {
+				finishErasing()
+				return true
+			}
 			if (drawingObject) {
 				canvas.value?.remove(drawingObject)
 				drawingObject = undefined
@@ -806,6 +1164,9 @@ export function useScreenshotEditor() {
 		selectedPropertyKind.value = undefined
 		selectionCount.value = 0
 		propertyEditStart = undefined
+		persistEditorState = false
+		erasing = false
+		erasedDuringGesture = false
 	}
 
 	return {
@@ -815,6 +1176,7 @@ export function useScreenshotEditor() {
 		strokeWidth,
 		fontSize,
 		censorMode,
+		eraserMode,
 		zoom,
 		isFit,
 		canUndo,
@@ -825,6 +1187,7 @@ export function useScreenshotEditor() {
 		hasColorProperty,
 		propertyValueKind,
 		showCensorMode,
+		showEraserMode,
 		initialize,
 		dispose,
 		setTool,
@@ -840,10 +1203,39 @@ export function useScreenshotEditor() {
 		setZoom,
 		setFit,
 		exportPng,
+		exportEditorState,
 		handleKeyboardShortcut,
 		isTextEditing,
 		resetHistory,
 	}
+}
+
+function parseEditorDocument(value: string | null | undefined) {
+	if (!value) return undefined
+	try {
+		const document = JSON.parse(value) as Partial<ScreenshotEditorDocument>
+		if (document.version !== 1 || !Array.isArray(document.objects)) return undefined
+		return document as ScreenshotEditorDocument
+	} catch {
+		return undefined
+	}
+}
+
+function isSourceRect(value: unknown): value is ScreenshotEditorSourceRect {
+	if (!value || typeof value !== 'object') return false
+	const rect = value as Partial<ScreenshotEditorSourceRect>
+	return (
+		typeof rect.left === 'number' &&
+		Number.isFinite(rect.left) &&
+		typeof rect.top === 'number' &&
+		Number.isFinite(rect.top) &&
+		typeof rect.width === 'number' &&
+		Number.isFinite(rect.width) &&
+		rect.width > 0 &&
+		typeof rect.height === 'number' &&
+		Number.isFinite(rect.height) &&
+		rect.height > 0
+	)
 }
 
 function setEditorMetadata(
@@ -854,6 +1246,18 @@ function setEditorMetadata(
 	const editorObject = object as EditorFabricObject
 	editorObject.editorKind = kind
 	editorObject.sourceRect = sourceRect
+}
+
+function boundingRectsOverlap(
+	left: { left: number; top: number; width: number; height: number },
+	right: { left: number; top: number; width: number; height: number },
+) {
+	return (
+		left.left <= right.left + right.width &&
+		left.left + left.width >= right.left &&
+		left.top <= right.top + right.height &&
+		left.top + left.height >= right.top
+	)
 }
 
 function normalizedRect(start: { x: number; y: number }, end: { x: number; y: number }) {

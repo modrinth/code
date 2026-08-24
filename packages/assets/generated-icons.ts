@@ -114,6 +114,7 @@ import _DownloadIcon from './icons/download.svg?component'
 import _DropdownIcon from './icons/dropdown.svg?component'
 import _EditIcon from './icons/edit.svg?component'
 import _EllipsisVerticalIcon from './icons/ellipsis-vertical.svg?component'
+import _EraserIcon from './icons/eraser.svg?component'
 import _ExpandIcon from './icons/expand.svg?component'
 import _ExternalIcon from './icons/external.svg?component'
 import _EyeIcon from './icons/eye.svg?component'
@@ -564,6 +565,7 @@ export const DownloadIcon = _DownloadIcon
 export const DropdownIcon = _DropdownIcon
 export const EditIcon = _EditIcon
 export const EllipsisVerticalIcon = _EllipsisVerticalIcon
+export const EraserIcon = _EraserIcon
 export const ExpandIcon = _ExpandIcon
 export const ExternalIcon = _ExternalIcon
 export const EyeIcon = _EyeIcon

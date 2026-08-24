@@ -10,6 +10,7 @@ pub(crate) struct ScreenshotRow {
     pub modified_at: i64,
     pub created_at: i64,
     pub original_screenshot_id: Option<String>,
+    pub editor_state: Option<String>,
     pub original_instance_id: Option<String>,
     pub group_id: Option<String>,
 }
@@ -36,6 +37,7 @@ pub(crate) async fn list_screenshots(
 			screenshots.modified_at,
 			screenshots.created_at,
 			screenshots.original_screenshot_id,
+			screenshots.editor_state,
 			original.instance_id AS "original_instance_id?",
 			memberships.group_id AS "group_id?"
 		FROM screenshots
@@ -69,6 +71,7 @@ pub(crate) async fn get_screenshot_by_key(
 			screenshots.modified_at,
 			screenshots.created_at,
 			screenshots.original_screenshot_id,
+			screenshots.editor_state,
 			original.instance_id AS "original_instance_id?",
 			memberships.group_id AS "group_id?"
 		FROM screenshots
@@ -101,6 +104,7 @@ pub(crate) async fn get_screenshot_by_id(
 			screenshots.modified_at,
 			screenshots.created_at,
 			screenshots.original_screenshot_id,
+			screenshots.editor_state,
 			original.instance_id AS "original_instance_id?",
 			memberships.group_id AS "group_id?"
 		FROM screenshots
@@ -125,6 +129,22 @@ pub(crate) async fn set_original_screenshot(
         "UPDATE screenshots SET original_screenshot_id = ? WHERE id = ?",
         original_id,
         edited_id,
+    )
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn set_editor_state(
+    screenshot_id: &str,
+    editor_state: Option<&str>,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    sqlx::query!(
+        "UPDATE screenshots SET editor_state = ? WHERE id = ?",
+        editor_state,
+        screenshot_id,
     )
     .execute(&mut **tx)
     .await?;
@@ -198,7 +218,8 @@ pub(crate) async fn update_screenshot(
 			content_hash = ?,
 			file_size = ?,
 			modified_at = ?,
-			created_at = ?
+			created_at = ?,
+			editor_state = ?
 		WHERE id = ?
 		",
         row.instance_id,
@@ -207,6 +228,7 @@ pub(crate) async fn update_screenshot(
         row.file_size,
         row.modified_at,
         row.created_at,
+        row.editor_state,
         row.id,
     )
     .execute(&mut **tx)

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE screenshots\n\t\tSET\n\t\t\tinstance_id = ?,\n\t\t\tfile_name = ?,\n\t\t\tcontent_hash = ?,\n\t\t\tfile_size = ?,\n\t\t\tmodified_at = ?,\n\t\t\tcreated_at = ?,\n\t\t\teditor_state = ?\n\t\tWHERE id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "73ea6c6070d2db879b625a18c1672e637a36e0b5539936a815083f4013058591"
+}

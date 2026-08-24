@@ -93,6 +93,7 @@ function activate(event: MouseEvent | KeyboardEvent) {
 		"
 		:aria-pressed="selectionActive ? selected : undefined"
 		@click="activate"
+		@contextmenu.prevent.stop="emit('more', $event)"
 		@keydown="activate"
 	>
 		<button

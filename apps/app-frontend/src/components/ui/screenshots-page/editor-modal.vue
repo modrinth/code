@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
 	CircleIcon,
+	EraserIcon,
 	EyeOffIcon,
 	HighlighterIcon,
 	MousePointer2Icon,
@@ -12,12 +13,14 @@ import {
 	TrashIcon,
 	TypeIcon,
 	UndoIcon,
+	XIcon,
 	ZoomInIcon,
 	ZoomOutIcon,
 } from '@modrinth/assets'
 import {
 	Button,
 	Chips,
+	commonMessages,
 	defineMessages,
 	IconButton,
 	injectNotificationManager,
@@ -28,9 +31,13 @@ import {
 } from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 
-import type { InstanceScreenshot } from '@/helpers/instance'
+import { get_screenshot_editor_data, type InstanceScreenshot } from '@/helpers/instance'
 
-import type { ScreenshotCensorMode, ScreenshotEditorTool } from './editor-types'
+import type {
+	ScreenshotCensorMode,
+	ScreenshotEditorTool,
+	ScreenshotEraserMode,
+} from './editor-types'
 import { useScreenshotEditor } from './use-screenshot-editor'
 
 const props = defineProps<{
@@ -42,6 +49,7 @@ const emit = defineEmits<{
 		payload: {
 			screenshot: InstanceScreenshot
 			pngBytes: Uint8Array
+			editorState: string | null
 			mode: 'create_copy' | 'replace_edit'
 		},
 	]
@@ -52,9 +60,11 @@ const canvasElement = ref<HTMLCanvasElement>()
 const viewport = ref<HTMLElement>()
 const screenshot = ref<InstanceScreenshot>()
 const exporting = ref(false)
+const loadingEditorData = ref(false)
 const closingAfterSave = ref(false)
 const spacePressed = ref(false)
 const panning = ref<{ x: number; y: number; scrollLeft: number; scrollTop: number }>()
+const brushPointer = ref({ x: 0, y: 0, visible: false })
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 
@@ -65,6 +75,7 @@ const {
 	strokeWidth,
 	fontSize,
 	censorMode,
+	eraserMode,
 	zoom,
 	isFit,
 	canUndo,
@@ -75,6 +86,7 @@ const {
 	hasColorProperty,
 	propertyValueKind,
 	showCensorMode,
+	showEraserMode,
 	initialize,
 	dispose,
 	setTool,
@@ -90,13 +102,17 @@ const {
 	setZoom,
 	setFit,
 	exportPng,
+	exportEditorState,
 	handleKeyboardShortcut,
 	isTextEditing,
 	resetHistory,
 } = useScreenshotEditor()
 
 const messages = defineMessages({
-	editScreenshot: { id: 'app.screenshots.editor.title', defaultMessage: 'Edit screenshot' },
+	editingScreenshot: {
+		id: 'app.screenshots.editor.editing-title',
+		defaultMessage: 'Editing {name}',
+	},
 	saveCopy: {
 		id: 'app.screenshots.editor.save-copy',
 		defaultMessage: 'Save copy',
@@ -117,6 +133,7 @@ const messages = defineMessages({
 	select: { id: 'app.screenshots.editor.tool.select', defaultMessage: 'Select' },
 	pen: { id: 'app.screenshots.editor.tool.pen', defaultMessage: 'Pen' },
 	highlight: { id: 'app.screenshots.editor.tool.highlight', defaultMessage: 'Highlight' },
+	eraser: { id: 'app.screenshots.editor.tool.eraser', defaultMessage: 'Eraser' },
 	text: { id: 'app.screenshots.editor.tool.text', defaultMessage: 'Text' },
 	arrow: { id: 'app.screenshots.editor.tool.arrow', defaultMessage: 'Arrow' },
 	shape: { id: 'app.screenshots.editor.tool.shape', defaultMessage: 'Shape' },
@@ -126,6 +143,9 @@ const messages = defineMessages({
 	blur: { id: 'app.screenshots.editor.censor.blur', defaultMessage: 'Blur' },
 	solid: { id: 'app.screenshots.editor.censor.solid', defaultMessage: 'Solid' },
 	censorMode: { id: 'app.screenshots.editor.censor.mode', defaultMessage: 'Censor type' },
+	eraserMode: { id: 'app.screenshots.editor.eraser.mode', defaultMessage: 'Eraser mode' },
+	element: { id: 'app.screenshots.editor.eraser.element', defaultMessage: 'Element' },
+	area: { id: 'app.screenshots.editor.eraser.area', defaultMessage: 'Area' },
 	colour: { id: 'app.screenshots.editor.colour', defaultMessage: 'Colour' },
 	width: { id: 'app.screenshots.editor.width', defaultMessage: 'Width' },
 	size: { id: 'app.screenshots.editor.size', defaultMessage: 'Size' },
@@ -144,7 +164,9 @@ const messages = defineMessages({
 	},
 })
 
-const busy = computed(() => props.saving || exporting.value || loading.value)
+const busy = computed(
+	() => props.saving || exporting.value || loadingEditorData.value || loading.value,
+)
 const isEditedScreenshot = computed(() => Boolean(screenshot.value?.original_screenshot_id))
 const saveOptions = computed<OverflowMenuOption[]>(() => [
 	{
@@ -167,6 +189,7 @@ const toolGroups: ScreenshotEditorToolOption[][] = [
 	[
 		{ id: 'pen', message: messages.pen, icon: PencilIcon, shortcut: 'P' },
 		{ id: 'highlight', message: messages.highlight, icon: HighlighterIcon, shortcut: 'H' },
+		{ id: 'eraser', message: messages.eraser, icon: EraserIcon, shortcut: 'E' },
 	],
 	[
 		{ id: 'arrow', message: messages.arrow, icon: MoveUpRightIcon, shortcut: 'A' },
@@ -187,7 +210,16 @@ const propertyMax = computed(() => (propertyValueKind.value === 'size' ? 120 : 4
 const propertyProgress = computed(
 	() => ((propertyValue.value - propertyMin.value) / (propertyMax.value - propertyMin.value)) * 100,
 )
+const hasBrushPointer = computed(
+	() =>
+		tool.value === 'pen' ||
+		tool.value === 'highlight' ||
+		(tool.value === 'eraser' && eraserMode.value === 'area'),
+)
+const brushPointerSize = computed(() => Math.max(2, strokeWidth.value * zoom.value))
+const brushPointerColor = computed(() => (tool.value === 'eraser' ? '#ffffff' : color.value))
 const censorModes: ScreenshotCensorMode[] = ['blur', 'solid']
+const eraserModes: ScreenshotEraserMode[] = ['element', 'area']
 
 let resizeObserver: ResizeObserver | undefined
 
@@ -198,13 +230,20 @@ async function show(nextScreenshot: InstanceScreenshot) {
 	await nextTick()
 	if (!canvasElement.value) return
 
+	loadingEditorData.value = true
 	try {
-		await initialize(canvasElement.value, nextScreenshot)
+		const editorData = await get_screenshot_editor_data({
+			instance_id: nextScreenshot.instance_id,
+			file_name: nextScreenshot.file_name,
+		})
+		await initialize(canvasElement.value, nextScreenshot, editorData)
 		observeViewport()
 		listenForKeyboard()
 	} catch (error) {
 		handleError(error)
 		modal.value?.hide()
+	} finally {
+		loadingEditorData.value = false
 	}
 }
 
@@ -226,7 +265,9 @@ function cleanup() {
 	dispose()
 	screenshot.value = undefined
 	closingAfterSave.value = false
+	loadingEditorData.value = false
 	panning.value = undefined
+	brushPointer.value.visible = false
 }
 
 function observeViewport() {
@@ -269,6 +310,10 @@ function formatCensorMode(mode: ScreenshotCensorMode) {
 	return formatMessage(mode === 'blur' ? messages.blur : messages.solid)
 }
 
+function formatEraserMode(mode: ScreenshotEraserMode) {
+	return formatMessage(mode === 'element' ? messages.element : messages.area)
+}
+
 function handleColorInput(event: Event) {
 	updateColor((event.target as HTMLInputElement).value)
 }
@@ -280,6 +325,7 @@ async function requestSave(mode: 'create_copy' | 'replace_edit') {
 		emit('save', {
 			screenshot: screenshot.value,
 			pngBytes: await exportPng(),
+			editorState: exportEditorState(),
 			mode,
 		})
 	} catch (error) {
@@ -337,6 +383,23 @@ function stopPan() {
 	panning.value = undefined
 }
 
+function updateBrushPointer(event: PointerEvent) {
+	if (!hasBrushPointer.value || panning.value) {
+		brushPointer.value.visible = false
+		return
+	}
+	const bounds = (event.currentTarget as HTMLElement).getBoundingClientRect()
+	brushPointer.value = {
+		x: event.clientX - bounds.left,
+		y: event.clientY - bounds.top,
+		visible: true,
+	}
+}
+
+function hideBrushPointer() {
+	brushPointer.value.visible = false
+}
+
 function handleWheel(event: WheelEvent) {
 	if (!event.ctrlKey && !event.metaKey) return
 	event.preventDefault()
@@ -365,47 +428,21 @@ defineExpose({ show, hide, markSavedAndHide })
 		:close-on-esc="false"
 		:on-after-hide="cleanup"
 		:disable-close="busy && !closingAfterSave"
+		actions-divider
 		width="calc(100vw - 3rem)"
 		max-width="calc(100vw - 3rem)"
 		class="h-[calc(100dvh-7rem)]"
 	>
 		<template #title>
-			<div class="flex min-w-0 flex-col">
-				<span class="text-xl font-semibold text-contrast">
-					{{ formatMessage(messages.editScreenshot) }}
-				</span>
-				<span class="truncate text-sm font-normal text-secondary">
-					{{ screenshot?.file_name }}
-				</span>
-			</div>
+			<span class="truncate text-xl font-semibold text-contrast">
+				{{
+					formatMessage(messages.editingScreenshot, {
+						name: screenshot?.file_name ?? '',
+					})
+				}}
+			</span>
 		</template>
-		<template #header-actions>
-			<SplitButton
-				v-if="isEditedScreenshot"
-				type="colored"
-				color="green"
-				:disabled="busy"
-				:options="saveOptions"
-				:menu-label="formatMessage(messages.moreSaveOptions)"
-				:group-label="formatMessage(messages.saveScreenshot)"
-				@click="requestSave('replace_edit')"
-			>
-				{{ formatMessage(messages.saveChanges) }}
-				<SaveIcon aria-hidden="true" />
-			</SplitButton>
-			<Button
-				v-else
-				type="colored"
-				color="green"
-				:disabled="busy"
-				@click="requestSave('create_copy')"
-			>
-				{{ formatMessage(messages.saveCopy) }}
-				<SaveIcon aria-hidden="true" />
-			</Button>
-		</template>
-
-		<div class="flex h-[calc(100dvh-12.75rem)] min-h-0 flex-col">
+		<div class="flex h-[calc(100dvh-17.25rem)] min-h-0 flex-col">
 			<div
 				class="flex flex-wrap items-center gap-1 border-0 border-b border-solid border-surface-5 px-4 py-2"
 			>
@@ -416,8 +453,12 @@ defineExpose({ show, hide, markSavedAndHide })
 						:key="editorTool.id"
 						v-tooltip="toolTooltip(editorTool)"
 						:label="formatMessage(editorTool.message)"
-						:type="tool === editorTool.id ? 'colored' : 'quiet'"
-						:color="tool === editorTool.id ? 'brand' : undefined"
+						type="quiet"
+						:color="tool === editorTool.id ? 'green' : undefined"
+						:class="{
+							'!bg-highlight-green shadow-[inset_0_0_0_1px_var(--color-green)]':
+								tool === editorTool.id,
+						}"
 						:aria-pressed="tool === editorTool.id"
 						@click="setTool(editorTool.id)"
 					>
@@ -427,6 +468,16 @@ defineExpose({ show, hide, markSavedAndHide })
 
 				<div class="mx-2 h-6 w-px bg-surface-5" />
 				<div class="flex w-[19rem] shrink-0 items-center gap-2">
+					<Chips
+						v-if="showEraserMode"
+						v-model="eraserMode"
+						:items="eraserModes"
+						:format-label="formatEraserMode"
+						:aria-label="formatMessage(messages.eraserMode)"
+						size="small"
+						hide-checkmark-icon
+						class="shrink-0"
+					/>
 					<Chips
 						v-if="showCensorMode"
 						v-model="censorMode"
@@ -566,14 +617,72 @@ defineExpose({ show, hide, markSavedAndHide })
 				@pointercancel="stopPan"
 				@wheel="handleWheel"
 			>
-				<div v-if="loading" class="absolute inset-0 animate-pulse bg-surface-2" />
+				<div
+					v-if="loading || loadingEditorData"
+					class="absolute inset-0 animate-pulse bg-surface-2"
+				/>
 				<div class="flex min-h-full min-w-full">
-					<div class="editor-canvas m-auto shrink-0">
+					<div
+						class="editor-canvas relative m-auto shrink-0"
+						@pointerenter="updateBrushPointer"
+						@pointermove="updateBrushPointer"
+						@pointerleave="hideBrushPointer"
+					>
 						<canvas ref="canvasElement" />
+						<div
+							v-if="hasBrushPointer && brushPointer.visible"
+							class="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-solid"
+							:style="{
+								left: `${brushPointer.x}px`,
+								top: `${brushPointer.y}px`,
+								width: `${brushPointerSize}px`,
+								height: `${brushPointerSize}px`,
+								borderColor: brushPointerColor,
+								boxShadow: '0 0 0 1px rgb(0 0 0 / 80%), inset 0 0 0 1px rgb(255 255 255 / 35%)',
+							}"
+						>
+							<div
+								v-if="tool !== 'eraser'"
+								class="absolute inset-0 rounded-full opacity-[0.15]"
+								:style="{ backgroundColor: color }"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+
+		<template #actions>
+			<div class="flex justify-end gap-2">
+				<Button type="outlined" :disabled="busy" @click="hide">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<SplitButton
+					v-if="isEditedScreenshot"
+					type="colored"
+					color="green"
+					:disabled="busy"
+					:options="saveOptions"
+					:menu-label="formatMessage(messages.moreSaveOptions)"
+					:group-label="formatMessage(messages.saveScreenshot)"
+					@click="requestSave('replace_edit')"
+				>
+					<SaveIcon aria-hidden="true" />
+					{{ formatMessage(messages.saveChanges) }}
+				</SplitButton>
+				<Button
+					v-else
+					type="colored"
+					color="green"
+					:disabled="busy"
+					@click="requestSave('create_copy')"
+				>
+					<SaveIcon aria-hidden="true" />
+					{{ formatMessage(messages.saveCopy) }}
+				</Button>
+			</div>
+		</template>
 	</NewModal>
 </template>
 

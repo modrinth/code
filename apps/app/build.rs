@@ -218,6 +218,7 @@ fn main() {
                         "instance_list_screenshots",
                         "instance_list_all_screenshots",
                         "instance_list_synced_screenshots",
+                        "instance_get_screenshot_editor_data",
                         "instance_save_edited_screenshot",
                         "instance_list_screenshot_groups",
                         "instance_create_screenshot_group",

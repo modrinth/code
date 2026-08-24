@@ -49,6 +49,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_list_screenshots,
             instance_list_all_screenshots,
             instance_list_synced_screenshots,
+            instance_get_screenshot_editor_data,
             instance_save_edited_screenshot,
             instance_list_screenshot_groups,
             instance_create_screenshot_group,
@@ -144,6 +145,12 @@ pub struct InstanceScreenshot {
     pub group_id: Option<String>,
     pub path: PathBuf,
     pub url: url::Url,
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub struct ScreenshotEditorData {
+    pub background_path: PathBuf,
+    pub editor_state: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -693,14 +700,37 @@ pub async fn instance_list_synced_screenshots<R: Runtime>(
 }
 
 #[tauri::command]
+pub async fn instance_get_screenshot_editor_data<R: Runtime>(
+    app_handle: AppHandle<R>,
+    key: theseus::instance::ScreenshotKey,
+) -> Result<ScreenshotEditorData> {
+    let data = theseus::instance::get_screenshot_editor_data(key).await?;
+    app_handle
+        .fs_scope()
+        .allow_file(&data.background_path)
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
+
+    Ok(ScreenshotEditorData {
+        background_path: data.background_path,
+        editor_state: data.editor_state,
+    })
+}
+
+#[tauri::command]
 pub async fn instance_save_edited_screenshot<R: Runtime>(
     app_handle: AppHandle<R>,
     key: theseus::instance::ScreenshotKey,
     png_bytes: Vec<u8>,
+    editor_state: Option<String>,
     mode: theseus::instance::ScreenshotEditSaveMode,
 ) -> Result<InstanceScreenshot> {
-    let screenshot =
-        theseus::instance::save_edited_screenshot(key, png_bytes, mode).await?;
+    let screenshot = theseus::instance::save_edited_screenshot(
+        key,
+        png_bytes,
+        editor_state,
+        mode,
+    )
+    .await?;
     serialize_screenshot(&app_handle, screenshot)
 }
 

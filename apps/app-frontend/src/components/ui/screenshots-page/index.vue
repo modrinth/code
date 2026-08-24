@@ -10,8 +10,8 @@ import {
 import {
 	ClipboardCopyIcon,
 	EditIcon,
-	ExternalIcon,
 	FileArchiveIcon,
+	FolderOpenIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import {
@@ -173,7 +173,10 @@ const { addNotification, handleError } = injectNotificationManager()
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 const formatMonth = useFormatDateTime({ month: 'long', year: 'numeric' })
 const screenshotOptions: ContextMenuOption[] = [
+	{ name: 'edit' },
+	{ name: 'copy' },
 	{ name: 'open' },
+	{ type: 'divider' },
 	{ name: 'delete', color: 'danger' },
 ]
 
@@ -225,10 +228,6 @@ const messages = defineMessages({
 	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
 	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
 	viewOriginal: { id: 'app.screenshots.view-original', defaultMessage: 'View original' },
-	editSaved: {
-		id: 'app.screenshots.editor.saved',
-		defaultMessage: 'Edited screenshot saved',
-	},
 	showInFolder: { id: 'app.screenshots.show-in-folder', defaultMessage: 'Show in folder' },
 	deleteTitle: { id: 'app.screenshots.delete-title', defaultMessage: 'Delete screenshot' },
 	deleteDescription: {
@@ -537,14 +536,19 @@ const saveEditMutation = useMutation({
 	mutationFn: (payload: {
 		screenshot: InstanceScreenshot
 		pngBytes: Uint8Array
+		editorState: string | null
 		mode: 'create_copy' | 'replace_edit'
 	}) =>
-		save_edited_screenshot(getScreenshotKey(payload.screenshot), payload.pngBytes, payload.mode),
+		save_edited_screenshot(
+			getScreenshotKey(payload.screenshot),
+			payload.pngBytes,
+			payload.editorState,
+			payload.mode,
+		),
 	onSuccess: async (saved) => {
 		await invalidateScreenshots([saved.instance_id])
 		await editorModal.value?.markSavedAndHide()
 		await revealScreenshot(saved.id)
-		addNotification({ type: 'success', title: formatMessage(messages.editSaved) })
 	},
 	onError: handleError,
 })
@@ -836,7 +840,11 @@ function showScreenshotOptions(screenshot: InstanceScreenshot, event: MouseEvent
 
 function handleScreenshotOption({ item, option }: ContextMenuSelection) {
 	const screenshot = item as InstanceScreenshot
-	if (option === 'open') {
+	if (option === 'edit') {
+		editScreenshot(screenshot)
+	} else if (option === 'copy') {
+		void copyScreenshot(screenshot)
+	} else if (option === 'open') {
 		void openScreenshot(screenshot)
 	} else if (option === 'delete') {
 		requestDelete(screenshot)
@@ -1144,8 +1152,16 @@ onBeforeUnmount(() => {
 		@save="saveEditMutation.mutate"
 	/>
 	<ContextMenu ref="screenshotOptionsMenu" @option-clicked="handleScreenshotOption">
+		<template #edit>
+			<EditIcon />
+			{{ formatMessage(messages.edit) }}
+		</template>
+		<template #copy>
+			<ClipboardCopyIcon />
+			{{ formatMessage(messages.copy) }}
+		</template>
 		<template #open>
-			<ExternalIcon />
+			<FolderOpenIcon />
 			{{ formatMessage(messages.showInFolder) }}
 		</template>
 		<template #delete>
@@ -1182,7 +1198,7 @@ onBeforeUnmount(() => {
 				:label="formatMessage(messages.showInFolder)"
 				@click="openScreenshotBySelectionKey(item.id)"
 			>
-				<ExternalIcon />
+				<FolderOpenIcon />
 			</IconButton>
 			<IconButton
 				v-tooltip="formatMessage(commonMessages.deleteLabel)"
