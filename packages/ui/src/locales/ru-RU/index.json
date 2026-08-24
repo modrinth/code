@@ -1934,12 +1934,6 @@
   "icon-select.select": {
     "defaultMessage": "Выбрать иконку"
   },
-  "input.clear": {
-    "defaultMessage": "Очистить ввод"
-  },
-  "input.search": {
-    "defaultMessage": "Поиск"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Поиск версии..."
   },

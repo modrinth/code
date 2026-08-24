@@ -1988,9 +1988,6 @@
   "icon-select.select": {
     "defaultMessage": "Seleccionar icono"
   },
-  "input.search": {
-    "defaultMessage": "Buscar"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Buscar versión..."
   },

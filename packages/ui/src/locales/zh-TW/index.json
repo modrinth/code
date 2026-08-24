@@ -2018,12 +2018,6 @@
   "icon-select.select": {
     "defaultMessage": "選擇圖示"
   },
-  "input.clear": {
-    "defaultMessage": "清除輸入"
-  },
-  "input.search": {
-    "defaultMessage": "搜尋"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "搜尋版本..."
   },
@@ -6765,4 +6759,3 @@
     "defaultMessage": "類型"
   }
 }
-
