@@ -170,10 +170,17 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 			</div>
 			<div class="mt-4">
 				<SettingsLabel id="project-url" :title="messages.urlTitle" />
-				<div class="text-input-wrapper">
-					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<Input id="project-url" v-model="current.url" :maxlength="64" autocomplete="off" />
-				</div>
+				<Input
+					id="project-url"
+					v-model="current.url"
+					:maxlength="64"
+					autocomplete="off"
+					wrapper-class="w-full"
+				>
+					<template #prefix>
+						<span class="whitespace-nowrap">https://modrinth.com/project/</span>
+					</template>
+				</Input>
 			</div>
 		</div>
 	</div>

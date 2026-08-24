@@ -4029,7 +4029,7 @@
     "message": "URL"
   },
   "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
+    "message": "{section} - {project}"
   },
   "project.settings.monetization.description": {
     "message": "Projects on Modrinth are automatically enrolled in the <rewards-program-link>Rewards Program</rewards-program-link>. If you don't want to (or can't for legal reasons) earn revenue from this project, you can turn it off here."

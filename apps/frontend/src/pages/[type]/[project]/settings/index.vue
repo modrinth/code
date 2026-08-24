@@ -29,18 +29,20 @@
 					<label for="project-slug">
 						<span class="label__title">URL</span>
 					</label>
-					<div class="text-input-wrapper !w-full">
-						<div class="text-input-wrapper__before">
-							<span class="hidden sm:inline">https://modrinth.com</span>/{{ projectTypeForUrl }}/
-						</div>
-						<Input
-							id="project-slug"
-							v-model="slug"
-							:maxlength="64"
-							autocomplete="off"
-							:disabled="!hasPermission"
-						/>
-					</div>
+					<Input
+						id="project-slug"
+						v-model="slug"
+						:maxlength="64"
+						autocomplete="off"
+						:disabled="!hasPermission"
+						wrapper-class="w-full"
+					>
+						<template #prefix>
+							<span class="whitespace-nowrap">
+								<span class="hidden sm:inline">https://modrinth.com</span>/{{ projectTypeForUrl }}/
+							</span>
+						</template>
+					</Input>
 				</div>
 
 				<div>

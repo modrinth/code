@@ -103,15 +103,7 @@
 
 <script setup lang="ts">
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	Button,
-	defineMessages,
-	Input,
-	NewModal,
-	TagItem,
-	useVIntl,
-} from '@modrinth/ui'
+import { Avatar, Button, defineMessages, Input, NewModal, TagItem, useVIntl } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'

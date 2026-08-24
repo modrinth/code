@@ -18,35 +18,47 @@
 			</span>
 		</template>
 
-		<input
-			v-bind="mergeProps(controlAttrs(), inputAttrs ?? {})"
-			:id="id"
-			ref="inputRef"
-			:type="type"
-			:value="model"
-			:placeholder="placeholder"
-			:disabled="disabled"
-			:readonly="readonly"
-			:name="name"
-			:autocomplete="autocomplete"
-			:autocorrect="autocorrect"
-			:autocapitalize="autocapitalize"
-			:spellcheck="spellcheck"
-			:inputmode="inputmode"
-			:maxlength="maxlength"
-			:min="min"
-			:max="max"
-			:step="step"
-			:aria-invalid="error || undefined"
-			class="min-w-0 w-full flex-1 self-stretch appearance-none border-0 bg-transparent p-0 font-medium text-primary shadow-none outline-none placeholder:text-secondary focus:text-contrast focus:ring-0"
-			:class="[
-				inputClass,
-				controlClass,
-				size === 'small' ? 'text-sm' : 'text-base',
-				disabled ? 'cursor-not-allowed' : '',
-			]"
-			@input="onInput"
-		/>
+		<div class="flex min-w-0 flex-1 self-stretch items-center" @click="inputRef?.focus()">
+			<div class="flex min-w-0 flex-1 items-baseline">
+				<span
+					v-if="$slots.prefix"
+					class="shrink-0 font-medium text-secondary opacity-60 transition-colors group-focus-within/input:text-contrast group-focus-within/input:opacity-100"
+					:class="size === 'small' ? 'text-sm' : 'text-base'"
+				>
+					<slot name="prefix" />
+				</span>
+
+				<input
+					v-bind="mergeProps(controlAttrs(), inputAttrs ?? {})"
+					:id="id"
+					ref="inputRef"
+					:type="type"
+					:value="model"
+					:placeholder="placeholder"
+					:disabled="disabled"
+					:readonly="readonly"
+					:name="name"
+					:autocomplete="autocomplete"
+					:autocorrect="autocorrect"
+					:autocapitalize="autocapitalize"
+					:spellcheck="spellcheck"
+					:inputmode="inputmode"
+					:maxlength="maxlength"
+					:min="min"
+					:max="max"
+					:step="step"
+					:aria-invalid="error || undefined"
+					class="min-w-0 w-full flex-1 appearance-none !min-h-0 !border-0 !bg-transparent !p-0 font-medium text-primary !shadow-none !outline-none placeholder:text-secondary focus:text-contrast focus:ring-0"
+					:class="[
+						inputClass,
+						controlClass,
+						size === 'small' ? 'text-sm' : 'text-base',
+						disabled ? 'cursor-not-allowed' : '',
+					]"
+					@input="onInput"
+				/>
+			</div>
+		</div>
 
 		<template v-if="showClearButton || $slots.trailing || $slots.right" #trailing>
 			<span class="flex shrink-0 items-center gap-2">

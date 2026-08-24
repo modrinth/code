@@ -35,6 +35,23 @@ export const WithIcon: Story = {
 	},
 }
 
+export const WithTextPrefix: Story = {
+	render: () => ({
+		components: { Input },
+		setup() {
+			const value = ref('sodium')
+			return { value }
+		},
+		template: `
+			<Input v-model="value">
+				<template #prefix>
+					<span style="white-space: nowrap">https://modrinth.com/mod/</span>
+				</template>
+			</Input>
+		`,
+	}),
+}
+
 export const Clearable: Story = {
 	render: () => ({
 		components: { Input },

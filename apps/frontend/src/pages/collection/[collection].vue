@@ -395,7 +395,6 @@ import {
 	ProjectList,
 	RadioButtons,
 	SidebarCard,
-	sortProjectTypes,
 	TeleportOverflowMenu,
 	Textarea,
 	useCompactNumber,

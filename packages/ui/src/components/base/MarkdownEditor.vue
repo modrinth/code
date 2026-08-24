@@ -250,7 +250,9 @@
 				</div>
 			</div>
 		</div>
-		<div ref="editorRef" :class="{ hide: previewMode }" />
+		<InputFrame :class="{ hide: previewMode }" :disabled="disabled" multiline>
+			<div ref="editorRef" class="min-w-0 w-full flex-1 self-stretch" />
+		</InputFrame>
 		<div v-if="!previewMode" class="info-blurb mt-2">
 			<div class="info-blurb">
 				<InfoIcon />
@@ -334,6 +336,7 @@ import NewModal from '../modal/NewModal.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
 import Input from './inputs/Input.vue'
+import InputFrame from './inputs/InputFrame.vue'
 import IntlFormatted from './IntlFormatted.vue'
 import Toggle from './Toggle.vue'
 
@@ -574,6 +577,30 @@ const resolvedPlaceholder = computed(
 	() => props.placeholder ?? formatMessage(messages.editorPlaceholder),
 )
 
+function createEditorTheme(disabled = props.disabled) {
+	return EditorView.theme({
+		'&': {
+			background: 'transparent',
+			width: '100%',
+		},
+		'&.cm-focused': {
+			outline: 'none',
+		},
+		'.cm-content': {
+			minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
+			padding: '0',
+			caretColor: 'var(--color-contrast)',
+			width: '100%',
+			pointerEvents: disabled ? 'none' : 'auto',
+		},
+		'.cm-scroller': {
+			height: '100%',
+			maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+			overflow: 'auto',
+		},
+	})
+}
+
 onMounted(() => {
 	const updateListener = EditorView.updateListener.of((update) => {
 		if (update.docChanged) {
@@ -583,36 +610,7 @@ onMounted(() => {
 
 	editorThemeCompartment = new Compartment()
 
-	const theme = EditorView.theme({
-		// in defaults.scss there's references to .cm-content and such to inherit global styles
-		'&': {
-			borderRadius: 'var(--radius-md)',
-			background: 'var(--color-button-bg)',
-			border: '0.25rem solid transparent',
-			transition: 'border-color 0.1s ease-in-out',
-		},
-		'&.cm-focused': {
-			'box-shadow': 'inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow)',
-			color: 'var(--color-contrast)',
-			outline: 'none',
-		},
-		'.cm-focused': {
-			border: 'none',
-		},
-		'.cm-content': {
-			minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
-			marginBlockEnd: '0.5rem',
-			padding: '0.5rem',
-			caretColor: 'var(--color-contrast)',
-			width: '100%',
-		},
-		'.cm-scroller': {
-			borderRadius: 'var(--radius-md)',
-			height: '100%',
-			maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-			overflow: 'auto',
-		},
-	})
+	const theme = createEditorTheme()
 
 	isDisabledCompartment = new Compartment()
 
@@ -838,43 +836,7 @@ watch(
 
 			if (editorThemeCompartment) {
 				editor.dispatch({
-					effects: [
-						editorThemeCompartment.reconfigure(
-							EditorView.theme({
-								// in defaults.scss there's references to .cm-content and such to inherit global styles
-								'&': {
-									borderRadius: 'var(--radius-md)',
-									background: 'var(--color-button-bg)',
-									border: '0.25rem solid transparent',
-									transition: 'border-color 0.1s ease-in-out',
-								},
-								'&.cm-focused': {
-									'box-shadow': 'inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow)',
-									color: 'var(--color-contrast)',
-									outline: 'none',
-								},
-								'.cm-focused': {
-									border: 'none',
-								},
-								'.cm-content': {
-									minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
-									marginBlockEnd: '0.5rem',
-									padding: '0.5rem',
-									caretColor: 'var(--color-contrast)',
-									width: '100%',
-									opacity: newValue ? 0.6 : 1,
-									pointerEvents: newValue ? 'none' : 'all',
-									cursor: newValue ? 'not-allowed' : 'auto',
-								},
-								'.cm-scroller': {
-									borderRadius: 'var(--radius-md)',
-									height: '100%',
-									maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-									overflow: 'auto',
-								},
-							}),
-						),
-					],
+					effects: [editorThemeCompartment.reconfigure(createEditorTheme(newValue))],
 				})
 			}
 		}
