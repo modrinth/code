@@ -62,17 +62,8 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Skjuler navnelappen over din spiller på utseende siden."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gjøm navnelapp"
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimer launcheren"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Viser hvor lenge du har spilt et tilfelle."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis spilletid"
@@ -118,9 +109,6 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpakker"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Å legge til innhold kan ødelegge komatibilitet når du blir med i serveren. Alt tilleggsinnhold vil også forsvinne når du oppdaterer servertilfelleinnholdet."
   },
   "app.browse.server.installing": {
     "message": "Installerer"
