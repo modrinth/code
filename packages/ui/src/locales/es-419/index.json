@@ -2018,12 +2018,6 @@
   "icon-select.select": {
     "defaultMessage": "Seleccionar ícono"
   },
-  "input.clear": {
-    "defaultMessage": "Borrar entrada"
-  },
-  "input.search": {
-    "defaultMessage": "Buscar"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Buscar versión..."
   },
@@ -6765,4 +6759,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

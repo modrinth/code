@@ -30,7 +30,7 @@
 				</span>
 			</span>
 			<div class="input-group">
-				<StyledInput
+				<Input
 					id="username"
 					v-model="currentUsername"
 					placeholder="Username"
@@ -118,7 +118,7 @@
 							The title of the role that this member plays for this organization.
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						:id="`member-${member.user.id}-role`"
 						v-model="member.role"
 						:disabled="
@@ -137,7 +137,7 @@
 							the organization projects' revenue goes to this member.
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						:id="`member-${member.user.id}-monetization-weight`"
 						v-model="member.payouts_split"
 						type="number"
@@ -252,7 +252,7 @@ import {
 	Checkbox,
 	IconButton,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 } from '@modrinth/ui'
 import { nextTick, ref } from 'vue'
 

@@ -222,7 +222,7 @@
 					v-if="activeCategory.searchable"
 					class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 w-full"
 				>
-					<StyledInput
+					<Input
 						v-model="categorySearchQuery"
 						:icon="SearchIcon"
 						type="text"
@@ -431,8 +431,8 @@ import { Button, type ButtonElementHandle, type ButtonSize } from '#ui/component
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useVirtualScroll } from '../../composables/virtual-scroll'
+import Input from './inputs/Input.vue'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
-import StyledInput from './StyledInput.vue'
 
 export type DropdownFilterBarOption = {
 	value: string

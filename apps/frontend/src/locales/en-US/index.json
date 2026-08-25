@@ -2679,7 +2679,7 @@
     "message": "New project"
   },
   "layout.action.new-server-project": {
-    "message": "New server"
+    "message": "New server project"
   },
   "layout.action.publish": {
     "message": "Publish"

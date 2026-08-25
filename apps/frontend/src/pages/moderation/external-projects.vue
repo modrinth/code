@@ -2,13 +2,13 @@
 	<NewModal ref="editModal" header="Edit external project">
 		<form class="flex flex-col gap-2" @submit.prevent="saveExternalProjectEdit">
 			<label class="font-semibold text-contrast" for="edit-form-title">Title</label>
-			<StyledInput id="edit-form-title" v-model="editForm.title" type="text" />
+			<Input id="edit-form-title" v-model="editForm.title" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-link">Link</label>
-			<StyledInput id="edit-form-link" v-model="editForm.link" type="text" />
+			<Input id="edit-form-link" v-model="editForm.link" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-cf-id">
 				CurseForge project ID
 			</label>
-			<StyledInput id="edit-form-cf-id" v-model="editForm.flameProjectId" type="text" />
+			<Input id="edit-form-cf-id" v-model="editForm.flameProjectId" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-status">Allowed?</label>
 			<Combobox
 				id="edit-form-status"
@@ -17,22 +17,13 @@
 				class="!w-full"
 			/>
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-proof">Proof</label>
-			<StyledInput
-				id="edit-form-proof"
-				v-model="editForm.proof"
-				type="text"
-				multiline
-				resize="both"
-				class="w-[30rem]"
-			/>
+			<Textarea id="edit-form-proof" v-model="editForm.proof" resize="both" class="w-[30rem]" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-exceptions">
 				Exceptions / notes
 			</label>
-			<StyledInput
+			<Textarea
 				id="edit-form-exceptions"
 				v-model="editForm.exceptions"
-				type="text"
-				multiline
 				resize="both"
 				class="w-[30rem]"
 			/>
@@ -46,7 +37,7 @@
 	</NewModal>
 	<div>
 		<form class="flex gap-2" @submit.prevent="executeSearch">
-			<StyledInput
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"
@@ -127,8 +118,9 @@ import {
 	externalProjectLicenseStatusMessages,
 	ExternalProjectLookupCard,
 	injectModrinthClient,
+	Input,
 	NewModal,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 

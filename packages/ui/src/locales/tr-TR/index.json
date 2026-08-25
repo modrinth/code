@@ -1958,9 +1958,6 @@
   "icon-select.select": {
     "defaultMessage": "Simge seç"
   },
-  "input.search": {
-    "defaultMessage": "Ara"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Sürüm ara..."
   },

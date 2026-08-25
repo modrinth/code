@@ -1904,9 +1904,6 @@
   "icon-select.select": {
     "defaultMessage": "Вибрати значок"
   },
-  "input.search": {
-    "defaultMessage": "Пошук"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Знайти версію…"
   },

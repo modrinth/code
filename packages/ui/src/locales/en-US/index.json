@@ -2018,12 +2018,6 @@
   "icon-select.select": {
     "defaultMessage": "Select icon"
   },
-  "input.clear": {
-    "defaultMessage": "Clear input"
-  },
-  "input.search": {
-    "defaultMessage": "Search"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Search version..."
   },

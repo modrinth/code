@@ -32,7 +32,7 @@
 						<span class="text-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-model="formData.businessName"
 					:placeholder="formatMessage(formFieldPlaceholders.businessNamePlaceholder)"
 					autocomplete="organization"
@@ -47,7 +47,7 @@
 						<span class="text-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-model="formData.email"
 					type="email"
 					:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
@@ -65,7 +65,7 @@
 								<span class="text-red">*</span>
 							</span>
 						</label>
-						<StyledInput
+						<Input
 							v-model="formData.firstName"
 							:placeholder="formatMessage(formFieldPlaceholders.firstNamePlaceholder)"
 							autocomplete="given-name"
@@ -79,7 +79,7 @@
 								<span class="text-red">*</span>
 							</span>
 						</label>
-						<StyledInput
+						<Input
 							v-model="formData.lastName"
 							:placeholder="formatMessage(formFieldPlaceholders.lastNamePlaceholder)"
 							autocomplete="family-name"
@@ -112,7 +112,7 @@
 						<span class="text-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-model="formData.physicalAddress.address1"
 					:placeholder="formatMessage(formFieldPlaceholders.addressPlaceholder)"
 					autocomplete="address-line1"
@@ -126,7 +126,7 @@
 						{{ formatMessage(formFieldLabels.addressLine2) }}
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-model="formData.physicalAddress.address2"
 					:placeholder="formatMessage(formFieldPlaceholders.address2Placeholder)"
 					autocomplete="address-line2"
@@ -142,7 +142,7 @@
 							<span class="text-red">*</span>
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						v-model="formData.physicalAddress.city"
 						:placeholder="formatMessage(formFieldPlaceholders.cityPlaceholder)"
 						autocomplete="address-level2"
@@ -164,7 +164,7 @@
 						searchable
 						:search-placeholder="formatMessage(messages.searchSubdivisionsPlaceholder)"
 					/>
-					<StyledInput
+					<Input
 						v-else
 						v-model="formData.physicalAddress.state"
 						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
@@ -182,7 +182,7 @@
 							<span class="text-red">*</span>
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						v-model="formData.physicalAddress.zip"
 						:placeholder="formatMessage(formFieldPlaceholders.postalCodePlaceholder)"
 						autocomplete="postal-code"
@@ -217,7 +217,7 @@ import {
 	defineMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 // TODO: Switch to using Muralpay's improved endpoint when it's available.

@@ -1964,12 +1964,6 @@
   "icon-select.select": {
     "defaultMessage": "Scegli icona"
   },
-  "input.clear": {
-    "defaultMessage": "Svuota"
-  },
-  "input.search": {
-    "defaultMessage": "Cerca"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Cerca tra le versioni..."
   },

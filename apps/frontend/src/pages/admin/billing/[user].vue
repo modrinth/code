@@ -30,7 +30,7 @@
 						{{ selectedCharge.net }})
 					</span>
 				</label>
-				<StyledInput id="amount" v-model="refundAmount" type="number" autocomplete="off" />
+				<Input id="amount" v-model="refundAmount" type="number" autocomplete="off" />
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="unprovision" class="flex flex-col gap-1">
@@ -99,7 +99,7 @@
 					<span class="text-lg font-semibold text-contrast">Days to credit</span>
 					<span>Enter the number of days to add to the next due date.</span>
 				</label>
-				<StyledInput id="days" v-model="creditDays" type="number" :min="1" autocomplete="off" />
+				<Input id="days" v-model="creditDays" type="number" :min="1" autocomplete="off" />
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="sendEmail" class="flex flex-col gap-1">
@@ -214,8 +214,8 @@ import {
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
 	Toggle,
 	useFormatDateTime,
 	useRelativeTime,
