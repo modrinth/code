@@ -38,6 +38,7 @@ import {
 	remove_synced_server,
 	set_command_history,
 	set_global_synced_option,
+	synced_option_needs_base,
 	type SyncedOption,
 	type SyncedServer,
 	update_synced_server,
@@ -398,15 +399,19 @@ function applyGlobalOption(option: SyncedOption, enabled: boolean, baseId?: stri
 	globalOptionMutation.mutate({ option, enabled, baseId })
 }
 
-function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
-	if (enabled && option !== 'screenshots') {
-		baseOption.value = option
-		baseInstanceId.value = instances.value[0]?.id ?? ''
-		baseInstanceSearch.value = ''
-		baseModal.value?.show()
-		return
+async function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
+	try {
+		if (enabled && option !== 'screenshots' && (await synced_option_needs_base(option))) {
+			baseOption.value = option
+			baseInstanceId.value = instances.value[0]?.id ?? ''
+			baseInstanceSearch.value = ''
+			baseModal.value?.show()
+			return
+		}
+		applyGlobalOption(option, enabled)
+	} catch (error) {
+		handleError(error)
 	}
-	applyGlobalOption(option, enabled)
 }
 
 function confirmBaseInstance() {

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT nbt FROM synced_hotbar_state WHERE singleton = 1",
+  "describe": {
+    "columns": [
+      {
+        "name": "nbt",
+        "ordinal": 0,
+        "type_info": "Blob"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8a628c5ee3bf1bfb39563f692320914e4b116fee221d9486be51734c0bd06019"
+}

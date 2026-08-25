@@ -505,6 +505,11 @@ pub(crate) async fn list_synced_screenshot_sources(
 			ON synced_options.instance_id = instances.id
 		WHERE synced_options.option = 'screenshots'
 			AND synced_options.enabled = 1
+			AND EXISTS (
+				SELECT 1
+				FROM global_synced_options_overrides
+				WHERE option = 'screenshots' AND enabled = 1
+			)
 		ORDER BY instances.name, instances.id
 		",
     )
@@ -1326,7 +1331,7 @@ pub(crate) async fn insert_default_instance_synced_options(
     sqlx::query!(
         "
 		INSERT INTO instance_synced_options (instance_id, option, enabled)
-		SELECT ?, option, enabled
+		SELECT ?, option, default_enabled
 		FROM global_synced_options_overrides
 		",
         instance_id,

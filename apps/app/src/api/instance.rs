@@ -63,6 +63,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_set_synced_option,
             instance_get_synced_options_overview,
             instance_get_global_synced_options,
+            instance_synced_option_needs_base,
             instance_set_global_synced_option,
             instance_get_command_history,
             instance_set_command_history,
@@ -815,6 +816,13 @@ pub async fn instance_get_synced_options_overview(
 pub async fn instance_get_global_synced_options()
 -> Result<theseus::instance::GlobalSyncedOptions> {
     Ok(theseus::instance::get_global_synced_options().await?)
+}
+
+#[tauri::command]
+pub async fn instance_synced_option_needs_base(
+    option: InstanceSyncedOption,
+) -> Result<bool> {
+    Ok(theseus::instance::synced_option_needs_base(option).await?)
 }
 
 #[tauri::command]

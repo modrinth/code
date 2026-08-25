@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE synced_option_revisions\n\t\tSET revision = revision + 1,\n\t\t\tinitialized = CASE WHEN ? THEN 1 ELSE initialized END\n\t\tWHERE option = 'multiplayer_servers'\n\t\tRETURNING revision AS \"revision!: i64\"\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "revision!: i64",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ad152b11be732cba5e0544219964f83d9d146d0f621b90d88e2166337287fa5b"
+}

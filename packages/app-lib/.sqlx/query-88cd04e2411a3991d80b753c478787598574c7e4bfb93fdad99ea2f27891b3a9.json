@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO synced_option_materializations\n\t\t\t(instance_id, option, family, expected_sha1, baseline,\n\t\t\t canonical_revision, pending, link_mode)\n\t\tVALUES (?, 'multiplayer_servers', '', ?, ?, ?, 1, 'copy')\n\t\tON CONFLICT(instance_id, option, family) DO UPDATE SET\n\t\t\texpected_sha1 = excluded.expected_sha1,\n\t\t\tbaseline = excluded.baseline,\n\t\t\tcanonical_revision = excluded.canonical_revision,\n\t\t\tpending = 1\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "88cd04e2411a3991d80b753c478787598574c7e4bfb93fdad99ea2f27891b3a9"
+}

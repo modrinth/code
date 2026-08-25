@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO global_synced_options_overrides\n\t\t\t(option, enabled, default_enabled)\n\t\tVALUES (?, ?, 1)\n\t\tON CONFLICT(option) DO UPDATE SET enabled = excluded.enabled\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "77035ec17f55197cf1c7ffcb1f8c9328388121f6c15cbe539f37f302ad957d92"
+}

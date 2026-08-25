@@ -1,8 +1,8 @@
 use super::synced_options::{
-    detach_link, ensure_link, instance_dir, instance_is_running,
-    instance_option_enabled, nbt_from_bytes, nbt_to_bytes, read_nbt_file,
-    record_materialization, safe_instance_id, sha1_file,
-    sync_files_are_protected, synced_options_path, write_nbt_file,
+    detach_link, ensure_link, finish_materialization, instance_dir,
+    instance_is_running, instance_option_enabled, materialization,
+    nbt_from_bytes, nbt_to_bytes, read_nbt_file, safe_instance_id, sha1_bytes,
+    sha1_file, sync_files_are_protected, synced_options_path,
 };
 use crate::state::{CachedEntry, InstanceLink, InstanceMetadata, SyncedOption};
 use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors};
@@ -10,6 +10,7 @@ use crate::{ErrorKind, State};
 use async_zip::base::read::seek::ZipFileReader;
 use quartz_nbt::{NbtCompound, NbtList, NbtTag};
 use serde::{Deserialize, Serialize};
+use sqlx::{Sqlite, Transaction};
 use std::collections::HashSet;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
@@ -120,6 +121,7 @@ struct SnapshotServer {
     id: String,
     source: ServerSource,
     data: NbtCompound,
+    position: i64,
 }
 
 pub(super) async fn seed_servers(
@@ -149,29 +151,16 @@ pub(super) async fn seed_servers(
     }
     let path = instance_dir(metadata, state).join(SERVERS_FILE);
     let mut servers = read_servers(&path).await?;
-    if is_modpack_link(&metadata.link) {
-        for local in &local_entries {
-            if let Some(index) = servers.iter().position(|data| {
-                data == &local.data
-                    || server_address(data) == server_address(&local.data)
-            }) {
-                servers.remove(index);
-            }
+    for local in &local_entries {
+        let local_address = server_identity_address(&local.data);
+        if let Some(index) = servers.iter().position(|data| {
+            data == &local.data
+                || (!local_address.is_empty()
+                    && server_identity_address(data) == local_address)
+        }) {
+            servers.remove(index);
         }
-    } else {
-        sqlx::query!(
-            "DELETE FROM instance_server_entries WHERE instance_id = ?",
-            metadata.instance.id,
-        )
-        .execute(&state.pool)
-        .await?;
     }
-    sqlx::query!(
-        "DELETE FROM instance_server_snapshots WHERE instance_id = ?",
-        metadata.instance.id,
-    )
-    .execute(&state.pool)
-    .await?;
     let canonical = servers
         .into_iter()
         .map(|data| CanonicalServer {
@@ -179,7 +168,7 @@ pub(super) async fn seed_servers(
             data,
         })
         .collect::<Vec<_>>();
-    write_canonical(state, &canonical).await?;
+    commit_server_state(Some(&canonical), None, state).await?;
     regenerate_servers(state).await
 }
 
@@ -192,15 +181,11 @@ pub(super) async fn ensure_servers(
         && let Err(error) = reconstruct_modpack_servers(metadata, state).await
     {
         tracing::warn!(
-            "Failed to reconstruct the server baseline for {}; preserving its current server list locally: {error}",
+            "Failed to reconstruct the server baseline for {}; retaining its last known per-instance server metadata: {error}",
             metadata.instance.id
         );
-        let path = instance_dir(metadata, state).join(SERVERS_FILE);
-        let servers = read_servers(&path).await?;
-        replace_modpack_servers(metadata, servers, false, state).await?;
     }
-    let canonical_path = canonical_path(state);
-    if !canonical_path.exists() {
+    if !canonical_exists(state).await? {
         if !is_modpack_link(&metadata.link) {
             let servers =
                 read_servers(&instance_dir(metadata, state).join(SERVERS_FILE))
@@ -212,9 +197,9 @@ pub(super) async fn ensure_servers(
                     data,
                 })
                 .collect::<Vec<_>>();
-            write_canonical(state, &canonical).await?;
+            commit_server_state(Some(&canonical), None, state).await?;
         } else {
-            write_canonical(state, &[]).await?;
+            commit_server_state(Some(&[]), None, state).await?;
         }
     }
     compose_instance(metadata, state).await
@@ -231,27 +216,25 @@ pub(super) async fn detach_servers(
 
 pub async fn capture_modpack_servers(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
     let path = instance_dir(&metadata, &state).join(SERVERS_FILE);
     let servers = read_servers(&path).await?;
     replace_modpack_servers(&metadata, servers, true, &state).await?;
-    if effective(&metadata, &state).await? {
-        compose_instance(&metadata, &state).await?;
-    }
+    regenerate_servers(&state).await?;
     Ok(())
 }
 
 pub async fn clear_modpack_servers(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
     replace_modpack_servers(&metadata, Vec::new(), true, &state).await?;
-    if effective(&metadata, &state).await? {
-        compose_instance(&metadata, &state).await?;
-    }
+    regenerate_servers(&state).await?;
     Ok(())
 }
 
@@ -261,33 +244,28 @@ async fn replace_modpack_servers(
     reconstructed: bool,
     state: &State,
 ) -> crate::Result<()> {
-    let mut tx = state.pool.begin().await?;
-    sqlx::query!(
-		"DELETE FROM instance_server_entries WHERE instance_id = ? AND source = 'modpack'",
-		metadata.instance.id,
-	)
-	.execute(&mut *tx)
-	.await?;
-    for (position, server) in servers.into_iter().enumerate() {
-        let id = Uuid::new_v4().to_string();
-        let source = ServerSource::Modpack.as_str();
-        let nbt = nbt_to_bytes(&server)?;
-        let position = position as i64;
-        sqlx::query!(
-            "
-			INSERT INTO instance_server_entries
-				(instance_id, id, source, canonical_id, nbt, position)
-			VALUES (?, ?, ?, NULL, ?, ?)
-			",
-            metadata.instance.id,
-            id,
-            source,
-            nbt,
-            position,
-        )
-        .execute(&mut *tx)
-        .await?;
+    let mut local = servers
+        .into_iter()
+        .enumerate()
+        .map(|(position, data)| LocalServer {
+            id: Uuid::new_v4().to_string(),
+            source: ServerSource::Modpack,
+            canonical_id: None,
+            data,
+            position: position as i64,
+        })
+        .collect::<Vec<_>>();
+    let mut retained = load_local(&metadata.instance.id, state)
+        .await?
+        .into_iter()
+        .filter(|server| server.source != ServerSource::Modpack)
+        .collect::<Vec<_>>();
+    for server in &mut retained {
+        server.position = local.len() as i64;
+        local.push(server.clone());
     }
+    let mut tx = state.pool.begin().await?;
+    write_local_rows(&mut tx, &metadata.instance.id, &local).await?;
     let version_id = modpack_version_id(&metadata.link);
     sqlx::query!(
         "
@@ -304,6 +282,7 @@ async fn replace_modpack_servers(
     )
     .execute(&mut *tx)
     .await?;
+    bump_server_revision(&mut tx, false).await?;
     tx.commit().await?;
     Ok(())
 }
@@ -433,49 +412,54 @@ pub(super) async fn reconcile_servers(
     if !local_path.exists() {
         return compose_instance(metadata, state).await;
     }
-    let expected = sqlx::query_scalar!(
-        "
-		SELECT expected_sha1 FROM synced_option_materializations
-		WHERE instance_id = ? AND option = 'multiplayer_servers' AND family = ''
-		",
-        metadata.instance.id,
+    canonical_initialized(state).await?;
+    let materialized = materialization(
+        &metadata.instance.id,
+        SyncedOption::MultiplayerServers,
+        "",
+        state,
     )
-    .fetch_optional(&state.pool)
-    .await?
-    .flatten();
+    .await?;
+    if materialized.as_ref().is_some_and(|value| value.pending) {
+        return compose_instance(metadata, state).await;
+    }
     let actual = sha1_file(&local_path).await?;
-    if expected.as_deref() == Some(actual.as_str()) {
-        return Ok(());
+    let revision = server_revision(state).await?;
+    if materialized
+        .as_ref()
+        .and_then(|value| value.expected_sha1.as_deref())
+        == Some(actual.as_str())
+    {
+        if materialized
+            .as_ref()
+            .is_some_and(|value| value.canonical_revision == revision)
+        {
+            return Ok(());
+        }
+        return compose_instance(metadata, state).await;
     }
 
     let current = read_servers(&local_path).await?;
     let snapshots = load_snapshots(&metadata.instance.id, state).await?;
+    let snapshot_matches = match_snapshots(&current, &snapshots);
     let mut matched = HashSet::new();
     let mut canonical = read_canonical(state).await?;
     let mut locals = load_local(&metadata.instance.id, state).await?;
 
-    for (position, data) in current.into_iter().enumerate() {
-        let snapshot = snapshots
-            .iter()
-            .filter(|snapshot| !matched.contains(&snapshot.id))
-            .find(|snapshot| snapshot.data == data)
-            .or_else(|| {
-                snapshots
-                    .iter()
-                    .filter(|snapshot| !matched.contains(&snapshot.id))
-                    .find(|snapshot| {
-                        server_address(&snapshot.data) == server_address(&data)
-                    })
-            })
-            .or_else(|| snapshots.get(position));
+    let mut canonical_order = Vec::new();
 
+    for ((position, data), snapshot) in
+        current.into_iter().enumerate().zip(snapshot_matches)
+    {
         if let Some(snapshot) = snapshot {
             matched.insert(snapshot.id.clone());
             match snapshot.source {
                 ServerSource::UserSynced => {
+                    canonical_order.push(snapshot.id.clone());
                     if let Some(server) = canonical
                         .iter_mut()
                         .find(|server| server.id == snapshot.id)
+                        && data != snapshot.data
                     {
                         server.data = data;
                     }
@@ -485,16 +469,17 @@ pub(super) async fn reconcile_servers(
                         .iter_mut()
                         .find(|server| server.id == snapshot.id)
                     {
-                        server.data = data;
+                        if data != snapshot.data {
+                            server.data = data;
+                        }
                         server.position = position as i64;
                     }
                 }
             }
         } else {
-            canonical.push(CanonicalServer {
-                id: Uuid::new_v4().to_string(),
-                data,
-            });
+            let id = Uuid::new_v4().to_string();
+            canonical_order.push(id.clone());
+            canonical.push(CanonicalServer { id, data });
         }
     }
 
@@ -505,27 +490,132 @@ pub(super) async fn reconcile_servers(
                 && !matched.contains(&snapshot.id)
         })
     });
-    write_canonical(state, &canonical).await?;
-    write_local(&metadata.instance.id, &locals, state).await?;
+    locals.retain(|server| {
+        !snapshots.iter().any(|snapshot| {
+            snapshot.source != ServerSource::UserSynced
+                && snapshot.id == server.id
+                && !matched.contains(&snapshot.id)
+        })
+    });
+    let by_id = canonical
+        .iter()
+        .cloned()
+        .map(|server| (server.id.clone(), server))
+        .collect::<std::collections::HashMap<_, _>>();
+    let visible = canonical_order.iter().cloned().collect::<HashSet<_>>();
+    let mut ordered = canonical_order
+        .into_iter()
+        .filter_map(|id| by_id.get(&id).cloned());
+    for server in &mut canonical {
+        if visible.contains(&server.id)
+            && let Some(next) = ordered.next()
+        {
+            *server = next;
+        }
+    }
+    commit_server_state(
+        Some(&canonical),
+        Some((&metadata.instance.id, &locals)),
+        state,
+    )
+    .await?;
     regenerate_servers(state).await
+}
+
+fn match_snapshots<'a>(
+    current: &[NbtCompound],
+    snapshots: &'a [SnapshotServer],
+) -> Vec<Option<&'a SnapshotServer>> {
+    let mut matches = vec![None; current.len()];
+    let mut matched_snapshots = HashSet::new();
+
+    for (position, data) in current.iter().enumerate() {
+        let candidate = snapshots
+            .iter()
+            .enumerate()
+            .filter(|(index, snapshot)| {
+                !matched_snapshots.contains(index) && snapshot.data == *data
+            })
+            .min_by_key(|(_, snapshot)| {
+                snapshot.position.abs_diff(position as i64)
+            })
+            .map(|(index, _)| index);
+        if let Some(index) = candidate {
+            matches[position] = Some(index);
+            matched_snapshots.insert(index);
+        }
+    }
+
+    for (position, data) in current.iter().enumerate() {
+        if matches[position].is_some() {
+            continue;
+        }
+        let address = server_identity_address(data);
+        if address.is_empty() {
+            continue;
+        }
+        let candidate = snapshots
+            .iter()
+            .enumerate()
+            .filter(|(index, snapshot)| {
+                !matched_snapshots.contains(index)
+                    && server_identity_address(&snapshot.data) == address
+            })
+            .min_by_key(|(_, snapshot)| {
+                snapshot.position.abs_diff(position as i64)
+            })
+            .map(|(index, _)| index);
+        if let Some(index) = candidate {
+            matches[position] = Some(index);
+            matched_snapshots.insert(index);
+        }
+    }
+
+    for (position, data) in current.iter().enumerate() {
+        if matches[position].is_some() {
+            continue;
+        }
+        let name = server_identity_name(data);
+        if name.is_empty() {
+            continue;
+        }
+        let candidate = snapshots
+            .iter()
+            .enumerate()
+            .filter(|(index, snapshot)| {
+                !matched_snapshots.contains(index)
+                    && server_identity_name(&snapshot.data) == name
+            })
+            .min_by_key(|(_, snapshot)| {
+                snapshot.position.abs_diff(position as i64)
+            })
+            .map(|(index, _)| index);
+        if let Some(index) = candidate {
+            matches[position] = Some(index);
+            matched_snapshots.insert(index);
+        }
+    }
+
+    matches
+        .into_iter()
+        .map(|snapshot| snapshot.map(|index| &snapshots[index]))
+        .collect()
 }
 
 pub(crate) async fn list_server_records(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<Vec<ServerRecord>> {
-    if effective(metadata, state).await? {
-        let snapshots = load_snapshots(&metadata.instance.id, state).await?;
-        if !snapshots.is_empty() {
-            return Ok(snapshots
-                .into_iter()
-                .map(|snapshot| ServerRecord {
-                    id: snapshot.id,
-                    source: snapshot.source,
-                    data: snapshot.data,
-                })
-                .collect());
-        }
+    let _guard = state.lock_synced_options().await;
+    list_server_records_locked(metadata, state).await
+}
+
+async fn list_server_records_locked(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<Vec<ServerRecord>> {
+    if participating(metadata, state).await? {
+        return compose_records(metadata, state).await;
     }
     Ok(
         read_servers(&instance_dir(metadata, state).join(SERVERS_FILE))
@@ -545,14 +635,15 @@ pub(crate) async fn add_user_server(
     mut data: NbtCompound,
     state: &State,
 ) -> crate::Result<String> {
+    let _guard = state.lock_synced_options().await;
     let id = Uuid::new_v4().to_string();
-    if effective(metadata, state).await? {
+    if participating(metadata, state).await? {
         let mut canonical = read_canonical(state).await?;
         canonical.push(CanonicalServer {
             id: id.clone(),
             data,
         });
-        write_canonical(state, &canonical).await?;
+        commit_server_state(Some(&canonical), None, state).await?;
         regenerate_servers(state).await?;
     } else {
         let path = instance_dir(metadata, state).join(SERVERS_FILE);
@@ -573,15 +664,25 @@ pub(crate) async fn update_server(
     data: NbtCompound,
     state: &State,
 ) -> crate::Result<()> {
-    if effective(metadata, state).await? {
-        let snapshots = load_snapshots(&metadata.instance.id, state).await?;
-        let snapshot = snapshots
+    let _guard = state.lock_synced_options().await;
+    update_server_locked(metadata, server_id, data, state).await
+}
+
+async fn update_server_locked(
+    metadata: &InstanceMetadata,
+    server_id: &str,
+    data: NbtCompound,
+    state: &State,
+) -> crate::Result<()> {
+    if participating(metadata, state).await? {
+        let records = compose_records(metadata, state).await?;
+        let record = records
             .iter()
-            .find(|snapshot| snapshot.id == server_id)
+            .find(|record| record.id == server_id)
             .ok_or_else(|| {
                 ErrorKind::InputError("Unknown server".to_string())
             })?;
-        if snapshot.source == ServerSource::UserSynced {
+        if record.source == ServerSource::UserSynced {
             let mut canonical = read_canonical(state).await?;
             let server = canonical
                 .iter_mut()
@@ -590,7 +691,7 @@ pub(crate) async fn update_server(
                     ErrorKind::InputError("Unknown server".to_string())
                 })?;
             server.data = data;
-            write_canonical(state, &canonical).await?;
+            commit_server_state(Some(&canonical), None, state).await?;
         } else {
             let mut locals = load_local(&metadata.instance.id, state).await?;
             let server = locals
@@ -620,8 +721,9 @@ pub(crate) async fn update_server_by_index(
     accept_textures: Option<bool>,
     state: &State,
 ) -> crate::Result<()> {
-    if effective(metadata, state).await? {
-        let records = list_server_records(metadata, state).await?;
+    let _guard = state.lock_synced_options().await;
+    if participating(metadata, state).await? {
+        let records = list_server_records_locked(metadata, state).await?;
         let record = records
             .get(index)
             .filter(|record| !record.hidden())
@@ -632,7 +734,7 @@ pub(crate) async fn update_server_by_index(
             })?;
         let mut data = record.data.clone();
         update_server_data(&mut data, name, address, accept_textures);
-        return update_server(metadata, &record.id, data, state).await;
+        return update_server_locked(metadata, &record.id, data, state).await;
     }
     let path = instance_dir(metadata, state).join(SERVERS_FILE);
     let mut servers = read_servers(&path).await?;
@@ -653,24 +755,31 @@ pub(crate) async fn remove_server(
     server_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    if !effective(metadata, state).await? {
+    let _guard = state.lock_synced_options().await;
+    remove_server_locked(metadata, server_id, state).await
+}
+
+async fn remove_server_locked(
+    metadata: &InstanceMetadata,
+    server_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    if !participating(metadata, state).await? {
         return Err(ErrorKind::InputError(
 			"Stable server removal requires multiplayer syncing for this instance."
 				.to_string(),
 		)
 		.into());
     }
-    let snapshots = load_snapshots(&metadata.instance.id, state).await?;
-    let snapshot = snapshots
+    let records = compose_records(metadata, state).await?;
+    let record = records
         .iter()
-        .find(|snapshot| snapshot.id == server_id)
-        .ok_or_else(|| {
-        ErrorKind::InputError("Unknown server".to_string())
-    })?;
-    if snapshot.source == ServerSource::UserSynced {
+        .find(|record| record.id == server_id)
+        .ok_or_else(|| ErrorKind::InputError("Unknown server".to_string()))?;
+    if record.source == ServerSource::UserSynced {
         let mut canonical = read_canonical(state).await?;
         canonical.retain(|server| server.id != server_id);
-        write_canonical(state, &canonical).await?;
+        commit_server_state(Some(&canonical), None, state).await?;
     } else {
         let mut locals = load_local(&metadata.instance.id, state).await?;
         locals.retain(|server| server.id != server_id);
@@ -684,8 +793,9 @@ pub(crate) async fn remove_server_by_index(
     index: usize,
     state: &State,
 ) -> crate::Result<()> {
-    if effective(metadata, state).await? {
-        let records = list_server_records(metadata, state).await?;
+    let _guard = state.lock_synced_options().await;
+    if participating(metadata, state).await? {
+        let records = list_server_records_locked(metadata, state).await?;
         let record = records
             .get(index)
             .filter(|record| !record.hidden())
@@ -694,7 +804,7 @@ pub(crate) async fn remove_server_by_index(
                     "No removable server at index {index}"
                 ))
             })?;
-        return remove_server(metadata, &record.id, state).await;
+        return remove_server_locked(metadata, &record.id, state).await;
     }
     let path = instance_dir(metadata, state).join(SERVERS_FILE);
     let mut servers = read_servers(&path).await?;
@@ -714,9 +824,17 @@ pub async fn desync_server(
     mode: DesyncServerMode,
 ) -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    if !participating(&metadata, &state).await? {
+        return Err(ErrorKind::InputError(
+            "This instance is not participating in multiplayer server syncing."
+                .to_string(),
+        )
+        .into());
+    }
     let mut canonical = read_canonical(&state).await?;
     let server = canonical
         .iter()
@@ -727,6 +845,11 @@ pub async fn desync_server(
                 "Only a synced user server can be desynced.".to_string(),
             )
         })?;
+    let local_position = compose_records(&metadata, &state)
+        .await?
+        .iter()
+        .position(|record| record.id == server_id)
+        .unwrap_or_default() as i64;
     let mut locals = load_local(instance_id, &state).await?;
     locals.push(LocalServer {
         id: Uuid::new_v4().to_string(),
@@ -734,20 +857,20 @@ pub async fn desync_server(
         canonical_id: (mode == DesyncServerMode::KeepInOtherInstances)
             .then(|| server.id.clone()),
         data: server.data,
-        position: locals.len() as i64,
+        position: local_position,
     });
     if mode == DesyncServerMode::RemoveFromOtherInstances {
         canonical.retain(|candidate| candidate.id != server_id);
-        write_canonical(&state, &canonical).await?;
     }
-    write_local(instance_id, &locals, &state).await?;
+    commit_server_state(Some(&canonical), Some((instance_id, &locals)), &state)
+        .await?;
     regenerate_servers(&state).await?;
-    let _ = metadata;
     Ok(())
 }
 
 pub async fn list_synced_servers() -> crate::Result<Vec<SyncedServer>> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     Ok(read_canonical(&state)
         .await?
         .into_iter()
@@ -771,6 +894,7 @@ pub async fn list_synced_servers() -> crate::Result<Vec<SyncedServer>> {
 
 pub async fn update_synced_server(server: SyncedServer) -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let mut canonical = read_canonical(&state).await?;
     let target = canonical
         .iter_mut()
@@ -784,12 +908,13 @@ pub async fn update_synced_server(server: SyncedServer) -> crate::Result<()> {
         server.address,
         server.accept_textures,
     );
-    write_canonical(&state, &canonical).await?;
+    commit_server_state(Some(&canonical), None, &state).await?;
     regenerate_servers(&state).await
 }
 
 pub async fn remove_synced_server(server_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let mut canonical = read_canonical(&state).await?;
     let previous_len = canonical.len();
     canonical.retain(|server| server.id != server_id);
@@ -798,7 +923,7 @@ pub async fn remove_synced_server(server_id: &str) -> crate::Result<()> {
             ErrorKind::InputError("Unknown synced server".to_string()).into()
         );
     }
-    write_canonical(&state, &canonical).await?;
+    commit_server_state(Some(&canonical), None, &state).await?;
     regenerate_servers(&state).await
 }
 
@@ -806,6 +931,45 @@ async fn compose_instance(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
+    let records = compose_records(metadata, state).await?;
+    let bytes = servers_to_bytes(
+        &records
+            .iter()
+            .map(|record| record.data.clone())
+            .collect::<Vec<_>>(),
+    )?;
+    let expected = sha1_bytes(&bytes);
+    let revision = server_revision(state).await?;
+    begin_server_materialization(
+        &metadata.instance.id,
+        &records,
+        &bytes,
+        &expected,
+        revision,
+        state,
+    )
+    .await?;
+    let generated = generated_path(state, &metadata.instance.id);
+    if let Some(parent) = generated.parent() {
+        crate::util::io::create_dir_all(parent).await?;
+    }
+    crate::util::io::write(&generated, &bytes).await?;
+    let target = instance_dir(metadata, state).join(SERVERS_FILE);
+    let mode = ensure_link(&generated, &target).await?;
+    finish_materialization(
+        &metadata.instance.id,
+        SyncedOption::MultiplayerServers,
+        "",
+        mode,
+        state,
+    )
+    .await
+}
+
+async fn compose_records(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<Vec<ServerRecord>> {
     let canonical = read_canonical(state).await?;
     let locals = load_local(&metadata.instance.id, state).await?;
     let exclusions = locals
@@ -823,33 +987,20 @@ async fn compose_instance(
         .collect::<Vec<_>>();
     let mut locals = locals;
     locals.sort_by_key(|server| server.position);
-    records.extend(locals.into_iter().map(|server| ServerRecord {
-        id: server.id,
-        source: server.source,
-        data: server.data,
-    }));
-
-    let generated = generated_path(state, &metadata.instance.id);
-    write_servers(
-        &generated,
-        &records
-            .iter()
-            .map(|record| record.data.clone())
-            .collect::<Vec<_>>(),
-    )
-    .await?;
-    write_snapshots(&metadata.instance.id, &records, state).await?;
-    let target = instance_dir(metadata, state).join(SERVERS_FILE);
-    let mode = ensure_link(&generated, &target).await?;
-    record_materialization(
-        &metadata.instance.id,
-        SyncedOption::MultiplayerServers,
-        "",
-        Some(&sha1_file(&generated).await?),
-        mode,
-        state,
-    )
-    .await
+    for server in locals {
+        let position = usize::try_from(server.position)
+            .unwrap_or(records.len())
+            .min(records.len());
+        records.insert(
+            position,
+            ServerRecord {
+                id: server.id,
+                source: server.source,
+                data: server.data,
+            },
+        );
+    }
+    Ok(records)
 }
 
 async fn regenerate_servers(state: &State) -> crate::Result<()> {
@@ -866,8 +1017,18 @@ async fn effective(
     state: &State,
 ) -> crate::Result<bool> {
     if sync_files_are_protected(metadata)
-        || instance_is_running(metadata, state)
-        || !instance_option_enabled(metadata, SyncedOption::MultiplayerServers)
+        || instance_is_running(metadata, state).await?
+    {
+        return Ok(false);
+    }
+    participating(metadata, state).await
+}
+
+async fn participating(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<bool> {
+    if !instance_option_enabled(metadata, SyncedOption::MultiplayerServers)
         || is_linked_server_project(&metadata.link)
     {
         return Ok(false);
@@ -884,44 +1045,114 @@ async fn effective(
     .await?)
 }
 
-async fn read_canonical(state: &State) -> crate::Result<Vec<CanonicalServer>> {
-    let path = canonical_path(state);
-    if !path.exists() {
-        return Ok(Vec::new());
-    }
-    let root = read_nbt_file(&path).await?;
-    let Some(list) = root.get::<_, &NbtList>("Servers").ok() else {
-        return Ok(Vec::new());
-    };
-    Ok(list
-        .iter()
-        .filter_map(|tag| {
-            let NbtTag::Compound(record) = tag else {
-                return None;
-            };
-            Some(CanonicalServer {
-                id: record.get::<_, &str>("Id").ok()?.to_string(),
-                data: record.get::<_, &NbtCompound>("Data").ok()?.clone(),
-            })
-        })
-        .collect())
+pub(super) async fn canonical_exists(state: &State) -> crate::Result<bool> {
+    canonical_initialized(state).await
 }
 
-async fn write_canonical(
+async fn canonical_initialized(state: &State) -> crate::Result<bool> {
+    Ok(sqlx::query_scalar!(
+        r#"
+		SELECT initialized AS "initialized!: bool"
+		FROM synced_option_revisions
+		WHERE option = 'multiplayer_servers'
+		"#,
+    )
+    .fetch_one(&state.pool)
+    .await?)
+}
+
+async fn read_canonical(state: &State) -> crate::Result<Vec<CanonicalServer>> {
+    canonical_initialized(state).await?;
+    let rows = sqlx::query!(
+        "
+		SELECT id, nbt
+		FROM synced_server_entries
+		ORDER BY position
+		",
+    )
+    .fetch_all(&state.pool)
+    .await?;
+    rows.into_iter()
+        .map(|row| {
+            Ok(CanonicalServer {
+                id: row.id,
+                data: nbt_from_bytes(row.nbt)?,
+            })
+        })
+        .collect()
+}
+
+async fn commit_server_state(
+    canonical: Option<&[CanonicalServer]>,
+    local: Option<(&str, &[LocalServer])>,
     state: &State,
+) -> crate::Result<i64> {
+    let canonical_changed = canonical.is_some();
+    let mut tx = state.pool.begin().await?;
+    if let Some(canonical) = canonical {
+        write_canonical_rows(&mut tx, canonical).await?;
+    }
+    if let Some((instance_id, local)) = local {
+        write_local_rows(&mut tx, instance_id, local).await?;
+    }
+    let revision = bump_server_revision(&mut tx, canonical_changed).await?;
+    tx.commit().await?;
+    Ok(revision)
+}
+
+async fn write_canonical_rows(
+    tx: &mut Transaction<'_, Sqlite>,
     servers: &[CanonicalServer],
 ) -> crate::Result<()> {
-    let mut list = NbtList::new();
-    for server in servers {
-        let mut record = NbtCompound::new();
-        record.insert("Id", server.id.clone());
-        record.insert("Data", server.data.clone());
-        list.push(record);
+    sqlx::query!("DELETE FROM synced_server_entries")
+        .execute(&mut **tx)
+        .await?;
+    for (position, server) in servers.iter().enumerate() {
+        let nbt = nbt_to_bytes(&server.data)?;
+        let position = position as i64;
+        sqlx::query!(
+            "
+			INSERT INTO synced_server_entries (id, nbt, position)
+			VALUES (?, ?, ?)
+			",
+            server.id,
+            nbt,
+            position,
+        )
+        .execute(&mut **tx)
+        .await?;
     }
-    let mut root = NbtCompound::new();
-    root.insert("Version", 1_i32);
-    root.insert("Servers", list);
-    write_nbt_file(&canonical_path(state), &root).await
+    Ok(())
+}
+
+async fn bump_server_revision(
+    tx: &mut Transaction<'_, Sqlite>,
+    initialize: bool,
+) -> crate::Result<i64> {
+    Ok(sqlx::query_scalar!(
+        r#"
+		UPDATE synced_option_revisions
+		SET revision = revision + 1,
+			initialized = CASE WHEN ? THEN 1 ELSE initialized END
+		WHERE option = 'multiplayer_servers'
+		RETURNING revision AS "revision!: i64"
+		"#,
+        initialize,
+    )
+    .fetch_one(&mut **tx)
+    .await?)
+}
+
+async fn server_revision(state: &State) -> crate::Result<i64> {
+    Ok(sqlx::query_scalar!(
+        r#"
+		SELECT revision AS "revision!: i64"
+		FROM synced_option_revisions
+		WHERE option = 'multiplayer_servers'
+		"#,
+    )
+    .fetch_one(&state.pool)
+    .await?)
 }
 
 pub(crate) async fn read_servers(
@@ -938,29 +1169,41 @@ fn servers_from_bytes(bytes: Vec<u8>) -> crate::Result<Vec<NbtCompound>> {
 }
 
 fn servers_from_root(root: NbtCompound) -> crate::Result<Vec<NbtCompound>> {
-    let Some(list) = root.get::<_, &NbtList>("servers").ok() else {
-        return Ok(Vec::new());
-    };
-    Ok(list
-        .iter()
-        .filter_map(|tag| match tag {
-            NbtTag::Compound(compound) => Some(compound.clone()),
-            _ => None,
+    let list = root.get::<_, &NbtList>("servers").map_err(|_| {
+        ErrorKind::InputError(
+            "servers.dat does not contain a valid servers list".to_string(),
+        )
+    })?;
+    list.iter()
+        .map(|tag| match tag {
+            NbtTag::Compound(compound) => Ok(compound.clone()),
+            _ => Err(ErrorKind::InputError(
+                "servers.dat contains an invalid server entry".to_string(),
+            )
+            .into()),
         })
-        .collect())
+        .collect()
 }
 
 pub(crate) async fn write_servers(
     path: &Path,
     servers: &[NbtCompound],
 ) -> crate::Result<()> {
+    if let Some(parent) = path.parent() {
+        crate::util::io::create_dir_all(parent).await?;
+    }
+    crate::util::io::write(path, servers_to_bytes(servers)?).await?;
+    Ok(())
+}
+
+fn servers_to_bytes(servers: &[NbtCompound]) -> crate::Result<Vec<u8>> {
     let mut list = NbtList::new();
     for server in servers {
         list.push(server.clone());
     }
     let mut root = NbtCompound::new();
     root.insert("servers", list);
-    write_nbt_file(path, &root).await
+    nbt_to_bytes(&root)
 }
 
 pub(crate) fn server_data(
@@ -1000,6 +1243,18 @@ fn server_hidden(server: &NbtCompound) -> bool {
 
 fn server_address(server: &NbtCompound) -> String {
     server.get::<_, &str>("ip").unwrap_or_default().to_string()
+}
+
+fn server_identity_address(server: &NbtCompound) -> String {
+    server_address(server).trim().to_ascii_lowercase()
+}
+
+fn server_identity_name(server: &NbtCompound) -> String {
+    server
+        .get::<_, &str>("name")
+        .unwrap_or_default()
+        .trim()
+        .to_ascii_lowercase()
 }
 
 async fn load_local(
@@ -1042,12 +1297,20 @@ async fn write_local(
     servers: &[LocalServer],
     state: &State,
 ) -> crate::Result<()> {
-    let mut tx = state.pool.begin().await?;
+    commit_server_state(None, Some((instance_id, servers)), state).await?;
+    Ok(())
+}
+
+async fn write_local_rows(
+    tx: &mut Transaction<'_, Sqlite>,
+    instance_id: &str,
+    servers: &[LocalServer],
+) -> crate::Result<()> {
     sqlx::query!(
         "DELETE FROM instance_server_entries WHERE instance_id = ?",
         instance_id,
     )
-    .execute(&mut *tx)
+    .execute(&mut **tx)
     .await?;
     for server in servers {
         let source = server.source.as_str();
@@ -1065,10 +1328,9 @@ async fn write_local(
             nbt,
             server.position,
         )
-        .execute(&mut *tx)
+        .execute(&mut **tx)
         .await?;
     }
-    tx.commit().await?;
     Ok(())
 }
 
@@ -1078,7 +1340,7 @@ async fn load_snapshots(
 ) -> crate::Result<Vec<SnapshotServer>> {
     let rows = sqlx::query!(
         "
-		SELECT server_id, source, nbt
+		SELECT server_id, source, nbt, position
 		FROM instance_server_snapshots
 		WHERE instance_id = ?
 		ORDER BY position
@@ -1100,14 +1362,18 @@ async fn load_snapshots(
                     },
                 )?,
                 data: nbt_from_bytes(row.nbt)?,
+                position: row.position,
             })
         })
         .collect()
 }
 
-async fn write_snapshots(
+async fn begin_server_materialization(
     instance_id: &str,
     servers: &[ServerRecord],
+    baseline: &[u8],
+    expected_sha1: &str,
+    canonical_revision: i64,
     state: &State,
 ) -> crate::Result<()> {
     let mut tx = state.pool.begin().await?;
@@ -1136,12 +1402,27 @@ async fn write_snapshots(
         .execute(&mut *tx)
         .await?;
     }
+    sqlx::query!(
+        "
+		INSERT INTO synced_option_materializations
+			(instance_id, option, family, expected_sha1, baseline,
+			 canonical_revision, pending, link_mode)
+		VALUES (?, 'multiplayer_servers', '', ?, ?, ?, 1, 'copy')
+		ON CONFLICT(instance_id, option, family) DO UPDATE SET
+			expected_sha1 = excluded.expected_sha1,
+			baseline = excluded.baseline,
+			canonical_revision = excluded.canonical_revision,
+			pending = 1
+		",
+        instance_id,
+        expected_sha1,
+        baseline,
+        canonical_revision,
+    )
+    .execute(&mut *tx)
+    .await?;
     tx.commit().await?;
     Ok(())
-}
-
-fn canonical_path(state: &State) -> PathBuf {
-    synced_options_path(state).join("servers/canonical.nbt")
 }
 
 fn generated_path(state: &State, instance_id: &str) -> PathBuf {

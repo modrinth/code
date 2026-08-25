@@ -232,6 +232,7 @@ fn main() {
                         "instance_set_synced_option",
                         "instance_get_synced_options_overview",
                         "instance_get_global_synced_options",
+                        "instance_synced_option_needs_base",
                         "instance_set_global_synced_option",
                         "instance_get_command_history",
                         "instance_set_command_history",

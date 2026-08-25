@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM synced_server_entries",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "85f28d7d9f35882959ace190f66de0af7bffbf1ae09c8f643a1aa2e3cd1b7212"
+}

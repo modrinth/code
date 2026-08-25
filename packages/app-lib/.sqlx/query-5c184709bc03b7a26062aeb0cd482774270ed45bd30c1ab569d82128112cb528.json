@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT initialized AS \"initialized!: bool\"\n\t\tFROM synced_option_revisions\n\t\tWHERE option = 'multiplayer_servers'\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "initialized!: bool",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "5c184709bc03b7a26062aeb0cd482774270ed45bd30c1ab569d82128112cb528"
+}

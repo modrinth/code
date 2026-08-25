@@ -97,10 +97,12 @@ pub use self::synced_options::{
     get_global_options as get_global_synced_options,
     get_overview as get_synced_options_overview, get_synced_options_folder,
     set_command_history, set_global_option as set_global_synced_option,
+    synced_option_needs_base,
 };
 pub(crate) use self::synced_options::{
-    prepare_instance_update,
+    monitor_persisted_processes, prepare_instance_update,
     reconcile_changed_file as reconcile_synced_option_file,
+    remove_generated_instance_files,
 };
 pub use self::synced_options::{
     reconcile_all as reconcile_all_synced_options,

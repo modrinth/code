@@ -13,6 +13,7 @@ use std::path::{Path, PathBuf};
 const COMMAND_HISTORY_FILE: &str = "command_history.txt";
 const HOTBAR_FILE: &str = "hotbar.nbt";
 const COMMAND_HISTORY_LIMIT: usize = 50;
+const COMPONENTS_DATA_VERSION_FLOOR: i32 = 3837;
 
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
 pub struct GlobalSyncedOptions {
@@ -55,6 +56,19 @@ pub struct SyncedOptionCapability {
 pub struct SyncedOptionsOverview {
     pub global_options: GlobalSyncedOptions,
     pub capabilities: Vec<SyncedOptionCapability>,
+}
+
+enum CapabilityStatus {
+    Supported,
+    Unsupported(String),
+    Indeterminate(String),
+}
+
+pub(super) struct Materialization {
+    pub expected_sha1: Option<String>,
+    pub baseline: Option<Vec<u8>>,
+    pub canonical_revision: i64,
+    pub pending: bool,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -102,6 +116,17 @@ pub async fn get_synced_options_folder() -> crate::Result<PathBuf> {
     let state = State::get().await?;
     create_synced_directories(&state).await?;
     Ok(synced_options_path(&state))
+}
+
+pub async fn synced_option_needs_base(
+    option: SyncedOption,
+) -> crate::Result<bool> {
+    if option == SyncedOption::Screenshots {
+        return Ok(false);
+    }
+    let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
+    Ok(!canonical_exists(option, &state).await?)
 }
 
 async fn get_global_options_with_state(
@@ -161,40 +186,61 @@ async fn capability(
     global_enabled: bool,
     state: &State,
 ) -> SyncedOptionCapability {
-    let version_reason = version_disabled_reason(metadata, option, state).await;
-    let linked_reason = (option == SyncedOption::MultiplayerServers
-		&& is_linked_server_project(&metadata.link))
-	.then(|| {
-		"Multiplayer server syncing is unavailable for linked server-project instances."
-			.to_string()
-	});
-    let global_reason = (!global_enabled).then(|| {
-        "This option is disabled in the app's synced options settings."
-            .to_string()
-    });
-    let disabled_reason = version_reason.or(linked_reason).or(global_reason);
+    let status =
+        capability_status(metadata, option, global_enabled, state).await;
+    let (supported, disabled_reason) = match status {
+        CapabilityStatus::Supported => (true, None),
+        CapabilityStatus::Unsupported(reason)
+        | CapabilityStatus::Indeterminate(reason) => (false, Some(reason)),
+    };
 
     SyncedOptionCapability {
         option,
-        supported: disabled_reason.is_none(),
+        supported,
         disabled_reason,
     }
 }
 
-async fn version_disabled_reason(
+async fn capability_status(
+    metadata: &InstanceMetadata,
+    option: SyncedOption,
+    global_enabled: bool,
+    state: &State,
+) -> CapabilityStatus {
+    if !global_enabled {
+        return CapabilityStatus::Unsupported(
+            "This option is disabled in the app's synced options settings."
+                .to_string(),
+        );
+    }
+    if option == SyncedOption::MultiplayerServers
+        && is_linked_server_project(&metadata.link)
+    {
+        return CapabilityStatus::Unsupported(
+			"Multiplayer server syncing is unavailable for linked server-project instances."
+				.to_string(),
+		);
+    }
+    match version_capability(metadata, option, state).await {
+        CapabilityStatus::Supported => CapabilityStatus::Supported,
+        status => status,
+    }
+}
+
+async fn version_capability(
     metadata: &InstanceMetadata,
     option: SyncedOption,
     state: &State,
-) -> Option<String> {
+) -> CapabilityStatus {
     if option == SyncedOption::Screenshots {
-        return None;
+        return CapabilityStatus::Supported;
     }
 
     let game_version = &metadata.applied_content_set.game_version;
     let Ok((manifest, version_index)) =
         crate::launcher::resolve_minecraft_manifest(game_version, state).await
     else {
-        return Some(
+        return CapabilityStatus::Indeterminate(
 			"This instance’s Minecraft version could not be verified, so syncing is unavailable."
 				.to_string(),
 		);
@@ -206,12 +252,12 @@ async fn version_disabled_reason(
         SyncedOption::MultiplayerServers => "b1.8",
         SyncedOption::CreativeHotbars => "1.12",
         SyncedOption::CommandHistory => "1.20.2",
-        SyncedOption::Screenshots => return None,
+        SyncedOption::Screenshots => return CapabilityStatus::Supported,
     };
     let Some(cutoff) =
         manifest.versions.iter().find(|item| item.id == cutoff_id)
     else {
-        return Some(
+        return CapabilityStatus::Indeterminate(
 			"This instance’s Minecraft version could not be verified, so syncing is unavailable."
 				.to_string(),
 		);
@@ -228,10 +274,10 @@ async fn version_disabled_reason(
     if version.release_time >= cutoff.release_time
         && (!release_only_option || is_supported_release)
     {
-        return None;
+        return CapabilityStatus::Supported;
     }
 
-    Some(
+    CapabilityStatus::Unsupported(
 		match option {
 			SyncedOption::MultiplayerServers => {
 				"Multiplayer server syncing requires Minecraft Beta 1.8 Pre-release or newer."
@@ -284,7 +330,11 @@ pub async fn set_global_option(
     base_instance_id: Option<&str>,
 ) -> crate::Result<GlobalSyncedOptions> {
     let state = State::get().await?;
-    if enabled && option != SyncedOption::Screenshots {
+    let _guard = state.lock_synced_options().await;
+    if enabled
+        && option != SyncedOption::Screenshots
+        && !canonical_exists(option, &state).await?
+    {
         let base_instance_id = base_instance_id.ok_or_else(|| {
             ErrorKind::InputError(
                 "Choose a base instance before enabling a synced option."
@@ -297,6 +347,15 @@ pub async fn set_global_option(
                 .ok_or_else(|| {
                     ErrorKind::InputError("Unknown instance".to_string())
                 })?;
+        if sync_files_are_protected(&metadata)
+            || instance_is_running(&metadata, &state).await?
+        {
+            return Err(ErrorKind::InputError(
+                "The base instance must be closed and fully installed."
+                    .to_string(),
+            )
+            .into());
+        }
         let base_capability = capability(&metadata, option, true, &state).await;
         if !base_capability.supported {
             return Err(ErrorKind::InputError(
@@ -310,8 +369,9 @@ pub async fn set_global_option(
     let option_name = option.as_str();
     sqlx::query!(
         "
-		INSERT INTO global_synced_options_overrides (option, enabled)
-		VALUES (?, ?)
+		INSERT INTO global_synced_options_overrides
+			(option, enabled, default_enabled)
+		VALUES (?, ?, 1)
 		ON CONFLICT(option) DO UPDATE SET enabled = excluded.enabled
 		",
         option_name,
@@ -322,19 +382,23 @@ pub async fn set_global_option(
 
     let instances = crate::state::list_instances(&state.pool).await?;
     for metadata in instances {
-        let supported = enabled
-            && capability(&metadata, option, true, &state).await.supported;
-        instance_rows::set_instance_synced_option(
-            &metadata.instance.id,
-            option,
-            supported,
-            &state.pool,
-        )
-        .await?;
-        if supported {
-            ensure_option(&metadata, option, &state).await?;
-        } else {
+        if sync_files_are_protected(&metadata)
+            || instance_is_running(&metadata, &state).await?
+        {
+            continue;
+        }
+        if !instance_option_enabled(&metadata, option) {
             detach_option(&metadata, option, &state).await?;
+            continue;
+        }
+        match capability_status(&metadata, option, enabled, &state).await {
+            CapabilityStatus::Supported => {
+                ensure_option(&metadata, option, &state).await?
+            }
+            CapabilityStatus::Unsupported(_) => {
+                detach_option(&metadata, option, &state).await?
+            }
+            CapabilityStatus::Indeterminate(_) => {}
         }
     }
 
@@ -347,10 +411,13 @@ pub async fn set_instance_option(
     enabled: bool,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
     let global = get_global_options_with_state(&state).await?;
+    let can_materialize = !sync_files_are_protected(&metadata)
+        && !instance_is_running(&metadata, &state).await?;
     if enabled {
         let eligibility =
             capability(&metadata, option, global.get(option), &state).await;
@@ -360,7 +427,14 @@ pub async fn set_instance_option(
             )
             .into());
         }
-        if !canonical_exists(option, &state) {
+        if !canonical_exists(option, &state).await? {
+            if !can_materialize {
+                return Err(ErrorKind::InputError(
+					"Close the instance before using it as the initial sync source."
+						.to_string(),
+				)
+				.into());
+            }
             seed_from_instance(&metadata, option, &state).await?;
         }
     }
@@ -372,10 +446,12 @@ pub async fn set_instance_option(
         &state.pool,
     )
     .await?;
-    if enabled {
-        ensure_option(&metadata, option, &state).await?;
-    } else {
-        detach_option(&metadata, option, &state).await?;
+    if can_materialize {
+        if enabled {
+            ensure_option(&metadata, option, &state).await?;
+        } else {
+            detach_option(&metadata, option, &state).await?;
+        }
     }
 
     crate::state::get_instance(instance_id, &state.pool)
@@ -387,6 +463,7 @@ pub async fn set_instance_option(
 
 pub async fn reconcile_all() -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     create_synced_directories(&state).await?;
     let instances = crate::state::list_instances(&state.pool).await?;
     for metadata in instances {
@@ -402,8 +479,55 @@ pub async fn reconcile_all() -> crate::Result<()> {
     Ok(())
 }
 
+pub(crate) async fn monitor_persisted_processes() -> crate::Result<()> {
+    let state = State::get().await?;
+    let instance_ids =
+        sqlx::query_scalar!("SELECT DISTINCT instance_id FROM processes",)
+            .fetch_all(&state.pool)
+            .await?;
+    for instance_id in instance_ids {
+        tokio::spawn(async move {
+            loop {
+                let Ok(state) = State::get().await else {
+                    break;
+                };
+                let Ok(Some(metadata)) =
+                    crate::state::get_instance(&instance_id, &state.pool).await
+                else {
+                    break;
+                };
+                match instance_is_running(&metadata, &state).await {
+                    Ok(true) => {
+                        tokio::time::sleep(std::time::Duration::from_secs(5))
+                            .await;
+                    }
+                    Ok(false) => {
+                        if let Err(error) =
+                            reconcile_instance(&instance_id).await
+                        {
+                            tracing::warn!(
+                                "Failed to reconcile synced options after a persisted process exited for {instance_id}: {error}"
+                            );
+                        }
+                        break;
+                    }
+                    Err(error) => {
+                        tracing::warn!(
+                            "Failed to inspect the persisted process for {instance_id}: {error}"
+                        );
+                        tokio::time::sleep(std::time::Duration::from_secs(5))
+                            .await;
+                    }
+                }
+            }
+        });
+    }
+    Ok(())
+}
+
 pub async fn reconcile_instance(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
@@ -414,6 +538,7 @@ pub(crate) async fn prepare_instance_update(
     instance_id: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
@@ -434,18 +559,20 @@ async fn reconcile_instance_with_state(
     state: &State,
 ) -> crate::Result<()> {
     if sync_files_are_protected(metadata)
-        || instance_is_running(metadata, state)
+        || instance_is_running(metadata, state).await?
     {
         return Ok(());
     }
     let global = get_global_options_with_state(state).await?;
     for option in SyncedOption::ALL {
-        let participating = instance_option_enabled(metadata, option);
-        let eligible = capability(metadata, option, global.get(option), state)
+        if !instance_option_enabled(metadata, option) {
+            detach_option(metadata, option, state).await?;
+            continue;
+        }
+        match capability_status(metadata, option, global.get(option), state)
             .await
-            .supported;
-        if participating && eligible {
-            match option {
+        {
+            CapabilityStatus::Supported => match option {
                 SyncedOption::CommandHistory => {
                     reconcile_command_history(metadata, state).await?
                 }
@@ -457,16 +584,11 @@ async fn reconcile_instance_with_state(
                         .await?
                 }
                 SyncedOption::Screenshots => {}
+            },
+            CapabilityStatus::Unsupported(_) => {
+                detach_option(metadata, option, state).await?
             }
-        } else if participating {
-            instance_rows::set_instance_synced_option(
-                &metadata.instance.id,
-                option,
-                false,
-                &state.pool,
-            )
-            .await?;
-            detach_option(metadata, option, state).await?;
+            CapabilityStatus::Indeterminate(_) => {}
         }
     }
     Ok(())
@@ -477,6 +599,7 @@ pub async fn reconcile_changed_file(
     file_name: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
@@ -497,6 +620,7 @@ pub async fn reconcile_changed_file(
 
 pub async fn get_command_history() -> crate::Result<String> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     let path = command_history_path(&state);
     if !path.exists() {
         return Ok(String::new());
@@ -506,6 +630,7 @@ pub async fn get_command_history() -> crate::Result<String> {
 
 pub async fn set_command_history(contents: &str) -> crate::Result<String> {
     let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
     create_synced_directories(&state).await?;
     let normalized = normalize_command_history(contents);
     io::write(command_history_path(&state), normalized.as_bytes()).await?;
@@ -515,6 +640,29 @@ pub async fn set_command_history(contents: &str) -> crate::Result<String> {
 
 pub fn synced_options_path(state: &State) -> PathBuf {
     state.directories.synced_options_dir()
+}
+
+pub(crate) async fn remove_generated_instance_files(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let instance_id = safe_instance_id(instance_id);
+    for path in [
+        synced_options_path(state)
+            .join("hotbars/generated/legacy")
+            .join(&instance_id),
+        synced_options_path(state)
+            .join("hotbars/generated/components")
+            .join(&instance_id),
+        synced_options_path(state)
+            .join("servers/generated")
+            .join(&instance_id),
+    ] {
+        if path.exists() {
+            io::remove_dir_all(path).await?;
+        }
+    }
+    Ok(())
 }
 
 async fn create_synced_directories(state: &State) -> crate::Result<()> {
@@ -559,7 +707,10 @@ async fn seed_from_instance(
                 empty_hotbar_root()
             };
             let mut sync_state = read_hotbar_state(state).await?;
-            merge_hotbar_family(&mut sync_state, family, root);
+            let baseline = empty_hotbar_root();
+            if merge_hotbar_family(&mut sync_state, family, &baseline, &root) {
+                increment_hotbar_revision(&mut sync_state);
+            }
             write_hotbar_state(state, &sync_state).await?;
             regenerate_hotbars(state).await?;
         }
@@ -603,14 +754,14 @@ async fn detach_option(
             .await
         }
         SyncedOption::CreativeHotbars => {
+            let target = instance_dir.join(HOTBAR_FILE);
             let family = hotbar_family(metadata, state).await.ok();
-            let source = family.map(|family| {
-                generated_hotbar_path(state, family, &metadata.instance.id)
-            });
-            if let Some(source) = source {
-                detach_link(&source, &instance_dir.join(HOTBAR_FILE)).await?;
-            }
-            Ok(())
+            let source = family
+                .map(|family| {
+                    generated_hotbar_path(state, family, &metadata.instance.id)
+                })
+                .unwrap_or_else(|| target.clone());
+            detach_link(&source, &target).await
         }
         SyncedOption::MultiplayerServers => {
             super::synced_servers::detach_servers(metadata, state).await
@@ -619,15 +770,18 @@ async fn detach_option(
     }
 }
 
-fn canonical_exists(option: SyncedOption, state: &State) -> bool {
-    match option {
+async fn canonical_exists(
+    option: SyncedOption,
+    state: &State,
+) -> crate::Result<bool> {
+    Ok(match option {
         SyncedOption::CommandHistory => command_history_path(state).exists(),
-        SyncedOption::CreativeHotbars => hotbar_state_path(state).exists(),
-        SyncedOption::MultiplayerServers => synced_options_path(state)
-            .join("servers/canonical.nbt")
-            .exists(),
+        SyncedOption::CreativeHotbars => hotbar_state_exists(state).await?,
+        SyncedOption::MultiplayerServers => {
+            super::synced_servers::canonical_exists(state).await?
+        }
         SyncedOption::Screenshots => true,
-    }
+    })
 }
 
 async fn ensure_command_history(
@@ -646,12 +800,23 @@ async fn ensure_command_history(
         io::write(&canonical, normalize_command_history(&contents)).await?;
     }
     let target = instance_dir(metadata, state).join(COMMAND_HISTORY_FILE);
-    let mode = ensure_link(&canonical, &target).await?;
-    record_materialization(
+    let baseline = io::read(&canonical).await?;
+    let expected = sha1_bytes(&baseline);
+    begin_materialization(
         &metadata.instance.id,
         SyncedOption::CommandHistory,
         "",
-        Some(&sha1_file(&canonical).await?),
+        Some(&expected),
+        Some(&baseline),
+        0,
+        state,
+    )
+    .await?;
+    let mode = ensure_link(&canonical, &target).await?;
+    finish_materialization(
+        &metadata.instance.id,
+        SyncedOption::CommandHistory,
+        "",
         mode,
         state,
     )
@@ -673,14 +838,18 @@ async fn reconcile_command_history(
         .await
         .map(|metadata| metadata.file_type().is_symlink())
         .unwrap_or(false);
-    let expected = materialization_hash(
+    let materialized = materialization(
         &metadata.instance.id,
         SyncedOption::CommandHistory,
         "",
         state,
     )
     .await?;
+    if materialized.as_ref().is_some_and(|value| value.pending) {
+        return ensure_command_history(metadata, state).await;
+    }
     let actual = sha1_file(&local).await?;
+    let expected = materialized.and_then(|value| value.expected_sha1);
     if !symlink && expected.as_deref() != Some(actual.as_str()) {
         let contents =
             String::from_utf8_lossy(&io::read(&local).await?).into_owned();
@@ -723,7 +892,7 @@ async fn ensure_hotbar(
     state: &State,
 ) -> crate::Result<()> {
     create_synced_directories(state).await?;
-    if !hotbar_state_path(state).exists() {
+    if !hotbar_state_exists(state).await? {
         seed_from_instance(metadata, SyncedOption::CreativeHotbars, state)
             .await?;
     }
@@ -743,32 +912,54 @@ async fn reconcile_hotbar(
         return ensure_hotbar(metadata, state).await;
     }
     let family = hotbar_family(metadata, state).await?;
-    let expected = materialization_hash(
+    let materialized = materialization(
         &metadata.instance.id,
         SyncedOption::CreativeHotbars,
         family.as_str(),
         state,
     )
     .await?;
+    if materialized.as_ref().is_some_and(|value| value.pending) {
+        return materialize_hotbars_for_instance(metadata, state).await;
+    }
     let actual = sha1_file(&local).await?;
-    if expected.as_deref() == Some(actual.as_str()) {
-        return Ok(());
+    let mut sync_state = read_hotbar_state(state).await?;
+    let canonical_revision = hotbar_revision(&sync_state);
+    if materialized
+        .as_ref()
+        .and_then(|value| value.expected_sha1.as_deref())
+        == Some(actual.as_str())
+    {
+        if materialized
+            .as_ref()
+            .is_some_and(|value| value.canonical_revision == canonical_revision)
+        {
+            return Ok(());
+        }
+        return materialize_hotbars_for_instance(metadata, state).await;
     }
 
     let changed = read_nbt_file(&local).await?;
-    let mut sync_state = read_hotbar_state(state).await?;
-    merge_hotbar_family(&mut sync_state, family, changed);
-    write_hotbar_state(state, &sync_state).await?;
+    let baseline = materialized
+        .and_then(|value| value.baseline)
+        .map(nbt_from_bytes)
+        .transpose()?
+        .unwrap_or_else(|| hotbar_family_root(&sync_state, family));
+    if merge_hotbar_family(&mut sync_state, family, &baseline, &changed) {
+        increment_hotbar_revision(&mut sync_state);
+        write_hotbar_state(state, &sync_state).await?;
+    }
     regenerate_hotbars(state).await
 }
 
 fn merge_hotbar_family(
     state: &mut NbtCompound,
     family: HotbarFamily,
-    changed: NbtCompound,
-) {
+    baseline: &NbtCompound,
+    changed: &NbtCompound,
+) -> bool {
     let family_key = family_state_key(family);
-    let previous = state
+    let mut current = state
         .get::<_, &NbtCompound>(family_key)
         .ok()
         .cloned()
@@ -778,43 +969,96 @@ fn merge_hotbar_family(
         HotbarFamily::Components => HotbarFamily::Legacy,
     };
     let other_key = family_state_key(other_family);
-    let mut other = state.get::<_, &NbtCompound>(other_key).ok().cloned();
-
+    let other = state.get::<_, &NbtCompound>(other_key).ok().cloned();
     let seed_components_with_legacy =
         other.is_none() && family == HotbarFamily::Legacy;
-    if seed_components_with_legacy {
-        other = Some(changed.clone());
-    }
-    let mut other_root = other.unwrap_or_else(empty_hotbar_root);
+    let mut other_root = if seed_components_with_legacy {
+        (*changed).clone()
+    } else {
+        other.unwrap_or_else(empty_hotbar_root)
+    };
     let mut revisions = state
         .get::<_, &NbtCompound>("Revisions")
         .ok()
         .cloned()
         .unwrap_or_default();
+    let family_versions_key = family_data_versions_key(family);
+    let other_versions_key = family_data_versions_key(other_family);
+    let mut family_versions = state
+        .get::<_, &NbtCompound>(family_versions_key)
+        .ok()
+        .cloned()
+        .unwrap_or_default();
+    let mut other_versions = state
+        .get::<_, &NbtCompound>(other_versions_key)
+        .ok()
+        .cloned()
+        .unwrap_or_default();
+    let writer_data_version = hotbar_data_version(changed).max(match family {
+        HotbarFamily::Legacy => 1,
+        HotbarFamily::Components => COMPONENTS_DATA_VERSION_FLOOR,
+    });
+    let current_data_version = hotbar_data_version(&current);
+    let other_data_version = hotbar_data_version(&other_root);
+    let mut changed_any = false;
 
     for slot in 0..81 {
-        let old_slot = hotbar_slot(&previous, slot);
+        let old_slot = hotbar_slot(baseline, slot);
         let new_slot = hotbar_slot(&changed, slot);
         if old_slot == new_slot {
             continue;
         }
+        let current_origin = family_versions
+            .get::<_, i32>(&slot.to_string())
+            .unwrap_or(current_data_version);
+        if writer_data_version > 0
+            && current_origin > 0
+            && writer_data_version < current_origin
+        {
+            continue;
+        }
+        set_hotbar_slot_optional(&mut current, slot, new_slot.clone());
+        family_versions.insert(slot.to_string(), writer_data_version);
         let revision = revisions
             .get::<_, i64>(&slot.to_string())
             .unwrap_or(0)
             .saturating_add(1);
         revisions.insert(slot.to_string(), revision);
-        if let Some(slot_value) = (!seed_components_with_legacy)
-            .then_some(new_slot)
-            .flatten()
+        if seed_components_with_legacy {
+            other_versions.insert(slot.to_string(), writer_data_version);
+        } else if let Some(slot_value) = new_slot
             .and_then(|value| convert_hotbar_slot(value, family, other_family))
         {
-            set_hotbar_slot(&mut other_root, slot, slot_value);
+            let other_origin = other_versions
+                .get::<_, i32>(&slot.to_string())
+                .unwrap_or(other_data_version);
+            if writer_data_version <= 0
+                || other_origin <= 0
+                || writer_data_version >= other_origin
+            {
+                set_hotbar_slot(&mut other_root, slot, slot_value);
+                other_versions.insert(slot.to_string(), writer_data_version);
+            }
         }
+        changed_any = true;
     }
 
-    state.insert(family_key, changed);
+    if writer_data_version > current_data_version {
+        current.insert("DataVersion", writer_data_version);
+        changed_any = true;
+    }
+    if seed_components_with_legacy
+        && writer_data_version > hotbar_data_version(&other_root)
+    {
+        other_root.insert("DataVersion", writer_data_version);
+    }
+
+    state.insert(family_key, current);
     state.insert(other_key, other_root);
     state.insert("Revisions", revisions);
+    state.insert(family_versions_key, family_versions);
+    state.insert(other_versions_key, other_versions);
+    changed_any
 }
 
 fn convert_hotbar_slot(
@@ -889,6 +1133,29 @@ fn set_hotbar_slot(root: &mut NbtCompound, slot: usize, value: NbtTag) {
     root.insert(toolbar, list);
 }
 
+fn set_hotbar_slot_optional(
+    root: &mut NbtCompound,
+    slot: usize,
+    value: Option<NbtTag>,
+) {
+    set_hotbar_slot(
+        root,
+        slot,
+        value.unwrap_or_else(|| NbtCompound::new().into()),
+    );
+}
+
+fn hotbar_data_version(root: &NbtCompound) -> i32 {
+    root.get::<_, i32>("DataVersion").unwrap_or(0)
+}
+
+fn family_data_versions_key(family: HotbarFamily) -> &'static str {
+    match family {
+        HotbarFamily::Legacy => "LegacyDataVersions",
+        HotbarFamily::Components => "ComponentsDataVersions",
+    }
+}
+
 async fn regenerate_hotbars(state: &State) -> crate::Result<()> {
     let instances = crate::state::list_instances(&state.pool).await?;
     for metadata in instances {
@@ -906,37 +1173,32 @@ async fn materialize_hotbars_for_instance(
     state: &State,
 ) -> crate::Result<()> {
     let sync_state = read_hotbar_state(state).await?;
-    let legacy = sync_state
-        .get::<_, &NbtCompound>("Legacy")
-        .ok()
-        .cloned()
-        .unwrap_or_else(empty_hotbar_root);
-    let components = sync_state
-        .get::<_, &NbtCompound>("Components")
-        .ok()
-        .cloned()
-        .unwrap_or_else(|| legacy.clone());
-
-    for (family, root) in [
-        (HotbarFamily::Legacy, legacy),
-        (HotbarFamily::Components, components),
-    ] {
-        let path = generated_hotbar_path(state, family, &metadata.instance.id);
-        if let Some(parent) = path.parent() {
-            io::create_dir_all(parent).await?;
-        }
-        write_nbt_file(&path, &root).await?;
-    }
-
     let family = hotbar_family(metadata, state).await?;
+    let root = hotbar_family_root(&sync_state, family);
+    let bytes = nbt_to_bytes(&root)?;
+    let expected = sha1_bytes(&bytes);
+    let revision = hotbar_revision(&sync_state);
     let generated = generated_hotbar_path(state, family, &metadata.instance.id);
-    let local = instance_dir(metadata, state).join(HOTBAR_FILE);
-    let mode = ensure_link(&generated, &local).await?;
-    record_materialization(
+    begin_materialization(
         &metadata.instance.id,
         SyncedOption::CreativeHotbars,
         family.as_str(),
-        Some(&sha1_file(&generated).await?),
+        Some(&expected),
+        Some(&bytes),
+        revision,
+        state,
+    )
+    .await?;
+    if let Some(parent) = generated.parent() {
+        io::create_dir_all(parent).await?;
+    }
+    io::write(&generated, &bytes).await?;
+    let local = instance_dir(metadata, state).join(HOTBAR_FILE);
+    let mode = ensure_link(&generated, &local).await?;
+    finish_materialization(
+        &metadata.instance.id,
+        SyncedOption::CreativeHotbars,
+        family.as_str(),
         mode,
         state,
     )
@@ -956,20 +1218,77 @@ fn empty_hotbar_root() -> NbtCompound {
 }
 
 async fn read_hotbar_state(state: &State) -> crate::Result<NbtCompound> {
-    let path = hotbar_state_path(state);
-    if !path.exists() {
-        let mut root = NbtCompound::new();
-        root.insert("Version", 1_i32);
-        return Ok(root);
+    hotbar_state_exists(state).await?;
+    let bytes = sqlx::query_scalar!(
+        "SELECT nbt FROM synced_hotbar_state WHERE singleton = 1",
+    )
+    .fetch_optional(&state.pool)
+    .await?;
+    if let Some(bytes) = bytes {
+        return nbt_from_bytes(bytes);
     }
-    read_nbt_file(&path).await
+    let mut root = NbtCompound::new();
+    root.insert("Version", 2_i32);
+    root.insert("Revision", 0_i64);
+    Ok(root)
+}
+
+async fn hotbar_state_exists(state: &State) -> crate::Result<bool> {
+    Ok(sqlx::query_scalar!(
+        r#"
+		SELECT EXISTS(
+			SELECT 1 FROM synced_hotbar_state WHERE singleton = 1
+		) AS "exists!: bool"
+		"#,
+    )
+    .fetch_one(&state.pool)
+    .await?)
+}
+
+fn hotbar_family_root(
+    state: &NbtCompound,
+    family: HotbarFamily,
+) -> NbtCompound {
+    let legacy = state
+        .get::<_, &NbtCompound>("Legacy")
+        .ok()
+        .cloned()
+        .unwrap_or_else(empty_hotbar_root);
+    match family {
+        HotbarFamily::Legacy => legacy,
+        HotbarFamily::Components => state
+            .get::<_, &NbtCompound>("Components")
+            .ok()
+            .cloned()
+            .unwrap_or(legacy),
+    }
+}
+
+fn hotbar_revision(state: &NbtCompound) -> i64 {
+    state.get::<_, i64>("Revision").unwrap_or(0)
+}
+
+fn increment_hotbar_revision(state: &mut NbtCompound) {
+    state.insert("Version", 2_i32);
+    state.insert("Revision", hotbar_revision(state).saturating_add(1));
 }
 
 async fn write_hotbar_state(
     state: &State,
     root: &NbtCompound,
 ) -> crate::Result<()> {
-    write_nbt_file(&hotbar_state_path(state), root).await
+    let bytes = nbt_to_bytes(root)?;
+    sqlx::query!(
+        "
+		INSERT INTO synced_hotbar_state (singleton, nbt)
+		VALUES (1, ?)
+		ON CONFLICT(singleton) DO UPDATE SET nbt = excluded.nbt
+		",
+        bytes,
+    )
+    .execute(&state.pool)
+    .await?;
+    Ok(())
 }
 
 fn family_state_key(family: HotbarFamily) -> &'static str {
@@ -981,10 +1300,6 @@ fn family_state_key(family: HotbarFamily) -> &'static str {
 
 fn command_history_path(state: &State) -> PathBuf {
     synced_options_path(state).join(COMMAND_HISTORY_FILE)
-}
-
-fn hotbar_state_path(state: &State) -> PathBuf {
-    synced_options_path(state).join("hotbars/state.nbt")
 }
 
 fn generated_hotbar_path(
@@ -1019,7 +1334,7 @@ async fn option_effective(
     state: &State,
 ) -> crate::Result<bool> {
     if sync_files_are_protected(metadata)
-        || instance_is_running(metadata, state)
+        || instance_is_running(metadata, state).await?
     {
         return Ok(false);
     }
@@ -1038,15 +1353,12 @@ pub(super) fn sync_files_are_protected(metadata: &InstanceMetadata) -> bool {
     )
 }
 
-pub(super) fn instance_is_running(
+pub(super) async fn instance_is_running(
     metadata: &InstanceMetadata,
     state: &State,
-) -> bool {
-    state
-        .process_manager
-        .get_all()
-        .iter()
-        .any(|process| process.instance_id == metadata.instance.id)
+) -> crate::Result<bool> {
+    crate::state::instance_has_running_process(&metadata.instance.id, state)
+        .await
 }
 
 pub(super) fn instance_option_enabled(
@@ -1126,14 +1438,15 @@ pub(super) async fn detach_link(
     source: &Path,
     target: &Path,
 ) -> crate::Result<()> {
-    let contents = if source.exists() {
-        Some(io::read(source).await?)
-    } else if target.exists() {
+    let target_metadata = tokio::fs::symlink_metadata(target).await.ok();
+    let contents = if target_metadata.is_some() && target.exists() {
         Some(io::read(target).await?)
+    } else if source.exists() {
+        Some(io::read(source).await?)
     } else {
         None
     };
-    if tokio::fs::symlink_metadata(target).await.is_ok() {
+    if target_metadata.is_some() {
         io::remove_file(target).await?;
     }
     if let Some(contents) = contents {
@@ -1142,11 +1455,44 @@ pub(super) async fn detach_link(
     Ok(())
 }
 
-pub(super) async fn record_materialization(
+pub(super) async fn begin_materialization(
     instance_id: &str,
     option: SyncedOption,
     family: &str,
     expected_sha1: Option<&str>,
+    baseline: Option<&[u8]>,
+    canonical_revision: i64,
+    state: &State,
+) -> crate::Result<()> {
+    let option_name = option.as_str();
+    sqlx::query!(
+        "
+		INSERT INTO synced_option_materializations
+			(instance_id, option, family, expected_sha1, baseline,
+			 canonical_revision, pending, link_mode)
+		VALUES (?, ?, ?, ?, ?, ?, 1, 'copy')
+		ON CONFLICT(instance_id, option, family) DO UPDATE SET
+			expected_sha1 = excluded.expected_sha1,
+			baseline = excluded.baseline,
+			canonical_revision = excluded.canonical_revision,
+			pending = 1
+		",
+        instance_id,
+        option_name,
+        family,
+        expected_sha1,
+        baseline,
+        canonical_revision,
+    )
+    .execute(&state.pool)
+    .await?;
+    Ok(())
+}
+
+pub(super) async fn finish_materialization(
+    instance_id: &str,
+    option: SyncedOption,
+    family: &str,
     mode: LinkMode,
     state: &State,
 ) -> crate::Result<()> {
@@ -1154,48 +1500,55 @@ pub(super) async fn record_materialization(
     let link_mode = mode.as_str();
     sqlx::query!(
         "
-		INSERT INTO synced_option_materializations
-			(instance_id, option, family, expected_sha1, link_mode)
-		VALUES (?, ?, ?, ?, ?)
-		ON CONFLICT(instance_id, option, family) DO UPDATE SET
-			expected_sha1 = excluded.expected_sha1,
-			link_mode = excluded.link_mode
+		UPDATE synced_option_materializations
+		SET pending = 0, link_mode = ?
+		WHERE instance_id = ? AND option = ? AND family = ?
 		",
+        link_mode,
         instance_id,
         option_name,
         family,
-        expected_sha1,
-        link_mode,
     )
     .execute(&state.pool)
     .await?;
     Ok(())
 }
 
-async fn materialization_hash(
+pub(super) async fn materialization(
     instance_id: &str,
     option: SyncedOption,
     family: &str,
     state: &State,
-) -> crate::Result<Option<String>> {
+) -> crate::Result<Option<Materialization>> {
     let option_name = option.as_str();
-    Ok(sqlx::query_scalar!(
-        "
-		SELECT expected_sha1
+    Ok(sqlx::query!(
+        r#"
+		SELECT expected_sha1, baseline,
+			canonical_revision AS "canonical_revision!: i64",
+			pending AS "pending!: bool"
 		FROM synced_option_materializations
 		WHERE instance_id = ? AND option = ? AND family = ?
-		",
+		"#,
         instance_id,
         option_name,
         family,
     )
     .fetch_optional(&state.pool)
     .await?
-    .flatten())
+    .map(|row| Materialization {
+        expected_sha1: row.expected_sha1,
+        baseline: row.baseline,
+        canonical_revision: row.canonical_revision,
+        pending: row.pending,
+    }))
 }
 
 pub(super) async fn sha1_file(path: &Path) -> crate::Result<String> {
     Ok(Sha1::from(io::read(path).await?).digest().to_string())
+}
+
+pub(super) fn sha1_bytes(bytes: &[u8]) -> String {
+    Sha1::from(bytes).digest().to_string()
 }
 
 pub(super) async fn read_nbt_file(path: &Path) -> crate::Result<NbtCompound> {
@@ -1205,24 +1558,6 @@ pub(super) async fn read_nbt_file(path: &Path) -> crate::Result<NbtCompound> {
         quartz_nbt::io::Flavor::Uncompressed,
     )?;
     Ok(root)
-}
-
-pub(super) async fn write_nbt_file(
-    path: &Path,
-    root: &NbtCompound,
-) -> crate::Result<()> {
-    if let Some(parent) = path.parent() {
-        io::create_dir_all(parent).await?;
-    }
-    let mut bytes = Vec::new();
-    quartz_nbt::io::write_nbt(
-        &mut bytes,
-        None,
-        root,
-        quartz_nbt::io::Flavor::Uncompressed,
-    )?;
-    io::write(path, bytes).await?;
-    Ok(())
 }
 
 pub(super) fn nbt_to_bytes(root: &NbtCompound) -> crate::Result<Vec<u8>> {

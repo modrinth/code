@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE synced_option_materializations\n\t\tSET pending = 0, link_mode = ?\n\t\tWHERE instance_id = ? AND option = ? AND family = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "fcfc3002c6c0fc036bf827e734dbdab11e9b1768bb68e0ec79331abf98921c80"
+}
