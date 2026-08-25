@@ -4025,9 +4025,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
-  },
   "project.settings.monetization.description": {
     "message": "Проєкти на Modrinth автоматично реєструються в <rewards-program-link>Програмі винагород</rewards-program-link>. Якщо ви не хочете (або не можете з юридичних причин) отримувати дохід від цього проєкту, ви можете вимкнути його тут."
   },

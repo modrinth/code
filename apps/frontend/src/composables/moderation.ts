@@ -2,6 +2,7 @@ import { type KeybindDefinition, Keybinds, Settings } from '@modrinth/moderation
 import { computed } from 'vue'
 
 import type { CookieOptions } from '#app'
+import { FrontendNotificationManager } from '~/providers/frontend-notifications'
 
 const moderationKeybindsId = 'moderation-keybinds'
 const moderationSettingsId = 'moderation-settings'
@@ -82,4 +83,16 @@ export const saveModerationOptions = () => {
 		keybinds: options.value.keybinds,
 		settings: options.value.settings,
 	}
+}
+
+let copyNotificationManager: FrontendNotificationManager | undefined
+
+export function notifyCopied(value: string, title: string) {
+	copyNotificationManager ??= new FrontendNotificationManager()
+	copyNotificationManager.addNotification({
+		type: 'success',
+		title,
+		text: value,
+		autoCloseMs: 1000,
+	})
 }

@@ -44,11 +44,12 @@ export class Keybinds {
 
 	handle(event: KeyboardEvent, ctx: ModerationContext): boolean {
 		if (
-			event.target instanceof HTMLInputElement ||
-			event.target instanceof HTMLTextAreaElement ||
-			(event.target as HTMLElement)?.closest('.cm-editor') ||
-			(event.target as HTMLElement)?.classList?.contains('cm-content') ||
-			(event.target as HTMLElement)?.classList?.contains('cm-line')
+			ctx.scope !== 'global' &&
+			(event.target instanceof HTMLInputElement ||
+				event.target instanceof HTMLTextAreaElement ||
+				(event.target as HTMLElement)?.closest('.cm-editor') ||
+				(event.target as HTMLElement)?.classList?.contains('cm-content') ||
+				(event.target as HTMLElement)?.classList?.contains('cm-line'))
 		) {
 			return false
 		}
