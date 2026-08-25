@@ -62,7 +62,7 @@
 				</code>
 			</div>
 			<a
-				class="text-link flex w-fit items-center gap-1 text-sm"
+				class="flex w-fit items-center gap-1 text-sm text-link"
 				href="https://cel.dev/reference/api-reference"
 				target="_blank"
 				rel="noopener noreferrer"
@@ -133,9 +133,7 @@ trace.issue_type == ISSUE_TYPE</code></pre>
 					<LoaderCircleIcon v-if="isTestingRule" class="size-5 animate-spin text-secondary" />
 				</div>
 
-				<div
-					class="grid items-stretch gap-3 md:grid-cols-[minmax(0,2fr)_auto_minmax(0,1fr)]"
-				>
+				<div class="grid items-stretch gap-3 md:grid-cols-[minmax(0,2fr)_auto_minmax(0,1fr)]">
 					<article class="universal-card flex min-w-0 flex-col gap-3">
 						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">
 							Trace details
@@ -147,10 +145,7 @@ trace.issue_type == ISSUE_TYPE</code></pre>
 							</label>
 							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 								Issue type
-								<StyledInput
-									v-model="testTraceForm.issueType"
-									placeholder="OBFUSCATED_NAMES"
-								/>
+								<StyledInput v-model="testTraceForm.issueType" placeholder="OBFUSCATED_NAMES" />
 							</label>
 							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 								Severity
@@ -165,10 +160,7 @@ trace.issue_type == ISSUE_TYPE</code></pre>
 							</label>
 							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 								JAR
-								<StyledInput
-									v-model="testTraceForm.jar"
-									placeholder="META-INF/jars/embedded.jar"
-								/>
+								<StyledInput v-model="testTraceForm.jar" placeholder="META-INF/jars/embedded.jar" />
 							</label>
 						</div>
 						<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
@@ -205,10 +197,7 @@ trace.issue_type == ISSUE_TYPE</code></pre>
 						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">
 							Rule result
 						</p>
-						<div
-							v-if="isTestingRule"
-							class="flex items-center gap-2 text-secondary"
-						>
+						<div v-if="isTestingRule" class="flex items-center gap-2 text-secondary">
 							<LoaderCircleIcon class="size-5 animate-spin" />
 							<span>Evaluating…</span>
 						</div>
@@ -803,9 +792,8 @@ function getCelSchemaCompletions(receiver?: string): Ace.Completion[] {
 	if (!isSchema(resolved.properties)) return []
 
 	return Object.entries(resolved.properties)
-		.filter(
-			(entry): entry is [string, Labrinth.TechReview.Internal.DelphiRuleSchema] =>
-				isSchema(entry[1]),
+		.filter((entry): entry is [string, Labrinth.TechReview.Internal.DelphiRuleSchema] =>
+			isSchema(entry[1]),
 		)
 		.map(([value, property]) => ({
 			value,
