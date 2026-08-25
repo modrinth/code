@@ -1008,9 +1008,7 @@ async fn reconcile_hotbar(
         .and_then(|value| value.merge_base)
         .map(nbt_from_bytes)
         .transpose()?
-        .unwrap_or_else(|| {
-            hotbar_family_root(&sync_state.nbt, changed_family)
-        });
+        .unwrap_or_else(|| hotbar_family_root(&sync_state.nbt, changed_family));
     if merge_hotbar_family(
         &mut sync_state.nbt,
         changed_family,
@@ -1075,7 +1073,7 @@ fn merge_hotbar_family(
 
     for slot in 0..81 {
         let old_slot = hotbar_slot(merge_base, slot);
-		let new_slot = hotbar_slot(changed, slot);
+        let new_slot = hotbar_slot(changed, slot);
         if old_slot == new_slot {
             continue;
         }
