@@ -15,6 +15,13 @@ This includes, but may not be limited to, the following files:
 - src/components/brand/\*
 - src/public/favicon.ico
 - src/public/favicon-light.ico
+- src/public/favicon-settings.ico
+- src/public/favicon-light-settings.ico
+- src/public/favicon-32x32.png
+- src/public/favicon-light-32x32.png
+- src/public/favicon-settings-32x32.png
+- src/public/favicon-light-settings-32x32.png
+- src/public/dev-favicons/\*
 - src/public/news/\*
 
 ## External logos
