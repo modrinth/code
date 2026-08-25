@@ -1,15 +1,18 @@
 import type { ScreenshotCensorMode, ScreenshotEditorSourceRect } from './editor-types'
 
 const BLUR_DOWNSAMPLE = 0.25
-const BLUR_SIGMA = 3
+const BLUR_SIGMA = 12
 const BLUR_RADIUS = Math.ceil(BLUR_SIGMA * 3)
 const BLUR_KERNEL = createGaussianKernel()
+
+type CensorTransform = readonly [number, number, number, number, number, number]
 
 export function renderCensorRegion(
 	source: CanvasImageSource,
 	sourceRect: ScreenshotEditorSourceRect,
 	mode: ScreenshotCensorMode,
 	solidColor: string,
+	transform?: CensorTransform,
 ) {
 	const width = Math.max(1, Math.round(sourceRect.width))
 	const height = Math.max(1, Math.round(sourceRect.height))
@@ -33,17 +36,33 @@ export function renderCensorRegion(
 	const sampleContext = sample.getContext('2d')
 	if (!sampleContext) throw new Error('Could not create blur canvas')
 
-	sampleContext.drawImage(
-		source,
-		sourceRect.left,
-		sourceRect.top,
-		sourceRect.width,
-		sourceRect.height,
-		0,
-		0,
-		sampleWidth,
-		sampleHeight,
-	)
+	if (transform) {
+		const inverse = invertTransform(transform)
+		const scaleX = sampleWidth / width
+		const scaleY = sampleHeight / height
+		sampleContext.setTransform(
+			inverse[0] * scaleX,
+			inverse[1] * scaleY,
+			inverse[2] * scaleX,
+			inverse[3] * scaleY,
+			(inverse[4] + width / 2) * scaleX,
+			(inverse[5] + height / 2) * scaleY,
+		)
+		sampleContext.drawImage(source, 0, 0)
+		sampleContext.resetTransform()
+	} else {
+		sampleContext.drawImage(
+			source,
+			sourceRect.left,
+			sourceRect.top,
+			sourceRect.width,
+			sourceRect.height,
+			0,
+			0,
+			sampleWidth,
+			sampleHeight,
+		)
+	}
 	const blurredPixels = gaussianBlur(
 		sampleContext.getImageData(0, 0, sampleWidth, sampleHeight),
 		sampleWidth,
@@ -54,6 +73,20 @@ export function renderCensorRegion(
 	outputContext.imageSmoothingQuality = 'high'
 	outputContext.drawImage(sample, 0, 0, sampleWidth, sampleHeight, 0, 0, width, height)
 	return output
+}
+
+function invertTransform(transform: CensorTransform): CensorTransform {
+	const [a, b, c, d, e, f] = transform
+	const determinant = a * d - b * c
+	if (Math.abs(determinant) < Number.EPSILON) return [1, 0, 0, 1, 0, 0]
+	return [
+		d / determinant,
+		-b / determinant,
+		-c / determinant,
+		a / determinant,
+		(c * f - d * e) / determinant,
+		(b * e - a * f) / determinant,
+	]
 }
 
 function createGaussianKernel() {

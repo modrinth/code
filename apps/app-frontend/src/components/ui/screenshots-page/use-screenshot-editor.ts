@@ -225,7 +225,11 @@ export function useScreenshotEditor() {
 			recordHistory()
 			syncSelectionProperties()
 		})
-		editorCanvas.on('object:modified', () => {
+		editorCanvas.on('object:modified', ({ target }) => {
+			if (target) {
+				refreshModifiedCensors(target as EditorFabricObject)
+				editorCanvas.requestRenderAll()
+			}
 			recordHistory()
 			syncSelectionProperties()
 		})
@@ -830,6 +834,39 @@ export function useScreenshotEditor() {
 		editorCanvas.requestRenderAll()
 	}
 
+	function refreshModifiedCensors(target: EditorFabricObject) {
+		const targets =
+			'getObjects' in target && typeof target.getObjects === 'function'
+				? (target.getObjects() as EditorFabricObject[])
+				: [target]
+		for (const object of targets) refreshCensor(object)
+	}
+
+	function refreshCensor(object: EditorFabricObject) {
+		if (
+			object.editorKind !== 'censor' ||
+			object.censorMode !== 'blur' ||
+			!sourceImage ||
+			object.width <= 0 ||
+			object.height <= 0
+		) {
+			return
+		}
+		const censorCanvas = renderCensorRegion(
+			sourceImage,
+			{ left: 0, top: 0, width: object.width, height: object.height },
+			'blur',
+			object.censorColor ?? '#000000',
+			object.calcTransformMatrix(),
+		)
+		;(object as FabricImage).setElement(censorCanvas, {
+			width: object.width,
+			height: object.height,
+		})
+		object.dirty = true
+		object.setCoords()
+	}
+
 	function deleteSelection() {
 		const editorCanvas = canvas.value
 		if (!editorCanvas) return false
@@ -930,6 +967,7 @@ export function useScreenshotEditor() {
 				setEditorMetadata(censor, 'censor', state.sourceRect)
 				censor.censorMode = restoredMode
 				censor.censorColor = restoredColor
+				refreshCensor(censor)
 				if (serializedClipPath) {
 					const [clipPath] = await enlivenObjects([serializedClipPath])
 					if (clipPath) censor.clipPath = clipPath
@@ -1095,8 +1133,8 @@ export function useScreenshotEditor() {
 			return true
 		}
 		if (event.key === 'Delete' || event.key === 'Backspace') {
-			if (!deleteSelection()) return false
 			event.preventDefault()
+			deleteSelection()
 			return true
 		}
 		if (event.key === 'Escape') {

@@ -8,6 +8,7 @@ import {
 	type DragStartEvent,
 } from '@dnd-kit/vue'
 import {
+	BoxIcon,
 	ClipboardCopyIcon,
 	EditIcon,
 	FileArchiveIcon,
@@ -76,7 +77,6 @@ import { type ActiveScreenshotDrag, useScreenshotDragGather } from './use-screen
 
 type ScreenshotSort = 'newest' | 'oldest' | 'name'
 type ScreenshotGroupBy = 'custom' | 'instance' | 'date' | 'none'
-type ScreenshotFilters = Record<'loader' | 'gameVersion' | 'modpack', string[]>
 
 type LegacyCustomScreenshotGrouping = {
 	groups: ScreenshotGroup[]
@@ -117,15 +117,7 @@ const isGlobal = computed(() => !props.instanceId)
 const storageSuffix = props.instanceId ? 'instance' : 'global'
 const search = ref('')
 const sort = useStorage<ScreenshotSort>(`screenshots-sort-${storageSuffix}`, 'newest')
-const groupBy = useStorage<ScreenshotGroupBy>(
-	`screenshots-group-${storageSuffix}`,
-	props.instanceId ? 'date' : 'instance',
-)
-const filters = useStorage<ScreenshotFilters>(`screenshots-filters-${storageSuffix}`, {
-	loader: [],
-	gameVersion: [],
-	modpack: [],
-})
+const groupBy = useStorage<ScreenshotGroupBy>(`screenshots-group-${storageSuffix}`, 'date')
 const sortModel = computed<string>({
 	get: () => sort.value,
 	set: (value) => {
@@ -172,13 +164,15 @@ const { formatMessage } = useVIntl()
 const { addNotification, handleError } = injectNotificationManager()
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 const formatMonth = useFormatDateTime({ month: 'long', year: 'numeric' })
-const screenshotOptions: ContextMenuOption[] = [
+const screenshotContextOptions: ContextMenuOption[] = [
 	{ name: 'edit' },
 	{ name: 'copy' },
 	{ name: 'open' },
+	{ name: 'go-to-instance' },
 	{ type: 'divider' },
 	{ name: 'delete', color: 'danger' },
 ]
+const screenshotOverflowOptions = screenshotContextOptions.slice(2)
 
 const messages = defineMessages({
 	heading: { id: 'app.screenshots.heading', defaultMessage: 'Screenshots' },
@@ -229,6 +223,7 @@ const messages = defineMessages({
 	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
 	viewOriginal: { id: 'app.screenshots.view-original', defaultMessage: 'View original' },
 	showInFolder: { id: 'app.screenshots.show-in-folder', defaultMessage: 'Show in folder' },
+	goToInstance: { id: 'app.screenshots.go-to-instance', defaultMessage: 'Go to instance' },
 	deleteTitle: { id: 'app.screenshots.delete-title', defaultMessage: 'Delete screenshot' },
 	deleteDescription: {
 		id: 'app.screenshots.delete-description',
@@ -287,29 +282,6 @@ const screenshotsReadyPending = computed(
 )
 const screenshots = computed(() => screenshotsQuery.data.value ?? [])
 const customGroups = computed(() => screenshotGroupsQuery.data.value ?? [])
-const instances = computed(() => instancesQuery.data.value ?? [])
-const instancesById = computed(
-	() => new Map(instances.value.map((instance) => [instance.id, instance])),
-)
-const screenshotInstanceIds = computed(
-	() => new Set(screenshots.value.map((screenshot) => screenshot.instance_id)),
-)
-const filterInstances = computed(() =>
-	instances.value.filter((instance) => screenshotInstanceIds.value.has(instance.id)),
-)
-const modpackFilterOptions = computed<ComboboxOption<string>[]>(() => {
-	const modpacksByProjectId = new Map<string, string>()
-	for (const instance of filterInstances.value) {
-		if (instance.shared_instance || instance.link?.type !== 'modrinth_modpack') continue
-		if (!modpacksByProjectId.has(instance.link.project_id)) {
-			modpacksByProjectId.set(instance.link.project_id, instance.name)
-		}
-	}
-
-	return [...modpacksByProjectId]
-		.map(([value, label]) => ({ value, label }))
-		.sort((a, b) => a.label.localeCompare(b.label))
-})
 const screenshotsError = computed(() => {
 	const error =
 		screenshotsQuery.error.value ||
@@ -349,10 +321,7 @@ const {
 	clear: clearGather,
 	finish: finishGather,
 } = useScreenshotDragGather(screenshots)
-const hasActiveFilters = computed(() =>
-	Object.values(filters.value).some((selectedValues) => selectedValues.length > 0),
-)
-const isNarrowingResults = computed(() => search.value.trim().length > 0 || hasActiveFilters.value)
+const isNarrowingResults = computed(() => search.value.trim().length > 0)
 
 const sortOptions = computed<ComboboxOption<string>[]>(() => [
 	{ value: 'newest', label: formatMessage(messages.newest) },
@@ -370,26 +339,11 @@ const filteredScreenshots = computed(() => {
 	const query = search.value.trim().toLocaleLowerCase()
 	const filtered = screenshots.value.filter((screenshot) => {
 		if (screenshot.id === revealedScreenshotId.value) return true
-		const instance = instancesById.value.get(screenshot.instance_id)
-		const matchesSearch =
+		return (
 			!query ||
 			screenshot.file_name.toLocaleLowerCase().includes(query) ||
 			screenshot.instance_name.toLocaleLowerCase().includes(query)
-		const matchesLoader =
-			filters.value.loader.length === 0 ||
-			(instance ? filters.value.loader.includes(instance.loader) : false)
-		const matchesGameVersion =
-			filters.value.gameVersion.length === 0 ||
-			(instance ? filters.value.gameVersion.includes(instance.game_version) : false)
-		const linkedModpackProjectId =
-			!instance?.shared_instance && instance?.link?.type === 'modrinth_modpack'
-				? instance.link.project_id
-				: undefined
-		const matchesModpack =
-			filters.value.modpack.length === 0 ||
-			(linkedModpackProjectId ? filters.value.modpack.includes(linkedModpackProjectId) : false)
-
-		return matchesSearch && matchesLoader && matchesGameVersion && matchesModpack
+		)
 	})
 
 	return filtered.sort((a, b) => {
@@ -421,12 +375,19 @@ const groupedScreenshots = computed((): ScreenshotGroupData[] => {
 		const syncedInstances = (instancesQuery.data.value ?? [])
 			.filter((instance) => instance.synced_options.screenshots)
 			.sort((a, b) => a.name.localeCompare(b.name))
-		const groups = syncedInstances.map((instance) => ({
-			id: `instance:${instance.id}`,
-			title: instance.name,
-			screenshots: screenshotGroups.get(instance.id) ?? [],
-			dropInstanceId: instance.id,
-		}))
+		const groups = syncedInstances.flatMap((instance) => {
+			const instanceScreenshots = screenshotGroups.get(instance.id)
+			return instanceScreenshots
+				? [
+						{
+							id: `instance:${instance.id}`,
+							title: instance.name,
+							screenshots: instanceScreenshots,
+							dropInstanceId: instance.id,
+						},
+					]
+				: []
+		})
 
 		for (const [instanceId, instanceScreenshots] of screenshotGroups) {
 			if (groups.some((group) => group.dropInstanceId === instanceId)) continue
@@ -438,9 +399,7 @@ const groupedScreenshots = computed((): ScreenshotGroupData[] => {
 			})
 		}
 
-		return isNarrowingResults.value
-			? groups.filter((group) => group.screenshots.length > 0)
-			: groups
+		return groups
 	}
 
 	if (groupBy.value === 'custom') {
@@ -563,24 +522,6 @@ watch(screenshots, (currentScreenshots) => {
 	const currentKeys = new Set(currentScreenshots.map(getSelectionKey))
 	selectedKeys.value = new Set([...selectedKeys.value].filter((key) => currentKeys.has(key)))
 })
-
-watch(
-	[
-		() => screenshotsQuery.isSuccess.value,
-		() => instancesQuery.isSuccess.value,
-		modpackFilterOptions,
-	],
-	([screenshotsLoaded, instancesLoaded, options]) => {
-		if (!screenshotsLoaded || !instancesLoaded) return
-
-		const validProjectIds = new Set(options.map((option) => option.value))
-		const modpack = filters.value.modpack.filter((projectId) => validProjectIds.has(projectId))
-		if (modpack.length !== filters.value.modpack.length) {
-			filters.value = { ...filters.value, modpack }
-		}
-	},
-	{ immediate: true },
-)
 
 watch(groupBy, (currentGroupBy) => {
 	if (currentGroupBy !== 'custom') {
@@ -835,7 +776,9 @@ function requestDelete(screenshot: InstanceScreenshot, fromPreview = false) {
 }
 
 function showScreenshotOptions(screenshot: InstanceScreenshot, event: MouseEvent) {
-	screenshotOptionsMenu.value?.showMenu(event, screenshot, screenshotOptions)
+	const options =
+		event.type === 'contextmenu' ? screenshotContextOptions : screenshotOverflowOptions
+	screenshotOptionsMenu.value?.showMenu(event, screenshot, options)
 }
 
 function handleScreenshotOption({ item, option }: ContextMenuSelection) {
@@ -846,9 +789,15 @@ function handleScreenshotOption({ item, option }: ContextMenuSelection) {
 		void copyScreenshot(screenshot)
 	} else if (option === 'open') {
 		void openScreenshot(screenshot)
+	} else if (option === 'go-to-instance') {
+		void goToInstance(screenshot)
 	} else if (option === 'delete') {
 		requestDelete(screenshot)
 	}
+}
+
+function goToInstance(screenshot: InstanceScreenshot) {
+	return router.push(`/instance/${encodeURIComponent(screenshot.instance_id)}`)
 }
 
 function screenshotBySelectionKey(selectionKey: string) {
@@ -1164,6 +1113,10 @@ onBeforeUnmount(() => {
 			<FolderOpenIcon />
 			{{ formatMessage(messages.showInFolder) }}
 		</template>
+		<template #go-to-instance>
+			<BoxIcon />
+			{{ formatMessage(messages.goToInstance) }}
+		</template>
 		<template #delete>
 			<TrashIcon />
 			{{ formatMessage(commonMessages.deleteLabel) }}
@@ -1210,22 +1163,24 @@ onBeforeUnmount(() => {
 		</template>
 	</ScreenshotPreviewModal>
 
-	<div class="flex w-full flex-col gap-5">
-		<h1 v-if="showHeading" class="m-0 text-2xl font-bold text-contrast">
-			{{ formatMessage(messages.heading) }}
-		</h1>
+	<div
+		class="flex h-full w-full flex-col gap-5"
+		:class="{ 'justify-center': screenshots.length === 0 && !groupIdPendingNameEdit }"
+	>
+		<template v-if="screenshots.length > 0 || groupIdPendingNameEdit">
+			<h1 v-if="showHeading" class="m-0 text-2xl font-bold text-contrast">
+				{{ formatMessage(messages.heading) }}
+			</h1>
 
-		<ScreenshotToolbar
-			v-model:search="search"
-			v-model:sort="sortModel"
-			v-model:group="groupByModel"
-			v-model:filters="filters"
-			:sort-options="sortOptions"
-			:group-options="groupOptions"
-			:instances="filterInstances"
-			:modpack-options="modpackFilterOptions"
-			@new-group="createCustomGroup"
-		/>
+			<ScreenshotToolbar
+				v-model:search="search"
+				v-model:sort="sortModel"
+				v-model:group="groupByModel"
+				:sort-options="sortOptions"
+				:group-options="groupOptions"
+				@new-group="createCustomGroup"
+			/>
+		</template>
 
 		<ReadyTransition :pending="screenshotsReadyPending">
 			<EmptyState

@@ -1502,23 +1502,8 @@
   "app.screenshots.error-heading": {
     "message": "Failed to load screenshots"
   },
-  "app.screenshots.filter.add": {
-    "message": "Add filter"
-  },
-  "app.screenshots.filter.clear": {
-    "message": "Clear filters"
-  },
-  "app.screenshots.filter.game-version": {
-    "message": "Game version"
-  },
-  "app.screenshots.filter.label": {
-    "message": "Filter by"
-  },
-  "app.screenshots.filter.loader": {
-    "message": "Loader"
-  },
-  "app.screenshots.filter.modpack": {
-    "message": "Modpack"
+  "app.screenshots.go-to-instance": {
+    "message": "Go to instance"
   },
   "app.screenshots.group-by": {
     "message": "Group by"
@@ -2751,7 +2736,7 @@
     "message": "Synced options"
   },
   "instance.settings.tabs.synced-options.description": {
-    "message": "Choose which content from this instance appears across the app."
+    "message": "Override synced options for this instance."
   },
   "instance.settings.tabs.synced-options.screenshots": {
     "message": "Screenshots"
