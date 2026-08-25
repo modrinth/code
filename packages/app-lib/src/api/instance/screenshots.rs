@@ -7,6 +7,7 @@ use std::collections::{HashMap, HashSet};
 use std::io::Cursor;
 use std::path::{Component, Path, PathBuf};
 use tokio::fs::File;
+use tokio::sync::OwnedMutexGuard;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 
 use crate::State;
@@ -120,6 +121,17 @@ async fn list_source_screenshot_sets(
     Ok(screenshots)
 }
 
+async fn lock_instance_screenshots<'a>(
+    state: &State,
+    instance_ids: impl IntoIterator<Item = &'a str>,
+) -> Vec<OwnedMutexGuard<()>> {
+    let mut locks = Vec::new();
+    for instance_id in instance_ids {
+        locks.push(state.lock_instance_screenshots(instance_id).await);
+    }
+    locks
+}
+
 pub async fn delete_screenshots(keys: &[ScreenshotKey]) -> crate::Result<()> {
     ensure_unique_keys(keys)?;
     let state = State::get().await?;
@@ -129,10 +141,7 @@ pub async fn delete_screenshots(keys: &[ScreenshotKey]) -> crate::Result<()> {
         .collect::<Vec<_>>();
     instance_ids.sort_unstable();
     instance_ids.dedup();
-    let mut locks = Vec::with_capacity(instance_ids.len());
-    for instance_id in instance_ids {
-        locks.push(state.lock_instance_screenshots(instance_id).await);
-    }
+    let _locks = lock_instance_screenshots(&state, instance_ids).await;
 
     for key in keys {
         io::remove_file(get_screenshot_path(key).await?).await?;
@@ -178,7 +187,7 @@ pub async fn export_screenshots(
                     crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
                 sources.insert(key.instance_id.clone(), source);
-                sources.get(&key.instance_id).unwrap()
+                &sources[&key.instance_id]
             }
         };
         let archive_folder = match archive_folders.get(&key.instance_id) {
@@ -239,10 +248,7 @@ pub async fn move_screenshots(
         .collect::<Vec<_>>();
     instance_ids.sort_unstable();
     instance_ids.dedup();
-    let mut locks = Vec::with_capacity(instance_ids.len());
-    for instance_id in instance_ids {
-        locks.push(state.lock_instance_screenshots(instance_id).await);
-    }
+    let _locks = lock_instance_screenshots(&state, instance_ids).await;
     let target_source = instance_rows::get_instance_screenshot_source(
         target_instance_id,
         &state.pool,
@@ -607,7 +613,7 @@ async fn scan_source_screenshots(
         return Ok(Vec::new());
     }
 
-    let screenshots_dir = source_screenshots_dir(state, &source).await?;
+    let screenshots_dir = source_screenshots_dir(state, source).await?;
     let mut entries = match io::read_dir(&screenshots_dir).await {
         Ok(entries) => entries,
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => {

@@ -5,7 +5,7 @@ import {
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -34,7 +34,7 @@ const messages = defineMessages({
 <template>
 	<div class="flex flex-col gap-2">
 		<div class="flex flex-wrap gap-2">
-			<StyledInput
+			<Input
 				v-model="search"
 				:icon="SearchIcon"
 				type="text"
