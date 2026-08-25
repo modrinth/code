@@ -1075,7 +1075,7 @@ fn merge_hotbar_family(
 
     for slot in 0..81 {
         let old_slot = hotbar_slot(merge_base, slot);
-        let new_slot = hotbar_slot(&changed, slot);
+		let new_slot = hotbar_slot(changed, slot);
         if old_slot == new_slot {
             continue;
         }
