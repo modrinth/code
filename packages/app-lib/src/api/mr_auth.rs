@@ -71,16 +71,15 @@ pub async fn logout() -> crate::Result<()> {
 #[tracing::instrument]
 pub async fn get_all() -> crate::Result<Vec<ModrinthCredentials>> {
     let state = crate::State::get().await?;
-    Ok(ModrinthCredentials::get_all(&state.pool).await?)
+    ModrinthCredentials::get_all(&state.pool).await
 }
 
 #[tracing::instrument]
 pub async fn set_active(user_id: &str) -> crate::Result<()> {
     let state = crate::State::get().await?;
     let users = ModrinthCredentials::get_all(&state.pool).await?;
-    let Some(mut creds) = users
-        .into_iter()
-        .find(|creds| creds.user_id == user_id)
+    let Some(mut creds) =
+        users.into_iter().find(|creds| creds.user_id == user_id)
     else {
         return Err(crate::ErrorKind::OtherError(format!(
             "Tried to activate nonexistent Modrinth user with ID {user_id}"
