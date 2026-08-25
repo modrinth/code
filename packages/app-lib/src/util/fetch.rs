@@ -19,7 +19,7 @@ use std::num::NonZeroU32;
 use std::path::Path;
 use std::pin::Pin;
 use std::sync::{Arc, LazyLock};
-use std::time::{self, Duration, Instant, SystemTime};
+use std::time::{Duration, Instant, SystemTime};
 use tokio::sync::Semaphore;
 use tokio::{fs::File, io::AsyncReadExt, io::AsyncWriteExt};
 use tracing::{debug, info};
