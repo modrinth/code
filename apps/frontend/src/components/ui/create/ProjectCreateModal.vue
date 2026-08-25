@@ -46,19 +46,18 @@
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
 				</span>
-				<div class="text-input-wrapper !w-full">
-					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<Input
-						id="slug"
-						v-model="slug"
-						:maxlength="64"
-						class="w-full"
-						type="text"
-						autocomplete="off"
-						:disabled="hasHitLimit"
-						@update:model-value="manualSlug = true"
-					/>
-				</div>
+				<Input
+					id="slug"
+					v-model="slug"
+					:maxlength="64"
+					class="w-full"
+					type="text"
+					autocomplete="off"
+					:disabled="hasHitLimit"
+					@update:model-value="manualSlug = true"
+				>
+					<template #prefix>https://modrinth.com/project/</template>
+				</Input>
 			</label>
 			<div class="flex flex-col gap-2.5">
 				<label for="owner">

@@ -57,3 +57,8 @@ const appearanceClass = computed(() => {
 	return 'border-surface-5 bg-surface-4'
 })
 </script>
+<style scoped>
+:deep(input) {
+	border-radius: 0;
+}
+</style>
