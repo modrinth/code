@@ -511,10 +511,76 @@ const DEFAULT_RULE = `#define ISSUE_TYPE "OBFUSCATED_NAMES"
 trace.issue_type == ISSUE_TYPE
 	? "low"
 	: null`
+
+const CEL_LANGUAGE_COMPLETIONS: Ace.Completion[] = [
+	...['true', 'false', 'null', 'in'].map((value) => ({
+		value,
+		score: 900,
+		meta: 'keyword',
+	})),
+	{ caption: 'has()', snippet: 'has(${1:field})', score: 850, meta: 'macro' },
+	{ caption: 'size()', snippet: 'size(${1:value})', score: 850, meta: 'function' },
+	{ caption: 'string()', snippet: 'string(${1:value})', score: 850, meta: 'function' },
+	{ caption: 'int()', snippet: 'int(${1:value})', score: 850, meta: 'function' },
+	{ caption: '#define', snippet: '#define ${1:NAME} ${2:value}', score: 800, meta: 'preprocessor' },
+]
+const CEL_MEMBER_COMPLETIONS: Ace.Completion[] = [
+	{ caption: 'contains()', snippet: 'contains("${1:value}")', score: 800, meta: 'string' },
+	{ caption: 'startsWith()', snippet: 'startsWith("${1:prefix}")', score: 800, meta: 'string' },
+	{ caption: 'endsWith()', snippet: 'endsWith("${1:suffix}")', score: 800, meta: 'string' },
+	{ caption: 'matches()', snippet: 'matches("${1:pattern}")', score: 800, meta: 'regex' },
+	{ caption: 'all()', snippet: 'all(${1:item}, ${2:predicate})', score: 750, meta: 'list macro' },
+	{
+		caption: 'exists()',
+		snippet: 'exists(${1:item}, ${2:predicate})',
+		score: 750,
+		meta: 'list macro',
+	},
+	{
+		caption: 'exists_one()',
+		snippet: 'exists_one(${1:item}, ${2:predicate})',
+		score: 750,
+		meta: 'list macro',
+	},
+	{
+		caption: 'filter()',
+		snippet: 'filter(${1:item}, ${2:predicate})',
+		score: 750,
+		meta: 'list macro',
+	},
+	{ caption: 'map()', snippet: 'map(${1:item}, ${2:expression})', score: 750, meta: 'list macro' },
+]
+const CEL_COMPLETER: Ace.Completer = {
+	id: 'delphi-cel',
+	triggerCharacters: ['.'],
+	getCompletions(_editor, session, position, prefix, callback) {
+		const beforePrefix = session
+			.getLine(position.row)
+			.slice(0, Math.max(0, position.column - prefix.length))
+		const receiver = beforePrefix.match(/([A-Za-z_][\w.]*)\.$/)?.[1]
+		if (!receiver) {
+			callback(null, [...getCelSchemaCompletions(), ...CEL_LANGUAGE_COMPLETIONS])
+			return
+		}
+
+		const schemaCompletions = getCelSchemaCompletions(receiver)
+		if (schemaCompletions.length > 0) {
+			callback(null, schemaCompletions)
+			return
+		}
+
+		callback(null, CEL_MEMBER_COMPLETIONS)
+	},
+}
 const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {
 	useWorker: false,
 	tabSize: 2,
 	useSoftTabs: true,
+	enableBasicAutocompletion: [CEL_COMPLETER],
+	enableLiveAutocompletion: [CEL_COMPLETER],
+	liveAutocompletionDelay: 150,
+	liveAutocompletionThreshold: 1,
+	enableSnippets: true,
 }
 
 type RuleTestError = {
@@ -628,6 +694,7 @@ onMounted(async () => {
 		import('vue3-ace-editor'),
 		import('@modrinth/ui/src/utils/ace-theme'),
 	])
+	await import('ace-builds/src-noconflict/ext-language_tools')
 	editorComponent.value = VAceEditor
 })
 
@@ -681,6 +748,70 @@ function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeve
 
 function isSchema(value: unknown): value is Labrinth.TechReview.Internal.DelphiRuleSchema {
 	return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function resolveRuleSchema(
+	schema: Labrinth.TechReview.Internal.DelphiRuleSchema,
+	components: Record<string, Labrinth.TechReview.Internal.DelphiRuleSchema>,
+): Labrinth.TechReview.Internal.DelphiRuleSchema {
+	let resolved = schema
+	const visited = new Set<string>()
+
+	while (typeof resolved.$ref === 'string') {
+		const name = decodeURIComponent(resolved.$ref.split('/').at(-1) ?? '')
+		if (!name || visited.has(name) || !components[name]) break
+
+		visited.add(name)
+		resolved = components[name]
+	}
+
+	return resolved
+}
+
+function getRuleSchemaLabel(
+	schema: Labrinth.TechReview.Internal.DelphiRuleSchema,
+	components: Record<string, Labrinth.TechReview.Internal.DelphiRuleSchema>,
+): string {
+	if (typeof schema.$ref === 'string') {
+		return decodeURIComponent(schema.$ref.split('/').at(-1) ?? '') || 'context'
+	}
+
+	const resolved = resolveRuleSchema(schema, components)
+	const types = Array.isArray(resolved.type)
+		? resolved.type.filter((type): type is string => typeof type === 'string')
+		: typeof resolved.type === 'string'
+			? [resolved.type]
+			: []
+	return types.join(' | ') || 'context'
+}
+
+function getCelSchemaCompletions(receiver?: string): Ace.Completion[] {
+	const response = ruleSchema.value
+	if (!response) return []
+
+	let schema = response.input
+	for (const segment of receiver?.split('.') ?? []) {
+		const resolved = resolveRuleSchema(schema, response.components)
+		if (!isSchema(resolved.properties)) return []
+
+		const property = resolved.properties[segment]
+		if (!isSchema(property)) return []
+		schema = property
+	}
+
+	const resolved = resolveRuleSchema(schema, response.components)
+	if (!isSchema(resolved.properties)) return []
+
+	return Object.entries(resolved.properties)
+		.filter(
+			(entry): entry is [string, Labrinth.TechReview.Internal.DelphiRuleSchema] =>
+				isSchema(entry[1]),
+		)
+		.map(([value, property]) => ({
+			value,
+			score: 1_000,
+			meta: getRuleSchemaLabel(property, response.components),
+		}))
 }
 
 function formatRuleSchema(
