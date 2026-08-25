@@ -15,12 +15,7 @@ futures = { workspace = true }
 lz4_flex = { workspace = true }
 postcard = { workspace = true }
 prometheus = { workspace = true }
-redis = { workspace = true, features = [
-  "ahash",
-  "cluster",
-  "cluster-async",
-  "tokio-comp"
-] }
+redis = { workspace = true, features = ["ahash", "cluster", "cluster-async", "tokio-comp"] }
 serde = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "sync", "time"] }

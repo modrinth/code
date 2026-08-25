@@ -3554,9 +3554,6 @@
   "project.settings.general.url.title": {
     "message": "رابط"
   },
-  "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
-  },
   "project.settings.monetization.title": {
     "message": "تمويل"
   },

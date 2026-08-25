@@ -62,7 +62,7 @@
 							}
 						"
 					>
-						<StyledInput
+						<Input
 							id="java-address"
 							v-model="javaAddress"
 							:placeholder="formatMessage(messages.enterAddressPlaceholder)"
@@ -140,7 +140,7 @@
 						</span>
 					</label>
 					<div class="mt-2 flex items-center gap-2">
-						<StyledInput
+						<Input
 							id="bedrock-address"
 							v-model="bedrockAddress"
 							:placeholder="formatMessage(messages.enterAddressPlaceholder)"
@@ -176,12 +176,12 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	Input,
 	IntlFormatted,
 	MultiSelect,
 	normalizeChildren,
 	SERVER_LANGUAGES,
 	SERVER_REGIONS,
-	StyledInput,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useVIntl,

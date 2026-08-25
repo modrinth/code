@@ -6,7 +6,7 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	SettingsFormGroup,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -71,10 +71,9 @@ const messages = defineMessages({
 				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="advertising-disclosure-note"
 			>
-				<StyledInput
+				<Textarea
 					id="advertising-disclosure-note"
 					v-model="model.note"
-					multiline
 					:rows="3"
 					class="max-w-[40rem]"
 					:disabled="disabled"

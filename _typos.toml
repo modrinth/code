@@ -17,6 +17,16 @@ extend-exclude = [
   "apps/labrinth/assets/disposable_email_blocklist.txt"
 ]
 
+[default]
+extend-ignore-re = [
+  # Ignore lines that end with `// typos:ignore`
+  "(?Rm)^.*(#|//)\\s*typos:ignore$",
+  # Ignore the line after `// typos:ignore`:
+  "(#|//)\\s*typos:ignore\\n.*",
+  # Ignore blocks between `// typos:off` and `// typos:on`
+  "(?s)(#|//)\\s*typos:off.*?\\n\\s*(#|//)\\s*typos:on",
+]
+
 [default.extend-words]
 # Terms Of Use in `tou-link`
 tou = "tou"

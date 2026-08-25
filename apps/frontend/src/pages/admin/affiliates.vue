@@ -19,7 +19,7 @@
 		>
 			<h1 class="m-0 grow text-2xl font-extrabold">Manage affiliate links</h1>
 			<div class="flex items-center gap-2">
-				<StyledInput
+				<Input
 					v-model="filterQuery"
 					:icon="SearchIcon"
 					type="text"
@@ -92,7 +92,7 @@ import {
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 } from '@modrinth/ui'
 import type { User } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'

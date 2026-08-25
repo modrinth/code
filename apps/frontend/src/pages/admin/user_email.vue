@@ -10,7 +10,7 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						id="name"
 						v-model="userEmail"
 						type="email"
@@ -31,7 +31,7 @@
 </template>
 <script setup lang="ts">
 import { MailIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
+import { Button, injectNotificationManager, Input } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 

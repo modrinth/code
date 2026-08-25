@@ -22,12 +22,7 @@
 					<label for="project-name">
 						<span class="label__title">Name</span>
 					</label>
-					<StyledInput
-						id="project-name"
-						v-model="name"
-						:maxlength="2048"
-						:disabled="!hasPermission"
-					/>
+					<Input id="project-name" v-model="name" :maxlength="2048" :disabled="!hasPermission" />
 					<ValidationMessage :check="nameValidation" class="mt-2" />
 				</div>
 
@@ -35,28 +30,29 @@
 					<label for="project-slug">
 						<span class="label__title">URL</span>
 					</label>
-					<div class="text-input-wrapper !w-full">
-						<div class="text-input-wrapper__before">
-							<span class="hidden sm:inline">https://modrinth.com</span>/{{ projectTypeForUrl }}/
-						</div>
-						<StyledInput
-							id="project-slug"
-							v-model="slug"
-							:maxlength="64"
-							autocomplete="off"
-							:disabled="!hasPermission"
-						/>
-					</div>
+					<Input
+						id="project-slug"
+						v-model="slug"
+						:maxlength="64"
+						autocomplete="off"
+						:disabled="!hasPermission"
+						wrapper-class="w-full"
+					>
+						<template #prefix>
+							<span class="whitespace-nowrap">
+								<span class="hidden sm:inline">https://modrinth.com</span>/{{ projectTypeForUrl }}/
+							</span>
+						</template>
+					</Input>
 				</div>
 
 				<div>
 					<label for="project-summary">
 						<span class="label__title">Summary</span>
 					</label>
-					<StyledInput
+					<Textarea
 						id="project-summary"
 						v-model="summary"
-						multiline
 						:maxlength="256"
 						:disabled="!hasPermission"
 						resize="vertical"
@@ -314,12 +310,13 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	Input,
 	IntlFormatted,
 	normalizeChildren,
 	SettingsInlineWarning,
 	SettingsOptionCard,
 	SettingsToggleCard,
-	StyledInput,
+	Textarea,
 	UnsavedChangesPopup,
 	useFormatBytes,
 	usePageLeaveSafety,

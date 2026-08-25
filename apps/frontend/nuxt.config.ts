@@ -19,12 +19,6 @@ const preloadedFonts = [
 	'inter/Inter-Bold.woff2',
 ]
 
-const favicons = {
-	'(prefers-color-scheme:no-preference)': '/favicon-light.ico',
-	'(prefers-color-scheme:light)': '/favicon-light.ico',
-	'(prefers-color-scheme:dark)': '/favicon.ico',
-}
-
 const PROD_MODRINTH_URL = 'https://modrinth.com'
 const STAGING_MODRINTH_URL = 'https://staging.modrinth.com'
 
@@ -49,12 +43,6 @@ export default defineNuxtConfig({
 						type: 'font/woff2',
 						crossorigin: 'anonymous',
 					}
-				}),
-				...Object.entries(favicons).map(([media, href]): object => {
-					return { rel: 'icon', type: 'image/x-icon', href, media }
-				}),
-				...Object.entries(favicons).map(([media, href]): object => {
-					return { rel: 'apple-touch-icon', type: 'image/x-icon', href, media, sizes: '64x64' }
 				}),
 				{
 					rel: 'search',

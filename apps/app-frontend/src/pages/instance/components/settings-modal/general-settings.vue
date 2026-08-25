@@ -13,7 +13,7 @@ import {
 	Chips,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
@@ -367,7 +367,7 @@ const messages = defineMessages({
 			{{ formatMessage(messages.name) }}
 		</label>
 		<div class="flex">
-			<StyledInput
+			<Input
 				id="instance-name"
 				v-model="title"
 				autocomplete="off"

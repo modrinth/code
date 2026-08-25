@@ -32,7 +32,7 @@
 						{{ formatMessage(messages.nameLabel) }}
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					id="name"
 					v-model="name"
 					:maxlength="64"
@@ -47,19 +47,18 @@
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
 				</span>
-				<div class="text-input-wrapper !w-full">
-					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<StyledInput
-						id="slug"
-						v-model="slug"
-						:maxlength="64"
-						class="w-full"
-						type="text"
-						autocomplete="off"
-						:disabled="hasHitLimit"
-						@update:model-value="manualSlug = true"
-					/>
-				</div>
+				<Input
+					id="slug"
+					v-model="slug"
+					:maxlength="64"
+					class="w-full"
+					type="text"
+					autocomplete="off"
+					:disabled="hasHitLimit"
+					@update:model-value="manualSlug = true"
+				>
+					<template #prefix>https://modrinth.com/project/</template>
+				</Input>
 			</label>
 			<div class="flex flex-col gap-2.5">
 				<label for="owner">
@@ -101,10 +100,9 @@
 						{{ formatMessage(messages.summaryLabel) }}
 					</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="additional-information"
 					v-model="description"
-					multiline
 					:maxlength="256"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
@@ -144,8 +142,9 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'

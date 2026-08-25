@@ -544,7 +544,7 @@
 						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
 					</template>
 					<template #new-server-project>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
+						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
 					</template>
 					<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
 					<template #new-collection>
@@ -1127,7 +1127,7 @@ const messages = defineMessages({
 	},
 	newServerProject: {
 		id: 'layout.action.new-server-project',
-		defaultMessage: 'New server',
+		defaultMessage: 'New server project',
 	},
 	newCollection: {
 		id: 'layout.action.new-collection',
@@ -1179,6 +1179,7 @@ const messages = defineMessages({
 	},
 })
 
+useFavicon()
 useHead({
 	link: [
 		{

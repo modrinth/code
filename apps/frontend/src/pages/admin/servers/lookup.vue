@@ -10,7 +10,7 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						id="server-subdomain"
 						v-model="subdomainInput"
 						:icon="ServerIcon"
@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { ModrinthApiError } from '@modrinth/api-client'
 import { SearchIcon, ServerIcon } from '@modrinth/assets'
-import { Admonition, Button, injectModrinthClient, StyledInput } from '@modrinth/ui'
+import { Admonition, Button, injectModrinthClient, Input } from '@modrinth/ui'
 
 const client = injectModrinthClient()
 

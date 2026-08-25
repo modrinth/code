@@ -24,7 +24,7 @@
 							formatMessage(messages.emailAddressLabel)
 						}}</span>
 					</label>
-					<StyledInput
+					<Input
 						id="email-input"
 						v-model="email"
 						:maxlength="2048"
@@ -68,7 +68,7 @@
 							formatMessage(messages.oldPasswordLabel)
 						}}</span>
 					</label>
-					<StyledInput
+					<Input
 						id="old-password"
 						v-model="oldPassword"
 						:maxlength="2048"
@@ -92,7 +92,7 @@
 								formatMessage(messages.newPasswordLabel)
 							}}</span></label
 						>
-						<StyledInput
+						<Input
 							id="new-password"
 							v-model="newPassword"
 							:maxlength="2048"
@@ -108,7 +108,7 @@
 								formatMessage(messages.confirmNewPasswordLabel)
 							}}</span>
 						</label>
-						<StyledInput
+						<Input
 							id="confirm-new-password"
 							v-model="confirmNewPassword"
 							:maxlength="2048"
@@ -183,7 +183,7 @@
 							formatMessage(messages.twoFactorEnterCodeDescription)
 						}}</span>
 					</label>
-					<StyledInput
+					<Input
 						id="two-factor-code"
 						v-model="twoFactorCode"
 						:maxlength="11"
@@ -248,7 +248,7 @@
 								formatMessage(messages.twoFactorVerifyCodeDescription)
 							}}</span>
 						</label>
-						<StyledInput
+						<Input
 							id="verify-code"
 							v-model="twoFactorCode"
 							:maxlength="6"
@@ -477,9 +477,9 @@ import {
 	ConfirmModal,
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NewModal,
-	StyledInput,
 	Table,
 	useVIntl,
 } from '@modrinth/ui'

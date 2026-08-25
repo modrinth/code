@@ -1799,12 +1799,6 @@
   "icon-select.select": {
     "defaultMessage": "Välj ikon"
   },
-  "input.clear": {
-    "defaultMessage": "Rensa indata"
-  },
-  "input.search": {
-    "defaultMessage": "Sök"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Sök efter version..."
   },

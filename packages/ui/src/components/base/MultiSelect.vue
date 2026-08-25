@@ -127,14 +127,13 @@
 							v-if="searchable"
 							class="px-0 py-1.5 border-0 border-solid border-b border-b-surface-5 flex"
 						>
-							<StyledInput
+							<Input
 								ref="searchInputRef"
 								v-model="searchQuery"
 								:icon="SearchIcon"
 								type="text"
 								:placeholder="searchPlaceholder"
-								wrapper-class="grow bg-surface-4 mx-0"
-								input-class="ps-9 mx-1.5"
+								wrapper-class="grow"
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
 							/>
@@ -422,7 +421,7 @@ import type {
 	ButtonSize,
 	ButtonType,
 } from './buttons/types'
-import StyledInput from './StyledInput.vue'
+import Input from './inputs/Input.vue'
 
 export interface MultiSelectOption<T> {
 	value: T
@@ -578,7 +577,7 @@ const dropdownRef = ref<HTMLElement>()
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const selectionActionsRef = ref<HTMLElement>()
-const searchInputRef = ref<InstanceType<typeof StyledInput>>()
+const searchInputRef = ref<InstanceType<typeof Input>>()
 const rafId = ref<number | null>(null)
 const tagsContainerRef = ref<HTMLElement>()
 const optionsOverlayScrollbars = ref<OverlayScrollbarsInstance | null>(null)

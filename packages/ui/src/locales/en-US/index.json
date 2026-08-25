@@ -2018,12 +2018,6 @@
   "icon-select.select": {
     "defaultMessage": "Select icon"
   },
-  "input.clear": {
-    "defaultMessage": "Clear input"
-  },
-  "input.search": {
-    "defaultMessage": "Search"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Search version..."
   },
@@ -3118,6 +3112,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Set as affiliate"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "View shared instances"
   },
   "profile.button.unblock": {
     "defaultMessage": "Unblock"

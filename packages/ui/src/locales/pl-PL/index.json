@@ -1982,12 +1982,6 @@
   "icon-select.select": {
     "defaultMessage": "Wybierz ikonę"
   },
-  "input.clear": {
-    "defaultMessage": "Wyczyść pole"
-  },
-  "input.search": {
-    "defaultMessage": "Szukaj"
-  },
   "input.search-version.placeholder": {
     "defaultMessage": "Szukaj wersji..."
   },

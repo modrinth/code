@@ -84,7 +84,7 @@
 						A place for users to report bugs, issues, and concerns about your project.
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					id="project-issue-tracker"
 					v-model="current.issues"
 					type="url"
@@ -104,7 +104,7 @@
 						A page/repository containing the source code for your project
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					id="project-source-code"
 					v-model="current.source"
 					type="url"
@@ -124,7 +124,7 @@
 						A page containing information, documentation, and help for the project.
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					id="project-wiki-page"
 					v-model="current.wiki"
 					type="url"
@@ -139,7 +139,7 @@
 					<span class="label__title">Discord invite </span>
 					<span class="label__description"> An invitation link to your Discord server. </span>
 				</label>
-				<StyledInput
+				<Input
 					id="project-discord-invite"
 					v-model="current.discord"
 					type="url"
@@ -161,7 +161,7 @@
 				:key="`donation-link-${index}`"
 				class="input-group donation-link-group"
 			>
-				<StyledInput
+				<Input
 					v-model="donationLink.url"
 					type="url"
 					:maxlength="2048"
@@ -208,7 +208,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	StyledInput,
+	Input,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,
