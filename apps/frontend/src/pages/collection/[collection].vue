@@ -410,6 +410,10 @@ import { onServerPrefetch } from 'vue'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 
+useSeoMeta({
+	robots: 'noindex',
+})
+
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
 const { formatMessage } = useVIntl()
@@ -614,6 +618,26 @@ const creator = computed(() =>
 
 const supportsMarkdown = computed(() => creator.value?.id === '2REoufqX')
 
+// Query for public projects
+const { data: creatorPublicProjectsSearch } = useQuery({
+	queryKey: computed(() => ['user', creator.value?.username, 'public-projects-search']),
+	queryFn: () =>
+		api.labrinth.projects_v3.search({
+			facets: [[`author:${creator.value.username}`]],
+			limit: 1,
+		}),
+	enabled: computed(
+		() =>
+			!isFollowingCollection.value &&
+			collection.value?.status === 'listed' &&
+			!!creator.value?.username,
+	),
+})
+
+const creatorHasPublicProjects = computed(
+	() => (creatorPublicProjectsSearch.value?.total_hits ?? 0) > 0,
+)
+
 // Query for followed projects
 const {
 	data: followedProjects,
@@ -673,10 +697,21 @@ onServerPrefetch(async () => {
 	})
 
 	if (collectionData?.user) {
-		await queryClient.ensureQueryData({
+		const creatorData = await queryClient.ensureQueryData({
 			queryKey: ['user', collectionData.user],
 			queryFn: () => api.labrinth.users_v2.get(collectionData.user),
 		})
+
+		if (collectionData.status === 'listed' && creatorData?.username) {
+			await queryClient.ensureQueryData({
+				queryKey: ['user', creatorData.username, 'public-projects-search'],
+				queryFn: () =>
+					api.labrinth.projects_v3.search({
+						facets: [[`author:${creatorData.username}`]],
+						limit: 1,
+					}),
+			})
+		}
 	}
 
 	if (collectionData?.projects?.length) {
@@ -688,8 +723,8 @@ onServerPrefetch(async () => {
 })
 
 watch(
-	[collection, creator],
-	([col, cre]) => {
+	[collection, creator, creatorHasPublicProjects],
+	([col, cre, hasPublicProjects]) => {
 		if (col && cre) {
 			const canonicalUrl = col ? `https://modrinth.com/collection/${col.id}` : undefined
 			useSeoMeta({
@@ -703,7 +738,7 @@ watch(
 				ogDescription: col.description,
 				ogImage: col.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png',
 				ogUrl: canonicalUrl,
-				robots: col.status === 'listed' ? 'all' : 'noindex',
+				robots: col.status === 'listed' && hasPublicProjects ? 'all' : 'noindex',
 			})
 			useHead({
 				link: [
