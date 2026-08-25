@@ -107,6 +107,13 @@ impl HotbarFamily {
             Self::Components => "components",
         }
     }
+
+    fn other(self) -> Self {
+        match self {
+            Self::Legacy => Self::Components,
+            Self::Components => Self::Legacy,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -867,21 +874,21 @@ async fn reconcile_command_history(
         .await
         .map(|metadata| metadata.file_type().is_symlink())
         .unwrap_or(false);
-    let checkpoint = checkpoint(
+    let current_checkpoint = checkpoint(
         &metadata.instance.id,
         SyncedOption::CommandHistory,
         "default",
         state,
     )
     .await?;
-    if checkpoint
+    if current_checkpoint
         .as_ref()
         .is_some_and(|value| value.status == CheckpointStatus::Pending)
     {
         return ensure_command_history(metadata, state).await;
     }
     let actual = sha1_file(&local).await?;
-    let expected = checkpoint.map(|value| value.expected_sha1);
+    let expected = current_checkpoint.map(|value| value.expected_sha1);
     if !symlink && expected.as_deref() != Some(actual.as_str()) {
         let contents =
             String::from_utf8_lossy(&io::read(&local).await?).into_owned();
@@ -944,14 +951,14 @@ async fn reconcile_hotbar(
         return ensure_hotbar(metadata, state).await;
     }
     let family = hotbar_family(metadata, state).await?;
-    let checkpoint = checkpoint(
+    let current_checkpoint = checkpoint(
         &metadata.instance.id,
         SyncedOption::CreativeHotbars,
         family.as_str(),
         state,
     )
     .await?;
-    if checkpoint
+    if current_checkpoint
         .as_ref()
         .is_some_and(|value| value.status == CheckpointStatus::Pending)
     {
@@ -959,12 +966,12 @@ async fn reconcile_hotbar(
     }
     let actual = sha1_file(&local).await?;
     let mut sync_state = read_hotbar_state(state).await?;
-    if checkpoint
+    if current_checkpoint
         .as_ref()
         .map(|value| value.expected_sha1.as_str())
         == Some(actual.as_str())
     {
-        if checkpoint
+        if current_checkpoint
             .as_ref()
             .is_some_and(|value| value.source_revision == sync_state.revision)
         {
@@ -973,13 +980,43 @@ async fn reconcile_hotbar(
         return write_hotbar_projection(metadata, state).await;
     }
 
+    let (changed_family, checkpoint) = if current_checkpoint.is_none() {
+        let previous_family = family.other();
+        let previous_checkpoint = checkpoint(
+            &metadata.instance.id,
+            SyncedOption::CreativeHotbars,
+            previous_family.as_str(),
+            state,
+        )
+        .await?;
+        if let Some(previous_checkpoint) = previous_checkpoint {
+            if previous_checkpoint.status == CheckpointStatus::Pending
+                || previous_checkpoint.expected_sha1 == actual
+            {
+                return write_hotbar_projection(metadata, state).await;
+            }
+            (previous_family, Some(previous_checkpoint))
+        } else {
+            (family, None)
+        }
+    } else {
+        (family, current_checkpoint)
+    };
+
     let changed = read_nbt_file(&local).await?;
     let merge_base = checkpoint
         .and_then(|value| value.merge_base)
         .map(nbt_from_bytes)
         .transpose()?
-        .unwrap_or_else(|| hotbar_family_root(&sync_state.nbt, family));
-    if merge_hotbar_family(&mut sync_state.nbt, family, &merge_base, &changed) {
+        .unwrap_or_else(|| {
+            hotbar_family_root(&sync_state.nbt, changed_family)
+        });
+    if merge_hotbar_family(
+        &mut sync_state.nbt,
+        changed_family,
+        &merge_base,
+        &changed,
+    ) {
         increment_hotbar_revision(&mut sync_state);
         write_hotbar_state(state, &sync_state).await?;
     }
@@ -1235,7 +1272,29 @@ async fn write_hotbar_projection(
         mode,
         state,
     )
-    .await
+    .await?;
+    remove_other_hotbar_checkpoint(&metadata.instance.id, family, state).await
+}
+
+async fn remove_other_hotbar_checkpoint(
+    instance_id: &str,
+    family: HotbarFamily,
+    state: &State,
+) -> crate::Result<()> {
+    let variant = family.as_str();
+    sqlx::query!(
+        "
+		DELETE FROM instance_sync_checkpoints
+		WHERE instance_id = ?
+			AND feature = 'creative_hotbars'
+			AND variant != ?
+		",
+        instance_id,
+        variant,
+    )
+    .execute(&state.pool)
+    .await?;
+    Ok(())
 }
 
 fn empty_hotbar_root() -> NbtCompound {
