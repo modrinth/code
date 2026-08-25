@@ -105,38 +105,73 @@
 			<section class="mt-2 flex flex-col gap-3">
 				<div class="flex items-center justify-between gap-3">
 					<div>
-						<h3 class="m-0 text-base font-bold text-contrast">Test traces</h3>
+						<h3 class="m-0 text-base font-bold text-contrast">Test trace</h3>
 						<p class="m-0 text-sm text-secondary">
-							These results are evaluated from the current expression.
+							Change the trace details to evaluate the current expression.
 						</p>
 					</div>
 					<LoaderCircleIcon v-if="isTestingRule" class="size-5 animate-spin text-secondary" />
 				</div>
 
 				<div
-					v-for="example in previewExamples"
-					:key="example.original.key"
-					class="grid items-stretch gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"
+					class="grid items-stretch gap-3 md:grid-cols-[minmax(0,2fr)_auto_minmax(0,1fr)]"
 				>
 					<article class="universal-card flex min-w-0 flex-col gap-3">
-						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">Original</p>
-						<div class="flex flex-wrap items-center gap-2">
-							<span
-								class="rounded-full border px-2 py-0.5 text-xs font-semibold capitalize"
-								:class="getSeverityBadgeColor(example.original.severity)"
-							>
-								{{ example.original.severity }}
-							</span>
-							<strong class="break-all text-contrast">{{ example.original.issue_type }}</strong>
+						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">
+							Trace details
+						</p>
+						<div class="grid gap-3 sm:grid-cols-2">
+							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+								Key
+								<StyledInput v-model="testTraceForm.key" placeholder="unique-trace-key" />
+							</label>
+							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+								Issue type
+								<StyledInput
+									v-model="testTraceForm.issueType"
+									placeholder="OBFUSCATED_NAMES"
+								/>
+							</label>
+							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+								Severity
+								<select
+									v-model="testTraceForm.severity"
+									class="h-9 w-full rounded-xl border-none bg-surface-4 px-3 font-medium capitalize text-primary outline-none focus:ring-4 focus:ring-brand-shadow"
+								>
+									<option v-for="severity in TRACE_SEVERITIES" :key="severity" :value="severity">
+										{{ severity }}
+									</option>
+								</select>
+							</label>
+							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+								JAR
+								<StyledInput
+									v-model="testTraceForm.jar"
+									placeholder="META-INF/jars/embedded.jar"
+								/>
+							</label>
 						</div>
-						<dl class="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-sm">
-							<dt class="text-secondary">Key</dt>
-							<dd class="m-0 break-all font-mono text-contrast">{{ example.original.key }}</dd>
-							<dt class="text-secondary">File</dt>
-							<dd class="m-0 break-all font-mono text-contrast">
-								{{ example.original.file_path }}
-							</dd>
-						</dl>
+						<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+							File path
+							<StyledInput
+								v-model="testTraceForm.filePath"
+								placeholder="com/example/Bootstrap.class"
+							/>
+						</label>
+						<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+							Data (JSON)
+							<StyledInput
+								v-model="testTraceForm.data"
+								multiline
+								:rows="4"
+								resize="vertical"
+								input-class="font-mono text-sm"
+								:error="Boolean(traceDataError)"
+							/>
+						</label>
+						<p v-if="traceDataError" class="m-0 text-sm text-red">
+							{{ traceDataError }}
+						</p>
 					</article>
 
 					<div
@@ -148,26 +183,40 @@
 
 					<article class="universal-card flex min-w-0 flex-col gap-3">
 						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">
-							New state
+							Rule result
 						</p>
 						<div
-							v-if="example.effectiveSeverity === 'hidden'"
+							v-if="isTestingRule"
+							class="flex items-center gap-2 text-secondary"
+						>
+							<LoaderCircleIcon class="size-5 animate-spin" />
+							<span>Evaluating…</span>
+						</div>
+						<p v-else-if="traceDataError || ruleTestError" class="m-0 text-sm text-secondary">
+							Preview unavailable.
+						</p>
+						<div
+							v-else-if="testTracePreview.effectiveSeverity === 'hidden'"
 							class="flex items-center gap-2 text-secondary"
 						>
 							<EyeOffIcon class="size-5" />
 							<strong class="text-contrast">Hidden from reports</strong>
 						</div>
+						<div v-else-if="!testTracePreview.effect" class="flex flex-col gap-2">
+							<strong class="text-contrast">No match</strong>
+							<p class="m-0 text-sm text-secondary">{{ testTracePreview.summary }}</p>
+						</div>
 						<template v-else>
 							<div class="flex flex-wrap items-center gap-2">
 								<span
 									class="rounded-full border px-2 py-0.5 text-xs font-semibold capitalize"
-									:class="getSeverityBadgeColor(example.effectiveSeverity)"
+									:class="getSeverityBadgeColor(testTracePreview.effectiveSeverity)"
 								>
-									{{ example.effectiveSeverity }}
+									{{ testTracePreview.effectiveSeverity }}
 								</span>
-								<strong class="break-all text-contrast">{{ example.original.issue_type }}</strong>
+								<strong class="break-all text-contrast">{{ testTraceForm.issueType }}</strong>
 							</div>
-							<p class="m-0 text-sm text-secondary">{{ example.summary }}</p>
+							<p class="m-0 text-sm text-secondary">{{ testTracePreview.summary }}</p>
 						</template>
 					</article>
 				</div>
@@ -451,79 +500,67 @@ type RuleTestError = {
 	details: string[]
 }
 
-const TEST_INPUTS: Labrinth.TechReview.Internal.RuleInput[] = [
-	{
-		schema_version: 1,
-		trace: {
-			key: 'known-safe:obfuscated-bootstrap',
-			issue_type: 'OBFUSCATED_NAMES',
-			severity: 'high',
-			jar: 'META-INF/jars/embedded.jar',
-			file_path: 'com/example/Bootstrap.class',
-			data: {
+type TestTraceForm = {
+	key: string
+	issueType: string
+	severity: Labrinth.TechReview.Internal.DelphiSeverity
+	jar: string
+	filePath: string
+	data: string
+}
+
+const TRACE_SEVERITIES: Labrinth.TechReview.Internal.DelphiSeverity[] = [
+	'low',
+	'medium',
+	'high',
+	'severe',
+	'malware',
+	'hidden',
+]
+
+const TEST_INPUT_METADATA: Omit<Labrinth.TechReview.Internal.RuleInput, 'trace'> = {
+	schema_version: 1,
+	sibling_traces: [],
+	scan: {
+		delphi_version: 17,
+	},
+	artifact: {
+		size: 412_892,
+		hashes: {
+			sha1: '0123456789abcdef',
+			sha512: 'fedcba9876543210',
+		},
+	},
+	project: {
+		id: 'example-project',
+		types: ['mod'],
+	},
+	version: {
+		id: 'example-version',
+		loaders: ['fabric'],
+	},
+	file: {
+		id: 'example-file',
+	},
+}
+
+function createTestTraceForm(): TestTraceForm {
+	return {
+		key: 'known-safe:obfuscated-bootstrap',
+		issueType: 'OBFUSCATED_NAMES',
+		severity: 'high',
+		jar: 'META-INF/jars/embedded.jar',
+		filePath: 'com/example/Bootstrap.class',
+		data: JSON.stringify(
+			{
 				confidence: 0.97,
 				symbol_count: 42,
 			},
-		},
-		sibling_traces: [],
-		scan: {
-			delphi_version: 17,
-		},
-		artifact: {
-			size: 412_892,
-			hashes: {
-				sha1: '0123456789abcdef',
-				sha512: 'fedcba9876543210',
-			},
-		},
-		project: {
-			id: 'example-project',
-			types: ['mod'],
-		},
-		version: {
-			id: 'example-version',
-			loaders: ['fabric'],
-		},
-		file: {
-			id: 'example-file',
-		},
-	},
-	{
-		schema_version: 1,
-		trace: {
-			key: 'network/known-telemetry-host',
-			issue_type: 'SUSPICIOUS_NETWORK_ACCESS',
-			severity: 'medium',
-			jar: null,
-			file_path: 'com/example/Telemetry.class',
-			data: {
-				host: 'telemetry.example.com',
-			},
-		},
-		sibling_traces: [],
-		scan: {
-			delphi_version: 18,
-		},
-		artifact: {
-			size: 98_304,
-			hashes: {
-				sha1: 'abcdef0123456789',
-				sha512: '0123456789abcdef',
-			},
-		},
-		project: {
-			id: 'telemetry-project',
-			types: ['mod'],
-		},
-		version: {
-			id: 'telemetry-version',
-			loaders: ['neoforge'],
-		},
-		file: {
-			id: 'telemetry-file',
-		},
-	},
-]
+			null,
+			2,
+		),
+	}
+}
 
 useHead({ title: 'Delphi rules - Modrinth' })
 
@@ -549,6 +586,7 @@ const editingRuleId = ref<number | null>(null)
 const ruleToDelete = ref<Labrinth.TechReview.Internal.DelphiRule | null>(null)
 const ruleTestEffects = ref<Array<Labrinth.TechReview.Internal.DelphiRuleEffect | null>>([])
 const ruleTestError = ref<RuleTestError | null>(null)
+const traceDataError = ref<string | null>(null)
 const scanProgress = ref<Labrinth.TechReview.Internal.DelphiRuleScanEvent | null>(null)
 const expandedAffectedDetails = reactive(
 	new Map<number, Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]>(),
@@ -559,6 +597,7 @@ const form = reactive({
 	priority: 0 as number | undefined,
 	rule: DEFAULT_RULE,
 })
+const testTraceForm = reactive(createTestTraceForm())
 let ruleTestRequestId = 0
 let scanAbortController: AbortController | null = null
 
@@ -577,32 +616,25 @@ const ruleInputSchemaText = computed(() =>
 const ruleOutputSchemaText = computed(() =>
 	ruleSchema.value ? formatRuleSchema(ruleSchema.value.output, ruleSchema.value.components) : '',
 )
-const previewExamples = computed(() =>
-	TEST_INPUTS.map(({ trace: original }, index) => {
-		const effect = ruleTestEffects.value[index] ?? null
-		const effectiveSeverity = effect?.severity ?? original.severity
-		let summary: string
+const testTracePreview = computed(() => {
+	const effect = ruleTestEffects.value[0] ?? null
+	const effectiveSeverity = effect?.severity ?? testTraceForm.severity
+	let summary: string
 
-		if (isTestingRule.value) {
-			summary = 'Evaluating the current expression...'
-		} else if (ruleTestError.value) {
-			summary = 'Preview unavailable.'
-		} else if (!effect) {
-			summary = 'Rule does not match; no change.'
-		} else if (effect.severity && effect.severity !== original.severity) {
-			summary = `Severity changed from ${original.severity} to ${effect.severity}.`
-		} else {
-			summary = 'Rule matched; no visible change.'
-		}
+	if (!effect) {
+		summary = 'This rule would not change the trace.'
+	} else if (effect.severity !== testTraceForm.severity) {
+		summary = `Severity changed from ${testTraceForm.severity} to ${effect.severity}.`
+	} else {
+		summary = 'The rule matched without changing the severity.'
+	}
 
-		return {
-			original,
-			effect,
-			effectiveSeverity,
-			summary,
-		}
-	}),
-)
+	return {
+		effect,
+		effectiveSeverity,
+		summary,
+	}
+})
 
 function isRuleLive(rule: Labrinth.TechReview.Internal.DelphiRule): boolean {
 	return rule.current_revision === undefined || rule.revision === rule.current_revision
@@ -721,6 +753,34 @@ function handleRuleInput(rule: string) {
 	queueRuleTest()
 }
 
+function getTestRuleInput(): Labrinth.TechReview.Internal.RuleInput | null {
+	let data: unknown
+	try {
+		data = JSON.parse(testTraceForm.data)
+	} catch {
+		traceDataError.value = 'Enter valid JSON data for the trace.'
+		return null
+	}
+
+	if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+		traceDataError.value = 'Trace data must be a JSON object.'
+		return null
+	}
+
+	traceDataError.value = null
+	return {
+		...TEST_INPUT_METADATA,
+		trace: {
+			key: testTraceForm.key,
+			issue_type: testTraceForm.issueType,
+			severity: testTraceForm.severity,
+			jar: testTraceForm.jar.trim() || null,
+			file_path: testTraceForm.filePath,
+			data: data as Record<string, unknown>,
+		},
+	}
+}
+
 async function testRule() {
 	if (!isRuleModalOpen.value) return
 
@@ -728,6 +788,7 @@ async function testRule() {
 	const rule = form.rule.trim()
 	ruleTestEffects.value = []
 	ruleTestError.value = null
+	traceDataError.value = null
 
 	if (!rule) {
 		isTestingRule.value = false
@@ -738,11 +799,17 @@ async function testRule() {
 		return
 	}
 
+	const input = getTestRuleInput()
+	if (!input) {
+		isTestingRule.value = false
+		return
+	}
+
 	isTestingRule.value = true
 	try {
 		const response = await client.labrinth.tech_review_internal.testRule({
 			rule,
-			inputs: TEST_INPUTS,
+			inputs: [input],
 		})
 		if (requestId !== ruleTestRequestId) return
 
@@ -776,6 +843,8 @@ function queueRuleTest() {
 	isTestingRule.value = true
 	void testRuleDebounced()
 }
+
+watch(testTraceForm, queueRuleTest, { flush: 'sync' })
 
 async function loadRules() {
 	isLoading.value = true
@@ -855,6 +924,7 @@ function openCreateModal() {
 	form.name = ''
 	form.priority = 0
 	form.rule = DEFAULT_RULE
+	Object.assign(testTraceForm, createTestTraceForm())
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
 	nextTick(() => ruleEditorInstance.value?.resize(true))
@@ -868,6 +938,7 @@ function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
 	form.name = rule.name
 	form.priority = rule.priority
 	form.rule = rule.rule
+	Object.assign(testTraceForm, createTestTraceForm())
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
 	nextTick(() => ruleEditorInstance.value?.resize(true))
