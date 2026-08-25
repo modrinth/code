@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tSELECT payout_run_id\n\t\t\t\tFROM payouts_values\n\t\t\t\tWHERE\n\t\t\t\t\tuser_id = $1\n\t\t\t\t\tAND (mod_id IS NULL OR mod_id = $2)\n\t\t\t\tORDER BY payout_run_id NULLS FIRST\n\t\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "payout_run_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "2296d6f4147eaf7e2f2e101aafcd6c4b3559cd68cee070570dc7706805eeedca"
+}

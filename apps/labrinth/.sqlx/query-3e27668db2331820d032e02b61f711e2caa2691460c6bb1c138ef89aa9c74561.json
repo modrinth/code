@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tSELECT period\n\t\t\t\tFROM payout_runs\n\t\t\t\tWHERE status = 'succeeded'\n\t\t\t\tORDER BY period\n\t\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "period",
+        "type_info": "Date"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "3e27668db2331820d032e02b61f711e2caa2691460c6bb1c138ef89aa9c74561"
+}

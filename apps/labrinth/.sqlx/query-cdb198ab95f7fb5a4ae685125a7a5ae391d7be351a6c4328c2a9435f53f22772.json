@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tINSERT INTO payouts_values (\n\t\t\tuser_id,\n\t\t\tmod_id,\n\t\t\tamount,\n\t\t\tcreated,\n\t\t\tdate_available,\n\t\t\tpayout_run_id\n\t\t)\n\t\tVALUES ($1, $2, 1, NOW(), NOW(), $3)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cdb198ab95f7fb5a4ae685125a7a5ae391d7be351a6c4328c2a9435f53f22772"
+}

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tINSERT INTO payout_runs (\n\t\t\tid,\n\t\t\tperiod,\n\t\t\tpayload,\n\t\t\tstatus,\n\t\t\tstarted_at,\n\t\t\tstarted_by,\n\t\t\texecute_at\n\t\t)\n\t\tVALUES (\n\t\t\t$1,\n\t\t\t$2,\n\t\t\t'{\"raw_actual_revenue_usd\": 0, \"adjustments\": []}'::jsonb,\n\t\t\t$3,\n\t\t\tNOW(),\n\t\t\t$4,\n\t\t\tNOW()\n\t\t)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Date",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0f4cefdd003516ad3260cd7b471fef35cf224e053933f4aec75f377fbdffbbcb"
+}
