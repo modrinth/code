@@ -1679,12 +1679,6 @@
   "app.settings.synced-options.creative-hotbars": {
     "message": "Saved creative hotbars"
   },
-  "app.settings.synced-options.description": {
-    "message": "Sync options and config across instances so you don’t have to set them up every time."
-  },
-  "app.settings.synced-options.folder": {
-    "message": "Synced folder"
-  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "Multiplayer servers"
   },
