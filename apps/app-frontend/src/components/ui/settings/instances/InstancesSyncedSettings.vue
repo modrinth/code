@@ -2,7 +2,7 @@
 import {
 	CheckIcon,
 	EditIcon,
-	FolderOpenIcon,
+	// FolderOpenIcon,
 	RefreshCwIcon,
 	SaveIcon,
 	SearchIcon,
@@ -34,7 +34,7 @@ import {
 	type GlobalSyncedOptions,
 	list as listInstances,
 	list_synced_servers,
-	open_synced_options_folder,
+	// open_synced_options_folder,
 	remove_synced_server,
 	set_command_history,
 	set_global_synced_option,
@@ -51,15 +51,15 @@ const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 
 const messages = defineMessages({
-	syncedDescription: {
-		id: 'app.settings.synced-options.description',
-		defaultMessage:
-			'Sync options and config across instances so you don’t have to set them up every time.',
-	},
-	syncedFolder: {
-		id: 'app.settings.synced-options.folder',
-		defaultMessage: 'Synced folder',
-	},
+	// syncedDescription: {
+	// 	id: 'app.settings.synced-options.description',
+	// 	defaultMessage:
+	// 		'Sync options and config across instances so you don’t have to set them up every time.',
+	// },
+	// syncedFolder: {
+	// 	id: 'app.settings.synced-options.folder',
+	// 	defaultMessage: 'Synced folder',
+	// },
 	multiplayerServers: {
 		id: 'app.settings.synced-options.multiplayer-servers',
 		defaultMessage: 'Multiplayer servers',
@@ -680,6 +680,7 @@ watch(
 
 		<section class="border-0 border-b border-solid border-divider pb-6">
 			<div class="flex flex-col gap-6">
+				<!--
 				<div class="flex items-center justify-between gap-4">
 					<p class="m-0 text-secondary">{{ formatMessage(messages.syncedDescription) }}</p>
 					<Button @click="open_synced_options_folder().catch(handleError)">
@@ -687,6 +688,7 @@ watch(
 						{{ formatMessage(messages.syncedFolder) }}
 					</Button>
 				</div>
+				-->
 
 				<div class="flex flex-col gap-4">
 					<div
