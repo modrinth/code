@@ -108,18 +108,18 @@ async fn get_global_options_with_state(
     state: &State,
 ) -> crate::Result<GlobalSyncedOptions> {
     let mut options = GlobalSyncedOptions::default();
-	let rows = sqlx::query!(
-		r#"
+    let rows = sqlx::query!(
+        r#"
 		SELECT option, enabled AS "enabled!: bool"
 		FROM global_synced_options_overrides
 		"#,
-	)
-	.fetch_all(&state.pool)
-	.await?;
+    )
+    .fetch_all(&state.pool)
+    .await?;
 
-	for row in rows {
-		if let Some(option) = option_from_str(&row.option) {
-			options.set(option, row.enabled);
+    for row in rows {
+        if let Some(option) = option_from_str(&row.option) {
+            options.set(option, row.enabled);
         }
     }
 
@@ -307,17 +307,17 @@ pub async fn set_global_option(
         seed_from_instance(&metadata, option, &state).await?;
     }
 
-	let option_name = option.as_str();
-	sqlx::query!(
-		"
+    let option_name = option.as_str();
+    sqlx::query!(
+        "
 		INSERT INTO global_synced_options_overrides (option, enabled)
 		VALUES (?, ?)
 		ON CONFLICT(option) DO UPDATE SET enabled = excluded.enabled
 		",
-		option_name,
-		enabled,
-	)
-	.execute(&state.pool)
+        option_name,
+        enabled,
+    )
+    .execute(&state.pool)
     .await?;
 
     let instances = crate::state::list_instances(&state.pool).await?;
@@ -1150,10 +1150,10 @@ pub(super) async fn record_materialization(
     mode: LinkMode,
     state: &State,
 ) -> crate::Result<()> {
-	let option_name = option.as_str();
-	let link_mode = mode.as_str();
-	sqlx::query!(
-		"
+    let option_name = option.as_str();
+    let link_mode = mode.as_str();
+    sqlx::query!(
+        "
 		INSERT INTO synced_option_materializations
 			(instance_id, option, family, expected_sha1, link_mode)
 		VALUES (?, ?, ?, ?, ?)
@@ -1161,13 +1161,13 @@ pub(super) async fn record_materialization(
 			expected_sha1 = excluded.expected_sha1,
 			link_mode = excluded.link_mode
 		",
-		instance_id,
-		option_name,
-		family,
-		expected_sha1,
-		link_mode,
-	)
-	.execute(&state.pool)
+        instance_id,
+        option_name,
+        family,
+        expected_sha1,
+        link_mode,
+    )
+    .execute(&state.pool)
     .await?;
     Ok(())
 }
@@ -1178,20 +1178,20 @@ async fn materialization_hash(
     family: &str,
     state: &State,
 ) -> crate::Result<Option<String>> {
-	let option_name = option.as_str();
-	Ok(sqlx::query_scalar!(
-		"
+    let option_name = option.as_str();
+    Ok(sqlx::query_scalar!(
+        "
 		SELECT expected_sha1
 		FROM synced_option_materializations
 		WHERE instance_id = ? AND option = ? AND family = ?
 		",
-		instance_id,
-		option_name,
-		family,
-	)
-	.fetch_optional(&state.pool)
-	.await?
-	.flatten())
+        instance_id,
+        option_name,
+        family,
+    )
+    .fetch_optional(&state.pool)
+    .await?
+    .flatten())
 }
 
 pub(super) async fn sha1_file(path: &Path) -> crate::Result<String> {

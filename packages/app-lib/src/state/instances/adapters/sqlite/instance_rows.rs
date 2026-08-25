@@ -534,15 +534,15 @@ pub(crate) async fn get_instance_synced_options(
     instance_id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<InstanceSyncedOptions> {
-	let enabled = sqlx::query_scalar!(
-		"
+    let enabled = sqlx::query_scalar!(
+        "
 		SELECT option
 		FROM instance_synced_options
 		WHERE instance_id = ? AND enabled = 1
 		",
-		instance_id,
-	)
-	.fetch_all(pool)
+        instance_id,
+    )
+    .fetch_all(pool)
     .await?
     .into_iter()
     .collect::<HashSet<_>>();
@@ -559,8 +559,8 @@ async fn attach_synced_options(
     records: &mut [InstanceMetadataRecord],
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-	let enabled_options = sqlx::query!(
-		"
+    let enabled_options = sqlx::query!(
+        "
 		SELECT instance_id, option
 		FROM instance_synced_options
 		WHERE enabled = 1
@@ -570,11 +570,11 @@ async fn attach_synced_options(
     .await?;
 
     for record in records {
-		for row in enabled_options
-			.iter()
-			.filter(|row| row.instance_id == record.instance.id)
-		{
-			match row.option.as_str() {
+        for row in enabled_options
+            .iter()
+            .filter(|row| row.instance_id == record.instance.id)
+        {
+            match row.option.as_str() {
                 "command_history" => {
                     record.synced_options.command_history = true
                 }
@@ -1284,14 +1284,14 @@ pub(crate) async fn set_instance_synced_option(
     enabled: bool,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-	let instance_exists = sqlx::query_scalar!(
-		r#"
+    let instance_exists = sqlx::query_scalar!(
+        r#"
 		SELECT EXISTS(SELECT 1 FROM instances WHERE id = ?)
 			AS "exists!: bool"
 		"#,
-		instance_id,
-	)
-	.fetch_one(pool)
+        instance_id,
+    )
+    .fetch_one(pool)
     .await?;
 
     if !instance_exists {
@@ -1301,19 +1301,19 @@ pub(crate) async fn set_instance_synced_option(
         .into());
     }
 
-	let option_name = option.as_str();
-	sqlx::query!(
-		"
+    let option_name = option.as_str();
+    sqlx::query!(
+        "
 		INSERT INTO instance_synced_options (instance_id, option, enabled)
 		VALUES (?, ?, ?)
 		ON CONFLICT (instance_id, option) DO UPDATE SET
 			enabled = excluded.enabled
 		",
-		instance_id,
-		option_name,
-		enabled,
-	)
-	.execute(pool)
+        instance_id,
+        option_name,
+        enabled,
+    )
+    .execute(pool)
     .await?;
 
     Ok(())
@@ -1323,15 +1323,15 @@ pub(crate) async fn insert_default_instance_synced_options(
     instance_id: &str,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
-	sqlx::query!(
-		"
+    sqlx::query!(
+        "
 		INSERT INTO instance_synced_options (instance_id, option, enabled)
 		SELECT ?, option, enabled
 		FROM global_synced_options_overrides
 		",
-		instance_id,
-	)
-	.execute(&mut **tx)
+        instance_id,
+    )
+    .execute(&mut **tx)
     .await?;
 
     Ok(())

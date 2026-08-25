@@ -159,19 +159,19 @@ pub(super) async fn seed_servers(
             }
         }
     } else {
-		sqlx::query!(
-			"DELETE FROM instance_server_entries WHERE instance_id = ?",
-			metadata.instance.id,
-		)
-		.execute(&state.pool)
-		.await?;
-	}
-	sqlx::query!(
-		"DELETE FROM instance_server_snapshots WHERE instance_id = ?",
-		metadata.instance.id,
-	)
-		.execute(&state.pool)
+        sqlx::query!(
+            "DELETE FROM instance_server_entries WHERE instance_id = ?",
+            metadata.instance.id,
+        )
+        .execute(&state.pool)
         .await?;
+    }
+    sqlx::query!(
+        "DELETE FROM instance_server_snapshots WHERE instance_id = ?",
+        metadata.instance.id,
+    )
+    .execute(&state.pool)
+    .await?;
     let canonical = servers
         .into_iter()
         .map(|data| CanonicalServer {
@@ -262,35 +262,35 @@ async fn replace_modpack_servers(
     state: &State,
 ) -> crate::Result<()> {
     let mut tx = state.pool.begin().await?;
-	sqlx::query!(
+    sqlx::query!(
 		"DELETE FROM instance_server_entries WHERE instance_id = ? AND source = 'modpack'",
 		metadata.instance.id,
 	)
 	.execute(&mut *tx)
 	.await?;
-	for (position, server) in servers.into_iter().enumerate() {
-		let id = Uuid::new_v4().to_string();
-		let source = ServerSource::Modpack.as_str();
-		let nbt = nbt_to_bytes(&server)?;
-		let position = position as i64;
-		sqlx::query!(
-			"
+    for (position, server) in servers.into_iter().enumerate() {
+        let id = Uuid::new_v4().to_string();
+        let source = ServerSource::Modpack.as_str();
+        let nbt = nbt_to_bytes(&server)?;
+        let position = position as i64;
+        sqlx::query!(
+            "
 			INSERT INTO instance_server_entries
 				(instance_id, id, source, canonical_id, nbt, position)
 			VALUES (?, ?, ?, NULL, ?, ?)
 			",
-			metadata.instance.id,
-			id,
-			source,
-			nbt,
-			position,
-		)
-		.execute(&mut *tx)
+            metadata.instance.id,
+            id,
+            source,
+            nbt,
+            position,
+        )
+        .execute(&mut *tx)
         .await?;
     }
-	let version_id = modpack_version_id(&metadata.link);
-	sqlx::query!(
-		"
+    let version_id = modpack_version_id(&metadata.link);
+    sqlx::query!(
+        "
 		INSERT INTO instance_server_baselines
 			(instance_id, version_id, reconstructed)
 		VALUES (?, ?, ?)
@@ -298,11 +298,11 @@ async fn replace_modpack_servers(
 			version_id = excluded.version_id,
 			reconstructed = excluded.reconstructed
 		",
-		metadata.instance.id,
-		version_id,
-		reconstructed,
-	)
-	.execute(&mut *tx)
+        metadata.instance.id,
+        version_id,
+        reconstructed,
+    )
+    .execute(&mut *tx)
     .await?;
     tx.commit().await?;
     Ok(())
@@ -312,34 +312,34 @@ async fn baseline_matches_link(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<bool> {
-	let row = sqlx::query!(
-		"
+    let row = sqlx::query!(
+        "
 		SELECT version_id
 		FROM instance_server_baselines
 		WHERE instance_id = ?
 		",
-		metadata.instance.id,
-	)
-	.fetch_optional(&state.pool)
-	.await?;
-	Ok(row.is_some_and(|row| {
-		row.version_id.as_deref() == modpack_version_id(&metadata.link)
-	}))
+        metadata.instance.id,
+    )
+    .fetch_optional(&state.pool)
+    .await?;
+    Ok(row.is_some_and(|row| {
+        row.version_id.as_deref() == modpack_version_id(&metadata.link)
+    }))
 }
 
 async fn baseline_was_reconstructed(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<bool> {
-	Ok(sqlx::query_scalar!(
-		r#"
+    Ok(sqlx::query_scalar!(
+        r#"
 		SELECT reconstructed AS "reconstructed!: bool"
 		FROM instance_server_baselines
 		WHERE instance_id = ?
 		"#,
-		instance_id,
-	)
-	.fetch_optional(&state.pool)
+        instance_id,
+    )
+    .fetch_optional(&state.pool)
     .await?
     .unwrap_or(false))
 }
@@ -433,16 +433,16 @@ pub(super) async fn reconcile_servers(
     if !local_path.exists() {
         return compose_instance(metadata, state).await;
     }
-	let expected = sqlx::query_scalar!(
-		"
+    let expected = sqlx::query_scalar!(
+        "
 		SELECT expected_sha1 FROM synced_option_materializations
 		WHERE instance_id = ? AND option = 'multiplayer_servers' AND family = ''
 		",
-		metadata.instance.id,
-	)
-	.fetch_optional(&state.pool)
-	.await?
-	.flatten();
+        metadata.instance.id,
+    )
+    .fetch_optional(&state.pool)
+    .await?
+    .flatten();
     let actual = sha1_file(&local_path).await?;
     if expected.as_deref() == Some(actual.as_str()) {
         return Ok(());
@@ -872,14 +872,14 @@ async fn effective(
     {
         return Ok(false);
     }
-	Ok(sqlx::query_scalar!(
-		r#"
+    Ok(sqlx::query_scalar!(
+        r#"
 		SELECT EXISTS(
 			SELECT 1 FROM global_synced_options_overrides
 			WHERE option = 'multiplayer_servers' AND enabled = 1
 		) AS "enabled!: bool"
 		"#,
-	)
+    )
     .fetch_one(&state.pool)
     .await?)
 }
@@ -1006,31 +1006,33 @@ async fn load_local(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<Vec<LocalServer>> {
-	let rows = sqlx::query!(
-		"
+    let rows = sqlx::query!(
+        "
 		SELECT id, source, canonical_id, nbt, position
 		FROM instance_server_entries
 		WHERE instance_id = ?
 		ORDER BY position
 		",
-		instance_id,
-	)
-		.fetch_all(&state.pool)
-		.await?;
-	rows.into_iter()
-		.map(|row| {
-			Ok(LocalServer {
-				id: row.id,
-				source: ServerSource::from_str(&row.source).ok_or_else(|| {
-					ErrorKind::InputError(format!(
-						"Unknown server source {}",
-						row.source
-					))
-				})?,
-				canonical_id: row.canonical_id,
-				data: nbt_from_bytes(row.nbt)?,
-				position: row.position,
-			})
+        instance_id,
+    )
+    .fetch_all(&state.pool)
+    .await?;
+    rows.into_iter()
+        .map(|row| {
+            Ok(LocalServer {
+                id: row.id,
+                source: ServerSource::from_str(&row.source).ok_or_else(
+                    || {
+                        ErrorKind::InputError(format!(
+                            "Unknown server source {}",
+                            row.source
+                        ))
+                    },
+                )?,
+                canonical_id: row.canonical_id,
+                data: nbt_from_bytes(row.nbt)?,
+                position: row.position,
+            })
         })
         .collect()
 }
@@ -1041,29 +1043,29 @@ async fn write_local(
     state: &State,
 ) -> crate::Result<()> {
     let mut tx = state.pool.begin().await?;
-	sqlx::query!(
-		"DELETE FROM instance_server_entries WHERE instance_id = ?",
-		instance_id,
-	)
-		.execute(&mut *tx)
-	.await?;
-	for server in servers {
-		let source = server.source.as_str();
-		let nbt = nbt_to_bytes(&server.data)?;
-		sqlx::query!(
-			"
+    sqlx::query!(
+        "DELETE FROM instance_server_entries WHERE instance_id = ?",
+        instance_id,
+    )
+    .execute(&mut *tx)
+    .await?;
+    for server in servers {
+        let source = server.source.as_str();
+        let nbt = nbt_to_bytes(&server.data)?;
+        sqlx::query!(
+            "
 			INSERT INTO instance_server_entries
 				(instance_id, id, source, canonical_id, nbt, position)
 			VALUES (?, ?, ?, ?, ?, ?)
 			",
-			instance_id,
-			server.id,
-			source,
-			server.canonical_id,
-			nbt,
-			server.position,
-		)
-		.execute(&mut *tx)
+            instance_id,
+            server.id,
+            source,
+            server.canonical_id,
+            nbt,
+            server.position,
+        )
+        .execute(&mut *tx)
         .await?;
     }
     tx.commit().await?;
@@ -1074,29 +1076,31 @@ async fn load_snapshots(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<Vec<SnapshotServer>> {
-	let rows = sqlx::query!(
-		"
+    let rows = sqlx::query!(
+        "
 		SELECT server_id, source, nbt
 		FROM instance_server_snapshots
 		WHERE instance_id = ?
 		ORDER BY position
 		",
-		instance_id,
-	)
-	.fetch_all(&state.pool)
-	.await?;
-	rows.into_iter()
-		.map(|row| {
-			Ok(SnapshotServer {
-				id: row.server_id,
-				source: ServerSource::from_str(&row.source).ok_or_else(|| {
-					ErrorKind::InputError(format!(
-						"Unknown server source {}",
-						row.source
-					))
-				})?,
-				data: nbt_from_bytes(row.nbt)?,
-			})
+        instance_id,
+    )
+    .fetch_all(&state.pool)
+    .await?;
+    rows.into_iter()
+        .map(|row| {
+            Ok(SnapshotServer {
+                id: row.server_id,
+                source: ServerSource::from_str(&row.source).ok_or_else(
+                    || {
+                        ErrorKind::InputError(format!(
+                            "Unknown server source {}",
+                            row.source
+                        ))
+                    },
+                )?,
+                data: nbt_from_bytes(row.nbt)?,
+            })
         })
         .collect()
 }
@@ -1107,29 +1111,29 @@ async fn write_snapshots(
     state: &State,
 ) -> crate::Result<()> {
     let mut tx = state.pool.begin().await?;
-	sqlx::query!(
-		"DELETE FROM instance_server_snapshots WHERE instance_id = ?",
-		instance_id,
-	)
-		.execute(&mut *tx)
-	.await?;
-	for (position, server) in servers.iter().enumerate() {
-		let source = server.source.as_str();
-		let nbt = nbt_to_bytes(&server.data)?;
-		let position = position as i64;
-		sqlx::query!(
-			"
+    sqlx::query!(
+        "DELETE FROM instance_server_snapshots WHERE instance_id = ?",
+        instance_id,
+    )
+    .execute(&mut *tx)
+    .await?;
+    for (position, server) in servers.iter().enumerate() {
+        let source = server.source.as_str();
+        let nbt = nbt_to_bytes(&server.data)?;
+        let position = position as i64;
+        sqlx::query!(
+            "
 			INSERT INTO instance_server_snapshots
 				(instance_id, server_id, source, nbt, position)
 			VALUES (?, ?, ?, ?, ?)
 			",
-			instance_id,
-			server.id,
-			source,
-			nbt,
-			position,
-		)
-		.execute(&mut *tx)
+            instance_id,
+            server.id,
+            source,
+            nbt,
+            position,
+        )
+        .execute(&mut *tx)
         .await?;
     }
     tx.commit().await?;
