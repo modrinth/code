@@ -193,7 +193,15 @@ function groupVersions(gameVersions: GameVersion[]) {
 			if (!groups[currentGroupKey]) groups[currentGroupKey] = []
 			groups[currentGroupKey].push(gameVersion.version)
 		} else {
-			if (!currentGroupKey) currentGroupKey = getSnapshotGroupKey(gameVersion.version)
+			// there are two different types of snapshot names:
+			// - the new YY.D-snapshot.*
+			// - and the old YYw.*
+			// for the new one (or any pre/rc release), the version that it will be released in is always included
+			// - we also have to check that the dot is in the first or second character, and in the other place is a number, because of `3D-Shareware-v1.34` for example
+			// - *and* also because of really old versions, the first character has to be a number
+			const containsVersionName: boolean = /^\d(\d\.|\.\d)/.test(gameVersion.version)
+			if (!currentGroupKey || containsVersionName)
+				currentGroupKey = getSnapshotGroupKey(gameVersion.version)
 
 			const key = `${currentGroupKey} ${DEV_RELEASE_KEY}`
 			if (!groups[key]) groups[key] = []
