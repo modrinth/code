@@ -1680,22 +1680,23 @@ pub async fn delete_all_locks(
     Ok(web::Json(DeleteAllLocksResponse { deleted_count }))
 }
 
-/// Get counts of each `ProjectStatus` across a user's projects. Only
-/// statuses with at least one project are present in the map.
+/// Get project id's for a given user with them grouped by their `ProjectStatus`.
+///
+/// Only statuses with at least one project are present in the map.
 #[utoipa::path(
     context_path = "/moderation",
     tag = "moderation",
     security(("bearer_auth" = [])),
-    responses((status = OK, body = HashMap<ProjectStatus, u32>))
+    responses((status = OK, body = HashMap<ProjectStatus, Vec<ProjectId>>))
 )]
-#[get("/user/{user_id}/project-status-counts")]
-pub async fn get_user_project_status_counts(
+#[get("/user/{user_id}/all-projects-grouped")]
+pub async fn get_user_project_grouped(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<HashMap<ProjectStatus, u32>>, ApiError> {
+) -> Result<web::Json<HashMap<ProjectStatus, Vec<ProjectId>>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -1713,17 +1714,13 @@ pub async fn get_user_project_status_counts(
             .wrap_not_found_err("resource not found")?;
 
     let counts =
-        user_project_status_counts(target_user.id, &**pool, &redis).await?;
+        user_projects_status_grouped(target_user.id, &**pool, &redis).await?;
 
     Ok(web::Json(counts))
 }
 
-#[derive(Debug, Deserialize)]
-pub struct ProjectStatusCountsUserIds {
-    pub ids: String,
-}
-
-/// Get counts of each `ProjectStatus` across multiple users' projects.
+/// Get project id's for a list of user's with them grouped by their `ProjectStatus`.
+///
 /// Users that don't exist are silently omitted from the response; users
 /// that exist but have no projects are included with an empty map.
 #[utoipa::path(
@@ -1731,16 +1728,16 @@ pub struct ProjectStatusCountsUserIds {
     tag = "moderation",
     security(("bearer_auth" = [])),
     params(("ids" = String, Query)),
-    responses((status = OK, body = HashMap<UserId, HashMap<ProjectStatus, u32>>))
+    responses((status = OK, body = HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>))
 )]
-#[get("/users/project-status-counts")]
-pub async fn get_users_project_status_counts(
+#[get("/users/all-projects-grouped")]
+pub async fn get_users_project_grouped(
     req: HttpRequest,
-    ids: web::Query<ProjectStatusCountsUserIds>,
+    ids: web::Query<UserIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<HashMap<UserId, HashMap<ProjectStatus, u32>>>, ApiError>
+) -> Result<web::Json<HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>>, ApiError>
 {
     check_is_moderator_from_headers(
         &req,
@@ -1767,9 +1764,9 @@ pub async fn get_users_project_status_counts(
     let pool_ref = &**pool;
     let redis_ref = &*redis;
 
-    let counts_by_user = try_join_all(target_users.into_iter().map(
+    let grouped_projects_by_user = try_join_all(target_users.into_iter().map(
         |target_user| async move {
-            let counts = user_project_status_counts(
+            let counts = user_projects_status_grouped(
                 target_user.id,
                 pool_ref,
                 redis_ref,
@@ -1783,25 +1780,26 @@ pub async fn get_users_project_status_counts(
         .into_iter()
         .collect::<HashMap<_, _>>();
 
-    Ok(web::Json(counts_by_user))
+    Ok(web::Json(grouped_projects_by_user))
 }
 
-/// Get counts of each `ProjectStatus` across an organization's projects.
+/// Get project id's for a given organization with them grouped by their `ProjectStatus`.
+///
 /// Only statuses with at least one project are present in the map.
 #[utoipa::path(
     context_path = "/moderation",
     tag = "moderation",
     security(("bearer_auth" = [])),
-    responses((status = OK, body = HashMap<ProjectStatus, u32>))
+    responses((status = OK, body = HashMap<ProjectStatus, Vec<ProjectId>>))
 )]
-#[get("/organization/{organization_id}/project-status-counts")]
-pub async fn get_organization_project_status_counts(
+#[get("/organization/{organization_id}/all-projects-grouped")]
+pub async fn get_organization_project_grouped(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<HashMap<ProjectStatus, u32>>, ApiError> {
+) -> Result<web::Json<HashMap<ProjectStatus, Vec<ProjectId>>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -1821,18 +1819,19 @@ pub async fn get_organization_project_status_counts(
         .wrap_internal_err("fetching organization from database")?
         .wrap_not_found_err("resource not found")?;
 
-    let counts = organization_project_status_counts(
+    let grouped_projects = organization_projects_status_grouped(
         target_org.id,
         &**pool,
         &redis,
     )
         .await?;
 
-    Ok(web::Json(counts))
+    Ok(web::Json(grouped_projects))
 }
 
-/// Get counts of each `ProjectStatus` across multiple organizations'
-/// projects. Organizations that don't exist are silently omitted from the
+/// Get project id's for a list of organization's with them grouped by their `ProjectStatus`.
+///
+/// Organizations that don't exist are silently omitted from the
 /// response; organizations that exist but have no projects are included
 /// with an empty map.
 #[utoipa::path(
@@ -1840,17 +1839,17 @@ pub async fn get_organization_project_status_counts(
     tag = "moderation",
     security(("bearer_auth" = [])),
     params(("ids" = String, Query)),
-    responses((status = OK, body = HashMap<OrganizationId, HashMap<ProjectStatus, u32>>))
+    responses((status = OK, body = HashMap<OrganizationId, HashMap<ProjectStatus, Vec<ProjectId>>>))
 )]
-#[get("/organizations/project-status-counts")]
-pub async fn get_organizations_project_status_counts(
+#[get("/organizations/all-projects-grouped")]
+pub async fn get_organizations_project_grouped(
     req: HttpRequest,
     ids: web::Query<OrganizationIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<
-    web::Json<HashMap<OrganizationId, HashMap<ProjectStatus, u32>>>,
+    web::Json<HashMap<OrganizationId, HashMap<ProjectStatus, Vec<ProjectId>>>>,
     ApiError,
 > {
     check_is_moderator_from_headers(
@@ -1881,9 +1880,9 @@ pub async fn get_organizations_project_status_counts(
     let pool_ref = &**pool;
     let redis_ref = &*redis;
 
-    let counts_by_org = try_join_all(target_orgs.into_iter().map(
+    let grouped_projects_by_org = try_join_all(target_orgs.into_iter().map(
         |target_org| async move {
-            let counts = organization_project_status_counts(
+            let counts = organization_projects_status_grouped(
                 target_org.id,
                 pool_ref,
                 redis_ref,
@@ -1897,37 +1896,35 @@ pub async fn get_organizations_project_status_counts(
         .into_iter()
         .collect::<HashMap<_, _>>();
 
-    Ok(web::Json(counts_by_org))
+    Ok(web::Json(grouped_projects_by_org))
 }
 
-/// Tallies a single user's projects by `ProjectStatus`. Shared by the
-/// single- and multi-user project-status-count endpoints.
-async fn user_project_status_counts<'a, E>(
+/// Groups the given User projects by their `ProjectStatus`.
+async fn user_projects_status_grouped<'a, E>(
     user_id: database::models::DBUserId,
     pool: E,
     redis: &RedisPool,
-) -> Result<HashMap<ProjectStatus, u32>, ApiError>
+) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
 where
     E: database::Executor<'a, Database = sqlx::Postgres>
     + database::Acquire<'a, Database = sqlx::Postgres>
     + Copy,
 {
     let project_ids =
-        models::DBUser::get_projects(user_id, pool, redis)
+        database::models::DBUser::get_projects(user_id, pool, redis)
             .await
             .wrap_internal_err("fetching user's projects from database")?;
 
-    project_status_counts_for(&project_ids, pool, redis).await
+    grouped_projects_for(&project_ids, pool, redis).await
 }
 
 
-// Tallies a single organization's projects by `ProjectStatus`. Shared by
-/// the single- and multi-organization project-status-count endpoints.
-async fn organization_project_status_counts<'a, E>(
+/// Groups the given Organization projects by their `ProjectStatus`.
+async fn organization_projects_status_grouped<'a, E>(
     organization_id: DBOrganizationId,
     pool: E,
     redis: &RedisPool,
-) -> Result<HashMap<ProjectStatus, u32>, ApiError>
+) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
 where
     E: database::Executor<'a, Database = sqlx::Postgres>
     + database::Acquire<'a, Database = sqlx::Postgres>
@@ -1937,16 +1934,15 @@ where
         .await
         .wrap_internal_err("fetching project IDs from database")?;
 
-    project_status_counts_for(&project_ids, pool, redis).await
+    grouped_projects_for(&project_ids, pool, redis).await
 }
 
-/// Tallies `ProjectStatus` counts across the given projects. Shared by the
-/// user- and organization-scoped project-status-count helpers above.
-async fn project_status_counts_for<'a, E>(
+/// Groups the given input Projects by their `ProjectStatus`.
+async fn grouped_projects_for<'a, E>(
     project_ids: &[DBProjectId],
     pool: E,
     redis: &RedisPool,
-) -> Result<HashMap<ProjectStatus, u32>, ApiError>
+) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
 where
     E: database::Executor<'a, Database = sqlx::Postgres>
     + database::Acquire<'a, Database = sqlx::Postgres>
@@ -1961,10 +1957,10 @@ where
             .await
             .wrap_internal_err("fetching projects from database")?;
 
-    let mut counts = HashMap::new();
+    let mut grouped_projects = HashMap::new();
     for project in &projects {
-        *counts.entry(project.inner.status).or_insert(0u32) += 1;
+        *grouped_projects.entry(project.inner.status).or_default().push(project.inner.id.into());
     }
 
-    Ok(counts)
+    Ok(grouped_projects)
 }
