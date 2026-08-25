@@ -42,12 +42,6 @@ fn validate_group_name(name: &str) -> crate::Result<&str> {
         ))
         .into());
     }
-    if name.eq_ignore_ascii_case("none") {
-        return Err(crate::ErrorKind::InputError(
-            "Group name cannot be None".to_string(),
-        )
-        .into());
-    }
     Ok(name)
 }
 

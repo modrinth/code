@@ -641,9 +641,7 @@ async function createCustomGroup() {
 function validateCustomGroupName(value: string) {
 	const normalizedGroupName = value.trim()
 	return (
-		normalizedGroupName.length > 0 &&
-		normalizedGroupName.length <= MAX_INSTANCE_GROUP_NAME_LENGTH &&
-		normalizedGroupName.toLocaleLowerCase() !== 'none'
+		normalizedGroupName.length > 0 && normalizedGroupName.length <= MAX_INSTANCE_GROUP_NAME_LENGTH
 	)
 }
 
