@@ -731,9 +731,21 @@ async function renameCustomGroup(groupId: string | null | undefined, name: strin
 	}
 }
 
-function requestCustomGroupDeletion(groupId: string) {
-	customGroupToDelete.value = customGroups.value.find((group) => group.id === groupId)
-	if (customGroupToDelete.value) deleteGroupModal.value?.show()
+async function requestCustomGroupDeletion(groupId: string) {
+	const group = customGroups.value.find((candidate) => candidate.id === groupId)
+	if (!group) return
+
+	customGroupToDelete.value = group
+	try {
+		const allScreenshots = await list_all_screenshots()
+		if (allScreenshots.some((screenshot) => screenshot.group_id === groupId)) {
+			deleteGroupModal.value?.show()
+		} else {
+			await deleteCustomGroup()
+		}
+	} catch (error) {
+		handleError(error)
+	}
 }
 
 async function deleteCustomGroup() {
