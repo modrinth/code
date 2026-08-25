@@ -26,7 +26,8 @@ CREATE TABLE screenshot_groups (
 	name TEXT NOT NULL,
 	display_order INTEGER NOT NULL DEFAULT 0,
 
-	PRIMARY KEY (id)
+	PRIMARY KEY (id),
+	CHECK (length(trim(name)) > 0)
 );
 
 CREATE INDEX screenshot_groups_display_order

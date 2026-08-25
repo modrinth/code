@@ -484,6 +484,20 @@ pub async fn save_edited_screenshot(
         .to_string();
 
     io::write(&target_path, png_bytes).await?;
+    if !copy_group {
+        let (file_size, content_hash) = sha1_file_async(&target_path).await?;
+        let file_size = i64::try_from(file_size).map_err(|_| {
+            crate::ErrorKind::InputError(
+                "Screenshot is too large to index".to_string(),
+            )
+        })?;
+        let mut source_row = source_row.clone();
+        source_row.content_hash = content_hash;
+        source_row.file_size = file_size;
+        let mut tx = state.pool.begin().await?;
+        screenshot_rows::update_screenshot(&source_row, &mut tx).await?;
+        tx.commit().await?;
+    }
     let scanned = scan_source_screenshots(&state, &source).await?;
     let reconciled =
         reconcile_source_screenshots(&state, &source, scanned).await?;
@@ -684,104 +698,130 @@ async fn reconcile_source_screenshots(
 ) -> crate::Result<Vec<InstanceScreenshot>> {
     let existing =
         screenshot_rows::list_screenshots(&source.id, &state.pool).await?;
-    let mut existing_by_name = existing
-        .into_iter()
-        .map(|row| (row.file_name.clone(), row))
+    let existing_by_name = existing
+        .iter()
+        .map(|row| (row.file_name.as_str(), row))
         .collect::<HashMap<_, _>>();
+    let metadata_matches = existing.len() == scanned.len()
+        && scanned.iter().all(|scanned| {
+            existing_by_name
+                .get(scanned.file_name.as_str())
+                .is_some_and(|row| {
+                    row.file_size == scanned.file_size
+                        && row.modified_at == scanned.modified_at
+                        && row.created_at
+                            == scanned.created_at.timestamp_millis()
+                })
+        });
+    let mut unmatched_by_hash =
+        HashMap::<(String, i64), Vec<ScreenshotRow>>::new();
     let mut resolved = Vec::with_capacity(scanned.len());
-    let mut unmatched_scanned = Vec::new();
 
-    for scanned in scanned {
-        let Some(mut row) = existing_by_name.remove(&scanned.file_name) else {
-            unmatched_scanned.push(scanned);
-            continue;
-        };
-        let metadata_changed = row.file_size != scanned.file_size
-            || row.modified_at != scanned.modified_at
-            || row.created_at != scanned.created_at.timestamp_millis();
-        if metadata_changed {
-            let (_, hash) = sha1_file_async(&scanned.path).await?;
-            if hash != row.content_hash {
-                row.editor_state = None;
-            }
-            row.content_hash = hash;
+    if metadata_matches {
+        let mut existing_by_name = existing
+            .into_iter()
+            .map(|row| (row.file_name.clone(), row))
+            .collect::<HashMap<_, _>>();
+        for scanned in scanned {
+            let row = existing_by_name.remove(&scanned.file_name).ok_or_else(
+                || {
+                    crate::ErrorKind::InputError(
+                        "Screenshot index changed during reconciliation"
+                            .to_string(),
+                    )
+                },
+            )?;
+            resolved.push(ResolvedScreenshot {
+                scanned,
+                row,
+                is_new: false,
+                changed: false,
+            });
+        }
+    } else {
+        for row in existing {
+            unmatched_by_hash
+                .entry((row.content_hash.clone(), row.file_size))
+                .or_default()
+                .push(row);
+        }
+
+        for mut scanned in scanned {
+            let (file_size, content_hash) =
+                sha1_file_async(&scanned.path).await?;
+            scanned.file_size = i64::try_from(file_size).map_err(|_| {
+                crate::ErrorKind::InputError(
+                    "Screenshot is too large to index".to_string(),
+                )
+            })?;
+            let hash_key = (content_hash.clone(), scanned.file_size);
+            let matched =
+                unmatched_by_hash.get_mut(&hash_key).and_then(|rows| {
+                    if rows.is_empty() {
+                        return None;
+                    }
+                    let created_at = scanned.created_at.timestamp_millis();
+                    let index = rows
+                        .iter()
+                        .position(|row| row.file_name == scanned.file_name)
+                        .or_else(|| {
+                            rows.iter().position(|row| {
+                                row.modified_at == scanned.modified_at
+                                    && row.created_at == created_at
+                            })
+                        })
+                        .unwrap_or(rows.len() - 1);
+                    Some(rows.swap_remove(index))
+                });
+            let (mut row, is_new) = match matched {
+                Some(row) => (row, false),
+                None => (
+                    ScreenshotRow {
+                        id: Uuid::new_v4().to_string(),
+                        instance_id: source.id.clone(),
+                        file_name: scanned.file_name.clone(),
+                        content_hash: content_hash.clone(),
+                        file_size: scanned.file_size,
+                        modified_at: scanned.modified_at,
+                        created_at: scanned.created_at.timestamp_millis(),
+                        original_screenshot_id: None,
+                        editor_state: None,
+                        original_instance_id: None,
+                        group_id: None,
+                    },
+                    true,
+                ),
+            };
+            let changed = !is_new
+                && (row.file_name != scanned.file_name
+                    || row.modified_at != scanned.modified_at
+                    || row.created_at != scanned.created_at.timestamp_millis());
+            row.instance_id.clone_from(&source.id);
+            row.file_name.clone_from(&scanned.file_name);
+            row.content_hash = content_hash;
             row.file_size = scanned.file_size;
             row.modified_at = scanned.modified_at;
             row.created_at = scanned.created_at.timestamp_millis();
+            resolved.push(ResolvedScreenshot {
+                scanned,
+                row,
+                is_new,
+                changed,
+            });
         }
-        resolved.push(ResolvedScreenshot {
-            scanned,
-            row,
-            is_new: false,
-            changed: metadata_changed,
-        });
-    }
-
-    let mut unmatched_by_hash =
-        HashMap::<(String, i64), Vec<ScreenshotRow>>::new();
-    for row in existing_by_name.into_values() {
-        unmatched_by_hash
-            .entry((row.content_hash.clone(), row.file_size))
-            .or_default()
-            .push(row);
-    }
-
-    for scanned in unmatched_scanned {
-        let (file_size, content_hash) = sha1_file_async(&scanned.path).await?;
-        let file_size = i64::try_from(file_size).map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Screenshot is too large to index".to_string(),
-            )
-        })?;
-        let hash_key = (content_hash.clone(), file_size);
-        let matched = unmatched_by_hash.get_mut(&hash_key).and_then(|rows| {
-            if rows.is_empty() {
-                return None;
-            }
-            let created_at = scanned.created_at.timestamp_millis();
-            let index = rows
-                .iter()
-                .position(|row| {
-                    row.modified_at == scanned.modified_at
-                        && row.created_at == created_at
-                })
-                .unwrap_or(rows.len() - 1);
-            Some(rows.swap_remove(index))
-        });
-        let (mut row, is_new) = match matched {
-            Some(row) => (row, false),
-            None => (
-                ScreenshotRow {
-                    id: Uuid::new_v4().to_string(),
-                    instance_id: source.id.clone(),
-                    file_name: scanned.file_name.clone(),
-                    content_hash: content_hash.clone(),
-                    file_size,
-                    modified_at: scanned.modified_at,
-                    created_at: scanned.created_at.timestamp_millis(),
-                    original_screenshot_id: None,
-                    editor_state: None,
-                    original_instance_id: None,
-                    group_id: None,
-                },
-                true,
-            ),
-        };
-        row.instance_id.clone_from(&source.id);
-        row.file_name.clone_from(&scanned.file_name);
-        row.content_hash = content_hash;
-        row.file_size = file_size;
-        row.modified_at = scanned.modified_at;
-        row.created_at = scanned.created_at.timestamp_millis();
-        resolved.push(ResolvedScreenshot {
-            scanned,
-            row,
-            is_new,
-            changed: !is_new,
-        });
     }
 
     let mut tx = state.pool.begin().await?;
+    for row in unmatched_by_hash.into_values().flatten() {
+        screenshot_rows::delete_screenshot(&row.id, &mut tx).await?;
+    }
+    for screenshot in &resolved {
+        if !screenshot.is_new && screenshot.changed {
+            let mut row = screenshot.row.clone();
+            row.file_name = Uuid::new_v4().to_string();
+            screenshot_rows::update_screenshot(&row, &mut tx).await?;
+        }
+    }
     for screenshot in &resolved {
         if screenshot.is_new {
             screenshot_rows::insert_screenshot(&screenshot.row, &mut tx)
@@ -790,9 +830,6 @@ async fn reconcile_source_screenshots(
             screenshot_rows::update_screenshot(&screenshot.row, &mut tx)
                 .await?;
         }
-    }
-    for row in unmatched_by_hash.into_values().flatten() {
-        screenshot_rows::delete_screenshot(&row.id, &mut tx).await?;
     }
     tx.commit().await?;
 
