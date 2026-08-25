@@ -134,6 +134,9 @@ importers:
       '@vueuse/core':
         specifier: ^11.1.0
         version: 11.3.0(vue@3.5.27(typescript@5.9.3))
+      ace-builds:
+        specifier: ^1.43.5
+        version: 1.43.6
       dayjs:
         specifier: ^1.11.10
         version: 1.11.19
@@ -173,6 +176,9 @@ importers:
       vue-virtual-scroller:
         specifier: v2.0.0-beta.8
         version: 2.0.0-beta.8(vue@3.5.27(typescript@5.9.3))
+      vue3-ace-editor:
+        specifier: ^2.2.4
+        version: 2.2.4(ace-builds@1.43.6)(vue@3.5.27(typescript@5.9.3))
       vuedraggable:
         specifier: ^4.1.0
         version: 4.1.0(vue@3.5.27(typescript@5.9.3))
