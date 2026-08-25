@@ -4037,6 +4037,12 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "You already have another {platform} link."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Please select a platform for this Donation link."
+  },
   "project.settings.monetization.description": {
     "message": "Projects on Modrinth are automatically enrolled in the <rewards-program-link>Rewards Program</rewards-program-link>. If you don't want to (or can't for legal reasons) earn revenue from this project, you can turn it off here."
   },
@@ -4240,6 +4246,15 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Upload versions before adding tags"
+  },
+  "project.text-validation.non-standard-text": {
+    "message": "Non-standard text characters are not allowed."
+  },
+  "project.text-validation.profanity": {
+    "message": "Profanity is not allowed."
+  },
+  "project.text-validation.slur": {
+    "message": "Slurs are not allowed."
   },
   "project.versions.copy-id-option": {
     "message": "Copy ID"
