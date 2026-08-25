@@ -26,7 +26,9 @@ use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::ip::client_ip;
 use crate::util::neverbounce::{check_email, email_check_error_generic};
-use crate::util::usercheck::{DecisionAction, check_email_gate};
+use crate::util::usercheck::{
+    DecisionAction, check_email_gate, gate_block_error,
+};
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
 use actix_web::http::StatusCode;
@@ -1910,7 +1912,7 @@ async fn ensure_email_passes_gate(
         .wrap_request_err("checking email address")?;
 
     if action == DecisionAction::Block {
-        return Err(ApiError::Request(email_check_error_generic()));
+        return Err(ApiError::Request(gate_block_error()));
     }
 
     Ok(())

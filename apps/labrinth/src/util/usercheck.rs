@@ -174,6 +174,12 @@ pub async fn check_email_gate(
     Ok(action)
 }
 
+pub fn gate_block_error() -> eyre::Error {
+    eyre!(
+        "Please try a different email address, or turn off any VPN or proxy services!"
+    )
+}
+
 async fn request_decision(
     email: &str,
     ip: Option<&str>,
