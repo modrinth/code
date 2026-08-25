@@ -41,10 +41,6 @@ const messages = defineMessages({
 	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
 	edited: { id: 'app.screenshots.edited', defaultMessage: 'Edited' },
 	moreActions: { id: 'app.screenshots.more-actions', defaultMessage: 'More actions' },
-	instanceAndTime: {
-		id: 'app.screenshots.card.instance-and-time',
-		defaultMessage: '{instance} · {time}',
-	},
 })
 
 const sensors = [
@@ -168,14 +164,7 @@ watch(
 					{{ screenshot.file_name }}
 				</div>
 				<div class="truncate text-xs text-secondary">
-					{{
-						showInstanceName
-							? formatMessage(messages.instanceAndTime, {
-									instance: screenshot.instance_name,
-									time: formatTime(screenshot.created_at),
-								})
-							: formatTime(screenshot.created_at)
-					}}
+					{{ showInstanceName ? screenshot.instance_name : formatTime(screenshot.created_at) }}
 				</div>
 			</div>
 			<div
