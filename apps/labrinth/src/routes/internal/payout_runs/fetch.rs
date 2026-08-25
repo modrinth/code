@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use actix_web::{HttpRequest, get, web};
 use chrono::{Months, NaiveDate, Utc};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -40,7 +41,14 @@ pub struct PayoutRunPeriod {
     pub period: YearMonth,
     pub status: PayoutPeriodStatus,
     pub days: Vec<PayoutRunDay>,
-    pub adjustments: Vec<Adjustment>,
+    /// Sum of all adjustments applied on top of actual revenue.
+    #[serde(with = "rust_decimal::serde::float")]
+    pub total_adjustments: Decimal,
+    /// Individual adjustments, including their admin-provided descriptions.
+    ///
+    /// Only visible to admins.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub adjustments: Option<Vec<Adjustment>>,
 }
 
 /// Has revenue been distributed for a specific payout period month yet?
@@ -83,7 +91,7 @@ pub async fn get_runs(
     aditude: web::Data<aditude::Client>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<PayoutRuns>, ApiError> {
-    let show_adjustment_descriptions = get_user_from_headers(
+    let is_admin = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -93,20 +101,29 @@ pub async fn get_runs(
     .await
     .is_ok_and(|(_, user)| user.role.is_admin());
     let now = Utc::now();
-    let latest_payout_value = sqlx::query_scalar!(
+    let current_date = aditude::phoenix_date(now);
+    let first_period_date = sqlx::query_scalar!(
         r#"
-        SELECT MAX(created)
-        FROM payouts_values
+        SELECT LEAST(
+            COALESCE(
+                (SELECT MAX(created)::date FROM payouts_values),
+                $1
+            ),
+            COALESCE(
+                (SELECT MIN(period) FROM payout_periods),
+                $1
+            ),
+            $1
+        ) AS "first_period!"
         "#,
+        current_date,
     )
     .fetch_one(&**pool)
     .await
-    .wrap_internal_err("fetching latest payout value")?
-    .unwrap_or(now)
-    .min(now);
+    .wrap_internal_err("fetching first payout period")?;
 
-    let current_period = YearMonth::from_day1(now.date_naive());
-    let mut period = YearMonth::from_day1(latest_payout_value.date_naive());
+    let current_period = YearMonth::from_day1(current_date);
+    let mut period = YearMonth::from_day1(first_period_date);
     let mut requested_periods = Vec::new();
 
     while period <= current_period {
@@ -130,6 +147,15 @@ pub async fn get_runs(
             .into_iter()
             .map(|period| (period.period, period))
             .collect::<HashMap<_, _>>();
+    let newest_stored_day = sqlx::query_scalar!(
+        r#"
+        SELECT MAX(date)
+        FROM payout_period_days
+        "#,
+    )
+    .fetch_one(&**pool)
+    .await
+    .wrap_internal_err("fetching newest stored payout period day")?;
     let stored_variances = DBPayoutVariance::get_all(&**pool)
         .await
         .wrap_internal_err("fetching payout variances")?;
@@ -147,26 +173,54 @@ pub async fn get_runs(
             })
             .collect(),
     };
-    let estimates =
-        estimate(aditude.get_ref(), redis.get_ref(), &requested_periods)
+    let live_periods = requested_periods
+        .iter()
+        .copied()
+        .filter(|period| {
+            stored_periods
+                .get(&period.date())
+                .is_none_or(|stored| stored.days.is_empty())
+        })
+        .collect::<Vec<_>>();
+    let mut live_estimates =
+        if let Some(first_live_period) = live_periods.first() {
+            let start_date = newest_stored_day
+                .unwrap_or_else(|| first_live_period.date())
+                .min(current_date);
+            estimate(
+                aditude.get_ref(),
+                redis.get_ref(),
+                &live_periods,
+                start_date,
+                current_date,
+            )
             .await
-            .wrap_internal_err("fetching payout estimates")?;
+            .wrap_internal_err("fetching payout estimates")?
+            .into_iter()
+            .map(|estimate| (estimate.period, estimate))
+            .collect::<HashMap<_, _>>()
+        } else {
+            HashMap::new()
+        };
 
-    let periods = estimates
+    let periods = requested_periods
         .into_iter()
-        .map(|estimate| -> Result<_, ApiError> {
-            if let Some(period) = stored_periods.get(&estimate.period.date()) {
-                let mut adjustments =
+        .map(|requested_period| -> Result<_, ApiError> {
+            if let Some(period) = stored_periods
+                .get(&requested_period.date())
+                .filter(|period| !period.days.is_empty())
+            {
+                let period_adjustments =
                     if let Some(payload) = &period.active_run_payload {
-                        payload.adjustments.clone()
+                        &payload.adjustments
                     } else {
-                        period.adjustments.clone()
+                        &period.adjustments
                     };
-                if !show_adjustment_descriptions {
-                    for adjustment in &mut adjustments {
-                        adjustment.description = None;
-                    }
-                }
+                let total_adjustments = period_adjustments
+                    .iter()
+                    .map(|adjustment| adjustment.amount_usd)
+                    .sum();
+                let adjustments = is_admin.then(|| period_adjustments.clone());
                 let total_estimated_revenue_usd = period
                     .days
                     .iter()
@@ -212,14 +266,18 @@ pub async fn get_runs(
                 };
 
                 Ok(PayoutRunPeriod {
-                    period: estimate.period,
+                    period: requested_period,
                     status,
                     days,
+                    total_adjustments,
                     adjustments,
                 })
             } else {
+                let estimate = live_estimates
+                    .remove(&requested_period)
+                    .wrap_internal_err("missing live payout estimate")?;
                 let status = if let Some(available_at) =
-                    net_60_payout_available_at(estimate.period)
+                    net_60_payout_available_at(requested_period)
                     && now >= available_at
                 {
                     PayoutPeriodStatus::InReview
@@ -242,10 +300,11 @@ pub async fn get_runs(
                     .collect();
 
                 Ok(PayoutRunPeriod {
-                    period: estimate.period,
+                    period: requested_period,
                     status,
                     days,
-                    adjustments: Vec::new(),
+                    total_adjustments: Decimal::ZERO,
+                    adjustments: is_admin.then(Vec::new),
                 })
             }
         })

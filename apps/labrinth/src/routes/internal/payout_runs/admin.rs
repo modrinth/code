@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, post, web};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Months, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -133,10 +133,21 @@ pub async fn start_run(
         )));
     }
 
-    let mut estimates =
-        estimate(aditude.get_ref(), redis.get_ref(), &[body.period])
-            .await
-            .wrap_internal_err("fetching payout estimate")?;
+    let estimate_end_date = body
+        .period
+        .date()
+        .checked_add_months(Months::new(1))
+        .and_then(|date| date.pred_opt())
+        .wrap_internal_err("calculating payout estimate end date")?;
+    let mut estimates = estimate(
+        aditude.get_ref(),
+        redis.get_ref(),
+        &[body.period],
+        body.period.date(),
+        estimate_end_date,
+    )
+    .await
+    .wrap_internal_err("fetching payout estimate")?;
     let estimate = estimates
         .pop()
         .wrap_internal_err("missing requested payout estimate")?;
