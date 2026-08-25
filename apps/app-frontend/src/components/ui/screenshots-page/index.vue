@@ -196,7 +196,7 @@ const messages = defineMessages({
 	newest: { id: 'app.screenshots.sort.newest', defaultMessage: 'Newest' },
 	oldest: { id: 'app.screenshots.sort.oldest', defaultMessage: 'Oldest' },
 	name: { id: 'app.screenshots.sort.name', defaultMessage: 'Name' },
-	custom: { id: 'app.screenshots.group.custom', defaultMessage: 'Custom grouping' },
+	custom: { id: 'app.screenshots.group.custom', defaultMessage: 'Custom group' },
 	instance: { id: 'app.screenshots.group.instance', defaultMessage: 'Instance' },
 	date: { id: 'app.screenshots.group.date', defaultMessage: 'Date' },
 	none: { id: 'app.screenshots.group.none', defaultMessage: 'No grouping' },
