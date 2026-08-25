@@ -19,6 +19,7 @@ const props = defineProps<{
 	canDrag: boolean
 	showInstanceName: boolean
 	highlighted: boolean
+	copied: boolean
 }>()
 
 const emit = defineEmits<{
@@ -36,6 +37,7 @@ const messages = defineMessages({
 	select: { id: 'app.screenshots.select', defaultMessage: 'Select {name}' },
 	deselect: { id: 'app.screenshots.deselect', defaultMessage: 'Deselect {name}' },
 	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
+	copied: { id: 'app.screenshots.copied', defaultMessage: 'Copied' },
 	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
 	edited: { id: 'app.screenshots.edited', defaultMessage: 'Edited' },
 	moreActions: { id: 'app.screenshots.more-actions', defaultMessage: 'More actions' },
@@ -191,13 +193,14 @@ watch(
 					<EditIcon />
 				</IconButton>
 				<IconButton
-					v-tooltip="formatMessage(messages.copy)"
-					:label="formatMessage(messages.copy)"
+					v-tooltip="formatMessage(copied ? messages.copied : messages.copy)"
+					:label="formatMessage(copied ? messages.copied : messages.copy)"
 					type="quiet"
 					class="bg-surface-2 text-contrast hover:bg-surface-3"
 					@click="emit('copy')"
 				>
-					<ClipboardCopyIcon />
+					<CheckIcon v-if="copied" class="text-green" />
+					<ClipboardCopyIcon v-else />
 				</IconButton>
 				<IconButton
 					v-tooltip="formatMessage(messages.moreActions)"

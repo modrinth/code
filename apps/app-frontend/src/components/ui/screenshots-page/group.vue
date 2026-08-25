@@ -21,6 +21,7 @@ const props = defineProps<{
 	dropCustomGroupId?: string
 	showInstanceName: boolean
 	highlightedScreenshotId?: string
+	copiedScreenshotIds: ReadonlySet<string>
 	forceOpen: boolean
 	animateEntry: boolean
 	hideHeader?: boolean
@@ -112,6 +113,7 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 					:can-drag="canDrag"
 					:show-instance-name="showInstanceName"
 					:highlighted="highlightedScreenshotId === screenshot.id"
+					:copied="copiedScreenshotIds.has(screenshot.id)"
 					@activate="(event) => emit('activate', screenshot, event)"
 					@toggle-selection="emit('toggle-selection', screenshot)"
 					@copy="emit('copy', screenshot)"
