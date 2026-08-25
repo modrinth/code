@@ -79,7 +79,17 @@ const messages = defineMessages({
 					/>
 				</template>
 				<template #selected="{ label }">
-					<span>{{ label }}</span>
+					<span class="grid">
+						<span class="col-start-1 row-start-1">{{ label }}</span>
+						<span
+							v-for="option in groupOptions"
+							:key="option.value"
+							aria-hidden="true"
+							class="invisible col-start-1 row-start-1 whitespace-nowrap"
+						>
+							{{ option.label }}
+						</span>
+					</span>
 				</template>
 			</Combobox>
 		</div>
