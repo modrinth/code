@@ -18,6 +18,9 @@ pub enum ProjectDisclosure {
         note: Option<String>,
         uses: BTreeSet<AiUsages>,
     },
+    AiFunctionality {
+        note: Option<String>,
+    },
     Advertisements {
         note: Option<String>,
     },
@@ -161,7 +164,6 @@ pub enum AiUsages {
     Code,
     Assets,
     Text,
-    Functionality,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, IntoStaticStr)]
