@@ -99,7 +99,7 @@ function activate(event: MouseEvent | KeyboardEvent) {
 		<button
 			v-if="screenshot.original_screenshot_id"
 			type="button"
-			class="absolute left-2 top-2 z-[3] flex cursor-pointer items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-1/90 px-2 py-1 text-xs font-semibold text-contrast shadow-sm backdrop-blur hover:bg-surface-2"
+			class="absolute left-2 top-2 z-[3] flex cursor-pointer items-center gap-1 rounded-full border border-solid border-brand bg-highlight-green px-2 py-1 text-xs font-semibold text-brand shadow-sm transition-[filter] hover:brightness-125"
 			@click.stop="emit('show-original')"
 		>
 			<EditIcon class="size-3.5" />
