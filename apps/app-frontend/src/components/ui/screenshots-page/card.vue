@@ -95,9 +95,9 @@ watch(
 		ref="card"
 		role="button"
 		tabindex="0"
-		class="group relative aspect-video min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition hover:border-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+		class="group relative aspect-video min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition-[filter] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
 		:class="{
-			'!border-contrast': selected,
+			'!border-contrast brightness-110': selected,
 			'!border-brand ring-2 ring-brand animate-pulse': highlighted,
 			'opacity-50': activeDragged,
 			'cursor-grab active:cursor-grabbing': canDrag,
