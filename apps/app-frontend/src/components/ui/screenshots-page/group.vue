@@ -22,6 +22,7 @@ const props = defineProps<{
 	showInstanceName: boolean
 	highlightedScreenshotId?: string
 	forceOpen: boolean
+	animateEntry: boolean
 	hideHeader?: boolean
 	editableTitle?: boolean
 	startEditingTitle?: boolean
@@ -92,8 +93,12 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 				tag="div"
 				class="grid min-h-[45px] w-full grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4"
 				move-class="transition-transform duration-200 ease-out motion-reduce:transition-none"
-				enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
-				enter-from-class="opacity-0"
+				:enter-active-class="
+					animateEntry
+						? 'transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none'
+						: ''
+				"
+				:enter-from-class="animateEntry ? 'opacity-0' : ''"
 				enter-to-class="opacity-100 scale-100"
 			>
 				<ScreenshotCard

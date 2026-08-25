@@ -145,6 +145,8 @@ const legacyCustomGrouping = useStorage<LegacyCustomScreenshotGrouping>(
 	},
 )
 const selectedKeys = ref(new Set<string>())
+const screenshotsPage = ref<HTMLElement>()
+const regrouping = ref(false)
 const screenshotToDelete = ref<InstanceScreenshot | null>(null)
 const deleteFromPreview = ref(false)
 const activeDrag = ref<ActiveScreenshotDrag | null>(null)
@@ -538,10 +540,17 @@ watch(screenshots, (currentScreenshots) => {
 	selectedKeys.value = new Set([...selectedKeys.value].filter((key) => currentKeys.has(key)))
 })
 
-watch(groupBy, (currentGroupBy) => {
+watch(groupBy, async (currentGroupBy, previousGroupBy) => {
 	if (currentGroupBy !== 'custom') {
 		groupIdPendingNameEdit.value = undefined
 	}
+	if (currentGroupBy === previousGroupBy) return
+
+	const previousPositions = getScreenshotCardPositions()
+	regrouping.value = true
+	await nextTick()
+	animateScreenshotCardsFrom(previousPositions)
+	regrouping.value = false
 })
 
 let handledFocus: string | undefined
@@ -576,6 +585,42 @@ useAppEvent('instance', (event) => {
 
 function getSelectionKey(screenshot: InstanceScreenshot) {
 	return JSON.stringify([screenshot.instance_id, screenshot.file_name])
+}
+
+function getScreenshotCardPositions() {
+	const positions = new Map<string, DOMRect>()
+	const cards =
+		screenshotsPage.value?.querySelectorAll<HTMLElement>('[data-screenshot-card]') ?? []
+	for (const card of cards) {
+		const selectionKey = card.dataset.selectionKey
+		if (selectionKey) positions.set(selectionKey, card.getBoundingClientRect())
+	}
+	return positions
+}
+
+function animateScreenshotCardsFrom(previousPositions: Map<string, DOMRect>) {
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+	const cards =
+		screenshotsPage.value?.querySelectorAll<HTMLElement>('[data-screenshot-card]') ?? []
+	for (const card of cards) {
+		const selectionKey = card.dataset.selectionKey
+		const previousPosition = selectionKey ? previousPositions.get(selectionKey) : undefined
+		if (!previousPosition) continue
+
+		const currentPosition = card.getBoundingClientRect()
+		const translateX = previousPosition.left - currentPosition.left
+		const translateY = previousPosition.top - currentPosition.top
+		if (translateX === 0 && translateY === 0) continue
+
+		card.animate(
+			[
+				{ transform: `translate(${translateX}px, ${translateY}px)` },
+				{ transform: 'translate(0, 0)' },
+			],
+			{ duration: 200, easing: 'ease-out' },
+		)
+	}
 }
 
 function getScreenshotKey(screenshot: InstanceScreenshot): ScreenshotKey {
@@ -1189,6 +1234,7 @@ onBeforeUnmount(() => {
 	</ScreenshotPreviewModal>
 
 	<div
+		ref="screenshotsPage"
 		class="flex h-full w-full flex-col gap-5"
 		:class="{ 'justify-center': screenshots.length === 0 && !groupIdPendingNameEdit }"
 	>
@@ -1258,6 +1304,7 @@ onBeforeUnmount(() => {
 						:drop-custom-group-id="group.customGroupId ?? undefined"
 						:show-instance-name="isGlobal && groupBy !== 'instance'"
 						:highlighted-screenshot-id="highlightedScreenshotId"
+						:animate-entry="!regrouping"
 						:force-open="search.length > 0"
 						:hide-header="groupBy === 'none'"
 						:editable-title="Boolean(group.customGroupId)"

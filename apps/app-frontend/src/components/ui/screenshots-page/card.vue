@@ -1,8 +1,12 @@
+<script lang="ts">
+const loadedScreenshotUrls = new Set<string>()
+</script>
+
 <script setup lang="ts">
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, ClipboardCopyIcon, EditIcon, MoreHorizontalIcon } from '@modrinth/assets'
 import { defineMessages, IconButton, useFormatDateTime, useVIntl } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import type { InstanceScreenshot } from '@/helpers/instance'
 
@@ -24,7 +28,8 @@ const emit = defineEmits<{
 }>()
 
 const card = ref<HTMLElement>()
-const loaded = ref(false)
+const image = ref<HTMLImageElement>()
+const loaded = ref(loadedScreenshotUrls.has(props.screenshot.url))
 const { formatMessage } = useVIntl()
 const formatTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
 const messages = defineMessages({
@@ -67,6 +72,22 @@ function activate(event: MouseEvent | KeyboardEvent) {
 	}
 	emit('activate', event)
 }
+
+function markImageLoaded() {
+	loadedScreenshotUrls.add(props.screenshot.url)
+	loaded.value = true
+}
+
+onMounted(() => {
+	if (image.value?.complete && image.value.naturalWidth > 0) markImageLoaded()
+})
+
+watch(
+	() => props.screenshot.url,
+	(url) => {
+		loaded.value = loadedScreenshotUrls.has(url)
+	},
+)
 </script>
 
 <template>
@@ -128,13 +149,14 @@ function activate(event: MouseEvent | KeyboardEvent) {
 		</button>
 		<div v-if="!loaded" class="absolute inset-0 animate-pulse bg-surface-3" />
 		<img
+			ref="image"
 			:src="screenshot.url"
 			:alt="screenshot.file_name"
 			loading="lazy"
 			draggable="false"
 			class="h-full w-full object-cover transition duration-200"
 			:class="loaded ? 'opacity-100' : 'opacity-0'"
-			@load="loaded = true"
+			@load="markImageLoaded"
 		/>
 		<div
 			class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-surface-1 to-transparent p-3 pt-[120px] text-contrast opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
