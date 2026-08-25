@@ -25,7 +25,7 @@ const emit = defineEmits<{
 
 const { formatMessage } = useVIntl()
 
-const AI_USES: AiUsage[] = ['code', 'assets', 'text', 'functionality']
+const AI_USES: AiUsage[] = ['code', 'assets', 'text']
 
 const messages = defineMessages({
 	title: {
@@ -35,9 +35,8 @@ const messages = defineMessages({
 	description: {
 		id: 'project.settings.disclosures.ai.description',
 		defaultMessage: `You must enable this if this project contains a substantial amount of AI-generated code, any
-				assets that are substantially AI-generated, the project's functionality relies on the use of
-				generative AI, or if any element of your project's page such as description or publishing
-				relies on generative AI.`,
+				assets that are substantially AI-generated, or if any element of your project's page such as
+				description or publishing relies on generative AI.`,
 	},
 	contentRules: {
 		id: 'project.settings.disclosures.ai.content-rules',

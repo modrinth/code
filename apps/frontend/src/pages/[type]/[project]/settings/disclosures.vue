@@ -22,6 +22,7 @@ import { computed, watch } from 'vue'
 import {
 	AdvertisingDisclosureCard,
 	AiDisclosureCard,
+	AiFunctionalityDisclosureCard,
 	ArchivedDisclosureCard,
 	DerivativeDisclosureCard,
 	type DisclosureFormIssue,
@@ -291,6 +292,14 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 					v-bind="disclosureUpdateProps('ai_content')"
 					@set-lock-status="
 						(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_content', status)
+					"
+				/>
+				<AiFunctionalityDisclosureCard
+					v-if="isDisclosureVisible('ai_functionality')"
+					v-model="current.aiFunctionality"
+					v-bind="disclosureUpdateProps('ai_functionality')"
+					@set-lock-status="
+						(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_functionality', status)
 					"
 				/>
 				<AdvertisingDisclosureCard

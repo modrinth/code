@@ -3839,11 +3839,20 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Contains advertisements"
   },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Placeholder description."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "e.g. This project includes an in-game assistant powered by a generative AI API."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Contains generative AI functionality"
+  },
   "project.settings.disclosures.ai.content-rules": {
     "message": "Please refer to Section 6 of <rules>Modrinth's Content Rules</rules> for more information."
   },
   "project.settings.disclosures.ai.description": {
-    "message": "You must enable this if this project contains a substantial amount of AI-generated code, any\n\t\t\t\tassets that are substantially AI-generated, the project's functionality relies on the use of\n\t\t\t\tgenerative AI, or if any element of your project's page such as description or publishing\n\t\t\t\trelies on generative AI."
+    "message": "You must enable this if this project contains a substantial amount of AI-generated code, any\n\t\t\t\tassets that are substantially AI-generated, or if any element of your project's page such as\n\t\t\t\tdescription or publishing relies on generative AI."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "e.g. The Chinese and Arabic translations are AI-generated."

@@ -1,6 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArchiveIcon,
+	BrainCircuitIcon,
 	CircleDollarSignIcon,
 	CircuitBoardIcon,
 	ClientIcon,
@@ -224,6 +225,7 @@ export type DisclosureTypeFilter = Labrinth.Projects.v3.ProjectDisclosureType
 
 const DISCLOSURE_TYPE_ICONS: Record<DisclosureTypeFilter, Component> = {
 	ai_content: SparklesIcon,
+	ai_functionality: BrainCircuitIcon,
 	advertisements: MegaphoneIcon,
 	epilepsy_triggers: EyeIcon,
 	system_interactions: CircuitBoardIcon,
@@ -252,6 +254,13 @@ export function formatDisclosureTypeLabel(
 				defineMessage({
 					id: 'search.filter_type.advanced.disclosure.ai_content',
 					defaultMessage: 'AI-generated content',
+				}),
+			)
+		case 'ai_functionality':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.ai_functionality',
+					defaultMessage: 'Generative AI functionality',
 				}),
 			)
 		case 'advertisements':

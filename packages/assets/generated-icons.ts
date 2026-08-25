@@ -61,6 +61,7 @@ import _BoxIcon from './icons/box.svg?component'
 import _BoxImportIcon from './icons/box-import.svg?component'
 import _BoxesIcon from './icons/boxes.svg?component'
 import _BracesIcon from './icons/braces.svg?component'
+import _BrainCircuitIcon from './icons/brain-circuit.svg?component'
 import _BrushCleaningIcon from './icons/brush-cleaning.svg?component'
 import _BugIcon from './icons/bug.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
@@ -505,6 +506,7 @@ export const BoxIcon = _BoxIcon
 export const BoxImportIcon = _BoxImportIcon
 export const BoxesIcon = _BoxesIcon
 export const BracesIcon = _BracesIcon
+export const BrainCircuitIcon = _BrainCircuitIcon
 export const BrushCleaningIcon = _BrushCleaningIcon
 export const BugIcon = _BugIcon
 export const CalendarIcon = _CalendarIcon

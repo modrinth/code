@@ -1304,7 +1304,7 @@ export namespace Labrinth {
 
 			export type TelemetryConsent = 'opt_in' | 'opt_out' | 'always_active'
 
-			export type AiUsage = 'code' | 'assets' | 'text' | 'functionality'
+			export type AiUsage = 'code' | 'assets' | 'text'
 
 			export type DisclosureLockStatus = 'unlocked' | 'cannot_disable' | 'fully_locked'
 
@@ -1318,6 +1318,10 @@ export namespace Labrinth {
 				| {
 						type: 'ai_content'
 						uses: AiUsage[]
+						note?: string | null
+				  }
+				| {
+						type: 'ai_functionality'
 						note?: string | null
 				  }
 				| {
