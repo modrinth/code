@@ -23,7 +23,7 @@ onActivated(breadcrumb.reset)
 </script>
 
 <template>
-	<div class="p-6">
+	<div class="box-border h-full p-6">
 		<ScreenshotsPage show-heading />
 	</div>
 </template>

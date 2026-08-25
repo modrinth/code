@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { SpinnerIcon } from '@modrinth/assets'
 import { defineMessages, injectNotificationManager, Toggle, useVIntl } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useRoute, useRouter } from 'vue-router'
@@ -20,7 +19,7 @@ const router = useRouter()
 const messages = defineMessages({
 	description: {
 		id: 'instance.settings.tabs.synced-options.description',
-		defaultMessage: 'Choose which content from this instance appears across the app.',
+		defaultMessage: 'Override synced options for this instance.',
 	},
 	screenshots: {
 		id: 'instance.settings.tabs.synced-options.screenshots',
@@ -33,9 +32,46 @@ const messages = defineMessages({
 	},
 })
 
+function setScreenshotsSynced(enabled: boolean) {
+	const updateInstance = (current: GameInstance | undefined) =>
+		current
+			? {
+					...current,
+					synced_options: { ...current.synced_options, screenshots: enabled },
+				}
+			: current
+
+	queryClient.setQueryData<GameInstance>(instanceKeys.detail(instance.value.id), updateInstance)
+	queryClient.setQueryData<GameInstance[]>(instanceKeys.list(), (instances) =>
+		instances?.map((candidate) =>
+			candidate.id === instance.value.id ? updateInstance(candidate)! : candidate,
+		),
+	)
+}
+
+let saveQueue = Promise.resolve()
+let latestMutationId = 0
+
+function saveScreenshotsSynced(enabled: boolean) {
+	const instanceId = instance.value.id
+	const save = saveQueue.then(() => set_synced_option(instanceId, 'screenshots', enabled))
+	saveQueue = save.then(
+		() => undefined,
+		() => undefined,
+	)
+	return save
+}
+
 const mutation = useMutation({
-	mutationFn: (enabled: boolean) => set_synced_option(instance.value.id, 'screenshots', enabled),
-	onSuccess: async (updatedInstance) => {
+	mutationFn: saveScreenshotsSynced,
+	onMutate: (enabled) => {
+		const mutationId = ++latestMutationId
+		setScreenshotsSynced(enabled)
+		return { mutationId }
+	},
+	onSuccess: async (updatedInstance, _enabled, context) => {
+		if (context?.mutationId !== latestMutationId) return
+
 		queryClient.setQueryData(instanceKeys.detail(updatedInstance.id), updatedInstance)
 		queryClient.setQueryData<GameInstance[]>(instanceKeys.list(), (instances) =>
 			instances?.map((candidate) =>
@@ -48,7 +84,16 @@ const mutation = useMutation({
 			await router.replace(`/instance/${encodeURIComponent(updatedInstance.id)}`)
 		}
 	},
-	onError: handleError,
+	onError: async (error, _enabled, context) => {
+		handleError(error)
+		if (context?.mutationId !== latestMutationId) return
+
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: instanceKeys.detail(instance.value.id) }),
+			queryClient.invalidateQueries({ queryKey: instanceKeys.list() }),
+			queryClient.invalidateQueries({ queryKey: screenshotKeys.all }),
+		])
+	},
 })
 </script>
 
@@ -64,12 +109,10 @@ const mutation = useMutation({
 					{{ formatMessage(messages.screenshotsDescription) }}
 				</p>
 			</div>
-			<div class="flex shrink-0 items-center gap-2">
-				<SpinnerIcon v-if="mutation.isPending.value" class="size-5 animate-spin" />
+			<div class="flex shrink-0 items-center">
 				<Toggle
 					id="sync-screenshots"
 					:model-value="instance.synced_options.screenshots"
-					:disabled="mutation.isPending.value"
 					@update:model-value="mutation.mutate"
 				/>
 			</div>

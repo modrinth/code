@@ -90,7 +90,7 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 			</template>
 			<TransitionGroup
 				tag="div"
-				class="grid min-h-[45px] w-full grid-cols-[repeat(auto-fill,minmax(min(15rem,100%),1fr))] gap-3 overflow-y-auto scroll-smooth"
+				class="grid min-h-[45px] w-full grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4"
 				move-class="transition-transform duration-200 ease-out motion-reduce:transition-none"
 				enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
 				enter-from-class="opacity-0"

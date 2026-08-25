@@ -227,6 +227,7 @@ async function show(nextScreenshot: InstanceScreenshot) {
 	screenshot.value = nextScreenshot
 	closingAfterSave.value = false
 	modal.value?.show()
+	listenForKeyboard()
 	await nextTick()
 	if (!canvasElement.value) return
 
@@ -238,7 +239,6 @@ async function show(nextScreenshot: InstanceScreenshot) {
 		})
 		await initialize(canvasElement.value, nextScreenshot, editorData)
 		observeViewport()
-		listenForKeyboard()
 	} catch (error) {
 		handleError(error)
 		modal.value?.hide()
@@ -350,14 +350,30 @@ function handleKeyup(event: KeyboardEvent) {
 	if (event.code === 'Space') spacePressed.value = false
 }
 
+function handleEditMenuUndo(event: Event) {
+	if (isTextEditing() || isTypingTarget(document.activeElement)) return
+	event.preventDefault()
+	void undo()
+}
+
+function handleEditMenuRedo(event: Event) {
+	if (isTextEditing() || isTypingTarget(document.activeElement)) return
+	event.preventDefault()
+	void redo()
+}
+
 function listenForKeyboard() {
 	document.addEventListener('keydown', handleKeydown)
 	document.addEventListener('keyup', handleKeyup)
+	document.addEventListener('edit-menu:undo', handleEditMenuUndo)
+	document.addEventListener('edit-menu:redo', handleEditMenuRedo)
 }
 
 function unlistenForKeyboard() {
 	document.removeEventListener('keydown', handleKeydown)
 	document.removeEventListener('keyup', handleKeyup)
+	document.removeEventListener('edit-menu:undo', handleEditMenuUndo)
+	document.removeEventListener('edit-menu:redo', handleEditMenuRedo)
 }
 
 function startPan(event: PointerEvent) {
@@ -550,10 +566,10 @@ defineExpose({ show, hide, markSavedAndHide })
 
 				<div class="ml-auto flex items-center gap-1">
 					<IconButton
+						v-if="canDelete"
 						v-tooltip="formatMessage(messages.deleteSelection)"
 						:label="formatMessage(messages.deleteSelection)"
 						type="quiet"
-						:disabled="!canDelete"
 						@click="deleteSelection"
 					>
 						<TrashIcon />

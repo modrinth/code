@@ -58,6 +58,7 @@ import { renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { convertFileSrc, invoke } from '@tauri-apps/api/core'
+import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -448,7 +449,24 @@ const authUnreachable = computed(() => {
 	return false
 })
 
+let unlistenEditMenu
+
+function handleEditMenuAction(action) {
+	const event = new CustomEvent(`edit-menu:${action}`, { cancelable: true })
+	if (document.dispatchEvent(event)) document.execCommand(action)
+}
+
 onMounted(async () => {
+	try {
+		const listeners = await Promise.all([
+			listen('edit-menu://undo', () => handleEditMenuAction('undo')),
+			listen('edit-menu://redo', () => handleEditMenuAction('redo')),
+		])
+		unlistenEditMenu = () => listeners.forEach((unlisten) => unlisten())
+	} catch (error) {
+		handleError(error)
+	}
+
 	await useCheckDisableMouseover()
 	try {
 		handleAdsConsentRequired(await should_show_ads_consent_popup())
@@ -467,6 +485,7 @@ onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 	document.removeEventListener('fullscreenchange', handleFullscreenChange)
+	unlistenEditMenu?.()
 	clearDelayedUpdatePopup()
 
 	if (fullscreenAdsWindowHold) {

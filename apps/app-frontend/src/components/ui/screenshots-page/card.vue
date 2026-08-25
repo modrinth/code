@@ -132,7 +132,7 @@ function activate(event: MouseEvent | KeyboardEvent) {
 			:alt="screenshot.file_name"
 			loading="lazy"
 			draggable="false"
-			class="h-full w-full object-cover transition duration-200 group-hover:scale-[1.02]"
+			class="h-full w-full object-cover transition duration-200"
 			:class="loaded ? 'opacity-100' : 'opacity-0'"
 			@load="loaded = true"
 		/>
