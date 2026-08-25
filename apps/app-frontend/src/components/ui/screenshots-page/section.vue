@@ -125,6 +125,7 @@ watch(
 			ref="accordion"
 			:open-by-default="hideHeader || !props.collapsed"
 			:force-open="forceOpen"
+			overflow-visible
 			class="w-full"
 			@on-open="emit('update:collapsed', false)"
 			@on-close="emit('update:collapsed', true)"
