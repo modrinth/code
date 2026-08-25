@@ -12,9 +12,7 @@
 				ref="create-project-version-modal"
 			></CreateProjectVersionModal>
 
-			<ProjectC2paScanModal
-				ref="project-c2pa-scan-modal"
-			></ProjectC2paScanModal>
+			<ProjectC2paScanModal ref="project-c2pa-scan-modal"></ProjectC2paScanModal>
 
 			<ConfirmModal
 				v-if="currentMember"
@@ -295,10 +293,10 @@ import {
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	ScanEyeIcon,
 	ShareIcon,
 	SpinnerIcon,
 	TrashIcon,
-	ScanEyeIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import {
