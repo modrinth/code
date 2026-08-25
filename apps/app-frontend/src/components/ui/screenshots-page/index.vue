@@ -13,7 +13,10 @@ import {
 	EditIcon,
 	FileArchiveIcon,
 	FolderOpenIcon,
+	MinusIcon,
+	SquarePlusIcon,
 	TrashIcon,
+	XIcon,
 } from '@modrinth/assets'
 import {
 	Button,
@@ -155,6 +158,8 @@ const deleteGroupModal = ref<InstanceType<typeof ConfirmModal>>()
 const customGroupToDelete = ref<ScreenshotGroup>()
 const groupIdPendingNameEdit = ref<string>()
 const migratingLegacyGroups = ref(false)
+const creatingCustomGroup = ref(false)
+const updatingCustomGroupMemberships = ref(false)
 const revealedScreenshotId = ref<string>()
 const highlightedScreenshotId = ref<string>()
 const queryClient = useQueryClient()
@@ -239,6 +244,11 @@ const messages = defineMessages({
 		defaultMessage: '{count} selected',
 	},
 	exportZip: { id: 'app.screenshots.selection.export-zip', defaultMessage: 'Export ZIP' },
+	newGroup: { id: 'app.screenshots.group.new', defaultMessage: 'New group' },
+	removeFromGroup: {
+		id: 'app.screenshots.selection.remove-from-group',
+		defaultMessage: 'Remove from group',
+	},
 	zipArchive: { id: 'app.screenshots.selection.zip-archive', defaultMessage: 'ZIP archive' },
 	globalExportFilename: {
 		id: 'app.screenshots.selection.global-export-filename',
@@ -291,6 +301,9 @@ const screenshotsError = computed(() => {
 const selectionActive = computed(() => selectedKeys.value.size > 0)
 const selectedScreenshots = computed(() =>
 	screenshots.value.filter((screenshot) => selectedKeys.value.has(getSelectionKey(screenshot))),
+)
+const selectedGroupedScreenshots = computed(() =>
+	selectedScreenshots.value.filter((screenshot) => screenshot.group_id),
 )
 const activeDraggedKeys = computed(() => new Set(activeDrag.value?.selectionKeys ?? []))
 const activeDraggedScreenshots = computed(() => {
@@ -515,7 +528,9 @@ const bulkBusy = computed(
 	() =>
 		deleteMutation.isPending.value ||
 		exportMutation.isPending.value ||
-		moveMutation.isPending.value,
+		moveMutation.isPending.value ||
+		creatingCustomGroup.value ||
+		updatingCustomGroupMemberships.value,
 )
 
 watch(screenshots, (currentScreenshots) => {
@@ -617,6 +632,8 @@ function getDefaultCustomGroupName() {
 }
 
 async function createCustomGroup() {
+	if (creatingCustomGroup.value) return
+	creatingCustomGroup.value = true
 	try {
 		const screenshotsToGroup = [...selectedScreenshots.value]
 		const group = await create_screenshot_group(
@@ -635,6 +652,8 @@ async function createCustomGroup() {
 		groupIdPendingNameEdit.value = group.id
 	} catch (error) {
 		handleError(error)
+	} finally {
+		creatingCustomGroup.value = false
 	}
 }
 
@@ -688,7 +707,8 @@ async function assignCustomGroup(
 	const movedScreenshots = screenshotsToMove.filter(
 		(screenshot) => (screenshot.group_id ?? null) !== customGroupId,
 	)
-	if (movedScreenshots.length === 0) return
+	if (movedScreenshots.length === 0 || updatingCustomGroupMemberships.value) return
+	updatingCustomGroupMemberships.value = true
 	try {
 		await set_screenshot_group_memberships(
 			movedScreenshots.map((screenshot) => ({
@@ -698,9 +718,16 @@ async function assignCustomGroup(
 		)
 		await invalidateScreenshots(movedScreenshots.map((screenshot) => screenshot.instance_id))
 		selectedKeys.value = new Set()
-	} catch {
-		return
+	} catch (error) {
+		handleError(error)
+	} finally {
+		updatingCustomGroupMemberships.value = false
 	}
+}
+
+function removeSelectedScreenshotsFromGroups() {
+	if (bulkBusy.value || selectedGroupedScreenshots.value.length === 0) return
+	void assignCustomGroup(selectedGroupedScreenshots.value, null)
 }
 
 function getDateGroup(createdAt: string): Omit<ScreenshotGroupData, 'screenshots'> {
@@ -1309,25 +1336,61 @@ onBeforeUnmount(() => {
 				{{ formatMessage(messages.selectedCount, { count: selectedKeys.size }) }}
 			</span>
 			<div class="mx-1 h-6 w-px bg-surface-5" />
-			<Button type="quiet" :disabled="bulkBusy" @click="clearSelection">
-				{{ formatMessage(commonMessages.clearButton) }}
+			<Button
+				v-tooltip="formatMessage(commonMessages.clearButton)"
+				type="quiet"
+				:aria-label="formatMessage(commonMessages.clearButton)"
+				:disabled="bulkBusy"
+				@click="clearSelection"
+			>
+				<XIcon class="hidden cq-show-icon" />
+				<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
 			</Button>
 		</div>
 		<div class="ml-auto flex items-center gap-0.5">
-			<Button type="quiet" :disabled="bulkBusy" @click="exportSelected">
+			<Button
+				v-tooltip="formatMessage(messages.newGroup)"
+				type="quiet"
+				:aria-label="formatMessage(messages.newGroup)"
+				:disabled="bulkBusy"
+				@click="createCustomGroup"
+			>
+				<SquarePlusIcon />
+				<span class="bar-label">{{ formatMessage(messages.newGroup) }}</span>
+			</Button>
+			<Button
+				v-if="selectedGroupedScreenshots.length > 0"
+				v-tooltip="formatMessage(messages.removeFromGroup)"
+				type="quiet"
+				:aria-label="formatMessage(messages.removeFromGroup)"
+				:disabled="bulkBusy"
+				@click="removeSelectedScreenshotsFromGroups"
+			>
+				<MinusIcon />
+				<span class="bar-label">{{ formatMessage(messages.removeFromGroup) }}</span>
+			</Button>
+			<Button
+				v-tooltip="formatMessage(messages.exportZip)"
+				type="quiet"
+				:aria-label="formatMessage(messages.exportZip)"
+				:disabled="bulkBusy"
+				@click="exportSelected"
+			>
 				<FileArchiveIcon />
-				<span>{{ formatMessage(messages.exportZip) }}</span>
+				<span class="bar-label">{{ formatMessage(messages.exportZip) }}</span>
 			</Button>
 			<div class="mx-1 h-6 w-px bg-surface-5" />
 			<Button
+				v-tooltip="formatMessage(commonMessages.deleteLabel)"
 				type="quiet"
 				color="red"
 				interaction="filled"
+				:aria-label="formatMessage(commonMessages.deleteLabel)"
 				:disabled="bulkBusy"
 				@click="bulkDeleteModal?.show()"
 			>
 				<TrashIcon />
-				<span>{{ formatMessage(commonMessages.deleteLabel) }}</span>
+				<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
 			</Button>
 		</div>
 	</FloatingActionBar>
