@@ -1,3 +1,5 @@
+export type ImageViewerEditorMode = 'view' | 'edit'
+
 export type ScreenshotEditorTool =
 	| 'select'
 	| 'pen'

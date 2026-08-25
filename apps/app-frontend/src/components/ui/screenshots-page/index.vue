@@ -27,6 +27,8 @@ import {
 	EmptyState,
 	FloatingActionBar,
 	IconButton,
+	ImageViewerEditor,
+	type ImageViewerEditorSavePayload,
 	injectNotificationManager,
 	ReadyTransition,
 	useFormatDateTime,
@@ -73,9 +75,7 @@ import {
 
 import ScreenshotDragGather from './drag-gather.vue'
 import ScreenshotDragPreview from './drag-preview.vue'
-import ScreenshotEditorModal from './editor-modal.vue'
 import ScreenshotGroupSection from './group.vue'
-import ScreenshotPreviewModal from './preview-modal.vue'
 import ScreenshotToolbar from './toolbar.vue'
 import { type ActiveScreenshotDrag, useScreenshotDragGather } from './use-screenshot-drag-gather'
 
@@ -154,8 +154,7 @@ const screenshotToDelete = ref<InstanceScreenshot | null>(null)
 const deleteFromPreview = ref(false)
 const activeDrag = ref<ActiveScreenshotDrag | null>(null)
 const activeDropGroupId = ref<string | null>(null)
-const previewModal = ref<InstanceType<typeof ScreenshotPreviewModal>>()
-const editorModal = ref<InstanceType<typeof ScreenshotEditorModal>>()
+const imageViewer = ref<InstanceType<typeof ImageViewerEditor>>()
 const screenshotOptionsMenu = ref<InstanceType<typeof ContextMenu>>()
 const screenshotOptionsTarget = ref<InstanceScreenshot>()
 const deleteModal = ref<InstanceType<typeof ConfirmModal>>()
@@ -485,6 +484,11 @@ const previewItems = computed(() =>
 		src: screenshot.url,
 		alt: screenshot.file_name,
 		title: screenshot.file_name,
+		editorSource: {
+			id: getSelectionKey(screenshot),
+			path: screenshot.path,
+			isEdited: Boolean(screenshot.original_screenshot_id),
+		},
 		description: isGlobal.value
 			? formatMessage(messages.instanceAndDate, {
 					instance: screenshot.instance_name,
@@ -530,11 +534,23 @@ const saveEditMutation = useMutation({
 		),
 	onSuccess: async (saved) => {
 		await invalidateScreenshots([saved.instance_id])
-		await editorModal.value?.markSavedAndHide()
+		await imageViewer.value?.markSavedAndView(getSelectionKey(saved))
 		await revealScreenshot(saved.id)
 	},
 	onError: handleError,
 })
+
+function saveScreenshotEdit(payload: ImageViewerEditorSavePayload) {
+	const screenshot = screenshotBySelectionKey(payload.item.id)
+	if (!screenshot) return
+	saveEditMutation.mutate({
+		screenshot,
+		pngBytes: payload.pngBytes,
+		editorState: payload.editorState,
+		mode: payload.mode,
+	})
+}
+
 const bulkBusy = computed(
 	() =>
 		deleteMutation.isPending.value ||
@@ -598,8 +614,7 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 
 function getScreenshotCardPositions() {
 	const positions = new Map<string, DOMRect>()
-	const cards =
-		screenshotsPage.value?.querySelectorAll<HTMLElement>('[data-screenshot-card]') ?? []
+	const cards = screenshotsPage.value?.querySelectorAll<HTMLElement>('[data-screenshot-card]') ?? []
 	for (const card of cards) {
 		const selectionKey = card.dataset.selectionKey
 		if (selectionKey) positions.set(selectionKey, card.getBoundingClientRect())
@@ -610,8 +625,7 @@ function getScreenshotCardPositions() {
 function animateScreenshotCardsFrom(previousPositions: Map<string, DOMRect>) {
 	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-	const cards =
-		screenshotsPage.value?.querySelectorAll<HTMLElement>('[data-screenshot-card]') ?? []
+	const cards = screenshotsPage.value?.querySelectorAll<HTMLElement>('[data-screenshot-card]') ?? []
 	for (const card of cards) {
 		const selectionKey = card.dataset.selectionKey
 		const previousPosition = selectionKey ? previousPositions.get(selectionKey) : undefined
@@ -853,7 +867,7 @@ function activateScreenshot(screenshot: InstanceScreenshot, event: MouseEvent | 
 	const index = filteredScreenshots.value.findIndex(
 		(candidate) => getSelectionKey(candidate) === getSelectionKey(screenshot),
 	)
-	if (index >= 0) previewModal.value?.show(index)
+	if (index >= 0) imageViewer.value?.show(index)
 }
 
 function clearSelection() {
@@ -912,19 +926,16 @@ function requestPreviewDelete(selectionKey: string) {
 }
 
 function editScreenshot(screenshot: InstanceScreenshot) {
-	previewModal.value?.hide()
-	void editorModal.value?.show(screenshot)
-}
-
-function editScreenshotBySelectionKey(selectionKey: string) {
-	const screenshot = screenshotBySelectionKey(selectionKey)
-	if (screenshot) editScreenshot(screenshot)
+	const index = filteredScreenshots.value.findIndex(
+		(candidate) => getSelectionKey(candidate) === getSelectionKey(screenshot),
+	)
+	if (index >= 0) void imageViewer.value?.edit(index)
 }
 
 function showOriginalBySelectionKey(selectionKey: string) {
 	const screenshot = screenshotBySelectionKey(selectionKey)
 	if (!screenshot) return
-	previewModal.value?.hide()
+	imageViewer.value?.hide()
 	void showOriginal(screenshot)
 }
 
@@ -975,7 +986,7 @@ async function confirmDelete() {
 	if (!screenshot) return
 	try {
 		await deleteMutation.mutateAsync([getScreenshotKey(screenshot)])
-		if (deleteFromPreview.value) previewModal.value?.hide()
+		if (deleteFromPreview.value) imageViewer.value?.hide()
 		addNotification({ type: 'success', title: formatMessage(messages.deleteSuccess) })
 	} catch (error) {
 		handleError(error)
@@ -1205,11 +1216,6 @@ onBeforeUnmount(() => {
 		:markdown="false"
 		@proceed="deleteCustomGroup"
 	/>
-	<ScreenshotEditorModal
-		ref="editorModal"
-		:saving="saveEditMutation.isPending.value"
-		@save="saveEditMutation.mutate"
-	/>
 	<ContextMenu ref="screenshotOptionsMenu" @option-clicked="handleScreenshotOption">
 		<template #edit>
 			<EditIcon />
@@ -1238,19 +1244,19 @@ onBeforeUnmount(() => {
 			{{ formatMessage(commonMessages.deleteLabel) }}
 		</template>
 	</ContextMenu>
-	<ScreenshotPreviewModal ref="previewModal" :items="previewItems">
+	<ImageViewerEditor
+		ref="imageViewer"
+		:items="previewItems"
+		editor="enabled"
+		:saving="saveEditMutation.isPending.value"
+		@save="saveScreenshotEdit"
+	>
 		<template #actions="{ item }">
-			<IconButton
-				v-tooltip="formatMessage(messages.edit)"
-				:label="formatMessage(messages.edit)"
-				@click="editScreenshotBySelectionKey(item.id)"
-			>
-				<EditIcon />
-			</IconButton>
 			<IconButton
 				v-if="screenshotBySelectionKey(item.id)?.original_screenshot_id"
 				v-tooltip="formatMessage(messages.viewOriginal)"
 				:label="formatMessage(messages.viewOriginal)"
+				type="quiet"
 				@click="showOriginalBySelectionKey(item.id)"
 			>
 				<EditIcon />
@@ -1258,6 +1264,7 @@ onBeforeUnmount(() => {
 			<IconButton
 				v-tooltip="formatMessage(messages.copy)"
 				:label="formatMessage(messages.copy)"
+				type="quiet"
 				@click="copyScreenshotBySelectionKey(item.id)"
 			>
 				<ClipboardCopyIcon />
@@ -1265,6 +1272,7 @@ onBeforeUnmount(() => {
 			<IconButton
 				v-tooltip="formatMessage(messages.showInFolder)"
 				:label="formatMessage(messages.showInFolder)"
+				type="quiet"
 				@click="openScreenshotBySelectionKey(item.id)"
 			>
 				<FolderOpenIcon />
@@ -1272,12 +1280,13 @@ onBeforeUnmount(() => {
 			<IconButton
 				v-tooltip="formatMessage(commonMessages.deleteLabel)"
 				:label="formatMessage(commonMessages.deleteLabel)"
+				type="quiet"
 				@click="requestPreviewDelete(item.id)"
 			>
 				<TrashIcon />
 			</IconButton>
 		</template>
-	</ScreenshotPreviewModal>
+	</ImageViewerEditor>
 
 	<div
 		ref="screenshotsPage"
