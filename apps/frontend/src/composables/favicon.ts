@@ -1,9 +1,9 @@
-import { toValue, type MaybeRefOrGetter } from 'vue'
+import { type MaybeRefOrGetter, toValue } from 'vue'
 
 import {
+	type FaviconVariant,
 	getFaviconHeadLinks,
 	resolveFaviconEnvironment,
-	type FaviconVariant,
 } from '~/utils/favicon.ts'
 
 export function useFaviconEnvironment() {

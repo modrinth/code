@@ -4016,9 +4016,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
-  },
   "project.settings.monetization.description": {
     "message": "I progetti su Modrinth vengono automaticamente iscritti al <rewards-program-link>Programma Premi</rewards-program-link>. Se non vuoi guadagnare da questo progetto (o non puoi per motivi legali), puoi disattivarlo qui."
   },
