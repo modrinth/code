@@ -47,6 +47,7 @@ use futures_util::future::try_join_all;
 use ariadne::ids::UserId;
 use crate::database::models::{DBOrganization, DBOrganizationId};
 use crate::models::ids::OrganizationId;
+use crate::routes::v3::organizations::OrganizationIds;
 use crate::routes::v3::users::UserIds;
 
 pub mod global;
@@ -1626,11 +1627,6 @@ pub async fn get_user_flagged_projects(
     Ok(web::Json(flagged))
 }
 
-#[derive(Debug, Deserialize)]
-pub struct FlaggedProjectsIds {
-    pub ids: String,
-}
-
 /// Get all of multiple users' `processing`/`rejected` projects whose most
 /// recent `tech_review` thread message was an `unsafe` verdict. Users that
 /// don't exist are silently omitted from the response; users that exist
@@ -1645,7 +1641,7 @@ pub struct FlaggedProjectsIds {
 #[get("/users/flagged-projects")]
 pub async fn get_users_flagged_projects(
     req: HttpRequest,
-    ids: web::Query<FlaggedProjectsIds>,
+    ids: web::Query<UserIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -1743,7 +1739,7 @@ pub async fn get_organization_flagged_projects(
 #[get("/organizations/flagged-projects")]
 pub async fn get_organizations_flagged_projects(
     req: HttpRequest,
-    ids: web::Query<FlaggedProjectsIds>,
+    ids: web::Query<OrganizationIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,

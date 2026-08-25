@@ -211,7 +211,7 @@ impl DBOrganization {
         exec: E,
     ) -> Result<Vec<DBProjectId>, super::DatabaseError>
     where
-        E: database::Executor<'a, Database = sqlx::Postgres>,
+        E: crate::database::Executor<'a, crate::Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
