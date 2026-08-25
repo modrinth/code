@@ -700,9 +700,12 @@ export namespace Labrinth {
 				seconds: number
 			}
 
+			export type ProjectRevenueKind = 'estimated' | 'actual'
+
 			export type ProjectRevenue = {
 				user_id?: string
-				revenue: string
+				revenue_kind: ProjectRevenueKind
+				revenue: number
 			}
 
 			export type AffiliateCodeAnalytics = {
@@ -723,7 +726,7 @@ export namespace Labrinth {
 			}
 
 			export type AffiliateCodeRevenue = {
-				revenue: string
+				revenue: number
 			}
 		}
 	}

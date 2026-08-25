@@ -40,6 +40,7 @@ pub use project_playtime::{
 pub(crate) use project_revenue::fetch as fetch_project_revenue;
 pub use project_revenue::{
     ProjectRevenue, ProjectRevenueField, ProjectRevenueFilters,
+    ProjectRevenueKind,
 };
 pub(crate) use project_views::fetch as fetch_project_views;
 pub use project_views::{ProjectViews, ProjectViewsField, ProjectViewsFilters};

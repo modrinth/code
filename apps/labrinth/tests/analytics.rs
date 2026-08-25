@@ -1,16 +1,19 @@
+use actix_http::StatusCode;
+use actix_web::test;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Duration, Utc};
 use common::permissions::PermissionsTest;
 use common::permissions::PermissionsTestContext;
 use common::{
+    api_common::Api,
     api_v3::ApiV3,
     database::*,
     environment::{TestEnvironment, with_test_environment},
 };
-use itertools::Itertools;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::queue::payouts;
-use rust_decimal::{Decimal, prelude::ToPrimitive};
+use rust_decimal::Decimal;
+use serde_json::json;
 
 pub mod common;
 
@@ -19,8 +22,6 @@ pub async fn analytics_revenue() {
     with_test_environment(
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
-            let api = &test_env.api;
-
             let alpha_project_id =
                 test_env.dummy.project_alpha.project_id.clone();
 
@@ -71,86 +72,88 @@ pub async fn analytics_revenue() {
             .unwrap();
             transaction.commit().await.unwrap();
 
-            let day = 86400;
-
-            // Test analytics endpoint with default values
-            // - all time points in the last 2 weeks
-            // - 1 day resolution
-            let analytics = api
-                .get_analytics_revenue_deserialized(
-                    vec![&alpha_project_id],
-                    false,
-                    None,
-                    None,
-                    None,
-                    USER_USER_PAT,
+            sqlx::query!(
+                r#"
+                INSERT INTO payout_estimates (
+                    period,
+                    user_id,
+                    mod_id,
+                    amount,
+                    created,
+                    date_available
                 )
-                .await;
-            assert_eq!(analytics.len(), 1); // 1 project
-            let project_analytics = &analytics[&alpha_project_id];
-            assert_eq!(project_analytics.len(), 8); // 1 days cut off, and 2 points take place on the same day. note that the day exactly 14 days ago is included
-            // sorted_by_key, values in the order of smallest to largest key
-            let (sorted_keys, sorted_by_key): (Vec<i64>, Vec<Decimal>) =
-                project_analytics
-                    .iter()
-                    .sorted_by_key(|(k, _)| *k)
-                    .rev()
-                    .unzip();
-            assert_eq!(
-                vec![100.1, 101.0, 200.0, 311.0, 400.0, 526.0, 633.0, 800.0],
-                to_f64_vec_rounded_up(sorted_by_key)
-            );
-            // Ensure that the keys are in multiples of 1 day
-            for k in sorted_keys {
-                assert_eq!(k % day, 0);
-            }
+                VALUES ('2000-01-01', $1, $2, 75, $3, $4)
+                "#,
+                USER_USER_ID_PARSED,
+                project_id,
+                money_time_pairs[3].1,
+                Utc::now() + Duration::days(60),
+            )
+            .execute(&pool)
+            .await
+            .unwrap();
 
-            // Test analytics with last 900 days to include all data
-            // keep resolution at default
-            let analytics = api
-                .get_analytics_revenue_deserialized(
-                    vec![&alpha_project_id],
-                    false,
-                    Some(Utc::now() - Duration::days(801)),
-                    None,
-                    None,
-                    USER_USER_PAT,
-                )
-                .await;
-            let project_analytics = &analytics[&alpha_project_id];
-            assert_eq!(project_analytics.len(), 9); // and 2 points take place on the same day
-            let (sorted_keys, sorted_by_key): (Vec<i64>, Vec<Decimal>) =
-                project_analytics
-                    .iter()
-                    .sorted_by_key(|(k, _)| *k)
-                    .rev()
-                    .unzip();
-            assert_eq!(
-                vec![
-                    100.1, 101.0, 200.0, 311.0, 400.0, 526.0, 633.0, 800.0,
-                    800.0
-                ],
-                to_f64_vec_rounded_up(sorted_by_key)
-            );
-            for k in sorted_keys {
-                assert_eq!(k % day, 0);
-            }
+            let modern_request = test::TestRequest::post()
+                .uri("/v3/analytics")
+                .append_header(("Authorization", USER_USER_PAT.unwrap()))
+                .set_json(json!({
+                    "time_range": {
+                        "start": Utc::now() - Duration::days(801),
+                        "end": Utc::now() + Duration::days(1),
+                        "resolution": { "slices": 802 }
+                    },
+                    "return_metrics": {
+                        "project_revenue": {
+                            "bucket_by": [],
+                            "filter_by": {}
+                        }
+                    },
+                    "project_ids": [alpha_project_id]
+                }))
+                .to_request();
+            let modern_response = test_env.call(modern_request).await;
+            assert_status!(&modern_response, StatusCode::OK);
+            let modern_analytics: serde_json::Value =
+                test::read_body_json(modern_response).await;
+            let revenue_metrics = modern_analytics["metrics"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .flat_map(|slice| slice.as_array().unwrap())
+                .filter(|metric| metric["metric_kind"] == "revenue")
+                .collect::<Vec<_>>();
+
+            let actual_revenue = revenue_metrics
+                .iter()
+                .filter(|metric| metric["revenue_kind"] == "actual")
+                .map(|metric| metric["revenue"].as_f64().unwrap())
+                .sum::<f64>();
+            let estimated_revenue = revenue_metrics
+                .iter()
+                .filter(|metric| metric["revenue_kind"] == "estimated")
+                .map(|metric| metric["revenue"].as_f64().unwrap())
+                .sum::<f64>();
+
+            assert!((actual_revenue - 3871.1).abs() < 1e-9);
+            assert_eq!(estimated_revenue, 75.0);
+
+            let shared_time_slice = modern_analytics["metrics"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|slice| slice.as_array().unwrap())
+                .find(|slice| {
+                    slice
+                        .iter()
+                        .any(|metric| metric["revenue_kind"] == "actual")
+                        && slice
+                            .iter()
+                            .any(|metric| metric["revenue_kind"] == "estimated")
+                });
+            assert!(shared_time_slice.is_some());
         },
     )
     .await;
-}
-
-fn to_f64_rounded_up(d: Decimal) -> f64 {
-    d.round_dp_with_strategy(
-        1,
-        rust_decimal::RoundingStrategy::MidpointAwayFromZero,
-    )
-    .to_f64()
-    .unwrap()
-}
-
-fn to_f64_vec_rounded_up(d: Vec<Decimal>) -> Vec<f64> {
-    d.into_iter().map(to_f64_rounded_up).collect_vec()
 }
 
 #[actix_rt::test]
@@ -158,29 +161,54 @@ pub async fn permissions_analytics_revenue() {
     with_test_environment(
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
-            let alpha_project_id =
-                test_env.dummy.project_alpha.project_id.clone();
-            let alpha_version_id =
-                test_env.dummy.project_alpha.version_id.clone();
-            let alpha_team_id = test_env.dummy.project_alpha.team_id.clone();
-
             let api = &test_env.api;
+            let pool = &test_env.db.pool;
 
             let view_analytics = ProjectPermissions::VIEW_ANALYTICS;
 
             // first, do check with a project
             let req_gen = |ctx: PermissionsTestContext| async move {
                 let project_id = ctx.project_id.unwrap();
-                let ids_or_slugs = vec![project_id.as_str()];
-                api.get_analytics_revenue(
-                    ids_or_slugs,
-                    false,
-                    None,
-                    None,
-                    Some(5),
-                    ctx.test_pat.as_deref(),
+                let project_id_i64 = parse_base62(&project_id).unwrap() as i64;
+                sqlx::query!(
+                    r#"
+                    INSERT INTO payout_estimates (
+                        period,
+                        user_id,
+                        mod_id,
+                        amount,
+                        created,
+                        date_available
+                    )
+                    VALUES ('2000-01-01', $1, $2, 1, NOW(), NOW())
+                    ON CONFLICT DO NOTHING
+                    "#,
+                    USER_USER_ID_PARSED,
+                    project_id_i64,
                 )
+                .execute(pool)
                 .await
+                .unwrap();
+                let mut request = test::TestRequest::post()
+                    .uri("/v3/analytics")
+                    .set_json(json!({
+                        "time_range": {
+                            "start": Utc::now() - Duration::days(1),
+                            "end": Utc::now() + Duration::days(1),
+                            "resolution": { "slices": 5 }
+                        },
+                        "return_metrics": {
+                            "project_revenue": {
+                                "bucket_by": [],
+                                "filter_by": {}
+                            }
+                        },
+                        "project_ids": [project_id]
+                    }));
+                if let Some(pat) = ctx.test_pat {
+                    request = request.append_header(("Authorization", pat));
+                }
+                api.call(request.to_request()).await
             };
 
             PermissionsTest::new(&test_env)
@@ -188,51 +216,13 @@ pub async fn permissions_analytics_revenue() {
                 .with_200_json_checks(
                     // On failure, should have 0 projects returned
                     |value: &serde_json::Value| {
-                        let value = value.as_object().unwrap();
+                        let value = value["projects"].as_object().unwrap();
                         assert_eq!(value.len(), 0);
                     },
                     // On success, should have 1 project returned
                     |value: &serde_json::Value| {
-                        let value = value.as_object().unwrap();
+                        let value = value["projects"].as_object().unwrap();
                         assert_eq!(value.len(), 1);
-                    },
-                )
-                .simple_project_permissions_test(view_analytics, req_gen)
-                .await
-                .unwrap();
-
-            // Now with a version
-            // Need to use alpha
-            let req_gen = |ctx: PermissionsTestContext| {
-                let alpha_version_id = alpha_version_id.clone();
-                async move {
-                    let ids_or_slugs = vec![alpha_version_id.as_str()];
-                    api.get_analytics_revenue(
-                        ids_or_slugs,
-                        true,
-                        None,
-                        None,
-                        Some(5),
-                        ctx.test_pat.as_deref(),
-                    )
-                    .await
-                }
-            };
-
-            PermissionsTest::new(&test_env)
-                .with_failure_codes(vec![200, 401])
-                .with_existing_project(&alpha_project_id, &alpha_team_id)
-                .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
-                .with_200_json_checks(
-                    // On failure, should have 0 versions returned
-                    |value: &serde_json::Value| {
-                        let value = value.as_object().unwrap();
-                        assert_eq!(value.len(), 0);
-                    },
-                    // On success, should have 1 versions returned
-                    |value: &serde_json::Value| {
-                        let value = value.as_object().unwrap();
-                        assert_eq!(value.len(), 0);
                     },
                 )
                 .simple_project_permissions_test(view_analytics, req_gen)

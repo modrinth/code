@@ -519,7 +519,7 @@ export function computeTotals(
 					totals.playtime += dataPoint.seconds
 					break
 				case 'revenue': {
-					const value = Number.parseFloat(dataPoint.revenue)
+					const value = dataPoint.revenue
 					totals.revenue += Number.isFinite(value) ? value : 0
 					break
 				}

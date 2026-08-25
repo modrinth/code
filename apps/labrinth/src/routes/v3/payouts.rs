@@ -1027,10 +1027,19 @@ pub async fn payment_methods(
 
 #[derive(Serialize, utoipa::ToSchema)]
 pub struct UserBalance {
+    /// Finalized revenue currently available to withdraw.
     pub available: Decimal,
     pub withdrawn_lifetime: Decimal,
     pub withdrawn_ytd: Decimal,
+    /// Finalized revenue not yet available and provisional creator estimates.
+    ///
+    /// Provisional estimates remain pending regardless of their estimated
+    /// availability date and may change before finalization.
     pub pending: Decimal,
+    /// Revenue grouped by its finalized or estimated availability date.
+    ///
+    /// These groups may include provisional creator estimates that can change
+    /// before finalization.
     pub dates: HashMap<DateTime<Utc>, Decimal>,
 }
 
@@ -1114,27 +1123,46 @@ async fn get_user_balance(
     pool: &PgPool,
 ) -> Result<UserBalance, ApiError> {
     let payouts = sqlx::query!(
-        "
-        SELECT date_available, SUM(amount) sum
-        FROM payouts_values
-        WHERE user_id = $1
+        r#"
+        SELECT
+            date_available AS "date_available!",
+            SUM(amount) FILTER (WHERE NOT provisional) finalized_sum,
+            SUM(amount) FILTER (WHERE provisional) estimate_sum
+        FROM (
+            SELECT date_available, amount, FALSE provisional
+            FROM payouts_values
+            WHERE user_id = $1
+
+            UNION ALL
+
+            SELECT date_available, amount, TRUE provisional
+            FROM payout_estimates
+            WHERE user_id = $1
+        ) payout_amounts
         GROUP BY date_available
         ORDER BY date_available DESC
-        ",
+        "#,
         user_id.0
     )
     .fetch_all(pool)
     .await
     .wrap_internal_err("fetching payouts from database")?;
 
+    let now = Utc::now();
     let available = payouts
         .iter()
-        .filter(|x| x.date_available <= Utc::now())
-        .fold(Decimal::ZERO, |acc, x| acc + x.sum.unwrap_or(Decimal::ZERO));
-    let pending = payouts
-        .iter()
-        .filter(|x| x.date_available > Utc::now())
-        .fold(Decimal::ZERO, |acc, x| acc + x.sum.unwrap_or(Decimal::ZERO));
+        .filter(|x| x.date_available <= now)
+        .fold(Decimal::ZERO, |acc, x| {
+            acc + x.finalized_sum.unwrap_or(Decimal::ZERO)
+        });
+    let pending = payouts.iter().fold(Decimal::ZERO, |acc, x| {
+        let finalized = if x.date_available > now {
+            x.finalized_sum.unwrap_or(Decimal::ZERO)
+        } else {
+            Decimal::ZERO
+        };
+        acc + finalized + x.estimate_sum.unwrap_or(Decimal::ZERO)
+    });
 
     let withdrawn = sqlx::query!(
         "
@@ -1168,7 +1196,13 @@ async fn get_user_balance(
         pending,
         dates: payouts
             .iter()
-            .map(|x| (x.date_available, x.sum.unwrap_or(Decimal::ZERO)))
+            .map(|x| {
+                (
+                    x.date_available,
+                    x.finalized_sum.unwrap_or(Decimal::ZERO)
+                        + x.estimate_sum.unwrap_or(Decimal::ZERO),
+                )
+            })
             .collect(),
     })
 }

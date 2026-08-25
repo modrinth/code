@@ -1072,6 +1072,7 @@ mod tests {
                     source_project: test_project_3,
                     metrics: ProjectMetrics::Revenue(ProjectRevenue {
                         user_id: None,
+                        revenue_kind: ProjectRevenueKind::Actual,
                         revenue: Decimal::new(20000, 2),
                     }),
                 })]),
@@ -1100,7 +1101,8 @@ mod tests {
                     {
                         "source_project": test_project_3.to_string(),
                         "metric_kind": "revenue",
-                        "revenue": "200.00",
+                        "revenue_kind": "actual",
+                        "revenue": 200.0,
                     }
                 ]
             ],

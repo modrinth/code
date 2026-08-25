@@ -40,6 +40,8 @@ pub struct AffiliateCodeRevenueFilters {
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct AffiliateCodeRevenue {
     /// Total revenue for this bucket.
+    #[serde(with = "rust_decimal::serde::float")]
+    #[schema(value_type = f64)]
     pub revenue: Decimal,
 }
 

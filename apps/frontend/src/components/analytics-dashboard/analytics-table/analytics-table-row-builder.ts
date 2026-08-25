@@ -337,7 +337,7 @@ function addAnalyticsMetricToTableRow(
 			row.playtime += point.seconds
 			break
 		case 'revenue': {
-			const parsed = Number.parseFloat(point.revenue)
+			const parsed = point.revenue
 			row.revenue += Number.isFinite(parsed) ? parsed : 0
 			break
 		}

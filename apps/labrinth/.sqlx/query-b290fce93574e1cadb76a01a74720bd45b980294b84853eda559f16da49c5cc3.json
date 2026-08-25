@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            WIDTH_BUCKET(\n                EXTRACT(EPOCH FROM created)::bigint,\n                EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,\n                EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,\n                $3::integer\n            ) AS \"bucket?\",\n            mod_id AS \"mod_id?\",\n            CASE\n                WHEN $5 AND ($6 OR mod_id = ANY($7)) THEN user_id\n                ELSE 0\n            END AS \"user_id?\",\n            estimated AS \"estimated!\",\n            SUM(amount) AS \"amount_sum?\"\n        FROM (\n            SELECT user_id, mod_id, amount, created, FALSE AS estimated\n            FROM payouts_values\n            WHERE mod_id IS NOT NULL\n\n            UNION ALL\n\n            SELECT user_id, mod_id, amount, created, TRUE AS estimated\n            FROM payout_estimates\n        ) creator_revenue\n        WHERE\n            -- only project revenue is counted here\n            -- for affiliate code revenue, see `affiliate_code_revenue`\n            creator_revenue.mod_id = ANY($4)\n            AND created >= $1\n            AND created < $2\n        GROUP BY 1, 2, 3, 4\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "bucket?",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "user_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "estimated!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "amount_sum?",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Timestamptz",
+        "Int4",
+        "Int8Array",
+        "Bool",
+        "Bool",
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "b290fce93574e1cadb76a01a74720bd45b980294b84853eda559f16da49c5cc3"
+}

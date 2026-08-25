@@ -39,13 +39,29 @@ pub enum ProjectRevenueField {
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectRevenueFilters {}
 
+/// Whether project revenue is provisional or finalized.
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectRevenueKind {
+    /// Provisional revenue which can change before finalization.
+    Estimated,
+    /// Finalized creator revenue.
+    Actual,
+}
+
 /// [`super::ReturnMetrics::project_revenue`].
-#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectRevenue {
     /// User these metrics are for.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_id: Option<UserId>,
+    /// Whether this revenue is estimated or actual.
+    pub revenue_kind: ProjectRevenueKind,
     /// Total revenue for this bucket.
+    #[serde(with = "rust_decimal::serde::float")]
+    #[schema(value_type = f64)]
     pub(crate) revenue: Decimal,
 }
 
@@ -76,16 +92,25 @@ pub(crate) async fn fetch(
                 WHEN $5 AND ($6 OR mod_id = ANY($7)) THEN user_id
                 ELSE 0
             END AS "user_id?",
+            estimated AS "estimated!",
             SUM(amount) AS "amount_sum?"
-        FROM payouts_values
+        FROM (
+            SELECT user_id, mod_id, amount, created, FALSE AS estimated
+            FROM payouts_values
+            WHERE mod_id IS NOT NULL
+
+            UNION ALL
+
+            SELECT user_id, mod_id, amount, created, TRUE AS estimated
+            FROM payout_estimates
+        ) creator_revenue
         WHERE
             -- only project revenue is counted here
             -- for affiliate code revenue, see `affiliate_code_revenue`
-            payouts_values.mod_id IS NOT NULL
-            AND payouts_values.mod_id = ANY($4)
+            creator_revenue.mod_id = ANY($4)
             AND created >= $1
             AND created < $2
-        GROUP BY 1, 2, 3
+        GROUP BY 1, 2, 3, 4
         "#,
         req.time_range.start,
         req.time_range.end,
@@ -126,6 +151,11 @@ pub(crate) async fn fetch(
                             .filter(|id| bucket_by_user_id && *id != 0)
                             .map(DBUserId)
                             .map(UserId::from),
+                        revenue_kind: if row.estimated {
+                            ProjectRevenueKind::Estimated
+                        } else {
+                            ProjectRevenueKind::Actual
+                        },
                         revenue,
                     }),
                 }),

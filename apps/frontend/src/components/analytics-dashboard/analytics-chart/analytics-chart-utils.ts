@@ -379,7 +379,7 @@ export function getMetricValue(
 			return point.metric_kind === 'playtime' ? point.seconds : 0
 		case 'revenue': {
 			if (point.metric_kind !== 'revenue') return 0
-			const value = Number.parseFloat(point.revenue)
+			const value = point.revenue
 			return Number.isFinite(value) ? value : 0
 		}
 	}
