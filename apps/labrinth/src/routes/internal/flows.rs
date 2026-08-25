@@ -1923,7 +1923,7 @@ async fn ensure_email_is_usable(
 ) -> Result<(), ApiError> {
     ensure_email_passes_gate(redis, email).await?;
 
-    let result = check_email(email)
+    let result = check_email(redis, email)
         .await
         .wrap_request_err("checking email address")?;
 
