@@ -331,8 +331,7 @@ fn duration_seconds_ceil(duration: Duration) -> u64 {
 }
 
 fn reqwest_client_builder_with_timeout() -> reqwest::ClientBuilder {
-    reqwest_client_builder()
-        .read_timeout(Duration::from_secs(30))
+    reqwest_client_builder().read_timeout(Duration::from_secs(30))
 }
 
 fn reqwest_client_builder() -> reqwest::ClientBuilder {
