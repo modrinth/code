@@ -145,6 +145,8 @@ const legacyCustomGrouping = useStorage<LegacyCustomScreenshotGrouping>(
 	},
 )
 const selectedKeys = ref(new Set<string>())
+const copiedScreenshotIds = ref(new Set<string>())
+const copiedResetTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 const screenshotsPage = ref<HTMLElement>()
 const regrouping = ref(false)
 const screenshotToDelete = ref<InstanceScreenshot | null>(null)
@@ -1004,9 +1006,25 @@ async function copyScreenshot(screenshot: InstanceScreenshot) {
 	try {
 		const png = readFile(screenshot.path).then((bytes) => new Blob([bytes], { type: 'image/png' }))
 		await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })])
+		markScreenshotCopied(screenshot.id)
 	} catch (error) {
 		handleError(error)
 	}
+}
+
+function markScreenshotCopied(id: string) {
+	copiedScreenshotIds.value = new Set([...copiedScreenshotIds.value, id])
+	const existingTimeout = copiedResetTimeouts.get(id)
+	if (existingTimeout) clearTimeout(existingTimeout)
+	copiedResetTimeouts.set(
+		id,
+		setTimeout(() => {
+			const nextCopiedScreenshotIds = new Set(copiedScreenshotIds.value)
+			nextCopiedScreenshotIds.delete(id)
+			copiedScreenshotIds.value = nextCopiedScreenshotIds
+			copiedResetTimeouts.delete(id)
+		}, 2000),
+	)
 }
 
 async function openScreenshot(screenshot: InstanceScreenshot) {
@@ -1133,6 +1151,8 @@ watch(activeDropGroupId, (groupId) => {
 onBeforeUnmount(() => {
 	clearGroupHoverOpenTimeout()
 	if (revealTimeout) clearTimeout(revealTimeout)
+	for (const timeout of copiedResetTimeouts.values()) clearTimeout(timeout)
+	copiedResetTimeouts.clear()
 })
 </script>
 
@@ -1304,6 +1324,7 @@ onBeforeUnmount(() => {
 						:drop-custom-group-id="group.customGroupId ?? undefined"
 						:show-instance-name="isGlobal && groupBy !== 'instance'"
 						:highlighted-screenshot-id="highlightedScreenshotId"
+						:copied-screenshot-ids="copiedScreenshotIds"
 						:animate-entry="!regrouping"
 						:force-open="search.length > 0"
 						:hide-header="groupBy === 'none'"
