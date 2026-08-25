@@ -3113,6 +3113,9 @@
   "profile.button.set-affiliate": {
     "defaultMessage": "Set as affiliate"
   },
+  "profile.button.shared-instances": {
+    "defaultMessage": "View shared instances"
+  },
   "profile.button.unblock": {
     "defaultMessage": "Unblock"
   },
