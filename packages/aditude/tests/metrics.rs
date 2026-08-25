@@ -1,7 +1,7 @@
 #![expect(missing_docs, reason = "test crate")]
 
 use aditude::{Client, mock::AditudeMock, v1, v2};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, TimeZone, Utc};
 use rust_decimal::dec;
 
 #[tokio::test]
@@ -114,4 +114,32 @@ async fn test_yesterday() {
         .unwrap();
 
     assert_eq!(real_yesterday, our_yesterday);
+}
+
+#[test]
+fn phoenix_day_boundaries() {
+    let august_19 = NaiveDate::from_ymd_opt(2026, 8, 19).unwrap();
+    assert_eq!(
+        aditude::phoenix_midnight(august_19),
+        Utc.with_ymd_and_hms(2026, 8, 19, 7, 0, 0).unwrap(),
+    );
+
+    let before_phoenix_midnight =
+        Utc.with_ymd_and_hms(2026, 8, 20, 6, 59, 59).unwrap();
+    assert_eq!(
+        aditude::yesterday(before_phoenix_midnight),
+        (
+            Utc.with_ymd_and_hms(2026, 8, 18, 7, 0, 0).unwrap(),
+            Utc.with_ymd_and_hms(2026, 8, 19, 7, 0, 0).unwrap(),
+        ),
+    );
+
+    let phoenix_midnight = Utc.with_ymd_and_hms(2026, 8, 20, 7, 0, 0).unwrap();
+    assert_eq!(
+        aditude::yesterday(phoenix_midnight),
+        (
+            Utc.with_ymd_and_hms(2026, 8, 19, 7, 0, 0).unwrap(),
+            Utc.with_ymd_and_hms(2026, 8, 20, 7, 0, 0).unwrap(),
+        ),
+    );
 }

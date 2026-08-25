@@ -54,18 +54,12 @@ async fn fetch_estimates(
     let first_period = periods_iter.next().wrap_err("no first period")?;
     let last_period = periods_iter.last().unwrap_or(first_period);
 
-    let range_start = first_period
-        .date()
-        .and_hms_opt(0, 0, 0)
-        .wrap_err("calculating payout period start")?
-        .and_utc();
-    let range_end = last_period
+    let range_start = aditude::phoenix_midnight(first_period.date());
+    let range_end_date = last_period
         .date()
         .checked_add_months(Months::new(1))
-        .wrap_err("calculating month after payout period end")?
-        .and_hms_opt(0, 0, 0)
-        .wrap_err("calculating payout period end")?
-        .and_utc();
+        .wrap_err("calculating month after payout period end")?;
+    let range_end = aditude::phoenix_midnight(range_end_date);
 
     let metrics = aditude
         .get_metrics_v2(aditude::v2::GetMetrics {
@@ -92,7 +86,7 @@ async fn fetch_estimates(
                 continue;
             };
 
-            let date = row.time.date_naive();
+            let date = aditude::phoenix_date(row.time);
             let period = YearMonth::from_day1(date);
 
             let period_estimate = map.entry(period).or_insert(PeriodEstimate {

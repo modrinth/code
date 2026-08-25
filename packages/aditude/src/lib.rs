@@ -8,8 +8,34 @@ pub mod v2;
 
 use std::borrow::Cow;
 
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Duration, FixedOffset, NaiveDate, Utc};
 use secrecy::SecretString;
+
+const PHOENIX_UTC_OFFSET_SECONDS: i32 = 7 * 60 * 60;
+
+fn phoenix_offset() -> FixedOffset {
+    FixedOffset::west_opt(PHOENIX_UTC_OFFSET_SECONDS)
+        .expect("Phoenix UTC offset should be valid")
+}
+
+/// Returns the UTC instant at which a calendar day starts in Phoenix.
+///
+/// Aditude buckets metrics in Phoenix time, which is MST (UTC-7) year-round.
+#[must_use]
+pub fn phoenix_midnight(date: NaiveDate) -> DateTime<Utc> {
+    date.and_hms_opt(0, 0, 0)
+        .expect("midnight should be valid")
+        .and_local_timezone(phoenix_offset())
+        .single()
+        .expect("a fixed offset should have one local midnight")
+        .with_timezone(&Utc)
+}
+
+/// Returns the Phoenix calendar date containing a UTC instant.
+#[must_use]
+pub fn phoenix_date(time: DateTime<Utc>) -> NaiveDate {
+    time.with_timezone(&phoenix_offset()).date_naive()
+}
 
 /// [Aditude](https://www.aditude.com/) client.
 #[derive(Debug)]
@@ -70,13 +96,7 @@ impl Client {
 /// range.
 #[must_use]
 pub fn yesterday(now: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {
-    let start = DateTime::<Utc>::from_naive_utc_and_offset(
-        (now - Duration::days(1))
-            .date_naive()
-            .and_hms_nano_opt(0, 0, 0, 0)
-            .unwrap_or_default(),
-        Utc,
-    );
+    let start = phoenix_midnight(phoenix_date(now - Duration::days(1)));
     let end = start + Duration::days(1);
     (start, end)
 }
