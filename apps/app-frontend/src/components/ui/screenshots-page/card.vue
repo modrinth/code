@@ -1,6 +1,4 @@
-<script lang="ts">
-const loadedScreenshotUrls = new Set<string>()
-</script>
+<script lang="ts"></script>
 
 <script setup lang="ts">
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
@@ -9,6 +7,7 @@ import { defineMessages, IconButton, useFormatDateTime, useVIntl } from '@modrin
 import { computed, onMounted, ref, watch } from 'vue'
 
 import type { InstanceScreenshot } from '@/helpers/instance'
+const loadedScreenshotUrls = new Set<string>()
 
 const props = defineProps<{
 	screenshot: InstanceScreenshot

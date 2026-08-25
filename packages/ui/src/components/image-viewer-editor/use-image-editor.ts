@@ -1,10 +1,8 @@
-import { useDebugLogger } from '@modrinth/ui'
-import { readFile } from '@tauri-apps/plugin-fs'
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import type { InstanceScreenshot, ScreenshotEditorData } from '@/helpers/instance'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { renderCensorRegion } from './censor-object'
+import { renderCensorRegion } from './image-viewer-editor-censor-object'
 import type {
 	EditorHistoryEntry,
 	ScreenshotCensorMode,
@@ -15,7 +13,8 @@ import type {
 	ScreenshotEditorSourceRect,
 	ScreenshotEditorTool,
 	ScreenshotEraserMode,
-} from './editor-types'
+} from './image-viewer-editor-types'
+import type { ImageViewerEditorData } from './types'
 
 type FabricModule = typeof import('fabric')
 type FabricCanvas = import('fabric').Canvas
@@ -69,8 +68,8 @@ const TOOL_SHORTCUTS: Partial<Record<string, ScreenshotEditorTool>> = {
 
 type PropertyValueKind = 'size' | 'width'
 
-export function useScreenshotEditor() {
-	const debugEraser = useDebugLogger('ScreenshotEditor:Eraser')
+export function useImageEditor() {
+	const debugEraser = useDebugLogger('ImageEditor:Eraser')
 	const canvas = shallowRef<FabricCanvas>()
 	const loading = ref(false)
 	const tool = ref<ScreenshotEditorTool>('select')
@@ -151,17 +150,18 @@ export function useScreenshotEditor() {
 
 	async function initialize(
 		element: HTMLCanvasElement,
-		screenshot: InstanceScreenshot,
-		editorData: ScreenshotEditorData,
+		editorData: ImageViewerEditorData,
+		viewportSize?: { width: number; height: number },
 	) {
 		dispose()
 		loading.value = true
 		try {
 			fabric = await import('fabric')
-			const document = parseEditorDocument(editorData.editor_state)
-			persistEditorState = Boolean(document) || !screenshot.original_screenshot_id
-			const bytes = await readFile(document ? editorData.background_path : screenshot.path)
-			sourceUrl = URL.createObjectURL(new Blob([bytes], { type: 'image/png' }))
+			const document = parseEditorDocument(editorData.editorState)
+			persistEditorState = Boolean(document) || !editorData.isEdited
+			sourceUrl = URL.createObjectURL(
+				document && editorData.background ? editorData.background : editorData.source,
+			)
 			sourceImage = await loadImage(sourceUrl)
 			originalWidth.value = sourceImage.naturalWidth
 			originalHeight.value = sourceImage.naturalHeight
@@ -175,6 +175,7 @@ export function useScreenshotEditor() {
 				selection: true,
 			})
 			canvas.value = nextCanvas
+			if (viewportSize) fitToViewport(viewportSize.width, viewportSize.height)
 			background = new fabric.FabricImage(sourceImage, {
 				left: 0,
 				top: 0,

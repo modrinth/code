@@ -401,18 +401,6 @@
   "app.icon-editor.notification.view-update": {
     "message": "View update"
   },
-  "app.image-preview.close": {
-    "message": "Close"
-  },
-  "app.image-preview.next": {
-    "message": "Next image"
-  },
-  "app.image-preview.previous": {
-    "message": "Previous image"
-  },
-  "app.image-preview.toggle-zoom": {
-    "message": "Toggle zoom"
-  },
   "app.install.phase.downloading_content": {
     "message": "Downloading content"
   },
@@ -1373,8 +1361,8 @@
   "app.restarting": {
     "message": "Restarting..."
   },
-  "app.screenshots.card.instance-and-time": {
-    "message": "{instance} · {time}"
+  "app.screenshots.copied": {
+    "message": "Copied"
   },
   "app.screenshots.copy": {
     "message": "Copy image"
@@ -1396,102 +1384,6 @@
   },
   "app.screenshots.edited": {
     "message": "Edited"
-  },
-  "app.screenshots.editor.censor.blur": {
-    "message": "Blur"
-  },
-  "app.screenshots.editor.censor.mode": {
-    "message": "Censor type"
-  },
-  "app.screenshots.editor.censor.solid": {
-    "message": "Solid"
-  },
-  "app.screenshots.editor.colour": {
-    "message": "Colour"
-  },
-  "app.screenshots.editor.delete-selection": {
-    "message": "Delete selected annotation"
-  },
-  "app.screenshots.editor.editing-title": {
-    "message": "Editing {name}"
-  },
-  "app.screenshots.editor.eraser.area": {
-    "message": "Area"
-  },
-  "app.screenshots.editor.eraser.element": {
-    "message": "Element"
-  },
-  "app.screenshots.editor.eraser.mode": {
-    "message": "Eraser mode"
-  },
-  "app.screenshots.editor.more-save-options": {
-    "message": "More save options"
-  },
-  "app.screenshots.editor.redo": {
-    "message": "Redo"
-  },
-  "app.screenshots.editor.save-as-new": {
-    "message": "Save as copy"
-  },
-  "app.screenshots.editor.save-changes": {
-    "message": "Save changes"
-  },
-  "app.screenshots.editor.save-copy": {
-    "message": "Save copy"
-  },
-  "app.screenshots.editor.save-screenshot": {
-    "message": "Save screenshot"
-  },
-  "app.screenshots.editor.size": {
-    "message": "Size"
-  },
-  "app.screenshots.editor.tool.arrow": {
-    "message": "Arrow"
-  },
-  "app.screenshots.editor.tool.censor": {
-    "message": "Censor"
-  },
-  "app.screenshots.editor.tool.ellipse": {
-    "message": "Ellipse"
-  },
-  "app.screenshots.editor.tool.eraser": {
-    "message": "Eraser"
-  },
-  "app.screenshots.editor.tool.highlight": {
-    "message": "Highlight"
-  },
-  "app.screenshots.editor.tool.pen": {
-    "message": "Pen"
-  },
-  "app.screenshots.editor.tool.rectangle": {
-    "message": "Rectangle"
-  },
-  "app.screenshots.editor.tool.select": {
-    "message": "Select"
-  },
-  "app.screenshots.editor.tool.shape": {
-    "message": "Shape"
-  },
-  "app.screenshots.editor.tool.text": {
-    "message": "Text"
-  },
-  "app.screenshots.editor.undo": {
-    "message": "Undo"
-  },
-  "app.screenshots.editor.width": {
-    "message": "Width"
-  },
-  "app.screenshots.editor.zoom-fit": {
-    "message": "Fit"
-  },
-  "app.screenshots.editor.zoom-fit-workspace": {
-    "message": "Fit to workspace"
-  },
-  "app.screenshots.editor.zoom-in": {
-    "message": "Zoom in"
-  },
-  "app.screenshots.editor.zoom-out": {
-    "message": "Zoom out"
   },
   "app.screenshots.empty-description": {
     "message": "Screenshots you take in-game will appear here."
@@ -1515,7 +1407,7 @@
     "message": "Collapse group"
   },
   "app.screenshots.group.custom": {
-    "message": "Custom grouping"
+    "message": "Custom group"
   },
   "app.screenshots.group.date": {
     "message": "Date"
@@ -1528,6 +1420,9 @@
   },
   "app.screenshots.group.edit": {
     "message": "Edit group name"
+  },
+  "app.screenshots.group.empty": {
+    "message": "Drag and drop to add screenshots."
   },
   "app.screenshots.group.expand": {
     "message": "Expand group"
@@ -1597,6 +1492,9 @@
   },
   "app.screenshots.selection.instance-export-filename": {
     "message": "{instance} screenshots.zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "Remove from group"
   },
   "app.screenshots.selection.selected-count": {
     "message": "{count} selected"

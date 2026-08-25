@@ -1,4 +1,4 @@
-import type { ScreenshotCensorMode, ScreenshotEditorSourceRect } from './editor-types'
+import type { ScreenshotCensorMode, ScreenshotEditorSourceRect } from './image-viewer-editor-types'
 
 const BLUR_DOWNSAMPLE = 0.25
 const BLUR_SIGMA = 12
