@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\tSELECT id, source, canonical_id, nbt, position\n\t\tFROM instance_server_entries\n\t\tWHERE instance_id = ?\n\t\tORDER BY position\n\t\t",
+  "query": "\n\t\tSELECT id, source, excluded_synced_server_id, nbt, position\n\t\tFROM instance_servers\n\t\tWHERE instance_id = ?\n\t\tORDER BY position\n\t\t",
   "describe": {
     "columns": [
       {
@@ -14,7 +14,7 @@
         "type_info": "Text"
       },
       {
-        "name": "canonical_id",
+        "name": "excluded_synced_server_id",
         "ordinal": 2,
         "type_info": "Text"
       },
@@ -40,5 +40,5 @@
       false
     ]
   },
-  "hash": "e6f5817e75f03035f327211cf7460b48b538e41dca1a1e850a03f8b95ad9a34a"
+  "hash": "d8f74c9d677ac6cc41503f1c88d3b360940b0419833a5679133fff5faaa81201"
 }

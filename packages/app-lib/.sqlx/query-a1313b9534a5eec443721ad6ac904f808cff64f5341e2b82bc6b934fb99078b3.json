@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\tSELECT server_id, source, nbt, position\n\t\tFROM instance_server_snapshots\n\t\tWHERE instance_id = ?\n\t\tORDER BY position\n\t\t",
+  "query": "\n\t\tSELECT server_id, owner, nbt, position\n\t\tFROM instance_server_projection_entries\n\t\tWHERE instance_id = ?\n\t\tORDER BY position\n\t\t",
   "describe": {
     "columns": [
       {
@@ -9,7 +9,7 @@
         "type_info": "Text"
       },
       {
-        "name": "source",
+        "name": "owner",
         "ordinal": 1,
         "type_info": "Text"
       },
@@ -34,5 +34,5 @@
       false
     ]
   },
-  "hash": "ffd791e2afbbdf0ccca67a75f0a0419c21b30bd3d379abb569de6197dd95836a"
+  "hash": "a1313b9534a5eec443721ad6ac904f808cff64f5341e2b82bc6b934fb99078b3"
 }

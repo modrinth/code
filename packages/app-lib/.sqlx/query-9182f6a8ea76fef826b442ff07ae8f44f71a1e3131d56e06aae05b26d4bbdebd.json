@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\tSELECT version_id\n\t\tFROM instance_server_baselines\n\t\tWHERE instance_id = ?\n\t\t",
+  "query": "\n\t\tSELECT version_id\n\t\tFROM instance_server_pack_state\n\t\tWHERE instance_id = ?\n\t\t",
   "describe": {
     "columns": [
       {
@@ -16,5 +16,5 @@
       true
     ]
   },
-  "hash": "0bb6b572586c47253e224af9bee1b92e6abffdcad59050db59a0fcbace5b5f26"
+  "hash": "9182f6a8ea76fef826b442ff07ae8f44f71a1e3131d56e06aae05b26d4bbdebd"
 }

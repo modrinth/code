@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\tSELECT initialized AS \"initialized!: bool\"\n\t\tFROM synced_option_revisions\n\t\tWHERE option = 'multiplayer_servers'\n\t\t",
+  "query": "\n\t\tSELECT EXISTS(\n\t\t\tSELECT 1 FROM synced_server_state WHERE singleton = 1\n\t\t) AS \"initialized!: bool\"\n\t\t",
   "describe": {
     "columns": [
       {
@@ -16,5 +16,5 @@
       false
     ]
   },
-  "hash": "5c184709bc03b7a26062aeb0cd482774270ed45bd30c1ab569d82128112cb528"
+  "hash": "b012838123b5acd053412951b0044857cc3145d7936b79ab4cf6adcbeeec3095"
 }

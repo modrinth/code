@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_sync_preferences (instance_id, feature, enabled)\n\t\tVALUES (?, ?, ?)\n\t\tON CONFLICT (instance_id, feature) DO UPDATE SET\n\t\t\tenabled = excluded.enabled\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "e9ab62553f47a98c02b45655f589df2d66a0bb9f2aa766f2fe979cd82c0536a6"
+}

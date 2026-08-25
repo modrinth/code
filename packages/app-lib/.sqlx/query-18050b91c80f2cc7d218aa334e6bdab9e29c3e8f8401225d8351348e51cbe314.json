@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\tSELECT id, nbt\n\t\tFROM synced_server_entries\n\t\tORDER BY position\n\t\t",
+  "query": "\n\t\tSELECT id, nbt\n\t\tFROM synced_servers\n\t\tORDER BY position\n\t\t",
   "describe": {
     "columns": [
       {
@@ -22,5 +22,5 @@
       false
     ]
   },
-  "hash": "14b69741e9a504eff61dea591fa836b6f50fe5e34c5d4b5666f41e3b0b49fe2f"
+  "hash": "18050b91c80f2cc7d218aa334e6bdab9e29c3e8f8401225d8351348e51cbe314"
 }

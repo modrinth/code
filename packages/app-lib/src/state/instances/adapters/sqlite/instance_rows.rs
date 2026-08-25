@@ -497,18 +497,19 @@ pub(crate) async fn get_instance_screenshot_source(
 pub(crate) async fn list_synced_screenshot_sources(
     pool: &SqlitePool,
 ) -> crate::Result<Vec<InstanceScreenshotSource>> {
-    let sources = sqlx::query_as::<_, InstanceScreenshotSource>(
+    let sources = sqlx::query_as!(
+        InstanceScreenshotSource,
         "
 		SELECT instances.id, instances.name, instances.path
 		FROM instances
-		INNER JOIN instance_synced_options synced_options
-			ON synced_options.instance_id = instances.id
-		WHERE synced_options.option = 'screenshots'
-			AND synced_options.enabled = 1
+		INNER JOIN instance_sync_preferences preferences
+			ON preferences.instance_id = instances.id
+		WHERE preferences.feature = 'screenshots'
+			AND preferences.enabled = 1
 			AND EXISTS (
 				SELECT 1
-				FROM global_synced_options_overrides
-				WHERE option = 'screenshots' AND enabled = 1
+				FROM sync_feature_settings
+				WHERE feature = 'screenshots' AND globally_enabled = 1
 			)
 		ORDER BY instances.name, instances.id
 		",
@@ -535,14 +536,14 @@ pub(crate) async fn list_screenshot_sources(
     Ok(sources)
 }
 
-pub(crate) async fn get_instance_synced_options(
+pub(crate) async fn get_instance_sync_preferences(
     instance_id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<InstanceSyncedOptions> {
-    let enabled = sqlx::query_scalar!(
+    let enabled_features = sqlx::query_scalar!(
         "
-		SELECT option
-		FROM instance_synced_options
+		SELECT feature
+		FROM instance_sync_preferences
 		WHERE instance_id = ? AND enabled = 1
 		",
         instance_id,
@@ -553,21 +554,21 @@ pub(crate) async fn get_instance_synced_options(
     .collect::<HashSet<_>>();
 
     Ok(InstanceSyncedOptions {
-        command_history: enabled.contains("command_history"),
-        multiplayer_servers: enabled.contains("multiplayer_servers"),
-        creative_hotbars: enabled.contains("creative_hotbars"),
-        screenshots: enabled.contains("screenshots"),
+        command_history: enabled_features.contains("command_history"),
+        multiplayer_servers: enabled_features.contains("multiplayer_servers"),
+        creative_hotbars: enabled_features.contains("creative_hotbars"),
+        screenshots: enabled_features.contains("screenshots"),
     })
 }
 
-async fn attach_synced_options(
+async fn attach_sync_preferences(
     records: &mut [InstanceMetadataRecord],
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    let enabled_options = sqlx::query!(
+    let enabled_preferences = sqlx::query!(
         "
-		SELECT instance_id, option
-		FROM instance_synced_options
+		SELECT instance_id, feature
+		FROM instance_sync_preferences
 		WHERE enabled = 1
 		",
     )
@@ -575,11 +576,11 @@ async fn attach_synced_options(
     .await?;
 
     for record in records {
-        for row in enabled_options
+        for row in enabled_preferences
             .iter()
             .filter(|row| row.instance_id == record.instance.id)
         {
-            match row.option.as_str() {
+            match row.feature.as_str() {
                 "command_history" => {
                     record.synced_options.command_history = true
                 }
@@ -926,7 +927,7 @@ pub(crate) async fn get_instance_metadata_by_id(
     let mut record = row.map(InstanceMetadataRow::into_record).transpose()?;
     if let Some(record) = record.as_mut() {
         record.synced_options =
-            get_instance_synced_options(&record.instance.id, pool).await?;
+            get_instance_sync_preferences(&record.instance.id, pool).await?;
     }
 
     Ok(record)
@@ -963,7 +964,7 @@ pub(crate) async fn get_instance_metadata_many(
         .into_iter()
         .map(InstanceMetadataRow::into_record)
         .collect::<crate::Result<Vec<_>>>()?;
-    attach_synced_options(&mut records, pool).await?;
+    attach_sync_preferences(&mut records, pool).await?;
     Ok(records)
 }
 
@@ -979,7 +980,7 @@ pub(crate) async fn list_instance_metadata(
         .into_iter()
         .map(InstanceMetadataRow::into_record)
         .collect::<crate::Result<Vec<_>>>()?;
-    attach_synced_options(&mut records, pool).await?;
+    attach_sync_preferences(&mut records, pool).await?;
     Ok(records)
 }
 
@@ -1283,7 +1284,7 @@ pub(crate) async fn insert_instance(
     Ok(())
 }
 
-pub(crate) async fn set_instance_synced_option(
+pub(crate) async fn set_instance_sync_preference(
     instance_id: &str,
     option: InstanceSyncedOption,
     enabled: bool,
@@ -1309,9 +1310,9 @@ pub(crate) async fn set_instance_synced_option(
     let option_name = option.as_str();
     sqlx::query!(
         "
-		INSERT INTO instance_synced_options (instance_id, option, enabled)
+		INSERT INTO instance_sync_preferences (instance_id, feature, enabled)
 		VALUES (?, ?, ?)
-		ON CONFLICT (instance_id, option) DO UPDATE SET
+		ON CONFLICT (instance_id, feature) DO UPDATE SET
 			enabled = excluded.enabled
 		",
         instance_id,
@@ -1324,15 +1325,15 @@ pub(crate) async fn set_instance_synced_option(
     Ok(())
 }
 
-pub(crate) async fn insert_default_instance_synced_options(
+pub(crate) async fn insert_default_instance_sync_preferences(
     instance_id: &str,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     sqlx::query!(
         "
-		INSERT INTO instance_synced_options (instance_id, option, enabled)
-		SELECT ?, option, default_enabled
-		FROM global_synced_options_overrides
+		INSERT INTO instance_sync_preferences (instance_id, feature, enabled)
+		SELECT ?, feature, new_instance_default
+		FROM sync_feature_settings
 		",
         instance_id,
     )

@@ -98,7 +98,7 @@ pub(crate) async fn create_instance(
 
         let mut tx = state.pool.begin().await?;
         instance_rows::insert_instance(&instance, &mut tx).await?;
-        instance_rows::insert_default_instance_synced_options(
+        instance_rows::insert_default_instance_sync_preferences(
             &instance_id,
             &mut tx,
         )

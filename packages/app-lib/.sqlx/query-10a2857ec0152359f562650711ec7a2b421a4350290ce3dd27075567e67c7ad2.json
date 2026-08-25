@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n\t\tSELECT instance_id, option\n\t\tFROM instance_synced_options\n\t\tWHERE enabled = 1\n\t\t",
+  "query": "\n\t\tSELECT instance_id, feature\n\t\tFROM instance_sync_preferences\n\t\tWHERE enabled = 1\n\t\t",
   "describe": {
     "columns": [
       {
@@ -9,7 +9,7 @@
         "type_info": "Text"
       },
       {
-        "name": "option",
+        "name": "feature",
         "ordinal": 1,
         "type_info": "Text"
       }
@@ -22,5 +22,5 @@
       false
     ]
   },
-  "hash": "9d60938be8573be0f82cac164245a9eafcfbfdf7b98df1f838ba9af56695d7a4"
+  "hash": "10a2857ec0152359f562650711ec7a2b421a4350290ce3dd27075567e67c7ad2"
 }

@@ -14,6 +14,7 @@ const COMMAND_HISTORY_FILE: &str = "command_history.txt";
 const HOTBAR_FILE: &str = "hotbar.nbt";
 const COMMAND_HISTORY_LIMIT: usize = 50;
 const COMPONENTS_DATA_VERSION_FLOOR: i32 = 3837;
+const HOTBAR_SCHEMA_VERSION: i64 = 2;
 
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
 pub struct GlobalSyncedOptions {
@@ -64,11 +65,33 @@ enum CapabilityStatus {
     Indeterminate(String),
 }
 
-pub(super) struct Materialization {
-    pub expected_sha1: Option<String>,
-    pub baseline: Option<Vec<u8>>,
-    pub canonical_revision: i64,
-    pub pending: bool,
+pub(super) struct SyncCheckpoint {
+    pub expected_sha1: String,
+    pub merge_base: Option<Vec<u8>>,
+    pub source_revision: i64,
+    pub status: CheckpointStatus,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(super) enum CheckpointStatus {
+    Pending,
+    Ready,
+}
+
+impl CheckpointStatus {
+    fn from_str(value: &str) -> Option<Self> {
+        match value {
+            "pending" => Some(Self::Pending),
+            "ready" => Some(Self::Ready),
+            _ => None,
+        }
+    }
+}
+
+struct HotbarState {
+    schema_version: i64,
+    revision: i64,
+    nbt: NbtCompound,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -135,16 +158,16 @@ async fn get_global_options_with_state(
     let mut options = GlobalSyncedOptions::default();
     let rows = sqlx::query!(
         r#"
-		SELECT option, enabled AS "enabled!: bool"
-		FROM global_synced_options_overrides
+		SELECT feature, globally_enabled AS "globally_enabled!: bool"
+		FROM sync_feature_settings
 		"#,
     )
     .fetch_all(&state.pool)
     .await?;
 
     for row in rows {
-        if let Some(option) = option_from_str(&row.option) {
-            options.set(option, row.enabled);
+        if let Some(option) = option_from_str(&row.feature) {
+            options.set(option, row.globally_enabled);
         }
     }
 
@@ -369,10 +392,11 @@ pub async fn set_global_option(
     let option_name = option.as_str();
     sqlx::query!(
         "
-		INSERT INTO global_synced_options_overrides
-			(option, enabled, default_enabled)
+		INSERT INTO sync_feature_settings
+			(feature, globally_enabled, new_instance_default)
 		VALUES (?, ?, 1)
-		ON CONFLICT(option) DO UPDATE SET enabled = excluded.enabled
+		ON CONFLICT(feature) DO UPDATE SET
+			globally_enabled = excluded.globally_enabled
 		",
         option_name,
         enabled,
@@ -416,7 +440,7 @@ pub async fn set_instance_option(
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
     let global = get_global_options_with_state(&state).await?;
-    let can_materialize = !sync_files_are_protected(&metadata)
+    let can_reconcile = !sync_files_are_protected(&metadata)
         && !instance_is_running(&metadata, &state).await?;
     if enabled {
         let eligibility =
@@ -428,7 +452,7 @@ pub async fn set_instance_option(
             .into());
         }
         if !canonical_exists(option, &state).await? {
-            if !can_materialize {
+            if !can_reconcile {
                 return Err(ErrorKind::InputError(
 					"Close the instance before using it as the initial sync source."
 						.to_string(),
@@ -439,14 +463,14 @@ pub async fn set_instance_option(
         }
     }
 
-    instance_rows::set_instance_synced_option(
+    instance_rows::set_instance_sync_preference(
         instance_id,
         option,
         enabled,
         &state.pool,
     )
     .await?;
-    if can_materialize {
+    if can_reconcile {
         if enabled {
             ensure_option(&metadata, option, &state).await?;
         } else {
@@ -707,8 +731,13 @@ async fn seed_from_instance(
                 empty_hotbar_root()
             };
             let mut sync_state = read_hotbar_state(state).await?;
-            let baseline = empty_hotbar_root();
-            if merge_hotbar_family(&mut sync_state, family, &baseline, &root) {
+            let merge_base = empty_hotbar_root();
+            if merge_hotbar_family(
+                &mut sync_state.nbt,
+                family,
+                &merge_base,
+                &root,
+            ) {
                 increment_hotbar_revision(&mut sync_state);
             }
             write_hotbar_state(state, &sync_state).await?;
@@ -800,23 +829,23 @@ async fn ensure_command_history(
         io::write(&canonical, normalize_command_history(&contents)).await?;
     }
     let target = instance_dir(metadata, state).join(COMMAND_HISTORY_FILE);
-    let baseline = io::read(&canonical).await?;
-    let expected = sha1_bytes(&baseline);
-    begin_materialization(
+    let canonical_bytes = io::read(&canonical).await?;
+    let expected = sha1_bytes(&canonical_bytes);
+    begin_checkpoint(
         &metadata.instance.id,
         SyncedOption::CommandHistory,
-        "",
-        Some(&expected),
-        Some(&baseline),
+        "default",
+        &expected,
+        None,
         0,
         state,
     )
     .await?;
     let mode = ensure_link(&canonical, &target).await?;
-    finish_materialization(
+    finish_checkpoint(
         &metadata.instance.id,
         SyncedOption::CommandHistory,
-        "",
+        "default",
         mode,
         state,
     )
@@ -838,18 +867,21 @@ async fn reconcile_command_history(
         .await
         .map(|metadata| metadata.file_type().is_symlink())
         .unwrap_or(false);
-    let materialized = materialization(
+    let checkpoint = checkpoint(
         &metadata.instance.id,
         SyncedOption::CommandHistory,
-        "",
+        "default",
         state,
     )
     .await?;
-    if materialized.as_ref().is_some_and(|value| value.pending) {
+    if checkpoint
+        .as_ref()
+        .is_some_and(|value| value.status == CheckpointStatus::Pending)
+    {
         return ensure_command_history(metadata, state).await;
     }
     let actual = sha1_file(&local).await?;
-    let expected = materialized.and_then(|value| value.expected_sha1);
+    let expected = checkpoint.map(|value| value.expected_sha1);
     if !symlink && expected.as_deref() != Some(actual.as_str()) {
         let contents =
             String::from_utf8_lossy(&io::read(&local).await?).into_owned();
@@ -896,7 +928,7 @@ async fn ensure_hotbar(
         seed_from_instance(metadata, SyncedOption::CreativeHotbars, state)
             .await?;
     }
-    materialize_hotbars_for_instance(metadata, state).await
+    write_hotbar_projection(metadata, state).await
 }
 
 async fn reconcile_hotbar(
@@ -912,40 +944,42 @@ async fn reconcile_hotbar(
         return ensure_hotbar(metadata, state).await;
     }
     let family = hotbar_family(metadata, state).await?;
-    let materialized = materialization(
+    let checkpoint = checkpoint(
         &metadata.instance.id,
         SyncedOption::CreativeHotbars,
         family.as_str(),
         state,
     )
     .await?;
-    if materialized.as_ref().is_some_and(|value| value.pending) {
-        return materialize_hotbars_for_instance(metadata, state).await;
+    if checkpoint
+        .as_ref()
+        .is_some_and(|value| value.status == CheckpointStatus::Pending)
+    {
+        return write_hotbar_projection(metadata, state).await;
     }
     let actual = sha1_file(&local).await?;
     let mut sync_state = read_hotbar_state(state).await?;
-    let canonical_revision = hotbar_revision(&sync_state);
-    if materialized
+    if checkpoint
         .as_ref()
-        .and_then(|value| value.expected_sha1.as_deref())
+        .map(|value| value.expected_sha1.as_str())
         == Some(actual.as_str())
     {
-        if materialized
+        if checkpoint
             .as_ref()
-            .is_some_and(|value| value.canonical_revision == canonical_revision)
+            .is_some_and(|value| value.source_revision == sync_state.revision)
         {
             return Ok(());
         }
-        return materialize_hotbars_for_instance(metadata, state).await;
+        return write_hotbar_projection(metadata, state).await;
     }
 
     let changed = read_nbt_file(&local).await?;
-    let baseline = materialized
-        .and_then(|value| value.baseline)
+    let merge_base = checkpoint
+        .and_then(|value| value.merge_base)
         .map(nbt_from_bytes)
         .transpose()?
-        .unwrap_or_else(|| hotbar_family_root(&sync_state, family));
-    if merge_hotbar_family(&mut sync_state, family, &baseline, &changed) {
+        .unwrap_or_else(|| hotbar_family_root(&sync_state.nbt, family));
+    if merge_hotbar_family(&mut sync_state.nbt, family, &merge_base, &changed) {
         increment_hotbar_revision(&mut sync_state);
         write_hotbar_state(state, &sync_state).await?;
     }
@@ -955,7 +989,7 @@ async fn reconcile_hotbar(
 fn merge_hotbar_family(
     state: &mut NbtCompound,
     family: HotbarFamily,
-    baseline: &NbtCompound,
+    merge_base: &NbtCompound,
     changed: &NbtCompound,
 ) -> bool {
     let family_key = family_state_key(family);
@@ -1003,7 +1037,7 @@ fn merge_hotbar_family(
     let mut changed_any = false;
 
     for slot in 0..81 {
-        let old_slot = hotbar_slot(baseline, slot);
+        let old_slot = hotbar_slot(merge_base, slot);
         let new_slot = hotbar_slot(&changed, slot);
         if old_slot == new_slot {
             continue;
@@ -1162,30 +1196,29 @@ async fn regenerate_hotbars(state: &State) -> crate::Result<()> {
         if option_effective(&metadata, SyncedOption::CreativeHotbars, state)
             .await?
         {
-            materialize_hotbars_for_instance(&metadata, state).await?;
+            write_hotbar_projection(&metadata, state).await?;
         }
     }
     Ok(())
 }
 
-async fn materialize_hotbars_for_instance(
+async fn write_hotbar_projection(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
     let sync_state = read_hotbar_state(state).await?;
     let family = hotbar_family(metadata, state).await?;
-    let root = hotbar_family_root(&sync_state, family);
+    let root = hotbar_family_root(&sync_state.nbt, family);
     let bytes = nbt_to_bytes(&root)?;
     let expected = sha1_bytes(&bytes);
-    let revision = hotbar_revision(&sync_state);
     let generated = generated_hotbar_path(state, family, &metadata.instance.id);
-    begin_materialization(
+    begin_checkpoint(
         &metadata.instance.id,
         SyncedOption::CreativeHotbars,
         family.as_str(),
-        Some(&expected),
+        &expected,
         Some(&bytes),
-        revision,
+        sync_state.revision,
         state,
     )
     .await?;
@@ -1195,7 +1228,7 @@ async fn materialize_hotbars_for_instance(
     io::write(&generated, &bytes).await?;
     let local = instance_dir(metadata, state).join(HOTBAR_FILE);
     let mode = ensure_link(&generated, &local).await?;
-    finish_materialization(
+    finish_checkpoint(
         &metadata.instance.id,
         SyncedOption::CreativeHotbars,
         family.as_str(),
@@ -1217,20 +1250,29 @@ fn empty_hotbar_root() -> NbtCompound {
     root
 }
 
-async fn read_hotbar_state(state: &State) -> crate::Result<NbtCompound> {
-    hotbar_state_exists(state).await?;
-    let bytes = sqlx::query_scalar!(
-        "SELECT nbt FROM synced_hotbar_state WHERE singleton = 1",
+async fn read_hotbar_state(state: &State) -> crate::Result<HotbarState> {
+    let row = sqlx::query!(
+        r#"
+		SELECT schema_version AS "schema_version!: i64",
+			revision AS "revision!: i64", nbt
+		FROM synced_hotbar_state
+		WHERE singleton = 1
+        "#,
     )
     .fetch_optional(&state.pool)
     .await?;
-    if let Some(bytes) = bytes {
-        return nbt_from_bytes(bytes);
+    if let Some(row) = row {
+        return Ok(HotbarState {
+            schema_version: row.schema_version,
+            revision: row.revision,
+            nbt: nbt_from_bytes(row.nbt)?,
+        });
     }
-    let mut root = NbtCompound::new();
-    root.insert("Version", 2_i32);
-    root.insert("Revision", 0_i64);
-    Ok(root)
+    Ok(HotbarState {
+        schema_version: HOTBAR_SCHEMA_VERSION,
+        revision: 0,
+        nbt: NbtCompound::new(),
+    })
 }
 
 async fn hotbar_state_exists(state: &State) -> crate::Result<bool> {
@@ -1264,26 +1306,28 @@ fn hotbar_family_root(
     }
 }
 
-fn hotbar_revision(state: &NbtCompound) -> i64 {
-    state.get::<_, i64>("Revision").unwrap_or(0)
-}
-
-fn increment_hotbar_revision(state: &mut NbtCompound) {
-    state.insert("Version", 2_i32);
-    state.insert("Revision", hotbar_revision(state).saturating_add(1));
+fn increment_hotbar_revision(state: &mut HotbarState) {
+    state.schema_version = HOTBAR_SCHEMA_VERSION;
+    state.revision = state.revision.saturating_add(1);
 }
 
 async fn write_hotbar_state(
     state: &State,
-    root: &NbtCompound,
+    hotbar_state: &HotbarState,
 ) -> crate::Result<()> {
-    let bytes = nbt_to_bytes(root)?;
+    let bytes = nbt_to_bytes(&hotbar_state.nbt)?;
     sqlx::query!(
         "
-		INSERT INTO synced_hotbar_state (singleton, nbt)
-		VALUES (1, ?)
-		ON CONFLICT(singleton) DO UPDATE SET nbt = excluded.nbt
+		INSERT INTO synced_hotbar_state
+			(singleton, schema_version, revision, nbt)
+		VALUES (1, ?, ?, ?)
+		ON CONFLICT(singleton) DO UPDATE SET
+			schema_version = excluded.schema_version,
+			revision = excluded.revision,
+			nbt = excluded.nbt
 		",
+        hotbar_state.schema_version,
+        hotbar_state.revision,
         bytes,
     )
     .execute(&state.pool)
@@ -1455,44 +1499,45 @@ pub(super) async fn detach_link(
     Ok(())
 }
 
-pub(super) async fn begin_materialization(
+pub(super) async fn begin_checkpoint(
     instance_id: &str,
     option: SyncedOption,
-    family: &str,
-    expected_sha1: Option<&str>,
-    baseline: Option<&[u8]>,
-    canonical_revision: i64,
+    variant: &str,
+    expected_sha1: &str,
+    merge_base: Option<&[u8]>,
+    source_revision: i64,
     state: &State,
 ) -> crate::Result<()> {
     let option_name = option.as_str();
     sqlx::query!(
         "
-		INSERT INTO synced_option_materializations
-			(instance_id, option, family, expected_sha1, baseline,
-			 canonical_revision, pending, link_mode)
-		VALUES (?, ?, ?, ?, ?, ?, 1, 'copy')
-		ON CONFLICT(instance_id, option, family) DO UPDATE SET
+		INSERT INTO instance_sync_checkpoints
+			(instance_id, feature, variant, expected_sha1, merge_base,
+			 source_revision, status, link_mode)
+		VALUES (?, ?, ?, ?, ?, ?, 'pending', NULL)
+		ON CONFLICT(instance_id, feature, variant) DO UPDATE SET
 			expected_sha1 = excluded.expected_sha1,
-			baseline = excluded.baseline,
-			canonical_revision = excluded.canonical_revision,
-			pending = 1
+			merge_base = excluded.merge_base,
+			source_revision = excluded.source_revision,
+			status = 'pending',
+			link_mode = NULL
 		",
         instance_id,
         option_name,
-        family,
+        variant,
         expected_sha1,
-        baseline,
-        canonical_revision,
+        merge_base,
+        source_revision,
     )
     .execute(&state.pool)
     .await?;
     Ok(())
 }
 
-pub(super) async fn finish_materialization(
+pub(super) async fn finish_checkpoint(
     instance_id: &str,
     option: SyncedOption,
-    family: &str,
+    variant: &str,
     mode: LinkMode,
     state: &State,
 ) -> crate::Result<()> {
@@ -1500,47 +1545,56 @@ pub(super) async fn finish_materialization(
     let link_mode = mode.as_str();
     sqlx::query!(
         "
-		UPDATE synced_option_materializations
-		SET pending = 0, link_mode = ?
-		WHERE instance_id = ? AND option = ? AND family = ?
+		UPDATE instance_sync_checkpoints
+		SET status = 'ready', link_mode = ?
+		WHERE instance_id = ? AND feature = ? AND variant = ?
 		",
         link_mode,
         instance_id,
         option_name,
-        family,
+        variant,
     )
     .execute(&state.pool)
     .await?;
     Ok(())
 }
 
-pub(super) async fn materialization(
+pub(super) async fn checkpoint(
     instance_id: &str,
     option: SyncedOption,
-    family: &str,
+    variant: &str,
     state: &State,
-) -> crate::Result<Option<Materialization>> {
+) -> crate::Result<Option<SyncCheckpoint>> {
     let option_name = option.as_str();
-    Ok(sqlx::query!(
+    let row = sqlx::query!(
         r#"
-		SELECT expected_sha1, baseline,
-			canonical_revision AS "canonical_revision!: i64",
-			pending AS "pending!: bool"
-		FROM synced_option_materializations
-		WHERE instance_id = ? AND option = ? AND family = ?
+		SELECT expected_sha1, merge_base,
+			source_revision AS "source_revision!: i64", status
+		FROM instance_sync_checkpoints
+		WHERE instance_id = ? AND feature = ? AND variant = ?
 		"#,
         instance_id,
         option_name,
-        family,
+        variant,
     )
     .fetch_optional(&state.pool)
-    .await?
-    .map(|row| Materialization {
-        expected_sha1: row.expected_sha1,
-        baseline: row.baseline,
-        canonical_revision: row.canonical_revision,
-        pending: row.pending,
-    }))
+    .await?;
+    row.map(|row| {
+        Ok(SyncCheckpoint {
+            expected_sha1: row.expected_sha1,
+            merge_base: row.merge_base,
+            source_revision: row.source_revision,
+            status: CheckpointStatus::from_str(&row.status).ok_or_else(
+                || {
+                    ErrorKind::InputError(format!(
+                        "Unknown sync checkpoint status {}",
+                        row.status
+                    ))
+                },
+            )?,
+        })
+    })
+    .transpose()
 }
 
 pub(super) async fn sha1_file(path: &Path) -> crate::Result<String> {

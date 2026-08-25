@@ -81,7 +81,7 @@ pub struct State {
     instance_screenshot_locks: DashMap<String, Arc<Mutex<()>>>,
     /// Serializes shared instance attachment and recipient mutations per instance.
     shared_instance_locks: DashMap<String, Arc<Mutex<()>>>,
-    /// Serializes canonical synced-option mutations and materialization.
+    /// Serializes canonical synced-option mutations and checkpoint updates.
     synced_options_lock: Mutex<()>,
 
     /// Discord RPC
