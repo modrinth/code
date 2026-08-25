@@ -28,7 +28,7 @@ use crate::{
     models::pats::Scopes,
     queue::session::AuthQueue,
     routes::ApiError,
-    util::error::Context,
+    util::{cel, error::Context},
 };
 
 const RULE_SCAN_LOCK_ID: i64 = 0x6465_6c70_6869_7275;

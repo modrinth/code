@@ -22,7 +22,7 @@ use crate::{
     },
     queue::session::AuthQueue,
     routes::ApiError,
-    util::{error::Context, validate::validation_errors_to_string},
+    util::{cel, error::Context, validate::validation_errors_to_string},
 };
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {

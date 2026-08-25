@@ -98,6 +98,26 @@
 						<pre
 							class="m-0 overflow-x-auto rounded-lg bg-surface-1 p-3 text-xs leading-relaxed text-contrast"
 						><code>{{ ruleOutputSchemaText }}</code></pre>
+						<p class="m-0 mb-2 mt-3 text-xs font-semibold uppercase tracking-wide text-secondary">
+							Extensions
+						</p>
+						<ul class="m-0 mb-3 list-disc pl-5 text-sm text-secondary">
+							<li>
+								<a
+									class="text-link"
+									href="https://cel.dev/reference/api-reference#general_string_functions"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									Regex
+								</a>
+							</li>
+						</ul>
+						<pre
+							class="m-0 overflow-x-auto rounded-lg bg-surface-1 p-3 text-xs leading-relaxed text-contrast"
+						><code>#define ISSUE_TYPE "OBFUSCATED_NAMES"
+
+trace.issue_type == ISSUE_TYPE</code></pre>
 					</div>
 				</div>
 			</details>
@@ -486,7 +506,9 @@ import type { Component } from 'vue'
 
 import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
-const DEFAULT_RULE = `trace.issue_type == "OBFUSCATED_NAMES"
+const DEFAULT_RULE = `#define ISSUE_TYPE "OBFUSCATED_NAMES"
+
+trace.issue_type == ISSUE_TYPE
 	? "low"
 	: null`
 const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {
