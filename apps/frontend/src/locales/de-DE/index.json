@@ -4028,9 +4028,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
-  },
   "project.settings.monetization.description": {
     "message": "Projekte auf Modrinth nehmen automatisch am <rewards-program-link>Belohnungsprogramm</rewards-program-link> teil. Falls du mit diesem Projekt keine Einnahmen erzielen möchtest (oder aus rechtlichen Gründen nicht darfst), kannst du dies hier deaktivieren."
   },

@@ -4025,9 +4025,6 @@
   "project.settings.general.url.title": {
     "message": "網址"
   },
-  "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
-  },
   "project.settings.monetization.description": {
     "message": "Modrinth 上的專案會自動加入<rewards-program-link>獎勵計畫</rewards-program-link>。如果你不想（或因法律原因無法）從專案獲取收益，可在這裡關閉營利功能。"
   },

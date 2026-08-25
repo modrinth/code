@@ -1179,6 +1179,7 @@ const messages = defineMessages({
 	},
 })
 
+useFavicon()
 useHead({
 	link: [
 		{

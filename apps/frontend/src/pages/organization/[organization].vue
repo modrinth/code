@@ -233,6 +233,7 @@ if (route.path.includes('settings')) {
 
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
+useFavicon(() => (routeHasSettings.value ? 'settings' : 'default'))
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
