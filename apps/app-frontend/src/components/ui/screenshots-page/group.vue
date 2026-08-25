@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useDroppable } from '@dnd-kit/vue'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import type { InstanceScreenshot } from '@/helpers/instance'
@@ -34,6 +35,13 @@ const props = defineProps<{
 
 const collapsed = defineModel<boolean>('collapsed', { required: true })
 const dropTarget = ref<HTMLElement>()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	emptyGroup: {
+		id: 'app.screenshots.group.empty',
+		defaultMessage: 'Drag and drop to add screenshots.',
+	},
+})
 
 const emit = defineEmits<{
 	(e: 'activate', screenshot: InstanceScreenshot, event: MouseEvent | KeyboardEvent): void
@@ -121,6 +129,13 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 					@more="(event) => emit('more', screenshot, event)"
 					@show-original="emit('show-original', screenshot)"
 				/>
+				<p
+					v-if="screenshots.length === 0"
+					key="empty-group"
+					class="col-span-full m-0 pl-0.5 pt-1 text-base font-base text-secondary opacity-80"
+				>
+					{{ formatMessage(messages.emptyGroup) }}
+				</p>
 			</TransitionGroup>
 		</ScreenshotSection>
 	</div>
