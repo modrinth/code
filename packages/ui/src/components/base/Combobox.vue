@@ -105,7 +105,7 @@
 						props.dropdownClass,
 						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
 					]"
-					:style="dropdownStyle"
+					:style="[dropdownStyle, { transformOrigin: dropdownTransformOrigin }]"
 					:role="listbox ? 'listbox' : 'menu'"
 					@mousedown.stop
 					@keydown="handleDropdownKeydown"
@@ -387,6 +387,9 @@ const dropdownStyle = ref({
 })
 
 const openDirection = ref<'down' | 'up'>('down')
+const dropdownTransformOrigin = computed(() =>
+	openDirection.value === 'up' ? 'bottom center' : 'top center',
+)
 
 const selectedOption = computed<ComboboxOption<T> | undefined>(() => {
 	return props.options.find(
@@ -475,9 +478,83 @@ function setInitialFocus() {
 		? props.options.findIndex((opt) => isDropdownOption(opt) && opt.value === props.modelValue)
 		: -1
 
-	if (focusedIndex.value >= 0 && optionRefs.value[focusedIndex.value]) {
-		optionRefs.value[focusedIndex.value]?.scrollIntoView({ block: 'center' })
+	if (focusedIndex.value >= 0) {
+		scrollOptionIntoView(focusedIndex.value, 'center')
 	}
+}
+
+function getOptionsViewport(): HTMLElement | undefined {
+	return optionsOverlayScrollbars.value?.elements().viewport ?? optionsContainerRef.value
+}
+
+function scrollOptionIntoView(index: number, block: 'center' | 'nearest') {
+	const option = optionRefs.value[index]
+	const viewport = getOptionsViewport()
+	if (!option || !viewport) return
+
+	const optionRect = option.getBoundingClientRect()
+	const viewportRect = viewport.getBoundingClientRect()
+	const optionTop = optionRect.top - viewportRect.top + viewport.scrollTop
+	const optionHeight = optionRect.height
+	const viewHeight = viewport.clientHeight
+	const current = viewport.scrollTop
+
+	if (block === 'center') {
+		viewport.scrollTop = Math.max(0, optionTop - (viewHeight - optionHeight) / 2)
+		return
+	}
+
+	if (optionTop < current) {
+		viewport.scrollTop = optionTop
+	} else if (optionTop + optionHeight > current + viewHeight) {
+		viewport.scrollTop = optionTop + optionHeight - viewHeight
+	}
+}
+
+function estimateDropdownHeight(): number {
+	const optionHeight = 44
+	const optionWithSubLabelHeight = 68
+	const dividerHeight = 1
+	let height = 0
+
+	if (filteredOptions.value.length === 0) {
+		if (searchQuery.value) {
+			height += 52
+		}
+	} else {
+		for (const item of filteredOptions.value) {
+			if (isDivider(item)) {
+				height += dividerHeight
+			} else {
+				height += item.subLabel ? optionWithSubLabelHeight : optionHeight
+			}
+		}
+
+		height = Math.min(height, props.maxHeight)
+	}
+
+	if (slots['dropdown-footer']) {
+		height += 48
+	}
+
+	return height
+}
+
+function previewOpenDirection() {
+	if (props.forceDirection) {
+		openDirection.value = props.forceDirection
+		return
+	}
+
+	if (!effectiveTriggerEl.value) return
+
+	const triggerRect = getTriggerRect(effectiveTriggerEl.value)
+	const viewport = getViewportRect()
+	openDirection.value = determineOpenDirection(
+		triggerRect,
+		{ width: triggerRect.width, height: estimateDropdownHeight() },
+		viewport,
+	)
 }
 
 function determineOpenDirection(
@@ -542,6 +619,26 @@ function getViewportRect(): ViewportRect {
 	}
 }
 
+function getTriggerRect(el: HTMLElement): DOMRect {
+	const rect = el.getBoundingClientRect()
+	const transform = getComputedStyle(el).transform
+	if (!transform || transform === 'none') return rect
+
+	const matrix = new DOMMatrixReadOnly(transform)
+	const scaleX = Math.hypot(matrix.a, matrix.b) || 1
+	const scaleY = Math.hypot(matrix.c, matrix.d) || 1
+	if (Math.abs(scaleX - 1) < 0.001 && Math.abs(scaleY - 1) < 0.001) return rect
+
+	const width = rect.width / scaleX
+	const height = rect.height / scaleY
+	return new DOMRect(
+		rect.left + (rect.width - width) / 2,
+		rect.top + (rect.height - height) / 2,
+		width,
+		height,
+	)
+}
+
 function resolveDropdownWidth(triggerWidth: number): string {
 	if (props.dropdownWidth === undefined) return `${triggerWidth}px`
 	if (typeof props.dropdownWidth === 'number') return `${props.dropdownWidth}px`
@@ -559,8 +656,9 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
-	const triggerRect = effectiveTriggerEl.value.getBoundingClientRect()
-	const width = resolveDropdownWidth(effectiveTriggerEl.value.offsetWidth)
+	const trigger = effectiveTriggerEl.value
+	let triggerRect = getTriggerRect(trigger)
+	const width = resolveDropdownWidth(triggerRect.width)
 	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
 
 	dropdownStyle.value = {
@@ -571,6 +669,7 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
+	triggerRect = getTriggerRect(trigger)
 	const dropdownRect = {
 		width: dropdownRef.value.offsetWidth,
 		height: dropdownRef.value.offsetHeight,
@@ -635,15 +734,16 @@ async function openDropdown() {
 	if (props.disabled || isOpen.value || !hasMinimumSearchLength.value || !hasDropdownContent.value)
 		return
 
+	previewOpenDirection()
 	isOpen.value = true
 	emit('open')
 
 	await nextTick()
 	await updateDropdownPosition()
 	await initializeOptionsOverlayScrollbars()
-
-	setInitialFocus()
 	startPositionTracking()
+	setInitialFocus()
+	scheduleDropdownPositionUpdate()
 }
 
 function closeDropdown() {
@@ -735,7 +835,7 @@ function focusOption(index: number) {
 	if (isDivider(option) || option.disabled) return
 
 	focusedIndex.value = index
-	optionRefs.value[index]?.scrollIntoView({ block: 'nearest' })
+	scrollOptionIntoView(index, 'nearest')
 }
 
 function focusNextOption() {

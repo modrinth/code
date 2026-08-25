@@ -1,2 +1,5 @@
+export type { AccountChoice } from './AccountChoiceList.vue'
+export { default as AccountChoiceList } from './AccountChoiceList.vue'
 export { default as UserBadges } from './UserBadges.vue'
 export { default as UserPageHeader } from './UserPageHeader.vue'
+export { default as UserRoleIcon } from './UserRoleIcon.vue'

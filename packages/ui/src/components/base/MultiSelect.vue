@@ -125,7 +125,7 @@
 					<div class="empty:hidden">
 						<div
 							v-if="searchable"
-							class="px-0 py-1.5 border-0 border-solid border-b border-b-surface-5 flex"
+							class="px-0 border-0 border-solid border-b border-b-surface-5 flex"
 						>
 							<Input
 								ref="searchInputRef"
@@ -133,7 +133,7 @@
 								:icon="SearchIcon"
 								type="text"
 								:placeholder="searchPlaceholder"
-								wrapper-class="grow"
+								wrapper-class="grow m-2"
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
 							/>

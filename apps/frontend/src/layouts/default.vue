@@ -611,12 +611,46 @@
 					<template #moderation>
 						<ScaleIcon aria-hidden="true" /> {{ formatMessage(commonMessages.moderationLabel) }}
 					</template>
+					<template #switch-account>
+						<UsersIcon aria-hidden="true" /> {{ formatMessage(messages.switchAccount) }}
+					</template>
+					<template
+						v-for="account in accountSwitcherAccounts"
+						:key="account.id"
+						#[account.optionId]
+					>
+						<Avatar :src="account.avatarUrl" size="1.25rem" aria-hidden="true" circle />
+						{{ account.username }}
+						<UserRoleIcon :role="account.role" />
+					</template>
 					<template #sign-out>
 						<LogOutIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signOutButton) }}
 					</template>
 				</TeleportOverflowMenu>
 				<template v-else>
-					<ButtonLink type="colored" color="brand" :to="signInRouteObj">
+					<TeleportOverflowMenu
+						v-if="accountSwitcherAccounts.length > 0"
+						type="colored"
+						color="brand"
+						:icon-only="false"
+						:label="formatMessage(commonMessages.signInButton)"
+						class="btn-dropdown-animation !gap-1 !pr-1"
+						:options="accountSwitcherOptions"
+					>
+						<LogInIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.signInButton) }}
+						<DropdownIcon class="h-5 w-5" />
+						<template
+							v-for="account in accountSwitcherAccounts"
+							:key="account.id"
+							#[account.optionId]
+						>
+							<Avatar :src="account.avatarUrl" size="1.25rem" aria-hidden="true" circle />
+							{{ account.username }}
+							<UserRoleIcon :role="account.role" />
+						</template>
+					</TeleportOverflowMenu>
+					<ButtonLink v-else type="colored" color="brand" :to="signInRouteObj">
 						<LogInIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.signInButton) }}
 					</ButtonLink>
@@ -872,6 +906,8 @@ import {
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
+	UsersIcon,
+	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -890,6 +926,7 @@ import {
 	providePageContext,
 	TeleportOverflowMenu,
 	useHostingIntercom,
+	UserRoleIcon,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
@@ -911,7 +948,13 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import { getSignInRouteObj } from '~/composables/auth.ts'
+import {
+	forgetStoredAccount,
+	switchToSignedOut,
+	switchToStoredAccount,
+	useStoredAccounts,
+} from '~/composables/accounts.ts'
+import { getAddAccountRouteObj, getSignInRouteObj } from '~/composables/auth.ts'
 import { errors as generatedStateErrors, taxComplianceThresholds } from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
@@ -933,6 +976,8 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
+const addAccountRouteObj = computed(() => getAddAccountRouteObj(route))
+const storedAccounts = useStoredAccounts()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
 const pageContext = injectPageContext()
@@ -1169,6 +1214,22 @@ const messages = defineMessages({
 		id: 'layout.nav.my-servers',
 		defaultMessage: 'My servers',
 	},
+	switchAccount: {
+		id: 'layout.nav.switch-account',
+		defaultMessage: 'Switch account',
+	},
+	addAccount: {
+		id: 'layout.nav.add-account',
+		defaultMessage: 'Add account',
+	},
+	useSignedOut: {
+		id: 'layout.nav.use-signed-out',
+		defaultMessage: 'Use signed out',
+	},
+	removeAccount: {
+		id: 'layout.nav.remove-account',
+		defaultMessage: 'Remove account',
+	},
 	openMenu: {
 		id: 'layout.mobile.open-menu',
 		defaultMessage: 'Open menu',
@@ -1251,6 +1312,60 @@ const navRoutes = computed(() => [
 		href: '/discover/servers',
 	},
 ])
+
+const accountSwitcherAccounts = computed(() =>
+	storedAccounts.value.map((account) => ({
+		...account,
+		optionId: `account-${account.id}`,
+		current: account.id === auth.value.user?.id,
+	})),
+)
+
+const accountSwitcherOptions = computed(() => [
+	...accountSwitcherAccounts.value.map((account) => ({
+		id: account.optionId,
+		label: account.username,
+		selected: account.current,
+		action: () => switchAccount(account),
+		// current account is rewritten on load, drop it by signing out
+		trailingAction: account.current
+			? undefined
+			: {
+					label: formatMessage(messages.removeAccount),
+					icon: XIcon,
+					action: () => forgetStoredAccount(account.id),
+				},
+	})),
+	{
+		id: 'use-signed-out',
+		label: formatMessage(messages.useSignedOut),
+		icon: UserXIcon,
+		selected: !auth.value.user,
+		action: () => useSiteSignedOut(),
+	},
+	{
+		type: 'divider',
+	},
+	{
+		id: 'add-account',
+		label: formatMessage(messages.addAccount),
+		icon: PlusIcon,
+		type: 'link',
+		to: addAccountRouteObj.value,
+	},
+])
+
+async function switchAccount(account) {
+	if (account.current) return
+
+	await switchToStoredAccount(account)
+}
+
+async function useSiteSignedOut() {
+	if (!auth.value.user) return
+
+	await switchToSignedOut()
+}
 
 const userMenuOptions = computed(() => {
 	const user = auth.value.user
@@ -1356,6 +1471,12 @@ const userMenuOptions = computed(() => {
 		...options,
 		{
 			type: 'divider',
+		},
+		{
+			id: 'switch-account',
+			label: formatMessage(messages.switchAccount),
+			type: 'submenu',
+			options: accountSwitcherOptions.value,
 		},
 		{
 			id: 'sign-out',

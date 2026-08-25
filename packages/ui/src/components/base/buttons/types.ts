@@ -80,6 +80,12 @@ export interface OverflowMenuItemBase {
 	tone?: 'default' | ButtonColor
 	hoverFilled?: boolean
 	hoverFilledOnly?: boolean
+	selected?: boolean
+	trailingAction?: {
+		label: string
+		icon: Component
+		action: (event: MouseEvent) => void
+	}
 }
 
 export interface OverflowMenuAction extends OverflowMenuItemBase {
@@ -102,7 +108,14 @@ export interface OverflowMenuDivider {
 	shown?: boolean
 }
 
-export type OverflowMenuOption = OverflowMenuAction | OverflowMenuLink | OverflowMenuDivider
+export type OverflowMenuLeafOption = OverflowMenuAction | OverflowMenuLink | OverflowMenuDivider
+
+export interface OverflowMenuSubmenu extends OverflowMenuItemBase {
+	type: 'submenu'
+	options: OverflowMenuLeafOption[]
+}
+
+export type OverflowMenuOption = OverflowMenuLeafOption | OverflowMenuSubmenu
 
 export interface ButtonElementHandle {
 	element: HTMLElement | null

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@modrinth/assets'
+import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Accordion,
 	Avatar,
+	ContextMenu,
 	defineMessages,
 	IconButton,
 	TeleportOverflowMenu,
@@ -11,7 +13,6 @@ import {
 import { useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import type { FriendWithUserData } from '@/helpers/friends.ts'
 
 const { formatMessage } = useVIntl()
@@ -36,27 +37,30 @@ const emit = defineEmits<{
 	onClose: []
 }>()
 
-function createContextMenuOptions(friend: FriendWithUserData) {
-	if (friend.accepted) {
-		return [
-			{
-				name: 'view-profile',
-			},
-			{
-				name: 'remove-friend',
-				color: 'danger',
-			},
-		]
-	} else {
-		return [
-			{
-				name: 'view-profile',
-			},
-			{
-				name: 'cancel-request',
-			},
-		]
-	}
+function createContextMenuOptions(friend: FriendWithUserData): OverflowMenuOption[] {
+	return [
+		{
+			id: 'view-profile',
+			label: formatMessage(messages.viewProfile),
+			icon: UserIcon,
+			action: () => openProfile(friend.username),
+		},
+		friend.accepted
+			? {
+					id: 'remove-friend',
+					label: formatMessage(messages.removeFriend),
+					icon: TrashIcon,
+					tone: 'red',
+					hoverFilledOnly: true,
+					action: () => void props.removeFriend(friend),
+				}
+			: {
+					id: 'cancel-request',
+					label: formatMessage(messages.cancelRequest),
+					icon: XIcon,
+					action: () => void props.removeFriend(friend),
+				},
+	]
 }
 
 function openProfile(username: string) {
@@ -64,16 +68,6 @@ function openProfile(username: string) {
 }
 
 const friendOptions = useTemplateRef('friendOptions')
-async function handleFriendOptions(args: { item: FriendWithUserData; option: string }) {
-	switch (args.option) {
-		case 'remove-friend':
-		case 'cancel-request':
-			await props.removeFriend(args.item)
-			break
-		case 'view-profile':
-			openProfile(args.item.username)
-	}
-}
 
 const messages = defineMessages({
 	removeFriend: {
@@ -96,18 +90,15 @@ const messages = defineMessages({
 		id: 'friends.friend.view-profile',
 		defaultMessage: 'View profile',
 	},
+	friendActionsLabel: {
+		id: 'friends.friend.actions.label',
+		defaultMessage: 'Friend actions',
+	},
 })
 </script>
 
 <template>
-	<ContextMenu ref="friendOptions" @option-clicked="handleFriendOptions">
-		<template #view-profile>
-			<UserIcon />
-			{{ formatMessage(messages.viewProfile) }}
-		</template>
-		<template #remove-friend> <TrashIcon /> {{ formatMessage(messages.removeFriend) }} </template>
-		<template #cancel-request> <XIcon /> {{ formatMessage(messages.cancelRequest) }} </template>
-	</ContextMenu>
+	<ContextMenu ref="friendOptions" :label="formatMessage(messages.friendActionsLabel)" />
 	<Accordion
 		:open-by-default="openByDefault"
 		:force-open="isSearching"
@@ -132,7 +123,7 @@ const messages = defineMessages({
 					:key="friend.username"
 					class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1"
 					@contextmenu.prevent.stop="
-						(event) => friendOptions?.showMenu(event, friend, createContextMenuOptions(friend))
+						(event) => friendOptions?.open(event, createContextMenuOptions(friend))
 					"
 				>
 					<RouterLink

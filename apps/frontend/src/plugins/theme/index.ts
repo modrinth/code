@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import { ref } from 'vue'
 
 import { useNativeTheme } from './native-theme.ts'
@@ -46,6 +47,21 @@ export default defineNuxtPlugin({
 				$settings.preferred === 'system' ? getPreferredNativeTheme() : $settings.preferred
 		}
 
+		function applyAccountAppearance(appearance: Labrinth.Users.v3.AppearancePreferences) {
+			if (isDarkTheme(appearance.theme)) {
+				$preferredThemes.dark = appearance.theme
+			} else {
+				$preferredThemes.light = appearance.theme
+			}
+
+			$settings.preferred = appearance.auto ? 'system' : appearance.theme
+
+			const systemThemeIsUnknown =
+				import.meta.server && $settings.preferred === 'system' && $nativeTheme.value === 'unknown'
+
+			if (!systemThemeIsUnknown) syncTheme()
+		}
+
 		if (
 			import.meta.server &&
 			$settings.preferred === 'system' &&
@@ -91,6 +107,7 @@ export default defineNuxtPlugin({
 					 */
 					native: $nativeTheme,
 					cycle,
+					applyAccountAppearance,
 				}),
 			},
 		}

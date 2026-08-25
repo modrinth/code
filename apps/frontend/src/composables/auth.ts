@@ -2,7 +2,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import { useStorage } from '@vueuse/core'
 import type { LocationQueryValue, RouteLocationNormalizedLoaded } from 'vue-router'
 
-import type { CookieOptions } from '#app'
+import { forgetStoredAccountByToken, rememberStoredAccount } from '@/composables/accounts.ts'
+import { useAuthCookie } from '@/composables/auth-cookie.ts'
 
 type AuthState = {
 	user: Labrinth.Users.v2.User | null
@@ -15,13 +16,6 @@ type LauncherRoute = Pick<RouteLocationNormalizedLoaded, 'query'>
 
 export const LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY = 'auth-last-sign-in-oauth-provider'
 export const PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY = 'auth-pending-sign-in-oauth-provider'
-
-const AUTH_COOKIE_OPTIONS = {
-	maxAge: 60 * 60 * 24 * 365 * 10,
-	sameSite: 'lax',
-	httpOnly: false,
-	path: '/',
-} satisfies CookieOptions<string | null>
 
 const normalizeAuthToken = (value: unknown) => {
 	if (typeof value === 'string') {
@@ -48,6 +42,9 @@ const isAuthFailure = (error: unknown): boolean => {
 }
 
 const clearAuthCookie = (auth: AuthState, authCookie: { value: string | null }) => {
+	if (auth.token) {
+		forgetStoredAccountByToken(auth.token)
+	}
 	authCookie.value = null
 	auth.token = ''
 	auth.user = null
@@ -84,11 +81,7 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 	}
 
 	const route = useRoute()
-	const config = useRuntimeConfig()
-	const authCookie = useCookie<string | null>('auth-token', {
-		...AUTH_COOKIE_OPTIONS,
-		secure: config.public.cookieSecure,
-	})
+	const authCookie = useAuthCookie()
 
 	if (oldToken) {
 		const normalized = normalizeAuthToken(oldToken)
@@ -183,6 +176,10 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 		}
 	}
 
+	if (auth.user && auth.token) {
+		rememberStoredAccount(auth.user, auth.token)
+	}
+
 	return auth
 }
 
@@ -198,6 +195,16 @@ export const getSignInRouteObj = (route: FullPathRoute, redirectOverride?: strin
 	path: '/auth/sign-in',
 	query: {
 		redirect: redirectOverride ?? getSignInRedirectPath(route),
+	},
+})
+
+export const ADD_ACCOUNT_QUERY_PARAM = 'add_account'
+
+export const getAddAccountRouteObj = (route: FullPathRoute) => ({
+	path: '/auth/sign-in',
+	query: {
+		redirect: getSignInRedirectPath(route),
+		[ADD_ACCOUNT_QUERY_PARAM]: 'true',
 	},
 })
 

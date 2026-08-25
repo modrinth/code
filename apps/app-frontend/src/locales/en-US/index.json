@@ -260,6 +260,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Hide already installed"
   },
+  "app.browse.project-actions.label": {
+    "message": "Project actions"
+  },
   "app.browse.project-type.data-packs": {
     "message": "Data Packs"
   },
@@ -463,6 +466,9 @@
   },
   "app.instance.action.stop": {
     "message": "Stop"
+  },
+  "app.instance.actions.label": {
+    "message": "Instance actions"
   },
   "app.instance.add-server.add": {
     "message": "Add"
@@ -851,6 +857,9 @@
   "app.java-selector.test-installation": {
     "message": "Test Java installation"
   },
+  "app.library.actions.label": {
+    "message": "Library actions"
+  },
   "app.library.context-menu.create-instance": {
     "message": "New instance"
   },
@@ -898,6 +907,9 @@
   },
   "app.library.group-by.none": {
     "message": "No grouping"
+  },
+  "app.library.group.actions.label": {
+    "message": "Group actions"
   },
   "app.library.group.collapse": {
     "message": "Collapse group"
@@ -1021,6 +1033,9 @@
   },
   "app.library.instance.action.view-instance": {
     "message": "View instance"
+  },
+  "app.library.instance.actions.label": {
+    "message": "Instance actions"
   },
   "app.library.instance.deselect": {
     "message": "Deselect instance"
@@ -1261,6 +1276,9 @@
   },
   "app.notification.warning": {
     "message": "Warning"
+  },
+  "app.project.actions.label": {
+    "message": "Project actions"
   },
   "app.project.coming-soon": {
     "message": "Coming soon"
@@ -1807,6 +1825,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>Add friends</link> to see what they're playing!"
+  },
+  "friends.friend.actions.label": {
+    "message": "Friend actions"
   },
   "friends.friend.cancel-request": {
     "message": "Cancel request"

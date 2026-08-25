@@ -1,5 +1,8 @@
-use crate::state::ModrinthCredentials;
+use crate::state::{FeatureFlag, ModrinthCredentials, Settings};
 use serde::Deserialize;
+
+const LOCALHOST_LOGIN_URL: &str = "http://localhost:3000/auth/sign-in";
+const LOCALHOST_SIGNUP_URL: &str = "http://localhost:3000/auth/sign-up";
 
 #[derive(Clone, Copy, Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -9,11 +12,23 @@ pub enum ModrinthAuthFlow {
 }
 
 #[tracing::instrument]
-pub fn authenticate_begin_flow(flow: ModrinthAuthFlow) -> &'static str {
-    match flow {
-        ModrinthAuthFlow::SignIn => crate::state::get_login_url(),
-        ModrinthAuthFlow::SignUp => crate::state::get_signup_url(),
-    }
+pub async fn authenticate_begin_flow(
+    flow: ModrinthAuthFlow,
+) -> crate::Result<&'static str> {
+    let state = crate::State::get().await?;
+    let settings = Settings::get(&state.pool).await?;
+    let use_localhost = settings
+        .feature_flags
+        .get(&FeatureFlag::LocalhostSignIn)
+        .copied()
+        .unwrap_or(false);
+
+    Ok(match (use_localhost, flow) {
+        (true, ModrinthAuthFlow::SignIn) => LOCALHOST_LOGIN_URL,
+        (true, ModrinthAuthFlow::SignUp) => LOCALHOST_SIGNUP_URL,
+        (false, ModrinthAuthFlow::SignIn) => crate::state::get_login_url(),
+        (false, ModrinthAuthFlow::SignUp) => crate::state::get_signup_url(),
+    })
 }
 
 #[tracing::instrument]

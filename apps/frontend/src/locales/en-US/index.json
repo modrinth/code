@@ -863,6 +863,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Enter code..."
   },
+  "auth.sign-in.add-account": {
+    "message": "Add account"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Choose an account to use in Modrinth App"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continue with Email"
   },
@@ -880,6 +886,9 @@
   },
   "auth.sign-in.launcher.complete.description": {
     "message": "We’re returning you to the Modrinth App. If nothing happens, use the button below."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Go to Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Open Modrinth App"
@@ -2204,6 +2213,9 @@
   "error.generic.401.signed-in-as": {
     "message": "You're currently signed in as:"
   },
+  "error.generic.401.switch-account": {
+    "message": "Or switch to another account:"
+  },
   "error.generic.401.title": {
     "message": "You don't have access to this page"
   },
@@ -2645,6 +2657,9 @@
   "landing.subheading": {
     "message": "Discover, play, and share Minecraft content through our open-source platform built for the community."
   },
+  "layout.account-switcher.switching": {
+    "message": "Switching accounts..."
+  },
   "layout.action.analytics-events": {
     "message": "Analytics events"
   },
@@ -2888,6 +2903,9 @@
   "layout.nav.active-reports": {
     "message": "Active reports"
   },
+  "layout.nav.add-account": {
+    "message": "Add account"
+  },
   "layout.nav.discover": {
     "message": "Discover"
   },
@@ -2918,6 +2936,9 @@
   "layout.nav.projects": {
     "message": "Projects"
   },
+  "layout.nav.remove-account": {
+    "message": "Remove account"
+  },
   "layout.nav.revenue": {
     "message": "Revenue"
   },
@@ -2927,8 +2948,14 @@
   "layout.nav.search": {
     "message": "Search"
   },
+  "layout.nav.switch-account": {
+    "message": "Switch account"
+  },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
+  },
+  "layout.nav.use-signed-out": {
+    "message": "Use signed out"
   },
   "layout.publish.email-verification-required.description": {
     "message": "You must verify your email before publishing on Modrinth."

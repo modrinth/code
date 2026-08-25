@@ -2,8 +2,12 @@ import {
 	DownloadIcon,
 	ExternalIcon,
 	MoreVerticalIcon,
+	PlusIcon,
 	SettingsIcon,
 	TrashIcon,
+	UsersIcon,
+	UserXIcon,
+	XIcon,
 } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
@@ -100,5 +104,43 @@ export const QuietTrigger: Story = {
 export const Hoverable: Story = {
 	args: {
 		hoverable: true,
+	},
+}
+
+const optionsWithSubmenu: OverflowMenuOption[] = [
+	...options,
+	{ type: 'divider' },
+	{
+		id: 'switch-account',
+		label: 'Switch account',
+		icon: UsersIcon,
+		type: 'submenu',
+		options: [
+			{ id: 'account-jai', label: 'Jai', selected: true, action: () => undefined },
+			{
+				id: 'account-prospector',
+				label: 'Prospector',
+				action: () => undefined,
+				trailingAction: {
+					label: 'Remove Prospector',
+					icon: XIcon,
+					action: () => undefined,
+				},
+			},
+			{
+				id: 'use-signed-out',
+				label: 'Use signed out',
+				icon: UserXIcon,
+				action: () => undefined,
+			},
+			{ type: 'divider' },
+			{ id: 'add-account', label: 'Add account', icon: PlusIcon, action: () => undefined },
+		],
+	},
+]
+
+export const WithSubmenu: Story = {
+	args: {
+		options: optionsWithSubmenu,
 	},
 }

@@ -374,6 +374,7 @@ const messages = defineMessages({
 								:tint-by="instanceId"
 								class="shrink-0"
 								no-shadow
+								pad-transparent-corners
 							/>
 							<span class="truncate">{{ instanceName }}</span>
 						</router-link>

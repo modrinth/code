@@ -61,6 +61,7 @@
 						:src="reportItemAvatarUrl"
 						:circle="report.item_type === 'user'"
 						size="4rem"
+						:pad-transparent-corners="report.item_type === 'shared-instance'"
 						:class="[
 							'flex-shrink-0 border border-surface-5 bg-surface-4 !shadow-none',
 							report.item_type !== 'user' && 'rounded-2xl',

@@ -11,6 +11,7 @@
 .floating-expand-enter-to,
 .floating-expand-leave-from {
 	opacity: 1;
+	scale: 1 1;
 }
 
 .floating-expand-enter-active,
@@ -19,6 +20,22 @@
 		opacity 0.125s var(--ease-out-expo),
 		scale 0.125s var(--ease-out-expo);
 	transform-origin: top;
+}
+
+.overflow-menu-item[data-tone]:not([data-hover-filled-only]),
+.overflow-menu-item[data-tone]:not([data-hover-filled-only]) svg {
+	color: var(--overflow-menu-item-tone);
+}
+
+.overflow-menu-item[data-tone][data-hover-filled]:hover,
+.overflow-menu-item[data-tone][data-hover-filled]:focus-visible {
+	color: var(--color-accent-contrast);
+	background-color: var(--overflow-menu-item-tone);
+}
+
+.overflow-menu-item[data-tone][data-hover-filled]:hover svg,
+.overflow-menu-item[data-tone][data-hover-filled]:focus-visible svg {
+	color: inherit;
 }
 
 @layer utilities {

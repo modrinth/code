@@ -4016,6 +4016,12 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Channel"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, number} selected"
+  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Toggle filter for {filter}"
   },
@@ -6666,6 +6672,12 @@
     "defaultMessage": "This user works for Modrinth."
   },
   "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth Team"
+  },
+  "user.role.moderator": {
+    "defaultMessage": "Content Moderator"
+  },
+  "user.role.modrinth-team": {
     "defaultMessage": "Modrinth Team"
   },
   "version.content.name": {

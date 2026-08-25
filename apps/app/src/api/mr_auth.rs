@@ -33,7 +33,7 @@ pub async fn modrinth_login<R: Runtime>(
 
     let auth_request_uri = format!(
         "{}?launcher=true&ipver={}&port={}",
-        mr_auth::authenticate_begin_flow(flow),
+        mr_auth::authenticate_begin_flow(flow).await?,
         if auth_code_recv_socket.is_ipv4() {
             "4"
         } else {

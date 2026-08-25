@@ -1,7 +1,13 @@
 <template>
 	<PageHeader :title="instance.name">
 		<template #leading>
-			<Avatar :src="iconSrc" :alt="instance.name" size="64px" :tint-by="instance.id" />
+			<Avatar
+				:src="iconSrc"
+				:alt="instance.name"
+				size="64px"
+				:tint-by="instance.id"
+				pad-transparent-corners
+			/>
 		</template>
 
 		<template v-if="instance.shared_instance || instance.quarantined" #badges>

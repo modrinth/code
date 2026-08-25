@@ -204,6 +204,7 @@ const dividerTooltip = computed(() => {
 					size="28px"
 					:tint-by="instance.id"
 					:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
+					pad-transparent-corners
 				/>
 				<div
 					v-if="instance.install_stage !== 'installed'"

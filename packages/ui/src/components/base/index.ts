@@ -13,6 +13,7 @@ export { default as BulletDivider } from './BulletDivider.vue'
 export { default as Button } from './buttons/Button.vue'
 export { default as ButtonGroup } from './buttons/ButtonGroup.vue'
 export { default as ButtonLink } from './buttons/ButtonLink.vue'
+export { default as ContextMenu } from './buttons/ContextMenu.vue'
 export { default as FileButton } from './buttons/FileButton.vue'
 export { default as IconButton } from './buttons/IconButton.vue'
 export { default as SplitButton } from './buttons/SplitButton.vue'
@@ -27,8 +28,10 @@ export type {
 	ButtonVisualProps,
 	OverflowMenuAction,
 	OverflowMenuDivider,
+	OverflowMenuLeafOption,
 	OverflowMenuLink,
 	OverflowMenuOption,
+	OverflowMenuSubmenu,
 	TeleportPlacement,
 } from './buttons/types'
 export { default as Card } from './Card.vue'

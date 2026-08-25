@@ -163,6 +163,7 @@ onMounted(() => {
 				no-shadow
 				class="!rounded-[14px]"
 				size="48px"
+				pad-transparent-corners
 			/>
 			<div class="flex flex-col col-span-2 justify-center gap-1 h-full">
 				<div class="flex items-center gap-1.5">
