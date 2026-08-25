@@ -56,7 +56,7 @@ onBeforeUnmount(() => {
 			<img :src="screenshot.url" alt="" class="h-full w-full object-cover" />
 			<TagItem
 				v-if="count > 1"
-				class="!absolute right-3 top-3 z-[2] border-surface-5 bg-surface-2 font-semibold tabular-nums text-contrast motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-out"
+				class="!absolute right-3 top-3 z-[2] border-surface-5 bg-surface-4 tabular-nums text-secondary motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-out"
 			>
 				{{ count }}
 			</TagItem>
