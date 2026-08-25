@@ -40,10 +40,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
-        .service(get_user_project_status_counts)
-        .service(get_users_project_status_counts)
-        .service(get_organization_project_status_counts)
-        .service(get_organizations_project_status_counts)
+        .service(get_user_project_grouped)
+        .service(get_users_project_grouped)
+        .service(get_organization_project_grouped)
+        .service(get_organizations_project_grouped)
         .service(web::scope("/tech-review").configure(tech_review::config))
         .service(
             web::scope("/external-license").configure(external_license::config),
