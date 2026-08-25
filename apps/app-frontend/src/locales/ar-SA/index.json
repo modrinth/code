@@ -1154,9 +1154,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "تسجيل الدخول إلى حساب Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "تسجيل الدخول ك <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "الترقية إلى Modrinth+"
   },
@@ -1168,9 +1165,6 @@
   },
   "app.navigation.home": {
     "message": "الصفحة الرئيسية"
-  },
-  "app.navigation.more-options": {
-    "message": "المزيد من الخيارات"
   },
   "app.navigation.next-image": {
     "message": "الصورة التالية"

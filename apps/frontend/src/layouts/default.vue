@@ -515,17 +515,20 @@
 						{
 							id: 'new-project',
 							label: formatMessage(messages.newProject),
+							icon: BoxIcon,
 							action: (event) => requireVerifiedEmail(() => $refs.modal_creation.show(event)),
 						},
 						{
 							id: 'new-server-project',
 							label: formatMessage(messages.newServerProject),
+							icon: ServerIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_creation.show(event, { type: 'server' })),
 						},
 						{
 							id: 'new-collection',
 							label: formatMessage(messages.newCollection),
+							icon: CollectionIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_collection_creation.show(event)),
 						},
@@ -533,6 +536,7 @@
 						{
 							id: 'new-organization',
 							label: formatMessage(messages.newOrganization),
+							icon: OrganizationIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
 						},
@@ -540,19 +544,6 @@
 				>
 					<PlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.publish) }}
-					<template #new-project>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
-					</template>
-					<template #new-server-project>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
-					</template>
-					<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
-					<template #new-collection>
-						<CollectionIcon aria-hidden="true" /> {{ formatMessage(messages.newCollection) }}
-					</template>
-					<template #new-organization>
-						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.newOrganization) }}
-					</template>
 				</TeleportOverflowMenu>
 				<TeleportOverflowMenu
 					v-if="auth.user"
@@ -566,54 +557,6 @@
 				>
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
 					<DropdownIcon class="h-5 w-5 text-secondary" />
-					<template #profile>
-						<UserIcon aria-hidden="true" /> {{ formatMessage(messages.profile) }}
-					</template>
-					<template #notifications>
-						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
-					</template>
-					<template #reports>
-						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.activeReports) }}
-					</template>
-					<template #saved>
-						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
-					</template>
-					<template #servers>
-						<ServerStackIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
-					</template>
-					<template #plus>
-						<ArrowBigUpDashIcon aria-hidden="true" />
-						{{ formatMessage(messages.upgradeToModrinthPlus) }}
-					</template>
-					<template #settings>
-						<SettingsIcon aria-hidden="true" /> {{ formatMessage(commonMessages.settingsLabel) }}
-					</template>
-					<template #flags>
-						<ToggleRightIcon aria-hidden="true" />
-						{{ formatMessage(commonSettingsMessages.featureFlags) }}
-					</template>
-					<template #projects>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.projects) }}
-					</template>
-					<template #organizations>
-						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.organizations) }}
-					</template>
-					<template #affiliate-links>
-						<AffiliateIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.affiliateLinksButton) }}
-					</template>
-					<template #revenue>
-						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
-					</template>
-					<template #analytics>
-						<ChartIcon aria-hidden="true" /> {{ formatMessage(commonMessages.analyticsButton) }}
-					</template>
-					<template #moderation>
-						<ScaleIcon aria-hidden="true" /> {{ formatMessage(commonMessages.moderationLabel) }}
-					</template>
-					<template #switch-account>
-						<UsersIcon aria-hidden="true" /> {{ formatMessage(messages.switchAccount) }}
-					</template>
 					<template
 						v-for="account in accountSwitcherAccounts"
 						:key="account.id"
@@ -622,9 +565,6 @@
 						<Avatar :src="account.avatarUrl" size="1.25rem" aria-hidden="true" circle />
 						{{ account.username }}
 						<UserRoleIcon :role="account.role" />
-					</template>
-					<template #sign-out>
-						<LogOutIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signOutButton) }}
 					</template>
 				</TeleportOverflowMenu>
 				<template v-else>
@@ -869,6 +809,7 @@
 import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
+	ArrowLeftRightIcon,
 	BellIcon,
 	BoxIcon,
 	BracesIcon,
@@ -906,7 +847,6 @@ import {
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
-	UsersIcon,
 	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -1375,12 +1315,14 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'profile',
 			label: formatMessage(messages.profile),
+			icon: UserIcon,
 			type: 'link',
 			to: `/user/${user.username}`,
 		},
 		{
 			id: 'plus',
 			label: formatMessage(messages.upgradeToModrinthPlus),
+			icon: ArrowBigUpDashIcon,
 			type: 'link',
 			to: '/plus',
 			tone: 'purple',
@@ -1389,12 +1331,14 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'servers',
 			label: formatMessage(messages.myServers),
+			icon: ServerStackIcon,
 			type: 'link',
 			to: '/hosting/manage',
 		},
 		{
 			id: 'flags',
 			label: formatMessage(commonSettingsMessages.featureFlags),
+			icon: ToggleRightIcon,
 			type: 'link',
 			to: '/settings/flags',
 			shown: flags.value.developerMode,
@@ -1402,6 +1346,7 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'settings',
 			label: formatMessage(commonMessages.settingsLabel),
+			icon: SettingsIcon,
 			type: 'link',
 			to: '/settings',
 		},
@@ -1416,18 +1361,21 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'notifications',
 			label: formatMessage(commonMessages.notificationsLabel),
+			icon: BellIcon,
 			type: 'link',
 			to: '/dashboard/notifications',
 		},
 		{
 			id: 'reports',
 			label: formatMessage(messages.activeReports),
+			icon: ReportIcon,
 			type: 'link',
 			to: '/dashboard/reports',
 		},
 		{
 			id: 'saved',
 			label: formatMessage(commonMessages.collectionsLabel),
+			icon: LibraryIcon,
 			type: 'link',
 			to: '/dashboard/collections',
 		},
@@ -1437,24 +1385,28 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'projects',
 			label: formatMessage(messages.projects),
+			icon: BoxIcon,
 			type: 'link',
 			to: '/dashboard/projects',
 		},
 		{
 			id: 'organizations',
 			label: formatMessage(messages.organizations),
+			icon: OrganizationIcon,
 			type: 'link',
 			to: '/dashboard/organizations',
 		},
 		{
 			id: 'analytics',
 			label: formatMessage(commonMessages.analyticsButton),
+			icon: ChartIcon,
 			type: 'link',
 			to: '/dashboard/analytics',
 		},
 		{
 			id: 'affiliate-links',
 			label: formatMessage(commonMessages.affiliateLinksButton),
+			icon: AffiliateIcon,
 			type: 'link',
 			to: '/dashboard/affiliate-links',
 			shown: Boolean(user.badges & UserBadge.AFFILIATE),
@@ -1462,6 +1414,7 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'revenue',
 			label: formatMessage(messages.revenue),
+			icon: CurrencyIcon,
 			type: 'link',
 			to: '/dashboard/revenue',
 		},
@@ -1475,12 +1428,14 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'switch-account',
 			label: formatMessage(messages.switchAccount),
+			icon: ArrowLeftRightIcon,
 			type: 'submenu',
 			options: accountSwitcherOptions.value,
 		},
 		{
 			id: 'sign-out',
 			label: formatMessage(commonMessages.signOutButton),
+			icon: LogOutIcon,
 			tone: 'red',
 			hoverFilled: true,
 			action: () => logoutUser(),

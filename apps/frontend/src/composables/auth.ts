@@ -229,6 +229,10 @@ export const getAuthUrl = (provider: string, redirect = '/dashboard') => {
 					callbackUrl.searchParams.set('port', port)
 				}
 
+				if (route.query[ADD_ACCOUNT_QUERY_PARAM] !== undefined) {
+					callbackUrl.searchParams.set(ADD_ACCOUNT_QUERY_PARAM, 'true')
+				}
+
 				return callbackUrl.toString()
 			})()
 		: `${config.public.siteUrl}/auth/sign-in?redirect=${encodeURIComponent(redirect)}`

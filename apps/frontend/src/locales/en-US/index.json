@@ -2657,9 +2657,6 @@
   "landing.subheading": {
     "message": "Discover, play, and share Minecraft content through our open-source platform built for the community."
   },
-  "layout.account-switcher.switching": {
-    "message": "Switching accounts..."
-  },
   "layout.action.analytics-events": {
     "message": "Analytics events"
   },

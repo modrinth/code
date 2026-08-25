@@ -15,24 +15,24 @@ const props = defineProps<{
 	side?: AnchoredTeleportSide
 	anchorStyle?: CSSProperties
 	origin?: string
+	expand?: 'vertical' | 'horizontal'
 	// covers the gap so hovering from the trigger doesn't count as leaving
 	bridge?: { side: AnchoredTeleportSide; size: number }
 }>()
 
 const element = ref<HTMLElement | null>(null)
 
-const transformOrigin = computed(() => {
-	switch (props.side) {
-		case 'top':
-			return 'bottom center'
-		case 'left':
-			return 'right center'
-		case 'right':
-			return 'left center'
-		case 'bottom':
-			return 'top center'
-		default:
-			return props.origin
+const expandStyle = computed(() => {
+	const origin = props.origin ?? 'top center'
+	return {
+		transformOrigin: origin,
+		'--floating-expand-origin': origin,
+		...(props.expand === 'horizontal'
+			? {
+					'--floating-expand-x': '0.3',
+					'--floating-expand-y': '0.8',
+				}
+			: {}),
 	}
 })
 
@@ -47,7 +47,7 @@ defineExpose({ element })
 			ref="element"
 			v-bind="$attrs"
 			:class="overflowMenuPanelClasses"
-			:style="[props.panelStyle, { transformOrigin }]"
+			:style="[props.panelStyle, expandStyle]"
 			role="menu"
 			:aria-label="props.label"
 		>

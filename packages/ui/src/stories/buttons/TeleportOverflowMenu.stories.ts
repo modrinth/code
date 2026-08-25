@@ -1,11 +1,11 @@
 import {
+	ArrowLeftRightIcon,
 	DownloadIcon,
 	ExternalIcon,
 	MoreVerticalIcon,
 	PlusIcon,
 	SettingsIcon,
 	TrashIcon,
-	UsersIcon,
 	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -113,7 +113,7 @@ const optionsWithSubmenu: OverflowMenuOption[] = [
 	{
 		id: 'switch-account',
 		label: 'Switch account',
-		icon: UsersIcon,
+		icon: ArrowLeftRightIcon,
 		type: 'submenu',
 		options: [
 			{ id: 'account-jai', label: 'Jai', selected: true, action: () => undefined },

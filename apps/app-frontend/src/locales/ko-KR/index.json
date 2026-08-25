@@ -1175,9 +1175,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Modrinth 계정으로 로그인"
   },
-  "app.nav.signed-in-as": {
-    "message": "<user>{username}</user> 으로 로그인됨"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ 로 업그레이드"
   },

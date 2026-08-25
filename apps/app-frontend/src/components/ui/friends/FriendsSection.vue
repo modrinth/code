@@ -3,11 +3,11 @@ import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@modrinth/assets'
 import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Accordion,
-	Avatar,
 	ContextMenu,
 	defineMessages,
 	IconButton,
 	TeleportOverflowMenu,
+	UserAvatar,
 	useVIntl,
 } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
@@ -121,32 +121,24 @@ const messages = defineMessages({
 				<div
 					v-for="friend in friends"
 					:key="friend.username"
-					class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1"
+					class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1 select-none"
 					@contextmenu.prevent.stop="
 						(event) => friendOptions?.open(event, createContextMenuOptions(friend))
 					"
 				>
 					<RouterLink
 						:to="`/user/${encodeURIComponent(friend.username)}`"
-						class="grid min-w-0 grid-cols-[auto_1fr] items-center gap-2 text-inherit no-underline"
+						class="grid min-w-0 grid-cols-[auto_1fr] items-center gap-2 text-inherit no-underline group no-click-animation"
 					>
-						<div class="relative">
-							<Avatar
-								:src="friend.avatar"
-								:class="{ grayscale: !friend.online && friend.accepted }"
-								class="w-12 h-12 rounded-full"
-								size="32px"
-								circle
-							/>
-							<span
-								v-if="friend.online"
-								aria-hidden="true"
-								class="bottom-[2px] right-[-2px] absolute w-3 h-3 bg-brand border-2 border-black border-solid rounded-full"
-							/>
-						</div>
+						<UserAvatar
+							:src="friend.avatar"
+							size="32px"
+							:badge="friend.online"
+							:grayscale="!friend.online && friend.accepted"
+						/>
 						<div class="flex flex-col">
 							<span
-								class="text-sm m-0"
+								class="text-sm m-0 group-hover:underline"
 								:class="friend.online || !friend.accepted ? 'text-contrast' : 'text-primary'"
 							>
 								{{ friend.username }}

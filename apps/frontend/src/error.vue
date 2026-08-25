@@ -2,7 +2,7 @@
 	<NuxtLayout>
 		<LoadingBar />
 		<NotificationPanel />
-		<AccountSwitchOverlay />
+		<AccountSwitchOverlay :show="isSwitchingAccount" />
 		<div class="main">
 			<div v-if="is404" class="error-graphic">
 				<Logo404 />
@@ -97,6 +97,7 @@
 import { AnnoyedRinthbot, LogInIcon, LogOutIcon, SadRinthbot } from '@modrinth/assets'
 import {
 	AccountChoiceList,
+	AccountSwitchOverlay,
 	Avatar,
 	Button,
 	ButtonLink,
@@ -112,10 +113,10 @@ import {
 } from '@modrinth/ui'
 
 import Logo404 from '~/assets/images/404.svg'
-import AccountSwitchOverlay from '~/components/ui/AccountSwitchOverlay.vue'
 import {
 	hydrateStoredAccounts,
 	switchToStoredAccount,
+	useIsSwitchingAccount,
 	useStoredAccounts,
 } from '~/composables/accounts.ts'
 import { getSignInRouteObj } from '~/composables/auth.js'
@@ -126,6 +127,7 @@ const auth = await useAuth()
 setupProviders(auth)
 
 const { formatMessage } = useVIntl()
+const isSwitchingAccount = useIsSwitchingAccount()
 
 const props = defineProps({
 	error: {

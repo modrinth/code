@@ -17,7 +17,7 @@ export const overflowMenuItemClasses =
 	'[&>svg]:size-5 [&>svg]:shrink-0 [&>svg]:text-primary'
 
 export const overflowMenuPanelClasses =
-	'fixed isolate z-[9999] rounded-[14px] bg-surface-3 shadow-lg ring-1 ring-surface-5'
+	'fixed isolate z-[9999] rounded-[14px] bg-surface-3 shadow-lg ring-1 ring-surface-5 select-none'
 
 export const menuPanelPadding = 8
 export const submenuGap = 2

@@ -43,6 +43,7 @@ export function useAnchoredTeleport(
 	})
 	const anchorStyle = ref<CSSProperties>({})
 	const resolvedSide = ref<AnchoredTeleportSide>('bottom')
+	const expandOrigin = ref('top center')
 
 	let resizeObserver: ResizeObserver | undefined
 
@@ -111,6 +112,11 @@ export function useAnchoredTeleport(
 		const maxLeft = Math.max(viewportPadding, window.innerWidth - panelRect.width - viewportPadding)
 		const panelTop = Math.min(Math.max(idealTop, viewportPadding), maxTop)
 		const panelLeft = Math.min(Math.max(idealLeft, viewportPadding), maxLeft)
+		const originY = triggerRect.top + triggerRect.height / 2 - panelTop
+		const originX = isHorizontal
+			? (resolvedSide.value === 'right' ? triggerRect.right : triggerRect.left) - panelLeft
+			: triggerRect.left + triggerRect.width / 2 - panelLeft
+		expandOrigin.value = `${originX}px ${originY}px`
 
 		panelStyle.value = {
 			top: `${panelTop}px`,
@@ -195,6 +201,7 @@ export function useAnchoredTeleport(
 		panelStyle,
 		anchorStyle,
 		resolvedSide,
+		expandOrigin,
 		open,
 		close,
 		updatePosition,

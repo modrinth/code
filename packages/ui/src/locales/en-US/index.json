@@ -2609,6 +2609,9 @@
   "label.yes": {
     "defaultMessage": "Yes"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Switching accounts..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Czech"
   },

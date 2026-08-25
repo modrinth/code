@@ -54,11 +54,7 @@ pub async fn authenticate_finish_flow(
         );
     }
 
-    state.friends_socket.disconnect().await?;
-    state
-        .friends_socket
-        .connect(&state.pool, &state.api_semaphore, &state.process_manager)
-        .await?;
+    reconnect_friends(&state).await?;
 
     Ok(creds)
 }
@@ -66,12 +62,58 @@ pub async fn authenticate_finish_flow(
 #[tracing::instrument]
 pub async fn logout() -> crate::Result<()> {
     let state = crate::State::get().await?;
-    let current = ModrinthCredentials::get_active(&state.pool).await?;
-
-    if let Some(current) = current {
-        ModrinthCredentials::remove(&current.user_id, &state.pool).await?;
-    }
+    ModrinthCredentials::deactivate_all(&state.pool).await?;
     state.friends_socket.disconnect().await?;
+
+    Ok(())
+}
+
+#[tracing::instrument]
+pub async fn get_all() -> crate::Result<Vec<ModrinthCredentials>> {
+    let state = crate::State::get().await?;
+    Ok(ModrinthCredentials::get_all(&state.pool).await?)
+}
+
+#[tracing::instrument]
+pub async fn set_active(user_id: &str) -> crate::Result<()> {
+    let state = crate::State::get().await?;
+    let users = ModrinthCredentials::get_all(&state.pool).await?;
+    let Some(mut creds) = users
+        .into_iter()
+        .find(|creds| creds.user_id == user_id)
+    else {
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Tried to activate nonexistent Modrinth user with ID {user_id}"
+        ))
+        .as_error());
+    };
+
+    creds.active = true;
+    creds.upsert(&state.pool).await?;
+    reconnect_friends(&state).await?;
+
+    Ok(())
+}
+
+#[tracing::instrument]
+pub async fn remove_user(user_id: &str) -> crate::Result<()> {
+    let state = crate::State::get().await?;
+    let current = ModrinthCredentials::get_active(&state.pool).await?;
+    ModrinthCredentials::remove(user_id, &state.pool).await?;
+
+    if current.is_some_and(|creds| creds.user_id == user_id) {
+        state.friends_socket.disconnect().await?;
+    }
+
+    Ok(())
+}
+
+async fn reconnect_friends(state: &crate::State) -> crate::Result<()> {
+    state.friends_socket.disconnect().await?;
+    state
+        .friends_socket
+        .connect(&state.pool, &state.api_semaphore, &state.process_manager)
+        .await?;
 
     Ok(())
 }

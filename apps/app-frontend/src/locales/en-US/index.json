@@ -290,6 +290,9 @@
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Open backups folder"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Enter modpack description..."
   },
@@ -316,6 +319,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Instance actions"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "This instance has been locked"
@@ -1232,11 +1238,17 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to latest version to launch the game."
   },
+  "app.nav.add-account": {
+    "message": "Add account"
+  },
   "app.nav.create-new-instance": {
     "message": "Create new instance"
   },
   "app.nav.home": {
     "message": "Home"
+  },
+  "app.nav.loading-profile": {
+    "message": "Loading profile..."
   },
   "app.nav.modrinth-account": {
     "message": "Modrinth account"
@@ -1244,14 +1256,23 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Sign in to a Modrinth account"
+  "app.nav.remove-account": {
+    "message": "Remove account"
   },
-  "app.nav.signed-in-as": {
-    "message": "Signed in as <user>{username}</user>"
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Sign into Modrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "Switch account"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
+  },
+  "app.nav.use-signed-out": {
+    "message": "Use signed out"
+  },
+  "app.nav.view-profile": {
+    "message": "View profile"
   },
   "app.navigation.go-back": {
     "message": "Go back"
@@ -1261,9 +1282,6 @@
   },
   "app.navigation.home": {
     "message": "Home"
-  },
-  "app.navigation.more-options": {
-    "message": "More options"
   },
   "app.navigation.next-image": {
     "message": "Next image"
@@ -1322,11 +1340,20 @@
   "app.project.versions.already-installed": {
     "message": "Already installed"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "Instance actions"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "Drag to show recent instances"
   },
   "app.quick-instance-switcher.drag-tooltip": {
     "message": "Drag to resize"
+  },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "This instance has been locked"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "View instance"
   },
   "app.restarting": {
     "message": "Restarting..."
@@ -2531,6 +2558,9 @@
   "instance.worlds.a_minecraft_server": {
     "message": "A Minecraft Server"
   },
+  "instance.worlds.actions.label": {
+    "message": "World actions"
+  },
   "instance.worlds.cant_connect": {
     "message": "Can't connect to server"
   },
@@ -2572,6 +2602,9 @@
   },
   "instance.worlds.play_instance": {
     "message": "Play instance"
+  },
+  "instance.worlds.play_world": {
+    "message": "Play world"
   },
   "instance.worlds.shortcut-created": {
     "message": "Shortcut created"

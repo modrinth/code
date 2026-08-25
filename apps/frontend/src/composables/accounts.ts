@@ -199,13 +199,13 @@ export const useIsSwitchingAccount = () => useState<boolean>('switching-account'
 export const switchToStoredAccount = async (account: StoredAccount) => {
 	if (!import.meta.client || !account.token) return
 
-	useIsSwitchingAccount().value = true
-
 	const theme = useTheme()
-	if (account.appearance && theme.syncAcrossDevices) {
+	if (account.appearance) {
 		theme.applyAccountAppearance(account.appearance)
+		await nextTick()
 	}
 
+	useIsSwitchingAccount().value = true
 	useAuthCookie().value = account.token
 	await nextTick()
 	window.location.reload()

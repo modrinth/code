@@ -30,7 +30,7 @@ const currentOptions = ref<OverflowMenuOption[]>([])
 const options = computed(() => visibleOptions(currentOptions.value))
 const rows = computed(() => options.value.filter(isMenuRow))
 
-const { isOpen, panelStyle, open, close, updatePosition } = useAnchoredTeleport(
+const { isOpen, panelStyle, expandOrigin, open, close, updatePosition } = useAnchoredTeleport(
 	anchor,
 	panelElement,
 	placement,
@@ -59,6 +59,7 @@ async function openMenu(event: MouseEvent, menuOptions: OverflowMenuOption[]) {
 	// focus the panel so keys work without highlighting a row
 	await nextTick()
 	panelElement.value?.focus()
+	window.getSelection()?.removeAllRanges()
 }
 
 function closeMenu() {
@@ -87,7 +88,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 			:panel-id="menuId"
 			:label="props.label"
 			:panel-style="panelStyle"
-			origin="top left"
+			:origin="expandOrigin"
 			tabindex="-1"
 			class="focus-visible:outline-none"
 			@keydown="handleKeydown"

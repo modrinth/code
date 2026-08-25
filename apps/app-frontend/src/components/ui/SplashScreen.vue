@@ -1,6 +1,6 @@
 <template>
 	<Transition name="splash-fade" @after-leave="onAfterLeave">
-		<div v-if="!doneLoading" class="splash-screen dark">
+		<div v-if="!doneLoading" class="splash-screen" :class="`${theme.active}-mode`">
 			<div class="app-logo-wrapper" data-tauri-drag-region>
 				<svg
 					class="app-logo"
@@ -83,6 +83,9 @@ import { ref, watch } from 'vue'
 
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useTheme } from '@/composables/use-theme.ts'
+
+const theme = useTheme()
 
 const doneLoading = ref(false)
 const loadingProgress = ref(0)
@@ -145,6 +148,12 @@ useAppEvent('loading', (e) => {
 	position: fixed;
 	inset: 0;
 	z-index: 10000;
+
+	--splash-cube-image: url('@/assets/loading/cube.png');
+
+	&.light-mode {
+		--splash-cube-image: url('@/assets/loading/cube-light.webp');
+	}
 }
 
 .splash-fade-leave-active {
@@ -166,6 +175,7 @@ useAppEvent('loading', (e) => {
 	align-items: center;
 
 	gap: 1rem;
+	color: var(--color-contrast);
 
 	z-index: 9998;
 }
@@ -184,8 +194,8 @@ useAppEvent('loading', (e) => {
 	height: 100vh;
 	width: 100vw;
 	background:
-		linear-gradient(180deg, rgba(66, 131, 92, 0.275) 0%, rgba(17, 35, 43, 0.5) 97.29%),
-		linear-gradient(0deg, rgba(22, 24, 28, 0.64), rgba(22, 24, 28, 0.64));
+		linear-gradient(180deg, var(--splash-tint-top) 0%, var(--splash-tint-bottom) 97.29%),
+		linear-gradient(0deg, var(--splash-overlay), var(--splash-overlay));
 	z-index: 9997;
 }
 
@@ -198,11 +208,19 @@ useAppEvent('loading', (e) => {
 
 	width: 180vw;
 	height: 180vh;
-	opacity: 0.8;
-	background: #16181c url('@/assets/loading/cube.png') center no-repeat;
-	background-size: contain;
+	background-color: var(--color-bg);
 
 	z-index: 9996;
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--splash-cube-image) center no-repeat;
+		background-size: contain;
+		opacity: var(--splash-cube-opacity);
+		mix-blend-mode: var(--splash-cube-blend);
+	}
 }
 
 .base-bg {

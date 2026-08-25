@@ -5,7 +5,7 @@
 			<LoadingBar />
 		</ClientOnly>
 		<NotificationPanel />
-		<AccountSwitchOverlay />
+		<AccountSwitchOverlay :show="isSwitchingAccount" />
 		<AdsConsentNotification />
 		<I18nDebugPanel />
 		<NuxtPage />
@@ -13,9 +13,14 @@
 	</NuxtLayout>
 </template>
 <script setup lang="ts">
-import { I18nDebugPanel, injectI18n, LoadingBar, NotificationPanel } from '@modrinth/ui'
+import {
+	AccountSwitchOverlay,
+	I18nDebugPanel,
+	injectI18n,
+	LoadingBar,
+	NotificationPanel,
+} from '@modrinth/ui'
 
-import AccountSwitchOverlay from '~/components/ui/AccountSwitchOverlay.vue'
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
 import { setupProviders } from '~/providers/setup.ts'
 
@@ -23,6 +28,7 @@ import {
 	hydrateStoredAccounts,
 	rememberStoredAccount,
 	rememberStoredAccountAppearance,
+	useIsSwitchingAccount,
 } from './composables/accounts'
 import { useAuth } from './composables/auth'
 
@@ -31,6 +37,7 @@ const userPreferences = setupProviders(auth)
 const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()
+const isSwitchingAccount = useIsSwitchingAccount()
 
 // initAuth doesn't run again after SSR, so stash the current account for switching
 watch(

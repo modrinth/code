@@ -52,7 +52,7 @@ const panelId = `overflow-submenu-${useId()}`
 const options = computed(() => visibleOptions(props.option.options))
 const triggerAttrs = computed(() => getOverflowMenuItemAttrs(props.option))
 
-const { isOpen, panelStyle, resolvedSide, open, close } = useAnchoredTeleport(
+const { isOpen, panelStyle, resolvedSide, expandOrigin, open, close } = useAnchoredTeleport(
 	triggerElement,
 	panelElement,
 	resolvedPlacement,
@@ -60,7 +60,6 @@ const { isOpen, panelStyle, resolvedSide, open, close } = useAnchoredTeleport(
 	alignOffset,
 )
 
-const origin = computed(() => (resolvedSide.value === 'left' ? 'top right' : 'top left'))
 const bridge = computed(() => ({ side: resolvedSide.value, size: resolvedDistance.value }))
 
 const { focusItem, handleNavigationKeydown } = useOverflowMenuNavigation(
@@ -150,7 +149,9 @@ function handlePanelKeydown(event: KeyboardEvent) {
 		:panel-id="panelId"
 		:label="props.option.label"
 		:panel-style="panelStyle"
-		:origin="origin"
+		:side="resolvedSide"
+		:origin="expandOrigin"
+		expand="horizontal"
 		:bridge="bridge"
 		@keydown="handlePanelKeydown"
 		@mouseenter="handleMouseEnter"

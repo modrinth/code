@@ -164,11 +164,12 @@ const choosableAccounts = computed((): StoredAccount[] => {
 	return accounts
 })
 
-const launcherAccountChoices = computed(() =>
-	isLauncherSignIn && !isAddingAccount && choosableAccounts.value.length > 1
-		? choosableAccounts.value
-		: [],
-)
+const launcherAccountChoices = computed(() => {
+	if (!isLauncherSignIn) return []
+
+	const minimumAccounts = isAddingAccount ? 1 : 2
+	return choosableAccounts.value.length >= minimumAccounts ? choosableAccounts.value : []
+})
 
 if (auth.value.user && !isAddingAccount && !isLauncherSignIn) {
 	await finishSignIn()

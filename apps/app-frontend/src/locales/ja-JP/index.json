@@ -776,9 +776,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Modrinthアカウントにサインイン"
   },
-  "app.nav.signed-in-as": {
-    "message": "<user>{username}</user>としてサインイン中"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+にアップグレード"
   },

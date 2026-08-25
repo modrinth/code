@@ -78,12 +78,8 @@ const triggerComponent = computed(() => (props.iconOnly ? IconButton : Button))
 const options = computed(() => visibleOptions(props.options))
 const rowOptions = computed(() => options.value.filter(isMenuRow))
 
-const { isOpen, panelStyle, anchorStyle, resolvedSide, open, close } = useAnchoredTeleport(
-	triggerElement,
-	panelElement,
-	resolvedPlacement,
-	resolvedDistance,
-)
+const { isOpen, panelStyle, anchorStyle, resolvedSide, expandOrigin, open, close } =
+	useAnchoredTeleport(triggerElement, panelElement, resolvedPlacement, resolvedDistance)
 
 const { focusedIndex, getItems, focusItem, handleKeydown, reset } = useMenuKeyboard({
 	panel: panelElement,
@@ -181,6 +177,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 			:panel-style="panelStyle"
 			:side="resolvedSide"
 			:anchor-style="anchorStyle"
+			:origin="expandOrigin"
 			@keydown="handleKeydown"
 			@mouseenter="handleMouseEnter"
 			@mouseleave="handleMouseLeave"
