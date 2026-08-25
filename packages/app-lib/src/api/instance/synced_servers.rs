@@ -130,13 +130,12 @@ pub(super) async fn seed_servers(
         && (!baseline_matches_link(metadata, state).await?
             || !baseline_was_reconstructed(&metadata.instance.id, state)
                 .await?)
+        && let Err(error) = reconstruct_modpack_servers(metadata, state).await
     {
-        if let Err(error) = reconstruct_modpack_servers(metadata, state).await {
-            tracing::warn!(
-                "Failed to reconstruct the server baseline for {}: {error}",
-                metadata.instance.id
-            );
-        }
+        tracing::warn!(
+            "Failed to reconstruct the server baseline for {}: {error}",
+            metadata.instance.id
+        );
     }
     let local_entries = load_local(&metadata.instance.id, state).await?;
     if is_modpack_link(&metadata.link)

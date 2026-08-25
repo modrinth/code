@@ -871,7 +871,7 @@ fn hotbar_slot(root: &NbtCompound, slot: usize) -> Option<NbtTag> {
     let position = slot % 9;
     root.get::<_, &NbtList>(&toolbar)
         .ok()
-        .and_then(|list| list.iter().nth(position).cloned())
+        .and_then(|list| list.as_ref().get(position).cloned())
 }
 
 fn set_hotbar_slot(root: &mut NbtCompound, slot: usize, value: NbtTag) {
