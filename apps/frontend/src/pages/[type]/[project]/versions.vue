@@ -12,6 +12,10 @@
 				ref="create-project-version-modal"
 			></CreateProjectVersionModal>
 
+			<ProjectC2paScanModal
+				ref="project-c2pa-scan-modal"
+			></ProjectC2paScanModal>
+
 			<ConfirmModal
 				v-if="currentMember"
 				ref="deleteVersionModal"
@@ -156,6 +160,14 @@
 									auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
 								shown: !currentMember,
 							},
+							{ type: 'divider', shown: isStaff(auth.user) },
+							{
+								id: 'view-c2pa-info',
+								label: 'View C2PA info',
+								tone: 'orange',
+								action: () => projectC2paScanModal.openC2paModal(createDownloadUrl(version)),
+								shown: isStaff(auth.user),
+							},
 							{ type: 'divider', shown: currentMember || flags.developerMode },
 							{
 								id: 'copy-id',
@@ -243,6 +255,10 @@
 							<TrashIcon aria-hidden="true" />
 							Delete
 						</template>
+						<template #view-c2pa-info>
+							<ScanEyeIcon aria-hidden="true" />
+							View C2PA Info
+						</template>
 						<template #copy-id>
 							<ClipboardCopyIcon aria-hidden="true" />
 							Copy ID
@@ -282,6 +298,7 @@ import {
 	ShareIcon,
 	SpinnerIcon,
 	TrashIcon,
+	ScanEyeIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import {
@@ -297,6 +314,7 @@ import { isStaff } from '@modrinth/utils'
 import { onMounted, useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import ProjectC2paScanModal from '~/components/ui/moderation/ProjectC2paScanModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
@@ -337,6 +355,7 @@ onMounted(() => {
 const deleteVersionModal = ref()
 const selectedVersion = ref(null)
 const createProjectVersionModal = useTemplateRef('create-project-version-modal')
+const projectC2paScanModal = useTemplateRef('project-c2pa-scan-modal')
 
 const handleOpenCreateVersionModal = () => {
 	if (!currentMember.value) return
