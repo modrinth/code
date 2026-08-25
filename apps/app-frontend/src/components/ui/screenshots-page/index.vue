@@ -8,7 +8,6 @@ import {
 	type DragStartEvent,
 } from '@dnd-kit/vue'
 import {
-	BoxIcon,
 	ClipboardCopyIcon,
 	EditIcon,
 	FileArchiveIcon,
@@ -19,6 +18,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Avatar,
 	Button,
 	type ComboboxOption,
 	commonMessages,
@@ -49,6 +49,7 @@ import {
 	delete_screenshot_group,
 	delete_screenshots,
 	export_screenshots,
+	getInstanceIconUrl,
 	import_screenshot_groups,
 	type InstanceScreenshot,
 	list_all_screenshots,
@@ -156,6 +157,7 @@ const activeDropGroupId = ref<string | null>(null)
 const previewModal = ref<InstanceType<typeof ScreenshotPreviewModal>>()
 const editorModal = ref<InstanceType<typeof ScreenshotEditorModal>>()
 const screenshotOptionsMenu = ref<InstanceType<typeof ContextMenu>>()
+const screenshotOptionsTarget = ref<InstanceScreenshot>()
 const deleteModal = ref<InstanceType<typeof ConfirmModal>>()
 const bulkDeleteModal = ref<InstanceType<typeof ConfirmModal>>()
 const deleteGroupModal = ref<InstanceType<typeof ConfirmModal>>()
@@ -296,6 +298,11 @@ const screenshotsReadyPending = computed(
 )
 const screenshots = computed(() => screenshotsQuery.data.value ?? [])
 const customGroups = computed(() => screenshotGroupsQuery.data.value ?? [])
+const screenshotOptionsInstance = computed(() =>
+	(instancesQuery.data.value ?? []).find(
+		(instance) => instance.id === screenshotOptionsTarget.value?.instance_id,
+	),
+)
 const screenshotsError = computed(() => {
 	const error =
 		screenshotsQuery.error.value ||
@@ -848,6 +855,7 @@ function requestDelete(screenshot: InstanceScreenshot, fromPreview = false) {
 }
 
 function showScreenshotOptions(screenshot: InstanceScreenshot, event: MouseEvent) {
+	screenshotOptionsTarget.value = screenshot
 	const options =
 		event.type === 'contextmenu' ? screenshotContextOptions : screenshotOverflowOptions
 	screenshotOptionsMenu.value?.showMenu(event, screenshot, options)
@@ -1204,7 +1212,13 @@ onBeforeUnmount(() => {
 			{{ formatMessage(messages.showInFolder) }}
 		</template>
 		<template #go-to-instance>
-			<BoxIcon />
+			<Avatar
+				:src="getInstanceIconUrl(screenshotOptionsInstance?.icon_path)"
+				:tint-by="screenshotOptionsTarget?.instance_id"
+				alt=""
+				size="1rem"
+				class="shrink-0"
+			/>
 			{{ formatMessage(messages.goToInstance) }}
 		</template>
 		<template #delete>
