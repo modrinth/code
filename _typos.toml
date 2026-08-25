@@ -6,8 +6,6 @@ extend-exclude = [
   "packages/utils/",
   "packages/ui/",
   "packages/blog/",
-  # contains domain names with deliberate typos
-  "apps/labrinth/assets/disposable_email_blocklist.txt"
 ]
 
 [default]
