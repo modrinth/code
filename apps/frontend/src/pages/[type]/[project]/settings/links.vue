@@ -205,6 +205,8 @@ import {
 	ConfirmLeaveModal,
 	defineMessage,
 	commonProjectSettingsMessages,
+	ConfirmLeaveModal,
+	defineMessage,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,

@@ -533,6 +533,9 @@
   "analytics.value.unknown": {
     "message": "Không rõ"
   },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "Không có siêu dữ liệu nào để xác định tệp tải xuống này thuộc về dự án phụ thuộc nào."
+  },
   "analytics.value.unmonetized": {
     "message": "Không kiếm tiền"
   },
@@ -746,11 +749,20 @@
   "auth.authorize.authorize-app-name": {
     "message": "Ủy quyền {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Thiếu các tham số truy vấn OAuth bắt buộc."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "Không tìm thấy vị trí chuyển hướng trong phản hồi"
   },
+  "auth.authorize.errro-title": {
+    "message": "Đã xảy ra lỗi"
+  },
   "auth.authorize.redirect-url": {
     "message": "Bạn sẽ được chuyển hướng đến <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Tiếp tục với {provider}"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Gửi email khôi phục"

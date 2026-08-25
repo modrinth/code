@@ -50,23 +50,8 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Pustaka"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Mematikan label nama di atas wujud pemain Anda pada halaman rupa."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan label nama"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Masuk kembali ke dunia"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Kecilkan pluncur ketika proses Minecraft berjalan."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Kecilkan peluncur"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Menampilkan seberapa lama Anda memainkan sebuah instans."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Tampilkan waktu bermain"
@@ -106,9 +91,6 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Paket Mod"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Menambah konten dapat merusak kompatibilitas saat bergabung ke server. Konten tambahan apa pun akan hilang ketika Anda memperbarui konten instans server."
   },
   "app.browse.server.installing": {
     "message": "Memasang"
@@ -379,9 +361,6 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Masuk"
   },
   "app.skins.title": {
     "message": "Pemilih rupa"

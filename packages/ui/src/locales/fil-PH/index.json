@@ -266,6 +266,12 @@
   "content.page-layout.share.project-links": {
     "defaultMessage": "Mga link ng proyekto"
   },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Pinakabago ang mauuna"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Pinakaluma ang mauuna"
+  },
   "content.selection-bar.all-already-disabled": {
     "defaultMessage": "Nakapatay na ang lahat ng piniling konento"
   },
@@ -2042,9 +2048,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Mayroon ka nang server?"
   },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Mag-sign-in"
-  },
   "servers.listing.copied-label": {
     "defaultMessage": "Kopyado"
   },
@@ -2206,9 +2209,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "madilim"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "Pumili ng iyong gugustohing paksang kulay para sa Modrinth ng nitong device."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Liwanag"
@@ -2736,3 +2736,4 @@
     "defaultMessage": "Uri"
   }
 }
+

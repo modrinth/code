@@ -44,6 +44,18 @@
   "badge.new": {
     "defaultMessage": "חדש"
   },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "בטל"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "שגיאה"
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "תוכנית"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "בטל"
+  },
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "הפרויקטים שנבחרו עוד לא הותקנו"
   },
@@ -113,6 +125,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "הסתר סנאפשוטים"
   },
+  "button.install": {
+    "defaultMessage": "התקן"
+  },
   "button.max": {
     "defaultMessage": "מקסימום"
   },
@@ -128,8 +143,14 @@
   "button.open-folder": {
     "defaultMessage": "פתח תיקיה"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "פתח בדפדפן"
+  },
   "button.open-in-folder": {
     "defaultMessage": "פתח בתקייה"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "פתח בModrinth"
   },
   "button.play": {
     "defaultMessage": "שחק"
@@ -139,6 +160,9 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "התקן מחדש חבילת מודים"
+  },
+  "button.remove": {
+    "defaultMessage": "מחק"
   },
   "button.remove-image": {
     "defaultMessage": "מחק תמונה"
@@ -190,6 +214,9 @@
   },
   "button.stop": {
     "defaultMessage": "עצור"
+  },
+  "button.switch-to-version": {
+    "defaultMessage": "החלף גרסה"
   },
   "button.switch-version": {
     "defaultMessage": "החלף גרסה"
@@ -1096,9 +1123,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "כהה"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "בחר את ערכת הצבעים המועדפת עליך עבור Modrinth במכשיר זה."
   },
   "settings.display.theme.light": {
     "defaultMessage": "בהיר"

@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "选择准确的标签"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "请通过填写适用于你 {type} 的内容披露信息，确保用户充分了解所有重要信息"
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "查看内容披露"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，让描述详尽清晰。"
   },
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "访问描述设置"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "访问权限设置"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "访问许可证设置"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "访问通用设置"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "查看版本设置"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "你的简介不能与项目名称相同。撰写一个兼具信息量与吸引力的简介是十分重要的。"

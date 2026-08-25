@@ -1,4 +1,4 @@
-// the following are non-stardard text that are detected
+// the following are non-standard text that are detected
 export type NonStandardTextIssueKind =
 	| 'fancy' // styled characters such as `𝐀`, `Ⓐ`, or `Ａ`.
 	| 'zalgo' // detached or excessive combining marks such as `a̴̵̶`.

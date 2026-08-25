@@ -42,10 +42,16 @@
     "defaultMessage": "Doğru dilleri seçin"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Bütün {totalAvailableTags} alınabilecek etiketi seçtin. Bu etiketlerin amacına uygun değil. Etiketler, kullanıcıların ilgili projeleri bulmasına yardımcı olmalıdır. Lütfen sadece projenle ilgili etiketleri seç."
+    "defaultMessage": "Bütün {totalAvailableTags, plural, one {# mevcut etiket} other {# mevcut etiketler}} seçtin. Bu etiketlerin amacına uygun değil. Etiketler, kullanıcıların ilgili projeleri bulmasına yardımcı olmalıdır. Lütfen sadece projenle ilgili etiketleri seç."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Uygun etiketleri seç"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "{type} açıklamanızı oyuncuların tüm önemli detaylardan haberdar olabileceği şekilde doldurun."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "İçerikle ilgili uyarıları kontrol edin"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Açıklamanız {length, plural, one {# okunabilir karakter} other {# okunabilir karakter}} uzunluğunda. Net ve bilgilendirici bir açıklama oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
@@ -126,7 +132,7 @@
     "defaultMessage": "Marka ihlalinden kaçının"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "Bazı resimlerinin alt yazısı eksik, erişebilirlik açısından özellikle görme engelli kişiler için alt yazı önemli."
+    "defaultMessage": "Bazı resimlerinin alt yazısı eksik, özellikle görme sorunu olan kullanıcılar için erişilebilirlik için bu çok önemli."
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Resim açıklaması ekle"
@@ -141,13 +147,13 @@
     "defaultMessage": "Moderasyon kanalına göz at"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "Tekrar göndermeden önce moderasyon ekibinin dediği şeyleri gözden geçir"
+    "defaultMessage": "Tekrar göndermeden önce moderasyon ekibinin dediği şeyleri gözden geçir."
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Geri bildirimleri incele"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count} çözünürlük etiketi şeçtiniz ({tags}). Kaynak paketlerinin genelde birincil çözünürlüklerine uyan bir çözünürlük etiketi olmalıdır."
+    "defaultMessage": "{count, plural, one {# çözünürlük etiketi} other {# çözünürlük etiketleri}} ({tags}) seçtiniz. Kaynak paketlerinin genelde birincil çözünürlüklerine uyan bir çözünürlük etiketi olmalıdır."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Açıklama ayarlarına göz at"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "İçerik açıklamalarını ziyaret et"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Lisans ayarlarına göz at"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Genel ayarlara göz at"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Sürüm ayarlarını ziyaret et"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Özetin proje adın ile aynı olamaz. Bilgilendirici ve ilgi çekici bir özet yazmak çok önemlidir."
@@ -253,6 +265,9 @@
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "{type} içeriğinizi sergilemek için en az bir galeri görseli gereklidir."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Shader'ınızdaki içeriği çeşitli şekillerde sergilemek için en az üç görsel gerekmektedir."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriye resim yükle"

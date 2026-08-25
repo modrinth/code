@@ -77,23 +77,8 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Kirjasto"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Kytkee pois päältä nimikyltin pelaajasi päällä skinit sivulla."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Piilota nimikyltti"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Hyppää takaisin sisään maailmoihin"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Pienennä laukaisin kun Minecraft prosessi käynnistyy."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Piilota käynnistysohjelma"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Näyttää, kuinka paljon aikaa olet käyttänyt instanssin pelaamiseen."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Näyttää peliaika"
@@ -136,9 +121,6 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modipaketit"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Sisällön lisääminen voi rikkoa yhteensopivuuden palvelimelle liittyessä. Kaikki lisätty sisältö katoaa myös kun päivität palvelin instanssin sisällön."
   },
   "app.browse.server.installing": {
     "message": "Asennetaan"
@@ -505,9 +487,6 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Pienten vallankumous"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Kirjaudu sisään"
   },
   "app.skins.title": {
     "message": "Skinivalinta"
