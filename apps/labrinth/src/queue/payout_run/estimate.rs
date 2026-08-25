@@ -2,7 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use chrono::{DateTime, Days, NaiveDate, Utc};
+use chrono::{DateTime, Days, Months, NaiveDate, Utc};
 use dashmap::DashMap;
 use eyre::Result;
 use rust_decimal::Decimal;
@@ -27,6 +27,39 @@ pub struct DayEstimate {
     pub date: NaiveDate,
     pub raw_estimated_revenue_usd: Decimal,
     pub impressions: u128,
+}
+
+/// Validate that an estimate contains exactly one complete entry for every
+/// calendar day in its payout period.
+pub(crate) fn validate_complete_period_estimate(
+    estimate: &PeriodEstimate,
+) -> Result<()> {
+    let period_end = estimate
+        .period
+        .date()
+        .checked_add_months(Months::new(1))
+        .wrap_err("calculating payout period end")?;
+    let mut expected_date = estimate.period.date();
+
+    for day in &estimate.days {
+        if day.date != expected_date {
+            return Err(eyre::eyre!(
+                "expected Aditude estimate for `{expected_date}`, found `{}`",
+                day.date,
+            ));
+        }
+        expected_date = expected_date
+            .succ_opt()
+            .wrap_err("calculating next payout estimate date")?;
+    }
+
+    if expected_date != period_end {
+        return Err(eyre::eyre!(
+            "missing Aditude estimate for `{expected_date}`",
+        ));
+    }
+
+    Ok(())
 }
 
 /// Get per-month and per-day estimated ad provider info for an inclusive date
@@ -192,5 +225,28 @@ mod tests {
         assert_eq!(estimate.days[0].date, period.date());
         assert_eq!(estimate.days[0].raw_estimated_revenue_usd, dec!(12.34));
         assert_eq!(estimate.days[0].impressions, 5678);
+    }
+
+    #[test]
+    fn validates_every_day_in_period() {
+        let period =
+            YearMonth::from_day1(NaiveDate::from_ymd_opt(2026, 2, 1).unwrap());
+        let mut date = period.date();
+        let period_end = NaiveDate::from_ymd_opt(2026, 3, 1).unwrap();
+        let mut days = Vec::new();
+        while date < period_end {
+            days.push(DayEstimate {
+                date,
+                raw_estimated_revenue_usd: dec!(1),
+                impressions: 1,
+            });
+            date = date.succ_opt().unwrap();
+        }
+        let mut estimate = PeriodEstimate { period, days };
+
+        validate_complete_period_estimate(&estimate).unwrap();
+
+        estimate.days.remove(10);
+        assert!(validate_complete_period_estimate(&estimate).is_err());
     }
 }

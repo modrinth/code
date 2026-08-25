@@ -1,12 +1,12 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT MAX(created)\n        FROM payouts_values\n        ",
+  "query": "\n        SELECT MAX(date)\n        FROM payout_period_days\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
         "name": "max",
-        "type_info": "Timestamptz"
+        "type_info": "Date"
       }
     ],
     "parameters": {
@@ -16,5 +16,5 @@
       null
     ]
   },
-  "hash": "154d32137068456f7c0739271790d46bbe78053eda81fb2c227d95262cb4140a"
+  "hash": "3962c046a8877433f2e5afd6064c0dfb11c7093d60093e8265d8cc5937c2c02c"
 }

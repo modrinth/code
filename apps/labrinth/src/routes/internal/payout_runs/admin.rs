@@ -12,12 +12,15 @@ use crate::{
     database::{
         PgPool,
         models::{
-            DBUserId, generate_payout_run_id,
+            DBUserId, DatabaseError, generate_payout_run_id,
             payout_run_item::{DBPayoutRun, PayoutRunStatus},
         },
     },
     models::{ids::PayoutRunId, pats::Scopes},
-    queue::{payout_run::estimate, session::AuthQueue},
+    queue::{
+        payout_run::{estimate, validate_complete_period_estimate},
+        session::AuthQueue,
+    },
     routes::ApiError,
     util::{
         error::Context,
@@ -57,6 +60,7 @@ pub struct StartPayoutRunResponse {
         (status = BAD_REQUEST, description = "Invalid payout run input"),
         (status = UNAUTHORIZED, description = "Invalid authentication or TOTP code"),
         (status = CONFLICT, description = "Payout period is unavailable or another run is active"),
+        (status = FAILED_DEPENDENCY, description = "Aditude returned an incomplete period"),
     ),
     security(("bearer_auth" = ["SESSION_ACCESS"])),
 )]
@@ -151,6 +155,8 @@ pub async fn start_run(
     let estimate = estimates
         .pop()
         .wrap_internal_err("missing requested payout estimate")?;
+    validate_complete_period_estimate(&estimate)
+        .wrap_failed_dependency_err("validating payout estimate")?;
     let payload = PayoutRunPayload {
         raw_actual_revenue_usd: body.raw_actual_revenue_usd,
         adjustments: body.adjustments.clone(),
@@ -272,9 +278,16 @@ pub async fn start_run(
         cancelled_by: None,
         error: None,
     };
-    run.upsert(&mut transaction)
-        .await
-        .wrap_internal_err("creating scheduled payout run")?;
+    let create_run_result = run.upsert(&mut transaction).await;
+    if let Err(DatabaseError::Database(sqlx::Error::Database(error))) =
+        &create_run_result
+        && error.constraint() == Some("payout_runs_single_active")
+    {
+        return Err(ApiError::Conflict(eyre::eyre!(
+            "another payout run is already scheduled or running",
+        )));
+    }
+    create_run_result.wrap_internal_err("creating scheduled payout run")?;
 
     transaction
         .commit()

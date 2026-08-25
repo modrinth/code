@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT LEAST(\n            COALESCE(\n                (SELECT MAX(created)::date FROM payouts_values),\n                $1\n            ),\n            COALESCE(\n                (SELECT MIN(period) FROM payout_periods),\n                $1\n            ),\n            $1\n        ) AS \"first_period!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "first_period!",
+        "type_info": "Date"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Date"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "805f9e937806491b75494627147259e3cc4cb82ba8f8645f748ad77b5abb81c8"
+}
