@@ -2306,12 +2306,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "选择更新渠道"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "启动钩子"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "自定义启动钩子"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "钩子供高级用户使用，可设置游戏启动前后运行的特定系统命令。"
   },
@@ -2374,9 +2368,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "当实例被锁定时，安装设置不可用。"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java 及内存"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "自定义环境变量"

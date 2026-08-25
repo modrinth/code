@@ -2306,12 +2306,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecciona el canal de actualizaciones"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Hooks de inicio"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hooks personalizados"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Los hooks permiten que usuarios avanzados ejecuten comandos del sistema antes y despues de lanzar el juego."
   },
@@ -2374,9 +2368,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Los ajustes de instalación no están disponibles mientras esta instancia esté bloqueada."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java y memoria"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Variables de entorno personalizadas"

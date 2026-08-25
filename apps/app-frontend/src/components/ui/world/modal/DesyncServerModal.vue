@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { XIcon } from '@modrinth/assets'
+import { LinkIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { Button, commonMessages, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
 import { ref } from 'vue'
 
@@ -25,11 +25,11 @@ const messages = defineMessages({
 	},
 	keep: {
 		id: 'instance.worlds.desync-server.keep',
-		defaultMessage: 'Keep in other instances',
+		defaultMessage: 'Keep',
 	},
 	remove: {
 		id: 'instance.worlds.desync-server.remove',
-		defaultMessage: 'Remove from other instances',
+		defaultMessage: 'Remove',
 	},
 })
 
@@ -50,15 +50,22 @@ defineExpose({ show })
 	<NewModal ref="modal" :header="formatMessage(messages.title)" max-width="540px">
 		<p class="m-0 text-secondary">{{ formatMessage(messages.description) }}</p>
 		<template #actions>
-			<div class="flex flex-wrap justify-end gap-2">
-				<Button type="outlined" @click="modal?.hide()">
+			<div class="flex justify-end gap-2">
+				<Button type="outlined" class="whitespace-nowrap" @click="modal?.hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="outlined" @click="confirm('keep_in_other_instances')">
+				<Button class="whitespace-nowrap" @click="confirm('keep_in_other_instances')">
+					<LinkIcon />
 					{{ formatMessage(messages.keep) }}
 				</Button>
-				<Button type="colored" color="red" @click="confirm('remove_from_other_instances')">
+				<Button
+					type="colored"
+					color="red"
+					class="whitespace-nowrap"
+					@click="confirm('remove_from_other_instances')"
+				>
+					<TrashIcon />
 					{{ formatMessage(messages.remove) }}
 				</Button>
 			</div>

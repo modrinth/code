@@ -2021,12 +2021,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Wybierz kanał aktualizacji"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Haczyki startowe"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Własne haczyki przy uruchomieniu"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooki pozwalają zaawansowanym użytkownikom uruchamiać określone systemowe komendy przed i po uruchomieniu gry."
   },
@@ -2071,9 +2065,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Wersja {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java i pamięć"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Zmienne środowiskowe"

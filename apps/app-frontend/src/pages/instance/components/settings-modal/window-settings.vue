@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-	defineMessages,
-	injectNotificationManager,
-	Input,
-	Toggle,
-	useVIntl,
-} from '@modrinth/ui'
+import { defineMessages, injectNotificationManager, Input, Toggle, useVIntl } from '@modrinth/ui'
 import { computed, type Ref, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/instance'
@@ -13,6 +7,7 @@ import { get } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
+import SettingsOptionsTransition from './settings-options-transition.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -97,7 +92,7 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<div class="flex flex-col gap-6">
+	<div class="flex flex-col">
 		<div class="flex items-center justify-between gap-4">
 			<div class="flex min-w-0 flex-col gap-1">
 				<h2 class="m-0 text-lg font-semibold text-contrast">
@@ -107,56 +102,58 @@ const messages = defineMessages({
 			</div>
 			<Toggle id="override-window-settings" v-model="overrideWindowSettings" />
 		</div>
-		<div v-if="overrideWindowSettings" class="flex flex-col gap-6">
-			<div class="flex items-center gap-4 justify-between">
-				<div class="flex flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.fullscreen) }}
-					</h2>
-					<p class="m-0">
-						{{ formatMessage(messages.fullscreenDescription) }}
-					</p>
+		<SettingsOptionsTransition :show="overrideWindowSettings">
+			<div class="flex flex-col gap-6 pt-6">
+				<div class="flex items-center gap-4 justify-between">
+					<div class="flex flex-col gap-1">
+						<h2 class="m-0 text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.fullscreen) }}
+						</h2>
+						<p class="m-0">
+							{{ formatMessage(messages.fullscreenDescription) }}
+						</p>
+					</div>
+					<Toggle id="fullscreen" v-model="fullscreenSetting" />
 				</div>
-				<Toggle id="fullscreen" v-model="fullscreenSetting" />
-			</div>
 
-			<div class="flex items-center gap-4 justify-between">
-				<div class="flex flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.width) }}
-					</h2>
-					<p class="m-0">
-						{{ formatMessage(messages.widthDescription) }}
-					</p>
+				<div class="flex items-center gap-4 justify-between">
+					<div class="flex flex-col gap-1">
+						<h2 class="m-0 text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.width) }}
+						</h2>
+						<p class="m-0">
+							{{ formatMessage(messages.widthDescription) }}
+						</p>
+					</div>
+					<Input
+						id="width"
+						v-model="resolution[0]"
+						autocomplete="off"
+						:disabled="fullscreenSetting"
+						type="number"
+						:placeholder="formatMessage(messages.enterWidth)"
+					/>
 				</div>
-				<Input
-					id="width"
-					v-model="resolution[0]"
-					autocomplete="off"
-					:disabled="fullscreenSetting"
-					type="number"
-					:placeholder="formatMessage(messages.enterWidth)"
-				/>
-			</div>
 
-			<div class="flex items-center gap-4 justify-between">
-				<div class="flex flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.height) }}
-					</h2>
-					<p class="m-0">
-						{{ formatMessage(messages.heightDescription) }}
-					</p>
+				<div class="flex items-center gap-4 justify-between">
+					<div class="flex flex-col gap-1">
+						<h2 class="m-0 text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.height) }}
+						</h2>
+						<p class="m-0">
+							{{ formatMessage(messages.heightDescription) }}
+						</p>
+					</div>
+					<Input
+						id="height"
+						v-model="resolution[1]"
+						autocomplete="off"
+						:disabled="fullscreenSetting"
+						type="number"
+						:placeholder="formatMessage(messages.enterHeight)"
+					/>
 				</div>
-				<Input
-					id="height"
-					v-model="resolution[1]"
-					autocomplete="off"
-					:disabled="fullscreenSetting"
-					type="number"
-					:placeholder="formatMessage(messages.enterHeight)"
-				/>
 			</div>
-		</div>
+		</SettingsOptionsTransition>
 	</div>
 </template>

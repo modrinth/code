@@ -16,6 +16,7 @@
 	<ConfirmRemoveWorldModal
 		ref="removeWorldModal"
 		:world="worldToRemove"
+		:other-synced-instance-count="otherSyncedInstanceCount"
 		@confirm="proceedRemoveWorld"
 	/>
 	<DesyncServerModal ref="desyncServerModal" @confirm="confirmDesyncServer" />
@@ -194,7 +195,11 @@ import {
 import { injectServerInstall } from '@/providers/server-install'
 
 import { injectInstancePage } from '../instance-context'
-import { instanceKeys, instanceWorldsQueryOptions } from '../query-options'
+import {
+	instanceKeys,
+	instanceListQueryOptions,
+	instanceWorldsQueryOptions,
+} from '../query-options'
 
 const messages = defineMessages({
 	searchWorldsPlaceholder: {
@@ -288,6 +293,15 @@ function toggleFilter(id: string) {
 }
 
 const queryClient = useQueryClient()
+
+const instanceListQuery = useQuery(instanceListQueryOptions())
+const otherSyncedInstanceCount = computed(
+	() =>
+		instanceListQuery.data.value?.filter(
+			(candidate) =>
+				candidate.id !== instance.value.id && candidate.synced_options.multiplayer_servers,
+		).length ?? 0,
+)
 
 const refreshingAll = ref(false)
 const hadNoWorlds = ref(true)

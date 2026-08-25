@@ -665,12 +665,6 @@
   "instance.settings.tabs.general.update-channel.release": {
     "message": "Terbitan"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Cangkuk pelancaran"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Cangkuk pelancaran tersuai"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Cangkuk membenarkan pengguna lanjutan menjalankan perintah sistem tertentu sebelum dan selepas melancarkan permainan."
   },
@@ -709,9 +703,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versi {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java dan ingatan"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Pembolehubah persekitaran tersuai"

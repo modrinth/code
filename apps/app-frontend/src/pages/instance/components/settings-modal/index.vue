@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	ChevronRightIcon,
-	InfoIcon,
-	RefreshCwIcon,
-	UsersIcon,
-	WrenchIcon,
-} from '@modrinth/assets'
+import { ChevronRightIcon, InfoIcon, RefreshCwIcon, UsersIcon, WrenchIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	commonMessages,

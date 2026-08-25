@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {
 	CoffeeIcon,
-	GameIcon,
 	GaugeIcon,
 	HeartHandshakeIcon,
 	LanguagesIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
+	RefreshCwIcon,
 	Settings2Icon,
 	ShieldIcon,
 	ToggleRightIcon,
@@ -134,7 +134,7 @@ const tabs = [
 			defaultMessage: 'Synced options',
 		}),
 		category: tabCategories.instances,
-		icon: GameIcon,
+		icon: RefreshCwIcon,
 		content: InstancesSyncedSettings,
 	},
 	{

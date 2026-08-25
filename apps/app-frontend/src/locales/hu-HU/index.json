@@ -1817,12 +1817,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Frissítési csatorna kiválasztása"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Indítási horgok"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Saját indítási horgok"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "A horgok lehetővé teszik a haladó felhasználók számára, hogy bizonyos rendszerparancsokat futtassanak a játék elindítása előtt és után."
   },
@@ -1876,9 +1870,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "A telepítési beállítások nem érhetők el, amíg ez a példány zárolva van."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java és memória"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Egyéni környezeti változók"

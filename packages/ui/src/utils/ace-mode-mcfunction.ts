@@ -91,9 +91,8 @@ ace['define'](
 	function (require: any, exports: any) {
 		const oop = require('ace/lib/oop')
 		const TextMode = require('ace/mode/text').Mode
-		const McfunctionHighlightRules = require(
-			'ace/mode/mcfunction_highlight_rules',
-		).McfunctionHighlightRules
+		const McfunctionHighlightRules =
+			require('ace/mode/mcfunction_highlight_rules').McfunctionHighlightRules
 
 		const Mode = function (this: any) {
 			this.HighlightRules = McfunctionHighlightRules

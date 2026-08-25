@@ -2306,12 +2306,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Update-Kanal auswählen"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Start Hooks"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Benutzerdefinierte Start Hooks"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooks ermöglichen es erfahrenen Benutzern, bestimmte Systembefehle vor und nach dem Start des Spiels auszuführen."
   },
@@ -2374,9 +2368,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Installationseinstellungen sind nicht verfügbar, solange diese Instanz gesperrt ist."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java und Arbeitsspeicher"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Benutzerdefinierte Umgebungsvariablen"

@@ -1697,12 +1697,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Vyber aktualizační kanál"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Spouštěcí hooky"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Vlastní spouštěcí hooky"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooky umožňují pokročilým uživatelům spustit určité systémové příkazy před a po spuštění hry."
   },
@@ -1741,9 +1735,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} verze"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java a pamět"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Vlastní proměnná prostředí"

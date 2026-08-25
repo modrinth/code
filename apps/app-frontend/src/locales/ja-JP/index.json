@@ -1682,12 +1682,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "アップデートチャンネルを選択"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "起動フック"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "カスタム起動フック"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "フックを使用して、ゲームの起動前後にシステムコマンドを実行するようにできます。"
   },
@@ -1750,9 +1744,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "このインスタンスがロックされている間は、インストール設定を利用できません。"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Javaとメモリ"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "カスタム環境変数"
