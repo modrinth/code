@@ -6,7 +6,7 @@ import {
 	Button,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -103,7 +103,7 @@ async function addServer(instance) {
 	<ModalWrapper ref="modal" :header="formatMessage(messages.title)">
 		<div class="flex flex-col gap-4 min-w-[350px]">
 			<Admonition type="warning" :body="formatMessage(messages.compatibilityWarning)" />
-			<StyledInput
+			<Input
 				v-model="searchFilter"
 				:icon="SearchIcon"
 				type="search"

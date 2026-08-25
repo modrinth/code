@@ -874,7 +874,7 @@ pub(super) async fn send_bytes_request_to_url(
         "Sending shared instances API request"
     );
 
-    let mut request = shared_instances_client(url)
+    let mut request = shared_instances_upload_client(url)
         .request(method.clone(), url)
         .bearer_auth(credentials.session)
         .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
@@ -1061,5 +1061,15 @@ pub(super) fn shared_instances_client(
         &REQWEST_CLIENT
     } else {
         &INSECURE_REQWEST_CLIENT
+    }
+}
+
+pub(super) fn shared_instances_upload_client(
+    base_url: &str,
+) -> &'static reqwest::Client {
+    if base_url.starts_with("https://") {
+        &NO_TIMEOUT_REQWEST_CLIENT
+    } else {
+        &INSECURE_NO_TIMEOUT_REQWEST_CLIENT
     }
 }

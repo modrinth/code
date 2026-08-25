@@ -25,7 +25,7 @@
 					<span class="font-semibold text-contrast">{{ confirmationText }}</span> below:
 				</span>
 			</label>
-			<StyledInput
+			<Input
 				v-if="hasToType"
 				id="confirmation"
 				v-model="confirmation_typed"
@@ -58,7 +58,7 @@ import { computed, ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 
-import StyledInput from '../base/StyledInput.vue'
+import Input from '../base/inputs/Input.vue'
 import NewModal from './NewModal.vue'
 
 const props = defineProps({

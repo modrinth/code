@@ -4025,9 +4025,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
-  },
   "project.settings.monetization.description": {
     "message": "Modrints上的项目自动注册于 <rewards-program-link>奖励方案</rewards-program-link>如果你不想(或由于法律原因不能)从这个项目赚取收入，你可以在这里关闭它。"
   },

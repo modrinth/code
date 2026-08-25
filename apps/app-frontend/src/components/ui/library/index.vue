@@ -371,7 +371,9 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 							>
 								<InstanceGroup
 									:can-drag-reorder="canDragReorderGroups"
-									:hide-header="visibleInstanceGroups.length === 1"
+									:hide-header="
+										instanceGroup.id === 'group:none' && visibleInstanceGroups.length === 1
+									"
 									:instance-group="instanceGroup"
 									:selection-anchor-instance-id="
 										anchorInstance?.groupId === instanceGroup.id ? anchorInstance?.instanceId : null

@@ -83,7 +83,7 @@
 		<!-- Instance-specific: Name field -->
 		<div v-if="ctx.flowType === 'instance'" class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">{{ formatMessage(messages.nameLabel) }}</span>
-			<StyledInput
+			<Input
 				v-model="ctx.instanceName.value"
 				:placeholder="ctx.autoInstanceName.value || formatMessage(messages.instanceNamePlaceholder)"
 			/>
@@ -230,8 +230,8 @@ import Avatar from '../../../base/Avatar.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
+import Input from '../../../base/inputs/Input.vue'
 import PaperChannelBadge from '../../../base/PaperChannelBadge.vue'
-import StyledInput from '../../../base/StyledInput.vue'
 import type { LoaderVersionEntry, LoaderVersionType } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
 import { formatLoaderLabel } from '../shared'

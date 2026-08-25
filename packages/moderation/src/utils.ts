@@ -19,6 +19,7 @@ export function expandVariables(
 }
 
 export const licensesNotRequiringSource: string[] = [
+	// typos:off
 	'LicenseRef-All-Rights-Reserved',
 	'Apache-2.0',
 	'BSD-2-Clause',
@@ -33,6 +34,7 @@ export const licensesNotRequiringSource: string[] = [
 	'ISC',
 	'MIT',
 	'Zlib',
+	// typos:on
 ]
 
 export const licensesRequiringSource: string[] = [

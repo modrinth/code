@@ -5,7 +5,7 @@
 		:class="[
 			wrapperClass,
 			calendarOnly ? 'calendar-only' : '',
-			disabled ? 'cursor-not-allowed opacity-50' : '',
+			disabled ? 'cursor-not-allowed' : '',
 			showToday ? 'show-today' : '',
 			props.mode === 'range' && selectedDates.length < 2 ? 'can-select-range' : '',
 			props.mode === 'range' && selectedDates.length === 1 ? 'is-selecting-range' : '',
@@ -14,20 +14,15 @@
 			rangeEndpointMoveState ? 'is-moving-range-end' : '',
 		]"
 	>
-		<ButtonFrame
-			as="span"
-			:class="[
-				calendarOnly
-					? '!block !h-auto !min-w-0 !bg-transparent !p-0 !shadow-none hover:!brightness-100'
-					: 'w-full !justify-start !p-0',
-				disabled ? '!cursor-not-allowed' : '',
-			]"
-		>
-			<CalendarIcon
-				v-if="showIcon && !calendarOnly"
-				class="pointer-events-none absolute left-3 z-[1] h-5 w-5 text-secondary opacity-60 transition-colors"
-				aria-hidden="true"
-			/>
+		<InputFrame v-if="!calendarOnly" class="w-full" :disabled="disabled">
+			<template v-if="showIcon" #leading>
+				<span
+					class="flex size-5 shrink-0 items-center justify-center text-secondary opacity-60 transition-colors group-focus-within/input:text-contrast group-focus-within/input:opacity-100"
+					aria-hidden="true"
+				>
+					<CalendarIcon class="size-5" />
+				</span>
+			</template>
 			<input
 				:id="id"
 				ref="inputRef"
@@ -37,27 +32,32 @@
 				:readonly="readonly"
 				:autocomplete="autocomplete"
 				:class="inputClasses"
-				:tabindex="calendarOnly ? -1 : undefined"
-				:aria-hidden="calendarOnly ? 'true' : undefined"
 				type="text"
 			/>
-			<button
-				v-if="hasClearButton"
-				type="button"
-				class="absolute right-0.5 top-px z-[1] touch-manipulation cursor-pointer select-none border-none bg-transparent p-2 text-secondary transition-colors hover:text-contrast"
-				aria-label="Clear date"
-				@click.stop="clearValue"
-			>
-				<XIcon class="h-5 w-5" aria-hidden="true" />
-			</button>
-		</ButtonFrame>
+			<template v-if="hasClearButton" #trailing>
+				<InputClearButton label="Clear date" @click.stop="clearValue" />
+			</template>
+		</InputFrame>
+		<input
+			v-else
+			:id="id"
+			ref="inputRef"
+			:name="name"
+			:disabled="disabled"
+			:readonly="readonly"
+			:autocomplete="autocomplete"
+			:class="inputClasses"
+			tabindex="-1"
+			aria-hidden="true"
+			type="text"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import 'flatpickr/dist/flatpickr.css'
 
-import { CalendarIcon, XIcon } from '@modrinth/assets'
+import { CalendarIcon } from '@modrinth/assets'
 import chevronLeftIcon from '@modrinth/assets/icons/chevron-left.svg?raw'
 import chevronRightIcon from '@modrinth/assets/icons/chevron-right.svg?raw'
 import flatpickr from 'flatpickr'
@@ -65,7 +65,8 @@ import type { Instance } from 'flatpickr/dist/types/instance'
 import type { Options } from 'flatpickr/dist/types/options'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import ButtonFrame from './buttons/ButtonFrame.vue'
+import InputClearButton from './InputClearButton.vue'
+import InputFrame from './InputFrame.vue'
 
 type DatePickerValue = string | Date | null | undefined
 type RangeEdge = 'start' | 'end'
@@ -1200,12 +1201,7 @@ const hasClearButton = computed(
 const inputClasses = computed(() => [
 	props.calendarOnly
 		? 'sr-only pointer-events-none absolute h-0 w-0 opacity-0'
-		: 'h-full w-full touch-manipulation appearance-none bg-transparent font-semibold text-primary shadow-none transition-[shadow,color] placeholder:text-secondary focus:text-contrast focus:ring-4 focus:ring-brand-shadow !outline-0',
-	!props.calendarOnly && props.showIcon ? 'pl-10' : '',
-	!props.calendarOnly && !props.showIcon ? 'pl-3' : '',
-	!props.calendarOnly
-		? `${hasClearButton.value ? 'pr-10' : 'pr-3'} rounded-xl border-none py-2 text-base outline-none`
-		: '',
+		: 'min-w-0 w-full flex-1 self-stretch appearance-none border-0 bg-transparent p-0 font-medium text-base text-primary shadow-none outline-none placeholder:text-secondary focus:text-contrast focus:ring-0',
 	props.disabled && !props.calendarOnly ? 'cursor-not-allowed' : '',
 	props.inputClass,
 ])
@@ -1557,7 +1553,7 @@ defineExpose({
 
 <style scoped>
 .modrinth-date-picker :deep(.flatpickr-wrapper) {
-	@apply w-full;
+	@apply min-w-0 w-full flex-1;
 }
 
 .modrinth-date-picker :deep(.flatpickr-calendar) {

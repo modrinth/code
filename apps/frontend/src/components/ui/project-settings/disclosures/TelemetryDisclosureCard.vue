@@ -7,8 +7,8 @@ import {
 	defineMessages,
 	disclosureTelemetryConsentMessages,
 	IconButton,
+	Input,
 	SettingsFormGroup,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
@@ -107,7 +107,7 @@ function removeEntry(index: number) {
 				:description="formatMessage(messages.dataDescription)"
 			>
 				<div v-for="(_, index) in model.entries" :key="index" class="flex items-center gap-2">
-					<StyledInput
+					<Input
 						v-model="model.entries[index]"
 						class="min-w-0 flex-1"
 						:disabled="disabled"

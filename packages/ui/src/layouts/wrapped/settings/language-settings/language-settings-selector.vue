@@ -4,7 +4,7 @@ import Fuse from 'fuse.js/dist/fuse.basic'
 import { computed, onMounted, ref } from 'vue'
 
 import Button from '#ui/components/base/buttons/Button.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import {
 	buildLocaleMessages,
 	defineMessages,
@@ -249,7 +249,7 @@ function getCategoryName(category: Category): string {
 <template>
 	<div class="flex flex-col gap-4">
 		<div v-if="$locales.length > 1" class="-mb-4">
-			<StyledInput
+			<Input
 				id="language-search"
 				v-model="$query"
 				:icon="SearchIcon"

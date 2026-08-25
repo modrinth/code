@@ -24,7 +24,7 @@
 			<span class="font-semibold text-contrast">
 				{{ formatMessage(messages.versionNumber) }} <span class="text-red">*</span>
 			</span>
-			<StyledInput
+			<Input
 				id="version-number"
 				v-model="draftVersion.version_number"
 				:disabled="isUploading"
@@ -36,7 +36,7 @@
 		</div>
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">{{ formatMessage(messages.versionSubtitle) }}</span>
-			<StyledInput
+			<Input
 				id="version-number"
 				v-model="draftVersion.name"
 				:placeholder="formatMessage(messages.versionSubtitlePlaceholder)"
@@ -66,8 +66,8 @@
 import {
 	Chips,
 	defineMessages,
+	Input,
 	MarkdownEditor,
-	StyledInput,
 	Tabs,
 	type TabsTab,
 	useVIntl,

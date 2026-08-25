@@ -29,8 +29,8 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	Input,
 	IntlFormatted,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
@@ -558,7 +558,7 @@ function dismissInfoBanner() {
 		</template>
 		<div class="flex flex-col gap-2">
 			<div class="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
-				<StyledInput
+				<Input
 					v-model="searchQuery"
 					type="text"
 					autocomplete="off"

@@ -3962,9 +3962,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
-  },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Forneça a prova que possui permissão para redistribuir todos os seguintes arquivos. Após a conclusão, as versões retidas serão publicadas automaticamente."
   },

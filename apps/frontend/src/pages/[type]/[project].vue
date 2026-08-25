@@ -1272,6 +1272,7 @@ const { data: thread } = useQuery({
 })
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
+useFavicon(() => (isSettings.value ? 'settings' : 'default'))
 
 // Jank modpack loaders fix
 const versionsRaw = computed(() => {
