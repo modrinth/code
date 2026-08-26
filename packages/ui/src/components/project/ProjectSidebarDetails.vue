@@ -97,7 +97,7 @@
 				</div>
 			</div>
 			<div v-if="systemInteractionsDisclosure">
-				<CircuitBoardIcon aria-hidden="true" />
+				<MonitorCogIcon aria-hidden="true" />
 				<div class="flex flex-col gap-1">
 					<span>
 						{{ capitalizeString(formatMessage(messages.systemInteractionsTitle)) }}
@@ -240,13 +240,13 @@ import {
 	BrainCircuitIcon,
 	CalendarIcon,
 	CircleDollarSignIcon,
-	CircuitBoardIcon,
 	DropdownIcon,
 	ExternalIcon,
 	EyeIcon,
 	GitForkIcon,
 	HeartIcon,
 	MegaphoneIcon,
+	MonitorCogIcon,
 	RadioTowerIcon,
 	ScaleIcon,
 	SparklesIcon,
@@ -343,7 +343,7 @@ const messages = defineMessages({
 	},
 	systemInteractionsTitle: {
 		id: 'project.disclosure.system-interactions.title',
-		defaultMessage: 'Contains external system interactions',
+		defaultMessage: 'Contains invasive system interactions',
 	},
 })
 

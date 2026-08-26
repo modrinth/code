@@ -3821,17 +3821,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Du musst dies aktivieren, wenn dein Projekt Werbung, Sponsoren oder Werbeaktionen für andere Werke enthält."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Falls die Werbung keinen direkten finanziellen Wert hat <emphasis>und</emphasis> sich auf etwas bezieht, das die durchschnittliche Person als <italic>relevant</italic> und <italic>unaufdringlich</italic> betrachten würde (wie beispielsweise einen Link zu deinem Modrinth-Profil in der Ecke der Einstellungsseite für deinen eigenen Mod), würden wir dies nicht als Werbung betrachten."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "z.B: Fügt den SMP-Server von Modrinth automatisch zu deiner Serverliste hinzu."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Enthält Werbung"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Weitere Informationen findest du in Abschnitt 6 der <rules>Inhaltsrichtlinien von Modrinth</rules>."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Du musst dies aktivieren, wenn dieses Projekt einen erheblichen Anteil an KI-generiertem Code enthält, wenn Assets vorhanden sind, die zu einem wesentlichen Teil KI-generiert sind, wenn die Funktionalität des Projekts auf dem Einsatz von generativer KI beruht oder wenn Elemente der Projektseite wie die Beschreibung oder die Veröffentlichung generativer KI basieren."

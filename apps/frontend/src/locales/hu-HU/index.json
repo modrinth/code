@@ -3512,9 +3512,6 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Hirdetéseket tartalmaz"
   },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "További információkért olvasd el a <rules>Modrinth tartalmi szabályainak</rules> 6. szakaszát."
-  },
   "project.settings.disclosures.ai.description": {
     "message": "Ezt a lehetőséget kötelezően be kell kapcsolnod, ha a projekted jelentős mennyiségű, MI által generált kódot tartalmaz; ha bármely erőforrás nagyrészt MI-vel generált; ha a projekt funkciói generatív MI használatán alapszanak; vagy ha a projekted oldalának bármely eleme – például a leírás vagy a közzététel – generatív MI-re támaszkodik."
   },

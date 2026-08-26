@@ -3818,17 +3818,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Ви повинні увімкнути це, якщо ваш проєкт містить рекламу, спонсорство або просування інших робіт."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Якщо просування не має прямої грошової цінності <emphasis>та</emphasis> стосується чогось, що пересічна людина вважатиме <italic>доречним</italic> і <italic>ненав'язливим</italic> (наприклад, посилання на ваш профіль Modrinth у кутку сторінки налаштувань вашого власного мода), ми не вважатимемо це рекламою."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "напр. Додає сервер Modrinth-SMP до вашого списку серверів автоматично."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Містить рекламу"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Будь ласка, зверніться до Розділу 6 <rules>Правил умісту Modrinth</rules> для отримання додаткової інформації."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Ви повинні увімкнути це, якщо проєкт містить значний обсяг коду, згенерованого ШІ, будь-які\n\t\t\t\tресурси, значною мірою згенеровані ШІ, функціональність проєкту базується на\n                                використанні генеративного ШІ, або якщо будь-який елемент сторінки вашого\n                                проєкту, як от опис чи публікація, базується на генеративному ШІ."

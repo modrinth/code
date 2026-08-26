@@ -3,13 +3,13 @@ import {
 	ArchiveIcon,
 	BrainCircuitIcon,
 	CircleDollarSignIcon,
-	CircuitBoardIcon,
 	ClientIcon,
 	EyeIcon,
 	getCategoryIcon,
 	getLoaderIcon,
 	GitForkIcon,
 	MegaphoneIcon,
+	MonitorCogIcon,
 	RadioTowerIcon,
 	ServerIcon,
 	SparklesIcon,
@@ -228,7 +228,7 @@ const DISCLOSURE_TYPE_ICONS: Record<DisclosureTypeFilter, Component> = {
 	ai_functionality: BrainCircuitIcon,
 	advertisements: MegaphoneIcon,
 	epilepsy_triggers: EyeIcon,
-	system_interactions: CircuitBoardIcon,
+	system_interactions: MonitorCogIcon,
 	telemetry: RadioTowerIcon,
 	derivative_work: GitForkIcon,
 	paid_features: CircleDollarSignIcon,
@@ -281,7 +281,7 @@ export function formatDisclosureTypeLabel(
 			return formatMessage(
 				defineMessage({
 					id: 'search.filter_type.advanced.disclosure.system_interactions',
-					defaultMessage: 'External system interactions',
+					defaultMessage: 'Invasive system interactions',
 				}),
 			)
 		case 'telemetry':
@@ -363,8 +363,10 @@ export function createDisclosureFilterOptions(
 	formatMessage: FormatMessage,
 	projectTypes: readonly ProjectType[],
 ): FilterOption[] {
-	return PROJECT_DISCLOSURE_TYPES.filter((disclosureType) =>
-		isDisclosureCompatibleWithProjectTypes(disclosureType, projectTypes),
+	return PROJECT_DISCLOSURE_TYPES.filter(
+		(disclosureType) =>
+			disclosureType !== 'derivative_work' &&
+			isDisclosureCompatibleWithProjectTypes(disclosureType, projectTypes),
 	).map((disclosureType) => ({
 		id: disclosureType,
 		formatted_name: formatDisclosureTypeLabel(formatMessage, disclosureType),

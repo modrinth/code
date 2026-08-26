@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CircuitBoardIcon } from '@modrinth/assets'
+import { MonitorCogIcon } from '@modrinth/assets'
 import { defineMessages, SettingsFormGroup, Textarea, useVIntl } from '@modrinth/ui'
 
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
@@ -22,7 +22,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	title: {
 		id: 'project.settings.disclosures.system-interactions.title',
-		defaultMessage: 'External system interactions',
+		defaultMessage: 'Invasive system interactions',
 	},
 	description: {
 		id: 'project.settings.disclosures.system-interactions.description',
@@ -31,7 +31,7 @@ const messages = defineMessages({
 	},
 	noteLabel: {
 		id: 'project.settings.disclosures.system-interactions.note-label',
-		defaultMessage: 'Describe the external system interactions',
+		defaultMessage: 'Describe the invasive system interactions',
 	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.system-interactions.note-placeholder',
@@ -44,7 +44,7 @@ const messages = defineMessages({
 	<DisclosureToggleCard
 		v-bind="props"
 		v-model="model.enabled"
-		:icon="CircuitBoardIcon"
+		:icon="MonitorCogIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
 		@set-lock-status="emit('setLockStatus', $event)"

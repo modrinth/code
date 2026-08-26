@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { BrainCircuitIcon } from '@modrinth/assets'
-import {
-	commonMessages,
-	defineMessages,
-	SettingsFormGroup,
-	StyledInput,
-	useVIntl,
-} from '@modrinth/ui'
+import { commonMessages, defineMessages, SettingsFormGroup, Textarea, useVIntl } from '@modrinth/ui'
 
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
 import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from './types'
@@ -28,11 +22,12 @@ const messages = defineMessages({
 	},
 	description: {
 		id: 'project.settings.disclosures.ai-functionality.description',
-		defaultMessage: 'Placeholder',
+		defaultMessage:
+			'Must be enabled if the project has functionality that makes use of generative AI, such as an in-game chatbot or dynamically generated textures.',
 	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.ai-functionality.note-placeholder',
-		defaultMessage: 'e.g. The in-game assistant uses generative AI to generate dialogue.',
+		defaultMessage: 'e.g. The NPCs uses generative AI for dialogue options.',
 	},
 })
 </script>
@@ -52,10 +47,9 @@ const messages = defineMessages({
 				title-for="ai-functionality-disclosure-note"
 				optional
 			>
-				<StyledInput
+				<Textarea
 					id="ai-functionality-disclosure-note"
 					v-model="model.note"
-					multiline
 					:rows="3"
 					class="max-w-[40rem]"
 					:disabled="disabled"

@@ -34,18 +34,20 @@ const messages = defineMessages({
 	},
 	description: {
 		id: 'project.settings.disclosures.ai.description',
-		defaultMessage: `You must enable this if this project contains a substantial amount of AI-generated code, any
-				assets that are substantially AI-generated, or if any element of your project's page such as
-				description or publishing relies on generative AI.`,
+		defaultMessage: `Must be enabled if this project contains any AI-generated assets or text, or if it contains a substantial amount of AI-generated code.`,
 	},
-	contentRules: {
-		id: 'project.settings.disclosures.ai.content-rules',
+	description2: {
+		id: 'project.settings.disclosures.ai.description.2',
+		defaultMessage: `It is important to be honest if generative AI has played a significant role in the production or publishing of this content. An easy way to think about this is if you would consider AI a co-author of the project, you should disclose it here.`,
+	},
+	stillUnsure: {
+		id: 'project.settings.disclosures.ai.still-unsure',
 		defaultMessage:
-			"Please refer to Section 6 of <rules>Modrinth's Content Rules</rules> for more information.",
+			"Still unsure? Refer to our guide to <faq-link>Disclosure and Usage of AI</faq-link> and section 6 of <rules>Modrinth's Content Rules</rules> for more information.",
 	},
 	typesDescription: {
 		id: 'project.settings.disclosures.ai.types-description',
-		defaultMessage: 'What is generative AI being used for?',
+		defaultMessage: 'What types of content have been generated with AI?',
 	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.ai.note-placeholder',
@@ -77,8 +79,20 @@ function setUse(use: AiUsage, enabled: boolean) {
 		:description="formatMessage(messages.description)"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
+		<p>
+			{{ formatMessage(messages.description2) }}
+		</p>
 		<p class="text-secondary">
-			<IntlFormatted :message-id="messages.contentRules">
+			<IntlFormatted :message-id="messages.stillUnsure">
+				<template #faq-link="{ children }">
+					<a
+						href="https://support.modrinth.com/en/articles/16551575"
+						target="_blank"
+						class="smart-clickable:allow-pointer-events underline hover:text-primary"
+					>
+						<component :is="() => normalizeChildren(children)" />
+					</a>
+				</template>
 				<template #rules="{ children }">
 					<nuxt-link
 						to="/legal/rules#generative-ai"

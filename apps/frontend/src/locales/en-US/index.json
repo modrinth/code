@@ -3828,10 +3828,10 @@
     "message": "Delete project"
   },
   "project.settings.disclosures.advertising.description.1": {
-    "message": "You must enable this if your project contains advertisements, sponsorships, or promotions of other works."
+    "message": "Must be enabled if this project contains advertisements, sponsorships, or promotions of other works."
   },
   "project.settings.disclosures.advertising.description.2": {
-    "message": "If the promotion has no direct monetary value <emphasis>and</emphasis> it is for something that the average person would consider <italic>relevant</italic> and <italic>unobtrusive</italic> (such as a link to your Modrinth profile in the corner of the settings page for your own mod), we would not consider that an advertisement."
+    "message": "This does not pertain to unobtrusive promotion of relevant content with no direct monetary value (such as a link to a Modrinth profile in your own configuration menu), and does not pertain to advertisements in the project page such as sponsored banners in the description."
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "e.g. Adds the Modrinth SMP server to your server list automatically."
@@ -3840,28 +3840,31 @@
     "message": "Contains advertisements"
   },
   "project.settings.disclosures.ai-functionality.description": {
-    "message": "Placeholder"
+    "message": "Must be enabled if the project has functionality that makes use of generative AI, such as an in-game chatbot or dynamically generated textures."
   },
   "project.settings.disclosures.ai-functionality.note-placeholder": {
-    "message": "e.g. The in-game assistant uses generative AI to generate dialogue."
+    "message": "e.g. The NPCs uses generative AI for dialogue options."
   },
   "project.settings.disclosures.ai-functionality.title": {
     "message": "Contains generative AI functionality"
   },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Please refer to Section 6 of <rules>Modrinth's Content Rules</rules> for more information."
-  },
   "project.settings.disclosures.ai.description": {
-    "message": "You must enable this if this project contains a substantial amount of AI-generated code, any\n\t\t\t\tassets that are substantially AI-generated, or if any element of your project's page such as\n\t\t\t\tdescription or publishing relies on generative AI."
+    "message": "Must be enabled if this project contains any AI-generated assets or text, or if it contains a substantial amount of AI-generated code."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "It is important to be honest if generative AI has played a significant role in the production or publishing of this content. An easy way to think about this is if you would consider AI a co-author of the project, you should disclose it here."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "e.g. The Chinese and Arabic translations are AI-generated."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "Still unsure? Refer to our guide to <faq-link>Disclosure and Usage of AI</faq-link> and section 6 of <rules>Modrinth's Content Rules</rules> for more information."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Contains AI-generated content"
   },
   "project.settings.disclosures.ai.types-description": {
-    "message": "What is generative AI being used for?"
+    "message": "What types of content have been generated with AI?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "Banner preview"
@@ -3905,6 +3908,9 @@
   "project.settings.disclosures.description": {
     "message": "You must add any applicable content disclosures to your project in compliance with <rules>Modrinth's Content Rules</rules>."
   },
+  "project.settings.disclosures.description.2": {
+    "message": "Unsure how to apply content disclosure to your project? Check out our <faq-link>Content Disclosures FAQ</faq-link>."
+  },
   "project.settings.disclosures.last-updated": {
     "message": "Last updated on {date} by {user}"
   },
@@ -3921,7 +3927,7 @@
     "message": "Please <contact-support-link>contact support</contact-support-link> if this disclosure needs to be edited or removed."
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "You must enable this if your project contains features that can be obtained by spending real-world money."
+    "message": "Must be enabled if this project contains features that can be unlocked by spending real-world money."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "e.g. Cosmetics available as Patreon reward"
@@ -3960,7 +3966,7 @@
     "message": "Photosensitivity warning disclosure must include a description."
   },
   "project.settings.disclosures.save-blocked.system-interactions-note": {
-    "message": "External system interactions disclosure must include a description."
+    "message": "Invasive system interactions disclosure must include a description."
   },
   "project.settings.disclosures.save-blocked.telemetry-empty": {
     "message": "Telemetry disclosure must list at least one type of data collected."
@@ -3969,13 +3975,13 @@
     "message": "You must enable this if your project reads or edits things on the user's system outside of the game."
   },
   "project.settings.disclosures.system-interactions.note-label": {
-    "message": "Describe the external system interactions"
+    "message": "Describe the invasive system interactions"
   },
   "project.settings.disclosures.system-interactions.note-placeholder": {
     "message": "e.g. It adds a file to the desktop called wake_up.txt"
   },
   "project.settings.disclosures.system-interactions.title": {
-    "message": "External system interactions"
+    "message": "Invasive system interactions"
   },
   "project.settings.disclosures.telemetry.consent-description": {
     "message": "What is the consent model of your telemetry?"

@@ -32,7 +32,7 @@ const messages = defineMessages({
 	description: {
 		id: 'project.settings.disclosures.paid-features.description',
 		defaultMessage:
-			'You must enable this if your project contains features that can be obtained by spending real-world money.',
+			'Must be enabled if this project contains features that can be unlocked by spending real-world money.',
 	},
 	featuresDescription: {
 		id: 'project.settings.disclosures.paid-features.features-description',

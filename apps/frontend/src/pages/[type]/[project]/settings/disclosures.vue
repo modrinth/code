@@ -75,6 +75,10 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.description',
 		defaultMessage: `You must add any applicable content disclosures to your project in compliance with <rules>Modrinth's Content Rules</rules>.`,
 	},
+	description2: {
+		id: 'project.settings.disclosures.description.2',
+		defaultMessage: `Unsure how to apply content disclosure to your project? Check out our <faq-link>Content Disclosures FAQ</faq-link>.`,
+	},
 	noPermission: {
 		id: 'project.settings.disclosures.save-blocked.no-permission',
 		defaultMessage: `You don't have permission to edit this project's disclosures.`,
@@ -112,7 +116,7 @@ const issueMessages = defineMessages({
 	},
 	'system-interactions-note': {
 		id: 'project.settings.disclosures.save-blocked.system-interactions-note',
-		defaultMessage: 'External system interactions disclosure must include a description.',
+		defaultMessage: 'Invasive system interactions disclosure must include a description.',
 	},
 }) satisfies Record<DisclosureFormIssue, MessageDescriptor>
 
@@ -269,12 +273,25 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 		<h2 class="m-0 text-2xl font-semibold">
 			{{ formatMessage(messages.title) }}
 		</h2>
-		<p class="mb-4 mt-2">
+		<p class="mb-0 mt-2">
 			<IntlFormatted :message-id="messages.description">
 				<template #rules="{ children }">
 					<nuxt-link to="/legal/rules" target="_blank" class="underline hover:text-contrast">
 						<component :is="() => normalizeChildren(children)" />
 					</nuxt-link>
+				</template>
+			</IntlFormatted>
+		</p>
+		<p class="mb-4 mt-2">
+			<IntlFormatted :message-id="messages.description2">
+				<template #faq-link="{ children }">
+					<a
+						href="https://support.modrinth.com/en/articles/16567675#h_29503820b1"
+						target="_blank"
+						class="underline hover:text-contrast"
+					>
+						<component :is="() => normalizeChildren(children)" />
+					</a>
 				</template>
 			</IntlFormatted>
 		</p>

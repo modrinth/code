@@ -3812,17 +3812,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Você deve habilitar isso se o seu projeto contém anúncios, patrocínios ou promoções de outras obras."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Se a promoção não tiver valor monetário direto <emphasis>e</emphasis> for para algo que a pessoa média consideraria <italic>relevante</italic> e <italic>discreto</italic> (como um link para o seu perfil do Modrinth no canto da página de configurações do seu próprio mod), não a consideraríamos uma propaganda."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "ex: Adiciona o servidor Modrinth SMP à sua lista de servidores automaticamente."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Contém propagandas"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Por favor, consulte a Seção 6 de <rules>Regras de conteúdo do Modrinth</rules> para obter mais informações."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Você deve habilitar esta opção se este projeto conter uma quantidade substancial de código gerado por IA, qualquer\n\t\t\t        ativo substancialmente gerado por IA, se a funcionalidade do projeto depende do uso de\n\t\t\t\tIA generativa, ou se qualquer elemento da página do seu projeto, como descrição ou publicação\n                                depender de IA generativa."
