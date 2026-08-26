@@ -25,80 +25,85 @@
 			<div class="input-group">
 				<IconButton
 					label="Toggle details"
+					:aria-expanded="!collapsed"
 					:class="{ '[&>svg]:rotate-180': !collapsed }"
 					@click="$emit('toggleCollapsed')"
 				>
-					<DropdownIcon class="duration-250 transition-transform ease-in-out" />
+					<DropdownIcon class="transition-transform duration-300 ease-in-out" />
 				</IconButton>
 			</div>
 		</div>
-		<div v-if="!collapsed" class="relative mt-4">
-			<div
-				class="nag-scroll-shadow-left pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
-				:class="showLeftNagShadow ? 'opacity-100' : 'opacity-0'"
-			/>
-			<div
-				ref="nagScroller"
-				class="flex w-full cursor-grab select-none gap-2 overflow-x-auto overflow-y-hidden pb-2"
-				:class="{ 'is-dragging': draggingNags }"
-				@pointerdown="onNagPointerDown"
-				@pointermove="onNagPointerMove"
-				@pointerup="finishNagDrag"
-				@pointercancel="finishNagDrag"
-				@click.capture="onNagClick"
-				@wheel="onNagWheel"
-				@scroll="updateNagScrollShadows"
-			>
+		<Accordion :open-by-default="!collapsed" content-class="mt-4">
+			<div class="relative">
 				<div
-					v-for="nag in visibleNags"
-					:key="nag.id"
-					class="flex w-72 shrink-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+					class="nag-scroll-shadow-left pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
+					:class="showLeftNagShadow ? 'opacity-100' : 'opacity-0'"
+				/>
+				<div
+					ref="nagScroller"
+					class="flex w-full cursor-grab select-none gap-2 overflow-x-auto overflow-y-hidden pb-2"
+					:class="{ 'is-dragging': draggingNags }"
+					@pointerdown="onNagPointerDown"
+					@pointermove="onNagPointerMove"
+					@pointerup="finishNagDrag"
+					@pointercancel="finishNagDrag"
+					@click.capture="onNagClick"
+					@wheel="onNagWheel"
+					@scroll="updateNagScrollShadows"
 				>
-					<span class="flex items-center gap-2 font-medium text-contrast">
-						<component
-							:is="nag.icon || getDefaultIcon(nag.status)"
-							v-tooltip="getStatusTooltip(nag.status)"
-							:class="[
-								'size-4',
-								nag.status === 'required' && 'text-red',
-								nag.status === 'warning' && 'text-orange',
-								nag.status === 'suggestion' && 'text-purple',
-							]"
-							:aria-label="getStatusTooltip(nag.status)"
-						/>
-						{{ getFormattedMessage(nag.title) }}
-					</span>
-					{{ getNagDescription(nag) }}
-					<NuxtLink
-						v-if="nag.link && shouldShowLink(nag)"
-						:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
-							nag.link.path
-						}`"
-						class="goto-link mt-auto"
+					<div
+						v-for="nag in visibleNags"
+						:key="nag.id"
+						class="flex w-72 shrink-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
 					>
-						{{ getFormattedMessage(nag.link.title) }}
-						<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
-					</NuxtLink>
-					<Button
-						v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
-						v-tooltip="
-							!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
-						"
-						type="colored"
-						color="orange"
-						:disabled="!canSubmitForReview"
-						@click="submitForReview"
-					>
-						<SendIcon />
-						{{ getFormattedMessage(messages.submitForReviewButton) }}
-					</Button>
+						<span class="flex items-center gap-2 font-medium text-contrast">
+							<component
+								:is="nag.icon || getDefaultIcon(nag.status)"
+								v-tooltip="getStatusTooltip(nag.status)"
+								:class="[
+									'size-4',
+									nag.status === 'required' && 'text-red',
+									nag.status === 'warning' && 'text-orange',
+									nag.status === 'suggestion' && 'text-purple',
+								]"
+								:aria-label="getStatusTooltip(nag.status)"
+							/>
+							{{ getFormattedMessage(nag.title) }}
+						</span>
+						{{ getNagDescription(nag) }}
+						<NuxtLink
+							v-if="nag.link && shouldShowLink(nag)"
+							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
+								nag.link.path
+							}`"
+							class="goto-link mt-auto"
+						>
+							{{ getFormattedMessage(nag.link.title) }}
+							<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
+						</NuxtLink>
+						<Button
+							v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
+							v-tooltip="
+								!canSubmitForReview
+									? getFormattedMessage(messages.submitChecklistTooltip)
+									: undefined
+							"
+							type="colored"
+							color="orange"
+							:disabled="!canSubmitForReview"
+							@click="submitForReview"
+						>
+							<SendIcon />
+							{{ getFormattedMessage(messages.submitForReviewButton) }}
+						</Button>
+					</div>
 				</div>
+				<div
+					class="nag-scroll-shadow-right pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
+					:class="showRightNagShadow ? 'opacity-100' : 'opacity-0'"
+				/>
 			</div>
-			<div
-				class="nag-scroll-shadow-right pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
-				:class="showRightNagShadow ? 'opacity-100' : 'opacity-0'"
-			/>
-		</div>
+		</Accordion>
 	</div>
 </template>
 
@@ -115,7 +120,7 @@ import {
 } from '@modrinth/assets'
 import type { Nag, NagContext, NagStatus, ProjectTitleMetadata } from '@modrinth/moderation'
 import { nags, validateProjectFields } from '@modrinth/moderation'
-import { Button, IconButton } from '@modrinth/ui'
+import { Accordion, Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -436,10 +441,6 @@ function getFormattedMessage(message: string | MessageDescriptor): string {
 </script>
 
 <style lang="scss" scoped>
-.duration-250 {
-	transition-duration: 250ms;
-}
-
 .is-dragging,
 .is-dragging * {
 	cursor: grabbing !important;
