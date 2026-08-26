@@ -117,7 +117,7 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 
 <template>
 	<div
-		class="absolute bottom-6 left-1/2 z-10 flex w-max max-w-[calc(100%_-_3rem)] -translate-x-1/2 items-center gap-2 rounded-[20px] border border-solid border-white/10 bg-surface-3 px-3 py-2.5 shadow-[0_1rem_3rem_rgb(0_0_0_/_32%)] max-[900px]:flex-wrap max-[900px]:justify-center"
+		class="absolute bottom-6 left-1/2 z-10 flex w-max max-w-[calc(100%_-_3rem)] -translate-x-1/2 items-center gap-2 rounded-[20px] border border-solid border-white/10 bg-surface-3 p-2 shadow-[0_1rem_3rem_rgb(0_0_0_/_32%)] max-[900px]:flex-wrap max-[900px]:justify-center"
 		@click.stop
 	>
 		<div v-if="hasPropertyControls" class="flex min-w-0 items-center gap-2">
@@ -142,10 +142,10 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 			<label
 				v-if="hasColorProperty"
 				v-tooltip="formatMessage(messages.colour)"
-				class="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-[14px] transition-[filter,box-shadow] hover:brightness-125 focus-within:ring-4 focus-within:ring-brand-shadow"
+				class="relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl transition-[filter,box-shadow] hover:brightness-125 focus-within:ring-4 focus-within:ring-brand-shadow"
 			>
 				<span
-					class="size-full rounded-[14px] border border-solid border-surface-5"
+					class="size-full rounded-xl border border-solid border-surface-5"
 					:style="{ backgroundColor: color }"
 				/>
 				<input
@@ -168,7 +168,7 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 				@change.capture="commitPropertyEdit"
 				@focusout="commitPropertyEdit"
 			>
-				<span class="shrink-0 text-xs font-medium text-white/60">
+				<span class="shrink-0 text-base font-semibold leading-5 text-white/60">
 					{{ formatMessage(propertyValueKind === 'size' ? messages.size : messages.width) }}
 				</span>
 				<input
@@ -189,7 +189,7 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 					:max="propertyMax"
 					step="1"
 					:aria-label="formatMessage(propertyValueKind === 'size' ? messages.size : messages.width)"
-					class="editor-property-value h-10 w-12 shrink-0 rounded-[14px] border border-solid border-surface-5 bg-surface-4 px-1 text-center text-sm font-semibold tabular-nums text-white outline-none focus:ring-4 focus:ring-brand-shadow"
+					class="editor-property-value h-9 w-12 shrink-0 rounded-xl border border-solid border-surface-5 bg-surface-4 px-1 text-center text-base font-semibold leading-5 tabular-nums text-white outline-none focus:ring-4 focus:ring-brand-shadow"
 					@input="handlePropertyInput"
 				/>
 			</div>
@@ -236,7 +236,7 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 			<Button
 				v-tooltip="formatMessage(messages.fitToWorkspace)"
 				type="quiet"
-				class="w-16 px-2 text-sm tabular-nums text-white/60"
+				class="w-16 px-2 tabular-nums text-white/60"
 				@click="setFit"
 			>
 				{{ isFit ? formatMessage(messages.fit) : `${Math.round(zoom * 100)}%` }}
