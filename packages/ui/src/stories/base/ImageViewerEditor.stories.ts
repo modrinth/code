@@ -58,10 +58,21 @@ function render(editor: 'enabled' | 'disabled') {
 					source: new Blob([IMAGE_SVG], { type: 'image/svg+xml' }),
 				}),
 			})
-			return { editor, items, open: () => viewer.value?.show(0), viewer }
+			return {
+				editor,
+				items,
+				open: () => viewer.value?.show(0),
+				openEditor: () => viewer.value?.edit(0),
+				viewer,
+			}
 		},
 		template: /*html*/ `
-			<Button type="colored" color="brand" @click="open">Open image viewer</Button>
+			<div class="flex gap-2">
+				<Button type="colored" color="brand" @click="open">Open image viewer</Button>
+				<Button v-if="editor === 'enabled'" type="outlined" @click="openEditor">
+					Open image editor
+				</Button>
+			</div>
 			<ImageViewerEditor ref="viewer" :items="items" :editor="editor" />
 		`,
 	})

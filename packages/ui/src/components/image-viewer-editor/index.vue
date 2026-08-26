@@ -6,7 +6,6 @@ import { injectImageViewerEditor } from '#ui/providers/image-viewer-editor'
 import Editor from './editor.vue'
 import type { ImageViewerEditorMode } from './image-viewer-editor-types'
 import type { ImageViewerEditorItem, ImageViewerEditorSavePayload } from './types'
-import Viewer from './viewer.vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -153,29 +152,25 @@ defineExpose({ show, edit, hide, next, previous, markSavedAndView })
 				</div>
 			</header>
 
-			<Viewer
-				v-if="mode === 'view'"
+			<Editor
+				ref="editorComponent"
 				:item="activeItem"
+				:mode="mode"
 				:index="activeIndex"
 				:count="items.length"
 				:can-edit="canEdit"
+				:saving="saving"
 				@close="hide"
 				@edit="beginEditing"
 				@next="next"
 				@previous="previous"
+				@cancel="finishEditing"
+				@save="emit('save', $event)"
 			>
 				<template #actions>
 					<slot name="actions" :item="activeItem" :index="activeIndex" :hide="hide" />
 				</template>
-			</Viewer>
-			<Editor
-				v-else
-				ref="editorComponent"
-				:item="activeItem"
-				:saving="saving"
-				@cancel="finishEditing"
-				@save="emit('save', $event)"
-			/>
+			</Editor>
 		</div>
 	</Teleport>
 </template>
