@@ -1959,7 +1959,7 @@ where
 
     let mut grouped_projects: HashMap<ProjectStatus, Vec<ProjectId>> = HashMap::new();
     for project in &projects {
-        *grouped_projects.entry(project.inner.status)
+        grouped_projects.entry(project.inner.status)
             .or_default()
             .push(project.inner.id.into());
     }
