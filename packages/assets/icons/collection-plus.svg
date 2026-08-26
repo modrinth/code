@@ -4,10 +4,10 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"
 	xmlns:serif="http://www.serif.com/"
 	style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
-    <path d="M10,16L10.01,16" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
-    <path d="M22,14.328L22,12.473C22,12.162 21.927,11.855 21.788,11.577L18.55,5.11C18.213,4.431 17.518,4 16.76,4L7.24,4C6.482,4 5.787,4.431 5.45,5.11L2.212,11.577C2.073,11.855 2,12.162 2,12.473L2,18C2,19.097 2.903,20 4,20L12.636,20" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
-    <path d="M21.946,12.013L2.054,12.013" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
-    <path d="M6,16L6.01,16" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M13.475,21L5,21C3.896,21 3,20.104 3,19L3,5C3,3.896 3.896,3 5,3L19,3C20.104,3 21,3.896 21,5L21,13.309" style="fill:none;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M7,7L7,17" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M11,7L11,17" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M15,7L16.429,14.145" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
     <g>
         <path d="M19,16L19,22" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
         <path d="M22,19L16,19" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>

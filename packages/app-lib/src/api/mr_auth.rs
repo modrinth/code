@@ -108,11 +108,16 @@ pub async fn remove_user(user_id: &str) -> crate::Result<()> {
 }
 
 async fn reconnect_friends(state: &crate::State) -> crate::Result<()> {
-    state.friends_socket.disconnect().await?;
-    state
+    if let Err(error) = state.friends_socket.disconnect().await {
+        tracing::warn!("Failed to disconnect friends socket: {error}");
+    }
+    if let Err(error) = state
         .friends_socket
         .connect(&state.pool, &state.api_semaphore, &state.process_manager)
-        .await?;
+        .await
+    {
+        tracing::warn!("Failed to reconnect friends socket: {error}");
+    }
 
     Ok(())
 }

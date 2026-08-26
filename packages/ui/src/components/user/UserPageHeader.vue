@@ -16,7 +16,7 @@
 				:icon="BadgeCheckIcon"
 				:icon-props="{ fill: 'var(--color-brand-highlight)' }"
 				:tooltip="formatMessage(messages.officialAccount)"
-				class="border-brand-highlight bg-brand-highlight text-brand"
+				class="border-brand-highlight bg-brand-highlight !text-brand"
 			>
 				{{ formatMessage(messages.officialAccount) }}
 			</PageHeaderBadgeItem>

@@ -19,6 +19,7 @@ export default defineNuxtPlugin(() => {
 		keybinds.value.handle(event, {
 			scope: 'global',
 			officialUrl: `${getOfficialOrigin(String(config.public.apiBaseUrl))}${window.location.pathname}${window.location.search}`,
+			localhostUrl: `http://localhost:3000${window.location.pathname}${window.location.search}`,
 			notifyCopied,
 		})
 	})

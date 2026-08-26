@@ -373,6 +373,7 @@
 						{
 							id: 'review-projects',
 							label: formatMessage(messages.reviewProjects),
+							icon: ScaleIcon,
 							type: 'link',
 							to: '/moderation',
 							tone: 'orange',
@@ -380,6 +381,7 @@
 						{
 							id: 'tech-review',
 							label: formatMessage(messages.techReview),
+							icon: ShieldAlertIcon,
 							type: 'link',
 							to: '/moderation/technical-review',
 							tone: 'orange',
@@ -387,6 +389,7 @@
 						{
 							id: 'review-reports',
 							label: formatMessage(messages.reports),
+							icon: ReportIcon,
 							type: 'link',
 							to: '/moderation/reports',
 							tone: 'orange',
@@ -394,116 +397,109 @@
 						{
 							id: 'external-projects',
 							label: formatMessage(messages.externalProjects),
+							icon: GlobeIcon,
 							type: 'link',
 							to: '/moderation/external-projects',
 							tone: 'orange',
 						},
 						{
-							type: 'divider',
+							id: 'global-traces',
+							label: 'Global traces',
+							icon: HashIcon,
+							type: 'link',
+							to: '/moderation/global-traces',
+							tone: 'orange',
 						},
+						{ type: 'divider' },
 						{
 							id: 'file-lookup',
-							label: formatMessage(messages.fileLookup),
+							label: 'File lookup',
+							icon: FileSearchCornerIcon,
 							type: 'link',
 							to: '/admin/file_lookup',
 						},
 						{
-							type: 'divider',
-							shown: isAdmin(auth.user),
-						},
-						{
 							id: 'user-lookup',
-							label: formatMessage(messages.lookupByEmail),
+							label: 'User lookup',
+							icon: UserSearchIcon,
 							type: 'link',
 							to: '/admin/user_email',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
 						},
 						{
-							id: 'affiliates',
-							label: formatMessage(messages.manageAffiliates),
-							type: 'link',
-							to: '/admin/affiliates',
-							tone: 'brand',
+							type: 'divider',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'servers-lookup',
 							label: 'Server lookup',
+							icon: ServerSearchIcon,
 							type: 'link',
 							to: '/admin/servers/lookup',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'servers-notices',
-							label: formatMessage(messages.manageServerNotices),
+							label: 'Server notices',
+							icon: IssuesIcon,
 							type: 'link',
 							to: '/admin/servers/notices',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'servers-transfers',
 							label: 'Server transfers',
+							icon: TransferIcon,
 							type: 'link',
 							to: '/admin/servers/transfers',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'servers-nodes',
 							label: 'Credit server nodes',
+							icon: ServerIcon,
 							action: (event) => $refs.modal_batch_credit.show(event),
-							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
+						{
+							type: 'divider',
+							shown: isAdmin(auth.user),
+						},
+						{
+							id: 'affiliates',
+							label: 'Affiliate links',
+							icon: AffiliateIcon,
+							type: 'link',
+							to: '/admin/affiliates',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'analytics-events',
-							label: formatMessage(messages.analyticsEvents),
+							label: 'Analytics events',
+							icon: ChartIcon,
 							type: 'link',
 							to: '/admin/analytics/events',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
+						},
+						{ type: 'divider' },
+						{
+							id: 'email-templates',
+							label: 'Email templates',
+							icon: MailIcon,
+							type: 'link',
+							to: '/admin/emails',
+						},
+						{
+							id: 'document-templates',
+							label: 'Document templates',
+							icon: BookOpenIcon,
+							type: 'link',
+							to: '/admin/docs',
 						},
 					]"
 				>
 					<ModrinthIcon aria-hidden="true" />
 					<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-					<template #review-projects>
-						<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
-					</template>
-					<template #tech-review>
-						<ShieldAlertIcon aria-hidden="true" /> {{ formatMessage(messages.techReview) }}
-					</template>
-					<template #review-reports>
-						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
-					</template>
-					<template #external-projects>
-						<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.externalProjects) }}
-					</template>
-					<template #user-lookup>
-						<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
-					</template>
-					<template #file-lookup>
-						<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
-					</template>
-					<template #servers-lookup> <ServerIcon aria-hidden="true" /> Server lookup </template>
-					<template #servers-notices>
-						<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
-					</template>
-					<template #servers-transfers>
-						<TransferIcon aria-hidden="true" /> Server transfers
-					</template>
-					<template #affiliates>
-						<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
-					</template>
-					<template #servers-nodes>
-						<ServerIcon aria-hidden="true" /> Credit server nodes
-					</template>
-					<template #analytics-events>
-						<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
-					</template>
 				</TeleportOverflowMenu>
 				<TeleportOverflowMenu
 					v-if="auth.user"
@@ -515,20 +511,20 @@
 						{
 							id: 'new-project',
 							label: formatMessage(messages.newProject),
-							icon: BoxIcon,
+							icon: BoxPlusIcon,
 							action: (event) => requireVerifiedEmail(() => $refs.modal_creation.show(event)),
 						},
 						{
 							id: 'new-server-project',
 							label: formatMessage(messages.newServerProject),
-							icon: ServerIcon,
+							icon: ServerPlusIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_creation.show(event, { type: 'server' })),
 						},
 						{
 							id: 'new-collection',
 							label: formatMessage(messages.newCollection),
-							icon: CollectionIcon,
+							icon: CollectionPlusIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_collection_creation.show(event)),
 						},
@@ -536,7 +532,7 @@
 						{
 							id: 'new-organization',
 							label: formatMessage(messages.newOrganization),
-							icon: OrganizationIcon,
+							icon: OrganizationPlusIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
 						},
@@ -811,26 +807,31 @@ import {
 	ArrowBigUpDashIcon,
 	ArrowLeftRightIcon,
 	BellIcon,
+	BookOpenIcon,
 	BoxIcon,
+	BoxPlusIcon,
 	BracesIcon,
 	ChartIcon,
-	CollectionIcon,
+	CollectionPlusIcon,
 	CompassIcon,
 	CurrencyIcon,
 	DownloadIcon,
 	DropdownIcon,
-	FileIcon,
+	FileSearchCornerIcon,
 	GlassesIcon,
 	GlobeIcon,
 	HamburgerIcon,
+	HashIcon,
 	HomeIcon,
 	IssuesIcon,
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
+	MailIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
+	OrganizationPlusIcon,
 	PackageOpenIcon,
 	PaintbrushIcon,
 	PlugIcon,
@@ -839,6 +840,8 @@ import {
 	ScaleIcon,
 	SearchIcon,
 	ServerIcon,
+	ServerPlusIcon,
+	ServerSearchIcon,
 	ServerStackIcon,
 	SettingsIcon,
 	ShieldAlertIcon,
@@ -1086,9 +1089,9 @@ const messages = defineMessages({
 		id: 'layout.action.external-projects',
 		defaultMessage: 'External projects',
 	},
-	lookupByEmail: {
-		id: 'layout.action.lookup-by-email',
-		defaultMessage: 'Lookup by email',
+	userLookup: {
+		id: 'layout.action.user-lookup',
+		defaultMessage: 'User lookup',
 	},
 	fileLookup: {
 		id: 'layout.action.file-lookup',

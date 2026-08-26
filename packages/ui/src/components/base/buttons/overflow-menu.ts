@@ -5,6 +5,7 @@ import type {
 	ButtonColor,
 	OverflowMenuAction,
 	OverflowMenuDivider,
+	OverflowMenuHeading,
 	OverflowMenuLink,
 	OverflowMenuOption,
 	OverflowMenuSubmenu,
@@ -41,6 +42,10 @@ export function isDivider(option: OverflowMenuOption): option is OverflowMenuDiv
 	return option.type === 'divider'
 }
 
+export function isHeading(option: OverflowMenuOption): option is OverflowMenuHeading {
+	return option.type === 'heading'
+}
+
 export function isLink(option: OverflowMenuOption): option is OverflowMenuLink {
 	return option.type === 'link'
 }
@@ -52,7 +57,7 @@ export function isSubmenu(option: OverflowMenuOption): option is OverflowMenuSub
 export function isMenuRow(
 	option: OverflowMenuOption,
 ): option is OverflowMenuAction | OverflowMenuLink | OverflowMenuSubmenu {
-	return option.type !== 'divider'
+	return option.type !== 'divider' && option.type !== 'heading'
 }
 
 export function visibleOptions<T extends { shown?: boolean }>(options: T[]): T[] {

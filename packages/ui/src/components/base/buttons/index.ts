@@ -18,6 +18,7 @@ export type {
 	ButtonVisualProps,
 	OverflowMenuAction,
 	OverflowMenuDivider,
+	OverflowMenuHeading,
 	OverflowMenuLeafOption,
 	OverflowMenuLink,
 	OverflowMenuOption,

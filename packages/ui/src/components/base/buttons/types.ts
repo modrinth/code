@@ -109,7 +109,18 @@ export interface OverflowMenuDivider {
 	shown?: boolean
 }
 
-export type OverflowMenuLeafOption = OverflowMenuAction | OverflowMenuLink | OverflowMenuDivider
+export interface OverflowMenuHeading {
+	type: 'heading'
+	id?: string
+	label: string
+	shown?: boolean
+}
+
+export type OverflowMenuLeafOption =
+	| OverflowMenuAction
+	| OverflowMenuLink
+	| OverflowMenuDivider
+	| OverflowMenuHeading
 
 export interface OverflowMenuSubmenu extends OverflowMenuItemBase {
 	type: 'submenu'

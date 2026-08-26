@@ -3,7 +3,14 @@ import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import type { AnchoredTeleportAnchor } from '../../../utils/use-anchored-teleport'
 import { pointAnchor, useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
-import { isDivider, isMenuRow, isSubmenu, useMenuKeyboard, visibleOptions } from './overflow-menu'
+import {
+	isDivider,
+	isHeading,
+	isMenuRow,
+	isSubmenu,
+	useMenuKeyboard,
+	visibleOptions,
+} from './overflow-menu'
 import OverflowMenuItem from './OverflowMenuItem.vue'
 import OverflowMenuPanel from './OverflowMenuPanel.vue'
 import OverflowMenuSubmenu from './OverflowMenuSubmenu.vue'
@@ -93,8 +100,15 @@ defineExpose({ open: openMenu, close: closeMenu })
 			class="focus-visible:outline-none"
 			@keydown="handleKeydown"
 		>
-			<template v-for="(option, index) in options" :key="option.id ?? `divider-${index}`">
+			<template v-for="(option, index) in options" :key="option.id ?? `${option.type}-${index}`">
 				<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
+
+				<div
+					v-else-if="isHeading(option)"
+					class="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary first:pt-1"
+				>
+					{{ option.label }}
+				</div>
 
 				<OverflowMenuSubmenu v-else-if="isSubmenu(option)" :option="option" @select="handleSelect">
 					<template #trigger>

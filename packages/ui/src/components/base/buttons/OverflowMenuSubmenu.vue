@@ -6,6 +6,7 @@ import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
 import {
 	getOverflowMenuItemAttrs,
 	isDivider,
+	isHeading,
 	menuItemSelector,
 	menuPanelPadding,
 	overflowMenuItemClasses,
@@ -166,8 +167,15 @@ function handlePanelKeydown(event: KeyboardEvent) {
 		@mouseenter="handleMouseEnter"
 		@mouseleave="handleMouseLeave"
 	>
-		<template v-for="(child, index) in options" :key="child.id ?? `divider-${index}`">
+		<template v-for="(child, index) in options" :key="child.id ?? `${child.type}-${index}`">
 			<div v-if="isDivider(child)" role="separator" class="my-1 h-px bg-surface-5" />
+
+			<div
+				v-else-if="isHeading(child)"
+				class="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary first:pt-1"
+			>
+				{{ child.label }}
+			</div>
 
 			<OverflowMenuItem v-else :option="child" submenu-item @select="handleSelect">
 				<slot name="item" :option="child">

@@ -6,6 +6,7 @@ import Button from './Button.vue'
 import IconButton from './IconButton.vue'
 import {
 	isDivider,
+	isHeading,
 	isLink,
 	isMenuRow,
 	isSubmenu,
@@ -182,8 +183,15 @@ defineExpose({ open: openMenu, close: closeMenu })
 			@mouseenter="handleMouseEnter"
 			@mouseleave="handleMouseLeave"
 		>
-			<template v-for="(option, index) in options" :key="option.id ?? `divider-${index}`">
+			<template v-for="(option, index) in options" :key="option.id ?? `${option.type}-${index}`">
 				<div v-if="isDivider(option)" role="separator" class="my-1 h-px bg-surface-5" />
+
+				<div
+					v-else-if="isHeading(option)"
+					class="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary first:pt-1"
+				>
+					{{ option.label }}
+				</div>
 
 				<OverflowMenuSubmenu
 					v-else-if="isSubmenu(option)"
