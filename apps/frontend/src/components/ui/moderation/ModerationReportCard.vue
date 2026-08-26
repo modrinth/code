@@ -233,28 +233,26 @@
 						</Button>
 					</template>
 					<template #additionalActions="{ hasReply }">
-						<template>
-							<Button
-								v-if="hasReply"
-								type="colored"
-								color="red"
-								class="w-full gap-2 sm:w-auto"
-								@click="closeReport(true)"
-							>
-								<CheckCircleIcon class="size-4" />
-								Reply and close
-							</Button>
-							<Button
-								v-else
-								type="colored"
-								color="red"
-								class="w-full gap-2 sm:w-auto"
-								@click="closeReport()"
-							>
-								<CheckCircleIcon class="size-4" />
-								Close report
-							</Button>
-						</template>
+						<Button
+							v-if="hasReply"
+							type="colored"
+							color="red"
+							class="w-full gap-2 sm:w-auto"
+							@click="closeReport(true)"
+						>
+							<CheckCircleIcon class="size-4" />
+							Reply and close
+						</Button>
+						<Button
+							v-else
+							type="colored"
+							color="red"
+							class="w-full gap-2 sm:w-auto"
+							@click="closeReport()"
+						>
+							<CheckCircleIcon class="size-4" />
+							Close report
+						</Button>
 					</template>
 				</ThreadView>
 			</div>
