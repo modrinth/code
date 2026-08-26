@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, useId, watch } from 'vue'
 
 import type { AnchoredTeleportAnchor } from '../../../utils/use-anchored-teleport'
 import { pointAnchor, useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
@@ -84,11 +84,16 @@ watch(isOpen, (openState, previousOpenState) => {
 	if (!openState && previousOpenState) emit('close')
 })
 
+const isClient = ref(false)
+onMounted(() => {
+	isClient.value = true
+})
+
 defineExpose({ open: openMenu, close: closeMenu })
 </script>
 
 <template>
-	<Teleport to="body">
+	<Teleport v-if="isClient" to="body">
 		<ButtonMenuPanel
 			ref="panel"
 			:open="isOpen"

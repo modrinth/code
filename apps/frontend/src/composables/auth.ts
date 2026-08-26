@@ -13,6 +13,7 @@ type AuthState = {
 type QueryValue = LocationQueryValue | LocationQueryValue[] | undefined
 type FullPathRoute = Pick<RouteLocationNormalizedLoaded, 'fullPath'>
 type LauncherRoute = Pick<RouteLocationNormalizedLoaded, 'query'>
+type AuthInitRoute = Pick<RouteLocationNormalizedLoaded, 'fullPath' | 'path' | 'query'>
 
 const normalizeAuthToken = (value: unknown) => {
 	if (typeof value === 'string') {
@@ -51,20 +52,26 @@ const getQueryString = (value: QueryValue) => {
 	return value ?? null
 }
 
-export const useAuth = async (oldToken: string | null | undefined = null) => {
+export const useAuth = async (
+	oldToken: string | null | undefined = null,
+	route?: AuthInitRoute,
+) => {
 	const auth = useState<AuthState>('auth', () => ({
 		user: null,
 		token: '',
 	}))
 
 	if (!auth.value.user || oldToken) {
-		auth.value = await initAuth(oldToken)
+		auth.value = await initAuth(oldToken, route)
 	}
 
 	return auth
 }
 
-export const initAuth = async (oldToken: string | null | undefined = null) => {
+export const initAuth = async (
+	oldToken: string | null | undefined = null,
+	route?: AuthInitRoute,
+) => {
 	const auth: AuthState = {
 		user: null,
 		token: '',
@@ -74,7 +81,7 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 		return auth
 	}
 
-	const route = useRoute()
+	const resolvedRoute = route ?? useRoute()
 	const authCookie = useAuthCookie()
 
 	if (oldToken) {
@@ -84,13 +91,16 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 		}
 	}
 
-	const oauthCode = normalizeAuthToken(route.query.code)
-	if (oauthCode && !route.fullPath.includes('new_account=true')) {
+	const oauthCode = normalizeAuthToken(resolvedRoute.query.code)
+	if (oauthCode && !resolvedRoute.fullPath.includes('new_account=true')) {
 		authCookie.value = oauthCode
 	}
 
-	if (route.fullPath.includes('new_account=true') && route.path !== '/auth/welcome') {
-		const redirect = route.path.startsWith('/auth/') ? null : route.fullPath
+	if (
+		resolvedRoute.fullPath.includes('new_account=true') &&
+		resolvedRoute.path !== '/auth/welcome'
+	) {
+		const redirect = resolvedRoute.path.startsWith('/auth/') ? null : resolvedRoute.fullPath
 
 		await navigateTo(
 			`/auth/welcome?authToken=${oauthCode}${

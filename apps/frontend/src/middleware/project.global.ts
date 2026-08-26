@@ -1,3 +1,5 @@
+import type { RouteLocationNormalized } from 'vue-router'
+
 import { useGeneratedState } from '~/composables/generated'
 import { projectQueryOptions, warmProjectCheckCaches } from '~/composables/queries/project'
 import { useAppQueryClient } from '~/composables/query-client'
@@ -29,7 +31,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	}
 
 	const queryClient = useAppQueryClient()
-	const client = await getProjectMiddlewareClient()
+	const client = await getProjectMiddlewareClient(to)
 	const tags = useGeneratedState()
 
 	if (import.meta.client) startLoading()
@@ -85,13 +87,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	}
 })
 
-async function getProjectMiddlewareClient() {
+async function getProjectMiddlewareClient(route: RouteLocationNormalized) {
 	if (import.meta.server) {
 		const authToken = useCookie('auth-token')
 		return useServerModrinthClient({ authToken: authToken.value || undefined })
 	}
 
-	const auth = await useAuth()
+	const auth = await useAuth(null, route)
 	const config = useRuntimeConfig()
 
 	return createModrinthClient(auth, {

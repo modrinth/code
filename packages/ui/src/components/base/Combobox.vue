@@ -95,7 +95,7 @@
 			</div>
 		</ButtonFrame>
 
-		<Teleport to="#teleports">
+		<Teleport v-if="isClient" to="#teleports">
 			<Transition name="floating-expand">
 				<div
 					v-if="shouldRenderDropdown"
@@ -1030,7 +1030,10 @@ onClickOutside(
 	{ ignore: outsideClickIgnoreTargets },
 )
 
+const isClient = ref(false)
+
 onMounted(() => {
+	isClient.value = true
 	window.addEventListener('resize', handleWindowResize)
 })
 

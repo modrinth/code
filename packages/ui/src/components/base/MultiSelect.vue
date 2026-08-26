@@ -107,7 +107,7 @@
 			</template>
 		</component>
 
-		<Teleport to="#teleports">
+		<Teleport v-if="isClient" to="#teleports">
 			<Transition name="floating-expand">
 				<div
 					v-if="isOpen"
@@ -1390,7 +1390,10 @@ onClickOutside(
 	{ ignore: [triggerElement, containerRef, '.v-popper__popper'] },
 )
 
+const isClient = ref(false)
+
 onMounted(() => {
+	isClient.value = true
 	window.addEventListener('resize', handleWindowResize)
 	calculateVisibleTags()
 })

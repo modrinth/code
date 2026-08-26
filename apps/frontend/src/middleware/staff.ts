@@ -1,7 +1,7 @@
 import { isStaff } from '@modrinth/utils'
 
-export default defineNuxtRouteMiddleware(async () => {
-	const auth = await useAuth()
+export default defineNuxtRouteMiddleware(async (to) => {
+	const auth = await useAuth(null, to)
 
 	if (!auth.value.user || !isStaff(auth.value.user)) {
 		throw createError({
