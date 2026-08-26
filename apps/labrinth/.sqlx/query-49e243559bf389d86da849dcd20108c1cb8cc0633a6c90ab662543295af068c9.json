@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO payout_runs (\n            id,\n            period,\n            payload,\n            status,\n            started_at,\n            started_by,\n            execute_at,\n            processing_started_at,\n            finished_at\n        )\n        VALUES (\n            $1,\n            $2,\n            '{\"raw_actual_revenue_usd\":100,\"revenue_adjustments\":[]}'::jsonb,\n            'succeeded',\n            $3,\n            $4,\n            $5,\n            $5,\n            $6\n        )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Date",
+        "Timestamptz",
+        "Int8",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "49e243559bf389d86da849dcd20108c1cb8cc0633a6c90ab662543295af068c9"
+}

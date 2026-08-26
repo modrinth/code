@@ -31,7 +31,7 @@ async fn insert_run(
 		VALUES (
 			$1,
 			$2,
-			'{"raw_actual_revenue_usd": 0, "adjustments": []}'::jsonb,
+			'{"raw_actual_revenue_usd": 0, "revenue_adjustments": []}'::jsonb,
 			$3,
 			NOW(),
 			$4,
@@ -118,7 +118,7 @@ async fn payout_run_lineage_and_active_run_constraints() {
 				INSERT INTO payout_periods (
 					period,
 					raw_actual_aditude_revenue_usd,
-					adjustments
+					revenue_adjustments
 				)
 				SELECT period, 0, '[]'::jsonb
 				FROM UNNEST($1::date[]) AS period

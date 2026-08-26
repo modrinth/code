@@ -4,7 +4,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-use super::{Adjustment, PayoutRunDay, PayoutRunPayload};
+use super::{PayoutRunDay, PayoutRunPayload, RevenueAdjustment};
 use crate::{
     auth::{
         AuthenticationError, get_user_from_headers, two_factor::verify_2fa_code,
@@ -45,7 +45,7 @@ pub struct StartPayoutRun {
     pub ignore_totp: bool,
     #[serde(with = "rust_decimal::serde::float")]
     pub raw_actual_revenue_usd: Decimal,
-    pub adjustments: Vec<Adjustment>,
+    pub revenue_adjustments: Vec<RevenueAdjustment>,
 }
 
 #[derive(Debug, Serialize, utoipa::ToSchema)]
@@ -58,10 +58,11 @@ pub struct StartPayoutRunResponse {
 pub struct CalculatePayoutRunResponse {
     pub period: YearMonth,
     pub days: Vec<PayoutRunDay>,
-    /// Sum of all adjustments that would be applied on top of actual revenue.
+    /// Sum of all revenue adjustments that would be applied on top of actual
+    /// revenue.
     #[serde(with = "rust_decimal::serde::float")]
-    pub total_adjustments: Decimal,
-    pub adjustments: Vec<Adjustment>,
+    pub total_revenue_adjustment_usd: Decimal,
+    pub revenue_adjustments: Vec<RevenueAdjustment>,
 }
 
 /// Calculate a payout run without scheduling it.
@@ -148,9 +149,16 @@ pub async fn calculate_run(
         .iter()
         .map(|day| day.raw_estimated_revenue_usd)
         .sum();
+    let total_revenue_adjustment_usd = body
+        .revenue_adjustments
+        .iter()
+        .map(|adjustment| adjustment.amount_usd)
+        .sum();
     let actual_flow = compute_actual_distribution_flow(
+        body.period,
         total_estimated_revenue_usd,
         body.raw_actual_revenue_usd,
+        total_revenue_adjustment_usd,
     );
     let days = estimate
         .days
@@ -161,6 +169,7 @@ pub async fn calculate_run(
                 day.date,
                 day.raw_estimated_revenue_usd,
                 day.impressions,
+                Decimal::ZERO,
                 &variances,
             ),
             actual: Some(actual_flow.distribution_for_day(
@@ -170,17 +179,12 @@ pub async fn calculate_run(
             )),
         })
         .collect();
-    let total_adjustments = body
-        .adjustments
-        .iter()
-        .map(|adjustment| adjustment.amount_usd)
-        .sum();
 
     Ok(web::Json(CalculatePayoutRunResponse {
         period: body.period,
         days,
-        total_adjustments,
-        adjustments: body.adjustments,
+        total_revenue_adjustment_usd,
+        revenue_adjustments: body.revenue_adjustments,
     }))
 }
 
@@ -290,7 +294,7 @@ pub async fn start_run(
         .wrap_failed_dependency_err("validating payout estimate")?;
     let payload = PayoutRunPayload {
         raw_actual_revenue_usd: body.raw_actual_revenue_usd,
-        adjustments: body.adjustments.clone(),
+        revenue_adjustments: body.revenue_adjustments.clone(),
     };
 
     let mut transaction = pool
@@ -303,7 +307,7 @@ pub async fn start_run(
         INSERT INTO payout_periods (
             period,
             raw_actual_aditude_revenue_usd,
-            adjustments
+            revenue_adjustments
         )
         VALUES ($1, $2, '[]'::jsonb)
         ON CONFLICT (period) DO UPDATE SET

@@ -1,7 +1,7 @@
 mod admin;
 mod fetch;
 
-pub use crate::queue::payout_run::{Adjustment, PayoutRunPayload};
+pub use crate::queue::payout_run::{PayoutRunPayload, RevenueAdjustment};
 pub use admin::*;
 pub use fetch::*;
 

@@ -54,7 +54,7 @@ async fn insert_succeeded_period(
         INSERT INTO payout_periods (
             period,
             raw_actual_aditude_revenue_usd,
-            adjustments
+            revenue_adjustments
         )
         VALUES ($1, 100, '[]'::jsonb)
         "#,
@@ -81,7 +81,7 @@ async fn insert_succeeded_period(
         VALUES (
             $1,
             $2,
-            '{"raw_actual_revenue_usd":100,"adjustments":[]}'::jsonb,
+            '{"raw_actual_revenue_usd":100,"revenue_adjustments":[]}'::jsonb,
             'succeeded',
             $3,
             $4,

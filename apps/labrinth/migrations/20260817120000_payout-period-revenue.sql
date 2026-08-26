@@ -3,7 +3,7 @@ CREATE TABLE payout_periods (
 		CHECK (EXTRACT(DAY FROM period) = 1),
 	raw_actual_aditude_revenue_usd NUMERIC(40, 20) NOT NULL
 		CHECK (raw_actual_aditude_revenue_usd >= 0),
-	adjustments JSONB NOT NULL
+	revenue_adjustments JSONB NOT NULL
 );
 
 CREATE TABLE payout_period_days (

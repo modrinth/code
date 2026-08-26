@@ -6,7 +6,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-use super::Adjustment;
+use super::RevenueAdjustment;
 use crate::{
     auth::get_user_from_headers,
     database::{
@@ -43,14 +43,15 @@ pub struct PayoutRunPeriod {
     /// When the active payout run is scheduled to begin executing.
     pub runs_at: Option<DateTime<Utc>>,
     pub days: Vec<PayoutRunDay>,
-    /// Sum of all adjustments applied on top of actual revenue.
+    /// Sum of all revenue adjustments applied on top of actual revenue.
     #[serde(with = "rust_decimal::serde::float")]
-    pub total_adjustments: Decimal,
-    /// Individual adjustments, including their admin-provided descriptions.
+    pub total_revenue_adjustment_usd: Decimal,
+    /// Individual revenue adjustments, including their admin-provided
+    /// descriptions.
     ///
     /// Only visible to admins.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub adjustments: Option<Vec<Adjustment>>,
+    pub revenue_adjustments: Option<Vec<RevenueAdjustment>>,
 }
 
 /// Has revenue been distributed for a specific payout period month yet?
@@ -200,25 +201,28 @@ pub async fn get_runs(
                 .get(&requested_period.date())
                 .filter(|period| !period.days.is_empty())
             {
-                let period_adjustments =
+                let period_revenue_adjustments =
                     if let Some(payload) = &period.active_run_payload {
-                        &payload.adjustments
+                        &payload.revenue_adjustments
                     } else {
-                        &period.adjustments
+                        &period.revenue_adjustments
                     };
-                let total_adjustments = period_adjustments
+                let total_revenue_adjustment_usd = period_revenue_adjustments
                     .iter()
                     .map(|adjustment| adjustment.amount_usd)
                     .sum();
-                let adjustments = is_admin.then(|| period_adjustments.clone());
+                let revenue_adjustments =
+                    is_admin.then(|| period_revenue_adjustments.clone());
                 let total_estimated_revenue_usd = period
                     .days
                     .iter()
                     .map(|day| day.raw_estimated_aditude_revenue_usd)
                     .sum();
                 let actual_flow = compute_actual_distribution_flow(
+                    requested_period,
                     total_estimated_revenue_usd,
                     period.raw_actual_aditude_revenue_usd,
+                    total_revenue_adjustment_usd,
                 );
                 let days = period
                     .days
@@ -235,6 +239,7 @@ pub async fn get_runs(
                                 day.date,
                                 day.raw_estimated_aditude_revenue_usd,
                                 impressions,
+                                Decimal::ZERO,
                                 &variances,
                             ),
                             actual: Some(actual_flow.distribution_for_day(
@@ -258,8 +263,8 @@ pub async fn get_runs(
                     status,
                     runs_at: period.active_run_execute_at,
                     days,
-                    total_adjustments,
-                    adjustments,
+                    total_revenue_adjustment_usd,
+                    revenue_adjustments,
                 })
             } else {
                 let estimate = live_estimates
@@ -282,6 +287,7 @@ pub async fn get_runs(
                             day.date,
                             day.raw_estimated_revenue_usd,
                             day.impressions,
+                            Decimal::ZERO,
                             &variances,
                         ),
                         actual: None,
@@ -293,8 +299,8 @@ pub async fn get_runs(
                     status,
                     runs_at: None,
                     days,
-                    total_adjustments: Decimal::ZERO,
-                    adjustments: is_admin.then(Vec::new),
+                    total_revenue_adjustment_usd: Decimal::ZERO,
+                    revenue_adjustments: is_admin.then(Vec::new),
                 })
             }
         })

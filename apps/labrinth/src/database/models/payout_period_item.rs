@@ -5,13 +5,13 @@ use rust_decimal::Decimal;
 use sqlx::types::Json;
 
 use super::DatabaseError;
-use crate::queue::payout_run::{Adjustment, PayoutRunPayload};
+use crate::queue::payout_run::{PayoutRunPayload, RevenueAdjustment};
 
 #[derive(Debug, Clone)]
 pub struct DBPayoutPeriod {
     pub period: NaiveDate,
     pub raw_actual_aditude_revenue_usd: Decimal,
-    pub adjustments: Vec<Adjustment>,
+    pub revenue_adjustments: Vec<RevenueAdjustment>,
     pub active_run_payload: Option<PayoutRunPayload>,
     pub active_run_execute_at: Option<DateTime<Utc>>,
     pub days: Vec<DBPayoutPeriodDay>,
@@ -39,7 +39,7 @@ impl DBPayoutPeriod {
 			SELECT
 				payout_periods.period,
 				payout_periods.raw_actual_aditude_revenue_usd,
-				payout_periods.adjustments AS "adjustments: Json<Vec<Adjustment>>",
+				payout_periods.revenue_adjustments AS "revenue_adjustments: Json<Vec<RevenueAdjustment>>",
 				active_run.payload AS "active_run_payload: Json<PayoutRunPayload>",
 				active_run.execute_at AS active_run_execute_at,
 				EXISTS (
@@ -68,7 +68,7 @@ impl DBPayoutPeriod {
                         period: row.period,
                         raw_actual_aditude_revenue_usd: row
                             .raw_actual_aditude_revenue_usd,
-                        adjustments: row.adjustments.0,
+                        revenue_adjustments: row.revenue_adjustments.0,
                         active_run_payload: row
                             .active_run_payload
                             .map(|payload| payload.0),

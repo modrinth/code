@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO payout_periods (\n            period,\n            raw_actual_aditude_revenue_usd,\n            revenue_adjustments\n        )\n        VALUES ($1, 100, '[]'::jsonb)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Date"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "12c7d361e554ea8d9216c420cdf6bb79c460a4dc4217a656ab4d2e11c714ea56"
+}

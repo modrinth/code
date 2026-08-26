@@ -14,8 +14,9 @@
 //!   money, so this is closer to NET 75. During this period, the month (payout
 //!   period) is in an _in review_ state.
 //! - Once we receive the money from the provider, an admin enters the total
-//!   amount we've received into the web UI, adds any manual adjustments (for
-//!   campaigns outside of our ad provider's), and starts a payout run.
+//!   amount we've received into the web UI, adds any manual revenue
+//!   adjustments (for campaigns outside of our ad provider's), and starts a
+//!   payout run.
 //! - The payout run is not immediately executed; there is a period of time in
 //!   which it can still be cancelled.
 //! - Once the payout run is executed, we calculate the exact revenue
@@ -50,11 +51,12 @@
 //!       ```
 //!   - (fees stay the same, since they're based on impressions, not revenue)
 //!   - (variance is ignored, since that's purely an estimation value)
-//!   - `actual.net_revenue_usd`: raw actual revenue - fees
+//!   - Revenue adjustments are split evenly across the days in the period.
+//!   - `actual.net_revenue_usd`: raw actual revenue - fees + revenue adjustment
 //!   - `actual.(platform|creator)_net_revenue_usd`: same logic as estimated,
 //!     but using the net actual revenue
-//! - Manual adjustments are stored separately on the payout period and applied
-//!   on top of its actual distribution.
+//! - Manual revenue adjustments are stored on the payout period and applied to
+//!   its actual distribution before the platform/creator split.
 //!
 //! ## Variance
 //!
@@ -63,9 +65,11 @@
 //!   epoch date)
 //! - the decimal fraction of variance to apply
 
-use chrono::NaiveDate;
+use chrono::{Months, NaiveDate};
 use rust_decimal::{Decimal, dec};
 use serde::{Deserialize, Serialize};
+
+use crate::util::time::YearMonth;
 
 mod estimate;
 
@@ -77,13 +81,13 @@ pub struct PayoutRunPayload {
     /// Actual raw revenue received from the ad provider for the period.
     #[serde(with = "rust_decimal::serde::float")]
     pub raw_actual_revenue_usd: Decimal,
-    /// Manual adjustments to apply on top of actual revenue.
-    pub adjustments: Vec<Adjustment>,
+    /// Manual revenue adjustments to apply on top of actual revenue.
+    pub revenue_adjustments: Vec<RevenueAdjustment>,
 }
 
-/// Manual admin-input adjustment to a payout period.
+/// Manual admin-input revenue adjustment to a payout period.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct Adjustment {
+pub struct RevenueAdjustment {
     /// Total value of the adjustment.
     #[serde(with = "rust_decimal::serde::float")]
     pub amount_usd: Decimal,
@@ -113,8 +117,14 @@ pub struct DayDistribution {
     /// For non-estimates (actual revenue values), this is zero.
     #[serde(with = "rust_decimal::serde::float")]
     pub variance_usd: Decimal,
+    /// Revenue added after fees and variance, before the platform/creator
+    /// split.
+    ///
+    /// This is zero for estimated revenue.
+    #[serde(with = "rust_decimal::serde::float")]
+    pub revenue_adjustment_usd: Decimal,
     /// Total net revenue that we earned;
-    /// `raw_revenue - fees - variance`.
+    /// `raw_revenue - fees - variance + revenue_adjustment`.
     #[serde(with = "rust_decimal::serde::float")]
     pub net_revenue_usd: Decimal,
     /// How much of the net revenue goes to the platform.
@@ -153,6 +163,7 @@ pub fn distribution_for_day(
     date: NaiveDate,
     raw_revenue_usd: Decimal,
     impressions: u128,
+    revenue_adjustment_usd: Decimal,
     variances: &PayoutVariances,
 ) -> DayDistribution {
     let fees_usd = {
@@ -168,16 +179,17 @@ pub fn distribution_for_day(
         .unwrap_or(variances.default_frac);
     let variance_usd = raw_revenue_usd * variance_frac;
 
-    let net_estimated_revenue_usd = raw_revenue_usd - fees_usd - variance_usd;
+    let net_revenue_usd =
+        raw_revenue_usd - fees_usd - variance_usd + revenue_adjustment_usd;
 
     DayDistribution {
         raw_revenue_usd,
         fees_usd,
         variance_usd,
-        net_revenue_usd: net_estimated_revenue_usd,
-        platform_net_revenue_usd: net_estimated_revenue_usd
-            * PLATFORM_REVENUE_SPLIT,
-        creator_net_revenue_usd: net_estimated_revenue_usd
+        revenue_adjustment_usd,
+        net_revenue_usd,
+        platform_net_revenue_usd: net_revenue_usd * PLATFORM_REVENUE_SPLIT,
+        creator_net_revenue_usd: net_revenue_usd
             * (dec!(1) - PLATFORM_REVENUE_SPLIT),
     }
 }
@@ -186,6 +198,9 @@ pub fn distribution_for_day(
 #[derive(Debug, Clone, Copy)]
 pub struct ActualDistributionFlow {
     share: Decimal,
+    period: YearMonth,
+    daily_revenue_adjustment_usd: Decimal,
+    final_day_revenue_adjustment_usd: Decimal,
 }
 
 /// Start a flow for computing the actual revenue distribution of a payout
@@ -202,12 +217,17 @@ pub struct ActualDistributionFlow {
 /// ```
 ///
 /// If the period's estimated revenue is zero, the share is `1`.
+/// Revenue adjustments are split evenly across every calendar day. Any
+/// decimal rounding remainder is placed on the final day so the daily values
+/// sum exactly to the period adjustment.
 ///
 /// We use a type-state-ish pattern here to ensure that the same flow is used
 /// for each day in a period.
 pub fn compute_actual_distribution_flow(
+    period: YearMonth,
     raw_estimated_revenue_usd: Decimal,
     raw_actual_revenue_usd: Decimal,
+    revenue_adjustment_usd: Decimal,
 ) -> ActualDistributionFlow {
     let share = if raw_estimated_revenue_usd.is_zero() {
         Decimal::ONE
@@ -215,7 +235,21 @@ pub fn compute_actual_distribution_flow(
         raw_actual_revenue_usd / raw_estimated_revenue_usd
     };
 
-    ActualDistributionFlow { share }
+    let next_period = period
+        .date()
+        .checked_add_months(Months::new(1))
+        .expect("a payout period must have a following month");
+    let day_count = Decimal::from((next_period - period.date()).num_days());
+    let daily_revenue_adjustment_usd = revenue_adjustment_usd / day_count;
+    let final_day_revenue_adjustment_usd = revenue_adjustment_usd
+        - daily_revenue_adjustment_usd * (day_count - Decimal::ONE);
+
+    ActualDistributionFlow {
+        share,
+        period,
+        daily_revenue_adjustment_usd,
+        final_day_revenue_adjustment_usd,
+    }
 }
 
 impl ActualDistributionFlow {
@@ -226,12 +260,72 @@ impl ActualDistributionFlow {
         raw_estimated_revenue_usd: Decimal,
         impressions: u128,
     ) -> DayDistribution {
+        debug_assert_eq!(YearMonth::from_day1(date), self.period);
+        let next_period = self
+            .period
+            .date()
+            .checked_add_months(Months::new(1))
+            .expect("a payout period must have a following month");
+        let revenue_adjustment_usd = if date.succ_opt() == Some(next_period) {
+            self.final_day_revenue_adjustment_usd
+        } else {
+            self.daily_revenue_adjustment_usd
+        };
+
         distribution_for_day(
             date,
             raw_estimated_revenue_usd * self.share,
             impressions,
+            revenue_adjustment_usd,
             // actual rev distribution always has no variance
             &PayoutVariances::ZERO,
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use chrono::Days;
+
+    use super::*;
+
+    #[test]
+    fn splits_revenue_adjustment_across_period_exactly() {
+        let period = YearMonth::from_year_month(2026, 4).unwrap();
+        let adjustment = dec!(500);
+        let flow = compute_actual_distribution_flow(
+            period,
+            dec!(30),
+            dec!(30),
+            adjustment,
+        );
+        let mut date = period.date();
+        let mut distributions = Vec::new();
+
+        for _ in 0..30 {
+            distributions.push(flow.distribution_for_day(date, dec!(1), 0));
+            date = date.checked_add_days(Days::new(1)).unwrap();
+        }
+
+        assert_eq!(
+            distributions
+                .iter()
+                .map(|day| day.revenue_adjustment_usd)
+                .sum::<Decimal>(),
+            adjustment,
+        );
+        assert_eq!(
+            distributions
+                .iter()
+                .map(|day| day.net_revenue_usd)
+                .sum::<Decimal>(),
+            dec!(530),
+        );
+        assert!(
+            distributions[..29]
+                .iter()
+                .all(|day| day.revenue_adjustment_usd
+                    == distributions[0].revenue_adjustment_usd),
+        );
     }
 }
