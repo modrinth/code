@@ -23,7 +23,7 @@ for (const [form, input] of blockedForms) {
 	})
 }
 
-test('does not use term exceptions', () => {
+test('matches whole words without term exceptions', () => {
 	const validator = createProfanityValidator({
 		patterns: {
 			bad: { kind: 'profanity' },
@@ -31,9 +31,10 @@ test('does not use term exceptions', () => {
 	})
 
 	assert.equal(validator.findFirst('not bad word')?.term, 'bad')
+	assert.equal(validator.findFirst('notbadword'), undefined)
 })
 
-test('uses the first match when one configured term prefixes another', () => {
+test('uses the whole-word match when one configured term prefixes another', () => {
 	const validator = createProfanityValidator({
 		patterns: {
 			bad: { kind: 'profanity' },
@@ -41,7 +42,14 @@ test('uses the first match when one configured term prefixes another', () => {
 		},
 	})
 
-	assert.equal(validator.findFirst('badword')?.term, 'bad')
+	assert.equal(validator.findFirst('badword')?.term, 'badword')
+})
+
+test('does not join ordinary words or match inside larger words', () => {
+	assert.equal(validateProfanity('pause menu').valid, true)
+	assert.equal(validateProfanity('accumulate').valid, true)
+	assert.equal(validateProfanity('cum').valid, false)
+	assert.equal(validateProfanity('s e m e n').valid, false)
 })
 
 test('rejects any uncensored configured profanity', () => {

@@ -244,6 +244,33 @@ function getDuplicateThresholds(terms: readonly string[]): Map<string, number> {
 	return thresholds
 }
 
+function isWordCharacter(character: string | undefined): boolean {
+	return character !== undefined && /^[\p{L}\p{M}\p{N}_]$/u.test(character)
+}
+
+function getCharacterBefore(text: string, index: number): string | undefined {
+	if (index <= 0) return undefined
+
+	const codePoint = text.codePointAt(index - 1)
+	if (codePoint === undefined) return undefined
+	if (codePoint >= 0xdc00 && codePoint <= 0xdfff && index > 1) {
+		return text.slice(index - 2, index)
+	}
+
+	return text[index - 1]
+}
+
+function getCharacterAt(text: string, index: number): string | undefined {
+	const codePoint = text.codePointAt(index)
+	return codePoint === undefined ? undefined : String.fromCodePoint(codePoint)
+}
+
+function isWholeWordMatch(text: string, start: number, end: number): boolean {
+	return (
+		!isWordCharacter(getCharacterBefore(text, start)) && !isWordCharacter(getCharacterAt(text, end))
+	)
+}
+
 export function createProfanityValidator(
 	config: ProfanityConfig = DEFAULT_PROFANITY_CONFIG,
 ): ProfanityValidator {
@@ -273,13 +300,20 @@ export function createProfanityValidator(
 
 		for (const match of matcher.getAllMatches(text, true)) {
 			const profanityPattern = entries[match.termId]
-			if (!profanityPattern || match.startIndex < (matches.at(-1)?.end ?? 0)) continue
+			const end = match.endIndex + 1
+			if (
+				!profanityPattern ||
+				!isWholeWordMatch(text, match.startIndex, end) ||
+				match.startIndex < (matches.at(-1)?.end ?? 0)
+			) {
+				continue
+			}
 
 			matches.push({
 				...profanityPattern,
-				rawText: text.slice(match.startIndex, match.endIndex + 1),
+				rawText: text.slice(match.startIndex, end),
 				start: match.startIndex,
-				end: match.endIndex + 1,
+				end,
 			})
 		}
 
