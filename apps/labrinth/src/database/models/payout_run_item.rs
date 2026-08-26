@@ -21,7 +21,6 @@ use crate::queue::payout_run::PayoutRunPayload;
 #[strum(serialize_all = "snake_case")]
 pub enum PayoutRunStatus {
     Scheduled,
-    Running,
     Cancelled,
     Failed,
     Succeeded,

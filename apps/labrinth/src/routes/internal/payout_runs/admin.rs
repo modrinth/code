@@ -327,7 +327,7 @@ pub async fn start_run(
             EXISTS (
                 SELECT 1
                 FROM payout_runs
-                WHERE status IN ('scheduled', 'running')
+                WHERE status = 'scheduled'
             ) AS "has_active_run!",
             EXISTS (
                 SELECT 1
@@ -343,7 +343,7 @@ pub async fn start_run(
     .wrap_internal_err("checking payout period run status")?;
     if run_state.has_active_run {
         return Err(ApiError::Conflict(eyre::eyre!(
-            "another payout run is already scheduled or running",
+            "another payout run is already scheduled",
         )));
     }
     if run_state.has_succeeded_run {
@@ -419,7 +419,7 @@ pub async fn start_run(
         && error.constraint() == Some("payout_runs_single_active")
     {
         return Err(ApiError::Conflict(eyre::eyre!(
-            "another payout run is already scheduled or running",
+            "another payout run is already scheduled",
         )));
     }
     create_run_result.wrap_internal_err("creating scheduled payout run")?;

@@ -41,7 +41,7 @@ CREATE TABLE payout_runs (
 
 CREATE UNIQUE INDEX payout_runs_active_period
 	ON payout_runs (period)
-	WHERE status IN ('scheduled', 'running');
+	WHERE status = 'scheduled';
 
 CREATE UNIQUE INDEX payout_runs_succeeded_period
 	ON payout_runs (period)

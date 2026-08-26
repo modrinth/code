@@ -51,7 +51,7 @@ impl DBPayoutPeriod {
 			FROM payout_periods
 			LEFT JOIN payout_runs active_run
 				ON active_run.period = payout_periods.period
-				AND active_run.status IN ('scheduled', 'running')
+				AND active_run.status = 'scheduled'
 			WHERE payout_periods.period = ANY($1)
 			"#,
             periods,

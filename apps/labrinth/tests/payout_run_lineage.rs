@@ -207,7 +207,7 @@ async fn payout_run_lineage_and_active_run_constraints() {
             insert_run(pool, 1002, periods[1], "scheduled")
                 .await
                 .unwrap();
-            let second_active = insert_run(pool, 1003, periods[2], "running")
+            let second_active = insert_run(pool, 1003, periods[2], "scheduled")
                 .await
                 .unwrap_err();
             assert_constraint(second_active, "payout_runs_single_active");

@@ -35,4 +35,4 @@ DROP INDEX payout_runs_active_period;
 
 CREATE UNIQUE INDEX payout_runs_single_active
 	ON payout_runs ((TRUE))
-	WHERE status IN ('scheduled', 'running');
+	WHERE status = 'scheduled';
