@@ -1,64 +1,47 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { createProfanityValidator, sanitizeProfanityText, validateProfanity } from './index.ts'
+import { createProfanityValidator, validateProfanity } from './index.ts'
 
-test('sanitizes text with the configured single-character replacements', () => {
-	assert.equal(sanitizeProfanityText('4@3105789+$([{!|£€¥¢<'), 'aaeiostbgtsccciieeycc')
-})
+const blockedForms = [
+	['normal form', 'fuck'],
+	['capitalization', 'FUCK'],
+	['Unicode variants', 'ｆｕｃｋ'],
+	['zero-width characters', 'f\u200Buck'],
+	['leetspeak', '$h!t'],
+	['period separators', 'f.u.c.k'],
+	['space separators', 'f u c k'],
+	['repeated letters', 'fuuuuuck'],
+] as const
 
-test('sanitizes paired characters before their single-character replacements', () => {
-	assert.equal(sanitizeProfanityText('()[]{}<>'), 'oooo')
-})
+for (const [form, input] of blockedForms) {
+	test(`blocks ${form}`, () => {
+		const result = validateProfanity(input)
 
-test('strips accents, separators, emoji, and ASCII casing', () => {
-	assert.equal(sanitizeProfanityText('F Ü.C—K🙂'), 'fuck')
-})
+		assert.equal(result.valid, false)
+		assert.equal(result.firstMatch?.rawText, input)
+	})
+}
 
-test('matches profanity across separators and common substitutions', () => {
-	assert.equal(validateProfanity('f.u c-k').firstMatch?.term, 'fuck')
-	assert.equal(validateProfanity('$h!t').firstMatch?.term, 'shit')
-	assert.equal(validateProfanity('p()rn').firstMatch?.term, 'porn')
-})
-
-test('honors exact negative prefix and suffix matches', () => {
+test('does not use term exceptions', () => {
 	const validator = createProfanityValidator({
 		patterns: {
-			bad: { kind: 'profanity', exceptions: ['notbadword'] },
+			bad: { kind: 'profanity' },
 		},
 	})
 
-	assert.equal(validator.findFirst('not bad word'), undefined)
-	assert.equal(validator.findFirst('very bad word')?.term, 'bad')
-	assert.equal(validator.findFirst('not bad phrase')?.term, 'bad')
+	assert.equal(validator.findFirst('not bad word')?.term, 'bad')
 })
 
-test('matches the first profanity while ignoring a later negative match', () => {
+test('uses the first match when one configured term prefixes another', () => {
 	const validator = createProfanityValidator({
 		patterns: {
-			shit: { kind: 'profanity', exceptions: ['horseshit', 'bullshit'] },
-			fuck: { kind: 'profanity', exceptions: [] },
-		},
-	})
-
-	assert.equal(validator.findFirst('this horseshit'), undefined)
-	assert.equal(validator.findFirst('fuck this bullshit')?.term, 'fuck')
-})
-
-test('uses the first terminal when one configured term prefixes another', () => {
-	const validator = createProfanityValidator({
-		patterns: {
-			bad: { kind: 'profanity', exceptions: [] },
-			badword: { kind: 'profanity', exceptions: [] },
+			bad: { kind: 'profanity' },
+			badword: { kind: 'profanity' },
 		},
 	})
 
 	assert.equal(validator.findFirst('badword')?.term, 'bad')
-})
-
-test('does not match configured false-positive substrings', () => {
-	assert.equal(validateProfanity('Scunthorpe, Clitheroe, and peacock').valid, true)
-	assert.equal(validateProfanity('cock and cunt').profanityCount, 2)
 })
 
 test('rejects any uncensored configured profanity', () => {
@@ -72,31 +55,31 @@ test('allows redacted profanity when the removed letters cannot reconstruct a te
 	assert.equal(validateProfanity('f.u.c.k').valid, false)
 })
 
-test('rejects slurs', () => {
+test('classifies slurs separately from other profanity', () => {
 	const validator = createProfanityValidator({
 		patterns: {
-			forbidden: { kind: 'slur', exceptions: [] },
+			forbidden: { kind: 'slur' },
 		},
 	})
+	const result = validator.validate('FORBIDDEN')
 
-	assert.equal(validator.validate('forbidden').valid, false)
-	assert.equal(validator.validate('forbidden').slurCount, 1)
+	assert.equal(result.valid, false)
+	assert.equal(result.profanityCount, 0)
+	assert.equal(result.slurCount, 1)
 })
 
-test('counts matches from left to right without overlaps', () => {
+test('returns non-overlapping matches and original input offsets', () => {
 	const validator = createProfanityValidator({
 		patterns: {
-			bad: { kind: 'profanity', exceptions: [] },
+			bad: { kind: 'profanity' },
 		},
 	})
 
 	assert.deepEqual(
-		validator
-			.findAll('bad-bad')
-			.map(({ sanitizedStart, sanitizedEnd }) => [sanitizedStart, sanitizedEnd]),
+		validator.findAll('b.a.d bad').map(({ start, end }) => [start, end]),
 		[
-			[0, 3],
-			[3, 6],
+			[0, 5],
+			[6, 9],
 		],
 	)
 })
@@ -106,18 +89,9 @@ test('rejects invalid configuration', () => {
 		() =>
 			createProfanityValidator({
 				patterns: {
-					'not sanitized': { kind: 'profanity', exceptions: [] },
+					'not sanitized': { kind: 'profanity' },
 				},
 			}),
-		/term must already be sanitized/,
-	)
-	assert.throws(
-		() =>
-			createProfanityValidator({
-				patterns: {
-					bad: { kind: 'profanity', exceptions: ['innocent'] },
-				},
-			}),
-		/exception must contain bad/,
+		/term must contain only ASCII letters/,
 	)
 })

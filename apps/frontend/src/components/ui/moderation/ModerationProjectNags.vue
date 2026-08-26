@@ -56,7 +56,7 @@
 					<div
 						v-for="nag in visibleNags"
 						:key="nag.id"
-						class="flex w-72 shrink-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+						class="flex w-[268px] shrink-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
 					>
 						<span class="flex items-center gap-2 font-medium text-contrast">
 							<component

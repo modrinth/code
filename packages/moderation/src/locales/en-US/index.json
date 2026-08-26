@@ -357,10 +357,10 @@
     "defaultMessage": "Non-standard text characters are not allowed."
   },
   "project.text-validation.profanity": {
-    "defaultMessage": "Profanity is not allowed."
+    "defaultMessage": "The detected profanity “{value}” is not allowed."
   },
   "project.text-validation.slur": {
-    "defaultMessage": "Slurs are not allowed."
+    "defaultMessage": "The detected slur “{value}” is not allowed."
   },
   "project.text-validation.summary-link": {
     "defaultMessage": "Links should not be included in project summaries."

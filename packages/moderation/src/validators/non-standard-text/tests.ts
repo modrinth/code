@@ -5,7 +5,16 @@ import { getNonStandardTextRatio, validateNonStandardText } from './index.ts'
 
 test('accepts ordinary multilingual text and punctuation', () => {
 	const result = validateNonStandardText(
-		'Hello, “world”! Français — Русский — العربية — 中文 — 日本語',
+		'Hello™, “world”! Français — Русский — العربية — 中文 — 日本語',
+	)
+
+	assert.equal(result.valid, true)
+	assert.deepEqual(result.issues, [])
+})
+
+test('accepts Chinese text with fullwidth punctuation', () => {
+	const result = validateNonStandardText(
+		'这是一个中文项目，支持简体和繁體中文！请查看说明：性能、兼容性（支持 1.21）。',
 	)
 
 	assert.equal(result.valid, true)
@@ -42,13 +51,13 @@ test('supports a custom combining-mark threshold', () => {
 })
 
 test('detects common fancy alphabets and presentation forms', () => {
-	const result = validateNonStandardText('𝐇 Ⓗ ʰ ℌ ｈ ﬀ')
+	const result = validateNonStandardText('𝐇 Ⓗ ʰ ℌ ｈ １ ﬀ')
 
 	assert.equal(result.valid, false)
-	assert.equal(result.counts.fancy, 6)
+	assert.equal(result.counts.fancy, 7)
 	assert.deepEqual(
 		result.issues.map(({ codePoint }) => codePoint),
-		['U+1D407', 'U+24BD', 'U+02B0', 'U+210C', 'U+FF48', 'U+FB00'],
+		['U+1D407', 'U+24BD', 'U+02B0', 'U+210C', 'U+FF48', 'U+FF11', 'U+FB00'],
 	)
 })
 
@@ -62,13 +71,22 @@ test('allows ordinary emoji and valid emoji joiner sequences', () => {
 	assert.equal(validateNonStandardText('Scotland: 🏴󠁧󠁢󠁳󠁣󠁴󠁿').valid, true)
 })
 
+test('allows zero-width spaces used as formatting residue', () => {
+	const result = validateNonStandardText(
+		'Clan System: Bank - Ranks - Languages \u200B\u200B- Vault - Management',
+	)
+
+	assert.equal(result.valid, true)
+	assert.deepEqual(result.issues, [])
+})
+
 test('detects suspicious invisible and directional characters', () => {
-	const result = validateNonStandardText('ab\u200Bcd\u202Eef\u2060gh f\uFE0F')
+	const result = validateNonStandardText('ab\u2060cd\u202Eef\u2063gh f\uFE0F')
 
 	assert.equal(result.counts.invisible, 4)
 	assert.deepEqual(
 		result.issues.map(({ codePoint }) => codePoint),
-		['U+200B', 'U+202E', 'U+2060', 'U+FE0F'],
+		['U+2060', 'U+202E', 'U+2063', 'U+FE0F'],
 	)
 })
 
@@ -106,13 +124,13 @@ test('detects private-use, unassigned, and lone surrogate code points', () => {
 })
 
 test('reports UTF-16 indexes consistently around astral characters', () => {
-	const result = validateNonStandardText('🙂\u200Btext')
+	const result = validateNonStandardText('🙂\u2060text')
 
 	assert.equal(result.issues[0].index, 2)
 })
 
 test('reports multiple issue categories in source order', () => {
-	const result = validateNonStandardText('𝐀\u200B\u0000')
+	const result = validateNonStandardText('𝐀\u2060\u0000')
 
 	assert.deepEqual(
 		result.issues.map(({ kind }) => kind),

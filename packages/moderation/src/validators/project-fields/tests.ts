@@ -55,10 +55,16 @@ test('extracts and deduplicates normalized links', () => {
 
 test('validates shared project text', () => {
 	assert.deepEqual(validateProjectText('An ordinary project'), [])
-	assert.equal(
-		validateProjectText('This project is shit')[0]?.message.id,
-		'project.text-validation.profanity',
-	)
+	assert.deepEqual(validateProjectText('This project is SHIT')[0], {
+		code: 'text-profanity',
+		severity: 'error',
+		message: {
+			id: 'project.text-validation.profanity',
+			defaultMessage: 'The detected profanity “{value}” is not allowed.',
+		},
+		values: { value: 'SHIT' },
+	})
+	assert.deepEqual(validateProjectText('F.A.G')[0]?.values, { value: 'F.A.G' })
 	assert.equal(
 		validateProjectText('𝐅ancy project')[0]?.message.id,
 		'project.text-validation.non-standard-text',
@@ -133,6 +139,32 @@ test('allows sparse non-standard text in descriptions but rejects it at the thre
 		validateProjectDescription(exactlyFivePercent)[0]?.message.id,
 		'project.text-validation.non-standard-text',
 	)
+})
+
+test('allows one profanity match in descriptions but rejects a second match or any slur', () => {
+	const description = 'A detailed project description '.repeat(10)
+
+	assert.equal(
+		validateProjectDescription(`${description} shit`).some(({ code }) => code === 'text-profanity'),
+		false,
+	)
+	assert.equal(
+		validateProjectDescription(`${description} f.u.c.k`).some(
+			({ code }) => code === 'text-profanity',
+		),
+		false,
+	)
+	assert.deepEqual(validateProjectDescription(`${description} shit FUCK`)[0], {
+		code: 'text-profanity',
+		severity: 'error',
+		message: {
+			id: 'project.text-validation.profanity',
+			defaultMessage: 'The detected profanity “{value}” is not allowed.',
+		},
+		values: { value: 'FUCK' },
+	})
+	assert.equal(validateProjectDescription(`${description} nigga`)[0]?.code, 'text-slur')
+	assert.equal(validateProjectDescription(`${description} nigger`)[0]?.code, 'text-slur')
 })
 
 test('validates required description content and returns simultaneous recommendations', () => {

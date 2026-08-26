@@ -40,9 +40,11 @@ export type ProjectTextValidationCode =
 	| 'description-missing-alt-text'
 
 export interface ProjectTextValidationOptions {
+	maxProfanityCount?: number
 	nonStandardTextFailureThreshold?: number
 }
 
+export const DESCRIPTION_MAX_PROFANITY_COUNT = 1
 export const DESCRIPTION_NON_STANDARD_TEXT_FAILURE_THRESHOLD = 0.05
 export const MIN_DESCRIPTION_CHARS = 200
 export const MAX_HEADER_LENGTH = 80
@@ -52,11 +54,11 @@ export const MIN_SUMMARY_CHARS = 30
 const messages = defineMessages({
 	slur: {
 		id: 'project.text-validation.slur',
-		defaultMessage: 'Slurs are not allowed.',
+		defaultMessage: 'The detected slur “{value}” is not allowed.',
 	},
 	profanity: {
 		id: 'project.text-validation.profanity',
-		defaultMessage: 'Profanity is not allowed.',
+		defaultMessage: 'The detected profanity “{value}” is not allowed.',
 	},
 	nonStandardText: {
 		id: 'project.text-validation.non-standard-text',
@@ -275,11 +277,34 @@ export function validateProjectText(
 	if (!text) return []
 
 	const profanity = validateProfanity(text)
-	if (profanity.slurCount > 0) {
-		return [{ code: 'text-slur', severity: 'error', message: messages.slur }]
+	const slurMatch = profanity.matches.find((match) => match.kind === 'slur')
+	if (slurMatch) {
+		return [
+			{
+				code: 'text-slur',
+				severity: 'error',
+				message: messages.slur,
+				values: { value: slurMatch.rawText },
+			},
+		]
 	}
-	if (profanity.profanityCount > 0) {
-		return [{ code: 'text-profanity', severity: 'error', message: messages.profanity }]
+
+	const maxProfanityCount = options.maxProfanityCount ?? 0
+	if (!Number.isInteger(maxProfanityCount) || maxProfanityCount < 0) {
+		throw new Error('Maximum profanity count must be a non-negative integer')
+	}
+	const profanityMatch = profanity.matches.filter((match) => match.kind === 'profanity')[
+		maxProfanityCount
+	]
+	if (profanityMatch) {
+		return [
+			{
+				code: 'text-profanity',
+				severity: 'error',
+				message: messages.profanity,
+				values: { value: profanityMatch.rawText },
+			},
+		]
 	}
 
 	const nonStandardText = validateNonStandardText(text)
@@ -370,6 +395,7 @@ export function validateProjectDescription(
 	description: string | null | undefined,
 ): ProjectTextValidationResult[] {
 	const results = validateProjectText(description, {
+		maxProfanityCount: DESCRIPTION_MAX_PROFANITY_COUNT,
 		nonStandardTextFailureThreshold: DESCRIPTION_NON_STANDARD_TEXT_FAILURE_THRESHOLD,
 	})
 	if (results.length > 0) return results

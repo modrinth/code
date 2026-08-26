@@ -171,6 +171,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	CopyIcon,
 	EditIcon,
 	ListFilterIcon,
 	ScaleIcon,
@@ -207,14 +208,15 @@ import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 import {
 	fetchAllModerationQueueProjects,
-	scanProjectsWithValidationErrors,
+	scanProjectsWithValidationIssues,
 	type ValidationFilterRequest,
 } from '~/services/moderation/validation-filter.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
 
 const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
+const notificationManager = injectNotificationManager()
+const { addNotification } = notificationManager
 const moderationQueue = useModerationQueue()
 const route = useRoute()
 const router = useRouter()
@@ -306,6 +308,7 @@ const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'Servers', label: 'Servers' },
 	{ value: 'Project IDs', label: 'Project IDs' },
 	{ value: 'Validation errors', label: 'Validation errors' },
+	{ value: 'Validation errors + warnings', label: 'Validation errors + warnings' },
 	{ value: 'Fucked up', label: 'Fucked up' },
 ]
 const filterTypeValues = filterTypes.map((option) => option.value)
@@ -314,6 +317,7 @@ const DEFAULT_FILTER_TYPE = filterTypeValues[0]
 const MODPACK_FILTER_TYPE = 'Modpacks'
 const PROJECT_IDS_FILTER_TYPE = 'Project IDs'
 const VALIDATION_ERROR_FILTER_TYPE = 'Validation errors'
+const VALIDATION_ERROR_AND_WARNING_FILTER_TYPE = 'Validation errors + warnings'
 const VALIDATION_FILTER_STALE_TIME_MS = 1000 * 60 * 5
 
 const baseSortTypes: ComboboxOption<string>[] = [
@@ -516,6 +520,17 @@ const moderationProjectsQueryKey = computed(
 	() => ['moderation-projects', moderationProjectsRequest.value] as const,
 )
 
+const isValidationErrorFilter = computed(
+	() => currentFilterType.value === VALIDATION_ERROR_FILTER_TYPE,
+)
+const isValidationErrorAndWarningFilter = computed(
+	() => currentFilterType.value === VALIDATION_ERROR_AND_WARNING_FILTER_TYPE,
+)
+const isValidationFilter = computed(
+	() => isValidationErrorFilter.value || isValidationErrorAndWarningFilter.value,
+)
+const isProjectIdsFilter = computed(() => currentFilterType.value === PROJECT_IDS_FILTER_TYPE)
+
 const {
 	data: standardProjectsResponse,
 	isPending: standardProjectsPending,
@@ -525,11 +540,7 @@ const {
 	queryKey: moderationProjectsQueryKey,
 	queryFn: ({ queryKey }) => client.labrinth.moderation_internal.getProjects(queryKey[1]),
 	placeholderData: (previousData) => previousData,
-	enabled: computed(
-		() =>
-			currentFilterType.value !== VALIDATION_ERROR_FILTER_TYPE &&
-			currentFilterType.value !== PROJECT_IDS_FILTER_TYPE,
-	),
+	enabled: computed(() => !isValidationFilter.value && !isProjectIdsFilter.value),
 })
 
 const validationFilterRequest = computed<ValidationFilterRequest>(() => ({
@@ -539,8 +550,43 @@ const validationFilterRequest = computed<ValidationFilterRequest>(() => ({
 }))
 
 const validationProjectsQueryKey = computed(
-	() => ['moderation-projects', 'validation-errors', validationFilterRequest.value] as const,
+	() =>
+		[
+			'moderation-projects',
+			'validation',
+			isValidationErrorAndWarningFilter.value,
+			validationFilterRequest.value,
+		] as const,
 )
+
+let validationScanNotificationId: string | number | undefined
+
+function showValidationScanCompleteNotification(
+	response: Labrinth.Moderation.Internal.ProjectsResponse,
+	includeWarnings: boolean,
+) {
+	if (validationScanNotificationId !== undefined) {
+		notificationManager.removeNotification(validationScanNotificationId)
+	}
+
+	const projectIds = response.projects.map((project) => project.id)
+	const notification = addNotification({
+		title: 'Validation scan complete',
+		text: `Found ${response.total} projects with validation ${includeWarnings ? 'errors or warnings' : 'errors'}.`,
+		type: 'success',
+		autoCloseMs: null,
+		copyable: false,
+		buttons: [
+			{
+				label: 'Copy all IDs',
+				icon: CopyIcon,
+				keepOpen: true,
+				action: () => navigator.clipboard.writeText(projectIds.join('\n')),
+			},
+		],
+	})
+	validationScanNotificationId = notification.id
+}
 
 const {
 	data: validationProjectsResponse,
@@ -548,36 +594,36 @@ const {
 	error: validationProjectsError,
 } = useQuery({
 	queryKey: validationProjectsQueryKey,
-	queryFn: ({ queryKey, signal }) =>
-		scanProjectsWithValidationErrors({
+	queryFn: async ({ queryKey, signal }) => {
+		const response = await scanProjectsWithValidationIssues({
 			client,
-			request: queryKey[2],
+			request: queryKey[3],
 			titleMetadata: {
 				gameVersions: generatedState.value.gameVersions.map(({ version }) => version),
 				loaders: generatedState.value.loaders.map(({ name }) => name),
 			},
+			includeWarnings: queryKey[2],
 			signal,
 			log: debugValidationFilter,
-		}),
-	enabled: computed(
-		() => import.meta.client && currentFilterType.value === VALIDATION_ERROR_FILTER_TYPE,
-	),
+		})
+		showValidationScanCompleteNotification(response, queryKey[2])
+		return response
+	},
+	enabled: computed(() => import.meta.client && isValidationFilter.value),
 	staleTime: VALIDATION_FILTER_STALE_TIME_MS,
 	retry: false,
 })
 
-watch(
-	() => currentFilterType.value === VALIDATION_ERROR_FILTER_TYPE,
-	(isValidationFilter) => {
-		if (!isValidationFilter) return
-		const cached = queryClient.getQueryData<Labrinth.Moderation.Internal.ProjectsResponse>(
-			validationProjectsQueryKey.value,
-		)
-		if (cached) {
-			debugValidationFilter(`Using cached scan result with ${cached.total} matching projects`)
-		}
-	},
-)
+watch([isValidationFilter, validationProjectsQueryKey], ([isActive]) => {
+	if (!isActive) return
+	const cached = queryClient.getQueryData<Labrinth.Moderation.Internal.ProjectsResponse>(
+		validationProjectsQueryKey.value,
+	)
+	if (cached) {
+		debugValidationFilter(`Using cached scan result with ${cached.total} matching projects`)
+		showValidationScanCompleteNotification(cached, isValidationErrorAndWarningFilter.value)
+	}
+})
 
 const projectIdsFilterRequest = computed<ValidationFilterRequest>(() => ({
 	exclude_technical_review: excludeTechnicalReview.value,
@@ -640,29 +686,23 @@ const {
 	retry: false,
 })
 
-const isValidationErrorFilter = computed(
-	() => currentFilterType.value === VALIDATION_ERROR_FILTER_TYPE,
-)
-const isProjectIdsFilter = computed(() => currentFilterType.value === PROJECT_IDS_FILTER_TYPE)
-const usesLocalPagination = computed(
-	() => isValidationErrorFilter.value || isProjectIdsFilter.value,
-)
+const usesLocalPagination = computed(() => isValidationFilter.value || isProjectIdsFilter.value)
 const moderationProjectsResponse = computed(() =>
-	isValidationErrorFilter.value
+	isValidationFilter.value
 		? validationProjectsResponse.value
 		: isProjectIdsFilter.value
 			? projectIdsProjectsResponse.value
 			: standardProjectsResponse.value,
 )
 const pending = computed(() =>
-	isValidationErrorFilter.value
+	isValidationFilter.value
 		? validationProjectsPending.value
 		: isProjectIdsFilter.value
 			? projectIds.value.length > 0 && projectIdsProjectsPending.value
 			: standardProjectsPending.value || standardProjectsPlaceholder.value,
 )
 const loadError = computed(() =>
-	isValidationErrorFilter.value
+	isValidationFilter.value
 		? validationProjectsError.value
 		: isProjectIdsFilter.value
 			? projectIdsProjectsError.value

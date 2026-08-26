@@ -33,7 +33,7 @@ test('validates project fields and gallery text', () => {
 				url: 'https://cdn.modrinth.com/gallery.png',
 				raw_url: 'https://cdn.modrinth.com/gallery.png',
 				featured: false,
-				name: 'This is shit',
+				name: 'This is $h!t',
 				description: '𝐁',
 				created: '2026-01-01T00:00:00Z',
 				ordering: 0,
@@ -84,6 +84,9 @@ test('validates project fields and gallery text', () => {
 			},
 		],
 	)
+	assert.deepEqual(result.failures.find(({ field }) => field === 'gallery-name')?.values, {
+		value: '$h!t',
+	})
 })
 
 test('reports whether a project has field validation failures', () => {

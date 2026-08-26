@@ -2,7 +2,7 @@
 export type NonStandardTextIssueKind =
 	| 'fancy' // styled characters such as `𝐀`, `Ⓐ`, or `Ａ`.
 	| 'zalgo' // detached or excessive combining marks such as `a̴̵̶`.
-	| 'invisible' // hidden formatting such as a zero-width space or bidi override.
+	| 'invisible' // hidden formatting such as a word joiner or bidi override.
 	| 'control' // disallowed control characters such as a null byte.
 	| 'private-use' // characters from Unicode private-use areas.
 	| 'unassigned' // code points with no assigned Unicode character.
@@ -44,7 +44,9 @@ const FANCY_RANGES: ReadonlyArray<readonly [number, number]> = [
 	[0x2070, 0x209f],
 	[0x2100, 0x214f],
 	[0xfb00, 0xfb06],
-	[0xff01, 0xff60],
+	[0xff10, 0xff19],
+	[0xff21, 0xff3a],
+	[0xff41, 0xff5a],
 	[0x1f100, 0x1f1ad],
 ]
 
@@ -230,6 +232,7 @@ export function validateNonStandardText(
 
 		if (FORMAT_PATTERN.test(character)) {
 			const allowed =
+				codePoint === 0x200b ||
 				(codePoint === 0x200c && isAllowedZeroWidthNonJoiner(characters, characterIndex)) ||
 				(codePoint === 0x200d && isAllowedZeroWidthJoiner(characters, characterIndex)) ||
 				(isEmojiTag(codePoint) && isAllowedEmojiTagSequence(characters, characterIndex))
@@ -257,7 +260,11 @@ export function validateNonStandardText(
 		combiningMarkCount = 0
 		hasBaseCharacter = !/^\s$/u.test(character)
 
-		if (isInRanges(codePoint, FANCY_RANGES) && !isPresentedAsEmoji(characters, characterIndex)) {
+		if (
+			codePoint !== 0x2122 &&
+			isInRanges(codePoint, FANCY_RANGES) &&
+			!isPresentedAsEmoji(characters, characterIndex)
+		) {
 			addIssue('fancy', character, codePoint, currentIndex)
 		}
 	}

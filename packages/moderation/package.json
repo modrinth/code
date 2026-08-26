@@ -16,6 +16,7 @@
 		"@modrinth/utils": "workspace:*",
 		"@modrinth/api-client": "workspace:*",
 		"linkify-it": "^5.0.0",
+		"obscenity": "^0.4.6",
 		"vue": "^3.5.13"
 	},
 	"devDependencies": {
