@@ -48,7 +48,7 @@ import {
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
-import { TeamMemberPermission } from '@modrinth/utils'
+import { isAdmin, TeamMemberPermission } from '@modrinth/utils'
 import { computed, useTemplateRef } from 'vue'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
@@ -81,11 +81,13 @@ const {
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(
 	() =>
-		!!currentMember.value &&
-		(currentMember.value.permissions & TeamMemberPermission.EDIT_BODY) ===
-			TeamMemberPermission.EDIT_BODY,
+		isAdminUser.value ||
+		(!!currentMember.value &&
+			(currentMember.value.permissions & TeamMemberPermission.EDIT_BODY) ===
+				TeamMemberPermission.EDIT_BODY),
 )
 const { pending: descriptionLinksPending, validation: descriptionValidation } =
 	useProjectDescriptionValidation(() => current.value.description)
@@ -93,7 +95,9 @@ const hasValidationIssues = computed(() =>
 	descriptionValidation.value.some((validation) => validation.severity === 'error'),
 )
 const canSave = computed(
-	() => hasPermission.value && !hasValidationIssues.value && !descriptionLinksPending.value,
+	() =>
+		hasPermission.value &&
+		(isAdminUser.value || (!hasValidationIssues.value && !descriptionLinksPending.value)),
 )
 
 async function save() {

@@ -13,6 +13,7 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
@@ -27,7 +28,7 @@ import {
 
 const { formatMessage } = useVIntl()
 
-const { allMembers, projectV2: project, patchProject } = injectProjectPageContext()
+const { allMembers, currentMember, projectV2: project, patchProject } = injectProjectPageContext()
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
@@ -61,7 +62,10 @@ const taglineValidation = useProjectSummaryValidation(
 	() => current.value.tagline,
 	() => current.value.title,
 )
-const canSave = computed(() => !titleValidation.value && !taglineValidation.value)
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
+const canSave = computed(
+	() => isAdminUser.value || (!titleValidation.value && !taglineValidation.value),
+)
 const {
 	onFocusIn: onSlugSuggestionFocusIn,
 	onFocusOut: onSlugSuggestionFocusOut,

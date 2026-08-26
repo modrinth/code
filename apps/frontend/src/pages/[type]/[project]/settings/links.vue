@@ -213,6 +213,7 @@ import {
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
 
@@ -362,9 +363,11 @@ watch(
 	{ deep: true, immediate: true },
 )
 
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
+
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
+	return isAdminUser.value || (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
 
 function donationsMapFromLinkUrls(linkUrls) {
@@ -443,6 +446,9 @@ const patchData = computed(() => {
 })
 
 const canSave = computed(() => {
+	if (!hasPermission.value || Object.keys(patchData.value).length === 0) return false
+	if (isAdminUser.value) return true
+
 	const checks = isServerProject.value
 		? [siteCheck, storeCheck, wikiCheck, discordInviteCheck]
 		: [issuesCheck, sourceCheck, wikiCheck, discordInviteCheck]
@@ -461,14 +467,7 @@ const canSave = computed(() => {
 		(donationCheckTimers.size > 0 ||
 			donationLinks.value.some((row) => isLinkCheckPending(donationContext(row))))
 
-	return (
-		hasPermission.value &&
-		!fieldsInvalid &&
-		!fieldsPending &&
-		!donationsInvalid &&
-		!donationsPending &&
-		Object.keys(patchData.value).length > 0
-	)
+	return !fieldsInvalid && !fieldsPending && !donationsInvalid && !donationsPending
 })
 
 const saving = ref(false)

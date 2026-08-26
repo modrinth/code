@@ -327,7 +327,7 @@ import {
 	usePageLeaveSafety,
 	useVIntl,
 } from '@modrinth/ui'
-import { fileIsValid, formatProjectStatus } from '@modrinth/utils'
+import { fileIsValid, formatProjectStatus, isAdmin } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
@@ -422,9 +422,12 @@ const bannerFile = ref(null)
 const bannerGalleryImage = computed(() =>
 	project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME),
 )
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+	return (
+		isAdminUser.value || ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+	)
 })
 
 const nameValidation = useProjectTitleValidation(name)

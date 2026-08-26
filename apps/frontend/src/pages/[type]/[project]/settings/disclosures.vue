@@ -15,7 +15,7 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { isStaff, TeamMemberPermission } from '@modrinth/utils'
+import { isAdmin, isStaff, TeamMemberPermission } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 
@@ -172,8 +172,11 @@ function resolveUpdatedBy(userId: string | null | undefined): DisclosureUpdatedB
 	)
 }
 
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(
-	() => !!((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
+	() =>
+		isAdminUser.value ||
+		!!((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
 )
 
 const {
@@ -249,7 +252,9 @@ watch(
 
 const issues = computed(() => getDisclosureFormIssues(current.value, projectTypes.value))
 
-const canSave = computed(() => hasPermission.value && issues.value.length === 0)
+const canSave = computed(
+	() => hasPermission.value && (isAdminUser.value || issues.value.length === 0),
+)
 
 const saveDisabledReason = computed(() => {
 	if (!hasPermission.value) {

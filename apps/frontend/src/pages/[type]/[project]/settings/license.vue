@@ -162,7 +162,7 @@ import {
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
-import { builtinLicenses, formatProjectType, TeamMemberPermission } from '@modrinth/utils'
+import { builtinLicenses, formatProjectType, isAdmin, TeamMemberPermission } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
@@ -250,19 +250,23 @@ const selectedLicense = computed({
 	},
 })
 
-const hasPermission = computed(() => {
-	return (currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS
-})
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
+const hasPermission = computed(
+	() =>
+		isAdminUser.value ||
+		Boolean((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
+)
 
 const canSave = computed(
 	() =>
-		Boolean(hasPermission.value) &&
-		!(
-			current.value.license.friendly === 'Custom' &&
-			(current.value.license.short === '' || current.value.licenseUrl === '')
-		) &&
-		effectiveLicenseCheck.value?.severity !== 'error' &&
-		!isLinkCheckPending(licenseContext.value),
+		hasPermission.value &&
+		(isAdminUser.value ||
+			(!(
+				current.value.license.friendly === 'Custom' &&
+				(current.value.license.short === '' || current.value.licenseUrl === '')
+			) &&
+				effectiveLicenseCheck.value?.severity !== 'error' &&
+				!isLinkCheckPending(licenseContext.value))),
 )
 
 async function save() {

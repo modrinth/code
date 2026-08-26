@@ -19,7 +19,7 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, sortedCategories } from '@modrinth/utils'
+import { capitalizeString, isAdmin, sortedCategories } from '@modrinth/utils'
 import { computed } from 'vue'
 
 interface Category {
@@ -145,7 +145,7 @@ const groupDescriptionMessages: Record<string, MessageDescriptor> = {
 	'performance impact': messages.performanceImpactDescription,
 }
 
-const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
+const { currentMember, projectV2: project, projectV3, patchProject } = injectProjectPageContext()
 
 useProjectSettingsHeadTitle(messages.title)
 
@@ -310,7 +310,8 @@ const isFeaturedLimitReached = computed(
 	() => current.value.featuredTags.length >= MAX_FEATURED_TAGS,
 )
 
-const canSave = computed(() => current.value.featuredTags.length > 0)
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
+const canSave = computed(() => isAdminUser.value || current.value.featuredTags.length > 0)
 
 const tooManyTagsWarning = computed(() => {
 	const tagCount = current.value.selectedTags.length

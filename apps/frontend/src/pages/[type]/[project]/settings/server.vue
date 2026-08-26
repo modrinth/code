@@ -186,6 +186,7 @@ import {
 	usePageLeaveSafety,
 	useVIntl,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
@@ -298,9 +299,12 @@ watch(javaAddress, () => {
 	}, 500)
 })
 
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+	return (
+		isAdminUser.value || ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+	)
 })
 
 async function pingJavaServer() {
@@ -478,7 +482,7 @@ function resetChanges() {
 }
 
 async function handleSave() {
-	if (javaAddress.value.trim() && !javaPingResult.value?.online) {
+	if (!isAdminUser.value && javaAddress.value.trim() && !javaPingResult.value?.online) {
 		addNotification({
 			title: formatMessage(messages.cannotSaveTitle),
 			text: formatMessage(messages.cannotSaveText),
