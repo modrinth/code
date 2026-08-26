@@ -9,9 +9,6 @@ pub(crate) struct ScreenshotRow {
     pub file_size: i64,
     pub modified_at: i64,
     pub created_at: i64,
-    pub original_screenshot_id: Option<String>,
-    pub editor_state: Option<String>,
-    pub original_instance_id: Option<String>,
     pub group_id: Option<String>,
 }
 
@@ -36,13 +33,8 @@ pub(crate) async fn list_screenshots(
 			screenshots.file_size,
 			screenshots.modified_at,
 			screenshots.created_at,
-			screenshots.original_screenshot_id,
-			screenshots.editor_state,
-			original.instance_id AS "original_instance_id?",
 			memberships.group_id AS "group_id?"
 		FROM screenshots
-		LEFT JOIN screenshots original
-			ON original.id = screenshots.original_screenshot_id
 		LEFT JOIN screenshot_group_memberships memberships
 			ON memberships.screenshot_id = screenshots.id
 		WHERE screenshots.instance_id = ?
@@ -70,13 +62,8 @@ pub(crate) async fn get_screenshot_by_key(
 			screenshots.file_size,
 			screenshots.modified_at,
 			screenshots.created_at,
-			screenshots.original_screenshot_id,
-			screenshots.editor_state,
-			original.instance_id AS "original_instance_id?",
 			memberships.group_id AS "group_id?"
 		FROM screenshots
-		LEFT JOIN screenshots original
-			ON original.id = screenshots.original_screenshot_id
 		LEFT JOIN screenshot_group_memberships memberships
 			ON memberships.screenshot_id = screenshots.id
 		WHERE screenshots.instance_id = ? AND screenshots.file_name = ?
@@ -86,70 +73,6 @@ pub(crate) async fn get_screenshot_by_key(
     )
     .fetch_optional(pool)
     .await?)
-}
-
-pub(crate) async fn get_screenshot_by_id(
-    id: &str,
-    pool: &SqlitePool,
-) -> crate::Result<Option<ScreenshotRow>> {
-    Ok(sqlx::query_as!(
-        ScreenshotRow,
-        r#"
-		SELECT
-			screenshots.id,
-			screenshots.instance_id,
-			screenshots.file_name,
-			screenshots.content_hash,
-			screenshots.file_size,
-			screenshots.modified_at,
-			screenshots.created_at,
-			screenshots.original_screenshot_id,
-			screenshots.editor_state,
-			original.instance_id AS "original_instance_id?",
-			memberships.group_id AS "group_id?"
-		FROM screenshots
-		LEFT JOIN screenshots original
-			ON original.id = screenshots.original_screenshot_id
-		LEFT JOIN screenshot_group_memberships memberships
-			ON memberships.screenshot_id = screenshots.id
-		WHERE screenshots.id = ?
-		"#,
-        id,
-    )
-    .fetch_optional(pool)
-    .await?)
-}
-
-pub(crate) async fn set_original_screenshot(
-    edited_id: &str,
-    original_id: &str,
-    tx: &mut Transaction<'_, Sqlite>,
-) -> crate::Result<()> {
-    sqlx::query!(
-        "UPDATE screenshots SET original_screenshot_id = ? WHERE id = ?",
-        original_id,
-        edited_id,
-    )
-    .execute(&mut **tx)
-    .await?;
-
-    Ok(())
-}
-
-pub(crate) async fn set_editor_state(
-    screenshot_id: &str,
-    editor_state: Option<&str>,
-    tx: &mut Transaction<'_, Sqlite>,
-) -> crate::Result<()> {
-    sqlx::query!(
-        "UPDATE screenshots SET editor_state = ? WHERE id = ?",
-        editor_state,
-        screenshot_id,
-    )
-    .execute(&mut **tx)
-    .await?;
-
-    Ok(())
 }
 
 pub(crate) async fn copy_group_membership(
@@ -218,8 +141,7 @@ pub(crate) async fn update_screenshot(
 			content_hash = ?,
 			file_size = ?,
 			modified_at = ?,
-			created_at = ?,
-			editor_state = ?
+			created_at = ?
 		WHERE id = ?
 		",
         row.instance_id,
@@ -228,7 +150,6 @@ pub(crate) async fn update_screenshot(
         row.file_size,
         row.modified_at,
         row.created_at,
-        row.editor_state,
         row.id,
     )
     .execute(&mut **tx)

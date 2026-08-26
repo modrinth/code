@@ -28,7 +28,7 @@ const items: ImageViewerEditorItem[] = [
 		alt: 'Stylised mountain landscape',
 		title: 'Mountain base at sunset',
 		description: 'Survival world · August 24 at 4:12 PM',
-		editorSource: { id: 'mountains', path: 'mountains.svg', isEdited: false },
+		editorSource: { id: 'mountains', path: 'mountains.svg' },
 	},
 	{
 		id: 'valley',
@@ -36,7 +36,7 @@ const items: ImageViewerEditorItem[] = [
 		alt: 'Stylised valley landscape',
 		title: 'View from the valley',
 		description: 'Survival world · August 24 at 4:18 PM',
-		editorSource: { id: 'valley', path: 'valley.svg', isEdited: false },
+		editorSource: { id: 'valley', path: 'valley.svg' },
 	},
 ]
 
@@ -54,10 +54,8 @@ function render(editor: 'enabled' | 'disabled') {
 		setup() {
 			const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 			provideImageViewerEditor({
-				loadEditorData: async (source) => ({
+				loadEditorData: async () => ({
 					source: new Blob([IMAGE_SVG], { type: 'image/svg+xml' }),
-					editorState: null,
-					isEdited: source.isEdited,
 				}),
 			})
 			return { editor, items, open: () => viewer.value?.show(0), viewer }

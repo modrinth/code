@@ -177,8 +177,6 @@ export type InstanceScreenshot = ScreenshotKey & {
 	instance_name: string
 	created_at: string
 	modified_at: number
-	original_screenshot_id?: string | null
-	original_instance_id?: string | null
 	group_id?: string | null
 	path: string
 	url: string
@@ -198,11 +196,6 @@ export type ScreenshotGroupImport = ScreenshotGroup & {
 	screenshot_ids: string[]
 }
 
-export type ScreenshotEditorData = {
-	background_path: string
-	editor_state?: string | null
-}
-
 export async function list_instance_screenshots(instanceId: string): Promise<InstanceScreenshot[]> {
 	return await invoke('plugin:instance|instance_list_screenshots', { instanceId })
 }
@@ -215,22 +208,14 @@ export async function list_synced_screenshots(): Promise<InstanceScreenshot[]> {
 	return await invoke('plugin:instance|instance_list_synced_screenshots')
 }
 
-export async function get_screenshot_editor_data(
-	key: ScreenshotKey,
-): Promise<ScreenshotEditorData> {
-	return await invoke('plugin:instance|instance_get_screenshot_editor_data', { key })
-}
-
 export async function save_edited_screenshot(
 	key: ScreenshotKey,
 	pngBytes: Uint8Array,
-	editorState: string | null,
 	mode: 'create_copy' | 'replace_edit',
 ): Promise<InstanceScreenshot> {
 	return await invoke('plugin:instance|instance_save_edited_screenshot', {
 		key,
 		pngBytes: Array.from(pngBytes),
-		editorState,
 		mode,
 	})
 }

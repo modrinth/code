@@ -24,7 +24,6 @@ const viewport = ref<HTMLElement>()
 const fitBounds = ref<HTMLElement>()
 const exporting = ref(false)
 const loadingEditorData = ref(false)
-const isEdited = ref(false)
 const spacePressed = ref(false)
 const panning = ref<{ x: number; y: number; scrollLeft: number; scrollTop: number }>()
 const brushPointer = ref({ x: 0, y: 0, visible: false })
@@ -45,7 +44,6 @@ const {
 	fitToViewport,
 	setZoom,
 	exportPng,
-	exportEditorState,
 	handleKeyboardShortcut,
 	isTextEditing,
 	resetHistory,
@@ -72,7 +70,6 @@ async function initializeEditor() {
 	loadingEditorData.value = true
 	try {
 		const editorData = await imageViewerEditor.loadEditorData(source)
-		isEdited.value = editorData.isEdited
 		await initialize(canvasElement.value, editorData, getViewportSize())
 		observeViewport()
 	} catch (error) {
@@ -120,7 +117,6 @@ async function requestSave(mode: 'create_copy' | 'replace_edit') {
 		emit('save', {
 			item: props.item,
 			pngBytes: await exportPng(),
-			editorState: exportEditorState(),
 			mode,
 		})
 	} catch (error) {
@@ -291,13 +287,7 @@ defineExpose({ markSaved })
 	</div>
 
 	<Toolbar :tool="tool" @select="setTool" />
-	<Controls
-		:editor="editor"
-		:busy="busy"
-		:is-edited="isEdited"
-		@cancel="cancel"
-		@save="requestSave"
-	/>
+	<Controls :editor="editor" :busy="busy" @cancel="cancel" @save="requestSave" />
 </template>
 
 <style scoped>

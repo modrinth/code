@@ -45,7 +45,7 @@ const messages = defineMessages({
 
 const emit = defineEmits<{
 	(e: 'activate', screenshot: InstanceScreenshot, event: MouseEvent | KeyboardEvent): void
-	(e: 'toggle-selection' | 'copy' | 'edit' | 'show-original', screenshot: InstanceScreenshot): void
+	(e: 'toggle-selection' | 'copy' | 'edit', screenshot: InstanceScreenshot): void
 	(e: 'more', screenshot: InstanceScreenshot, event: MouseEvent): void
 }>()
 
@@ -127,7 +127,6 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 					@copy="emit('copy', screenshot)"
 					@edit="emit('edit', screenshot)"
 					@more="(event) => emit('more', screenshot, event)"
-					@show-original="emit('show-original', screenshot)"
 				/>
 				<p
 					v-if="screenshots.length === 0"

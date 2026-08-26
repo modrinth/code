@@ -5,8 +5,6 @@ export const imageViewerEditorMessages = defineMessages({
 	previous: { id: 'image-viewer.previous', defaultMessage: 'Previous image' },
 	next: { id: 'image-viewer.next', defaultMessage: 'Next image' },
 	edit: { id: 'image-viewer.edit', defaultMessage: 'Edit' },
-	saveCopy: { id: 'image-viewer.editor.save-copy', defaultMessage: 'Save copy' },
-	saveChanges: { id: 'image-viewer.editor.save-changes', defaultMessage: 'Save changes' },
 	saveAsCopy: { id: 'image-viewer.editor.save-as-new', defaultMessage: 'Save as copy' },
 	moreSaveOptions: {
 		id: 'image-viewer.editor.more-save-options',

@@ -23,7 +23,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	(e: 'activate', event: MouseEvent | KeyboardEvent): void
-	(e: 'copy' | 'edit' | 'show-original' | 'toggle-selection'): void
+	(e: 'copy' | 'edit' | 'toggle-selection'): void
 	(e: 'more', event: MouseEvent): void
 }>()
 
@@ -38,7 +38,6 @@ const messages = defineMessages({
 	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
 	copied: { id: 'app.screenshots.copied', defaultMessage: 'Copied' },
 	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
-	edited: { id: 'app.screenshots.edited', defaultMessage: 'Edited' },
 	moreActions: { id: 'app.screenshots.more-actions', defaultMessage: 'More actions' },
 })
 
@@ -114,15 +113,6 @@ watch(
 		@contextmenu.prevent.stop="emit('more', $event)"
 		@keydown="activate"
 	>
-		<button
-			v-if="screenshot.original_screenshot_id"
-			type="button"
-			class="absolute left-2 top-2 z-[3] flex cursor-pointer items-center gap-1 rounded-full border border-solid border-brand bg-highlight-green px-2 py-1 text-xs font-semibold text-brand shadow-sm transition-[filter] hover:brightness-125"
-			@click.stop="emit('show-original')"
-		>
-			<EditIcon class="size-3.5" />
-			<span>{{ formatMessage(messages.edited) }}</span>
-		</button>
 		<button
 			type="button"
 			class="selection-button group/selection absolute right-0.5 top-0 z-[2] flex size-[50px] cursor-pointer items-start justify-center border-0 bg-transparent p-0 pt-4"

@@ -48,7 +48,3 @@ export type ScreenshotEditorObjectState = Record<string, unknown> & {
 export type EditorHistoryEntry = {
 	objects: ScreenshotEditorObjectState[]
 }
-
-export type ScreenshotEditorDocument = EditorHistoryEntry & {
-	version: 1
-}
