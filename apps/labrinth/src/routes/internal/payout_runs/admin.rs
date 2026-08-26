@@ -43,6 +43,12 @@ pub struct StartPayoutRun {
     #[cfg(debug_assertions)]
     #[serde(default)]
     pub ignore_totp: bool,
+    /// Schedule the payout run for immediate execution when testing locally.
+    ///
+    /// This field does not exist in release builds.
+    #[cfg(debug_assertions)]
+    #[serde(default)]
+    pub execute_now: bool,
     #[serde(with = "rust_decimal::serde::float")]
     pub raw_actual_revenue_usd: Decimal,
     pub revenue_adjustments: Vec<RevenueAdjustment>,
@@ -233,6 +239,10 @@ pub async fn start_run(
     let ignore_totp = body.ignore_totp;
     #[cfg(not(debug_assertions))]
     let ignore_totp = false;
+    #[cfg(debug_assertions)]
+    let execute_now = body.execute_now;
+    #[cfg(not(debug_assertions))]
+    let execute_now = false;
 
     if !ignore_totp {
         let two_factor_code = body
@@ -390,8 +400,12 @@ pub async fn start_run(
         r#"
         SELECT
             NOW() AS "started_at!",
-            NOW() + INTERVAL '2 minutes' AS "execute_at!"
+            CASE
+                WHEN $1 THEN NOW()
+                ELSE NOW() + INTERVAL '2 minutes'
+            END AS "execute_at!"
         "#,
+        execute_now,
     )
     .fetch_one(&mut transaction)
     .await
