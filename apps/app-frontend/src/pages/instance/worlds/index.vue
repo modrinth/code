@@ -19,7 +19,7 @@
 		@confirm="proceedRemoveWorld"
 	/>
 	<ReadyTransition :pending="worldsReadyPending">
-		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
+		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-2">
 			<div class="flex flex-wrap items-center gap-2">
 				<Input
 					v-model="searchFilter"
@@ -75,7 +75,7 @@
 					}}
 				</Button>
 			</div>
-			<div class="flex flex-col w-full gap-2">
+			<div class="mt-2 flex w-full flex-col gap-2">
 				<WorldItem
 					v-for="world in filteredWorlds"
 					:key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"

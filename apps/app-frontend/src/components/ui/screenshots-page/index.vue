@@ -1254,6 +1254,7 @@ onBeforeUnmount(() => {
 				v-tooltip="formatMessage(commonMessages.deleteLabel)"
 				:label="formatMessage(commonMessages.deleteLabel)"
 				type="quiet"
+				class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 				@click="requestPreviewDelete(item.id)"
 			>
 				<TrashIcon />

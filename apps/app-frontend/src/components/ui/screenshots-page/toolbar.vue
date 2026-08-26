@@ -77,21 +77,11 @@ const messages = defineMessages({
 						class="size-5 text-primary"
 						:aria-label="formatMessage(messages.groupBy)"
 					/>
-				</template>
-				<template #selected="{ label }">
-					<span class="grid">
-						<span class="col-start-1 row-start-1">{{ label }}</span>
-						<span
-							v-for="option in groupOptions"
-							:key="option.value"
-							aria-hidden="true"
-							class="invisible col-start-1 row-start-1 whitespace-nowrap"
-						>
-							{{ option.label }}
-						</span>
-					</span>
-				</template>
-			</Combobox>
+			</template>
+			<template #selected="{ label }">
+				<span>{{ label }}</span>
+			</template>
+		</Combobox>
 		</div>
 	</div>
 </template>

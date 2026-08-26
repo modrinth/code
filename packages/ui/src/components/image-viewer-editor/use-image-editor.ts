@@ -1126,6 +1126,31 @@ export function useImageEditor() {
 			canvas.value?.requestRenderAll()
 			return true
 		}
+		if (event.key === 'Escape') {
+			event.preventDefault()
+			if (erasing) {
+				finishErasing()
+				return true
+			}
+			if (drawingObject) {
+				canvas.value?.remove(drawingObject)
+				drawingObject = undefined
+				drawingStart = undefined
+				constructingObject = false
+				canvas.value?.requestRenderAll()
+				return true
+			}
+			if (canvas.value?.getActiveObjects().length) {
+				canvas.value.discardActiveObject()
+				canvas.value.requestRenderAll()
+				return true
+			}
+			if (tool.value !== 'select') {
+				setTool('select')
+				return true
+			}
+			return false
+		}
 		if (activeObject?.isEditing) return false
 		if (isTypingTarget(event.target)) return false
 
@@ -1145,31 +1170,6 @@ export function useImageEditor() {
 			event.preventDefault()
 			deleteSelection()
 			return true
-		}
-		if (event.key === 'Escape') {
-			event.preventDefault()
-			if (erasing) {
-				finishErasing()
-				return true
-			}
-			if (drawingObject) {
-				canvas.value?.remove(drawingObject)
-				drawingObject = undefined
-				drawingStart = undefined
-				constructingObject = false
-				canvas.value?.requestRenderAll()
-				return true
-			}
-			if (tool.value !== 'select') {
-				setTool('select')
-				return true
-			}
-			if (canvas.value?.getActiveObjects().length) {
-				canvas.value.discardActiveObject()
-				canvas.value.requestRenderAll()
-				return true
-			}
-			return false
 		}
 		if (!modifier && !event.altKey) {
 			const shortcutTool = TOOL_SHORTCUTS[key]
