@@ -151,7 +151,7 @@ export function useImageEditor() {
 		editorData: ImageViewerEditorData,
 		viewportSize?: { width: number; height: number },
 	) {
-		dispose()
+		await dispose()
 		loading.value = true
 		try {
 			fabric = await import('fabric')
@@ -995,6 +995,36 @@ export function useImageEditor() {
 		if (canRedo.value) await restoreHistory(historyIndex.value + 1)
 	}
 
+	async function discardChanges() {
+		if (history.value[0]) await restoreHistory(0)
+		resetHistory()
+	}
+
+	function setInteractionEnabled(enabled: boolean) {
+		const editorCanvas = canvas.value
+		if (!editorCanvas) return
+		if (enabled) {
+			editorCanvas.skipTargetFind = false
+			setTool(tool.value)
+			return
+		}
+
+		setTool('select')
+		editorCanvas.discardActiveObject()
+		editorCanvas.isDrawingMode = false
+		editorCanvas.selection = false
+		editorCanvas.skipTargetFind = true
+		for (const object of annotationObjects()) {
+			object.selectable = false
+			object.evented = false
+		}
+		editorCanvas.defaultCursor = 'default'
+		editorCanvas.hoverCursor = 'default'
+		editorCanvas.moveCursor = 'default'
+		syncSelectionProperties()
+		editorCanvas.requestRenderAll()
+	}
+
 	function fitToViewport(width: number, height: number) {
 		if (!canvas.value || !originalWidth.value || !originalHeight.value) return
 		fitScale.value = Math.min(
@@ -1164,8 +1194,8 @@ export function useImageEditor() {
 		) as EditorFabricObject[]
 	}
 
-	function dispose() {
-		void canvas.value?.dispose()
+	async function dispose() {
+		await canvas.value?.dispose()
 		canvas.value = undefined
 		background = undefined
 		sourceImage = undefined
@@ -1194,6 +1224,7 @@ export function useImageEditor() {
 		censorMode,
 		eraserMode,
 		zoom,
+		fitScale,
 		isFit,
 		canUndo,
 		canRedo,
@@ -1215,6 +1246,8 @@ export function useImageEditor() {
 		deleteSelection,
 		undo,
 		redo,
+		discardChanges,
+		setInteractionEnabled,
 		fitToViewport,
 		setZoom,
 		setFit,
