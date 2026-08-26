@@ -15,11 +15,13 @@
 						<TriangleAlertIcon class="size-4 shrink-0 text-orange" />
 						<span class="text-secondary">{{ getFormattedMessage(messages.warning) }}</span>
 					</div>
-					|
-					<div class="flex items-center gap-1">
-						<LightBulbIcon class="size-4 shrink-0 text-purple" />
-						<span class="text-secondary">{{ getFormattedMessage(messages.suggestion) }}</span>
-					</div>
+					<template v-if="!isProcessing">
+						|
+						<div class="flex items-center gap-1">
+							<LightBulbIcon class="size-4 shrink-0 text-purple" />
+							<span class="text-secondary">{{ getFormattedMessage(messages.suggestion) }}</span>
+						</div>
+					</template>
 				</div>
 			</div>
 			<div class="input-group">
@@ -204,6 +206,8 @@ const emit = defineEmits<{
 	setProcessing: [processing: boolean]
 }>()
 
+const isProcessing = computed(() => props.project.status === 'processing')
+
 const nagScroller = ref<HTMLElement | null>(null)
 const showLeftNagShadow = ref(false)
 const showRightNagShadow = ref(false)
@@ -355,7 +359,11 @@ function isNagComplete(nag: Nag): boolean {
 }
 
 const visibleNags = computed<Nag[]>(() => {
-	const finalNags = applicableNags.value.filter((nag) => !isNagComplete(nag))
+	const finalNags = applicableNags.value.filter(
+		(nag) =>
+			!isNagComplete(nag) &&
+			(!isProcessing.value || nag.status === 'required' || nag.status === 'warning'),
+	)
 
 	if (props.project.status === 'draft') {
 		finalNags.push({
