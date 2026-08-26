@@ -2,6 +2,7 @@ pub mod admin;
 pub mod affiliate;
 pub mod analytics_event;
 pub mod attribution;
+pub mod badges;
 pub mod billing;
 pub mod blocked_users;
 pub mod campaign;
@@ -44,6 +45,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             )
             .service(web::scope("/moderation").configure(moderation::config))
             .service(web::scope("/affiliate").configure(affiliate::config))
+            .service(web::scope("/badges").configure(badges::config))
             .service(web::scope("/campaign").configure(campaign::config))
             .service(web::scope("/search-management").configure(search::config))
             .service(web::scope("/globals").configure(globals::config))
@@ -102,6 +104,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		flows::list_passkeys,
 		flows::rename_passkey,
 		flows::delete_passkey,
+		badges::check_contributor,
+		badges::crowdin_init,
+		badges::crowdin_callback,
 		pats::get_pats,
 		pats::create_pat,
 		pats::edit_pat,

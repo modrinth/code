@@ -423,6 +423,32 @@
 					</Button>
 				</div>
 			</div>
+			<div class="adjacent-input">
+				<label for="theme-selector">
+					<span class="label__title">{{ formatMessage(messages.contributorBadgeFieldTitle) }}</span>
+					<span class="label__description">{{
+						formatMessage(messages.contributorBadgeFieldDescription)
+					}}</span>
+				</label>
+				<div>
+					<Button @click="checkContributorBadge">
+						<UpdatedIcon /> {{ formatMessage(messages.contributorBadgeCheckButton) }}
+					</Button>
+				</div>
+			</div>
+			<div class="adjacent-input">
+				<label for="theme-selector">
+					<span class="label__title">{{ formatMessage(messages.translatorBadgeFieldTitle) }}</span>
+					<span class="label__description">{{
+						formatMessage(messages.translatorBadgeFieldDescription)
+					}}</span>
+				</label>
+				<div>
+					<ButtonLink :href="getCrowdinVerifyUrl(auth.token)">
+						<ExternalIcon /> {{ formatMessage(messages.translatorBadgeVerifyButton) }}
+					</ButtonLink>
+				</div>
+			</div>
 			<PasskeySettings />
 		</section>
 
@@ -492,8 +518,10 @@ import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
 import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
 
+import { UserBadge } from '@modrinth/utils'
+
 import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
-import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
+import { getAuthUrl, getCrowdinVerifyUrl, removeAuthProvider } from '~/composables/auth.ts'
 
 definePageMeta({
 	middleware: 'auth',
@@ -541,6 +569,38 @@ const messages = defineMessages({
 	saveEmailButton: {
 		id: 'settings.account.email.action.save',
 		defaultMessage: 'Save email',
+	},
+	contributorBadgeFieldTitle: {
+		id: 'settings.account.badges.contributor.title',
+		defaultMessage: 'Contributor badge',
+	},
+	contributorBadgeFieldDescription: {
+		id: 'settings.account.badges.contributor.description',
+		defaultMessage: 'Check your linked GitHub account for merged pull requests.',
+	},
+	contributorBadgeCheckButton: {
+		id: 'settings.account.badges.contributor.action.check',
+		defaultMessage: 'Check contributor status',
+	},
+	contributorBadgeEarnedText: {
+		id: 'settings.account.badges.contributor.result.earned',
+		defaultMessage: "You've earned the Contributor badge!",
+	},
+	contributorBadgeNotEarnedText: {
+		id: 'settings.account.badges.contributor.result.not-earned',
+		defaultMessage: "You don't have enough merged pull requests yet.",
+	},
+	translatorBadgeFieldTitle: {
+		id: 'settings.account.badges.translator.title',
+		defaultMessage: 'Translator & proofreader badges',
+	},
+	translatorBadgeFieldDescription: {
+		id: 'settings.account.badges.translator.description',
+		defaultMessage: 'Briefly sign in with Crowdin to check your translation stats.',
+	},
+	translatorBadgeVerifyButton: {
+		id: 'settings.account.badges.translator.action.verify',
+		defaultMessage: 'Verify on Crowdin',
 	},
 	passwordHeaderRemove: {
 		id: 'settings.account.password.modal.header.remove',
@@ -819,6 +879,32 @@ async function handleRemoveAuthProvider(provider) {
 	} catch (error) {
 		handleError(error)
 	}
+}
+
+async function checkContributorBadge() {
+	startLoading()
+	try {
+		const res = await useBaseFetch('badges/contributor/check', {
+			method: 'POST',
+		})
+		await useAuth(auth.value.token)
+
+		const earned = (res.badges & UserBadge.CONTRIBUTOR) !== 0
+		addNotification({
+			title: formatMessage(messages.contributorBadgeFieldTitle),
+			text: formatMessage(
+				earned ? messages.contributorBadgeEarnedText : messages.contributorBadgeNotEarnedText,
+			),
+			type: earned ? 'success' : 'info',
+		})
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+	stopLoading()
 }
 
 const managePasswordModal = ref()

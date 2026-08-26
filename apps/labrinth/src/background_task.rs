@@ -1,9 +1,11 @@
 use crate::database;
 use crate::database::PgPool;
+use crate::database::models::DBUser;
 use crate::database::models::ids::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::NotificationBody;
+use crate::models::users::Badges;
 use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
@@ -15,10 +17,11 @@ use crate::queue::payouts::{
 };
 use crate::search::SearchBackend;
 use crate::util::anrok;
+use crate::util::github_contributor;
 use actix_web::web;
 use clap::ValueEnum;
 use eyre::WrapErr;
-use tracing::{info, instrument};
+use tracing::{info, instrument, warn};
 use xredis::RedisPool;
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
@@ -46,6 +49,8 @@ pub enum BackgroundTask {
     ScanPendingFiles,
     /// Queues Discord Creator Club role claim emails for newly eligible users.
     DiscordRoleEmailCampaign,
+    /// Rechecks linked GitHub accounts for newly eligible Contributor badges.
+    RecheckContributorBadges,
 }
 
 impl BackgroundTask {
@@ -130,6 +135,9 @@ impl BackgroundTask {
             }
             DiscordRoleEmailCampaign => {
                 discord_role_email_campaign(pool, redis_pool).await
+            }
+            RecheckContributorBadges => {
+                recheck_contributor_badges(pool, redis_pool).await
             }
         }
     }
@@ -326,6 +334,85 @@ pub async fn discord_role_email_campaign(
         .wrap_err("failed to commit Discord role email campaign transaction")?;
 
     info!(count, "Finished indexing Discord role email campaign");
+    Ok(())
+}
+
+pub async fn recheck_contributor_badges(
+    pool: PgPool,
+    redis_pool: RedisPool,
+) -> eyre::Result<()> {
+    info!("Started rechecking contributor badges");
+
+    let candidate_ids = sqlx::query_scalar!(
+        r#"
+        SELECT id AS "id!"
+        FROM users
+        WHERE github_id IS NOT NULL AND (badges & $1) = 0
+        LIMIT 500
+        "#,
+        Badges::CONTRIBUTOR.bits() as i64,
+    )
+    .fetch_all(&pool)
+    .await
+    .wrap_err("failed to fetch contributor badge candidates")?
+    .into_iter()
+    .map(DBUserId)
+    .collect::<Vec<_>>();
+
+    let mut updated = 0usize;
+
+    for user_id in candidate_ids {
+        let Some(db_user) = DBUser::get_id(user_id, &pool, &redis_pool)
+            .await
+            .wrap_err("failed to fetch user for contributor badge recheck")?
+        else {
+            continue;
+        };
+        let Some(github_id) = db_user.github_id else {
+            continue;
+        };
+
+        let eligible = match github_contributor::is_eligible_contributor(
+            github_id,
+        )
+        .await
+        {
+            Ok(eligible) => eligible,
+            Err(err) => {
+                warn!(
+                    "failed to check GitHub contributor status for {:?}: {err:#}",
+                    db_user.id
+                );
+                continue;
+            }
+        };
+
+        if !eligible {
+            continue;
+        }
+
+        let badges = db_user.badges | Badges::CONTRIBUTOR;
+
+        sqlx::query!(
+            "UPDATE users SET badges = $1 WHERE id = $2",
+            badges.bits() as i64,
+            db_user.id as DBUserId,
+        )
+        .execute(&pool)
+        .await
+        .wrap_err("failed to update contributor badge")?;
+
+        DBUser::clear_caches(
+            &[(db_user.id, Some(db_user.username))],
+            &redis_pool,
+        )
+        .await
+        .wrap_err("failed to clear user cache")?;
+
+        updated += 1;
+    }
+
+    info!("Finished rechecking contributor badges, updated {updated} users");
     Ok(())
 }
 

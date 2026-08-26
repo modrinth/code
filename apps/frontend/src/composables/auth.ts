@@ -229,6 +229,11 @@ export const getAuthUrl = (provider: string, redirect = '/dashboard') => {
 	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(fullURL)}`
 }
 
+export const getCrowdinVerifyUrl = (token: string) => {
+	const config = useRuntimeConfig()
+	return `${config.public.apiBaseUrl}badges/crowdin/init?token=${encodeURIComponent(token)}`
+}
+
 export const promotePendingSignInOAuthProvider = () => {
 	if (!import.meta.client) return
 	const pending = useStorage<string | null>(

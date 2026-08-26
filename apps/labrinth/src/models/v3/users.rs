@@ -19,6 +19,7 @@ bitflags::bitflags! {
         const CONTRIBUTOR = 1 << 5;
         const TRANSLATOR = 1 << 6;
         const AFFILIATE = 1 << 7;
+        const PROOFREADER = 1 << 8;
     }
 }
 
