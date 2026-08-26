@@ -386,7 +386,9 @@ const shouldPreventActions = ref(false)
 const galleryTitleValidation = computed(() => validateProjectText(editTitle.value))
 const galleryDescriptionValidation = computed(() => validateProjectText(editDescription.value))
 const galleryFieldsInvalid = computed(
-	() => !!galleryTitleValidation.value || !!galleryDescriptionValidation.value,
+	() =>
+		galleryTitleValidation.value.some((validation) => validation.severity === 'error') ||
+		galleryDescriptionValidation.value.some((validation) => validation.severity === 'error'),
 )
 
 // Constant for accepted file types

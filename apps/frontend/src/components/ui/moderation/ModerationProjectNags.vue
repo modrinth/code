@@ -32,51 +32,72 @@
 				</IconButton>
 			</div>
 		</div>
-		<div v-if="!collapsed" class="mt-4 grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-2">
+		<div v-if="!collapsed" class="relative mt-4">
 			<div
-				v-for="nag in visibleNags"
-				:key="nag.id"
-				class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+				class="nag-scroll-shadow-left pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
+				:class="showLeftNagShadow ? 'opacity-100' : 'opacity-0'"
+			/>
+			<div
+				ref="nagScroller"
+				class="flex w-full cursor-grab select-none gap-2 overflow-x-auto overflow-y-hidden pb-2"
+				:class="{ 'is-dragging': draggingNags }"
+				@pointerdown="onNagPointerDown"
+				@pointermove="onNagPointerMove"
+				@pointerup="finishNagDrag"
+				@pointercancel="finishNagDrag"
+				@click.capture="onNagClick"
+				@wheel="onNagWheel"
+				@scroll="updateNagScrollShadows"
 			>
-				<span class="flex items-center gap-2 font-medium text-contrast">
-					<component
-						:is="nag.icon || getDefaultIcon(nag.status)"
-						v-tooltip="getStatusTooltip(nag.status)"
-						:class="[
-							'size-4',
-							nag.status === 'required' && 'text-red',
-							nag.status === 'warning' && 'text-orange',
-							nag.status === 'suggestion' && 'text-purple',
-						]"
-						:aria-label="getStatusTooltip(nag.status)"
-					/>
-					{{ getFormattedMessage(nag.title) }}
-				</span>
-				{{ getNagDescription(nag) }}
-				<NuxtLink
-					v-if="nag.link && shouldShowLink(nag)"
-					:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
-						nag.link.path
-					}`"
-					class="goto-link mt-auto"
+				<div
+					v-for="nag in visibleNags"
+					:key="nag.id"
+					class="flex w-72 shrink-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
 				>
-					{{ getFormattedMessage(nag.link.title) }}
-					<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
-				</NuxtLink>
-				<Button
-					v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
-					v-tooltip="
-						!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
-					"
-					type="colored"
-					color="orange"
-					:disabled="!canSubmitForReview"
-					@click="submitForReview"
-				>
-					<SendIcon />
-					{{ getFormattedMessage(messages.submitForReviewButton) }}
-				</Button>
+					<span class="flex items-center gap-2 font-medium text-contrast">
+						<component
+							:is="nag.icon || getDefaultIcon(nag.status)"
+							v-tooltip="getStatusTooltip(nag.status)"
+							:class="[
+								'size-4',
+								nag.status === 'required' && 'text-red',
+								nag.status === 'warning' && 'text-orange',
+								nag.status === 'suggestion' && 'text-purple',
+							]"
+							:aria-label="getStatusTooltip(nag.status)"
+						/>
+						{{ getFormattedMessage(nag.title) }}
+					</span>
+					{{ getNagDescription(nag) }}
+					<NuxtLink
+						v-if="nag.link && shouldShowLink(nag)"
+						:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
+							nag.link.path
+						}`"
+						class="goto-link mt-auto"
+					>
+						{{ getFormattedMessage(nag.link.title) }}
+						<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
+					</NuxtLink>
+					<Button
+						v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
+						v-tooltip="
+							!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
+						"
+						type="colored"
+						color="orange"
+						:disabled="!canSubmitForReview"
+						@click="submitForReview"
+					>
+						<SendIcon />
+						{{ getFormattedMessage(messages.submitForReviewButton) }}
+					</Button>
+				</div>
 			</div>
+			<div
+				class="nag-scroll-shadow-right pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
+				:class="showRightNagShadow ? 'opacity-100' : 'opacity-0'"
+			/>
 		</div>
 	</div>
 </template>
@@ -92,15 +113,17 @@ import {
 	SendIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
-import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
-import { nags } from '@modrinth/moderation'
+import type { Nag, NagContext, NagStatus, ProjectTitleMetadata } from '@modrinth/moderation'
+import { nags, validateProjectFields } from '@modrinth/moderation'
 import { Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import type { Component } from 'vue'
-import { computed } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 interface Tags {
 	rejectedStatuses: string[]
+	gameVersions: { version: string }[]
+	loaders: { name: string }[]
 }
 
 interface Props {
@@ -176,9 +199,125 @@ const emit = defineEmits<{
 	setProcessing: [processing: boolean]
 }>()
 
+const nagScroller = ref<HTMLElement | null>(null)
+const showLeftNagShadow = ref(false)
+const showRightNagShadow = ref(false)
+const draggingNags = ref(false)
+
+let nagScrollerResizeObserver: ResizeObserver | null = null
+let nagDragPointerId: number | null = null
+let nagDragCaptureTarget: Element | null = null
+let nagDragStartX = 0
+let nagDragStartScrollLeft = 0
+let suppressNagClick = false
+let suppressNagClickTimeout: ReturnType<typeof setTimeout> | null = null
+
+function updateNagScrollShadows() {
+	const el = nagScroller.value
+	if (!el) {
+		showLeftNagShadow.value = false
+		showRightNagShadow.value = false
+		return
+	}
+
+	showLeftNagShadow.value = el.scrollLeft > 0
+	showRightNagShadow.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 1
+}
+
+function onNagWheel(event: WheelEvent) {
+	const el = nagScroller.value
+	if (!el || el.scrollWidth <= el.clientWidth) return
+
+	const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
+	event.preventDefault()
+	el.scrollLeft += delta
+}
+
+function onNagPointerDown(event: PointerEvent) {
+	const el = nagScroller.value
+	if (!el || event.pointerType === 'touch' || event.button !== 0) return
+
+	nagDragPointerId = event.pointerId
+	nagDragStartX = event.clientX
+	nagDragStartScrollLeft = el.scrollLeft
+	suppressNagClick = false
+	nagDragCaptureTarget =
+		event.target instanceof Element ? (event.target.closest('a, button') ?? el) : el
+	nagDragCaptureTarget.setPointerCapture(event.pointerId)
+}
+
+function onNagPointerMove(event: PointerEvent) {
+	const el = nagScroller.value
+	if (!el || event.pointerId !== nagDragPointerId) return
+
+	const distance = event.clientX - nagDragStartX
+	if (!draggingNags.value && Math.abs(distance) < 4) return
+
+	draggingNags.value = true
+	suppressNagClick = true
+	event.preventDefault()
+	el.scrollLeft = nagDragStartScrollLeft - distance
+}
+
+function finishNagDrag(event: PointerEvent) {
+	if (event.pointerId !== nagDragPointerId) return
+
+	if (nagDragCaptureTarget?.hasPointerCapture(event.pointerId)) {
+		nagDragCaptureTarget.releasePointerCapture(event.pointerId)
+	}
+	nagDragPointerId = null
+	nagDragCaptureTarget = null
+	draggingNags.value = false
+
+	if (suppressNagClick) {
+		if (suppressNagClickTimeout) clearTimeout(suppressNagClickTimeout)
+		suppressNagClickTimeout = setTimeout(() => {
+			suppressNagClick = false
+			suppressNagClickTimeout = null
+		}, 0)
+	}
+}
+
+function onNagClick(event: MouseEvent) {
+	if (!suppressNagClick) return
+
+	event.preventDefault()
+	event.stopPropagation()
+	suppressNagClick = false
+	if (suppressNagClickTimeout) clearTimeout(suppressNagClickTimeout)
+	suppressNagClickTimeout = null
+}
+
+onMounted(() => {
+	nagScrollerResizeObserver = new ResizeObserver(updateNagScrollShadows)
+	if (nagScroller.value) nagScrollerResizeObserver.observe(nagScroller.value)
+	nextTick(updateNagScrollShadows)
+})
+
+onBeforeUnmount(() => {
+	nagScrollerResizeObserver?.disconnect()
+	if (suppressNagClickTimeout) clearTimeout(suppressNagClickTimeout)
+})
+
+watch(nagScroller, (el, previousEl) => {
+	if (previousEl) nagScrollerResizeObserver?.unobserve(previousEl)
+	if (el) nagScrollerResizeObserver?.observe(el)
+	nextTick(updateNagScrollShadows)
+})
+
+const titleMetadata = computed<ProjectTitleMetadata>(() => ({
+	gameVersions: props.tags.gameVersions.map(({ version }) => version),
+	loaders: props.tags.loaders.map(({ name }) => name),
+}))
+
+const projectValidation = computed(() =>
+	validateProjectFields(props.projectV3, titleMetadata.value),
+)
+
 const nagContext = computed<NagContext>(() => ({
 	project: props.project,
 	projectV3: props.projectV3,
+	projectValidation: projectValidation.value,
 	versions: props.versions,
 	currentMember: props.currentMember?.user as Labrinth.Users.v2.User,
 	currentRoute: props.routeName,
@@ -247,6 +386,8 @@ const visibleNags = computed<Nag[]>(() => {
 	return finalNags
 })
 
+watch(visibleNags, () => nextTick(updateNagScrollShadows))
+
 function shouldShowLink(nag: Nag): boolean {
 	return nag.link?.shouldShow ? nag.link.shouldShow(nagContext.value) : false
 }
@@ -297,5 +438,20 @@ function getFormattedMessage(message: string | MessageDescriptor): string {
 <style lang="scss" scoped>
 .duration-250 {
 	transition-duration: 250ms;
+}
+
+.is-dragging,
+.is-dragging * {
+	cursor: grabbing !important;
+}
+
+.nag-scroll-shadow-left {
+	-webkit-mask-image: linear-gradient(to right, black, transparent);
+	mask-image: linear-gradient(to right, black, transparent);
+}
+
+.nag-scroll-shadow-right {
+	-webkit-mask-image: linear-gradient(to left, black, transparent);
+	mask-image: linear-gradient(to left, black, transparent);
 }
 </style>

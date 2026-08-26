@@ -1,5 +1,5 @@
 export * from './core'
-export * from './description'
 export * from './links'
+export * from './project-validation'
 export * from './server-projects'
 export * from './tags'

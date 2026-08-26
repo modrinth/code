@@ -54,48 +54,98 @@ test('extracts and deduplicates normalized links', () => {
 })
 
 test('validates shared project text', () => {
-	assert.equal(validateProjectText('An ordinary project'), null)
+	assert.deepEqual(validateProjectText('An ordinary project'), [])
 	assert.equal(
-		validateProjectText('This project is shit')?.message.id,
+		validateProjectText('This project is shit')[0]?.message.id,
 		'project.text-validation.profanity',
 	)
 	assert.equal(
-		validateProjectText('𝐅ancy project')?.message.id,
+		validateProjectText('𝐅ancy project')[0]?.message.id,
 		'project.text-validation.non-standard-text',
 	)
 })
 
-test('validates project title metadata', () => {
-	assert.deepEqual(validateProjectTitle('Fabric Tools', metadata), {
-		severity: 'error',
-		message: {
-			id: 'project.text-validation.title-loader',
-			defaultMessage: 'Project titles cannot include the loader “{value}”.',
+test('validates project titles', () => {
+	assert.deepEqual(validateProjectTitle('Fabric Tools', metadata), [
+		{
+			code: 'title-loader',
+			severity: 'warn',
+			message: {
+				id: 'project.text-validation.title-loader',
+				defaultMessage: 'Project titles should not include the loader “{value}”.',
+			},
+			values: { value: 'fabric' },
 		},
-		values: { value: 'fabric' },
-	})
-	assert.equal(validateProjectTitle('Ordinary Tools', metadata), null)
+	])
+	assert.equal(
+		validateProjectTitle('Minecraft Tools', metadata)[0]?.code,
+		'title-minecraft-branding',
+	)
+	assert.deepEqual(
+		validateProjectTitle('Minecraft Fabric Tools', metadata).map(({ code }) => code),
+		['title-loader', 'title-minecraft-branding'],
+	)
+	assert.deepEqual(validateProjectTitle('Ordinary Tools', metadata), [])
 })
 
 test('validates project summaries', () => {
 	assert.equal(
-		validateProjectSummary('Visit modrinth.com', 'Project title')?.message.id,
+		validateProjectSummary('Visit modrinth.com', 'Project title')[0]?.message.id,
 		'project.text-validation.summary-link',
 	)
+	assert.equal(validateProjectSummary('Visit modrinth.com', 'Project title')[0]?.severity, 'warn')
 	assert.equal(
-		validateProjectSummary('  Caf\u00e9  ', 'Cafe\u0301')?.message.id,
+		validateProjectSummary('  Caf\u00e9  ', 'Cafe\u0301')[0]?.message.id,
 		'project.text-validation.summary-matches-title',
 	)
-	assert.equal(validateProjectSummary('Project summary', 'Project title'), null)
+	assert.equal(validateProjectSummary('  Caf\u00e9  ', 'Cafe\u0301')[0]?.severity, 'warn')
+	assert.deepEqual(validateProjectSummary('Short summary', 'Project title'), [
+		{
+			code: 'summary-too-short',
+			severity: 'warn',
+			message: {
+				id: 'project.text-validation.summary-too-short',
+				defaultMessage:
+					'Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary.',
+			},
+			values: { length: 13, minChars: 30 },
+		},
+	])
+	assert.deepEqual(
+		validateProjectSummary('A detailed summary of this excellent project', 'Project title'),
+		[],
+	)
+	assert.deepEqual(
+		validateProjectSummary('# Short summary', 'Project title').map(({ code }) => code),
+		['summary-too-short', 'summary-special-formatting'],
+	)
 })
 
 test('allows sparse non-standard text in descriptions but rejects it at the threshold', () => {
 	const belowFivePercent = '𝐀'.concat('a'.repeat(20))
 	const exactlyFivePercent = '𝐀'.concat('a'.repeat(19))
 
-	assert.equal(validateProjectDescription(belowFivePercent), null)
 	assert.equal(
-		validateProjectDescription(exactlyFivePercent)?.message.id,
+		validateProjectDescription(belowFivePercent).some(({ code }) => code === 'text-non-standard'),
+		false,
+	)
+	assert.equal(
+		validateProjectDescription(exactlyFivePercent)[0]?.message.id,
 		'project.text-validation.non-standard-text',
+	)
+})
+
+test('validates required description content and returns simultaneous recommendations', () => {
+	assert.equal(validateProjectDescription('  ')[0]?.code, 'description-required')
+
+	const description = `${'# '.concat('A'.repeat(81))}\n![](one.png)\n![](two.png)\n![](three.png)\n![](four.png)`
+	assert.deepEqual(
+		validateProjectDescription(description).map(({ code }) => code),
+		[
+			'description-too-short',
+			'description-long-headers',
+			'description-image-heavy',
+			'description-missing-alt-text',
+		],
 	)
 })

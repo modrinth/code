@@ -1,14 +1,14 @@
 import type { Nag } from '../types/nags'
 import { coreNags } from './nags/core'
-import { descriptionNags } from './nags/description'
 import { linksNags } from './nags/links'
+import { projectValidationNags } from './nags/project-validation'
 import { serverProjectsNags } from './nags/server-projects'
 import { tagsNags } from './nags/tags'
 
 export default [
 	...coreNags,
 	...linksNags,
-	...descriptionNags,
+	...projectValidationNags,
 	...tagsNags,
 	...serverProjectsNags,
 ] as Nag[]

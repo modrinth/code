@@ -2,6 +2,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { MessageDescriptor } from '@modrinth/ui'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
+import type { ProjectValidationResult } from '../validators/project-validation/index.ts'
+
 /**
  * Type which represents the status type of a nag.
  *
@@ -25,6 +27,10 @@ export interface NagContext {
 	 * The project V3 associated with the nag.
 	 */
 	projectV3: Labrinth.Projects.v3.Project
+	/**
+	 * Validation results for editable project text fields.
+	 */
+	projectValidation: ProjectValidationResult
 	/**
 	 * The versions associated with the project.
 	 */

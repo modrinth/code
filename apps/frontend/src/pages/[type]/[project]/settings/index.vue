@@ -64,11 +64,6 @@
 						resize="vertical"
 					/>
 					<ValidationMessage :check="summaryValidation" class="mt-2" />
-					<div v-if="summaryWarning" class="my-2">
-						<SettingsInlineWarning>
-							{{ summaryWarning }}
-						</SettingsInlineWarning>
-					</div>
 				</div>
 
 				<div>
@@ -295,7 +290,7 @@
 			:saving="saving"
 			:can-save="canSave"
 			:save-disabled-reason="
-				hasPermission && hasValidationIssues
+				hasPermission && hasBlockingValidationIssues
 					? projectTextValidationMessages.resolveIssuesToSave
 					: undefined
 			"
@@ -308,7 +303,6 @@
 
 <script setup>
 import { ImageIcon, ScaleIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
-import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
 	Button,
@@ -435,25 +429,19 @@ const hasPermission = computed(() => {
 
 const nameValidation = useProjectTitleValidation(name)
 const summaryValidation = useProjectSummaryValidation(summary, name)
-const hasValidationIssues = computed(() => !!nameValidation.value || !!summaryValidation.value)
-const canSave = computed(() => hasPermission.value && !hasValidationIssues.value)
+const hasValidationIssues = computed(
+	() =>
+		nameValidation.value.some((validation) => validation.severity === 'error') ||
+		summaryValidation.value.some((validation) => validation.severity === 'error'),
+)
+const hasBlockingValidationIssues = computed(() => hasValidationIssues.value && !isStaff.value)
+const canSave = computed(() => hasPermission.value && !hasBlockingValidationIssues.value)
 
 const monetizationToggleDisabled = computed(() => !hasPermission.value || isForceDemonetized.value)
 
 const hasDeletePermission = computed(() => {
 	const DELETE_PROJECT = 1 << 7
 	return ((currentMember.value?.permissions ?? 0) & DELETE_PROJECT) === DELETE_PROJECT
-})
-
-const summaryWarning = computed(() => {
-	const text = summary.value?.trim() || ''
-	const charCount = text.length
-
-	if (charCount < MIN_SUMMARY_CHARS) {
-		return `It's recommended to have a summary with at least ${MIN_SUMMARY_CHARS} characters. (${charCount}/${MIN_SUMMARY_CHARS})`
-	}
-
-	return null
 })
 
 const visibilityOptions = computed(() =>

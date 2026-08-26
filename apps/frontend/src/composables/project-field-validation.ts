@@ -98,9 +98,10 @@ export function useProjectDescriptionValidation(
 		requestId++
 	})
 
-	const validation = computed<ProjectTextValidationResult | LinkCheckResult | null>(
-		() => validateProjectDescription(toValue(description)) ?? linkValidation.value,
-	)
+	const validation = computed<Array<ProjectTextValidationResult | LinkCheckResult>>(() => [
+		...validateProjectDescription(toValue(description)),
+		...(linkValidation.value ? [linkValidation.value] : []),
+	])
 
 	return {
 		pending,

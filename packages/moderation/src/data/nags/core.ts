@@ -50,29 +50,6 @@ export const coreNags: Nag[] = [
 		},
 	},
 	{
-		id: 'add-description',
-		title: defineMessage({
-			id: 'nags.add-description.title',
-			defaultMessage: 'Add a description',
-		}),
-		description: defineMessage({
-			id: 'nags.add-description.description',
-			defaultMessage:
-				"A description that clearly describes the project's purpose and function is required.",
-		}),
-		status: 'required',
-		shouldShow: (context: NagContext) => context.project.body === '',
-		link: {
-			path: 'settings/description',
-			title: defineMessage({
-				id: 'nags.settings.description.title',
-				defaultMessage: 'Visit description settings',
-			}),
-			shouldShow: (context: NagContext) =>
-				context.currentRoute !== 'type-project-settings-description',
-		},
-	},
-	{
 		id: 'add-icon',
 		title: defineMessage({
 			id: 'nags.add-icon.title',

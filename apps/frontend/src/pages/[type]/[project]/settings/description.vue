@@ -21,11 +21,6 @@
 				:on-image-upload="onUploadHandler"
 			/>
 			<ValidationMessage :check="descriptionValidation" class="mt-2" />
-			<div v-if="descriptionWarning" class="mt-2">
-				<SettingsInlineWarning>
-					{{ descriptionWarning }}
-				</SettingsInlineWarning>
-			</div>
 		</div>
 		<UnsavedChangesPopup
 			:original="saved"
@@ -44,13 +39,11 @@
 </template>
 
 <script lang="ts" setup>
-import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
 import {
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	injectProjectPageContext,
 	MarkdownEditor,
-	SettingsInlineWarning,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,
@@ -96,7 +89,9 @@ const hasPermission = computed(
 )
 const { pending: descriptionLinksPending, validation: descriptionValidation } =
 	useProjectDescriptionValidation(() => current.value.description)
-const hasValidationIssues = computed(() => descriptionValidation.value?.severity === 'error')
+const hasValidationIssues = computed(() =>
+	descriptionValidation.value.some((validation) => validation.severity === 'error'),
+)
 const canSave = computed(
 	() => hasPermission.value && !hasValidationIssues.value && !descriptionLinksPending.value,
 )
@@ -105,17 +100,6 @@ async function save() {
 	if (!canSave.value) return
 	await saveForm()
 }
-
-const descriptionWarning = computed(() => {
-	const text = current.value.description?.trim() || ''
-	const charCount = countText(text)
-
-	if (charCount < MIN_DESCRIPTION_CHARS) {
-		return `It's recommended to have a description with at least ${MIN_DESCRIPTION_CHARS} characters. (${charCount}/${MIN_DESCRIPTION_CHARS})`
-	}
-
-	return null
-})
 
 async function onUploadHandler(file: File) {
 	if (await fileDeclaresAi(file)) {

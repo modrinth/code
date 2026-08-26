@@ -346,7 +346,9 @@ const shouldPreventActions = ref(false)
 const galleryTitleValidation = computed(() => validateProjectText(editTitle.value))
 const galleryDescriptionValidation = computed(() => validateProjectText(editDescription.value))
 const galleryFieldsInvalid = computed(
-	() => !!galleryTitleValidation.value || !!galleryDescriptionValidation.value,
+	() =>
+		galleryTitleValidation.value.some((validation) => validation.severity === 'error') ||
+		galleryDescriptionValidation.value.some((validation) => validation.severity === 'error'),
 )
 
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'

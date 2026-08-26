@@ -62,6 +62,9 @@
   "nags.edit-description.title": {
     "defaultMessage": "Edit description"
   },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "Edit gallery"
+  },
   "nags.edit-license.title": {
     "defaultMessage": "Edit license"
   },
@@ -101,6 +104,12 @@
   "nags.image-heavy-description.title": {
     "defaultMessage": "Ensure accessibility"
   },
+  "nags.invalid-gallery-text.description": {
+    "defaultMessage": "Gallery image {number} {field, select, gallery-name {name} gallery-description {description} other {text}}: {error}"
+  },
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "Fix gallery text"
+  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "License URL is invalid."
   },
@@ -112,6 +121,15 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Add a valid license link"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Fix the project description"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "Fix the project name"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "Fix the project summary"
   },
   "nags.link-shortener-usage.description": {
     "defaultMessage": "Use of link shorteners or other methods to obscure where a link may lead in your external links or license link is prohibited, please only use appropriate full length links."
@@ -212,6 +230,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Select correct resolution"
   },
+  "nags.project-name-metadata.title": {
+    "defaultMessage": "Remove technical details from the name"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "Review the project summary"
+  },
   "nags.review-permissions.description": {
     "defaultMessage": "Make sure you have provided proof of your permission to distribute any external content in your Modpack."
   },
@@ -275,29 +299,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Visit versions settings"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Your summary can not be the same as your project's Name. It's important to create an informative and enticing Summary."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Make the summary unique"
-  },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Your summary should not contain formatting, line breaks, special characters, or links, since the summary will only display plain text."
+    "defaultMessage": "Your summary should not contain formatting, line breaks, or special characters, since the summary will only display plain text."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "Clear up the summary"
-  },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary."
+    "defaultMessage": "Clean up the summary"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Expand the summary"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Keeping your project's Name clean makes it memorable and easier to find. Version and loader information is automatically displayed alongside your project."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Clean up the name"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "You've selected {languageCount, plural, one {# language} other {# languages}}. Please list only the languages your server actively supports."
@@ -354,15 +363,18 @@
     "defaultMessage": "Slurs are not allowed."
   },
   "project.text-validation.summary-link": {
-    "defaultMessage": "Links are not allowed in project summaries."
+    "defaultMessage": "Links should not be included in project summaries."
   },
   "project.text-validation.summary-matches-title": {
-    "defaultMessage": "A project summary cannot be the same as its title."
+    "defaultMessage": "A project summary should not be the same as its title."
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary."
   },
   "project.text-validation.title-game-version": {
-    "defaultMessage": "Project titles cannot include the Minecraft version “{value}”."
+    "defaultMessage": "Project titles should not include the Minecraft version “{value}”."
   },
   "project.text-validation.title-loader": {
-    "defaultMessage": "Project titles cannot include the loader “{value}”."
+    "defaultMessage": "Project titles should not include the loader “{value}”."
   }
 }

@@ -139,7 +139,9 @@
 							v-if="
 								projectV3 &&
 								currentMember &&
-								(projectV3.status === 'draft' || tags.rejectedStatuses.includes(projectV3.status))
+								(projectV3.status === 'draft' ||
+									projectV3.status === 'processing' ||
+									tags.rejectedStatuses.includes(projectV3.status))
 							"
 							:project="project"
 							:project-v3="projectV3"

@@ -166,7 +166,7 @@ const moderatorSeeUserUi = computed<boolean>({
 		<ModerationProjectNags
 			v-if="
 				projectV3 &&
-				((currentMember && project.status === 'draft') ||
+				((currentMember && (project.status === 'draft' || project.status === 'processing')) ||
 					tags.rejectedStatuses.includes(project.status))
 			"
 			:project="project"

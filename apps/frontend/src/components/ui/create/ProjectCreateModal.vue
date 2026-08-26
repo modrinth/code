@@ -339,7 +339,11 @@ const summaryValidation = useProjectSummaryValidation(description, name)
 
 const disableCreate = computed(() => {
 	if (hasHitLimit.value) return true
-	if (nameValidation.value || summaryValidation.value) return true
+	if (
+		nameValidation.value.some((validation) => validation.severity === 'error') ||
+		summaryValidation.value.some((validation) => validation.severity === 'error')
+	)
+		return true
 	if (!name.value.trim() || !slug.value.trim()) return true
 	if (!manualSlug.value && checkingSlugSuggestions.value) return true
 	if (!manualSlug.value && !slugSuggestions.value.includes(slug.value)) return true
