@@ -8,6 +8,7 @@ import {
 	type DragStartEvent,
 } from '@dnd-kit/vue'
 import {
+	CheckIcon,
 	ClipboardCopyIcon,
 	EditIcon,
 	FileArchiveIcon,
@@ -230,6 +231,7 @@ const messages = defineMessages({
 		defaultMessage: '{instance} · {date}',
 	},
 	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
+	copied: { id: 'app.screenshots.copied', defaultMessage: 'Copied' },
 	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
 	showInFolder: { id: 'app.screenshots.show-in-folder', defaultMessage: 'Show in folder' },
 	goToInstance: { id: 'app.screenshots.go-to-instance', defaultMessage: 'Go to instance' },
@@ -906,6 +908,11 @@ function copyScreenshotBySelectionKey(selectionKey: string) {
 	if (screenshot) void copyScreenshot(screenshot)
 }
 
+function isScreenshotCopiedBySelectionKey(selectionKey: string) {
+	const screenshot = screenshotBySelectionKey(selectionKey)
+	return screenshot ? copiedScreenshotIds.value.has(screenshot.id) : false
+}
+
 function openScreenshotBySelectionKey(selectionKey: string) {
 	const screenshot = screenshotBySelectionKey(selectionKey)
 	if (screenshot) void openScreenshot(screenshot)
@@ -1219,12 +1226,21 @@ onBeforeUnmount(() => {
 	>
 		<template #actions="{ item }">
 			<IconButton
-				v-tooltip="formatMessage(messages.copy)"
-				:label="formatMessage(messages.copy)"
+				v-tooltip="
+					formatMessage(
+						isScreenshotCopiedBySelectionKey(item.id) ? messages.copied : messages.copy,
+					)
+				"
+				:label="
+					formatMessage(
+						isScreenshotCopiedBySelectionKey(item.id) ? messages.copied : messages.copy,
+					)
+				"
 				type="quiet"
 				@click="copyScreenshotBySelectionKey(item.id)"
 			>
-				<ClipboardCopyIcon />
+				<CheckIcon v-if="isScreenshotCopiedBySelectionKey(item.id)" class="text-green" />
+				<ClipboardCopyIcon v-else />
 			</IconButton>
 			<IconButton
 				v-tooltip="formatMessage(messages.showInFolder)"
