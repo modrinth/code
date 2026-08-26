@@ -116,8 +116,9 @@
 						<pre
 							class="m-0 overflow-x-auto rounded-lg bg-surface-1 p-3 text-xs leading-relaxed text-contrast"
 						><code>#define ISSUE_TYPE "OBFUSCATED_NAMES"
+#bind IS_MATCH trace.issue_type == ISSUE_TYPE
 
-trace.issue_type == ISSUE_TYPE</code></pre>
+IS_MATCH ? "low" : null</code></pre>
 					</div>
 				</div>
 			</details>
@@ -512,6 +513,7 @@ const CEL_LANGUAGE_COMPLETIONS: Ace.Completion[] = [
 	{ caption: 'string()', snippet: 'string(${1:value})', score: 850, meta: 'function' },
 	{ caption: 'int()', snippet: 'int(${1:value})', score: 850, meta: 'function' },
 	{ caption: '#define', snippet: '#define ${1:NAME} ${2:value}', score: 800, meta: 'preprocessor' },
+	{ caption: '#bind', snippet: '#bind ${1:NAME} ${2:expression}', score: 800, meta: 'preprocessor' },
 ]
 const CEL_MEMBER_COMPLETIONS: Ace.Completion[] = [
 	{ caption: 'contains()', snippet: 'contains("${1:value}")', score: 800, meta: 'string' },

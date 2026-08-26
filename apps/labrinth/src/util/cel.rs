@@ -10,24 +10,67 @@ const MAX_PREPROCESSED_SIZE: usize = 1_048_576;
 
 pub struct Program {
     inner: CelProgram,
+    bindings: Vec<CompiledBinding>,
 }
 
 impl Program {
     pub fn compile(source: &str) -> Result<Self> {
-        let source = preprocess(source)
+        let preprocessed = preprocess(source)
             .wrap_err("failed to preprocess cel expression")?;
-        let inner =
-            CelProgram::compile(&source).map_err(|error| eyre!(error))?;
+        let bindings = preprocessed
+            .bindings
+            .into_iter()
+            .map(|binding| {
+                let inner = CelProgram::compile(&binding.expression)
+                    .map_err(|error| eyre!(error))
+                    .wrap_err_with(|| {
+                        format!(
+                            "failed to compile `#bind {}` on line {}",
+                            binding.name, binding.line
+                        )
+                    })?;
 
-        Ok(Self { inner })
+                Ok(CompiledBinding {
+                    name: binding.name,
+                    inner,
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let inner = CelProgram::compile(&preprocessed.expression)
+            .map_err(|error| eyre!(error))?;
+
+        Ok(Self { inner, bindings })
     }
 
     pub fn execute<'a>(
         &self,
         context: &Context<'a>,
     ) -> std::result::Result<Value, ExecutionError> {
-        self.inner.execute(context)
+        let mut context = context.new_inner_scope();
+
+        for binding in &self.bindings {
+            let value = binding.inner.execute(&context).map_err(|error| {
+                ExecutionError::function_error(
+                    &format!("#bind {}", binding.name),
+                    error,
+                )
+            })?;
+            context.add_variable_from_value(&binding.name, value);
+        }
+
+        self.inner.execute(&context)
     }
+}
+
+struct CompiledBinding {
+    name: String,
+    inner: CelProgram,
+}
+
+#[derive(Debug)]
+struct Preprocessed {
+    expression: String,
+    bindings: Vec<Binding>,
 }
 
 #[derive(Debug)]
@@ -36,16 +79,35 @@ struct Definition {
     replacement: String,
 }
 
+#[derive(Debug)]
+struct Binding {
+    name: String,
+    expression: String,
+    line: usize,
+}
+
+#[derive(Debug)]
+enum Directive {
+    Define(Definition),
+    Bind { name: String, expression: String },
+}
+
 #[derive(Debug, Error)]
 enum PreprocessorError {
-    #[error("invalid `#define` on line {line}, column {column}: {message}")]
-    InvalidDefinition {
+    #[error(
+        "invalid preprocessor directive on line {line}, column {column}: {message}"
+    )]
+    InvalidDirective {
         line: usize,
         column: usize,
         message: String,
     },
     #[error("macro `{name}` is defined more than once")]
     DuplicateDefinition { name: String },
+    #[error("binding `{name}` is declared more than once")]
+    DuplicateBinding { name: String },
+    #[error("`{name}` cannot be both a macro and a binding")]
+    ConflictingDirective { name: String },
     #[error("recursive macro expansion: {path}")]
     RecursiveExpansion { path: String },
     #[error("preprocessed expression exceeds {MAX_PREPROCESSED_SIZE} bytes")]
@@ -64,7 +126,7 @@ enum LexState {
     BlockComment,
 }
 
-fn definition_parser() -> impl Parser<char, Definition, Error = Simple<char>> {
+fn directive_parser() -> impl Parser<char, Directive, Error = Simple<char>> {
     let horizontal_whitespace = one_of(" \t").repeated();
     let identifier = filter(|character: &char| {
         character.is_ascii_alphabetic() || *character == '_'
@@ -78,26 +140,37 @@ fn definition_parser() -> impl Parser<char, Definition, Error = Simple<char>> {
     .map(|(first, rest)| {
         std::iter::once(first).chain(rest).collect::<String>()
     });
-    let replacement = any().repeated().at_least(1).collect::<String>();
+    let expression = any().repeated().at_least(1).collect::<String>();
+    let kind = just("define").to(true).or(just("bind").to(false));
 
     horizontal_whitespace
         .clone()
         .ignore_then(just('#'))
         .then_ignore(horizontal_whitespace.clone())
-        .then_ignore(just("define"))
+        .ignore_then(kind)
         .then_ignore(horizontal_whitespace.clone().at_least(1))
-        .ignore_then(identifier)
+        .then(identifier)
         .then_ignore(horizontal_whitespace.at_least(1))
-        .then(replacement)
-        .map(|(name, replacement)| Definition {
-            name,
-            replacement: replacement.trim().to_string(),
+        .then(expression)
+        .map(|((define, name), expression)| {
+            if define {
+                Directive::Define(Definition {
+                    name,
+                    replacement: expression.trim().to_string(),
+                })
+            } else {
+                Directive::Bind {
+                    name,
+                    expression: expression.trim().to_string(),
+                }
+            }
         })
         .then_ignore(end())
 }
 
-fn preprocess(source: &str) -> Result<String, PreprocessorError> {
+fn preprocess(source: &str) -> Result<Preprocessed, PreprocessorError> {
     let mut definitions = BTreeMap::new();
+    let mut bindings = Vec::new();
     let mut expression = String::with_capacity(source.len());
     let mut state = LexState::Normal;
 
@@ -107,26 +180,57 @@ fn preprocess(source: &str) -> Result<String, PreprocessorError> {
 
         if directive {
             let directive = line.trim_end_matches(['\r', '\n']);
-            let definition =
-                definition_parser().parse(directive).map_err(|errors| {
+            let directive =
+                directive_parser().parse(directive).map_err(|errors| {
                     let error =
                         errors.into_iter().next().unwrap_or_else(|| {
                             Simple::custom(0..0, "invalid directive")
                         });
-                    PreprocessorError::InvalidDefinition {
+                    PreprocessorError::InvalidDirective {
                         line: line_index + 1,
                         column: error.span().start + 1,
                         message: error.to_string(),
                     }
                 })?;
 
-            if definitions
-                .insert(definition.name.clone(), definition.replacement)
-                .is_some()
-            {
-                return Err(PreprocessorError::DuplicateDefinition {
-                    name: definition.name,
-                });
+            match directive {
+                Directive::Define(definition) => {
+                    if bindings.iter().any(|binding: &Binding| {
+                        binding.name == definition.name
+                    }) {
+                        return Err(PreprocessorError::ConflictingDirective {
+                            name: definition.name,
+                        });
+                    }
+                    if definitions
+                        .insert(definition.name.clone(), definition.replacement)
+                        .is_some()
+                    {
+                        return Err(PreprocessorError::DuplicateDefinition {
+                            name: definition.name,
+                        });
+                    }
+                }
+                Directive::Bind { name, expression } => {
+                    if definitions.contains_key(&name) {
+                        return Err(PreprocessorError::ConflictingDirective {
+                            name,
+                        });
+                    }
+                    if bindings
+                        .iter()
+                        .any(|binding: &Binding| binding.name == name)
+                    {
+                        return Err(PreprocessorError::DuplicateBinding {
+                            name,
+                        });
+                    }
+                    bindings.push(Binding {
+                        name,
+                        expression,
+                        line: line_index + 1,
+                    });
+                }
             }
 
             if line.ends_with('\n') {
@@ -140,7 +244,21 @@ fn preprocess(source: &str) -> Result<String, PreprocessorError> {
 
     let mut expanded = String::with_capacity(expression.len());
     expand(&expression, &definitions, &mut Vec::new(), &mut expanded)?;
-    Ok(expanded)
+    for binding in &mut bindings {
+        let mut expanded = String::with_capacity(binding.expression.len());
+        expand(
+            &binding.expression,
+            &definitions,
+            &mut Vec::new(),
+            &mut expanded,
+        )?;
+        binding.expression = expanded;
+    }
+
+    Ok(Preprocessed {
+        expression: expanded,
+        bindings,
+    })
 }
 
 fn expand(
@@ -372,14 +490,14 @@ fn string_start(bytes: &[u8], index: usize) -> Option<(usize, LexState)> {
 
 #[cfg(test)]
 mod tests {
-    use super::preprocess;
+    use super::{Context, Program, Value, preprocess};
 
     #[test]
     fn expands_object_macros() {
         let source =
             "#define ISSUE OBFUSCATED_NAMES\ntrace.issue_type == ISSUE";
         assert_eq!(
-            preprocess(source).unwrap(),
+            preprocess(source).unwrap().expression,
             "\ntrace.issue_type == OBFUSCATED_NAMES"
         );
     }
@@ -388,7 +506,7 @@ mod tests {
     fn recursively_expands_macros() {
         let source =
             "#define RESULT SEVERITY\n#define SEVERITY \"low\"\nRESULT";
-        assert_eq!(preprocess(source).unwrap(), "\n\n\"low\"");
+        assert_eq!(preprocess(source).unwrap().expression, "\n\n\"low\"");
     }
 
     #[test]
@@ -396,7 +514,7 @@ mod tests {
         let source =
             "#define VALUE expanded\nVALUE == \"VALUE\" // VALUE\n/* VALUE */";
         assert_eq!(
-            preprocess(source).unwrap(),
+            preprocess(source).unwrap().expression,
             "\nexpanded == \"VALUE\" // VALUE\n/* VALUE */"
         );
     }
@@ -409,5 +527,45 @@ mod tests {
             error.to_string(),
             "recursive macro expansion: FIRST -> SECOND -> FIRST"
         );
+    }
+
+    #[test]
+    fn evaluates_runtime_bindings_in_order() {
+        let source = "#bind DOUBLE input * 2\n#bind RESULT DOUBLE + 1\nRESULT";
+        let program = Program::compile(source).unwrap();
+        let mut context = Context::default();
+        context.add_variable("input", 4).unwrap();
+
+        assert_eq!(program.execute(&context).unwrap(), Value::Int(9));
+    }
+
+    #[test]
+    fn expands_definitions_in_runtime_bindings() {
+        let source =
+            "#define MULTIPLIER 3\n#bind RESULT input * MULTIPLIER\nRESULT";
+        let program = Program::compile(source).unwrap();
+        let mut context = Context::default();
+        context.add_variable("input", 4).unwrap();
+
+        assert_eq!(program.execute(&context).unwrap(), Value::Int(12));
+    }
+
+    #[test]
+    fn bindings_shadow_context_variables_after_initialization() {
+        let source = "#bind VALUE VALUE + 1\nVALUE";
+        let program = Program::compile(source).unwrap();
+        let mut context = Context::default();
+        context.add_variable("VALUE", 4).unwrap();
+
+        assert_eq!(program.execute(&context).unwrap(), Value::Int(5));
+    }
+
+    #[test]
+    fn reports_runtime_binding_errors_with_the_binding_name() {
+        let program =
+            Program::compile("#bind RESULT missing + 1\nRESULT").unwrap();
+        let error = program.execute(&Context::default()).unwrap_err();
+
+        assert!(error.to_string().contains("#bind RESULT"));
     }
 }
