@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use chrono::NaiveDate;
+use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use sqlx::types::Json;
 
@@ -13,9 +13,8 @@ pub struct DBPayoutPeriod {
     pub raw_actual_aditude_revenue_usd: Decimal,
     pub adjustments: Vec<Adjustment>,
     pub active_run_payload: Option<PayoutRunPayload>,
+    pub active_run_execute_at: Option<DateTime<Utc>>,
     pub days: Vec<DBPayoutPeriodDay>,
-    pub has_scheduled_run: bool,
-    pub has_running_run: bool,
     pub has_succeeded_run: bool,
 }
 
@@ -41,25 +40,8 @@ impl DBPayoutPeriod {
 				payout_periods.period,
 				payout_periods.raw_actual_aditude_revenue_usd,
 				payout_periods.adjustments AS "adjustments: Json<Vec<Adjustment>>",
-				(
-					SELECT payout_runs.payload
-					FROM payout_runs
-					WHERE payout_runs.period = payout_periods.period
-						AND payout_runs.status IN ('scheduled', 'running')
-					LIMIT 1
-				) AS "active_run_payload: Json<PayoutRunPayload>",
-				EXISTS (
-					SELECT 1
-					FROM payout_runs
-					WHERE payout_runs.period = payout_periods.period
-						AND payout_runs.status = 'scheduled'
-				) AS "has_scheduled_run!",
-				EXISTS (
-					SELECT 1
-					FROM payout_runs
-					WHERE payout_runs.period = payout_periods.period
-						AND payout_runs.status = 'running'
-				) AS "has_running_run!",
+				active_run.payload AS "active_run_payload: Json<PayoutRunPayload>",
+				active_run.execute_at AS active_run_execute_at,
 				EXISTS (
 					SELECT 1
 					FROM payout_runs
@@ -67,6 +49,9 @@ impl DBPayoutPeriod {
 						AND payout_runs.status = 'succeeded'
 				) AS "has_succeeded_run!"
 			FROM payout_periods
+			LEFT JOIN payout_runs active_run
+				ON active_run.period = payout_periods.period
+				AND active_run.status IN ('scheduled', 'running')
 			WHERE payout_periods.period = ANY($1)
 			"#,
             periods,
@@ -87,9 +72,8 @@ impl DBPayoutPeriod {
                         active_run_payload: row
                             .active_run_payload
                             .map(|payload| payload.0),
+                        active_run_execute_at: row.active_run_execute_at,
                         days: Vec::new(),
-                        has_scheduled_run: row.has_scheduled_run,
-                        has_running_run: row.has_running_run,
                         has_succeeded_run: row.has_succeeded_run,
                     },
                 )

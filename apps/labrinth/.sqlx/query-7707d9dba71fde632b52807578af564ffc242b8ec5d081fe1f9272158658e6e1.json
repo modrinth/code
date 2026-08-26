@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO payouts_values (\n                    user_id,\n                    mod_id,\n                    amount,\n                    created,\n                    date_available\n                )\n                VALUES\n                    ($1, $2, 70, $3, $4),\n                    ($1, $2, 30, $5, $6)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Timestamptz",
+        "Timestamptz",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7707d9dba71fde632b52807578af564ffc242b8ec5d081fe1f9272158658e6e1"
+}

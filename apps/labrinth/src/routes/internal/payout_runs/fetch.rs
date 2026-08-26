@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use actix_web::{HttpRequest, get, web};
-use chrono::{Months, NaiveDate, Utc};
+use chrono::{DateTime, Months, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -40,6 +40,8 @@ pub struct PayoutRuns {
 pub struct PayoutRunPeriod {
     pub period: YearMonth,
     pub status: PayoutPeriodStatus,
+    /// When the active payout run is scheduled to begin executing.
+    pub runs_at: Option<DateTime<Utc>>,
     pub days: Vec<PayoutRunDay>,
     /// Sum of all adjustments applied on top of actual revenue.
     #[serde(with = "rust_decimal::serde::float")]
@@ -65,8 +67,6 @@ pub enum PayoutPeriodStatus {
     InReview,
     /// A payout run is waiting for its cancellation window to expire.
     Scheduled,
-    /// Payout run is currently executing.
-    Running,
     /// Payout run has been paid out to creators.
     Paid,
 }
@@ -147,15 +147,6 @@ pub async fn get_runs(
             .into_iter()
             .map(|period| (period.period, period))
             .collect::<HashMap<_, _>>();
-    let newest_stored_day = sqlx::query_scalar!(
-        r#"
-        SELECT MAX(date)
-        FROM payout_period_days
-        "#,
-    )
-    .fetch_one(&**pool)
-    .await
-    .wrap_internal_err("fetching newest stored payout period day")?;
     let stored_variances = DBPayoutVariance::get_all(&**pool)
         .await
         .wrap_internal_err("fetching payout variances")?;
@@ -182,26 +173,25 @@ pub async fn get_runs(
                 .is_none_or(|stored| stored.days.is_empty())
         })
         .collect::<Vec<_>>();
-    let mut live_estimates =
-        if let Some(first_live_period) = live_periods.first() {
-            let start_date = newest_stored_day
-                .unwrap_or_else(|| first_live_period.date())
-                .min(current_date);
-            estimate(
-                aditude.get_ref(),
-                redis.get_ref(),
-                &live_periods,
-                start_date,
-                current_date,
-            )
-            .await
-            .wrap_internal_err("fetching payout estimates")?
-            .into_iter()
-            .map(|estimate| (estimate.period, estimate))
-            .collect::<HashMap<_, _>>()
-        } else {
-            HashMap::new()
-        };
+    let mut live_estimates = if let Some(first_requested_period) =
+        requested_periods.first()
+        && !live_periods.is_empty()
+    {
+        estimate(
+            aditude.get_ref(),
+            redis.get_ref(),
+            &live_periods,
+            first_requested_period.date(),
+            current_date,
+        )
+        .await
+        .wrap_internal_err("fetching payout estimates")?
+        .into_iter()
+        .map(|estimate| (estimate.period, estimate))
+        .collect::<HashMap<_, _>>()
+    } else {
+        HashMap::new()
+    };
 
     let periods = requested_periods
         .into_iter()
@@ -257,9 +247,7 @@ pub async fn get_runs(
                     .collect::<Result<Vec<_>, _>>()?;
                 let status = if period.has_succeeded_run {
                     PayoutPeriodStatus::Paid
-                } else if period.has_running_run {
-                    PayoutPeriodStatus::Running
-                } else if period.has_scheduled_run {
+                } else if period.active_run_execute_at.is_some() {
                     PayoutPeriodStatus::Scheduled
                 } else {
                     PayoutPeriodStatus::InReview
@@ -268,6 +256,7 @@ pub async fn get_runs(
                 Ok(PayoutRunPeriod {
                     period: requested_period,
                     status,
+                    runs_at: period.active_run_execute_at,
                     days,
                     total_adjustments,
                     adjustments,
@@ -302,6 +291,7 @@ pub async fn get_runs(
                 Ok(PayoutRunPeriod {
                     period: requested_period,
                     status,
+                    runs_at: None,
                     days,
                     total_adjustments: Decimal::ZERO,
                     adjustments: is_admin.then(Vec::new),

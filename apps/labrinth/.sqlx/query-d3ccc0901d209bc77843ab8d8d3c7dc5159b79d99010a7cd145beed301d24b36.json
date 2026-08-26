@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            date_available AS \"date_available!\",\n            SUM(amount) FILTER (WHERE NOT provisional) finalized_sum,\n            SUM(amount) FILTER (WHERE provisional) estimate_sum,\n            SUM(amount) FILTER (WHERE authoritative) authoritative_sum,\n            SUM(amount) FILTER (\n                WHERE provisional AND authoritative\n            ) actionable_estimate_sum\n        FROM (\n            SELECT\n                payouts_values.date_available,\n                payouts_values.amount,\n                FALSE provisional,\n                payouts_values.payout_run_id IS NULL\n                    OR payout_runs.status = 'succeeded' authoritative\n            FROM payouts_values\n            LEFT JOIN payout_runs\n                ON payout_runs.id = payouts_values.payout_run_id\n            WHERE payouts_values.user_id = $1\n\n            UNION ALL\n\n            SELECT\n                payout_estimates.date_available,\n                payout_estimates.amount,\n                TRUE provisional,\n                succeeded_periods.period IS NULL authoritative\n            FROM payout_estimates\n            LEFT JOIN (\n                SELECT period\n                FROM payout_runs\n                WHERE status = 'succeeded'\n            ) succeeded_periods\n                ON succeeded_periods.period = payout_estimates.period\n            WHERE payout_estimates.user_id = $1\n        ) payout_amounts\n        GROUP BY date_available\n        ORDER BY date_available DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "date_available!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 1,
+        "name": "finalized_sum",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 2,
+        "name": "estimate_sum",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 3,
+        "name": "authoritative_sum",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "actionable_estimate_sum",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "d3ccc0901d209bc77843ab8d8d3c7dc5159b79d99010a7cd145beed301d24b36"
+}

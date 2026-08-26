@@ -1031,16 +1031,25 @@ pub struct UserBalance {
     pub available: Decimal,
     pub withdrawn_lifetime: Decimal,
     pub withdrawn_ytd: Decimal,
-    /// Finalized revenue not yet available and provisional creator estimates.
+    /// Finalized revenue not yet available and provisional creator estimates
+    /// for periods without a succeeded payout run.
     ///
-    /// Provisional estimates remain pending regardless of their estimated
-    /// availability date and may change before finalization.
+    /// Unfinalized estimates remain pending regardless of their estimated
+    /// availability date and may change before finalization. Retained
+    /// historical estimates do not remain actionable after finalization.
     pub pending: Decimal,
     /// Revenue grouped by its finalized or estimated availability date.
     ///
-    /// These groups may include provisional creator estimates that can change
-    /// before finalization.
+    /// Each payout period contributes either its finalized revenue, when it
+    /// has a succeeded payout run, or its provisional estimate otherwise.
     pub dates: HashMap<DateTime<Utc>, Decimal>,
+    /// Provisional creator estimates grouped by estimated availability date.
+    ///
+    /// Retained historical estimates remain visible after finalization and
+    /// may differ from the corresponding finalized revenue.
+    pub estimated_dates: HashMap<DateTime<Utc>, Decimal>,
+    /// Finalized revenue grouped by availability date.
+    pub actual_dates: HashMap<DateTime<Utc>, Decimal>,
 }
 
 #[derive(Serialize, utoipa::ToSchema)]
@@ -1127,17 +1136,38 @@ async fn get_user_balance(
         SELECT
             date_available AS "date_available!",
             SUM(amount) FILTER (WHERE NOT provisional) finalized_sum,
-            SUM(amount) FILTER (WHERE provisional) estimate_sum
+            SUM(amount) FILTER (WHERE provisional) estimate_sum,
+            SUM(amount) FILTER (WHERE authoritative) authoritative_sum,
+            SUM(amount) FILTER (
+                WHERE provisional AND authoritative
+            ) actionable_estimate_sum
         FROM (
-            SELECT date_available, amount, FALSE provisional
+            SELECT
+                payouts_values.date_available,
+                payouts_values.amount,
+                FALSE provisional,
+                payouts_values.payout_run_id IS NULL
+                    OR payout_runs.status = 'succeeded' authoritative
             FROM payouts_values
-            WHERE user_id = $1
+            LEFT JOIN payout_runs
+                ON payout_runs.id = payouts_values.payout_run_id
+            WHERE payouts_values.user_id = $1
 
             UNION ALL
 
-            SELECT date_available, amount, TRUE provisional
+            SELECT
+                payout_estimates.date_available,
+                payout_estimates.amount,
+                TRUE provisional,
+                succeeded_periods.period IS NULL authoritative
             FROM payout_estimates
-            WHERE user_id = $1
+            LEFT JOIN (
+                SELECT period
+                FROM payout_runs
+                WHERE status = 'succeeded'
+            ) succeeded_periods
+                ON succeeded_periods.period = payout_estimates.period
+            WHERE payout_estimates.user_id = $1
         ) payout_amounts
         GROUP BY date_available
         ORDER BY date_available DESC
@@ -1161,7 +1191,7 @@ async fn get_user_balance(
         } else {
             Decimal::ZERO
         };
-        acc + finalized + x.estimate_sum.unwrap_or(Decimal::ZERO)
+        acc + finalized + x.actionable_estimate_sum.unwrap_or(Decimal::ZERO)
     });
 
     let withdrawn = sqlx::query!(
@@ -1196,12 +1226,20 @@ async fn get_user_balance(
         pending,
         dates: payouts
             .iter()
-            .map(|x| {
-                (
-                    x.date_available,
-                    x.finalized_sum.unwrap_or(Decimal::ZERO)
-                        + x.estimate_sum.unwrap_or(Decimal::ZERO),
-                )
+            .filter_map(|x| {
+                x.authoritative_sum.map(|amount| (x.date_available, amount))
+            })
+            .collect(),
+        estimated_dates: payouts
+            .iter()
+            .filter_map(|x| {
+                x.estimate_sum.map(|amount| (x.date_available, amount))
+            })
+            .collect(),
+        actual_dates: payouts
+            .iter()
+            .filter_map(|x| {
+                x.finalized_sum.map(|amount| (x.date_available, amount))
             })
             .collect(),
     })

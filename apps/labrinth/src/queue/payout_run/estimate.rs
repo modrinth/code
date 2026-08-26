@@ -89,6 +89,26 @@ pub async fn estimate(
     Ok(periods)
 }
 
+/// Fetch fresh per-day estimated ad provider info for one payout period,
+/// bypassing Redis.
+pub async fn refresh_estimate(
+    aditude: &aditude::Client,
+    period: YearMonth,
+    start_date: NaiveDate,
+    end_date: NaiveDate,
+) -> Result<PeriodEstimate> {
+    if start_date > end_date {
+        return Err(eyre::eyre!("estimate start date is after end date"));
+    }
+
+    let estimates =
+        fetch_estimates(aditude, &[period], start_date, end_date).await?;
+    estimates
+        .remove(&period)
+        .map(|(_, estimate)| estimate)
+        .wrap_err("missing refreshed payout estimate")
+}
+
 async fn fetch_estimates(
     aditude: &aditude::Client,
     periods: &[YearMonth],

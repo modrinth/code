@@ -4,7 +4,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-use super::{Adjustment, PayoutRunPayload};
+use super::{Adjustment, PayoutRunDay, PayoutRunPayload};
 use crate::{
     auth::{
         AuthenticationError, get_user_from_headers, two_factor::verify_2fa_code,
@@ -14,11 +14,16 @@ use crate::{
         models::{
             DBUserId, DatabaseError, generate_payout_run_id,
             payout_run_item::{DBPayoutRun, PayoutRunStatus},
+            payout_variance_item::DBPayoutVariance,
         },
     },
     models::{ids::PayoutRunId, pats::Scopes},
     queue::{
-        payout_run::{estimate, validate_complete_period_estimate},
+        payout_run::{
+            PayoutVariance, PayoutVariances, compute_actual_distribution_flow,
+            distribution_for_day, refresh_estimate,
+            validate_complete_period_estimate,
+        },
         session::AuthQueue,
     },
     routes::ApiError,
@@ -47,6 +52,136 @@ pub struct StartPayoutRun {
 pub struct StartPayoutRunResponse {
     pub id: PayoutRunId,
     pub execute_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct CalculatePayoutRunResponse {
+    pub period: YearMonth,
+    pub days: Vec<PayoutRunDay>,
+    /// Sum of all adjustments that would be applied on top of actual revenue.
+    #[serde(with = "rust_decimal::serde::float")]
+    pub total_adjustments: Decimal,
+    pub adjustments: Vec<Adjustment>,
+}
+
+/// Calculate a payout run without scheduling it.
+///
+/// Admin-only. This fetches fresh Aditude data and does not require TOTP.
+#[utoipa::path(
+    tag = "payout runs",
+    request_body = StartPayoutRun,
+    responses(
+        (status = OK, body = CalculatePayoutRunResponse),
+        (status = BAD_REQUEST, description = "Invalid payout run input"),
+        (status = UNAUTHORIZED, description = "Invalid authentication"),
+        (status = FAILED_DEPENDENCY, description = "Aditude returned an incomplete period"),
+    ),
+    security(("bearer_auth" = ["SESSION_ACCESS"])),
+)]
+#[post("/calculate")]
+pub async fn calculate_run(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    aditude: web::Data<aditude::Client>,
+    session_queue: web::Data<AuthQueue>,
+    web::Json(body): web::Json<StartPayoutRun>,
+) -> Result<web::Json<CalculatePayoutRunResponse>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?
+    .1;
+    if !user.role.is_admin() {
+        return Err(ApiError::Auth(eyre::eyre!(
+            AuthenticationError::InvalidCredentials,
+        )));
+    }
+
+    if body.raw_actual_revenue_usd.is_sign_negative() {
+        return Err(ApiError::Request(eyre::eyre!(
+            "`raw_actual_revenue_usd` cannot be negative",
+        )));
+    }
+
+    let estimate_end_date = body
+        .period
+        .date()
+        .checked_add_months(Months::new(1))
+        .and_then(|date| date.pred_opt())
+        .wrap_internal_err("calculating payout estimate end date")?;
+    let estimate = refresh_estimate(
+        aditude.get_ref(),
+        body.period,
+        body.period.date(),
+        estimate_end_date,
+    )
+    .await
+    .wrap_internal_err("fetching payout estimate")?;
+    validate_complete_period_estimate(&estimate)
+        .wrap_failed_dependency_err("validating payout estimate")?;
+
+    let stored_variances = DBPayoutVariance::get_all(&**pool)
+        .await
+        .wrap_internal_err("fetching payout variances")?;
+    let default_variance = stored_variances
+        .first()
+        .wrap_internal_err("no payout variance configured")?
+        .variance;
+    let variances = PayoutVariances {
+        default_frac: default_variance,
+        fracs: stored_variances
+            .into_iter()
+            .map(|variance| PayoutVariance {
+                starts_at: variance.applied_on,
+                frac: variance.variance,
+            })
+            .collect(),
+    };
+    let total_estimated_revenue_usd = estimate
+        .days
+        .iter()
+        .map(|day| day.raw_estimated_revenue_usd)
+        .sum();
+    let actual_flow = compute_actual_distribution_flow(
+        total_estimated_revenue_usd,
+        body.raw_actual_revenue_usd,
+    );
+    let days = estimate
+        .days
+        .into_iter()
+        .map(|day| PayoutRunDay {
+            date: day.date,
+            estimated: distribution_for_day(
+                day.date,
+                day.raw_estimated_revenue_usd,
+                day.impressions,
+                &variances,
+            ),
+            actual: Some(actual_flow.distribution_for_day(
+                day.date,
+                day.raw_estimated_revenue_usd,
+                day.impressions,
+            )),
+        })
+        .collect();
+    let total_adjustments = body
+        .adjustments
+        .iter()
+        .map(|adjustment| adjustment.amount_usd)
+        .sum();
+
+    Ok(web::Json(CalculatePayoutRunResponse {
+        period: body.period,
+        days,
+        total_adjustments,
+        adjustments: body.adjustments,
+    }))
 }
 
 /// Start a payout run.
@@ -143,18 +278,14 @@ pub async fn start_run(
         .checked_add_months(Months::new(1))
         .and_then(|date| date.pred_opt())
         .wrap_internal_err("calculating payout estimate end date")?;
-    let mut estimates = estimate(
+    let estimate = refresh_estimate(
         aditude.get_ref(),
-        redis.get_ref(),
-        &[body.period],
+        body.period,
         body.period.date(),
         estimate_end_date,
     )
     .await
     .wrap_internal_err("fetching payout estimate")?;
-    let estimate = estimates
-        .pop()
-        .wrap_internal_err("missing requested payout estimate")?;
     validate_complete_period_estimate(&estimate)
         .wrap_failed_dependency_err("validating payout estimate")?;
     let payload = PayoutRunPayload {
