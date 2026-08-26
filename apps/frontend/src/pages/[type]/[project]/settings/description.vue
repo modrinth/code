@@ -99,7 +99,7 @@ const descriptionWarning = computed(() => {
 	const charCount = countText(text)
 
 	if (charCount < MIN_DESCRIPTION_CHARS) {
-		return `It's recommended to have a description with at least ${MIN_DESCRIPTION_CHARS} readable characters. (${charCount}/${MIN_DESCRIPTION_CHARS})`
+		return `It's recommended to have a description with at least ${MIN_DESCRIPTION_CHARS} characters. (${charCount}/${MIN_DESCRIPTION_CHARS})`
 	}
 
 	return null

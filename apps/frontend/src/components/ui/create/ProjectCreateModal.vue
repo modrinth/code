@@ -43,10 +43,14 @@
 				/>
 				<ValidationMessage :check="nameValidation" />
 			</div>
-			<label for="slug" class="flex flex-col gap-2.5">
-				<span class="text-md font-semibold text-contrast">
+			<div
+				class="flex flex-col gap-2.5"
+				@focusin="onSlugSuggestionFocusIn"
+				@focusout="onSlugSuggestionFocusOut"
+			>
+				<label for="slug" class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
-				</span>
+				</label>
 				<Input
 					id="slug"
 					v-model="slug"
@@ -59,7 +63,13 @@
 				>
 					<template #prefix>https://modrinth.com/project/</template>
 				</Input>
-			</label>
+				<SlugSuggestions
+					:selected="slug"
+					:suggestions="slugSuggestions"
+					:visible="showSlugSuggestions"
+					@select="selectSlugSuggestion"
+				/>
+			</div>
 			<div class="flex flex-col gap-2.5">
 				<label for="owner">
 					<span class="text-md font-semibold text-contrast">
@@ -150,7 +160,12 @@ import {
 import { computed, defineAsyncComponent, h } from 'vue'
 
 import ValidationMessage from '~/components/ValidationMessage.vue'
+import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import { validateProjectText } from '~/composables/project-text-validation'
+import {
+	useProjectSlugSuggestions,
+	useSlugSuggestionVisibility,
+} from '~/composables/project-slug-suggestions'
 import { generateUrlSlug } from '~/utils/slugs'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
@@ -276,6 +291,16 @@ const name = ref('')
 const slug = ref('')
 const description = ref('')
 const manualSlug = ref(false)
+const {
+	onFocusIn: onSlugSuggestionFocusIn,
+	onFocusOut: onSlugSuggestionFocusOut,
+	visible: showSlugSuggestions,
+} = useSlugSuggestionVisibility()
+const { checking: checkingSlugSuggestions, suggestions: slugSuggestions } =
+	useProjectSlugSuggestions({
+		title: name,
+		username: () => auth.value.user?.username,
+	})
 const projectType = ref<ProjectTypes>('project')
 const projectTypeOptions = computed<ComboboxOption<ProjectTypes>[]>(() => [
 	{
@@ -313,6 +338,8 @@ const disableCreate = computed(() => {
 	if (hasHitLimit.value) return true
 	if (nameValidation.value || summaryValidation.value) return true
 	if (!name.value.trim() || !slug.value.trim()) return true
+	if (!manualSlug.value && checkingSlugSuggestions.value) return true
+	if (!manualSlug.value && !slugSuggestions.value.includes(slug.value)) return true
 	if (description.value.trim().length < 3) return true
 	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
 		return true
@@ -483,6 +510,7 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 	slug.value = ''
 	description.value = ''
 	manualSlug.value = false
+	showSlugSuggestions.value = false
 	owner.value = 'self'
 	projectType.value = options?.type ?? 'project'
 	await fetchOrganizations()
@@ -494,4 +522,13 @@ function updatedName() {
 		slug.value = generateUrlSlug(name.value)
 	}
 }
+
+function selectSlugSuggestion(suggestion: string) {
+	slug.value = suggestion
+	manualSlug.value = true
+}
+
+watch([slugSuggestions, checkingSlugSuggestions], ([suggestions, checking]) => {
+	if (!manualSlug.value && !checking) slug.value = suggestions[0] ?? ''
+})
 </script>

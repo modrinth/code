@@ -15,11 +15,16 @@ import {
 } from '@modrinth/ui'
 
 import ValidationMessage from '~/components/ValidationMessage.vue'
+import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import { validateProjectText } from '~/composables/project-text-validation'
+import {
+	useProjectSlugSuggestions,
+	useSlugSuggestionVisibility,
+} from '~/composables/project-slug-suggestions'
 
 const { formatMessage } = useVIntl()
 
-const { projectV2: project, patchProject } = injectProjectPageContext()
+const { allMembers, projectV2: project, patchProject } = injectProjectPageContext()
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
@@ -51,6 +56,19 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 const titleValidation = computed(() => validateProjectText(current.value.title))
 const taglineValidation = computed(() => validateProjectText(current.value.tagline))
 const canSave = computed(() => !titleValidation.value && !taglineValidation.value)
+const {
+	onFocusIn: onSlugSuggestionFocusIn,
+	onFocusOut: onSlugSuggestionFocusOut,
+	visible: showSlugSuggestions,
+} = useSlugSuggestionVisibility()
+const ownerUsername = computed(
+	() => (allMembers.value.find((member) => member.is_owner) ?? allMembers.value[0])?.user.username,
+)
+const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
+	title: () => current.value.title,
+	username: ownerUsername,
+	currentProjectId: () => project.value.id,
+})
 
 async function save() {
 	if (!canSave.value) return
@@ -190,7 +208,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 				/>
 				<ValidationMessage :check="taglineValidation" class="mt-2" />
 			</div>
-			<div class="mt-4">
+			<div class="mt-4" @focusin="onSlugSuggestionFocusIn" @focusout="onSlugSuggestionFocusOut">
 				<SettingsLabel id="project-url" :title="messages.urlTitle" />
 				<Input
 					id="project-url"
@@ -203,6 +221,12 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 						<span class="whitespace-nowrap">https://modrinth.com/project/</span>
 					</template>
 				</Input>
+				<SlugSuggestions
+					:selected="current.url"
+					:suggestions="slugSuggestions"
+					:visible="showSlugSuggestions"
+					@select="current.url = $event"
+				/>
 			</div>
 		</div>
 	</div>

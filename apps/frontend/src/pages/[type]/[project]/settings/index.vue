@@ -26,7 +26,7 @@
 					<ValidationMessage :check="nameValidation" class="mt-2" />
 				</div>
 
-				<div>
+				<div @focusin="onSlugSuggestionFocusIn" @focusout="onSlugSuggestionFocusOut">
 					<label for="project-slug">
 						<span class="label__title">URL</span>
 					</label>
@@ -44,6 +44,12 @@
 							</span>
 						</template>
 					</Input>
+					<SlugSuggestions
+						:selected="slug"
+						:suggestions="slugSuggestions"
+						:visible="hasPermission && showSlugSuggestions"
+						@select="slug = $event"
+					/>
 				</div>
 
 				<div>
@@ -325,9 +331,14 @@ import {
 import { fileIsValid, formatProjectStatus } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'
 import { validateProjectText } from '~/composables/project-text-validation'
+import {
+	useProjectSlugSuggestions,
+	useSlugSuggestionVisibility,
+} from '~/composables/project-slug-suggestions'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
@@ -338,6 +349,7 @@ const { addNotification } = injectNotificationManager()
 const {
 	projectV3: project,
 	currentMember,
+	allMembers,
 	patchProjectV3,
 	patchIcon,
 	invalidate,
@@ -355,6 +367,19 @@ const formatBytes = useFormatBytes()
 const name = ref(project.value.name)
 const slug = ref(project.value.slug ?? '')
 const summary = ref(project.value.summary)
+const {
+	onFocusIn: onSlugSuggestionFocusIn,
+	onFocusOut: onSlugSuggestionFocusOut,
+	visible: showSlugSuggestions,
+} = useSlugSuggestionVisibility()
+const ownerUsername = computed(
+	() => (allMembers.value.find((member) => member.is_owner) ?? allMembers.value[0])?.user.username,
+)
+const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
+	title: name,
+	username: ownerUsername,
+	currentProjectId: () => project.value.id,
+})
 const icon = ref(null)
 const previewImage = ref(null)
 const deletedIcon = ref(false)
