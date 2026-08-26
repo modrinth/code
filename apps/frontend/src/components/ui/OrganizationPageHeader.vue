@@ -3,6 +3,7 @@
 		<template #leading>
 			<Avatar
 				:src="organization.icon_url"
+				:raw-src="organization.raw_icon_url"
 				:alt="organization.name"
 				:tint-by="organization.id"
 				size="96px"

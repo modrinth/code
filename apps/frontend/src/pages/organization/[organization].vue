@@ -15,7 +15,7 @@
 						class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
 					>
 						<div class="flex items-center gap-4">
-							<Avatar size="sm" :src="organization.icon_url" />
+							<Avatar size="sm" :src="organization.icon_url" :raw-src="organization.raw_icon_url" />
 							<div class="flex flex-col justify-center gap-1">
 								<h2 class="m-0 text-base">
 									<nuxt-link :to="`/organization/${organization.slug}`">

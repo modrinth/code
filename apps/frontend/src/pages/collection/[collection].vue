@@ -150,7 +150,7 @@
 						</nuxt-link>
 					</ClientOnly>
 					<div class="grid grid-cols-[auto_1fr] gap-4 sm:grid-cols-[auto_1fr_auto]">
-						<Avatar :src="collection.icon_url" size="64px" />
+						<Avatar :src="collection.icon_url" :raw-src="collection.raw_icon_url" size="64px" />
 						<div class="flex flex-col gap-3">
 							<h1 class="heading-2xl">
 								{{ collection.name }}
