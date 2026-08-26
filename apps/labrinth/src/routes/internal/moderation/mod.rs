@@ -1957,9 +1957,11 @@ where
             .await
             .wrap_internal_err("fetching projects from database")?;
 
-    let mut grouped_projects = HashMap::new();
+    let mut grouped_projects: HashMap<ProjectStatus, Vec<ProjectId>> = HashMap::new();
     for project in &projects {
-        *grouped_projects.entry(project.inner.status).or_default().push(project.inner.id.into());
+        *grouped_projects.entry(project.inner.status)
+            .or_default()
+            .push(project.inner.id.into());
     }
 
     Ok(grouped_projects)
