@@ -33,18 +33,19 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
-import ContextMenu from '@/components/ui/ContextMenu.vue'
+import ContextMenu from '@/components/ui/context-menu/index.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
+	getInstanceIconUrl,
 	list as listInstances,
 } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
@@ -63,7 +64,6 @@ import {
 	createServerInstallContent,
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
-import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -109,7 +109,7 @@ const breadcrumbLabel = computed(() => {
 		),
 	})
 })
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
@@ -182,7 +182,7 @@ const instanceBreadcrumbDefinition = {
 	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
 	visual: () => ({
 		type: 'image' as const,
-		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		src: getInstanceIconUrl(instance.value?.icon_path),
 		alt: instance.value?.name,
 		tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
 	}),
@@ -384,7 +384,7 @@ async function initInstanceContext() {
 }
 
 function setBrowseHideInstalledFlag(flag: 'hide_installed_modpacks', value: boolean) {
-	themeStore.featureFlags[flag] = value
+	appSettings.featureFlags[flag] = value
 	getSettings()
 		.then((settings) => {
 			settings.feature_flags[flag] = value
@@ -394,7 +394,7 @@ function setBrowseHideInstalledFlag(flag: 'hide_installed_modpacks', value: bool
 }
 
 const hideInstalledModpacks = computed({
-	get: () => themeStore.getFeatureFlag('hide_installed_modpacks'),
+	get: () => appSettings.getFeatureFlag('hide_installed_modpacks'),
 	set: (value: boolean) => setBrowseHideInstalledFlag('hide_installed_modpacks', value),
 })
 
@@ -530,13 +530,20 @@ const {
 })
 
 const offline = ref(!navigator.onLine)
-window.addEventListener('offline', () => {
+const handleOffline = () => {
 	debugLog('went offline')
 	offline.value = true
-})
-window.addEventListener('online', () => {
+}
+const handleOnline = () => {
 	debugLog('went online')
 	offline.value = false
+}
+window.addEventListener('offline', handleOffline)
+window.addEventListener('online', handleOnline)
+
+onBeforeUnmount(() => {
+	window.removeEventListener('offline', handleOffline)
+	window.removeEventListener('online', handleOnline)
 })
 
 const messages = defineMessages({
@@ -585,6 +592,17 @@ const messages = defineMessages({
 		id: 'app.browse.project-type.modpacks',
 		defaultMessage: 'Modpacks',
 	},
+	modsProjectType: { id: 'app.browse.project-type.mods', defaultMessage: 'Mods' },
+	resourcePacksProjectType: {
+		id: 'app.browse.project-type.resource-packs',
+		defaultMessage: 'Resource Packs',
+	},
+	dataPacksProjectType: {
+		id: 'app.browse.project-type.data-packs',
+		defaultMessage: 'Data Packs',
+	},
+	shadersProjectType: { id: 'app.browse.project-type.shaders', defaultMessage: 'Shaders' },
+	serversProjectType: { id: 'app.browse.project-type.servers', defaultMessage: 'Servers' },
 	providedByInstance: {
 		id: 'search.filter.locked.instance',
 		defaultMessage: 'Provided by the instance',
@@ -687,16 +705,31 @@ const selectableProjectTypes = computed(() => {
 	}
 
 	if (isFromWorlds.value) {
-		return [{ label: 'Servers', href: `/browse/server${suffix}` }]
+		return [{ label: formatMessage(messages.serversProjectType), href: `/browse/server${suffix}` }]
 	}
 
 	return [
-		{ label: 'Modpacks', href: `/browse/modpack${suffix}`, shown: modpacks },
-		{ label: 'Mods', href: `/browse/mod${suffix}`, shown: mods },
-		{ label: 'Resource Packs', href: `/browse/resourcepack${suffix}` },
-		{ label: 'Data Packs', href: `/browse/datapack${suffix}`, shown: dataPacks },
-		{ label: 'Shaders', href: `/browse/shader${suffix}` },
-		{ label: 'Servers', href: `/browse/server${suffix}`, shown: !instance.value },
+		{
+			label: formatMessage(messages.modpacksProjectType),
+			href: `/browse/modpack${suffix}`,
+			shown: modpacks,
+		},
+		{ label: formatMessage(messages.modsProjectType), href: `/browse/mod${suffix}`, shown: mods },
+		{
+			label: formatMessage(messages.resourcePacksProjectType),
+			href: `/browse/resourcepack${suffix}`,
+		},
+		{
+			label: formatMessage(messages.dataPacksProjectType),
+			href: `/browse/datapack${suffix}`,
+			shown: dataPacks,
+		},
+		{ label: formatMessage(messages.shadersProjectType), href: `/browse/shader${suffix}` },
+		{
+			label: formatMessage(messages.serversProjectType),
+			href: `/browse/server${suffix}`,
+			shown: !instance.value,
+		},
 	]
 })
 
@@ -716,7 +749,7 @@ const installContext = computed(() => {
 			queuedCount: queuedServerInstallCount.value,
 			selectedProjects: selectedServerInstallProjects.value,
 			isInstallingSelected: isInstallingQueuedServerInstalls.value,
-			skipNonEssentialWarnings: themeStore.getFeatureFlag('skip_non_essential_warnings'),
+			skipNonEssentialWarnings: appSettings.getFeatureFlag('skip_non_essential_warnings'),
 			installProgress: queuedInstallProgress.value,
 			clearQueued: clearQueuedServerInstalls,
 			clearSelected: clearQueuedServerInstalls,
@@ -730,7 +763,7 @@ const installContext = computed(() => {
 			name: instance.value.name,
 			loader: instance.value.loader,
 			gameVersion: instance.value.game_version,
-			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+			iconSrc: getInstanceIconUrl(instance.value.icon_path),
 			backUrl: `/instance/${encodeURIComponent(instance.value.id)}${isFromWorlds.value ? '/worlds' : ''}`,
 			backLabel: formatMessage(messages.backToInstance),
 			heading: formatMessage(
@@ -1196,9 +1229,9 @@ function getProjectBrowseQuery() {
 }
 
 const advancedFiltersCollapsed = computed({
-	get: () => themeStore.getFeatureFlag('advanced_filters_collapsed'),
+	get: () => appSettings.getFeatureFlag('advanced_filters_collapsed'),
 	set: (value) => {
-		themeStore.featureFlags['advanced_filters_collapsed'] = value
+		appSettings.featureFlags['advanced_filters_collapsed'] = value
 		getSettings()
 			.then((settings) => {
 				settings.feature_flags['advanced_filters_collapsed'] = value
@@ -1209,9 +1242,9 @@ const advancedFiltersCollapsed = computed({
 })
 
 const dismissedPhotosensitivityFilterWarning = computed({
-	get: () => themeStore.getFeatureFlag('dismissed_photosensitivity_filter_warning'),
+	get: () => appSettings.getFeatureFlag('dismissed_photosensitivity_filter_warning'),
 	set: (value) => {
-		themeStore.featureFlags['dismissed_photosensitivity_filter_warning'] = value
+		appSettings.featureFlags['dismissed_photosensitivity_filter_warning'] = value
 		getSettings()
 			.then((settings) => {
 				settings.feature_flags['dismissed_photosensitivity_filter_warning'] = value

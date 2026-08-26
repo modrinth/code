@@ -14,7 +14,7 @@
 		</template>
 		<template #panel>
 			<div :class="dropdownClass">
-				<StyledInput
+				<Input
 					v-if="search"
 					id="search-input"
 					ref="searchInput"
@@ -69,8 +69,8 @@ import { CheckIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { Button, TeleportPopoutMenu } from './buttons'
+import Input from './inputs/Input.vue'
 import ScrollablePanel from './ScrollablePanel.vue'
-import StyledInput from './StyledInput.vue'
 
 type Option = string | number | object
 

@@ -21,7 +21,7 @@
 	<ReadyTransition :pending="worldsReadyPending">
 		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
 			<div class="flex flex-wrap items-center gap-2">
-				<StyledInput
+				<Input
 					v-model="searchFilter"
 					:icon="SearchIcon"
 					type="text"
@@ -141,8 +141,8 @@ import {
 	GAME_MODES,
 	type GameVersion,
 	injectNotificationManager,
+	Input,
 	ReadyTransition,
-	StyledInput,
 	useReadyState,
 	useVIntl,
 } from '@modrinth/ui'
@@ -157,6 +157,7 @@ import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
+import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { get_game_versions } from '@/helpers/tags'
@@ -186,7 +187,6 @@ import {
 	type World,
 } from '@/helpers/worlds.ts'
 import { injectServerInstall } from '@/providers/server-install'
-import { handleSevereError } from '@/store/error.js'
 
 import { injectInstancePage } from '../instance-context'
 import { instanceKeys, instanceWorldsQueryOptions } from '../query-options'

@@ -2469,7 +2469,7 @@
     "message": "끊김없이 빠른 속도를 제공합니다"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "저희 인프라는 절대 과부하되지 않으며, Modrinth에서 호스팅되는 모든 서버는 항상 최대 성능으로 작동합니다."
+    "message": "저희 인프라는 절대 과부하되지 않습니다. 즉, Modrinth에서 호스트 중인 모든 서버는 항상 최선의 성능으로 돌아갑니다."
   },
   "hosting-marketing.why.description": {
     "message": "Modrinth에서 제공하는 수천 개의 모드팩 중에서 선택하거나 직접 만들어 보세요. 준비가 되면 친구들을 초대하여 함께 플레이하세요."
@@ -3446,6 +3446,9 @@
   "project-type.shader.singular": {
     "message": "셰이더"
   },
+  "project.actions.checking-modpack-archives": {
+    "message": "확인 중..."
+  },
   "project.actions.create-server": {
     "message": "서버 만들기"
   },
@@ -3457,6 +3460,9 @@
   },
   "project.actions.edit-project": {
     "message": "프로젝트 수정"
+  },
+  "project.actions.project-page": {
+    "message": "프로젝트 페이지"
   },
   "project.actions.rescan-modpack": {
     "message": "모드팩 재검사"
@@ -3472,6 +3478,15 @@
   },
   "project.actions.servers-promo.title": {
     "message": "서버 생성"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "AI로 생성된 이미지를 사용하여 프로젝트를 소개하는 것은 허용되지 않습니다. 탐지 시스템을 우회하려는 시도는 Modrinth 계정 정지 조치로 이어질 수 있습니다."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "생성형 AI 정책에 대한 자세한 내용은 <rules>Modrinth 콘텐츠 규정</rules>의 6항을 참조하십시오."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "AI로 생성된 이미지는 허용되지 않습니다"
   },
   "project.collections.create-new": {
     "message": "새 컬렉션 생성"
@@ -3719,8 +3734,20 @@
   "project.moderation.title": {
     "message": "관리"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "이 .mrpack 파일은 오류가 발생할 수 있습니다."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "이 모드팩은 내보내기 오류가 발생하였습니다"
+  },
   "project.navigation.changelog": {
     "message": "변경 사항"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "일부 모드팩 파일을 압축 해제할 수 없습니다"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "이 프로젝트에 .mrpack 파일을 찾을 수 없습니다."
   },
   "project.notification.icon-updated.message": {
     "message": "프로젝트 아이콘을 변경했습니다."
@@ -4572,7 +4599,7 @@
     "message": "패스키 로딩중..."
   },
   "settings.account.security.passkey.modal.never-used": {
-    "message": "사용 안 함"
+    "message": "사용한 적 없음"
   },
   "settings.account.security.passkey.modal.no-passkeys": {
     "message": "등록된 패스키가 없습니다."
@@ -4991,95 +5018,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>개발자 모드</strong>가 활성화되어 있습니다. 이를 통해 Modrinth API를 사용하는 개발자인 경우 도움이 될 수 있는 Modrinth 전체의 여러 내부 ID를 확인할 수 있습니다. 페이지 하단의 Modrinth 로고를 5번 클릭하여 개발자 모드를 전환합니다."
   },
-  "settings.display.flags.description": {
-    "message": "이 장치에서 특정 기능을 사용하거나 사용하지 않도록 설정합니다."
-  },
-  "settings.display.flags.title": {
-    "message": "기능 전환"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "개발자 모드가 비활성화 되었습니다"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "개발자 모드 비활성화됨"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "데이터 팩 페이지"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "이 장치에서 프로젝트 목록을 표시하는 각 페이지에 대해 원하는 레이아웃을 선택합니다."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "모드 페이지"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "갤러리"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "그리드"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "행"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "모드팩 페이지"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "플러그인 페이지"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "리소스 팩 페이지"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "서버 페이지"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "셰이더 페이지"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "프로젝트 목록 레이아웃"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "사용자 프로필 페이지"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "컬렉션"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "하드웨어 가속 렌더링이 없으면 성능 문제를 일으킬 수 있는 고급 렌더링을 활성화합니다."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "고급 렌더링"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Modrinth 외부로 나가는 링크를 새 탭에서 엽니다. 이 설정에 상관없이 동일한 도메인과 마크다운 설명의 링크가 같은 탭에서 열리고 광고 및 편집 페이지의 링크가 새 탭에서 열립니다."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "새 탭에서 외부 링크 열기"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "기본 네비게이선에서 \"Modrinth App 받기\" 버튼을 숨깁니다. Modrinth App 페이지는 여전히 시작 페이지 또는 하단에서 찾을 수 있습니다."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth 앱 프로모션 숨기기"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "콘텐츠 페이지에서 사이드바를 왼쪽으로 정렬"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "사이드바를 페이지 콘텐츠의 왼쪽에 정렬합니다."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "필터 사이드바를 검색 결과 페이지의 오른쪽에 정렬합니다."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "검색 페이지에서 필터 사이드바를 오른쪽으로 정렬"
-  },
-  "settings.display.theme.description": {
-    "message": "이 디바이스에서 선호하는 Modrinth 의 색상 테마를 선택합니다."
-  },
-  "settings.display.theme.title": {
-    "message": "색상 테마"
   },
   "settings.head-title": {
     "message": "디스플레이 설정"
@@ -5133,7 +5076,7 @@
     "message": "{ago} 에 사용됨"
   },
   "settings.pats.token.never-used": {
-    "message": "사용된 적 없음"
+    "message": "사용한 적 없음"
   },
   "settings.sessions.action.revoke-session": {
     "message": "세션 제거"

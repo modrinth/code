@@ -308,14 +308,8 @@
   "instances.content-install.new-tab": {
     "defaultMessage": "อินสแตนซ์อันใหม่"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "ลบไอคอน"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "ค้นหาอินสแตนซ์"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "เลือกไอคอน"
   },
   "label.available": {
     "defaultMessage": "ว่างอยู่ {amount}"
@@ -638,9 +632,6 @@
   "settings.display.theme.dark": {
     "defaultMessage": "มืด"
   },
-  "settings.display.theme.description": {
-    "defaultMessage": "เลือกธีมสีที่คุณต้องการสำหรับ Modrinth บนอุปกรณ์นี้"
-  },
   "settings.display.theme.light": {
     "defaultMessage": "สว่าง"
   },
@@ -654,3 +645,4 @@
     "defaultMessage": "ภาษา"
   }
 }
+

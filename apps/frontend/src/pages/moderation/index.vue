@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<StyledInput
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"
@@ -157,8 +157,8 @@ import {
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	Pagination,
-	StyledInput,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'

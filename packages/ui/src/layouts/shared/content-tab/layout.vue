@@ -19,6 +19,7 @@ import {
 	TrashIcon,
 	UserIcon,
 } from '@modrinth/assets'
+import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -26,7 +27,7 @@ import { Button, type OverflowMenuOption, TeleportOverflowMenu } from '#ui/compo
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -179,7 +180,9 @@ function getItemId(item: ContentItem) {
 }
 
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
-const sortMode = ref<SortMode>('alphabetical-asc')
+const sortMode = ctx.filterPersistKey
+	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, 'alphabetical-asc')
+	: ref<SortMode>('alphabetical-asc')
 
 const sortLabels: Record<SortMode, () => string> = {
 	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),
@@ -939,13 +942,13 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						</span>
 
 						<div class="flex flex-wrap items-center gap-2">
-							<StyledInput
+							<Input
 								v-model="searchQuery"
 								:icon="SearchIcon"
 								type="text"
 								autocomplete="off"
 								:spellcheck="false"
-								input-class="!h-10"
+								size="medium"
 								wrapper-class="flex-1 min-w-0"
 								clearable
 								:placeholder="
@@ -1024,11 +1027,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 									class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
 								>
 									<div
-										class="h-6 w-px shrink-0 bg-surface-5"
-										:class="{
-											hidden: metadataFiltersWrapped,
-											'mr-0.5': !metadataFiltersWrapped,
-										}"
+										class="mr-0.5 h-6 w-px shrink-0 bg-surface-5"
+										:class="{ invisible: metadataFiltersWrapped }"
 									/>
 									<DropdownFilterBar
 										v-model="selectedMetadataFilters"

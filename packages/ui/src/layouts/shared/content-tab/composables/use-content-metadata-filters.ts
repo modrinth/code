@@ -115,10 +115,6 @@ const messages = defineMessages({
 		id: 'content.metadata-filter.state',
 		defaultMessage: 'State',
 	},
-	updates: {
-		id: 'content.metadata-filter.updates',
-		defaultMessage: 'Updates',
-	},
 	warnings: {
 		id: 'content.metadata-filter.warnings',
 		defaultMessage: 'Warnings',
@@ -134,10 +130,6 @@ const messages = defineMessages({
 	updateAvailable: {
 		id: 'content.metadata-filter.update.available',
 		defaultMessage: 'Update available',
-	},
-	upToDate: {
-		id: 'content.metadata-filter.update.up-to-date',
-		defaultMessage: 'Up to date',
 	},
 	clientRetained: {
 		id: 'content.metadata-filter.warning.client-retained',
@@ -238,15 +230,6 @@ export function useContentMetadataFilters(
 						],
 		},
 		{
-			key: 'updates',
-			label: formatMessage(messages.updates),
-			values: (item) => [
-				item.has_update
-					? option('available', formatMessage(messages.updateAvailable))
-					: option('current', formatMessage(messages.upToDate)),
-			],
-		},
-		{
 			key: 'warnings',
 			label: formatMessage(messages.warnings),
 			values: (item) => {
@@ -262,6 +245,13 @@ export function useContentMetadataFilters(
 						return [option('none', formatMessage(messages.noWarnings))]
 				}
 			},
+		},
+		{
+			key: 'updates',
+			label: formatMessage(messages.updateAvailable),
+			direct: true,
+			values: (item) =>
+				item.has_update ? [option('available', formatMessage(messages.updateAvailable))] : [],
 		},
 		{
 			key: 'open_source',

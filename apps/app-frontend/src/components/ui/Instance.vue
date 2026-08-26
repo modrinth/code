@@ -7,22 +7,39 @@ import {
 	StopCircleIcon,
 	TimerIcon,
 } from '@modrinth/assets'
-import { Avatar, IconButton, injectNotificationManager, useRelativeTime } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
+import {
+	Avatar,
+	defineMessages,
+	IconButton,
+	injectNotificationManager,
+	useRelativeTime,
+	useVIntl,
+} from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAppEvent } from '@/composables/use-app-event'
+import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
-import { kill, run } from '@/helpers/instance'
+import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import { showInstanceInFolder } from '@/helpers/utils.js'
-import { handleSevereError } from '@/store/error.js'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const messages = defineMessages({
+	instanceIcon: { id: 'app.instance.card.icon-alt', defaultMessage: 'Instance icon' },
+	stop: { id: 'app.instance.card.stop', defaultMessage: 'Stop' },
+	loading: { id: 'app.instance.card.loading', defaultMessage: 'Instance is loading...' },
+	installing: { id: 'app.instance.card.installing', defaultMessage: 'Installing...' },
+	play: { id: 'app.instance.card.play', defaultMessage: 'Play' },
+	repair: { id: 'app.instance.card.repair', defaultMessage: 'Repair' },
+	played: { id: 'app.instance.card.played', defaultMessage: 'Played {relativeTime}' },
+	neverPlayed: { id: 'app.instance.card.never-played', defaultMessage: 'Never played' },
+})
 
 const props = defineProps({
 	instance: {
@@ -159,9 +176,9 @@ onMounted(() => {
 		>
 			<Avatar
 				size="48px"
-				:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+				:src="getInstanceIconUrl(instance.icon_path)"
 				:tint-by="instance.id"
-				alt="Mod card"
+				:alt="formatMessage(messages.instanceIcon)"
 			/>
 			<div class="h-full flex items-center font-bold text-contrast leading-normal">
 				<span class="line-clamp-2">{{ instance.name }}</span>
@@ -169,10 +186,10 @@ onMounted(() => {
 			<div class="flex items-center">
 				<IconButton
 					v-if="playing"
-					v-tooltip="'Stop'"
+					v-tooltip="formatMessage(messages.stop)"
 					type="colored"
 					color="red"
-					:label="'Stop'"
+					:label="formatMessage(messages.stop)"
 					@mouseenter="checkProcess"
 					@click="(e) => stop(e, 'InstanceCard')"
 				>
@@ -180,18 +197,18 @@ onMounted(() => {
 				</IconButton>
 				<IconButton
 					v-else-if="modLoading"
-					v-tooltip="'Instance is loading...'"
-					:label="'Instance is loading...'"
+					v-tooltip="formatMessage(messages.loading)"
+					:label="formatMessage(messages.loading)"
 					disabled
 				>
 					<SpinnerIcon class="animate-spin" />
 				</IconButton>
 				<IconButton
 					v-else-if="!instance.quarantined"
-					v-tooltip="'Play'"
+					v-tooltip="formatMessage(messages.play)"
 					:type="first ? 'colored' : 'base'"
 					:color="first ? 'brand' : undefined"
-					label="Play"
+					:label="formatMessage(messages.play)"
 					@click="(e) => play(e, 'InstanceCard')"
 					@mouseenter="checkProcess"
 				>
@@ -203,9 +220,13 @@ onMounted(() => {
 				<TimerIcon />
 				<span class="text-sm">
 					<template v-if="instance.last_played">
-						Played {{ formatRelativeTime(dayjs(instance.last_played).toISOString()) }}
+						{{
+							formatMessage(messages.played, {
+								relativeTime: formatRelativeTime(dayjs(instance.last_played).toISOString()),
+							})
+						}}
 					</template>
-					<template v-else> Never played </template>
+					<template v-else>{{ formatMessage(messages.neverPlayed) }}</template>
 				</span>
 			</div>
 		</div>
@@ -219,19 +240,19 @@ onMounted(() => {
 			<div class="relative flex items-center justify-center">
 				<Avatar
 					size="48px"
-					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+					:src="getInstanceIconUrl(instance.icon_path)"
 					:tint-by="instance.id"
-					alt="Mod card"
+					:alt="formatMessage(messages.instanceIcon)"
 					:class="`transition-all ${modLoading || installing ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
 				/>
 				<div class="absolute inset-0 flex items-center justify-center">
 					<IconButton
 						v-if="playing"
-						v-tooltip="'Stop'"
+						v-tooltip="formatMessage(messages.stop)"
 						type="colored"
 						color="red"
 						size="xl"
-						:label="'Stop'"
+						:label="formatMessage(messages.stop)"
 						:class="{ 'scale-100 opacity-100': playing }"
 						class="transition-all scale-75 origin-bottom opacity-0 card-shadow"
 						@click="(e) => stop(e, 'InstanceCard')"
@@ -241,17 +262,17 @@ onMounted(() => {
 					</IconButton>
 					<SpinnerIcon
 						v-else-if="modLoading || installing"
-						v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
+						v-tooltip="formatMessage(modLoading ? messages.loading : messages.installing)"
 						class="animate-spin w-8 h-8"
 						tabindex="-1"
 					/>
 					<IconButton
 						v-else-if="!installed && !instance.quarantined"
-						v-tooltip="'Repair'"
+						v-tooltip="formatMessage(messages.repair)"
 						type="colored"
 						color="brand"
 						size="xl"
-						:label="'Repair'"
+						:label="formatMessage(messages.repair)"
 						class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
 						@click="(e) => repair(e)"
 					>
@@ -259,11 +280,11 @@ onMounted(() => {
 					</IconButton>
 					<IconButton
 						v-else-if="!instance.quarantined"
-						v-tooltip="'Play'"
+						v-tooltip="formatMessage(messages.play)"
 						type="colored"
 						color="brand"
 						size="xl"
-						:label="'Play'"
+						:label="formatMessage(messages.play)"
 						class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
 						@click="(e) => play(e, 'InstanceCard')"
 						@mouseenter="checkProcess"

@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import {
-	Checkbox,
-	defineMessages,
-	injectNotificationManager,
-	StyledInput,
-	useVIntl,
-} from '@modrinth/ui'
+import { Checkbox, defineMessages, injectNotificationManager, Input, useVIntl } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/instance'
 import { get } from '@/helpers/settings.ts'
 
-import type { AppSettings, Hooks } from '../../../../helpers/types'
+import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
 
 const { handleError } = injectNotificationManager()
@@ -26,23 +20,31 @@ const overrideHooks = ref(
 		!!instance.value.hooks.wrapper ||
 		!!instance.value.hooks.post_exit,
 )
-const hooks = ref(instance.value.hooks ?? globalSettings.hooks)
-
-const editInstanceObject = computed(() => {
-	const editInstancePatch: {
-		hooks?: Hooks
-	} = {}
-
-	// When hooks are not overridden per-instance, we want to clear them
-	editInstancePatch.hooks = overrideHooks.value ? hooks.value : {}
-
-	return editInstancePatch
+const hooksRaw = instance.value.hooks ?? globalSettings.hooks
+const hooks = ref({
+	pre_launch: hooksRaw.pre_launch ?? '',
+	wrapper: hooksRaw.wrapper ?? '',
+	post_exit: hooksRaw.post_exit ?? '',
 })
+
+const editInstanceObject = computed(() => ({
+	hooks: overrideHooks.value
+		? {
+				pre_launch: hooks.value.pre_launch ?? '',
+				wrapper: hooks.value.wrapper ?? '',
+				post_exit: hooks.value.post_exit ?? '',
+			}
+		: {
+				pre_launch: '',
+				wrapper: '',
+				post_exit: '',
+			},
+}))
 
 watch(
 	[overrideHooks, hooks],
 	async () => {
-		await edit(instance.value.id, editInstanceObject.value)
+		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -141,7 +143,7 @@ const messages = defineMessages({
 		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.preLaunch) }}
 		</h2>
-		<StyledInput
+		<Input
 			id="pre-launch"
 			v-model="hooks.pre_launch"
 			autocomplete="off"
@@ -156,7 +158,7 @@ const messages = defineMessages({
 		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.wrapper) }}
 		</h2>
-		<StyledInput
+		<Input
 			id="wrapper"
 			v-model="hooks.wrapper"
 			autocomplete="off"
@@ -171,7 +173,7 @@ const messages = defineMessages({
 		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.postExit) }}
 		</h2>
-		<StyledInput
+		<Input
 			id="post-exit"
 			v-model="hooks.post_exit"
 			autocomplete="off"

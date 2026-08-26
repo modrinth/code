@@ -19,6 +19,7 @@ export const Default: StoryObj = {
 
 			const showSuccess = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Install complete',
 					text: 'Complex Gaming [Cobblemon] is installed and ready to play.',
 					type: 'success',
@@ -38,6 +39,7 @@ export const Default: StoryObj = {
 
 			const showError = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Download failed',
 					text: 'Failed to download the modpack. Please try again.',
 					type: 'error',
@@ -53,6 +55,7 @@ export const Default: StoryObj = {
 
 			const showWarning = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Update available',
 					text: "Modrinth App v2.1.0 is available now! Since you're on a metered network, we didn't automatically download it.",
 					type: 'warning',
@@ -73,6 +76,7 @@ export const Default: StoryObj = {
 
 			const showInfo = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Download complete',
 					text: 'Modrinth App v2.1.0 has finished downloading. Reload to update now.',
 					type: 'info',
@@ -92,6 +96,7 @@ export const Default: StoryObj = {
 
 			const showNoButtons = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Heads up',
 					text: 'This notification has no action buttons and will auto-close in 30 seconds.',
 					type: 'info',
@@ -100,6 +105,7 @@ export const Default: StoryObj = {
 
 			const showPermanent = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Permanent notification',
 					text: 'This notification will stay open until manually dismissed.',
 					type: 'warning',
@@ -109,6 +115,7 @@ export const Default: StoryObj = {
 
 			const showBlocking = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Your privacy and how ads support Modrinth',
 					text: 'Ads make Modrinth possible and fund creator rewards. Our partners may store unique identifiers to personalize ads and measure performance.',
 					type: 'info',
@@ -139,6 +146,7 @@ export const Default: StoryObj = {
 
 			const showWaitingProgress = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Installing modpack...',
 					text: 'example-pack-1.0.0.mrpack',
 					type: 'info',
@@ -149,6 +157,7 @@ export const Default: StoryObj = {
 
 			const showDeterminateProgress = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Downloading update',
 					text: 'Downloading files...',
 					type: 'success',
@@ -159,6 +168,7 @@ export const Default: StoryObj = {
 
 			const showGroupedDownloads = () => {
 				popupManager.addPopupNotification({
+					contentType: 'standard',
 					title: 'Downloads',
 					type: 'download',
 					autoCloseMs: null,

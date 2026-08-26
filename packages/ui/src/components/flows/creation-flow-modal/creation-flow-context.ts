@@ -12,7 +12,7 @@ import {
 } from '#ui/composables/i18n'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
-import { createContext, injectModrinthClient } from '../../../providers'
+import { createContext, injectModrinthClient, injectNotificationManager } from '../../../providers'
 import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
@@ -81,10 +81,6 @@ export const creationFlowMessages = defineMessages({
 		id: 'creation-flow.button.import-instances',
 		defaultMessage: 'Import {count, plural, one {# instance} other {# instances}}',
 	},
-	chooseModpackTitle: {
-		id: 'creation-flow.title.choose-modpack',
-		defaultMessage: 'Choose modpack',
-	},
 })
 
 export const flowTypeHeadingMessages: Record<FlowType, MessageDescriptor> = {
@@ -101,15 +97,17 @@ export interface ModpackSelection {
 	iconUrl?: string
 }
 
-export interface ModpackSearchHit {
+export interface ProjectSearchHit {
 	title: string
 	iconUrl?: string
 	latestVersion?: string
+	projectType: string
 }
 
-export interface ModpackSearchResult {
+export interface ProjectSearchResult {
 	hits: {
 		project_id: string
+		project_type?: string
 		title: string
 		icon_url: string
 		latest_version?: string
@@ -117,6 +115,35 @@ export interface ModpackSearchResult {
 	total_hits: number
 	offset: number
 	limit: number
+}
+
+export interface ProjectInstallSelection {
+	projectId: string
+	title: string
+	iconUrl?: string | null
+	link: string
+	owner?: {
+		name: string
+		iconUrl?: string
+		circle?: boolean
+		link: string | (() => void)
+	} | null
+	compatibleLoaders: string[]
+	gameVersions: string[]
+	releaseGameVersions: Set<string>
+}
+
+export interface ProjectInstallCreateData {
+	name: string
+	iconPath: string | null
+	iconPreviewUrl: string | null
+	loader: string
+	gameVersion: string
+}
+
+export interface GeneratedInstanceIcon {
+	path: string
+	previewUrl: string
 }
 
 export interface CreationFlowContextValue {
@@ -152,6 +179,8 @@ export interface CreationFlowContextValue {
 	instanceIcon: Ref<File | null>
 	instanceIconUrl: Ref<string | null>
 	instanceIconPath: Ref<string | null>
+	randomizeInstanceIcon: (() => Promise<GeneratedInstanceIcon | null>) | null
+	customizeInstanceIcon: (() => void) | null
 
 	// Loader/version state (custom setup)
 	selectedLoader: Ref<string | null>
@@ -169,13 +198,12 @@ export interface CreationFlowContextValue {
 	modpackSelection: Ref<ModpackSelection | null>
 	modpackFile: Ref<File | null>
 	modpackFilePath: Ref<string | null>
+	projectInstall: Ref<ProjectInstallSelection | null>
 
-	// Modpack search state (persisted across stage navigation)
-	modpackSearchProjectId: Ref<string | undefined>
-	modpackSearchVersionId: Ref<string | undefined>
-	modpackSearchOptions: Ref<ComboboxOption<string>[]>
-	modpackVersionOptions: Ref<ComboboxOption<string>[]>
-	modpackSearchHits: Ref<Record<string, ModpackSearchHit>>
+	// Project search state (persisted across stage navigation)
+	projectSearchProjectId: Ref<string | undefined>
+	projectSearchOptions: Ref<ComboboxOption<string>[]>
+	projectSearchHits: Ref<Record<string, ProjectSearchHit>>
 
 	// Import state (instance flow only)
 	importLaunchers: Ref<ImportableLauncher[]>
@@ -206,13 +234,14 @@ export interface CreationFlowContextValue {
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
 	browseModpacks: () => void
+	selectProject: (projectId: string, projectType: string) => Promise<void>
 	finish: () => void
 	buildProperties: () => Archon.Content.v1.PropertiesFields
 	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
 	prefetchLoaderMetadata: () => Promise<void>
 
 	// Platform-provided search
-	searchModpacks: (query: string, limit?: number) => Promise<ModpackSearchResult>
+	searchProjects: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	getProjectVersions: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest: LoaderManifestResolver | null
 }
@@ -232,9 +261,16 @@ export interface CreationFlowOptions {
 	initialGameVersion?: string
 	fetchExistingInstanceNames?: () => Promise<string[]>
 	onBack?: () => void
-	searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
+	searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>
+	prepareProjectInstall?: (
+		projectId: string,
+		projectType: string,
+	) => Promise<ProjectInstallSelection | null>
+	createProjectInstall?: (data: ProjectInstallCreateData) => Promise<void>
 	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest?: LoaderManifestResolver
+	randomizeInstanceIcon?: () => Promise<GeneratedInstanceIcon | null>
+	customizeInstanceIcon?: () => void
 	finishDisabled?: ComputedRef<boolean>
 	finishDisabledTooltip?: ComputedRef<string | undefined>
 }
@@ -250,6 +286,7 @@ export function createCreationFlowContext(
 ): CreationFlowContextValue {
 	const debug = useDebugLogger('CreationFlow')
 	const client = injectModrinthClient()
+	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
 	const { formatMessage } = useVIntl()
 	const availableLoaders = options.availableLoaders ?? ['fabric', 'neoforge', 'forge', 'quilt']
@@ -259,7 +296,11 @@ export function createCreationFlowContext(
 	const initialLoader = options.initialLoader ?? null
 	const initialGameVersion = options.initialGameVersion ?? null
 	const onBack = options.onBack ?? null
-	const searchModpacks = options.searchModpacks!
+	const randomizeInstanceIcon = options.randomizeInstanceIcon ?? null
+	const customizeInstanceIcon = options.customizeInstanceIcon ?? null
+	const searchProjects = options.searchProjects!
+	const prepareProjectInstall = options.prepareProjectInstall
+	const createProjectInstall = options.createProjectInstall
 	const getProjectVersions = options.getProjectVersions!
 	const getLoaderManifest = options.getLoaderManifest ?? null
 	const finishDisabled = options.finishDisabled ?? computed(() => false)
@@ -321,13 +362,12 @@ export function createCreationFlowContext(
 	const modpackSelection = ref<ModpackSelection | null>(null)
 	const modpackFile = ref<File | null>(null)
 	const modpackFilePath = ref<string | null>(null)
+	const projectInstall = ref<ProjectInstallSelection | null>(null)
 
-	// Modpack search state (persisted across stage navigation)
-	const modpackSearchProjectId = ref<string | undefined>()
-	const modpackSearchVersionId = ref<string | undefined>()
-	const modpackSearchOptions = ref<ComboboxOption<string>[]>([])
-	const modpackVersionOptions = ref<ComboboxOption<string>[]>([])
-	const modpackSearchHits = ref<Record<string, ModpackSearchHit>>({})
+	// Project search state (persisted across stage navigation)
+	const projectSearchProjectId = ref<string | undefined>()
+	const projectSearchOptions = ref<ComboboxOption<string>[]>([])
+	const projectSearchHits = ref<Record<string, ProjectSearchHit>>({})
 
 	// Import state (instance flow only)
 	const importLaunchers = ref<ImportableLauncher[]>([])
@@ -344,7 +384,10 @@ export function createCreationFlowContext(
 
 	// hideLoaderVersion: hides the loader version section (vanilla world type OR vanilla selected as loader chip)
 	const hideLoaderVersion = computed(
-		() => setupType.value === 'vanilla' || selectedLoader.value === 'vanilla',
+		() =>
+			setupType.value === 'vanilla' ||
+			selectedLoader.value === 'vanilla' ||
+			projectInstall.value !== null,
 	)
 
 	function toApiLoaderName(loader: string): string {
@@ -454,11 +497,10 @@ export function createCreationFlowContext(
 		modpackSelection.value = null
 		modpackFile.value = null
 		modpackFilePath.value = null
-		modpackSearchProjectId.value = undefined
-		modpackSearchVersionId.value = undefined
-		modpackSearchOptions.value = []
-		modpackVersionOptions.value = []
-		modpackSearchHits.value = {}
+		projectInstall.value = null
+		projectSearchProjectId.value = undefined
+		projectSearchOptions.value = []
+		projectSearchHits.value = {}
 
 		// Import state
 		importLaunchers.value = []
@@ -474,12 +516,12 @@ export function createCreationFlowContext(
 	function setSetupType(type: SetupType) {
 		debug('setSetupType:', type)
 		isImportMode.value = false
+		projectInstall.value = null
 		setupType.value = type
 		if (type === 'modpack') {
 			selectedLoader.value = null
 			selectedLoaderVersion.value = null
 			loaderVersionType.value = 'stable'
-			modal.value?.setStage('modpack')
 		} else {
 			modpackSelection.value = null
 			modpackFile.value = null
@@ -506,6 +548,37 @@ export function createCreationFlowContext(
 		emit.browseModpacks()
 	}
 
+	async function selectProject(projectId: string, projectType: string) {
+		if (!prepareProjectInstall) return
+
+		try {
+			const selection = await prepareProjectInstall(projectId, projectType)
+			if (selection) {
+				setProjectInstall(selection)
+			} else {
+				modal.value?.hide()
+			}
+		} catch (error) {
+			projectSearchProjectId.value = undefined
+			handleError(error as Error)
+		}
+	}
+
+	function setProjectInstall(selection: ProjectInstallSelection) {
+		projectInstall.value = selection
+		projectSearchProjectId.value = undefined
+		setupType.value = 'custom'
+		isImportMode.value = false
+		modpackSelection.value = null
+		instanceName.value = selection.title
+		selectedLoader.value = selection.compatibleLoaders[0] ?? null
+		selectedGameVersion.value =
+			selection.gameVersions.find((version) => selection.releaseGameVersions.has(version)) ??
+			selection.gameVersions[0] ??
+			null
+		modal.value?.setStage('custom-setup')
+	}
+
 	function finish() {
 		if (finishDisabled.value) return
 
@@ -518,6 +591,22 @@ export function createCreationFlowContext(
 			hasModpackFile: !!modpackFile.value,
 		})
 		loading.value = true
+		if (
+			projectInstall.value &&
+			createProjectInstall &&
+			selectedLoader.value &&
+			selectedGameVersion.value
+		) {
+			modal.value?.hide()
+			void createProjectInstall({
+				name: instanceName.value.trim() || projectInstall.value.title,
+				iconPath: instanceIconPath.value,
+				iconPreviewUrl: instanceIconUrl.value,
+				loader: selectedLoader.value,
+				gameVersion: selectedGameVersion.value,
+			}).catch(handleError)
+			return
+		}
 		emit.create(contextValue)
 	}
 
@@ -569,6 +658,8 @@ export function createCreationFlowContext(
 		instanceIcon,
 		instanceIconUrl,
 		instanceIconPath,
+		randomizeInstanceIcon,
+		customizeInstanceIcon,
 		selectedLoader,
 		selectedGameVersion,
 		loaderVersionType,
@@ -582,11 +673,10 @@ export function createCreationFlowContext(
 		modpackSelection,
 		modpackFile,
 		modpackFilePath,
-		modpackSearchProjectId,
-		modpackSearchVersionId,
-		modpackSearchOptions,
-		modpackVersionOptions,
-		modpackSearchHits,
+		projectInstall,
+		projectSearchProjectId,
+		projectSearchOptions,
+		projectSearchHits,
 		importLaunchers,
 		importSelectedInstances,
 		importSearchQuery,
@@ -603,11 +693,12 @@ export function createCreationFlowContext(
 		setSetupType,
 		setImportMode,
 		browseModpacks,
+		selectProject,
 		finish,
 		buildProperties,
 		fetchLoaderMetadata,
 		prefetchLoaderMetadata,
-		searchModpacks,
+		searchProjects,
 		getProjectVersions,
 		getLoaderManifest,
 	}

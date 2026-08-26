@@ -342,7 +342,7 @@ only a list of actions or links.
 
 	<template #panel="{ close }">
 		<div class="flex w-72 flex-col gap-4">
-			<StyledInput v-model="versionName" label="Version name" />
+			<Input v-model="versionName" label="Version name" />
 			<Button type="colored" @click="close()">Apply</Button>
 		</div>
 	</template>

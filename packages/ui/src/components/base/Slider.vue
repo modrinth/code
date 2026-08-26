@@ -44,7 +44,7 @@
 				<span> {{ max }} {{ unit }} </span>
 			</div>
 		</div>
-		<StyledInput
+		<Input
 			:model-value="String(currentValue)"
 			type="number"
 			class="w-24 ml-3"
@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-import StyledInput from './StyledInput.vue'
+import Input from './inputs/Input.vue'
 
 const emit = defineEmits<{ 'update:modelValue': [number] }>()
 

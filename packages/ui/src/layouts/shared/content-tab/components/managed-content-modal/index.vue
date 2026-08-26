@@ -3,6 +3,7 @@ import {
 	ArrowLeftRightIcon,
 	BoxIcon,
 	ExternalIcon,
+	FileIcon,
 	GlassesIcon,
 	PaintbrushIcon,
 	SearchIcon,
@@ -17,7 +18,7 @@ import type { OverflowMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectPageContext } from '#ui/providers/page-context'
@@ -103,6 +104,10 @@ const messages = defineMessages({
 	openInSlicer: {
 		id: 'instances.managed-content-modal.open-in-slicer',
 		defaultMessage: 'Open in Slicer',
+	},
+	downloadFile: {
+		id: 'instances.managed-content-modal.download-file',
+		defaultMessage: 'Download File',
 	},
 })
 
@@ -314,6 +319,15 @@ const externalSlicerUrls = computed(() => {
 	}
 	return urls
 })
+const externalUrls = computed(() => {
+	const urls: Record<string, string> = {}
+	for (const item of items.value) {
+		if (item.external && item.external_url) {
+			urls[item.id] = item.external_url
+		}
+	}
+	return urls
+})
 const hasExternalSlicerUrls = computed(() => Object.keys(externalSlicerUrls.value).length > 0)
 const showTableActions = computed(() => props.enableToggle || hasExternalSlicerUrls.value)
 
@@ -479,7 +493,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 		</template>
 		<div class="flex flex-col h-[min(600px,calc(95vh-10rem))]">
 			<div class="flex flex-col gap-4 px-6 py-4 border-b border-solid border-0 border-surface-4">
-				<StyledInput
+				<Input
 					v-model="searchQuery"
 					:icon="SearchIcon"
 					:placeholder="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"
@@ -597,6 +611,18 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 									class="!w-9 !px-0 !rounded-full"
 								>
 									<ExternalIcon class="size-4" />
+								</ButtonLink>
+								<ButtonLink
+									v-if="externalUrls[item.id]"
+									v-tooltip="formatMessage(messages.downloadFile)"
+									type="quiet"
+									:aria-label="formatMessage(messages.downloadFile)"
+									:href="externalUrls[item.id]"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="!w-9 !px-0 !rounded-full"
+								>
+									<FileIcon class="size-4" />
 								</ButtonLink>
 							</template>
 						</ContentCardTable>

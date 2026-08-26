@@ -13,8 +13,8 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	injectModrinthClient,
+	Input,
 	Pagination,
-	StyledInput,
 	TeleportPopoutMenu,
 	Toggle,
 	useVIntl,
@@ -627,7 +627,7 @@ onUnmounted(() => {
 		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<StyledInput
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"

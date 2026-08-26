@@ -6,10 +6,10 @@ import { computed, ref, toValue } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button, IconButton } from '#ui/components/base/buttons'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import Pagination from '#ui/components/base/Pagination.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
 import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
@@ -130,7 +130,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 	<template v-if="ctx.installContext?.value && ctx.variant !== 'web'">
 		<div
 			ref="stickyInstallHeaderRef"
-			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-3 py-4 border-surface-5"
+			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-6 py-4 border-surface-5"
 			:class="[isInstallHeaderStuck ? 'border-t' : '']"
 		>
 			<BrowseInstallHeader />
@@ -144,7 +144,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		:replace="ctx.variant === 'app'"
 	/>
 
-	<StyledInput
+	<Input
 		v-model="ctx.query.value"
 		:icon="SearchIcon"
 		type="text"
@@ -156,7 +156,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		"
 		clearable
 		wrapper-class="w-full"
-		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
+		size="large"
 		@clear="ctx.clearSearch()"
 	/>
 
@@ -237,6 +237,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		v-if="ctx.isServerType.value"
 		v-model:selected-filters="ctx.serverCurrentFilters.value"
 		:filters="ctx.serverFilterTypes.value"
+		:project-type="ctx.projectType.value"
 		:provided-filters="[]"
 		:overridden-provided-filter-types="[]"
 	/>
@@ -248,12 +249,13 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 				(f) => f.display !== 'none' && !(ctx.hiddenFilterTypes?.value ?? []).includes(f.id),
 			)
 		"
+		:project-type="ctx.projectType.value"
 		:provided-filters="ctx.providedFilters?.value ?? []"
 		:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
 		:provided-message="lockedMessages?.providedBy"
 	/>
 
-	<div class="search">
+	<div class="search [overflow-anchor:none]">
 		<section v-if="ctx.loading.value" class="offline">
 			<component :is="ctx.loadingComponent ?? LoadingIndicator" />
 		</section>

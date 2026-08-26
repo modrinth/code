@@ -149,6 +149,7 @@ const route = useNativeRoute()
 const auth = await useAuth()
 const flags = useFeatureFlags()
 
+useFavicon('settings')
 useSeoMeta({
 	robots: 'noindex',
 })

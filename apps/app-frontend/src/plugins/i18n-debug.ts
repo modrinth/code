@@ -9,13 +9,13 @@ import {
 import type { App } from 'vue'
 import { reactive, ref, watch } from 'vue'
 
-import { useTheming } from '@/store/theme'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 
 export default {
 	install(app: App) {
-		const theming = useTheming()
+		const appSettings = useAppSettings()
 
-		const enabled = ref(theming.featureFlags.i18n_debug ?? false)
+		const enabled = ref(appSettings.featureFlags.i18n_debug ?? false)
 		const keyReveal = ref(false)
 		const registry = reactive(new Map()) as Map<
 			string,
@@ -29,7 +29,7 @@ export default {
 		initI18nDebugRuntime(context)
 
 		watch(
-			() => theming.featureFlags.i18n_debug,
+			() => appSettings.featureFlags.i18n_debug,
 			(active) => {
 				enabled.value = active
 				if (!active) {

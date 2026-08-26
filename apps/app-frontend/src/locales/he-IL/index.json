@@ -11,6 +11,24 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "החבא יותר התקנים רצים"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "הועתק"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "העתקת הפרטים"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.action-bar.install.retry": {
+    "message": "נסה שוב"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "ביטול"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "לא נתן להוריד את הקבצים"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "הפוך למקרה ראשי"
   },
@@ -20,8 +38,8 @@
   "app.action-bar.stop-instance": {
     "message": ""
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "חזרה לעולמות"
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "ספרייה"
   },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
@@ -212,9 +230,6 @@
   "app.world.world-item.offline": {
     "message": "לא מקוון"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} מחוברים"
-  },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
   },
@@ -370,18 +385,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "בחירת סמל"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "קבוצות ספרייה"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "יצירת קבוצה חדשה"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "קבוצות ספרייה מאפשרות לך לארגן את ההתקנות שלך לחלקים שונים בספרייה שלך."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "שם קבוצה"
   },
   "instance.settings.tabs.general.name": {
     "message": "שם"

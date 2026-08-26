@@ -11,8 +11,38 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Itago ang mas marami pang tumatakbong instansiya"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Kinopya"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopyahin ang detalye"
+  },
   "app.action-bar.install.retry": {
     "message": "Subukan muli"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Kinansela dahil sa pagsara ng aplikasyon"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Hindi mabasa ang modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Kinansela"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Hindi matapos ang paglinis"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Hindi ma-download ang mga talaksan"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Hindi ma-save ang mga talaksan"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Hindi matapos ang pagdownload"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Hindi mahanap ang instansiya"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Gumawa ng pangunahing instansiya"
@@ -47,26 +77,14 @@
   "app.action-bar.view-logs": {
     "message": "Tignan ang logs"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Masalimuot na pagrerender"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema ng kulay"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Tahanan"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Librarya"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Panimulang pahina ng paglapag"
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Itago ang nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Bumalik sa mga mundo"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Pakipaalala bago ko ma-install ang mga di-kilalang modpack"
@@ -103,9 +121,6 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Maaaring makasisira sa pagkakatugma sa pagsasali ng server ang pagdaragdag ng kontento. Ang anumang kontento ay mawawala sa pag-update ng kontento ng instansiyang pang-server."
   },
   "app.browse.server.installing": {
     "message": "Ini-install"
@@ -314,9 +329,6 @@
   "app.world.world-item.offline": {
     "message": "Offline"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
-  },
   "friends.action.add-friend": {
     "message": "Magdagdag ng kaibigan"
   },
@@ -472,18 +484,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Pumili ng ikono"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Mga grupo ng librerya"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Lumikha ng bagong grupo"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Binibigyan ng mga grupo ng librerya na iyong maayos ang iyong mga instansiya sa iba't-ibang pangkat in iyong librerya."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ilagay ang pangalan ng grupo"
   },
   "instance.settings.tabs.general.name": {
     "message": "Pangalan"

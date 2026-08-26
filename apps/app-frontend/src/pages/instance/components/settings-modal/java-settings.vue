@@ -13,8 +13,8 @@ import {
 	Checkbox,
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	Slider,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -24,7 +24,7 @@ import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
 import useJavaTest from '@/composables/useJavaTest'
 import useMemorySlider from '@/composables/useMemorySlider'
 import { edit, get_optimal_jre_key } from '@/helpers/instance'
-import { get } from '@/helpers/settings.ts'
+import { get, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
@@ -92,9 +92,7 @@ const javaArgs = ref(
 
 const overrideEnvVars = ref((instance.value.custom_env_vars?.length ?? 0) > 0)
 const envVars = ref(
-	(instance.value.custom_env_vars ?? globalSettings.custom_env_vars)
-		.map((x) => x.join('='))
-		.join(' '),
+	serializeEnvVars(instance.value.custom_env_vars ?? globalSettings.custom_env_vars),
 )
 
 const overrideMemorySettings = ref(!!instance.value.memory)
@@ -113,13 +111,7 @@ const editInstanceObject = computed(() => {
 		extra_launch_args: overrideJavaArgs.value
 			? javaArgs.value.trim().split(/\s+/).filter(Boolean)
 			: null,
-		custom_env_vars: overrideEnvVars.value
-			? envVars.value
-					.trim()
-					.split(/\s+/)
-					.filter(Boolean)
-					.map((x) => x.split('=').filter(Boolean))
-			: null,
+		custom_env_vars: overrideEnvVars.value ? parseEnvVars(envVars.value) : null,
 		memory: overrideMemorySettings.value ? memory.value : null,
 	}
 })
@@ -136,7 +128,7 @@ watch(
 		memory,
 	],
 	async () => {
-		await edit(instance.value.id, editInstanceObject.value)
+		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -216,7 +208,7 @@ const messages = defineMessages({
 						>Java {{ optimalJava?.parsed_version }}</span
 					>
 					<div class="flex gap-2 items-center">
-						<StyledInput
+						<Input
 							:model-value="activePath"
 							:disabled="!overrideJavaInstall"
 							autocomplete="off"
@@ -309,7 +301,7 @@ const messages = defineMessages({
 			:label="formatMessage(messages.customJavaArguments)"
 			class="my-2"
 		/>
-		<StyledInput
+		<Input
 			id="java-args"
 			v-model="javaArgs"
 			autocomplete="off"
@@ -325,7 +317,7 @@ const messages = defineMessages({
 			:label="formatMessage(messages.customEnvironmentVariables)"
 			class="mb-2"
 		/>
-		<StyledInput
+		<Input
 			id="env-vars"
 			v-model="envVars"
 			autocomplete="off"

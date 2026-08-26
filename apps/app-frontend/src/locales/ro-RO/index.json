@@ -344,18 +344,6 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selectează pictograma"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupuri din bibliotecă"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Creează grup nou"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupurile din bibliotecă îți permit să-ți organizezi instanțele în diferite secțiuni în biblioteca ta."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Introdu numele grupului"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nume"
   },

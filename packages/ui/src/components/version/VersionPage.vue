@@ -25,7 +25,7 @@ import {
 
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
-import StyledInput from '../base/StyledInput.vue'
+import Input from '../base/inputs/Input.vue'
 import Table from '../base/Table.vue'
 import TagItem from '../base/TagItem.vue'
 import TagTagItem from '../base/TagTagItem.vue'
@@ -505,7 +505,7 @@ const authorLink = computed(() =>
 			</h3>
 			<Table :columns="contentTableColumns" :data="includedContent" row-key="id">
 				<template #header-actions>
-					<StyledInput
+					<Input
 						v-model="contentSearchQuery"
 						:icon="SearchIcon"
 						:placeholder="formatMessage(messages.searchContent)"

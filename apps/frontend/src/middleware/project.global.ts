@@ -62,7 +62,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		const remainder = pathParts.filter((x) => x).join('/')
 
 		// Build the canonical path
-		const canonicalPath = `/${correctType}/${project.slug}${remainder ? `/${remainder}` : ''}`
+		const canonicalPath = `/${correctType}/${encodeURIComponent(project.slug)}${remainder ? `/${remainder}` : ''}`
 
 		// Only redirect if the path actually changed
 		if (to.path !== canonicalPath) {

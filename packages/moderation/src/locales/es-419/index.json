@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona las etiquetas adecuadas"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Asegúrate de que los usuarios estén al tanto de cualquier detalle importante rellenando las divulgaciones de contenido que se aplican a tu {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Comprobar el contenido de divulgación"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "Tu descripción tiene {length, plural, one {# carácter legible} other {# caracteres legibles}}. Se recomienda al menos {minChars, plural, one {# carácter} other {# caracteres}} para crear una descripción clara e informativa."
   },
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Ver configuración de la descripción"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Visitar la configuración de divulgación"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Ver configuración de la licencia"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Ver configuración general"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Visitar la configuración de versiones"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Tu resumen no puede ser igual al nombre de tu proyecto. Es importante crear un resumen informativo y llamativo."

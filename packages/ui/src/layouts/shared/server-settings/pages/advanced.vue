@@ -111,11 +111,10 @@
 						</Button>
 					</div>
 					<div class="relative">
-						<StyledInput
+						<Textarea
 							id="startup-command-field"
 							v-model="startupCommand"
 							v-tooltip="advancedActionTooltip"
-							multiline
 							resize="vertical"
 							input-class="font-mono field-sizing-content"
 							:disabled="isStartupLoading || !canUseAdvancedSettings"
@@ -218,7 +217,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { Combobox, StyledInput } from '#ui/components'
+import { Combobox, Textarea } from '#ui/components'
 import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { useServerPermissions } from '#ui/composables/server-permissions'

@@ -507,7 +507,7 @@
     "defaultMessage": "{count} verwijderd (uitgeschakeld)"
   },
   "content.diff-modal.reviewed-files": {
-    "defaultMessage": "Een bestand wordt alleen beoordeeld als het op Modrinth wordt gepubliceerd, ongeacht het bestandsformaat (inclusief .mrpack)."
+    "defaultMessage": "Bestanden die niet op Modrinth worden gepubliceerd, worden niet beoordeeld."
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Sommige inhoud op je server kon niet worden geanalyseerd en kan door deze wijziging worden beïnvloed."
@@ -617,6 +617,15 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projectnamen"
   },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Nieuwste eerst"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Oudste eerst"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sorteer op {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Werk alles bij"
   },
@@ -706,12 +715,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Spelversie zoeken..."
-  },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Pictogram verwijderen"
-  },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Pictogram selecteren"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Recentste"
@@ -887,9 +890,6 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Modpack zoeken"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Een instantie is een Minecraft-installatie met een specifieke loader, versie en mods."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Begin helemaal opnieuw door een loader en een spelversie te kiezen."
   },
@@ -901,12 +901,6 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Instantie importeren"
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Bekijk modpacks op Modrinth of importeer er een vanuit een bestand."
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Modpack installeren"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Klassiek Minecraft zonder mods of plug-ins."
@@ -922,9 +916,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Wereldtype selecteren"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modpack kiezen"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Instantie aanmaken"
@@ -2054,14 +2045,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Er zijn geen compatibele instanties gevonden"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Pictogram verwijderen"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Zoek instantie"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Selecteer pictogram"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"
@@ -3779,9 +3764,6 @@
   "search.filter.option.show_more": {
     "defaultMessage": "Meer tonen"
   },
-  "search.filter_type.advanced": {
-    "defaultMessage": "Gevorderd"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Omgeving"
   },
@@ -4607,14 +4589,8 @@
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Tijdens de installatie is er een onverwachte fout opgetreden."
   },
-  "servers.installing-banner.preparing.header": {
-    "defaultMessage": "We zijn je server aan het klaarmaken"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Heb je al een server?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Meer informatie over Modrinth Hosting"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4625,23 +4601,14 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installeer mods, nodig vrienden uit en speel samen – allemaal via de Modrinth app."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Nog geen servers"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Kies je favoriete mods en wij regelen de rest."
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Mods installeren met één klik"
   },
-  "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Nodig vrienden uit en help ze op weg in de Modrinth app."
-  },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Speel met vrienden"
-  },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Inloggen"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Stel je server in net zoals een eigen wereld."
@@ -5105,9 +5072,6 @@
   "settings.display.theme.dark": {
     "defaultMessage": "Donker"
   },
-  "settings.display.theme.description": {
-    "defaultMessage": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
-  },
   "settings.display.theme.light": {
     "defaultMessage": "Licht"
   },
@@ -5249,9 +5213,6 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Vriendschapsverzoeken"
   },
-  "settings.social.interaction-source.coming-soon": {
-    "defaultMessage": "Binnenkort beschikbaar!"
-  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Iedereen"
   },
@@ -5263,12 +5224,6 @@
   },
   "settings.social.interaction-source.no-one": {
     "defaultMessage": "Niemand"
-  },
-  "settings.social.shared-instance-invites.description": {
-    "defaultMessage": "Bepaal zelf wie je uitnodigingen kan sturen voor gedeelde instanties en Modrinth Hosting-panelen."
-  },
-  "settings.social.shared-instance-invites.title": {
-    "defaultMessage": "Uitnodigingen"
   },
   "settings.social.sign-in-required.description": {
     "defaultMessage": "Met een Modrinth-account kun je bepalen wie er contact met je kan opnemen en kun je geblokkeerde gebruikers beheren"
@@ -5937,7 +5892,7 @@
     "defaultMessage": "Waarschuwing voor onbekende bestanden"
   },
   "unknown-file-warning-modal.reviewed-files": {
-    "defaultMessage": "Een bestand wordt alleen beoordeeld als het op Modrinth wordt gepubliceerd, ongeacht het bestandsformaat (inclusief .mrpack)."
+    "defaultMessage": "Bestanden die niet op Modrinth worden gepubliceerd, worden niet beoordeeld."
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Onbekende bestanden"

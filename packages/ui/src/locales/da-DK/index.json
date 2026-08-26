@@ -395,6 +395,12 @@
   "content.page-layout.share.label": {
     "defaultMessage": "Del"
   },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Ældst først"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sorter efter {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Opdater alle"
   },
@@ -430,12 +436,6 @@
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Opsæt server"
-  },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Fjern ikon"
-  },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Vælg ikon"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Navn"
@@ -505,9 +505,6 @@
   },
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Søg efter modpack"
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Installer modpack"
   },
   "external-files.permissions-card.add-files-to-group": {
     "defaultMessage": "Tilføj filer..."
@@ -791,14 +788,8 @@
   "instances.content-install.new-tab": {
     "defaultMessage": "Ny instans"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Fjern ikon"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Søg efter instanser"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Vælg ikon"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuværrende"
@@ -1964,9 +1955,6 @@
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du allerede en server?"
   },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Lær mere om Modrinth Hosting"
-  },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -1976,9 +1964,6 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Installer mods, inviter venner og spil alle sammen fra Modrinth Appen."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Ingen servere endnu"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Vælg dine favorit mods og vi håndtere resten."
   },
@@ -1987,9 +1972,6 @@
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Spil med venner"
-  },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Log ind"
   },
   "servers.list-empty.simple-setup-title": {
     "defaultMessage": "Simpel opsætning"
@@ -2092,9 +2074,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Mørk"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "Vælg dit foretrukne farvetema til Modrinth på denne enhed."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Lys"
@@ -2238,3 +2217,4 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
+

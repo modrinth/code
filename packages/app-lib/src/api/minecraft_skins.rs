@@ -306,9 +306,21 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
 pub async fn get_available_skins() -> crate::Result<Vec<Skin>> {
     let state = State::get().await?;
 
-    let selected_credentials = Credentials::get_default_credential(&state.pool)
-        .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
+    let Some(selected_credentials) =
+        Credentials::get_default_credential(&state.pool).await?
+    else {
+        let fallback_default_skin = get_fallback_default_skin()?;
+
+        return Ok(assets::DEFAULT_SKINS
+            .iter()
+            .map(|skin| Skin {
+                is_equipped: skin.texture_key
+                    == fallback_default_skin.texture_key
+                    && skin.variant == fallback_default_skin.variant,
+                ..skin.clone()
+            })
+            .collect());
+    };
 
     let online_profile = selected_credentials.online_profile_fresh().await;
     let profile_id = online_profile

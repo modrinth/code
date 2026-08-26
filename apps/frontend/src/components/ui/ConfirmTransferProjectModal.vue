@@ -55,7 +55,7 @@
 					To confirm this transfer, type
 					<span class="font-bold text-contrast">{{ project.name }}</span> below
 				</p>
-				<StyledInput
+				<Input
 					v-model="confirmationText"
 					:placeholder="`Enter ${project.name}`"
 					wrapper-class="w-full"
@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import { RightArrowIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Avatar, Button, NewModal, StyledInput } from '@modrinth/ui'
+import { Admonition, Avatar, Button, Input, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{

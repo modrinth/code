@@ -6,8 +6,8 @@ import {
 	defineMessages,
 	IconButton,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
-	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -15,17 +15,17 @@ import { computed, ref } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useFriends } from '@/composables/use-friends'
 import type { FriendWithUserData } from '@/helpers/friends.ts'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
-import { useTheming } from '@/store/state'
 
 const { formatMessage } = useVIntl()
 
 const { handleError } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
-const themeStore = useTheming()
+const appSettings = useAppSettings()
 
 const props = defineProps<{
 	credentials: ModrinthCredentials | null
@@ -39,11 +39,11 @@ type FriendsSectionCollapsedFlag =
 	| 'friends_pending_collapsed'
 
 function isFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag) {
-	return themeStore.getFeatureFlag(flag)
+	return appSettings.getFeatureFlag(flag)
 }
 
 function setFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag, collapsed: boolean) {
-	themeStore.featureFlags[flag] = collapsed
+	appSettings.featureFlags[flag] = collapsed
 	getSettings()
 		.then((settings) => {
 			settings.feature_flags[flag] = collapsed
@@ -250,7 +250,7 @@ const messages = defineMessages({
 				{{ formatMessage(messages.usernameDescription) }}
 			</p>
 			<div class="flex items-center gap-2 mt-4">
-				<StyledInput
+				<Input
 					v-model="username"
 					:icon="UserIcon"
 					type="text"
@@ -280,7 +280,7 @@ const messages = defineMessages({
 			>
 				<UserPlusIcon />
 			</IconButton>
-			<StyledInput
+			<Input
 				v-model="search"
 				:icon="SearchIcon"
 				type="text"

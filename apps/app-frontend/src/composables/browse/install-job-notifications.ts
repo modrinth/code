@@ -10,6 +10,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 import type { Router } from 'vue-router'
 
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import {
 	install_job_dismiss,
 	install_job_list,
@@ -23,7 +24,6 @@ import {
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
 import { injectAppEvents } from '@/providers/app-events'
-import { useTheming } from '@/store/state'
 
 const messages = defineMessages({
 	installs: {
@@ -236,7 +236,7 @@ export async function useInstallJobNotifications(opts: {
 }) {
 	const appEvents = injectAppEvents()
 	const { formatMessage } = useVIntl()
-	const themeStore = useTheming()
+	const appSettings = useAppSettings()
 	const jobs = ref<InstallJobSnapshot[]>([])
 	const iconUrls = ref<Record<string, string | null>>({})
 	const instanceNames = ref<Record<string, string>>({})
@@ -421,7 +421,7 @@ export async function useInstallJobNotifications(opts: {
 	}
 
 	function shouldShowCopyDetails(job: InstallJobSnapshot): boolean {
-		return isTerminalJob(job) || themeStore.getFeatureFlag('always_show_copy_details')
+		return isTerminalJob(job) || appSettings.getFeatureFlag('always_show_copy_details')
 	}
 
 	function isCopied(job: InstallJobSnapshot): boolean {

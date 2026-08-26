@@ -3101,48 +3101,6 @@
   "settings.billing.upgrade": {
     "message": "Opgrader"
   },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Side til datapakker"
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods side"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Galleri"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Gitter"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Rækker"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modpacks side"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins side"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Side til ressourcepakker"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Servere side"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Side til shaders"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Projektlistelayouts"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Samling"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Flytter sidebjælken til venstre for sidens indhold."
-  },
-  "settings.display.theme.title": {
-    "message": "Farvetema"
-  },
   "settings.pats.action.create": {
     "message": "Opret en PAT"
   },

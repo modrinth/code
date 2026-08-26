@@ -2,7 +2,8 @@
 
 use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSetSyncStatus, ContentSourceKind,
-    Instance, InstanceLaunchContext, InstanceLaunchOverrides,
+    Instance, InstanceIconBackground, InstanceIconConfig,
+    InstanceLaunchContext, InstanceLaunchOverrides,
     InstanceLaunchOverridesData, InstanceLink, SharedInstanceAttachment,
     SharedInstanceRole, playtime_to_storage,
 };
@@ -12,6 +13,7 @@ use crate::state::{
 use chrono::{DateTime, TimeZone, Utc};
 use serde::de::DeserializeOwned;
 use sqlx::{Executor, Sqlite, SqlitePool, Transaction};
+use std::collections::HashSet;
 use uuid::Uuid;
 
 #[derive(Debug, sqlx::FromRow)]
@@ -161,10 +163,11 @@ pub(crate) struct InstanceLaunchOverridesRow {
 #[derive(Debug)]
 pub(crate) struct InstanceMetadataRecord {
     pub instance: Instance,
+    pub icon_config: Option<InstanceIconConfig>,
     pub applied_content_set: ContentSet,
     pub link: InstanceLink,
     pub shared_instance: Option<SharedInstanceAttachment>,
-    pub groups: Vec<String>,
+    pub group_ids: Vec<String>,
     pub launch_overrides: InstanceLaunchOverrides,
 }
 
@@ -184,6 +187,8 @@ struct InstanceMetadataRow {
     update_channel: String,
     name: String,
     icon_path: Option<String>,
+    icon_config_background: Option<String>,
+    icon_config_symbol: Option<String>,
     created: i64,
     modified: i64,
     last_played: Option<i64>,
@@ -221,7 +226,7 @@ struct InstanceMetadataRow {
     imported_name: Option<String>,
     imported_version_number: Option<String>,
     imported_filename: Option<String>,
-    groups: String,
+    group_ids: String,
     launch_overrides: Option<String>,
 }
 
@@ -333,16 +338,31 @@ impl InstanceMetadataRow {
             self.shared_sync_applied_update_id,
             self.shared_sync_latest_available_update_id,
         )?;
-        let groups = parse_groups(self.groups)?;
+        let group_ids = parse_group_ids(self.group_ids)?;
         let launch_overrides =
             launch_overrides_from_json(instance_id, self.launch_overrides)?;
+        let icon_config =
+            match (self.icon_config_background, self.icon_config_symbol) {
+                (Some(background), Some(symbol)) => Some(InstanceIconConfig {
+                    background: deserialize_icon_background(background)?,
+                    symbol,
+                }),
+                (None, None) => None,
+                _ => {
+                    return Err(crate::ErrorKind::InputError(
+                        "Instance icon config is incomplete".to_string(),
+                    )
+                    .into());
+                }
+            };
 
         Ok(InstanceMetadataRecord {
             instance,
+            icon_config,
             applied_content_set,
             link,
             shared_instance,
-            groups,
+            group_ids,
             launch_overrides,
         })
     }
@@ -538,6 +558,8 @@ macro_rules! query_instance_metadata {
                     i.update_channel AS "update_channel!: String",
                     i.name AS "name!: String",
                     i.icon_path AS "icon_path?: String",
+                    config.background AS "icon_config_background?: String",
+                    config.symbol AS "icon_config_symbol?: String",
                     i.created AS "created!: i64",
                     i.modified AS "modified!: i64",
                     i.last_played AS "last_played?: i64",
@@ -576,14 +598,16 @@ macro_rules! query_instance_metadata {
                     link.imported_version_number AS "imported_version_number?: String",
                     link.imported_filename AS "imported_filename?: String",
                     COALESCE((
-                        SELECT json_group_array(group_name)
+                        SELECT json_group_array(id)
                         FROM (
-                            SELECT group_name
-                            FROM instance_groups
-                            WHERE instance_id = i.id
-                            ORDER BY group_name
+                            SELECT groups.id
+                            FROM instance_group_memberships memberships
+                            INNER JOIN instance_groups groups
+                                ON groups.id = memberships.group_id
+                            WHERE memberships.instance_id = i.id
+                            ORDER BY groups.name
                         )
-                    ), '[]') AS "groups!: String",
+                    ), '[]') AS "group_ids!: String",
                     json(overrides.overrides) AS "launch_overrides?: String"
                 "#
                 + $from
@@ -598,11 +622,164 @@ macro_rules! query_instance_metadata {
                     AND sync.provider = 'shared_instance'
                 LEFT JOIN instance_launch_overrides overrides
                     ON overrides.instance_id = i.id
+                LEFT JOIN instance_icon_configs config
+                    ON config.instance_id = i.id
                 "#
                 + $suffix,
             $arg,
         )
     };
+}
+
+pub(crate) async fn update_instance_icon_config(
+    instance_id: &str,
+    config: Option<&InstanceIconConfig>,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    if let Some(config) = config {
+        let background = serde_json::to_string(&config.background)?;
+        let symbol = &config.symbol;
+        sqlx::query(
+            "
+			INSERT INTO instance_icon_configs (instance_id, background, symbol)
+			VALUES (?, ?, ?)
+			ON CONFLICT (instance_id) DO UPDATE SET
+				background = excluded.background,
+				symbol = excluded.symbol
+			",
+        )
+        .bind(instance_id)
+        .bind(&background)
+        .bind(symbol)
+        .execute(&mut **tx)
+        .await?;
+
+        update_recent_instance_icon_config(config, tx).await?;
+    } else {
+        sqlx::query(
+            "
+			DELETE FROM instance_icon_configs
+			WHERE instance_id = ?
+			",
+        )
+        .bind(instance_id)
+        .execute(&mut **tx)
+        .await?;
+    }
+
+    Ok(())
+}
+
+pub(crate) async fn update_instance_icon_if_empty(
+    instance_id: &str,
+    icon_path: &str,
+    config: &InstanceIconConfig,
+    pool: &SqlitePool,
+) -> crate::Result<bool> {
+    let modified = Utc::now().timestamp();
+    let mut tx = pool.begin().await?;
+    let result = sqlx::query(
+        "
+		UPDATE instances
+		SET icon_path = ?, modified = ?
+		WHERE id = ? AND (icon_path IS NULL OR icon_path = '')
+		",
+    )
+    .bind(icon_path)
+    .bind(modified)
+    .bind(instance_id)
+    .execute(&mut *tx)
+    .await?;
+
+    if result.rows_affected() == 0 {
+        tx.rollback().await?;
+        return Ok(false);
+    }
+
+    update_instance_icon_config(instance_id, Some(config), &mut tx).await?;
+    tx.commit().await?;
+
+    Ok(true)
+}
+
+pub(crate) async fn update_recent_instance_icon_config(
+    config: &InstanceIconConfig,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    let background = serde_json::to_string(&config.background)?;
+    let used_at = Utc::now().timestamp_millis();
+
+    sqlx::query(
+        "
+			INSERT INTO recent_instance_icon_configs (background, symbol, used_at)
+			VALUES (?, ?, ?)
+			ON CONFLICT (background, symbol) DO UPDATE SET
+				used_at = excluded.used_at
+			",
+    )
+    .bind(&background)
+    .bind(&config.symbol)
+    .bind(used_at)
+    .execute(&mut **tx)
+    .await?;
+
+    sqlx::query(
+        "
+			DELETE FROM recent_instance_icon_configs
+			WHERE rowid NOT IN (
+				SELECT rowid
+				FROM recent_instance_icon_configs
+				ORDER BY used_at DESC, background, symbol
+				LIMIT 16
+			)
+			",
+    )
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn get_recent_instance_icon_configs(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<InstanceIconConfig>> {
+    let rows = sqlx::query_as::<_, InstanceIconConfigRow>(
+        "
+		SELECT background, symbol
+		FROM recent_instance_icon_configs
+		ORDER BY used_at DESC, background, symbol
+		LIMIT 16
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    rows.into_iter()
+        .map(|row| {
+            Ok(InstanceIconConfig {
+                background: deserialize_icon_background(row.background)?,
+                symbol: row.symbol,
+            })
+        })
+        .collect()
+}
+
+#[derive(sqlx::FromRow)]
+struct InstanceIconConfigRow {
+    background: String,
+    symbol: String,
+}
+
+fn deserialize_icon_background(
+    background: String,
+) -> crate::Result<InstanceIconBackground> {
+    match serde_json::from_str(&background) {
+        Ok(background) => Ok(background),
+        Err(_) if background.starts_with('#') => {
+            Ok(InstanceIconBackground::Color { value: background })
+        }
+        Err(error) => Err(error.into()),
+    }
 }
 
 pub(crate) async fn get_instance_metadata_by_id(
@@ -746,10 +923,12 @@ where
 {
     let rows = sqlx::query_scalar!(
         "
-		SELECT group_name
-		FROM instance_groups
-		WHERE instance_id = ?
-		ORDER BY group_name
+		SELECT groups.id
+		FROM instance_group_memberships memberships
+		INNER JOIN instance_groups groups
+			ON groups.id = memberships.group_id
+		WHERE memberships.instance_id = ?
+		ORDER BY groups.name
 		",
         instance_id,
     )
@@ -757,6 +936,122 @@ where
     .await?;
 
     Ok(rows)
+}
+
+pub(crate) async fn list_instance_groups(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<(String, String)>> {
+    let groups = sqlx::query_as::<_, (String, String)>(
+        "
+		SELECT id, name
+		FROM instance_groups
+		ORDER BY display_order, name, id
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(groups)
+}
+
+pub(crate) async fn create_instance_group(
+    id: &str,
+    name: &str,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let mut tx = pool.begin().await?;
+
+    sqlx::query(
+        "
+		UPDATE instance_groups
+		SET display_order = display_order + 1
+		WHERE id != ?
+		",
+    )
+    .bind(crate::api::instance::FAVORITES_GROUP_ID)
+    .execute(&mut *tx)
+    .await?;
+
+    sqlx::query(
+        "
+		INSERT INTO instance_groups (id, name, display_order)
+		VALUES (?, ?, 0)
+		",
+    )
+    .bind(id)
+    .bind(name)
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+
+    Ok(())
+}
+
+pub(crate) async fn set_instance_group_order(
+    group_ids: &[String],
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let mut tx = pool.begin().await?;
+    let existing_group_ids = sqlx::query_scalar::<_, String>(
+        "
+		SELECT id
+		FROM instance_groups
+		WHERE id != ?
+		ORDER BY display_order, name, id
+		",
+    )
+    .bind(crate::api::instance::FAVORITES_GROUP_ID)
+    .fetch_all(&mut *tx)
+    .await?;
+    let existing_group_id_set = existing_group_ids
+        .iter()
+        .map(String::as_str)
+        .collect::<HashSet<_>>();
+    let mut seen_group_ids = HashSet::new();
+    let mut ordered_group_ids = Vec::with_capacity(existing_group_ids.len());
+
+    for group_id in group_ids {
+        if !seen_group_ids.insert(group_id.as_str()) {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Duplicate instance group {group_id} in group order"
+            ))
+            .into());
+        }
+
+        if !existing_group_id_set.contains(group_id.as_str()) {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Unknown instance group {group_id}"
+            ))
+            .into());
+        }
+
+        ordered_group_ids.push(group_id.as_str());
+    }
+
+    for group_id in &existing_group_ids {
+        if seen_group_ids.insert(group_id.as_str()) {
+            ordered_group_ids.push(group_id.as_str());
+        }
+    }
+
+    for (display_order, group_id) in ordered_group_ids.into_iter().enumerate() {
+        sqlx::query(
+            "
+			UPDATE instance_groups
+			SET display_order = ?
+			WHERE id = ?
+			",
+        )
+        .bind(display_order as i64)
+        .bind(group_id)
+        .execute(&mut *tx)
+        .await?;
+    }
+
+    tx.commit().await?;
+
+    Ok(())
 }
 
 pub(crate) async fn get_instance_launch_overrides<'e, E>(
@@ -1032,12 +1327,12 @@ pub(crate) async fn set_shared_instance_attachment(
 
 pub(crate) async fn replace_instance_groups(
     instance_id: &str,
-    groups: &[String],
+    group_ids: &[String],
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     sqlx::query!(
         "
-		DELETE FROM instance_groups
+		DELETE FROM instance_group_memberships
 		WHERE instance_id = ?
 		",
         instance_id,
@@ -1045,15 +1340,18 @@ pub(crate) async fn replace_instance_groups(
     .execute(&mut **tx)
     .await?;
 
-    for group in groups {
-        sqlx::query!(
+    for group_id in group_ids {
+        sqlx::query(
             "
-			INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
+			INSERT OR IGNORE INTO instance_group_memberships (
+				instance_id,
+				group_id
+			)
 			VALUES (?, ?)
 			",
-            instance_id,
-            group,
         )
+        .bind(instance_id)
+        .bind(group_id)
         .execute(&mut **tx)
         .await?;
     }
@@ -1264,7 +1562,7 @@ fn required_i64(value: Option<i64>, column: &str) -> crate::Result<i64> {
     })
 }
 
-fn parse_groups(value: String) -> crate::Result<Vec<String>> {
+fn parse_group_ids(value: String) -> crate::Result<Vec<String>> {
     serde_json::from_str(&value).map_err(|err| {
         crate::ErrorKind::InputError(format!(
             "Invalid instance groups JSON: {err}"

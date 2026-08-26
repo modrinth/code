@@ -11,7 +11,7 @@ interface ProjectProperties extends InstanceProperties {
 }
 
 type AnalyticsEventMap = {
-	Launched: { version: string; dev: boolean; onboarded: boolean }
+	Launched: { version: string; dev: boolean }
 	PageView: { path: string; fromPath: string; failed: unknown }
 	InstanceCreate: { source: string }
 	InstanceCreateStart: { source: string }

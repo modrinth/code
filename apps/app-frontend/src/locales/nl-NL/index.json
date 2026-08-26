@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Actieve downloads verbergen"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Verberg meer actieve instanties"
   },
@@ -110,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "Herlaadt om te updaten"
   },
+  "app.action-bar.show-downloads": {
+    "message": "Actieve downloads weergeven"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Toon meer actieve instanties"
   },
@@ -143,29 +149,11 @@
   "app.ads-consent.title": {
     "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Schakel visuele effecten zoals achtergrondvervaging in. Zonder hardwareversnelling kan dit ten koste gaan van de prestaties."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Geavanceerde weergave"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Kies het kleurenthema dat door de Modrinth-app wordt gebruikt."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Kleurenthema"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Kies de pagina die wordt weergegeven wanneer de Modrinth-app wordt geopend."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotheek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standaard openingspagina"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Verberg je gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."
@@ -173,23 +161,11 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Verberg nametag"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Toon recent gespeelde werelden in het Ga terug-gedeelte op de startpagina."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Ga terug in werelden"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimaliseer de Modrinth-app zodra Minecraft opstart."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "App minimaliseren"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Gebruik de titelbalk en vensterbedieningselementen van je besturingssysteem. Hiervoor moet de app opnieuw worden opgestart."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Systeemvensterframe"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Laat zien hoe lang je elke instantie hebt gespeeld."
@@ -267,7 +243,7 @@
     "message": "Modpacks"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Het toevoegen van inhoud kan de compatibiliteit verstoren bij het verbinden met de server. Eventuele toegevoegde inhoud gaat bovendien verloren wanneer je de inhoud van de serverinstantie bijwerkt."
+    "message": "Als je inhoud toevoegt, kan dit ertoe leiden dat je geen toegang hebt tot deze server. Alle inhoud die je toevoegt, wordt verwijderd wanneer de beheerde inhoud van de server wordt bijgewerkt."
   },
   "app.browse.server.installing": {
     "message": "Installeren"
@@ -280,6 +256,12 @@
   },
   "app.export-modal.export-button": {
     "message": "Exporteer"
+  },
+  "app.export-modal.export-complete": {
+    "message": "Exporteren voltooid"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} is succesvol geëxporteerd."
   },
   "app.export-modal.header": {
     "message": "Exporteer modpack"
@@ -295,6 +277,12 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Opgewonden Modrinth-bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Update van Modrinth-app vereist"
   },
   "app.install.phase.downloading_content": {
     "message": "Inhoud aan het downloaden"
@@ -705,7 +693,7 @@
     "message": "Neem voor ondersteuningsverzoeken contact op met ons <support-link>ondersteuningsteam</support-link>. Voor bugmeldingen kun je een <github-link>GitHub-issue</github-link> aanmaken."
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "Een bestand wordt alleen beoordeeld als het op Modrinth wordt gepubliceerd, ongeacht het bestandsformaat (inclusief .mrpack)."
+    "message": "Bestanden die niet op Modrinth worden gepubliceerd, worden niet beoordeeld."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Gedeelde instantie"
@@ -760,9 +748,6 @@
   },
   "app.nav.home": {
     "message": "Start"
-  },
-  "app.nav.library": {
-    "message": "Bibliotheek"
   },
   "app.nav.modrinth-account": {
     "message": "Modrinth-account"
@@ -1145,18 +1130,6 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
-  "app.skins.sign-in.button": {
-    "message": "Inloggen"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Log in op je Minecraft-account om de functies voor het beheren van skins in de Modrinth-app te kunnen gebruiken."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Excited Modrinth Bot"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Graag inloggen"
-  },
   "app.skins.title": {
     "message": "Skinkiezer"
   },
@@ -1228,9 +1201,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Als je de versie wijzigt, wordt alleen je lokale kopie aangepast. Bij toekomstige updates van de gedeelde instantie kan deze weer worden teruggezet of opnieuw worden gewijzigd."
@@ -1537,18 +1507,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selecteer pictogram"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Bibliotheekgroepen"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Nieuwe groep creëren"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Bibliotheekgroepen stellen je in staat om je instanties in verschillende secties in je bibliotheek te organiseren."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Voer groepsnaam in"
   },
   "instance.settings.tabs.general.name": {
     "message": "Naam"

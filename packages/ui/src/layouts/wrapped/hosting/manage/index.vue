@@ -1,8 +1,12 @@
 <template>
 	<div
 		data-pyro-server-list-root
-		class="relative mx-auto mb-6 flex w-full flex-col p-6"
-		:class="serverList.length ? 'min-h-screen' : 'min-h-[calc(100vh-14.5rem)]'"
+		class="relative mx-auto flex w-full flex-col p-6"
+		:class="
+			serverList.length && !showEmptyState
+				? 'min-h-screen mb-6'
+				: 'min-h-[calc(100vh-14.5rem)] h-full py-0'
+		"
 	>
 		<ServersGuestPlanModal
 			ref="guestPlanModal"
@@ -98,7 +102,7 @@
 					{{ formatMessage(messages.serversTitle) }}
 				</h1>
 				<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
-					<StyledInput
+					<Input
 						id="search"
 						v-model="searchInput"
 						:icon="SearchIcon"
@@ -134,7 +138,7 @@
 				<div
 					v-else-if="showEmptyState"
 					key="empty"
-					class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
+					class="flex h-full flex-col items-center justify-center gap-8 grow"
 				>
 					<ServerListEmpty
 						:logged-in="loggedIn"
@@ -237,12 +241,12 @@ import {
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
 	ServerListEmpty,
 	ServersGuestPlanModal,
-	StyledInput,
 	useServerBackupDownload,
 	useVIntl,
 } from '@modrinth/ui'
@@ -331,6 +335,10 @@ const messages = defineMessages({
 	handleErrorTitle: {
 		id: 'servers.manage.handle-error.title',
 		defaultMessage: 'An error occurred',
+	},
+	unknownError: {
+		id: 'servers.manage.error.unknown',
+		defaultMessage: 'Unknown error',
 	},
 	purchaseUnavailableTitle: {
 		id: 'servers.manage.purchase-unavailable.title',
@@ -677,7 +685,9 @@ function handleError(err: unknown) {
 }
 
 function formatFetchError(error: unknown) {
-	return error instanceof Error && error.message ? error.message : 'Unknown error'
+	return error instanceof Error && error.message
+		? error.message
+		: formatMessage(messages.unknownError)
 }
 
 function handleSignIn() {

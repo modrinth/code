@@ -1,9 +1,17 @@
 <template>
 	<section v-if="auth.user" class="universal-card">
 		<AccountSocialSettings
+			ref="socialSettings"
 			:get-blocked-users="getBlockedUsers"
 			:get-users="getUsers"
 			:unblock-user="unblockUser"
+		/>
+		<UnsavedChangesPopup
+			:original="socialSettings?.originalState ?? emptySocialState"
+			:modified="socialSettings?.modifiedState ?? emptySocialState"
+			:saving="socialSettings?.saving ?? false"
+			@reset="socialSettings?.reset()"
+			@save="socialSettings?.save()"
 		/>
 	</section>
 </template>
@@ -14,6 +22,7 @@ import {
 	AccountSocialSettings,
 	commonSettingsMessages,
 	injectModrinthClient,
+	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -24,6 +33,12 @@ definePageMeta({
 const auth = await useAuth()
 const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
+const socialSettings = ref<InstanceType<typeof AccountSocialSettings> | null>(null)
+const emptySocialState = {
+	friendPrivacy: 'everyone',
+	sharedInstancesPrivacy: 'everyone',
+	hostingAccessPrivacy: 'everyone',
+}
 
 function getBlockedUsers(): Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]> {
 	return client.labrinth.blocked_users_v3.list()

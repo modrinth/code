@@ -330,9 +330,13 @@ const sharedInstanceBanPending = ref(false)
 const sharedInstanceVersions = new Map<string, SharedInstances.Instances.v1.InstanceVersion>()
 let sharedInstanceDetailsRequest: Promise<void> | null = null
 
-watch(isThreadCollapsed, (collapsed) => {
-	if (!collapsed) void loadSharedInstanceDetails()
-})
+watch(
+	isThreadCollapsed,
+	(collapsed) => {
+		if (!collapsed) void loadSharedInstanceDetails()
+	},
+	{ immediate: true },
+)
 
 const didCloseReport = ref(false)
 const reportClosed = computed(() => {

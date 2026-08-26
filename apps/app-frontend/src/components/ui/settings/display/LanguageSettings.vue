@@ -1,74 +1,35 @@
+<template>
+	<SharedLanguageSettings ref="languageSettings" product="app" :persist-locale="persistLocale" />
+</template>
+
 <script setup lang="ts">
-import {
-	Admonition,
-	AutoLink,
-	commonSettingsMessages,
-	IntlFormatted,
-	LanguageSelector,
-	languageSelectorMessages,
-	LOCALES,
-	useVIntl,
-} from '@modrinth/ui'
-import { computed, ref, watch } from 'vue'
+import { LanguageSettings as SharedLanguageSettings } from '@modrinth/ui'
+import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
-import i18n from '@/i18n.config'
+import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
-const { formatMessage } = useVIntl()
+const settingsModal = inject(appSettingsModalContextKey, null)
+const languageSettings = ref<InstanceType<typeof SharedLanguageSettings> | null>(null)
 
-const platform = computed(() => formatMessage(languageSelectorMessages.platformApp))
+onMounted(() => {
+	settingsModal?.registerUnsavedChangesController({
+		hasChanges: () => languageSettings.value?.hasChanges ?? false,
+		getOriginal: () => languageSettings.value?.originalState ?? {},
+		getModified: () => languageSettings.value?.modifiedState ?? {},
+		isSaving: () => languageSettings.value?.saving ?? false,
+		reset: () => languageSettings.value?.reset(),
+		save: () => languageSettings.value?.save(),
+	})
+})
 
-const settings = ref(await get())
+onBeforeUnmount(() => {
+	settingsModal?.registerUnsavedChangesController(null)
+})
 
-watch(
-	settings,
-	async () => {
-		await set(settings.value)
-	},
-	{ deep: true },
-)
-
-const $isChanging = ref(false)
-
-async function onLocaleChange(newLocale: string) {
-	if (settings.value.locale === newLocale) return
-
-	$isChanging.value = true
-	try {
-		i18n.global.locale.value = newLocale
-		settings.value.locale = newLocale
-	} finally {
-		$isChanging.value = false
-	}
+async function persistLocale(locale: string): Promise<void> {
+	const settings = await get()
+	if (settings.locale === locale) return
+	await set({ ...settings, locale })
 }
 </script>
-
-<template>
-	<h2 class="m-0 text-lg font-semibold text-contrast">
-		{{ formatMessage(commonSettingsMessages.language) }}
-	</h2>
-
-	<Admonition type="warning" class="mt-2 mb-4">
-		{{ formatMessage(languageSelectorMessages.languageWarning, { platform }) }}
-	</Admonition>
-
-	<p class="m-0 mb-4">
-		<IntlFormatted
-			:message-id="languageSelectorMessages.languagesDescription"
-			:values="{ platform }"
-		>
-			<template #~crowdin-link="{ children }">
-				<AutoLink to="https://translate.modrinth.com">
-					<component :is="() => children" />
-				</AutoLink>
-			</template>
-		</IntlFormatted>
-	</p>
-
-	<LanguageSelector
-		:current-locale="settings.locale"
-		:locales="LOCALES"
-		:on-locale-change="onLocaleChange"
-		:is-changing="$isChanging"
-	/>
-</template>

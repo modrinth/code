@@ -53,26 +53,14 @@
   "app.action-bar.view-logs": {
     "message": "Lihat log"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Pemaparan lanjutan"
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Tema warna"
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Laman utama"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Pustaka"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Laman pendaratan lalai"
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan tanda nama"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Lompat kembali ke dalam dunia"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Beri saya amaran sebelum memasang pek mod yang tidak diketahui"
@@ -110,8 +98,8 @@
   "app.browse.project-type.modpacks": {
     "message": "Pek Mod"
   },
-  "app.browse.server-instance-content-warning": {
-    "message": "Menambah kandungan boleh merosakkan keserasian apabila menyertai pelayan. Sebarang kandungan yang ditambah juga akan hilang apabila anda mengemas kini kandungan pemasangan pelayan."
+  "app.browse.project-type.mods": {
+    "message": "Mod"
   },
   "app.browse.server.installing": {
     "message": "Sedang memasang"
@@ -137,6 +125,9 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "Langkau"
+  },
   "app.install.phase.preparing_java.downloading": {
     "message": "Sedang memuat turun Java {version}"
   },
@@ -155,8 +146,26 @@
   "app.install.phase.reading_pack_manifest": {
     "message": "Sedang membaca manifest pek"
   },
+  "app.instance.action.edit": {
+    "message": "Sunting"
+  },
+  "app.instance.action.play": {
+    "message": "Main"
+  },
+  "app.instance.action.stop": {
+    "message": "Hentikan"
+  },
+  "app.instance.add-server.add": {
+    "message": "Tambah"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Ditambah"
+  },
+  "app.instance.card.play": {
+    "message": "Main"
+  },
+  "app.instance.card.stop": {
+    "message": "Hentikan"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Semua data untuk pemasangan anda akan dipadamkan secara kekal, termasuk dunia, konfigurasi dan semua kandungan yang dipasang."
@@ -200,6 +209,9 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Berjaya dimuat naik"
   },
+  "app.instance.tab.logs": {
+    "message": "Log"
+  },
   "app.instance.worlds.add-server": {
     "message": "Tambah pelayan"
   },
@@ -236,6 +248,27 @@
   "app.java-detection.select": {
     "message": "Pilih"
   },
+  "app.library.group.instance.add": {
+    "message": "Tambah"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Tambah"
+  },
+  "app.library.instance.action.play": {
+    "message": "Main"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Hentikan"
+  },
+  "app.library.instance.play": {
+    "message": "Main"
+  },
+  "app.library.instance.stop": {
+    "message": "Hentikan"
+  },
+  "app.library.sort.name": {
+    "message": "Nama"
+  },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk mainkan"
   },
@@ -258,6 +291,9 @@
     "message": "Ditambah"
   },
   "app.nav.home": {
+    "message": "Laman utama"
+  },
+  "app.navigation.home": {
     "message": "Laman utama"
   },
   "app.news.title": {
@@ -386,18 +422,6 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
-  "app.skins.sign-in.button": {
-    "message": "Daftar Masuk"
-  },
-  "app.skins.sign-in.description": {
-    "message": "Sila daftar masuk ke akaun Minecraft anda untuk menggunakan ciri pengurusan kekulit milik Modrinth App."
-  },
-  "app.skins.sign-in.rinthbot-alt": {
-    "message": "Bot Modrinth yang Teruja"
-  },
-  "app.skins.sign-in.title": {
-    "message": "Sila daftar masuk"
-  },
   "app.skins.title": {
     "message": "Pemilih kekulit"
   },
@@ -442,9 +466,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Luar Talian"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} dalam talian"
   },
   "friends.action.add-friend": {
     "message": "Tambah rakan"
@@ -551,6 +572,36 @@
   "instance.files.save-as": {
     "message": "Simpan sebagai..."
   },
+  "instance.icon-editor.background.blue": {
+    "message": "Biru"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Kelabu"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Hijau Muda"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Merah Jambu"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Merah"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "Mawar"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Kek"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Orb"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Tayar"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
   "instance.server-modal.address": {
     "message": "Alamat"
   },
@@ -601,18 +652,6 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Pilih ikon"
-  },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Kumpulan pustaka"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Cipta kumpulan baharu"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Kumpulan pustaka membolehkan anda menyusun pemasangan anda ke dalam bahagian yang berbeza dalam pustaka anda."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Masukkan nama kumpulan"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nama"

@@ -878,6 +878,15 @@
   "auth.sign-in.last-sign-in": {
     "message": "Last used"
   },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "We’re returning you to the Modrinth App. If nothing happens, use the button below."
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Open Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "You’re signed in"
+  },
   "auth.sign-in.no-account": {
     "message": "Don't have an account?"
   },
@@ -2670,7 +2679,7 @@
     "message": "New project"
   },
   "layout.action.new-server-project": {
-    "message": "New server"
+    "message": "New server project"
   },
   "layout.action.publish": {
     "message": "Publish"
@@ -3494,6 +3503,15 @@
   "project.actions.servers-promo.title": {
     "message": "Create a server"
   },
+  "project.actions.view-dependents": {
+    "message": "View dependents"
+  },
+  "project.actions.view-modpacks": {
+    "message": "View modpacks"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "View {projectType} dependents"
+  },
   "project.ai-image-warning-modal.body.1": {
     "message": "Using AI-generated images to represent your project is not allowed. Attempting to work around detection may lead to your Modrinth account being suspended."
   },
@@ -4018,9 +4036,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.head-title": {
-    "message": "⚙️ {section} - {project}"
   },
   "project.settings.monetization.description": {
     "message": "Projects on Modrinth are automatically enrolled in the <rewards-program-link>Rewards Program</rewards-program-link>. If you don't want to (or can't for legal reasons) earn revenue from this project, you can turn it off here."
@@ -5282,95 +5297,11 @@
   "settings.display.banner.developer-mode.description": {
     "message": "<strong>Developer mode</strong> is active. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode."
   },
-  "settings.display.flags.description": {
-    "message": "Enable or disable certain features on this device."
-  },
-  "settings.display.flags.title": {
-    "message": "Toggle features"
-  },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Developer mode has been disabled"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Developer mode deactivated"
-  },
-  "settings.display.project-list-layouts.datapack": {
-    "message": "Data Packs page"
-  },
-  "settings.display.project-list-layouts.description": {
-    "message": "Select your preferred layout for each page that displays project lists on this device."
-  },
-  "settings.display.project-list-layouts.mod": {
-    "message": "Mods page"
-  },
-  "settings.display.project-list-layouts.mode.gallery": {
-    "message": "Gallery"
-  },
-  "settings.display.project-list-layouts.mode.grid": {
-    "message": "Grid"
-  },
-  "settings.display.project-list-layouts.mode.rows": {
-    "message": "Rows"
-  },
-  "settings.display.project-list-layouts.modpack": {
-    "message": "Modpacks page"
-  },
-  "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins page"
-  },
-  "settings.display.project-list-layouts.resourcepack": {
-    "message": "Resource Packs page"
-  },
-  "settings.display.project-list-layouts.server": {
-    "message": "Servers page"
-  },
-  "settings.display.project-list-layouts.shader": {
-    "message": "Shaders page"
-  },
-  "settings.display.project-list-layouts.title": {
-    "message": "Project list layouts"
-  },
-  "settings.display.project-list-layouts.user": {
-    "message": "User profile pages"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Collection"
-  },
-  "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
-  },
-  "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Advanced rendering"
-  },
-  "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab."
-  },
-  "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Open external links in new tab"
-  },
-  "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Hides the \"Get Modrinth App\" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer."
-  },
-  "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Hide Modrinth App promotions"
-  },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Left-aligned sidebar on content pages"
-  },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Aligns the sidebar to the left of the page's content."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Aligns the filters sidebar to the right of the search results."
-  },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Right-aligned filters sidebar on search pages"
-  },
-  "settings.display.theme.description": {
-    "message": "Select your preferred color theme for Modrinth on this device."
-  },
-  "settings.display.theme.title": {
-    "message": "Color theme"
   },
   "settings.head-title": {
     "message": "Display settings"

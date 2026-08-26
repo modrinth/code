@@ -83,6 +83,9 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Renovar Servidor"
   },
+  "browse.view-prefix": {
+    "defaultMessage": "Exibição:"
+  },
   "button.accept": {
     "defaultMessage": "Aceitar"
   },
@@ -320,6 +323,9 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Atualizado"
   },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Adicionado"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removidos"
   },
@@ -349,6 +355,9 @@
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Pressiona Shift enquanto clicas para saltar a confirmação."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "mundo"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Conteúdo adicional"
@@ -398,6 +407,15 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Nomes dos projetos"
   },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Mais recentes primeiro"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Mais antigos primeiro"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Ordenar por {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Atualizar tudo"
   },
@@ -436,6 +454,45 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selecionado"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Outro"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "Nome"
+  },
+  "creation-flow.modal.final-config.difficulty.easy": {
+    "defaultMessage": "Fácil"
+  },
+  "creation-flow.modal.final-config.difficulty.hard": {
+    "defaultMessage": "Difícil"
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "Plano"
+  },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "Adicionar"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Outra"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(opcional)"
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Notas"
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Uma breve explicação ou imagens prova são necessárias."
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Nenhuma"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "Não"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "Sim"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Resumo da extração"
@@ -506,6 +563,12 @@
   "files.error.try-again": {
     "defaultMessage": "Tentar novamente"
   },
+  "files.item-type.file": {
+    "defaultMessage": "ficheiro"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "ficheiros"
+  },
   "files.move-modal.current-location": {
     "defaultMessage": "Localização atual"
   },
@@ -514,6 +577,9 @@
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "ex.: /minha-pasta"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Início"
   },
   "files.navbar.new-folder": {
     "defaultMessage": "Nova pasta"
@@ -577,6 +643,12 @@
   },
   "files.upload-dropdown.file": {
     "defaultMessage": "Ficheiro"
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} restantes"
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Nome"
   },
   "form.label.address-line": {
     "defaultMessage": "Endereço"
@@ -672,7 +744,7 @@
     "defaultMessage": "Modo de jogo"
   },
   "header.category.minecraft-server-meta": {
-    "defaultMessage": "Parâmetros"
+    "defaultMessage": "Meta"
   },
   "header.category.performance-impact": {
     "defaultMessage": "Impacto no desempenho"
@@ -736,6 +808,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Nome"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Atual"
@@ -806,6 +881,9 @@
   "label.details": {
     "defaultMessage": "Detalhes"
   },
+  "label.done": {
+    "defaultMessage": "Concluído"
+  },
   "label.email": {
     "defaultMessage": "E-mail"
   },
@@ -841,6 +919,12 @@
   },
   "label.password": {
     "defaultMessage": "Palavra-passe"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Grande"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Pequeno"
   },
   "label.project": {
     "defaultMessage": "Projeto"
@@ -898,6 +982,9 @@
   },
   "label.version": {
     "defaultMessage": "Versão"
+  },
+  "label.view": {
+    "defaultMessage": "Exibição"
   },
   "label.visibility": {
     "defaultMessage": "Visibilidade"
@@ -1004,6 +1091,36 @@
   "locale.zh-TW": {
     "defaultMessage": "Chinês (Tradicional)"
   },
+  "markdown-editor.error-label": {
+    "defaultMessage": "Erro"
+  },
+  "markdown-editor.image-modal.upload-mode.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Etiqueta"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Negrito"
+  },
+  "markdown-editor.toolbar.code": {
+    "defaultMessage": "Código"
+  },
+  "markdown-editor.toolbar.image": {
+    "defaultMessage": "Imagem"
+  },
+  "markdown-editor.toolbar.link": {
+    "defaultMessage": "Link"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Citação"
+  },
+  "markdown-editor.toolbar.video": {
+    "defaultMessage": "Vídeo"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Adicionar método de pagamento"
   },
@@ -1077,7 +1194,7 @@
     "defaultMessage": "Devolvido"
   },
   "omorphia.component.badge.label.safe": {
-    "defaultMessage": "Passar"
+    "defaultMessage": "Passou"
   },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Agendado"
@@ -1089,7 +1206,7 @@
     "defaultMessage": "Não listado"
   },
   "omorphia.component.badge.label.unsafe": {
-    "defaultMessage": "Falha"
+    "defaultMessage": "Falhou"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copiar código para a área de transferência"
@@ -1171,6 +1288,15 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Um criador Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Um utilizador Modrinth."
+  },
+  "profile.button.block": {
+    "defaultMessage": "Bloquear"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Publicado a {date}"
@@ -1844,6 +1970,9 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Não listado pelo modrinth"
   },
+  "report.item-type.user": {
+    "defaultMessage": "utilizador"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Filtro trancado"
   },
@@ -1910,6 +2039,9 @@
   "search.filter_type.project_id": {
     "defaultMessage": "ID do projeto"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Tipo"
+  },
   "search.filter_type.server_region": {
     "defaultMessage": "Região"
   },
@@ -1921,6 +2053,57 @@
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "Ações"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "Utilizador"
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Acesso não conseguiu ser carregado"
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Acesso revogado"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Acesso não conseguiu ser removido"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Todos"
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Dono"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Dono"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "Ações"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Cargo"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Utilizador"
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "Ações para {username}"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "Ações"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Hora"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Utilizador"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Automático"
@@ -1936,6 +2119,18 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Restaurar"
+  },
+  "servers.backups.toolbar.filter-auto": {
+    "defaultMessage": "Automático"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Novo"
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "Um envio de ficheiro está em progresso. Sair desta página cancelará o envio."
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural,one {dia} other {dias}} <hours-count>{hours}</hours-count> {hours, plural, one {hora} other {horas}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuto} other {minutos}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {segundo} other {segundos}} restantes..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignorar"
@@ -1979,6 +2174,9 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Começar"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Grande"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Ideal para 15 a 25 jogadores, modpacks ou muitos mods."
   },
@@ -1990,6 +2188,9 @@
   },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Selecionar Plano"
+  },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Pequeno"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfeito para 1 a 5 amigos com alguns mods leves."
@@ -2008,6 +2209,9 @@
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Quanta RAM queres que o teu servidor tenha?"
+  },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
   },
   "servers.region.prompt": {
     "defaultMessage": "Onde queres que o teu servidor esteja localizado?"
@@ -2038,9 +2242,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Escuro"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "Seleciona o teu tema de cores preferido para o Modrinth neste dispositivo."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Claro"
@@ -2082,7 +2283,7 @@
     "defaultMessage": "Nenhuma língua corresponde à sua pesquisa."
   },
   "settings.language.platform.app": {
-    "defaultMessage": "aplicação"
+    "defaultMessage": "app"
   },
   "settings.language.platform.site": {
     "defaultMessage": "site"
@@ -2096,8 +2297,35 @@
   "settings.pats.title": {
     "defaultMessage": "Tokens de acesso pessoal"
   },
+  "settings.profile.bio.description": {
+    "defaultMessage": "Uma breve descrição para que todos possam saber mais sobre ti."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Bio"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "Um nome único sem distinção de maiúsculas ou minúsculas para identificar o teu perfil."
+  },
   "settings.sessions.title": {
     "defaultMessage": "Sessões"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Ações"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Utilizador"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Adicionar"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Adicionado"
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Aplicar"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Guardar"
   },
   "tag.category.128x": {
     "defaultMessage": "Unknown"
@@ -2261,6 +2489,9 @@
   "tag.category.management": {
     "defaultMessage": "Gestão"
   },
+  "tag.category.media": {
+    "defaultMessage": "Multimédia"
+  },
   "tag.category.medium": {
     "defaultMessage": "Médio"
   },
@@ -2294,6 +2525,9 @@
   "tag.category.offline-mode": {
     "defaultMessage": "Modo offline"
   },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Otimização"
   },
@@ -2306,11 +2540,17 @@
   "tag.category.personal-worlds": {
     "defaultMessage": "Mundos pessoais"
   },
+  "tag.category.plots": {
+    "defaultMessage": "Lotes"
+  },
   "tag.category.potato": {
     "defaultMessage": "Batata"
   },
   "tag.category.prison": {
     "defaultMessage": "Prisão"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
   },
   "tag.category.pvp": {
     "defaultMessage": "PvP"
@@ -2492,7 +2732,50 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Aplicar"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Limpar"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Hoje"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "dias"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "horas"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "semanas"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Tens alterações por guardar."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " não está publicado no Modrinth. Recomendamos fortemente que apenas instales ficheiros de fontes que confies."
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " contém ficheiros que não foram publicados no Modrinth. Recomendamos fortemente que apenas instales ficheiros de fontes que confies."
+  },
+  "version.content.name": {
+    "defaultMessage": "Nome"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Outro"
+  },
+  "version.section.files": {
+    "defaultMessage": "Ficheiros"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Ficheiro"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Tamanho"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Tipo"
   }
 }
+

@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<StyledInput
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"
@@ -136,6 +136,7 @@
 								<Combobox
 									v-model="currentReportTargetFilter"
 									class="!w-full"
+									dropdown-class="!z-[10000]"
 									:options="reportTargetFilterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									@select="goToPage(1)"
@@ -147,6 +148,7 @@
 									<Combobox
 										v-model="currentReportIssueFilter"
 										class="!w-full"
+										dropdown-class="!z-[10000]"
 										:options="reportIssueFilterTypes"
 										:placeholder="formatMessage(commonMessages.filterByLabel)"
 										@select="goToPage(1)"
@@ -158,6 +160,7 @@
 								<Combobox
 									v-model="currentProjectTypeFilter"
 									class="!w-full"
+									dropdown-class="!z-[10000]"
 									:options="projectTypeFilterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									@select="goToPage(1)"
@@ -219,10 +222,10 @@ import {
 	commonMessages,
 	formatReportType,
 	injectModrinthClient,
+	Input,
 	MultiSelect,
 	type MultiSelectItem,
 	Pagination,
-	StyledInput,
 	TeleportPopoutMenu,
 	useVIntl,
 } from '@modrinth/ui'

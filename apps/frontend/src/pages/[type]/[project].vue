@@ -532,7 +532,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="mb-3 overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-1" /></div>
+					<NavTabs :links="navLinks" replace page-nav />
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -564,10 +564,12 @@ import {
 	HeartIcon,
 	LeftArrowIcon,
 	MoreVerticalIcon,
+	PackageSearchIcon,
 	PlayIcon,
 	ReportIcon,
 	ScaleIcon,
 	ScanEyeIcon,
+	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
 	XIcon,
@@ -582,6 +584,8 @@ import {
 	ButtonLink,
 	commonMessages,
 	defineMessages,
+	formatDependencyProjectFilterOption,
+	formatProjectTypeSentence,
 	getActiveDisclosures,
 	IconButton,
 	injectModrinthClient,
@@ -629,6 +633,7 @@ import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
+import { notifyCopied } from '~/composables/moderation.ts'
 import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
@@ -845,6 +850,18 @@ const messages = defineMessages({
 	reviewProject: {
 		id: 'project.actions.review-project',
 		defaultMessage: 'Review project',
+	},
+	viewDependents: {
+		id: 'project.actions.view-dependents',
+		defaultMessage: 'View dependents',
+	},
+	viewProjectTypeDependents: {
+		id: 'project.actions.view-project-type-dependents',
+		defaultMessage: 'View {projectType} dependents',
+	},
+	viewModpacks: {
+		id: 'project.actions.view-modpacks',
+		defaultMessage: 'View modpacks',
 	},
 	rescanModpack: {
 		id: 'project.actions.rescan-modpack',
@@ -1255,6 +1272,7 @@ const { data: thread } = useQuery({
 })
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
+useFavicon(() => (isSettings.value ? 'settings' : 'default'))
 
 // Jank modpack loaders fix
 const versionsRaw = computed(() => {
@@ -1904,6 +1922,30 @@ async function checkModpackArchives() {
 
 const projectHeaderMoreActions = computed(() => {
 	const isStaff = !!(auth.value.user && tags.value.staffRoles.includes(auth.value.user.role))
+	const projectId = project.value?.id
+	const dependentSearchTypes = getDependentSearchTypes()
+	const dependentSearchActions = dependentSearchTypes
+		.filter((projectType) => projectType !== 'modpack')
+		.map((projectType) => ({
+			id: `view-${projectType}-dependents`,
+			label: formatMessage(
+				dependentSearchTypes.length === 1
+					? messages.viewDependents
+					: messages.viewProjectTypeDependents,
+				{
+					projectType: formatProjectTypeSentence(formatMessage, projectType),
+				},
+			),
+			icon: SearchIcon,
+			type: 'link',
+			to: {
+				path: `/discover/${projectType}s`,
+				query: {
+					dep: formatDependencyProjectFilterOption(projectId, ['required']),
+				},
+			},
+		}))
+	const isPluginOnly = dependentSearchTypes.length === 1 && dependentSearchTypes[0] === 'plugin'
 
 	return [
 		{
@@ -1914,7 +1956,21 @@ const projectHeaderMoreActions = computed(() => {
 			to: `${projectPath.value}/settings/analytics`,
 			shown: !!auth.value.user && !!currentMember.value,
 		},
-		{ type: 'divider', shown: !!auth.value.user && !!currentMember.value },
+		...dependentSearchActions,
+		{
+			id: 'view-modpacks',
+			label: formatMessage(messages.viewModpacks),
+			icon: PackageSearchIcon,
+			type: 'link',
+			to: {
+				path: '/discover/modpacks',
+				query: {
+					dep: formatDependencyProjectFilterOption(projectId, ['required']),
+				},
+			},
+			shown: !isPluginOnly && project.value?.actualProjectType !== 'modpack',
+		},
+		{ type: 'divider' },
 		{
 			id: 'moderation-checklist',
 			label: formatMessage(messages.reviewProject),
@@ -1977,6 +2033,29 @@ const projectHeaderMoreActions = computed(() => {
 	]
 })
 
+function getDependentSearchTypes() {
+	if (!project.value) return []
+
+	if (project.value.actualProjectType !== 'mod') {
+		return [isServerProject.value ? 'server' : project.value.actualProjectType]
+	}
+
+	const loaders = project.value.loaders ?? []
+	const projectTypes = []
+
+	if (loaders.some((loader) => tags.value.loaderData.modLoaders.includes(loader))) {
+		projectTypes.push('mod')
+	}
+	if (loaders.some((loader) => tags.value.loaderData.allPluginLoaders.includes(loader))) {
+		projectTypes.push('plugin')
+	}
+	if (loaders.some((loader) => tags.value.loaderData.dataPackLoaders.includes(loader))) {
+		projectTypes.push('datapack')
+	}
+
+	return projectTypes.length > 0 ? projectTypes : ['mod']
+}
+
 const createCanonicalUrl = () =>
 	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
 
@@ -1998,7 +2077,7 @@ if (!route.name.startsWith('type-project-settings')) {
 		ogImage: () =>
 			project.value
 				? (project.value?.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png')
-				: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
+				: 'https://cdn-raw.modrinth.com/not-found.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})
@@ -2298,6 +2377,7 @@ function handleKeybinds(event) {
 	keybinds.value.handle(event, {
 		project: projectRaw.value,
 		scope: 'project',
+		notifyCopied,
 	})
 }
 

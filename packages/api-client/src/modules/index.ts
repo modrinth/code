@@ -9,6 +9,7 @@ import { ArchonNoticesV0Module } from './archon/notices/v0'
 import { ArchonOptionsV1Module } from './archon/options/v1'
 import { ArchonPropertiesV1Module } from './archon/properties/v1'
 import { ArchonServerUsersV1Module } from './archon/server-users/v1'
+import { ArchonServersInternalModule } from './archon/servers/internal'
 import { ArchonServersV0Module } from './archon/servers/v0'
 import { ArchonServersV1Module } from './archon/servers/v1'
 import { ArchonTransfersInternalModule } from './archon/transfers/internal'
@@ -87,6 +88,7 @@ export const MODULE_REGISTRY = {
 	archon_options_v1: ArchonOptionsV1Module,
 	archon_properties_v1: ArchonPropertiesV1Module,
 	archon_server_users_v1: ArchonServerUsersV1Module,
+	archon_servers_internal: ArchonServersInternalModule,
 	archon_servers_v0: ArchonServersV0Module,
 	archon_servers_v1: ArchonServersV1Module,
 	archon_transfers_internal: ArchonTransfersInternalModule,

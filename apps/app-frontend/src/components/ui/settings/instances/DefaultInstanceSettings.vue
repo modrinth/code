@@ -2,15 +2,15 @@
 import {
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	Slider,
-	StyledInput,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import useMemorySlider from '@/composables/useMemorySlider'
-import { get, set } from '@/helpers/settings.ts'
+import { get, parseEnvVars, serializeEnvVars, set } from '@/helpers/settings.ts'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -149,7 +149,7 @@ const messages = defineMessages({
 
 const fetchSettings = await get()
 fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')
-fetchSettings.envVars = fetchSettings.custom_env_vars.map((x) => x.join('=')).join(' ')
+fetchSettings.envVars = serializeEnvVars(fetchSettings.custom_env_vars)
 
 const settings = ref(fetchSettings)
 
@@ -164,27 +164,15 @@ watch(
 		const setSettings = JSON.parse(JSON.stringify(settings.value))
 
 		setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
-		setSettings.custom_env_vars = setSettings.envVars
-			.trim()
-			.split(/\s+/)
-			.filter(Boolean)
-			.map((x) => x.split('=').filter(Boolean))
-
-		if (!setSettings.hooks.pre_launch) {
-			setSettings.hooks.pre_launch = null
-		}
-		if (!setSettings.hooks.wrapper) {
-			setSettings.hooks.wrapper = null
-		}
-		if (!setSettings.hooks.post_exit) {
-			setSettings.hooks.post_exit = null
-		}
+		setSettings.custom_env_vars = parseEnvVars(setSettings.envVars)
+		delete setSettings.launchArgs
+		delete setSettings.envVars
 
 		if (!setSettings.custom_dir) {
 			setSettings.custom_dir = null
 		}
 
-		await set(setSettings)
+		await set(setSettings).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -216,7 +204,7 @@ watch(
 					</p>
 				</div>
 
-				<StyledInput
+				<Input
 					id="width"
 					v-model="settings.game_resolution[0]"
 					:disabled="settings.force_fullscreen"
@@ -236,7 +224,7 @@ watch(
 					</p>
 				</div>
 
-				<StyledInput
+				<Input
 					id="height"
 					v-model="settings.game_resolution[1]"
 					:disabled="settings.force_fullscreen"
@@ -273,7 +261,7 @@ watch(
 				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.javaArgumentsTitle) }}
 				</h2>
-				<StyledInput
+				<Input
 					id="java-args"
 					v-model="settings.launchArgs"
 					autocomplete="off"
@@ -290,7 +278,7 @@ watch(
 				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.environmentVariablesTitle) }}
 				</h2>
-				<StyledInput
+				<Input
 					id="env-vars"
 					v-model="settings.envVars"
 					autocomplete="off"
@@ -311,7 +299,7 @@ watch(
 				<h3 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.preLaunchHookTitle) }}
 				</h3>
-				<StyledInput
+				<Input
 					id="pre-launch"
 					v-model="settings.hooks.pre_launch"
 					autocomplete="off"
@@ -328,7 +316,7 @@ watch(
 				<h3 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.wrapperHookTitle) }}
 				</h3>
-				<StyledInput
+				<Input
 					id="wrapper"
 					v-model="settings.hooks.wrapper"
 					autocomplete="off"
@@ -345,7 +333,7 @@ watch(
 				<h3 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.postExitHookTitle) }}
 				</h3>
-				<StyledInput
+				<Input
 					id="post-exit"
 					v-model="settings.hooks.post_exit"
 					autocomplete="off"

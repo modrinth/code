@@ -473,9 +473,6 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} izbrisalo"
   },
-  "content.diff-modal.reviewed-files": {
-    "defaultMessage": "Datoteka se pregleda samo ako je postavljena na Modrinth, bez obzira na njen format (uključujući .mrpack)."
-  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Deo sadržaja na tvome serveru nije mogao biti analiziran i na njega može uticati ova promena."
   },
@@ -584,6 +581,15 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Imena projekata"
   },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Najnovije prvo"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Najstarije prvo"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sortiraj so {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Ažuiraj sve"
   },
@@ -673,12 +679,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Traži verziju igre..."
-  },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Smakni ikonu"
-  },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Izaberi ikonu"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Najnovija"
@@ -854,9 +854,6 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Potraži modpack"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Instanca je podešavanje Mínecrafta sa određenim programom za učitavanje, verzijom i modovima."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Počni od nule tako što izabereš pokretač i verziju igre."
   },
@@ -868,12 +865,6 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Uvozi instancu"
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Pregledaj modpakove na Modrinthu ili ih uvezi iz datoteke."
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Instaliraj modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Klasični Minecraft bez modova ili plugina."
@@ -889,9 +880,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Izaberi tip sveta"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Izaberi modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Kreiraj instancu"
@@ -2009,14 +1997,8 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Nema pronađenih kompatibilnih instanca"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Smakni ikonu"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Pretraži instancu"
-  },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Izaberi ikonu"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Upravo"
@@ -3557,9 +3539,6 @@
   "search.filter.option.show_more": {
     "defaultMessage": "Pokaži više"
   },
-  "search.filter_type.advanced": {
-    "defaultMessage": "Napredno"
-  },
   "search.filter_type.environment": {
     "defaultMessage": "Okruže"
   },
@@ -4385,14 +4364,8 @@
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Došlo je do neočekivane greške tokom instalacije."
   },
-  "servers.installing-banner.preparing.header": {
-    "defaultMessage": "Pripremamo tvoj server"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Već imaš server?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Saznaj više o Modrinth hostiranju"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth hostiranje"
@@ -4403,23 +4376,14 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Instaliraj modove, pozvi prijatelje, i igraj skupa ave u Modrinth aplikaciji."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Nema još servera"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Izaberi svoje omiljene modove, a mi ćemo se pobrinuti za ostalo."
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Instalacija modova jednim klikom"
   },
-  "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Pozovi prijatelje i pomozi im da se podese direktno u Modrinth aplikaciji."
-  },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Igraj sa prijateljima"
-  },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Prijavi se"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Podesi svoj server baš kao samostalni svet."
@@ -4882,9 +4846,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Tamno"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "Izaberi željenu temu boja za Modrinth na ovom uređaju."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Svetlo"
@@ -5507,9 +5468,6 @@
   "unknown-file-warning-modal.modpack-warning-title": {
     "defaultMessage": "Upozorenje nepoznatih datoteka"
   },
-  "unknown-file-warning-modal.reviewed-files": {
-    "defaultMessage": "Datoteka se pregleda samo ako je postavljena na Modrinth, bez obzira na njen format (uključujući .mrpack)."
-  },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Nepoznate datoteke"
   },
@@ -5700,3 +5658,4 @@
     "defaultMessage": "Tip"
   }
 }
+
