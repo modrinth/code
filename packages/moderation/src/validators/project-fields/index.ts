@@ -60,6 +60,10 @@ const messages = defineMessages({
 		id: 'project.text-validation.profanity',
 		defaultMessage: 'The detected profanity “{value}” is not allowed.',
 	},
+	descriptionProfanity: {
+		id: 'project.text-validation.description-profanity',
+		defaultMessage: 'Excessive profanity is not allowed. Detected: {values}',
+	},
 	nonStandardText: {
 		id: 'project.text-validation.non-standard-text',
 		defaultMessage: 'Non-standard text characters are not allowed.',
@@ -398,6 +402,20 @@ export function validateProjectDescription(
 		maxProfanityCount: DESCRIPTION_MAX_PROFANITY_COUNT,
 		nonStandardTextFailureThreshold: DESCRIPTION_NON_STANDARD_TEXT_FAILURE_THRESHOLD,
 	})
+	if (results[0]?.code === 'text-profanity') {
+		const detectedValues = validateProfanity(description ?? '')
+			.matches.filter((match) => match.kind === 'profanity')
+			.map((match) => `"${match.rawText}"`)
+			.join(', ')
+
+		return [
+			{
+				...results[0],
+				message: messages.descriptionProfanity,
+				values: { values: detectedValues },
+			},
+		]
+	}
 	if (results.length > 0) return results
 
 	const normalizedDescription = normalizeProjectFieldText(description ?? '')

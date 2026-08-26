@@ -92,7 +92,7 @@
 						v-if="editIndex === -1"
 						type="colored"
 						color="brand"
-						:disabled="shouldPreventActions || galleryFieldsInvalid"
+						:disabled="shouldPreventActions || !canSaveGalleryFields"
 						@click="createGalleryItem"
 					>
 						<PlusIcon aria-hidden="true" />
@@ -102,7 +102,7 @@
 						v-else
 						type="colored"
 						color="brand"
-						:disabled="shouldPreventActions || galleryFieldsInvalid"
+						:disabled="shouldPreventActions || !canSaveGalleryFields"
 						@click="editGalleryItem"
 					>
 						<SaveIcon aria-hidden="true" />
@@ -303,6 +303,7 @@ import {
 	Textarea,
 	useFormatDateTime,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
@@ -350,6 +351,8 @@ const galleryFieldsInvalid = computed(
 		galleryTitleValidation.value.some((validation) => validation.severity === 'error') ||
 		galleryDescriptionValidation.value.some((validation) => validation.severity === 'error'),
 )
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
+const canSaveGalleryFields = computed(() => isAdminUser.value || !galleryFieldsInvalid.value)
 
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
@@ -430,7 +433,7 @@ const showPreviewImage = () => {
 }
 
 const createGalleryItem = async () => {
-	if (galleryFieldsInvalid.value) return
+	if (!canSaveGalleryFields.value) return
 	shouldPreventActions.value = true
 
 	const success = await createGalleryItemMutation(
@@ -449,7 +452,7 @@ const createGalleryItem = async () => {
 }
 
 const editGalleryItem = async () => {
-	if (galleryFieldsInvalid.value) return
+	if (!canSaveGalleryFields.value) return
 	shouldPreventActions.value = true
 
 	const success = await editGalleryItemMutation(

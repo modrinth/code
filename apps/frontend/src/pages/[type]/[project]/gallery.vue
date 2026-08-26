@@ -92,7 +92,7 @@
 						v-if="editIndex === -1"
 						type="colored"
 						color="brand"
-						:disabled="shouldPreventActions || galleryFieldsInvalid"
+						:disabled="shouldPreventActions || !canSaveGalleryFields"
 						@click="createGalleryItem"
 					>
 						<PlusIcon aria-hidden="true" />
@@ -102,7 +102,7 @@
 						v-else
 						type="colored"
 						color="brand"
-						:disabled="shouldPreventActions || galleryFieldsInvalid"
+						:disabled="shouldPreventActions || !canSaveGalleryFields"
 						@click="editGalleryItem"
 					>
 						<SaveIcon aria-hidden="true" />
@@ -312,6 +312,7 @@ import {
 	Textarea,
 	useFormatDateTime,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 import { useEventListener } from '@vueuse/core'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
@@ -390,6 +391,8 @@ const galleryFieldsInvalid = computed(
 		galleryTitleValidation.value.some((validation) => validation.severity === 'error') ||
 		galleryDescriptionValidation.value.some((validation) => validation.severity === 'error'),
 )
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
+const canSaveGalleryFields = computed(() => isAdminUser.value || !galleryFieldsInvalid.value)
 
 // Constant for accepted file types
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
@@ -490,7 +493,7 @@ function showPreviewImage() {
 
 // CRUD operations
 async function createGalleryItem() {
-	if (galleryFieldsInvalid.value) return
+	if (!canSaveGalleryFields.value) return
 	shouldPreventActions.value = true
 	startLoading()
 
@@ -511,7 +514,7 @@ async function createGalleryItem() {
 }
 
 async function editGalleryItem() {
-	if (galleryFieldsInvalid.value) return
+	if (!canSaveGalleryFields.value) return
 	shouldPreventActions.value = true
 	startLoading()
 

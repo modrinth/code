@@ -248,6 +248,44 @@ function isWordCharacter(character: string | undefined): boolean {
 	return character !== undefined && /^[\p{L}\p{M}\p{N}_]$/u.test(character)
 }
 
+const LEET_SPEAK_CHARACTERS = new Set(['@', '(', '|', '!', '/', '$'])
+
+function isObfuscatedWordCharacter(character: string): boolean {
+	return isWordCharacter(character) || LEET_SPEAK_CHARACTERS.has(character)
+}
+
+function isCharacterByCharacterObfuscation(text: string): boolean {
+	const chunkLengths: number[] = []
+	let currentChunkLength = 0
+	let hasInvisibleSeparator = false
+	let hasVisibleSeparator = false
+
+	for (const character of text) {
+		if (isObfuscatedWordCharacter(character)) {
+			currentChunkLength++
+		} else {
+			if (/^\p{Cf}$/u.test(character)) {
+				hasInvisibleSeparator = true
+			} else {
+				hasVisibleSeparator = true
+			}
+
+			if (currentChunkLength > 0) {
+				chunkLengths.push(currentChunkLength)
+				currentChunkLength = 0
+			}
+		}
+	}
+
+	if (currentChunkLength > 0) chunkLengths.push(currentChunkLength)
+
+	return (
+		chunkLengths.length > 1 &&
+		((hasInvisibleSeparator && !hasVisibleSeparator) ||
+			chunkLengths.every((length) => length === 1))
+	)
+}
+
 function getCharacterBefore(text: string, index: number): string | undefined {
 	if (index <= 0) return undefined
 
@@ -282,27 +320,45 @@ export function createProfanityValidator(
 
 		return { kind: pattern.kind, term }
 	})
-	const matcher = new RegExpMatcher({
-		blacklistedTerms: entries.map(({ term }, id) => ({ id, pattern: parseRawPattern(term) })),
+	const blacklistedTerms = entries.map(({ term }, id) => ({ id, pattern: parseRawPattern(term) }))
+	const baseTransformers = [
+		resolveConfusablesTransformer(),
+		resolveLeetSpeakTransformer(),
+		toAsciiLowerCaseTransformer(),
+	]
+	const duplicateTransformer = () =>
+		collapseDuplicatesTransformer({
+			customThresholds: getDuplicateThresholds(entries.map(({ term }) => term)),
+		})
+	const strictMatcher = new RegExpMatcher({
+		blacklistedTerms,
+		blacklistMatcherTransformers: [...baseTransformers, duplicateTransformer()],
+	})
+	const separatorMatcher = new RegExpMatcher({
+		blacklistedTerms,
 		blacklistMatcherTransformers: [
-			resolveConfusablesTransformer(),
-			resolveLeetSpeakTransformer(),
-			toAsciiLowerCaseTransformer(),
+			...baseTransformers,
 			skipNonAlphabeticTransformer(),
-			collapseDuplicatesTransformer({
-				customThresholds: getDuplicateThresholds(entries.map(({ term }) => term)),
-			}),
+			duplicateTransformer(),
 		],
 	})
 
 	function findAll(text: string): ProfanityMatch[] {
 		const matches: ProfanityMatch[] = []
+		const strictMatches = new Set(
+			[...strictMatcher.getAllMatches(text, true)].map(
+				(match) => `${match.termId}:${match.startIndex}:${match.endIndex}`,
+			),
+		)
 
-		for (const match of matcher.getAllMatches(text, true)) {
+		for (const match of separatorMatcher.getAllMatches(text, true)) {
 			const profanityPattern = entries[match.termId]
 			const end = match.endIndex + 1
+			const rawText = text.slice(match.startIndex, end)
+			const matchKey = `${match.termId}:${match.startIndex}:${match.endIndex}`
 			if (
 				!profanityPattern ||
+				(!strictMatches.has(matchKey) && !isCharacterByCharacterObfuscation(rawText)) ||
 				!isWholeWordMatch(text, match.startIndex, end) ||
 				match.startIndex < (matches.at(-1)?.end ?? 0)
 			) {
@@ -311,7 +367,7 @@ export function createProfanityValidator(
 
 			matches.push({
 				...profanityPattern,
-				rawText: text.slice(match.startIndex, end),
+				rawText,
 				start: match.startIndex,
 				end,
 			})

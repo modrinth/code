@@ -52,6 +52,11 @@ test('does not join ordinary words or match inside larger words', () => {
 	assert.equal(validateProfanity('s e m e n').valid, false)
 })
 
+test('does not join multi-character chunks into a slur', () => {
+	assert.equal(validateProfanity('6000   ->   OK').valid, true)
+	assert.equal(validateProfanity('6000 OK').valid, true)
+})
+
 test('rejects any uncensored configured profanity', () => {
 	assert.equal(validateProfanity('A clean project').valid, true)
 	assert.equal(validateProfanity('This is shit').valid, false)

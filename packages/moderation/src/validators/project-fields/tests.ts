@@ -158,10 +158,13 @@ test('allows one profanity match in descriptions but rejects a second match or a
 		code: 'text-profanity',
 		severity: 'error',
 		message: {
-			id: 'project.text-validation.profanity',
-			defaultMessage: 'The detected profanity “{value}” is not allowed.',
+			id: 'project.text-validation.description-profanity',
+			defaultMessage: 'Excessive profanity is not allowed. Detected: {values}',
 		},
-		values: { value: 'FUCK' },
+		values: { values: '"shit", "FUCK"' },
+	})
+	assert.deepEqual(validateProjectDescription(`${description} shit FUCK bastard`)[0]?.values, {
+		values: '"shit", "FUCK", "bastard"',
 	})
 	assert.equal(validateProjectDescription(`${description} nigga`)[0]?.code, 'text-slur')
 	assert.equal(validateProjectDescription(`${description} nigger`)[0]?.code, 'text-slur')

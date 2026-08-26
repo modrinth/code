@@ -33,14 +33,6 @@ const descriptionErrorCodes: readonly ProjectTextValidationCode[] = [
 	'text-non-standard',
 ]
 
-const messages = {
-	galleryFailure: defineMessage({
-		id: 'nags.invalid-gallery-text.description',
-		defaultMessage:
-			'Gallery image {number} {field, select, gallery-name {name} gallery-description {description} other {text}}: {error}',
-	}),
-}
-
 function getFirstFailure(
 	context: NagContext,
 	fields: readonly ProjectValidationField[],
@@ -78,18 +70,6 @@ function getCodedFailureDescription(context: NagContext, code: ProjectTextValida
 
 	const { formatMessage } = useVIntl()
 	return formatMessage(failure.message, failure.values)
-}
-
-function getGalleryFailureDescription(context: NagContext): string {
-	const failure = getFirstFailure(context, ['gallery-name', 'gallery-description'], 'error')
-	if (!failure) return ''
-
-	const { formatMessage } = useVIntl()
-	return formatMessage(messages.galleryFailure, {
-		number: (failure.galleryIndex ?? 0) + 1,
-		field: failure.field,
-		error: formatMessage(failure.message, failure.values),
-	})
 }
 
 export const projectValidationNags: Nag[] = [
@@ -341,7 +321,8 @@ export const projectValidationNags: Nag[] = [
 			id: 'nags.invalid-gallery-text.title',
 			defaultMessage: 'Fix gallery text',
 		}),
-		description: getGalleryFailureDescription,
+		description: (context) =>
+			getFailureDescription(context, ['gallery-name', 'gallery-description'], 'error'),
 		status: 'required',
 		shouldShow: (context) =>
 			getFirstFailure(context, ['gallery-name', 'gallery-description'], 'error') !== undefined,
