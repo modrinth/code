@@ -18,7 +18,12 @@
 							>
 								<LeftArrowIcon />
 							</ButtonLink>
-							<Avatar :src="project.icon_url" :tint-by="project.id" size="64px" />
+							<Avatar
+								:src="project.icon_url"
+								:raw-src="project.raw_icon_url"
+								:tint-by="project.id"
+								size="64px"
+							/>
 						</template>
 						<template #metadata>
 							<PageHeaderMetadata>

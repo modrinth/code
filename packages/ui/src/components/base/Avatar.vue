@@ -17,6 +17,7 @@
 		:loading="loading"
 		@load="onLoad"
 		@error="onError"
+		@contextmenu="onFullImageContextMenu($event, rawSrc)"
 	/>
 	<svg
 		v-else
@@ -50,6 +51,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
+import { useFullImageContextMenu } from '../../composables'
+
+const onFullImageContextMenu = useFullImageContextMenu()
+
 const pixelated = ref(false)
 const hasTransparentCorners = ref(false)
 const hasDetectedCorners = ref(false)
@@ -68,6 +73,7 @@ defineExpose({
 const props = withDefaults(
 	defineProps<{
 		src?: string | null
+		rawSrc?: string | null
 		alt?: string
 		size?: string
 		circle?: boolean
@@ -79,6 +85,7 @@ const props = withDefaults(
 	}>(),
 	{
 		src: null,
+		rawSrc: null,
 		alt: '',
 		size: '2rem',
 		circle: false,
