@@ -288,8 +288,6 @@ import {
 import { formatProjectType } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 
-import { isStaff } from '~/helpers/users.js'
-
 import ThreadView from '../thread/ThreadView.vue'
 import SharedInstanceReportContext, {
 	type SharedInstanceOwnerInstance,
@@ -300,7 +298,6 @@ import SharedInstanceReportContext, {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-// const auth = await useAuth()
 
 type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 	project_id?: string
