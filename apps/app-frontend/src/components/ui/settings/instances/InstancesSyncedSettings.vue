@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import {
-	CheckIcon,
 	EditIcon,
 	// FolderOpenIcon,
 	RefreshCwIcon,
 	SaveIcon,
 	SearchIcon,
-	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
+	CheckCircleButton,
 	commonMessages,
 	defineMessages,
 	IconButton,
@@ -26,6 +25,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { Component } from 'vue'
 import { computed, ref, shallowRef, watch } from 'vue'
 
+import WorldItem from '@/components/ui/world/WorldItem.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
 import {
 	get_command_history,
@@ -38,12 +38,17 @@ import {
 	remove_synced_server,
 	set_command_history,
 	set_global_synced_option,
-	synced_option_needs_base,
 	type SyncedOption,
 	type SyncedServer,
 	update_synced_server,
 } from '@/helpers/instance'
 import { get, parseEnvVars, serializeEnvVars, set } from '@/helpers/settings.ts'
+import {
+	refreshServerData,
+	refreshServers,
+	type ServerData,
+	type ServerWorld,
+} from '@/helpers/worlds.ts'
 import { instanceKeys, screenshotKeys } from '@/pages/instance/query-options'
 
 const { handleError } = injectNotificationManager()
@@ -115,6 +120,10 @@ const messages = defineMessages({
 	serverEditorTitle: {
 		id: 'app.settings.synced-options.multiplayer-servers.editor-title',
 		defaultMessage: 'Edit synced servers',
+	},
+	editServerTitle: {
+		id: 'instance.edit-server.title',
+		defaultMessage: 'Edit server',
 	},
 	serverName: {
 		id: 'app.settings.synced-options.multiplayer-servers.name',
@@ -323,6 +332,7 @@ const baseInstanceSearch = ref('')
 const baseModal = ref<InstanceType<typeof NewModal> | null>(null)
 const commandHistoryModal = ref<InstanceType<typeof NewModal> | null>(null)
 const serverEditorModal = ref<InstanceType<typeof NewModal> | null>(null)
+const editServerModal = ref<InstanceType<typeof NewModal> | null>(null)
 const commandHistory = ref('')
 const syncedServers = ref<SyncedServer[]>(
 	(await list_synced_servers().catch((error) => {
@@ -330,7 +340,29 @@ const syncedServers = ref<SyncedServer[]>(
 		return []
 	})) ?? [],
 )
+const editedServer = ref<SyncedServer | null>(null)
+const serverData = ref<Record<string, ServerData>>({})
 const editorComponent = shallowRef<Component | null>(null)
+
+const syncedServerCards = computed(() =>
+	syncedServers.value.map((server, index) => ({
+		server,
+		world: {
+			name: server.name,
+			type: 'server',
+			index,
+			server_id: server.id,
+			address: server.address,
+			pack_status:
+				server.accept_textures === true
+					? 'enabled'
+					: server.accept_textures === false
+						? 'disabled'
+						: 'prompt',
+			display_status: 'normal',
+		} satisfies ServerWorld,
+	})),
+)
 
 const baseInstanceDescription = computed(() => {
 	switch (baseOption.value) {
@@ -399,19 +431,15 @@ function applyGlobalOption(option: SyncedOption, enabled: boolean, baseId?: stri
 	globalOptionMutation.mutate({ option, enabled, baseId })
 }
 
-async function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
-	try {
-		if (enabled && option !== 'screenshots' && (await synced_option_needs_base(option))) {
-			baseOption.value = option
-			baseInstanceId.value = instances.value[0]?.id ?? ''
-			baseInstanceSearch.value = ''
-			baseModal.value?.show()
-			return
-		}
-		applyGlobalOption(option, enabled)
-	} catch (error) {
-		handleError(error)
+function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
+	if (enabled && option !== 'screenshots') {
+		baseOption.value = option
+		baseInstanceId.value = instances.value[0]?.id ?? ''
+		baseInstanceSearch.value = ''
+		baseModal.value?.show()
+		return
 	}
+	applyGlobalOption(option, enabled)
 }
 
 function confirmBaseInstance() {
@@ -450,19 +478,42 @@ async function openServerEditor() {
 		handleError(error)
 		return []
 	})
+	serverData.value = {}
 	serverEditorModal.value?.show()
+	await refreshServers(
+		syncedServerCards.value.map(({ world }) => world),
+		serverData.value,
+		null,
+	)
 }
 
-async function saveSyncedServers() {
+function openSyncedServerEditor(server: SyncedServer) {
+	editedServer.value = { ...server }
+	editServerModal.value?.show()
+}
+
+async function saveSyncedServer() {
+	if (!editedServer.value) return
+	const server = editedServer.value
+
 	try {
-		for (const server of syncedServers.value) {
-			await update_synced_server(server)
+		await update_synced_server(server)
+		const index = syncedServers.value.findIndex(({ id }) => id === server.id)
+		if (index !== -1) {
+			syncedServers.value[index] = { ...server }
 		}
-		serverEditorModal.value?.hide()
+		editServerModal.value?.hide()
+		serverData.value[server.address] = { refreshing: true }
+		await refreshServerData(serverData.value[server.address], null, server.address)
 		await queryClient.invalidateQueries({ queryKey: ['worlds'] })
 	} catch (error) {
 		handleError(error)
 	}
+}
+
+async function refreshSyncedServer(address: string) {
+	serverData.value[address] ??= { refreshing: true }
+	await refreshServerData(serverData.value[address], null, address)
 }
 
 async function removeSyncedServer(serverId: string) {
@@ -542,43 +593,24 @@ watch(
 					:aria-label="formatMessage(messages.chooseSyncSourceTitle)"
 					class="flex flex-col gap-1"
 				>
-					<button
+					<CheckCircleButton
 						v-for="instance in filteredBaseInstances"
 						:key="instance.id"
-						type="button"
-						role="radio"
-						:aria-checked="baseInstanceId === instance.id"
-						class="flex h-10 w-full shrink-0 cursor-pointer items-center justify-between gap-4 rounded-[14px] border border-solid px-2 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-						:class="
-							baseInstanceId === instance.id
-								? 'border-brand bg-brand-highlight text-contrast'
-								: 'border-transparent bg-transparent text-contrast hover:bg-surface-3'
-						"
+						:checked="baseInstanceId === instance.id"
+						class="h-10"
 						@click="baseInstanceId = instance.id"
 					>
-						<span class="flex min-w-0 items-center gap-2">
-							<span class="size-5 shrink-0 overflow-hidden rounded-[6px]">
-								<Avatar
-									:src="getInstanceIconUrl(instance.icon_path)"
-									:alt="instance.name"
-									:tint-by="instance.id"
-									size="1.25rem"
-									no-shadow
-								/>
-							</span>
-							<span class="truncate font-semibold">{{ instance.name }}</span>
+						<span class="size-5 shrink-0 overflow-hidden rounded-[6px]">
+							<Avatar
+								:src="getInstanceIconUrl(instance.icon_path)"
+								:alt="instance.name"
+								:tint-by="instance.id"
+								size="1.25rem"
+								no-shadow
+							/>
 						</span>
-						<span
-							v-if="baseInstanceId === instance.id"
-							class="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand text-brand-inverted"
-						>
-							<CheckIcon class="size-4" aria-hidden="true" />
-						</span>
-						<span
-							v-else
-							class="size-6 shrink-0 rounded-full border border-solid border-surface-5"
-						/>
-					</button>
+						<span class="truncate">{{ instance.name }}</span>
+					</CheckCircleButton>
 				</div>
 			</div>
 			<template #actions>
@@ -634,45 +666,71 @@ watch(
 		<NewModal
 			ref="serverEditorModal"
 			:header="formatMessage(messages.serverEditorTitle)"
-			max-width="650px"
-			width="650px"
+			scrollable
+			actions-divider
+			no-padding
+			max-content-height="34.5rem"
+			max-width="750px"
+			width="750px"
 		>
-			<p v-if="syncedServers.length === 0" class="m-0 text-secondary">
+			<p v-if="syncedServers.length === 0" class="m-0 px-6 py-4 text-secondary">
 				{{ formatMessage(messages.noSyncedServers) }}
 			</p>
-			<div v-else class="flex flex-col gap-4">
-				<div
-					v-for="server in syncedServers"
+			<div v-else class="flex flex-col gap-2 px-6 py-4">
+				<WorldItem
+					v-for="{ server, world } in syncedServerCards"
 					:key="server.id"
-					class="grid grid-cols-[1fr_1fr_auto] items-end gap-2"
-				>
-					<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
-						{{ formatMessage(messages.serverName) }}
-						<Input v-model="server.name" autocomplete="off" />
-					</label>
-					<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
-						{{ formatMessage(messages.serverAddress) }}
-						<Input v-model="server.address" autocomplete="off" />
-					</label>
-					<Button
-						v-tooltip="formatMessage(commonMessages.removeButton)"
-						type="outlined"
-						:aria-label="formatMessage(commonMessages.removeButton)"
-						@click="removeSyncedServer(server.id)"
-					>
-						<TrashIcon />
+					:world="world"
+					card-background="surface-2"
+					:show-play-button="false"
+					:refreshing="serverData[server.address]?.refreshing"
+					:server-status="serverData[server.address]?.status"
+					:rendered-motd="serverData[server.address]?.renderedMotd"
+					@refresh="refreshSyncedServer(server.address)"
+					@edit="openSyncedServerEditor(server)"
+					@delete="removeSyncedServer(server.id)"
+				/>
+			</div>
+			<template #actions>
+				<div class="flex justify-end">
+					<Button type="outlined" @click="serverEditorModal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.closeButton) }}
 					</Button>
 				</div>
+			</template>
+		</NewModal>
+
+		<NewModal
+			ref="editServerModal"
+			:header="formatMessage(messages.editServerTitle)"
+			max-width="500px"
+			width="500px"
+		>
+			<div v-if="editedServer" class="flex flex-col gap-4">
+				<label class="flex flex-col gap-2 font-semibold text-contrast">
+					{{ formatMessage(messages.serverName) }}
+					<Input v-model="editedServer.name" autocomplete="off" wrapper-class="w-full" />
+				</label>
+				<label class="flex flex-col gap-2 font-semibold text-contrast">
+					{{ formatMessage(messages.serverAddress) }}
+					<Input v-model="editedServer.address" autocomplete="off" wrapper-class="w-full" />
+				</label>
 			</div>
 			<template #actions>
 				<div class="flex justify-end gap-2">
-					<Button type="outlined" @click="serverEditorModal?.hide()">
+					<Button type="outlined" @click="editServerModal?.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand" @click="saveSyncedServers">
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="!editedServer?.address"
+						@click="saveSyncedServer"
+					>
 						<SaveIcon />
-						{{ formatMessage(commonMessages.saveButton) }}
+						{{ formatMessage(commonMessages.saveChangesButton) }}
 					</Button>
 				</div>
 			</template>

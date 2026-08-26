@@ -94,6 +94,8 @@ const props = withDefaults(
 		}
 
 		managed?: boolean
+		showPlayButton?: boolean
+		cardBackground?: 'raised' | 'surface-2'
 
 		// Instance
 		instanceId?: string
@@ -116,6 +118,8 @@ const props = withDefaults(
 
 		gameMode: undefined,
 		managed: false,
+		showPlayButton: true,
+		cardBackground: 'raised',
 
 		instanceId: undefined,
 		instanceName: undefined,
@@ -272,9 +276,11 @@ const messages = defineMessages({
 			/>
 		</template>
 		<div
-			class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] transition-[filter] ease-out [--hover-brightness:1.25] min-h-20"
+			class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] transition-[filter] ease-out [--hover-brightness:1.25] min-h-20"
 			:class="{
 				'world-item-highlighted': highlighted,
+				'bg-bg-raised': cardBackground === 'raised',
+				'bg-surface-2': cardBackground === 'surface-2',
 			}"
 		>
 			<Avatar
@@ -431,7 +437,9 @@ const messages = defineMessages({
 			</div>
 			<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
 				<Button
-					v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
+					v-if="
+						showPlayButton && (playingWorld || (locked && playingInstance)) && !startingInstance
+					"
 					type="colored"
 					color="red"
 					@click="emit('stop')"
@@ -440,7 +448,7 @@ const messages = defineMessages({
 					{{ formatMessage(commonMessages.stopButton) }}
 				</Button>
 				<Button
-					v-else
+					v-else-if="showPlayButton"
 					v-tooltip="
 						quarantined
 							? formatMessage(messages.instanceLocked)

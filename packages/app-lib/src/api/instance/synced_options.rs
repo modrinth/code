@@ -151,12 +151,7 @@ pub async fn get_synced_options_folder() -> crate::Result<PathBuf> {
 pub async fn synced_option_needs_base(
     option: SyncedOption,
 ) -> crate::Result<bool> {
-    if option == SyncedOption::Screenshots {
-        return Ok(false);
-    }
-    let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
-    Ok(!canonical_exists(option, &state).await?)
+    Ok(option != SyncedOption::Screenshots)
 }
 
 async fn get_global_options_with_state(
@@ -361,10 +356,7 @@ pub async fn set_global_option(
 ) -> crate::Result<GlobalSyncedOptions> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
-    if enabled
-        && option != SyncedOption::Screenshots
-        && !canonical_exists(option, &state).await?
-    {
+    if enabled && option != SyncedOption::Screenshots {
         let base_instance_id = base_instance_id.ok_or_else(|| {
             ErrorKind::InputError(
                 "Choose a base instance before enabling a synced option."
@@ -737,7 +729,12 @@ async fn seed_from_instance(
             } else {
                 empty_hotbar_root()
             };
-            let mut sync_state = read_hotbar_state(state).await?;
+            let previous_state = read_hotbar_state(state).await?;
+            let mut sync_state = HotbarState {
+                schema_version: HOTBAR_SCHEMA_VERSION,
+                revision: previous_state.revision,
+                nbt: NbtCompound::new(),
+            };
             let merge_base = empty_hotbar_root();
             if merge_hotbar_family(
                 &mut sync_state.nbt,
