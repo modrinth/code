@@ -1,5 +1,5 @@
 import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
-import { type ProjectTitleMetadata, validateProjectFields } from '@modrinth/moderation'
+import { validateProjectFields } from '@modrinth/moderation'
 
 export type ValidationFilterRequest = Omit<
 	Labrinth.Moderation.Internal.ProjectsRequest,
@@ -16,7 +16,6 @@ export interface ModerationQueueFetchOptions {
 interface ValidationFilterScanOptions {
 	client: AbstractModrinthClient
 	request: ValidationFilterRequest
-	titleMetadata: ProjectTitleMetadata
 	includeWarnings: boolean
 	signal: AbortSignal
 	log: (message: string) => void
@@ -130,7 +129,6 @@ export async function fetchAllModerationQueueProjects(
 export async function scanProjectsWithValidationIssues({
 	client,
 	request,
-	titleMetadata,
 	includeWarnings,
 	signal,
 	log,
@@ -170,7 +168,7 @@ export async function scanProjectsWithValidationIssues({
 				if (!project) {
 					throw new Error(`V3 projects response omitted queued project ${projectId}`)
 				}
-				const validation = validateProjectFields(project, titleMetadata)
+				const validation = validateProjectFields(project)
 				if (includeWarnings ? validation.failures.length > 0 : !validation.valid) {
 					matchingProjectIds.add(projectId)
 				}

@@ -227,8 +227,8 @@
 	"nags.multiple-resolution-tags.title": {
 		"defaultMessage": "Select correct resolution"
 	},
-	"nags.project-name-metadata.title": {
-		"defaultMessage": "Remove technical details from the name"
+	"nags.project-name-version.title": {
+		"defaultMessage": "Fix project name"
 	},
 	"nags.project-summary-content.title": {
 		"defaultMessage": "Review the project summary"
@@ -351,7 +351,7 @@
 		"defaultMessage": "Visit links settings"
 	},
 	"project.text-validation.description-profanity": {
-		"defaultMessage": "Excessive profanity is not allowed. Detected: {values}."
+		"defaultMessage": "Excessive profanity is not allowed. Detected: {values}"
 	},
 	"project.text-validation.non-standard-text": {
 		"defaultMessage": "Non-standard text characters are not allowed."
@@ -371,10 +371,7 @@
 	"project.text-validation.summary-too-short": {
 		"defaultMessage": "Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary."
 	},
-	"project.text-validation.title-game-version": {
-		"defaultMessage": "Project titles should not include the Minecraft version “{value}”."
-	},
-	"project.text-validation.title-loader": {
-		"defaultMessage": "Project titles should not include the loader “{value}”."
+	"project.text-validation.title-version-number": {
+		"defaultMessage": "Names are not allowed to include version numbers."
 	}
 }

@@ -59,14 +59,14 @@
 					<div
 						v-for="nag in visibleNags"
 						:key="nag.id"
-						class="flex w-[268px] shrink-0 flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+						class="flex w-[268px] shrink-0 flex-col gap-2.5 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
 					>
-						<span class="flex items-center gap-2 font-medium text-contrast">
+						<span class="flex items-start gap-2 font-medium text-contrast">
 							<component
 								:is="nag.icon || getDefaultIcon(nag.status)"
 								v-tooltip="getStatusTooltip(nag.status)"
 								:class="[
-									'size-4',
+									'mt-0.5 size-4 min-w-4',
 									nag.status === 'required' && 'text-red',
 									nag.status === 'warning' && 'text-orange',
 									nag.status === 'suggestion' && 'text-purple',
@@ -123,7 +123,7 @@ import {
 	SendIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
-import type { Nag, NagContext, NagStatus, ProjectTitleMetadata } from '@modrinth/moderation'
+import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nags, validateProjectFields } from '@modrinth/moderation'
 import { Accordion, Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
@@ -327,14 +327,7 @@ watch(nagScroller, (el, previousEl) => {
 	nextTick(updateNagScrollShadows)
 })
 
-const titleMetadata = computed<ProjectTitleMetadata>(() => ({
-	gameVersions: props.tags.gameVersions.map(({ version }) => version),
-	loaders: props.tags.loaders.map(({ name }) => name),
-}))
-
-const projectValidation = computed(() =>
-	validateProjectFields(props.projectV3, titleMetadata.value),
-)
+const projectValidation = computed(() => validateProjectFields(props.projectV3))
 
 const nagContext = computed<NagContext>(() => ({
 	project: props.project,

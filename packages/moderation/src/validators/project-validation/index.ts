@@ -2,7 +2,6 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import {
 	type ProjectTextValidationResult,
-	type ProjectTitleMetadata,
 	validateProjectDescription,
 	validateProjectSummary,
 	validateProjectText,
@@ -29,7 +28,6 @@ export interface ProjectValidationResult {
 
 export function validateProjectFields(
 	project: Labrinth.Projects.v3.Project,
-	titleMetadata: ProjectTitleMetadata,
 ): ProjectValidationResult {
 	const failures: ProjectValidationFailure[] = []
 
@@ -47,7 +45,7 @@ export function validateProjectFields(
 		)
 	}
 
-	addFailures('name', validateProjectTitle(project.name, titleMetadata))
+	addFailures('name', validateProjectTitle(project.name))
 	addFailures('summary', validateProjectSummary(project.summary, project.name))
 	addFailures('description', validateProjectDescription(project.description))
 
@@ -67,9 +65,6 @@ export function validateProjectFields(
 	}
 }
 
-export function hasProjectFieldValidationFailures(
-	project: Labrinth.Projects.v3.Project,
-	titleMetadata: ProjectTitleMetadata,
-): boolean {
-	return !validateProjectFields(project, titleMetadata).valid
+export function hasProjectFieldValidationFailures(project: Labrinth.Projects.v3.Project): boolean {
+	return !validateProjectFields(project).valid
 }

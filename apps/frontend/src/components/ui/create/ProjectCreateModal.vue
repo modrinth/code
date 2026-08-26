@@ -40,6 +40,7 @@
 					autocomplete="off"
 					:disabled="hasHitLimit"
 					@update:model-value="updatedName()"
+					@blur="nameForValidation = name"
 				/>
 				<ValidationMessage :check="nameValidation" />
 			</div>
@@ -334,7 +335,8 @@ const visibilities = ref<VisibilityOption[]>([
 ])
 const visibility = ref<VisibilityOption>(visibilities.value[0])
 
-const nameValidation = useProjectTitleValidation(name)
+const nameForValidation = ref(name.value)
+const nameValidation = useProjectTitleValidation(nameForValidation)
 const summaryValidation = useProjectSummaryValidation(description, name)
 
 const disableCreate = computed(() => {
@@ -514,6 +516,7 @@ async function createProject() {
 
 async function show(event?: MouseEvent, options?: ShowOptions) {
 	name.value = ''
+	nameForValidation.value = name.value
 	slug.value = ''
 	description.value = ''
 	manualSlug.value = false

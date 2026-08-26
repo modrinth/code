@@ -26,8 +26,7 @@ export type ProjectTextValidationCode =
 	| 'text-slur'
 	| 'text-profanity'
 	| 'text-non-standard'
-	| 'title-game-version'
-	| 'title-loader'
+	| 'title-version-number'
 	| 'title-minecraft-branding'
 	| 'summary-link'
 	| 'summary-matches-title'
@@ -68,13 +67,9 @@ const messages = defineMessages({
 		id: 'project.text-validation.non-standard-text',
 		defaultMessage: 'Non-standard text characters are not allowed.',
 	},
-	titleGameVersion: {
-		id: 'project.text-validation.title-game-version',
-		defaultMessage: 'Project titles should not include the Minecraft version “{value}”.',
-	},
-	titleLoader: {
-		id: 'project.text-validation.title-loader',
-		defaultMessage: 'Project titles should not include the loader “{value}”.',
+	titleVersionNumber: {
+		id: 'project.text-validation.title-version-number',
+		defaultMessage: 'Names are not allowed to include version numbers.',
 	},
 	titleMinecraftBranding: {
 		id: 'nags.minecraft-title-clause.description',
@@ -126,23 +121,6 @@ const messages = defineMessages({
 	},
 })
 
-const titleMetadataMessages = {
-	'game-version': messages.titleGameVersion,
-	loader: messages.titleLoader,
-}
-
-export type ProjectTitleMetadataKind = 'game-version' | 'loader'
-
-export interface ProjectTitleMetadata {
-	gameVersions: readonly string[]
-	loaders: readonly string[]
-}
-
-export interface ProjectTitleMetadataMatch {
-	kind: ProjectTitleMetadataKind
-	value: string
-}
-
 const linkify = new LinkifyIt({
 	fuzzyEmail: false,
 	fuzzyIP: true,
@@ -151,28 +129,6 @@ const linkify = new LinkifyIt({
 
 function normalizeForSearch(value: string) {
 	return value.normalize('NFC').toLowerCase()
-}
-
-export function findProjectTitleMetadata(
-	title: string,
-	metadata: ProjectTitleMetadata,
-): ProjectTitleMetadataMatch | null {
-	const normalizedTitle = normalizeForSearch(title)
-	const groups: ReadonlyArray<readonly [ProjectTitleMetadataKind, readonly string[]]> = [
-		['game-version', metadata.gameVersions],
-		['loader', metadata.loaders],
-	]
-
-	for (const [kind, values] of groups) {
-		for (const value of values) {
-			const normalizedValue = normalizeForSearch(value.trim())
-			if (normalizedValue && normalizedTitle.includes(normalizedValue)) {
-				return { kind, value }
-			}
-		}
-	}
-
-	return null
 }
 
 export function normalizeProjectFieldText(value: string) {
@@ -325,22 +281,23 @@ export function validateProjectText(
 
 export function validateProjectTitle(
 	text: string | null | undefined,
-	metadata: ProjectTitleMetadata,
 ): ProjectTextValidationResult[] {
 	const results = validateProjectText(text)
 	if (results.length > 0 || !text) return results
 
-	const match = findProjectTitleMetadata(text, metadata)
-	if (match) {
+	const normalizedTitle = normalizeForSearch(text)
+	const disallowedVersion = [...normalizedTitle.matchAll(/\d+(?:\.\d+)+/g)].find((match) => {
+		const textAfterVersion = normalizedTitle.slice((match.index ?? 0) + match[0].length)
+		return !/\b(?:port|fork)\b/.test(textAfterVersion)
+	})
+	if (disallowedVersion) {
 		results.push({
-			code: match.kind === 'game-version' ? 'title-game-version' : 'title-loader',
-			severity: 'warn',
-			message: titleMetadataMessages[match.kind],
-			values: { value: match.value },
+			code: 'title-version-number',
+			severity: 'error',
+			message: messages.titleVersionNumber,
 		})
 	}
 
-	const normalizedTitle = normalizeProjectFieldText(text).toLowerCase()
 	const wordsInTitle = normalizedTitle.split(/\s+/).filter(Boolean)
 	if (normalizedTitle.includes('minecraft') && wordsInTitle.length <= 3) {
 		results.push({

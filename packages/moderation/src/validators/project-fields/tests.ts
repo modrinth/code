@@ -4,31 +4,12 @@ import test from 'node:test'
 import {
 	containsProjectLinkOrIp,
 	extractProjectLinks,
-	findProjectTitleMetadata,
 	projectSummaryMatchesTitle,
 	validateProjectDescription,
 	validateProjectSummary,
 	validateProjectText,
 	validateProjectTitle,
 } from './index.ts'
-
-const metadata = {
-	gameVersions: ['1.21.1'],
-	loaders: ['fabric'],
-}
-
-test('finds game versions and loaders in project titles', () => {
-	assert.deepEqual(findProjectTitleMetadata('Tools for 1.21.1', metadata), {
-		kind: 'game-version',
-		value: '1.21.1',
-	})
-	assert.deepEqual(findProjectTitleMetadata('FABRIC Tools', metadata), {
-		kind: 'loader',
-		value: 'fabric',
-	})
-	assert.equal(findProjectTitleMetadata('Magical Tools', metadata), null)
-	assert.equal(findProjectTitleMetadata('Ordinary Tools', metadata), null)
-})
 
 test('compares summaries and titles after trimming and Unicode normalization', () => {
 	assert.equal(projectSummaryMatchesTitle('  Caf\u00e9  ', 'Cafe\u0301'), true)
@@ -72,26 +53,37 @@ test('validates shared project text', () => {
 })
 
 test('validates project titles', () => {
-	assert.deepEqual(validateProjectTitle('Fabric Tools', metadata), [
+	assert.deepEqual(validateProjectTitle('Tools 1.2.3'), [
 		{
-			code: 'title-loader',
-			severity: 'warn',
+			code: 'title-version-number',
+			severity: 'error',
 			message: {
-				id: 'project.text-validation.title-loader',
-				defaultMessage: 'Project titles should not include the loader “{value}”.',
+				id: 'project.text-validation.title-version-number',
+				defaultMessage: 'Names are not allowed to include version numbers.',
 			},
-			values: { value: 'fabric' },
 		},
 	])
-	assert.equal(
-		validateProjectTitle('Minecraft Tools', metadata)[0]?.code,
-		'title-minecraft-branding',
-	)
+	assert.deepEqual(validateProjectTitle('Tools 1.2'), [
+		{
+			code: 'title-version-number',
+			severity: 'error',
+			message: {
+				id: 'project.text-validation.title-version-number',
+				defaultMessage: 'Names are not allowed to include version numbers.',
+			},
+		},
+	])
+	assert.deepEqual(validateProjectTitle('My Mod 1.2 Fabric Port'), [])
+	assert.deepEqual(validateProjectTitle('My Mod 1.2 FORK'), [])
+	assert.equal(validateProjectTitle('My Port of Mod 1.2')[0]?.code, 'title-version-number')
+	assert.equal(validateProjectTitle('My Mod 1.2 Supported')[0]?.code, 'title-version-number')
+	assert.deepEqual(validateProjectTitle('Fabric Tools'), [])
+	assert.equal(validateProjectTitle('Minecraft Tools')[0]?.code, 'title-minecraft-branding')
 	assert.deepEqual(
-		validateProjectTitle('Minecraft Fabric Tools', metadata).map(({ code }) => code),
-		['title-loader', 'title-minecraft-branding'],
+		validateProjectTitle('Minecraft Tools 1.2').map(({ code }) => code),
+		['title-version-number', 'title-minecraft-branding'],
 	)
-	assert.deepEqual(validateProjectTitle('Ordinary Tools', metadata), [])
+	assert.deepEqual(validateProjectTitle('Ordinary Tools'), [])
 })
 
 test('validates project summaries', () => {

@@ -22,7 +22,14 @@
 					<label for="project-name">
 						<span class="label__title">Name</span>
 					</label>
-					<Input id="project-name" v-model="name" :maxlength="2048" :disabled="!hasPermission" />
+					<Input
+						id="project-name"
+						v-model="name"
+						:maxlength="2048"
+						wrapper-class="w-full max-w-72"
+						:disabled="!hasPermission"
+						@blur="nameForValidation = name"
+					/>
 					<ValidationMessage :check="nameValidation" class="mt-2" />
 				</div>
 
@@ -430,7 +437,8 @@ const hasPermission = computed(() => {
 	)
 })
 
-const nameValidation = useProjectTitleValidation(name)
+const nameForValidation = ref(name.value)
+const nameValidation = useProjectTitleValidation(nameForValidation)
 const summaryValidation = useProjectSummaryValidation(summary, name)
 const hasValidationIssues = computed(
 	() =>
@@ -537,6 +545,7 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 function resetChanges() {
 	name.value = project.value.name
+	nameForValidation.value = name.value
 	slug.value = project.value.slug ?? ''
 	summary.value = project.value.summary
 	visibility.value = tags.value.approvedStatuses.includes(project.value.status)

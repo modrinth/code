@@ -14,10 +14,6 @@ const nameErrorCodes: readonly ProjectTextValidationCode[] = [
 	'text-profanity',
 	'text-non-standard',
 ]
-const nameWarningCodes: readonly ProjectTextValidationCode[] = [
-	'title-game-version',
-	'title-loader',
-]
 const summaryErrorCodes: readonly ProjectTextValidationCode[] = [
 	'text-slur',
 	'text-profanity',
@@ -93,15 +89,14 @@ export const projectValidationNags: Nag[] = [
 		},
 	},
 	{
-		id: 'project-name-metadata',
+		id: 'project-name-version',
 		title: defineMessage({
-			id: 'nags.project-name-metadata.title',
-			defaultMessage: 'Remove technical details from the name',
+			id: 'nags.project-name-version.title',
+			defaultMessage: 'Fix project name',
 		}),
-		description: (context) => getFailureDescription(context, ['name'], 'warn', nameWarningCodes),
-		status: 'warning',
-		shouldShow: (context) =>
-			getFirstFailure(context, ['name'], 'warn', nameWarningCodes) !== undefined,
+		description: (context) => getCodedFailureDescription(context, 'title-version-number'),
+		status: 'required',
+		shouldShow: (context) => getCodedFailure(context, 'title-version-number') !== undefined,
 		link: {
 			path: 'settings',
 			title: defineMessage({

@@ -222,7 +222,6 @@ const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const generatedState = useGeneratedState()
 const debugValidationFilter = useDebugLogger('moderation-validation-filter')
 const debugProjectIdsFilter = useDebugLogger('moderation-project-ids-filter')
 
@@ -598,10 +597,6 @@ const {
 		const response = await scanProjectsWithValidationIssues({
 			client,
 			request: queryKey[3],
-			titleMetadata: {
-				gameVersions: generatedState.value.gameVersions.map(({ version }) => version),
-				loaders: generatedState.value.loaders.map(({ name }) => name),
-			},
 			includeWarnings: queryKey[2],
 			signal,
 			log: debugValidationFilter,

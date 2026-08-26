@@ -37,7 +37,7 @@ const {
 	current,
 	saving,
 	hasChanges,
-	reset,
+	reset: resetForm,
 	save: saveForm,
 } = useSavable(
 	() => ({
@@ -57,7 +57,8 @@ const {
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
-const titleValidation = useProjectTitleValidation(() => current.value.title)
+const titleForValidation = ref(current.value.title)
+const titleValidation = useProjectTitleValidation(titleForValidation)
 const taglineValidation = useProjectSummaryValidation(
 	() => current.value.tagline,
 	() => current.value.title,
@@ -83,6 +84,11 @@ const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
 async function save() {
 	if (!canSave.value) return
 	await saveForm()
+}
+
+function reset() {
+	resetForm()
+	titleForValidation.value = current.value.title
 }
 
 const messages = defineMessages({
@@ -198,6 +204,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 						autocomplete="off"
 						:maxlength="50"
 						wrapper-class="flex-grow"
+						@blur="titleForValidation = current.title"
 					/>
 				</div>
 				<ValidationMessage :check="titleValidation" class="mt-2" />

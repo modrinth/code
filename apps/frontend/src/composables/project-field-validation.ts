@@ -5,7 +5,6 @@ import {
 	type LinkCheckContext,
 	type LinkCheckResult,
 	type ProjectTextValidationResult,
-	type ProjectTitleMetadata,
 	validateProjectDescription,
 	validateProjectSummary,
 	validateProjectTitle,
@@ -20,18 +19,8 @@ export const projectTextValidationMessages = defineMessages({
 	},
 })
 
-function useProjectTitleMetadata() {
-	const generatedState = useGeneratedState()
-
-	return computed<ProjectTitleMetadata>(() => ({
-		gameVersions: generatedState.value.gameVersions.map(({ version }) => version),
-		loaders: generatedState.value.loaders.map(({ name }) => name),
-	}))
-}
-
 export function useProjectTitleValidation(text: MaybeRefOrGetter<string | null | undefined>) {
-	const metadata = useProjectTitleMetadata()
-	return computed(() => validateProjectTitle(toValue(text), metadata.value))
+	return computed(() => validateProjectTitle(toValue(text)))
 }
 
 export function useProjectSummaryValidation(

@@ -3,13 +3,7 @@ import test from 'node:test'
 
 import type { Labrinth } from '@modrinth/api-client'
 
-import type { ProjectTitleMetadata } from '../project-fields/index.ts'
 import { hasProjectFieldValidationFailures, validateProjectFields } from './index.ts'
-
-const metadata: ProjectTitleMetadata = {
-	gameVersions: ['1.21.1'],
-	loaders: ['fabric'],
-}
 
 function createProject(
 	overrides: Partial<Labrinth.Projects.v3.Project> = {},
@@ -25,8 +19,8 @@ function createProject(
 
 test('validates project fields and gallery text', () => {
 	const project = createProject({
-		name: 'Fabric Tools',
-		summary: 'Fabric Tools',
+		name: 'Ordinary Tools',
+		summary: 'Ordinary Tools',
 		description: '𝐀',
 		gallery: [
 			{
@@ -41,7 +35,7 @@ test('validates project fields and gallery text', () => {
 		],
 	})
 
-	const result = validateProjectFields(project, metadata)
+	const result = validateProjectFields(project)
 
 	assert.equal(result.valid, false)
 	assert.deepEqual(
@@ -52,12 +46,6 @@ test('validates project fields and gallery text', () => {
 			message: message.id,
 		})),
 		[
-			{
-				field: 'name',
-				galleryIndex: undefined,
-				galleryUrl: undefined,
-				message: 'project.text-validation.title-loader',
-			},
 			{
 				field: 'summary',
 				galleryIndex: undefined,
@@ -93,36 +81,40 @@ test('reports whether a project has field validation failures', () => {
 	const validProject = createProject()
 	const invalidProject = createProject({ summary: 'This project is shit' })
 
-	assert.deepEqual(validateProjectFields(validProject, metadata), {
+	assert.deepEqual(validateProjectFields(validProject), {
 		valid: true,
 		failures: [],
 	})
-	assert.equal(hasProjectFieldValidationFailures(validProject, metadata), false)
-	assert.equal(hasProjectFieldValidationFailures(invalidProject, metadata), true)
+	assert.equal(hasProjectFieldValidationFailures(validProject), false)
+	assert.equal(hasProjectFieldValidationFailures(invalidProject), true)
 })
 
-test('treats title metadata and summary content recommendations as warnings', () => {
+test('treats version numbers as errors and summary content recommendations as warnings', () => {
 	const project = createProject({
-		name: 'Fabric Tools',
+		name: 'Tools 1.2.3',
 		summary: 'Visit modrinth.com for more information',
 	})
-	const result = validateProjectFields(project, metadata)
+	const result = validateProjectFields(project)
 
-	assert.equal(result.valid, true)
+	assert.equal(result.valid, false)
 	assert.deepEqual(
 		result.failures.map(({ code, severity }) => ({ code, severity })),
 		[
-			{ code: 'title-loader', severity: 'warn' },
+			{ code: 'title-version-number', severity: 'error' },
 			{ code: 'summary-link', severity: 'warn' },
 		],
 	)
-	assert.equal(hasProjectFieldValidationFailures(project, metadata), false)
+	assert.equal(hasProjectFieldValidationFailures(project), true)
+	assert.equal(
+		hasProjectFieldValidationFailures(createProject({ name: 'Tools 1.2 Fabric Port' })),
+		false,
+	)
 })
 
 test('reports summary recommendations without invalidating the project', () => {
 	const project = createProject({ summary: 'Short summary' })
 
-	assert.deepEqual(validateProjectFields(project, metadata), {
+	assert.deepEqual(validateProjectFields(project), {
 		valid: true,
 		failures: [
 			{
@@ -138,5 +130,5 @@ test('reports summary recommendations without invalidating the project', () => {
 			},
 		],
 	})
-	assert.equal(hasProjectFieldValidationFailures(project, metadata), false)
+	assert.equal(hasProjectFieldValidationFailures(project), false)
 })
