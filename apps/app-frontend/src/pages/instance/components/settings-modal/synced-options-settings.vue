@@ -82,6 +82,8 @@ const mutation = useMutation({
 
 		if (updatedInstance.synced_options.screenshots && route.name === 'InstanceScreenshots') {
 			await router.replace(`/instance/${encodeURIComponent(updatedInstance.id)}`)
+		} else if (!updatedInstance.synced_options.screenshots && route.name === 'Screenshots') {
+			await router.replace('/')
 		}
 	},
 	onError: async (error, _enabled, context) => {
