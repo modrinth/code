@@ -5,6 +5,7 @@ export type ScreenshotEditorTool =
 	| 'pen'
 	| 'highlight'
 	| 'eraser'
+	| 'crop'
 	| 'text'
 	| 'arrow'
 	| 'rectangle'
@@ -47,4 +48,5 @@ export type ScreenshotEditorObjectState = Record<string, unknown> & {
 
 export type EditorHistoryEntry = {
 	objects: ScreenshotEditorObjectState[]
+	crop: ScreenshotEditorSourceRect
 }

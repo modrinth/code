@@ -937,10 +937,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 				<template v-if="ctx.items.value.length > 0">
 					<div class="flex flex-col gap-2">
-						<span
-							v-if="ctx.managedContent.value"
-							class="mb-2 text-xl font-semibold text-contrast"
-						>
+						<span v-if="ctx.managedContent.value" class="mb-2 text-xl font-semibold text-contrast">
 							{{ formatMessage(messages.additionalContent) }}
 						</span>
 

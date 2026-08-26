@@ -5,7 +5,8 @@ export const imageViewerEditorMessages = defineMessages({
 	previous: { id: 'image-viewer.previous', defaultMessage: 'Previous image' },
 	next: { id: 'image-viewer.next', defaultMessage: 'Next image' },
 	edit: { id: 'image-viewer.edit', defaultMessage: 'Edit' },
-	saveAsCopy: { id: 'image-viewer.editor.save-as-new', defaultMessage: 'Save as copy' },
+	saveAsCopy: { id: 'image-viewer.editor.save-as-new', defaultMessage: 'Save copy' },
+	overwrite: { id: 'image-viewer.editor.overwrite', defaultMessage: 'Overwrite' },
 	moreSaveOptions: {
 		id: 'image-viewer.editor.more-save-options',
 		defaultMessage: 'More save options',
@@ -15,6 +16,7 @@ export const imageViewerEditorMessages = defineMessages({
 	pen: { id: 'image-viewer.editor.tool.pen', defaultMessage: 'Pen' },
 	highlight: { id: 'image-viewer.editor.tool.highlight', defaultMessage: 'Highlight' },
 	eraser: { id: 'image-viewer.editor.tool.eraser', defaultMessage: 'Eraser' },
+	crop: { id: 'image-viewer.editor.tool.crop', defaultMessage: 'Crop' },
 	text: { id: 'image-viewer.editor.tool.text', defaultMessage: 'Text' },
 	arrow: { id: 'image-viewer.editor.tool.arrow', defaultMessage: 'Arrow' },
 	rectangle: { id: 'image-viewer.editor.tool.rectangle', defaultMessage: 'Rectangle' },
@@ -26,6 +28,11 @@ export const imageViewerEditorMessages = defineMessages({
 	eraserMode: { id: 'image-viewer.editor.eraser.mode', defaultMessage: 'Eraser mode' },
 	element: { id: 'image-viewer.editor.eraser.element', defaultMessage: 'Element' },
 	area: { id: 'image-viewer.editor.eraser.area', defaultMessage: 'Area' },
+	cropDimensions: {
+		id: 'image-viewer.editor.crop.dimensions',
+		defaultMessage: '{width} × {height} px',
+	},
+	resetCrop: { id: 'image-viewer.editor.crop.reset', defaultMessage: 'Reset crop' },
 	colour: { id: 'image-viewer.editor.colour', defaultMessage: 'Colour' },
 	width: { id: 'image-viewer.editor.width', defaultMessage: 'Width' },
 	size: { id: 'image-viewer.editor.size', defaultMessage: 'Size' },
@@ -43,7 +50,7 @@ export const imageViewerEditorMessages = defineMessages({
 		defaultMessage: 'Fit to workspace',
 	},
 	annotationTools: {
-		id: 'image-viewer.editor.annotation-tools',
-		defaultMessage: 'Annotation tools',
+		id: 'image-viewer.editor.image-editing-tools',
+		defaultMessage: 'Image editing tools',
 	},
 })

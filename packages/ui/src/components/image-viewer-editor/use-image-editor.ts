@@ -23,6 +23,7 @@ type FabricPath = import('fabric').Path
 type FabricPathData = Exclude<ConstructorParameters<FabricModule['Path']>[0], string>
 type FabricImage = import('fabric').FabricImage
 type FabricGroup = import('fabric').Group
+type FabricRect = import('fabric').Rect
 type FabricImageOptions = ConstructorParameters<FabricModule['FabricImage']>[1]
 type EditorFabricObject = FabricObject & {
 	editorKind?: ScreenshotEditorObjectKind
@@ -34,12 +35,16 @@ type EditorFabricObject = FabricObject & {
 
 type FabricPointerEvent = {
 	e: MouseEvent | TouchEvent | PointerEvent
+	target?: FabricObject
+	transform?: { corner?: string }
 }
 
 const MIN_ZOOM = 0.25
 const MAX_ZOOM = 4
 const CONTROL_SIZE = 14
 const CONTROL_TOUCH_SIZE = 24
+const MAX_RENDERED_CANVAS_PIXELS = 16_777_216
+const MIN_CROP_SIZE = 1
 const SELECTION_COLOR = '#1bd96a'
 const CENSOR_REGENERATED_PROPERTIES = new Set([
 	'type',
@@ -58,6 +63,7 @@ const TOOL_SHORTCUTS: Partial<Record<string, ScreenshotEditorTool>> = {
 	c: 'censor',
 	e: 'eraser',
 	h: 'highlight',
+	k: 'crop',
 	o: 'ellipse',
 	p: 'pen',
 	r: 'rectangle',
@@ -82,6 +88,7 @@ export function useImageEditor() {
 	const isFit = ref(true)
 	const originalWidth = ref(0)
 	const originalHeight = ref(0)
+	const cropRect = ref<ScreenshotEditorSourceRect>({ left: 0, top: 0, width: 0, height: 0 })
 	const history = ref<EditorHistoryEntry[]>([])
 	const historyIndex = ref(-1)
 	const selectedPropertyKind = ref<ScreenshotEditorPropertyKind>()
@@ -120,6 +127,10 @@ export function useImageEditor() {
 	const showEraserMode = computed(() => selectionCount.value === 0 && tool.value === 'eraser')
 	const canZoomOut = computed(() => zoom.value > MIN_ZOOM)
 	const canZoomIn = computed(() => zoom.value < MAX_ZOOM)
+	const showCropControls = computed(() => selectionCount.value === 0 && tool.value === 'crop')
+	const cropWidth = computed(() => cropRect.value.width)
+	const cropHeight = computed(() => cropRect.value.height)
+	const canResetCrop = computed(() => !isFullCrop())
 
 	const defaultWidths: Record<'width' | 'highlight' | 'eraser', number> = {
 		width: 6,
@@ -131,15 +142,20 @@ export function useImageEditor() {
 
 	let fabric: FabricModule | undefined
 	let background: FabricImage | undefined
+	let cropSelection: FabricRect | undefined
+	let cropShade: FabricRect[] = []
 	let sourceImage: HTMLImageElement | undefined
 	let sourceUrl: string | undefined
 	let drawingStart: { x: number; y: number } | undefined
 	let drawingObject: EditorFabricObject | undefined
+	let cropDrawingStart: FabricPoint | undefined
+	let cropDrawingPrevious: ScreenshotEditorSourceRect | undefined
 	let restoringHistory = false
 	let constructingObject = false
 	let propertyEditStart: string | undefined
 	let erasing = false
 	let erasedDuringGesture = false
+	let interactionEnabled = true
 
 	watch(eraserMode, () => {
 		finishErasing()
@@ -184,6 +200,7 @@ export function useImageEditor() {
 			setEditorMetadata(background, 'background')
 			nextCanvas.add(background)
 			nextCanvas.sendObjectToBack(background)
+			createCropUi(nextCanvas)
 			bindCanvasEvents(nextCanvas)
 			resetHistory()
 			setTool('select')
@@ -200,6 +217,7 @@ export function useImageEditor() {
 			if (!constructingObject && !restoringHistory && !editorCanvas.isDrawingMode) {
 				recordHistory()
 			}
+			keepCropUiOnTop()
 		})
 		editorCanvas.on('path:created', ({ path }) => {
 			if (tool.value === 'eraser' && eraserMode.value === 'area') {
@@ -213,7 +231,21 @@ export function useImageEditor() {
 			recordHistory()
 			syncSelectionProperties()
 		})
+		editorCanvas.on('object:moving', ({ target }) => {
+			if (target === cropSelection) {
+				constrainCropMove()
+				syncCropFromSelection()
+			}
+		})
+		editorCanvas.on('object:scaling', ({ target }) => {
+			if (target === cropSelection) syncCropFromSelection()
+		})
 		editorCanvas.on('object:modified', ({ target }) => {
+			if (target === cropSelection) {
+				normalizeCropSelection()
+				recordHistory()
+				return
+			}
 			if (target) {
 				refreshModifiedCensors(target as EditorFabricObject)
 				editorCanvas.requestRenderAll()
@@ -233,8 +265,219 @@ export function useImageEditor() {
 		})
 	}
 
+	function createCropUi(editorCanvas: FabricCanvas) {
+		const fabricModule = fabric
+		if (!fabricModule) return
+		cropRect.value = fullCropRect()
+		cropShade = Array.from(
+			{ length: 4 },
+			() =>
+				new fabricModule.Rect({
+					left: 0,
+					top: 0,
+					originX: 'left',
+					originY: 'top',
+					width: 0,
+					height: 0,
+					fill: 'rgba(0, 0, 0, 0.55)',
+					strokeWidth: 0,
+					selectable: false,
+					evented: false,
+					excludeFromExport: true,
+					visible: false,
+				}),
+		)
+		cropSelection = new fabricModule.Rect({
+			...cropRect.value,
+			originX: 'left',
+			originY: 'top',
+			fill: 'transparent',
+			stroke: SELECTION_COLOR,
+			strokeUniform: true,
+			strokeWidth: 2,
+			lockRotation: true,
+			lockScalingFlip: true,
+			selectable: false,
+			evented: false,
+			excludeFromExport: true,
+			perPixelTargetFind: true,
+			visible: false,
+		})
+		styleCropControls()
+		editorCanvas.add(...cropShade, cropSelection)
+		updateCropUi()
+	}
+
+	function fullCropRect(): ScreenshotEditorSourceRect {
+		return {
+			left: 0,
+			top: 0,
+			width: originalWidth.value,
+			height: originalHeight.value,
+		}
+	}
+
+	function isFullCrop() {
+		const rect = cropRect.value
+		return (
+			rect.left === 0 &&
+			rect.top === 0 &&
+			rect.width === originalWidth.value &&
+			rect.height === originalHeight.value
+		)
+	}
+
+	function updateCropUi() {
+		if (!cropSelection || cropShade.length !== 4) return
+		const rect = cropRect.value
+		const right = rect.left + rect.width
+		const bottom = rect.top + rect.height
+		cropSelection.set({
+			left: rect.left,
+			top: rect.top,
+			width: rect.width,
+			height: rect.height,
+			scaleX: 1,
+			scaleY: 1,
+		})
+		cropShade[0].set({ left: 0, top: 0, width: originalWidth.value, height: rect.top })
+		cropShade[1].set({ left: 0, top: rect.top, width: rect.left, height: rect.height })
+		cropShade[2].set({
+			left: right,
+			top: rect.top,
+			width: originalWidth.value - right,
+			height: rect.height,
+		})
+		cropShade[3].set({
+			left: 0,
+			top: bottom,
+			width: originalWidth.value,
+			height: originalHeight.value - bottom,
+		})
+		const cropToolActive = interactionEnabled && tool.value === 'crop'
+		const hasCropBounds = !isFullCrop()
+		const shadeVisible = interactionEnabled && hasCropBounds
+		for (const shade of cropShade) {
+			shade.visible = shadeVisible
+			shade.setCoords()
+		}
+		cropSelection.set({
+			visible: cropToolActive && hasCropBounds,
+			selectable: cropToolActive && hasCropBounds,
+			evented: cropToolActive && hasCropBounds,
+		})
+		cropSelection.setCoords()
+		keepCropUiOnTop()
+		canvas.value?.requestRenderAll()
+	}
+
+	function keepCropUiOnTop() {
+		const editorCanvas = canvas.value
+		if (!editorCanvas || !cropSelection) return
+		for (const shade of cropShade) editorCanvas.bringObjectToFront(shade)
+		editorCanvas.bringObjectToFront(cropSelection)
+	}
+
+	function cropSelectionRect(): ScreenshotEditorSourceRect | undefined {
+		if (!cropSelection) return undefined
+		return {
+			left: cropSelection.left,
+			top: cropSelection.top,
+			width: cropSelection.width * cropSelection.scaleX,
+			height: cropSelection.height * cropSelection.scaleY,
+		}
+	}
+
+	function sanitizeCropRect(rect: ScreenshotEditorSourceRect): ScreenshotEditorSourceRect {
+		const left = Math.min(originalWidth.value - MIN_CROP_SIZE, Math.max(0, Math.round(rect.left)))
+		const top = Math.min(originalHeight.value - MIN_CROP_SIZE, Math.max(0, Math.round(rect.top)))
+		const right = Math.min(
+			originalWidth.value,
+			Math.max(left + MIN_CROP_SIZE, Math.round(rect.left + rect.width)),
+		)
+		const bottom = Math.min(
+			originalHeight.value,
+			Math.max(top + MIN_CROP_SIZE, Math.round(rect.top + rect.height)),
+		)
+		return { left, top, width: right - left, height: bottom - top }
+	}
+
+	function syncCropFromSelection() {
+		const rect = cropSelectionRect()
+		if (!rect) return
+		cropRect.value = sanitizeCropRect(rect)
+		const nextRect = cropRect.value
+		const right = nextRect.left + nextRect.width
+		const bottom = nextRect.top + nextRect.height
+		cropShade[0]?.set({ height: nextRect.top })
+		cropShade[1]?.set({ top: nextRect.top, width: nextRect.left, height: nextRect.height })
+		cropShade[2]?.set({
+			left: right,
+			top: nextRect.top,
+			width: originalWidth.value - right,
+			height: nextRect.height,
+		})
+		cropShade[3]?.set({
+			top: bottom,
+			height: originalHeight.value - bottom,
+		})
+		canvas.value?.requestRenderAll()
+	}
+
+	function normalizeCropSelection() {
+		const rect = cropSelectionRect()
+		if (!rect) return
+		cropRect.value = sanitizeCropRect(rect)
+		updateCropUi()
+		updateActiveCropSelection()
+	}
+
+	function constrainCropMove() {
+		if (!cropSelection) return
+		const width = cropSelection.width * cropSelection.scaleX
+		const height = cropSelection.height * cropSelection.scaleY
+		cropSelection.set({
+			left: Math.min(originalWidth.value - width, Math.max(0, cropSelection.left)),
+			top: Math.min(originalHeight.value - height, Math.max(0, cropSelection.top)),
+		})
+	}
+
+	function setCropRect(nextRect: ScreenshotEditorSourceRect) {
+		cropRect.value = sanitizeCropRect(nextRect)
+		updateCropUi()
+	}
+
+	function resetCrop() {
+		if (isFullCrop()) return
+		setCropRect(fullCropRect())
+		updateActiveCropSelection()
+		recordHistory()
+	}
+
+	function updateActiveCropSelection() {
+		const editorCanvas = canvas.value
+		if (!editorCanvas || !cropSelection) return
+		if (tool.value !== 'crop' || isFullCrop()) {
+			if (editorCanvas.getActiveObject() === cropSelection) editorCanvas.discardActiveObject()
+			return
+		}
+		editorCanvas.setActiveObject(cropSelection)
+	}
+
+	function styleCropControls() {
+		if (!cropSelection) return
+		styleObjectControls(cropSelection)
+		cropSelection.set({
+			lockRotation: true,
+			strokeWidth: 2 / Math.max(zoom.value, 0.01),
+		})
+		cropSelection.setControlsVisibility({ mtr: false })
+		cropSelection.setCoords()
+	}
+
 	function setTool(nextTool: ScreenshotEditorTool) {
 		if (nextTool !== 'eraser') finishErasing()
+		if (nextTool !== 'crop') cancelCropDrawing()
 		tool.value = nextTool
 		const editorCanvas = canvas.value
 		if (!editorCanvas || !fabric) return
@@ -255,6 +498,8 @@ export function useImageEditor() {
 			styleObjectControls(object)
 		}
 		if (nextTool !== 'select') editorCanvas.discardActiveObject()
+		updateCropUi()
+		updateActiveCropSelection()
 		syncSelectionProperties()
 		configureCursor(editorCanvas, nextTool)
 		configureBrush(editorCanvas)
@@ -313,12 +558,13 @@ export function useImageEditor() {
 		editorCanvas.freeDrawingCursor = cursor
 		editorCanvas.hoverCursor = nextTool === 'select' ? 'move' : cursor
 		editorCanvas.moveCursor = nextTool === 'select' ? 'move' : cursor
+		if (cropSelection) cropSelection.hoverCursor = nextTool === 'crop' ? 'move' : cursor
 	}
 
 	function syncSelectionProperties() {
 		commitPropertyEdit()
 		const activeObjects = (canvas.value?.getActiveObjects() ?? []).filter(
-			(object) => object !== background,
+			isAnnotationObject,
 		) as EditorFabricObject[]
 		selectionCount.value = activeObjects.length
 		const selected = activeObjects.length === 1 ? activeObjects[0] : undefined
@@ -395,7 +641,7 @@ export function useImageEditor() {
 
 	function singleSelectedObject() {
 		const activeObjects = (canvas.value?.getActiveObjects() ?? []).filter(
-			(object) => object !== background,
+			isAnnotationObject,
 		) as EditorFabricObject[]
 		return activeObjects.length === 1 ? activeObjects[0] : undefined
 	}
@@ -644,6 +890,20 @@ export function useImageEditor() {
 		const editorCanvas = canvas.value
 		if (!editorCanvas || !fabric || editorCanvas.isDrawingMode || tool.value === 'select') return
 		const point = editorCanvas.getScenePoint(event.e)
+		if (tool.value === 'crop') {
+			if (
+				event.target === cropSelection &&
+				(event.transform?.corner || isPointNearCropBorder(point))
+			) {
+				return
+			}
+			editorCanvas._currentTransform = null
+			cropDrawingStart = point
+			cropDrawingPrevious = { ...cropRect.value }
+			constructingObject = true
+			setCropRect({ left: point.x, top: point.y, width: 1, height: 1 })
+			return
+		}
 		if (tool.value === 'eraser' && eraserMode.value === 'element') {
 			beginErasing(point)
 			return
@@ -716,9 +976,25 @@ export function useImageEditor() {
 		}
 	}
 
+	function isPointNearCropBorder(point: FabricPoint) {
+		const rect = cropRect.value
+		const tolerance = 10 / Math.max(zoom.value, 0.01)
+		return (
+			Math.abs(point.x - rect.left) <= tolerance ||
+			Math.abs(point.x - (rect.left + rect.width)) <= tolerance ||
+			Math.abs(point.y - rect.top) <= tolerance ||
+			Math.abs(point.y - (rect.top + rect.height)) <= tolerance
+		)
+	}
+
 	function handleMouseMove(event: FabricPointerEvent) {
 		const editorCanvas = canvas.value
 		if (!editorCanvas) return
+		if (cropDrawingStart) {
+			const rect = normalizedRect(cropDrawingStart, editorCanvas.getScenePoint(event.e))
+			setCropRect(rect)
+			return
+		}
 		if (tool.value === 'eraser' && eraserMode.value === 'element') {
 			if (erasing) eraseAtPoint(editorCanvas.getScenePoint(event.e))
 			return
@@ -746,6 +1022,22 @@ export function useImageEditor() {
 	function handleMouseUp(event: FabricPointerEvent) {
 		const editorCanvas = canvas.value
 		if (!editorCanvas) return
+		if (cropDrawingStart) {
+			const rect = normalizedRect(cropDrawingStart, editorCanvas.getScenePoint(event.e))
+			const previous = cropDrawingPrevious
+			cropDrawingStart = undefined
+			cropDrawingPrevious = undefined
+			constructingObject = false
+			if (rect.width < 2 || rect.height < 2) {
+				if (previous) setCropRect(previous)
+			} else {
+				setCropRect(rect)
+				recordHistory()
+			}
+			updateActiveCropSelection()
+			editorCanvas.requestRenderAll()
+			return
+		}
 		if (erasing) {
 			eraseAtPoint(editorCanvas.getScenePoint(event.e))
 			finishErasing()
@@ -822,6 +1114,14 @@ export function useImageEditor() {
 		editorCanvas.requestRenderAll()
 	}
 
+	function cancelCropDrawing() {
+		if (!cropDrawingStart) return
+		if (cropDrawingPrevious) setCropRect(cropDrawingPrevious)
+		cropDrawingStart = undefined
+		cropDrawingPrevious = undefined
+		constructingObject = false
+	}
+
 	function refreshModifiedCensors(target: EditorFabricObject) {
 		const targets =
 			'getObjects' in target && typeof target.getObjects === 'function'
@@ -858,7 +1158,7 @@ export function useImageEditor() {
 	function deleteSelection() {
 		const editorCanvas = canvas.value
 		if (!editorCanvas) return false
-		const active = editorCanvas.getActiveObjects().filter((object) => object !== background)
+		const active = editorCanvas.getActiveObjects().filter(isAnnotationObject)
 		if (active.length === 0) return false
 		editorCanvas.discardActiveObject()
 		constructingObject = true
@@ -899,6 +1199,7 @@ export function useImageEditor() {
 
 	function snapshot(): EditorHistoryEntry {
 		return {
+			crop: { ...cropRect.value },
 			objects: annotationObjects().map((object) => {
 				const state = object.toObject([
 					'editorKind',
@@ -973,6 +1274,7 @@ export function useImageEditor() {
 		try {
 			editorCanvas.discardActiveObject()
 			editorCanvas.remove(...annotationObjects())
+			setCropRect(entry.crop)
 			const restored = await enlivenEditorObjects(entry.objects)
 			for (const object of restored) {
 				styleObjectControls(object)
@@ -1003,6 +1305,7 @@ export function useImageEditor() {
 	function setInteractionEnabled(enabled: boolean) {
 		const editorCanvas = canvas.value
 		if (!editorCanvas) return
+		interactionEnabled = enabled
 		if (enabled) {
 			editorCanvas.skipTargetFind = false
 			setTool(tool.value)
@@ -1018,6 +1321,7 @@ export function useImageEditor() {
 			object.selectable = false
 			object.evented = false
 		}
+		updateCropUi()
 		editorCanvas.defaultCursor = 'default'
 		editorCanvas.hoverCursor = 'default'
 		editorCanvas.moveCursor = 'default'
@@ -1052,30 +1356,45 @@ export function useImageEditor() {
 	function applyDisplayScale() {
 		const editorCanvas = canvas.value
 		if (!editorCanvas) return
-		const scale = zoom.value
+		const displayScale = zoom.value
+		const maximumRenderScale = Math.sqrt(
+			MAX_RENDERED_CANVAS_PIXELS / (originalWidth.value * originalHeight.value),
+		)
+		const renderScale = Math.min(displayScale, maximumRenderScale)
 		editorCanvas.setDimensions(
 			{
-				width: Math.round(originalWidth.value * scale),
-				height: Math.round(originalHeight.value * scale),
+				width: Math.max(1, Math.round(originalWidth.value * renderScale)),
+				height: Math.max(1, Math.round(originalHeight.value * renderScale)),
+			},
+			{ backstoreOnly: true },
+		)
+		editorCanvas.setDimensions(
+			{
+				width: Math.max(1, Math.round(originalWidth.value * displayScale)),
+				height: Math.max(1, Math.round(originalHeight.value * displayScale)),
 			},
 			{ cssOnly: true },
 		)
+		editorCanvas.setViewportTransform([renderScale, 0, 0, renderScale, 0, 0])
 		for (const object of annotationObjects()) styleObjectControls(object)
+		styleCropControls()
 		editorCanvas.calcOffset()
 		editorCanvas.requestRenderAll()
 	}
 
 	function styleObjectControls(object: FabricObject) {
 		const displayScale = Math.max(zoom.value, 0.01)
+		const renderScale = Math.max(canvas.value?.getZoom() ?? 1, 0.01)
+		const controlScale = renderScale / displayScale
 		object.set({
 			borderColor: SELECTION_COLOR,
-			borderScaleFactor: 2 / displayScale,
+			borderScaleFactor: 2 * controlScale,
 			cornerColor: SELECTION_COLOR,
-			cornerSize: CONTROL_SIZE / displayScale,
+			cornerSize: CONTROL_SIZE * controlScale,
 			cornerStrokeColor: '#ffffff',
 			cornerStyle: 'circle',
-			padding: 3 / displayScale,
-			touchCornerSize: CONTROL_TOUCH_SIZE / displayScale,
+			padding: 3 * controlScale,
+			touchCornerSize: CONTROL_TOUCH_SIZE * controlScale,
 			transparentCorners: false,
 		})
 		object.setControlsVisibility({
@@ -1098,9 +1417,9 @@ export function useImageEditor() {
 			}
 		}
 		if (object.controls.mtr) {
-			object.controls.mtr.offsetY = -28 / displayScale
-			object.controls.mtr.sizeX = 10 / displayScale
-			object.controls.mtr.sizeY = 10 / displayScale
+			object.controls.mtr.offsetY = -28 * controlScale
+			object.controls.mtr.sizeX = 10 * controlScale
+			object.controls.mtr.sizeY = 10 * controlScale
 		}
 		object.setCoords()
 	}
@@ -1108,9 +1427,40 @@ export function useImageEditor() {
 	async function exportPng() {
 		const editorCanvas = canvas.value
 		if (!editorCanvas) throw new Error('Screenshot editor is not ready')
+		const activeObject = editorCanvas.getActiveObject()
 		editorCanvas.discardActiveObject()
+		for (const shade of cropShade) shade.visible = false
+		if (cropSelection) cropSelection.visible = false
 		editorCanvas.requestRenderAll()
-		const blob = await editorCanvas.toBlob({ format: 'png', multiplier: 1 })
+		const crop = cropRect.value
+		let blob: Blob | null = null
+		try {
+			const displayViewportTransform = editorCanvas.viewportTransform
+			const blobPromise = (() => {
+				editorCanvas.setViewportTransform([1, 0, 0, 1, 0, 0])
+				try {
+					return editorCanvas.toBlob({
+						format: 'png',
+						multiplier: 1,
+						left: crop.left,
+						top: crop.top,
+						width: crop.width,
+						height: crop.height,
+					})
+				} finally {
+					editorCanvas.setViewportTransform(displayViewportTransform)
+				}
+			})()
+			blob = await blobPromise
+		} finally {
+			updateCropUi()
+			if (activeObject && activeObject !== cropSelection) {
+				editorCanvas.setActiveObject(activeObject)
+			} else {
+				updateActiveCropSelection()
+			}
+			editorCanvas.requestRenderAll()
+		}
 		if (!blob) throw new Error('Could not export edited screenshot')
 		return new Uint8Array(await blob.arrayBuffer())
 	}
@@ -1128,6 +1478,11 @@ export function useImageEditor() {
 		}
 		if (event.key === 'Escape') {
 			event.preventDefault()
+			if (cropDrawingStart) {
+				cancelCropDrawing()
+				canvas.value?.requestRenderAll()
+				return true
+			}
 			if (erasing) {
 				finishErasing()
 				return true
@@ -1189,15 +1544,21 @@ export function useImageEditor() {
 	}
 
 	function annotationObjects() {
-		return (canvas.value?.getObjects() ?? []).filter(
-			(object) => object !== background,
-		) as EditorFabricObject[]
+		return (canvas.value?.getObjects() ?? []).filter(isAnnotationObject) as EditorFabricObject[]
+	}
+
+	function isAnnotationObject(object: FabricObject) {
+		return (
+			object !== background && object !== cropSelection && !cropShade.includes(object as FabricRect)
+		)
 	}
 
 	async function dispose() {
 		await canvas.value?.dispose()
 		canvas.value = undefined
 		background = undefined
+		cropSelection = undefined
+		cropShade = []
 		sourceImage = undefined
 		if (sourceUrl) URL.revokeObjectURL(sourceUrl)
 		sourceUrl = undefined
@@ -1208,11 +1569,15 @@ export function useImageEditor() {
 		isFit.value = true
 		originalWidth.value = 0
 		originalHeight.value = 0
+		cropRect.value = { left: 0, top: 0, width: 0, height: 0 }
 		selectedPropertyKind.value = undefined
 		selectionCount.value = 0
 		propertyEditStart = undefined
 		erasing = false
 		erasedDuringGesture = false
+		cropDrawingStart = undefined
+		cropDrawingPrevious = undefined
+		interactionEnabled = true
 	}
 
 	return {
@@ -1235,6 +1600,10 @@ export function useImageEditor() {
 		propertyValueKind,
 		showCensorMode,
 		showEraserMode,
+		showCropControls,
+		cropWidth,
+		cropHeight,
+		canResetCrop,
 		initialize,
 		dispose,
 		setTool,
@@ -1244,6 +1613,7 @@ export function useImageEditor() {
 		beginPropertyEdit,
 		commitPropertyEdit,
 		deleteSelection,
+		resetCrop,
 		undo,
 		redo,
 		discardChanges,

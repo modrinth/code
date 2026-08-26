@@ -106,6 +106,7 @@ import _ContractIcon from './icons/contract.svg?component'
 import _CopyIcon from './icons/copy.svg?component'
 import _CopyrightIcon from './icons/copyright.svg?component'
 import _CpuIcon from './icons/cpu.svg?component'
+import _CropIcon from './icons/crop.svg?component'
 import _CrownIcon from './icons/crown.svg?component'
 import _CubeIcon from './icons/cube.svg?component'
 import _CurrencyIcon from './icons/currency.svg?component'
@@ -562,6 +563,7 @@ export const ContractIcon = _ContractIcon
 export const CopyIcon = _CopyIcon
 export const CopyrightIcon = _CopyrightIcon
 export const CpuIcon = _CpuIcon
+export const CropIcon = _CropIcon
 export const CrownIcon = _CrownIcon
 export const CubeIcon = _CubeIcon
 export const CurrencyIcon = _CurrencyIcon
