@@ -2060,12 +2060,6 @@
   "image-viewer.editor.save-as-new": {
     "defaultMessage": "Save as copy"
   },
-  "image-viewer.editor.save-changes": {
-    "defaultMessage": "Save changes"
-  },
-  "image-viewer.editor.save-copy": {
-    "defaultMessage": "Save copy"
-  },
   "image-viewer.editor.save-image": {
     "defaultMessage": "Save image"
   },

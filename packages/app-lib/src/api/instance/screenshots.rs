@@ -23,7 +23,6 @@ use uuid::Uuid;
 
 const SCREENSHOTS_DIRECTORY: &str = "screenshots";
 const SCREENSHOT_SCAN_CONCURRENCY: usize = 8;
-const MAX_SCREENSHOT_EDITOR_STATE_SIZE: usize = 16 * 1024 * 1024;
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct ScreenshotKey {
@@ -39,17 +38,9 @@ pub struct InstanceScreenshot {
     pub file_name: String,
     pub created_at: DateTime<Utc>,
     pub modified_at: i64,
-    pub original_screenshot_id: Option<String>,
-    pub original_instance_id: Option<String>,
     pub group_id: Option<String>,
     #[serde(skip)]
     pub path: PathBuf,
-}
-
-#[derive(Clone, Debug)]
-pub struct ScreenshotEditorData {
-    pub background_path: PathBuf,
-    pub editor_state: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize)]
@@ -348,55 +339,12 @@ pub async fn get_screenshot_path(
     Ok(canonical_path)
 }
 
-pub async fn get_screenshot_editor_data(
-    key: ScreenshotKey,
-) -> crate::Result<ScreenshotEditorData> {
-    validate_file_name(&key.file_name)?;
-
-    let state = State::get().await?;
-    let current_path = get_screenshot_path(&key).await?;
-    let source_row = screenshot_rows::get_screenshot_by_key(
-        &key.instance_id,
-        &key.file_name,
-        &state.pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown screenshot".to_string())
-    })?;
-
-    if let (Some(editor_state), Some(original_id)) =
-        (source_row.editor_state, source_row.original_screenshot_id)
-        && let Some(original) =
-            screenshot_rows::get_screenshot_by_id(&original_id, &state.pool)
-                .await?
-    {
-        let original_key = ScreenshotKey {
-            instance_id: original.instance_id,
-            file_name: original.file_name,
-        };
-        if let Ok(background_path) = get_screenshot_path(&original_key).await {
-            return Ok(ScreenshotEditorData {
-                background_path,
-                editor_state: Some(editor_state),
-            });
-        }
-    }
-
-    Ok(ScreenshotEditorData {
-        background_path: current_path,
-        editor_state: None,
-    })
-}
-
 pub async fn save_edited_screenshot(
     key: ScreenshotKey,
     png_bytes: Vec<u8>,
-    editor_state: Option<String>,
     mode: ScreenshotEditSaveMode,
 ) -> crate::Result<InstanceScreenshot> {
     validate_file_name(&key.file_name)?;
-    validate_editor_state(editor_state.as_deref())?;
 
     let state = State::get().await?;
     let source = instance_rows::get_instance_screenshot_source(
@@ -440,37 +388,14 @@ pub async fn save_edited_screenshot(
     }
 
     let screenshots_dir = source_screenshots_dir(&state, &source).await?;
-    let (target_path, original_id, copy_group) = match mode {
-        ScreenshotEditSaveMode::CreateCopy => {
-            let original_id = source_row
-                .original_screenshot_id
-                .clone()
-                .unwrap_or_else(|| source_row.id.clone());
-            let root_file_name = match screenshot_rows::get_screenshot_by_id(
-                &original_id,
-                &state.pool,
-            )
-            .await?
-            {
-                Some(original) => original.file_name,
-                None => source_row.file_name.clone(),
-            };
-            (
-                available_edited_path(&screenshots_dir, &root_file_name)
-                    .await?,
-                original_id,
-                true,
-            )
-        }
+    let (target_path, copy_group) = match mode {
+        ScreenshotEditSaveMode::CreateCopy => (
+            available_target_path(&screenshots_dir, &source_row.file_name)
+                .await?,
+            true,
+        ),
         ScreenshotEditSaveMode::ReplaceEdit => {
-            let original_id =
-                source_row.original_screenshot_id.clone().ok_or_else(|| {
-                    crate::ErrorKind::InputError(
-                        "Original screenshots cannot be replaced by the editor"
-                            .to_string(),
-                    )
-                })?;
-            (source_screenshot.path.clone(), original_id, false)
+            (source_screenshot.path.clone(), false)
         }
     };
     let target_file_name = target_path
@@ -513,21 +438,9 @@ pub async fn save_edited_screenshot(
     if copy_group {
         let result: crate::Result<()> = async {
             let mut tx = state.pool.begin().await?;
-            screenshot_rows::set_original_screenshot(
-                &saved.id,
-                &original_id,
-                &mut tx,
-            )
-            .await?;
             screenshot_rows::copy_group_membership(
                 &source_row.id,
                 &saved.id,
-                &mut tx,
-            )
-            .await?;
-            screenshot_rows::set_editor_state(
-                &saved.id,
-                editor_state.as_deref(),
                 &mut tx,
             )
             .await?;
@@ -547,14 +460,17 @@ pub async fn save_edited_screenshot(
         }
     }
 
-    let mut saved_row =
-        screenshot_rows::get_screenshot_by_id(&saved.id, &state.pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(
-                    "Could not load edited screenshot".to_string(),
-                )
-            })?;
+    let mut saved_row = screenshot_rows::get_screenshot_by_key(
+        &saved.instance_id,
+        &saved.file_name,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Could not load edited screenshot".to_string(),
+        )
+    })?;
     if !copy_group {
         let mut tx = state.pool.begin().await?;
         if saved_row.created_at != source_row.created_at {
@@ -569,17 +485,9 @@ pub async fn save_edited_screenshot(
                         )
                     })?;
         }
-        screenshot_rows::set_editor_state(
-            &saved.id,
-            editor_state.as_deref(),
-            &mut tx,
-        )
-        .await?;
         tx.commit().await?;
     }
     saved.modified_at = saved_row.modified_at;
-    saved.original_screenshot_id = saved_row.original_screenshot_id;
-    saved.original_instance_id = saved_row.original_instance_id;
     saved.group_id = saved_row.group_id;
 
     let _ = emit_instance(
@@ -784,9 +692,6 @@ async fn reconcile_source_screenshots(
                         file_size: scanned.file_size,
                         modified_at: scanned.modified_at,
                         created_at: scanned.created_at.timestamp_millis(),
-                        original_screenshot_id: None,
-                        editor_state: None,
-                        original_instance_id: None,
                         group_id: None,
                     },
                     true,
@@ -842,8 +747,6 @@ async fn reconcile_source_screenshots(
             file_name: screenshot.scanned.file_name,
             created_at: screenshot.scanned.created_at,
             modified_at: screenshot.row.modified_at,
-            original_screenshot_id: screenshot.row.original_screenshot_id,
-            original_instance_id: screenshot.row.original_instance_id,
             group_id: screenshot.row.group_id,
             path: screenshot.scanned.path,
         })
@@ -919,34 +822,6 @@ async fn available_target_path(
     unreachable!()
 }
 
-async fn available_edited_path(
-    target_dir: &Path,
-    file_name: &str,
-) -> crate::Result<PathBuf> {
-    validate_file_name(file_name)?;
-    let path = Path::new(file_name);
-    let stem = path.file_stem().and_then(|value| value.to_str()).unwrap();
-    let extension = path.extension().and_then(|value| value.to_str()).unwrap();
-
-    for suffix in 1_u32.. {
-        let edited_suffix = if suffix == 1 {
-            " edited".to_string()
-        } else {
-            format!(" edited ({suffix})")
-        };
-        let candidate =
-            target_dir.join(format!("{stem}{edited_suffix}.{extension}"));
-        if !tokio::fs::try_exists(&candidate)
-            .await
-            .map_err(|error| IOError::with_path(error, &candidate))?
-        {
-            return Ok(candidate);
-        }
-    }
-
-    unreachable!()
-}
-
 async fn png_dimensions(bytes: Vec<u8>) -> crate::Result<(u32, u32)> {
     tokio::task::spawn_blocking(move || {
         image::ImageReader::with_format(
@@ -992,33 +867,6 @@ fn validate_file_name(file_name: &str) -> crate::Result<()> {
     if !is_single_file || !has_png_extension(path) {
         return Err(crate::ErrorKind::InputError(
             "Invalid screenshot file name".to_string(),
-        )
-        .into());
-    }
-
-    Ok(())
-}
-
-fn validate_editor_state(editor_state: Option<&str>) -> crate::Result<()> {
-    let Some(editor_state) = editor_state else {
-        return Ok(());
-    };
-    if editor_state.len() > MAX_SCREENSHOT_EDITOR_STATE_SIZE {
-        return Err(crate::ErrorKind::InputError(
-            "Screenshot editor state is too large".to_string(),
-        )
-        .into());
-    }
-
-    let value = serde_json::from_str::<serde_json::Value>(editor_state)
-        .map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Screenshot editor state is not valid JSON: {error}",
-            ))
-        })?;
-    if !value.is_object() {
-        return Err(crate::ErrorKind::InputError(
-            "Screenshot editor state must be a JSON object".to_string(),
         )
         .into());
     }

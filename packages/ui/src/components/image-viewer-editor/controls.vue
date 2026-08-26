@@ -25,7 +25,6 @@ import type { useImageEditor } from './use-image-editor'
 const props = defineProps<{
 	editor: ReturnType<typeof useImageEditor>
 	busy: boolean
-	isEdited: boolean
 }>()
 
 const emit = defineEmits<{
@@ -259,7 +258,6 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 			{{ formatMessage(commonMessages.cancelButton) }}
 		</Button>
 		<SplitButton
-			v-if="isEdited"
 			type="colored"
 			color="green"
 			:disabled="busy"
@@ -269,18 +267,8 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 			@click="emit('save', 'replace_edit')"
 		>
 			<SaveIcon aria-hidden="true" />
-			{{ formatMessage(messages.saveChanges) }}
+			{{ formatMessage(commonMessages.saveButton) }}
 		</SplitButton>
-		<Button
-			v-else
-			type="colored"
-			color="green"
-			:disabled="busy"
-			@click="emit('save', 'create_copy')"
-		>
-			<SaveIcon aria-hidden="true" />
-			{{ formatMessage(messages.saveCopy) }}
-		</Button>
 	</div>
 </template>
 

@@ -6,7 +6,6 @@ import { renderCensorRegion } from './image-viewer-editor-censor-object'
 import type {
 	EditorHistoryEntry,
 	ScreenshotCensorMode,
-	ScreenshotEditorDocument,
 	ScreenshotEditorObjectKind,
 	ScreenshotEditorObjectState,
 	ScreenshotEditorPropertyKind,
@@ -139,7 +138,6 @@ export function useImageEditor() {
 	let restoringHistory = false
 	let constructingObject = false
 	let propertyEditStart: string | undefined
-	let persistEditorState = false
 	let erasing = false
 	let erasedDuringGesture = false
 
@@ -157,11 +155,7 @@ export function useImageEditor() {
 		loading.value = true
 		try {
 			fabric = await import('fabric')
-			const document = parseEditorDocument(editorData.editorState)
-			persistEditorState = Boolean(document) || !editorData.isEdited
-			sourceUrl = URL.createObjectURL(
-				document && editorData.background ? editorData.background : editorData.source,
-			)
+			sourceUrl = URL.createObjectURL(editorData.source)
 			sourceImage = await loadImage(sourceUrl)
 			originalWidth.value = sourceImage.naturalWidth
 			originalHeight.value = sourceImage.naturalHeight
@@ -190,13 +184,6 @@ export function useImageEditor() {
 			setEditorMetadata(background, 'background')
 			nextCanvas.add(background)
 			nextCanvas.sendObjectToBack(background)
-			if (document) {
-				const restored = await enlivenEditorObjects(document.objects)
-				for (const object of restored) {
-					styleObjectControls(object)
-					nextCanvas.add(object)
-				}
-			}
 			bindCanvasEvents(nextCanvas)
 			resetHistory()
 			setTool('select')
@@ -1098,15 +1085,6 @@ export function useImageEditor() {
 		return new Uint8Array(await blob.arrayBuffer())
 	}
 
-	function exportEditorState() {
-		if (!persistEditorState) return null
-		const document: ScreenshotEditorDocument = {
-			version: 1,
-			...snapshot(),
-		}
-		return JSON.stringify(document)
-	}
-
 	function handleKeyboardShortcut(event: KeyboardEvent) {
 		const activeObject = canvas.value?.getActiveObject() as
 			| (EditorFabricObject & { isEditing?: boolean; exitEditing?: () => void })
@@ -1203,7 +1181,6 @@ export function useImageEditor() {
 		selectedPropertyKind.value = undefined
 		selectionCount.value = 0
 		propertyEditStart = undefined
-		persistEditorState = false
 		erasing = false
 		erasedDuringGesture = false
 	}
@@ -1242,21 +1219,9 @@ export function useImageEditor() {
 		setZoom,
 		setFit,
 		exportPng,
-		exportEditorState,
 		handleKeyboardShortcut,
 		isTextEditing,
 		resetHistory,
-	}
-}
-
-function parseEditorDocument(value: string | null | undefined) {
-	if (!value) return undefined
-	try {
-		const document = JSON.parse(value) as Partial<ScreenshotEditorDocument>
-		if (document.version !== 1 || !Array.isArray(document.objects)) return undefined
-		return document as ScreenshotEditorDocument
-	} catch {
-		return undefined
 	}
 }
 

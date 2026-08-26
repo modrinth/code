@@ -1340,9 +1340,6 @@
   "app.screenshots.edit": {
     "message": "Edit screenshot"
   },
-  "app.screenshots.edited": {
-    "message": "Edited"
-  },
   "app.screenshots.empty-description": {
     "message": "Screenshots you take in-game will appear here."
   },
@@ -1474,9 +1471,6 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "Oldest"
-  },
-  "app.screenshots.view-original": {
-    "message": "View original"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"

@@ -231,7 +231,6 @@ const messages = defineMessages({
 	},
 	copy: { id: 'app.screenshots.copy', defaultMessage: 'Copy image' },
 	edit: { id: 'app.screenshots.edit', defaultMessage: 'Edit screenshot' },
-	viewOriginal: { id: 'app.screenshots.view-original', defaultMessage: 'View original' },
 	showInFolder: { id: 'app.screenshots.show-in-folder', defaultMessage: 'Show in folder' },
 	goToInstance: { id: 'app.screenshots.go-to-instance', defaultMessage: 'Go to instance' },
 	deleteTitle: { id: 'app.screenshots.delete-title', defaultMessage: 'Delete screenshot' },
@@ -487,7 +486,6 @@ const previewItems = computed(() =>
 		editorSource: {
 			id: getSelectionKey(screenshot),
 			path: screenshot.path,
-			isEdited: Boolean(screenshot.original_screenshot_id),
 		},
 		description: isGlobal.value
 			? formatMessage(messages.instanceAndDate, {
@@ -523,15 +521,9 @@ const saveEditMutation = useMutation({
 	mutationFn: (payload: {
 		screenshot: InstanceScreenshot
 		pngBytes: Uint8Array
-		editorState: string | null
 		mode: 'create_copy' | 'replace_edit'
 	}) =>
-		save_edited_screenshot(
-			getScreenshotKey(payload.screenshot),
-			payload.pngBytes,
-			payload.editorState,
-			payload.mode,
-		),
+		save_edited_screenshot(getScreenshotKey(payload.screenshot), payload.pngBytes, payload.mode),
 	onSuccess: async (saved) => {
 		await invalidateScreenshots([saved.instance_id])
 		await imageViewer.value?.markSavedAndView(getSelectionKey(saved))
@@ -546,7 +538,6 @@ function saveScreenshotEdit(payload: ImageViewerEditorSavePayload) {
 	saveEditMutation.mutate({
 		screenshot,
 		pngBytes: payload.pngBytes,
-		editorState: payload.editorState,
 		mode: payload.mode,
 	})
 }
@@ -932,31 +923,6 @@ function editScreenshot(screenshot: InstanceScreenshot) {
 	if (index >= 0) void imageViewer.value?.edit(index)
 }
 
-function showOriginalBySelectionKey(selectionKey: string) {
-	const screenshot = screenshotBySelectionKey(selectionKey)
-	if (!screenshot) return
-	imageViewer.value?.hide()
-	void showOriginal(screenshot)
-}
-
-async function showOriginal(screenshot: InstanceScreenshot) {
-	const originalId = screenshot.original_screenshot_id
-	if (!originalId) return
-
-	if (screenshots.value.some((item) => item.id === originalId)) {
-		await revealScreenshot(originalId)
-		return
-	}
-
-	if (screenshot.original_instance_id) {
-		await router.push({
-			name: 'InstanceScreenshots',
-			params: { id: screenshot.original_instance_id },
-			query: { focus: originalId },
-		})
-	}
-}
-
 let revealTimeout: ReturnType<typeof setTimeout> | undefined
 
 async function revealScreenshot(id: string) {
@@ -1253,15 +1219,6 @@ onBeforeUnmount(() => {
 	>
 		<template #actions="{ item }">
 			<IconButton
-				v-if="screenshotBySelectionKey(item.id)?.original_screenshot_id"
-				v-tooltip="formatMessage(messages.viewOriginal)"
-				:label="formatMessage(messages.viewOriginal)"
-				type="quiet"
-				@click="showOriginalBySelectionKey(item.id)"
-			>
-				<EditIcon />
-			</IconButton>
-			<IconButton
 				v-tooltip="formatMessage(messages.copy)"
 				:label="formatMessage(messages.copy)"
 				type="quiet"
@@ -1375,7 +1332,6 @@ onBeforeUnmount(() => {
 						@copy="copyScreenshot"
 						@edit="editScreenshot"
 						@more="showScreenshotOptions"
-						@show-original="showOriginal"
 					>
 						<template v-if="group.customGroupId" #actions="{ startEditing }">
 							<div
