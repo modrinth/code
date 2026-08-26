@@ -3840,10 +3840,10 @@
     "message": "Contains advertisements"
   },
   "project.settings.disclosures.ai-functionality.description": {
-    "message": "Placeholder description."
+    "message": "Placeholder"
   },
   "project.settings.disclosures.ai-functionality.note-placeholder": {
-    "message": "e.g. This project includes an in-game assistant powered by a generative AI API."
+    "message": "e.g. The in-game assistant uses generative AI to generate dialogue."
   },
   "project.settings.disclosures.ai-functionality.title": {
     "message": "Contains generative AI functionality"

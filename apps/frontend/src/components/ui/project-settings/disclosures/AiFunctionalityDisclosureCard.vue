@@ -32,8 +32,7 @@ const messages = defineMessages({
 	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.ai-functionality.note-placeholder',
-		defaultMessage:
-			'e.g. The in-game assistant uses generative AI to generate dialogue.',
+		defaultMessage: 'e.g. The in-game assistant uses generative AI to generate dialogue.',
 	},
 })
 </script>
