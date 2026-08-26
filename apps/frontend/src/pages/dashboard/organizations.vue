@@ -46,7 +46,9 @@
 					</ButtonLink>
 				</div>
 			</template>
-			<template v-else> {{ formatMessage(messages.makeOrganization) }} </template>
+			<template v-else>
+				<p class="mt-0">{{ formatMessage(messages.makeOrganization) }}</p>
+			</template>
 		</section>
 	</div>
 </template>
