@@ -76,8 +76,6 @@ struct ResponseMeta {
 #[derive(Serialize)]
 struct DecisionRequest<'a> {
     email: &'a str,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    ip: Option<&'a str>,
 }
 
 /// Asks the configured UserCheck gate whether a signup should proceed.
@@ -87,10 +85,7 @@ struct DecisionRequest<'a> {
 /// signup, while anything else is an error that rejects the signup.
 /// `Challenge` resolves to `Allow` because these flows have no step-up
 /// mechanism past the captcha that already ran.
-pub async fn check_email_gate(
-    email: &str,
-    ip: Option<&str>,
-) -> eyre::Result<DecisionAction> {
+pub async fn check_email_gate(email: &str) -> eyre::Result<DecisionAction> {
     if ENV.USERCHECK_API_KEY.is_empty() || ENV.USERCHECK_GATE_ID.is_empty() {
         debug!(
             action = "allow",
@@ -100,7 +95,7 @@ pub async fn check_email_gate(
     }
 
     let decision_time_start = Instant::now();
-    let response = request_decision(email, ip).await;
+    let response = request_decision(email).await;
     let decision_time = decision_time_start.elapsed();
 
     let response = match response {
@@ -180,10 +175,7 @@ pub fn gate_block_error() -> eyre::Error {
     )
 }
 
-async fn request_decision(
-    email: &str,
-    ip: Option<&str>,
-) -> reqwest::Result<DecisionResponse> {
+async fn request_decision(email: &str) -> reqwest::Result<DecisionResponse> {
     HTTP_CLIENT
         .post(format!(
             "{}/v0/gates/{}/decisions",
@@ -192,7 +184,7 @@ async fn request_decision(
         ))
         .bearer_auth(&ENV.USERCHECK_API_KEY)
         .timeout(TIMEOUT)
-        .json(&DecisionRequest { email, ip })
+        .json(&DecisionRequest { email })
         .send()
         .await?
         .error_for_status()?
