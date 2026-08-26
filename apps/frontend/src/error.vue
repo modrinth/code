@@ -39,7 +39,13 @@
 							<span class="font-medium text-contrast">{{ auth.user.username }}</span>
 							<UserRoleIcon :role="auth.user.role" />
 
-							<Button type="quiet" color="red" native-type="button" class="ml-auto" @click="logout">
+							<Button
+								type="quiet"
+								color="red"
+								native-type="button"
+								class="ml-auto"
+								@click="signOut"
+							>
 								<LogOutIcon />
 								{{ formatMessage(commonMessages.signOutButton) }}
 							</Button>
@@ -48,7 +54,7 @@
 							<p class="m-0">
 								{{ formatMessage(unauthorizedMessages.switchAccountLabel) }}
 							</p>
-							<AccountChoiceList :accounts="otherAccounts" @select="switchToStoredAccount" />
+							<AccountChoiceList :accounts="otherAccounts" @select="onSelectStoredAccount" />
 						</template>
 					</template>
 					<template v-else>
@@ -104,6 +110,7 @@ import {
 	commonMessages,
 	defineMessage,
 	defineMessages,
+	injectNotificationManager,
 	IntlFormatted,
 	LoadingBar,
 	normalizeChildren,
@@ -115,18 +122,19 @@ import {
 import Logo404 from '~/assets/images/404.svg'
 import {
 	hydrateStoredAccounts,
+	switchToSignedOut,
 	switchToStoredAccount,
 	useIsSwitchingAccount,
 	useStoredAccounts,
 } from '~/composables/accounts.ts'
 import { getSignInRouteObj } from '~/composables/auth.js'
-import { logout } from '~/composables/user.js'
 import { setupProviders } from '~/providers/setup.ts'
 
 const auth = await useAuth()
 setupProviders(auth)
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 const isSwitchingAccount = useIsSwitchingAccount()
 
 const props = defineProps({
@@ -153,6 +161,10 @@ const unauthorizedMessages = defineMessages({
 		id: 'error.generic.401.switch-account',
 		defaultMessage: 'Or switch to another account:',
 	},
+	accountSwitchFailed: {
+		id: 'error.generic.401.switch-account-failed',
+		defaultMessage: "Couldn't switch accounts. Please try again.",
+	},
 })
 
 const storedAccounts = useStoredAccounts()
@@ -160,6 +172,21 @@ const storedAccounts = useStoredAccounts()
 const otherAccounts = computed(() =>
 	storedAccounts.value.filter((account) => account.id !== auth.value.user?.id),
 )
+
+async function signOut() {
+	await switchToSignedOut()
+}
+
+async function onSelectStoredAccount(account) {
+	const result = await switchToStoredAccount(account)
+	if (result === 'error') {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: formatMessage(unauthorizedMessages.accountSwitchFailed),
+			type: 'error',
+		})
+	}
+}
 
 // error page replaces the app root, so hydrate here too
 onMounted(hydrateStoredAccounts)

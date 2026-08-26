@@ -84,6 +84,7 @@ export interface OverflowMenuItemBase {
 	trailingAction?: {
 		label: string
 		icon: Component
+		color?: ButtonColor
 		action: (event: MouseEvent) => void
 	}
 }

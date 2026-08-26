@@ -821,6 +821,33 @@
   "auth.create-account.username.placeholder": {
     "message": "Enter username"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Enter the 6-digit code from your authenticator app, or one of your backup codes."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Two-factor authentication"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Enter code..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Continue with passkey"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "It was last signed into with {method, select, password {a password} passkey {a passkey} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Reauthenticate"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Sign in another way"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Sign in with {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} needs to be reauthenticated."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Send recovery email"
   },
@@ -2216,6 +2243,9 @@
   "error.generic.401.switch-account": {
     "message": "Or switch to another account:"
   },
+  "error.generic.401.switch-account-failed": {
+    "message": "Couldn't switch accounts. Please try again."
+  },
   "error.generic.401.title": {
     "message": "You don't have access to this page"
   },
@@ -2948,11 +2978,11 @@
   "layout.nav.switch-account": {
     "message": "Switch account"
   },
+  "layout.nav.switch-account-failed": {
+    "message": "Couldn't switch accounts. Please try again."
+  },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
-  },
-  "layout.nav.use-signed-out": {
-    "message": "Use signed out"
   },
   "layout.publish.email-verification-required.description": {
     "message": "You must verify your email before publishing on Modrinth."

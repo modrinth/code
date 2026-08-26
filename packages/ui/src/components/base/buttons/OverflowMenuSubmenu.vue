@@ -85,7 +85,12 @@ function closeSubmenu(restoreFocus = false) {
 	close(restoreFocus)
 }
 
-function handleTriggerClick() {
+function handleTriggerClick(event: MouseEvent) {
+	if (event.detail && window.matchMedia('(hover: hover)').matches) return
+	toggleSubmenu()
+}
+
+function toggleSubmenu() {
 	if (isOpen.value) closeSubmenu()
 	else openSubmenu()
 }
@@ -99,7 +104,11 @@ function handleTriggerKeydown(event: KeyboardEvent) {
 	if (event.key === 'ArrowLeft' && isOpen.value) {
 		event.preventDefault()
 		closeSubmenu(true)
+		return
 	}
+	if (event.key !== 'Enter' && event.key !== ' ') return
+	event.preventDefault()
+	toggleSubmenu()
 }
 
 function handleSelect(option: OverflowMenuAction | OverflowMenuLink) {

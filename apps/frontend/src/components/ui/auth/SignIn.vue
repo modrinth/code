@@ -217,10 +217,10 @@ import type { LocationQuery } from 'vue-router'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
 import {
-	getAuthUrl,
 	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-} from '@/composables/auth.ts'
+} from '@/composables/accounts.ts'
+import { getAuthUrl } from '@/composables/auth.ts'
 
 const oauthProviders = [
 	{ id: 'discord', name: 'Discord', icon: DiscordColorIcon },

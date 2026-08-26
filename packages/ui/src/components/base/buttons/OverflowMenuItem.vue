@@ -1,17 +1,23 @@
 <script setup lang="ts">
-import { CheckIcon } from '@modrinth/assets'
+import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
-import { getOverflowMenuItemAttrs, isLink, overflowMenuItemClasses } from './overflow-menu'
+import {
+	getOverflowMenuItemAttrs,
+	isLink,
+	overflowMenuItemClasses,
+	overflowMenuTones,
+} from './overflow-menu'
 import type { OverflowMenuAction, OverflowMenuLink } from './types'
 
 const trailingActionClasses =
-	'flex shrink-0 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-2 text-secondary opacity-0 ' +
-	'pointer-events-none hover:bg-surface-5 hover:text-contrast focus-visible:outline-none ' +
+	'overflow-menu-trailing relative flex size-10 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 opacity-0 ' +
+	"pointer-events-none before:pointer-events-none before:absolute before:size-8 before:rounded-full before:content-[''] " +
+	'focus-visible:outline-none ' +
 	'group-hover/overflow-menu-item:pointer-events-auto group-hover/overflow-menu-item:opacity-100 ' +
 	'focus-visible:pointer-events-auto focus-visible:opacity-100 ' +
-	'[&>svg]:size-5'
+	'[&>svg]:relative [&>svg]:z-[1] [&>svg]:size-5'
 
 const props = defineProps<{
 	option: OverflowMenuAction | OverflowMenuLink
@@ -26,9 +32,16 @@ const emit = defineEmits<{
 const wrapperElement = ref<HTMLElement | null>(null)
 const trailingElement = ref<HTMLElement | null>(null)
 
+const trailingActionStyle = computed(() => {
+	const color = props.option.trailingAction?.color
+	if (!color) return undefined
+	return { '--overflow-menu-trailing-color': overflowMenuTones[color] }
+})
+
 const itemAttrs = computed(() => ({
 	...getOverflowMenuItemAttrs(props.option),
 	'data-overflow-submenu-item': props.submenuItem || undefined,
+	'aria-checked': typeof props.option.selected === 'boolean' ? props.option.selected : undefined,
 	'aria-current': props.option.selected || undefined,
 }))
 
@@ -88,8 +101,17 @@ function handleFocus(event: FocusEvent) {
 			@keydown="handleKeydown"
 			@focus="handleFocus"
 		>
+			<RadioButtonCheckedIcon
+				v-if="props.option.selected === true"
+				aria-hidden="true"
+				class="!text-brand"
+			/>
+			<RadioButtonIcon
+				v-else-if="props.option.selected === false"
+				aria-hidden="true"
+				class="!text-secondary"
+			/>
 			<slot />
-			<CheckIcon v-if="props.option.selected" aria-hidden="true" class="ml-auto !text-green" />
 		</RouterLink>
 
 		<a
@@ -108,8 +130,17 @@ function handleFocus(event: FocusEvent) {
 			@keydown="handleKeydown"
 			@focus="handleFocus"
 		>
+			<RadioButtonCheckedIcon
+				v-if="props.option.selected === true"
+				aria-hidden="true"
+				class="!text-brand"
+			/>
+			<RadioButtonIcon
+				v-else-if="props.option.selected === false"
+				aria-hidden="true"
+				class="!text-secondary"
+			/>
 			<slot />
-			<CheckIcon v-if="props.option.selected" aria-hidden="true" class="ml-auto !text-green" />
 		</a>
 
 		<button
@@ -123,8 +154,17 @@ function handleFocus(event: FocusEvent) {
 			@keydown="handleKeydown"
 			@focus="handleFocus"
 		>
+			<RadioButtonCheckedIcon
+				v-if="props.option.selected === true"
+				aria-hidden="true"
+				class="!text-brand"
+			/>
+			<RadioButtonIcon
+				v-else-if="props.option.selected === false"
+				aria-hidden="true"
+				class="!text-secondary"
+			/>
 			<slot />
-			<CheckIcon v-if="props.option.selected" aria-hidden="true" class="ml-auto !text-green" />
 		</button>
 
 		<button
@@ -134,6 +174,7 @@ function handleFocus(event: FocusEvent) {
 			type="button"
 			:aria-label="props.option.trailingAction.label"
 			:class="trailingActionClasses"
+			:style="trailingActionStyle"
 			tabindex="-1"
 			@click="props.option.trailingAction.action($event)"
 			@keydown="handleTrailingKeydown"

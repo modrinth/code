@@ -28,7 +28,6 @@ import {
 	ToggleRightIcon,
 	UserIcon,
 	UserPlusIcon,
-	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -589,10 +588,6 @@ const messages = defineMessages({
 	addAccount: {
 		id: 'app.nav.add-account',
 		defaultMessage: 'Add account',
-	},
-	useSignedOut: {
-		id: 'app.nav.use-signed-out',
-		defaultMessage: 'Use signed out',
 	},
 	removeAccount: {
 		id: 'app.nav.remove-account',
@@ -1170,16 +1165,8 @@ async function requestModrinthAuth(flow = 'sign-in', addAccount = false) {
 }
 
 async function logOut() {
-	await performLogOut()
-}
-
-async function performLogOut() {
-	credentialsRefreshId++
-	credentials.value = undefined
-	clearLiveNotifications()
-
-	await logout().catch(handleError)
-	await fetchCredentials()
+	if (!credentials.value?.user) return
+	await completeAccountSwitch(() => logout())
 }
 
 async function fetchStoredModrinthAccounts() {
@@ -1221,21 +1208,13 @@ const accountSwitcherOptions = computed(() => [
 		label: account.user.username,
 		selected: account.current,
 		action: () => switchModrinthAccount(account),
-		trailingAction: account.current
-			? undefined
-			: {
-					label: formatMessage(messages.removeAccount),
-					icon: XIcon,
-					action: () => forgetModrinthAccount(account.user_id),
-				},
+		trailingAction: {
+			label: formatMessage(messages.removeAccount),
+			icon: XIcon,
+			color: 'red',
+			action: () => forgetModrinthAccount(account.user_id),
+		},
 	})),
-	{
-		id: 'use-signed-out',
-		label: formatMessage(messages.useSignedOut),
-		icon: UserXIcon,
-		selected: !credentials.value?.user,
-		action: () => useSignedOut(),
-	},
 	{
 		type: 'divider',
 	},
@@ -1294,18 +1273,14 @@ async function switchModrinthAccount(account) {
 }
 
 async function forgetModrinthAccount(userId) {
-	if (credentials.value?.user_id === userId && credentials.value?.session) {
-		await performLogOut()
+	const isCurrent = credentials.value?.user_id === userId && !!credentials.value?.session
+	if (isCurrent) {
+		await completeAccountSwitch(() => removeUser(userId))
 		return
 	}
 
 	await removeUser(userId).catch(handleError)
 	await fetchStoredModrinthAccounts()
-}
-
-async function useSignedOut() {
-	if (!credentials.value?.user) return
-	await completeAccountSwitch(() => logout())
 }
 
 const modrinthAccountMenuOptions = computed(() => [

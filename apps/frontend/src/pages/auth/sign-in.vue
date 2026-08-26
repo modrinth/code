@@ -34,14 +34,17 @@ import type { LocationQueryValue } from 'vue-router'
 import SignInView from '@/components/ui/auth/SignIn.vue'
 import {
 	hydrateStoredAccounts,
+	isStoredAccountAuthMethod,
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	rememberStoredAccount,
 	type StoredAccount,
+	type StoredAccountAuthMethod,
 	useStoredAccounts,
 } from '@/composables/accounts.ts'
 import {
 	ADD_ACCOUNT_QUERY_PARAM,
 	getLauncherRedirectUrl,
-	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	promotePendingSignInOAuthProvider,
 } from '@/composables/auth.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
@@ -266,7 +269,7 @@ async function beginPasswordSignIn() {
 		if (res.flow) {
 			flow.value = res.flow
 		} else {
-			await finishSignIn(res.session)
+			await finishSignIn(res.session, 'password')
 		}
 	} catch (err) {
 		addNotification({
@@ -288,7 +291,7 @@ async function begin2FASignIn() {
 			code: twoFactorCode.value,
 		})
 
-		await finishSignIn(res.session)
+		await finishSignIn(res.session, 'password')
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -313,7 +316,7 @@ async function beginPasskeySignin() {
 		})
 
 		pendingSignInOAuthProvider.value = 'passkey'
-		await finishSignIn(result.session)
+		await finishSignIn(result.session, 'passkey')
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -324,7 +327,7 @@ async function beginPasskeySignin() {
 	stopLoading()
 }
 
-async function finishSignIn(sessionToken?: string | null) {
+async function finishSignIn(sessionToken?: string | null, authMethod?: StoredAccountAuthMethod) {
 	if (route.query.launcher) {
 		const token = sessionToken ?? auth.value.token
 		if (token) {
@@ -340,6 +343,20 @@ async function finishSignIn(sessionToken?: string | null) {
 		queryClient.clear()
 	}
 
+	const signedIn = await useAuth()
+	if (signedIn.value.user && signedIn.value.token) {
+		const nextAuthMethod =
+			authMethod ??
+			(isStoredAccountAuthMethod(pendingSignInOAuthProvider.value)
+				? pendingSignInOAuthProvider.value
+				: undefined)
+		rememberStoredAccount(
+			signedIn.value.user,
+			signedIn.value.token,
+			nextAuthMethod ? { authMethod: nextAuthMethod } : undefined,
+		)
+	}
+
 	promotePendingSignInOAuthProvider()
 
 	if (route.query.redirect) {
@@ -347,8 +364,8 @@ async function finishSignIn(sessionToken?: string | null) {
 		await navigateTo(redirect, {
 			replace: true,
 		})
-	} else {
-		await navigateTo('/dashboard')
+	} else if (signedIn.value.user) {
+		await navigateTo(`/user/${signedIn.value.user.username}`)
 	}
 }
 </script>

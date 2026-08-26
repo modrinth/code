@@ -27,7 +27,7 @@ export const topLevelMenuItemSelector = `${menuItemSelector}:not([data-overflow-
 
 const TYPEAHEAD_RESET_DELAY = 500
 
-const toneVariables: Record<ButtonColor, string> = {
+export const overflowMenuTones: Record<ButtonColor, string> = {
 	brand: 'var(--color-brand)',
 	red: 'var(--color-red)',
 	orange: 'var(--color-orange)',
@@ -68,7 +68,7 @@ export function getOverflowMenuItemAttrs(
 		role: 'menuitem',
 		tabindex: '-1',
 		style: tone
-			? ({ '--overflow-menu-item-tone': toneVariables[tone] } as CSSProperties)
+			? ({ '--overflow-menu-item-tone': overflowMenuTones[tone] } as CSSProperties)
 			: undefined,
 		'data-tone': tone,
 		'data-hover-filled': option.hoverFilled || option.hoverFilledOnly || undefined,

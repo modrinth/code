@@ -6,7 +6,6 @@ import {
 	PlusIcon,
 	SettingsIcon,
 	TrashIcon,
-	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
@@ -116,22 +115,29 @@ const optionsWithSubmenu: OverflowMenuOption[] = [
 		icon: ArrowLeftRightIcon,
 		type: 'submenu',
 		options: [
-			{ id: 'account-jai', label: 'Jai', selected: true, action: () => undefined },
 			{
-				id: 'account-prospector',
-				label: 'Prospector',
+				id: 'account-jai',
+				label: 'Jai',
+				selected: true,
 				action: () => undefined,
 				trailingAction: {
-					label: 'Remove Prospector',
+					label: 'Remove Jai',
 					icon: XIcon,
+					color: 'red',
 					action: () => undefined,
 				},
 			},
 			{
-				id: 'use-signed-out',
-				label: 'Use signed out',
-				icon: UserXIcon,
+				id: 'account-prospector',
+				label: 'Prospector',
+				selected: false,
 				action: () => undefined,
+				trailingAction: {
+					label: 'Remove Prospector',
+					icon: XIcon,
+					color: 'red',
+					action: () => undefined,
+				},
 			},
 			{ type: 'divider' },
 			{ id: 'add-account', label: 'Add account', icon: PlusIcon, action: () => undefined },

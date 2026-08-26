@@ -1,35 +1,4 @@
 <template>
-	<div class="pointer-events-none fixed inset-0 z-[-1]">
-		<div id="fixed-background-teleport" class="relative"></div>
-	</div>
-	<div class="pointer-events-none absolute inset-0 z-[-1]">
-		<div id="absolute-background-teleport" class="relative"></div>
-	</div>
-	<div
-		class="pride-backdrop pointer-events-none absolute inset-0 z-[-1]"
-		:class="{ shown: showPrideBackdrop }"
-	></div>
-	<div class="pointer-events-none absolute inset-0 z-50">
-		<div
-			class="over-the-top-random-animation"
-			:style="{ '--_r-count': rCount }"
-			:class="{ threshold: rCount > 20, 'rings-expand': rCount >= 40 }"
-		>
-			<div>
-				<div
-					class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-				></div>
-				<div
-					class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-				></div>
-				<div
-					class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
-				>
-					?
-				</div>
-			</div>
-		</div>
-	</div>
 	<div
 		ref="main_page"
 		class="layout"
@@ -38,6 +7,37 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
+		<div class="pointer-events-none fixed inset-0 z-[-1]">
+			<div id="fixed-background-teleport" class="relative"></div>
+		</div>
+		<div class="pointer-events-none absolute inset-0 z-[-1]">
+			<div id="absolute-background-teleport" class="relative"></div>
+		</div>
+		<div
+			class="pride-backdrop pointer-events-none absolute inset-0 z-[-1]"
+			:class="{ shown: showPrideBackdrop }"
+		></div>
+		<div class="pointer-events-none absolute inset-0 z-50">
+			<div
+				class="over-the-top-random-animation"
+				:style="{ '--_r-count': rCount }"
+				:class="{ threshold: rCount > 20, 'rings-expand': rCount >= 40 }"
+			>
+				<div>
+					<div
+						class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+					></div>
+					<div
+						class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+					></div>
+					<div
+						class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
+					>
+						?
+					</div>
+				</div>
+			</div>
+		</div>
 		<RussiaBanner v-if="flags.showAllBanners || isRussia" />
 		<TaxIdMismatchBanner v-if="flags.showAllBanners || showTinMismatchBanner" />
 		<TaxComplianceBanner v-if="flags.showAllBanners || showTaxComplianceBanner" />
@@ -847,7 +847,6 @@ import {
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
-	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -895,6 +894,7 @@ import {
 	useStoredAccounts,
 } from '~/composables/accounts.ts'
 import { getAddAccountRouteObj, getSignInRouteObj } from '~/composables/auth.ts'
+import { logout } from '~/composables/user.js'
 import { errors as generatedStateErrors, taxComplianceThresholds } from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
@@ -1162,13 +1162,13 @@ const messages = defineMessages({
 		id: 'layout.nav.add-account',
 		defaultMessage: 'Add account',
 	},
-	useSignedOut: {
-		id: 'layout.nav.use-signed-out',
-		defaultMessage: 'Use signed out',
-	},
 	removeAccount: {
 		id: 'layout.nav.remove-account',
 		defaultMessage: 'Remove account',
+	},
+	accountSwitchFailed: {
+		id: 'layout.nav.switch-account-failed',
+		defaultMessage: "Couldn't switch accounts. Please try again.",
 	},
 	openMenu: {
 		id: 'layout.mobile.open-menu',
@@ -1267,22 +1267,13 @@ const accountSwitcherOptions = computed(() => [
 		label: account.username,
 		selected: account.current,
 		action: () => switchAccount(account),
-		// current account is rewritten on load, drop it by signing out
-		trailingAction: account.current
-			? undefined
-			: {
-					label: formatMessage(messages.removeAccount),
-					icon: XIcon,
-					action: () => forgetStoredAccount(account.id),
-				},
+		trailingAction: {
+			label: formatMessage(messages.removeAccount),
+			icon: XIcon,
+			color: 'red',
+			action: () => removeAccount(account),
+		},
 	})),
-	{
-		id: 'use-signed-out',
-		label: formatMessage(messages.useSignedOut),
-		icon: UserXIcon,
-		selected: !auth.value.user,
-		action: () => useSiteSignedOut(),
-	},
 	{
 		type: 'divider',
 	},
@@ -1298,13 +1289,23 @@ const accountSwitcherOptions = computed(() => [
 async function switchAccount(account) {
 	if (account.current) return
 
-	await switchToStoredAccount(account)
+	const result = await switchToStoredAccount(account)
+	if (result === 'error') {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: formatMessage(messages.accountSwitchFailed),
+			type: 'error',
+		})
+	}
 }
 
-async function useSiteSignedOut() {
-	if (!auth.value.user) return
+async function removeAccount(account) {
+	if (account.current) {
+		await logout()
+		return
+	}
 
-	await switchToSignedOut()
+	forgetStoredAccount(account.id)
 }
 
 const userMenuOptions = computed(() => {
@@ -1524,7 +1525,7 @@ watch(
 )
 
 async function logoutUser() {
-	await logout()
+	await switchToSignedOut()
 }
 
 function runAnalytics() {

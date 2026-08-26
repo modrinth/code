@@ -1268,9 +1268,6 @@
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
   },
-  "app.nav.use-signed-out": {
-    "message": "Use signed out"
-  },
   "app.nav.view-profile": {
     "message": "View profile"
   },

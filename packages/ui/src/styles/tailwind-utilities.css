@@ -89,6 +89,20 @@
 	color: inherit;
 }
 
+.overflow-menu-trailing {
+	color: var(--overflow-menu-trailing-color, var(--color-secondary));
+}
+
+.overflow-menu-trailing:hover,
+.overflow-menu-trailing:focus-visible {
+	color: var(--color-accent-contrast);
+}
+
+.overflow-menu-trailing:hover::before,
+.overflow-menu-trailing:focus-visible::before {
+	background-color: var(--overflow-menu-trailing-color, var(--color-secondary));
+}
+
 @layer utilities {
 	.heading-xl {
 		@apply m-0 text-xl font-semibold leading-none text-contrast;

@@ -2,7 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { useStorage } from '@vueuse/core'
 import type { LocationQueryValue, RouteLocationNormalizedLoaded } from 'vue-router'
 
-import { forgetStoredAccountByToken, rememberStoredAccount } from '@/composables/accounts.ts'
+import { rememberStoredAccount } from '@/composables/accounts.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
 
 type AuthState = {
@@ -13,9 +13,6 @@ type AuthState = {
 type QueryValue = LocationQueryValue | LocationQueryValue[] | undefined
 type FullPathRoute = Pick<RouteLocationNormalizedLoaded, 'fullPath'>
 type LauncherRoute = Pick<RouteLocationNormalizedLoaded, 'query'>
-
-export const LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY = 'auth-last-sign-in-oauth-provider'
-export const PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY = 'auth-pending-sign-in-oauth-provider'
 
 const normalizeAuthToken = (value: unknown) => {
 	if (typeof value === 'string') {
@@ -42,9 +39,6 @@ const isAuthFailure = (error: unknown): boolean => {
 }
 
 const clearAuthCookie = (auth: AuthState, authCookie: { value: string | null }) => {
-	if (auth.token) {
-		forgetStoredAccountByToken(auth.token)
-	}
 	authCookie.value = null
 	auth.token = ''
 	auth.user = null
@@ -185,9 +179,7 @@ export const initAuth = async (oldToken: string | null | undefined = null) => {
 
 export const getSignInRedirectPath = (route: FullPathRoute) => {
 	const fullPath = route.fullPath
-	if (fullPath === '/auth' || fullPath.startsWith('/auth/')) {
-		return '/dashboard'
-	}
+	if (fullPath === '/auth' || fullPath.startsWith('/auth/')) return undefined
 	return fullPath
 }
 
@@ -208,48 +200,48 @@ export const getAddAccountRouteObj = (route: FullPathRoute) => ({
 	},
 })
 
-export const getAuthUrl = (provider: string, redirect = '/dashboard') => {
+export const getAuthUrl = (provider: string, redirect?: string) => {
 	const config = useRuntimeConfig()
 	const route = useNativeRoute()
 	const launcher = getQueryString(route.query.launcher)
+	const addingAccount =
+		route.query[ADD_ACCOUNT_QUERY_PARAM] !== undefined || route.path === '/auth/reauthenticate'
 
-	const fullURL = launcher
-		? (() => {
-				const callbackUrl = new URL('/auth/sign-in', config.public.siteUrl)
-				callbackUrl.searchParams.set('launcher', launcher)
+	const callbackUrl = new URL('/auth/sign-in', config.public.siteUrl)
+	if (launcher) {
+		callbackUrl.searchParams.set('launcher', launcher)
 
-				const ipver = getQueryString(route.query.ipver)
-				const port = getQueryString(route.query.port)
+		const ipver = getQueryString(route.query.ipver)
+		const port = getQueryString(route.query.port)
 
-				if (ipver) {
-					callbackUrl.searchParams.set('ipver', ipver)
-				}
+		if (ipver) {
+			callbackUrl.searchParams.set('ipver', ipver)
+		}
 
-				if (port) {
-					callbackUrl.searchParams.set('port', port)
-				}
+		if (port) {
+			callbackUrl.searchParams.set('port', port)
+		}
+	} else if (redirect) {
+		callbackUrl.searchParams.set('redirect', redirect)
+	}
 
-				if (route.query[ADD_ACCOUNT_QUERY_PARAM] !== undefined) {
-					callbackUrl.searchParams.set(ADD_ACCOUNT_QUERY_PARAM, 'true')
-				}
+	if (addingAccount) {
+		callbackUrl.searchParams.set(ADD_ACCOUNT_QUERY_PARAM, 'true')
+	}
 
-				return callbackUrl.toString()
-			})()
-		: `${config.public.siteUrl}/auth/sign-in?redirect=${encodeURIComponent(redirect)}`
-
-	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(fullURL)}`
+	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(callbackUrl.toString())}`
 }
 
 export const promotePendingSignInOAuthProvider = () => {
 	if (!import.meta.client) return
 	const pending = useStorage<string | null>(
-		PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+		'auth-pending-sign-in-oauth-provider',
 		null,
 		undefined,
 		{ initOnMounted: true },
 	)
 	if (!pending.value) return
-	const last = useStorage<string | null>(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, null, undefined, {
+	const last = useStorage<string | null>('auth-last-sign-in-oauth-provider', null, undefined, {
 		initOnMounted: true,
 	})
 	last.value = pending.value
