@@ -223,7 +223,6 @@
 					</template>
 					<template #closedActions>
 						<Button
-							v-if="isStaff(auth.user)"
 							type="colored"
 							color="green"
 							class="mt-2 w-full gap-2 sm:w-auto"
@@ -234,7 +233,7 @@
 						</Button>
 					</template>
 					<template #additionalActions="{ hasReply }">
-						<template v-if="isStaff(auth.user)">
+						<template>
 							<Button
 								v-if="hasReply"
 								type="colored"
@@ -301,7 +300,7 @@ import SharedInstanceReportContext, {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const auth = await useAuth()
+// const auth = await useAuth()
 
 type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 	project_id?: string
