@@ -43,8 +43,11 @@
 				/>
 				<div
 					ref="nagScroller"
-					class="flex w-full cursor-grab select-none gap-2 overflow-x-auto overflow-y-hidden pb-2"
-					:class="{ 'is-dragging': draggingNags }"
+					class="flex w-full gap-2 overflow-x-auto overflow-y-hidden pb-2"
+					:class="{
+						'cursor-grab select-none': canScrollNags,
+						'is-dragging': draggingNags,
+					}"
 					@pointerdown="onNagPointerDown"
 					@pointermove="onNagPointerMove"
 					@pointerup="finishNagDrag"
@@ -209,6 +212,7 @@ const emit = defineEmits<{
 const isProcessing = computed(() => props.project.status === 'processing')
 
 const nagScroller = ref<HTMLElement | null>(null)
+const canScrollNags = ref(false)
 const showLeftNagShadow = ref(false)
 const showRightNagShadow = ref(false)
 const draggingNags = ref(false)
@@ -224,13 +228,16 @@ let suppressNagClickTimeout: ReturnType<typeof setTimeout> | null = null
 function updateNagScrollShadows() {
 	const el = nagScroller.value
 	if (!el) {
+		canScrollNags.value = false
 		showLeftNagShadow.value = false
 		showRightNagShadow.value = false
 		return
 	}
 
-	showLeftNagShadow.value = el.scrollLeft > 0
-	showRightNagShadow.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 1
+	canScrollNags.value = el.scrollWidth > el.clientWidth + 1
+	showLeftNagShadow.value = canScrollNags.value && el.scrollLeft > 0
+	showRightNagShadow.value =
+		canScrollNags.value && el.scrollLeft < el.scrollWidth - el.clientWidth - 1
 }
 
 function onNagWheel(event: WheelEvent) {
@@ -244,7 +251,13 @@ function onNagWheel(event: WheelEvent) {
 
 function onNagPointerDown(event: PointerEvent) {
 	const el = nagScroller.value
-	if (!el || event.pointerType === 'touch' || event.button !== 0) return
+	if (
+		!el ||
+		el.scrollWidth <= el.clientWidth + 1 ||
+		event.pointerType === 'touch' ||
+		event.button !== 0
+	)
+		return
 
 	nagDragPointerId = event.pointerId
 	nagDragStartX = event.clientX
