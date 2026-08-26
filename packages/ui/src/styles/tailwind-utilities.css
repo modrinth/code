@@ -73,34 +73,34 @@
 	transform-origin: var(--floating-expand-origin, top);
 }
 
-.overflow-menu-item[data-tone]:not([data-hover-filled-only]),
-.overflow-menu-item[data-tone]:not([data-hover-filled-only]) svg {
-	color: var(--overflow-menu-item-tone);
+.button-menu-item[data-tone]:not([data-hover-filled-only]),
+.button-menu-item[data-tone]:not([data-hover-filled-only]) svg {
+	color: var(--button-menu-item-tone);
 }
 
-.overflow-menu-item[data-tone][data-hover-filled]:hover,
-.overflow-menu-item[data-tone][data-hover-filled]:focus-visible {
+.button-menu-item[data-tone][data-hover-filled]:hover,
+.button-menu-item[data-tone][data-hover-filled]:focus-visible {
 	color: var(--color-accent-contrast);
-	background-color: var(--overflow-menu-item-tone);
+	background-color: var(--button-menu-item-tone);
 }
 
-.overflow-menu-item[data-tone][data-hover-filled]:hover svg,
-.overflow-menu-item[data-tone][data-hover-filled]:focus-visible svg {
+.button-menu-item[data-tone][data-hover-filled]:hover svg,
+.button-menu-item[data-tone][data-hover-filled]:focus-visible svg {
 	color: inherit;
 }
 
-.overflow-menu-trailing {
-	color: var(--overflow-menu-trailing-color, var(--color-secondary));
+.button-menu-trailing {
+	color: var(--button-menu-trailing-color, var(--color-secondary));
 }
 
-.overflow-menu-trailing:hover,
-.overflow-menu-trailing:focus-visible {
+.button-menu-trailing:hover,
+.button-menu-trailing:focus-visible {
 	color: var(--color-accent-contrast);
 }
 
-.overflow-menu-trailing:hover::before,
-.overflow-menu-trailing:focus-visible::before {
-	background-color: var(--overflow-menu-trailing-color, var(--color-secondary));
+.button-menu-trailing:hover::before,
+.button-menu-trailing:focus-visible::before {
+	background-color: var(--button-menu-trailing-color, var(--color-secondary));
 }
 
 @layer utilities {

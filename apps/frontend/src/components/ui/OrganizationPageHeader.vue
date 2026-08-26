@@ -69,9 +69,9 @@ import {
 import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	Avatar,
+	type ButtonMenuOption,
 	commonMessages,
 	defineMessages,
-	type OverflowMenuOption,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
@@ -132,7 +132,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
 
-const moreActions = computed<OverflowMenuOption[]>(() => [
+const moreActions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'manage-projects',
 		label: formatMessage(messages.manageProjects),

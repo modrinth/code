@@ -287,8 +287,8 @@ import {
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import {
+	type ButtonMenuOption,
 	IconButton,
-	type OverflowMenuOption,
 	TeleportOverflowMenu,
 } from '#ui/components/base/buttons'
 
@@ -599,7 +599,7 @@ function handleRemoveMember(member: ServerAccessMember) {
 	emit('removeMember', member)
 }
 
-function memberActionOptions(member: ServerAccessMember): OverflowMenuOption[] {
+function memberActionOptions(member: ServerAccessMember): ButtonMenuOption[] {
 	return [
 		{
 			id: 'resend-invite',

@@ -2,33 +2,33 @@
 import { ChevronRightIcon } from '@modrinth/assets'
 import { computed, ref, toRef, useId } from 'vue'
 
-import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
+import { useAnchoredTeleport } from '../../../../utils/use-anchored-teleport'
+import type {
+	ButtonMenuAction,
+	ButtonMenuLink,
+	ButtonMenuSubmenu,
+	TeleportPlacement,
+} from '../types'
 import {
-	getOverflowMenuItemAttrs,
+	buttonMenuItemClasses,
+	getButtonMenuItemAttrs,
 	isDivider,
 	isHeading,
 	menuItemSelector,
 	menuPanelPadding,
-	overflowMenuItemClasses,
 	submenuGap,
+	useButtonMenuNavigation,
 	useHoverIntent,
-	useOverflowMenuNavigation,
 	visibleOptions,
-} from './overflow-menu'
-import OverflowMenuItem from './OverflowMenuItem.vue'
-import OverflowMenuPanel from './OverflowMenuPanel.vue'
-import type {
-	OverflowMenuAction,
-	OverflowMenuLink,
-	OverflowMenuSubmenu,
-	TeleportPlacement,
-} from './types'
+} from './button-menu'
+import ButtonMenuItem from './ButtonMenuItem.vue'
+import ButtonMenuPanel from './ButtonMenuPanel.vue'
 
 const HOVER_CLOSE_DELAY = 200
 
 const props = withDefaults(
 	defineProps<{
-		option: OverflowMenuSubmenu
+		option: ButtonMenuSubmenu
 		placement?: TeleportPlacement
 		distance?: number
 	}>(),
@@ -39,19 +39,19 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-	select: [option: OverflowMenuAction | OverflowMenuLink]
+	select: [option: ButtonMenuAction | ButtonMenuLink]
 }>()
 
 const triggerElement = ref<HTMLElement | null>(null)
-const panel = ref<InstanceType<typeof OverflowMenuPanel> | null>(null)
+const panel = ref<InstanceType<typeof ButtonMenuPanel> | null>(null)
 const panelElement = computed(() => panel.value?.element ?? null)
 const resolvedPlacement = toRef(props, 'placement')
 const resolvedDistance = toRef(props, 'distance')
 const alignOffset = ref(-menuPanelPadding)
-const panelId = `overflow-submenu-${useId()}`
+const panelId = `button-menu-submenu-${useId()}`
 
 const options = computed(() => visibleOptions(props.option.options))
-const triggerAttrs = computed(() => getOverflowMenuItemAttrs(props.option))
+const triggerAttrs = computed(() => getButtonMenuItemAttrs(props.option))
 
 const { isOpen, panelStyle, resolvedSide, expandOrigin, open, close } = useAnchoredTeleport(
 	triggerElement,
@@ -63,7 +63,7 @@ const { isOpen, panelStyle, resolvedSide, expandOrigin, open, close } = useAncho
 
 const bridge = computed(() => ({ side: resolvedSide.value, size: resolvedDistance.value }))
 
-const { focusItem, handleNavigationKeydown } = useOverflowMenuNavigation(
+const { focusItem, handleNavigationKeydown } = useButtonMenuNavigation(
 	panelElement,
 	menuItemSelector,
 )
@@ -112,7 +112,7 @@ function handleTriggerKeydown(event: KeyboardEvent) {
 	toggleSubmenu()
 }
 
-function handleSelect(option: OverflowMenuAction | OverflowMenuLink) {
+function handleSelect(option: ButtonMenuAction | ButtonMenuLink) {
 	emit('select', option)
 	if (!option.remainOpen) closeSubmenu()
 }
@@ -140,7 +140,7 @@ function handlePanelKeydown(event: KeyboardEvent) {
 		:aria-expanded="isOpen"
 		:aria-controls="panelId"
 		aria-haspopup="menu"
-		:class="overflowMenuItemClasses"
+		:class="buttonMenuItemClasses"
 		@click="handleTriggerClick"
 		@keydown="handleTriggerKeydown"
 		@mouseenter="handleMouseEnter"
@@ -153,7 +153,7 @@ function handlePanelKeydown(event: KeyboardEvent) {
 		<ChevronRightIcon aria-hidden="true" class="ml-auto !text-secondary" />
 	</button>
 
-	<OverflowMenuPanel
+	<ButtonMenuPanel
 		ref="panel"
 		:open="isOpen"
 		:panel-id="panelId"
@@ -177,12 +177,12 @@ function handlePanelKeydown(event: KeyboardEvent) {
 				{{ child.label }}
 			</div>
 
-			<OverflowMenuItem v-else :option="child" submenu-item @select="handleSelect">
+			<ButtonMenuItem v-else :option="child" submenu-item @select="handleSelect">
 				<slot name="item" :option="child">
 					<component :is="child.icon" v-if="child.icon" aria-hidden="true" />
 					{{ child.label }}
 				</slot>
-			</OverflowMenuItem>
+			</ButtonMenuItem>
 		</template>
-	</OverflowMenuPanel>
+	</ButtonMenuPanel>
 </template>

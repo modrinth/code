@@ -88,7 +88,7 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useFormatBytes } from '#ui/composables'
@@ -140,7 +140,7 @@ const emit = defineEmits<{
 		e: 'moveDirectTo',
 		item: Pick<FileItem, 'name' | 'type' | 'path'> & { destination: string },
 	): void
-	(e: 'contextmenu', event: MouseEvent, options: OverflowMenuOption[]): void
+	(e: 'contextmenu', event: MouseEvent, options: ButtonMenuOption[]): void
 	(e: 'toggle-select'): void
 }>()
 
@@ -183,7 +183,7 @@ function getFullPath() {
 	return joinDisplayPath(ctx.basePath?.value, props.path)
 }
 
-const menuOptions = computed<OverflowMenuOption[]>(() => {
+const menuOptions = computed<ButtonMenuOption[]>(() => {
 	const item = { name: props.name, type: props.type, path: props.path }
 	const wd = props.writeDisabled
 	const wdTooltip = props.writeDisabledTooltip

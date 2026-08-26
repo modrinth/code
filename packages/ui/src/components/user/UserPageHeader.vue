@@ -103,7 +103,7 @@ import {
 import { computed } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { Button, ButtonLink, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
@@ -228,7 +228,7 @@ const formatDateTime = useFormatDateTime({
 const downloadsTooltip = computed(() => formatNumber(props.downloads))
 const joinedTooltip = computed(() => formatDateTime(props.user.created))
 
-const moreActions = computed<OverflowMenuOption[]>(() => [
+const moreActions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'manage-projects',
 		label: formatMessage(messages.profileManageProjectsButton),

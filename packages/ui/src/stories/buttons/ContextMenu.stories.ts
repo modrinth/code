@@ -4,9 +4,9 @@ import { fn } from 'storybook/test'
 import { nextTick, onMounted, ref } from 'vue'
 
 import ContextMenu from '../../components/base/buttons/ContextMenu.vue'
-import type { OverflowMenuOption } from '../../components/base/buttons/types'
+import type { ButtonMenuOption } from '../../components/base/buttons/types'
 
-const options: OverflowMenuOption[] = [
+const options: ButtonMenuOption[] = [
 	{
 		id: 'play',
 		label: 'Play',

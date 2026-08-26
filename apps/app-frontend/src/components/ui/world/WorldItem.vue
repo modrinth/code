@@ -18,7 +18,7 @@ import {
 	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { MessageDescriptor, OverflowMenuOption } from '@modrinth/ui'
+import type { ButtonMenuOption, MessageDescriptor } from '@modrinth/ui'
 import {
 	Avatar,
 	BulletDivider,
@@ -294,7 +294,7 @@ const playTooltip = computed(() => {
 	return null
 })
 
-const overflowOptions = computed((): OverflowMenuOption[] => [
+const overflowOptions = computed((): ButtonMenuOption[] => [
 	{
 		id: 'play-instance',
 		label: formatMessage(messages.playInstance),
@@ -397,7 +397,7 @@ const overflowOptions = computed((): OverflowMenuOption[] => [
 	},
 ])
 
-const contextMenuOptions = computed((): OverflowMenuOption[] => [
+const contextMenuOptions = computed((): ButtonMenuOption[] => [
 	showStop.value
 		? {
 				id: 'stop',

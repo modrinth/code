@@ -12,11 +12,11 @@ import {
 	Avatar,
 	BulletDivider,
 	Button,
+	type ButtonMenuOption,
 	commonMessages,
 	ContextMenu,
 	defineMessages,
 	injectNotificationManager,
-	type OverflowMenuOption,
 	SmartClickable,
 	TagItem,
 	TeleportOverflowMenu,
@@ -155,7 +155,7 @@ const cardOptions = useTemplateRef('cardOptions')
 const showStop = computed(() => playing.value && !loading.value)
 const playDisabled = computed(() => props.instance.quarantined || playing.value || loading.value)
 
-const overflowOptions = computed((): OverflowMenuOption[] => [
+const overflowOptions = computed((): ButtonMenuOption[] => [
 	{
 		id: 'open-instance',
 		label: formatMessage(messages.viewInstance),
@@ -171,7 +171,7 @@ const overflowOptions = computed((): OverflowMenuOption[] => [
 	},
 ])
 
-const contextMenuOptions = computed((): OverflowMenuOption[] => [
+const contextMenuOptions = computed((): ButtonMenuOption[] => [
 	showStop.value
 		? {
 				id: 'stop',

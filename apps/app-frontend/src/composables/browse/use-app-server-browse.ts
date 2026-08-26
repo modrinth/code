@@ -8,7 +8,7 @@ import {
 	SpinnerIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
-import type { CardAction, OverflowMenuOption } from '@modrinth/ui'
+import type { ButtonMenuOption, CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -34,7 +34,7 @@ interface BrowseServerInstance {
 }
 
 interface ContextMenuHandle {
-	open: (event: MouseEvent, options: OverflowMenuOption[]) => void
+	open: (event: MouseEvent, options: ButtonMenuOption[]) => void
 }
 
 export interface UseAppServerBrowseOptions {

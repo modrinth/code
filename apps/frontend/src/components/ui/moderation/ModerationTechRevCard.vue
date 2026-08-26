@@ -25,6 +25,7 @@ import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/modera
 import { Button, ButtonLink, IconButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	Avatar,
+	type ButtonMenuOption,
 	Collapsible,
 	CollapsibleRegion,
 	commonMessages,
@@ -32,7 +33,6 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	NavTabs,
-	type OverflowMenuOption,
 	Toggle,
 	useFormatBytes,
 	useFormatDateTime,
@@ -116,7 +116,7 @@ const isProjectApproved = computed(() => {
 })
 
 const isLoadingStatusAction = ref(false)
-const projectStatusActions = computed<OverflowMenuOption[]>(() => [
+const projectStatusActions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'approve',
 		label: 'Approve',

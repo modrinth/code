@@ -11,9 +11,9 @@ import {
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import TeleportOverflowMenu from '../../components/base/buttons/TeleportOverflowMenu.vue'
-import type { OverflowMenuOption } from '../../components/base/buttons/types'
+import type { ButtonMenuOption } from '../../components/base/buttons/types'
 
-const options: OverflowMenuOption[] = [
+const options: ButtonMenuOption[] = [
 	{
 		id: 'download',
 		label: 'Download',
@@ -106,7 +106,7 @@ export const Hoverable: Story = {
 	},
 }
 
-const optionsWithSubmenu: OverflowMenuOption[] = [
+const optionsWithSubmenu: ButtonMenuOption[] = [
 	...options,
 	{ type: 'divider' },
 	{

@@ -3,7 +3,6 @@ import { computed, nextTick, ref, toRef, useId, watch } from 'vue'
 
 import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
 import Button from './Button.vue'
-import IconButton from './IconButton.vue'
 import {
 	isDivider,
 	isHeading,
@@ -13,19 +12,20 @@ import {
 	useHoverIntent,
 	useMenuKeyboard,
 	visibleOptions,
-} from './overflow-menu'
-import OverflowMenuItem from './OverflowMenuItem.vue'
-import OverflowMenuPanel from './OverflowMenuPanel.vue'
-import OverflowMenuSubmenu from './OverflowMenuSubmenu.vue'
+} from './button-menu/button-menu'
+import ButtonMenuItem from './button-menu/ButtonMenuItem.vue'
+import ButtonMenuPanel from './button-menu/ButtonMenuPanel.vue'
+import ButtonMenuSubmenu from './button-menu/ButtonMenuSubmenu.vue'
+import IconButton from './IconButton.vue'
 import type {
 	ButtonColor,
 	ButtonElementHandle,
 	ButtonInteraction,
+	ButtonMenuAction,
+	ButtonMenuLink,
+	ButtonMenuOption,
 	ButtonSize,
 	ButtonType,
-	OverflowMenuAction,
-	OverflowMenuLink,
-	OverflowMenuOption,
 	TeleportPlacement,
 } from './types'
 
@@ -36,7 +36,7 @@ defineOptions({ inheritAttrs: false })
 const props = withDefaults(
 	defineProps<{
 		label: string
-		options: OverflowMenuOption[]
+		options: ButtonMenuOption[]
 		type?: ButtonType
 		color?: ButtonColor
 		size?: ButtonSize
@@ -62,14 +62,14 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-	select: [option: OverflowMenuAction | OverflowMenuLink]
+	select: [option: ButtonMenuAction | ButtonMenuLink]
 	open: []
 	close: []
 }>()
 
 const triggerButton = ref<ButtonElementHandle | null>(null)
 const triggerElement = computed(() => triggerButton.value?.element ?? null)
-const panel = ref<InstanceType<typeof OverflowMenuPanel> | null>(null)
+const panel = ref<InstanceType<typeof ButtonMenuPanel> | null>(null)
 const panelElement = computed(() => panel.value?.element ?? null)
 const resolvedPlacement = toRef(props, 'placement')
 const resolvedDistance = toRef(props, 'distance')
@@ -127,12 +127,12 @@ function handleTriggerKeydown(event: KeyboardEvent) {
 	openMenu(event.key === 'ArrowDown' ? 'first' : 'last')
 }
 
-function handleItemSelect(option: OverflowMenuAction | OverflowMenuLink) {
+function handleItemSelect(option: ButtonMenuAction | ButtonMenuLink) {
 	emit('select', option)
 	if (!option.remainOpen) closeMenu(!isLink(option)) // don't steal focus from a navigating link
 }
 
-function handleSubmenuSelect(option: OverflowMenuAction | OverflowMenuLink) {
+function handleSubmenuSelect(option: ButtonMenuAction | ButtonMenuLink) {
 	emit('select', option)
 	if (!option.remainOpen) closeMenu()
 }
@@ -170,7 +170,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 	</component>
 
 	<Teleport to="body">
-		<OverflowMenuPanel
+		<ButtonMenuPanel
 			ref="panel"
 			:open="isOpen"
 			:panel-id="menuId"
@@ -193,7 +193,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 					{{ option.label }}
 				</div>
 
-				<OverflowMenuSubmenu
+				<ButtonMenuSubmenu
 					v-else-if="isSubmenu(option)"
 					:option="option"
 					@select="handleSubmenuSelect"
@@ -210,9 +210,9 @@ defineExpose({ open: openMenu, close: closeMenu })
 							{{ child.label }}
 						</slot>
 					</template>
-				</OverflowMenuSubmenu>
+				</ButtonMenuSubmenu>
 
-				<OverflowMenuItem
+				<ButtonMenuItem
 					v-else
 					:option="option"
 					@select="handleItemSelect"
@@ -222,8 +222,8 @@ defineExpose({ open: openMenu, close: closeMenu })
 						<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
 						{{ option.label }}
 					</slot>
-				</OverflowMenuItem>
+				</ButtonMenuItem>
 			</template>
-		</OverflowMenuPanel>
+		</ButtonMenuPanel>
 	</Teleport>
 </template>

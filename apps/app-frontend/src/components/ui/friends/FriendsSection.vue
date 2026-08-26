@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@modrinth/assets'
-import type { OverflowMenuOption } from '@modrinth/ui'
+import type { ButtonMenuOption } from '@modrinth/ui'
 import {
 	Accordion,
 	ContextMenu,
@@ -37,7 +37,7 @@ const emit = defineEmits<{
 	onClose: []
 }>()
 
-function createContextMenuOptions(friend: FriendWithUserData): OverflowMenuOption[] {
+function createContextMenuOptions(friend: FriendWithUserData): ButtonMenuOption[] {
 	return [
 		{
 			id: 'view-profile',

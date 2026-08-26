@@ -3,29 +3,29 @@ import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
+import type { ButtonMenuAction, ButtonMenuLink } from '../types'
 import {
-	getOverflowMenuItemAttrs,
+	buttonMenuItemClasses,
+	buttonMenuTones,
+	getButtonMenuItemAttrs,
 	isLink,
-	overflowMenuItemClasses,
-	overflowMenuTones,
-} from './overflow-menu'
-import type { OverflowMenuAction, OverflowMenuLink } from './types'
+} from './button-menu'
 
 const trailingActionClasses =
-	'overflow-menu-trailing relative flex size-10 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 opacity-0 ' +
+	'button-menu-trailing relative flex size-10 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 opacity-0 ' +
 	"pointer-events-none before:pointer-events-none before:absolute before:size-8 before:rounded-full before:content-[''] " +
 	'focus-visible:outline-none ' +
-	'group-hover/overflow-menu-item:pointer-events-auto group-hover/overflow-menu-item:opacity-100 ' +
+	'group-hover/button-menu-item:pointer-events-auto group-hover/button-menu-item:opacity-100 ' +
 	'focus-visible:pointer-events-auto focus-visible:opacity-100 ' +
 	'[&>svg]:relative [&>svg]:z-[1] [&>svg]:size-5'
 
 const props = defineProps<{
-	option: OverflowMenuAction | OverflowMenuLink
+	option: ButtonMenuAction | ButtonMenuLink
 	submenuItem?: boolean
 }>()
 
 const emit = defineEmits<{
-	select: [option: OverflowMenuAction | OverflowMenuLink, event: MouseEvent]
+	select: [option: ButtonMenuAction | ButtonMenuLink, event: MouseEvent]
 	focus: [element: HTMLElement]
 }>()
 
@@ -35,12 +35,12 @@ const trailingElement = ref<HTMLElement | null>(null)
 const trailingActionStyle = computed(() => {
 	const color = props.option.trailingAction?.color
 	if (!color) return undefined
-	return { '--overflow-menu-trailing-color': overflowMenuTones[color] }
+	return { '--button-menu-trailing-color': buttonMenuTones[color] }
 })
 
 const itemAttrs = computed(() => ({
-	...getOverflowMenuItemAttrs(props.option),
-	'data-overflow-submenu-item': props.submenuItem || undefined,
+	...getButtonMenuItemAttrs(props.option),
+	'data-button-menu-submenu-item': props.submenuItem || undefined,
 	'aria-checked': typeof props.option.selected === 'boolean' ? props.option.selected : undefined,
 	'aria-current': props.option.selected || undefined,
 }))
@@ -90,13 +90,13 @@ function handleFocus(event: FocusEvent) {
 </script>
 
 <template>
-	<div ref="wrapperElement" class="group/overflow-menu-item flex items-center">
+	<div ref="wrapperElement" class="group/button-menu-item flex items-center">
 		<RouterLink
 			v-if="isLink(props.option) && props.option.to !== undefined && !props.option.disabled"
 			v-tooltip="props.option.tooltip"
 			v-bind="itemAttrs"
 			:to="props.option.to"
-			:class="[overflowMenuItemClasses, 'flex-1']"
+			:class="[buttonMenuItemClasses, 'flex-1']"
 			@click="handleClick"
 			@keydown="handleKeydown"
 			@focus="handleFocus"
@@ -125,7 +125,7 @@ function handleFocus(event: FocusEvent) {
 			"
 			:download="props.option.download"
 			:aria-disabled="props.option.disabled || undefined"
-			:class="[overflowMenuItemClasses, 'flex-1']"
+			:class="[buttonMenuItemClasses, 'flex-1']"
 			@click="handleClick"
 			@keydown="handleKeydown"
 			@focus="handleFocus"
@@ -149,7 +149,7 @@ function handleFocus(event: FocusEvent) {
 			v-bind="itemAttrs"
 			type="button"
 			:aria-disabled="props.option.disabled || undefined"
-			:class="[overflowMenuItemClasses, 'flex-1']"
+			:class="[buttonMenuItemClasses, 'flex-1']"
 			@click="handleClick"
 			@keydown="handleKeydown"
 			@focus="handleFocus"

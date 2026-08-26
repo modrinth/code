@@ -69,7 +69,7 @@ export type ButtonLinkDestination =
 
 export type TeleportPlacement = AnchoredTeleportPlacement
 
-export interface OverflowMenuItemBase {
+export interface ButtonMenuItemBase {
 	id: string
 	label: string
 	icon?: Component
@@ -89,12 +89,12 @@ export interface OverflowMenuItemBase {
 	}
 }
 
-export interface OverflowMenuAction extends OverflowMenuItemBase {
+export interface ButtonMenuAction extends ButtonMenuItemBase {
 	type?: 'action'
 	action: (event: MouseEvent) => void
 }
 
-export interface OverflowMenuLink extends OverflowMenuItemBase {
+export interface ButtonMenuLink extends ButtonMenuItemBase {
 	type: 'link'
 	to?: RouteLocationRaw
 	href?: string
@@ -103,31 +103,31 @@ export interface OverflowMenuLink extends OverflowMenuItemBase {
 	download?: string | boolean
 }
 
-export interface OverflowMenuDivider {
+export interface ButtonMenuDivider {
 	type: 'divider'
 	id?: string
 	shown?: boolean
 }
 
-export interface OverflowMenuHeading {
+export interface ButtonMenuHeading {
 	type: 'heading'
 	id?: string
 	label: string
 	shown?: boolean
 }
 
-export type OverflowMenuLeafOption =
-	| OverflowMenuAction
-	| OverflowMenuLink
-	| OverflowMenuDivider
-	| OverflowMenuHeading
+export type ButtonMenuLeafOption =
+	| ButtonMenuAction
+	| ButtonMenuLink
+	| ButtonMenuDivider
+	| ButtonMenuHeading
 
-export interface OverflowMenuSubmenu extends OverflowMenuItemBase {
+export interface ButtonMenuSubmenu extends ButtonMenuItemBase {
 	type: 'submenu'
-	options: OverflowMenuLeafOption[]
+	options: ButtonMenuLeafOption[]
 }
 
-export type OverflowMenuOption = OverflowMenuLeafOption | OverflowMenuSubmenu
+export type ButtonMenuOption = ButtonMenuLeafOption | ButtonMenuSubmenu
 
 export interface ButtonElementHandle {
 	element: HTMLElement | null

@@ -2,8 +2,8 @@
 import type { CSSProperties } from 'vue'
 import { computed, ref } from 'vue'
 
-import type { AnchoredTeleportSide } from '../../../utils/use-anchored-teleport'
-import { overflowMenuPanelClasses } from './overflow-menu'
+import type { AnchoredTeleportSide } from '../../../../utils/use-anchored-teleport'
+import { buttonMenuPanelClasses } from './button-menu'
 
 defineOptions({ inheritAttrs: false })
 
@@ -46,7 +46,7 @@ defineExpose({ element })
 			:id="props.panelId"
 			ref="element"
 			v-bind="$attrs"
-			:class="overflowMenuPanelClasses"
+			:class="buttonMenuPanelClasses"
 			:style="[props.panelStyle, expandStyle]"
 			role="menu"
 			:aria-label="props.label"
@@ -54,16 +54,16 @@ defineExpose({ element })
 			<span
 				v-if="props.side && props.anchorStyle"
 				aria-hidden="true"
-				class="overflow-menu-arrow"
+				class="button-menu-arrow"
 				:data-side="props.side"
 				:style="props.anchorStyle"
 			/>
 			<span
 				v-if="props.bridge"
 				aria-hidden="true"
-				class="overflow-menu-bridge"
+				class="button-menu-bridge"
 				:data-side="props.bridge.side"
-				:style="{ '--overflow-menu-bridge-size': `${props.bridge.size}px` }"
+				:style="{ '--button-menu-bridge-size': `${props.bridge.size}px` }"
 			/>
 			<div
 				data-anchored-scroll-region
@@ -77,14 +77,14 @@ defineExpose({ element })
 </template>
 
 <style scoped>
-.overflow-menu-arrow {
+.button-menu-arrow {
 	position: absolute;
 	width: 0;
 	height: 0;
 	pointer-events: none;
 }
 
-.overflow-menu-arrow::before {
+.button-menu-arrow::before {
 	position: absolute;
 	width: 10px;
 	height: 10px;
@@ -93,72 +93,72 @@ defineExpose({ element })
 	transform: translate(-50%, -50%) rotate(45deg);
 }
 
-.overflow-menu-arrow[data-side='bottom'] {
+.button-menu-arrow[data-side='bottom'] {
 	top: 0;
 }
 
-.overflow-menu-arrow[data-side='bottom']::before {
+.button-menu-arrow[data-side='bottom']::before {
 	border-top: 1px solid var(--surface-5);
 	border-left: 1px solid var(--surface-5);
 	border-radius: 0 0 99999px 0;
 }
 
-.overflow-menu-arrow[data-side='top'] {
+.button-menu-arrow[data-side='top'] {
 	bottom: 0;
 }
 
-.overflow-menu-arrow[data-side='top']::before {
+.button-menu-arrow[data-side='top']::before {
 	border-right: 1px solid var(--surface-5);
 	border-bottom: 1px solid var(--surface-5);
 }
 
-.overflow-menu-arrow[data-side='right'] {
+.button-menu-arrow[data-side='right'] {
 	left: 0;
 }
 
-.overflow-menu-arrow[data-side='right']::before {
+.button-menu-arrow[data-side='right']::before {
 	border-bottom: 1px solid var(--surface-5);
 	border-left: 1px solid var(--surface-5);
 }
 
-.overflow-menu-arrow[data-side='left'] {
+.button-menu-arrow[data-side='left'] {
 	right: 0;
 }
 
-.overflow-menu-arrow[data-side='left']::before {
+.button-menu-arrow[data-side='left']::before {
 	border-top: 1px solid var(--surface-5);
 	border-right: 1px solid var(--surface-5);
 }
 
-.overflow-menu-bridge {
+.button-menu-bridge {
 	position: absolute;
 }
 
-.overflow-menu-bridge[data-side='right'] {
+.button-menu-bridge[data-side='right'] {
 	top: 0;
 	bottom: 0;
-	left: calc(-1 * var(--overflow-menu-bridge-size));
-	width: var(--overflow-menu-bridge-size);
+	left: calc(-1 * var(--button-menu-bridge-size));
+	width: var(--button-menu-bridge-size);
 }
 
-.overflow-menu-bridge[data-side='left'] {
+.button-menu-bridge[data-side='left'] {
 	top: 0;
 	bottom: 0;
-	right: calc(-1 * var(--overflow-menu-bridge-size));
-	width: var(--overflow-menu-bridge-size);
+	right: calc(-1 * var(--button-menu-bridge-size));
+	width: var(--button-menu-bridge-size);
 }
 
-.overflow-menu-bridge[data-side='bottom'] {
+.button-menu-bridge[data-side='bottom'] {
 	left: 0;
 	right: 0;
-	top: calc(-1 * var(--overflow-menu-bridge-size));
-	height: var(--overflow-menu-bridge-size);
+	top: calc(-1 * var(--button-menu-bridge-size));
+	height: var(--button-menu-bridge-size);
 }
 
-.overflow-menu-bridge[data-side='top'] {
+.button-menu-bridge[data-side='top'] {
 	left: 0;
 	right: 0;
-	bottom: calc(-1 * var(--overflow-menu-bridge-size));
-	height: var(--overflow-menu-bridge-size);
+	bottom: calc(-1 * var(--button-menu-bridge-size));
+	height: var(--button-menu-bridge-size);
 }
 </style>

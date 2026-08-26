@@ -13,7 +13,7 @@ import {
 	TrashIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import type { OverflowMenuLeafOption, OverflowMenuOption } from '@modrinth/ui'
+import type { ButtonMenuLeafOption, ButtonMenuOption } from '@modrinth/ui'
 import { defineMessages, formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { open as openDialog } from '@tauri-apps/plugin-dialog'
 import { useEventListener, useStorage } from '@vueuse/core'
@@ -113,7 +113,7 @@ export type InstanceCard = {
 }
 
 type InstanceContextMenu = {
-	open: (event: MouseEvent, options: OverflowMenuOption[]) => void
+	open: (event: MouseEvent, options: ButtonMenuOption[]) => void
 }
 
 type ConfirmDeleteModal = {
@@ -1223,7 +1223,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			handleError(toError(error)),
 		)
 
-	const buildInstanceIconOptions = (item: InstanceCard): OverflowMenuLeafOption[] => [
+	const buildInstanceIconOptions = (item: InstanceCard): ButtonMenuLeafOption[] => [
 		{
 			id: item.instance.icon_path ? 'replace_icon' : 'select_icon',
 			label: formatMessage(

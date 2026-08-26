@@ -3,32 +3,32 @@ import { onUnmounted, ref } from 'vue'
 
 import type {
 	ButtonColor,
-	OverflowMenuAction,
-	OverflowMenuDivider,
-	OverflowMenuHeading,
-	OverflowMenuLink,
-	OverflowMenuOption,
-	OverflowMenuSubmenu,
-} from './types'
+	ButtonMenuAction,
+	ButtonMenuDivider,
+	ButtonMenuHeading,
+	ButtonMenuLink,
+	ButtonMenuOption,
+	ButtonMenuSubmenu,
+} from '../types'
 
-export const overflowMenuItemClasses =
-	'overflow-menu-item flex min-h-10 z-10 w-full items-center gap-2 rounded-[10px] border-0 bg-transparent px-3 py-2 text-left text-base font-semibold leading-5 text-contrast no-underline ' +
+export const buttonMenuItemClasses =
+	'button-menu-item flex min-h-10 z-10 w-full items-center gap-2 rounded-[10px] border-0 bg-transparent px-3 py-2 text-left text-base font-semibold leading-5 text-contrast no-underline ' +
 	'cursor-pointer whitespace-nowrap hover:bg-surface-4 focus-visible:bg-surface-4 focus-visible:outline-none ' +
 	'disabled:cursor-not-allowed disabled:opacity-50 [&[aria-disabled=true]]:cursor-not-allowed [&[aria-disabled=true]]:opacity-50 ' +
 	'[&>svg]:size-5 [&>svg]:shrink-0 [&>svg]:text-primary'
 
-export const overflowMenuPanelClasses =
+export const buttonMenuPanelClasses =
 	'fixed isolate z-[9999] rounded-[14px] bg-surface-3 shadow-lg ring-1 ring-surface-5 select-none'
 
 export const menuPanelPadding = 8
 export const submenuGap = 2
 export const menuItemSelector = '[role="menuitem"]'
 // submenu items render inside this panel, so skip them when moving focus
-export const topLevelMenuItemSelector = `${menuItemSelector}:not([data-overflow-submenu-item])`
+export const topLevelMenuItemSelector = `${menuItemSelector}:not([data-button-menu-submenu-item])`
 
 const TYPEAHEAD_RESET_DELAY = 500
 
-export const overflowMenuTones: Record<ButtonColor, string> = {
+export const buttonMenuTones: Record<ButtonColor, string> = {
 	brand: 'var(--color-brand)',
 	red: 'var(--color-red)',
 	orange: 'var(--color-orange)',
@@ -38,25 +38,25 @@ export const overflowMenuTones: Record<ButtonColor, string> = {
 	medal_promotion: 'var(--medal-promotion-text-orange, var(--color-orange))',
 }
 
-export function isDivider(option: OverflowMenuOption): option is OverflowMenuDivider {
+export function isDivider(option: ButtonMenuOption): option is ButtonMenuDivider {
 	return option.type === 'divider'
 }
 
-export function isHeading(option: OverflowMenuOption): option is OverflowMenuHeading {
+export function isHeading(option: ButtonMenuOption): option is ButtonMenuHeading {
 	return option.type === 'heading'
 }
 
-export function isLink(option: OverflowMenuOption): option is OverflowMenuLink {
+export function isLink(option: ButtonMenuOption): option is ButtonMenuLink {
 	return option.type === 'link'
 }
 
-export function isSubmenu(option: OverflowMenuOption): option is OverflowMenuSubmenu {
+export function isSubmenu(option: ButtonMenuOption): option is ButtonMenuSubmenu {
 	return option.type === 'submenu'
 }
 
 export function isMenuRow(
-	option: OverflowMenuOption,
-): option is OverflowMenuAction | OverflowMenuLink | OverflowMenuSubmenu {
+	option: ButtonMenuOption,
+): option is ButtonMenuAction | ButtonMenuLink | ButtonMenuSubmenu {
 	return option.type !== 'divider' && option.type !== 'heading'
 }
 
@@ -64,8 +64,8 @@ export function visibleOptions<T extends { shown?: boolean }>(options: T[]): T[]
 	return options.filter((option) => option.shown !== false)
 }
 
-export function getOverflowMenuItemAttrs(
-	option: OverflowMenuAction | OverflowMenuLink | OverflowMenuSubmenu,
+export function getButtonMenuItemAttrs(
+	option: ButtonMenuAction | ButtonMenuLink | ButtonMenuSubmenu,
 ) {
 	const tone = option.tone && option.tone !== 'default' ? option.tone : undefined
 
@@ -73,7 +73,7 @@ export function getOverflowMenuItemAttrs(
 		role: 'menuitem',
 		tabindex: '-1',
 		style: tone
-			? ({ '--overflow-menu-item-tone': overflowMenuTones[tone] } as CSSProperties)
+			? ({ '--button-menu-item-tone': buttonMenuTones[tone] } as CSSProperties)
 			: undefined,
 		'data-tone': tone,
 		'data-hover-filled': option.hoverFilled || option.hoverFilledOnly || undefined,
@@ -81,7 +81,7 @@ export function getOverflowMenuItemAttrs(
 	}
 }
 
-export function useOverflowMenuNavigation(
+export function useButtonMenuNavigation(
 	panel: Readonly<Ref<HTMLElement | null>>,
 	itemSelector: string,
 ) {
@@ -136,7 +136,7 @@ export function useMenuKeyboard(options: {
 	onEscape: () => void
 	onTab?: () => void
 }) {
-	const navigation = useOverflowMenuNavigation(options.panel, topLevelMenuItemSelector)
+	const navigation = useButtonMenuNavigation(options.panel, topLevelMenuItemSelector)
 	const typeahead = ref('')
 	let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
 
