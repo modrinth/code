@@ -44,6 +44,7 @@
 					:maxlength="64"
 					placeholder="Enter title..."
 				/>
+				<ValidationMessage :check="galleryTitleValidation" />
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
@@ -53,6 +54,7 @@
 					:maxlength="255"
 					placeholder="Enter description..."
 				/>
+				<ValidationMessage :check="galleryDescriptionValidation" />
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>
@@ -90,7 +92,7 @@
 						v-if="editIndex === -1"
 						type="colored"
 						color="brand"
-						:disabled="shouldPreventActions"
+						:disabled="shouldPreventActions || galleryFieldsInvalid"
 						@click="createGalleryItem"
 					>
 						<PlusIcon aria-hidden="true" />
@@ -100,7 +102,7 @@
 						v-else
 						type="colored"
 						color="brand"
-						:disabled="shouldPreventActions"
+						:disabled="shouldPreventActions || galleryFieldsInvalid"
 						@click="editGalleryItem"
 					>
 						<SaveIcon aria-hidden="true" />
@@ -296,6 +298,7 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { validateProjectText } from '@modrinth/moderation'
 import {
 	Button,
 	ButtonLink,
@@ -312,6 +315,7 @@ import {
 import { useEventListener } from '@vueuse/core'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
 
@@ -379,6 +383,11 @@ const previewImage = ref<string | null>(null)
 
 // UI state
 const shouldPreventActions = ref(false)
+const galleryTitleValidation = computed(() => validateProjectText(editTitle.value))
+const galleryDescriptionValidation = computed(() => validateProjectText(editDescription.value))
+const galleryFieldsInvalid = computed(
+	() => !!galleryTitleValidation.value || !!galleryDescriptionValidation.value,
+)
 
 // Constant for accepted file types
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
@@ -479,6 +488,7 @@ function showPreviewImage() {
 
 // CRUD operations
 async function createGalleryItem() {
+	if (galleryFieldsInvalid.value) return
 	shouldPreventActions.value = true
 	startLoading()
 
@@ -499,6 +509,7 @@ async function createGalleryItem() {
 }
 
 async function editGalleryItem() {
+	if (galleryFieldsInvalid.value) return
 	shouldPreventActions.value = true
 	startLoading()
 

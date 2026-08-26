@@ -161,7 +161,10 @@ import { computed, defineAsyncComponent, h } from 'vue'
 
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
-import { validateProjectText } from '~/composables/project-text-validation'
+import {
+	useProjectSummaryValidation,
+	useProjectTitleValidation,
+} from '~/composables/project-field-validation'
 import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
@@ -331,8 +334,8 @@ const visibilities = ref<VisibilityOption[]>([
 ])
 const visibility = ref<VisibilityOption>(visibilities.value[0])
 
-const nameValidation = computed(() => validateProjectText(name.value))
-const summaryValidation = computed(() => validateProjectText(description.value))
+const nameValidation = useProjectTitleValidation(name)
+const summaryValidation = useProjectSummaryValidation(description, name)
 
 const disableCreate = computed(() => {
 	if (hasHitLimit.value) return true

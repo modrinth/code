@@ -294,6 +294,11 @@
 			:modified="modified"
 			:saving="saving"
 			:can-save="canSave"
+			:save-disabled-reason="
+				hasPermission && hasValidationIssues
+					? projectTextValidationMessages.resolveIssuesToSave
+					: undefined
+			"
 			@reset="resetChanges"
 			@save="handleSave"
 		/>
@@ -334,7 +339,11 @@ import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'
-import { validateProjectText } from '~/composables/project-text-validation'
+import {
+	projectTextValidationMessages,
+	useProjectSummaryValidation,
+	useProjectTitleValidation,
+} from '~/composables/project-field-validation'
 import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
@@ -424,11 +433,10 @@ const hasPermission = computed(() => {
 	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
 })
 
-const nameValidation = computed(() => validateProjectText(name.value))
-const summaryValidation = computed(() => validateProjectText(summary.value))
-const canSave = computed(
-	() => hasPermission.value && !nameValidation.value && !summaryValidation.value,
-)
+const nameValidation = useProjectTitleValidation(name)
+const summaryValidation = useProjectSummaryValidation(summary, name)
+const hasValidationIssues = computed(() => !!nameValidation.value || !!summaryValidation.value)
+const canSave = computed(() => hasPermission.value && !hasValidationIssues.value)
 
 const monetizationToggleDisabled = computed(() => !hasPermission.value || isForceDemonetized.value)
 

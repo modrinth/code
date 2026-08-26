@@ -557,6 +557,9 @@ importers:
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../utils
+      linkify-it:
+        specifier: ^5.0.0
+        version: 5.0.0
       vue:
         specifier: ^3.5.13
         version: 3.5.27(typescript@5.9.3)
@@ -570,6 +573,9 @@ importers:
       '@modrinth/ui':
         specifier: workspace:*
         version: link:../ui
+      '@types/linkify-it':
+        specifier: ^5.0.0
+        version: 5.0.0
       typescript:
         specifier: ^5.4.5
         version: 5.9.3

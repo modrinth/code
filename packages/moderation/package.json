@@ -15,12 +15,14 @@
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/utils": "workspace:*",
 		"@modrinth/api-client": "workspace:*",
+		"linkify-it": "^5.0.0",
 		"vue": "^3.5.13"
 	},
 	"devDependencies": {
 		"@formatjs/cli": "^6.2.12",
 		"@modrinth/tooling-config": "workspace:*",
 		"@modrinth/ui": "workspace:*",
+		"@types/linkify-it": "^5.0.0",
 		"typescript": "^5.4.5"
 	}
 }

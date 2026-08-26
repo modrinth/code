@@ -153,7 +153,7 @@
     "defaultMessage": "The wiki is disabled on this repository."
   },
   "nags.link.invalid-url": {
-    "defaultMessage": "This is not a valid URL."
+    "defaultMessage": "There's an invalid URL in the description."
   },
   "nags.link.license.url-mismatch": {
     "defaultMessage": "This link points to the {detected} license, but your project is set to {selected}."
@@ -343,5 +343,26 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visit links settings"
+  },
+  "project.text-validation.non-standard-text": {
+    "defaultMessage": "Non-standard text characters are not allowed."
+  },
+  "project.text-validation.profanity": {
+    "defaultMessage": "Profanity is not allowed."
+  },
+  "project.text-validation.slur": {
+    "defaultMessage": "Slurs are not allowed."
+  },
+  "project.text-validation.summary-link": {
+    "defaultMessage": "Links are not allowed in project summaries."
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "A project summary cannot be the same as its title."
+  },
+  "project.text-validation.title-game-version": {
+    "defaultMessage": "Project titles cannot include the Minecraft version “{value}”."
+  },
+  "project.text-validation.title-loader": {
+    "defaultMessage": "Project titles cannot include the loader “{value}”."
   }
 }

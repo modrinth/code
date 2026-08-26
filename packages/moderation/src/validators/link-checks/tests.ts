@@ -36,6 +36,37 @@ test('rejects a recognized link used in the wrong field', async () => {
 	assert.equal(getLinkCheckState(context)?.message?.id, 'nags.link.wrong-field')
 })
 
+test('allows structured link types in general content', async () => {
+	const context = {
+		field: 'description',
+		url: 'https://github.com/modrinth/code',
+		generalContent: true,
+	}
+
+	await checkLink(context)
+
+	assert.equal(getLinkCheckState(context)?.severity, 'valid')
+})
+
+test('allows unrecognized valid links but keeps global restrictions in general content', async () => {
+	const allowed = {
+		field: 'description',
+		url: 'https://docs.example.dev/project',
+		generalContent: true,
+	}
+	const blocked = {
+		field: 'description',
+		url: 'https://bit.ly/project',
+		generalContent: true,
+	}
+
+	await checkLink(allowed)
+	await checkLink(blocked)
+
+	assert.equal(getLinkCheckState(allowed)?.severity, 'valid')
+	assert.equal(getLinkCheckState(blocked)?.severity, 'error')
+})
+
 test('compares recognized license URLs with the selected license', async () => {
 	const matching = {
 		field: 'license',

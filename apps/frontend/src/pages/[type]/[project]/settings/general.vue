@@ -16,7 +16,10 @@ import {
 
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
-import { validateProjectText } from '~/composables/project-text-validation'
+import {
+	useProjectSummaryValidation,
+	useProjectTitleValidation,
+} from '~/composables/project-field-validation'
 import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
@@ -53,8 +56,11 @@ const {
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
-const titleValidation = computed(() => validateProjectText(current.value.title))
-const taglineValidation = computed(() => validateProjectText(current.value.tagline))
+const titleValidation = useProjectTitleValidation(() => current.value.title)
+const taglineValidation = useProjectSummaryValidation(
+	() => current.value.tagline,
+	() => current.value.title,
+)
 const canSave = computed(() => !titleValidation.value && !taglineValidation.value)
 const {
 	onFocusIn: onSlugSuggestionFocusIn,

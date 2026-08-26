@@ -4247,14 +4247,11 @@
   "project.settings.tags.upload-version-first.heading": {
     "message": "Upload versions before adding tags"
   },
-  "project.text-validation.non-standard-text": {
-    "message": "Non-standard text characters are not allowed."
+  "project.slug-suggestions.label": {
+    "message": "Suggestions:"
   },
-  "project.text-validation.profanity": {
-    "message": "Profanity is not allowed."
-  },
-  "project.text-validation.slur": {
-    "message": "Slurs are not allowed."
+  "project.text-validation.resolve-issues-to-save": {
+    "message": "Resolve the issues from your edits to save."
   },
   "project.versions.copy-id-option": {
     "message": "Copy ID"

@@ -9,13 +9,19 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { TriangleAlertIcon, XCircleIcon } from '@modrinth/assets'
-import { useVIntl } from '@modrinth/ui'
+import { type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
-const props = defineProps({
-	check: { type: Object, default: null },
+interface ValidationCheck {
+	severity: 'valid' | 'warn' | 'error'
+	message?: MessageDescriptor
+	values?: Record<string, unknown>
+}
+
+const props = withDefaults(defineProps<{ check?: ValidationCheck | null }>(), {
+	check: null,
 })
 
 const { formatMessage } = useVIntl()

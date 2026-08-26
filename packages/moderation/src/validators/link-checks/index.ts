@@ -17,6 +17,7 @@ function defineMessages<T extends Record<string, MessageDescriptor>>(descriptors
 export interface LinkCheckContext {
 	url: string | undefined
 	field: string
+	generalContent?: boolean
 
 	[key: string]: unknown
 }
@@ -226,7 +227,10 @@ async function matchNode(
 			(child) => !isAsyncMatcher(child.when) && !child.isFallback,
 		)
 		const asyncChildren = node.childNodes.filter(
-			(child) => isAsyncMatcher(child.when) && !child.isFallback,
+			(child) =>
+				isAsyncMatcher(child.when) &&
+				!child.isFallback &&
+				!(context.generalContent && hasFieldSpecificDescendant(child)),
 		)
 		const fallbackChildren = node.childNodes.filter((child) => child.isFallback)
 		let expectedChild: LinkCheckNode | undefined
@@ -272,7 +276,7 @@ const coreMessages = defineMessages({
 //TODO: we should probably just let you not provide https but backend currently requires it
 const invalidUrlMessage = defineMessage({
 	id: 'nags.link.invalid-url',
-	defaultMessage: 'This is not a valid URL.',
+	defaultMessage: "There's an invalid URL in the description.",
 })
 
 function validUrlPrefix(remaining: string): number | null {
@@ -314,6 +318,13 @@ function cacheKey(context: LinkCheckContext): string {
 	return JSON.stringify(context)
 }
 
+function hasFieldSpecificDescendant(node: LinkCheckNode): boolean {
+	return (
+		(node.forMatchers?.length ?? 0) > 0 ||
+		(node.childNodes?.some((child) => hasFieldSpecificDescendant(child)) ?? false)
+	)
+}
+
 async function checkLink(context: LinkCheckContext) {
 	const url = context.url
 	if (!url) return
@@ -327,6 +338,10 @@ async function checkLink(context: LinkCheckContext) {
 
 	const found = await matchNode(rootNode, normalizedUrl, context, true)
 	if (!found) {
+		if (context.generalContent && validUrlPrefix(normalizedUrl) !== null) {
+			cache.set(key, valid)
+			return
+		}
 		cache.delete(key)
 		return
 	}
@@ -336,6 +351,11 @@ async function checkLink(context: LinkCheckContext) {
 	const applies = isLeaf && matched.forMatchers?.some((matcher) => matchesField(matcher, context))
 
 	if (!applies) {
+		if (context.generalContent && hasFieldSpecificDescendant(matched)) {
+			cache.set(key, valid)
+			return
+		}
+
 		const build = matched.unrecognizedSeverity === 'warn' ? warn : error
 
 		if (matched.unrecognizedMessage && isLeaf) {

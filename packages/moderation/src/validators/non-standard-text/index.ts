@@ -29,6 +29,14 @@ export interface NonStandardTextOptions {
 
 export const DEFAULT_MAX_COMBINING_MARKS_PER_CHARACTER = 2
 
+export function getNonStandardTextRatio(text: string, result: NonStandardTextResult): number {
+	const characterCount = Array.from(text).length
+	if (characterCount === 0) return 0
+
+	const nonStandardCharacterCount = new Set(result.issues.map(({ index }) => index)).size
+	return nonStandardCharacterCount / characterCount
+}
+
 const FANCY_RANGES: ReadonlyArray<readonly [number, number]> = [
 	[0x02b0, 0x02ff],
 	[0x1d400, 0x1d7ff],

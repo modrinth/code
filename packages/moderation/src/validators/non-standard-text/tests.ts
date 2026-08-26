@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { validateNonStandardText } from './index.ts'
+import { getNonStandardTextRatio, validateNonStandardText } from './index.ts'
 
 test('accepts ordinary multilingual text and punctuation', () => {
 	const result = validateNonStandardText(
@@ -118,4 +118,19 @@ test('reports multiple issue categories in source order', () => {
 		result.issues.map(({ kind }) => kind),
 		['fancy', 'invisible', 'control'],
 	)
+})
+
+test('calculates the ratio of non-standard Unicode characters', () => {
+	const belowFivePercent = '𝐀'.concat('a'.repeat(20))
+	const exactlyFivePercent = '𝐀'.concat('a'.repeat(19))
+
+	assert.equal(
+		getNonStandardTextRatio(belowFivePercent, validateNonStandardText(belowFivePercent)),
+		1 / 21,
+	)
+	assert.equal(
+		getNonStandardTextRatio(exactlyFivePercent, validateNonStandardText(exactlyFivePercent)),
+		0.05,
+	)
+	assert.equal(getNonStandardTextRatio('', validateNonStandardText('')), 0)
 })
