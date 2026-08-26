@@ -93,11 +93,7 @@ const {
 
 const busy = computed(
 	() =>
-		props.saving ||
-		exporting.value ||
-		discarding.value ||
-		loadingEditorData.value ||
-		loading.value,
+		props.saving || exporting.value || discarding.value || loadingEditorData.value || loading.value,
 )
 const hasBrushPointer = computed(
 	() =>
@@ -336,10 +332,7 @@ function markSaved() {
 	resetHistory()
 }
 
-watch(
-	() => [props.item.id, props.item.src],
-	queueInitialization,
-)
+watch(() => [props.item.id, props.item.src], queueInitialization)
 watch(
 	() => props.mode,
 	(mode) => {
@@ -430,11 +423,7 @@ defineExpose({ markSaved })
 		@click.stop
 	>
 		<div v-if="count > 1" class="flex items-center gap-2">
-			<IconButton
-				:label="formatMessage(messages.previous)"
-				type="quiet"
-				@click="emit('previous')"
-			>
+			<IconButton :label="formatMessage(messages.previous)" type="quiet" @click="emit('previous')">
 				<LeftArrowIcon aria-hidden="true" />
 			</IconButton>
 			<span
@@ -444,11 +433,7 @@ defineExpose({ markSaved })
 				<strong class="font-semibold text-white">{{ index + 1 }}</strong>
 				<span>/ {{ count }}</span>
 			</span>
-			<IconButton
-				:label="formatMessage(messages.next)"
-				type="quiet"
-				@click="emit('next')"
-			>
+			<IconButton :label="formatMessage(messages.next)" type="quiet" @click="emit('next')">
 				<RightArrowIcon aria-hidden="true" />
 			</IconButton>
 		</div>
@@ -495,11 +480,7 @@ defineExpose({ markSaved })
 			<slot name="actions" />
 		</div>
 		<div class="h-6 w-px bg-white/10" />
-		<IconButton
-			:label="formatMessage(messages.close)"
-			type="quiet"
-			@click="emit('close')"
-		>
+		<IconButton :label="formatMessage(messages.close)" type="quiet" @click="emit('close')">
 			<XIcon aria-hidden="true" />
 		</IconButton>
 	</div>

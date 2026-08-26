@@ -1227,14 +1227,10 @@ onBeforeUnmount(() => {
 		<template #actions="{ item }">
 			<IconButton
 				v-tooltip="
-					formatMessage(
-						isScreenshotCopiedBySelectionKey(item.id) ? messages.copied : messages.copy,
-					)
+					formatMessage(isScreenshotCopiedBySelectionKey(item.id) ? messages.copied : messages.copy)
 				"
 				:label="
-					formatMessage(
-						isScreenshotCopiedBySelectionKey(item.id) ? messages.copied : messages.copy,
-					)
+					formatMessage(isScreenshotCopiedBySelectionKey(item.id) ? messages.copied : messages.copy)
 				"
 				type="quiet"
 				@click="copyScreenshotBySelectionKey(item.id)"

@@ -379,9 +379,11 @@ pub async fn save_edited_screenshot(
     let source_dimensions =
         png_dimensions(io::read(&source_screenshot.path).await?).await?;
     let edited_dimensions = png_dimensions(png_bytes.clone()).await?;
-    if edited_dimensions != source_dimensions {
+    if edited_dimensions.0 > source_dimensions.0
+        || edited_dimensions.1 > source_dimensions.1
+    {
         return Err(crate::ErrorKind::InputError(format!(
-            "Edited screenshot dimensions must remain {}x{}",
+            "Edited screenshot dimensions cannot exceed {}x{}",
             source_dimensions.0, source_dimensions.1,
         ))
         .into());

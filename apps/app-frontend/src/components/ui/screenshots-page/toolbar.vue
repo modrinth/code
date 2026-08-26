@@ -77,11 +77,11 @@ const messages = defineMessages({
 						class="size-5 text-primary"
 						:aria-label="formatMessage(messages.groupBy)"
 					/>
-			</template>
-			<template #selected="{ label }">
-				<span>{{ label }}</span>
-			</template>
-		</Combobox>
+				</template>
+				<template #selected="{ label }">
+					<span>{{ label }}</span>
+				</template>
+			</Combobox>
 		</div>
 	</div>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
 	CircleIcon,
+	CropIcon,
 	EraserIcon,
 	EyeOffIcon,
 	HighlighterIcon,
@@ -28,7 +29,10 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 
 const toolGroups = [
-	[{ id: 'select', message: messages.select, icon: MousePointer2Icon, shortcut: 'V' }],
+	[
+		{ id: 'select', message: messages.select, icon: MousePointer2Icon, shortcut: 'V' },
+		{ id: 'crop', message: messages.crop, icon: CropIcon, shortcut: 'K' },
+	],
 	[
 		{ id: 'pen', message: messages.pen, icon: PencilIcon, shortcut: 'P' },
 		{ id: 'highlight', message: messages.highlight, icon: HighlighterIcon, shortcut: 'H' },

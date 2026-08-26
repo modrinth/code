@@ -50,12 +50,17 @@ const {
 	propertyValueKind,
 	showCensorMode,
 	showEraserMode,
+	showCropControls,
+	cropWidth,
+	cropHeight,
+	canResetCrop,
 	updateColor,
 	updateStrokeWidth,
 	updateFontSize,
 	beginPropertyEdit,
 	commitPropertyEdit,
 	deleteSelection,
+	resetCrop,
 	undo,
 	redo,
 	setZoom,
@@ -72,6 +77,7 @@ const propertyProgress = computed(
 )
 const hasPropertyControls = computed(
 	() =>
+		showCropControls.value ||
 		showEraserMode.value ||
 		showCensorMode.value ||
 		hasColorProperty.value ||
@@ -81,10 +87,10 @@ const censorModes: ScreenshotCensorMode[] = ['blur', 'solid']
 const eraserModes: ScreenshotEraserMode[] = ['element', 'area']
 const saveOptions = computed<OverflowMenuOption[]>(() => [
 	{
-		id: 'save-as-copy',
-		label: formatMessage(messages.saveAsCopy),
+		id: 'overwrite',
+		label: formatMessage(messages.overwrite),
 		icon: SaveIcon,
-		action: () => emit('save', 'create_copy'),
+		action: () => emit('save', 'replace_edit'),
 	},
 ])
 
@@ -121,6 +127,14 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 		@click.stop
 	>
 		<div v-if="hasPropertyControls" class="flex min-w-0 items-center gap-2">
+			<div v-if="showCropControls" class="flex items-center gap-2">
+				<span class="shrink-0 text-base font-semibold leading-5 tabular-nums text-white/60">
+					{{ formatMessage(messages.cropDimensions, { width: cropWidth, height: cropHeight }) }}
+				</span>
+				<Button type="quiet" :disabled="!canResetCrop" @click="resetCrop">
+					{{ formatMessage(messages.resetCrop) }}
+				</Button>
+			</div>
 			<Chips
 				v-if="showEraserMode"
 				v-model="eraserMode"
@@ -264,10 +278,10 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 			:options="saveOptions"
 			:menu-label="formatMessage(messages.moreSaveOptions)"
 			:group-label="formatMessage(messages.saveImage)"
-			@click="emit('save', 'replace_edit')"
+			@click="emit('save', 'create_copy')"
 		>
 			<SaveIcon aria-hidden="true" />
-			{{ formatMessage(commonMessages.saveButton) }}
+			{{ formatMessage(messages.saveAsCopy) }}
 		</SplitButton>
 	</div>
 </template>
