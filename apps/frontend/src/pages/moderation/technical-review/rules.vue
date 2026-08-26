@@ -112,6 +112,24 @@
 									Regex
 								</a>
 							</li>
+							<li>
+								<a
+									class="text-link"
+									href="https://docs.rs/url/latest/url/struct.Url.html"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									URL parsing
+								</a>
+								with <code>url.parse(string)</code> and
+								<code>url.is_valid(string)</code>
+								<div class="mt-1 text-xs">
+									Parsed URLs expose <code>href</code>, <code>scheme</code>, <code>host</code>,
+									<code>domain</code>, <code>port</code>, <code>path</code>,
+									<code>path_segments</code>, <code>query</code>, <code>query_pairs</code>,
+									<code>fragment</code>, credentials, and origin fields.
+								</div>
+							</li>
 						</ul>
 						<pre
 							class="m-0 overflow-x-auto rounded-lg bg-surface-1 p-3 text-xs leading-relaxed text-contrast"
@@ -512,6 +530,8 @@ const CEL_LANGUAGE_COMPLETIONS: Ace.Completion[] = [
 	{ caption: 'size()', snippet: 'size(${1:value})', score: 850, meta: 'function' },
 	{ caption: 'string()', snippet: 'string(${1:value})', score: 850, meta: 'function' },
 	{ caption: 'int()', snippet: 'int(${1:value})', score: 850, meta: 'function' },
+	{ caption: 'url.parse()', snippet: 'url.parse("${1:url}")', score: 850, meta: 'URL' },
+	{ caption: 'url.is_valid()', snippet: 'url.is_valid("${1:url}")', score: 850, meta: 'URL' },
 	{ caption: '#define', snippet: '#define ${1:NAME} ${2:value}', score: 800, meta: 'preprocessor' },
 	{ caption: '#bind', snippet: '#bind ${1:NAME} ${2:expression}', score: 800, meta: 'preprocessor' },
 ]

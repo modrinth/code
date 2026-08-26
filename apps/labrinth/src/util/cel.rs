@@ -1,12 +1,120 @@
-use std::collections::BTreeMap;
+use std::{
+    collections::BTreeMap,
+    ops::{Deref, DerefMut},
+    sync::Arc,
+};
 
-pub use ::cel::Context;
-use ::cel::{ExecutionError, Program as CelProgram, Value};
+use ::cel::{
+    Context as CelContext, ExecutionError, Program as CelProgram, Value,
+};
 use chumsky::{Parser, prelude::*};
 use eyre::{Result, WrapErr, eyre};
+use serde::Serialize;
 use thiserror::Error;
+use url::{Host, Url};
 
 const MAX_PREPROCESSED_SIZE: usize = 1_048_576;
+
+pub struct Context<'a> {
+    inner: CelContext<'a>,
+}
+
+impl Default for Context<'_> {
+    fn default() -> Self {
+        let mut inner = CelContext::default();
+        inner.add_function("url.parse", parse_url);
+        inner.add_function("url.is_valid", is_valid_url);
+
+        Self { inner }
+    }
+}
+
+impl<'a> Deref for Context<'a> {
+    type Target = CelContext<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl DerefMut for Context<'_> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
+}
+
+#[derive(Serialize)]
+struct ParsedUrl<'a> {
+    href: &'a str,
+    scheme: &'a str,
+    has_authority: bool,
+    cannot_be_a_base: bool,
+    username: &'a str,
+    password: Option<&'a str>,
+    host: Option<&'a str>,
+    host_type: Option<&'static str>,
+    domain: Option<&'a str>,
+    port: Option<i64>,
+    port_or_known_default: Option<i64>,
+    path: &'a str,
+    path_segments: Option<Vec<&'a str>>,
+    query: Option<&'a str>,
+    query_pairs: Vec<QueryPair>,
+    fragment: Option<&'a str>,
+    origin: String,
+    origin_is_tuple: bool,
+}
+
+#[derive(Serialize)]
+struct QueryPair {
+    key: String,
+    value: String,
+}
+
+fn parse_url(value: Arc<String>) -> std::result::Result<Value, ExecutionError> {
+    let parsed = Url::parse(&value)
+        .map_err(|error| ExecutionError::function_error("url.parse", error))?;
+    let origin = parsed.origin();
+    let host_type = parsed.host().map(|host| match host {
+        Host::Domain(_) => "domain",
+        Host::Ipv4(_) => "ipv4",
+        Host::Ipv6(_) => "ipv6",
+    });
+    let query_pairs = parsed
+        .query_pairs()
+        .map(|(key, value)| QueryPair {
+            key: key.into_owned(),
+            value: value.into_owned(),
+        })
+        .collect();
+    let value = ParsedUrl {
+        href: parsed.as_str(),
+        scheme: parsed.scheme(),
+        has_authority: parsed.has_authority(),
+        cannot_be_a_base: parsed.cannot_be_a_base(),
+        username: parsed.username(),
+        password: parsed.password(),
+        host: parsed.host_str(),
+        host_type,
+        domain: parsed.domain(),
+        port: parsed.port().map(i64::from),
+        port_or_known_default: parsed.port_or_known_default().map(i64::from),
+        path: parsed.path(),
+        path_segments: parsed.path_segments().map(Iterator::collect),
+        query: parsed.query(),
+        query_pairs,
+        fragment: parsed.fragment(),
+        origin: origin.ascii_serialization(),
+        origin_is_tuple: origin.is_tuple(),
+    };
+
+    ::cel::to_value(value)
+        .map_err(|error| ExecutionError::function_error("url.parse", error))
+}
+
+fn is_valid_url(value: Arc<String>) -> bool {
+    Url::parse(&value).is_ok()
+}
 
 pub struct Program {
     inner: CelProgram,
@@ -46,7 +154,7 @@ impl Program {
         &self,
         context: &Context<'a>,
     ) -> std::result::Result<Value, ExecutionError> {
-        let mut context = context.new_inner_scope();
+        let mut context = context.inner.new_inner_scope();
 
         for binding in &self.bindings {
             let value = binding.inner.execute(&context).map_err(|error| {
@@ -567,5 +675,48 @@ mod tests {
         let error = program.execute(&Context::default()).unwrap_err();
 
         assert!(error.to_string().contains("#bind RESULT"));
+    }
+
+    #[test]
+    fn parses_urls_with_namespaced_functions() {
+        let source = r#"
+#bind URL url.parse("https://user:password@example.com:8443/a/b?first=one&first=two#fragment")
+URL.scheme == "https" &&
+URL.host == "example.com" &&
+URL.host_type == "domain" &&
+URL.port == 8443 &&
+URL.path == "/a/b" &&
+URL.path_segments == ["a", "b"] &&
+URL.query_pairs[1].key == "first" &&
+URL.query_pairs[1].value == "two" &&
+URL.fragment == "fragment"
+"#;
+        let program = Program::compile(source).unwrap();
+
+        assert_eq!(
+            program.execute(&Context::default()).unwrap(),
+            Value::Bool(true)
+        );
+    }
+
+    #[test]
+    fn checks_url_validity() {
+        let program = Program::compile(
+            r#"url.is_valid("https://modrinth.com/") && !url.is_valid("not a URL")"#,
+        )
+        .unwrap();
+
+        assert_eq!(
+            program.execute(&Context::default()).unwrap(),
+            Value::Bool(true)
+        );
+    }
+
+    #[test]
+    fn reports_url_parse_errors() {
+        let program = Program::compile(r#"url.parse("not a URL")"#).unwrap();
+        let error = program.execute(&Context::default()).unwrap_err();
+
+        assert!(error.to_string().contains("url.parse"));
     }
 }
