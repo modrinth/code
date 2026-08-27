@@ -67,6 +67,25 @@ test('allows unrecognized valid links but keeps global restrictions in general c
 	assert.equal(getLinkCheckState(blocked)?.severity, 'error')
 })
 
+test('blocks subdomains of blocklisted hosts without blocking lookalike domains', async () => {
+	const blocked = {
+		field: 'description',
+		url: 'https://social.modrinth.com/project',
+		generalContent: true,
+	}
+	const allowed = {
+		field: 'description',
+		url: 'https://modrinth.com.example.dev/project',
+		generalContent: true,
+	}
+
+	await checkLink(blocked)
+	await checkLink(allowed)
+
+	assert.equal(getLinkCheckState(blocked)?.severity, 'error')
+	assert.equal(getLinkCheckState(allowed)?.severity, 'valid')
+})
+
 test('compares recognized license URLs with the selected license', async () => {
 	const matching = {
 		field: 'license',

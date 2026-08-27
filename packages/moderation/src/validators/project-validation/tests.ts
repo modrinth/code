@@ -89,10 +89,10 @@ test('reports whether a project has field validation failures', () => {
 	assert.equal(hasProjectFieldValidationFailures(invalidProject), true)
 })
 
-test('treats version numbers as errors and summary content recommendations as warnings', () => {
+test('treats version numbers and explicit summary links as errors', () => {
 	const project = createProject({
 		name: 'Tools 1.2.3',
-		summary: 'Visit modrinth.com for more information',
+		summary: 'Visit https://example.dev for more information',
 	})
 	const result = validateProjectFields(project)
 
@@ -101,7 +101,7 @@ test('treats version numbers as errors and summary content recommendations as wa
 		result.failures.map(({ code, severity }) => ({ code, severity })),
 		[
 			{ code: 'title-version-number', severity: 'error' },
-			{ code: 'summary-link', severity: 'warn' },
+			{ code: 'summary-link', severity: 'error' },
 		],
 	)
 	assert.equal(hasProjectFieldValidationFailures(project), true)
@@ -109,6 +109,22 @@ test('treats version numbers as errors and summary content recommendations as wa
 		hasProjectFieldValidationFailures(createProject({ name: 'Tools 1.2 Fabric Port' })),
 		false,
 	)
+})
+
+test('rejects blocklisted links in summaries and descriptions', () => {
+	const summaryResult = validateProjectFields(
+		createProject({ summary: 'Visit modrinth.com for more information' }),
+	)
+	assert.equal(summaryResult.valid, false)
+	assert.equal(summaryResult.failures[0]?.field, 'summary')
+	assert.equal(summaryResult.failures[0]?.code, 'text-banned-link')
+
+	const descriptionResult = validateProjectFields(
+		createProject({ description: `Visit https://bit.ly/project. ${'More details. '.repeat(20)}` }),
+	)
+	assert.equal(descriptionResult.valid, false)
+	assert.equal(descriptionResult.failures[0]?.field, 'description')
+	assert.equal(descriptionResult.failures[0]?.code, 'text-banned-link')
 })
 
 test('reports summary recommendations without invalidating the project', () => {

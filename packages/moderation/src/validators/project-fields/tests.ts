@@ -2,8 +2,12 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+	containsExplicitHttpProjectLink,
 	containsProjectLinkOrIp,
+	countText,
 	extractProjectLinks,
+	MIN_CHARS_PER_IMAGE,
+	MIN_DESCRIPTION_CHARS,
 	projectSummaryMatchesTitle,
 	validateProjectDescription,
 	validateProjectSummary,
@@ -23,6 +27,13 @@ test('detects links and IP addresses but not email addresses or game versions', 
 	assert.equal(containsProjectLinkOrIp('Join 127.0.0.1:25565'), true)
 	assert.equal(containsProjectLinkOrIp('Supports Minecraft 1.21.1'), false)
 	assert.equal(containsProjectLinkOrIp('Contact hello@example.com'), false)
+})
+
+test('distinguishes explicit HTTP links from bare domains', () => {
+	assert.equal(containsExplicitHttpProjectLink('Visit https://myserver.com'), true)
+	assert.equal(containsExplicitHttpProjectLink('Visit HTTP://myserver.com'), true)
+	assert.equal(containsExplicitHttpProjectLink('Visit myserver.com'), false)
+	assert.equal(containsExplicitHttpProjectLink('The protocol is https://'), false)
 })
 
 test('extracts and deduplicates normalized links', () => {
@@ -87,11 +98,31 @@ test('validates project titles', () => {
 })
 
 test('validates project summaries', () => {
+	const summaryContentMessage =
+		'Your summary should not contain formatting, line breaks, special characters, or links. The summary only displays plain text.'
 	assert.equal(
-		validateProjectSummary('Visit modrinth.com', 'Project title')[0]?.message.id,
-		'project.text-validation.summary-link',
+		validateProjectSummary('Visit https://example.dev', 'Project title')[0]?.message.id,
+		'nags.summary-special-formatting.description',
 	)
-	assert.equal(validateProjectSummary('Visit modrinth.com', 'Project title')[0]?.severity, 'warn')
+	assert.equal(
+		validateProjectSummary('Visit https://example.dev', 'Project title')[0]?.message.defaultMessage,
+		summaryContentMessage,
+	)
+	assert.equal(
+		validateProjectSummary('Visit https://example.dev', 'Project title')[0]?.severity,
+		'error',
+	)
+	assert.equal(
+		validateProjectSummary('Visit http://example.dev', 'Project title')[0]?.code,
+		'summary-link',
+	)
+	assert.deepEqual(
+		validateProjectSummary(
+			'Connect at myserver.com to join our friendly community',
+			'Project title',
+		),
+		[],
+	)
 	assert.equal(
 		validateProjectSummary('  Caf\u00e9  ', 'Cafe\u0301')[0]?.message.id,
 		'project.text-validation.summary-matches-title',
@@ -116,6 +147,47 @@ test('validates project summaries', () => {
 	assert.deepEqual(
 		validateProjectSummary('# Short summary', 'Project title').map(({ code }) => code),
 		['summary-too-short', 'summary-special-formatting'],
+	)
+	assert.equal(
+		validateProjectSummary('# Short summary', 'Project title')[1]?.message.defaultMessage,
+		summaryContentMessage,
+	)
+})
+
+test('rejects blocklisted links and IP addresses in summaries and descriptions', () => {
+	const blockedSummary = validateProjectSummary(
+		'Visit https://social.modrinth.com/project',
+		'Title',
+	)
+	assert.deepEqual(blockedSummary[0], {
+		code: 'text-banned-link',
+		severity: 'error',
+		message: {
+			id: 'project.text-validation.banned-link',
+			defaultMessage: '“{url}” is not allowed in project summaries or descriptions.',
+		},
+		values: {
+			label: 'Modrinth',
+			url: 'https://social.modrinth.com/project',
+		},
+	})
+
+	const blockedDescription = validateProjectDescription(
+		`A detailed project description with https://bit.ly/project. ${'More details. '.repeat(20)}`,
+	)
+	assert.equal(blockedDescription[0]?.code, 'text-banned-link')
+	assert.equal(blockedDescription[0]?.values?.label, 'URL shortener')
+
+	const blockedIp = validateProjectSummary('Join 127.0.0.1:25565 to play', 'Title')
+	assert.equal(blockedIp[0]?.code, 'text-banned-link')
+	assert.equal(blockedIp[0]?.values?.label, 'IP address')
+
+	const allowedDescription = validateProjectDescription(
+		`Read more at https://example.dev/project. ${'More details. '.repeat(20)}`,
+	)
+	assert.equal(
+		allowedDescription.some(({ code }) => code === 'text-banned-link'),
+		false,
 	)
 })
 
@@ -160,6 +232,34 @@ test('allows one profanity match in descriptions but rejects a second match or a
 	})
 	assert.equal(validateProjectDescription(`${description} nigga`)[0]?.code, 'text-slur')
 	assert.equal(validateProjectDescription(`${description} nigger`)[0]?.code, 'text-slur')
+})
+
+test('counts blockquote content as readable description text', () => {
+	assert.equal(countText('> Quoted text'), 'Quoted text'.length)
+	assert.equal(
+		countText('> First line\n> > Nested line\n>\n> - Quoted list item'),
+		'First line Nested line Quoted list item'.length,
+	)
+
+	const quotedDescription = `> ${'A'.repeat(MIN_DESCRIPTION_CHARS)}`
+	assert.equal(
+		validateProjectDescription(quotedDescription).some(
+			({ code }) => code === 'description-too-short',
+		),
+		false,
+	)
+
+	const images = ['![One](one.png)', '![Two](two.png)', '![Three](three.png)', '![Four](four.png)']
+	const quotedImageDescription = [
+		`> ${'A'.repeat(MIN_CHARS_PER_IMAGE * images.length)}`,
+		...images,
+	].join('\n')
+	assert.equal(
+		validateProjectDescription(quotedImageDescription).some(
+			({ code }) => code === 'description-image-heavy',
+		),
+		false,
+	)
 })
 
 test('validates required description content and returns simultaneous recommendations', () => {

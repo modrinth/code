@@ -2,6 +2,7 @@ import LinkifyIt from 'linkify-it'
 
 import { getNonStandardTextRatio, validateNonStandardText } from '../non-standard-text/index.ts'
 import { validateProfanity } from '../profanity/index.ts'
+import { getBlockedProjectContentLink } from '../project-links/index.ts'
 
 export interface ProjectFieldMessageDescriptor {
 	id: string
@@ -26,6 +27,7 @@ export type ProjectTextValidationCode =
 	| 'text-slur'
 	| 'text-profanity'
 	| 'text-non-standard'
+	| 'text-banned-link'
 	| 'title-version-number'
 	| 'title-minecraft-branding'
 	| 'summary-link'
@@ -67,6 +69,10 @@ const messages = defineMessages({
 		id: 'project.text-validation.non-standard-text',
 		defaultMessage: 'Non-standard text characters are not allowed.',
 	},
+	bannedLink: {
+		id: 'project.text-validation.banned-link',
+		defaultMessage: '“{url}” is not allowed in project summaries or descriptions.',
+	},
 	titleVersionNumber: {
 		id: 'project.text-validation.title-version-number',
 		defaultMessage: 'Names are not allowed to include version numbers.',
@@ -75,10 +81,6 @@ const messages = defineMessages({
 		id: 'nags.minecraft-title-clause.description',
 		defaultMessage:
 			'Projects must not use Minecraft\'s branding or include "Minecraft" as a significant part of the name.',
-	},
-	summaryLink: {
-		id: 'project.text-validation.summary-link',
-		defaultMessage: 'Links should not be included in project summaries.',
 	},
 	summaryMatchesTitle: {
 		id: 'project.text-validation.summary-matches-title',
@@ -92,7 +94,7 @@ const messages = defineMessages({
 	summarySpecialFormatting: {
 		id: 'nags.summary-special-formatting.description',
 		defaultMessage:
-			'Your summary should not contain formatting, line breaks, or special characters, since the summary will only display plain text.',
+			'Your summary should not contain formatting, line breaks, special characters, or links. The summary only displays plain text.',
 	},
 	descriptionRequired: {
 		id: 'nags.add-description.description',
@@ -151,6 +153,22 @@ export function containsProjectLinkOrIp(text: string) {
 	return linkify.test(text)
 }
 
+export function containsExplicitHttpProjectLink(text: string) {
+	return (linkify.match(text) ?? []).some((match) => {
+		const schema = match.schema.toLowerCase()
+		return schema === 'http:' || schema === 'https:'
+	})
+}
+
+export function findBlockedProjectContentLink(text: string) {
+	for (const url of extractProjectLinks(text)) {
+		const blockedLink = getBlockedProjectContentLink(url)
+		if (blockedLink) return blockedLink
+	}
+
+	return null
+}
+
 export function hasProjectSummaryFormatting(summary: string) {
 	return Boolean(
 		summary.match(/# .*/g) ||
@@ -195,7 +213,7 @@ export function countText(markdown: string): number {
 		.replace(/\[[^\]]*]\([^)]+\)/g, ' ')
 	const withoutHtml = withoutImagesAndLinks.replace(/<[^>]+>/g, ' ')
 	const withoutMarkdownSyntax = withoutHtml
-		.replace(/^>{1}\s?.*$/gm, ' ')
+		.replace(/^(?:>[ \t]?)+/gm, '')
 		.replace(/^#{1,6}\s+/gm, ' ')
 		.replace(/[*_~`>-]/g, ' ')
 		.replace(/\|/g, ' ')
@@ -317,11 +335,21 @@ export function validateProjectSummary(
 	const results = validateProjectText(summary)
 	if (results.length > 0 || !summary) return results
 
-	if (containsProjectLinkOrIp(summary)) {
-		return [{ code: 'summary-link', severity: 'warn', message: messages.summaryLink }]
+	const blockedLink = findBlockedProjectContentLink(summary)
+	if (blockedLink) {
+		return [
+			{
+				code: 'text-banned-link',
+				severity: 'error',
+				message: messages.bannedLink,
+				values: blockedLink,
+			},
+		]
 	}
 
-	if (title && projectSummaryMatchesTitle(summary, title)) {
+	const containsExplicitLink = containsExplicitHttpProjectLink(summary)
+
+	if (!containsExplicitLink && title && projectSummaryMatchesTitle(summary, title)) {
 		return [
 			{
 				code: 'summary-matches-title',
@@ -332,7 +360,7 @@ export function validateProjectSummary(
 	}
 
 	const length = normalizeProjectFieldText(summary).length
-	if (length < MIN_SUMMARY_CHARS) {
+	if (!containsExplicitLink && length < MIN_SUMMARY_CHARS) {
 		results.push({
 			code: 'summary-too-short',
 			severity: 'warn',
@@ -341,10 +369,10 @@ export function validateProjectSummary(
 		})
 	}
 
-	if (hasProjectSummaryFormatting(summary)) {
+	if (hasProjectSummaryFormatting(summary) || containsExplicitLink) {
 		results.push({
-			code: 'summary-special-formatting',
-			severity: 'warn',
+			code: containsExplicitLink ? 'summary-link' : 'summary-special-formatting',
+			severity: containsExplicitLink ? 'error' : 'warn',
 			message: messages.summarySpecialFormatting,
 		})
 	}
@@ -382,6 +410,18 @@ export function validateProjectDescription(
 				code: 'description-required',
 				severity: 'error',
 				message: messages.descriptionRequired,
+			},
+		]
+	}
+
+	const blockedLink = findBlockedProjectContentLink(normalizedDescription)
+	if (blockedLink) {
+		return [
+			{
+				code: 'text-banned-link',
+				severity: 'error',
+				message: messages.bannedLink,
+				values: blockedLink,
 			},
 		]
 	}

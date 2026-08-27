@@ -18,15 +18,15 @@ const summaryErrorCodes: readonly ProjectTextValidationCode[] = [
 	'text-slur',
 	'text-profanity',
 	'text-non-standard',
-]
-const summaryWarningCodes: readonly ProjectTextValidationCode[] = [
+	'text-banned-link',
 	'summary-link',
-	'summary-matches-title',
 ]
+const summaryWarningCodes: readonly ProjectTextValidationCode[] = ['summary-matches-title']
 const descriptionErrorCodes: readonly ProjectTextValidationCode[] = [
 	'text-slur',
 	'text-profanity',
 	'text-non-standard',
+	'text-banned-link',
 ]
 
 function getFirstFailure(

@@ -2,6 +2,10 @@ import { defineMessage, formatProjectTypeSentence, useVIntl } from '@modrinth/ui
 
 import type { Nag, NagContext } from '../../types/nags'
 import { licenseRequiresSource, notSourceAsDistributed } from '../../utils'
+import {
+	getBlockedProjectContentLink,
+	PROJECT_CONTENT_LINK_SHORTENERS,
+} from '../../validators/project-links'
 
 export const commonLinkDomains = {
 	source: [
@@ -45,10 +49,10 @@ export const commonLinkDomains = {
 		'example.com',
 		't.me',
 	],
-	linkShorteners: ['bit.ly', 'adf.ly', 'tinyurl.com', 'short.io', 'is.gd'],
+	linkShorteners: PROJECT_CONTENT_LINK_SHORTENERS,
 }
 
-export function isCommonUrl(url: string | null, commonDomains: string[]): boolean {
+export function isCommonUrl(url: string | null, commonDomains: readonly string[]): boolean {
 	if (url === null || url === '') return true
 	try {
 		const domain = new URL(url).hostname.toLowerCase()
@@ -58,7 +62,7 @@ export function isCommonUrl(url: string | null, commonDomains: string[]): boolea
 	}
 }
 
-export function isCommonUrlOfType(url: string | null, commonDomains: string[]): boolean {
+export function isCommonUrlOfType(url: string | null, commonDomains: readonly string[]): boolean {
 	if (url === null || url === '') return false
 	return isCommonUrl(url, commonDomains)
 }
@@ -73,6 +77,26 @@ export function isLinkShortener(url: string | null): boolean {
 
 export function isUncommonLicenseUrl(url: string | null): boolean {
 	return isCommonUrlOfType(url, commonLinkDomains.licenseBlocklist)
+}
+
+export function findBlockedProjectExternalLink(context: Pick<NagContext, 'project' | 'projectV3'>) {
+	const urls = [
+		context.project.source_url,
+		context.project.issues_url,
+		context.project.wiki_url,
+		context.project.discord_url,
+		context.project.license.url,
+		...(context.project.donation_urls ?? []).map(({ url }) => url),
+		...Object.values(context.projectV3?.link_urls ?? {}).map(({ url }) => url),
+	]
+
+	for (const url of urls) {
+		if (!url) continue
+		const blockedLink = getBlockedProjectContentLink(url)
+		if (blockedLink) return blockedLink
+	}
+
+	return null
 }
 
 export const linksNags: Nag[] = [
@@ -210,36 +234,26 @@ export const linksNags: Nag[] = [
 		},
 	},
 	{
-		id: 'link-shortener-usage',
+		id: 'banned-link-usage',
 		title: defineMessage({
-			id: 'nags.link-shortener-usage.title',
-			defaultMessage: "Don't use link shorteners",
+			id: 'nags.banned-link-usage.title',
+			defaultMessage: 'Remove prohibited links',
 		}),
-		description: defineMessage({
-			id: 'nags.link-shortener-usage.description',
-			defaultMessage:
-				'Use of link shorteners or other methods to obscure where a link may lead in your external links or license link is prohibited, please only use appropriate full length links.',
-		}),
-		status: 'required',
-		shouldShow: (context: NagContext) => {
-			if (context.project.donation_urls) {
-				for (const donation of context.project.donation_urls) {
-					if (isLinkShortener(donation.url ?? null)) {
-						return true
-					}
-				}
-			}
+		description: (context: NagContext) => {
+			const blockedLink = findBlockedProjectExternalLink(context)
+			if (!blockedLink) return ''
 
-			return (
-				isLinkShortener(context.project.source_url ?? null) ||
-				isLinkShortener(context.project.issues_url ?? null) ||
-				isLinkShortener(context.project.wiki_url ?? null) ||
-				isLinkShortener(context.project.discord_url ?? null) ||
-				isLinkShortener(context.projectV3?.link_urls?.site?.url ?? null) ||
-				isLinkShortener(context.projectV3?.link_urls?.store?.url ?? null) ||
-				Boolean(context.project.license.url && isLinkShortener(context.project.license.url ?? null))
+			const { formatMessage } = useVIntl()
+			return formatMessage(
+				defineMessage({
+					id: 'nags.banned-link-usage.description',
+					defaultMessage: '“{url}” is not allowed in project links.',
+				}),
+				blockedLink,
 			)
 		},
+		status: 'required',
+		shouldShow: (context: NagContext) => findBlockedProjectExternalLink(context) !== null,
 	},
 	{
 		id: 'invalid-license-url',

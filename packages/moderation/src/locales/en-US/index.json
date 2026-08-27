@@ -47,6 +47,12 @@
 	"nags.all-tags-selected.title": {
 		"defaultMessage": "Select accurate tags"
 	},
+	"nags.banned-link-usage.description": {
+		"defaultMessage": "“{url}” is not allowed in project links."
+	},
+	"nags.banned-link-usage.title": {
+		"defaultMessage": "Remove prohibited links"
+	},
 	"nags.check-disclosures.description": {
 		"defaultMessage": "Make sure users are aware of any important details by filling in content disclosures that apply to your {type}."
 	},
@@ -127,12 +133,6 @@
 	},
 	"nags.invalid-project-summary.title": {
 		"defaultMessage": "Fix the project summary"
-	},
-	"nags.link-shortener-usage.description": {
-		"defaultMessage": "Use of link shorteners or other methods to obscure where a link may lead in your external links or license link is prohibited, please only use appropriate full length links."
-	},
-	"nags.link-shortener-usage.title": {
-		"defaultMessage": "Don't use link shorteners"
 	},
 	"nags.link.discord.channel": {
 		"defaultMessage": "This is a link to a Discord channel, not a server invite."
@@ -297,7 +297,7 @@
 		"defaultMessage": "Visit versions settings"
 	},
 	"nags.summary-special-formatting.description": {
-		"defaultMessage": "Your summary should not contain formatting, line breaks, or special characters, since the summary will only display plain text."
+		"defaultMessage": "Your summary should not contain formatting, line breaks, special characters, or links. The summary only displays plain text."
 	},
 	"nags.summary-special-formatting.title": {
 		"defaultMessage": "Clean up the summary"
@@ -350,6 +350,9 @@
 	"nags.visit-links-settings.title": {
 		"defaultMessage": "Visit links settings"
 	},
+	"project.text-validation.banned-link": {
+		"defaultMessage": "“{url}” is not allowed in project summaries or descriptions."
+	},
 	"project.text-validation.description-profanity": {
 		"defaultMessage": "Excessive profanity is not allowed. Detected: {values}"
 	},
@@ -361,9 +364,6 @@
 	},
 	"project.text-validation.slur": {
 		"defaultMessage": "The detected slur “{value}” is not allowed."
-	},
-	"project.text-validation.summary-link": {
-		"defaultMessage": "Links should not be included in project summaries."
 	},
 	"project.text-validation.summary-matches-title": {
 		"defaultMessage": "A project summary should not be the same as its title."

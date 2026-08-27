@@ -1,5 +1,7 @@
 import { computed, onScopeDispose, reactive, type Ref, watch } from 'vue'
 
+import { PROJECT_CONTENT_LINK_BLOCKLIST } from '../project-links/index.ts'
+
 interface MessageDescriptor {
 	id: string
 	defaultMessage?: string
@@ -104,7 +106,7 @@ function anchored(source: string): RegExp {
 
 function blacklist(label: string, ...domains: string[]): LinkCheckBuilder {
 	const pattern = domains.map((domain) => domain.replace(/\./g, '\\.')).join('|')
-	return check(new RegExp(`^(?:${pattern})`, 'i'), label)
+	return check(new RegExp(`^(?:[^./:?#]+\\.)*(?:${pattern})(?=[:/?#]|$)`, 'i'), label)
 }
 
 function buildNode(when: LinkCheckMatcher, label?: string): LinkCheckBuilder {
@@ -829,32 +831,7 @@ checks.children(
 )
 
 checks.children(
-	blacklist('URL Shortener', 'bit.ly', 'adf.ly', 'tinyurl.com', 'short.io', 'is.gd'),
-
-	// Social Media
-	blacklist('Twitter', 'twitter.com', 'x.com'),
-	blacklist('Instagram', 'instagram.com'),
-	blacklist('Facebook', 'facebook.com'),
-	blacklist('TikTok', 'tiktok.com'),
-	blacklist('Telegram', 'telegram.org', 't.me'),
-	blacklist('Bilibili', 'bilibili.com'),
-	blacklist('Bluesky', 'bsky.app'),
-	blacklist('Twitch', 'twitch.tv'),
-	blacklist('Reddit', 'reddit.com', 'redd.it'),
-
-	// Minecraft
-	blacklist('Modrinth', 'modrinth.com'),
-	blacklist('Minecraft', 'minecraft.net'),
-	//TODO we should probably setup curseforge/planetminecraft issues for issues but im too lazy to do that rn
-	blacklist(
-		'Mod Distribution Platform',
-		'curseforge.com',
-		'planetminecraft.com',
-		'9minecraft.net',
-		'mcmod.cn',
-	),
-
-	blacklist('AI Mod Generation Platform', 'creativemode.net', 'orcaclient.com', 'autoforged.cn'),
+	...PROJECT_CONTENT_LINK_BLOCKLIST.map(({ label, domains }) => blacklist(label, ...domains)),
 )
 
 export { checkLink, getLinkCheckState, isLinkCheckPending, useLinkCheck }

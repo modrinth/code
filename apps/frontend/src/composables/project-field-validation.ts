@@ -46,6 +46,10 @@ export function useProjectDescriptionValidation(
 			linkValidation.value = null
 
 			if (import.meta.server) return
+			if (validateProjectDescription(text).some(({ code }) => code === 'text-banned-link')) {
+				pending.value = false
+				return
+			}
 
 			const links = extractProjectLinks(text ?? '')
 			if (links.length === 0) {
