@@ -58,8 +58,20 @@ export function flattenFileReports(
 			...file,
 			id: file.report_id,
 			version_id: version.version_id,
+			version_number: version.version_number,
 		})),
 	)
+}
+
+export function getVersionLabel(file: FlattenedFileReport): string {
+	return file.version_number || file.version_id
+}
+
+export function getVersionPageHref(
+	project: { id: string; slug?: string; project_types: string[] },
+	versionId: string,
+): string {
+	return `/${project.project_types[0] ?? 'project'}/${project.slug ?? project.id}/version/${versionId}`
 }
 
 export function verdictToDecision(

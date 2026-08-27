@@ -3,6 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 export type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 	id: string
 	version_id: string
+	version_number?: string
 }
 
 export type DetailDecision = 'safe' | 'malware' | 'pending'

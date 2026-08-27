@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, CodeIcon, DownloadIcon, ExternalIcon, TimerIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	CodeIcon,
+	DownloadIcon,
+	ExternalIcon,
+	TimerIcon,
+	VersionIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonLink,
@@ -8,6 +15,7 @@ import {
 	CopyLinkButton,
 	getProjectTypeIcon,
 	NavTabs,
+	useFormatBytes,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType } from '@modrinth/utils'
 import { computed, provide, ref, watch } from 'vue'
@@ -16,6 +24,8 @@ import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModa
 import {
 	getFileHighestSeverity,
 	getSeverityBadgeColor,
+	getVersionLabel,
+	getVersionPageHref,
 	severityOrder,
 } from '~/components/ui/moderation/tech-review/helpers'
 import TechRevFileDetailTab from '~/components/ui/moderation/tech-review/TechRevFileDetailTab.vue'
@@ -40,6 +50,8 @@ const props = defineProps<{
 	collapsed: boolean
 	disableCollapsing?: boolean
 }>()
+
+const formatBytes = useFormatBytes()
 
 const emit = defineEmits<{
 	refetch: []
@@ -301,9 +313,30 @@ watch(
 					@tab-click="handleTabClick"
 				/>
 
-				<div v-if="selectedFile" class="flex flex-row items-end gap-2">
+				<div v-if="currentTab === 'File' && selectedFile" class="flex flex-row items-end gap-2">
 					<ButtonLink
-						v-tooltip="`Download`"
+						type="outlined"
+						target="_blank"
+						:href="getVersionPageHref(item.project, selectedFile.version_id)"
+						class="!bg-surface-2"
+						:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
+					>
+						<VersionIcon aria-hidden="true" />
+						{{ getVersionLabel(selectedFile) }}
+					</ButtonLink>
+					<ButtonLink
+						type="outlined"
+						target="_blank"
+						:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
+						class="!bg-surface-2"
+						aria-label="Open in Slicer"
+					>
+						<ExternalIcon aria-hidden="true" /> Slicer
+					</ButtonLink>
+					<ButtonLink
+						v-tooltip="
+							`Download ${selectedFile.file_name} (${formatBytes(selectedFile.file_size)})`
+						"
 						type="outlined"
 						target="_blank"
 						:href="selectedFile.download_url"
@@ -314,16 +347,6 @@ watch(
 						circular
 					>
 						<DownloadIcon aria-hidden="true" />
-					</ButtonLink>
-					<ButtonLink
-						v-tooltip="`Open in Slicer`"
-						type="outlined"
-						target="_blank"
-						:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
-						class="!bg-surface-2"
-						aria-label="Open in Slicer"
-					>
-						<ExternalIcon aria-hidden="true" /> Open
 					</ButtonLink>
 				</div>
 			</div>
@@ -346,6 +369,7 @@ watch(
 			<TechRevFilesTab
 				v-else-if="currentTab === 'Files'"
 				:reports="item.reports"
+				:project="item.project"
 				@view-flags="viewFileFlags"
 			/>
 			<TechRevFileDetailTab

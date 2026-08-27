@@ -8,6 +8,7 @@ import MaliciousSummaryModal, {
 	type UnsafeFile,
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
+import { flattenFileReports } from '~/components/ui/moderation/tech-review/helpers'
 import { useTechReviewSources } from '~/components/ui/moderation/tech-review/use-tech-review-sources'
 
 const client = injectModrinthClient()
@@ -68,11 +69,6 @@ const isLoading = computed(
 
 const hasError = computed(() => isReportError.value || isProjectError.value)
 
-type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
-	id: string
-	version_id: string
-}
-
 const ownership = computed<Labrinth.TechReview.Internal.Ownership | null>(() => {
 	if (organizationData.value) {
 		return {
@@ -103,15 +99,7 @@ const reviewItem = computed(() => {
 
 	const { project_report, thread } = projectReportData.value
 
-	const reports: FlattenedFileReport[] = project_report
-		? project_report.versions.flatMap((version) =>
-				version.files.map((file) => ({
-					...file,
-					id: file.report_id,
-					version_id: version.version_id,
-				})),
-			)
-		: []
+	const reports = project_report ? flattenFileReports(project_report.versions) : []
 
 	return {
 		project: projectData.value,

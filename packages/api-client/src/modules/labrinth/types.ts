@@ -2522,6 +2522,7 @@ export namespace Labrinth {
 
 			export type VersionReport = {
 				version_id: string
+				version_number?: string
 				files: FileReport[]
 			}
 

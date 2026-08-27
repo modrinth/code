@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckIcon, DownloadIcon, ExternalIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, ExternalIcon, VersionIcon } from '@modrinth/assets'
 import { Button, ButtonLink, useFormatBytes } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { computed } from 'vue'
@@ -8,6 +8,8 @@ import {
 	getFileDetailCount,
 	getFileHighestSeverity,
 	getSeverityBadgeColor,
+	getVersionLabel,
+	getVersionPageHref,
 	truncateMiddle,
 } from './helpers'
 import type { FlattenedFileReport } from './types'
@@ -15,6 +17,11 @@ import { injectTechReviewDecisions } from './use-tech-review-decisions'
 
 const props = defineProps<{
 	reports: FlattenedFileReport[]
+	project: {
+		id: string
+		slug?: string
+		project_types: string[]
+	}
 }>()
 
 const emit = defineEmits<{
@@ -46,7 +53,9 @@ const allFiles = computed(() => {
 		<div class="flex items-center gap-3">
 			<span
 				v-tooltip="file.file_name"
-				class="font-medium text-contrast"
+				class="py-2 font-medium text-contrast"
+				:aria-label="`View flags for ${file.file_name}`"
+				tabindex="0"
 				:class="{ 'cursor-pointer hover:underline': getFileDetailCount(file) > 0 }"
 				@click="getFileDetailCount(file) > 0 && emit('viewFlags', file)"
 			>
@@ -92,9 +101,24 @@ const allFiles = computed(() => {
 		</div>
 
 		<div class="flex items-center gap-2">
-			<Button v-if="getFileDetailCount(file) > 0" @click="emit('viewFlags', file)">Flags</Button>
 			<ButtonLink
-				v-tooltip="`Download ${file.file_name}`"
+				type="outlined"
+				target="_blank"
+				:href="getVersionPageHref(project, file.version_id)"
+				:aria-label="`Open version ${getVersionLabel(file)}`"
+			>
+				<VersionIcon aria-hidden="true" /> {{ getVersionLabel(file) }}
+			</ButtonLink>
+			<ButtonLink
+				type="outlined"
+				target="_blank"
+				:href="`https://slicer.run/?url=${encodeURIComponent(file.download_url)}`"
+				aria-label="Open in Slicer"
+			>
+				<ExternalIcon aria-hidden="true" /> Slicer
+			</ButtonLink>
+			<ButtonLink
+				v-tooltip="`Download ${file.file_name} (${formatBytes(file.file_size)})`"
 				type="outlined"
 				:href="file.download_url"
 				:download="file.file_name"
@@ -103,15 +127,6 @@ const allFiles = computed(() => {
 				circular
 			>
 				<DownloadIcon />
-			</ButtonLink>
-			<ButtonLink
-				v-tooltip="`Open in Slicer`"
-				type="outlined"
-				target="_blank"
-				:href="`https://slicer.run/?url=${encodeURIComponent(file.download_url)}`"
-				aria-label="Open in Slicer"
-			>
-				<ExternalIcon aria-hidden="true" /> Open
 			</ButtonLink>
 		</div>
 	</div>
