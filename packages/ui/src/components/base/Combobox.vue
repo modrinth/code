@@ -107,6 +107,7 @@
 					]"
 					:style="[dropdownStyle, { transformOrigin: dropdownTransformOrigin }]"
 					:role="listbox ? 'listbox' : 'menu'"
+					@pointerdown.stop
 					@mousedown.stop
 					@keydown="handleDropdownKeydown"
 				>

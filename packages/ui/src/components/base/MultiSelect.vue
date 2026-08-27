@@ -119,6 +119,7 @@
 					:style="dropdownStyle"
 					role="listbox"
 					aria-multiselectable="true"
+					@pointerdown.stop
 					@mousedown.stop
 					@keydown="handleDropdownKeydown"
 				>
