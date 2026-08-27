@@ -122,7 +122,7 @@ const isGlobal = computed(() => !props.instanceId)
 const storageSuffix = props.instanceId ? 'instance' : 'global'
 const search = ref('')
 const sort = useStorage<ScreenshotSort>(`screenshots-sort-${storageSuffix}`, 'newest')
-const groupBy = useStorage<ScreenshotGroupBy>(`screenshots-group-${storageSuffix}`, 'date')
+const groupBy = useStorage<ScreenshotGroupBy>(`screenshots-group-v2-${storageSuffix}`, 'date')
 const sortModel = computed<string>({
 	get: () => sort.value,
 	set: (value) => {
@@ -860,7 +860,10 @@ function activateScreenshot(screenshot: InstanceScreenshot, event: MouseEvent | 
 	const index = filteredScreenshots.value.findIndex(
 		(candidate) => getSelectionKey(candidate) === getSelectionKey(screenshot),
 	)
-	if (index >= 0) imageViewer.value?.show(index)
+	if (index >= 0) {
+		screenshotOptionsMenu.value?.hideMenu()
+		imageViewer.value?.show(index)
+	}
 }
 
 function clearSelection() {
@@ -927,7 +930,10 @@ function editScreenshot(screenshot: InstanceScreenshot) {
 	const index = filteredScreenshots.value.findIndex(
 		(candidate) => getSelectionKey(candidate) === getSelectionKey(screenshot),
 	)
-	if (index >= 0) void imageViewer.value?.edit(index)
+	if (index >= 0) {
+		screenshotOptionsMenu.value?.hideMenu()
+		void imageViewer.value?.edit(index)
+	}
 }
 
 let revealTimeout: ReturnType<typeof setTimeout> | undefined

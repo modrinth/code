@@ -1,14 +1,12 @@
-use async_zip::tokio::write::ZipFileWriter;
-use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Utc};
 use futures::stream::{self, StreamExt, TryStreamExt};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::io::Cursor;
 use std::path::{Component, Path, PathBuf};
-use tokio::fs::File;
 use tokio::sync::OwnedMutexGuard;
-use tokio_util::compat::FuturesAsyncWriteCompatExt;
+use zip::write::SimpleFileOptions;
+use zip::{CompressionMethod, ZipWriter};
 
 use crate::State;
 use crate::event::InstancePayloadType;
@@ -196,29 +194,27 @@ pub async fn export_screenshots(
         screenshots.push((archive_name, get_screenshot_path(key).await?));
     }
 
-    let mut file = File::create(&export_path)
-        .await
-        .map_err(|error| IOError::with_path(error, &export_path))?;
-    let mut writer = ZipFileWriter::with_tokio(&mut file);
+    tokio::task::spawn_blocking(move || -> crate::Result<()> {
+        let file = std::fs::File::create(&export_path)
+            .map_err(|error| IOError::with_path(error, &export_path))?;
+        let mut writer = ZipWriter::new(file);
+        let options = SimpleFileOptions::default()
+            .compression_method(CompressionMethod::Stored);
 
-    for (archive_name, path) in screenshots {
-        let mut stream = writer
-            .write_entry_stream(
-                ZipEntryBuilder::new(archive_name.into(), Compression::Stored)
-                    .build(),
-            )
-            .await?
-            .compat_write();
-        let mut source = File::open(&path)
-            .await
-            .map_err(|error| IOError::with_path(error, &path))?;
-        tokio::io::copy(&mut source, &mut stream)
-            .await
-            .map_err(IOError::from)?;
-        stream.into_inner().close().await?;
-    }
+        for (archive_name, path) in screenshots {
+            writer
+                .start_file(archive_name, options)
+                .map_err(std::io::Error::from)?;
+            let mut source = std::fs::File::open(&path)
+                .map_err(|error| IOError::with_path(error, &path))?;
+            std::io::copy(&mut source, &mut writer).map_err(IOError::from)?;
+        }
 
-    writer.close().await?;
+        writer.finish().map_err(std::io::Error::from)?;
+        Ok(())
+    })
+    .await??;
+
     Ok(())
 }
 
