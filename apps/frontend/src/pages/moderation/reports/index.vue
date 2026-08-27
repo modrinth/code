@@ -218,8 +218,8 @@ import {
 	type MultiSelectItem,
 	Pagination,
 	TeleportPopoutMenu,
-	useFormatNumber,
 	useDebugLogger,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
 import Fuse from 'fuse.js'
@@ -284,7 +284,7 @@ const { data: allReports, pending: reportsPending } = await useLazyAsyncData(
 		const endTime = performance.now()
 		const duration = endTime - startTime
 
-	debug(
+		debug(
 			`Reports fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
 		)
 
