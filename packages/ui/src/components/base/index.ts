@@ -71,7 +71,15 @@ export { default as I18nDebugPanel } from './I18nDebugPanel.vue'
 export { default as IconSelect } from './IconSelect.vue'
 export { default as InlineEditableText } from './InlineEditableText.vue'
 export type { InputAppearance, InputSize } from './inputs'
-export { DateInput, DatePicker, Input, InputClearButton, InputFrame, Textarea } from './inputs'
+export {
+	ColorPicker,
+	DateInput,
+	DatePicker,
+	Input,
+	InputClearButton,
+	InputFrame,
+	Textarea,
+} from './inputs'
 export { default as IntlFormatted } from './IntlFormatted.vue'
 export { default as LoadingBar } from './LoadingBar.vue'
 export { default as LoadingIndicator } from './LoadingIndicator.vue'
