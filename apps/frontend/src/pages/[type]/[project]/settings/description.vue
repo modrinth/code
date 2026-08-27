@@ -52,8 +52,8 @@ import {
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
-import { TeamMemberPermission } from '@modrinth/utils'
-import { computed, useTemplateRef } from 'vue'
+import { type MarkdownDocument, parseModrinthMarkdown, TeamMemberPermission } from '@modrinth/utils'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -73,9 +73,18 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
+const descriptionDocument = ref<MarkdownDocument | null>(null)
+watch(
+	() => current.value.description,
+	async (text) => {
+		const trimmed = text?.trim() || ''
+		descriptionDocument.value = trimmed ? await parseModrinthMarkdown(trimmed) : null
+	},
+	{ immediate: true },
+)
+
 const descriptionWarning = computed(() => {
-	const text = current.value.description?.trim() || ''
-	const charCount = countText(text)
+	const charCount = countText(descriptionDocument.value)
 
 	if (charCount < MIN_DESCRIPTION_CHARS) {
 		return `It's recommended to have a description with at least ${MIN_DESCRIPTION_CHARS} readable characters. (${charCount}/${MIN_DESCRIPTION_CHARS})`
