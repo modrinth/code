@@ -150,7 +150,7 @@
 		}}</Button>
 	</div>
 
-	<Teleport to="#teleports">
+	<Teleport v-if="isClient" to="#teleports">
 		<Transition name="floating-expand" :css="!isMobileAddMenuLayout">
 			<div
 				v-if="isAddMenuOpen && !isMobileActiveSubmenu"
@@ -192,7 +192,7 @@
 		</Transition>
 	</Teleport>
 
-	<Teleport to="#teleports">
+	<Teleport v-if="isClient" to="#teleports">
 		<Transition name="floating-expand" :css="!isMobileAddMenuLayout">
 			<div
 				v-if="isAddMenuOpen && activeCategory && (isMobileAddMenuLayout || hasSubmenuPosition)"
@@ -425,7 +425,7 @@ import {
 import { onClickOutside } from '@vueuse/core'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
 import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { Button, type ButtonElementHandle, type ButtonSize } from '#ui/components/base/buttons'
 
@@ -607,6 +607,7 @@ const emit = defineEmits<{
 }>()
 
 const isAddMenuOpen = ref(false)
+const isClient = ref(false)
 const activeCategoryKey = ref<string | null>(null)
 const pendingCategoryKey = ref<string | null>(null)
 const draftSelectedFilters = ref<DropdownFilterBarValue>(cloneSelectedFilters(props.modelValue))
@@ -1979,6 +1980,10 @@ watch(
 	},
 	{ deep: true },
 )
+
+onMounted(() => {
+	isClient.value = true
+})
 
 onBeforeUnmount(() => {
 	clearPendingCategoryTimeout()

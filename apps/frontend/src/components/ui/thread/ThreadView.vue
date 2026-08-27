@@ -95,10 +95,10 @@ import { ChevronDownIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/ass
 import type { QuickReply } from '@modrinth/moderation'
 import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import {
+	type ButtonMenuOption,
 	CopyCode,
 	injectNotificationManager,
 	MarkdownEditor,
-	type OverflowMenuOption,
 } from '@modrinth/ui'
 import type { Thread, User } from '@modrinth/utils'
 import dayjs from 'dayjs'
@@ -110,7 +110,7 @@ import ThreadMessage from './ThreadMessage.vue'
 
 const { addNotification } = injectNotificationManager()
 
-const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
+const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 	const replies = props.quickReplies
 	const context = props.quickReplyContext
 
@@ -127,7 +127,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 					id: reply.label,
 					label: reply.label,
 					action: () => handleQuickReply(reply, context),
-				}) as OverflowMenuOption,
+				}) as ButtonMenuOption,
 		)
 })
 

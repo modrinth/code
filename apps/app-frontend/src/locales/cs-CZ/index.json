@@ -1151,9 +1151,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Přihlásit se do Modrinth účtu"
   },
-  "app.nav.signed-in-as": {
-    "message": "Přihlášen jako <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgradovat na Modrinth+"
   },
@@ -1165,9 +1162,6 @@
   },
   "app.navigation.home": {
     "message": "Domov"
-  },
-  "app.navigation.more-options": {
-    "message": "Více možností"
   },
   "app.navigation.next-image": {
     "message": "Další obrázek"

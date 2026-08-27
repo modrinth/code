@@ -222,7 +222,17 @@ function showProfile(): void {
 	modal.value?.show()
 }
 
-defineExpose({ show, showProfile })
+function showFeatureFlags(): void {
+	const featureFlagsTabIndex = availableTabs.value.findIndex(
+		(tab) => tab.content === FeatureFlagSettings,
+	)
+	if (featureFlagsTabIndex >= 0) {
+		modal.value?.setTab(featureFlagsTabIndex)
+	}
+	modal.value?.show()
+}
+
+defineExpose({ show, showProfile, showFeatureFlags })
 
 const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 

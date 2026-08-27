@@ -3,47 +3,61 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { nextTick, onMounted, ref } from 'vue'
 
-import ContextMenu from '../../../../../apps/app-frontend/src/components/ui/context-menu/index.vue'
-import type { ContextMenuOption } from '../../../../../apps/app-frontend/src/components/ui/context-menu/types'
+import ContextMenu from '../../components/base/buttons/ContextMenu.vue'
+import type { ButtonMenuOption } from '../../components/base/buttons/types'
 
-const options: ContextMenuOption[] = [
-	{ name: 'play', color: 'primary' },
+const options: ButtonMenuOption[] = [
 	{
-		name: 'copy',
-		children: [{ name: 'copy_name' }, { name: 'copy_path' }, { name: 'copy_id' }],
+		id: 'play',
+		label: 'Play',
+		icon: PlayIcon,
+		tone: 'brand',
+		action: () => undefined,
 	},
-	{ name: 'open_folder' },
+	{
+		id: 'copy',
+		label: 'Copy',
+		icon: CopyIcon,
+		type: 'submenu',
+		options: [
+			{ id: 'copy_name', label: 'Copy name', icon: CopyIcon, action: () => undefined },
+			{ id: 'copy_path', label: 'Copy path', icon: CopyIcon, action: () => undefined },
+			{ id: 'copy_id', label: 'Copy ID', icon: CopyIcon, action: () => undefined },
+		],
+	},
+	{ id: 'open_folder', label: 'Open folder', icon: FolderOpenIcon, action: () => undefined },
 	{ type: 'divider' },
-	{ name: 'settings' },
-	{ name: 'delete', color: 'danger' },
+	{ id: 'settings', label: 'Settings', icon: SettingsIcon, action: () => undefined },
+	{
+		id: 'delete',
+		label: 'Delete',
+		icon: TrashIcon,
+		tone: 'red',
+		hoverFilledOnly: true,
+		action: () => undefined,
+	},
 ]
 
 const meta = {
-	title: 'App/Context Menu',
+	title: 'Buttons/Context Menu',
 	component: ContextMenu,
 	parameters: {
 		layout: 'fullscreen',
 	},
 	args: {
-		onMenuClosed: fn(),
-		onOptionClicked: fn(),
+		label: 'Instance actions',
+		onSelect: fn(),
+		onOpen: fn(),
+		onClose: fn(),
 	},
 	render: (args) => ({
-		components: {
-			ContextMenu,
-			CopyIcon,
-			FolderOpenIcon,
-			PlayIcon,
-			SettingsIcon,
-			TrashIcon,
-		},
+		components: { ContextMenu },
 		setup() {
 			const contextMenu = ref<InstanceType<typeof ContextMenu>>()
 			const target = ref<HTMLElement>()
-			const item = { id: 'storybook-instance', name: 'Storybook Instance' }
 
 			function openMenu(event: MouseEvent) {
-				contextMenu.value?.showMenu(event, item, options)
+				contextMenu.value?.open(event, options)
 			}
 
 			onMounted(() => {
@@ -74,18 +88,11 @@ const meta = {
 
 				<ContextMenu
 					ref="contextMenu"
-					@menu-closed="args.onMenuClosed"
-					@option-clicked="args.onOptionClicked"
-				>
-					<template #play><PlayIcon /> Play</template>
-					<template #copy><CopyIcon /> Copy</template>
-					<template #copy_name><CopyIcon /> Copy name</template>
-					<template #copy_path><CopyIcon /> Copy path</template>
-					<template #copy_id> <CopyIcon /> Copy ID</template>
-					<template #open_folder><FolderOpenIcon /> Open folder</template>
-					<template #settings><SettingsIcon /> Settings</template>
-					<template #delete><TrashIcon /> Delete</template>
-				</ContextMenu>
+					:label="args.label"
+					@select="args.onSelect"
+					@open="args.onOpen"
+					@close="args.onClose"
+				/>
 			</div>
 		`,
 	}),

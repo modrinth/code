@@ -1232,9 +1232,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "登录Modrinth账户"
   },
-  "app.nav.signed-in-as": {
-    "message": "以<user>{username}</user>身份登录"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "升级至Modrinth+"
   },
@@ -1246,9 +1243,6 @@
   },
   "app.navigation.home": {
     "message": "主页"
-  },
-  "app.navigation.more-options": {
-    "message": "更多选项"
   },
   "app.navigation.next-image": {
     "message": "下一张图片"

@@ -122,6 +122,11 @@ function addFriendFromModal() {
 	username.value = ''
 }
 
+function showAddFriendModal() {
+	username.value = ''
+	addFriendModal.value?.show()
+}
+
 function addFriend(friend: FriendWithUserData) {
 	acceptFriend(friend)
 }
@@ -129,6 +134,8 @@ function addFriend(friend: FriendWithUserData) {
 function removeFriend(friend: FriendWithUserData) {
 	removeFriendRecord(friend)
 }
+
+defineExpose({ showAddFriendModal })
 
 const messages = defineMessages({
 	addFriend: {

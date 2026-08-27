@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Devam et"
   },
-  "admin.billing.error.not-found": {
-    "message": "Kullanıcı bulunamadı"
-  },
   "ads-consent.accept": {
     "message": "Tümünü kabul et"
   },
@@ -2650,9 +2647,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Dosya bulma"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "E-posta ile arama"
   },
   "layout.action.manage-affiliates": {
     "message": "Ortaklık linklerini yönet"

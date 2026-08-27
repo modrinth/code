@@ -363,7 +363,13 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 						:key="instance.id"
 						class="flex min-w-0 items-center gap-2 rounded-xl bg-surface-2 p-3"
 					>
-						<Avatar :src="instance.icon_url" :tint-by="instance.id" size="2.5rem" no-shadow />
+						<Avatar
+							:src="instance.icon_url"
+							:tint-by="instance.id"
+							size="2.5rem"
+							no-shadow
+							pad-transparent-corners
+						/>
 						<div class="flex min-w-0 flex-1 flex-col">
 							<div class="flex min-w-0 items-center gap-1.5">
 								<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>

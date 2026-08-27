@@ -14,7 +14,7 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
@@ -44,7 +44,7 @@ interface Props {
 	enableToggle?: boolean
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string | null
-	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
+	getOverflowOptions?: (item: ContentItem) => ButtonMenuOption[]
 	switchVersion?: (item: ContentItem) => void
 	showEnvironmentWarnings?: boolean
 }

@@ -1,6 +1,14 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, PlayIcon, PlusIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
-import type { CardAction } from '@modrinth/ui'
+import {
+	CheckIcon,
+	ClipboardCopyIcon,
+	GlobeIcon,
+	PlayIcon,
+	PlusIcon,
+	SpinnerIcon,
+	StopCircleIcon,
+} from '@modrinth/assets'
+import type { ButtonMenuOption, CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -26,16 +34,7 @@ interface BrowseServerInstance {
 }
 
 interface ContextMenuHandle {
-	showMenu: (
-		event: MouseEvent,
-		result: Labrinth.Search.v3.ResultSearchProject,
-		options: { name: string }[],
-	) => void
-}
-
-interface ContextMenuOptionClick {
-	option: 'open_link' | 'copy_link'
-	item: Labrinth.Search.v3.ResultSearchProject
+	open: (event: MouseEvent, options: ButtonMenuOption[]) => void
 }
 
 export interface UseAppServerBrowseOptions {
@@ -275,19 +274,21 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	}
 
 	function handleRightClick(event: MouseEvent, result: Labrinth.Search.v3.ResultSearchProject) {
-		contextMenuRef.value?.showMenu(event, result, [{ name: 'open_link' }, { name: 'copy_link' }])
-	}
-
-	function handleOptionsClick(args: ContextMenuOptionClick) {
-		const url = getProjectUrl(args.item)
-		switch (args.option) {
-			case 'open_link':
-				openUrl(url)
-				break
-			case 'copy_link':
-				navigator.clipboard.writeText(url)
-				break
-		}
+		const url = getProjectUrl(result)
+		contextMenuRef.value?.open(event, [
+			{
+				id: 'open_link',
+				label: formatMessage(commonMessages.openInModrinthButton),
+				icon: GlobeIcon,
+				action: () => void openUrl(url),
+			},
+			{
+				id: 'copy_link',
+				label: formatMessage(commonMessages.copyLinkButton),
+				icon: ClipboardCopyIcon,
+				action: () => void navigator.clipboard.writeText(url),
+			},
+		])
 	}
 
 	useAppEvent('process', (event) => {
@@ -314,7 +315,6 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		getServerModpackContent,
 		getServerCardActions,
 		handleRightClick,
-		handleOptionsClick,
 	}
 }
 

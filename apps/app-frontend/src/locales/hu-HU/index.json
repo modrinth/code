@@ -983,9 +983,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Bejelentkezés egy Modrinth-fiókba"
   },
-  "app.nav.signed-in-as": {
-    "message": "Bejelentkezve mint <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Frissíts a Modrinth+-ra"
   },

@@ -13,7 +13,7 @@
 				:server-region="project.minecraft_server?.region"
 				:server-status-online="!!project.minecraft_java_server?.ping?.data"
 				:server-modpack-content="getServerModpackContent(project, openModpackProject)"
-				:status="showStatus ? project.status : undefined"
+				:status="statusFor(project)"
 				:max-tags="2"
 				:layout="cardLayout"
 				is-server-project
@@ -38,7 +38,7 @@
 				:color="project.color"
 				:environment="project.environment?.[0]"
 				:layout="cardLayout"
-				:status="showStatus ? project.status : undefined"
+				:status="statusFor(project)"
 			>
 				<template v-if="$slots.actions" #actions>
 					<slot name="actions" :project="project" />
@@ -71,7 +71,7 @@ const props = withDefaults(
 		projects: Labrinth.Projects.v3.Project[]
 		layout?: 'list' | 'grid' | 'gallery'
 		linkMode?: ProjectLinkMode
-		showStatus?: boolean
+		showStatus?: boolean | ((project: Labrinth.Projects.v3.Project) => boolean)
 	}>(),
 	{
 		layout: 'list',
@@ -86,6 +86,12 @@ defineSlots<{
 
 const router = useRouter()
 const cardLayout = computed(() => (props.layout === 'list' ? 'list' : 'grid'))
+
+function statusFor(project: Labrinth.Projects.v3.Project) {
+	const visible =
+		typeof props.showStatus === 'function' ? props.showStatus(project) : !!props.showStatus
+	return visible ? project.status : undefined
+}
 
 function openModpackProject(projectId: string): void {
 	const path = `/project/${projectId}`

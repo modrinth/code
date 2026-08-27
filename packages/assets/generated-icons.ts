@@ -59,6 +59,7 @@ import _BookmarkIcon from './icons/bookmark.svg?component'
 import _BotIcon from './icons/bot.svg?component'
 import _BoxIcon from './icons/box.svg?component'
 import _BoxImportIcon from './icons/box-import.svg?component'
+import _BoxPlusIcon from './icons/box-plus.svg?component'
 import _BoxesIcon from './icons/boxes.svg?component'
 import _BracesIcon from './icons/braces.svg?component'
 import _BrushCleaningIcon from './icons/brush-cleaning.svg?component'
@@ -97,6 +98,7 @@ import _CogIcon from './icons/cog.svg?component'
 import _CoinsIcon from './icons/coins.svg?component'
 import _CollapseIcon from './icons/collapse.svg?component'
 import _CollectionIcon from './icons/collection.svg?component'
+import _CollectionPlusIcon from './icons/collection-plus.svg?component'
 import _CompassIcon from './icons/compass.svg?component'
 import _ComponentIcon from './icons/component.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
@@ -123,6 +125,7 @@ import _FileCodeIcon from './icons/file-code.svg?component'
 import _FileCogIcon from './icons/file-cog.svg?component'
 import _FileImageIcon from './icons/file-image.svg?component'
 import _FilePlusIcon from './icons/file-plus.svg?component'
+import _FileSearchCornerIcon from './icons/file-search-corner.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
@@ -209,6 +212,7 @@ import _NotepadTextIcon from './icons/notepad-text.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OnlineIndicatorIcon from './icons/online-indicator.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
+import _OrganizationPlusIcon from './icons/organization-plus.svg?component'
 import _PackageIcon from './icons/package.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
@@ -247,6 +251,7 @@ import _SearchIcon from './icons/search.svg?component'
 import _SendIcon from './icons/send.svg?component'
 import _ServerIcon from './icons/server.svg?component'
 import _ServerPlusIcon from './icons/server-plus.svg?component'
+import _ServerSearchIcon from './icons/server-search.svg?component'
 import _ServerStackIcon from './icons/server-stack.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
 import _Settings2Icon from './icons/settings-2.svg?component'
@@ -503,6 +508,7 @@ export const BookmarkIcon = _BookmarkIcon
 export const BotIcon = _BotIcon
 export const BoxIcon = _BoxIcon
 export const BoxImportIcon = _BoxImportIcon
+export const BoxPlusIcon = _BoxPlusIcon
 export const BoxesIcon = _BoxesIcon
 export const BracesIcon = _BracesIcon
 export const BrushCleaningIcon = _BrushCleaningIcon
@@ -541,6 +547,7 @@ export const CogIcon = _CogIcon
 export const CoinsIcon = _CoinsIcon
 export const CollapseIcon = _CollapseIcon
 export const CollectionIcon = _CollectionIcon
+export const CollectionPlusIcon = _CollectionPlusIcon
 export const CompassIcon = _CompassIcon
 export const ComponentIcon = _ComponentIcon
 export const ContractIcon = _ContractIcon
@@ -567,6 +574,7 @@ export const FileCodeIcon = _FileCodeIcon
 export const FileCogIcon = _FileCogIcon
 export const FileImageIcon = _FileImageIcon
 export const FilePlusIcon = _FilePlusIcon
+export const FileSearchCornerIcon = _FileSearchCornerIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon
 export const FilterXIcon = _FilterXIcon
@@ -653,6 +661,7 @@ export const NotepadTextIcon = _NotepadTextIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const OnlineIndicatorIcon = _OnlineIndicatorIcon
 export const OrganizationIcon = _OrganizationIcon
+export const OrganizationPlusIcon = _OrganizationPlusIcon
 export const PackageIcon = _PackageIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PackageOpenIcon = _PackageOpenIcon
@@ -691,6 +700,7 @@ export const SearchIcon = _SearchIcon
 export const SendIcon = _SendIcon
 export const ServerIcon = _ServerIcon
 export const ServerPlusIcon = _ServerPlusIcon
+export const ServerSearchIcon = _ServerSearchIcon
 export const ServerStackIcon = _ServerStackIcon
 export const SettingsIcon = _SettingsIcon
 export const Settings2Icon = _Settings2Icon

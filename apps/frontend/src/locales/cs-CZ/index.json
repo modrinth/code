@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Pokračovat"
   },
-  "admin.billing.error.not-found": {
-    "message": "Uživatel nebyl nalezen"
-  },
   "ads-consent.accept": {
     "message": "Přijmout vše"
   },

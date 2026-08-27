@@ -2609,6 +2609,9 @@
   "label.yes": {
     "defaultMessage": "Yes"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Switching accounts..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Czech"
   },
@@ -4018,6 +4021,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Channel"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, number} selected"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Toggle filter for {filter}"
@@ -6671,6 +6680,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth Team"
   },
+  "user.role.moderator": {
+    "defaultMessage": "Content Moderator"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Modrinth Team"
+  },
   "version.content.name": {
     "defaultMessage": "Name"
   },
@@ -6681,7 +6696,7 @@
     "defaultMessage": "Dev jar"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
+    "defaultMessage": "Javadocs jar"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Optional resource pack"
@@ -6696,7 +6711,7 @@
     "defaultMessage": "Signature file"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "Source jar"
+    "defaultMessage": "Sources jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Other"

@@ -132,6 +132,15 @@ const keybinds: { [id: string]: KeybindListener } = {
 			globalThis.open(ctx.officialUrl, '_blank', 'noopener,noreferrer')
 		},
 	},
+	'open-localhost': {
+		keybind: [],
+		description: 'Open current page on localhost',
+		scope: 'global',
+		enabled: () => !isLocalhost(),
+		action: (ctx) => {
+			globalThis.open(ctx.localhostUrl, '_blank', 'noopener,noreferrer')
+		},
+	},
 	'copy-official-site': {
 		keybind: 'Ctrl+Shift+O',
 		description: 'Copy production/staging URL (localhost only)',

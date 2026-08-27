@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "متابعة"
   },
-  "admin.billing.error.not-found": {
-    "message": "المستخدم غير موجود"
-  },
   "ads-consent.accept": {
     "message": "قبول الكل"
   },
@@ -2647,9 +2644,6 @@
   },
   "layout.action.file-lookup": {
     "message": "البحث عن ملف"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "البحث باستخدام البريد الإلكتروني"
   },
   "layout.action.manage-affiliates": {
     "message": "إدارة روابط العمولة"

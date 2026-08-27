@@ -107,7 +107,7 @@
 			</template>
 		</component>
 
-		<Teleport to="#teleports">
+		<Teleport v-if="isClient" to="#teleports">
 			<Transition name="floating-expand">
 				<div
 					v-if="isOpen"
@@ -125,7 +125,7 @@
 					<div class="empty:hidden">
 						<div
 							v-if="searchable"
-							class="px-0 py-1.5 border-0 border-solid border-b border-b-surface-5 flex"
+							class="px-0 border-0 border-solid border-b border-b-surface-5 flex"
 						>
 							<Input
 								ref="searchInputRef"
@@ -133,7 +133,7 @@
 								:icon="SearchIcon"
 								type="text"
 								:placeholder="searchPlaceholder"
-								wrapper-class="grow"
+								wrapper-class="grow m-2"
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
 							/>
@@ -1390,7 +1390,10 @@ onClickOutside(
 	{ ignore: [triggerElement, containerRef, '.v-popper__popper'] },
 )
 
+const isClient = ref(false)
+
 onMounted(() => {
+	isClient.value = true
 	window.addEventListener('resize', handleWindowResize)
 	calculateVisibleTags()
 })

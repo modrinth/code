@@ -1178,9 +1178,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Logga in till ett Modrinth-konto"
   },
-  "app.nav.signed-in-as": {
-    "message": "Inloggad som <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Uppgradera till Modrinth+"
   },
@@ -1192,9 +1189,6 @@
   },
   "app.navigation.home": {
     "message": "Hem"
-  },
-  "app.navigation.more-options": {
-    "message": "Mer alternativ"
   },
   "app.navigation.next-image": {
     "message": "Nästa bild"

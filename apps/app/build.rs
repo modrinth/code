@@ -134,6 +134,9 @@ fn main() {
                         "modrinth_login",
                         "logout",
                         "get",
+                        "get_all",
+                        "set_active",
+                        "remove_account",
                         "cancel_modrinth_login",
                     ])
                     .default_permission(

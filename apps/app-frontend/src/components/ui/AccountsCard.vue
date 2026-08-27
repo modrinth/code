@@ -20,7 +20,6 @@
 			<div class="flex gap-2 w-full min-w-0">
 				<Avatar
 					size="36px"
-					disable-conditional-icon-padding
 					:src="
 						selectedAccount
 							? avatarUrl
@@ -35,7 +34,7 @@
 				</div>
 			</div>
 		</template>
-		<div class="bg-button-bg pt-1 pb-2 border border-solid border-surface-5">
+		<div class="bg-button-bg pt-1 pb-2 border-0 border-t border-solid border-surface-5">
 			<template v-if="accounts.length > 0">
 				<div v-for="account in accounts" :key="account.profile.id" class="flex gap-1 items-center">
 					<button
@@ -47,11 +46,7 @@
 							class="w-5 h-5 text-brand shrink-0"
 						/>
 						<RadioButtonIcon v-else class="w-5 h-5 text-secondary shrink-0" />
-						<Avatar
-							:src="getAccountAvatarUrl(account)"
-							size="24px"
-							disable-conditional-icon-padding
-						/>
+						<Avatar :src="getAccountAvatarUrl(account)" size="24px" />
 						<p
 							class="m-0 truncate min-w-0"
 							:class="

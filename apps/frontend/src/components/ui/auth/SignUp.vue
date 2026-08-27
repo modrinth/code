@@ -152,7 +152,8 @@ import {
 import { useStorage } from '@vueuse/core'
 import type { LocationQuery } from 'vue-router'
 
-import { getAuthUrl, PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY } from '@/composables/auth.ts'
+import { PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY } from '@/composables/accounts.ts'
+import { getAuthUrl } from '@/composables/auth.ts'
 
 type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
 
