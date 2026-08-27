@@ -1202,9 +1202,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Iniciar sesión en una cuenta de Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Sesión iniciada como <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Actualizar a Modrinth+"
   },
@@ -1216,9 +1213,6 @@
   },
   "app.navigation.home": {
     "message": "Inicio"
-  },
-  "app.navigation.more-options": {
-    "message": "Más opciones"
   },
   "app.navigation.next-image": {
     "message": "Siguiente imagen"

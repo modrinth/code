@@ -51,6 +51,8 @@ const iconSrc = computed(() => {
 	return fetchedIcon.value ?? installContext.value?.iconSrc ?? null
 })
 
+const isInstanceIcon = computed(() => !installContext.value?.serverId)
+
 const metadataItems = computed(() => {
 	const context = installContext.value
 	if (!context) return []
@@ -161,6 +163,7 @@ async function handleSelectedProjectsLeaveResult(
 					:alt="installContext.name"
 					size="48px"
 					class="shrink-0"
+					:pad-transparent-corners="isInstanceIcon"
 				/>
 			</template>
 

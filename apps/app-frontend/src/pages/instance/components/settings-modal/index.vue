@@ -200,6 +200,7 @@ defineExpose({ show, hide })
 					:src="getInstanceIconUrl(instance.icon_path)"
 					size="24px"
 					:tint-by="props.instance.id"
+					pad-transparent-corners
 				/>
 				{{ instance.name }} <ChevronRightIcon />
 				<span class="font-extrabold text-contrast">{{

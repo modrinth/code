@@ -1196,9 +1196,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Se connecter à un compte Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Connecté en tant que <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Passer à Modrinth+"
   },
@@ -1210,9 +1207,6 @@
   },
   "app.navigation.home": {
     "message": "Accueil"
-  },
-  "app.navigation.more-options": {
-    "message": "Plus d'options"
   },
   "app.navigation.next-image": {
     "message": "Prochaine image"

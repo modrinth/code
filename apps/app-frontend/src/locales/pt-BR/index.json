@@ -851,9 +851,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Iniciar sessão em uma conta Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Conectado como <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Assinar o Modrinth+"
   },

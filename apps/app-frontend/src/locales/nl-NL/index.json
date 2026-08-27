@@ -758,9 +758,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Meld je aan bij een Modrinth-account"
   },
-  "app.nav.signed-in-as": {
-    "message": "Aangemeld als <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade naar Modrinth+"
   },

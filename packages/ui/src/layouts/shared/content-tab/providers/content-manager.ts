@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from 'vue'
 
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { createContext } from '#ui/providers/create-context'
 
 import type {
@@ -81,7 +81,7 @@ export interface ContentManagerContext {
 	switchVersion?: (item: ContentItem) => void
 
 	// Per-item overflow menu (optional)
-	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
+	getOverflowOptions?: (item: ContentItem) => ButtonMenuOption[]
 
 	// Share support (optional — when undefined, share button becomes hidden entirely)
 	shareItems?: (items: ContentItem[], format: 'names' | 'file-names' | 'urls' | 'markdown') => void

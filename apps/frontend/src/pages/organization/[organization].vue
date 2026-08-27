@@ -126,7 +126,7 @@
 				<ProjectList
 					v-if="projects && projects.length > 0"
 					:projects="displayedProjects"
-					:show-status="showProjectStatus"
+					:show-status="canSeeProjectStatus"
 				/>
 				<div v-else-if="true" class="error">
 					<UpToDate class="icon" />
@@ -215,7 +215,6 @@ const messages = defineMessages({
 const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
-const user = await useUser()
 const cosmetics = useCosmetics()
 const route = useNativeRoute()
 const router = useRouter()
@@ -321,10 +320,6 @@ const displayedProjects = computed(() =>
 		.sort(projectUserSorting),
 )
 
-const showProjectStatus = computed(
-	() => !!(auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))),
-)
-
 const sumDownloads = computed(() => {
 	let sum = 0
 
@@ -357,6 +352,22 @@ const { currentMember } = organizationContext
 provideOrganizationContext(organizationContext)
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
+
+const authUserId = computed(() => auth.value?.user?.id as string | undefined)
+const viewerProjectsQuery = useQuery({
+	queryKey: computed(() => ['user', authUserId.value, 'projects']),
+	queryFn: () => client.labrinth.users_v3.getProjects(authUserId.value!),
+	enabled: computed(() => !!authUserId.value && !!organization.value && !currentMember.value),
+	staleTime: 30_000,
+})
+const viewerMemberProjectIds = computed(
+	() => new Set((viewerProjectsQuery.data.value ?? []).map((project) => project.id)),
+)
+
+function canSeeProjectStatus(project: ProjectV3) {
+	if (currentMember.value) return true
+	return viewerMemberProjectIds.value.has(project.id)
+}
 
 watch(
 	[routeHasSettings, acceptedMembers, currentMember],

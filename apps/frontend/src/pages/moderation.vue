@@ -1,9 +1,9 @@
 <template>
 	<div
-		class="relativemb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
+		class="relative mb-6 mt-4 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
 		:class="`m${marginTarget}-auto`"
 	>
-		<h1>Moderation</h1>
+		<h1 class="mb-4 mt-0 text-3xl font-semibold">Moderation</h1>
 		<NavTabs :links="moderationLinks" class="mb-4 hidden sm:flex" />
 		<div class="mb-4 sm:hidden">
 			<Chips

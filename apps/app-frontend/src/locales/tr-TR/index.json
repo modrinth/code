@@ -1232,9 +1232,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Bir Modrinth hesabıyla oturum açın"
   },
-  "app.nav.signed-in-as": {
-    "message": "<user>{username}</user> olarak oturum açıldı"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+'a yükselt"
   },
@@ -1246,9 +1243,6 @@
   },
   "app.navigation.home": {
     "message": "Ana Sayfa"
-  },
-  "app.navigation.more-options": {
-    "message": "Diğer ayarlar"
   },
   "app.navigation.next-image": {
     "message": "Sonraki görsel"

@@ -43,7 +43,12 @@
 		<!-- Instance-specific: Icon upload -->
 		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-2.5">
 			<div class="group relative size-[7.75rem] shrink-0">
-				<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="100%" no-shadow />
+				<Avatar
+					:src="ctx.instanceIconUrl.value ?? undefined"
+					size="100%"
+					no-shadow
+					pad-transparent-corners
+				/>
 				<div
 					v-if="ctx.instanceIconUrl.value"
 					class="pointer-events-none absolute right-1.5 top-1.5 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"

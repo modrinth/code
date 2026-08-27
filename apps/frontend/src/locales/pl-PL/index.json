@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Kontynuuj"
   },
-  "admin.billing.error.not-found": {
-    "message": "Nie znaleziono użytkownika"
-  },
   "ads-consent.accept": {
     "message": "Zaakceptuj wszystko"
   },
@@ -2644,9 +2641,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Wyszukiwarka plików"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Szukaj po e-mailu"
   },
   "layout.action.manage-affiliates": {
     "message": "Zarządzaj linkami afiliacyjnymi"

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Button, Toggle } from '@modrinth/ui'
-import { ref, watch } from 'vue'
+import { SearchIcon } from '@modrinth/assets'
+import { Button, Input, Toggle } from '@modrinth/ui'
+import Fuse from 'fuse.js'
+import { computed, ref, watch } from 'vue'
 
 import {
 	DEFAULT_FEATURE_FLAGS,
@@ -12,7 +14,22 @@ import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 const appSettings = useAppSettings()
 
 const settings = ref(await getSettings())
-const options = ref(Object.keys(DEFAULT_FEATURE_FLAGS) as FeatureFlag[])
+const searchQuery = ref('')
+const allFlags = computed(() => Object.keys(DEFAULT_FEATURE_FLAGS) as FeatureFlag[])
+
+const fuse = computed(
+	() =>
+		new Fuse(allFlags.value, {
+			threshold: 0.4,
+		}),
+)
+
+const filteredFlags = computed(() => {
+	if (!searchQuery.value.trim()) {
+		return allFlags.value
+	}
+	return fuse.value.search(searchQuery.value).map((result) => result.item)
+})
 
 function setFeatureFlag(key: FeatureFlag, value: boolean) {
 	appSettings.featureFlags[key] = value
@@ -29,7 +46,14 @@ watch(
 </script>
 <template>
 	<div class="flex flex-col gap-2.5">
-		<div v-for="option in options" :key="option" class="flex items-center justify-between">
+		<Input
+			v-model="searchQuery"
+			type="search"
+			:icon="SearchIcon"
+			placeholder="Search flags..."
+			wrapper-class="w-full"
+		/>
+		<div v-for="option in filteredFlags" :key="option" class="flex items-center justify-between">
 			<div>
 				<h2 class="m-0 text-lg font-semibold text-contrast capitalize">
 					{{ option.replaceAll('_', ' ') }}
@@ -50,5 +74,8 @@ watch(
 				/>
 			</div>
 		</div>
+		<p v-if="filteredFlags.length === 0" class="text-center text-secondary">
+			No flags found matching "{{ searchQuery }}"
+		</p>
 	</div>
 </template>

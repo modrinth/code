@@ -1,7 +1,13 @@
 <template>
 	<PageHeader :title="instance.name">
 		<template #leading>
-			<Avatar :src="iconSrc" :alt="instance.name" size="64px" :tint-by="instance.id" />
+			<Avatar
+				:src="iconSrc"
+				:alt="instance.name"
+				size="64px"
+				:tint-by="instance.id"
+				pad-transparent-corners
+			/>
 		</template>
 
 		<template v-if="instance.shared_instance || instance.quarantined" #badges>
@@ -181,10 +187,10 @@ import {
 import { Button, IconButton, SplitButton, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	Avatar,
+	type ButtonMenuOption,
 	commonMessages,
 	defineMessages,
 	formatLoaderLabel,
-	type OverflowMenuOption,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
@@ -344,7 +350,7 @@ const playtimeLabel = computed(() => {
 
 	return `${seconds} second${seconds === 1 ? '' : 's'}`
 })
-const serverPlayOptions = computed<OverflowMenuOption[]>(() => [
+const serverPlayOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'launch_instance',
 		label: formatMessage(messages.launchInstance),
@@ -352,8 +358,8 @@ const serverPlayOptions = computed<OverflowMenuOption[]>(() => [
 		action: () => emit('play'),
 	},
 ])
-const moreActions = computed<OverflowMenuOption[]>(() => {
-	const actions: OverflowMenuOption[] = [
+const moreActions = computed<ButtonMenuOption[]>(() => {
+	const actions: ButtonMenuOption[] = [
 		{
 			id: 'open-folder',
 			label: formatMessage(messages.openFolder),

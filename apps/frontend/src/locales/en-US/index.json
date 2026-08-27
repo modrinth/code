@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Continue"
   },
-  "admin.billing.error.not-found": {
-    "message": "User not found"
-  },
   "ads-consent.accept": {
     "message": "Accept all"
   },
@@ -821,6 +818,33 @@
   "auth.create-account.username.placeholder": {
     "message": "Enter username"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Enter the 6-digit code from your authenticator app, or one of your backup codes."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Two-factor authentication"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Enter code..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Continue with passkey"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "It was last signed into with {method, select, password {a password} passkey {a passkey} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Reauthenticate"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Sign in another way"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Sign in with {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} needs to be reauthenticated."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Send recovery email"
   },
@@ -863,6 +887,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Enter code..."
   },
+  "auth.sign-in.add-account": {
+    "message": "Add account"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Choose an account to use in Modrinth App"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continue with Email"
   },
@@ -880,6 +910,9 @@
   },
   "auth.sign-in.launcher.complete.description": {
     "message": "We’re returning you to the Modrinth App. If nothing happens, use the button below."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Go to Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Open Modrinth App"
@@ -2204,6 +2237,12 @@
   "error.generic.401.signed-in-as": {
     "message": "You're currently signed in as:"
   },
+  "error.generic.401.switch-account": {
+    "message": "Or switch to another account:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Couldn't switch accounts. Please try again."
+  },
   "error.generic.401.title": {
     "message": "You don't have access to this page"
   },
@@ -2660,9 +2699,6 @@
   "layout.action.file-lookup": {
     "message": "File lookup"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Lookup by email"
-  },
   "layout.action.manage-affiliates": {
     "message": "Manage affiliate links"
   },
@@ -2692,6 +2728,9 @@
   },
   "layout.action.tech-review": {
     "message": "Tech review"
+  },
+  "layout.action.user-lookup": {
+    "message": "User lookup"
   },
   "layout.avatar.alt": {
     "message": "Your avatar"
@@ -2888,6 +2927,9 @@
   "layout.nav.active-reports": {
     "message": "Active reports"
   },
+  "layout.nav.add-account": {
+    "message": "Add account"
+  },
   "layout.nav.discover": {
     "message": "Discover"
   },
@@ -2918,6 +2960,9 @@
   "layout.nav.projects": {
     "message": "Projects"
   },
+  "layout.nav.remove-account": {
+    "message": "Remove account"
+  },
   "layout.nav.revenue": {
     "message": "Revenue"
   },
@@ -2926,6 +2971,12 @@
   },
   "layout.nav.search": {
     "message": "Search"
+  },
+  "layout.nav.switch-account": {
+    "message": "Switch account"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Couldn't switch accounts. Please try again."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"

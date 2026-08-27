@@ -1,35 +1,4 @@
 <template>
-	<div class="pointer-events-none fixed inset-0 z-[-1]">
-		<div id="fixed-background-teleport" class="relative"></div>
-	</div>
-	<div class="pointer-events-none absolute inset-0 z-[-1]">
-		<div id="absolute-background-teleport" class="relative"></div>
-	</div>
-	<div
-		class="pride-backdrop pointer-events-none absolute inset-0 z-[-1]"
-		:class="{ shown: showPrideBackdrop }"
-	></div>
-	<div class="pointer-events-none absolute inset-0 z-50">
-		<div
-			class="over-the-top-random-animation"
-			:style="{ '--_r-count': rCount }"
-			:class="{ threshold: rCount > 20, 'rings-expand': rCount >= 40 }"
-		>
-			<div>
-				<div
-					class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-				></div>
-				<div
-					class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-				></div>
-				<div
-					class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
-				>
-					?
-				</div>
-			</div>
-		</div>
-	</div>
 	<div
 		ref="main_page"
 		class="layout"
@@ -38,6 +7,37 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
+		<div class="pointer-events-none fixed inset-0 z-[-1]">
+			<div id="fixed-background-teleport" class="relative"></div>
+		</div>
+		<div class="pointer-events-none absolute inset-0 z-[-1]">
+			<div id="absolute-background-teleport" class="relative"></div>
+		</div>
+		<div
+			class="pride-backdrop pointer-events-none absolute inset-0 z-[-1]"
+			:class="{ shown: showPrideBackdrop }"
+		></div>
+		<div class="pointer-events-none absolute inset-0 z-50">
+			<div
+				class="over-the-top-random-animation"
+				:style="{ '--_r-count': rCount }"
+				:class="{ threshold: rCount > 20, 'rings-expand': rCount >= 40 }"
+			>
+				<div>
+					<div
+						class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+					></div>
+					<div
+						class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+					></div>
+					<div
+						class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
+					>
+						?
+					</div>
+				</div>
+			</div>
+		</div>
 		<RussiaBanner v-if="flags.showAllBanners || isRussia" />
 		<TaxIdMismatchBanner v-if="flags.showAllBanners || showTinMismatchBanner" />
 		<TaxComplianceBanner v-if="flags.showAllBanners || showTaxComplianceBanner" />
@@ -373,6 +373,7 @@
 						{
 							id: 'review-projects',
 							label: formatMessage(messages.reviewProjects),
+							icon: ScaleIcon,
 							type: 'link',
 							to: '/moderation',
 							tone: 'orange',
@@ -380,6 +381,7 @@
 						{
 							id: 'tech-review',
 							label: formatMessage(messages.techReview),
+							icon: ShieldAlertIcon,
 							type: 'link',
 							to: '/moderation/technical-review',
 							tone: 'orange',
@@ -387,6 +389,7 @@
 						{
 							id: 'review-reports',
 							label: formatMessage(messages.reports),
+							icon: ReportIcon,
 							type: 'link',
 							to: '/moderation/reports',
 							tone: 'orange',
@@ -394,116 +397,109 @@
 						{
 							id: 'external-projects',
 							label: formatMessage(messages.externalProjects),
+							icon: GlobeIcon,
 							type: 'link',
 							to: '/moderation/external-projects',
 							tone: 'orange',
 						},
 						{
-							type: 'divider',
+							id: 'global-traces',
+							label: 'Global traces',
+							icon: HashIcon,
+							type: 'link',
+							to: '/moderation/global-traces',
+							tone: 'orange',
 						},
+						{ type: 'divider' },
 						{
 							id: 'file-lookup',
-							label: formatMessage(messages.fileLookup),
+							label: 'File lookup',
+							icon: FileSearchCornerIcon,
 							type: 'link',
 							to: '/admin/file_lookup',
 						},
 						{
-							type: 'divider',
-							shown: isAdmin(auth.user),
-						},
-						{
 							id: 'user-lookup',
-							label: formatMessage(messages.lookupByEmail),
+							label: 'User lookup',
+							icon: UserSearchIcon,
 							type: 'link',
 							to: '/admin/user_email',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
 						},
 						{
-							id: 'affiliates',
-							label: formatMessage(messages.manageAffiliates),
-							type: 'link',
-							to: '/admin/affiliates',
-							tone: 'brand',
+							type: 'divider',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'servers-lookup',
 							label: 'Server lookup',
+							icon: ServerSearchIcon,
 							type: 'link',
 							to: '/admin/servers/lookup',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'servers-notices',
-							label: formatMessage(messages.manageServerNotices),
+							label: 'Server notices',
+							icon: IssuesIcon,
 							type: 'link',
 							to: '/admin/servers/notices',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'servers-transfers',
 							label: 'Server transfers',
+							icon: TransferIcon,
 							type: 'link',
 							to: '/admin/servers/transfers',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'servers-nodes',
 							label: 'Credit server nodes',
+							icon: ServerIcon,
 							action: (event) => $refs.modal_batch_credit.show(event),
-							tone: 'brand',
+							shown: isAdmin(auth.user),
+						},
+						{
+							type: 'divider',
+							shown: isAdmin(auth.user),
+						},
+						{
+							id: 'affiliates',
+							label: 'Affiliate links',
+							icon: AffiliateIcon,
+							type: 'link',
+							to: '/admin/affiliates',
 							shown: isAdmin(auth.user),
 						},
 						{
 							id: 'analytics-events',
-							label: formatMessage(messages.analyticsEvents),
+							label: 'Analytics events',
+							icon: ChartIcon,
 							type: 'link',
 							to: '/admin/analytics/events',
-							tone: 'brand',
 							shown: isAdmin(auth.user),
+						},
+						{ type: 'divider' },
+						{
+							id: 'email-templates',
+							label: 'Email templates',
+							icon: MailIcon,
+							type: 'link',
+							to: '/admin/emails',
+						},
+						{
+							id: 'document-templates',
+							label: 'Document templates',
+							icon: BookOpenIcon,
+							type: 'link',
+							to: '/admin/docs',
 						},
 					]"
 				>
 					<ModrinthIcon aria-hidden="true" />
 					<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-					<template #review-projects>
-						<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
-					</template>
-					<template #tech-review>
-						<ShieldAlertIcon aria-hidden="true" /> {{ formatMessage(messages.techReview) }}
-					</template>
-					<template #review-reports>
-						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
-					</template>
-					<template #external-projects>
-						<GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.externalProjects) }}
-					</template>
-					<template #user-lookup>
-						<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
-					</template>
-					<template #file-lookup>
-						<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
-					</template>
-					<template #servers-lookup> <ServerIcon aria-hidden="true" /> Server lookup </template>
-					<template #servers-notices>
-						<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
-					</template>
-					<template #servers-transfers>
-						<TransferIcon aria-hidden="true" /> Server transfers
-					</template>
-					<template #affiliates>
-						<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
-					</template>
-					<template #servers-nodes>
-						<ServerIcon aria-hidden="true" /> Credit server nodes
-					</template>
-					<template #analytics-events>
-						<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
-					</template>
 				</TeleportOverflowMenu>
 				<TeleportOverflowMenu
 					v-if="auth.user"
@@ -515,17 +511,20 @@
 						{
 							id: 'new-project',
 							label: formatMessage(messages.newProject),
+							icon: BoxPlusIcon,
 							action: (event) => requireVerifiedEmail(() => $refs.modal_creation.show(event)),
 						},
 						{
 							id: 'new-server-project',
 							label: formatMessage(messages.newServerProject),
+							icon: ServerPlusIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_creation.show(event, { type: 'server' })),
 						},
 						{
 							id: 'new-collection',
 							label: formatMessage(messages.newCollection),
+							icon: CollectionPlusIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_collection_creation.show(event)),
 						},
@@ -533,6 +532,7 @@
 						{
 							id: 'new-organization',
 							label: formatMessage(messages.newOrganization),
+							icon: OrganizationPlusIcon,
 							action: (event) =>
 								requireVerifiedEmail(() => $refs.modal_organization_creation.show(event)),
 						},
@@ -540,19 +540,6 @@
 				>
 					<PlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.publish) }}
-					<template #new-project>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
-					</template>
-					<template #new-server-project>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
-					</template>
-					<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
-					<template #new-collection>
-						<CollectionIcon aria-hidden="true" /> {{ formatMessage(messages.newCollection) }}
-					</template>
-					<template #new-organization>
-						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.newOrganization) }}
-					</template>
 				</TeleportOverflowMenu>
 				<TeleportOverflowMenu
 					v-if="auth.user"
@@ -566,57 +553,40 @@
 				>
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
 					<DropdownIcon class="h-5 w-5 text-secondary" />
-					<template #profile>
-						<UserIcon aria-hidden="true" /> {{ formatMessage(messages.profile) }}
-					</template>
-					<template #notifications>
-						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
-					</template>
-					<template #reports>
-						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.activeReports) }}
-					</template>
-					<template #saved>
-						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
-					</template>
-					<template #servers>
-						<ServerStackIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
-					</template>
-					<template #plus>
-						<ArrowBigUpDashIcon aria-hidden="true" />
-						{{ formatMessage(messages.upgradeToModrinthPlus) }}
-					</template>
-					<template #settings>
-						<SettingsIcon aria-hidden="true" /> {{ formatMessage(commonMessages.settingsLabel) }}
-					</template>
-					<template #flags>
-						<ToggleRightIcon aria-hidden="true" />
-						{{ formatMessage(commonSettingsMessages.featureFlags) }}
-					</template>
-					<template #projects>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.projects) }}
-					</template>
-					<template #organizations>
-						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.organizations) }}
-					</template>
-					<template #affiliate-links>
-						<AffiliateIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.affiliateLinksButton) }}
-					</template>
-					<template #revenue>
-						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
-					</template>
-					<template #analytics>
-						<ChartIcon aria-hidden="true" /> {{ formatMessage(commonMessages.analyticsButton) }}
-					</template>
-					<template #moderation>
-						<ScaleIcon aria-hidden="true" /> {{ formatMessage(commonMessages.moderationLabel) }}
-					</template>
-					<template #sign-out>
-						<LogOutIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signOutButton) }}
+					<template
+						v-for="account in accountSwitcherAccounts"
+						:key="account.id"
+						#[account.optionId]
+					>
+						<Avatar :src="account.avatarUrl" size="1.25rem" aria-hidden="true" circle />
+						{{ account.username }}
+						<UserRoleIcon :role="account.role" />
 					</template>
 				</TeleportOverflowMenu>
 				<template v-else>
-					<ButtonLink type="colored" color="brand" :to="signInRouteObj">
+					<TeleportOverflowMenu
+						v-if="accountSwitcherAccounts.length > 0"
+						type="colored"
+						color="brand"
+						:icon-only="false"
+						:label="formatMessage(commonMessages.signInButton)"
+						class="btn-dropdown-animation !gap-1 !pr-1"
+						:options="accountSwitcherOptions"
+					>
+						<LogInIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.signInButton) }}
+						<DropdownIcon class="h-5 w-5" />
+						<template
+							v-for="account in accountSwitcherAccounts"
+							:key="account.id"
+							#[account.optionId]
+						>
+							<Avatar :src="account.avatarUrl" size="1.25rem" aria-hidden="true" circle />
+							{{ account.username }}
+							<UserRoleIcon :role="account.role" />
+						</template>
+					</TeleportOverflowMenu>
+					<ButtonLink v-else type="colored" color="brand" :to="signInRouteObj">
 						<LogInIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.signInButton) }}
 					</ButtonLink>
@@ -835,27 +805,33 @@
 import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
+	ArrowLeftRightIcon,
 	BellIcon,
+	BookOpenIcon,
 	BoxIcon,
+	BoxPlusIcon,
 	BracesIcon,
 	ChartIcon,
-	CollectionIcon,
+	CollectionPlusIcon,
 	CompassIcon,
 	CurrencyIcon,
 	DownloadIcon,
 	DropdownIcon,
-	FileIcon,
+	FileSearchCornerIcon,
 	GlassesIcon,
 	GlobeIcon,
 	HamburgerIcon,
+	HashIcon,
 	HomeIcon,
 	IssuesIcon,
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
+	MailIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
+	OrganizationPlusIcon,
 	PackageOpenIcon,
 	PaintbrushIcon,
 	PlugIcon,
@@ -864,6 +840,8 @@ import {
 	ScaleIcon,
 	SearchIcon,
 	ServerIcon,
+	ServerPlusIcon,
+	ServerSearchIcon,
 	ServerStackIcon,
 	SettingsIcon,
 	ShieldAlertIcon,
@@ -890,6 +868,7 @@ import {
 	providePageContext,
 	TeleportOverflowMenu,
 	useHostingIntercom,
+	UserRoleIcon,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
@@ -911,7 +890,14 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import { getSignInRouteObj } from '~/composables/auth.ts'
+import {
+	forgetStoredAccount,
+	switchToSignedOut,
+	switchToStoredAccount,
+	useStoredAccounts,
+} from '~/composables/accounts.ts'
+import { getAddAccountRouteObj, getSignInRouteObj } from '~/composables/auth.ts'
+import { logout } from '~/composables/user.js'
 import { errors as generatedStateErrors, taxComplianceThresholds } from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
@@ -933,6 +919,8 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
+const addAccountRouteObj = computed(() => getAddAccountRouteObj(route))
+const storedAccounts = useStoredAccounts()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
 const pageContext = injectPageContext()
@@ -1101,9 +1089,9 @@ const messages = defineMessages({
 		id: 'layout.action.external-projects',
 		defaultMessage: 'External projects',
 	},
-	lookupByEmail: {
-		id: 'layout.action.lookup-by-email',
-		defaultMessage: 'Lookup by email',
+	userLookup: {
+		id: 'layout.action.user-lookup',
+		defaultMessage: 'User lookup',
 	},
 	fileLookup: {
 		id: 'layout.action.file-lookup',
@@ -1168,6 +1156,22 @@ const messages = defineMessages({
 	myServers: {
 		id: 'layout.nav.my-servers',
 		defaultMessage: 'My servers',
+	},
+	switchAccount: {
+		id: 'layout.nav.switch-account',
+		defaultMessage: 'Switch account',
+	},
+	addAccount: {
+		id: 'layout.nav.add-account',
+		defaultMessage: 'Add account',
+	},
+	removeAccount: {
+		id: 'layout.nav.remove-account',
+		defaultMessage: 'Remove account',
+	},
+	accountSwitchFailed: {
+		id: 'layout.nav.switch-account-failed',
+		defaultMessage: "Couldn't switch accounts. Please try again.",
 	},
 	openMenu: {
 		id: 'layout.mobile.open-menu',
@@ -1252,6 +1256,61 @@ const navRoutes = computed(() => [
 	},
 ])
 
+const accountSwitcherAccounts = computed(() =>
+	storedAccounts.value.map((account) => ({
+		...account,
+		optionId: `account-${account.id}`,
+		current: account.id === auth.value.user?.id,
+	})),
+)
+
+const accountSwitcherOptions = computed(() => [
+	...accountSwitcherAccounts.value.map((account) => ({
+		id: account.optionId,
+		label: account.username,
+		selected: account.current,
+		action: () => switchAccount(account),
+		trailingAction: {
+			label: formatMessage(messages.removeAccount),
+			icon: XIcon,
+			color: 'red',
+			action: () => removeAccount(account),
+		},
+	})),
+	{
+		type: 'divider',
+	},
+	{
+		id: 'add-account',
+		label: formatMessage(messages.addAccount),
+		icon: PlusIcon,
+		type: 'link',
+		to: addAccountRouteObj.value,
+	},
+])
+
+async function switchAccount(account) {
+	if (account.current) return
+
+	const result = await switchToStoredAccount(account)
+	if (result === 'error') {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: formatMessage(messages.accountSwitchFailed),
+			type: 'error',
+		})
+	}
+}
+
+async function removeAccount(account) {
+	if (account.current) {
+		await logout()
+		return
+	}
+
+	forgetStoredAccount(account.id)
+}
+
 const userMenuOptions = computed(() => {
 	const user = auth.value.user
 	if (!user) return []
@@ -1260,12 +1319,14 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'profile',
 			label: formatMessage(messages.profile),
+			icon: UserIcon,
 			type: 'link',
 			to: `/user/${user.username}`,
 		},
 		{
 			id: 'plus',
 			label: formatMessage(messages.upgradeToModrinthPlus),
+			icon: ArrowBigUpDashIcon,
 			type: 'link',
 			to: '/plus',
 			tone: 'purple',
@@ -1274,12 +1335,14 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'servers',
 			label: formatMessage(messages.myServers),
+			icon: ServerStackIcon,
 			type: 'link',
 			to: '/hosting/manage',
 		},
 		{
 			id: 'flags',
 			label: formatMessage(commonSettingsMessages.featureFlags),
+			icon: ToggleRightIcon,
 			type: 'link',
 			to: '/settings/flags',
 			shown: flags.value.developerMode,
@@ -1287,6 +1350,7 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'settings',
 			label: formatMessage(commonMessages.settingsLabel),
+			icon: SettingsIcon,
 			type: 'link',
 			to: '/settings',
 		},
@@ -1301,18 +1365,21 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'notifications',
 			label: formatMessage(commonMessages.notificationsLabel),
+			icon: BellIcon,
 			type: 'link',
 			to: '/dashboard/notifications',
 		},
 		{
 			id: 'reports',
 			label: formatMessage(messages.activeReports),
+			icon: ReportIcon,
 			type: 'link',
 			to: '/dashboard/reports',
 		},
 		{
 			id: 'saved',
 			label: formatMessage(commonMessages.collectionsLabel),
+			icon: LibraryIcon,
 			type: 'link',
 			to: '/dashboard/collections',
 		},
@@ -1322,24 +1389,28 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'projects',
 			label: formatMessage(messages.projects),
+			icon: BoxIcon,
 			type: 'link',
 			to: '/dashboard/projects',
 		},
 		{
 			id: 'organizations',
 			label: formatMessage(messages.organizations),
+			icon: OrganizationIcon,
 			type: 'link',
 			to: '/dashboard/organizations',
 		},
 		{
 			id: 'analytics',
 			label: formatMessage(commonMessages.analyticsButton),
+			icon: ChartIcon,
 			type: 'link',
 			to: '/dashboard/analytics',
 		},
 		{
 			id: 'affiliate-links',
 			label: formatMessage(commonMessages.affiliateLinksButton),
+			icon: AffiliateIcon,
 			type: 'link',
 			to: '/dashboard/affiliate-links',
 			shown: Boolean(user.badges & UserBadge.AFFILIATE),
@@ -1347,6 +1418,7 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'revenue',
 			label: formatMessage(messages.revenue),
+			icon: CurrencyIcon,
 			type: 'link',
 			to: '/dashboard/revenue',
 		},
@@ -1358,8 +1430,16 @@ const userMenuOptions = computed(() => {
 			type: 'divider',
 		},
 		{
+			id: 'switch-account',
+			label: formatMessage(messages.switchAccount),
+			icon: ArrowLeftRightIcon,
+			type: 'submenu',
+			options: accountSwitcherOptions.value,
+		},
+		{
 			id: 'sign-out',
 			label: formatMessage(commonMessages.signOutButton),
+			icon: LogOutIcon,
 			tone: 'red',
 			hoverFilled: true,
 			action: () => logoutUser(),
@@ -1448,7 +1528,7 @@ watch(
 )
 
 async function logoutUser() {
-	await logout()
+	await switchToSignedOut()
 }
 
 function runAnalytics() {

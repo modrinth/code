@@ -16,6 +16,7 @@
 				size="56px"
 				no-shadow
 				class="!rounded-2xl"
+				pad-transparent-corners
 			/>
 			<div class="flex min-w-0 flex-col gap-0.5">
 				<span class="truncate font-semibold text-contrast">{{ preview.name }}</span>

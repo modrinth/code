@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "繼續"
   },
-  "admin.billing.error.not-found": {
-    "message": "找不到使用者"
-  },
   "ads-consent.accept": {
     "message": "全部接受"
   },
@@ -2650,9 +2647,6 @@
   },
   "layout.action.file-lookup": {
     "message": "檔案查詢"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "依電子郵件查詢"
   },
   "layout.action.manage-affiliates": {
     "message": "管理聯盟連結"

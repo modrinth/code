@@ -190,8 +190,8 @@ async function finishSignIn(sessionToken?: string | null) {
 		await navigateTo(redirect, {
 			replace: true,
 		})
-	} else {
-		await navigateTo('/dashboard')
+	} else if (auth.value.user) {
+		await navigateTo(`/user/${auth.value.user.username}`)
 	}
 }
 </script>

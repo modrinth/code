@@ -1082,17 +1082,11 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Zaloguj się na konto Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Zalogowano jako <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Ulepsz do Modrinth+"
   },
   "app.navigation.home": {
     "message": "Strona główna"
-  },
-  "app.navigation.more-options": {
-    "message": "Więcej opcji"
   },
   "app.news.title": {
     "message": "Aktualności"
