@@ -51,9 +51,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
-import { useFullImageContextMenu } from '../../composables'
+import { useDebugLogger, useFullImageContextMenu } from '../../composables'
 
 const onFullImageContextMenu = useFullImageContextMenu()
+const debug = useDebugLogger('Avatar')
 
 const pixelated = ref(false)
 const hasTransparentCorners = ref(false)
@@ -141,7 +142,7 @@ function clearDetectionTimeout() {
 function onError(e) {
 	clearDetectionTimeout()
 	detectingSource = undefined
-	console.log('Avatar image failed to load:', props.src, e)
+	debug('Avatar image failed to load:', props.src, e)
 	failed.value = true
 }
 

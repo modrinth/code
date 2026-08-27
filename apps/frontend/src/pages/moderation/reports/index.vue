@@ -227,6 +227,7 @@ import {
 	type MultiSelectItem,
 	Pagination,
 	TeleportPopoutMenu,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import Fuse from 'fuse.js'
@@ -241,6 +242,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = await useAuth()
 const client = injectModrinthClient()
+const debug = useDebugLogger('ModerationReports')
 
 const { data: allReports } = await useLazyAsyncData('new-moderation-reports', async () => {
 	const startTime = performance.now()
@@ -284,7 +286,7 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 	const endTime = performance.now()
 	const duration = endTime - startTime
 
-	console.debug(
+	debug(
 		`Reports fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
 	)
 

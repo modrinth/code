@@ -1105,7 +1105,7 @@ if (!persistedState) {
 			if (thread.value === undefined) return
 			if (currentStage.value === initialAutoStage) {
 				const firstValid = findFirstValidStage()
-				console.log('[DEBUG settle]', {
+				debug('settle', {
 					initialAutoStage,
 					currentStage: currentStage.value,
 					firstValid,
@@ -1118,7 +1118,7 @@ if (!persistedState) {
 					markStageVisited(currentStageObj.value.id)
 				}
 			} else {
-				console.log('[DEBUG settle] currentStage already changed before settle', {
+				debug('settle: currentStage already changed before settle', {
 					initialAutoStage,
 					currentStage: currentStage.value,
 				})
@@ -1143,7 +1143,7 @@ const projectUrlType = computed(() =>
 let lastSyncedStageTarget: string | null = null
 function syncStageUrl(stage: StageNode | undefined) {
 	const navigate = stage?._navigate
-	console.log('[DEBUG syncStageUrl]', { stageId: stage?.id, navigate, lastSyncedStageTarget })
+	debug('syncStageUrl', { stageId: stage?.id, navigate, lastSyncedStageTarget })
 	if (navigate === undefined) return
 	const target = `/${projectUrlType.value}/${projectV2.value.slug}${navigate}`
 	if (target === lastSyncedStageTarget) return
