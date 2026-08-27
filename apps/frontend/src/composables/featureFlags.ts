@@ -19,6 +19,7 @@ const validateValues = <K extends PropertyKey>(flags: Record<K, FlagValue>) => f
 export const DEFAULT_FEATURE_FLAGS = validateValues({
 	// Developer flags
 	developerMode: false,
+	showThreadIds: false,
 	demoMode: false,
 	showVersionFilesInTable: false,
 	showVersionEnvironmentColumn: false,

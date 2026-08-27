@@ -95,7 +95,7 @@
 				</div>
 			</div>
 		</NewModal>
-		<div v-if="flags.developerMode" class="mx-4 mb-3 font-semibold">
+		<div v-if="flags.showThreadIds" class="mx-4 mb-3 font-semibold">
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>

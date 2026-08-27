@@ -1,22 +1,15 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	BlendIcon,
-	ListFilterIcon,
-	LoaderCircleIcon,
-	SearchIcon,
-	SortAscIcon,
-	SortDescIcon,
-} from '@modrinth/assets'
+import { BlendIcon, ListFilterIcon, SortAscIcon, SortDescIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
 	injectModrinthClient,
-	Input,
 	Pagination,
 	TeleportPopoutMenu,
 	Toggle,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
@@ -26,7 +19,11 @@ import { nextTick, reactive } from 'vue'
 import MaliciousSummaryModal, {
 	type UnsafeFile,
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
+import ModerationQueueSkeleton from '~/components/ui/moderation/ModerationQueueSkeleton.vue'
+import ModerationQueueToolbar from '~/components/ui/moderation/ModerationQueueToolbar.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
+import { flattenFileReports } from '~/components/ui/moderation/tech-review/helpers'
+import { useTechReviewSources } from '~/components/ui/moderation/tech-review/use-tech-review-sources'
 
 useHead({ title: 'Tech review queue - Modrinth' })
 
@@ -38,133 +35,9 @@ const currentPage = ref(1)
 const API_PAGE_SIZE = 50
 const UI_PAGE_SIZE = 4
 const { formatMessage } = useVIntl()
+const formatNumber = useFormatNumber()
 const route = useRoute()
 const router = useRouter()
-
-const CACHE_TTL = 24 * 60 * 60 * 1000
-const CACHE_KEY_PREFIX = 'tech_review_source_'
-
-type CachedSource = {
-	source: string
-	timestamp: number
-}
-
-function getCachedSource(detailId: string): string | null {
-	try {
-		const cached = localStorage.getItem(`${CACHE_KEY_PREFIX}${detailId}`)
-		if (!cached) return null
-
-		const data: CachedSource = JSON.parse(cached)
-		const now = Date.now()
-
-		if (now - data.timestamp > CACHE_TTL) {
-			localStorage.removeItem(`${CACHE_KEY_PREFIX}${detailId}`)
-			return null
-		}
-
-		return data.source
-	} catch {
-		return null
-	}
-}
-
-function setCachedSource(detailId: string, source: string): void {
-	try {
-		const data: CachedSource = {
-			source,
-			timestamp: Date.now(),
-		}
-		localStorage.setItem(`${CACHE_KEY_PREFIX}${detailId}`, JSON.stringify(data))
-	} catch (error) {
-		console.error('Failed to cache source:', error)
-	}
-}
-
-function clearExpiredCache(): void {
-	try {
-		const now = Date.now()
-		const keys = Object.keys(localStorage)
-
-		for (const key of keys) {
-			if (key.startsWith(CACHE_KEY_PREFIX)) {
-				const cached = localStorage.getItem(key)
-				if (cached) {
-					const data: CachedSource = JSON.parse(cached)
-					if (now - data.timestamp > CACHE_TTL) {
-						localStorage.removeItem(key)
-					}
-				}
-			}
-		}
-	} catch (error) {
-		console.error('Failed to clear expired cache:', error)
-	}
-}
-
-clearExpiredCache()
-
-const loadingIssues = reactive<Set<string>>(new Set())
-const decompiledSources = reactive<Map<string, string>>(new Map())
-const loadedIssues = reactive<Set<string>>(new Set())
-
-async function loadIssueSource(issueId: string): Promise<void> {
-	if (loadingIssues.has(issueId) || loadedIssues.has(issueId)) return
-
-	loadingIssues.add(issueId)
-
-	try {
-		const issueData = await client.labrinth.tech_review_internal.getIssue(issueId)
-
-		for (const detail of issueData.details) {
-			if (detail.decompiled_source) {
-				decompiledSources.set(detail.id, detail.decompiled_source)
-				setCachedSource(detail.id, detail.decompiled_source)
-			}
-		}
-		loadedIssues.add(issueId)
-	} catch (error) {
-		console.error('Failed to load issue source:', error)
-	} finally {
-		loadingIssues.delete(issueId)
-	}
-}
-
-function findIssuesByIds(issueIds: Set<string>): Labrinth.TechReview.Internal.FileIssue[] {
-	const issues: Labrinth.TechReview.Internal.FileIssue[] = []
-
-	for (const review of reviewItems.value) {
-		for (const report of review.reports) {
-			for (const issue of report.issues) {
-				if (issueIds.has(issue.id)) {
-					issues.push(issue)
-				}
-			}
-		}
-	}
-
-	return issues
-}
-
-function handleLoadIssueSources(issueIds: string[]): void {
-	const uniqueIssueIds = new Set(issueIds)
-	const issues = findIssuesByIds(uniqueIssueIds)
-
-	for (const issue of issues) {
-		for (const detail of issue.details) {
-			if (!decompiledSources.has(detail.id)) {
-				const cached = getCachedSource(detail.id)
-				if (cached) {
-					decompiledSources.set(detail.id, cached)
-				}
-			}
-		}
-
-		const hasUncached = issue.details.some((detail) => !decompiledSources.has(detail.id))
-		if (hasUncached) {
-			loadIssueSource(issue.id)
-		}
-	}
-}
 
 const query = ref(route.query.q?.toString() || '')
 
@@ -200,18 +73,26 @@ watch(
 const currentFilterType = ref('All flags')
 
 const filterTypes = computed<ComboboxOption<string>[]>(() => {
-	const base: ComboboxOption<string>[] = [{ value: 'All flags', label: 'All flags' }]
-	if (!reviewItems.value) return base
+	const issues =
+		reviewItems.value?.flatMap((review) => review.reports.flatMap((report) => report.issues)) ?? []
+	const counts = new Map<string, number>()
+	for (const issue of issues) {
+		counts.set(issue.issue_type, (counts.get(issue.issue_type) ?? 0) + 1)
+	}
 
-	const issueTypes = new Set(
-		reviewItems.value
-			.flatMap((review) => review.reports)
-			.flatMap((report) => report.issues)
-			.map((issue) => issue.issue_type),
-	)
-
-	const sortedTypes = Array.from(issueTypes).sort()
-	return [...base, ...sortedTypes.map((type) => ({ value: type, label: type }))]
+	const options: ComboboxOption<string>[] = [
+		{
+			value: 'All flags',
+			label: isLoading.value ? 'All flags' : `All flags (${formatNumber(issues.length)})`,
+		},
+	]
+	for (const type of Array.from(counts.keys()).sort()) {
+		options.push({
+			value: type,
+			label: isLoading.value ? type : `${type} (${formatNumber(counts.get(type) ?? 0)})`,
+		})
+	}
+	return options
 })
 
 const currentSortType = ref('Severity highest')
@@ -230,16 +111,34 @@ const responseFilterTypes: ComboboxOption<string>[] = [
 ]
 
 const currentProjectTypeFilter = ref('All project types')
-const projectTypeFilterTypes: ComboboxOption<string>[] = [
-	{ value: 'All project types', label: 'All project types' },
-	{ value: 'Modpacks', label: 'Modpacks' },
-	{ value: 'Mods', label: 'Mods' },
-	{ value: 'Resource Packs', label: 'Resource Packs' },
-	{ value: 'Data Packs', label: 'Data Packs' },
-	{ value: 'Plugins', label: 'Plugins' },
-	{ value: 'Shaders', label: 'Shaders' },
-	{ value: 'Servers', label: 'Servers' },
-]
+const PROJECT_TYPE_FILTERS = [
+	{ value: 'All project types', name: 'All project types' },
+	{ value: 'Modpacks', name: 'Modpacks' },
+	{ value: 'Mods', name: 'Mods' },
+	{ value: 'Resource Packs', name: 'Resource Packs' },
+	{ value: 'Data Packs', name: 'Data Packs' },
+	{ value: 'Plugins', name: 'Plugins' },
+	{ value: 'Shaders', name: 'Shaders' },
+	{ value: 'Servers', name: 'Servers' },
+] as const
+const projectTypeFilterTypes = computed<ComboboxOption<string>[]>(() => {
+	const items = reviewItems.value ?? []
+	const showCounts = !isLoading.value && currentProjectTypeFilter.value === 'All project types'
+
+	return PROJECT_TYPE_FILTERS.map((filter) => {
+		if (!showCounts) {
+			return { value: filter.value, label: filter.name }
+		}
+
+		const apiType = toApiProjectType(filter.value)
+		const count =
+			filter.value === 'All project types'
+				? items.length
+				: items.filter((item) => apiType && item.project.project_types.includes(apiType)).length
+
+		return { value: filter.value, label: `${filter.name} (${formatNumber(count)})` }
+	})
+})
 
 const inOtherQueueFilter = ref(true)
 
@@ -275,12 +174,10 @@ const searchResults = computed(() => {
 	return fuse.value.search(query.value).map((result) => result.item)
 })
 
-const baseFiltered = computed(() => {
+const filteredItems = computed(() => {
 	if (!reviewItems.value) return []
 	return query.value && searchResults.value ? searchResults.value : [...reviewItems.value]
 })
-
-const filteredItems = computed(() => baseFiltered.value)
 
 const filteredIssuesCount = computed(() => {
 	return filteredItems.value.reduce((total, review) => {
@@ -295,6 +192,15 @@ const paginatedItems = computed(() => {
 	const end = start + UI_PAGE_SIZE
 	return filteredItems.value.slice(start, end)
 })
+const pageStart = computed(() =>
+	filteredItems.value.length === 0 ? 0 : (currentPage.value - 1) * UI_PAGE_SIZE + 1,
+)
+const pageEnd = computed(() =>
+	Math.min(
+		(currentPage.value - 1) * UI_PAGE_SIZE + paginatedItems.value.length,
+		filteredItems.value.length,
+	),
+)
 function goToPage(page: number, top = false) {
 	currentPage.value = page
 
@@ -388,7 +294,7 @@ const {
 		})
 	},
 	getNextPageParam: (lastPage, allPages) => {
-		// If we got a full page, there's probably more
+		// full page = maybe more
 		return lastPage.project_reports.length >= API_PAGE_SIZE ? allPages.length : undefined
 	},
 	initialPageParam: 0,
@@ -423,11 +329,6 @@ const mergedSearchResponse = computed(() => {
 	)
 })
 
-type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
-	id: string
-	version_id: string
-}
-
 const reviewItems = computed(() => {
 	if (!mergedSearchResponse.value?.project_reports?.length) {
 		return []
@@ -435,47 +336,29 @@ const reviewItems = computed(() => {
 
 	const response = mergedSearchResponse.value
 
-	return response.project_reports
-		.map((projectReport) => {
-			const project = response.projects[projectReport.project_id]
-			const thread = project?.thread_id ? response.threads[project.thread_id] : undefined
+	return response.project_reports.flatMap((projectReport) => {
+		const project = response.projects[projectReport.project_id]
+		const thread = project?.thread_id ? response.threads[project.thread_id] : undefined
+		if (!thread) return []
 
-			if (!thread) return null
-
-			const reports: FlattenedFileReport[] = projectReport.versions.flatMap((version) =>
-				version.files.map((file) => ({
-					...file,
-					id: file.report_id,
-					version_id: version.version_id,
-				})),
-			)
-
-			return {
+		return [
+			{
 				project,
 				project_owner: response.ownership[projectReport.project_id],
 				thread,
-				reports,
-			}
-		})
-		.filter(
-			(
-				item,
-			): item is {
-				project: Labrinth.TechReview.Internal.ProjectModerationInfo
-				project_owner: Labrinth.TechReview.Internal.Ownership
-				thread: Labrinth.TechReview.Internal.Thread
-				reports: FlattenedFileReport[]
-			} => item !== null,
-		)
+				reports: flattenFileReports(projectReport.versions),
+			},
+		]
+	})
 })
 
-function handleMarkComplete(projectId: string) {
-	// Find the index of the current card before removing it
-	const currentIndex = paginatedItems.value.findIndex((item) => item.project.id === projectId)
+const { loadingIssues, decompiledSources, handleLoadIssueSources } = useTechReviewSources(() =>
+	reviewItems.value.flatMap((review) => review.reports.flatMap((report) => report.issues)),
+)
 
-	// Find the thread ID for this project so we can remove it from the threads cache
-	const projectData = reviewItems.value.find((item) => item.project.id === projectId)
-	const threadId = projectData?.thread?.id
+function handleMarkComplete(projectId: string) {
+	const currentIndex = paginatedItems.value.findIndex((item) => item.project.id === projectId)
+	const threadId = reviewItems.value.find((item) => item.project.id === projectId)?.thread?.id
 
 	queryClient.setQueryData(
 		techReviewQueryKey.value,
@@ -493,7 +376,7 @@ function handleMarkComplete(projectId: string) {
 				...oldData,
 				pages: oldData.pages.map((page) => ({
 					...page,
-					// Keep the raw page length stable; getNextPageParam uses it to know if more API pages exist.
+					// leave this as-is so getNextPageParam still sees a full page
 					project_reports: page.project_reports,
 					projects: Object.fromEntries(
 						Object.entries(page.projects).filter(([id]) => id !== projectId),
@@ -509,25 +392,18 @@ function handleMarkComplete(projectId: string) {
 		},
 	)
 
-	// Also invalidate the query to ensure consistency with server state
-	// This triggers a background refetch after the optimistic update
 	queryClient.invalidateQueries({
 		queryKey: ['tech-reviews'],
-		refetchType: 'none', // Don't refetch immediately, just mark as stale
+		refetchType: 'none',
 	})
 
-	// Scroll to the next card after Vue updates the DOM
 	nextTick(() => {
-		// Get the project ID at the same position (next project after removal)
 		const nextItem = paginatedItems.value[currentIndex]
 		if (nextItem) {
-			const nextCard = cardRefs.get(nextItem.project.id)
-			if (nextCard) {
-				nextCard.scrollIntoView({
-					behavior: 'smooth',
-					block: 'start',
-				})
-			}
+			cardRefs.get(nextItem.project.id)?.scrollIntoView({
+				behavior: 'smooth',
+				block: 'start',
+			})
 		}
 	})
 }
@@ -626,32 +502,14 @@ onUnmounted(() => {
 			:progress="batchScanProgressInformation"
 		/> -->
 
-		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<Input
-				v-model="query"
-				:icon="SearchIcon"
-				type="text"
-				autocomplete="off"
-				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-				clearable
-				wrapper-class="flex-1 lg:max-w-52"
-				input-class="!h-10"
-				@input="goToPage(1)"
-			/>
-
-			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
-				<LoaderCircleIcon
-					v-if="isFetchingNextPage"
-					v-tooltip="`Pages are still being fetched...`"
-					aria-hidden="true"
-					class="my-auto mr-2 size-6 animate-spin text-green"
-				/>
-				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
-			</div>
-
-			<div
-				class="flex flex-col items-stretch justify-end gap-2 sm:flex-row sm:items-center lg:flex-shrink-0"
-			>
+		<ModerationQueueToolbar
+			v-model="query"
+			:page="currentPage"
+			:total-pages="totalPages"
+			@search="goToPage(1)"
+			@switch-page="goToPage"
+		>
+			<template #actions>
 				<Combobox
 					v-model="currentResponseFilter"
 					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"
@@ -695,16 +553,19 @@ onUnmounted(() => {
 					<template #panel>
 						<div class="flex min-w-64 flex-col gap-3">
 							<label class="flex cursor-pointer items-center justify-between gap-2 text-sm">
-								<span class="whitespace-nowrap font-semibold">In project queue</span>
+								<span class="whitespace-nowrap font-semibold">Only under review</span>
 								<Toggle v-model="inOtherQueueFilter" />
 							</label>
 							<div class="flex flex-col gap-2">
-								<span class="text-sm font-semibold text-secondary"
-									>Flag type ({{ filteredIssuesCount }})</span
-								>
+								<span class="flex items-center gap-1.5 text-sm font-semibold text-secondary">
+									Flag type
+									<SpinnerIcon v-if="isLoading" class="size-3.5 animate-spin" aria-hidden="true" />
+									<template v-else>({{ formatNumber(filteredIssuesCount) }})</template>
+								</span>
 								<Combobox
 									v-model="currentFilterType"
 									class="!w-full"
+									dropdown-class="!z-[10000]"
 									:options="filterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									searchable
@@ -722,6 +583,7 @@ onUnmounted(() => {
 								<Combobox
 									v-model="currentProjectTypeFilter"
 									class="!w-full"
+									dropdown-class="!z-[10000]"
 									:options="projectTypeFilterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									searchable
@@ -737,23 +599,29 @@ onUnmounted(() => {
 						</div>
 					</template>
 				</TeleportPopoutMenu>
-			</div>
-		</div>
+			</template>
+			<template #meta>
+				<div v-if="filteredItems.length > 0" class="flex items-center gap-2">
+					<SpinnerIcon
+						v-if="isFetchingNextPage"
+						v-tooltip="`Pages are still being fetched...`"
+						aria-hidden="true"
+						class="size-4 animate-spin"
+					/>
+					Showing {{ formatNumber(pageStart) }}–{{ formatNumber(pageEnd) }} of
+					{{ formatNumber(filteredItems.length) }} projects
+				</div>
+			</template>
+		</ModerationQueueToolbar>
 
-		<div v-if="totalPages > 1" class="flex justify-center lg:hidden">
-			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+		<ModerationQueueSkeleton v-if="isLoading" />
+		<div
+			v-else-if="paginatedItems.length === 0"
+			class="universal-card flex h-24 items-center justify-center text-secondary"
+		>
+			No projects in queue.
 		</div>
-
-		<div class="flex flex-col gap-4">
-			<div v-if="isLoading" class="flex flex-col gap-4">
-				<div v-for="i in UI_PAGE_SIZE" :key="i" class="universal-card h-48 animate-pulse"></div>
-			</div>
-			<div
-				v-else-if="paginatedItems.length === 0"
-				class="universal-card flex h-24 items-center justify-center text-secondary"
-			>
-				No projects in queue.
-			</div>
+		<div v-else class="flex flex-col gap-4">
 			<div
 				v-for="item in paginatedItems"
 				:key="item.project.id"
@@ -780,7 +648,7 @@ onUnmounted(() => {
 			</div>
 		</div>
 
-		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
+		<div v-if="totalPages > 1" class="flex justify-end">
 			<Pagination
 				:page="currentPage"
 				:count="totalPages"

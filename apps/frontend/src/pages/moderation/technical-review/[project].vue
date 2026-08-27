@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ArrowLeftIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { ButtonLink, injectModrinthClient } from '@modrinth/ui'
+import { LoaderCircleIcon } from '@modrinth/assets'
+import { BackToParentLink, injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import MaliciousSummaryModal, {
@@ -301,13 +301,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<div class="flex flex-col gap-4">
-		<div>
-			<ButtonLink :to="'/moderation/technical-review'">
-				<ArrowLeftIcon class="size-5" />
-				Back to queue
-			</ButtonLink>
-		</div>
+	<div class="flex flex-col">
+		<BackToParentLink :to="'/moderation/technical-review'"> Back to queue </BackToParentLink>
 
 		<div v-if="isLoading" class="flex flex-col gap-4">
 			<div class="universal-card flex h-48 items-center justify-center">
@@ -333,12 +328,12 @@ onUnmounted(() => {
 			:loading-issues="loadingIssues"
 			:decompiled-sources="decompiledSources"
 			:collapsed="false"
+			disable-collapsing
 			@refetch="refetch"
 			@load-issue-sources="handleLoadIssueSources"
 			@mark-complete="handleMarkComplete"
 			@show-malicious-summary="handleShowMaliciousSummary"
 		/>
-
 		<MaliciousSummaryModal ref="maliciousSummaryModalRef" :unsafe-files="currentUnsafeFiles" />
 	</div>
 </template>

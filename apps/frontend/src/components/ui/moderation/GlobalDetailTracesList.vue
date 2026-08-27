@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="executeSearch">
+		<form class="flex flex-col gap-2 sm:flex-row sm:items-center" @submit.prevent="executeSearch">
 			<Input
 				v-model="query"
 				:icon="SearchIcon"
@@ -8,9 +8,10 @@
 				autocomplete="off"
 				placeholder="Search global trace keys..."
 				clearable
-				wrapper-class="flex-1 w-full"
+				size="medium"
+				wrapper-class="min-w-0 flex-1"
 			/>
-			<Button type="colored" color="brand" native-type="submit" :disabled="isLoading">
+			<Button type="colored" color="brand" size="lg" native-type="submit" :disabled="isLoading">
 				<SearchIcon aria-hidden="true" />
 				Search
 			</Button>
@@ -20,7 +21,7 @@
 			v-if="!isLoading && !loadError && total > 0"
 			class="mt-4 flex flex-wrap items-center justify-between gap-3"
 		>
-			<p class="m-0 text-sm text-secondary">Showing {{ pageStart }}-{{ pageEnd }} of {{ total }}</p>
+			<p class="m-0">Showing {{ pageStart }}-{{ pageEnd }} of {{ total }}</p>
 			<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
 		</div>
 

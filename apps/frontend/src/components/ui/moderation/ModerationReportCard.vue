@@ -1,6 +1,6 @@
 <template>
-	<div class="overflow-hidden rounded-2xl">
-		<div class="bg-bg-raised p-4">
+	<div class="overflow-hidden rounded-2xl border border-solid border-surface-4">
+		<div class="border-0 border-b border-solid border-surface-4 bg-bg-raised p-4">
 			<div
 				class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
 			>
@@ -180,6 +180,7 @@
 			v-model:collapsed="isThreadCollapsed"
 			:expand-text="expandText"
 			collapse-text="Collapse thread"
+			:disabled="disableCollapsing"
 		>
 			<div class="bg-surface-2 pt-2">
 				<ThreadView
@@ -302,7 +303,7 @@ import SharedInstanceReportContext, {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const auth = await useAuth()
+const auth = useAuthState()
 
 type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 	project_id?: string
@@ -312,6 +313,7 @@ type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 const props = defineProps<{
 	report: ExtendedReport
 	collapsed: boolean
+	disableCollapsing?: boolean
 	sharedInstanceDetailsLoader?: () => Promise<SharedInstanceReportDetails>
 	sharedInstanceVersionContentLoader?: (
 		instanceId: string,
