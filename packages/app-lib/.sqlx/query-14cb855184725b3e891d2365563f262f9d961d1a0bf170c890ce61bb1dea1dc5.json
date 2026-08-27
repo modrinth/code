@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\t\tUPDATE synced_server_state\n\t\t\t\tSET revision = revision + 1\n\t\t\t\tWHERE singleton = 1\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "14cb855184725b3e891d2365563f262f9d961d1a0bf170c890ce61bb1dea1dc5"
+}

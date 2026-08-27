@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT EXISTS(\n\t\t\tSELECT 1 FROM synced_server_state WHERE singleton = 1\n\t\t) AS \"initialized!: bool\"\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "initialized!: bool",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b012838123b5acd053412951b0044857cc3145d7936b79ab4cf6adcbeeec3095"
+}

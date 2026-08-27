@@ -19,3 +19,6 @@ export const appSettingsModalContextKey: InjectionKey<AppSettingsModalContext> =
 export const appSettingsModalOpenProfileKey: InjectionKey<() => void> = Symbol(
 	'appSettingsModalOpenProfile',
 )
+export const appSettingsModalOpenSyncedOptionsKey: InjectionKey<() => void> = Symbol(
+	'appSettingsModalOpenSyncedOptions',
+)

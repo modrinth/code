@@ -971,9 +971,6 @@
   "app.settings.tabs.behavior": {
     "message": "Gedrag"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standaard spelopties"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
   },
@@ -1532,12 +1529,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecteer updatekanaal"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Opstart haakjes"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Aangepaste opstart haakjes"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Haakjes maken het mogelijk voor gevorderde gebruikers om bepaalde systeemcommando's uit te voeren voor en na het opstarten van het spel."
   },
@@ -1600,9 +1591,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java en geheugen"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Aangepaste omgevingsvariabelen"

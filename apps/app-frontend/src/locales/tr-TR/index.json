@@ -1478,9 +1478,6 @@
   "app.settings.tabs.behavior": {
     "message": "Davranış"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Varsayılan oyun seçenekleri"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java kurulumları"
   },
@@ -2303,12 +2300,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Güncelleme kanalını seç"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Başlatma kancaları"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Özel başlatma kancaları"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Kancalar gelişmiş kullanıcıların oyunu başlattıktan önce ve sonra belirli sistem komutları çalıştırmasını sağlar."
   },
@@ -2371,9 +2362,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Bu örnek kilitliyken kurulum ayarlarına erişilemez."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java ve bellek"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Özel ortam değişkenleri"

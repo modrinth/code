@@ -1253,9 +1253,6 @@
   "app.settings.tabs.behavior": {
     "message": "Поведінка"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Стандартні параметри гри"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Інсталяції Java"
   },
@@ -2003,12 +2000,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Оберіть випуск оновлення"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Параметри запуску"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Користувацькі параметри запуску"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Дають змогу досвідченим користувачам застосовувати певні системні команди до та після запуску гри."
   },
@@ -2071,9 +2062,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Налаштування інсталяції недоступні, поки ця збірка заблокована."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java та пам’ять"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Власні змінні середовища"

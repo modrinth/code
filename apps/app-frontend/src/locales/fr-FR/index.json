@@ -1439,9 +1439,6 @@
   "app.settings.tabs.behavior": {
     "message": "Comportement"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Options de jeu par défaut"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Installations de Java"
   },
@@ -2159,12 +2156,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Sélectionner le canal de mise à jour"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Crochets de lancement"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Crochets de lancement personnalisés"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Les crochets permettent aux usagers avancés d'exécuter certaines commandes systèmes avant et après le lancement du jeu."
   },
@@ -2227,9 +2218,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Les paramètres d'installation ne sont pas disponible pendant que cette instance est verrouillée."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java et mémoire"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Variables d'environnement personnalisé"
