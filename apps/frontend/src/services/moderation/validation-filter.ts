@@ -6,7 +6,7 @@ export type ValidationFilterRequest = Omit<
 	'count' | 'offset' | 'project_type'
 >
 
-export interface ModerationQueueFetchOptions {
+interface ModerationQueueFetchOptions {
 	client: AbstractModrinthClient
 	request: ValidationFilterRequest
 	signal: AbortSignal
@@ -100,29 +100,6 @@ async function fetchQueueProjects(
 	return {
 		total: projects.length,
 		projects,
-	}
-}
-
-export async function fetchAllModerationQueueProjects(
-	options: ModerationQueueFetchOptions,
-): Promise<Labrinth.Moderation.Internal.ProjectsResponse> {
-	const pacedFetcher = createPacedFetcher(options.signal, options.log)
-
-	try {
-		options.log('Starting moderation queue fetch')
-		const response = await fetchQueueProjects(options, pacedFetcher.fetch)
-		options.log(`Queue fetch complete: ${response.total} projects fetched`)
-		return response
-	} catch (error) {
-		if (options.signal.aborted) {
-			options.log('Queue fetch cancelled')
-		} else {
-			console.error(
-				`[moderation-project-ids-filter] Queue fetch failed during ${pacedFetcher.getCurrentStage()}`,
-				error,
-			)
-		}
-		throw error
 	}
 }
 

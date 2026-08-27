@@ -5,14 +5,12 @@ import { nextTick, ref, useTemplateRef } from 'vue'
 
 const emit = defineEmits<{
 	apply: [projectIds: string[]]
-	cancel: []
 }>()
 
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const textareaRef = useTemplateRef<InstanceType<typeof Textarea>>('textareaRef')
 const input = ref('')
 const error = ref('')
-let applied = false
 
 function parseProjectIds(value: string): string[] {
 	return [
@@ -25,10 +23,9 @@ function parseProjectIds(value: string): string[] {
 	]
 }
 
-async function show(projectIds: string[]) {
-	input.value = projectIds.join('\n')
+async function show() {
+	input.value = ''
 	error.value = ''
-	applied = false
 	modalRef.value?.show()
 	await nextTick()
 	textareaRef.value?.focus()
@@ -38,10 +35,6 @@ function hide() {
 	modalRef.value?.hide()
 }
 
-function handleHide() {
-	if (!applied) emit('cancel')
-}
-
 function apply() {
 	const projectIds = parseProjectIds(input.value)
 	if (projectIds.length === 0) {
@@ -49,7 +42,6 @@ function apply() {
 		return
 	}
 
-	applied = true
 	emit('apply', projectIds)
 	hide()
 }
@@ -60,15 +52,14 @@ defineExpose({ show, hide })
 <template>
 	<NewModal
 		ref="modalRef"
-		header="Filter by project IDs"
+		header="Moderate by IDs"
 		width="36rem"
 		max-width="calc(100vw - 2rem)"
-		:on-hide="handleHide"
 	>
 		<form class="flex flex-col gap-4" @submit.prevent="apply">
 			<div class="flex flex-col gap-2">
 				<label class="font-semibold text-contrast" for="moderation-project-ids">
-					Project IDs
+					Project IDs to moderate
 				</label>
 				<Textarea
 					id="moderation-project-ids"

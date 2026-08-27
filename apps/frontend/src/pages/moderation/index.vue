@@ -34,16 +34,6 @@
 								</span>
 							</template>
 						</Combobox>
-						<IconButton
-							v-if="isProjectIdsFilter"
-							v-tooltip="'Edit project IDs'"
-							label="Edit project IDs"
-							size="lg"
-							class="flex-shrink-0"
-							@click="editProjectIdsFilter"
-						>
-							<EditIcon aria-hidden="true" />
-						</IconButton>
 					</div>
 
 					<Combobox
@@ -83,6 +73,15 @@
 						</template>
 					</Combobox>
 				</div>
+
+				<Button
+					type="outlined"
+					class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+					@click="openModerateByIdsModal"
+				>
+					<ListFilterIcon class="flex-shrink-0" />
+					Moderate by IDs
+				</Button>
 
 				<Button
 					type="colored"
@@ -126,11 +125,7 @@
 				:skipped-ids="moderationQueue.currentQueue.skipped"
 				@review-skipped="reviewSkippedQueue"
 			/>
-			<ProjectIdsFilterModal
-				ref="projectIdsFilterModal"
-				@apply="applyProjectIdsFilter"
-				@cancel="cancelProjectIdsFilter"
-			/>
+			<ModerateByIdsModal ref="moderateByIdsModal" @apply="startModeratingByIds" />
 		</div>
 
 		<div class="flex flex-col gap-3">
@@ -172,7 +167,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CopyIcon,
-	EditIcon,
 	ListFilterIcon,
 	ScaleIcon,
 	SearchIcon,
@@ -188,7 +182,6 @@ import {
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,
-	IconButton,
 	Input,
 	Pagination,
 	Toggle,
@@ -199,15 +192,14 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
+import ModerateByIdsModal from '~/components/ui/moderation/ModerateByIdsModal.vue'
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
-import ProjectIdsFilterModal from '~/components/ui/moderation/ProjectIdsFilterModal.vue'
 import QueueSummaryModal from '~/components/ui/moderation/QueueSummaryModal.vue'
 import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 import {
-	fetchAllModerationQueueProjects,
 	scanProjectsWithValidationIssues,
 	type ValidationFilterRequest,
 } from '~/services/moderation/validation-filter.ts'
@@ -223,10 +215,9 @@ const router = useRouter()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const debugValidationFilter = useDebugLogger('moderation-validation-filter')
-const debugProjectIdsFilter = useDebugLogger('moderation-project-ids-filter')
 
 const queueSummaryModal = ref()
-const projectIdsFilterModal = ref<InstanceType<typeof ProjectIdsFilterModal>>()
+const moderateByIdsModal = ref<InstanceType<typeof ModerateByIdsModal>>()
 
 const visible = ref(false)
 if (import.meta.client && history && history.state && history.state.confetti) {
@@ -305,7 +296,6 @@ const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'Plugins', label: 'Plugins' },
 	{ value: 'Shaders', label: 'Shaders' },
 	{ value: 'Servers', label: 'Servers' },
-	{ value: 'Project IDs', label: 'Project IDs' },
 	{ value: 'Validation errors', label: 'Validation errors' },
 	{ value: 'Validation errors + warnings', label: 'Validation errors + warnings' },
 	{ value: 'Fucked up', label: 'Fucked up' },
@@ -314,7 +304,6 @@ const filterTypeValues = filterTypes.map((option) => option.value)
 const DEFAULT_FILTER_TYPE = filterTypeValues[0]
 
 const MODPACK_FILTER_TYPE = 'Modpacks'
-const PROJECT_IDS_FILTER_TYPE = 'Project IDs'
 const VALIDATION_ERROR_FILTER_TYPE = 'Validation errors'
 const VALIDATION_ERROR_AND_WARNING_FILTER_TYPE = 'Validation errors + warnings'
 const VALIDATION_FILTER_STALE_TIME_MS = 1000 * 60 * 5
@@ -367,13 +356,10 @@ function parseSortTypeFromQuery(
 
 const currentFilterType = ref(parseFilterTypeFromQuery(route.query.filter))
 const currentSortType = ref(parseSortTypeFromQuery(route.query.sort, currentFilterType.value))
-const projectIds = ref<string[]>([])
-const previousFilterType = ref(DEFAULT_FILTER_TYPE)
-const projectIdsSelectionPending = ref(false)
 
 watch(
 	currentFilterType,
-	async (newFilter, oldFilter) => {
+	(newFilter) => {
 		if (
 			newFilter !== MODPACK_FILTER_TYPE &&
 			modpackSortTypeValues.includes(currentSortType.value)
@@ -392,26 +378,9 @@ watch(
 			path: route.path,
 			query: currentQuery,
 		})
-
-		if (newFilter === PROJECT_IDS_FILTER_TYPE && oldFilter !== PROJECT_IDS_FILTER_TYPE) {
-			previousFilterType.value = oldFilter || DEFAULT_FILTER_TYPE
-			projectIdsSelectionPending.value = true
-			debugProjectIdsFilter('Project IDs filter selected; opening ID editor')
-			await nextTick()
-			projectIdsFilterModal.value?.show(projectIds.value)
-		}
 	},
 	{ immediate: false },
 )
-
-onMounted(async () => {
-	if (currentFilterType.value !== PROJECT_IDS_FILTER_TYPE) return
-
-	projectIdsSelectionPending.value = true
-	debugProjectIdsFilter('Project IDs filter loaded from URL; opening ID editor')
-	await nextTick()
-	projectIdsFilterModal.value?.show(projectIds.value)
-})
 
 watch(
 	() => route.query.filter,
@@ -528,7 +497,6 @@ const isValidationErrorAndWarningFilter = computed(
 const isValidationFilter = computed(
 	() => isValidationErrorFilter.value || isValidationErrorAndWarningFilter.value,
 )
-const isProjectIdsFilter = computed(() => currentFilterType.value === PROJECT_IDS_FILTER_TYPE)
 
 const {
 	data: standardProjectsResponse,
@@ -539,7 +507,7 @@ const {
 	queryKey: moderationProjectsQueryKey,
 	queryFn: ({ queryKey }) => client.labrinth.moderation_internal.getProjects(queryKey[1]),
 	placeholderData: (previousData) => previousData,
-	enabled: computed(() => !isValidationFilter.value && !isProjectIdsFilter.value),
+	enabled: computed(() => !isValidationFilter.value),
 })
 
 const validationFilterRequest = computed<ValidationFilterRequest>(() => ({
@@ -620,88 +588,17 @@ watch([isValidationFilter, validationProjectsQueryKey], ([isActive]) => {
 	}
 })
 
-const projectIdsFilterRequest = computed<ValidationFilterRequest>(() => ({
-	exclude_technical_review: excludeTechnicalReview.value,
-	query: debouncedFilterQuery.value || undefined,
-	sort: 'oldest',
-}))
-
-const projectIdsProjectsQueryKey = computed(
-	() =>
-		[
-			'moderation-projects',
-			'project-ids',
-			projectIdsFilterRequest.value,
-			projectIds.value,
-		] as const,
-)
-
-const {
-	data: projectIdsProjectsResponse,
-	isPending: projectIdsProjectsPending,
-	error: projectIdsProjectsError,
-} = useQuery({
-	queryKey: projectIdsProjectsQueryKey,
-	queryFn: async ({ queryKey, signal }) => {
-		const requestedIds = queryKey[3]
-		debugProjectIdsFilter(`Filtering queue for ${requestedIds.length} project IDs`)
-		const queueResponse = await fetchAllModerationQueueProjects({
-			client,
-			request: queryKey[2],
-			signal,
-			log: debugProjectIdsFilter,
-		})
-		const queueProjectsById = new Map(
-			queueResponse.projects.map((project) => [project.id, project]),
-		)
-		const projects = requestedIds
-			.map((projectId) => queueProjectsById.get(projectId))
-			.filter((project): project is NonNullable<typeof project> => !!project)
-		const missingProjectIds = requestedIds.filter((projectId) => !queueProjectsById.has(projectId))
-
-		debugProjectIdsFilter(
-			`Project ID filter complete: ${projects.length} matched, ${missingProjectIds.length} not in queue`,
-		)
-		if (missingProjectIds.length > 0) {
-			debugProjectIdsFilter(`IDs not found in queue: ${missingProjectIds.join(', ')}`)
-		}
-
-		return {
-			total: projects.length,
-			projects,
-		}
-	},
-	enabled: computed(
-		() =>
-			import.meta.client &&
-			currentFilterType.value === PROJECT_IDS_FILTER_TYPE &&
-			projectIds.value.length > 0,
-	),
-	staleTime: VALIDATION_FILTER_STALE_TIME_MS,
-	retry: false,
-})
-
-const usesLocalPagination = computed(() => isValidationFilter.value || isProjectIdsFilter.value)
+const usesLocalPagination = computed(() => isValidationFilter.value)
 const moderationProjectsResponse = computed(() =>
-	isValidationFilter.value
-		? validationProjectsResponse.value
-		: isProjectIdsFilter.value
-			? projectIdsProjectsResponse.value
-			: standardProjectsResponse.value,
+	isValidationFilter.value ? validationProjectsResponse.value : standardProjectsResponse.value,
 )
 const pending = computed(() =>
 	isValidationFilter.value
 		? validationProjectsPending.value
-		: isProjectIdsFilter.value
-			? projectIds.value.length > 0 && projectIdsProjectsPending.value
-			: standardProjectsPending.value || standardProjectsPlaceholder.value,
+		: standardProjectsPending.value || standardProjectsPlaceholder.value,
 )
 const loadError = computed(() =>
-	isValidationFilter.value
-		? validationProjectsError.value
-		: isProjectIdsFilter.value
-			? projectIdsProjectsError.value
-			: standardProjectsError.value,
+	isValidationFilter.value ? validationProjectsError.value : standardProjectsError.value,
 )
 const loadErrorMessage = computed(
 	() => loadError.value?.message ?? 'An unknown error occurred while loading the moderation queue.',
@@ -764,9 +661,6 @@ const emptyStateDescription = computed(() => {
 		return 'Check that your search query is correct!'
 	}
 	if (currentFilterType.value !== DEFAULT_FILTER_TYPE) {
-		if (isProjectIdsFilter.value) {
-			return 'None of the selected projects are currently in the moderation queue.'
-		}
 		return `There are no ${currentFilterType.value.toLowerCase()} in the queue.`
 	}
 	return 'you will probably never see this but if you do, congrats!!! :D'
@@ -776,28 +670,8 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-function editProjectIdsFilter() {
-	projectIdsSelectionPending.value = false
-	debugProjectIdsFilter('Opening Project IDs editor')
-	projectIdsFilterModal.value?.show(projectIds.value)
-}
-
-function applyProjectIdsFilter(ids: string[]) {
-	projectIds.value = ids
-	projectIdsSelectionPending.value = false
-	goToPage(1)
-	debugProjectIdsFilter(`Applied Project IDs filter with ${ids.length} unique IDs`)
-}
-
-function cancelProjectIdsFilter() {
-	if (!projectIdsSelectionPending.value) {
-		debugProjectIdsFilter('Project IDs edit cancelled')
-		return
-	}
-
-	projectIdsSelectionPending.value = false
-	debugProjectIdsFilter(`Project IDs selection cancelled; restoring ${previousFilterType.value}`)
-	currentFilterType.value = previousFilterType.value
+function openModerateByIdsModal() {
+	moderateByIdsModal.value?.show()
 }
 
 async function findFirstEligibleProject(): Promise<string | null> {
@@ -836,6 +710,23 @@ async function navigateToModerationProject(projectId: string) {
 			showChecklist: true,
 		},
 	})
+}
+
+async function startModeratingByIds(projectIds: string[]) {
+	await moderationQueue.setQueue(projectIds)
+
+	const targetProjectId = await findFirstEligibleProject()
+
+	if (!targetProjectId) {
+		addNotification({
+			title: 'No projects available',
+			text: 'None of the provided projects are awaiting moderation or available to review.',
+			type: 'warning',
+		})
+		return
+	}
+
+	await navigateToModerationProject(targetProjectId)
 }
 
 async function getFilteredProjectIds(): Promise<string[]> {
