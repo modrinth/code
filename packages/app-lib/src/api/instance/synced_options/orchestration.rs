@@ -206,7 +206,7 @@ async fn capability_status(
     }
 }
 
-pub(crate) async fn instance_option_supported(
+pub(in crate::api::instance) async fn instance_option_supported(
     metadata: &InstanceMetadata,
     option: SyncedOption,
     global_enabled: bool,

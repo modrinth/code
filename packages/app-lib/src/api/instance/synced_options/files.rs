@@ -6,7 +6,7 @@ use sha1_smol::Sha1;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
 
-pub(crate) struct SyncCheckpoint {
+pub(in crate::api::instance) struct SyncCheckpoint {
     pub expected_sha1: String,
     pub merge_base: Option<Vec<u8>>,
     pub source_revision: i64,
@@ -14,7 +14,7 @@ pub(crate) struct SyncCheckpoint {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(crate) enum CheckpointStatus {
+pub(in crate::api::instance) enum CheckpointStatus {
     Pending,
     Ready,
 }
@@ -30,7 +30,7 @@ impl CheckpointStatus {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum LinkMode {
+pub(in crate::api::instance) enum LinkMode {
     Symbolic,
     #[cfg(windows)]
     Hard,
@@ -50,11 +50,11 @@ impl LinkMode {
     }
 }
 
-pub(crate) fn safe_instance_id(instance_id: &str) -> String {
+pub(in crate::api::instance) fn safe_instance_id(instance_id: &str) -> String {
     instance_id.replace([':', '/', '\\'], "_")
 }
 
-pub(crate) fn instance_dir(
+pub(in crate::api::instance) fn instance_dir(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> PathBuf {
@@ -64,7 +64,9 @@ pub(crate) fn instance_dir(
         .join(&metadata.instance.path)
 }
 
-pub(crate) fn sync_files_are_protected(metadata: &InstanceMetadata) -> bool {
+pub(in crate::api::instance) fn sync_files_are_protected(
+    metadata: &InstanceMetadata,
+) -> bool {
     matches!(
         metadata.instance.install_stage,
         InstanceInstallStage::MinecraftInstalling
@@ -72,7 +74,7 @@ pub(crate) fn sync_files_are_protected(metadata: &InstanceMetadata) -> bool {
     )
 }
 
-pub(crate) async fn instance_is_running(
+pub(in crate::api::instance) async fn instance_is_running(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<bool> {
@@ -80,7 +82,7 @@ pub(crate) async fn instance_is_running(
         .await
 }
 
-pub(crate) fn instance_option_enabled(
+pub(in crate::api::instance) fn instance_option_enabled(
     metadata: &InstanceMetadata,
     option: SyncedOption,
 ) -> bool {
@@ -96,7 +98,7 @@ pub(crate) fn instance_option_enabled(
     }
 }
 
-pub(crate) async fn ensure_link(
+pub(in crate::api::instance) async fn ensure_link(
     source: &Path,
     target: &Path,
 ) -> crate::Result<LinkMode> {
@@ -134,7 +136,7 @@ pub(crate) async fn ensure_link(
     }
 }
 
-pub(crate) async fn detach_link(
+pub(in crate::api::instance) async fn detach_link(
     source: &Path,
     target: &Path,
 ) -> crate::Result<()> {
@@ -155,7 +157,7 @@ pub(crate) async fn detach_link(
     Ok(())
 }
 
-pub(crate) async fn begin_checkpoint(
+pub(in crate::api::instance) async fn begin_checkpoint(
     instance_id: &str,
     option: SyncedOption,
     variant: &str,
@@ -190,7 +192,7 @@ pub(crate) async fn begin_checkpoint(
     Ok(())
 }
 
-pub(crate) async fn finish_checkpoint(
+pub(in crate::api::instance) async fn finish_checkpoint(
     instance_id: &str,
     option: SyncedOption,
     variant: &str,
@@ -215,7 +217,7 @@ pub(crate) async fn finish_checkpoint(
     Ok(())
 }
 
-pub(crate) async fn checkpoint(
+pub(in crate::api::instance) async fn checkpoint(
     instance_id: &str,
     option: SyncedOption,
     variant: &str,
@@ -253,15 +255,19 @@ pub(crate) async fn checkpoint(
     .transpose()
 }
 
-pub(crate) async fn sha1_file(path: &Path) -> crate::Result<String> {
+pub(in crate::api::instance) async fn sha1_file(
+    path: &Path,
+) -> crate::Result<String> {
     Ok(Sha1::from(io::read(path).await?).digest().to_string())
 }
 
-pub(crate) fn sha1_bytes(bytes: &[u8]) -> String {
+pub(in crate::api::instance) fn sha1_bytes(bytes: &[u8]) -> String {
     Sha1::from(bytes).digest().to_string()
 }
 
-pub(crate) async fn read_nbt_file(path: &Path) -> crate::Result<NbtCompound> {
+pub(in crate::api::instance) async fn read_nbt_file(
+    path: &Path,
+) -> crate::Result<NbtCompound> {
     let bytes = io::read(path).await?;
     let (root, _) = quartz_nbt::io::read_nbt(
         &mut Cursor::new(bytes),
@@ -270,7 +276,9 @@ pub(crate) async fn read_nbt_file(path: &Path) -> crate::Result<NbtCompound> {
     Ok(root)
 }
 
-pub(crate) fn nbt_to_bytes(root: &NbtCompound) -> crate::Result<Vec<u8>> {
+pub(in crate::api::instance) fn nbt_to_bytes(
+    root: &NbtCompound,
+) -> crate::Result<Vec<u8>> {
     let mut bytes = Vec::new();
     quartz_nbt::io::write_nbt(
         &mut bytes,
@@ -281,7 +289,9 @@ pub(crate) fn nbt_to_bytes(root: &NbtCompound) -> crate::Result<Vec<u8>> {
     Ok(bytes)
 }
 
-pub(crate) fn nbt_from_bytes(bytes: Vec<u8>) -> crate::Result<NbtCompound> {
+pub(in crate::api::instance) fn nbt_from_bytes(
+    bytes: Vec<u8>,
+) -> crate::Result<NbtCompound> {
     let (root, _) = quartz_nbt::io::read_nbt(
         &mut Cursor::new(bytes),
         quartz_nbt::io::Flavor::Uncompressed,

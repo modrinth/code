@@ -28,7 +28,7 @@ use super::types::{
 };
 use std::collections::HashSet;
 
-pub(crate) async fn seed_servers(
+pub(in crate::api::instance) async fn seed_servers(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
@@ -75,7 +75,7 @@ pub(crate) async fn seed_servers(
     regenerate_servers(state).await
 }
 
-pub(crate) async fn merge_servers_from_instance(
+pub(in crate::api::instance) async fn merge_servers_from_instance(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
@@ -133,7 +133,7 @@ pub(crate) async fn merge_servers_from_instance(
     Ok(())
 }
 
-pub(crate) async fn ensure_servers(
+pub(in crate::api::instance) async fn ensure_servers(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
@@ -166,7 +166,7 @@ pub(crate) async fn ensure_servers(
     compose_instance(metadata, state).await
 }
 
-pub(crate) async fn detach_servers(
+pub(in crate::api::instance) async fn detach_servers(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
@@ -175,7 +175,7 @@ pub(crate) async fn detach_servers(
     detach_link(&generated, &local).await
 }
 
-pub(crate) async fn reconcile_servers(
+pub(in crate::api::instance) async fn reconcile_servers(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
@@ -700,7 +700,7 @@ pub async fn remove_synced_server(server_id: &str) -> crate::Result<()> {
     regenerate_servers(&state).await
 }
 
-pub(crate) async fn compose_instance(
+pub(super) async fn compose_instance(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
@@ -784,7 +784,7 @@ async fn regenerate_servers(state: &State) -> crate::Result<()> {
     Ok(())
 }
 
-pub(crate) async fn effective(
+pub(super) async fn effective(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<bool> {

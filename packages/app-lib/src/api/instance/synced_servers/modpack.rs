@@ -1,8 +1,9 @@
 use super::super::synced_options::instance_dir;
+use super::SERVERS_FILE;
 use super::codec::{read_servers, servers_from_bytes};
+use super::operations::{compose_instance, effective};
 use super::storage::{load_local, write_local_rows};
 use super::types::{LocalServer, ServerSource};
-use super::{SERVERS_FILE, compose_instance, effective};
 use crate::state::{CachedEntry, InstanceLink, InstanceMetadata};
 use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors};
 use crate::{ErrorKind, State};

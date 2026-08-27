@@ -12,13 +12,13 @@ pub(crate) use self::operations::{
     add_user_server, list_server_records, remove_server_by_index,
     update_server_by_index,
 };
-pub(super) use self::operations::{
-    compose_instance, detach_servers, effective, ensure_servers,
-    merge_servers_from_instance, reconcile_servers, seed_servers,
-};
 pub use self::operations::{
     desync_server, list_synced_servers, remove_synced_server,
     update_synced_server,
+};
+pub(super) use self::operations::{
+    detach_servers, ensure_servers, merge_servers_from_instance,
+    reconcile_servers, seed_servers,
 };
 pub(super) use self::storage::canonical_exists;
 pub use self::types::{DesyncServerMode, ServerSource, SyncedServer};

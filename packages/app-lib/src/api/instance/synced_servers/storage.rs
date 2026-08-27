@@ -11,7 +11,9 @@ use sqlx::{Sqlite, Transaction};
 use std::collections::HashSet;
 use std::path::PathBuf;
 
-pub(crate) async fn canonical_exists(state: &State) -> crate::Result<bool> {
+pub(in crate::api::instance) async fn canonical_exists(
+    state: &State,
+) -> crate::Result<bool> {
     canonical_initialized(state).await
 }
 
