@@ -200,9 +200,7 @@ pub(crate) async fn resolve_icon_path(
         .await
         {
             Ok(bytes) => bytes,
-            Err(error)
-                if ignore_missing_remote_icon =>
-            {
+            Err(error) if ignore_missing_remote_icon => {
                 tracing::warn!("Error while getting instance icon: {error}");
                 return Ok(None);
             }
