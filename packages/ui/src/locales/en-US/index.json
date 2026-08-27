@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "Continue"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copied to clipboard"
+  },
   "button.copy-filename": {
     "defaultMessage": "Copy filename"
   },

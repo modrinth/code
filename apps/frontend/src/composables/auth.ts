@@ -52,14 +52,17 @@ const getQueryString = (value: QueryValue) => {
 	return value ?? null
 }
 
+export const useAuthState = () =>
+	useState<AuthState>('auth', () => ({
+		user: null,
+		token: '',
+	}))
+
 export const useAuth = async (
 	oldToken: string | null | undefined = null,
 	route?: AuthInitRoute,
 ) => {
-	const auth = useState<AuthState>('auth', () => ({
-		user: null,
-		token: '',
-	}))
+	const auth = useAuthState()
 
 	if (!auth.value.user || oldToken) {
 		auth.value = await initAuth(oldToken, route)

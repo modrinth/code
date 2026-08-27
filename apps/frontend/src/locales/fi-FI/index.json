@@ -383,9 +383,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Hyväksy vastauksella"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Sulje keskustelu"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Sulje vastauksella"
   },

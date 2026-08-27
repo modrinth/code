@@ -1025,9 +1025,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "回覆並核准"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "關閉討論串"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "回覆並關閉"
   },

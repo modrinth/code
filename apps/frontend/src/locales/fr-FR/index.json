@@ -1025,9 +1025,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Approuver avec réponse"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Fermer le fil"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Fermer avec réponse"
   },

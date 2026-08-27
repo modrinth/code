@@ -36,7 +36,7 @@
 		</form>
 	</NewModal>
 	<div>
-		<form class="flex gap-2" @submit.prevent="executeSearch">
+		<form class="flex items-center gap-2" @submit.prevent="executeSearch">
 			<Input
 				v-model="query"
 				:icon="SearchIcon"
@@ -44,17 +44,18 @@
 				autocomplete="off"
 				placeholder="Search external projects..."
 				clearable
-				wrapper-class="flex-1 w-full"
+				size="medium"
+				wrapper-class="min-w-0 flex-1"
 			/>
-			<Button type="colored" color="brand" native-type="submit">
+			<Button type="colored" color="brand" size="lg" native-type="submit">
 				<SearchIcon aria-hidden="true" />
 				Search by title
 			</Button>
-			<Button native-type="button" @click="executeFlameIdLookup">
+			<Button size="lg" native-type="button" @click="executeFlameIdLookup">
 				<BinaryIcon aria-hidden="true" />
 				Lookup CurseForge ID
 			</Button>
-			<Button native-type="button" @click="executeSha1Lookup">
+			<Button size="lg" native-type="button" @click="executeSha1Lookup">
 				<HashIcon aria-hidden="true" />
 				Lookup SHA-1
 			</Button>

@@ -396,6 +396,8 @@ pub struct ProjectReport {
 pub struct VersionReport {
     /// ID of the project version this report is for.
     pub version_id: VersionId,
+    /// Version number of the project version this report is for.
+    pub version_number: String,
     /// Reports for this version's files.
     #[serde(default)]
     pub files: Vec<FileReport>,
@@ -663,6 +665,7 @@ async fn fetch_project_reports(
 
             version_reports.push(VersionReport {
                 version_id: VersionId::from(version_query.inner.id),
+                version_number: version_query.inner.version_number.clone(),
                 files: file_reports,
             });
         }

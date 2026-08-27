@@ -1022,9 +1022,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Підтвердити з відповіддю"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Закрити тему"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Закрити з відповіддю"
   },

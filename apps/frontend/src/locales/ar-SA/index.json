@@ -1025,9 +1025,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "الموافقة مع الرد"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "إغلاق سلسلة المحادثة"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "الإغلاق مع الرد"
   },

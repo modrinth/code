@@ -794,9 +794,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Luluskan dengan balasan"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Tutup bebenang"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Tutup dengan balasan"
   },

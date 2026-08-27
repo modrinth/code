@@ -1022,9 +1022,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Zatwierdź z odpowiedzią "
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Zamknij wątek"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Zamknij z odpowiedzią"
   },
