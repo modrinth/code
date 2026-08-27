@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CheckIcon, DownloadIcon, ExternalIcon, VersionIcon } from '@modrinth/assets'
-import { Button, ButtonLink, useFormatBytes } from '@modrinth/ui'
+import { ButtonLink, useFormatBytes } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { computed } from 'vue'
 
