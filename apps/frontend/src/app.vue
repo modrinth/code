@@ -33,7 +33,7 @@ import {
 import { useAuth } from './composables/auth'
 
 const auth = await useAuth()
-const userPreferences = setupProviders(auth)
+const { userPreferences } = setupProviders(auth)
 const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()
