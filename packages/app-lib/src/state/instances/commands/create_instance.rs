@@ -200,9 +200,8 @@ pub(crate) async fn resolve_icon_path(
         .await
         {
             Ok(bytes) => bytes,
-            Err(error)
-                if ignore_missing_remote_icon && is_not_found_error(&error) =>
-            {
+            Err(error) if ignore_missing_remote_icon => {
+                tracing::warn!("Error while getting instance icon: {error}");
                 return Ok(None);
             }
             Err(error) => return Err(error),
@@ -217,18 +216,6 @@ pub(crate) async fn resolve_icon_path(
     };
 
     Ok(Some(file.to_string_lossy().to_string()))
-}
-
-fn is_not_found_error(error: &crate::Error) -> bool {
-    match error.raw.as_ref() {
-        crate::ErrorKind::FetchError(error) => {
-            error.status() == Some(reqwest::StatusCode::NOT_FOUND)
-        }
-        crate::ErrorKind::LabrinthError(error) => {
-            error.status == Some(reqwest::StatusCode::NOT_FOUND.as_u16())
-        }
-        _ => false,
-    }
 }
 
 fn content_source_kind(link: &InstanceLink) -> ContentSourceKind {
