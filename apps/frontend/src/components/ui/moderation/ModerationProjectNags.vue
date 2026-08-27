@@ -96,8 +96,10 @@ import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nags } from '@modrinth/moderation'
 import { Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import type { MarkdownDocument } from '@modrinth/utils'
+import { parseModrinthMarkdown } from '@modrinth/utils'
 import type { Component } from 'vue'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 interface Tags {
 	rejectedStatuses: string[]
@@ -176,12 +178,22 @@ const emit = defineEmits<{
 	setProcessing: [processing: boolean]
 }>()
 
+const descriptionDocument = ref<MarkdownDocument | null>(null)
+watch(
+	() => props.project.body,
+	async (body) => {
+		descriptionDocument.value = body ? await parseModrinthMarkdown(body) : null
+	},
+	{ immediate: true },
+)
+
 const nagContext = computed<NagContext>(() => ({
 	project: props.project,
 	projectV3: props.projectV3,
 	versions: props.versions,
 	currentMember: props.currentMember?.user as Labrinth.Users.v2.User,
 	currentRoute: props.routeName,
+	descriptionDocument: descriptionDocument.value,
 	tags: props.tags,
 	submitProject: submitForReview,
 }))

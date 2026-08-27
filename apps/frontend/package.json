@@ -69,7 +69,6 @@
 		"js-yaml": "^4.1.0",
 		"jszip": "^3.10.1",
 		"lru-cache": "^11.2.4",
-		"markdown-it": "14.1.0",
 		"pathe": "^1.1.2",
 		"prettier": "^3.6.2",
 		"qrcode.vue": "^3.4.0",
@@ -79,8 +78,7 @@
 		"vue-router": "*",
 		"vue-typed-virtual-list": "^1.0.10",
 		"vue3-ace-editor": "^2.2.4",
-		"vue3-apexcharts": "^1.5.2",
-		"xss": "^1.0.14"
+		"vue3-apexcharts": "^1.5.2"
 	},
 	"web-types": "../../web-types.json",
 	"prettier": "@modrinth/tooling-config/frontend.prettier.config.cjs"

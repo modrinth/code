@@ -1,5 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { MessageDescriptor } from '@modrinth/ui'
+import type { MarkdownDocument } from '@modrinth/utils'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 /**
@@ -37,6 +38,10 @@ export interface NagContext {
 	 * The current route in the application.
 	 */
 	currentRoute: string
+	/**
+	 * The project's description parsed into an AST via Comark (`null` while parsing)
+	 */
+	descriptionDocument: MarkdownDocument | null
 	/* eslint-disable @typescript-eslint/no-explicit-any */
 	tags: any
 	submitProject: (...any: any) => any

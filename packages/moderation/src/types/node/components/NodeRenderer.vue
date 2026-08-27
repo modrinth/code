@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { Button, IconButton } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+import { Button, IconButton, MarkdownBody } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, inject, watchEffect } from 'vue'
 
@@ -305,11 +304,11 @@ watchEffect(() => {
 					"
 				>
 					<div v-if="getTitle(item)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
-						<!-- eslint-disable vue/no-v-html -- title text is author-controlled (stage definitions), not user input -->
-						<span
-							v-html="renderString(getTitle(item)!).replace(/^<p>([\s\S]*)<\/p>\n?$/, '$1')"
-						/><span v-if="needsAttention(item)" class="text-red">*</span>
-						<!-- eslint-enable vue/no-v-html -->
+						<MarkdownBody tag="span" unwrap-paragraph :source="getTitle(item)!" /><span
+							v-if="needsAttention(item)"
+							class="text-red"
+							>*</span
+						>
 					</div>
 
 					<template v-if="hasChildrenCap(item) && !hasValueCap(item)">

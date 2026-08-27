@@ -17,7 +17,10 @@ import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import mcfunction from 'highlightjs-mcfunction'
 
-import { configuredXss, md } from '../parse'
+import type { ComponentRenderFn } from '@comark/html/render'
+import type { ElementNode } from 'comark'
+
+import { createModrinthHtmlRenderer, getFenceCodeText, getFenceLanguage } from '../markdown/parse'
 import skript from './skript'
 
 /* REGISTRATION */
@@ -57,22 +60,48 @@ hljs.registerAliases(['html', 'htm', 'xhtml', 'mcui', 'fxml'], { languageName: '
 
 export { hljs }
 
-export const renderHighlightedString = (string) =>
-	configuredXss.process(
-		md({
-			highlight(str, lang) {
-				if (lang && hljs.getLanguage(lang)) {
-					try {
-						return hljs.highlight(str, { language: lang }).value
-					} catch {
-						/* empty */
-					}
-				}
+function escapeHtml(value: string): string {
+	return value.replace(/[&<>"']/g, (char) => {
+		switch (char) {
+			case '&':
+				return '&amp;'
+			case '<':
+				return '&lt;'
+			case '>':
+				return '&gt;'
+			case '"':
+				return '&quot;'
+			default:
+				return '&#39;'
+		}
+	})
+}
 
-				return ''
-			},
-		}).render(string),
-	)
+const highlightedPreComponent: ComponentRenderFn = (node) => {
+	const preNode = node as ElementNode
+	const codeText = getFenceCodeText(preNode)
+	const language = getFenceLanguage(preNode)
+
+	let inner: string
+	let className: string | undefined
+
+	if (language && hljs.getLanguage(language)) {
+		try {
+			inner = hljs.highlight(codeText, { language }).value
+			className = `hljs language-${language}`
+		} catch {
+			inner = escapeHtml(codeText)
+			className = `language-${language}`
+		}
+	} else {
+		inner = escapeHtml(codeText)
+		className = language ? `language-${language}` : undefined
+	}
+
+	return `<pre><code${className ? ` class="${className}"` : ''}>${inner}</code></pre>`
+}
+
+export const renderHighlightedString = createModrinthHtmlRenderer({ pre: highlightedPreComponent })
 
 export const highlightCodeLines = (code: string, language: string): string[] => {
 	if (!code) return []

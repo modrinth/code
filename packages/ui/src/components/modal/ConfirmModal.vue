@@ -9,11 +9,7 @@
 	>
 		<div class="flex flex-col gap-4">
 			<template v-if="description">
-				<div
-					v-if="markdown"
-					class="markdown-body max-w-[35rem]"
-					v-html="renderString(description)"
-				/>
+				<MarkdownBody v-if="markdown" class="max-w-[35rem]" :source="description" />
 				<p v-else class="max-w-[35rem] m-0">
 					{{ description }}
 				</p>
@@ -53,12 +49,12 @@
 
 <script setup>
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import { renderString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 
 import Input from '../base/inputs/Input.vue'
+import MarkdownBody from '../base/MarkdownBody.vue'
 import NewModal from './NewModal.vue'
 
 const props = defineProps({

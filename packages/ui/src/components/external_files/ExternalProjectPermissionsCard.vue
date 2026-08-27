@@ -14,7 +14,6 @@ import {
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { renderString } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
@@ -32,6 +31,7 @@ import {
 } from '../../providers'
 import type { QuickReply } from '../../providers/attribution-moderation'
 import Textarea from '../base/inputs/Textarea.vue'
+import MarkdownBody from '../base/MarkdownBody.vue'
 import AddFilesToAttributionGroupModal from './AddFilesToAttributionGroupModal.vue'
 import AddToExistingExternalProjectModal from './AddToExistingExternalProjectModal.vue'
 import AddToGlobalPermissionsDatabaseModal from './AddToGlobalPermissionsDatabaseModal.vue'
@@ -696,11 +696,8 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 											</div>
 											<div class="leading-[1.5]">Reason:</div>
 											<div>
-												<div
-													class="markdown-body"
-													v-html="
-														renderString(group.attribution?.moderation_status?.reason || 'N/A')
-													"
+												<MarkdownBody
+													:source="group.attribution?.moderation_status?.reason || 'N/A'"
 												/>
 											</div>
 										</div>
@@ -796,10 +793,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 									v-else-if="group.attribution?.moderation_status?.reason"
 									class="flex flex-col gap-2 mt-3"
 								>
-									<div
-										class="markdown-body"
-										v-html="renderString(group.attribution?.moderation_status?.reason)"
-									/>
+									<MarkdownBody :source="group.attribution?.moderation_status?.reason" />
 								</div>
 							</div>
 							<div

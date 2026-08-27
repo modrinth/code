@@ -39,11 +39,7 @@
 				<span class="label__description"></span>
 			</span>
 			<div class="markdown-body-wrapper">
-				<div
-					style="width: 100%"
-					class="markdown-body"
-					v-html="renderHighlightedString(linkMarkdown)"
-				/>
+				<MarkdownBody highlight style="width: 100%" :source="linkMarkdown" />
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<Button type="outlined" @click="() => linkModal?.hide()">
@@ -135,11 +131,7 @@
 				<span class="label__description"></span>
 			</span>
 			<div class="markdown-body-wrapper">
-				<div
-					style="width: 100%"
-					class="markdown-body"
-					v-html="renderHighlightedString(imageMarkdown)"
-				/>
+				<MarkdownBody highlight style="width: 100%" :source="imageMarkdown" />
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<Button type="outlined" @click="() => imageModal?.hide()">
@@ -193,11 +185,7 @@
 			</span>
 
 			<div class="markdown-body-wrapper">
-				<div
-					style="width: 100%"
-					class="markdown-body"
-					v-html="renderHighlightedString(videoMarkdown)"
-				/>
+				<MarkdownBody highlight style="width: 100%" :source="videoMarkdown" />
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
 				<Button type="outlined" @click="() => videoModal?.hide()">
@@ -284,14 +272,14 @@
 		</div>
 		<div v-else>
 			<div class="markdown-body-wrapper">
-				<div
-					style="width: 100%"
+				<MarkdownBody
+					highlight
 					:style="{
+						width: '100%',
 						maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
 						overflowY: 'auto',
 					}"
-					class="markdown-body"
-					v-html="renderHighlightedString(currentValue ?? '')"
+					:source="currentValue ?? ''"
 				/>
 			</div>
 		</div>
@@ -325,7 +313,6 @@ import {
 	YouTubeIcon,
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
-import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, useId, watch } from 'vue'
 
 import { Button, IconButton } from '#ui/components/base/buttons'
@@ -338,6 +325,7 @@ import FileInput from './FileInput.vue'
 import Input from './inputs/Input.vue'
 import InputFrame from './inputs/InputFrame.vue'
 import IntlFormatted from './IntlFormatted.vue'
+import MarkdownBody from './MarkdownBody.vue'
 import Toggle from './Toggle.vue'
 
 const { formatMessage } = useVIntl()

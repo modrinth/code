@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon, SearchIcon } from '@modrinth/assets'
-import { renderString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -11,6 +10,7 @@ import { injectModrinthClient } from '../../providers/api-client'
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import Input from '../base/inputs/Input.vue'
+import MarkdownBody from '../base/MarkdownBody.vue'
 
 const { formatMessage } = useVIntl()
 const { formatCompactNumber } = useCompactNumber()
@@ -94,10 +94,10 @@ const messages = defineMessages({
 				<span>
 					{{ formatMessage(messages.projectCount, { count: collection?.projects.length ?? 0 }) }}
 				</span>
-				<div
+				<MarkdownBody
 					v-if="supportsMarkdown"
 					class="description-body"
-					v-html="renderString(collection?.description ?? '')"
+					:source="collection?.description ?? ''"
 				/>
 				<p v-else class="m-0 break-words">{{ collection?.description }}</p>
 			</template>

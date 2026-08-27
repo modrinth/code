@@ -841,6 +841,15 @@ a:not(.no-click-animation),
 		line-height: 1.5;
 	}
 
+	ul.contains-task-list,
+	li.task-list-item {
+		list-style: none;
+	}
+
+	.task-list-item-checkbox {
+		margin-right: 0.5em;
+	}
+
 	h1 {
 		display: block;
 	}

@@ -1,5 +1,6 @@
 import { defineMessage, useVIntl } from '@modrinth/ui'
-import { renderHighlightedString } from '@modrinth/utils'
+import type { ElementNode, MarkdownDocument, Node } from '@modrinth/utils'
+import { visit } from '@modrinth/utils'
 
 import type { Nag, NagContext } from '../../types/nags'
 
@@ -8,31 +9,41 @@ export const MAX_HEADER_LENGTH = 80
 export const MIN_SUMMARY_CHARS = 30
 export const MIN_CHARS_PER_IMAGE = 60
 
-export function analyzeHeaderLength(markdown: string): {
+function collectText(node: Node, out: string[]): void {
+	if (typeof node === 'string') {
+		out.push(node)
+		return
+	}
+	const tag = node[0]
+	if (tag === null || tag === 'code' || tag === 'pre') return
+	for (const child of node.slice(2) as Node[]) collectText(child, out)
+}
+
+function getElementText(node: ElementNode): string {
+	const out: string[] = []
+	for (const child of node.slice(2) as Node[]) collectText(child, out)
+	return out.join('')
+}
+
+export function analyzeHeaderLength(document: MarkdownDocument | null): {
 	hasLongHeaders: boolean
 	longHeaders: string[]
 } {
-	if (!markdown) return { hasLongHeaders: false, longHeaders: [] }
-
-	const withoutCodeBlocks = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
-
-	const headerRegex = /^(#{1,3})\s+(.+)$/gm
-	const headers = [...withoutCodeBlocks.matchAll(headerRegex)]
+	if (!document) return { hasLongHeaders: false, longHeaders: [] }
 
 	const longHeaders: string[] = []
+	visit(
+		document,
+		(node) => Array.isArray(node) && /^h[1-3]$/.test(node[0] as string),
+		(node) => {
+			const headerText = getElementText(node as ElementNode).trim()
+			const sentences = headerText.split(/[.!?]+/g).filter((s) => s.trim().length > 0)
 
-	headers.forEach((match) => {
-		const headerText = match[2].trim()
-		const sentenceEnders = /[.!?]+/g
-		const sentences = headerText.split(sentenceEnders).filter((s) => s.trim().length > 0)
-
-		const isVeryLong = headerText.length > MAX_HEADER_LENGTH
-		const hasMultipleSentences = sentences.length > 1
-
-		if (isVeryLong || hasMultipleSentences) {
-			longHeaders.push(headerText)
-		}
-	})
+			if (headerText.length > MAX_HEADER_LENGTH || sentences.length > 1) {
+				longHeaders.push(headerText)
+			}
+		},
+	)
 
 	return {
 		hasLongHeaders: longHeaders.length > 0,
@@ -40,76 +51,41 @@ export function analyzeHeaderLength(markdown: string): {
 	}
 }
 
-export function analyzeImageContent(markdown: string): {
+export function analyzeImageContent(document: MarkdownDocument | null): {
 	imageHeavy: boolean
 	hasEmptyAltText: boolean
 } {
-	if (!markdown) return { imageHeavy: false, hasEmptyAltText: false }
+	if (!document) return { imageHeavy: false, hasEmptyAltText: false }
 
-	const withoutCodeBlocks = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
+	let totalImages = 0
+	let hasEmptyAltText = false
 
-	const imageRegex = /!\[([^\]]*)\]\([^)]+\)/g
-	const images = [...withoutCodeBlocks.matchAll(imageRegex)]
+	visit(
+		document,
+		(node) => Array.isArray(node) && node[0] === 'img',
+		(node) => {
+			totalImages++
+			const alt = (node as ElementNode)[1]?.alt
+			if (typeof alt !== 'string' || !alt.trim()) hasEmptyAltText = true
+		},
+	)
 
-	const htmlImageRegex = /<img[^>]*>/gi
-	const htmlImages = [...withoutCodeBlocks.matchAll(htmlImageRegex)]
-
-	const totalImages = images.length + htmlImages.length
 	if (totalImages === 0) return { imageHeavy: false, hasEmptyAltText: false }
 
-	const textLength = countText(withoutCodeBlocks)
+	const textLength = countText(document)
 	const recommendedTextLength = MIN_CHARS_PER_IMAGE * totalImages
 	const imageHeavy =
 		recommendedTextLength > MIN_DESCRIPTION_CHARS && textLength < recommendedTextLength
 
-	const hasEmptyAltText =
-		images.some((match) => !match[1]?.trim()) ||
-		htmlImages.some((match) => {
-			const altMatch = match[0].match(/alt\s*=\s*["']([^"']*)["']/i)
-			return !altMatch || !altMatch[1]?.trim()
-		})
-
 	return { imageHeavy, hasEmptyAltText }
 }
 
-export function countText(markdown: string): number {
-	if (!markdown) return 0
+export function countText(document: MarkdownDocument | null): number {
+	if (!document) return 0
 
-	const fallback = (md: string): number => {
-		const withoutCode = md.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
-		const withoutImagesAndLinks = withoutCode
-			.replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
-			.replace(/\[[^\]]*]\([^)]+\)/g, ' ')
-		const withoutHtml = withoutImagesAndLinks.replace(/<[^>]+>/g, ' ')
-		const withoutMdSyntax = withoutHtml
-			.replace(/^>{1}\s?.*$/gm, ' ')
-			.replace(/^#{1,6}\s+/gm, ' ')
-			.replace(/[*_~`>-]/g, ' ')
-			.replace(/\|/g, ' ')
-		return withoutMdSyntax.replace(/\s+/g, ' ').trim().length
-	}
-
-	if (typeof window === 'undefined' || typeof globalThis.DOMParser === 'undefined') {
-		console.warn(`[Moderation] SSR: no window/DOMParser, falling back for countText`)
-		return fallback(markdown)
-	}
-
-	try {
-		const htmlString = renderHighlightedString(markdown)
-		const parser = new DOMParser()
-		const doc = parser.parseFromString(htmlString, 'text/html')
-		const walker = doc.createTreeWalker(doc.body || doc, NodeFilter.SHOW_TEXT)
-
-		const textList: string[] = []
-		let node = walker.nextNode()
-		while (node) {
-			if (node.textContent) textList.push(node.textContent)
-			node = walker.nextNode()
-		}
-		return textList.join(' ').replace(/\s+/g, ' ').trim().length
-	} catch {
-		return fallback(markdown)
-	}
+	const out: string[] = []
+	for (const node of document.nodes) collectText(node, out)
+	return out.join('').replace(/\s+/g, ' ').trim().length
 }
 
 export const descriptionNags: Nag[] = [
@@ -121,7 +97,7 @@ export const descriptionNags: Nag[] = [
 		}),
 		description: (context: NagContext) => {
 			const { formatMessage } = useVIntl()
-			const readableLength = countText(context.project.body || '')
+			const readableLength = countText(context.descriptionDocument)
 
 			return formatMessage(
 				defineMessage({
@@ -137,7 +113,7 @@ export const descriptionNags: Nag[] = [
 		},
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
-			const readableLength = countText(context.project.body || '')
+			const readableLength = countText(context.descriptionDocument)
 			return readableLength < MIN_DESCRIPTION_CHARS && readableLength > 0
 		},
 		link: {
@@ -158,7 +134,7 @@ export const descriptionNags: Nag[] = [
 		}),
 		description: (context: NagContext) => {
 			const { formatMessage } = useVIntl()
-			const { longHeaders } = analyzeHeaderLength(context.project.body || '')
+			const { longHeaders } = analyzeHeaderLength(context.descriptionDocument)
 			const count = longHeaders.length
 
 			return formatMessage(
@@ -174,7 +150,7 @@ export const descriptionNags: Nag[] = [
 		},
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
-			const { hasLongHeaders } = analyzeHeaderLength(context.project.body || '')
+			const { hasLongHeaders } = analyzeHeaderLength(context.descriptionDocument)
 			return hasLongHeaders
 		},
 		link: {
@@ -358,7 +334,7 @@ export const descriptionNags: Nag[] = [
 		}),
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
-			const { imageHeavy } = analyzeImageContent(context.project.body || '')
+			const { imageHeavy } = analyzeImageContent(context.descriptionDocument)
 			return imageHeavy
 		},
 		link: {
@@ -384,7 +360,7 @@ export const descriptionNags: Nag[] = [
 		}),
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
-			const { hasEmptyAltText } = analyzeImageContent(context.project.body || '')
+			const { hasEmptyAltText } = analyzeImageContent(context.descriptionDocument)
 			return hasEmptyAltText
 		},
 		link: {

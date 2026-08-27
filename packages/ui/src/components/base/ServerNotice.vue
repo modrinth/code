@@ -28,13 +28,12 @@
 				<XIcon /> Dismiss
 			</Button>
 		</template>
-		<div v-if="message" class="markdown-body" v-html="renderString(message)" />
+		<MarkdownBody v-if="message" :source="message" />
 	</Admonition>
 </template>
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { renderString } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
@@ -42,6 +41,7 @@ import { Button } from '#ui/components/base/buttons'
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import Admonition from './Admonition.vue'
 import CopyCode from './CopyCode.vue'
+import MarkdownBody from './MarkdownBody.vue'
 
 const { formatMessage } = useVIntl()
 const emit = defineEmits<{
@@ -102,7 +102,7 @@ const NOTICE_TYPE_BTN: Record<string, 'blue' | 'orange' | 'red'> = {
 const heading = computed(() => NOTICE_HEADINGS[props.level] ?? messages.info)
 </script>
 <style scoped lang="scss">
-.markdown-body > *:first-child {
+:deep(.markdown-body) > *:first-child {
 	margin-top: 0;
 }
 </style>

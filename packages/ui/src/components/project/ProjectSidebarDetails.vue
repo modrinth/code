@@ -17,7 +17,7 @@
 					{{ project.license.name ? project.license.name : formatMessage(messages.licenseTitle) }}
 				</span>
 			</template>
-			<div class="markdown-body" v-html="licenseHtml" />
+			<MarkdownBody :source="licenseSource" />
 		</NewModal>
 		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div
@@ -30,7 +30,7 @@
 						{{ capitalizeString(formatMessage(messages.photosensitivityTitle)) }}
 					</span>
 					<span v-if="photosensitivityDisclosure.note" class="text-sm text-secondary">
-						<BasicMarkdownText :text="photosensitivityDisclosure.note" :target="linkTarget" />
+						<MarkdownBody variant="basic" :source="photosensitivityDisclosure.note" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -41,7 +41,7 @@
 						{{ capitalizeString(aiGeneratedLabel) }}
 					</span>
 					<span v-if="aiDisclosure.note" class="text-sm text-secondary">
-						<BasicMarkdownText :text="aiDisclosure.note" :target="linkTarget" />
+						<MarkdownBody variant="basic" :source="aiDisclosure.note" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -52,7 +52,7 @@
 						{{ capitalizeString(formatMessage(messages.advertisingTitle)) }}
 					</span>
 					<span v-if="advertisingDisclosure.note" class="text-sm text-secondary">
-						<BasicMarkdownText :text="advertisingDisclosure.note" :target="linkTarget" />
+						<MarkdownBody variant="basic" :source="advertisingDisclosure.note" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -67,7 +67,7 @@
 						:key="`${feature}-${index}`"
 						class="text-sm text-secondary"
 					>
-						<BasicMarkdownText :text="feature" :target="linkTarget" />
+						<MarkdownBody variant="basic" :source="feature" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -88,7 +88,7 @@
 						:key="`${entry}-${index}`"
 						class="text-sm text-secondary"
 					>
-						<BasicMarkdownText :text="entry" :target="linkTarget" />
+						<MarkdownBody variant="basic" :source="entry" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -99,7 +99,7 @@
 						{{ capitalizeString(formatMessage(messages.systemInteractionsTitle)) }}
 					</span>
 					<span v-if="systemInteractionsDisclosure.note" class="text-sm text-secondary">
-						<BasicMarkdownText :text="systemInteractionsDisclosure.note" :target="linkTarget" />
+						<MarkdownBody variant="basic" :source="systemInteractionsDisclosure.note" :target="linkTarget" />
 					</span>
 				</div>
 			</div>
@@ -152,10 +152,10 @@
 							<ExternalIcon />
 						</a>
 						<span v-else class="text-sm">
-							<BasicMarkdownText :text="source.label" :target="linkTarget" />
+							<MarkdownBody variant="basic" :source="source.label" :target="linkTarget" />
 						</span>
 						<span v-if="source.note" class="text-sm text-secondary">
-							<BasicMarkdownText :text="source.note" :target="linkTarget" />
+							<MarkdownBody variant="basic" :source="source.note" :target="linkTarget" />
 						</span>
 					</div>
 					<button
@@ -247,7 +247,7 @@ import {
 	SparklesIcon,
 	VersionIcon,
 } from '@modrinth/assets'
-import { capitalizeString, renderString } from '@modrinth/utils'
+import { capitalizeString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
@@ -256,7 +256,7 @@ import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers'
 import { commonMessages } from '../../utils/common-messages'
 import { getActiveDisclosures } from '../../utils/disclosures'
-import { Avatar, BasicMarkdownText, IntlFormatted } from '../base'
+import { Avatar, IntlFormatted, MarkdownBody } from '../base'
 import { NewModal } from '../modal'
 
 const LICENSE_STALE_TIME = 1000 * 60 * 10
@@ -469,13 +469,13 @@ const { data: licenseBody, isError: isLicenseError } = useQuery({
 	staleTime: LICENSE_STALE_TIME,
 })
 
-const licenseHtml = computed(() => {
+const licenseSource = computed(() => {
 	if (licenseBody.value) {
-		return renderString(licenseBody.value)
+		return licenseBody.value
 	}
 
 	if (isLicenseError.value || licenseBody.value === '') {
-		return renderString(formatMessage(messages.licenseErrorMessage))
+		return formatMessage(messages.licenseErrorMessage)
 	}
 
 	return formatMessage(messages.loadingLicenseText)

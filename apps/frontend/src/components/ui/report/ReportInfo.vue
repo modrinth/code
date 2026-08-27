@@ -99,7 +99,7 @@
 				color="orange"
 			/>
 		</div>
-		<div v-if="showMessage" class="markdown-body" v-html="renderHighlightedString(report.body)" />
+		<MarkdownBody v-if="showMessage" highlight :source="report.body" />
 		<ThreadSummary
 			v-if="thread"
 			:thread="thread"
@@ -138,11 +138,12 @@ import {
 	CopyCode,
 	defineMessages,
 	formatReportType,
+	MarkdownBody,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatProjectType, renderHighlightedString } from '@modrinth/utils'
+import { formatProjectType } from '@modrinth/utils'
 
 import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
@@ -219,7 +220,7 @@ const messages = defineMessages({
 		}
 	}
 
-	.markdown-body {
+	:deep(.markdown-body) {
 		grid-area: body;
 		max-width: 100%;
 	}

@@ -12,4 +12,23 @@ export default baseConfig.append([
 			...storybook.configs.recommended.rules,
 		},
 	},
+	{
+		name: 'modrinth/restrict-comark-vue',
+		files: ['**/*.{ts,vue}'],
+		ignores: ['src/components/base/MarkdownBody.vue'],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						{
+							name: '@comark/vue',
+							message:
+								"Use <MarkdownBody> instead",
+						},
+					],
+				},
+			],
+		},
+	},
 ])

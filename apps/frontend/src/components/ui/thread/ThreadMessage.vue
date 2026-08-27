@@ -81,10 +81,15 @@
 				<ScaleIcon v-tooltip="'Moderator'" />
 			</span>
 		</template>
+		<MarkdownBody
+			v-if="message.body.type === 'text' && !forceCompact"
+			:source="message.body.body"
+			class="message__body"
+		/>
 		<div
-			v-if="message.body.type === 'text'"
+			v-else-if="message.body.type === 'text'"
 			class="message__body markdown-body"
-			v-html="formattedMessage"
+			v-html="compactPreview"
 		/>
 		<div v-else class="message__body status-message">
 			<span v-if="message.body.type === 'legacy_project_message'">
@@ -166,11 +171,13 @@ import {
 	AutoLink,
 	Avatar,
 	Badge,
+	MarkdownBody,
 	TeleportOverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
+import { computedAsync } from '@vueuse/core'
 
 import { isStaff } from '~/helpers/users.js'
 
@@ -208,20 +215,14 @@ const props = defineProps({
 const emit = defineEmits(['update-thread'])
 const settings = useModerationSettings()
 
-const formattedMessage = computed(() => {
-	const body = renderString(props.message.body.body)
-	if (props.forceCompact) {
-		const hasImage = body.includes('<img')
-		const noHtml = body.replace(/<\/?[^>]+(>|$)/g, '')
-		if (noHtml.trim()) {
-			return noHtml
-		} else if (hasImage) {
-			return 'sent an image.'
-		} else {
-			return 'sent a message.'
-		}
-	}
-	return body
+const compactPreview = computedAsync(async () => {
+	if (!props.forceCompact) return ''
+	const body = await renderString(props.message.body.body)
+	const hasImage = body.includes('<img')
+	const noHtml = body.replace(/<\/?[^>]+(>|$)/g, '')
+	if (noHtml.trim()) return noHtml
+	if (hasImage) return 'sent an image.'
+	return 'sent a message.'
 })
 
 const formatRelativeTime = useRelativeTime()

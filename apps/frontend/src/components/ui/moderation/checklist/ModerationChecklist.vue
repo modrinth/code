@@ -1472,7 +1472,7 @@ watchEffect(async () => {
 				newMap.set(
 					entry.node,
 					expanded
-						? `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(expanded)}</div>`
+						? `<div class="markdown-body moderation-tooltip-markdown">${await renderHighlightedString(expanded)}</div>`
 						: '',
 				)
 			} catch {

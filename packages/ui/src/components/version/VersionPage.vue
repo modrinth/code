@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, ExternalIcon, FileIcon, SearchIcon } from '@modrinth/assets'
-import {
-	capitalizeString,
-	formatVersionsForDisplay,
-	type GameVersionTag,
-	renderHighlightedString,
-} from '@modrinth/utils'
+import { capitalizeString, formatVersionsForDisplay, type GameVersionTag } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -26,6 +21,7 @@ import {
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import Input from '../base/inputs/Input.vue'
+import MarkdownBody from '../base/MarkdownBody.vue'
 import Table from '../base/Table.vue'
 import TagItem from '../base/TagItem.vue'
 import TagTagItem from '../base/TagTagItem.vue'
@@ -457,11 +453,7 @@ const authorLink = computed(() =>
 		<section id="changes">
 			<h3 class="mt-0 mb-2 text-lg font-semibold">{{ formatMessage(messages.changes) }}</h3>
 			<div class="p-4 bg-surface-3 rounded-2xl border-solid border border-surface-4">
-				<div
-					v-if="version.changelog"
-					class="markdown-body"
-					v-html="renderHighlightedString(version.changelog)"
-				/>
+				<MarkdownBody v-if="version.changelog" highlight :source="version.changelog" />
 				<div v-else class="text-secondary">{{ formatMessage(messages.noChanges) }}</div>
 			</div>
 		</section>

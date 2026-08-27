@@ -237,11 +237,7 @@
 					v-if="collection.description"
 					:title="formatMessage(commonMessages.descriptionLabel)"
 				>
-					<div
-						v-if="supportsMarkdown"
-						class="description-body"
-						v-html="renderString(collection.description)"
-					/>
+					<MarkdownBody v-if="supportsMarkdown" class="description-body" :source="collection.description" />
 					<p v-else class="m-0 break-words">{{ collection.description }}</p>
 				</SidebarCard>
 				<SidebarCard
@@ -387,6 +383,7 @@ import {
 	injectNotificationManager,
 	Input,
 	IntlFormatted,
+	MarkdownBody,
 	NavTabs,
 	NewModal,
 	normalizeChildren,
@@ -403,7 +400,7 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { isAdmin, renderString } from '@modrinth/utils'
+import { isAdmin } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { onServerPrefetch } from 'vue'

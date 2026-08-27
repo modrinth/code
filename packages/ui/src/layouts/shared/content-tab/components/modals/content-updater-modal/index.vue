@@ -166,11 +166,7 @@
 								formatMessage(messages.loadingChangelog)
 							}}</span>
 						</div>
-						<div
-							v-else-if="selectedVersion.changelog"
-							class="markdown-body"
-							v-html="renderHighlightedString(selectedVersion.changelog)"
-						/>
+						<MarkdownBody v-else-if="selectedVersion.changelog" highlight :source="selectedVersion.changelog" />
 						<div v-else class="text-secondary italic">
 							{{ formatMessage(messages.noChangelog) }}
 						</div>
@@ -281,18 +277,14 @@ import {
 	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	capitalizeString,
-	formatVersionsForDisplay,
-	type GameVersionTag,
-	renderHighlightedString,
-} from '@modrinth/utils'
+import { capitalizeString, formatVersionsForDisplay, type GameVersionTag } from '@modrinth/utils'
 import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, toRef } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import { Button } from '#ui/components/base/buttons'
 import Input from '#ui/components/base/inputs/Input.vue'
+import MarkdownBody from '#ui/components/base/MarkdownBody.vue'
 import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import VersionChannelIndicator from '#ui/components/version/VersionChannelIndicator.vue'

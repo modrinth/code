@@ -16,12 +16,12 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	MarkdownBody,
 	NewModal,
 	Table,
 	type TableColumn,
 	useVIntl,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
@@ -427,7 +427,7 @@ defineExpose({ show, hide })
 				v-if="versionLoadError || rowScanError"
 				class="mb-3 rounded-xl bg-highlight-red px-4 py-1 text-red"
 			>
-				<div v-html="renderString((versionLoadError || rowScanError) ?? '')"></div>
+				<MarkdownBody :source="(versionLoadError || rowScanError) ?? ''" />
 			</div>
 			<Table
 				:columns="columns"

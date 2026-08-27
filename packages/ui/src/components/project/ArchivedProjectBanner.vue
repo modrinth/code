@@ -3,7 +3,7 @@ import { ArchiveIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import BasicMarkdownText from '#ui/components/base/BasicMarkdownText.vue'
+import MarkdownBody from '#ui/components/base/MarkdownBody.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const props = defineProps<{
@@ -33,9 +33,7 @@ const messages = defineMessages({
 		<template #icon="{ iconClass }">
 			<ArchiveIcon :class="iconClass" />
 		</template>
-		<span v-if="trimmedReason">
-			<BasicMarkdownText :text="trimmedReason" />
-		</span>
+		<MarkdownBody v-if="trimmedReason" variant="basic" :source="trimmedReason" />
 		<span v-else>{{ formatMessage(messages.body, { title }) }}</span>
 	</Admonition>
 </template>
