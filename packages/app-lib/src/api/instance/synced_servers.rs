@@ -1,8 +1,9 @@
 use super::synced_options::{
     CheckpointStatus, checkpoint, detach_link, ensure_link, finish_checkpoint,
-    instance_dir, instance_is_running, instance_option_enabled, nbt_from_bytes,
-    nbt_to_bytes, read_nbt_file, safe_instance_id, sha1_bytes, sha1_file,
-    sync_files_are_protected, synced_options_path,
+    instance_dir, instance_is_running, instance_option_enabled,
+    instance_option_supported, nbt_from_bytes, nbt_to_bytes, read_nbt_file,
+    safe_instance_id, sha1_bytes, sha1_file, sync_files_are_protected,
+    synced_options_path,
 };
 use crate::state::{CachedEntry, InstanceLink, InstanceMetadata, SyncedOption};
 use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors};
@@ -1104,12 +1105,10 @@ async fn participating(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<bool> {
-    if !instance_option_enabled(metadata, SyncedOption::MultiplayerServers)
-        || is_linked_server_project(&metadata.link)
-    {
+    if !instance_option_enabled(metadata, SyncedOption::MultiplayerServers) {
         return Ok(false);
     }
-    Ok(sqlx::query_scalar!(
+    let global_enabled = sqlx::query_scalar!(
         r#"
 		SELECT EXISTS(
 			SELECT 1 FROM sync_feature_settings
@@ -1118,7 +1117,15 @@ async fn participating(
 		"#,
     )
     .fetch_one(&state.pool)
-    .await?)
+    .await?;
+
+    Ok(instance_option_supported(
+        metadata,
+        SyncedOption::MultiplayerServers,
+        global_enabled,
+        state,
+    )
+    .await)
 }
 
 pub(super) async fn canonical_exists(state: &State) -> crate::Result<bool> {
@@ -1563,15 +1570,6 @@ fn generated_path(state: &State, instance_id: &str) -> PathBuf {
         .join("servers/generated")
         .join(safe_instance_id(instance_id))
         .join(SERVERS_FILE)
-}
-
-fn is_linked_server_project(link: &InstanceLink) -> bool {
-    matches!(
-        link,
-        InstanceLink::ServerProject { .. }
-            | InstanceLink::ServerProjectModpack { .. }
-            | InstanceLink::ModrinthHosting { .. }
-    )
 }
 
 fn is_modpack_link(link: &InstanceLink) -> bool {

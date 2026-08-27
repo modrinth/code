@@ -268,6 +268,18 @@ async fn capability_status(
     }
 }
 
+pub(super) async fn instance_option_supported(
+    metadata: &InstanceMetadata,
+    option: SyncedOption,
+    global_enabled: bool,
+    state: &State,
+) -> bool {
+    matches!(
+        capability_status(metadata, option, global_enabled, state).await,
+        CapabilityStatus::Supported
+    )
+}
+
 async fn version_capability(
     metadata: &InstanceMetadata,
     option: SyncedOption,

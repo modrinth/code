@@ -130,8 +130,17 @@ pub(crate) async fn create_instance(
             &state.directories,
         )
         .await;
-        crate::api::instance::reconcile_instance_synced_options(&instance.id)
-            .await?;
+        if let Err(error) =
+            crate::api::instance::reconcile_instance_synced_options(
+                &instance.id,
+            )
+            .await
+        {
+            tracing::warn!(
+                "Failed to reconcile synced options for newly created instance {}: {error}",
+                instance.id
+            );
+        }
 
         Ok(instance)
     }
