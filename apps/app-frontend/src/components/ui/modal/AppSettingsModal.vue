@@ -131,7 +131,7 @@ const tabs = [
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.synced-options',
-			defaultMessage: 'Synced options',
+			defaultMessage: 'Synced settings',
 		}),
 		category: tabCategories.instances,
 		icon: RefreshCwIcon,

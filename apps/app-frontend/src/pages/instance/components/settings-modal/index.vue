@@ -91,7 +91,7 @@ const tabs = computed<TabbedModalTab[]>(() => [
 	{
 		name: defineMessage({
 			id: 'instance.settings.tabs.settings-overrides',
-			defaultMessage: 'Settings overrides',
+			defaultMessage: 'Sync overrides',
 		}),
 		icon: Settings2Icon,
 		content: SyncedOptionsSettings,

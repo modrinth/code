@@ -1752,7 +1752,7 @@
     "message": "Resource management"
   },
   "app.settings.tabs.synced-options": {
-    "message": "Synced options"
+    "message": "Synced settings"
   },
   "app.sidebar.playing-as": {
     "message": "Playing as"
@@ -2667,7 +2667,7 @@
     "message": "/path/to/java"
   },
   "instance.settings.tabs.settings-overrides": {
-    "message": "Settings overrides"
+    "message": "Sync overrides"
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
@@ -2715,7 +2715,7 @@
     "message": "Exclude this instance from multiplayer server syncing."
   },
   "instance.settings.tabs.synced-options.open-app-settings": {
-    "message": "Open synced options"
+    "message": "Open synced settings"
   },
   "instance.settings.tabs.synced-options.screenshots": {
     "message": "Screenshots"

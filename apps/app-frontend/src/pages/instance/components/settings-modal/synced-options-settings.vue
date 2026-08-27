@@ -51,7 +51,7 @@ const messages = defineMessages({
 	},
 	openSyncedOptions: {
 		id: 'instance.settings.tabs.synced-options.open-app-settings',
-		defaultMessage: 'Open synced options',
+		defaultMessage: 'Open synced settings',
 	},
 	multiplayerServers: {
 		id: 'instance.settings.tabs.synced-options.multiplayer-servers',
