@@ -794,9 +794,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Godkjenn med svar"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Lukk tråden"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Lukk med svar"
   },

@@ -1070,8 +1070,8 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Approve with reply"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Close thread"
+  "conversation-thread.action.close-report": {
+    "message": "Close report"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Close with reply"

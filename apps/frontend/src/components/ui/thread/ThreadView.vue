@@ -23,10 +23,12 @@
 			<p class="text-lg text-secondary">No messages yet</p>
 		</div>
 
-		<template v-if="closed">
-			<p class="text-secondary">This thread is closed and new messages cannot be sent to it.</p>
-			<slot name="closedActions" />
-		</template>
+		<div v-if="closed" class="flex flex-col gap-4 p-4 pt-2">
+			<p class="m-0 text-secondary">This thread is closed and new messages cannot be sent to it.</p>
+			<div>
+				<slot name="closedActions" />
+			</div>
+		</div>
 
 		<template v-else>
 			<div class="px-4 py-2">

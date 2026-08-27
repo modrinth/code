@@ -179,12 +179,14 @@
 		>
 			No reports in queue.
 		</div>
-		<div v-else class="flex flex-col gap-4">
+		<div v-else class="flex flex-col gap-4 overflow-x-clip">
 			<ReportCard
 				v-for="report in paginatedReports"
 				:key="report.id"
 				:report="report"
 				:collapsed="true"
+				dismiss-after-close
+				@dismiss="dismissReport(report.id)"
 			/>
 		</div>
 
@@ -290,37 +292,7 @@ const { data: allReports, pending: reportsPending } = await useLazyAsyncData(
 
 const isLoading = computed(() => reportsPending.value || allReports.value == null)
 
-const query = ref(route.query.q?.toString() || '')
-
-watch(
-	query,
-	(newQuery) => {
-		const currentQuery = { ...route.query }
-		if (newQuery) {
-			currentQuery.q = newQuery
-		} else {
-			delete currentQuery.q
-		}
-
-		router.replace({
-			path: route.path,
-			query: currentQuery,
-		})
-	},
-	{ immediate: false },
-)
-
-watch(
-	() => route.query.q,
-	(newQueryParam) => {
-		const newValue = newQueryParam?.toString() || ''
-		if (query.value !== newValue) {
-			query.value = newValue
-		}
-	},
-)
-
-const currentSortTypeSorting = ref('oldest')
+const SORT_VALUES = ['oldest', 'newest'] as const
 const sortTypes: ComboboxOption<string>[] = [
 	{ value: 'oldest', label: 'Oldest' },
 	{ value: 'newest', label: 'Newest' },
@@ -332,11 +304,7 @@ const MESSAGE_FILTERS = [
 	{ value: 'read', name: 'Read' },
 	{ value: 'involved', name: 'Involved' },
 ] as const
-const currentMessageFilter = ref<(typeof MESSAGE_FILTERS)[number]['value']>('all')
-const currentMessageFilterName = computed(
-	() =>
-		MESSAGE_FILTERS.find((filter) => filter.value === currentMessageFilter.value)?.name ?? 'All',
-)
+const MESSAGE_FILTER_VALUES = MESSAGE_FILTERS.map((filter) => filter.value)
 
 const PROJECT_TYPE_FILTERS = [
 	{ value: 'all', name: 'All project types' },
@@ -349,7 +317,7 @@ const PROJECT_TYPE_FILTERS = [
 	{ value: 'minecraft_java_server', name: 'Servers' },
 	{ value: 'shared-instance', name: 'Shared instance' },
 ] as const
-const currentProjectTypeFilter = ref<(typeof PROJECT_TYPE_FILTERS)[number]['value']>('all')
+const PROJECT_TYPE_VALUES = PROJECT_TYPE_FILTERS.map((filter) => filter.value)
 
 const REPORT_TARGET_FILTERS = [
 	{ value: 'all', name: 'All' },
@@ -358,13 +326,145 @@ const REPORT_TARGET_FILTERS = [
 	{ value: 'version', name: 'Versions' },
 	{ value: 'shared-instance', name: 'Shared instances' },
 ] as const
-const currentReportTargetFilter = ref<(typeof REPORT_TARGET_FILTERS)[number]['value']>('all')
+const REPORT_TARGET_VALUES = REPORT_TARGET_FILTERS.map((filter) => filter.value)
 
-const currentReportIssueFilter = ref('all')
+function parseAllowed<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+	const parsed = queryAsStringOrEmpty((value as string | string[] | null | undefined) ?? '')
+	return (allowed as readonly string[]).includes(parsed) ? (parsed as T) : fallback
+}
+
+function parsePage(value: unknown): number {
+	const page = Number.parseInt(
+		queryAsStringOrEmpty((value as string | string[] | null | undefined) ?? ''),
+		10,
+	)
+	return Number.isInteger(page) && page > 0 ? page : 1
+}
+
+function selectedValuesEqual(left: string[], right: string[]): boolean {
+	if (left.length !== right.length) return false
+	return left.every((value, index) => value === right[index])
+}
+
+function serializeRouteQuery(query: typeof route.query): string {
+	const keys = Object.keys(query).sort()
+	return JSON.stringify(
+		Object.fromEntries(
+			keys.flatMap((key) => {
+				const value = query[key]
+				if (value == null || value === '') return []
+				return [[key, Array.isArray(value) ? value.map(String) : String(value)]]
+			}),
+		),
+	)
+}
+
+const query = ref(queryAsStringOrEmpty(route.query.q ?? ''))
+const currentSortTypeSorting = ref(parseAllowed(route.query.sort, SORT_VALUES, 'oldest'))
+const currentMessageFilter = ref(parseAllowed(route.query.messages, MESSAGE_FILTER_VALUES, 'all'))
+const currentMessageFilterName = computed(
+	() =>
+		MESSAGE_FILTERS.find((filter) => filter.value === currentMessageFilter.value)?.name ?? 'All',
+)
+const currentProjectTypeFilter = ref(
+	parseAllowed(route.query.projectType, PROJECT_TYPE_VALUES, 'all'),
+)
+const currentReportTargetFilter = ref(parseAllowed(route.query.target, REPORT_TARGET_VALUES, 'all'))
+const currentReportIssueFilter = ref(queryAsStringOrEmpty(route.query.issue ?? '') || 'all')
+const currentReporterOrProject = ref(queryAsStringArray(route.query.selected))
+const currentPage = ref(parsePage(route.query.page))
+
+function writeFiltersToRoute() {
+	const nextQuery = { ...route.query }
+
+	if (query.value) nextQuery.q = query.value
+	else delete nextQuery.q
+
+	if (currentSortTypeSorting.value !== 'oldest') nextQuery.sort = currentSortTypeSorting.value
+	else delete nextQuery.sort
+
+	if (currentMessageFilter.value !== 'all') nextQuery.messages = currentMessageFilter.value
+	else delete nextQuery.messages
+
+	if (currentReportTargetFilter.value !== 'all') nextQuery.target = currentReportTargetFilter.value
+	else delete nextQuery.target
+
+	if (currentReportIssueFilter.value !== 'all') nextQuery.issue = currentReportIssueFilter.value
+	else delete nextQuery.issue
+
+	if (currentProjectTypeFilter.value !== 'all') {
+		nextQuery.projectType = currentProjectTypeFilter.value
+	} else {
+		delete nextQuery.projectType
+	}
+
+	if (currentReporterOrProject.value.length === 1) {
+		nextQuery.selected = currentReporterOrProject.value[0]
+	} else if (currentReporterOrProject.value.length > 1) {
+		nextQuery.selected = currentReporterOrProject.value
+	} else {
+		delete nextQuery.selected
+	}
+
+	if (currentPage.value > 1) nextQuery.page = String(currentPage.value)
+	else delete nextQuery.page
+
+	if (serializeRouteQuery(route.query) === serializeRouteQuery(nextQuery)) return
+
+	router.replace({
+		path: route.path,
+		query: nextQuery,
+	})
+}
+
+function readFiltersFromRoute() {
+	const nextQuery = queryAsStringOrEmpty(route.query.q ?? '')
+	if (query.value !== nextQuery) query.value = nextQuery
+
+	const nextSort = parseAllowed(route.query.sort, SORT_VALUES, 'oldest')
+	if (currentSortTypeSorting.value !== nextSort) currentSortTypeSorting.value = nextSort
+
+	const nextMessages = parseAllowed(route.query.messages, MESSAGE_FILTER_VALUES, 'all')
+	if (currentMessageFilter.value !== nextMessages) currentMessageFilter.value = nextMessages
+
+	const nextProjectType = parseAllowed(route.query.projectType, PROJECT_TYPE_VALUES, 'all')
+	if (currentProjectTypeFilter.value !== nextProjectType) {
+		currentProjectTypeFilter.value = nextProjectType
+	}
+
+	const nextTarget = parseAllowed(route.query.target, REPORT_TARGET_VALUES, 'all')
+	if (currentReportTargetFilter.value !== nextTarget) currentReportTargetFilter.value = nextTarget
+
+	const nextIssue = queryAsStringOrEmpty(route.query.issue ?? '') || 'all'
+	if (currentReportIssueFilter.value !== nextIssue) currentReportIssueFilter.value = nextIssue
+
+	const nextSelected = queryAsStringArray(route.query.selected)
+	if (!selectedValuesEqual(currentReporterOrProject.value, nextSelected)) {
+		currentReporterOrProject.value = nextSelected
+	}
+
+	const nextPage = parsePage(route.query.page)
+	if (currentPage.value !== nextPage) currentPage.value = nextPage
+}
+
+watch(
+	[
+		query,
+		currentSortTypeSorting,
+		currentMessageFilter,
+		currentProjectTypeFilter,
+		currentReportTargetFilter,
+		currentReportIssueFilter,
+		currentReporterOrProject,
+		currentPage,
+	],
+	writeFiltersToRoute,
+	{ deep: true },
+)
+
+watch(() => route.query, readFiltersFromRoute, { deep: true })
 
 type ReportedType<T> = T & { report_item_count: number }
-
-const currentReporterOrProject = ref<string[]>([])
 const reporterOrProjectOptions = computed<MultiSelectItem<string>[]>(() => {
 	if (!allReports.value) return []
 	const options: MultiSelectItem<string>[] = []
@@ -420,7 +520,6 @@ const reporterOrProjectOptions = computed<MultiSelectItem<string>[]>(() => {
 	return options
 })
 
-const currentPage = ref(1)
 const itemsPerPage = 15
 const totalPages = computed(() => Math.ceil((sortedReports.value?.length || 0) / itemsPerPage))
 
@@ -686,5 +785,27 @@ const pageEnd = computed(
 
 function goToPage(page: number) {
 	currentPage.value = page
+}
+
+watch(totalPages, (pages) => {
+	if (isLoading.value) return
+
+	if (pages === 0) {
+		if (currentPage.value !== 1) goToPage(1)
+		return
+	}
+
+	if (currentPage.value > pages) {
+		goToPage(pages)
+	}
+})
+
+function dismissReport(reportId: string) {
+	if (!allReports.value) return
+
+	allReports.value = allReports.value.filter((report) => report.id !== reportId)
+	if (currentPage.value > totalPages.value) {
+		currentPage.value = Math.max(1, totalPages.value)
+	}
 }
 </script>

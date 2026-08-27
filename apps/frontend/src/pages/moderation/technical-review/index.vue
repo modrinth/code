@@ -31,7 +31,6 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const keybinds = useModerationKeybinds()
 
-const currentPage = ref(1)
 const API_PAGE_SIZE = 50
 const UI_PAGE_SIZE = 4
 const { formatMessage } = useVIntl()
@@ -39,38 +38,166 @@ const formatNumber = useFormatNumber()
 const route = useRoute()
 const router = useRouter()
 
-const query = ref(route.query.q?.toString() || '')
+const SORT_VALUES = ['Severity highest', 'Severity lowest', 'Oldest', 'Newest'] as const
+const sortTypes: ComboboxOption<string>[] = [
+	{ value: 'Severity highest', label: 'Severity highest' },
+	{ value: 'Severity lowest', label: 'Severity lowest' },
+	{ value: 'Oldest', label: 'Oldest' },
+	{ value: 'Newest', label: 'Newest' },
+]
+
+const RESPONSE_FILTER_VALUES = ['All', 'Unread', 'Read'] as const
+const responseFilterTypes: ComboboxOption<string>[] = [
+	{ value: 'All', label: 'All' },
+	{ value: 'Unread', label: 'Unread' },
+	{ value: 'Read', label: 'Read' },
+]
+
+const PROJECT_TYPE_FILTERS = [
+	{ value: 'All project types', name: 'All project types' },
+	{ value: 'Modpacks', name: 'Modpacks' },
+	{ value: 'Mods', name: 'Mods' },
+	{ value: 'Resource Packs', name: 'Resource Packs' },
+	{ value: 'Data Packs', name: 'Data Packs' },
+	{ value: 'Plugins', name: 'Plugins' },
+	{ value: 'Shaders', name: 'Shaders' },
+	{ value: 'Servers', name: 'Servers' },
+] as const
+const PROJECT_TYPE_VALUES = PROJECT_TYPE_FILTERS.map((filter) => filter.value)
+
+function parseAllowed<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+	const parsed = queryAsStringOrEmpty((value as string | string[] | null | undefined) ?? '')
+	return (allowed as readonly string[]).includes(parsed) ? (parsed as T) : fallback
+}
+
+function parsePage(value: unknown): number {
+	const page = Number.parseInt(
+		queryAsStringOrEmpty((value as string | string[] | null | undefined) ?? ''),
+		10,
+	)
+	return Number.isInteger(page) && page > 0 ? page : 1
+}
+
+function parseBoolean(value: unknown, fallback: boolean): boolean {
+	const parsed = queryAsStringOrEmpty(
+		(value as string | string[] | null | undefined) ?? '',
+	).toLowerCase()
+	if (parsed === 'true' || parsed === '1') return true
+	if (parsed === 'false' || parsed === '0') return false
+	return fallback
+}
+
+function serializeRouteQuery(query: typeof route.query): string {
+	const keys = Object.keys(query).sort()
+	return JSON.stringify(
+		Object.fromEntries(
+			keys.flatMap((key) => {
+				const value = query[key]
+				if (value == null || value === '') return []
+				return [[key, Array.isArray(value) ? value.map(String) : String(value)]]
+			}),
+		),
+	)
+}
+
+const query = ref(queryAsStringOrEmpty(route.query.q ?? ''))
+const currentFilterType = ref(queryAsStringOrEmpty(route.query.flags ?? '') || 'All flags')
+const currentSortType = ref(parseAllowed(route.query.sort, SORT_VALUES, 'Severity highest'))
+const currentResponseFilter = ref(parseAllowed(route.query.response, RESPONSE_FILTER_VALUES, 'All'))
+const currentProjectTypeFilter = ref(
+	parseAllowed(route.query.projectType, PROJECT_TYPE_VALUES, 'All project types'),
+)
+const inOtherQueueFilter = ref(parseBoolean(route.query.underReview, true))
+const currentPage = ref(parsePage(route.query.page))
+
+let syncingFromRoute = false
+
+function writeFiltersToRoute() {
+	if (syncingFromRoute) return
+
+	const nextQuery = { ...route.query }
+
+	if (query.value) nextQuery.q = query.value
+	else delete nextQuery.q
+
+	if (currentSortType.value !== 'Severity highest') nextQuery.sort = currentSortType.value
+	else delete nextQuery.sort
+
+	if (currentResponseFilter.value !== 'All') nextQuery.response = currentResponseFilter.value
+	else delete nextQuery.response
+
+	if (currentFilterType.value !== 'All flags') nextQuery.flags = currentFilterType.value
+	else delete nextQuery.flags
+
+	if (currentProjectTypeFilter.value !== 'All project types') {
+		nextQuery.projectType = currentProjectTypeFilter.value
+	} else {
+		delete nextQuery.projectType
+	}
+
+	if (!inOtherQueueFilter.value) nextQuery.underReview = 'false'
+	else delete nextQuery.underReview
+
+	if (currentPage.value > 1) nextQuery.page = String(currentPage.value)
+	else delete nextQuery.page
+
+	if (serializeRouteQuery(route.query) === serializeRouteQuery(nextQuery)) return
+
+	router.replace({
+		path: route.path,
+		query: nextQuery,
+	})
+}
+
+function readFiltersFromRoute() {
+	syncingFromRoute = true
+
+	const nextQuery = queryAsStringOrEmpty(route.query.q ?? '')
+	if (query.value !== nextQuery) query.value = nextQuery
+
+	const nextFlags = queryAsStringOrEmpty(route.query.flags ?? '') || 'All flags'
+	if (currentFilterType.value !== nextFlags) currentFilterType.value = nextFlags
+
+	const nextSort = parseAllowed(route.query.sort, SORT_VALUES, 'Severity highest')
+	if (currentSortType.value !== nextSort) currentSortType.value = nextSort
+
+	const nextResponse = parseAllowed(route.query.response, RESPONSE_FILTER_VALUES, 'All')
+	if (currentResponseFilter.value !== nextResponse) currentResponseFilter.value = nextResponse
+
+	const nextProjectType = parseAllowed(
+		route.query.projectType,
+		PROJECT_TYPE_VALUES,
+		'All project types',
+	)
+	if (currentProjectTypeFilter.value !== nextProjectType) {
+		currentProjectTypeFilter.value = nextProjectType
+	}
+
+	const nextUnderReview = parseBoolean(route.query.underReview, true)
+	if (inOtherQueueFilter.value !== nextUnderReview) inOtherQueueFilter.value = nextUnderReview
+
+	const nextPage = parsePage(route.query.page)
+	if (currentPage.value !== nextPage) currentPage.value = nextPage
+
+	nextTick(() => {
+		syncingFromRoute = false
+	})
+}
 
 watch(
-	query,
-	(newQuery) => {
-		const currentQuery = { ...route.query }
-		if (newQuery) {
-			currentQuery.q = newQuery
-		} else {
-			delete currentQuery.q
-		}
-
-		router.replace({
-			path: route.path,
-			query: currentQuery,
-		})
-		goToPage(1)
-	},
-	{ immediate: false },
+	[
+		query,
+		currentFilterType,
+		currentSortType,
+		currentResponseFilter,
+		currentProjectTypeFilter,
+		inOtherQueueFilter,
+		currentPage,
+	],
+	writeFiltersToRoute,
 )
 
-watch(
-	() => route.query.q,
-	(newQueryParam) => {
-		const newValue = newQueryParam?.toString() || ''
-		if (query.value !== newValue) {
-			query.value = newValue
-		}
-	},
-)
-
-const currentFilterType = ref('All flags')
+watch(() => route.query, readFiltersFromRoute, { deep: true })
 
 const filterTypes = computed<ComboboxOption<string>[]>(() => {
 	const issues =
@@ -95,32 +222,6 @@ const filterTypes = computed<ComboboxOption<string>[]>(() => {
 	return options
 })
 
-const currentSortType = ref('Severity highest')
-const sortTypes: ComboboxOption<string>[] = [
-	{ value: 'Severity highest', label: 'Severity highest' },
-	{ value: 'Severity lowest', label: 'Severity lowest' },
-	{ value: 'Oldest', label: 'Oldest' },
-	{ value: 'Newest', label: 'Newest' },
-]
-
-const currentResponseFilter = ref('All')
-const responseFilterTypes: ComboboxOption<string>[] = [
-	{ value: 'All', label: 'All' },
-	{ value: 'Unread', label: 'Unread' },
-	{ value: 'Read', label: 'Read' },
-]
-
-const currentProjectTypeFilter = ref('All project types')
-const PROJECT_TYPE_FILTERS = [
-	{ value: 'All project types', name: 'All project types' },
-	{ value: 'Modpacks', name: 'Modpacks' },
-	{ value: 'Mods', name: 'Mods' },
-	{ value: 'Resource Packs', name: 'Resource Packs' },
-	{ value: 'Data Packs', name: 'Data Packs' },
-	{ value: 'Plugins', name: 'Plugins' },
-	{ value: 'Shaders', name: 'Shaders' },
-	{ value: 'Servers', name: 'Servers' },
-] as const
 const projectTypeFilterTypes = computed<ComboboxOption<string>[]>(() => {
 	const items = reviewItems.value ?? []
 	const showCounts = !isLoading.value && currentProjectTypeFilter.value === 'All project types'
@@ -139,8 +240,6 @@ const projectTypeFilterTypes = computed<ComboboxOption<string>[]>(() => {
 		return { value: filter.value, label: `${filter.name} (${formatNumber(count)})` }
 	})
 })
-
-const inOtherQueueFilter = ref(true)
 
 const techReviewQueryKey = computed(
 	() =>
@@ -426,13 +525,16 @@ watch(
 		currentProjectTypeFilter,
 	],
 	() => {
+		if (syncingFromRoute) return
 		goToPage(1)
 	},
 )
 
 watch(totalPages, (pages) => {
+	if (isLoading.value) return
+
 	if (pages === 0) {
-		goToPage(1)
+		if (currentPage.value !== 1) goToPage(1)
 		return
 	}
 

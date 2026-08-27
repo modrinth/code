@@ -1025,9 +1025,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Onaylandı, işlem tamamlandı"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Konuyu kapat"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Cevapla ve kapat"
   },

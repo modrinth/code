@@ -1022,9 +1022,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Accepteren met antwoord"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Sluit thread"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Sluit met antwoord"
   },

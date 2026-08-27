@@ -908,9 +908,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Chấp thuận với phản hồi"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Đóng luồng"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Đóng với phản hồi"
   },

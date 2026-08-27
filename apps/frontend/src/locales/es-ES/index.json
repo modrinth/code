@@ -1025,9 +1025,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Aprobar con respuesta"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Cerrar hilo"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Cerrar con respuesta"
   },
