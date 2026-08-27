@@ -67,7 +67,7 @@ const router = useRouter()
 const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
-	(e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void
+	(e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete' | 'desync'): void
 	(e: 'open-folder', world: SingleplayerWorld): void
 }>()
 
@@ -95,6 +95,8 @@ const props = withDefaults(
 		}
 
 		managed?: boolean
+		showPlayButton?: boolean
+		cardBackground?: 'raised' | 'surface-2'
 
 		// Instance
 		instanceId?: string
@@ -117,6 +119,8 @@ const props = withDefaults(
 
 		gameMode: undefined,
 		managed: false,
+		showPlayButton: true,
+		cardBackground: 'raised',
 
 		instanceId: undefined,
 		instanceName: undefined,
@@ -218,6 +222,10 @@ const messages = defineMessages({
 		id: 'instance.worlds.copy_address',
 		defaultMessage: 'Copy address',
 	},
+	desync: {
+		id: 'instance.worlds.desync_server',
+		defaultMessage: 'Desync',
+	},
 	viewInstance: {
 		id: 'instance.worlds.view_instance',
 		defaultMessage: 'View instance',
@@ -270,7 +278,10 @@ const messages = defineMessages({
 
 const cardOptions = useTemplateRef('cardOptions')
 const showStop = computed(
-	() => (props.playingWorld || (locked.value && props.playingInstance)) && !props.startingInstance,
+	() =>
+		props.showPlayButton &&
+		(props.playingWorld || (locked.value && props.playingInstance)) &&
+		!props.startingInstance,
 )
 const playDisabled = computed(
 	() =>
@@ -326,6 +337,17 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		icon: ClipboardCopyIcon,
 		shown: props.world.type === 'server',
 		action: () => copyToClipboard((props.world as ServerWorld).address),
+	},
+	{
+		id: 'desync',
+		label: formatMessage(messages.desync),
+		icon: XIcon,
+		action: () => emit('desync'),
+		shown:
+			!props.instanceId &&
+			props.world.type === 'server' &&
+			(props.world as ServerWorld).source === 'user_synced' &&
+			!!(props.world as ServerWorld).server_id,
 	},
 	{
 		id: 'edit',
@@ -404,6 +426,7 @@ const contextMenuOptions = computed((): ButtonMenuOption[] => [
 				label: formatMessage(commonMessages.stopButton),
 				icon: StopCircleIcon,
 				tone: 'red',
+				shown: props.showPlayButton,
 				action: () => emit('stop'),
 			}
 		: {
@@ -411,11 +434,12 @@ const contextMenuOptions = computed((): ButtonMenuOption[] => [
 				label: formatMessage(messages.playWorld),
 				icon: PlayIcon,
 				tone: 'brand',
+				shown: props.showPlayButton,
 				disabled: playDisabled.value,
 				tooltip: playTooltip.value ?? undefined,
 				action: () => emit('play'),
 			},
-	{ type: 'divider' },
+	{ type: 'divider', shown: props.showPlayButton },
 	...overflowOptions.value,
 ])
 
@@ -433,9 +457,11 @@ function openContextMenu(event: MouseEvent) {
 				/>
 			</template>
 			<div
-				class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] transition-[filter] ease-out [--hover-brightness:1.25] min-h-20"
+				class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] transition-[filter] ease-out [--hover-brightness:1.25] min-h-20"
 				:class="{
 					'world-item-highlighted': highlighted,
+					'bg-bg-raised': cardBackground === 'raised',
+					'bg-surface-2': cardBackground === 'surface-2',
 				}"
 			>
 				<Avatar
@@ -592,12 +618,17 @@ function openContextMenu(event: MouseEvent) {
 					</template>
 				</div>
 				<div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-					<Button v-if="showStop" type="colored" color="red" @click="emit('stop')">
+					<Button
+						v-if="showPlayButton && showStop"
+						type="colored"
+						color="red"
+						@click="emit('stop')"
+					>
 						<StopCircleIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.stopButton) }}
 					</Button>
 					<Button
-						v-else
+						v-else-if="showPlayButton"
 						v-tooltip="playTooltip"
 						:disabled="playDisabled"
 						type="colored"

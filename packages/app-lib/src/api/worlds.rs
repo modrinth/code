@@ -140,6 +140,8 @@ pub enum WorldDetails {
     },
     Server {
         index: usize,
+        server_id: String,
+        source: crate::api::instance::ServerSource,
         address: String,
         pack_status: ServerPackStatus,
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -448,35 +450,43 @@ fn read_hardcore(data: &NbtCompound) -> bool {
 
 async fn get_server_worlds_in_instance(
     instance_id: &str,
-    instance_dir: &Path,
+    _instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
-    let servers = servers_data::read(instance_dir).await?;
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    let servers = crate::api::instance::synced_servers::list_server_records(
+        &metadata, &state,
+    )
+    .await?;
     if servers.is_empty() {
         return Ok(());
     }
 
-    let state = State::get().await?;
     let join_log = server_join_log::get_joins(instance_id, &state.pool)
         .await
         .ok();
 
     for (index, server) in servers.into_iter().enumerate() {
-        if server.hidden {
+        if server.hidden() {
             // TODO: Figure out whether we want to hide or show direct connect servers
             continue;
         }
+        let address = server.address();
+        let server_id = server.id.clone();
         let world = World {
-            name: server.name,
+            name: server.name(),
             last_played: join_log
                 .as_ref()
                 .and_then(|log| {
-                    let (host, port) = parse_server_address(&server.ip).ok()?;
+                    let (host, port) = parse_server_address(&address).ok()?;
                     log.get(&(host.to_owned(), port))
                 })
                 .copied(),
             icon: server
-                .icon
+                .icon()
                 .and_then(|icon| {
                     Url::parse(&format!("data:image/png;base64,{icon}")).ok()
                 })
@@ -484,8 +494,10 @@ async fn get_server_worlds_in_instance(
             display_status: DisplayStatus::Normal,
             details: WorldDetails::Server {
                 index,
-                address: server.ip,
-                pack_status: server.accept_textures.into(),
+                server_id,
+                source: server.source,
+                address,
+                pack_status: server.accept_textures().into(),
                 project_id: None,
                 content_kind: None,
             },
@@ -766,25 +778,28 @@ pub async fn add_server_to_instance(
     content_kind: Option<String>,
 ) -> Result<usize> {
     let state = State::get().await?;
-    let (instance_id, instance_path) =
+    let (instance_id, _) =
         resolve_instance_identity(instance_id, &state).await?;
-    let instance_dir = state.directories.instances_dir().join(instance_path);
-    let mut servers = servers_data::read(&instance_dir).await?;
-    let insert_index = servers
-        .iter()
-        .position(|x| x.hidden)
-        .unwrap_or(servers.len());
-    servers.insert(
-        insert_index,
-        servers_data::ServerData {
-            name,
-            ip: address.clone(),
-            accept_textures: pack_status.into(),
-            hidden: false,
-            icon: None,
-        },
+    let metadata = crate::state::get_instance(&instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    let data = crate::api::instance::synced_servers::server_data(
+        name,
+        address.clone(),
+        pack_status.into(),
     );
-    servers_data::write(&instance_dir, &servers).await?;
+    let server_id = crate::api::instance::synced_servers::add_user_server(
+        &metadata, data, &state,
+    )
+    .await?;
+    let insert_index =
+        crate::api::instance::synced_servers::list_server_records(
+            &metadata, &state,
+        )
+        .await?
+        .iter()
+        .position(|server| server.id == server_id)
+        .unwrap_or(0);
 
     if project_id.is_some() || content_kind.is_some() {
         if let Some(project_id) = &project_id {
@@ -820,25 +835,20 @@ pub async fn edit_server_in_instance(
     pack_status: ServerPackStatus,
 ) -> Result<()> {
     let state = State::get().await?;
-    let (_, instance_path) =
+    let (instance_id, _) =
         resolve_instance_identity(instance_id, &state).await?;
-    let instance_dir = state.directories.instances_dir().join(instance_path);
-    let mut servers = servers_data::read(&instance_dir).await?;
-    let server =
-        servers
-            .get_mut(index)
-            .filter(|x| !x.hidden)
-            .ok_or_else(|| {
-                ErrorKind::InputError(format!(
-                    "No editable server at index {index}"
-                ))
-                .as_error()
-            })?;
-    server.name = name;
-    server.ip = address;
-    server.accept_textures = pack_status.into();
-    servers_data::write(&instance_dir, &servers).await?;
-    Ok(())
+    let metadata = crate::state::get_instance(&instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    crate::api::instance::synced_servers::update_server_by_index(
+        &metadata,
+        index,
+        name,
+        address,
+        pack_status.into(),
+        &state,
+    )
+    .await
 }
 
 pub async fn remove_server_from_instance(
@@ -846,80 +856,15 @@ pub async fn remove_server_from_instance(
     index: usize,
 ) -> Result<()> {
     let state = State::get().await?;
-    let (_, instance_path) =
+    let (instance_id, _) =
         resolve_instance_identity(instance_id, &state).await?;
-    let instance_dir = state.directories.instances_dir().join(instance_path);
-    let mut servers = servers_data::read(&instance_dir).await?;
-    if servers.get(index).as_ref().is_none_or(|x| x.hidden) {
-        return Err(ErrorKind::InputError(format!(
-            "No removable server at index {index}"
-        ))
-        .into());
-    }
-    servers.remove(index);
-    servers_data::write(&instance_dir, &servers).await?;
-    Ok(())
-}
-
-mod servers_data {
-    use crate::Result;
-    use crate::util::io;
-    use serde::{Deserialize, Serialize};
-    use std::path::Path;
-
-    #[derive(Serialize, Deserialize, Debug, Clone)]
-    #[serde(rename_all = "camelCase")]
-    pub struct ServerData {
-        #[serde(default)]
-        pub hidden: bool,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub icon: Option<String>,
-        #[serde(default)]
-        pub ip: String,
-        #[serde(default)]
-        pub name: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub accept_textures: Option<bool>,
-    }
-
-    pub async fn read(instance_dir: &Path) -> Result<Vec<ServerData>> {
-        #[derive(Deserialize, Debug)]
-        struct ServersData {
-            #[serde(default)]
-            servers: Vec<ServerData>,
-        }
-
-        let servers_dat_path = instance_dir.join("servers.dat");
-        if !servers_dat_path.exists() {
-            return Ok(vec![]);
-        }
-        let servers_data = io::read(servers_dat_path).await?;
-        let servers_data: ServersData = quartz_nbt::serde::deserialize(
-            &servers_data,
-            quartz_nbt::io::Flavor::Uncompressed,
-        )?
-        .0;
-        Ok(servers_data.servers)
-    }
-
-    pub async fn write(
-        instance_dir: &Path,
-        servers: &[ServerData],
-    ) -> Result<()> {
-        #[derive(Serialize, Debug)]
-        struct ServersData<'a> {
-            servers: &'a [ServerData],
-        }
-
-        let servers_dat_path = instance_dir.join("servers.dat");
-        let data = quartz_nbt::serde::serialize(
-            &ServersData { servers },
-            None,
-            quartz_nbt::io::Flavor::Uncompressed,
-        )?;
-        io::write(servers_dat_path, data).await?;
-        Ok(())
-    }
+    let metadata = crate::state::get_instance(&instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    crate::api::instance::synced_servers::remove_server_by_index(
+        &metadata, index, &state,
+    )
+    .await
 }
 
 pub async fn get_instance_protocol_version(

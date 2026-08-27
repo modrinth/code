@@ -57,6 +57,31 @@ export const WithActions: Story = {
 	}),
 }
 
+export const Stacked: Story = {
+	render: () => ({
+		components: { NewModal, Button },
+		setup() {
+			const parentModalRef = ref<InstanceType<typeof NewModal> | null>(null)
+			const childModalRef = ref<InstanceType<typeof NewModal> | null>(null)
+			const openParentModal = () => parentModalRef.value?.show()
+			const openChildModal = () => childModalRef.value?.show()
+			return { parentModalRef, childModalRef, openParentModal, openChildModal }
+		},
+		template: `
+			<div>
+				<Button type="colored" color="brand" @click="openParentModal">Open Parent Modal</Button>
+				<NewModal ref="parentModalRef" header="Parent Modal">
+					<p>The child modal should appear above this surface and backdrop.</p>
+					<Button type="colored" color="brand" @click="openChildModal">Open Child Modal</Button>
+				</NewModal>
+				<NewModal ref="childModalRef" header="Child Modal" max-width="500px">
+					<p>This modal is the topmost layer.</p>
+				</NewModal>
+			</div>
+		`,
+	}),
+}
+
 export const DangerFade: Story = {
 	render: () => ({
 		components: { NewModal, Button },

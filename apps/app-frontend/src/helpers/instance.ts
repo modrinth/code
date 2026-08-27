@@ -167,6 +167,219 @@ export async function get_mod_full_path(instanceId: string, projectPath: string)
 	return await invoke('plugin:instance|instance_get_mod_full_path', { instanceId, projectPath })
 }
 
+export type ScreenshotKey = {
+	instance_id: string
+	file_name: string
+}
+
+export type InstanceScreenshot = ScreenshotKey & {
+	id: string
+	instance_name: string
+	created_at: string
+	modified_at: number
+	group_id?: string | null
+	path: string
+	url: string
+}
+
+export type ScreenshotGroup = {
+	id: string
+	name: string
+}
+
+export type ScreenshotGroupMembershipUpdate = {
+	screenshot_id: string
+	group_id?: string | null
+}
+
+export type ScreenshotGroupImport = ScreenshotGroup & {
+	screenshot_ids: string[]
+}
+
+export async function list_instance_screenshots(instanceId: string): Promise<InstanceScreenshot[]> {
+	return await invoke('plugin:instance|instance_list_screenshots', { instanceId })
+}
+
+export async function list_all_screenshots(): Promise<InstanceScreenshot[]> {
+	return await invoke('plugin:instance|instance_list_all_screenshots')
+}
+
+export async function list_synced_screenshots(): Promise<InstanceScreenshot[]> {
+	return await invoke('plugin:instance|instance_list_synced_screenshots')
+}
+
+export async function save_edited_screenshot(
+	key: ScreenshotKey,
+	pngBytes: Uint8Array,
+	mode: 'create_copy' | 'replace_edit',
+): Promise<InstanceScreenshot> {
+	return await invoke('plugin:instance|instance_save_edited_screenshot', {
+		key,
+		pngBytes: Array.from(pngBytes),
+		mode,
+	})
+}
+
+export async function list_screenshot_groups(): Promise<ScreenshotGroup[]> {
+	return await invoke('plugin:instance|instance_list_screenshot_groups')
+}
+
+export async function create_screenshot_group(
+	name: string,
+	screenshotIds: string[],
+): Promise<ScreenshotGroup> {
+	return await invoke('plugin:instance|instance_create_screenshot_group', {
+		name,
+		screenshotIds,
+	})
+}
+
+export async function rename_screenshot_group(
+	id: string,
+	newName: string,
+): Promise<ScreenshotGroup> {
+	return await invoke('plugin:instance|instance_rename_screenshot_group', { id, newName })
+}
+
+export async function delete_screenshot_group(id: string): Promise<void> {
+	return await invoke('plugin:instance|instance_delete_screenshot_group', { id })
+}
+
+export async function set_screenshot_group_memberships(
+	updates: ScreenshotGroupMembershipUpdate[],
+): Promise<void> {
+	return await invoke('plugin:instance|instance_set_screenshot_group_memberships', { updates })
+}
+
+export async function import_screenshot_groups(groups: ScreenshotGroupImport[]): Promise<void> {
+	return await invoke('plugin:instance|instance_import_screenshot_groups', { groups })
+}
+
+export async function delete_screenshots(keys: ScreenshotKey[]): Promise<void> {
+	return await invoke('plugin:instance|instance_delete_screenshots', { keys })
+}
+
+export async function export_screenshots(keys: ScreenshotKey[], exportPath: string): Promise<void> {
+	return await invoke('plugin:instance|instance_export_screenshots', { keys, exportPath })
+}
+
+export async function move_screenshots(
+	keys: ScreenshotKey[],
+	targetInstanceId: string,
+): Promise<ScreenshotKey[]> {
+	return await invoke('plugin:instance|instance_move_screenshots', { keys, targetInstanceId })
+}
+
+export async function open_screenshot(key: ScreenshotKey): Promise<void> {
+	return await invoke('plugin:instance|instance_open_screenshot', { key })
+}
+
+export async function set_synced_option(
+	instanceId: string,
+	option: SyncedOption,
+	enabled: boolean,
+	resolution?: SyncedOptionJoinResolution,
+): Promise<GameInstance> {
+	return await invoke('plugin:instance|instance_set_synced_option', {
+		instanceId,
+		option,
+		enabled,
+		resolution,
+	})
+}
+
+export type SyncedOption =
+	| 'command_history'
+	| 'multiplayer_servers'
+	| 'creative_hotbars'
+	| 'screenshots'
+
+export type GlobalSyncedOptions = Record<SyncedOption, boolean>
+
+export type SyncedOptionJoinAction = 'seed_shared' | 'attach' | 'merge' | 'requires_resolution'
+
+export type SyncedOptionJoinResolution = 'use_synced' | 'use_instance'
+
+export type SyncedOptionJoinPreview = {
+	action: SyncedOptionJoinAction
+}
+
+export type SyncedOptionCapability = {
+	option: SyncedOption
+	supported: boolean
+	disabled_reason?: string | null
+}
+
+export type SyncedOptionsOverview = {
+	global_options: GlobalSyncedOptions
+	capabilities: SyncedOptionCapability[]
+}
+
+export async function get_synced_option_join_preview(
+	instanceId: string,
+	option: SyncedOption,
+): Promise<SyncedOptionJoinPreview> {
+	return await invoke('plugin:instance|instance_get_synced_option_join_preview', {
+		instanceId,
+		option,
+	})
+}
+
+export async function get_synced_options_overview(
+	instanceId: string,
+): Promise<SyncedOptionsOverview> {
+	return await invoke('plugin:instance|instance_get_synced_options_overview', { instanceId })
+}
+
+export async function get_global_synced_options(): Promise<GlobalSyncedOptions> {
+	return await invoke('plugin:instance|instance_get_global_synced_options')
+}
+
+export async function set_global_synced_option(
+	option: SyncedOption,
+	enabled: boolean,
+): Promise<GlobalSyncedOptions> {
+	return await invoke('plugin:instance|instance_set_global_synced_option', {
+		option,
+		enabled,
+	})
+}
+
+export async function get_command_history(): Promise<string> {
+	return await invoke('plugin:instance|instance_get_command_history')
+}
+
+export async function set_command_history(contents: string): Promise<string> {
+	return await invoke('plugin:instance|instance_set_command_history', { contents })
+}
+
+export async function open_synced_options_folder(): Promise<void> {
+	return await invoke('plugin:instance|instance_open_synced_options_folder')
+}
+
+export type SyncedServer = {
+	id: string
+	name: string
+	address: string
+	accept_textures?: boolean | null
+}
+
+export async function list_synced_servers(): Promise<SyncedServer[]> {
+	return await invoke('plugin:instance|instance_list_synced_servers')
+}
+
+export async function update_synced_server(server: SyncedServer): Promise<void> {
+	return await invoke('plugin:instance|instance_update_synced_server', { server })
+}
+
+export async function remove_synced_server(serverId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_remove_synced_server', { serverId })
+}
+
+export async function rebuild_synced_options(instanceId?: string): Promise<void> {
+	return await invoke('plugin:instance|instance_rebuild_synced_options', { instanceId })
+}
+
 export interface JavaVersion {
 	parsed_version: number
 	version: string

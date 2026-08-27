@@ -711,6 +711,7 @@ import {
 	ResubscribeModal,
 	ServerListing,
 	TeleportOverflowMenu,
+	useDebugLogger,
 	useFormatDateTime,
 	useFormatPrice,
 	useServerBackupDownload,
@@ -728,6 +729,7 @@ import { products } from '~/generated/state.json'
 const { addNotification, handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 const { getLatestBackupDownload } = useServerBackupDownload()
+const debug = useDebugLogger('Billing')
 definePageMeta({
 	middleware: 'auth',
 })
@@ -1013,7 +1015,6 @@ const messages = defineMessages({
 })
 
 function getIntervalNounLabel(interval) {
-	console.log(interval)
 	return interval === 'yearly'
 		? formatMessage(messages.intervalYear)
 		: interval === 'quarterly'
@@ -1391,10 +1392,10 @@ function showCancellationSurvey(subscription) {
 			price: price ? `${price / 100}` : 'unknown',
 			currency: currency ?? 'unknown',
 		},
-		onOpen: () => console.log(`Opened cancellation survey for: ${subscription.id}`),
-		onClose: () => console.log(`Closed cancellation survey for: ${subscription.id}`),
+		onOpen: () => debug(`Opened cancellation survey for: ${subscription.id}`),
+		onClose: () => debug(`Closed cancellation survey for: ${subscription.id}`),
 		onSubmit: (payload) => {
-			console.log('Form submitted, cancelling server.', payload)
+			debug('Form submitted, cancelling server.', payload)
 			cancelSubscription(subscription.id, true)
 		},
 	}
@@ -1403,9 +1404,7 @@ function showCancellationSurvey(subscription) {
 
 	try {
 		if (window.Tally?.openPopup) {
-			console.log(
-				`Opening Tally popup for servers subscription ${subscription.id} (form ID: ${formId})`,
-			)
+			debug(`Opening Tally popup for servers subscription ${subscription.id} (form ID: ${formId})`)
 			window.Tally.openPopup(formId, popupOptions)
 		} else {
 			console.warn('Tally script not yet loaded')

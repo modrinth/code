@@ -92,6 +92,7 @@ import {
 	EditIcon,
 	FolderOpenIcon,
 	GlobeIcon,
+	ImagesIcon,
 	PlayIcon,
 	PlusIcon,
 	StopCircleIcon,
@@ -139,6 +140,7 @@ import {
 } from '@/helpers/install'
 import {
 	get_full_path,
+	get_global_synced_options,
 	getInstanceIconUrl,
 	kill,
 	refresh_content_updates,
@@ -187,6 +189,7 @@ const messages = defineMessages({
 	},
 	contentTab: { id: 'app.instance.tab.content', defaultMessage: 'Content' },
 	filesTab: { id: 'app.instance.tab.files', defaultMessage: 'Files' },
+	screenshotsTab: { id: 'app.instance.tab.screenshots', defaultMessage: 'Screenshots' },
 	worldsTab: { id: 'app.instance.tab.worlds', defaultMessage: 'Worlds' },
 	logsTab: { id: 'app.instance.tab.logs', defaultMessage: 'Logs' },
 	shareTab: { id: 'app.instance.tab.share', defaultMessage: 'Share' },
@@ -230,6 +233,10 @@ useQuery(
 	})),
 )
 const instance = computed(() => instanceQuery.data.value)
+const globalSyncedOptionsQuery = useQuery({
+	queryKey: ['global-synced-options'],
+	queryFn: get_global_synced_options,
+})
 useQuery(
 	computed(() => ({
 		queryKey: instanceKeys.contentUpdateCheck(instanceId.value),
@@ -494,6 +501,17 @@ const tabs = computed(() => {
 			icon: TerminalSquareIcon,
 		},
 	]
+
+	const screenshotsSynced =
+		globalSyncedOptionsQuery.data.value?.screenshots === true &&
+		instance.value?.synced_options.screenshots === true
+	if (!screenshotsSynced) {
+		instanceTabs.splice(2, 0, {
+			label: formatMessage(messages.screenshotsTab),
+			href: `${basePath.value}/screenshots`,
+			icon: ImagesIcon,
+		})
+	}
 
 	if (showShareTab.value) {
 		instanceTabs.push({

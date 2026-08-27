@@ -4,8 +4,9 @@ use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSetSyncStatus, ContentSourceKind,
     Instance, InstanceIconBackground, InstanceIconConfig,
     InstanceLaunchContext, InstanceLaunchOverrides,
-    InstanceLaunchOverridesData, InstanceLink, SharedInstanceAttachment,
-    SharedInstanceRole, playtime_to_storage,
+    InstanceLaunchOverridesData, InstanceLink, InstanceSyncedOption,
+    InstanceSyncedOptions, SharedInstanceAttachment, SharedInstanceRole,
+    playtime_to_storage,
 };
 use crate::state::{
     InstanceInstallStage, LauncherFeatureVersion, ModLoader, ReleaseChannel,
@@ -168,6 +169,7 @@ pub(crate) struct InstanceMetadataRecord {
     pub link: InstanceLink,
     pub shared_instance: Option<SharedInstanceAttachment>,
     pub group_ids: Vec<String>,
+    pub synced_options: InstanceSyncedOptions,
     pub launch_overrides: InstanceLaunchOverrides,
 }
 
@@ -175,6 +177,13 @@ pub(crate) struct InstanceMetadataRecord {
 pub(crate) struct InstanceDisplayInfo {
     pub id: String,
     pub name: String,
+}
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub(crate) struct InstanceScreenshotSource {
+    pub id: String,
+    pub name: String,
+    pub path: String,
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -363,6 +372,7 @@ impl InstanceMetadataRow {
             link,
             shared_instance,
             group_ids,
+            synced_options: InstanceSyncedOptions::default(),
             launch_overrides,
         })
     }
@@ -464,6 +474,129 @@ where
     .await?;
 
     Ok(row)
+}
+
+pub(crate) async fn get_instance_screenshot_source(
+    instance_id: &str,
+    pool: &SqlitePool,
+) -> crate::Result<Option<InstanceScreenshotSource>> {
+    let source = sqlx::query_as::<_, InstanceScreenshotSource>(
+        "
+		SELECT id, name, path
+		FROM instances
+		WHERE id = ?
+		",
+    )
+    .bind(instance_id)
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(source)
+}
+
+pub(crate) async fn list_synced_screenshot_sources(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<InstanceScreenshotSource>> {
+    let sources = sqlx::query_as!(
+        InstanceScreenshotSource,
+        "
+		SELECT instances.id, instances.name, instances.path
+		FROM instances
+		INNER JOIN instance_sync_preferences preferences
+			ON preferences.instance_id = instances.id
+		WHERE preferences.feature = 'screenshots'
+			AND preferences.enabled = 1
+			AND EXISTS (
+				SELECT 1
+				FROM sync_feature_settings
+				WHERE feature = 'screenshots' AND globally_enabled = 1
+			)
+		ORDER BY instances.name, instances.id
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(sources)
+}
+
+pub(crate) async fn list_screenshot_sources(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<InstanceScreenshotSource>> {
+    let sources = sqlx::query_as::<_, InstanceScreenshotSource>(
+        "
+		SELECT id, name, path
+		FROM instances
+		ORDER BY name, id
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(sources)
+}
+
+pub(crate) async fn get_instance_sync_preferences(
+    instance_id: &str,
+    pool: &SqlitePool,
+) -> crate::Result<InstanceSyncedOptions> {
+    let enabled_features = sqlx::query_scalar!(
+        "
+		SELECT feature
+		FROM instance_sync_preferences
+		WHERE instance_id = ? AND enabled = 1
+		",
+        instance_id,
+    )
+    .fetch_all(pool)
+    .await?
+    .into_iter()
+    .collect::<HashSet<_>>();
+
+    Ok(InstanceSyncedOptions {
+        command_history: enabled_features.contains("command_history"),
+        multiplayer_servers: enabled_features.contains("multiplayer_servers"),
+        creative_hotbars: enabled_features.contains("creative_hotbars"),
+        screenshots: enabled_features.contains("screenshots"),
+    })
+}
+
+async fn attach_sync_preferences(
+    records: &mut [InstanceMetadataRecord],
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let enabled_preferences = sqlx::query!(
+        "
+		SELECT instance_id, feature
+		FROM instance_sync_preferences
+		WHERE enabled = 1
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    for record in records {
+        for row in enabled_preferences
+            .iter()
+            .filter(|row| row.instance_id == record.instance.id)
+        {
+            match row.feature.as_str() {
+                "command_history" => {
+                    record.synced_options.command_history = true
+                }
+                "multiplayer_servers" => {
+                    record.synced_options.multiplayer_servers = true
+                }
+                "creative_hotbars" => {
+                    record.synced_options.creative_hotbars = true
+                }
+                "screenshots" => record.synced_options.screenshots = true,
+                _ => {}
+            }
+        }
+    }
+
+    Ok(())
 }
 
 pub(crate) async fn is_instance_quarantined<'e, E>(
@@ -791,7 +924,13 @@ pub(crate) async fn get_instance_metadata_by_id(
             .fetch_optional(pool)
             .await?;
 
-    row.map(InstanceMetadataRow::into_record).transpose()
+    let mut record = row.map(InstanceMetadataRow::into_record).transpose()?;
+    if let Some(record) = record.as_mut() {
+        record.synced_options =
+            get_instance_sync_preferences(&record.instance.id, pool).await?;
+    }
+
+    Ok(record)
 }
 
 pub(crate) async fn get_instance_metadata_many(
@@ -821,9 +960,12 @@ pub(crate) async fn get_instance_metadata_many(
     .fetch_all(pool)
     .await?;
 
-    rows.into_iter()
+    let mut records = rows
+        .into_iter()
         .map(InstanceMetadataRow::into_record)
-        .collect()
+        .collect::<crate::Result<Vec<_>>>()?;
+    attach_sync_preferences(&mut records, pool).await?;
+    Ok(records)
 }
 
 pub(crate) async fn list_instance_metadata(
@@ -834,9 +976,12 @@ pub(crate) async fn list_instance_metadata(
             .fetch_all(pool)
             .await?;
 
-    rows.into_iter()
+    let mut records = rows
+        .into_iter()
         .map(InstanceMetadataRow::into_record)
-        .collect()
+        .collect::<crate::Result<Vec<_>>>()?;
+    attach_sync_preferences(&mut records, pool).await?;
+    Ok(records)
 }
 
 pub(crate) async fn get_instance_launch_context(
@@ -1132,6 +1277,65 @@ pub(crate) async fn insert_instance(
         last_played,
         submitted_time_played,
         recent_time_played,
+    )
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn set_instance_sync_preference(
+    instance_id: &str,
+    option: InstanceSyncedOption,
+    enabled: bool,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let instance_exists = sqlx::query_scalar!(
+        r#"
+		SELECT EXISTS(SELECT 1 FROM instances WHERE id = ?)
+			AS "exists!: bool"
+		"#,
+        instance_id,
+    )
+    .fetch_one(pool)
+    .await?;
+
+    if !instance_exists {
+        return Err(crate::ErrorKind::InputError(
+            "Unknown instance".to_string(),
+        )
+        .into());
+    }
+
+    let option_name = option.as_str();
+    sqlx::query!(
+        "
+		INSERT INTO instance_sync_preferences (instance_id, feature, enabled)
+		VALUES (?, ?, ?)
+		ON CONFLICT (instance_id, feature) DO UPDATE SET
+			enabled = excluded.enabled
+		",
+        instance_id,
+        option_name,
+        enabled,
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn insert_default_instance_sync_preferences(
+    instance_id: &str,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    sqlx::query!(
+        "
+		INSERT INTO instance_sync_preferences (instance_id, feature, enabled)
+		SELECT ?, feature, new_instance_default
+		FROM sync_feature_settings
+		",
+        instance_id,
     )
     .execute(&mut **tx)
     .await?;

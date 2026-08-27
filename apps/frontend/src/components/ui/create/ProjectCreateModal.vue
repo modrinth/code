@@ -143,6 +143,7 @@ import {
 	Input,
 	NewModal,
 	Textarea,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
@@ -163,6 +164,7 @@ interface ShowOptions {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+const debug = useDebugLogger('ProjectCreateModal')
 
 defineExpose({
 	show,
@@ -453,7 +455,7 @@ async function createProject() {
 				},
 			})) as Labrinth.Projects.v3.Project
 			createdProjectId = result.id
-			console.log(createdProjectId)
+			debug(createdProjectId)
 		}
 
 		modal.value?.hide()
