@@ -1,8 +1,8 @@
 import LinkifyIt from 'linkify-it'
 
+import { getBlockedProjectContentLink } from '../links/index.ts'
 import { getNonStandardTextRatio, validateNonStandardText } from '../non-standard-text/index.ts'
 import { validateProfanity } from '../profanity/index.ts'
-import { getBlockedProjectContentLink } from '../project-links/index.ts'
 
 export interface ProjectFieldMessageDescriptor {
 	id: string

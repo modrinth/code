@@ -193,13 +193,9 @@
 	</div>
 </template>
 
-<script setup>
-import {
-	checkLink,
-	getLinkCheckState,
-	isLinkCheckPending,
-	useLinkCheck,
-} from '@modrinth/moderation'
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
+import { type LinkCheckContext, type LinkCheckResult, validateLink } from '@modrinth/moderation'
 import {
 	Combobox,
 	commonProjectSettingsMessages,
@@ -216,6 +212,15 @@ import {
 import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+
+type EditableLinkField = 'discord' | 'issues' | 'site' | 'source' | 'store' | 'wiki'
+type EditableLinks = Partial<Record<EditableLinkField, string>>
+type ProjectLinkUrls = Labrinth.Projects.v3.Project['link_urls']
+
+interface DonationRow {
+	id?: string
+	url?: string
+}
 
 const tags = useGeneratedState()
 
@@ -238,7 +243,7 @@ const {
 	saved,
 	current,
 	reset: resetFields,
-} = useSavable(
+} = useSavable<EditableLinks>(
 	() => {
 		if (isServerProject.value) {
 			return {
@@ -258,10 +263,11 @@ const {
 	() => {},
 )
 
-function donationRowsFromLinks(linkUrls) {
-	const rows = (tags.value.donationPlatforms ?? [])
-		.filter((platform) => linkUrls?.[platform.short]?.url)
-		.map((platform) => ({ id: platform.short, url: linkUrls[platform.short].url }))
+function donationRowsFromLinks(linkUrls?: ProjectLinkUrls): DonationRow[] {
+	const rows: DonationRow[] = (tags.value.donationPlatforms ?? []).flatMap((platform) => {
+		const url = linkUrls?.[platform.short]?.url
+		return url ? [{ id: platform.short, url }] : []
+	})
 	rows.push({ id: undefined, url: undefined })
 	return rows
 }
@@ -277,7 +283,11 @@ function reset() {
 	resetDonations()
 }
 
-function fieldContext(field, getUrl, extra) {
+function fieldContext(
+	field: string,
+	getUrl: () => string | undefined,
+	extra: Record<string, unknown> = {},
+) {
 	return computed(() => ({ field, url: getUrl(), ...extra }))
 }
 
@@ -290,23 +300,30 @@ const wikiContext = fieldContext('wiki', () => current.value.wiki)
 const siteContext = fieldContext('site', () => current.value.site)
 const storeContext = fieldContext('store', () => current.value.store)
 
-const discordInviteCheck = useLinkCheck(discordContext)
-const issuesCheck = useLinkCheck(issuesContext)
-const sourceCheck = useLinkCheck(sourceContext)
-const wikiCheck = useLinkCheck(wikiContext)
-const siteCheck = useLinkCheck(siteContext)
-const storeCheck = useLinkCheck(storeContext)
+const discordInviteValidation = useLinkValidation(discordContext)
+const issuesValidation = useLinkValidation(issuesContext)
+const sourceValidation = useLinkValidation(sourceContext)
+const wikiValidation = useLinkValidation(wikiContext)
+const siteValidation = useLinkValidation(siteContext)
+const storeValidation = useLinkValidation(storeContext)
 
-function donationContext(row) {
+const discordInviteCheck = discordInviteValidation.result
+const issuesCheck = issuesValidation.result
+const sourceCheck = sourceValidation.result
+const wikiCheck = wikiValidation.result
+const siteCheck = siteValidation.result
+const storeCheck = storeValidation.result
+
+function donationContext(row: DonationRow): LinkCheckContext {
 	return {
-		field: row.id,
+		field: row.id ?? '',
 		url: row.url,
 		isDonation: true,
 		platformName: tags.value.donationPlatforms.find((platform) => platform.short === row.id)?.name,
 	}
 }
 
-function donationCheckState(row, index) {
+function donationCheckState(row: DonationRow, index: number): LinkCheckResult | undefined {
 	if (row.url && !row.id) {
 		return {
 			severity: 'error',
@@ -335,12 +352,17 @@ function donationCheckState(row, index) {
 		}
 	}
 
-	return getLinkCheckState(donationContext(row))
+	return donationCheckResults.get(index)
 }
 
-const donationCheckTimers = reactive(new Map())
+const donationCheckTimers = reactive(new Map<number, ReturnType<typeof setTimeout>>())
+const donationCheckResults = reactive(new Map<number, LinkCheckResult>())
+const donationChecksPending = reactive(new Set<number>())
+let donationValidationId = 0
+
 onScopeDispose(() => {
 	for (const timeout of donationCheckTimers.values()) clearTimeout(timeout)
+	donationValidationId++
 })
 
 watch(
@@ -348,14 +370,26 @@ watch(
 	(rows) => {
 		for (const timeout of donationCheckTimers.values()) clearTimeout(timeout)
 		donationCheckTimers.clear()
+		donationCheckResults.clear()
+		donationChecksPending.clear()
+		const currentValidationId = ++donationValidationId
 
 		rows.forEach((row, index) => {
 			if (!row.id || !row.url) return
+			donationChecksPending.add(index)
 			donationCheckTimers.set(
 				index,
-				setTimeout(() => {
+				setTimeout(async () => {
 					donationCheckTimers.delete(index)
-					void checkLink(donationContext(row))
+					try {
+						const result = await validateLink(donationContext(row))
+						if (currentValidationId !== donationValidationId) return
+						if (result) donationCheckResults.set(index, result)
+					} finally {
+						if (currentValidationId === donationValidationId) {
+							donationChecksPending.delete(index)
+						}
+					}
 				}, 500),
 			)
 		})
@@ -370,33 +404,33 @@ const hasPermission = computed(() => {
 	return isAdminUser.value || (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
 
-function donationsMapFromLinkUrls(linkUrls) {
-	const donations = {}
+function donationsMapFromLinkUrls(linkUrls?: ProjectLinkUrls): Record<string, string> {
+	const donations: Record<string, string> = {}
 	for (const platform of tags.value.donationPlatforms ?? []) {
 		donations[platform.short] = linkUrls?.[platform.short]?.url ?? ''
 	}
 	return donations
 }
 
-const donationsOriginal = computed(() =>
+const donationsOriginal = computed<Record<string, string>>(() =>
 	isServerProject.value ? {} : donationsMapFromLinkUrls(project.value?.link_urls),
 )
 
-const donationsModified = computed(() => {
+const donationsModified = computed<Record<string, string>>(() => {
 	if (isServerProject.value) return {}
-	const donations = {}
+	const donations: Record<string, string> = {}
 	for (const row of donationLinks.value) {
 		if (row.id && !(row.id in donations)) donations[row.id] = row.url ?? ''
 	}
 	return donations
 })
 
-function serializeDonationRow(row) {
+function serializeDonationRow(row: DonationRow): string {
 	return `${row.id ?? ''}:${row.url}`
 }
 
-function donationRowsToObject(rows) {
-	const entries = {}
+function donationRowsToObject(rows: DonationRow[]): Record<string, string> {
+	const entries: Record<string, string> = {}
 	rows.forEach((row, index) => {
 		if (!row.url) return
 		entries[`donation-row-${index}`] = serializeDonationRow(row)
@@ -406,16 +440,19 @@ function donationRowsToObject(rows) {
 
 const donationsSavedRows = computed(() => donationRowsFromLinks(project.value?.link_urls))
 
-const originalDonationRows = computed(() =>
+const originalDonationRows = computed<Record<string, string>>(() =>
 	isServerProject.value ? {} : donationRowsToObject(donationsSavedRows.value),
 )
-const modifiedDonationRows = computed(() =>
+const modifiedDonationRows = computed<Record<string, string>>(() =>
 	isServerProject.value ? {} : donationRowsToObject(donationLinks.value),
 )
 
-const original = computed(() => ({ ...saved.value, ...originalDonationRows.value }))
-const modified = computed(() => {
-	const donations = { ...modifiedDonationRows.value }
+const original = computed<Record<string, string | undefined>>(() => ({
+	...saved.value,
+	...originalDonationRows.value,
+}))
+const modified = computed<Record<string, string | undefined>>(() => {
+	const donations: Record<string, string | undefined> = { ...modifiedDonationRows.value }
 	for (const key of Object.keys(originalDonationRows.value)) {
 		if (!(key in donations)) donations[key] = undefined
 	}
@@ -428,11 +465,12 @@ const hasChanges = computed(() =>
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
-const patchData = computed(() => {
-	const data = {}
-	for (const key of Object.keys(current.value)) {
-		if (current.value[key] == saved.value[key]) continue
-		data[key] = current.value[key] === '' ? null : current.value[key].trim()
+const patchData = computed<Record<string, string | null>>(() => {
+	const data: Record<string, string | null> = {}
+	for (const key of Object.keys(current.value) as EditableLinkField[]) {
+		const value = current.value[key]
+		if (value == null || value === saved.value[key]) continue
+		data[key] = value === '' ? null : value.trim()
 	}
 	if (!isServerProject.value) {
 		for (const platform of tags.value.donationPlatforms ?? []) {
@@ -452,20 +490,18 @@ const canSave = computed(() => {
 	const checks = isServerProject.value
 		? [siteCheck, storeCheck, wikiCheck, discordInviteCheck]
 		: [issuesCheck, sourceCheck, wikiCheck, discordInviteCheck]
-	const contexts = isServerProject.value
-		? [siteContext, storeContext, wikiContext, discordContext]
-		: [issuesContext, sourceContext, wikiContext, discordContext]
+	const validations = isServerProject.value
+		? [siteValidation, storeValidation, wikiValidation, discordInviteValidation]
+		: [issuesValidation, sourceValidation, wikiValidation, discordInviteValidation]
 
 	const fieldsInvalid = checks.some((check) => check.value?.severity === 'error')
-	const fieldsPending = contexts.some((context) => isLinkCheckPending(context.value))
+	const fieldsPending = validations.some((validation) => validation.pending.value)
 
 	const donationsInvalid =
 		!isServerProject.value &&
 		donationLinks.value.some((row, index) => donationCheckState(row, index)?.severity === 'error')
 	const donationsPending =
-		!isServerProject.value &&
-		(donationCheckTimers.size > 0 ||
-			donationLinks.value.some((row) => isLinkCheckPending(donationContext(row))))
+		!isServerProject.value && (donationCheckTimers.size > 0 || donationChecksPending.size > 0)
 
 	return !fieldsInvalid && !fieldsPending && !donationsInvalid && !donationsPending
 })
@@ -491,15 +527,24 @@ async function save() {
 				: 'Your links have been updated.',
 			type: 'success',
 		})
-	} catch (err) {
+	} catch (err: unknown) {
 		addNotification({
 			title: 'Failed to update links',
-			text: err.data?.description ?? String(err),
+			text: getErrorDescription(err),
 			type: 'error',
 		})
 	} finally {
 		saving.value = false
 	}
+}
+
+function getErrorDescription(error: unknown): string {
+	if (typeof error === 'object' && error !== null && 'data' in error) {
+		const data = (error as { data?: { description?: string } }).data
+		if (data?.description) return data.description
+	}
+
+	return error instanceof Error ? error.message : String(error)
 }
 
 function updateDonationLinks() {

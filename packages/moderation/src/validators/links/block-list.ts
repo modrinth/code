@@ -1,0 +1,24 @@
+export const PROJECT_LINK_BLOCK_LIST = {
+	urlShorteners: ['bit.ly', 'adf.ly', 'tinyurl.com', 'short.io', 'is.gd'],
+	external: [
+		{ label: 'Twitter', domains: ['twitter.com', 'x.com'] },
+		{ label: 'Instagram', domains: ['instagram.com'] },
+		{ label: 'Facebook', domains: ['facebook.com'] },
+		{ label: 'TikTok', domains: ['tiktok.com'] },
+		{ label: 'Telegram', domains: ['telegram.org', 't.me'] },
+		{ label: 'Bilibili', domains: ['bilibili.com'] },
+		{ label: 'Bluesky', domains: ['bsky.app'] },
+		{ label: 'Twitch', domains: ['twitch.tv'] },
+		{ label: 'Reddit', domains: ['reddit.com', 'redd.it'] },
+		{ label: 'Modrinth', domains: ['modrinth.com'] },
+		{ label: 'Minecraft', domains: ['minecraft.net'] },
+		{
+			label: 'Mod distribution platform',
+			domains: ['curseforge.com', 'planetminecraft.com', '9minecraft.net', 'mcmod.cn'],
+		},
+		{
+			label: 'AI mod generation platform',
+			domains: ['creativemode.net', 'orcaclient.com', 'autoforged.cn'],
+		},
+	],
+} as const

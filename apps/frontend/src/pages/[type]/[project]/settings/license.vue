@@ -149,7 +149,6 @@
 </template>
 
 <script setup lang="ts">
-import { isLinkCheckPending, useLinkCheck } from '@modrinth/moderation'
 import {
 	Checkbox,
 	Combobox,
@@ -238,7 +237,8 @@ const licenseContext = computed(() => ({
 	expectedLicense: current.value.license.short,
 	isCustom: current.value.license.friendly === 'Custom',
 }))
-const effectiveLicenseCheck = useLinkCheck(licenseContext)
+const licenseValidation = useLinkValidation(licenseContext)
+const effectiveLicenseCheck = licenseValidation.result
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
@@ -266,7 +266,7 @@ const canSave = computed(
 				(current.value.license.short === '' || current.value.licenseUrl === '')
 			) &&
 				effectiveLicenseCheck.value?.severity !== 'error' &&
-				!isLinkCheckPending(licenseContext.value))),
+				!licenseValidation.pending.value)),
 )
 
 async function save() {

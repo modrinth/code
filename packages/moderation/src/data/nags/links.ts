@@ -4,80 +4,11 @@ import type { Nag, NagContext } from '../../types/nags'
 import { licenseRequiresSource, notSourceAsDistributed } from '../../utils'
 import {
 	getBlockedProjectExternalLink,
-	PROJECT_LINK_SHORTENERS,
-} from '../../validators/project-links'
-
-export const commonLinkDomains = {
-	source: [
-		'github.com',
-		'gitlab.com',
-		'bitbucket.org',
-		'codeberg.org',
-		'git.sr.ht',
-		'tangled.org',
-		'git.gay',
-	],
-	issues: [
-		'github.com',
-		'gitlab.com',
-		'bitbucket.org',
-		'codeberg.org',
-		'docs.google.com',
-		'tangled.org',
-		'git.gay',
-	],
-	discord: ['discord.gg', 'discord.com', 'dsc.gg'],
-	licenseBlocklist: [
-		'youtube.com',
-		'youtu.be',
-		'modrinth.com',
-		'curseforge.com',
-		'twitter.com',
-		'x.com',
-		'discord.gg',
-		'discord.com',
-		'instagram.com',
-		'facebook.com',
-		'tiktok.com',
-		'reddit.com',
-		'twitch.tv',
-		'patreon.com',
-		'ko-fi.com',
-		'paypal.com',
-		'buymeacoffee.com',
-		'google.com',
-		'example.com',
-		't.me',
-	],
-	linkShorteners: PROJECT_LINK_SHORTENERS,
-}
-
-export function isCommonUrl(url: string | null, commonDomains: readonly string[]): boolean {
-	if (url === null || url === '') return true
-	try {
-		const domain = new URL(url).hostname.toLowerCase()
-		return commonDomains.some((allowed) => domain.includes(allowed))
-	} catch {
-		return false
-	}
-}
-
-export function isCommonUrlOfType(url: string | null, commonDomains: readonly string[]): boolean {
-	if (url === null || url === '') return false
-	return isCommonUrl(url, commonDomains)
-}
-
-export function isDiscordUrl(url: string | null): boolean {
-	return isCommonUrlOfType(url, commonLinkDomains.discord)
-}
-
-export function isLinkShortener(url: string | null): boolean {
-	return isCommonUrlOfType(url, commonLinkDomains.linkShorteners)
-}
-
-export function isUncommonLicenseUrl(url: string | null): boolean {
-	return isCommonUrlOfType(url, commonLinkDomains.licenseBlocklist)
-}
+	getLinkHostname,
+	isCommonProjectLink,
+	isDiscordLink,
+	isInappropriateLicenseLink,
+} from '../../validators/links'
 
 export function findBlockedProjectExternalLink(context: Pick<NagContext, 'project' | 'projectV3'>) {
 	const urls = [
@@ -191,10 +122,13 @@ export const linksNags: Nag[] = [
 		}),
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
+			const sourceUrl = context.project.source_url
+			const issuesUrl = context.project.issues_url
+			const discordUrl = context.project.discord_url
 			return (
-				!isCommonUrl(context.project.source_url ?? null, commonLinkDomains.source) ||
-				!isCommonUrl(context.project.issues_url ?? null, commonLinkDomains.issues) ||
-				!isCommonUrl(context.project.discord_url ?? null, commonLinkDomains.discord)
+				(!!sourceUrl && !isCommonProjectLink(sourceUrl, 'source')) ||
+				(!!issuesUrl && !isCommonProjectLink(issuesUrl, 'issues')) ||
+				(!!discordUrl && !isCommonProjectLink(discordUrl, 'discord'))
 			)
 		},
 		link: {
@@ -219,11 +153,11 @@ export const linksNags: Nag[] = [
 		}),
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			isDiscordUrl(context.project.source_url ?? null) ||
-			isDiscordUrl(context.project.issues_url ?? null) ||
-			isDiscordUrl(context.project.wiki_url ?? null) ||
-			isDiscordUrl(context.projectV3?.link_urls?.site?.url ?? null) ||
-			isDiscordUrl(context.projectV3?.link_urls?.store?.url ?? null),
+			isDiscordLink(context.project.source_url) ||
+			isDiscordLink(context.project.issues_url) ||
+			isDiscordLink(context.project.wiki_url) ||
+			isDiscordLink(context.projectV3?.link_urls?.site?.url) ||
+			isDiscordLink(context.projectV3?.link_urls?.store?.url),
 		link: {
 			path: 'settings/links',
 			title: defineMessage({
@@ -274,8 +208,8 @@ export const linksNags: Nag[] = [
 				)
 			}
 
-			try {
-				const domain = new URL(licenseUrl).hostname.toLowerCase()
+			const domain = getLinkHostname(licenseUrl)
+			if (domain) {
 				return formatMessage(
 					defineMessage({
 						id: 'nags.invalid-license-url.description.domain',
@@ -284,29 +218,21 @@ export const linksNags: Nag[] = [
 					}),
 					{ domain },
 				)
-			} catch {
-				return formatMessage(
-					defineMessage({
-						id: 'nags.invalid-license-url.description.malformed',
-						defaultMessage:
-							'Your license URL appears to be malformed. Please provide a valid URL to your license text.',
-					}),
-				)
 			}
+
+			return formatMessage(
+				defineMessage({
+					id: 'nags.invalid-license-url.description.malformed',
+					defaultMessage:
+						'Your license URL appears to be malformed. Please provide a valid URL to your license text.',
+				}),
+			)
 		},
 		status: 'required',
 		shouldShow: (context: NagContext) => {
 			const licenseUrl = context.project.license.url
 			if (!licenseUrl) return false
-
-			const isBlocklisted = isUncommonLicenseUrl(licenseUrl)
-
-			try {
-				new URL(licenseUrl)
-				return isBlocklisted
-			} catch {
-				return true
-			}
+			return getLinkHostname(licenseUrl) === null || isInappropriateLicenseLink(licenseUrl)
 		},
 		link: {
 			path: 'settings',

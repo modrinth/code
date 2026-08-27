@@ -1,10 +1,9 @@
 import {
-	checkLink,
 	extractProjectLinks,
-	getLinkCheckState,
 	type LinkCheckContext,
 	type LinkCheckResult,
 	type ProjectTextValidationResult,
+	validateLink,
 	validateProjectDescription,
 	validateProjectSummary,
 	validateProjectTitle,
@@ -28,6 +27,47 @@ export function useProjectSummaryValidation(
 	title: MaybeRefOrGetter<string | null | undefined>,
 ) {
 	return computed(() => validateProjectSummary(toValue(summary), toValue(title)))
+}
+
+export function useLinkValidation(context: MaybeRefOrGetter<LinkCheckContext>) {
+	const result = ref<LinkCheckResult | null>(null)
+	const pending = ref(false)
+	let debounceTimer: ReturnType<typeof setTimeout> | undefined
+	let requestId = 0
+
+	watch(
+		() => toValue(context),
+		(value) => {
+			clearTimeout(debounceTimer)
+			const currentRequestId = ++requestId
+			result.value = null
+
+			if (import.meta.server || !value.url) {
+				pending.value = false
+				return
+			}
+
+			pending.value = true
+			debounceTimer = setTimeout(async () => {
+				try {
+					const validation = await validateLink(value)
+					if (currentRequestId === requestId) result.value = validation ?? null
+				} catch {
+					if (currentRequestId === requestId) result.value = null
+				} finally {
+					if (currentRequestId === requestId) pending.value = false
+				}
+			}, 500)
+		},
+		{ deep: true, immediate: true },
+	)
+
+	onScopeDispose(() => {
+		clearTimeout(debounceTimer)
+		requestId++
+	})
+
+	return { pending, result }
 }
 
 export function useProjectDescriptionValidation(
@@ -66,12 +106,11 @@ export function useProjectDescriptionValidation(
 				}))
 
 				try {
-					await Promise.all(contexts.map((context) => checkLink(context)))
+					const checks = (
+						await Promise.all(contexts.map((context) => validateLink(context)))
+					).filter((check): check is LinkCheckResult => check !== undefined)
 					if (currentRequestId !== requestId) return
 
-					const checks = contexts
-						.map((context) => getLinkCheckState(context))
-						.filter((check): check is LinkCheckResult => check !== undefined)
 					linkValidation.value =
 						checks.find((check) => check.severity === 'error') ??
 						checks.find((check) => check.severity === 'warn') ??
