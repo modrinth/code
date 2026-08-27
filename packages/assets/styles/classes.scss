@@ -1046,7 +1046,7 @@ a:not(.no-click-animation),
 			padding: 0.5rem;
 			grid-template-rows: min-content 1fr;
 
-			summary {
+			> summary {
 				@apply border-b-surface-5;
 
 				&::before {
