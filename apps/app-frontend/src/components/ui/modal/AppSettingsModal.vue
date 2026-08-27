@@ -232,7 +232,17 @@ function showFeatureFlags(): void {
 	modal.value?.show()
 }
 
-defineExpose({ show, showProfile, showFeatureFlags })
+function showSyncedOptions(): void {
+	const syncedOptionsTabIndex = availableTabs.value.findIndex(
+		(tab) => tab.content === InstancesSyncedSettings,
+	)
+	if (syncedOptionsTabIndex >= 0) {
+		modal.value?.setTab(syncedOptionsTabIndex)
+	}
+	modal.value?.show()
+}
+
+defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions })
 
 const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 

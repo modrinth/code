@@ -1715,17 +1715,26 @@
   "app.settings.synced-options.command-history": {
     "message": "Command history"
   },
+  "app.settings.synced-options.command-history.description": {
+    "message": "Sync command history across your instances."
+  },
   "app.settings.synced-options.command-history.editor-title": {
     "message": "Edit command history"
   },
   "app.settings.synced-options.creative-hotbars": {
     "message": "Saved creative hotbars"
   },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "Sync saved creative hotbars across your instances."
+  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "Multiplayer servers"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Server address"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "Sync multiplayer servers across your instances."
   },
   "app.settings.synced-options.multiplayer-servers.editor-title": {
     "message": "Edit synced servers"
@@ -1743,7 +1752,7 @@
     "message": "Screenshots"
   },
   "app.settings.synced-options.screenshots.description": {
-    "message": "View screenshots from all your instances in one place."
+    "message": "View screenshots from your instances in one place."
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
@@ -2643,16 +2652,16 @@
     "message": "Installation settings are unavailable while this instance is locked."
   },
   "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Custom environment variables"
+    "message": "Use custom environment variables for this instance."
   },
   "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Custom Java arguments"
+    "message": "Use custom Java arguments for this instance."
   },
   "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Custom Java installation"
+    "message": "Use a custom Java installation for this instance."
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Custom memory allocation"
+    "message": "Use a custom memory allocation for this instance."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Enter environmental variables..."
@@ -2678,35 +2687,59 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
+  "instance.settings.tabs.settings-overrides": {
+    "message": "Settings overrides"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
-  },
-  "instance.settings.tabs.synced-options": {
-    "message": "Synced options"
   },
   "instance.settings.tabs.synced-options.command-history": {
     "message": "Command history"
   },
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "Command history syncing is turned off in app settings."
+  },
+  "instance.settings.tabs.synced-options.command-history.exclude-description": {
+    "message": "Exclude this instance from command history syncing."
+  },
   "instance.settings.tabs.synced-options.creative-hotbars": {
     "message": "Saved creative hotbars"
   },
-  "instance.settings.tabs.synced-options.description": {
-    "message": "Sync this instance’s options and config with other instances so you don’t have to set them up every time."
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "Saved creative hotbar syncing is turned off in app settings."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.exclude-description": {
+    "message": "Exclude this instance from saved creative hotbar syncing."
   },
   "instance.settings.tabs.synced-options.multiplayer-servers": {
     "message": "Multiplayer servers"
   },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "Multiplayer server syncing is turned off in app settings."
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.exclude-description": {
+    "message": "Exclude this instance from multiplayer server syncing."
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "Open synced options"
+  },
   "instance.settings.tabs.synced-options.screenshots": {
     "message": "Screenshots"
   },
-  "instance.settings.tabs.synced-options.screenshots.description": {
-    "message": "View this instance’s screenshots alongside all your others."
+  "instance.settings.tabs.synced-options.screenshots.disabled-in-app": {
+    "message": "Screenshots are turned off in app settings."
+  },
+  "instance.settings.tabs.synced-options.screenshots.exclude-description": {
+    "message": "Exclude this instance’s screenshots from the Screenshots page."
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "Game settings can be shared between instances. Choose what to share in app settings."
   },
   "instance.settings.tabs.window": {
     "message": "Window"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Custom window settings"
+    "message": "Use custom window settings for this instance."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullscreen"

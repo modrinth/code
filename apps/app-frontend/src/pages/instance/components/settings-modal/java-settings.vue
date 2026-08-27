@@ -139,7 +139,7 @@ const messages = defineMessages({
 	},
 	customJavaInstallation: {
 		id: 'instance.settings.tabs.java.custom-java-installation',
-		defaultMessage: 'Custom Java installation',
+		defaultMessage: 'Use a custom Java installation for this instance.',
 	},
 	javaPathPlaceholder: {
 		id: 'instance.settings.tabs.java.java-path-placeholder',
@@ -151,7 +151,7 @@ const messages = defineMessages({
 	},
 	customMemoryAllocation: {
 		id: 'instance.settings.tabs.java.custom-memory-allocation',
-		defaultMessage: 'Custom memory allocation',
+		defaultMessage: 'Use a custom memory allocation for this instance.',
 	},
 	javaArguments: {
 		id: 'instance.settings.tabs.java.java-arguments',
@@ -159,7 +159,7 @@ const messages = defineMessages({
 	},
 	customJavaArguments: {
 		id: 'instance.settings.tabs.java.custom-java-arguments',
-		defaultMessage: 'Custom Java arguments',
+		defaultMessage: 'Use custom Java arguments for this instance.',
 	},
 	enterJavaArguments: {
 		id: 'instance.settings.tabs.java.enter-java-arguments',
@@ -171,7 +171,7 @@ const messages = defineMessages({
 	},
 	customEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.custom-environment-variables',
-		defaultMessage: 'Custom environment variables',
+		defaultMessage: 'Use custom environment variables for this instance.',
 	},
 	enterEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.enter-environment-variables',

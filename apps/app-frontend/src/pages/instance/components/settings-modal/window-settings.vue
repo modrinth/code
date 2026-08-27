@@ -54,7 +54,7 @@ const messages = defineMessages({
 	},
 	customWindowSettings: {
 		id: 'instance.settings.tabs.window.custom-window-settings',
-		defaultMessage: 'Custom window settings',
+		defaultMessage: 'Use custom window settings for this instance.',
 	},
 	fullscreen: {
 		id: 'instance.settings.tabs.window.fullscreen',

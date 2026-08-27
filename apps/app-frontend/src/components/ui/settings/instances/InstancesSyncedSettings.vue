@@ -69,13 +69,25 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.multiplayer-servers',
 		defaultMessage: 'Multiplayer servers',
 	},
+	multiplayerServersDescription: {
+		id: 'app.settings.synced-options.multiplayer-servers.description',
+		defaultMessage: 'Sync multiplayer servers across your instances.',
+	},
 	commandHistory: {
 		id: 'app.settings.synced-options.command-history',
 		defaultMessage: 'Command history',
 	},
+	commandHistoryDescription: {
+		id: 'app.settings.synced-options.command-history.description',
+		defaultMessage: 'Sync command history across your instances.',
+	},
 	creativeHotbars: {
 		id: 'app.settings.synced-options.creative-hotbars',
 		defaultMessage: 'Saved creative hotbars',
+	},
+	creativeHotbarsDescription: {
+		id: 'app.settings.synced-options.creative-hotbars.description',
+		defaultMessage: 'Sync saved creative hotbars across your instances.',
 	},
 	screenshots: {
 		id: 'app.settings.synced-options.screenshots',
@@ -83,7 +95,7 @@ const messages = defineMessages({
 	},
 	screenshotsDescription: {
 		id: 'app.settings.synced-options.screenshots.description',
-		defaultMessage: 'View screenshots from all your instances in one place.',
+		defaultMessage: 'View screenshots from your instances in one place.',
 	},
 	chooseSyncSourceTitle: {
 		id: 'app.settings.synced-options.choose-sync-source.title',
@@ -293,16 +305,19 @@ const globalRows: Array<{
 	{
 		option: 'multiplayer_servers',
 		title: 'multiplayerServers',
+		description: 'multiplayerServersDescription',
 		editable: 'servers',
 	},
 	{
 		option: 'command_history',
 		title: 'commandHistory',
+		description: 'commandHistoryDescription',
 		editable: 'commands',
 	},
 	{
 		option: 'creative_hotbars',
 		title: 'creativeHotbars',
+		description: 'creativeHotbarsDescription',
 	},
 	{
 		option: 'screenshots',

@@ -180,7 +180,10 @@ import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
-import { appSettingsModalOpenProfileKey } from './providers/app-settings-modal'
+import {
+	appSettingsModalOpenProfileKey,
+	appSettingsModalOpenSyncedOptionsKey,
+} from './providers/app-settings-modal'
 
 const appSettings = useAppSettings()
 const appTheme = useTheme()
@@ -1033,6 +1036,7 @@ const updateToPlayModal = ref()
 const modrinthLoginModal = ref()
 const appSettingsModal = ref()
 provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
+provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
 
 watch(incompatibilityWarningModal, (modal) => {
 	if (modal) {

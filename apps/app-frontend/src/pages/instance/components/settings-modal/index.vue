@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronRightIcon, InfoIcon, RefreshCwIcon, UsersIcon, WrenchIcon } from '@modrinth/assets'
+import { ChevronRightIcon, InfoIcon, Settings2Icon, UsersIcon, WrenchIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	commonMessages,
@@ -90,10 +90,10 @@ const tabs = computed<TabbedModalTab[]>(() => [
 	},
 	{
 		name: defineMessage({
-			id: 'instance.settings.tabs.synced-options',
-			defaultMessage: 'Synced options',
+			id: 'instance.settings.tabs.settings-overrides',
+			defaultMessage: 'Settings overrides',
 		}),
-		icon: RefreshCwIcon,
+		icon: Settings2Icon,
 		content: SyncedOptionsSettings,
 	},
 	{

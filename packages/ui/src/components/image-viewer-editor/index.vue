@@ -28,6 +28,7 @@ const emit = defineEmits<{
 
 const activeId = ref<string | null>(null)
 const mode = ref<ImageViewerEditorMode>('view')
+const closeAfterEditing = ref(false)
 const editorComponent = ref<InstanceType<typeof Editor>>()
 const context = injectImageViewerEditor(null)
 
@@ -50,28 +51,36 @@ function show(index: number) {
 	if (activeId.value === null) context?.onShow?.()
 	activeId.value = item.id
 	mode.value = 'view'
+	closeAfterEditing.value = false
 	emit('show', item, index)
 }
 
 async function edit(index: number) {
 	show(index)
-	await beginEditing()
+	await beginEditing(true)
 }
 
-async function beginEditing() {
+async function beginEditing(closeOnCancel = false) {
 	if (!canEdit.value || props.saving) return
+	closeAfterEditing.value = closeOnCancel
 	mode.value = 'edit'
 	await nextTick()
 }
 
 function finishEditing() {
-	if (!props.saving) mode.value = 'view'
+	if (props.saving) return
+	if (closeAfterEditing.value) {
+		hide()
+	} else {
+		mode.value = 'view'
+	}
 }
 
 function hide() {
 	if (activeId.value === null || props.saving) return
 	activeId.value = null
 	mode.value = 'view'
+	closeAfterEditing.value = false
 	context?.onHide?.()
 	emit('hide')
 }
@@ -94,6 +103,7 @@ function previous() {
 async function markSavedAndView(itemId?: string) {
 	editorComponent.value?.markSaved()
 	mode.value = 'view'
+	closeAfterEditing.value = false
 	await nextTick()
 	if (itemId && props.items.some((item) => item.id === itemId)) activeId.value = itemId
 }
