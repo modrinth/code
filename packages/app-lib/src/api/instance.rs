@@ -14,6 +14,8 @@ mod run;
 mod screenshot_groups;
 mod screenshots;
 mod shared;
+mod synced_options;
+pub(crate) mod synced_servers;
 
 pub use self::content::{
     get_content_items, get_dependencies_as_content_items,
@@ -88,4 +90,25 @@ pub use self::shared::{
     invite_shared_instance_users, publish_shared_instance,
     remove_shared_instance_users, revoke_shared_instance_invite,
     unlink_shared_instance, unpublish_shared_instance, update_shared_instance,
+};
+pub use self::synced_options::{
+    GlobalSyncedOptions, SyncedOptionCapability, SyncedOptionsOverview,
+    get_capabilities as get_synced_option_capabilities, get_command_history,
+    get_global_options as get_global_synced_options,
+    get_overview as get_synced_options_overview, get_synced_options_folder,
+    set_command_history, set_global_option as set_global_synced_option,
+    synced_option_needs_base,
+};
+pub(crate) use self::synced_options::{
+    monitor_persisted_processes, prepare_instance_update,
+    reconcile_changed_file as reconcile_synced_option_file,
+    remove_generated_instance_files,
+};
+pub use self::synced_options::{
+    reconcile_all as reconcile_all_synced_options,
+    reconcile_instance as reconcile_instance_synced_options,
+};
+pub use self::synced_servers::{
+    DesyncServerMode, ServerSource, SyncedServer, desync_server,
+    list_synced_servers, remove_synced_server, update_synced_server,
 };

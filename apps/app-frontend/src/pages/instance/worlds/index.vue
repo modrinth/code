@@ -16,8 +16,10 @@
 	<ConfirmRemoveWorldModal
 		ref="removeWorldModal"
 		:world="worldToRemove"
+		:other-synced-instance-count="otherSyncedInstanceCount"
 		@confirm="proceedRemoveWorld"
 	/>
+	<DesyncServerModal ref="desyncServerModal" @confirm="confirmDesyncServer" />
 	<ReadyTransition :pending="worldsReadyPending">
 		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-2">
 			<div class="flex flex-wrap items-center gap-2">
@@ -108,6 +110,7 @@
 									: editServerModal?.show(world)
 					"
 					@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
+					@desync="() => world.type === 'server' && desyncServerModal?.show(world as ServerWorld)"
 					@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.id, world.path)"
 				/>
 			</div>
@@ -153,6 +156,7 @@ import { useRoute } from 'vue-router'
 
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWorldModal.vue'
+import DesyncServerModal from '@/components/ui/world/modal/DesyncServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
@@ -164,6 +168,8 @@ import { get_game_versions } from '@/helpers/tags'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import {
 	delete_world,
+	desync_server,
+	type DesyncServerMode,
 	get_instance_protocol_version,
 	getServerDomainKey,
 	getWorldIdentifier,
@@ -189,7 +195,11 @@ import {
 import { injectServerInstall } from '@/providers/server-install'
 
 import { injectInstancePage } from '../instance-context'
-import { instanceKeys, instanceWorldsQueryOptions } from '../query-options'
+import {
+	instanceKeys,
+	instanceListQueryOptions,
+	instanceWorldsQueryOptions,
+} from '../query-options'
 
 const messages = defineMessages({
 	searchWorldsPlaceholder: {
@@ -244,6 +254,7 @@ const addServerModal = ref<InstanceType<typeof AddServerModal>>()
 const editServerModal = ref<InstanceType<typeof EditServerModal>>()
 const editWorldModal = ref<InstanceType<typeof EditWorldModal>>()
 const removeWorldModal = ref<InstanceType<typeof ConfirmRemoveWorldModal>>()
+const desyncServerModal = ref<InstanceType<typeof DesyncServerModal>>()
 
 const worldToRemove = ref<World | null>(null)
 
@@ -282,6 +293,15 @@ function toggleFilter(id: string) {
 }
 
 const queryClient = useQueryClient()
+
+const instanceListQuery = useQuery(instanceListQueryOptions())
+const otherSyncedInstanceCount = computed(
+	() =>
+		instanceListQuery.data.value?.filter(
+			(candidate) =>
+				candidate.id !== instance.value.id && candidate.synced_options.multiplayer_servers,
+		).length ?? 0,
+)
 
 const refreshingAll = ref(false)
 const hadNoWorlds = ref(true)
@@ -505,6 +525,12 @@ async function removeServer(server: ServerWorld) {
 			w.index = serverIdx++
 		}
 	}
+}
+
+async function confirmDesyncServer(server: ServerWorld, mode: DesyncServerMode) {
+	if (!server.server_id) return
+	await desync_server(instance.value.id, server.server_id, mode).catch(handleError)
+	await refreshAllWorlds()
 }
 
 async function editWorld(path: string, name: string, removeIcon: boolean) {

@@ -3,7 +3,7 @@ use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use dashmap::DashMap;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
-use tokio::sync::{Mutex, OnceCell, OwnedMutexGuard, Semaphore};
+use tokio::sync::{Mutex, MutexGuard, OnceCell, OwnedMutexGuard, Semaphore};
 
 use crate::state::instances::watcher::FileWatcher;
 use sqlx::SqlitePool;
@@ -81,6 +81,8 @@ pub struct State {
     instance_screenshot_locks: DashMap<String, Arc<Mutex<()>>>,
     /// Serializes shared instance attachment and recipient mutations per instance.
     shared_instance_locks: DashMap<String, Arc<Mutex<()>>>,
+    /// Serializes canonical synced-option mutations and checkpoint updates.
+    synced_options_lock: Mutex<()>,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -105,6 +107,10 @@ pub struct State {
 }
 
 impl State {
+    pub(crate) async fn lock_synced_options(&self) -> MutexGuard<'_, ()> {
+        self.synced_options_lock.lock().await
+    }
+
     pub(crate) async fn lock_instance_content(
         &self,
         instance_id: &str,
@@ -168,6 +174,22 @@ impl State {
                 &state.pool,
             )
             .await;
+
+            if let Err(error) =
+                crate::api::instance::monitor_persisted_processes().await
+            {
+                tracing::error!(
+                    "Failed to monitor persisted Minecraft processes: {error}"
+                );
+            }
+
+            if let Err(error) =
+                crate::api::instance::reconcile_all_synced_options().await
+            {
+                tracing::error!(
+                    "Failed to reconcile instance synced options during startup: {error}"
+                );
+            }
 
             if let Err(e) = crate::api::instance::migrate_legacy_icons().await {
                 tracing::error!("Error migrating legacy instance icons: {e}");
@@ -272,6 +294,7 @@ impl State {
             instance_content_locks: DashMap::new(),
             instance_screenshot_locks: DashMap::new(),
             shared_instance_locks: DashMap::new(),
+            synced_options_lock: Mutex::new(()),
             discord_rpc,
             process_manager,
             friends_socket,

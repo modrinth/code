@@ -16,6 +16,7 @@ const { formatMessage } = useVIntl()
 
 const props = defineProps<{
 	world: World | null
+	otherSyncedInstanceCount: number
 }>()
 
 const emit = defineEmits<{
@@ -44,6 +45,11 @@ const messages = defineMessages({
 		defaultMessage:
 			'This server will be removed from your server list and from the in-game server list. You can add it again later if you know the address.',
 	},
+	syncedServerRemovalNotice: {
+		id: 'app.instance.worlds.remove-server-modal.synced-removal-notice',
+		defaultMessage:
+			'This server will also be removed from {count, plural, one {# other instance} other {# other instances}} because it’s synced.',
+	},
 	deleteWorldWarningBody: {
 		id: 'app.instance.worlds.delete-world-modal.warning-body',
 		defaultMessage:
@@ -62,6 +68,9 @@ const messages = defineMessages({
 const modal = ref<InstanceType<typeof NewModal>>()
 
 const isServer = computed(() => props.world?.type === 'server')
+const isSyncedServer = computed(
+	() => props.world?.type === 'server' && props.world.source === 'user_synced',
+)
 const isSingleplayer = computed(() => props.world?.type === 'singleplayer')
 const titleMessage = computed(() =>
 	isServer.value ? messages.removeServerTitle : messages.deleteWorldTitle,
@@ -102,6 +111,13 @@ defineExpose({ show, hide })
 			>
 				{{ formatMessage(warningBodyMessage) }}
 			</Admonition>
+			<p v-if="isSyncedServer" class="m-0 text-secondary">
+				{{
+					formatMessage(messages.syncedServerRemovalNotice, {
+						count: otherSyncedInstanceCount,
+					})
+				}}
+			</p>
 		</div>
 
 		<template #actions>

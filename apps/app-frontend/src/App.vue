@@ -120,7 +120,12 @@ import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_user_many, get_version } from '@/helpers/cache.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
-import { can_current_user_use_shared_instances, get as getInstance, run } from '@/helpers/instance'
+import {
+	can_current_user_use_shared_instances,
+	get as getInstance,
+	get_global_synced_options,
+	run,
+} from '@/helpers/instance'
 import {
 	get as getCreds,
 	getAll as getAllCreds,
@@ -440,6 +445,11 @@ const os = ref('')
 const isDevEnvironment = ref(false)
 
 const stateInitialized = ref(false)
+const globalSyncedOptionsQuery = useQuery({
+	queryKey: ['global-synced-options'],
+	queryFn: get_global_synced_options,
+	enabled: computed(() => stateInitialized.value),
+})
 
 const criticalErrorMessage = ref()
 
@@ -2049,7 +2059,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
 				<ShirtIcon />
 			</NavButton>
-			<NavButton v-tooltip.right="formatMessage(messages.screenshots)" to="/screenshots">
+			<NavButton
+				v-if="globalSyncedOptionsQuery.data.value?.screenshots"
+				v-tooltip.right="formatMessage(messages.screenshots)"
+				to="/screenshots"
+			>
 				<ImagesIcon />
 			</NavButton>
 			<NavButton

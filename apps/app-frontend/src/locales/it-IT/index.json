@@ -1472,9 +1472,6 @@
   "app.settings.tabs.behavior": {
     "message": "Comportamento"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Opzioni di gioco predefinite"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Installazioni Java"
   },
@@ -2297,12 +2294,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Seleziona il canale di aggiornamento"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Hook di avvio"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hook di avvio personalizzati"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "I hook permettono a utenti avanzati di eseguire comandi di sistema prima e dopo l'avvio del gioco."
   },
@@ -2365,9 +2356,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Le impostazioni non sono disponibili mentre l'istanza è bloccata."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java e memoria"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Personalizzate"

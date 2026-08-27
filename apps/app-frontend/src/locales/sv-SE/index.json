@@ -1373,9 +1373,6 @@
   "app.settings.tabs.behavior": {
     "message": "Beteende"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standard spelinställningar"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java-installationer"
   },
@@ -2138,12 +2135,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Välj uppdateringskanal"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Startkrokar"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Egendefinierade startkrokar"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Krokar gör det möjligt för avancerade användare att köra vissa systemkommandon före och efter att spelet startas."
   },
@@ -2197,9 +2188,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Installationsinställningar är otillgängligt medan den här instansen är låst."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java och minne"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Anpassade miljövariabler"

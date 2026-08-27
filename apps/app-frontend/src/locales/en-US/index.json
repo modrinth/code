@@ -809,6 +809,9 @@
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Remove server"
   },
+  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
+    "message": "This server will also be removed from {count, plural, one {# other instance} other {# other instances}} because it’s synced."
+  },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Remove server"
   },
@@ -1541,6 +1544,9 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Height"
   },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Java and memory"
+  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Arguments passed to Java when launching an instance."
   },
@@ -1549,6 +1555,9 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java arguments"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "Launch hooks"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximum memory available to each instance."
@@ -1582,6 +1591,9 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Width"
+  },
+  "app.settings.default-instance-options.window.title": {
+    "message": "Window"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Command used to wrap the Minecraft launch process."
@@ -1679,14 +1691,65 @@
   "app.settings.sidebar.label.instances": {
     "message": "Instances"
   },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "Pick the instance whose command history becomes the shared copy."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "Pick the instance whose saved creative hotbars become the shared copy."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "Pick the instance whose multiplayer servers become the shared copy."
+  },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "No instances found"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "Search instance"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "Sync"
+  },
+  "app.settings.synced-options.choose-sync-source.title": {
+    "message": "Choose a sync source"
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "Command history"
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "Edit command history"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "Saved creative hotbars"
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "Multiplayer servers"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "Server address"
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "Edit synced servers"
+  },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "No user-added servers are currently synced."
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "Server name"
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "No servers synced yet"
+  },
+  "app.settings.synced-options.screenshots": {
+    "message": "Screenshots"
+  },
+  "app.settings.synced-options.screenshots.description": {
+    "message": "View screenshots from all your instances in one place."
+  },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
   },
   "app.settings.tabs.behavior": {
     "message": "Behavior"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Default game options"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installations"
@@ -1699,6 +1762,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "Synced options"
   },
   "app.sidebar.playing-as": {
     "message": "Playing as"
@@ -2513,12 +2579,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Select update channel"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Launch hooks"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Custom launch hooks"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooks allow advanced users to run certain system commands before and after launching the game."
   },
@@ -2582,9 +2642,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installation settings are unavailable while this instance is locked."
   },
-  "instance.settings.tabs.java": {
-    "message": "Java and memory"
-  },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Custom environment variables"
   },
@@ -2627,14 +2684,23 @@
   "instance.settings.tabs.synced-options": {
     "message": "Synced options"
   },
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "Command history"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "Saved creative hotbars"
+  },
   "instance.settings.tabs.synced-options.description": {
-    "message": "Override synced options for this instance."
+    "message": "Sync this instance’s options and config with other instances so you don’t have to set them up every time."
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "Multiplayer servers"
   },
   "instance.settings.tabs.synced-options.screenshots": {
     "message": "Screenshots"
   },
   "instance.settings.tabs.synced-options.screenshots.description": {
-    "message": "Show screenshots from this instance in the global Screenshots page. Turn this off to use an instance-only Screenshots tab."
+    "message": "View this instance’s screenshots alongside all your others."
   },
   "instance.settings.tabs.window": {
     "message": "Window"
@@ -2737,6 +2803,21 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "Create shortcut"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "Do you want to keep this server in other synced instances, or remove it from them?"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "Keep"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "Remove"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "Desync server"
+  },
+  "instance.worlds.desync_server": {
+    "message": "Desync"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Don't show on Home"

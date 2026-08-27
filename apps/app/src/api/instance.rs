@@ -61,6 +61,17 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_move_screenshots,
             instance_open_screenshot,
             instance_set_synced_option,
+            instance_get_synced_options_overview,
+            instance_get_global_synced_options,
+            instance_synced_option_needs_base,
+            instance_set_global_synced_option,
+            instance_get_command_history,
+            instance_set_command_history,
+            instance_open_synced_options_folder,
+            instance_list_synced_servers,
+            instance_update_synced_server,
+            instance_remove_synced_server,
+            instance_rebuild_synced_options,
             instance_check_installed,
             instance_update_all,
             instance_update_project,
@@ -792,6 +803,93 @@ pub async fn instance_set_synced_option(
         theseus::instance::set_synced_option(instance_id, option, enabled)
             .await?,
     ))
+}
+
+#[tauri::command]
+pub async fn instance_get_synced_options_overview(
+    instance_id: &str,
+) -> Result<theseus::instance::SyncedOptionsOverview> {
+    Ok(theseus::instance::get_synced_options_overview(instance_id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_get_global_synced_options()
+-> Result<theseus::instance::GlobalSyncedOptions> {
+    Ok(theseus::instance::get_global_synced_options().await?)
+}
+
+#[tauri::command]
+pub async fn instance_synced_option_needs_base(
+    option: InstanceSyncedOption,
+) -> Result<bool> {
+    Ok(theseus::instance::synced_option_needs_base(option).await?)
+}
+
+#[tauri::command]
+pub async fn instance_set_global_synced_option(
+    option: InstanceSyncedOption,
+    enabled: bool,
+    base_instance_id: Option<&str>,
+) -> Result<theseus::instance::GlobalSyncedOptions> {
+    Ok(theseus::instance::set_global_synced_option(
+        option,
+        enabled,
+        base_instance_id,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn instance_get_command_history() -> Result<String> {
+    Ok(theseus::instance::get_command_history().await?)
+}
+
+#[tauri::command]
+pub async fn instance_set_command_history(contents: &str) -> Result<String> {
+    Ok(theseus::instance::set_command_history(contents).await?)
+}
+
+#[tauri::command]
+pub async fn instance_open_synced_options_folder<R: Runtime>(
+    app_handle: AppHandle<R>,
+) -> Result<()> {
+    let path = theseus::instance::get_synced_options_folder().await?;
+    app_handle
+        .opener()
+        .open_path(path.to_string_lossy(), None::<&str>)
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_list_synced_servers()
+-> Result<Vec<theseus::instance::SyncedServer>> {
+    Ok(theseus::instance::list_synced_servers().await?)
+}
+
+#[tauri::command]
+pub async fn instance_update_synced_server(
+    server: theseus::instance::SyncedServer,
+) -> Result<()> {
+    Ok(theseus::instance::update_synced_server(server).await?)
+}
+
+#[tauri::command]
+pub async fn instance_remove_synced_server(server_id: &str) -> Result<()> {
+    Ok(theseus::instance::remove_synced_server(server_id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_rebuild_synced_options(
+    instance_id: Option<&str>,
+) -> Result<()> {
+    if let Some(instance_id) = instance_id {
+        theseus::instance::reconcile_instance_synced_options(instance_id)
+            .await?;
+    } else {
+        theseus::instance::reconcile_all_synced_options().await?;
+    }
+    Ok(())
 }
 
 fn serialize_screenshots<R: Runtime>(
