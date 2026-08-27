@@ -171,7 +171,6 @@ import {
 	desync_server,
 	type DesyncServerMode,
 	get_instance_protocol_version,
-	getServerDomainKey,
 	getWorldIdentifier,
 	handleDefaultInstanceUpdateEvent,
 	hasServerQuickPlaySupport,
@@ -616,7 +615,7 @@ function worldsMatch(world: World, other: World | undefined) {
 
 const dedupedWorlds = computed(() => {
 	const visibleWorlds: World[] = []
-	const serverIndexByDomain = new Map<string, number>()
+	const serverIndexByAddress = new Map<string, number>()
 
 	for (const world of worlds.value) {
 		if (world.type !== 'server') {
@@ -624,14 +623,11 @@ const dedupedWorlds = computed(() => {
 			continue
 		}
 
-		const domainKey =
-			getServerDomainKey(world.address) ||
-			normalizeServerAddress(world.address) ||
-			`server-${world.index}`
-		const existingIndex = serverIndexByDomain.get(domainKey)
+		const addressKey = normalizeServerAddress(world.address) || `server-${world.index}`
+		const existingIndex = serverIndexByAddress.get(addressKey)
 
 		if (existingIndex == null) {
-			serverIndexByDomain.set(domainKey, visibleWorlds.length)
+			serverIndexByAddress.set(addressKey, visibleWorlds.length)
 			visibleWorlds.push(world)
 			continue
 		}

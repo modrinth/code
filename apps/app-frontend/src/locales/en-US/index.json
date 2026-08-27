@@ -2694,16 +2694,16 @@
     "message": "The version being replaced will be backed up before anything changes."
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.description": {
-    "message": "{instance} has different saved hotbars. You can apply the currently synced hotbars to this instance or make this instance’s hotbars the shared version."
+    "message": "{instance} and your synced version have different creative hotbars. Choose which one to use across your instances."
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.title": {
-    "message": "Choose which saved hotbars to use"
+    "message": "Choose creative hotbars"
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
-    "message": "Use this instance’s hotbars"
+    "message": "Overwrite others"
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
-    "message": "Use synced hotbars"
+    "message": "Use synced"
   },
   "instance.settings.tabs.synced-options.multiplayer-servers": {
     "message": "Multiplayer servers"

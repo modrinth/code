@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
+import {
+	EditIcon,
+	RefreshCwIcon,
+	RotateCounterClockwiseIcon,
+	SpinnerIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
@@ -97,12 +103,12 @@ const messages = defineMessages({
 	},
 	hotbarConflictTitle: {
 		id: 'instance.settings.tabs.synced-options.hotbars-conflict.title',
-		defaultMessage: 'Choose which saved hotbars to use',
+		defaultMessage: 'Choose creative hotbars',
 	},
 	hotbarConflictDescription: {
 		id: 'instance.settings.tabs.synced-options.hotbars-conflict.description',
 		defaultMessage:
-			'{instance} has different saved hotbars. You can apply the currently synced hotbars to this instance or make this instance’s hotbars the shared version.',
+			'{instance} and your synced version have different creative hotbars. Choose which one to use across your instances.',
 	},
 	hotbarBackupDescription: {
 		id: 'instance.settings.tabs.synced-options.hotbars-conflict.backup-description',
@@ -110,11 +116,11 @@ const messages = defineMessages({
 	},
 	useSyncedHotbars: {
 		id: 'instance.settings.tabs.synced-options.hotbars-conflict.use-synced',
-		defaultMessage: 'Use synced hotbars',
+		defaultMessage: 'Use synced',
 	},
 	useInstanceHotbars: {
 		id: 'instance.settings.tabs.synced-options.hotbars-conflict.use-instance',
-		defaultMessage: 'Use this instance’s hotbars',
+		defaultMessage: 'Overwrite others',
 	},
 })
 
@@ -209,6 +215,11 @@ const mutation = useMutation({
 		await queryClient.invalidateQueries({
 			queryKey: ['instance-synced-options', updatedInstance.id],
 		})
+		if (variables.option === 'multiplayer_servers') {
+			await queryClient.invalidateQueries({
+				queryKey: instanceKeys.worlds(updatedInstance.id),
+			})
+		}
 
 		if (variables.option === 'screenshots') {
 			await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
@@ -280,13 +291,16 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 						:disabled="mutation.isPending.value"
 						@click="hotbarResolutionModal?.hide()"
 					>
+						<XIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
 					<Button
-						type="outlined"
+						type="colored"
+						color="orange"
 						:disabled="mutation.isPending.value"
 						@click="resolveHotbars('use_instance')"
 					>
+						<EditIcon aria-hidden="true" />
 						{{ formatMessage(messages.useInstanceHotbars) }}
 					</Button>
 					<Button
@@ -295,6 +309,7 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 						:disabled="mutation.isPending.value"
 						@click="resolveHotbars('use_synced')"
 					>
+						<RotateCounterClockwiseIcon aria-hidden="true" />
 						{{ formatMessage(messages.useSyncedHotbars) }}
 					</Button>
 				</div>

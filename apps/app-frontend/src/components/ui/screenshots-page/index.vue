@@ -21,9 +21,11 @@ import {
 import {
 	Avatar,
 	Button,
+	type ButtonMenuOption,
 	type ComboboxOption,
 	commonMessages,
 	ConfirmModal,
+	ContextMenu,
 	defineMessages,
 	EmptyState,
 	FloatingActionBar,
@@ -44,8 +46,6 @@ import dayjs from 'dayjs'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
-import type { ContextMenuOption, ContextMenuSelection } from '@/components/ui/context-menu/types'
 import { useAppEvent } from '@/composables/use-app-event'
 import {
 	create_screenshot_group,
@@ -175,16 +175,6 @@ const { formatMessage } = useVIntl()
 const { addNotification, handleError } = injectNotificationManager()
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 const formatMonth = useFormatDateTime({ month: 'long', year: 'numeric' })
-const screenshotContextOptions: ContextMenuOption[] = [
-	{ name: 'edit' },
-	{ name: 'copy' },
-	{ name: 'open' },
-	{ name: 'go-to-instance' },
-	{ type: 'divider' },
-	{ name: 'delete', color: 'danger' },
-]
-const screenshotOverflowOptions = screenshotContextOptions.slice(2)
-
 const messages = defineMessages({
 	heading: { id: 'app.screenshots.heading', defaultMessage: 'Screenshots' },
 	emptyHeading: { id: 'app.screenshots.empty-heading', defaultMessage: 'No screenshots yet' },
@@ -861,7 +851,7 @@ function activateScreenshot(screenshot: InstanceScreenshot, event: MouseEvent | 
 		(candidate) => getSelectionKey(candidate) === getSelectionKey(screenshot),
 	)
 	if (index >= 0) {
-		screenshotOptionsMenu.value?.hideMenu()
+		screenshotOptionsMenu.value?.close()
 		imageViewer.value?.show(index)
 	}
 }
@@ -878,24 +868,44 @@ function requestDelete(screenshot: InstanceScreenshot, fromPreview = false) {
 
 function showScreenshotOptions(screenshot: InstanceScreenshot, event: MouseEvent) {
 	screenshotOptionsTarget.value = screenshot
-	const options =
-		event.type === 'contextmenu' ? screenshotContextOptions : screenshotOverflowOptions
-	screenshotOptionsMenu.value?.showMenu(event, screenshot, options)
-}
-
-function handleScreenshotOption({ item, option }: ContextMenuSelection) {
-	const screenshot = item as InstanceScreenshot
-	if (option === 'edit') {
-		editScreenshot(screenshot)
-	} else if (option === 'copy') {
-		void copyScreenshot(screenshot)
-	} else if (option === 'open') {
-		void openScreenshot(screenshot)
-	} else if (option === 'go-to-instance') {
-		void goToInstance(screenshot)
-	} else if (option === 'delete') {
-		requestDelete(screenshot)
-	}
+	const options: ButtonMenuOption[] = [
+		...(event.type === 'contextmenu'
+			? [
+					{
+						id: 'edit',
+						label: formatMessage(messages.edit),
+						icon: EditIcon,
+						action: () => editScreenshot(screenshot),
+					},
+					{
+						id: 'copy',
+						label: formatMessage(messages.copy),
+						icon: ClipboardCopyIcon,
+						action: () => void copyScreenshot(screenshot),
+					},
+				]
+			: []),
+		{
+			id: 'open',
+			label: formatMessage(messages.showInFolder),
+			icon: FolderOpenIcon,
+			action: () => void openScreenshot(screenshot),
+		},
+		{
+			id: 'go-to-instance',
+			label: formatMessage(messages.goToInstance),
+			action: () => void goToInstance(screenshot),
+		},
+		{ type: 'divider' },
+		{
+			id: 'delete',
+			label: formatMessage(commonMessages.deleteLabel),
+			icon: TrashIcon,
+			tone: 'red',
+			action: () => requestDelete(screenshot),
+		},
+	]
+	screenshotOptionsMenu.value?.open(event, options)
 }
 
 function goToInstance(screenshot: InstanceScreenshot) {
@@ -931,7 +941,7 @@ function editScreenshot(screenshot: InstanceScreenshot) {
 		(candidate) => getSelectionKey(candidate) === getSelectionKey(screenshot),
 	)
 	if (index >= 0) {
-		screenshotOptionsMenu.value?.hideMenu()
+		screenshotOptionsMenu.value?.close()
 		void imageViewer.value?.edit(index)
 	}
 }
@@ -1195,19 +1205,7 @@ onBeforeUnmount(() => {
 		:markdown="false"
 		@proceed="deleteCustomGroup"
 	/>
-	<ContextMenu ref="screenshotOptionsMenu" @option-clicked="handleScreenshotOption">
-		<template #edit>
-			<EditIcon />
-			{{ formatMessage(messages.edit) }}
-		</template>
-		<template #copy>
-			<ClipboardCopyIcon />
-			{{ formatMessage(messages.copy) }}
-		</template>
-		<template #open>
-			<FolderOpenIcon />
-			{{ formatMessage(messages.showInFolder) }}
-		</template>
+	<ContextMenu ref="screenshotOptionsMenu" :label="formatMessage(commonMessages.actionsLabel)">
 		<template #go-to-instance>
 			<Avatar
 				:src="getInstanceIconUrl(screenshotOptionsInstance?.icon_path)"
@@ -1217,10 +1215,6 @@ onBeforeUnmount(() => {
 				class="shrink-0"
 			/>
 			{{ formatMessage(messages.goToInstance) }}
-		</template>
-		<template #delete>
-			<TrashIcon />
-			{{ formatMessage(commonMessages.deleteLabel) }}
 		</template>
 	</ContextMenu>
 	<ImageViewerEditor
