@@ -9,12 +9,34 @@ use serde::{Deserialize, Serialize};
 use sha1_smol::Sha1;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 const COMMAND_HISTORY_FILE: &str = "command_history.txt";
 const HOTBAR_FILE: &str = "hotbar.nbt";
 const COMMAND_HISTORY_LIMIT: usize = 50;
 const COMPONENTS_DATA_VERSION_FLOOR: i32 = 3837;
 const HOTBAR_SCHEMA_VERSION: i64 = 2;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SyncedOptionJoinAction {
+    SeedShared,
+    Attach,
+    Merge,
+    RequiresResolution,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+pub struct SyncedOptionJoinPreview {
+    pub action: SyncedOptionJoinAction,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SyncedOptionJoinResolution {
+    UseSynced,
+    UseInstance,
+}
 
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
 pub struct GlobalSyncedOptions {
@@ -146,12 +168,6 @@ pub async fn get_synced_options_folder() -> crate::Result<PathBuf> {
     let state = State::get().await?;
     create_synced_directories(&state).await?;
     Ok(synced_options_path(&state))
-}
-
-pub async fn synced_option_needs_base(
-    option: SyncedOption,
-) -> crate::Result<bool> {
-    Ok(option != SyncedOption::Screenshots)
 }
 
 async fn get_global_options_with_state(
@@ -352,41 +368,11 @@ async fn hotbar_family(
 pub async fn set_global_option(
     option: SyncedOption,
     enabled: bool,
-    base_instance_id: Option<&str>,
 ) -> crate::Result<GlobalSyncedOptions> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
-    if enabled && option != SyncedOption::Screenshots {
-        let base_instance_id = base_instance_id.ok_or_else(|| {
-            ErrorKind::InputError(
-                "Choose a base instance before enabling a synced option."
-                    .to_string(),
-            )
-        })?;
-        let metadata =
-            crate::state::get_instance(base_instance_id, &state.pool)
-                .await?
-                .ok_or_else(|| {
-                    ErrorKind::InputError("Unknown instance".to_string())
-                })?;
-        if sync_files_are_protected(&metadata)
-            || instance_is_running(&metadata, &state).await?
-        {
-            return Err(ErrorKind::InputError(
-                "The base instance must be closed and fully installed."
-                    .to_string(),
-            )
-            .into());
-        }
-        let base_capability = capability(&metadata, option, true, &state).await;
-        if !base_capability.supported {
-            return Err(ErrorKind::InputError(
-                base_capability.disabled_reason.unwrap_or_default(),
-            )
-            .into());
-        }
-        seed_from_instance(&metadata, option, &state).await?;
-    }
+    let reset_participation =
+        enabled && !canonical_exists(option, &state).await?;
 
     let option_name = option.as_str();
     sqlx::query!(
@@ -404,6 +390,25 @@ pub async fn set_global_option(
     .await?;
 
     let instances = crate::state::list_instances(&state.pool).await?;
+    if reset_participation {
+        for metadata in instances {
+            if instance_option_enabled(&metadata, option) {
+                instance_rows::set_instance_sync_preference(
+                    &metadata.instance.id,
+                    option,
+                    false,
+                    &state.pool,
+                )
+                .await?;
+            }
+            if !sync_files_are_protected(&metadata)
+                && !instance_is_running(&metadata, &state).await?
+            {
+                detach_option(&metadata, option, &state).await?;
+            }
+        }
+        return get_global_options_with_state(&state).await;
+    }
     for metadata in instances {
         if sync_files_are_protected(&metadata)
             || instance_is_running(&metadata, &state).await?
@@ -416,7 +421,7 @@ pub async fn set_global_option(
         }
         match capability_status(&metadata, option, enabled, &state).await {
             CapabilityStatus::Supported => {
-                ensure_option(&metadata, option, &state).await?
+                reconcile_option(&metadata, option, &state).await?
             }
             CapabilityStatus::Unsupported(_) => {
                 detach_option(&metadata, option, &state).await?
@@ -432,12 +437,16 @@ pub async fn set_instance_option(
     instance_id: &str,
     option: SyncedOption,
     enabled: bool,
+    resolution: Option<SyncedOptionJoinResolution>,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    if instance_option_enabled(&metadata, option) == enabled {
+        return Ok(metadata);
+    }
     let global = get_global_options_with_state(&state).await?;
     let can_reconcile = !sync_files_are_protected(&metadata)
         && !instance_is_running(&metadata, &state).await?;
@@ -450,15 +459,56 @@ pub async fn set_instance_option(
             )
             .into());
         }
-        if !canonical_exists(option, &state).await? {
-            if !can_reconcile {
-                return Err(ErrorKind::InputError(
-					"Close the instance before using it as the initial sync source."
-						.to_string(),
-				)
-				.into());
+        if option != SyncedOption::Screenshots && !can_reconcile {
+            return Err(ErrorKind::InputError(
+                "Close the instance before including it in file syncing."
+                    .to_string(),
+            )
+            .into());
+        }
+
+        let action =
+            instance_option_join_action(&metadata, option, &state).await?;
+        if action == SyncedOptionJoinAction::RequiresResolution
+            && resolution.is_none()
+        {
+            return Err(ErrorKind::InputError(
+                "Choose whether to use the synced hotbars or this instance's hotbars."
+                    .to_string(),
+            )
+            .into());
+        }
+        if option != SyncedOption::Screenshots {
+            backup_instance_option_file(&metadata, option, &state).await?;
+        }
+        match action {
+            SyncedOptionJoinAction::SeedShared => {
+                seed_from_instance(&metadata, option, &state).await?;
             }
-            seed_from_instance(&metadata, option, &state).await?;
+            SyncedOptionJoinAction::Attach => {}
+            SyncedOptionJoinAction::Merge => match option {
+                SyncedOption::CommandHistory => {
+                    merge_command_history_from_instance(&metadata, &state)
+                        .await?;
+                }
+                SyncedOption::MultiplayerServers => {
+                    super::synced_servers::merge_servers_from_instance(
+                        &metadata, &state,
+                    )
+                    .await?;
+                }
+                SyncedOption::CreativeHotbars | SyncedOption::Screenshots => {
+                    unreachable!()
+                }
+            },
+            SyncedOptionJoinAction::RequiresResolution => match resolution {
+                Some(SyncedOptionJoinResolution::UseSynced) => {}
+                Some(SyncedOptionJoinResolution::UseInstance) => {
+                    backup_shared_hotbars(&state).await?;
+                    seed_from_instance(&metadata, option, &state).await?;
+                }
+                None => unreachable!(),
+            },
         }
     }
 
@@ -482,6 +532,63 @@ pub async fn set_instance_option(
         .ok_or_else(|| {
             ErrorKind::InputError("Unknown instance".to_string()).into()
         })
+}
+
+pub async fn get_instance_option_join_preview(
+    instance_id: &str,
+    option: SyncedOption,
+) -> crate::Result<SyncedOptionJoinPreview> {
+    let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    let global = get_global_options_with_state(&state).await?;
+    let eligibility =
+        capability(&metadata, option, global.get(option), &state).await;
+    if !eligibility.supported {
+        return Err(ErrorKind::InputError(
+            eligibility.disabled_reason.unwrap_or_default(),
+        )
+        .into());
+    }
+    if option != SyncedOption::Screenshots
+        && (sync_files_are_protected(&metadata)
+            || instance_is_running(&metadata, &state).await?)
+    {
+        return Err(ErrorKind::InputError(
+            "Close the instance before including it in file syncing."
+                .to_string(),
+        )
+        .into());
+    }
+
+    Ok(SyncedOptionJoinPreview {
+        action: instance_option_join_action(&metadata, option, &state).await?,
+    })
+}
+
+async fn instance_option_join_action(
+    metadata: &InstanceMetadata,
+    option: SyncedOption,
+    state: &State,
+) -> crate::Result<SyncedOptionJoinAction> {
+    if !canonical_exists(option, state).await? {
+        return Ok(SyncedOptionJoinAction::SeedShared);
+    }
+    Ok(match option {
+        SyncedOption::CommandHistory | SyncedOption::MultiplayerServers => {
+            SyncedOptionJoinAction::Merge
+        }
+        SyncedOption::CreativeHotbars => {
+            if instance_hotbars_differ_from_synced(metadata, state).await? {
+                SyncedOptionJoinAction::RequiresResolution
+            } else {
+                SyncedOptionJoinAction::Attach
+            }
+        }
+        SyncedOption::Screenshots => SyncedOptionJoinAction::Attach,
+    })
 }
 
 pub async fn reconcile_all() -> crate::Result<()> {
@@ -595,19 +702,9 @@ async fn reconcile_instance_with_state(
         match capability_status(metadata, option, global.get(option), state)
             .await
         {
-            CapabilityStatus::Supported => match option {
-                SyncedOption::CommandHistory => {
-                    reconcile_command_history(metadata, state).await?
-                }
-                SyncedOption::CreativeHotbars => {
-                    reconcile_hotbar(metadata, state).await?
-                }
-                SyncedOption::MultiplayerServers => {
-                    super::synced_servers::reconcile_servers(metadata, state)
-                        .await?
-                }
-                SyncedOption::Screenshots => {}
-            },
+            CapabilityStatus::Supported => {
+                reconcile_option(metadata, option, state).await?
+            }
             CapabilityStatus::Unsupported(_) => {
                 detach_option(metadata, option, state).await?
             }
@@ -615,6 +712,25 @@ async fn reconcile_instance_with_state(
         }
     }
     Ok(())
+}
+
+async fn reconcile_option(
+    metadata: &InstanceMetadata,
+    option: SyncedOption,
+    state: &State,
+) -> crate::Result<()> {
+    match option {
+        SyncedOption::CommandHistory => {
+            reconcile_command_history(metadata, state).await
+        }
+        SyncedOption::CreativeHotbars => {
+            reconcile_hotbar(metadata, state).await
+        }
+        SyncedOption::MultiplayerServers => {
+            super::synced_servers::reconcile_servers(metadata, state).await
+        }
+        SyncedOption::Screenshots => Ok(()),
+    }
 }
 
 pub async fn reconcile_changed_file(
@@ -697,6 +813,81 @@ async fn create_synced_directories(state: &State) -> crate::Result<()> {
     ] {
         io::create_dir_all(path).await?;
     }
+    Ok(())
+}
+
+async fn backup_instance_option_file(
+    metadata: &InstanceMetadata,
+    option: SyncedOption,
+    state: &State,
+) -> crate::Result<()> {
+    let directory = instance_dir(metadata, state);
+    let path = match option {
+        SyncedOption::CommandHistory => directory.join(COMMAND_HISTORY_FILE),
+        SyncedOption::CreativeHotbars => directory.join(HOTBAR_FILE),
+        SyncedOption::MultiplayerServers => directory.join("servers.dat"),
+        SyncedOption::Screenshots => return Ok(()),
+    };
+    if !path.exists() {
+        return Ok(());
+    }
+    let Some(file_name) = path.file_name().and_then(|value| value.to_str())
+    else {
+        return Ok(());
+    };
+    backup_bytes(
+        &metadata.instance.id,
+        file_name,
+        &io::read(&path).await?,
+        state,
+    )
+    .await
+}
+
+async fn backup_shared_hotbars(state: &State) -> crate::Result<()> {
+    let sync_state = read_hotbar_state(state).await?;
+    let legacy = hotbar_family_root(&sync_state.nbt, HotbarFamily::Legacy);
+    let components =
+        hotbar_family_root(&sync_state.nbt, HotbarFamily::Components);
+    backup_bytes(
+        "shared",
+        "hotbar-legacy.nbt",
+        &nbt_to_bytes(&legacy)?,
+        state,
+    )
+    .await?;
+    backup_bytes(
+        "shared",
+        "hotbar-components.nbt",
+        &nbt_to_bytes(&components)?,
+        state,
+    )
+    .await?;
+    backup_bytes(
+        "shared",
+        "hotbars-state.nbt",
+        &nbt_to_bytes(&sync_state.nbt)?,
+        state,
+    )
+    .await
+}
+
+async fn backup_bytes(
+    owner: &str,
+    file_name: &str,
+    contents: &[u8],
+    state: &State,
+) -> crate::Result<()> {
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_nanos();
+    let directory = synced_options_path(state)
+        .join("backups")
+        .join(safe_instance_id(owner))
+        .join(timestamp.to_string());
+    io::create_dir_all(&directory).await?;
+    io::write(directory.join(file_name), contents).await?;
     Ok(())
 }
 
@@ -923,6 +1114,47 @@ fn normalize_command_history(contents: &str) -> String {
     normalized
 }
 
+async fn merge_command_history_from_instance(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<()> {
+    let canonical_path = command_history_path(state);
+    let canonical = if canonical_path.exists() {
+        String::from_utf8_lossy(&io::read(&canonical_path).await?).into_owned()
+    } else {
+        String::new()
+    };
+    let local_path = instance_dir(metadata, state).join(COMMAND_HISTORY_FILE);
+    let local = if local_path.exists() {
+        String::from_utf8_lossy(&io::read(&local_path).await?).into_owned()
+    } else {
+        String::new()
+    };
+    let canonical_lines = canonical.lines().collect::<Vec<_>>();
+    let available = COMMAND_HISTORY_LIMIT.saturating_sub(canonical_lines.len());
+    let mut seen = canonical_lines
+        .iter()
+        .copied()
+        .collect::<std::collections::HashSet<_>>();
+    let mut imported = Vec::new();
+    for line in local.lines().rev() {
+        if imported.len() == available {
+            break;
+        }
+        if seen.insert(line) {
+            imported.push(line);
+        }
+    }
+    imported.reverse();
+    imported.extend(canonical_lines);
+    let merged = normalize_command_history(&imported.join("\n"));
+    if merged != normalize_command_history(&canonical) {
+        io::write(&canonical_path, merged).await?;
+        refresh_command_history_links(state).await?;
+    }
+    Ok(())
+}
+
 async fn ensure_hotbar(
     metadata: &InstanceMetadata,
     state: &State,
@@ -1016,6 +1248,22 @@ async fn reconcile_hotbar(
         write_hotbar_state(state, &sync_state).await?;
     }
     regenerate_hotbars(state).await
+}
+
+async fn instance_hotbars_differ_from_synced(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<bool> {
+    let local_path = instance_dir(metadata, state).join(HOTBAR_FILE);
+    if !local_path.exists() {
+        return Ok(false);
+    }
+    let local = read_nbt_file(&local_path).await?;
+    let family = hotbar_family(metadata, state).await?;
+    let synced =
+        hotbar_family_root(&read_hotbar_state(state).await?.nbt, family);
+    Ok((0..81)
+        .any(|slot| hotbar_slot(&local, slot) != hotbar_slot(&synced, slot)))
 }
 
 fn merge_hotbar_family(

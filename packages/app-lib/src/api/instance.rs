@@ -92,12 +92,13 @@ pub use self::shared::{
     unlink_shared_instance, unpublish_shared_instance, update_shared_instance,
 };
 pub use self::synced_options::{
-    GlobalSyncedOptions, SyncedOptionCapability, SyncedOptionsOverview,
+    GlobalSyncedOptions, SyncedOptionCapability, SyncedOptionJoinAction,
+    SyncedOptionJoinPreview, SyncedOptionJoinResolution, SyncedOptionsOverview,
     get_capabilities as get_synced_option_capabilities, get_command_history,
     get_global_options as get_global_synced_options,
+    get_instance_option_join_preview as get_synced_option_join_preview,
     get_overview as get_synced_options_overview, get_synced_options_folder,
     set_command_history, set_global_option as set_global_synced_option,
-    synced_option_needs_base,
 };
 pub(crate) use self::synced_options::{
     monitor_persisted_processes, prepare_instance_update,

@@ -21,22 +21,22 @@
 		@navigate="trackGalleryNavigation"
 	>
 		<template #actions="{ item }">
-			<ButtonLink
+			<Button
 				type="quiet"
-				class="btn icon-only !rounded-full !p-0"
-				target="_blank"
-				:href="item.src"
+				class="!w-9 !rounded-full !p-0"
 				aria-label="Open image in new tab"
+				@click="openUrl(item.src)"
 			>
 				<ExternalIcon aria-hidden="true" />
-			</ButtonLink>
+			</Button>
 		</template>
 	</ImageViewerEditor>
 </template>
 
 <script setup>
 import { CalendarIcon, ExternalIcon } from '@modrinth/assets'
-import { ButtonLink, Card, ImageViewerEditor, useFormatDateTime } from '@modrinth/ui'
+import { Button, Card, ImageViewerEditor, useFormatDateTime } from '@modrinth/ui'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref } from 'vue'
 
 import { trackEvent } from '@/helpers/analytics'

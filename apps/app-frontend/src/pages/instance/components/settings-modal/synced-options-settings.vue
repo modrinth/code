@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
-import { Button, defineMessages, injectNotificationManager, Toggle, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	NewModal,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, inject } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import {
+	get_synced_option_join_preview,
 	get_synced_options_overview,
 	set_synced_option,
 	type SyncedOption,
+	type SyncedOptionJoinResolution,
 } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 import { appSettingsModalOpenSyncedOptionsKey } from '@/providers/app-settings-modal'
@@ -85,6 +95,27 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.synced-options.screenshots.disabled-in-app',
 		defaultMessage: 'Screenshots are turned off in app settings.',
 	},
+	hotbarConflictTitle: {
+		id: 'instance.settings.tabs.synced-options.hotbars-conflict.title',
+		defaultMessage: 'Choose which saved hotbars to use',
+	},
+	hotbarConflictDescription: {
+		id: 'instance.settings.tabs.synced-options.hotbars-conflict.description',
+		defaultMessage:
+			'{instance} has different saved hotbars. You can apply the currently synced hotbars to this instance or make this instance’s hotbars the shared version.',
+	},
+	hotbarBackupDescription: {
+		id: 'instance.settings.tabs.synced-options.hotbars-conflict.backup-description',
+		defaultMessage: 'The version being replaced will be backed up before anything changes.',
+	},
+	useSyncedHotbars: {
+		id: 'instance.settings.tabs.synced-options.hotbars-conflict.use-synced',
+		defaultMessage: 'Use synced hotbars',
+	},
+	useInstanceHotbars: {
+		id: 'instance.settings.tabs.synced-options.hotbars-conflict.use-instance',
+		defaultMessage: 'Use this instance’s hotbars',
+	},
 })
 
 const globalDisabledMessages: Record<SyncedOption, keyof typeof messages> = {
@@ -135,6 +166,8 @@ const capabilities = computed(
 				[],
 		),
 )
+const hotbarResolutionModal = ref<InstanceType<typeof NewModal> | null>(null)
+const previewingOption = ref<SyncedOption | null>(null)
 
 function excluded(option: SyncedOption): boolean {
 	return (
@@ -156,9 +189,17 @@ function showAppSyncedOptions(): void {
 }
 
 const mutation = useMutation({
-	mutationFn: ({ option, enabled }: { option: SyncedOption; enabled: boolean }) =>
-		set_synced_option(instance.value.id, option, enabled),
+	mutationFn: ({
+		option,
+		enabled,
+		resolution,
+	}: {
+		option: SyncedOption
+		enabled: boolean
+		resolution?: SyncedOptionJoinResolution
+	}) => set_synced_option(instance.value.id, option, enabled, resolution),
 	onSuccess: async (updatedInstance, variables) => {
+		hotbarResolutionModal.value?.hide()
 		queryClient.setQueryData(instanceKeys.detail(updatedInstance.id), updatedInstance)
 		queryClient.setQueryData<GameInstance[]>(instanceKeys.list(), (instances) =>
 			instances?.map((candidate) =>
@@ -180,10 +221,86 @@ const mutation = useMutation({
 	},
 	onError: handleError,
 })
+
+async function setExcluded(option: SyncedOption, nextExcluded: boolean) {
+	const enabled = !nextExcluded
+	if (!enabled || option !== 'creative_hotbars') {
+		mutation.mutate({ option, enabled })
+		return
+	}
+
+	previewingOption.value = option
+	try {
+		const preview = await get_synced_option_join_preview(instance.value.id, option)
+		if (preview.action === 'requires_resolution') {
+			hotbarResolutionModal.value?.show()
+		} else {
+			mutation.mutate({ option, enabled })
+		}
+	} catch (error) {
+		handleError(error)
+	} finally {
+		previewingOption.value = null
+	}
+}
+
+function resolveHotbars(resolution: SyncedOptionJoinResolution) {
+	mutation.mutate({
+		option: 'creative_hotbars',
+		enabled: true,
+		resolution,
+	})
+}
 </script>
 
 <template>
 	<div class="flex flex-col gap-6">
+		<NewModal
+			ref="hotbarResolutionModal"
+			:header="formatMessage(messages.hotbarConflictTitle)"
+			fade="warning"
+			max-width="560px"
+		>
+			<div class="flex flex-col gap-3 text-primary">
+				<p class="m-0">
+					{{
+						formatMessage(messages.hotbarConflictDescription, {
+							instance: instance.name,
+						})
+					}}
+				</p>
+				<p class="m-0 text-secondary">
+					{{ formatMessage(messages.hotbarBackupDescription) }}
+				</p>
+			</div>
+			<template #actions>
+				<div class="flex flex-wrap justify-end gap-2">
+					<Button
+						type="outlined"
+						:disabled="mutation.isPending.value"
+						@click="hotbarResolutionModal?.hide()"
+					>
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="outlined"
+						:disabled="mutation.isPending.value"
+						@click="resolveHotbars('use_instance')"
+					>
+						{{ formatMessage(messages.useInstanceHotbars) }}
+					</Button>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="mutation.isPending.value"
+						@click="resolveHotbars('use_synced')"
+					>
+						{{ formatMessage(messages.useSyncedHotbars) }}
+					</Button>
+				</div>
+			</template>
+		</NewModal>
+
 		<div class="flex items-center justify-between gap-4">
 			<p class="m-0 text-secondary">
 				{{ formatMessage(messages.sharedSettingsDescription) }}
@@ -206,7 +323,10 @@ const mutation = useMutation({
 				</div>
 				<div class="flex shrink-0 items-center gap-2">
 					<SpinnerIcon
-						v-if="mutation.isPending.value && mutation.variables.value?.option === row.option"
+						v-if="
+							(mutation.isPending.value && mutation.variables.value?.option === row.option) ||
+							previewingOption === row.option
+						"
 						class="size-5 animate-spin"
 					/>
 					<span v-tooltip="disabledReason(row.option)" class="flex">
@@ -215,12 +335,11 @@ const mutation = useMutation({
 							:model-value="excluded(row.option)"
 							:disabled="
 								mutation.isPending.value ||
+								previewingOption !== null ||
 								overviewQuery.isPending.value ||
 								!!disabledReason(row.option)
 							"
-							@update:model-value="
-								(excluded) => mutation.mutate({ option: row.option, enabled: !excluded })
-							"
+							@update:model-value="(excluded) => setExcluded(row.option, excluded)"
 						/>
 					</span>
 				</div>

@@ -1262,14 +1262,14 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
-	"app.nav.remove-account": {
-		"message": "Remove account"
-	},
-	"app.nav.screenshots": {
-		"message": "Screenshots"
-	},
-	"app.nav.sign-in-to-modrinth-account": {
-		"message": "Sign into Modrinth"
+  "app.nav.remove-account": {
+    "message": "Remove account"
+  },
+  "app.nav.screenshots": {
+    "message": "Screenshots"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Sign into Modrinth"
   },
   "app.nav.switch-account": {
     "message": "Switch account"
@@ -1690,27 +1690,6 @@
   },
   "app.settings.sidebar.label.instances": {
     "message": "Instances"
-  },
-  "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "Pick the instance whose command history becomes the shared copy."
-  },
-  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "Pick the instance whose saved creative hotbars become the shared copy."
-  },
-  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "Pick the instance whose multiplayer servers become the shared copy."
-  },
-  "app.settings.synced-options.choose-sync-source.no-instances-found": {
-    "message": "No instances found"
-  },
-  "app.settings.synced-options.choose-sync-source.search-placeholder": {
-    "message": "Search instance"
-  },
-  "app.settings.synced-options.choose-sync-source.sync": {
-    "message": "Sync"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Choose a sync source"
   },
   "app.settings.synced-options.command-history": {
     "message": "Command history"
@@ -2710,6 +2689,21 @@
   },
   "instance.settings.tabs.synced-options.creative-hotbars.exclude-description": {
     "message": "Exclude this instance from saved creative hotbar syncing."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
+    "message": "The version being replaced will be backed up before anything changes."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "{instance} has different saved hotbars. You can apply the currently synced hotbars to this instance or make this instance’s hotbars the shared version."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.title": {
+    "message": "Choose which saved hotbars to use"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
+    "message": "Use this instance’s hotbars"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
+    "message": "Use synced hotbars"
   },
   "instance.settings.tabs.synced-options.multiplayer-servers": {
     "message": "Multiplayer servers"

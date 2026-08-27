@@ -194,6 +194,64 @@ pub(super) async fn seed_servers(
     regenerate_servers(state).await
 }
 
+pub(super) async fn merge_servers_from_instance(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<()> {
+    if is_modpack_link(&metadata.link)
+        && (!pack_state_matches_link(metadata, state).await?
+            || !pack_state_exists(&metadata.instance.id, state).await?)
+        && let Err(error) = reconstruct_modpack_servers(metadata, state).await
+    {
+        tracing::warn!(
+            "Failed to reconstruct the server pack state for {}: {error}",
+            metadata.instance.id
+        );
+    }
+    let local_entries = load_local(&metadata.instance.id, state).await?;
+    if is_modpack_link(&metadata.link)
+        && !pack_state_exists(&metadata.instance.id, state).await?
+    {
+        return Err(ErrorKind::InputError(
+            "This linked modpack cannot join multiplayer syncing until its supplied server list has been reconstructed."
+                .to_string(),
+        )
+        .into());
+    }
+    let path = instance_dir(metadata, state).join(SERVERS_FILE);
+    let mut candidates = read_servers(&path).await?;
+    for local in &local_entries {
+        let local_address = server_identity_address(&local.data);
+        if let Some(index) = candidates.iter().position(|data| {
+            data == &local.data
+                || (!local_address.is_empty()
+                    && server_identity_address(data) == local_address)
+        }) {
+            candidates.remove(index);
+        }
+    }
+
+    let mut canonical = read_canonical(state).await?;
+    for data in candidates {
+        let address = server_identity_address(&data);
+        let exists = canonical.iter().any(|server| {
+            server.data == data
+                || (!address.is_empty()
+                    && server_identity_address(&server.data) == address)
+        });
+        if !exists {
+            canonical.push(CanonicalServer {
+                id: Uuid::new_v4().to_string(),
+                data,
+            });
+        }
+    }
+    if commit_server_state(Some(&canonical), None, state).await? {
+        regenerate_servers(state).await?;
+    }
+    Ok(())
+}
+
 pub(super) async fn ensure_servers(
     metadata: &InstanceMetadata,
     state: &State,

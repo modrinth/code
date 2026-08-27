@@ -88,11 +88,13 @@ pub async fn set_synced_option(
     instance_id: &str,
     option: InstanceSyncedOption,
     enabled: bool,
+    resolution: Option<super::SyncedOptionJoinResolution>,
 ) -> crate::Result<InstanceMetadata> {
     let instance = super::synced_options::set_instance_option(
         instance_id,
         option,
         enabled,
+        resolution,
     )
     .await?;
 

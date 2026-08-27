@@ -61,9 +61,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_move_screenshots,
             instance_open_screenshot,
             instance_set_synced_option,
+            instance_get_synced_option_join_preview,
             instance_get_synced_options_overview,
             instance_get_global_synced_options,
-            instance_synced_option_needs_base,
             instance_set_global_synced_option,
             instance_get_command_history,
             instance_set_command_history,
@@ -798,11 +798,28 @@ pub async fn instance_set_synced_option(
     instance_id: &str,
     option: InstanceSyncedOption,
     enabled: bool,
+    resolution: Option<theseus::instance::SyncedOptionJoinResolution>,
 ) -> Result<Instance> {
     Ok(Instance::from(
-        theseus::instance::set_synced_option(instance_id, option, enabled)
-            .await?,
+        theseus::instance::set_synced_option(
+            instance_id,
+            option,
+            enabled,
+            resolution,
+        )
+        .await?,
     ))
+}
+
+#[tauri::command]
+pub async fn instance_get_synced_option_join_preview(
+    instance_id: &str,
+    option: InstanceSyncedOption,
+) -> Result<theseus::instance::SyncedOptionJoinPreview> {
+    Ok(
+        theseus::instance::get_synced_option_join_preview(instance_id, option)
+            .await?,
+    )
 }
 
 #[tauri::command]
@@ -819,24 +836,11 @@ pub async fn instance_get_global_synced_options()
 }
 
 #[tauri::command]
-pub async fn instance_synced_option_needs_base(
-    option: InstanceSyncedOption,
-) -> Result<bool> {
-    Ok(theseus::instance::synced_option_needs_base(option).await?)
-}
-
-#[tauri::command]
 pub async fn instance_set_global_synced_option(
     option: InstanceSyncedOption,
     enabled: bool,
-    base_instance_id: Option<&str>,
 ) -> Result<theseus::instance::GlobalSyncedOptions> {
-    Ok(theseus::instance::set_global_synced_option(
-        option,
-        enabled,
-        base_instance_id,
-    )
-    .await?)
+    Ok(theseus::instance::set_global_synced_option(option, enabled).await?)
 }
 
 #[tauri::command]

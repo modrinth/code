@@ -278,11 +278,13 @@ export async function set_synced_option(
 	instanceId: string,
 	option: SyncedOption,
 	enabled: boolean,
+	resolution?: SyncedOptionJoinResolution,
 ): Promise<GameInstance> {
 	return await invoke('plugin:instance|instance_set_synced_option', {
 		instanceId,
 		option,
 		enabled,
+		resolution,
 	})
 }
 
@@ -293,6 +295,14 @@ export type SyncedOption =
 	| 'screenshots'
 
 export type GlobalSyncedOptions = Record<SyncedOption, boolean>
+
+export type SyncedOptionJoinAction = 'seed_shared' | 'attach' | 'merge' | 'requires_resolution'
+
+export type SyncedOptionJoinResolution = 'use_synced' | 'use_instance'
+
+export type SyncedOptionJoinPreview = {
+	action: SyncedOptionJoinAction
+}
 
 export type SyncedOptionCapability = {
 	option: SyncedOption
@@ -305,6 +315,16 @@ export type SyncedOptionsOverview = {
 	capabilities: SyncedOptionCapability[]
 }
 
+export async function get_synced_option_join_preview(
+	instanceId: string,
+	option: SyncedOption,
+): Promise<SyncedOptionJoinPreview> {
+	return await invoke('plugin:instance|instance_get_synced_option_join_preview', {
+		instanceId,
+		option,
+	})
+}
+
 export async function get_synced_options_overview(
 	instanceId: string,
 ): Promise<SyncedOptionsOverview> {
@@ -315,19 +335,13 @@ export async function get_global_synced_options(): Promise<GlobalSyncedOptions> 
 	return await invoke('plugin:instance|instance_get_global_synced_options')
 }
 
-export async function synced_option_needs_base(option: SyncedOption): Promise<boolean> {
-	return await invoke('plugin:instance|instance_synced_option_needs_base', { option })
-}
-
 export async function set_global_synced_option(
 	option: SyncedOption,
 	enabled: boolean,
-	baseInstanceId?: string,
 ): Promise<GlobalSyncedOptions> {
 	return await invoke('plugin:instance|instance_set_global_synced_option', {
 		option,
 		enabled,
-		baseInstanceId,
 	})
 }
 
