@@ -1,6 +1,9 @@
 import { computed, onScopeDispose, reactive, type Ref, watch } from 'vue'
 
-import { PROJECT_CONTENT_LINK_BLOCKLIST } from '../project-links/index.ts'
+import {
+	getBlockedProjectContentLink,
+	getBlockedProjectExternalLink,
+} from '../project-links/index.ts'
 
 interface MessageDescriptor {
 	id: string
@@ -102,11 +105,6 @@ type LinkCheckChildShape =
 
 function anchored(source: string): RegExp {
 	return new RegExp(`^${source}`, 'i')
-}
-
-function blacklist(label: string, ...domains: string[]): LinkCheckBuilder {
-	const pattern = domains.map((domain) => domain.replace(/\./g, '\\.')).join('|')
-	return check(new RegExp(`^(?:[^./:?#]+\\.)*(?:${pattern})(?=[:/?#]|$)`, 'i'), label)
 }
 
 function buildNode(when: LinkCheckMatcher, label?: string): LinkCheckBuilder {
@@ -278,7 +276,12 @@ const coreMessages = defineMessages({
 //TODO: we should probably just let you not provide https but backend currently requires it
 const invalidUrlMessage = defineMessage({
 	id: 'nags.link.invalid-url',
-	defaultMessage: "There's an invalid URL in the description.",
+	defaultMessage: 'This URL is invalid',
+})
+
+const invalidDescriptionUrlMessage = defineMessage({
+	id: 'nags.link.description.invalid-url',
+	defaultMessage: 'The description has an invalid link',
 })
 
 function validUrlPrefix(remaining: string): number | null {
@@ -337,6 +340,13 @@ async function checkLink(context: LinkCheckContext) {
 	const normalizedUrl = url.replace(/^(https:\/\/)www\./i, '$1')
 
 	cache.set(key, 'pending')
+	const blockedLink = context.generalContent
+		? getBlockedProjectContentLink(url)
+		: getBlockedProjectExternalLink(url)
+	if (blockedLink) {
+		cache.set(key, error(coreMessages.neverValid, { label: blockedLink.label }))
+		return
+	}
 
 	const found = await matchNode(rootNode, normalizedUrl, context, true)
 	if (!found) {
@@ -361,7 +371,12 @@ async function checkLink(context: LinkCheckContext) {
 		const build = matched.unrecognizedSeverity === 'warn' ? warn : error
 
 		if (matched.unrecognizedMessage && isLeaf) {
-			cache.set(key, build(matched.unrecognizedMessage, { label: matched.label }))
+			const message =
+				context.field === 'description' &&
+				matched.unrecognizedMessage.id === invalidUrlMessage.id
+					? invalidDescriptionUrlMessage
+					: matched.unrecognizedMessage
+			cache.set(key, build(message, { label: matched.label }))
 			return
 		}
 
@@ -828,10 +843,6 @@ checks.children(
 		check(/^\/forms\//i, 'Forms').for('issues'),
 		check(/^\/document\//i, 'Documents').for('wiki'),
 	),
-)
-
-checks.children(
-	...PROJECT_CONTENT_LINK_BLOCKLIST.map(({ label, domains }) => blacklist(label, ...domains)),
 )
 
 export { checkLink, getLinkCheckState, isLinkCheckPending, useLinkCheck }

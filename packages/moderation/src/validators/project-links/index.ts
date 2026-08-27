@@ -1,9 +1,9 @@
-export interface ProjectContentLinkBlocklistEntry {
+export interface ProjectLinkBlocklistEntry {
 	label: string
 	domains: readonly string[]
 }
 
-export const PROJECT_CONTENT_LINK_SHORTENERS = [
+export const PROJECT_LINK_SHORTENERS = [
 	'bit.ly',
 	'adf.ly',
 	'tinyurl.com',
@@ -11,11 +11,17 @@ export const PROJECT_CONTENT_LINK_SHORTENERS = [
 	'is.gd',
 ] as const
 
-export const PROJECT_CONTENT_LINK_BLOCKLIST: readonly ProjectContentLinkBlocklistEntry[] = [
-	{
-		label: 'URL shortener',
-		domains: PROJECT_CONTENT_LINK_SHORTENERS,
-	},
+const URL_SHORTENER_BLOCKLIST_ENTRY: ProjectLinkBlocklistEntry = {
+	label: 'URL shortener',
+	domains: PROJECT_LINK_SHORTENERS,
+}
+
+export const PROJECT_CONTENT_LINK_BLOCKLIST: readonly ProjectLinkBlocklistEntry[] = [
+	URL_SHORTENER_BLOCKLIST_ENTRY,
+]
+
+export const PROJECT_EXTERNAL_LINK_BLOCKLIST: readonly ProjectLinkBlocklistEntry[] = [
+	URL_SHORTENER_BLOCKLIST_ENTRY,
 	{ label: 'Twitter', domains: ['twitter.com', 'x.com'] },
 	{ label: 'Instagram', domains: ['instagram.com'] },
 	{ label: 'Facebook', domains: ['facebook.com'] },
@@ -37,7 +43,7 @@ export const PROJECT_CONTENT_LINK_BLOCKLIST: readonly ProjectContentLinkBlocklis
 	},
 ]
 
-export interface BlockedProjectContentLink extends Record<string, unknown> {
+export interface BlockedProjectLink extends Record<string, unknown> {
 	label: string
 	url: string
 }
@@ -47,7 +53,10 @@ function isIpAddress(hostname: string) {
 	return /^\d{1,3}(?:\.\d{1,3}){3}$/.test(strippedHostname) || strippedHostname.includes(':')
 }
 
-export function getBlockedProjectContentLink(url: string): BlockedProjectContentLink | null {
+function getBlockedProjectLink(
+	url: string,
+	blocklist: readonly ProjectLinkBlocklistEntry[],
+): BlockedProjectLink | null {
 	let hostname: string
 	try {
 		hostname = new URL(url).hostname.toLowerCase().replace(/\.$/, '')
@@ -57,9 +66,17 @@ export function getBlockedProjectContentLink(url: string): BlockedProjectContent
 
 	if (isIpAddress(hostname)) return { label: 'IP address', url }
 
-	const entry = PROJECT_CONTENT_LINK_BLOCKLIST.find(({ domains }) =>
+	const entry = blocklist.find(({ domains }) =>
 		domains.some((domain) => hostname === domain || hostname.endsWith(`.${domain}`)),
 	)
 
 	return entry ? { label: entry.label, url } : null
+}
+
+export function getBlockedProjectContentLink(url: string): BlockedProjectLink | null {
+	return getBlockedProjectLink(url, PROJECT_CONTENT_LINK_BLOCKLIST)
+}
+
+export function getBlockedProjectExternalLink(url: string): BlockedProjectLink | null {
+	return getBlockedProjectLink(url, PROJECT_EXTERNAL_LINK_BLOCKLIST)
 }

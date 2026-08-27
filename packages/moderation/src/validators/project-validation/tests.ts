@@ -119,7 +119,7 @@ test('treats version numbers and explicit summary links as errors', () => {
 
 test('rejects blocklisted links in summaries and descriptions', () => {
 	const summaryResult = validateProjectFields(
-		createProject({ summary: 'Visit modrinth.com for more information' }),
+		createProject({ summary: 'Visit bit.ly/project for more information' }),
 	)
 	assert.equal(summaryResult.valid, false)
 	assert.equal(summaryResult.failures[0]?.field, 'summary')

@@ -3,8 +3,8 @@ import { defineMessage, formatProjectTypeSentence, useVIntl } from '@modrinth/ui
 import type { Nag, NagContext } from '../../types/nags'
 import { licenseRequiresSource, notSourceAsDistributed } from '../../utils'
 import {
-	getBlockedProjectContentLink,
-	PROJECT_CONTENT_LINK_SHORTENERS,
+	getBlockedProjectExternalLink,
+	PROJECT_LINK_SHORTENERS,
 } from '../../validators/project-links'
 
 export const commonLinkDomains = {
@@ -49,7 +49,7 @@ export const commonLinkDomains = {
 		'example.com',
 		't.me',
 	],
-	linkShorteners: PROJECT_CONTENT_LINK_SHORTENERS,
+	linkShorteners: PROJECT_LINK_SHORTENERS,
 }
 
 export function isCommonUrl(url: string | null, commonDomains: readonly string[]): boolean {
@@ -92,7 +92,7 @@ export function findBlockedProjectExternalLink(context: Pick<NagContext, 'projec
 
 	for (const url of urls) {
 		if (!url) continue
-		const blockedLink = getBlockedProjectContentLink(url)
+		const blockedLink = getBlockedProjectExternalLink(url)
 		if (blockedLink) return blockedLink
 	}
 

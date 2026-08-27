@@ -161,10 +161,7 @@ test('validates project summaries', () => {
 })
 
 test('rejects blocklisted links and IP addresses in summaries and descriptions', () => {
-	const blockedSummary = validateProjectSummary(
-		'Visit https://social.modrinth.com/project',
-		'Title',
-	)
+	const blockedSummary = validateProjectSummary('Visit https://bit.ly/project', 'Title')
 	assert.deepEqual(blockedSummary[0], {
 		code: 'text-banned-link',
 		severity: 'error',
@@ -173,8 +170,8 @@ test('rejects blocklisted links and IP addresses in summaries and descriptions',
 			defaultMessage: '“{url}” is not allowed in project summaries or descriptions.',
 		},
 		values: {
-			label: 'Modrinth',
-			url: 'https://social.modrinth.com/project',
+			label: 'URL shortener',
+			url: 'https://bit.ly/project',
 		},
 	})
 
@@ -189,7 +186,7 @@ test('rejects blocklisted links and IP addresses in summaries and descriptions',
 	assert.equal(blockedIp[0]?.values?.label, 'IP address')
 
 	const allowedDescription = validateProjectDescription(
-		`Read more at https://example.dev/project. ${'More details. '.repeat(20)}`,
+		`Read more at https://social.modrinth.com/project. ${'More details. '.repeat(20)}`,
 	)
 	assert.equal(
 		allowedDescription.some(({ code }) => code === 'text-banned-link'),

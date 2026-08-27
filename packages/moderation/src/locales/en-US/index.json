@@ -134,6 +134,9 @@
 	"nags.invalid-project-summary.title": {
 		"defaultMessage": "Fix the project summary"
 	},
+	"nags.link.description.invalid-url": {
+		"defaultMessage": "The description has an invalid link"
+	},
 	"nags.link.discord.channel": {
 		"defaultMessage": "This is a link to a Discord channel, not a server invite."
 	},
@@ -168,7 +171,7 @@
 		"defaultMessage": "The wiki is disabled on this repository."
 	},
 	"nags.link.invalid-url": {
-		"defaultMessage": "There's an invalid URL in the description."
+		"defaultMessage": "This URL is invalid"
 	},
 	"nags.link.license.url-mismatch": {
 		"defaultMessage": "This link points to the {detected} license, but your project is set to {selected}."

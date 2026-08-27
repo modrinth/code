@@ -16,6 +16,22 @@ test('rejects invalid and insecure URLs', async () => {
 	assert.equal(getLinkCheckState(reserved)?.severity, 'error')
 })
 
+test('uses a description-specific message for invalid content links', async () => {
+	const context = {
+		field: 'description',
+		url: 'http://example.dev/project',
+		generalContent: true,
+	}
+
+	await checkLink(context)
+
+	assert.equal(getLinkCheckState(context)?.message?.id, 'nags.link.description.invalid-url')
+	assert.equal(
+		getLinkCheckState(context)?.message?.defaultMessage,
+		'The description has an invalid link',
+	)
+})
+
 test('matches recognized hosts case-insensitively', async () => {
 	const googleForm = { field: 'issues', url: 'https://DOCS.GOOGLE.COM/forms/d/e/example' }
 	const shortener = { field: 'source', url: 'https://BIT.LY/example' }
@@ -67,8 +83,12 @@ test('allows unrecognized valid links but keeps global restrictions in general c
 	assert.equal(getLinkCheckState(blocked)?.severity, 'error')
 })
 
-test('blocks subdomains of blocklisted hosts without blocking lookalike domains', async () => {
-	const blocked = {
+test('applies the external-link blocklist only outside general content', async () => {
+	const blockedExternalLink = {
+		field: 'site',
+		url: 'https://social.modrinth.com/project',
+	}
+	const allowedContentLink = {
 		field: 'description',
 		url: 'https://social.modrinth.com/project',
 		generalContent: true,
@@ -79,10 +99,12 @@ test('blocks subdomains of blocklisted hosts without blocking lookalike domains'
 		generalContent: true,
 	}
 
-	await checkLink(blocked)
+	await checkLink(blockedExternalLink)
+	await checkLink(allowedContentLink)
 	await checkLink(allowed)
 
-	assert.equal(getLinkCheckState(blocked)?.severity, 'error')
+	assert.equal(getLinkCheckState(blockedExternalLink)?.severity, 'error')
+	assert.equal(getLinkCheckState(allowedContentLink)?.severity, 'valid')
 	assert.equal(getLinkCheckState(allowed)?.severity, 'valid')
 })
 
