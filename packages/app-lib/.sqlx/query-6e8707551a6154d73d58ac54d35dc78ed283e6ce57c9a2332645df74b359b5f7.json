@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT schema_version AS \"schema_version!: i64\",\n\t\t\trevision AS \"revision!: i64\", nbt\n\t\tFROM synced_hotbar_state\n\t\tWHERE singleton = 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "schema_version!: i64",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "revision!: i64",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "nbt",
+        "ordinal": 2,
+        "type_info": "Blob"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6e8707551a6154d73d58ac54d35dc78ed283e6ce57c9a2332645df74b359b5f7"
+}

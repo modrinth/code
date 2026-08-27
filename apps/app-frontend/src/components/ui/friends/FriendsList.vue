@@ -291,10 +291,11 @@ const messages = defineMessages({
 				v-model="search"
 				:icon="SearchIcon"
 				type="text"
+				appearance="transparent"
 				:placeholder="formatMessage(messages.searchFriends)"
 				clearable
-				input-class="!bg-transparent !border !border-solid !border-button-bg !text-primary !placeholder:text-primary"
-				wrapper-class="flex-1 [&>svg]:!text-primary [&>svg]:!opacity-100"
+				input-class="!text-primary !placeholder:text-primary"
+				wrapper-class="flex-1 !border-button-bg [&>span:first-child]:!text-primary [&>span:first-child]:!opacity-100"
 				@keyup.esc="search = ''"
 			/>
 		</template>

@@ -1457,9 +1457,6 @@
   "app.settings.tabs.behavior": {
     "message": "Поведение"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Предустановки игры"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Расположение Java"
   },
@@ -2279,12 +2276,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Выберите канал обновления"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Команды запуска"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Переопределение команд запуска"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
   },
@@ -2347,9 +2338,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Параметры установки недоступны, пока сборка заблокирована."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java и память"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Переопределение переменных среды"

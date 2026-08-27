@@ -98,6 +98,11 @@ pub(crate) async fn create_instance(
 
         let mut tx = state.pool.begin().await?;
         instance_rows::insert_instance(&instance, &mut tx).await?;
+        instance_rows::insert_default_instance_sync_preferences(
+            &instance_id,
+            &mut tx,
+        )
+        .await?;
         if let Some(icon_config) = &input.icon_config {
             instance_rows::update_instance_icon_config(
                 &instance_id,
@@ -125,6 +130,17 @@ pub(crate) async fn create_instance(
             &state.directories,
         )
         .await;
+        if let Err(error) =
+            crate::api::instance::reconcile_instance_synced_options(
+                &instance.id,
+            )
+            .await
+        {
+            tracing::warn!(
+                "Failed to reconcile synced options for newly created instance {}: {error}",
+                instance.id
+            );
+        }
 
         Ok(instance)
     }

@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT instances.id, instances.name, instances.path\n\t\tFROM instances\n\t\tINNER JOIN instance_sync_preferences preferences\n\t\t\tON preferences.instance_id = instances.id\n\t\tWHERE preferences.feature = 'screenshots'\n\t\t\tAND preferences.enabled = 1\n\t\t\tAND EXISTS (\n\t\t\t\tSELECT 1\n\t\t\t\tFROM sync_feature_settings\n\t\t\t\tWHERE feature = 'screenshots' AND globally_enabled = 1\n\t\t\t)\n\t\tORDER BY instances.name, instances.id\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "path",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1fb66446c3ba0f52e682f8aae4b80a97310f308b3aa25c322d499b32d549f7b7"
+}

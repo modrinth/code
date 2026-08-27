@@ -144,6 +144,13 @@ fn main() {
 
     let mut builder = tauri::Builder::default();
 
+    #[cfg(target_os = "macos")]
+    {
+        builder = builder
+            .menu(|app| macos::menu::create(app))
+            .on_menu_event(macos::menu::handle_event);
+    }
+
     #[cfg(feature = "updater")]
     {
         use tauri_plugin_http::reqwest::header::{HeaderValue, USER_AGENT};

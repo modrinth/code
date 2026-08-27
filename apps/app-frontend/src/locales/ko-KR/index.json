@@ -1397,9 +1397,6 @@
   "app.settings.tabs.behavior": {
     "message": "동작"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "기본 게임 옵션"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java 설치"
   },
@@ -1958,12 +1955,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "업데이트 채널 선택"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "실행 후크"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "사용자 지정 실행 후크"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "후크 기능을 사용하면 고급 사용자가 게임 실행 전후에 특정 시스템 명령을 실행할 수 있습니다."
   },
@@ -2005,9 +1996,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "이 인스턴스가 잠긴 상태에서는 설치 설정을 사용할 수 없습니다."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java 및 메모리"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "사용자 지정 환경 변수"
