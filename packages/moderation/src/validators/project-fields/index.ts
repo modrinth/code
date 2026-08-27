@@ -84,7 +84,7 @@ const messages = defineMessages({
 	},
 	summaryMatchesTitle: {
 		id: 'project.text-validation.summary-matches-title',
-		defaultMessage: 'A project summary should not be the same as its title.',
+		defaultMessage: "A project summary cannot be the same as it's title.",
 	},
 	summaryTooShort: {
 		id: 'project.text-validation.summary-too-short',
@@ -138,8 +138,8 @@ export function normalizeProjectFieldText(value: string) {
 }
 
 export function projectSummaryMatchesTitle(summary: string, title: string) {
-	const normalizedSummary = normalizeProjectFieldText(summary)
-	const normalizedTitle = normalizeProjectFieldText(title)
+	const normalizedSummary = normalizeProjectFieldText(summary).replace(/\s+/g, '')
+	const normalizedTitle = normalizeProjectFieldText(title).replace(/\s+/g, '')
 
 	return normalizedSummary.length > 0 && normalizedSummary === normalizedTitle
 }
@@ -353,7 +353,7 @@ export function validateProjectSummary(
 		return [
 			{
 				code: 'summary-matches-title',
-				severity: 'warn',
+				severity: 'error',
 				message: messages.summaryMatchesTitle,
 			},
 		]
@@ -372,7 +372,7 @@ export function validateProjectSummary(
 	if (hasProjectSummaryFormatting(summary) || containsExplicitLink) {
 		results.push({
 			code: containsExplicitLink ? 'summary-link' : 'summary-special-formatting',
-			severity: containsExplicitLink ? 'error' : 'warn',
+			severity: 'error',
 			message: messages.summarySpecialFormatting,
 		})
 	}

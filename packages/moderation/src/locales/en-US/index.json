@@ -366,7 +366,7 @@
 		"defaultMessage": "The detected slur “{value}” is not allowed."
 	},
 	"project.text-validation.summary-matches-title": {
-		"defaultMessage": "A project summary should not be the same as its title."
+		"defaultMessage": "A project summary cannot be the same as it's title."
 	},
 	"project.text-validation.summary-too-short": {
 		"defaultMessage": "Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary."

@@ -21,7 +21,7 @@ const summaryErrorCodes: readonly ProjectTextValidationCode[] = [
 	'text-banned-link',
 	'summary-link',
 ]
-const summaryWarningCodes: readonly ProjectTextValidationCode[] = ['summary-matches-title']
+const summaryRequiredCodes: readonly ProjectTextValidationCode[] = ['summary-matches-title']
 const descriptionErrorCodes: readonly ProjectTextValidationCode[] = [
 	'text-slur',
 	'text-profanity',
@@ -151,10 +151,10 @@ export const projectValidationNags: Nag[] = [
 			defaultMessage: 'Review the project summary',
 		}),
 		description: (context) =>
-			getFailureDescription(context, ['summary'], 'warn', summaryWarningCodes),
-		status: 'warning',
+			getFailureDescription(context, ['summary'], 'error', summaryRequiredCodes),
+		status: 'required',
 		shouldShow: (context) =>
-			getFirstFailure(context, ['summary'], 'warn', summaryWarningCodes) !== undefined,
+			getFirstFailure(context, ['summary'], 'error', summaryRequiredCodes) !== undefined,
 		link: {
 			path: 'settings',
 			title: defineMessage({
@@ -189,7 +189,7 @@ export const projectValidationNags: Nag[] = [
 			defaultMessage: 'Clean up the summary',
 		}),
 		description: (context) => getCodedFailureDescription(context, 'summary-special-formatting'),
-		status: 'warning',
+		status: 'required',
 		shouldShow: (context) => getCodedFailure(context, 'summary-special-formatting') !== undefined,
 		link: {
 			path: 'settings',

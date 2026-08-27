@@ -15,8 +15,9 @@ import {
 	validateProjectTitle,
 } from './index.ts'
 
-test('compares summaries and titles after trimming and Unicode normalization', () => {
+test('compares summaries and titles without whitespace and after Unicode normalization', () => {
 	assert.equal(projectSummaryMatchesTitle('  Caf\u00e9  ', 'Cafe\u0301'), true)
+	assert.equal(projectSummaryMatchesTitle('Project summary', 'Projectsummary'), true)
 	assert.equal(projectSummaryMatchesTitle('Project summary', 'Project title'), false)
 	assert.equal(projectSummaryMatchesTitle('', ''), false)
 })
@@ -127,7 +128,11 @@ test('validates project summaries', () => {
 		validateProjectSummary('  Caf\u00e9  ', 'Cafe\u0301')[0]?.message.id,
 		'project.text-validation.summary-matches-title',
 	)
-	assert.equal(validateProjectSummary('  Caf\u00e9  ', 'Cafe\u0301')[0]?.severity, 'warn')
+	assert.equal(validateProjectSummary('  Caf\u00e9  ', 'Cafe\u0301')[0]?.severity, 'error')
+	assert.equal(
+		validateProjectSummary('  Caf\u00e9  ', 'Cafe\u0301')[0]?.message.defaultMessage,
+		"A project summary cannot be the same as it's title.",
+	)
 	assert.deepEqual(validateProjectSummary('Short summary', 'Project title'), [
 		{
 			code: 'summary-too-short',
@@ -148,6 +153,7 @@ test('validates project summaries', () => {
 		validateProjectSummary('# Short summary', 'Project title').map(({ code }) => code),
 		['summary-too-short', 'summary-special-formatting'],
 	)
+	assert.equal(validateProjectSummary('# Short summary', 'Project title')[1]?.severity, 'error')
 	assert.equal(
 		validateProjectSummary('# Short summary', 'Project title')[1]?.message.defaultMessage,
 		summaryContentMessage,

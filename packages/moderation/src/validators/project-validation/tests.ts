@@ -87,6 +87,12 @@ test('reports whether a project has field validation failures', () => {
 	})
 	assert.equal(hasProjectFieldValidationFailures(validProject), false)
 	assert.equal(hasProjectFieldValidationFailures(invalidProject), true)
+	assert.equal(
+		hasProjectFieldValidationFailures(
+			createProject({ name: 'Ordinary Tools', summary: 'Ordinary Tools' }),
+		),
+		true,
+	)
 })
 
 test('treats version numbers and explicit summary links as errors', () => {
@@ -147,4 +153,19 @@ test('reports summary recommendations without invalidating the project', () => {
 		],
 	})
 	assert.equal(hasProjectFieldValidationFailures(project), false)
+})
+
+test('treats summary formatting as a field validation failure', () => {
+	const project = createProject({ summary: '# A formatted project summary' })
+	const result = validateProjectFields(project)
+
+	assert.equal(result.valid, false)
+	assert.deepEqual(
+		result.failures.map(({ code, severity }) => ({ code, severity })),
+		[
+			{ code: 'summary-too-short', severity: 'warn' },
+			{ code: 'summary-special-formatting', severity: 'error' },
+		],
+	)
+	assert.equal(hasProjectFieldValidationFailures(project), true)
 })
