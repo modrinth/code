@@ -50,6 +50,24 @@ const FANCY_RANGES: ReadonlyArray<readonly [number, number]> = [
 	[0x1f100, 0x1f1ad],
 ]
 
+const ALLOWED_FANCY_CODE_POINTS = new Set([
+	0x02d6,
+	0x02d7,
+	0x02d8,
+	0x02d9,
+	0x02da,
+	0x02db,
+	0x02dc,
+	0x02dd,
+	0x207a,
+	0x207b,
+	0x208a,
+	0x208b,
+	0x2120,
+	0x2122,
+	0x2139,
+])
+
 const MARK_PATTERN = /\p{M}/u
 const CONTROL_PATTERN = /\p{Cc}/u
 const FORMAT_PATTERN = /\p{Cf}/u
@@ -261,7 +279,7 @@ export function validateNonStandardText(
 		hasBaseCharacter = !/^\s$/u.test(character)
 
 		if (
-			codePoint !== 0x2122 &&
+			!ALLOWED_FANCY_CODE_POINTS.has(codePoint) &&
 			isInRanges(codePoint, FANCY_RANGES) &&
 			!isPresentedAsEmoji(characters, characterIndex)
 		) {

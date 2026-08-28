@@ -61,6 +61,10 @@ test('detects common fancy alphabets and presentation forms', () => {
 	)
 })
 
+test('allows selected decorative characters from fancy ranges', () => {
+	assert.equal(validateNonStandardText('˖˗˘˙˚˛˜˝⁺⁻₊₋℠ℹ⊹✦').valid, true)
+})
+
 test('allows ordinary emoji and valid emoji joiner sequences', () => {
 	assert.equal(validateNonStandardText('Hello 👋🏽').valid, true)
 	assert.equal(validateNonStandardText('Family: 👨‍👩‍👧‍👦').valid, true)
