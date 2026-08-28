@@ -121,7 +121,7 @@ export const projectNameValidationRules = {
 		},
 	},
 	'minecraft-title-clause': {
-		severity: 'warning',
+		severity: 'error',
 		evaluate: (projectName) => {
 			const normalizedName = projectName.normalize('NFC').toLowerCase()
 			const words = normalizedName.split(/\s+/).filter(Boolean)
