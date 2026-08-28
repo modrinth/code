@@ -1,8 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG TAILSCALE_VERSION=v1.102.3
-
-FROM docker.io/tailscale/tailscale:${TAILSCALE_VERSION} AS tailscale
+FROM docker.io/tailscale/tailscale:latest AS tailscale
 
 FROM node:24-trixie-slim
 
@@ -48,9 +46,17 @@ start_tailscale() {
 		sleep 0.1
 	done
 
+	if [ -n "${TAILSCALE_HOSTNAME:-}" ]; then
+		node_hostname="$TAILSCALE_HOSTNAME"
+	elif [ -n "${BUNNYNET_MC_PODID:-}" ] && [ -n "${BUNNYNET_MC_REGION:-}" ]; then
+		node_hostname="frontend-$BUNNYNET_MC_PODID-$BUNNYNET_MC_REGION"
+	else
+		node_hostname="frontend-$(hostname)"
+	fi
+
 	tailscale --socket="$TAILSCALE_SOCKET" up \
 		--authkey="$TAILSCALE_AUTH_KEY" \
-		--hostname="${TAILSCALE_HOSTNAME:-frontend-$(hostname)}" \
+		--hostname="$node_hostname" \
 		--accept-dns=false \
 		--timeout=30s \
 		--ssh
