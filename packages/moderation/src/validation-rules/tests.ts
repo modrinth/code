@@ -3,10 +3,12 @@ import test from 'node:test'
 
 import { evaluateRules } from './evaluate-rules.ts'
 import {
+	analyzeHeaderLength,
 	analyzeImageContent,
 	BANNED_DESCRIPTION_LINK_DOMAINS,
 	countText,
 	extractDescriptionLinks,
+	extractRenderedHeaders,
 	findBannedDescriptionLink,
 	MIN_DESCRIPTION_CHARS,
 	validateProjectDescription,
@@ -190,6 +192,76 @@ test('validates description requirements and simultaneous recommendations', () =
 		validateProjectDescription(description).map(({ code }) => code),
 		['description-too-short', 'project-description-spam', 'long-headers', 'missing-alt-text'],
 	)
+})
+
+test('allows short headers regardless of punctuation', () => {
+	assert.deepEqual(analyzeHeaderLength('# Version 1.2 is available'), {
+		hasLongHeaders: false,
+		longHeaders: [],
+	})
+	assert.deepEqual(analyzeHeaderLength('# Install version 1.2. Enjoy!'), {
+		hasLongHeaders: false,
+		longHeaders: [],
+	})
+})
+
+test('validates Setext headers', () => {
+	assert.deepEqual(
+		analyzeHeaderLength('Version 1.2 is available\n===\n\nFirst sentence. Second sentence.\n---'),
+		{
+			hasLongHeaders: false,
+			longHeaders: [],
+		},
+	)
+	assert.deepEqual(analyzeHeaderLength(`${'A'.repeat(81)}\n===`), {
+		hasLongHeaders: true,
+		longHeaders: ['A'.repeat(81)],
+	})
+})
+
+test('validates visible header text without counting markup', () => {
+	const styledHeader =
+		'<b><font color="#FF5555">W</font><font color="#FFAA00">O</font><font color="#55FF55">W</font><font color="#55FFFF">!</font></b>'
+	assert.deepEqual(extractRenderedHeaders(`### ${styledHeader}`), ['WOW!'])
+	assert.deepEqual(analyzeHeaderLength(`### ${styledHeader}`), {
+		hasLongHeaders: false,
+		longHeaders: [],
+	})
+
+	const longStyledHeader = `<b>${'A'.repeat(81)}</b>`
+	assert.deepEqual(analyzeHeaderLength(`### ${longStyledHeader}`), {
+		hasLongHeaders: true,
+		longHeaders: ['A'.repeat(81)],
+	})
+	assert.deepEqual(analyzeHeaderLength('### <b>First sentence. Second sentence.</b>'), {
+		hasLongHeaders: false,
+		longHeaders: [],
+	})
+	assert.deepEqual(analyzeHeaderLength(`### [Docs](https://example.com/${'a'.repeat(81)})`), {
+		hasLongHeaders: false,
+		longHeaders: [],
+	})
+})
+
+test('validates rendered heading levels one through three using grapheme counts', () => {
+	assert.deepEqual(analyzeHeaderLength(`<h3>${'A'.repeat(81)}</h3>`), {
+		hasLongHeaders: true,
+		longHeaders: ['A'.repeat(81)],
+	})
+	assert.deepEqual(analyzeHeaderLength(`<h4>${'A'.repeat(81)}</h4>`), {
+		hasLongHeaders: false,
+		longHeaders: [],
+	})
+
+	const emoji = '👨‍👩‍👧‍👦'
+	assert.deepEqual(analyzeHeaderLength(`### ${emoji.repeat(80)}`), {
+		hasLongHeaders: false,
+		longHeaders: [],
+	})
+	assert.deepEqual(analyzeHeaderLength(`### ${emoji.repeat(81)}`), {
+		hasLongHeaders: true,
+		longHeaders: [emoji.repeat(81)],
+	})
 })
 
 test('requires 125 readable description characters', () => {

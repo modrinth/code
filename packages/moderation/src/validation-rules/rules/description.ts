@@ -1,5 +1,7 @@
 import { defineMessages } from '@modrinth/ui/i18n'
+import { renderString } from '@modrinth/utils/parse.ts'
 import LinkifyIt from 'linkify-it'
+import { parse } from 'node-html-parser'
 import tlds from 'tlds' with { type: 'json' }
 
 import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
@@ -105,6 +107,8 @@ const descriptionLinkify = new LinkifyIt({
 	fuzzyLink: true,
 }).tlds(tlds)
 
+const headerCharacterSegmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+
 export function extractDescriptionLinks(description: string): string[] {
 	const matches = descriptionLinkify.match(description) ?? []
 	return [
@@ -133,20 +137,26 @@ export function findBannedDescriptionLink(description: string): string | null {
 	return null
 }
 
+export function extractRenderedHeaders(markdown: string): string[] {
+	if (!markdown) return []
+
+	const renderedDescription = parse(renderString(markdown))
+	return renderedDescription
+		.querySelectorAll('h1, h2, h3')
+		.map((header) => header.textContent.replace(/\s+/g, ' ').trim())
+}
+
+function countHeaderCharacters(header: string): number {
+	return [...headerCharacterSegmenter.segment(header)].length
+}
+
 export function analyzeHeaderLength(markdown: string): {
 	hasLongHeaders: boolean
 	longHeaders: string[]
 } {
-	if (!markdown) return { hasLongHeaders: false, longHeaders: [] }
-
-	const withoutCodeBlocks = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
-	const headers = [...withoutCodeBlocks.matchAll(/^(#{1,3})\s+(.+)$/gm)]
-	const longHeaders = headers
-		.map((match) => match[2].trim())
-		.filter((headerText) => {
-			const sentences = headerText.split(/[.!?]+/g).filter((sentence) => sentence.trim().length > 0)
-			return headerText.length > MAX_HEADER_LENGTH || sentences.length > 1
-		})
+	const longHeaders = extractRenderedHeaders(markdown).filter(
+		(header) => countHeaderCharacters(header) > MAX_HEADER_LENGTH,
+	)
 
 	return { hasLongHeaders: longHeaders.length > 0, longHeaders }
 }
@@ -280,7 +290,7 @@ export const projectDescriptionValidationRules = {
 		},
 	},
 	'long-headers': {
-		severity: 'warning',
+		severity: 'error',
 		evaluate: (description) => {
 			const { longHeaders } = analyzeHeaderLength(description ?? '')
 			if (longHeaders.length > 0) {
