@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { LightBulbIcon, TriangleAlertIcon, XCircleIcon } from '@modrinth/assets'
 import { type MessageDescriptor, useVIntl } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, onScopeDispose, shallowRef, watch } from 'vue'
 
 interface ValidationCheck {
 	code?: string
@@ -37,15 +37,46 @@ interface ValidationCheck {
 	values?: Record<string, unknown>
 }
 
-const props = withDefaults(defineProps<{ check?: ValidationCheck | ValidationCheck[] | null }>(), {
-	check: null,
-})
+type ValidationCheckInput = ValidationCheck | ValidationCheck[] | null
+
+const props = withDefaults(
+	defineProps<{
+		check?: ValidationCheckInput
+		debounce?: number
+	}>(),
+	{
+		check: null,
+		debounce: 300,
+	},
+)
 
 const { formatMessage } = useVIntl()
+const displayedCheck = shallowRef<ValidationCheckInput>(props.check)
+let debounceTimer: ReturnType<typeof setTimeout> | undefined
+
+watch(
+	() => props.check,
+	(check) => {
+		clearTimeout(debounceTimer)
+		if (props.debounce <= 0) {
+			displayedCheck.value = check
+			return
+		}
+
+		debounceTimer = setTimeout(() => {
+			displayedCheck.value = check
+		}, props.debounce)
+	},
+)
+
+onScopeDispose(() => clearTimeout(debounceTimer))
 
 const validations = computed(() =>
-	(Array.isArray(props.check) ? props.check : props.check ? [props.check] : []).filter(
-		(validation) => validation.severity !== 'valid',
-	),
+	(Array.isArray(displayedCheck.value)
+		? displayedCheck.value
+		: displayedCheck.value
+			? [displayedCheck.value]
+			: []
+	).filter((validation) => validation.severity !== 'valid'),
 )
 </script>

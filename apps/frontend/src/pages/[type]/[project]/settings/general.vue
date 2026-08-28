@@ -57,8 +57,7 @@ const {
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
-const titleForValidation = ref(current.value.title)
-const titleValidation = useProjectTitleValidation(titleForValidation)
+const titleValidation = useProjectTitleValidation(() => current.value.title)
 const taglineValidation = useProjectSummaryValidation(
 	() => current.value.tagline,
 	() => current.value.title,
@@ -88,7 +87,6 @@ async function save() {
 
 function reset() {
 	resetForm()
-	titleForValidation.value = current.value.title
 }
 
 const messages = defineMessages({
@@ -204,7 +202,6 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 						autocomplete="off"
 						:maxlength="50"
 						wrapper-class="flex-grow"
-						@blur="titleForValidation = current.title"
 					/>
 				</div>
 				<ValidationMessage :check="titleValidation" class="mt-2" />
