@@ -6,9 +6,10 @@ import {
 	defineMessages,
 	InlineEditableText,
 	TagItem,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -37,6 +38,7 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const debugLayout = useDebugLogger('Screenshots:Section')
 const accordion = ref<InstanceType<typeof Accordion>>()
 const titleInput = ref<InstanceType<typeof InlineEditableText>>()
 const titleModel = ref(props.title)
@@ -46,12 +48,41 @@ const messages = defineMessages({
 })
 
 function toggle() {
+	debugLayout('toggle requested', {
+		title: props.title,
+		count: props.count,
+		isOpen: accordion.value?.isOpen,
+	})
 	if (accordion.value?.isOpen) {
 		accordion.value.close()
 	} else {
 		accordion.value?.open()
 	}
 }
+
+function handleOpen() {
+	debugLayout('opened', { title: props.title, count: props.count })
+	emit('update:collapsed', false)
+}
+
+function handleClose() {
+	debugLayout('closed', { title: props.title, count: props.count })
+	emit('update:collapsed', true)
+}
+
+onMounted(() => {
+	debugLayout('mounted', {
+		title: props.title,
+		count: props.count,
+		collapsed: props.collapsed,
+		hideHeader: props.hideHeader,
+		forceOpen: props.forceOpen,
+	})
+})
+
+onBeforeUnmount(() => {
+	debugLayout('unmounted', { title: props.title, count: props.count })
+})
 
 async function startTitleEditing() {
 	if (!props.editable) return
@@ -127,8 +158,8 @@ watch(
 			:force-open="forceOpen"
 			overflow-visible
 			class="w-full"
-			@on-open="emit('update:collapsed', false)"
-			@on-close="emit('update:collapsed', true)"
+			@on-open="handleOpen"
+			@on-close="handleClose"
 		>
 			<div class="mt-2.5">
 				<slot />

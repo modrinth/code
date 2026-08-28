@@ -2,7 +2,7 @@ use crate::api::Result;
 use dashmap::DashMap;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Manager, Runtime};
 use tauri_plugin_fs::FsExt;
@@ -906,13 +906,25 @@ fn serialize_screenshots<R: Runtime>(
     app_handle: &AppHandle<R>,
     screenshots: Vec<theseus::instance::InstanceScreenshot>,
 ) -> Result<Vec<InstanceScreenshot>> {
-    let mut result = Vec::with_capacity(screenshots.len());
-
-    for screenshot in screenshots {
-        result.push(serialize_screenshot(app_handle, screenshot)?);
+    let screenshot_directories = screenshots
+        .iter()
+        .filter_map(|screenshot| screenshot.path.parent())
+        .collect::<HashSet<_>>();
+    for directory in screenshot_directories {
+        app_handle
+            .asset_protocol_scope()
+            .allow_directory(directory, false)
+            .map_err(|error| std::io::Error::other(error.to_string()))?;
+        app_handle
+            .fs_scope()
+            .allow_directory(directory, false)
+            .map_err(|error| std::io::Error::other(error.to_string()))?;
     }
 
-    Ok(result)
+    screenshots
+        .into_iter()
+        .map(serialize_screenshot_data)
+        .collect()
 }
 
 fn serialize_screenshot<R: Runtime>(
@@ -927,6 +939,12 @@ fn serialize_screenshot<R: Runtime>(
         .fs_scope()
         .allow_file(&screenshot.path)
         .map_err(|error| std::io::Error::other(error.to_string()))?;
+    serialize_screenshot_data(screenshot)
+}
+
+fn serialize_screenshot_data(
+    screenshot: theseus::instance::InstanceScreenshot,
+) -> Result<InstanceScreenshot> {
     let mut url = super::utils::tauri_convert_file_src(&screenshot.path)?;
     url.query_pairs_mut()
         .append_pair("revision", &screenshot.modified_at.to_string());
