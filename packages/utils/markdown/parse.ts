@@ -37,7 +37,7 @@ export const modrinthPlugins: ComarkPlugin[] = [
 	alert(),
 	attributes(), // safe cuz we filter attributes, ends up being a nice shorthand for any places people want to use the attributes we allow?
 	binding(),
-	breaks(), // makes newlines work like newlines
+	// breaks(), // makes newlines work like newlines //TODO: make this an option?
 	components(),
 	emoji(),
 	footnotes(),
