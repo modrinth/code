@@ -69,8 +69,20 @@ const PRODUCT_SCOPES: Record<
 		catalogScopes: ['apps/app-frontend', 'packages/ui'],
 	},
 	website: {
-		sourceDirectories: ['apps/frontend/src', 'packages/moderation/src', 'packages/ui/src'],
-		catalogScopes: ['packages/ui', 'packages/moderation', 'apps/frontend'],
+		sourceDirectories: [
+			'apps/frontend/src',
+			// 'apps/website/src',
+			'packages/layouts/src',
+			'packages/moderation/src',
+			'packages/ui/src',
+		],
+		catalogScopes: [
+			'packages/ui',
+			'packages/moderation',
+			'packages/layouts',
+			'apps/frontend',
+			// 'apps/website',
+		],
 	},
 }
 
@@ -765,8 +777,10 @@ function main() {
 	const scanDirs = [
 		'apps/frontend/src',
 		'apps/app-frontend/src',
+		// 'apps/website/src',
 		'packages/ui/src',
 		'packages/moderation/src',
+		'packages/layouts/src',
 	]
 
 	if (!jsonOutput && !quiet) {

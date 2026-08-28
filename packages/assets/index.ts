@@ -6,7 +6,7 @@
  *       and automatically generated through the "pnpm run fix" command.
  */
 
-import './omorphia.scss'
+import './omorphia.css'
 
 import _FourOhFourNotFound from './branding/404.svg?component'
 // Branding

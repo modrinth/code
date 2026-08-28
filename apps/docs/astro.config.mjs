@@ -25,8 +25,8 @@ export default defineConfig({
 				replacesTitle: true,
 			},
 			customCss: [
-				'@modrinth/assets/styles/variables.scss',
-				'@modrinth/assets/styles/inter.scss',
+				'@modrinth/assets/styles/variables.css',
+				'@modrinth/assets/styles/inter.css',
 				'./src/styles/modrinth.css',
 			],
 			plugins: [

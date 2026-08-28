@@ -1,4 +1,6 @@
-.light-properties {
+html,
+.light-mode,
+.light {
 	--surface-1: #ebebeb;
 	--surface-1-5: #ededed;
 	--surface-2: #f5f5f5;
@@ -89,7 +91,7 @@
 	--color-text-default: #2c2e31;
 	--color-text-tertiary: #484d54;
 
-	// ===
+	/* === */
 
 	--color-bg: var(--surface-1);
 	--color-raised-bg: var(--surface-3);
@@ -188,7 +190,6 @@
 }
 
 html {
-	@extend .light-properties;
 	--dark-color-base: #b0bac5;
 	--dark-color-contrast: #ecf9fb;
 
@@ -214,22 +215,19 @@ html {
 	--color-ad-highlight: var(--color-purple);
 
 	--color-link: var(--color-blue) !important;
-	--color-link-hover: var(--color-blue) !important; // DEPRECATED, use filters in future
-	--color-link-active: var(--color-blue) !important; // DEPRECATED, use filters in future
+	--color-link-hover: var(--color-blue) !important; /* DEPRECATED, use filters in future */
+	--color-link-active: var(--color-blue) !important; /* DEPRECATED, use filters in future */
 
 	--shadow-button: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.15);
 
 	--color-focus-ring: #ea80ff;
 }
 
-.light-mode,
-.light {
-	@extend .light-properties;
-}
-
 .dark-mode,
 .dark,
-:root[data-theme='dark'] {
+:root[data-theme='dark'],
+.oled-mode,
+.retro-mode {
 	--surface-1: #16181c;
 	--surface-1-5: #1a1c20;
 	--surface-2: #1d1f23;
@@ -320,7 +318,7 @@ html {
 	--color-text-default: #b0bac5;
 	--color-text-tertiary: #96a2b0;
 
-	// ===
+	/* === */
 
 	--color-bg: var(--surface-1);
 	--color-raised-bg: var(--surface-3);
@@ -408,7 +406,6 @@ html {
 }
 
 .oled-mode {
-	@extend .dark-mode;
 	--surface-1: #000000;
 	--surface-1-5: #050506;
 	--surface-2: #09090a;
@@ -434,7 +431,6 @@ html {
 }
 
 .retro-mode {
-	@extend .dark-mode;
 	--surface-1: #191917;
 	--surface-2: rgb(22, 22, 21);
 	--surface-2-5: #3a3c3e;

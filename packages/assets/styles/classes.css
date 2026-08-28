@@ -1,13 +1,15 @@
-// Bodies + Generic Global Styles
+/* Bodies + Generic Global Styles */
 
-.universal-labels {
+.universal-labels,
+.universal-body,
+.card {
 	label,
 	.label {
 		:where(.label__title) {
 			display: block;
 			margin-block: var(--gap-md) var(--gap-sm);
 
-			// Same styling as h3
+			/* Same styling as h3 */
 			color: var(--color-contrast);
 			font-size: 1.17rem;
 			font-weight: bold;
@@ -38,9 +40,8 @@
 	}
 }
 
-.universal-body {
-	@extend .universal-labels;
-
+.universal-body,
+.card {
 	> :where(input + *, .input-group + *, .chips + *, .input-div + *) {
 		margin-block-start: var(--gap-md);
 	}
@@ -101,7 +102,7 @@
 		}
 
 		@media screen and (max-width: 750px) {
-			&:not(&.small) {
+			&:not(.small) {
 				flex-direction: column;
 				align-items: start;
 			}
@@ -187,28 +188,30 @@
 	}
 }
 
-// CLICKABLES/BUTTONS
+/* CLICKABLES/BUTTONS */
 a:not(.no-click-animation),
-.clickable {
+.clickable,
+.button-base,
+.btn {
 	transition:
 		opacity 0.5s ease-in-out,
 		filter 0.2s ease-in-out,
 		scale 0.05s ease-in-out,
 		outline 0.2s ease-in-out;
 
-	&:active:not(&:disabled) {
+	&:active:not(:disabled) {
 		scale: 0.95;
 	}
 }
 
-.button-base {
-	@extend .clickable;
+.button-base,
+.btn {
 	font-weight: 500;
 	border: none;
 	outline: 2px solid transparent;
 
-	&:focus-visible:not(&:disabled),
-	&:hover:not(&:disabled) {
+	&:focus-visible:not(:disabled),
+	&:hover:not(:disabled) {
 		cursor: pointer;
 
 		&:not(.btn-outline.btn-hover-filled, .btn-transparent) {
@@ -216,7 +219,7 @@ a:not(.no-click-animation),
 		}
 	}
 
-	&:active:not(&:disabled, .btn-outline.btn-hover-filled, .btn-transparent) {
+	&:active:not(:disabled, .btn-outline.btn-hover-filled, .btn-transparent) {
 		filter: brightness(0.8);
 	}
 
@@ -240,17 +243,17 @@ a:not(.no-click-animation),
 		transform 0.05s ease-in-out,
 		outline 0.2s ease-in-out;
 
-	&:focus-visible:not(&.disabled),
-	&:hover:not(&.disabled) {
+	&:focus-visible:not(.disabled),
+	&:hover:not(.disabled) {
 		filter: brightness(0.85);
 	}
 
-	&:active:not(&.disabled) {
+	&:active:not(.disabled) {
 		filter: brightness(0.8);
 	}
 
-	// For some reason this within the above block makes it universal and not only applied to children. SCSS bug maybe?
-	&:active:not(&.disabled) button:not(&:disabled) {
+	/* For some reason this within the above block makes it universal and not only applied to children. SCSS bug maybe? */
+	&:active:not(.disabled) button:not(:disabled) {
 		transform: scale(0.95);
 	}
 
@@ -269,8 +272,6 @@ a:not(.no-click-animation),
 }
 
 .btn {
-	@extend .button-base;
-
 	--_text-color: var(--color-base);
 	--_background-color: var(--color-button-bg);
 	--_accent-color: var(--color-base);
@@ -296,8 +297,8 @@ a:not(.no-click-animation),
 			color: var(--color-base);
 		}
 
-		&:focus-visible:not(&:disabled),
-		&:hover:not(&:disabled) {
+		&:focus-visible:not(:disabled),
+		&:hover:not(:disabled) {
 			background-color: var(--color-button-bg);
 
 			&.btn-hover-filled,
@@ -319,8 +320,8 @@ a:not(.no-click-animation),
 			border-color: var(--color-contrast);
 		}
 
-		&:focus-visible:not(&:disabled),
-		&:hover:not(&:disabled) {
+		&:focus-visible:not(:disabled),
+		&:hover:not(:disabled) {
 			&.btn-hover-filled,
 			&.btn-hover-filled-only {
 				border-color: var(--_accent-color);
@@ -493,8 +494,10 @@ a:not(.no-click-animation),
 	}
 }
 
-// CARDS
-.base-card {
+/* CARDS */
+.base-card,
+.card,
+.navigation-card {
 	padding: 1rem;
 	position: relative;
 	min-height: var(--font-size-2xl);
@@ -517,7 +520,7 @@ a:not(.no-click-animation),
 		z-index: 2;
 	}
 
-	&:where(&.warning, &.information) {
+	&:where(.warning, .information) {
 		padding: 1.5rem;
 		line-height: 1.5;
 		min-height: 0;
@@ -529,14 +532,7 @@ a:not(.no-click-animation),
 	}
 }
 
-.card {
-	@extend .base-card;
-	@extend .universal-body;
-}
-
 .navigation-card {
-	@extend .base-card;
-
 	padding-inline: var(--gap-xl);
 	padding-block: var(--gap-md);
 
@@ -547,7 +543,7 @@ a:not(.no-click-animation),
 	row-gap: 0.5rem;
 }
 
-// UTILITY
+/* UTILITY */
 
 .wrap-as-needed {
 	overflow-wrap: break-word;
@@ -572,7 +568,7 @@ a:not(.no-click-animation),
 	margin: var(--gap-sm) 0;
 }
 
-// TABLE
+/* TABLE */
 .table {
 	display: grid;
 	grid-template-rows: repeat(auto-fill, auto);
@@ -634,10 +630,10 @@ a:not(.no-click-animation),
 	}
 }
 
-// CUSTOM COMPONENTS
-// TODO: MOST OF THESE SHOULD BE MOVED TO AN OMORPHIA COMPONENT
+/* CUSTOM COMPONENTS */
+/* TODO: MOST OF THESE SHOULD BE MOVED TO AN OMORPHIA COMPONENT */
 
-// TOOLTIPS
+/* TOOLTIPS */
 
 .v-popper__popper.v-popper--theme-dropdown,
 .v-popper__popper.v-popper--theme-dropdown.v-popper--theme-ribbit-popout {
@@ -690,7 +686,7 @@ a:not(.no-click-animation),
 }
 
 .v-popper__popper.v-popper__popper--hide-to .v-popper__wrapper {
-	//transform: scale(.9);
+	/* transform: scale(.9); */
 }
 
 .v-popper__popper.v-popper--theme-tooltip {
@@ -817,7 +813,7 @@ a:not(.no-click-animation),
 	}
 }
 
-// MARKDOWN
+/* MARKDOWN */
 
 .markdown-body {
 	h1:first-child {
@@ -862,7 +858,8 @@ a:not(.no-click-animation),
 	}
 
 	h4 {
-		@apply mt-5 mb-3;
+		margin-top: 1.25rem;
+		margin-bottom: 0.75rem;
 	}
 
 	h1,
@@ -912,21 +909,25 @@ a:not(.no-click-animation),
 		height: auto;
 	}
 
-	html:not(.dark-mode, .oled-mode) & img[src$='#gh-dark-mode-only'] {
+	html:not(.dark-mode, .oled-mode, .retro-mode) & img[src$='#gh-dark-mode-only'] {
 		display: none;
 	}
 
-	html:is(.dark-mode, .oled-mode) & img[src$='#gh-light-mode-only'] {
+	html:is(.dark-mode, .oled-mode, .retro-mode) & img[src$='#gh-light-mode-only'] {
 		display: none;
 	}
 
 	pre {
-		@apply bg-surface-2 rounded-xl p-4 border border-solid border-surface-5;
+		background-color: var(--surface-2);
+		border-radius: 0.75rem;
+		padding: 1rem;
+		border: 1px solid var(--surface-5);
 		margin-top: 1rem;
 		overflow-x: auto;
 
 		code {
-			@apply bg-transparent border-0;
+			background-color: transparent;
+			border-width: 0;
 			font-size: 80%;
 			padding: 0;
 			border-radius: 0;
@@ -934,10 +935,10 @@ a:not(.no-click-animation),
 	}
 
 	code {
-		@apply bg-surface-3 rounded-md p-4 border border-solid border-surface-5;
 		padding: 0.2em 0.4em;
 		font-size: 80%;
 		border-radius: var(--radius-sm);
+		border: 1px solid var(--surface-5);
 		background-color: var(--color-button-bg);
 		color: var(--color-contrast);
 	}
@@ -988,18 +989,31 @@ a:not(.no-click-animation),
 	}
 
 	details {
-		@apply border border-solid border-surface-5 bg-surface-3 rounded-xl p-2;
+		border: 1px solid var(--surface-5);
+		background-color: var(--surface-3);
+		border-radius: 0.75rem;
+		padding: 0.5rem;
 		display: grid;
 		grid-template-rows: min-content 0fr;
 		transition: grid-template-rows 0.3s var(--ease-out-expo);
 		overflow: clip;
 
 		summary {
-			@apply bg-surface-4 hover:bg-surface-5 p-2 flex items-center gap-1 text-contrast -m-2 border border-solid border-transparent;
+			padding: 0.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			color: var(--color-text-primary);
+			margin: -0.5rem;
+			border: 1px solid transparent;
 			font-weight: 600;
 			cursor: pointer;
 			background-color: var(--color-button-bg);
 			list-style: none;
+
+			&:hover {
+				background-color: var(--surface-5);
+			}
 
 			&::-webkit-details-marker {
 				display: none;
@@ -1010,7 +1024,7 @@ a:not(.no-click-animation),
 			}
 
 			&::before {
-				@apply text-primary;
+				color: var(--color-text-default);
 				content: '';
 				flex-shrink: 0;
 				width: 1.25rem;
@@ -1025,15 +1039,15 @@ a:not(.no-click-animation),
 		}
 
 		> :nth-child(2) {
-			@apply mt-5;
+			margin-top: 1.25rem;
 		}
 
 		> :nth-child(n + 2) {
-			@apply mx-1;
+			margin-inline: 0.25rem;
 		}
 
 		> :last-child:not(summary) {
-			@apply mb-1;
+			margin-bottom: 0.25rem;
 		}
 
 		&::details-content {
@@ -1047,7 +1061,7 @@ a:not(.no-click-animation),
 			grid-template-rows: min-content 1fr;
 
 			> summary {
-				@apply border-b-surface-5;
+				border-bottom-color: var(--surface-5);
 
 				&::before {
 					transform: rotate(180deg);
@@ -1094,7 +1108,7 @@ select {
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
-	background: #cccccc url(http://dropdown/arrow/url/) no-repeat right center;
+	background: #cccccc url('http://dropdown/arrow/url/') no-repeat right center;
 	color: #000000;
 	border: 1px solid #000000;
 }

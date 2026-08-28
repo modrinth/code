@@ -1,0 +1,7 @@
+**/.nuxt
+**/dist
+**/.output
+**/.data
+**/.wrangler
+src/locales/**
+src/assets/**/*.svg

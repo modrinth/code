@@ -35,6 +35,8 @@
 	"i18n-ally.localesPaths": [
 		"packages/ui/src/locales",
 		"apps/frontend/src/locales",
+		"apps/website/src/locales",
+		"packages/layouts/src/locales",
 		"packages/moderation/src/locales"
 	],
 	"i18n-ally.pathMatcher": "{locale}/index.{ext}",
