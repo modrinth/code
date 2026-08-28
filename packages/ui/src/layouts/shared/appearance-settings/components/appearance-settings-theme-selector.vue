@@ -111,24 +111,6 @@ function getPreviewClass(option: T): string {
 	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 	gap: var(--gap-lg);
 
-	.preview {
-		&.light-mode {
-			@extend .light-mode;
-		}
-
-		&.dark-mode {
-			@extend .dark-mode;
-		}
-
-		&.oled-mode {
-			@extend .oled-mode;
-		}
-
-		&.retro-mode {
-			@extend .retro-mode;
-		}
-	}
-
 	.preview .example-card {
 		margin: 0;
 		padding: 1rem;

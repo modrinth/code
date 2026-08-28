@@ -1,12 +1,12 @@
-@import 'reset';
+@import './reset.css';
 
-// Use border box on everything to preserve everyone's sanity
+/* Use border box on everything to preserve everyone's sanity */
 * {
 	box-sizing: border-box;
 }
 
 body {
-	// Defaults
+	/* Defaults */
 	background-color: var(--color-bg);
 	color: var(--color-base);
 	--font-standard:
@@ -19,18 +19,18 @@ body {
 	margin: 0;
 	padding: 0;
 
-	// Font Sizes
-	--font-size-xxs: 0.625rem; //10px
-	--font-size-xs: 0.75rem; //12px
-	--font-size-sm: 0.875rem; //14px
-	--font-size-nm: 1rem; //16px
-	--font-size-md: 1.125rem; //18px
-	--font-size-lg: 1.25rem; //20px
-	--font-size-xl: 1.5rem; //24px
-	--font-size-2xl: 2rem; //32px
-	--font-size-3xl: 3rem; //48px
+	/* Font Sizes */
+	--font-size-xxs: 0.625rem; /* 10px */
+	--font-size-xs: 0.75rem; /* 12px */
+	--font-size-sm: 0.875rem; /* 14px */
+	--font-size-nm: 1rem; /* 16px */
+	--font-size-md: 1.125rem; /* 18px */
+	--font-size-lg: 1.25rem; /* 20px */
+	--font-size-xl: 1.5rem; /* 24px */
+	--font-size-2xl: 2rem; /* 32px */
+	--font-size-3xl: 3rem; /* 48px */
 
-	// Font Weights
+	/* Font Weights */
 	--font-weight-regular: 400;
 	--font-weight-medium: 500;
 	--font-weight-bold: 700;
@@ -101,7 +101,7 @@ svg {
 		transform 0.05s ease-in-out,
 		outline 0.2s ease-in-out;
 
-	&:active:not(&:disabled) {
+	&:active:not(:disabled) {
 		transform: scale(0.95);
 	}
 }
@@ -135,7 +135,7 @@ h3 {
 	color: var(--color-contrast);
 }
 
-// Scrollbar styles
+/* Scrollbar styles */
 ::-webkit-scrollbar {
 	width: 0.75rem;
 	height: 0.75rem;
@@ -149,7 +149,7 @@ h3 {
 	background: var(--color-scrollbar);
 }
 
-// Firefox scrollbar
+/* Firefox scrollbar */
 * {
 	scrollbar-width: thin;
 	scrollbar-color: var(--color-scrollbar) transparent;

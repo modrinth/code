@@ -14,7 +14,7 @@ Read `packages/ui/AGENTS.md` in full.
 3. Treat the result as reference code and adapt it to the Modrinth codebase.
 4. Map Figma color variables to the applicable `surface-*` and `text-*` tokens. Do not use aliased Figma names directly.
 5. Reuse applicable components from `packages/ui/src/components/` before creating new ones. Also refer to `standards/frontend/COMPONENT_STRUCTURE.md`
-6. Read `packages/assets/styles/variables.scss` when Figma does not supply a required token.
+6. Read `packages/assets/styles/variables.css` when Figma does not supply a required token.
 7. Use exact spacing values from the design.
 8. Implement the result as a Vue SFC with Tailwind classes and the existing component library.
 

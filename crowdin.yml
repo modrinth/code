@@ -12,6 +12,11 @@ files:
     translation: /apps/frontend/src/locales/%locale%/%original_file_name%
     skip_untranslated_strings: true
 
+  # - source: /apps/website/src/locales/en-US/*.json
+  #   dest: /website/%original_file_name%
+  #   translation: /apps/website/src/locales/%locale%/%original_file_name%
+  #   skip_untranslated_strings: true
+
   - source: /packages/ui/src/locales/en-US/*.json
     dest: /ui/%original_file_name%
     translation: /packages/ui/src/locales/%locale%/%original_file_name%
@@ -20,6 +25,11 @@ files:
   - source: /packages/moderation/src/locales/en-US/*.json
     dest: /moderation/%original_file_name%
     translation: /packages/moderation/src/locales/%locale%/%original_file_name%
+    skip_untranslated_strings: true
+
+  - source: /packages/layouts/src/locales/en-US/*.json
+    dest: /layouts/%original_file_name%
+    translation: /packages/layouts/src/locales/%locale%/%original_file_name%
     skip_untranslated_strings: true
 
 project_id_env: CROWDIN_PROJECT_ID

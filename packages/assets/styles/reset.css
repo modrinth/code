@@ -9,3 +9,7 @@ input[type='button'] {
 	cursor: pointer;
 	outline: 2px solid transparent;
 }
+
+:where(*) {
+	border: 0 solid currentColor;
+}

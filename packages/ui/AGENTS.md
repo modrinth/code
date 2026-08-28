@@ -38,7 +38,7 @@ All frontend packages share a Tailwind preset at `packages/tooling-config/tailwi
 import preset from '@modrinth/tooling-config/tailwind/tailwind-preset.ts'
 ```
 
-CSS custom properties are defined in `packages/assets/styles/variables.scss` with light, dark, and OLED theme variants.
+CSS custom properties are defined in `packages/assets/styles/variables.css` with light, dark, and OLED theme variants.
 
 ### Color Usage Rules
 
@@ -61,7 +61,7 @@ CSS custom properties are defined in `packages/assets/styles/variables.scss` wit
 | `text-primary`   | Default body text                |
 | `text-secondary` | Reduced emphasis, secondary info |
 
-**Brand and semantic colors** not all exposed as Figma variables — refer to `packages/assets/styles/variables.scss` for the full set:
+**Brand and semantic colors** not all exposed as Figma variables — refer to `packages/assets/styles/variables.css` for the full set:
 
 - `bg-{color}`, `text-{color}` etc. — Primary brand colors
 - `bg-{color}-highlight` — 25% opacity semantic highlights

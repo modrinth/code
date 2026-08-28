@@ -85,6 +85,8 @@
 				"apps/frontend/src/locales/**/*.json",
 				"packages/moderation/src/**/*.vue",
 				"packages/moderation/src/locales/**/*.json",
+				"packages/layouts/src/**/*.vue",
+				"packages/layouts/src/locales/**/*.json",
 				"packages/ui/src/**/*.vue",
 				"packages/ui/src/locales/**/*.json"
 			],

@@ -1,44 +1,9 @@
+@import '@modrinth/ui/src/styles/tailwind-utilities.css';
+@import '@modrinth/assets/omorphia.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import '@modrinth/ui/src/styles/tailwind-utilities.css';
-
-@font-face {
-	font-family: 'bundled-minecraft-font-mrapp';
-	font-style: normal;
-	font-display: swap;
-	font-weight: 400;
-	src: url('https://cdn-raw.modrinth.com/fonts/minecraft/regular.otf') format('opentype');
-}
-
-@font-face {
-	font-family: 'bundled-minecraft-font-mrapp';
-	font-style: italic;
-	font-display: swap;
-	font-weight: 400;
-	src: url('https://cdn-raw.modrinth.com/fonts/minecraft/italic.otf') format('opentype');
-}
-
-@font-face {
-	font-family: 'bundled-minecraft-font-mrapp';
-	font-style: normal;
-	font-display: swap;
-	font-weight: 600;
-	src: url('https://cdn-raw.modrinth.com/fonts/minecraft/bold.otf') format('opentype');
-}
-
-@font-face {
-	font-family: 'bundled-minecraft-font-mrapp';
-	font-style: italic;
-	font-display: swap;
-	font-weight: 600;
-	src: url('https://cdn-raw.modrinth.com/fonts/minecraft/bold-italic.otf') format('opentype');
-}
-
-.font-minecraft {
-	font-family: 'bundled-minecraft-font-mrapp', monospace;
-}
 
 :root {
 	font-family: var(--font-standard, sans-serif), sans-serif;
@@ -165,33 +130,11 @@ img {
 	box-shadow: var(--shadow-card);
 }
 
-// From the Bootstrap project
-// The MIT License (MIT)
-// Copyright (c) 2011-2023 The Bootstrap Authors
-// https://github.com/twbs/bootstrap/blob/2f617215755b066904248525a8c56ea425dde871/scss/mixins/_visually-hidden.scss#L8
-.visually-hidden {
-	width: 1px !important;
-	height: 1px !important;
-	padding: 0 !important;
-	margin: -1px !important;
-	overflow: hidden !important;
-	clip: rect(0, 0, 0, 0) !important;
-	white-space: nowrap !important;
-	border: 0 !important;
-
-	&:not(caption) {
-		position: absolute !important;
-	}
-}
-
-@import '@modrinth/assets/omorphia.css';
-
 input {
 	border-radius: var(--size-rounded-sm);
 	box-sizing: border-box;
 	border: 2px solid transparent;
-	// safari iOS rounds inputs by default
-	// set the appearance to none to prevent this
+	/* safari iOS rounds inputs by default. set the appearance to none to prevent this */
 	appearance: none !important;
 }
 
