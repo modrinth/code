@@ -24,10 +24,10 @@ TAILSCALE_DIR=/tmp/tailscale
 TAILSCALE_SOCKET="$TAILSCALE_DIR/tailscaled.sock"
 
 start_tailscale() {
+	echo "entrypoint: starting tailscale as euid=$(id -u) groups=$(id -G)" >&2
 	mkdir -p "$TAILSCALE_DIR"
 
-	# Userspace networking needs no TUN device or extra capabilities, and running
-	# as the same user as the server is what lets Tailscale SSH log in as it.
+	# Userspace networking needs no TUN device or extra capabilities.
 	# --state=mem: registers an ephemeral node; --statedir gives the SSH host keys
 	# somewhere writable to live, which mem: on its own does not.
 	tailscaled \
@@ -66,6 +66,11 @@ if [ -n "${TAILSCALE_AUTH_KEY:-}" ]; then
 	start_tailscale || echo "entrypoint: tailscale setup failed, serving without SSH" >&2
 fi
 
+# Only drop if we actually started as root; some runtimes pin their own uid.
+if [ "$(id -u)" = "0" ]; then
+	exec setpriv --reuid=node --regid=node --init-groups -- "$@"
+fi
+
 exec "$@"
 EOF
 
@@ -78,7 +83,8 @@ WORKDIR /app
 # Nitro bundles every runtime dependency into .output, so no node_modules is needed.
 COPY --chown=node:node .output ./.output
 
-USER node
+# Stays root so tailscaled can setgroups/setuid for SSH sessions; the entrypoint
+# drops the server itself to the node user.
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/entrypoint.sh"]
