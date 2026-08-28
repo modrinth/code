@@ -1,6 +1,10 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24-slim
+ARG TAILSCALE_VERSION=v1.102.3
+
+FROM docker.io/tailscale/tailscale:${TAILSCALE_VERSION} AS tailscale
+
+FROM node:24-trixie-slim
 
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
 LABEL org.opencontainers.image.title=frontend
@@ -10,6 +14,54 @@ LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends dumb-init \
 	&& rm -rf /var/lib/apt/lists/*
+
+# Debug
+COPY --from=tailscale /usr/local/bin/tailscale /usr/local/bin/tailscaled /usr/local/bin/
+
+COPY --chmod=0755 <<'EOF' /usr/local/bin/entrypoint.sh
+#!/bin/sh
+set -eu
+
+TAILSCALE_DIR=/tmp/tailscale
+TAILSCALE_SOCKET="$TAILSCALE_DIR/tailscaled.sock"
+
+start_tailscale() {
+	mkdir -p "$TAILSCALE_DIR"
+
+	# Userspace networking needs no TUN device or extra capabilities, and running
+	# as the same user as the server is what lets Tailscale SSH log in as it.
+	# --state=mem: registers an ephemeral node; --statedir gives the SSH host keys
+	# somewhere writable to live, which mem: on its own does not.
+	tailscaled \
+		--tun=userspace-networking \
+		--state=mem: \
+		--statedir="$TAILSCALE_DIR" \
+		--socket="$TAILSCALE_SOCKET" &
+
+	waited=0
+	while [ ! -S "$TAILSCALE_SOCKET" ]; do
+		if [ "$waited" -ge 50 ]; then
+			echo "entrypoint: tailscaled socket never appeared" >&2
+			return 1
+		fi
+		waited=$((waited + 1))
+		sleep 0.1
+	done
+
+	tailscale --socket="$TAILSCALE_SOCKET" up \
+		--authkey="$TAILSCALE_AUTH_KEY" \
+		--hostname="${TAILSCALE_HOSTNAME:-frontend-$(hostname)}" \
+		--accept-dns=false \
+		--timeout=30s \
+		--ssh
+}
+
+if [ -n "${TAILSCALE_AUTH_KEY:-}" ]; then
+	start_tailscale || echo "entrypoint: tailscale setup failed, serving without SSH" >&2
+fi
+
+exec "$@"
+EOF
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
@@ -23,8 +75,5 @@ COPY --chown=node:node .output ./.output
 USER node
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-	CMD node -e "fetch('http://127.0.0.1:'+process.env.PORT+'/robots.txt').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"
-
-ENTRYPOINT ["dumb-init", "--"]
+ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/entrypoint.sh"]
 CMD ["node", "/app/.output/server/index.mjs"]
