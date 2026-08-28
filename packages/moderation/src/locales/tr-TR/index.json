@@ -113,12 +113,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Geçerli bir lisans bağlantısı ekle"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Link kısaltma gibi yönlendirileceğin link gizleme yöntemlerine izin verilmiyor, lütfen sadece uygun tam linkler kullan."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Bağlantı kısaltıcı kullanma"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "Açıklamandaki {count, plural, one {# başlık} other {# başlık}} fazla {count, plural, one {uzun} other {uzun}}. Başlıklar kısa olmalı ve tam cümleler değil, bölüm başlıkları olmalı."
   },
@@ -221,29 +215,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Sürüm ayarlarını ziyaret et"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Özetin proje adın ile aynı olamaz. Bilgilendirici ve ilgi çekici bir özet yazmak çok önemlidir."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Özetin özgün olsun"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Özetin düz yazı olarak gösterildiği için formatlama, yeni satırlar, özel karakterler veya bağlantılar içermemelidir."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Özetini düzenle"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Özetin {length} karakter. Bilgilendirici ve çekici bir özet için en az {minChars} karakter önerilir."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Özeti uzat"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Projenizin Adını temiz tutmak onu unutulmaz yapar ve bulunmasını kolaylaştırır. Sürüm ve yükleyici bilgileri projenizin yanında otomatik olarak görüntülenir."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "İsmi düzenle"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "{languageCount, plural,one {# dil}other {# dil}} seçtiniz. Lütfen sadece sunucunuzun aktif olarak desteklediği dilleri seçiniz."
@@ -288,4 +267,3 @@
     "defaultMessage": "Bağlantı ayarlarına göz at"
   }
 }
-

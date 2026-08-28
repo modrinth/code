@@ -13,6 +13,10 @@
 			"types": "./index.ts",
 			"default": "./index.ts"
 		},
+		"./i18n": {
+			"types": "./src/composables/i18n.ts",
+			"default": "./src/composables/i18n.ts"
+		},
 		"./pages": {
 			"types": "./src/pages/index.ts",
 			"default": "./src/pages/index.ts"

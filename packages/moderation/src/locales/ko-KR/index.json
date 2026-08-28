@@ -107,12 +107,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "올바른 라이선스 링크를 추가해 주세요"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "외부 링크나 라이선스 링크에서 링크 단축기 및 기타 방법의 사용은 금지되어 있습니다. 반드시 전체 길이의 링크만 사용해 주세요."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "링크 단축기 사용 금지"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "설명의 {count, plural, other {#개의 헤더}}{count, plural, other {}}가 너무 깁니다. 헤더는 간결해야 하며, 완전한 문장이 아닌 단락 제목 역할을 해야 합니다."
   },
@@ -212,29 +206,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "버전 설정 방문"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "요약은 프로젝트 이름과 동일할 수 없습니다. 정보가 충분하고 흥미를 끄는 요약을 작성하는 것이 중요합니다."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "고유한 요약 만들기"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "요약은 일반 텍스트로만 표시되므로 서식, 줄 바꿈, 특수 문자, 링크를 포함해서는 안 됩니다."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "요약 정리"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "작성한 요약이 {length, plural, other {#자}}입니다. 적절한 정보를 제공하는 요약을 작성하려면 최소 {minChars, plural, other {#자}} 이상을 권장합니다."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "요약 확장"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "프로젝트 이름을 깔끔하게 유지하면 기억하기 쉽고 찾기도 쉬워집니다. 버전 및 로더 정보는 프로젝트와 함께 자동으로 표시됩니다."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "이름 정리"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "언어 {languageCount, plural, other {#}}개를 선택했습니다. 서버가 실제로 지원하는 언어만 선택해 주세요."
@@ -276,4 +255,3 @@
     "defaultMessage": "링크 설정 방문"
   }
 }
-

@@ -15,8 +15,8 @@ import {
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
 
-import ValidationMessage from '~/components/ValidationMessage.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import {
 	useProjectSummaryValidation,
 	useProjectTitleValidation,

@@ -160,8 +160,8 @@ import {
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
 
-import ValidationMessage from '~/components/ValidationMessage.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import {
 	useProjectSummaryValidation,
 	useProjectTitleValidation,

@@ -113,12 +113,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Исправьте URL лицензии"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Использование сервисов сокращения ссылок и других способов скрытия адреса лицензии и внешних ссылок запрещено. Указывайте полные ссылки."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Не сокращайте ссылки"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# заголовок} few {# заголовка} other {# заголовков}} в описании слишком {count, plural, one {длинный} other {длинные}}. Заголовки должны быть краткими названиями разделов, а не предложениями."
   },
@@ -221,29 +215,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Настроить версии"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Сводка не может совпадать с названием проекта. Сделайте её понятной и интересной."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Разнообразьте сводку"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "В сводке отображается простой текст. Она не должна содержать форматирование, переносы строк, ссылки и спецсимволы."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Упростите сводку"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "В сводке {length, plural, one {# символ} few {# символа} other {# символов}}. Для понятной и интересной сводки рекомендуется не менее {minChars, plural, one {# символа} few {# символов} other {# символов}}."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Расширьте сводку"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Проект с простым названием проще запомнить и найти. Информация о версии и загрузчике указывается автоматически."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Упростите название"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "{languageCount, plural, one {Выбран # язык} few {Выбрано # языка} other {Выбрано # языков}}. Оставьте только те, которые сервер активно поддерживает."
@@ -291,4 +270,3 @@
     "defaultMessage": "Настроить ссылки"
   }
 }
-

@@ -38,9 +38,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "เพิ่มลิงก์ไลเซนส์ที่ถูกต้อง"
   },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "ห้ามใช้ตัวย่อลิงก์"
-  },
   "nags.missing-alt-text.title": {
     "defaultMessage": "เพิ่มคำอธิบายรูปภาพ"
   },
@@ -51,4 +48,3 @@
     "defaultMessage": "เลือกแท็ก"
   }
 }
-

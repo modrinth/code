@@ -113,12 +113,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Añade un enlace de licencia válido"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Se prohíbe el uso de acortadores de enlaces u otros métodos para ocultar el destino de tus enlaces externos o de licencia. Usa únicamente enlaces completos."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "No uses acortadores de enlaces"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# encabezado} other {# encabezados}} en tu descripción {count, plural, one {es} other {son}} demasiado {count, plural, one {largo} other {largos}}. Los encabezados deben ser concisos y actuar como títulos de sección, no como frases completas."
   },
@@ -221,29 +215,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Visitar la configuración de versiones"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Tu resumen no puede ser igual al nombre de tu proyecto. Es importante crear un resumen informativo y llamativo."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Crea un resumen único"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Tu resumen no debe contener formato, saltos de línea, caracteres especiales ni enlaces, ya que solo se mostrará texto plano."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Aclara el resumen"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Tu resumen tiene {length, plural, one {# carácter} other {# caracteres}}. Se recomienda al menos {minChars, plural, one {# carácter} other {# caracteres}} para crear un resumen informativo y atractivo."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Ampliar el resumen"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Mantener el nombre de tu proyecto limpio hace que sea más fácil de recordar y de encontrar. La información de la versión y del cargador se muestra automáticamente junto a tu proyecto."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Hacer el nombre más claro"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Has seleccionado {languageCount, plural, one {# idioma} other {# idiomas}}. Por favor, indica solo los idiomas que tu servidor admite activamente."
@@ -291,4 +270,3 @@
     "defaultMessage": "Ver configuración de enlaces"
   }
 }
-

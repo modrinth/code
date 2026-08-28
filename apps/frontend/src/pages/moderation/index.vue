@@ -215,6 +215,7 @@ const router = useRouter()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const debugValidationFilter = useDebugLogger('moderation-validation-filter')
+const tags = useGeneratedState()
 
 const queueSummaryModal = ref()
 const moderateByIdsModal = ref<InstanceType<typeof ModerateByIdsModal>>()
@@ -566,6 +567,7 @@ const {
 			client,
 			request: queryKey[3],
 			includeWarnings: queryKey[2],
+			tags: tags.value,
 			signal,
 			log: debugValidationFilter,
 		})

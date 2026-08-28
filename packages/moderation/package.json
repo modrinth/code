@@ -7,7 +7,7 @@
 	"scripts": {
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
-		"test": "node --test src/validators/*/tests.ts",
+		"test": "node --test src/validators/*/tests.ts src/validation-rules/tests.ts",
 		"intl:extract": "formatjs extract \"**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore \"node_modules/**/*\" --out-file src/locales/en-US/index.json --preserve-whitespace",
 		"intl:prune-local": "pnpm -w scripts i18n-icu-contract prune-local --scope packages/moderation"
 	},

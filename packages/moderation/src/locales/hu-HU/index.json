@@ -113,12 +113,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Adj meg egy érvényes licenszlinket"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Tilos linkrövidítők vagy más módszerek használata a külső linkek vagy licenszkapcsolatok céljának elrejtésére. Kérlek csak megfelelő, teljes hosszúságú linkeket használj."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Ne használj linkrövidítőket"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "A leírásodban {count} fejléc túl hosszú. A fejlécek legyenek tömörek, és csak szakaszcímként szolgáljanak, ne teljes mondatként."
   },
@@ -221,29 +215,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Verzió-beállítások meglátogatása"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Az összegzés nem lehet azonos a projekt nevével. Fontos, hogy informatív és figyelemfelkeltő összegzést készíts."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Tedd az összegzést egyedivé"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Az összegzés nem tartalmazhat formázást, sortöréseket, speciális karaktereket vagy linkeket, mivel az összefoglalás csak sima szöveget jelenít meg."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Tisztítsd meg az összegzést"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "A jelenlegi összegzés {length} karakter hosszú. Egy informatív és figyelemfelkeltő összegzéshez legalább {minChars} karakter ajánlott."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Fejtsd ki az összegzést"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Ha a projekt neve egyszerű, az könnyebben megjegyezhető és könnyebben megtalálható lesz. A verzió- és a betöltőinformációk automatikusan megjelennek a projekt mellett."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Tisztítsd meg a nevet"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "{languageCount} nyelvet választottál ki. Kérlek csak azokat a nyelveket válaszd ki, amelyeket a szerver aktívan támogat."
@@ -291,4 +270,3 @@
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   }
 }
-

@@ -1,5 +1,5 @@
 import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
-import { validateProjectFields } from '@modrinth/moderation'
+import { type ProjectValidationContext, validateProject } from '@modrinth/moderation'
 
 export type ValidationFilterRequest = Omit<
 	Labrinth.Moderation.Internal.ProjectsRequest,
@@ -17,6 +17,7 @@ interface ValidationFilterScanOptions {
 	client: AbstractModrinthClient
 	request: ValidationFilterRequest
 	includeWarnings: boolean
+	tags: ProjectValidationContext['tags']
 	signal: AbortSignal
 	log: (message: string) => void
 }
@@ -107,6 +108,7 @@ export async function scanProjectsWithValidationIssues({
 	client,
 	request,
 	includeWarnings,
+	tags,
 	signal,
 	log,
 }: ValidationFilterScanOptions): Promise<Labrinth.Moderation.Internal.ProjectsResponse> {
@@ -129,24 +131,69 @@ export async function scanProjectsWithValidationIssues({
 			const projectIds = queueProjects
 				.slice(batchIndex * PROJECT_BATCH_SIZE, (batchIndex + 1) * PROJECT_BATCH_SIZE)
 				.map((project) => project.id)
-			const projects = await pacedFetcher.fetch(
+			const projectsV3 = await pacedFetcher.fetch(
 				`Fetching V3 project batch ${batchIndex + 1}/${projectBatchCount}`,
 				() => client.labrinth.projects_v3.getMultiple(projectIds),
 			)
-			const projectsById = new Map(projects.map((project) => [project.id, project]))
-			const missingProjectIds = projectIds.filter((projectId) => !projectsById.has(projectId))
+			const projectsV2 = await pacedFetcher.fetch(
+				`Fetching V2 project batch ${batchIndex + 1}/${projectBatchCount}`,
+				() => client.labrinth.projects_v2.getMultiple(projectIds),
+			)
+			const projectsV3ById = new Map(projectsV3.map((project) => [project.id, project]))
+			const projectsV2ById = new Map(projectsV2.map((project) => [project.id, project]))
+			const missingProjectIds = projectIds.filter(
+				(projectId) => !projectsV3ById.has(projectId) || !projectsV2ById.has(projectId),
+			)
 
 			if (missingProjectIds.length > 0) {
-				throw new Error(`V3 projects response omitted ${missingProjectIds.length} queued projects`)
+				throw new Error(`Project responses omitted ${missingProjectIds.length} queued projects`)
+			}
+
+			const versionIds = [...new Set(projectsV3.flatMap((project) => project.versions))]
+			const versions: Labrinth.Versions.v3.Version[] = []
+			const versionBatchCount = Math.ceil(versionIds.length / PROJECT_BATCH_SIZE)
+			for (let versionBatchIndex = 0; versionBatchIndex < versionBatchCount; versionBatchIndex++) {
+				const batchVersionIds = versionIds.slice(
+					versionBatchIndex * PROJECT_BATCH_SIZE,
+					(versionBatchIndex + 1) * PROJECT_BATCH_SIZE,
+				)
+				versions.push(
+					...(await pacedFetcher.fetch(
+						`Fetching version batch ${versionBatchIndex + 1}/${versionBatchCount}`,
+						() => client.labrinth.versions_v3.getVersions(batchVersionIds),
+					)),
+				)
+			}
+			const versionsById = new Map(versions.map((version) => [version.id, version]))
+			const missingVersionIds = versionIds.filter((versionId) => !versionsById.has(versionId))
+			if (missingVersionIds.length > 0) {
+				throw new Error(`Version responses omitted ${missingVersionIds.length} project versions`)
 			}
 
 			for (const projectId of projectIds) {
-				const project = projectsById.get(projectId)
-				if (!project) {
-					throw new Error(`V3 projects response omitted queued project ${projectId}`)
+				const projectV3 = projectsV3ById.get(projectId)
+				const rawProjectV2 = projectsV2ById.get(projectId)
+				if (!projectV3 || !rawProjectV2) {
+					throw new Error(`Project responses omitted queued project ${projectId}`)
 				}
-				const validation = validateProjectFields(project)
-				if (includeWarnings ? validation.failures.length > 0 : !validation.valid) {
+				const project = {
+					...rawProjectV2,
+					actualProjectType: rawProjectV2.project_type,
+				}
+				const projectVersions = projectV3.versions.flatMap((versionId) => {
+					const version = versionsById.get(versionId)
+					return version ? [version] : []
+				})
+				const validation = validateProject({
+					project,
+					projectV3,
+					versions: projectVersions,
+					tags,
+				})
+				if (
+					validation.requiredNags.length > 0 ||
+					(includeWarnings && validation.warningNags.length > 0)
+				) {
 					matchingProjectIds.add(projectId)
 				}
 			}

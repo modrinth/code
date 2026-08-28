@@ -74,12 +74,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Lisää kelvollinen lisenssilinkki"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Linkinlyhenteiden tai muiden linkin kohteen piilottavien menetelmien käyttö ulkoisissa linkeissä on kiellettyä. Ole hyvä ja käytä suoria ja täysmittaisia linkkejä."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Älä käytä linkinlyhenteitä"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# otsikko} other {# otsikot}} kuvauksessasi {count, plural,one {on liian pitkä} other {ovat liian pitkiä}}. Otsikoiden tulisi olla tiiviitä ja toimia osioiden otsikkoina, eikä kokonaisina virkkeinä."
   },
@@ -123,4 +117,3 @@
     "defaultMessage": "Vahvista ulkoiset linkit"
   }
 }
-

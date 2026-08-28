@@ -113,12 +113,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "اضف رابط حقوق صحيح"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "يُحظر استخدام مختصرات الروابط أو طرق أخرى لإخفاء الوجهة التي قد يؤدي إليها الرابط في روابطك الخارجية أو رابط الترخيص، يرجى استخدام الروابط الطويلة المناسبة فقط."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "لا تستخدم مقصر روابط"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# header} other {# headers}} في وصفك {count, plural, one {طويل جدًا} other {طويلة جدًا}}.يجب أن تكون العناوين مختصرة وتعمل كعناوين للأقسام،وليست جملًا كاملة. "
   },
@@ -221,29 +215,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "زيارة إعدادات الإصدارات"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "لا يمكن أن يكون ملخص مشروعك نفس اسمه. من المهم أن تصنع ملخصا واضحا وغني بالمعلومات."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "تاكد أن ملخصك فريد"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "لا يجب على الملخص الخاص بك أن يمتلك التنسيق، فواصل الأسطر، الأحرف الخاصة، أو الروابط، حيث أن الملخص سيعرض فقط النص العادي."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "نضف الملخص"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "الملخص الخاص بك {length, plural, one {# character} other {# characters}}. يفضل ان تكون على الاقل {minChars, plural, one {# character} other {# characters}} لإنشاء وصف واضح."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "وسع الملخص"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "ترك اسم مشروعك نضيف يجعله قابلا للتذكر و سهلا للبحث.\nالتحديث و معلومات المحمل تعرض في مشروعك بطريقة أوتوماتيكية."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "عدل اسم"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "لقد حددت {languageCount, plural, one {# لغة} other {# لغات}}. يُرجى إدراج اللغات التي يدعمها خادمك بشكل فعلي فقط."
@@ -291,4 +270,3 @@
     "defaultMessage": "زيارة إعدادات الروابط"
   }
 }
-

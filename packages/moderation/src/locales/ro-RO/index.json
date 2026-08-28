@@ -89,12 +89,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Adaugă un link valid către licență"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Utilizarea de prescurtări de link-uri sau alte metode de a ascunde destinația unui link în secțiunea de link-uri externe sau în link-ul licenței este interzisă, te rugăm să folosești doar link-uri complete și valide."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Nu utilizați prescurtări de link"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# antet} other {# antete}} în descrierea ta {count, plural, one {este} other {sunt}} prea lung. Antetul trebuie să fie concis și să acționeze ca titluri de secțiune, nu ca propoziții întregi."
   },
@@ -179,29 +173,14 @@
   "nags.settings.title": {
     "defaultMessage": "Vizitează setările generale"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Rezumatul tău nu poate fi identic cu numele proiectului. Este important să creezi un rezumat informativ și atractiv."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Fă rezumatul unic"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Rezumatul tău nu trebuie să conțină formatare, salturi de linie, caractere speciale sau link-uri, deoarece va fi afișat doar ca text simplu."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Curăță rezumatul"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Sumarul dumneavoastră are o lungime de {length, plural, one {# caracter} other {#caractere}}. Minim {minChars, plural, one {# caracter este recomandat} other {#caractere sunt recomandate}} pentru a creea un sumar informativ ți incitant."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Extinde rezumatul"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Prin a face numele proiectului tău curat îl faci și mai ușor de ținut minte si de găsit. Informații de versiune și loader sunt afișate automatic lângă proiectul dumneavoastră."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Curăță numele"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Ați selectat {tagCount, plural,one {#etichetă} other {etichetă}}. Vă rugăm să reduceți la{maxTagCount} sau mai puține pentru a vă asigura că serverul dvs. apare în rezultatele de căutare relevante."
@@ -234,4 +213,3 @@
     "defaultMessage": "Vizitează setările link-urilor"
   }
 }
-

@@ -2,8 +2,8 @@ import IntlMessageFormat from 'intl-messageformat'
 import type { Ref } from 'vue'
 import type { CompileError, MessageCompiler, MessageContext } from 'vue-i18n'
 
-import { injectI18n } from '../providers/i18n'
-import { injectI18nDebug } from './i18n-debug'
+import { injectI18n } from '../providers/i18n.ts'
+import { injectI18nDebug } from './i18n-debug.ts'
 
 export interface MessageDescriptor {
 	id: string

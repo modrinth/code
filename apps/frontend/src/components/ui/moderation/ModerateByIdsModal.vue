@@ -50,12 +50,7 @@ defineExpose({ show, hide })
 </script>
 
 <template>
-	<NewModal
-		ref="modalRef"
-		header="Moderate by IDs"
-		width="36rem"
-		max-width="calc(100vw - 2rem)"
-	>
+	<NewModal ref="modalRef" header="Moderate by IDs" width="36rem" max-width="calc(100vw - 2rem)">
 		<form class="flex flex-col gap-4" @submit.prevent="apply">
 			<div class="flex flex-col gap-2">
 				<label class="font-semibold text-contrast" for="moderation-project-ids">

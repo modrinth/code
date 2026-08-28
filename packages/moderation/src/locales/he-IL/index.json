@@ -107,12 +107,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "הוסף קישור רישיון חוקי"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "שימוש במקצרי קישורים או בשיטות אחרות כדי לטשטש את היעד של קישור אסור בקישורים חיצוניים או בקישור הרישיון. אנא השתמש רק בקישורים מלאים ומתאימים."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "אל תשתמש במקצרי קישורים"
-  },
   "nags.long-headers.title": {
     "defaultMessage": "קצר כותרות"
   },
@@ -191,12 +185,6 @@
   "nags.settings.title": {
     "defaultMessage": "בקר בהגדרות כלליות"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "התקציר שלך לא יכול להיות זהה לשם הפרוייקט שלך. זה חשוב ליצור תקציר אינפורמטיבי ומעניין."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "עשה את התקציר שלך ייחודי"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "התקציר שלך לא יכול לכלול פרמוט, הפסקות שורה, תווים מיוחדים או קישורים, מכיוון שהוא יוצג בטקסט פשוט."
   },
@@ -205,12 +193,6 @@
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "הארך את התקציר"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "שמירה על שם הפרויקט נקי הופכת אותו לזכיר וקל יותר למציאה. פרטי הגרסה והטוען מוצגים אוטומטית לצד הפרויקט."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "נקה את השם"
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "בחר תגים מדוייקים"

@@ -2,8 +2,6 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { MessageDescriptor } from '@modrinth/ui'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
-import type { ProjectValidationResult } from '../validators/project-validation/index.ts'
-
 /**
  * Type which represents the status type of a nag.
  *
@@ -13,12 +11,23 @@ import type { ProjectValidationResult } from '../validators/project-validation/i
  */
 export type NagStatus = 'required' | 'warning' | 'suggestion' | 'special-submit-action'
 
+export type NagDestinationId =
+	| 'description'
+	| 'disclosures'
+	| 'gallery'
+	| 'general'
+	| 'license'
+	| 'links'
+	| 'moderation'
+	| 'permissions'
+	| 'server'
+	| 'tags'
+	| 'versions'
+
 /**
- * Interface representing the context in which a nag is displayed.
- * It includes the project, versions, current member, all members, and the current route.
- * This context is used to determine whether a nag or it's link should be shown and how it should be presented.
+ * Data required to validate a project.
  */
-export interface NagContext {
+export interface ProjectValidationContext {
 	/**
 	 * The project associated with the nag.
 	 */
@@ -28,25 +37,28 @@ export interface NagContext {
 	 */
 	projectV3: Labrinth.Projects.v3.Project
 	/**
-	 * Validation results for editable project text fields.
-	 */
-	projectValidation: ProjectValidationResult
-	/**
 	 * The versions associated with the project.
 	 */
 	versions: Labrinth.Versions.v3.Version[]
+
+	tags: {
+		categories?: Labrinth.Tags.v2.Category[]
+		rejectedStatuses: string[]
+	}
+}
+
+/**
+ * Context required to render a nag and its navigation.
+ */
+export interface NagContext extends ProjectValidationContext {
 	/**
 	 * The current project member viewing the nag.
 	 */
-	currentMember: Labrinth.Users.v2.User
+	currentMember?: Labrinth.Users.v2.User
 	/**
 	 * The current route in the application.
 	 */
 	currentRoute: string
-	/* eslint-disable @typescript-eslint/no-explicit-any */
-	tags: any
-	submitProject: (...any: any) => any
-	/* eslint-enable @typescript-eslint/no-explicit-any */
 }
 
 /**
@@ -62,9 +74,9 @@ export interface NagLink {
 	 */
 	title: MessageDescriptor | string
 	/**
-	 * The status of the nag, which can be 'required', 'warning', or 'suggestion'.
+	 * Whether to show the link in the current context.
 	 */
-	shouldShow?: (context: NagContext) => boolean
+	shouldShow: (context: NagContext) => boolean
 }
 
 /**
@@ -83,7 +95,7 @@ export interface Nag {
 	 * A function that returns the description of the nag.
 	 * It can accept a context to provide dynamic descriptions.
 	 */
-	description: MessageDescriptor | ((context: NagContext) => string)
+	description: MessageDescriptor | ((context: ProjectValidationContext) => string)
 	/**
 	 * The status of the nag, which can be 'required', 'warning', or 'suggestion'.
 	 */
@@ -97,7 +109,7 @@ export interface Nag {
 	/**
 	 * A function that determines whether the nag should be shown based on the context.
 	 */
-	shouldShow: (context: NagContext) => boolean
+	shouldShow: (context: ProjectValidationContext) => boolean
 	/**
 	 * An optional link associated with the nag.
 	 * If provided, it should be displayed alongside the nag.

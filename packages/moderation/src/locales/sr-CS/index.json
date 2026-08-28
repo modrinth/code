@@ -113,12 +113,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Dodaj važeći link licence"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Upotreba skraćivača linkova ili drugih metoda za prikrivanje mesta gde link može voditi u tvojim spoljnim linkovima ili licencnim linkovima je zabranjena, koristi samo odgovarajuće linkove pune dužine."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Ne koristi skraćivače linkova"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# zaglavlje} other {# zaglavlja}} u tvojem opisu {count, plural, one {# je predugo} other {# su preduga}}. Zaglavlja treba da budu sažeti i da služe kao naslovi odeljaka, a ne kao cele rečenice."
   },
@@ -221,29 +215,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Posetite podešavanja verzija"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Tvog rezime ne može biti isti kao naziv tvog projekta. Važno je da napraviš informativan i privlačan rezime."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Napravi rezime jedinstvenim"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Tvoj rezime ne bi trebalo da sadrži formatiranje, prelome redova, specijalne znakove ili linkove, jer će rezime prikazivati samo običan tekst."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Razjasni rezime"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Tvoj rezime je {length, plural, one {# slovo} other {# slova}}. Najmanje {minChars, plural, one {# slovo} other {# slova}} je preporučeno da bi se kreirao informativan i privlačan rezime."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Proširi rezime"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Održavanje čistog imena vašeg projekta ga čini lakšim za pamćenje i pronalaženje. Informacije o verziji i programu za učitavanje se automatski prikazuju pored vašeg projekta."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Počisti Ime"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Izabrao si {languageCount, plural, one {# jezik} other {# jezika}}. Navedi samo jezike koje tvoj server aktivno podržava."
@@ -291,4 +270,3 @@
     "defaultMessage": "Posjeti podešavanja linkova"
   }
 }
-

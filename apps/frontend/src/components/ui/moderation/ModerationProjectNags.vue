@@ -124,13 +124,14 @@ import {
 	TriangleAlertIcon,
 } from '@modrinth/assets'
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
-import { nags, validateProjectFields } from '@modrinth/moderation'
+import { getNags, nagDestinations, validateProject } from '@modrinth/moderation'
 import { Accordion, Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 interface Tags {
+	categories?: Labrinth.Tags.v2.Category[]
 	rejectedStatuses: string[]
 	gameVersions: { version: string }[]
 	loaders: { name: string }[]
@@ -327,24 +328,17 @@ watch(nagScroller, (el, previousEl) => {
 	nextTick(updateNagScrollShadows)
 })
 
-const projectValidation = computed(() => validateProjectFields(props.projectV3))
-
 const nagContext = computed<NagContext>(() => ({
 	project: props.project,
 	projectV3: props.projectV3,
-	projectValidation: projectValidation.value,
 	versions: props.versions,
-	currentMember: props.currentMember?.user as Labrinth.Users.v2.User,
+	currentMember: props.currentMember?.user,
 	currentRoute: props.routeName,
 	tags: props.tags,
-	submitProject: submitForReview,
 }))
 
 const canSubmitForReview = computed(() => {
-	return (
-		applicableNags.value.filter((nag) => nag.status === 'required' && !isNagComplete(nag))
-			.length === 0
-	)
+	return validateProject(nagContext.value).valid
 })
 
 async function submitForReview() {
@@ -354,7 +348,7 @@ async function submitForReview() {
 }
 
 const applicableNags = computed<Nag[]>(() => {
-	return nags.filter((nag) => {
+	return getNags(nagContext.value).filter((nag) => {
 		return nag.shouldShow(nagContext.value)
 	})
 })
@@ -390,9 +384,8 @@ const visibleNags = computed<Nag[]>(() => {
 			status: 'special-submit-action',
 			shouldShow: (ctx) => ctx.tags.rejectedStatuses.includes(ctx.project.status),
 			link: {
-				path: 'moderation',
+				...nagDestinations.moderation,
 				title: messages.visitModerationPage,
-				shouldShow: () => props.routeName !== 'type-project-moderation',
 			},
 		})
 	}
@@ -408,7 +401,7 @@ const visibleNags = computed<Nag[]>(() => {
 watch(visibleNags, () => nextTick(updateNagScrollShadows))
 
 function shouldShowLink(nag: Nag): boolean {
-	return nag.link?.shouldShow ? nag.link.shouldShow(nagContext.value) : false
+	return nag.link?.shouldShow(nagContext.value) ?? false
 }
 
 function getDefaultIcon(status: NagStatus): Component {

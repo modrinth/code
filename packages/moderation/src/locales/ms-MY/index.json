@@ -95,12 +95,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Tambahkan pautan lesen yang sah"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Penggunaan pemendek pautan atau kaedah lain untuk mengaburkan hala tuju pautan di dalam pautan luaran atau lesen anda adalah dilarang, sila gunakan pautan panjang penuh yang sesuai sahaja."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Jangan gunakan pemendek pautan"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, other {# tajuk}} di dalam keterangan anda {count, plural, other {adalah}} terlalu panjang. Tajuk hendaklah ringkas dan bertindak sebagai tajuk bahagian, bukan ayat penuh."
   },
@@ -188,29 +182,14 @@
   "nags.settings.title": {
     "defaultMessage": "Kunjungi tetapan umum"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Ringkasan anda tidak boleh sama dengan Nama projek anda. Adalah penting untuk mencipta Ringkasan yang bermaklumat dan menarik."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Jadikan ringkasan itu unik"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Ringkasan anda tidak boleh mengandungi pemformatan, pemisah baris, aksara khas atau pautan, kerana ringkasan hanya akan memaparkan teks biasa."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Bersihkan ringkasan"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Panjang ringkasan anda ialah {length, plural, other {# aksara}}. Sekurang-kurangnya {minChars, plural, other {# aksara}} disyorkan untuk membuat ringkasan yang bermaklumat dan menarik."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Kembangkan ringkasan"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Nama projek anda yang kemas akan menjadikannya lebih diingati dan mudah untuk dicari. Maklumat versi dan pemuat dipaparkan secara automatik bersama projek anda."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Bersihkan nama"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Anda telah memilih sebanyak {tagCount, plural, other {# tag}} Pertimbangkan untuk mengurangkannya kepada kurang atau sama dengan {maxTagCount} untuk memastikan pelayan anda dipaparkan dalam hasil carian yang berkaitan."
@@ -246,4 +225,3 @@
     "defaultMessage": "Kunjungi tetapan pautan"
   }
 }
-

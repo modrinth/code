@@ -113,12 +113,6 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Adicione um link de licença válido"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "É proibido o uso de encurtadores de links ou outros métodos para ocultar o destino de um link nos seus links externos ou nos links de licença. Use somente links completos e apropriados."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Não use encurtadores de link"
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# cabeçalho} other {# cabeçalhos}} na sua descrição {count, plural, one {é muito longo} other {são muito longos}}. Os cabeçalhos devem ser concisos e funcionar como títulos de seção, não como frases completas."
   },
@@ -221,29 +215,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Visitar configurações das versões"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Seu resumo não pode ser igual ao nome do seu projeto. É importante criar um resumo informativo e atraente."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Torne o resumo único"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Seu resumo não deve incluir formatação, quebras de linha, caracteres especiais ou links, pois o resumo será exibido como texto simples."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Limpe o resumo"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Seu sumário é {length, plural, one {# caractére} other {# caractéres}}. É recomendado pelo menos {minChars, plural, one {# caractére} other {# caractéres}} para criar um sumário informativo e atraente."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Aumente o resumo"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Manter o Nome do seu projeto limpo faz ele ser memorável e mais fácil de achar. As informações sobre a versão e o carregador são automaticamente exibidas com seu projeto."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Limpe o nome"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Você selecionou {languageCount, plural, one {# idioma} other {# idiomas}}. Por favor, liste apenas os idiomas que seu servidor usa ativamente."
@@ -291,4 +270,3 @@
     "defaultMessage": "Visitar página de links"
   }
 }
-

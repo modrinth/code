@@ -288,7 +288,7 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { validateProjectText } from '@modrinth/moderation'
+import { validateProjectGalleryDescription, validateProjectGalleryName } from '@modrinth/moderation'
 import {
 	Button,
 	ButtonLink,
@@ -344,8 +344,10 @@ const editOrder = ref(null)
 const editFile = ref(null)
 const previewImage = ref(null)
 const shouldPreventActions = ref(false)
-const galleryTitleValidation = computed(() => validateProjectText(editTitle.value))
-const galleryDescriptionValidation = computed(() => validateProjectText(editDescription.value))
+const galleryTitleValidation = computed(() => validateProjectGalleryName(editTitle.value))
+const galleryDescriptionValidation = computed(() =>
+	validateProjectGalleryDescription(editDescription.value),
+)
 const galleryFieldsInvalid = computed(
 	() =>
 		galleryTitleValidation.value.some((validation) => validation.severity === 'error') ||

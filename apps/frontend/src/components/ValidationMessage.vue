@@ -2,12 +2,22 @@
 	<div v-if="validations.length > 0" class="flex w-full flex-col gap-1.5">
 		<div
 			v-for="(validation, index) in validations"
-			:key="validation.message?.id ?? index"
+			:key="validation.code ?? validation.message?.id ?? index"
 			class="flex w-full items-center gap-1.5"
-			:class="validation.severity === 'error' ? 'text-red' : 'text-orange'"
+			:class="{
+				'text-red': validation.severity === 'error',
+				'text-orange': validation.severity === 'warn' || validation.severity === 'warning',
+				'text-purple': validation.severity === 'suggestion',
+			}"
 		>
 			<component
-				:is="validation.severity === 'error' ? XCircleIcon : TriangleAlertIcon"
+				:is="
+					validation.severity === 'error'
+						? XCircleIcon
+						: validation.severity === 'suggestion'
+							? LightBulbIcon
+							: TriangleAlertIcon
+				"
 				class="my-auto"
 			/>
 			{{ validation.message ? formatMessage(validation.message, validation.values) : undefined }}
@@ -16,12 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { TriangleAlertIcon, XCircleIcon } from '@modrinth/assets'
+import { LightBulbIcon, TriangleAlertIcon, XCircleIcon } from '@modrinth/assets'
 import { type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 interface ValidationCheck {
-	severity: 'valid' | 'warn' | 'error'
+	code?: string
+	severity: 'valid' | 'warn' | 'warning' | 'suggestion' | 'error'
 	message?: MessageDescriptor
 	values?: Record<string, unknown>
 }

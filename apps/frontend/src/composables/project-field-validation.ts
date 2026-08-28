@@ -1,12 +1,13 @@
 import {
 	extractProjectLinks,
+	type FieldValidationMessage,
+	findBlockedProjectContentLink,
 	type LinkCheckContext,
 	type LinkCheckResult,
-	type ProjectTextValidationResult,
 	validateLink,
 	validateProjectDescription,
+	validateProjectNameField,
 	validateProjectSummary,
-	validateProjectTitle,
 } from '@modrinth/moderation'
 import { defineMessages } from '@modrinth/ui'
 import { computed, type MaybeRefOrGetter, onScopeDispose, ref, toValue, watch } from 'vue'
@@ -19,14 +20,19 @@ export const projectTextValidationMessages = defineMessages({
 })
 
 export function useProjectTitleValidation(text: MaybeRefOrGetter<string | null | undefined>) {
-	return computed(() => validateProjectTitle(toValue(text)))
+	return computed(() => validateProjectNameField(toValue(text) ?? ''))
 }
 
 export function useProjectSummaryValidation(
 	summary: MaybeRefOrGetter<string | null | undefined>,
 	title: MaybeRefOrGetter<string | null | undefined>,
 ) {
-	return computed(() => validateProjectSummary(toValue(summary), toValue(title)))
+	return computed(() =>
+		validateProjectSummary({
+			summary: toValue(summary),
+			name: toValue(title),
+		}),
+	)
 }
 
 export function useLinkValidation(context: MaybeRefOrGetter<LinkCheckContext>) {
@@ -86,7 +92,7 @@ export function useProjectDescriptionValidation(
 			linkValidation.value = null
 
 			if (import.meta.server) return
-			if (validateProjectDescription(text).some(({ code }) => code === 'text-banned-link')) {
+			if (findBlockedProjectContentLink(text ?? '')) {
 				pending.value = false
 				return
 			}
@@ -130,7 +136,7 @@ export function useProjectDescriptionValidation(
 		requestId++
 	})
 
-	const validation = computed<Array<ProjectTextValidationResult | LinkCheckResult>>(() => [
+	const validation = computed<Array<FieldValidationMessage | LinkCheckResult>>(() => [
 		...validateProjectDescription(toValue(description)),
 		...(linkValidation.value ? [linkValidation.value] : []),
 	])
