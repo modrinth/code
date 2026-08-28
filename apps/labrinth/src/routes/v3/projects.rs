@@ -3467,7 +3467,7 @@ pub async fn project_unfollow_internal(
             "querying database for `project_unfollow_internal`",
         )?;
 
-        sqlx::query!(
+        let result = sqlx::query!(
             "
             DELETE FROM mod_follows
             WHERE follower_id = $1 AND mod_id = $2
@@ -3480,6 +3480,14 @@ pub async fn project_unfollow_internal(
         .wrap_internal_err(
             "querying database for `project_unfollow_internal`",
         )?;
+        // make sure that we actually removed the follow,
+        // because between the `SELECT` and the transaction starting, the follow status could've changed
+        // if we don't check, then you can make the counter go down when you're not followed
+        if result.rows_affected() == 0 {
+            return Err(ApiError::Request(eyre::eyre!(
+                "You are not following this project!",
+            )));
+        }
 
         transaction
             .commit()
