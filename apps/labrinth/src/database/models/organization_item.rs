@@ -223,10 +223,10 @@ impl DBOrganization {
             ",
             organization_id as DBOrganizationId,
         )
-                .fetch(exec)
-                .map_ok(|m| DBProjectId(m.id))
-                .try_collect::<Vec<_>>()
-                .await?;
+        .fetch(exec)
+        .map_ok(|m| DBProjectId(m.id))
+        .try_collect::<Vec<_>>()
+        .await?;
 
         Ok(db_projects)
     }

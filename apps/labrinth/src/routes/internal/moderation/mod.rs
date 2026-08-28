@@ -2,12 +2,16 @@ use super::ApiError;
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::PgPool;
-use crate::database::models::{DBModerationLock, DBOrganization, DBOrganizationId, DBProjectId, DBProject};
 use crate::database::models::moderation_external_item;
+use crate::database::models::{
+    DBModerationLock, DBOrganization, DBOrganizationId, DBProject, DBProjectId,
+};
 use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
+use crate::routes::v3::organizations::OrganizationIds;
+use crate::routes::v3::users::UserIds;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::{
@@ -18,12 +22,10 @@ use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
+use futures_util::future::try_join_all;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use futures_util::future::try_join_all;
 use xredis::RedisPool;
-use crate::routes::v3::organizations::OrganizationIds;
-use crate::routes::v3::users::UserIds;
 
 pub mod external_license;
 mod ownership;
@@ -1704,8 +1706,8 @@ pub async fn get_user_project_grouped(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-        .await
-        .wrap_auth_err("authenticating API request")?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let target_user =
         database::models::DBUser::get(&info.into_inner().0, &**pool, &redis)
@@ -1737,8 +1739,10 @@ pub async fn get_users_project_grouped(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>>, ApiError>
-{
+) -> Result<
+    web::Json<HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>>,
+    ApiError,
+> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -1746,8 +1750,8 @@ pub async fn get_users_project_grouped(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-        .await
-        .wrap_auth_err("authenticating API request")?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
         .wrap_request_err("deserializing JSON data")?;
@@ -1764,18 +1768,17 @@ pub async fn get_users_project_grouped(
     let pool_ref = &**pool;
     let redis_ref = &*redis;
 
-    let grouped_projects_by_user = try_join_all(target_users.into_iter().map(
-        |target_user| async move {
+    let grouped_projects_by_user =
+        try_join_all(target_users.into_iter().map(|target_user| async move {
             let counts = user_projects_status_grouped(
                 target_user.id,
                 pool_ref,
                 redis_ref,
             )
-                .await?;
+            .await?;
 
             Ok::<_, ApiError>((UserId::from(target_user.id), counts))
-        },
-    ))
+        }))
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();
@@ -1807,24 +1810,21 @@ pub async fn get_organization_project_grouped(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-        .await
-        .wrap_auth_err("authenticating API request")?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let target_org = database::models::DBOrganization::get(
         &info.into_inner().0,
         &**pool,
         &redis,
     )
-        .await
-        .wrap_internal_err("fetching organization from database")?
-        .wrap_not_found_err("resource not found")?;
+    .await
+    .wrap_internal_err("fetching organization from database")?
+    .wrap_not_found_err("resource not found")?;
 
-    let grouped_projects = organization_projects_status_grouped(
-        target_org.id,
-        &**pool,
-        &redis,
-    )
-        .await?;
+    let grouped_projects =
+        organization_projects_status_grouped(target_org.id, &**pool, &redis)
+            .await?;
 
     Ok(web::Json(grouped_projects))
 }
@@ -1859,8 +1859,8 @@ pub async fn get_organizations_project_grouped(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-        .await
-        .wrap_auth_err("authenticating API request")?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let organization_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
         .wrap_request_err("deserializing JSON data")?;
@@ -1874,24 +1874,23 @@ pub async fn get_organizations_project_grouped(
         &**pool,
         &redis,
     )
-        .await
-        .wrap_internal_err("fetching organizations from database")?;
+    .await
+    .wrap_internal_err("fetching organizations from database")?;
 
     let pool_ref = &**pool;
     let redis_ref = &*redis;
 
-    let grouped_projects_by_org = try_join_all(target_orgs.into_iter().map(
-        |target_org| async move {
+    let grouped_projects_by_org =
+        try_join_all(target_orgs.into_iter().map(|target_org| async move {
             let counts = organization_projects_status_grouped(
                 target_org.id,
                 pool_ref,
                 redis_ref,
             )
-                .await?;
+            .await?;
 
             Ok::<_, ApiError>((OrganizationId::from(target_org.id), counts))
-        },
-    ))
+        }))
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();
@@ -1907,8 +1906,8 @@ async fn user_projects_status_grouped<'a, E>(
 ) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
 where
     E: database::Executor<'a, Database = sqlx::Postgres>
-    + database::Acquire<'a, Database = sqlx::Postgres>
-    + Copy,
+        + database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
 {
     let project_ids =
         database::models::DBUser::get_projects(user_id, pool, redis)
@@ -1918,7 +1917,6 @@ where
     grouped_projects_for(&project_ids, pool, redis).await
 }
 
-
 /// Groups the given Organization projects by their `ProjectStatus`.
 async fn organization_projects_status_grouped<'a, E>(
     organization_id: DBOrganizationId,
@@ -1927,8 +1925,8 @@ async fn organization_projects_status_grouped<'a, E>(
 ) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
 where
     E: database::Executor<'a, Database = sqlx::Postgres>
-    + database::Acquire<'a, Database = sqlx::Postgres>
-    + Copy,
+        + database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
 {
     let project_ids = DBOrganization::get_projects(organization_id, pool)
         .await
@@ -1945,21 +1943,22 @@ async fn grouped_projects_for<'a, E>(
 ) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
 where
     E: database::Executor<'a, Database = sqlx::Postgres>
-    + database::Acquire<'a, Database = sqlx::Postgres>
-    + Copy,
+        + database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
 {
     if project_ids.is_empty() {
         return Ok(HashMap::new());
     }
 
-    let projects =
-        DBProject::get_many_ids(project_ids, pool, redis)
-            .await
-            .wrap_internal_err("fetching projects from database")?;
+    let projects = DBProject::get_many_ids(project_ids, pool, redis)
+        .await
+        .wrap_internal_err("fetching projects from database")?;
 
-    let mut grouped_projects: HashMap<ProjectStatus, Vec<ProjectId>> = HashMap::new();
+    let mut grouped_projects: HashMap<ProjectStatus, Vec<ProjectId>> =
+        HashMap::new();
     for project in &projects {
-        grouped_projects.entry(project.inner.status)
+        grouped_projects
+            .entry(project.inner.status)
             .or_default()
             .push(project.inner.id.into());
     }

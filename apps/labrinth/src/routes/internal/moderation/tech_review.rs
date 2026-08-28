@@ -9,13 +9,17 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 use super::ownership::get_projects_ownership;
+use crate::database::models::{DBOrganization, DBOrganizationId};
+use crate::models::ids::OrganizationId;
+use crate::routes::v3::organizations::OrganizationIds;
+use crate::routes::v3::users::UserIds;
 use crate::{
     auth::check_is_moderator_from_headers,
     database::{
         DBProject,
         models::{
-            DBFileId, DBProjectId, DBThread, DBThreadId, DBUser, DBUserId, DBVersion,
-            DBVersionId, DelphiReportId, DelphiReportIssueDetailsId,
+            DBFileId, DBProjectId, DBThread, DBThreadId, DBUser, DBUserId,
+            DBVersion, DBVersionId, DelphiReportId, DelphiReportIssueDetailsId,
             DelphiReportIssueId,
             delphi_report_item::{
                 DBDelphiReport, DelphiSeverity, DelphiStatus, DelphiVerdict,
@@ -42,13 +46,9 @@ use crate::{
     search::SearchState,
     util::error::Context,
 };
+use ariadne::ids::UserId;
 use eyre::eyre;
 use futures_util::future::try_join_all;
-use ariadne::ids::UserId;
-use crate::database::models::{DBOrganization, DBOrganizationId};
-use crate::models::ids::OrganizationId;
-use crate::routes::v3::organizations::OrganizationIds;
-use crate::routes::v3::users::UserIds;
 
 pub mod global;
 
@@ -1613,8 +1613,8 @@ pub async fn get_user_flagged_projects(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-        .await
-        .wrap_auth_err("authenticating API request")?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
@@ -1653,8 +1653,8 @@ pub async fn get_users_flagged_projects(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-        .await
-        .wrap_auth_err("authenticating API request")?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
         .wrap_request_err("deserializing JSON data")?;
@@ -1670,15 +1670,14 @@ pub async fn get_users_flagged_projects(
     let pool_ref = &**pool;
     let redis_ref = &*redis;
 
-    let flagged_by_user = try_join_all(target_users.into_iter().map(
-        |target_user| async move {
+    let flagged_by_user =
+        try_join_all(target_users.into_iter().map(|target_user| async move {
             let flagged =
                 user_flagged_projects(target_user.id, pool_ref, redis_ref)
                     .await?;
 
             Ok::<_, ApiError>((UserId::from(target_user.id), flagged))
-        },
-    ))
+        }))
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();
@@ -1709,14 +1708,13 @@ pub async fn get_organization_flagged_projects(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-        .await
-        .wrap_auth_err("authenticating API request")?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-    let target_org =
-        DBOrganization::get(&info.into_inner().0, &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching organization from database")?
-            .wrap_not_found_err("resource not found")?;
+    let target_org = DBOrganization::get(&info.into_inner().0, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching organization from database")?
+        .wrap_not_found_err("resource not found")?;
 
     let flagged =
         organization_flagged_projects(target_org.id, &**pool, &redis).await?;
@@ -1743,8 +1741,7 @@ pub async fn get_organizations_flagged_projects(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<HashMap<OrganizationId, Vec<FlaggedProject>>>, ApiError>
-{
+) -> Result<web::Json<HashMap<OrganizationId, Vec<FlaggedProject>>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -1752,8 +1749,8 @@ pub async fn get_organizations_flagged_projects(
         &session_queue,
         Scopes::PROJECT_READ,
     )
-        .await
-        .wrap_auth_err("authenticating API request")?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let organization_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
         .wrap_request_err("deserializing JSON data")?;
@@ -1770,18 +1767,17 @@ pub async fn get_organizations_flagged_projects(
     let pool_ref = &**pool;
     let redis_ref = &*redis;
 
-    let flagged_by_org = try_join_all(target_orgs.into_iter().map(
-        |target_org| async move {
+    let flagged_by_org =
+        try_join_all(target_orgs.into_iter().map(|target_org| async move {
             let flagged = organization_flagged_projects(
                 target_org.id,
                 pool_ref,
                 redis_ref,
             )
-                .await?;
+            .await?;
 
             Ok::<_, ApiError>((OrganizationId::from(target_org.id), flagged))
-        },
-    ))
+        }))
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();
@@ -1799,8 +1795,8 @@ async fn user_flagged_projects<'a, E>(
 ) -> Result<Vec<FlaggedProject>, ApiError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres>
-    + crate::database::Acquire<'a, Database = sqlx::Postgres>
-    + Copy,
+        + crate::database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
 {
     let project_ids = DBUser::get_projects(user_id, pool, redis)
         .await
@@ -1820,8 +1816,8 @@ async fn organization_flagged_projects<'a, E>(
 ) -> Result<Vec<FlaggedProject>, ApiError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres>
-    + crate::database::Acquire<'a, Database = sqlx::Postgres>
-    + Copy,
+        + crate::database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
 {
     let project_ids = DBOrganization::get_projects(organization_id, pool)
         .await
@@ -1840,8 +1836,8 @@ async fn flagged_projects_among<'a, E>(
 ) -> Result<Vec<FlaggedProject>, ApiError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres>
-    + crate::database::Acquire<'a, Database = sqlx::Postgres>
-    + Copy,
+        + crate::database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
 {
     if project_ids.is_empty() {
         return Ok(Vec::new());
