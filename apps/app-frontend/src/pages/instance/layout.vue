@@ -502,9 +502,7 @@ const tabs = computed(() => {
 		},
 	]
 
-	const screenshotsSynced =
-		globalSyncedOptionsQuery.data.value?.screenshots === true &&
-		instance.value?.synced_options.screenshots === true
+	const screenshotsSynced = globalSyncedOptionsQuery.data.value?.screenshots === true
 	if (!screenshotsSynced) {
 		instanceTabs.splice(2, 0, {
 			label: formatMessage(messages.screenshotsTab),

@@ -429,10 +429,10 @@ const groupedScreenshots = computed((): ScreenshotGroupData[] => {
 			screenshotGroups.set(screenshot.instance_id, group)
 		}
 
-		const syncedInstances = (instancesQuery.data.value ?? [])
-			.filter((instance) => instance.synced_options.screenshots)
-			.sort((a, b) => a.name.localeCompare(b.name))
-		const groups = syncedInstances.flatMap((instance) => {
+		const instances = [...(instancesQuery.data.value ?? [])].sort((a, b) =>
+			a.name.localeCompare(b.name),
+		)
+		const groups = instances.flatMap((instance) => {
 			const instanceScreenshots = screenshotGroups.get(instance.id)
 			return instanceScreenshots
 				? [

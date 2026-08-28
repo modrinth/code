@@ -839,8 +839,14 @@ pub async fn instance_get_global_synced_options()
 pub async fn instance_set_global_synced_option(
     option: InstanceSyncedOption,
     enabled: bool,
+    base_instance_id: Option<String>,
 ) -> Result<theseus::instance::GlobalSyncedOptions> {
-    Ok(theseus::instance::set_global_synced_option(option, enabled).await?)
+    Ok(theseus::instance::set_global_synced_option(
+        option,
+        enabled,
+        base_instance_id.as_deref(),
+    )
+    .await?)
 }
 
 #[tauri::command]
