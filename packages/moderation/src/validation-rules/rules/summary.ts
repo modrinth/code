@@ -1,4 +1,5 @@
 import { defineMessages } from '@modrinth/ui/i18n'
+import { md } from '@modrinth/utils/parse.ts'
 import LinkifyIt from 'linkify-it'
 import tlds from 'tlds' with { type: 'json' }
 
@@ -34,7 +35,11 @@ const messages = defineMessages({
 	},
 	cleanUpSummary: {
 		id: 'nags.summary-special-formatting.title',
-		defaultMessage: 'Clean up the summary',
+		defaultMessage: 'Remove Markdown and HTML from the summary',
+	},
+	removeSummaryLinks: {
+		id: 'nags.project-summary-links.title',
+		defaultMessage: 'Remove links from the summary',
 	},
 	editSummary: {
 		id: 'nags.edit-summary.title',
@@ -68,8 +73,11 @@ const messages = defineMessages({
 	},
 	specialFormatting: {
 		id: 'nags.summary-special-formatting.description',
-		defaultMessage:
-			'Your summary should not contain formatting, line breaks, special characters, or links. The summary only displays plain text.',
+		defaultMessage: 'Your summary cannot contain Markdown or HTML, as it displays in plain text.',
+	},
+	links: {
+		id: 'nags.project-summary-links.description',
+		defaultMessage: 'Links, URLs, or IPs are not allowed in the project summary.',
 	},
 })
 
@@ -86,6 +94,10 @@ const summaryLinkify = new LinkifyIt({
 	fuzzyLink: true,
 }).tlds(tlds)
 
+const summaryMarkdown = md({ linkify: false })
+const allowedSummaryBlockTokenTypes = new Set(['paragraph_open', 'inline', 'paragraph_close'])
+const allowedSummaryInlineTokenTypes = new Set(['text', 'softbreak', 'hardbreak'])
+
 function containsProjectSummaryLinkOrIp(summary: string): boolean {
 	return summaryLinkify.test(summary)
 }
@@ -98,17 +110,11 @@ export function projectSummaryMatchesName(summary: string, name: string) {
 }
 
 export function hasProjectSummaryFormatting(summary: string) {
-	return Boolean(
-		summary.match(/# .*/g) ||
-		summary.match(/---/g) ||
-		summary.match(/\n/g) ||
-		summary.match(/`.*`/g) ||
-		summary.match(/\*.*\*/g) ||
-		summary.match(/_.*_/g) ||
-		summary.match(/~~.*~~/g) ||
-		summary.match(/```/g) ||
-		summary.match(/> /g),
-	)
+	return summaryMarkdown.parse(summary, {}).some((token) => {
+		if (!allowedSummaryBlockTokenTypes.has(token.type)) return true
+
+		return token.children?.some((child) => !allowedSummaryInlineTokenTypes.has(child.type)) ?? false
+	})
 }
 
 const commonNagPresentation = {
@@ -182,13 +188,21 @@ export const projectSummaryValidationRules = {
 	'summary-special-formatting': {
 		severity: 'error',
 		evaluate: ({ summary }) => ({
-			valid:
-				!summary ||
-				(!hasProjectSummaryFormatting(summary) && !containsProjectSummaryLinkOrIp(summary)),
+			valid: !summary || !hasProjectSummaryFormatting(summary),
 		}),
 		presentation: {
 			message: messages.specialFormatting,
 			nag: { title: messages.cleanUpSummary, ...commonNagPresentation },
+		},
+	},
+	'project-summary-links': {
+		severity: 'error',
+		evaluate: ({ summary }) => ({
+			valid: !summary || !containsProjectSummaryLinkOrIp(summary),
+		}),
+		presentation: {
+			message: messages.links,
+			nag: { title: messages.removeSummaryLinks, ...commonNagPresentation },
 		},
 	},
 } satisfies ValidationRuleSet<ProjectSummaryValidationInput>

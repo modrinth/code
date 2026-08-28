@@ -266,6 +266,12 @@
   "nags.project-summary-content.title": {
     "defaultMessage": "Review the project summary"
   },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "Any links, URLs, or IPs are not allowed in the project summary."
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "Remove links from the summary"
+  },
   "nags.project-summary-non-standard-text.description": {
     "defaultMessage": "Non-standard text characters, such as “₮ɆӾ₮”, are not allowed."
   },
@@ -345,7 +351,7 @@
     "defaultMessage": "Visit versions settings"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Your summary should not contain formatting, line breaks, special characters, or links. The summary only displays plain text."
+    "defaultMessage": "Your summary cannot not contain Markdown or HTML, as it displays in plain text."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Clean up the summary"

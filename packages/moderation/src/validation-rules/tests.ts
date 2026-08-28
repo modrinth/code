@@ -15,7 +15,11 @@ import {
 } from './rules/description.ts'
 import { validateProjectGalleryDescription, validateProjectGalleryName } from './rules/gallery.ts'
 import { projectNameValidationRules, validateProjectNameField } from './rules/name.ts'
-import { projectSummaryMatchesName, validateProjectSummary } from './rules/summary.ts'
+import {
+	hasProjectSummaryFormatting,
+	projectSummaryMatchesName,
+	validateProjectSummary,
+} from './rules/summary.ts'
 import { toFieldMessages } from './to-field-messages.ts'
 import { toNags } from './to-nags.ts'
 import type { ValidationRuleSet } from './types.ts'
@@ -141,6 +145,32 @@ test('rejects repeated summary padding', () => {
 	)
 })
 
+test('detects Markdown and HTML formatting in project summaries', () => {
+	for (const summary of [
+		'Unknown <span>🩸</span>Unknown is a dark and unsettling horror-survival mod.',
+		'<custom-element>Custom HTML content</custom-element>',
+		'Visible content <!-- hidden HTML content -->',
+		'**Bold text** in a detailed project summary',
+		'# Heading in a detailed project summary',
+		'- A list item in a detailed project summary',
+		'`Inline code` in a detailed project summary',
+	]) {
+		assert.equal(hasProjectSummaryFormatting(summary), true, summary)
+	}
+})
+
+test('allows plain-text punctuation in project summaries', () => {
+	for (const summary of [
+		'A configuration value named file_name is supported.',
+		'Use * to mark an important configuration value.',
+		'The expression 2 < 3 is used as an example.',
+		'First line\r\nSecond line',
+		'First paragraph\n\nSecond paragraph',
+	]) {
+		assert.equal(hasProjectSummaryFormatting(summary), false, summary)
+	}
+})
+
 test('rejects every link and IP address in project summaries', () => {
 	for (const summary of [
 		'Visit https://example.dev for more information about this project',
@@ -149,7 +179,7 @@ test('rejects every link and IP address in project summaries', () => {
 	]) {
 		assert.deepEqual(
 			validateProjectSummary({ summary, name: 'Project title' }).map(({ code }) => code),
-			['summary-special-formatting'],
+			['project-summary-links'],
 		)
 	}
 
