@@ -2,14 +2,13 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
-	getBlockedProjectContentLink,
+	EXTERNAL_LINKS_BLOCK_LIST,
 	getBlockedProjectExternalLink,
 	getLinkHostname,
 	isCommonProjectLink,
 	isDiscordLink,
 	isInappropriateLicenseLink,
-	isLinkShortener,
-	PROJECT_LINK_BLOCK_LIST,
+	URL_SHORTENERS,
 	validateLink,
 	validateLinkSyntax,
 } from './index.ts'
@@ -36,7 +35,8 @@ test('uses a description-specific message for invalid content links', async () =
 	})
 
 	assert.equal(result?.message?.id, 'nags.link.description.invalid-url')
-	assert.equal(result?.message?.defaultMessage, 'The description has an invalid link')
+	assert.equal(result?.message?.defaultMessage, 'The description has an invalid link: “{fullUrl}”.')
+	assert.deepEqual(result?.values, { fullUrl: 'http://example.dev/project' })
 })
 
 test('matches recognized hosts case-insensitively', async () => {
@@ -70,20 +70,20 @@ test('allows structured link types in general content', async () => {
 	assert.equal(result?.severity, 'valid')
 })
 
-test('allows unrecognized valid links but keeps global restrictions in general content', async () => {
+test('allows unrecognized valid links in general content', async () => {
 	const allowed = await validateLink({
 		field: 'description',
 		url: 'https://docs.example.dev/project',
 		generalContent: true,
 	})
-	const blocked = await validateLink({
+	const shortener = await validateLink({
 		field: 'description',
 		url: 'https://bit.ly/project',
 		generalContent: true,
 	})
 
 	assert.equal(allowed?.severity, 'valid')
-	assert.equal(blocked?.severity, 'error')
+	assert.equal(shortener?.severity, 'valid')
 })
 
 test('applies the external-link blocklist only outside general content', async () => {
@@ -126,11 +126,7 @@ test('compares recognized license URLs with the selected license', async () => {
 })
 
 test('blocks every configured URL shortener and its subdomains', () => {
-	for (const domain of PROJECT_LINK_BLOCK_LIST.urlShorteners) {
-		assert.deepEqual(getBlockedProjectContentLink(`https://${domain}/project`), {
-			label: 'URL shortener',
-			url: `https://${domain}/project`,
-		})
+	for (const domain of URL_SHORTENERS) {
 		assert.equal(
 			getBlockedProjectExternalLink(`https://subdomain.${domain}/project`)?.label,
 			'URL shortener',
@@ -139,7 +135,7 @@ test('blocks every configured URL shortener and its subdomains', () => {
 })
 
 test('blocks every configured external domain and its subdomains', () => {
-	for (const { label, domains } of PROJECT_LINK_BLOCK_LIST.external) {
+	for (const { label, domains } of EXTERNAL_LINKS_BLOCK_LIST) {
 		for (const domain of domains) {
 			assert.deepEqual(getBlockedProjectExternalLink(`https://${domain}/project`), {
 				label,
@@ -153,8 +149,7 @@ test('blocks every configured external domain and its subdomains', () => {
 	}
 })
 
-test('allows external-only blocklist entries in project content', () => {
-	assert.equal(getBlockedProjectContentLink('https://social.modrinth.com/project'), null)
+test('blocks configured external links', () => {
 	assert.equal(
 		getBlockedProjectExternalLink('https://social.modrinth.com/project')?.label,
 		'Modrinth',
@@ -162,12 +157,10 @@ test('allows external-only blocklist entries in project content', () => {
 })
 
 test('blocks IP-address URLs without blocking domain lookalikes', () => {
-	assert.equal(getBlockedProjectContentLink('http://127.0.0.1:25565')?.label, 'IP address')
-	assert.equal(getBlockedProjectContentLink('https://[2001:db8::1]')?.label, 'IP address')
 	assert.equal(getBlockedProjectExternalLink('http://127.0.0.1:25565')?.label, 'IP address')
-	assert.equal(getBlockedProjectContentLink('https://modrinth.com.example.dev'), null)
+	assert.equal(getBlockedProjectExternalLink('https://[2001:db8::1]')?.label, 'IP address')
 	assert.equal(getBlockedProjectExternalLink('https://modrinth.com.example.dev'), null)
-	assert.equal(getBlockedProjectContentLink('not a URL'), null)
+	assert.equal(getBlockedProjectExternalLink('not a URL'), null)
 })
 
 test('matches classified domains exactly or by subdomain', () => {
@@ -177,8 +170,6 @@ test('matches classified domains exactly or by subdomain', () => {
 	assert.equal(isCommonProjectLink('https://github.com.example.com/modrinth/code', 'source'), false)
 	assert.equal(isDiscordLink('https://discord.gg/modrinth'), true)
 	assert.equal(isDiscordLink('https://discord.gg.example.com/modrinth'), false)
-	assert.equal(isLinkShortener('https://bit.ly/modrinth'), true)
-	assert.equal(isLinkShortener('https://bit.ly.example.com/modrinth'), false)
 	assert.equal(isInappropriateLicenseLink('https://youtube.com/watch?v=example'), true)
 	assert.equal(isInappropriateLicenseLink('https://youtube.com.evil.dev/license'), false)
 })

@@ -68,6 +68,26 @@ test('allows redacted profanity when the removed letters cannot reconstruct a te
 	assert.equal(validateProfanity('f.u.c.k').valid, false)
 })
 
+test('allows exact allowlisted terms case-insensitively', () => {
+	const validator = createProfanityValidator({
+		patterns: {
+			koon: { kind: 'slur' },
+		},
+		allowlist: ['Кооп'],
+	})
+
+	assert.equal(validator.validate('Кооп').valid, true)
+	assert.equal(validator.validate('кооп').valid, true)
+	assert.equal(validator.validate('К.о.о.п').valid, false)
+	assert.equal(validator.validate('koon').valid, false)
+})
+
+test('allows default allowlisted terms', () => {
+	assert.equal(validateProfanity('Кооп').valid, true)
+	assert.equal(validateProfanity('кооп').valid, true)
+	assert.equal(validateProfanity('A Кооп project').valid, true)
+})
+
 test('classifies slurs separately from other profanity', () => {
 	const validator = createProfanityValidator({
 		patterns: {

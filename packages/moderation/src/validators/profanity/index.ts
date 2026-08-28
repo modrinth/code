@@ -16,6 +16,7 @@ export interface ProfanityPattern {
 
 export interface ProfanityConfig {
 	patterns: Readonly<Record<string, ProfanityPattern>>
+	allowlist?: readonly string[]
 }
 
 export interface ProfanityMatch {
@@ -223,8 +224,11 @@ export const DEFAULT_PROFANITY_PATTERNS: Readonly<Record<string, ProfanityPatter
 		}),
 	)
 
+export const DEFAULT_PROFANITY_ALLOWLIST = ['Кооп'] as const
+
 export const DEFAULT_PROFANITY_CONFIG: ProfanityConfig = {
 	patterns: DEFAULT_PROFANITY_PATTERNS,
+	allowlist: DEFAULT_PROFANITY_ALLOWLIST,
 }
 
 function getDuplicateThresholds(terms: readonly string[]): Map<string, number> {
@@ -312,6 +316,7 @@ function isWholeWordMatch(text: string, start: number, end: number): boolean {
 export function createProfanityValidator(
 	config: ProfanityConfig = DEFAULT_PROFANITY_CONFIG,
 ): ProfanityValidator {
+	const allowlist = new Set(config.allowlist?.map((term) => term.normalize('NFC').toLowerCase()))
 	const entries = Object.entries(config.patterns).map(([rawTerm, pattern]) => {
 		const term = rawTerm.toLowerCase()
 		if (!term || !/^[a-z]+$/.test(term)) {
@@ -358,6 +363,7 @@ export function createProfanityValidator(
 			const matchKey = `${match.termId}:${match.startIndex}:${match.endIndex}`
 			if (
 				!profanityPattern ||
+				allowlist.has(rawText.normalize('NFC').toLowerCase()) ||
 				(!strictMatches.has(matchKey) && !isCharacterByCharacterObfuscation(rawText)) ||
 				!isWholeWordMatch(text, match.startIndex, end) ||
 				match.startIndex < (matches.at(-1)?.end ?? 0)

@@ -144,7 +144,7 @@
     "defaultMessage": "Fix the project summary"
   },
   "nags.link.description.invalid-url": {
-    "defaultMessage": "The description has an invalid link"
+    "defaultMessage": "The description has an invalid link: “{fullUrl}”."
   },
   "nags.link.discord.channel": {
     "defaultMessage": "This is a link to a Discord channel, not a server invite."
@@ -262,9 +262,6 @@
   },
   "nags.project-name-version.title": {
     "defaultMessage": "Fix project name"
-  },
-  "nags.project-summary-banned-link.description": {
-    "defaultMessage": "“{fullUrl}” is not allowed in project summaries."
   },
   "nags.project-summary-content.title": {
     "defaultMessage": "Review the project summary"

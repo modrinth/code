@@ -1,7 +1,7 @@
 import {
-	extractProjectLinks,
+	extractDescriptionLinks,
 	type FieldValidationMessage,
-	findBlockedProjectContentLink,
+	findBannedDescriptionLink,
 	type LinkCheckContext,
 	type LinkCheckResult,
 	validateLink,
@@ -92,12 +92,12 @@ export function useProjectDescriptionValidation(
 			linkValidation.value = null
 
 			if (import.meta.server) return
-			if (findBlockedProjectContentLink(text ?? '')) {
+			if (findBannedDescriptionLink(text ?? '')) {
 				pending.value = false
 				return
 			}
 
-			const links = extractProjectLinks(text ?? '')
+			const links = extractDescriptionLinks(text ?? '')
 			if (links.length === 0) {
 				pending.value = false
 				return

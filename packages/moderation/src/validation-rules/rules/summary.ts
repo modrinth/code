@@ -1,10 +1,8 @@
 import { defineMessages } from '@modrinth/ui/i18n'
+import LinkifyIt from 'linkify-it'
+import tlds from 'tlds' with { type: 'json' }
 
 import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
-import {
-	containsExplicitHttpProjectLink,
-	findBlockedProjectContentLink,
-} from '../../validators/links/detection.ts'
 import { evaluateRules } from '../evaluate-rules.ts'
 import {
 	evaluateNonStandardText,
@@ -49,10 +47,6 @@ const messages = defineMessages({
 		id: 'nags.project-summary-non-standard-text.description',
 		defaultMessage: 'Non-standard text characters, such as “₮ɆӾ₮”, are not allowed.',
 	},
-	bannedLink: {
-		id: 'nags.project-summary-banned-link.description',
-		defaultMessage: '“{fullUrl}” is not allowed in project summaries.',
-	},
 	matchesName: {
 		id: 'project.text-validation.summary-matches-title',
 		defaultMessage: "A project summary cannot be the same as it's title.",
@@ -74,6 +68,16 @@ export const MIN_SUMMARY_CHARS = 30
 export interface ProjectSummaryValidationInput {
 	summary: string | null | undefined
 	name: string | null | undefined
+}
+
+const summaryLinkify = new LinkifyIt({
+	fuzzyEmail: false,
+	fuzzyIP: true,
+	fuzzyLink: true,
+}).tlds(tlds)
+
+function containsProjectSummaryLinkOrIp(summary: string): boolean {
+	return summaryLinkify.test(summary)
 }
 
 export function projectSummaryMatchesName(summary: string, name: string) {
@@ -127,23 +131,12 @@ export const projectSummaryValidationRules = {
 			nag: { title: messages.fixSummary, ...commonNagPresentation },
 		},
 	},
-	'project-summary-banned-link': {
-		severity: 'error',
-		evaluate: ({ summary }) => {
-			const blockedLink = findBlockedProjectContentLink(summary ?? '')
-			return blockedLink ? { valid: false, values: { fullUrl: blockedLink.url } } : { valid: true }
-		},
-		presentation: {
-			message: messages.bannedLink,
-			nag: { title: messages.fixSummary, ...commonNagPresentation },
-		},
-	},
 	'project-summary-matches-title': {
 		severity: 'error',
 		evaluate: ({ summary, name }) => ({
 			valid:
 				!summary ||
-				containsExplicitHttpProjectLink(summary) ||
+				containsProjectSummaryLinkOrIp(summary) ||
 				!name ||
 				!projectSummaryMatchesName(summary, name),
 		}),
@@ -155,7 +148,7 @@ export const projectSummaryValidationRules = {
 	'summary-too-short': {
 		severity: 'warning',
 		evaluate: ({ summary }) => {
-			if (!summary || containsExplicitHttpProjectLink(summary)) return { valid: true }
+			if (!summary || containsProjectSummaryLinkOrIp(summary)) return { valid: true }
 			const length = normalizeProjectFieldText(summary).length
 			return length < MIN_SUMMARY_CHARS
 				? { valid: false, values: { length, minChars: MIN_SUMMARY_CHARS } }
@@ -171,7 +164,7 @@ export const projectSummaryValidationRules = {
 		evaluate: ({ summary }) => ({
 			valid:
 				!summary ||
-				(!hasProjectSummaryFormatting(summary) && !containsExplicitHttpProjectLink(summary)),
+				(!hasProjectSummaryFormatting(summary) && !containsProjectSummaryLinkOrIp(summary)),
 		}),
 		presentation: {
 			message: messages.specialFormatting,

@@ -1,20 +1,12 @@
-export { PROJECT_LINK_BLOCK_LIST } from './block-list.ts'
-export {
-	containsExplicitHttpProjectLink,
-	containsProjectLinkOrIp,
-	extractProjectLinks,
-	findBlockedProjectContentLink,
-} from './detection.ts'
+export { EXTERNAL_LINKS_BLOCK_LIST, URL_SHORTENERS } from './block-list.ts'
 export { PROJECT_LINK_DOMAIN_LIST } from './domain-list.ts'
 export {
-	getBlockedProjectContentLink,
 	getBlockedProjectExternalLink,
 	getLinkHostname,
 	hostnameMatchesDomain,
 	isCommonProjectLink,
 	isDiscordLink,
 	isInappropriateLicenseLink,
-	isLinkShortener,
 } from './syntax-checks.ts'
 export type {
 	BlockedProjectLink,

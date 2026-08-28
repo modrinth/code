@@ -1,7 +1,14 @@
 import { defineMessages } from '@modrinth/ui/i18n'
+import LinkifyIt from 'linkify-it'
+import tlds from 'tlds' with { type: 'json' }
 
 import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
-import { findBlockedProjectContentLink } from '../../validators/links/detection.ts'
+import { URL_SHORTENERS } from '../../validators/links/block-list.ts'
+import {
+	getLinkHostname,
+	hostnameMatchesDomain,
+	isIpAddress,
+} from '../../validators/links/syntax-checks.ts'
 import { evaluateRules } from '../evaluate-rules.ts'
 import {
 	evaluateNonStandardText,
@@ -85,11 +92,46 @@ const messages = defineMessages({
 	},
 })
 
-export const DESCRIPTION_MAX_PROFANITY_COUNT = 1
+export const DESCRIPTION_MAX_PROFANITY_COUNT = 2
 export const DESCRIPTION_NON_STANDARD_TEXT_FAILURE_THRESHOLD = 0.05
 export const MIN_DESCRIPTION_CHARS = 200
 export const MAX_HEADER_LENGTH = 80
 export const MIN_CHARS_PER_IMAGE = 60
+export const BANNED_DESCRIPTION_LINK_DOMAINS = [...URL_SHORTENERS] as const
+
+const descriptionLinkify = new LinkifyIt({
+	fuzzyEmail: false,
+	fuzzyIP: true,
+	fuzzyLink: true,
+}).tlds(tlds)
+
+export function extractDescriptionLinks(description: string): string[] {
+	const matches = descriptionLinkify.match(description) ?? []
+	return [
+		...new Set(
+			matches
+				.map((match) => match.url)
+				.filter((url) => {
+					const hostname = getLinkHostname(url)
+					return hostname === null || !isIpAddress(hostname)
+				}),
+		),
+	]
+}
+
+export function findBannedDescriptionLink(description: string): string | null {
+	for (const url of extractDescriptionLinks(description)) {
+		const hostname = getLinkHostname(url)
+		if (
+			hostname &&
+			BANNED_DESCRIPTION_LINK_DOMAINS.some((domain) => hostnameMatchesDomain(hostname, domain))
+		) {
+			return url
+		}
+	}
+
+	return null
+}
 
 export function analyzeHeaderLength(markdown: string): {
 	hasLongHeaders: boolean
@@ -199,8 +241,12 @@ export const projectDescriptionValidationRules = {
 	'project-description-banned-link': {
 		severity: 'error',
 		evaluate: (description) => {
-			const blockedLink = findBlockedProjectContentLink(description ?? '')
-			return blockedLink ? { valid: false, values: { fullUrl: blockedLink.url } } : { valid: true }
+			const bannedLink = findBannedDescriptionLink(description ?? '')
+			if (bannedLink) {
+				return { valid: false, values: { fullUrl: bannedLink } }
+			} else {
+				return { valid: true }
+			}
 		},
 		presentation: {
 			message: messages.bannedLink,
@@ -213,9 +259,11 @@ export const projectDescriptionValidationRules = {
 			const normalized = normalizeProjectFieldText(description ?? '')
 			if (!normalized) return { valid: true }
 			const length = countText(normalized)
-			return length < MIN_DESCRIPTION_CHARS
-				? { valid: false, values: { length, minChars: MIN_DESCRIPTION_CHARS } }
-				: { valid: true }
+			if (length < MIN_DESCRIPTION_CHARS) {
+				return { valid: false, values: { length, minChars: MIN_DESCRIPTION_CHARS } }
+			} else {
+				return { valid: true }
+			}
 		},
 		presentation: {
 			message: messages.tooShort,
@@ -226,9 +274,11 @@ export const projectDescriptionValidationRules = {
 		severity: 'warning',
 		evaluate: (description) => {
 			const { longHeaders } = analyzeHeaderLength(description ?? '')
-			return longHeaders.length > 0
-				? { valid: false, values: { count: longHeaders.length } }
-				: { valid: true }
+			if (longHeaders.length > 0) {
+				return { valid: false, values: { count: longHeaders.length } }
+			} else {
+				return { valid: true }
+			}
 		},
 		presentation: {
 			message: messages.longHeaders,

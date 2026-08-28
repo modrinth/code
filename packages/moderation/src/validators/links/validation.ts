@@ -12,7 +12,6 @@ import {
 	anchored,
 	check,
 	fallback,
-	getBlockedProjectContentLink,
 	getBlockedProjectExternalLink,
 	hasFieldSpecificDescendant,
 	matchesField,
@@ -63,7 +62,6 @@ const coreMessages = defineMessages({
 	},
 })
 
-//TODO: we should probably just let you not provide https but backend currently requires it
 const invalidUrlMessage = defineMessage({
 	id: 'nags.link.invalid-url',
 	defaultMessage: 'This URL is invalid',
@@ -71,7 +69,7 @@ const invalidUrlMessage = defineMessage({
 
 const invalidDescriptionUrlMessage = defineMessage({
 	id: 'nags.link.description.invalid-url',
-	defaultMessage: 'The description has an invalid link',
+	defaultMessage: 'The description has an invalid link: “{fullUrl}”.',
 })
 
 const checks = check(validUrlPrefix).message(invalidUrlMessage).transparent()
@@ -97,11 +95,13 @@ function prepareMatchedLinkValidation(
 
 		const build = matched.unrecognizedSeverity === 'warn' ? warn : error
 		if (matched.unrecognizedMessage && isLeaf) {
-			const message =
+			const isInvalidDescriptionUrl =
 				context.field === 'description' && matched.unrecognizedMessage.id === invalidUrlMessage.id
-					? invalidDescriptionUrlMessage
-					: matched.unrecognizedMessage
-			return build(message, { label: matched.label })
+			const message = isInvalidDescriptionUrl
+				? invalidDescriptionUrlMessage
+				: matched.unrecognizedMessage
+			const values = isInvalidDescriptionUrl ? { fullUrl: context.url } : { label: matched.label }
+			return build(message, values)
 		}
 
 		if (expectedChild) {
@@ -121,12 +121,10 @@ function prepareMatchedLinkValidation(
 	return () => matched.verifyMatch!(match, context)
 }
 
-function getBlockedLinkResult(context: LinkCheckContext): LinkCheckResult | undefined {
+function getBlockedExternalLinkResult(context: LinkCheckContext): LinkCheckResult | undefined {
 	const url = context.url
-	if (!url) return
-	const blockedLink = context.generalContent
-		? getBlockedProjectContentLink(url)
-		: getBlockedProjectExternalLink(url)
+	if (!url || context.generalContent) return
+	const blockedLink = getBlockedProjectExternalLink(url)
 	return blockedLink ? error(coreMessages.neverValid, { label: blockedLink.label }) : undefined
 }
 
@@ -134,7 +132,7 @@ export function validateLinkSyntax(context: LinkCheckContext): LinkCheckResult |
 	const url = context.url
 	if (!url) return
 
-	const blockedResult = getBlockedLinkResult(context)
+	const blockedResult = getBlockedExternalLinkResult(context)
 	if (blockedResult) return blockedResult
 
 	const normalizedUrl = url.replace(/^(https:\/\/)www\./i, '$1')
@@ -155,7 +153,7 @@ export async function validateLink(
 	const url = context.url
 	if (!url) return
 
-	const blockedResult = getBlockedLinkResult(context)
+	const blockedResult = getBlockedExternalLinkResult(context)
 	if (blockedResult) return blockedResult
 
 	const normalizedUrl = url.replace(/^(https:\/\/)www\./i, '$1')

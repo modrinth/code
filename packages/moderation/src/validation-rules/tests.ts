@@ -3,7 +3,10 @@ import test from 'node:test'
 
 import { evaluateRules } from './evaluate-rules.ts'
 import {
+	BANNED_DESCRIPTION_LINK_DOMAINS,
 	countText,
+	extractDescriptionLinks,
+	findBannedDescriptionLink,
 	MIN_CHARS_PER_IMAGE,
 	MIN_DESCRIPTION_CHARS,
 	validateProjectDescription,
@@ -124,6 +127,46 @@ test('validates summary content from one rule set', () => {
 		}),
 		[],
 	)
+})
+
+test('rejects every link and IP address in project summaries', () => {
+	for (const summary of [
+		'Visit https://example.dev for more information about this project',
+		'Visit example.dev for more information about this project',
+		'Join 127.0.0.1:25565 for more information about this project',
+	]) {
+		assert.deepEqual(
+			validateProjectSummary({ summary, name: 'Project title' }).map(({ code }) => code),
+			['summary-special-formatting'],
+		)
+	}
+
+	assert.deepEqual(
+		validateProjectSummary({
+			summary: 'Contact hello@example.com for more information about this project',
+			name: 'Project title',
+		}),
+		[],
+	)
+})
+
+test('rejects configured description links and allows other links', () => {
+	for (const domain of BANNED_DESCRIPTION_LINK_DOMAINS) {
+		assert.equal(
+			findBannedDescriptionLink(`Visit https://${domain}/project`),
+			`https://${domain}/project`,
+		)
+		assert.equal(
+			findBannedDescriptionLink(`Visit subdomain.${domain}/project`),
+			`http://subdomain.${domain}/project`,
+		)
+	}
+
+	assert.equal(findBannedDescriptionLink('Visit https://example.dev/project'), null)
+	assert.equal(findBannedDescriptionLink('Join 127.0.0.1:25565'), null)
+	assert.deepEqual(extractDescriptionLinks('Join 127.0.0.1:25565 or visit example.dev'), [
+		'http://example.dev',
+	])
 })
 
 test('validates description requirements and simultaneous recommendations', () => {

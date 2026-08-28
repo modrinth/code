@@ -1,4 +1,4 @@
-import { PROJECT_LINK_BLOCK_LIST } from './block-list.ts'
+import { EXTERNAL_LINKS_BLOCK_LIST, URL_SHORTENERS } from './block-list.ts'
 import { PROJECT_LINK_DOMAIN_LIST } from './domain-list.ts'
 import type {
 	BlockedProjectLink,
@@ -304,10 +304,6 @@ export function isDiscordLink(url: string | null | undefined): boolean {
 	return isCommonProjectLink(url, 'discord')
 }
 
-export function isLinkShortener(url: string | null | undefined): boolean {
-	return isLinkFromDomains(url, PROJECT_LINK_BLOCK_LIST.urlShorteners)
-}
-
 export function isInappropriateLicenseLink(url: string | null | undefined): boolean {
 	return isLinkFromDomains(url, PROJECT_LINK_DOMAIN_LIST.inappropriateLicense)
 }
@@ -319,34 +315,23 @@ export function hasFieldSpecificDescendant(node: LinkCheckNode): boolean {
 	)
 }
 
-function isIpAddress(hostname: string): boolean {
+export function isIpAddress(hostname: string): boolean {
 	const strippedHostname = hostname.replace(/^\[|]$/g, '')
 	return /^\d{1,3}(?:\.\d{1,3}){3}$/.test(strippedHostname) || strippedHostname.includes(':')
 }
 
-function getBlockedProjectLink(url: string, includeExternal: boolean): BlockedProjectLink | null {
+export function getBlockedProjectExternalLink(url: string): BlockedProjectLink | null {
 	const hostname = getLinkHostname(url)
 	if (!hostname) return null
 
 	if (isIpAddress(hostname)) return { label: 'IP address', url }
 
-	if (
-		PROJECT_LINK_BLOCK_LIST.urlShorteners.some((domain) => hostnameMatchesDomain(hostname, domain))
-	) {
+	if (URL_SHORTENERS.some((domain) => hostnameMatchesDomain(hostname, domain))) {
 		return { label: 'URL shortener', url }
 	}
 
-	if (!includeExternal) return null
-	const entry = PROJECT_LINK_BLOCK_LIST.external.find(({ domains }) =>
+	const entry = EXTERNAL_LINKS_BLOCK_LIST.find(({ domains }) =>
 		domains.some((domain) => hostnameMatchesDomain(hostname, domain)),
 	)
 	return entry ? { label: entry.label, url } : null
-}
-
-export function getBlockedProjectContentLink(url: string): BlockedProjectLink | null {
-	return getBlockedProjectLink(url, false)
-}
-
-export function getBlockedProjectExternalLink(url: string): BlockedProjectLink | null {
-	return getBlockedProjectLink(url, true)
 }
