@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Töröld az azonos linkeket"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "A leírásnak elegendő mennyiségű egyszerű szöveget vagy képhelyettesítő szöveget kell tartalmaznia, hogy a képernyőolvasókat használók vagy lassú internetkapcsolattal rendelkezők számára is hozzáférhető legyen."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Biztosítsa az akadálymentességet"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "A licensz linkje érvénytelen."
   },

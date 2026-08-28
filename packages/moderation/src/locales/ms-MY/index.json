@@ -77,12 +77,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Bersihkan pautan yang serupa"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Keterangan anda harus mengandungi teks biasa atau teks alt gambar yang mencukupi, memastikan ia boleh diakses oleh mereka yang menggunakan pembaca skrin atau dengan sambungan internet yang perlahan."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Pastikan kebolehcapaian"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL lesen tidak sah."
   },

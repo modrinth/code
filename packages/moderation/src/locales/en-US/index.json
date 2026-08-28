@@ -113,12 +113,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Clean up identical links"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Your Description should contain sufficient plain text or image alt-text, keeping it accessible to those using screen readers or with slow internet connections."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Ensure accessibility"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Fix gallery text"
   },

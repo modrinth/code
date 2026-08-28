@@ -89,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Xóa các đường link giống nhau"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Phần mô tả của bạn nên chứa đủ văn bản thuần hoặc văn bản thay thế cho hình ảnh (alt-text), nhằm đảm bảo khả năng truy cập cho người dùng trình đọc màn hình hoặc có kết nối internet chậm."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Đảm bảo khả năng truy cập"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL giấy phép không hợp lệ."
   },

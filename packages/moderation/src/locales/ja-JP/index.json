@@ -92,12 +92,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "リンクの重複を整理"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "視覚障害のある方やインターネット回線速度の遅い方への配慮のため、十分で分かりやすい説明または画像の代替テキストが必要です。"
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "アクセシビリティを確保する"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "ライセンスのURLが無効です。"
   },

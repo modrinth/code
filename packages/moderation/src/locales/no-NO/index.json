@@ -83,12 +83,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Fjern identiske lenker"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Beskrivelsen din bør inneholde tilstrekkelig med ren tekst eller alternativ tekst til bilder, slik at den er tilgjengelig for personer som bruker skjermlesere eller har langsomme internettforbindelser."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Sikre tilgjengelighet"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisens-URL er ugyldig."
   },

@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "تنظيف الروابط المتطابقة"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "وصفك يجب أن يحتوي على نص عادي أو نص بديل للصورة، لتكون متاحة لمستخدمي قارئ الشاشة أو من لا توجد عنده اتصال إنترنت جيد."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "يرجى التأكد من إمكانية الوصول في وصفك"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "رابط الرخصة غير صالح."
   },

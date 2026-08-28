@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Özdeş bağlantıları temizle"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Açıklaman yeterli düz yazı veya resim açıklamalı içermeli ki ekran okuyucu veya patates internet kullananlar için erişilebilir olsun."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Erişilebilirlikte emin ol"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisans URL'i geçersiz."
   },

@@ -89,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "중복 링크 정리"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "설명에는 충분한 일반 텍스트 또는 이미지 대체 텍스트를 포함하여, 화면 읽기 도구를 사용하는 사용자나 인터넷 속도가 느린 사용자도 접근할 수 있도록 해야 합니다."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "접근성 보장"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "라이선스 URL이 잘못되었습니다."
   },

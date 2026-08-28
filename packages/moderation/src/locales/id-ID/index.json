@@ -89,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Bersihkan tautan identik"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Keterangan Anda seharusnya berisi teks biasa atau teks alt gambar yang cukup, agar memastikan aksesibilitas terhadap pengguna pembaca layar atau pengguna dengan koneksi internet yang lambat."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Pastikan aksesibilitas"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL lisensi tidak sah."
   },

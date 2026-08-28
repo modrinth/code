@@ -59,9 +59,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Anna lähdekoodi"
   },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Varmista esteettömyys"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisenssin URL-osoite on virheellinen."
   },

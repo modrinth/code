@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Приберіть однакові посилання"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Ваш опис повинен містити достатню кількість простого тексту або альтернативного тексту зображень, щоби він був зрозумілим для тих, хто використовує читачі екрану або має повільне з’єднання з інтернетом."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Забезпечте доступність"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Посилання на ліцензію неправильне."
   },

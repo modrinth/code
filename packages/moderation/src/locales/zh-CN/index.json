@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "清除重复的链接"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "你的介绍描述应包含足够的纯文本或图片替代文本，确保使用屏幕阅读器的用户或网速较慢的用户也能正常访问。"
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "确保无障碍体验"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "许可证 URL 不可用。"
   },

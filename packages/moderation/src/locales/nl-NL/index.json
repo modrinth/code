@@ -89,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Identieke links opschonen"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Je beschrijving moet voldoende normale tekst of alternatieve tekst bij afbeeldingen bevatten, zodat deze toegankelijk blijft voor mensen die een schermlezer gebruiken of een trage internetverbinding hebben."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Zorg voor toegankelijkheid"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licentie URL is ongeldig."
   },

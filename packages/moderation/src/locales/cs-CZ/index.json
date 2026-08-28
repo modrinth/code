@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Odstraňte duplicitní odkazy"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Popis by měl obsahovat dostatečné množství prostého textu nebo popisků u obrázku, aby byl přístupný i těm, kteří používají čtečky obrazovky nebo mají pomalé připojení k internetu."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Zajistěte přístupnost"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL licence je neplatná."
   },

@@ -37,10 +37,6 @@ const messages = defineMessages({
 		id: 'nags.long-headers.title',
 		defaultMessage: 'Shorten headers',
 	},
-	ensureAccessibility: {
-		id: 'nags.image-heavy-description.title',
-		defaultMessage: 'Ensure accessibility',
-	},
 	addImageAltText: {
 		id: 'nags.missing-alt-text.title',
 		defaultMessage: 'Add image alt text',
@@ -80,11 +76,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'{count, plural, one {# header} other {# headers}} in your description {count, plural, one {is} other {are}} too long. Headers should be concise and act as section titles, not full sentences.',
 	},
-	imageHeavy: {
-		id: 'nags.image-heavy-description.description',
-		defaultMessage:
-			'Your Description should contain sufficient plain text or image alt-text, keeping it accessible to those using screen readers or with slow internet connections.',
-	},
 	missingAltText: {
 		id: 'nags.missing-alt-text.description',
 		defaultMessage:
@@ -96,7 +87,6 @@ export const DESCRIPTION_MAX_PROFANITY_COUNT = 2
 export const DESCRIPTION_NON_STANDARD_TEXT_FAILURE_THRESHOLD = 0.05
 export const MIN_DESCRIPTION_CHARS = 200
 export const MAX_HEADER_LENGTH = 80
-export const MIN_CHARS_PER_IMAGE = 60
 export const BANNED_DESCRIPTION_LINK_DOMAINS = [...URL_SHORTENERS] as const
 
 const descriptionLinkify = new LinkifyIt({
@@ -169,21 +159,13 @@ export function countText(markdown: string): number {
 }
 
 export function analyzeImageContent(markdown: string): {
-	imageHeavy: boolean
 	hasEmptyAltText: boolean
 } {
-	if (!markdown) return { imageHeavy: false, hasEmptyAltText: false }
+	if (!markdown) return { hasEmptyAltText: false }
 
 	const withoutCodeBlocks = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
 	const images = [...withoutCodeBlocks.matchAll(/!\[([^\]]*)\]\([^)]+\)/g)]
 	const htmlImages = [...withoutCodeBlocks.matchAll(/<img[^>]*>/gi)]
-	const totalImages = images.length + htmlImages.length
-	if (totalImages === 0) return { imageHeavy: false, hasEmptyAltText: false }
-
-	const textLength = countText(withoutCodeBlocks)
-	const recommendedTextLength = MIN_CHARS_PER_IMAGE * totalImages
-	const imageHeavy =
-		recommendedTextLength > MIN_DESCRIPTION_CHARS && textLength < recommendedTextLength
 	const hasEmptyAltText =
 		images.some((match) => !match[1]?.trim()) ||
 		htmlImages.some((match) => {
@@ -191,7 +173,7 @@ export function analyzeImageContent(markdown: string): {
 			return !altMatch || !altMatch[1]?.trim()
 		})
 
-	return { imageHeavy, hasEmptyAltText }
+	return { hasEmptyAltText }
 }
 
 type DescriptionInput = string | null | undefined
@@ -283,16 +265,6 @@ export const projectDescriptionValidationRules = {
 		presentation: {
 			message: messages.longHeaders,
 			nag: { title: messages.shortenHeaders, ...commonNagPresentation },
-		},
-	},
-	'image-heavy-description': {
-		severity: 'warning',
-		evaluate: (description) => ({
-			valid: !analyzeImageContent(description ?? '').imageHeavy,
-		}),
-		presentation: {
-			message: messages.imageHeavy,
-			nag: { title: messages.ensureAccessibility, ...commonNagPresentation },
 		},
 	},
 	'missing-alt-text': {

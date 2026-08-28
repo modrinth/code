@@ -77,12 +77,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Ipaglinis ang mga magkaparehong link"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Ang iyong Paglalarawan ay dapat maglalaman ng simpleng teksto o image alt-text, panatilihing accessible sa mga gumamagamit ng screen reader o mahihina ang koneksiyon sa internet."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Siguraduhin ang aksesibilidad"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Di-wasto ang URL ng lisensiya."
   },

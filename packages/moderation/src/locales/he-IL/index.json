@@ -89,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "תמחק קישורים זהים"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "התיאור שלך צריך להכיל מספיק טקסט פשוט או טקסט חלופי לתמונה, כדי שיישאר נגיש למשתמשים עם הקראות מסך או חיבורי אינטרנט איטיים."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "הבטח נגישות"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "כתובת ה-URL של הרישיון אינה חוקית."
   },

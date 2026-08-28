@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Identische Links bereinigen"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Deine Beschreibung sollte genügend normalen Text und Alt-Text für Bilder enthalten, damit es für Benutzer mit Bildschirmleseprogrammen oder langsamem Internet verfügbar ist."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Barrierefreiheit sicherstellen"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lizenz-URL ist ungültig."
   },

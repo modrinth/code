@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Уберите повторения"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Укажите в описании обычный и альтернативный текст для изображений, чтобы сделать его доступным для средств чтения с экрана и при медленном интернете."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Обеспечьте доступность"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Ссылка на лицензию недействительна."
   },

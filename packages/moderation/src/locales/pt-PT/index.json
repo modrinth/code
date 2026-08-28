@@ -83,12 +83,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Limpar links idênticos"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "A tua Descrição deve conter texto simples ou texto alternativo para imagens suficiente, mantendo-a acessível aos que utilizam leitores de ecrã ou que têm ligações lentas à internet."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Garante acessibilidade"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "O URL da licença é inválido."
   },

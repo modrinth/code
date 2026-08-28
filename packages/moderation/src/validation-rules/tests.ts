@@ -3,11 +3,11 @@ import test from 'node:test'
 
 import { evaluateRules } from './evaluate-rules.ts'
 import {
+	analyzeImageContent,
 	BANNED_DESCRIPTION_LINK_DOMAINS,
 	countText,
 	extractDescriptionLinks,
 	findBannedDescriptionLink,
-	MIN_CHARS_PER_IMAGE,
 	MIN_DESCRIPTION_CHARS,
 	validateProjectDescription,
 } from './rules/description.ts'
@@ -178,8 +178,16 @@ test('validates description requirements and simultaneous recommendations', () =
 	const description = `${'# '.concat('A'.repeat(81))}\n![](one.png)\n![](two.png)\n![](three.png)\n![](four.png)`
 	assert.deepEqual(
 		validateProjectDescription(description).map(({ code }) => code),
-		['description-too-short', 'long-headers', 'image-heavy-description', 'missing-alt-text'],
+		['description-too-short', 'long-headers', 'missing-alt-text'],
 	)
+})
+
+test('requires alt text for description images', () => {
+	assert.deepEqual(analyzeImageContent('![Screenshot](screenshot.png)'), {
+		hasEmptyAltText: false,
+	})
+	assert.deepEqual(analyzeImageContent('![](screenshot.png)'), { hasEmptyAltText: true })
+	assert.deepEqual(analyzeImageContent('<img src="screenshot.png">'), { hasEmptyAltText: true })
 })
 
 test('counts blockquote content as readable description text', () => {
@@ -189,18 +197,6 @@ test('counts blockquote content as readable description text', () => {
 	assert.equal(
 		validateProjectDescription(quotedDescription).some(
 			({ code }) => code === 'description-too-short',
-		),
-		false,
-	)
-
-	const images = ['![One](one.png)', '![Two](two.png)', '![Three](three.png)', '![Four](four.png)']
-	const quotedImageDescription = [
-		`> ${'A'.repeat(MIN_CHARS_PER_IMAGE * images.length)}`,
-		...images,
-	].join('\n')
-	assert.equal(
-		validateProjectDescription(quotedImageDescription).some(
-			({ code }) => code === 'image-heavy-description',
 		),
 		false,
 	)

@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Počisti identične linkove"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Tvoj opis treba da sadrži dovoljno običnog teksta ili alternativnog teksta slike, kako bi bio pristupačan onima koji koriste čitače ekrana ili imaju spore internet veze."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Obezbedi pristupačnost"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL adresa licence je nevažeća."
   },

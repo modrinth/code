@@ -95,12 +95,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "清理重複連結"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "請在描述中提供充足的純文字或圖片替代文字，讓螢幕閱讀器使用者與網路速度較慢的使用者也能順利閱讀。"
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "確保無障礙體驗"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "授權條款網址無效。"
   },
