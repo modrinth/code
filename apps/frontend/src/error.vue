@@ -110,6 +110,7 @@ import {
 	commonMessages,
 	defineMessage,
 	defineMessages,
+	injectNotificationManager,
 	IntlFormatted,
 	LoadingBar,
 	normalizeChildren,
@@ -130,9 +131,10 @@ import { getSignInRouteObj } from '~/composables/auth.js'
 import { setupProviders } from '~/providers/setup.ts'
 
 const auth = await useAuth()
-const { notificationManager } = setupProviders(auth)
+setupProviders(auth)
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 const isSwitchingAccount = useIsSwitchingAccount()
 
 const props = defineProps({
@@ -178,7 +180,7 @@ async function signOut() {
 async function onSelectStoredAccount(account) {
 	const result = await switchToStoredAccount(account)
 	if (result === 'error') {
-		notificationManager.addNotification({
+		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: formatMessage(unauthorizedMessages.accountSwitchFailed),
 			type: 'error',
