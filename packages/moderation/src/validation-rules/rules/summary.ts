@@ -63,7 +63,7 @@ const messages = defineMessages({
 	},
 })
 
-export const MIN_SUMMARY_CHARS = 30
+export const MIN_SUMMARY_CHARS = 25
 
 export interface ProjectSummaryValidationInput {
 	summary: string | null | undefined
@@ -146,7 +146,7 @@ export const projectSummaryValidationRules = {
 		},
 	},
 	'summary-too-short': {
-		severity: 'warning',
+		severity: 'error',
 		evaluate: ({ summary }) => {
 			if (!summary || containsProjectSummaryLinkOrIp(summary)) return { valid: true }
 			const length = normalizeProjectFieldText(summary).length
