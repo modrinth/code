@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Continuer"
   },
-  "admin.billing.error.not-found": {
-    "message": "Utilisateur non trouvé"
-  },
   "ads-consent.accept": {
     "message": "Tout accepter"
   },
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Approuver avec réponse"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Fermer le fil"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Fermer avec réponse"
@@ -2650,9 +2644,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Recherche de fichier"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Recherche par adresse e-mail"
   },
   "layout.action.manage-affiliates": {
     "message": "Gérer les liens affiliés"

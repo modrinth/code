@@ -362,12 +362,6 @@
   "instance.settings.tabs.general.name": {
     "message": "Navn"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Startkroker"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Egendefinerte startkroker"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Startkroker lar avanserte brukere køre visse systemkommandoer før og etter spillet blir startet."
   },
@@ -406,9 +400,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} versjon"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java og minne"
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
     "message": "Egendefinert minneallokasjon"

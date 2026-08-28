@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "계속"
   },
-  "admin.billing.error.not-found": {
-    "message": "사용자를 찾을 수 없습니다"
-  },
   "ads-consent.accept": {
     "message": "모두 수용"
   },
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "답글과 함께 승인"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "스레드 닫기"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "답글과 함께 닫기"
@@ -2650,9 +2644,6 @@
   },
   "layout.action.file-lookup": {
     "message": "파일 찾기"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "이메일로 찾기"
   },
   "layout.action.manage-affiliates": {
     "message": "제휴 링크 관리"

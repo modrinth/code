@@ -23,7 +23,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             show_launcher_logs_folder,
             show_app_db_backups_folder,
             progress_bars_list,
-            get_opening_command
+            get_opening_command,
         ])
         .build()
 }

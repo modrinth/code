@@ -118,8 +118,7 @@ const chartOptions = ref({
 		},
 	},
 	tooltip: {
-		custom({ series, seriesIndex, dataPointIndex, w }) {
-			console.log(seriesIndex, w)
+		custom({ series, dataPointIndex, w }) {
 			return `<div class="bar-tooltip">${series
 				.map((value) =>
 					value[dataPointIndex] > 0

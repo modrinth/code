@@ -389,12 +389,6 @@
   "instance.settings.tabs.general.name": {
     "message": "שם"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "פעולות בעת הפעלה"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "פעולות בעת הפעלה מותאמות אישית"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "פעולות בעת הפעלה מאפשרות למשתמשים מתקדמים להריץ פקודות מערכת מסוימות לפני ואחרי שהמשחק מופעל."
   },
@@ -433,9 +427,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} גרסה"
-  },
-  "instance.settings.tabs.java": {
-    "message": "ג'אווה וזיכרון"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "משתני סביבה"

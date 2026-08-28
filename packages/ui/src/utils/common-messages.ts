@@ -1466,7 +1466,7 @@ export const fileTypeMessages: Record<
 	}),
 	'sources-jar': defineMessage({
 		id: 'version.file-type.sources-jar',
-		defaultMessage: 'Source jar',
+		defaultMessage: 'Sources jar',
 	}),
 	'dev-jar': defineMessage({
 		id: 'version.file-type.dev-jar',
@@ -1474,7 +1474,7 @@ export const fileTypeMessages: Record<
 	}),
 	'javadoc-jar': defineMessage({
 		id: 'version.file-type.javadoc-jar',
-		defaultMessage: 'Javadoc jar',
+		defaultMessage: 'Javadocs jar',
 	}),
 	signature: defineMessage({
 		id: 'version.file-type.signature',

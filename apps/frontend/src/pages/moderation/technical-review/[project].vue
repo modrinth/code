@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ArrowLeftIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { ButtonLink, injectModrinthClient } from '@modrinth/ui'
+import { LoaderCircleIcon } from '@modrinth/assets'
+import { BackToParentLink, injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import MaliciousSummaryModal, {
 	type UnsafeFile,
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
+import { flattenFileReports } from '~/components/ui/moderation/tech-review/helpers'
+import { useTechReviewSources } from '~/components/ui/moderation/tech-review/use-tech-review-sources'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -17,133 +19,6 @@ const keybinds = useModerationKeybinds()
 const projectId = String(useRouteId('project'))
 
 useHead({ title: () => `Tech review - ${projectId} - Modrinth` })
-
-const CACHE_TTL = 24 * 60 * 60 * 1000
-const CACHE_KEY_PREFIX = 'tech_review_source_'
-
-type CachedSource = {
-	source: string
-	timestamp: number
-}
-
-function getCachedSource(detailId: string): string | null {
-	try {
-		const cached = localStorage.getItem(`${CACHE_KEY_PREFIX}${detailId}`)
-		if (!cached) return null
-
-		const data: CachedSource = JSON.parse(cached)
-		const now = Date.now()
-
-		if (now - data.timestamp > CACHE_TTL) {
-			localStorage.removeItem(`${CACHE_KEY_PREFIX}${detailId}`)
-			return null
-		}
-
-		return data.source
-	} catch {
-		return null
-	}
-}
-
-function setCachedSource(detailId: string, source: string): void {
-	try {
-		const data: CachedSource = {
-			source,
-			timestamp: Date.now(),
-		}
-		localStorage.setItem(`${CACHE_KEY_PREFIX}${detailId}`, JSON.stringify(data))
-	} catch (error) {
-		console.error('Failed to cache source:', error)
-	}
-}
-
-function clearExpiredCache(): void {
-	try {
-		const now = Date.now()
-		const keys = Object.keys(localStorage)
-
-		for (const key of keys) {
-			if (key.startsWith(CACHE_KEY_PREFIX)) {
-				const cached = localStorage.getItem(key)
-				if (cached) {
-					const data: CachedSource = JSON.parse(cached)
-					if (now - data.timestamp > CACHE_TTL) {
-						localStorage.removeItem(key)
-					}
-				}
-			}
-		}
-	} catch (error) {
-		console.error('Failed to clear expired cache:', error)
-	}
-}
-
-if (import.meta.client) {
-	clearExpiredCache()
-}
-
-const loadingIssues = reactive<Set<string>>(new Set())
-const decompiledSources = reactive<Map<string, string>>(new Map())
-const loadedIssues = reactive<Set<string>>(new Set())
-
-async function loadIssueSource(issueId: string): Promise<void> {
-	if (loadingIssues.has(issueId) || loadedIssues.has(issueId)) return
-
-	loadingIssues.add(issueId)
-
-	try {
-		const issueData = await client.labrinth.tech_review_internal.getIssue(issueId)
-
-		for (const detail of issueData.details) {
-			if (detail.decompiled_source) {
-				decompiledSources.set(detail.id, detail.decompiled_source)
-				setCachedSource(detail.id, detail.decompiled_source)
-			}
-		}
-		loadedIssues.add(issueId)
-	} catch (error) {
-		console.error('Failed to load issue source:', error)
-	} finally {
-		loadingIssues.delete(issueId)
-	}
-}
-
-function findIssuesByIds(issueIds: Set<string>): Labrinth.TechReview.Internal.FileIssue[] {
-	const issues: Labrinth.TechReview.Internal.FileIssue[] = []
-
-	if (!reviewItem.value) return []
-
-	for (const report of reviewItem.value.reports) {
-		for (const issue of report.issues) {
-			if (issueIds.has(issue.id)) {
-				issues.push(issue)
-			}
-		}
-	}
-
-	return issues
-}
-
-function handleLoadIssueSources(issueIds: string[]): void {
-	const uniqueIssueIds = new Set(issueIds)
-	const issues = findIssuesByIds(uniqueIssueIds)
-
-	for (const issue of issues) {
-		for (const detail of issue.details) {
-			if (!decompiledSources.has(detail.id)) {
-				const cached = getCachedSource(detail.id)
-				if (cached) {
-					decompiledSources.set(detail.id, cached)
-				}
-			}
-		}
-
-		const hasUncached = issue.details.some((detail) => !decompiledSources.has(detail.id))
-		if (hasUncached) {
-			loadIssueSource(issue.id)
-		}
-	}
-}
 
 const {
 	data: projectReportData,
@@ -194,11 +69,6 @@ const isLoading = computed(
 
 const hasError = computed(() => isReportError.value || isProjectError.value)
 
-type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
-	id: string
-	version_id: string
-}
-
 const ownership = computed<Labrinth.TechReview.Internal.Ownership | null>(() => {
 	if (organizationData.value) {
 		return {
@@ -229,15 +99,7 @@ const reviewItem = computed(() => {
 
 	const { project_report, thread } = projectReportData.value
 
-	const reports: FlattenedFileReport[] = project_report
-		? project_report.versions.flatMap((version) =>
-				version.files.map((file) => ({
-					...file,
-					id: file.report_id,
-					version_id: version.version_id,
-				})),
-			)
-		: []
+	const reports = project_report ? flattenFileReports(project_report.versions) : []
 
 	return {
 		project: projectData.value,
@@ -246,6 +108,10 @@ const reviewItem = computed(() => {
 		reports,
 	}
 })
+
+const { loadingIssues, decompiledSources, handleLoadIssueSources } = useTechReviewSources(
+	() => reviewItem.value?.reports.flatMap((report) => report.issues) ?? [],
+)
 
 const focusedDetailId = computed(() => route.query.detail?.toString() ?? null)
 
@@ -301,13 +167,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<div class="flex flex-col gap-4">
-		<div>
-			<ButtonLink :to="'/moderation/technical-review'">
-				<ArrowLeftIcon class="size-5" />
-				Back to queue
-			</ButtonLink>
-		</div>
+	<div class="flex flex-col">
+		<BackToParentLink :to="'/moderation/technical-review'"> Back to queue </BackToParentLink>
 
 		<div v-if="isLoading" class="flex flex-col gap-4">
 			<div class="universal-card flex h-48 items-center justify-center">
@@ -333,12 +194,12 @@ onUnmounted(() => {
 			:loading-issues="loadingIssues"
 			:decompiled-sources="decompiledSources"
 			:collapsed="false"
+			disable-collapsing
 			@refetch="refetch"
 			@load-issue-sources="handleLoadIssueSources"
 			@mark-complete="handleMarkComplete"
 			@show-malicious-summary="handleShowMaliciousSummary"
 		/>
-
 		<MaliciousSummaryModal ref="maliciousSummaryModalRef" :unsafe-files="currentUnsafeFiles" />
 	</div>
 </template>

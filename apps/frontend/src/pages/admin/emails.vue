@@ -113,19 +113,31 @@ function openPopupPreview(id: string, offset = 0) {
 	)
 }
 
-const counts = computed(() => ({
-	total: allTemplates.length,
-	shown: filtered.value.length,
-}))
-
 onMounted(() => {
 	document.getElementById('email-search')?.focus()
 })
 </script>
 
 <template>
-	<div class="normal-page no-sidebar">
-		<h1 class="mb-4 text-3xl font-extrabold text-heading">Email templates</h1>
+	<div>
+		<div class="mb-4 flex items-center justify-between gap-4">
+			<h2 class="m-0 text-2xl font-semibold">Email templates</h2>
+			<div class="flex items-center gap-2">
+				<Input
+					id="email-search"
+					v-model="query"
+					:icon="SearchIcon"
+					type="text"
+					autocomplete="off"
+					placeholder="Search templates..."
+					clearable
+				/>
+				<Button type="colored" color="brand" :disabled="filtered.length === 0" @click="openAll">
+					<LibraryIcon class="h-4 w-4" aria-hidden="true" />
+					Open all ({{ filtered.length }})
+				</Button>
+			</div>
+		</div>
 		<NewModal
 			ref="previewModal"
 			header="Preview email"
@@ -187,31 +199,10 @@ onMounted(() => {
 				</div>
 			</div>
 		</NewModal>
-		<div class="normal-page__content">
-			<div class="flex flex-wrap items-center gap-3">
-				<Input
-					id="email-search"
-					v-model="query"
-					type="search"
-					:icon="SearchIcon"
-					placeholder="Search templates..."
-					wrapper-class="w-72"
-				/>
-
-				<Button type="colored" color="brand" :disabled="filtered.length === 0" @click="openAll">
-					<LibraryIcon class="h-4 w-4" aria-hidden="true" />
-					Open all ({{ counts.shown }})
-				</Button>
-
-				<span class="text-sm text-secondary">
-					Showing <span class="font-medium text-contrast">{{ counts.shown }}</span> of
-					<span class="font-medium text-contrast">{{ counts.total }}</span>
-				</span>
-			</div>
-
+		<div>
 			<div
 				v-if="filtered.length === 0"
-				class="mt-4 border-0 border-b border-solid border-surface-4 pb-4"
+				class="border-0 border-b border-solid border-surface-4 pb-4"
 			>
 				No templates match your search.
 			</div>

@@ -15,6 +15,7 @@ import { computed, nextTick, onBeforeUnmount, ref, toRef, useTemplateRef, watch 
 import { Button } from '#ui/components/base/buttons'
 import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
+import { useDebugLogger } from '../../composables/debug-logger'
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
@@ -28,6 +29,7 @@ import ConfirmPurchase from './ServersPurchase3Review.vue'
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
+const debug = useDebugLogger('ModrinthServersPurchaseModal')
 
 export type RegionPing = {
 	region: string
@@ -246,7 +248,7 @@ const nextStep = computed(() => {
 const canProceed = computed(() => {
 	switch (currentStep.value) {
 		case 'plan':
-			console.log('Plan step:', {
+			debug('Plan step:', {
 				customServer: customServer.value,
 				selectedPlan: selectedPlan.value,
 				existingPlan: props.existingPlan,

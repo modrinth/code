@@ -879,10 +879,10 @@ const popupOptions = computed(
 				modpack_id: serverProject.value?.id,
 				modpack_name: serverProject.value?.title,
 			},
-			onOpen: () => console.log(`Opened survey notice: ${surveyNotice.value?.id}`),
+			onOpen: () => debug(`Opened survey notice: ${surveyNotice.value?.id}`),
 			onClose: async () => await dismissSurvey(),
 			onSubmit: (payload: unknown) => {
-				console.log('Form submitted:', payload)
+				debug('Form submitted:', payload)
 			},
 		}) satisfies TallyPopupOptions,
 )

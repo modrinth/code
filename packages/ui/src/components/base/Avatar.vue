@@ -6,9 +6,9 @@
 		:style="`--_size: ${cssSize}`"
 		:class="{
 			circle: circle,
-			detecting: !hasDetectedCorners,
+			detecting: padTransparentCorners && !hasDetectedCorners,
 			'no-shadow': noShadow,
-			padded: hasTransparentCorners && !circle && !disableConditionalIconPadding,
+			padded: padTransparentCorners && hasTransparentCorners,
 			raised: raised,
 			pixelated: pixelated,
 		}"
@@ -51,9 +51,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
-import { useFullImageContextMenu } from '../../composables'
+import { useDebugLogger, useFullImageContextMenu } from '../../composables'
 
 const onFullImageContextMenu = useFullImageContextMenu()
+const debug = useDebugLogger('Avatar')
 
 const pixelated = ref(false)
 const hasTransparentCorners = ref(false)
@@ -78,7 +79,7 @@ const props = withDefaults(
 		size?: string
 		circle?: boolean
 		noShadow?: boolean
-		disableConditionalIconPadding?: boolean
+		padTransparentCorners?: boolean
 		loading?: 'eager' | 'lazy'
 		raised?: boolean
 		tintBy?: string | null
@@ -90,7 +91,7 @@ const props = withDefaults(
 		size: '2rem',
 		circle: false,
 		noShadow: false,
-		disableConditionalIconPadding: false,
+		padTransparentCorners: false,
 		loading: 'eager',
 		raised: false,
 		tintBy: null,
@@ -141,7 +142,7 @@ function clearDetectionTimeout() {
 function onError(e) {
 	clearDetectionTimeout()
 	detectingSource = undefined
-	console.log('Avatar image failed to load:', props.src, e)
+	debug('Avatar image failed to load:', props.src, e)
 	failed.value = true
 }
 
@@ -150,14 +151,19 @@ function onLoad() {
 	if (!image) return
 	const source = image.currentSrc
 	if (detectingSource === source) return
-	detectingSource = source
-	clearDetectionTimeout()
 
 	if (image.naturalWidth && image.naturalWidth < 32) {
 		pixelated.value = true
 	} else {
 		pixelated.value = false
 	}
+
+	if (!props.padTransparentCorners) {
+		return
+	}
+
+	detectingSource = source
+	clearDetectionTimeout()
 
 	if (canReadImagePixels(source)) {
 		const transparentCorners = detectTransparentCorners(image)

@@ -70,6 +70,7 @@
 				size="xs"
 				no-shadow
 				:raised="raised"
+				pad-transparent-corners
 			/>
 			<div v-else class="backed-svg" :class="{ raised: raised }">
 				<BoxesIcon />

@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "继续"
   },
-  "admin.billing.error.not-found": {
-    "message": "用户不存在"
-  },
   "ads-consent.accept": {
     "message": "全部接受"
   },
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "批准并回复"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "关闭对话消息"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "关闭并回复"
@@ -2650,9 +2644,6 @@
   },
   "layout.action.file-lookup": {
     "message": "文件查询"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "通过电子邮箱查找"
   },
   "layout.action.manage-affiliates": {
     "message": "管理推广链接"

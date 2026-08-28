@@ -208,15 +208,9 @@
 			v-if="projectInstallContext"
 			:install-context="projectInstallContext"
 		/>
-		<ContextMenu ref="options" @option-clicked="handleOptionsClick">
-			<template #install>
-				<DownloadIcon /> {{ formatMessage(commonMessages.installButton) }}
-			</template>
-			<template #open_link>
-				<GlobeIcon /> {{ formatMessage(commonMessages.openInModrinthButton) }} <ExternalIcon />
-			</template>
-			<template #copy_link>
-				<ClipboardCopyIcon /> {{ formatMessage(commonMessages.copyLinkButton) }}
+		<ContextMenu ref="options" :label="formatMessage(messages.projectActionsLabel)">
+			<template #open_link="{ option }">
+				<GlobeIcon /> {{ option.label }} <ExternalIcon />
 			</template>
 		</ContextMenu>
 		<CreationFlowModal
@@ -260,6 +254,7 @@ import {
 	BrowseInstallHeader,
 	Button,
 	commonMessages,
+	ContextMenu,
 	CreationFlowModal,
 	defineMessages,
 	getTargetInstallPreferences,
@@ -287,7 +282,6 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import {
 	fetchCachedServerStatus,
@@ -353,6 +347,7 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	moreOptions: { id: 'app.project.more-options', defaultMessage: 'More options' },
+	projectActionsLabel: { id: 'app.project.actions.label', defaultMessage: 'Project actions' },
 	descriptionTab: { id: 'app.project.tab.description', defaultMessage: 'Description' },
 	versionsTab: { id: 'app.project.tab.versions', defaultMessage: 'Versions' },
 	galleryTab: { id: 'app.project.tab.gallery', defaultMessage: 'Gallery' },
@@ -926,36 +921,32 @@ async function install(version) {
 
 const options = ref(null)
 const handleRightClick = (event) => {
-	options.value.showMenu(event, data.value, [
+	const project = data.value
+	options.value.open(event, [
 		{
-			name: 'install',
+			id: 'install',
+			label: formatMessage(commonMessages.installButton),
+			icon: DownloadIcon,
+			action: () => install(null),
+		},
+		{ type: 'divider' },
+		{
+			id: 'open_link',
+			label: formatMessage(commonMessages.openInModrinthButton),
+			icon: GlobeIcon,
+			action: () => openProjectLink(project),
 		},
 		{
-			type: 'divider',
-		},
-		{
-			name: 'open_link',
-		},
-		{
-			name: 'copy_link',
+			id: 'copy_link',
+			label: formatMessage(commonMessages.copyLinkButton),
+			icon: ClipboardCopyIcon,
+			action: () => copyProjectLink(project),
 		},
 	])
 }
-const handleOptionsClick = (args) => {
-	switch (args.option) {
-		case 'install':
-			install(null)
-			break
-		case 'open_link':
-			openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
-			break
-		case 'copy_link':
-			navigator.clipboard.writeText(
-				`https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
-			)
-			break
-	}
-}
+const getProjectLink = (project) => `https://modrinth.com/${project.project_type}/${project.slug}`
+const openProjectLink = (project) => openUrl(getProjectLink(project))
+const copyProjectLink = (project) => navigator.clipboard.writeText(getProjectLink(project))
 </script>
 
 <style scoped lang="scss">

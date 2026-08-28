@@ -5,6 +5,7 @@ export { default as AppearingProgressBar } from './AppearingProgressBar.vue'
 export { default as AutoBrandIcon } from './AutoBrandIcon.vue'
 export { default as AutoLink } from './AutoLink.vue'
 export { default as Avatar } from './Avatar.vue'
+export { default as BackToParentLink } from './BackToParentLink.vue'
 export { default as Badge } from './Badge.vue'
 export { default as BaseTerminal } from './BaseTerminal.vue'
 export { default as BigOptionButton } from './BigOptionButton.vue'
@@ -12,6 +13,8 @@ export { default as BulletDivider } from './BulletDivider.vue'
 export { default as Button } from './buttons/Button.vue'
 export { default as ButtonGroup } from './buttons/ButtonGroup.vue'
 export { default as ButtonLink } from './buttons/ButtonLink.vue'
+export { default as CheckCircleButton } from './buttons/CheckCircleButton.vue'
+export { default as ContextMenu } from './buttons/ContextMenu.vue'
 export { default as FileButton } from './buttons/FileButton.vue'
 export { default as IconButton } from './buttons/IconButton.vue'
 export { default as SplitButton } from './buttons/SplitButton.vue'
@@ -20,14 +23,17 @@ export { default as TeleportPopoutMenu } from './buttons/TeleportPopoutMenu.vue'
 export type {
 	ButtonColor,
 	ButtonInteraction,
+	ButtonMenuAction,
+	ButtonMenuDivider,
+	ButtonMenuHeading,
+	ButtonMenuLeafOption,
+	ButtonMenuLink,
+	ButtonMenuOption,
+	ButtonMenuSubmenu,
 	ButtonNativeType,
 	ButtonSize,
 	ButtonType,
 	ButtonVisualProps,
-	OverflowMenuAction,
-	OverflowMenuDivider,
-	OverflowMenuLink,
-	OverflowMenuOption,
 	TeleportPlacement,
 } from './buttons/types'
 export { default as Card } from './Card.vue'
@@ -40,6 +46,7 @@ export { default as CollapsibleRegion } from './CollapsibleRegion.vue'
 export type { ComboboxOption, ComboboxSearchInputVariant } from './Combobox.vue'
 export { default as Combobox } from './Combobox.vue'
 export { default as CopyCode } from './CopyCode.vue'
+export { default as CopyLinkButton } from './CopyLinkButton.vue'
 export { default as DoubleIcon } from './DoubleIcon.vue'
 export { default as DropArea } from './DropArea.vue'
 export type { DropdownFilterBarCategory, DropdownFilterBarOption } from './DropdownFilterBar.vue'

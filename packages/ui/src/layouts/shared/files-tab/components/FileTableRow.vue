@@ -62,35 +62,6 @@
 						:options="menuOptions"
 					>
 						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-						<template #copy-filename
-							><ClipboardCopyIcon />
-							{{ formatMessage(commonMessages.copyFilenameButton) }}</template
-						>
-						<template #copy-full-path
-							><ClipboardCopyIcon />
-							{{ formatMessage(commonMessages.copyFullPathButton) }}</template
-						>
-						<template #open-in-folder
-							><FolderOpenIcon /> {{ formatMessage(commonMessages.openInFolderButton) }}</template
-						>
-						<template #extract
-							><PackageOpenIcon /> {{ formatMessage(commonMessages.extractButton) }}</template
-						>
-						<template #rename
-							><EditIcon /> {{ formatMessage(commonMessages.renameButton) }}</template
-						>
-						<template #move
-							><RightArrowIcon /> {{ formatMessage(commonMessages.moveButton) }}</template
-						>
-						<template #download
-							><DownloadIcon />
-							{{
-								ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton)
-							}}</template
-						>
-						<template #delete
-							><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template
-						>
 					</TeleportOverflowMenu>
 				</div>
 			</div>
@@ -117,6 +88,7 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useFormatBytes } from '#ui/composables'
@@ -168,7 +140,7 @@ const emit = defineEmits<{
 		e: 'moveDirectTo',
 		item: Pick<FileItem, 'name' | 'type' | 'path'> & { destination: string },
 	): void
-	(e: 'contextmenu', x: number, y: number): void
+	(e: 'contextmenu', event: MouseEvent, options: ButtonMenuOption[]): void
 	(e: 'toggle-select'): void
 }>()
 
@@ -205,13 +177,13 @@ const containerClasses = computed(() => {
 
 const fileExtension = computed(() => getFileExtension(props.name))
 
-const isZip = computed(() => fileExtension.value === 'zip')
+const canExtract = computed(() => fileExtension.value === 'zip' && !!ctx.extractFile)
 
 function getFullPath() {
 	return joinDisplayPath(ctx.basePath?.value, props.path)
 }
 
-const menuOptions = computed(() => {
+const menuOptions = computed<ButtonMenuOption[]>(() => {
 	const item = { name: props.name, type: props.type, path: props.path }
 	const wd = props.writeDisabled
 	const wdTooltip = props.writeDisabledTooltip
@@ -248,15 +220,17 @@ const menuOptions = computed(() => {
 		{
 			id: 'extract',
 			label: formatMessage(commonMessages.extractButton),
-			shown: isZip.value,
+			icon: PackageOpenIcon,
+			shown: canExtract.value,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('extract', item),
 		},
-		{ type: 'divider', shown: isZip.value },
+		{ type: 'divider', shown: canExtract.value },
 		{
 			id: 'rename',
 			label: formatMessage(commonMessages.renameButton),
+			icon: EditIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('rename', item),
@@ -264,6 +238,7 @@ const menuOptions = computed(() => {
 		{
 			id: 'move',
 			label: formatMessage(commonMessages.moveButton),
+			icon: RightArrowIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('move', item),
@@ -271,12 +246,14 @@ const menuOptions = computed(() => {
 		{
 			id: 'download',
 			label: ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton),
+			icon: DownloadIcon,
 			action: () => emit('download', item),
 			shown: props.type !== 'directory',
 		},
 		{
 			id: 'delete',
 			label: formatMessage(commonMessages.deleteLabel),
+			icon: TrashIcon,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('delete', item),
@@ -327,7 +304,7 @@ const formattedSize = computed(() => {
 
 function openContextMenu(event: MouseEvent) {
 	event.preventDefault()
-	emit('contextmenu', event.clientX, event.clientY)
+	emit('contextmenu', event, menuOptions.value)
 }
 
 function handleMouseEnter() {

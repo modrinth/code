@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Pokračovat"
   },
-  "admin.billing.error.not-found": {
-    "message": "Uživatel nebyl nalezen"
-  },
   "ads-consent.accept": {
     "message": "Přijmout vše"
   },
@@ -919,9 +916,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Schválit s odpovědí"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Uzavřít vlákno"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Uzavřít s odpovědí"
