@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "查看内容披露"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，让描述详尽清晰。"
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "扩展描述"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "编辑描述"
   },

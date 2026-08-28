@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "تحقق من إفصاحات المحتوى"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "وصفك هو {length, plural, one {# readable character} other {# readable characters}}. يُوصى بأن يكون على الأقل {minChars, plural, one {# character}other{#characters}} لإنشاء وصف واضح وغني بالمعلومات."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "قم بتوسيع الوصف"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "تعديل الوصف"
   },

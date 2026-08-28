@@ -35,12 +35,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selectează etichete precise"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Descrierea dumneavoastră este {length, plural, one {# caracter lizibil} other {# caractere lizibile}}. Măcar {minChars, plural, one {# caracter este} other {# caractere sunt}} recomandate pentru a creea o descriere clară și informativă."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Extinde descrierea"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Editează descrierea"
   },

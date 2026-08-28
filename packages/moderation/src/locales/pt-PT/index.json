@@ -41,12 +41,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleciona etiquetas adequadas"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "A tua descrição tem {length, plural, one {# caractere legível} other {# caracteres legíveis}}. Pelo menos {minChars, plural, one {# caractere} other {# caracteres}} são recomendados para criar uma descrição clara e informativa."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Expande a descrição"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Edita a descrição"
   },

@@ -35,12 +35,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Vælg præcise tags"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Din beskrivelse er {length, plural, one {# læsligt bogstav} other {# læslige bogstaver}}. Som minimum er {minChars, plural, one {# bogstav} other {# bogstaver}} anbefalet for at lave en klar og informativ beskrivelse."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Forlæng beskrivelsen"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Rediger beskrivelsen"
   },

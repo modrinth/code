@@ -41,12 +41,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Velg aktuelle tagger"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Din beskrivelse inneholder {length, plural, one {# leselig tegn} other {# leselige tegn}}. Minst {minChars, plural, one {# tegn} other {# tegn}} er anbefalt for å lage en klar og informativ beskrivelse."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Utvid beskrivelsen"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Rediger beskrivelse"
   },

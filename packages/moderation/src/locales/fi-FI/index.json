@@ -32,9 +32,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Valitse sopivat tagit"
   },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Laajenna kuvausta"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Muokkaa kuvausta"
   },

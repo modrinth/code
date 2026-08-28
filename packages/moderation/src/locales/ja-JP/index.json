@@ -50,12 +50,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "コンテンツの開示を確認"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "説明文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい説明文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "説明を展開する"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "説明を編集する"
   },

@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Verificar divulgações de conteúdo"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Sua descrição possui {length, plural, one {apenas # caractere legível} other {apenas # caracteres legíveis}}. No mínimo, {minChars, plural, one {# caractere é recomendado} other {# characteres são recomendados}} para criar uma descrição concisa e informativa."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Expandir a descrição"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Edite a descrição"
   },

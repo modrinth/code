@@ -9,6 +9,7 @@ import {
 	hostnameMatchesDomain,
 	isIpAddress,
 } from '../../validators/links/syntax-checks.ts'
+import { validateSpam } from '../../validators/spam/index.ts'
 import { evaluateRules } from '../evaluate-rules.ts'
 import {
 	evaluateNonStandardText,
@@ -32,6 +33,10 @@ const messages = defineMessages({
 	expandDescription: {
 		id: 'nags.description-too-short.title',
 		defaultMessage: 'Expand the description',
+	},
+	removeSpam: {
+		id: 'nags.project-description-spam.title',
+		defaultMessage: 'Remove spam from the description',
 	},
 	shortenHeaders: {
 		id: 'nags.long-headers.title',
@@ -69,7 +74,12 @@ const messages = defineMessages({
 	tooShort: {
 		id: 'nags.description-too-short.description',
 		defaultMessage:
-			'Your description is {length, plural, one {# readable character} other {# readable characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create a clear and informative description.',
+			"Your description is too brief. Add more to clearly describe the project's purpose and function.",
+	},
+	spam: {
+		id: 'nags.project-description-spam.description',
+		defaultMessage:
+			'Repeated characters, words, or phrases cannot be used to pad a project description.',
 	},
 	longHeaders: {
 		id: 'nags.long-headers.description',
@@ -85,7 +95,7 @@ const messages = defineMessages({
 
 export const DESCRIPTION_MAX_PROFANITY_COUNT = 2
 export const DESCRIPTION_NON_STANDARD_TEXT_FAILURE_THRESHOLD = 0.05
-export const MIN_DESCRIPTION_CHARS = 200
+export const MIN_DESCRIPTION_CHARS = 125
 export const MAX_HEADER_LENGTH = 80
 export const BANNED_DESCRIPTION_LINK_DOMAINS = [...URL_SHORTENERS] as const
 
@@ -141,21 +151,29 @@ export function analyzeHeaderLength(markdown: string): {
 	return { hasLongHeaders: longHeaders.length > 0, longHeaders }
 }
 
-export function countText(markdown: string): number {
-	if (!markdown) return 0
+export function extractDescriptionText(markdown: string): string {
+	if (!markdown) return ''
 
 	const withoutCode = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
 	const withoutImagesAndLinks = withoutCode
-		.replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
+		.replace(/!\[([^\]]*)]\([^)]+\)/g, '$1')
 		.replace(/\[[^\]]*]\([^)]+\)/g, ' ')
-	const withoutHtml = withoutImagesAndLinks.replace(/<[^>]+>/g, ' ')
+	const withHtmlImageAltText = withoutImagesAndLinks.replace(/<img[^>]*>/gi, (image) => {
+		const altMatch = image.match(/alt\s*=\s*(?:"([^"]*)"|'([^']*)')/i)
+		return altMatch?.[1] ?? altMatch?.[2] ?? ' '
+	})
+	const withoutHtml = withHtmlImageAltText.replace(/<[^>]+>/g, ' ')
 	const withoutMarkdownSyntax = withoutHtml
 		.replace(/^(?:>[ \t]?)+/gm, '')
 		.replace(/^#{1,6}\s+/gm, ' ')
 		.replace(/[*_~`>-]/g, ' ')
 		.replace(/\|/g, ' ')
 
-	return withoutMarkdownSyntax.replace(/\s+/g, ' ').trim().length
+	return withoutMarkdownSyntax.replace(/\s+/g, ' ').trim()
+}
+
+export function countText(markdown: string): number {
+	return extractDescriptionText(markdown).length
 }
 
 export function analyzeImageContent(markdown: string): {
@@ -220,6 +238,32 @@ export const projectDescriptionValidationRules = {
 			nag: { title: messages.addDescription, ...commonNagPresentation },
 		},
 	},
+	'description-too-short': {
+		severity: 'error',
+		evaluate: (description) => {
+			const normalized = normalizeProjectFieldText(description ?? '')
+			if (!normalized) return { valid: true }
+
+			const length = countText(normalized)
+			return length >= MIN_DESCRIPTION_CHARS
+				? { valid: true }
+				: { valid: false, values: { length, minChars: MIN_DESCRIPTION_CHARS } }
+		},
+		presentation: {
+			message: messages.tooShort,
+			nag: { title: messages.expandDescription, ...commonNagPresentation },
+		},
+	},
+	'project-description-spam': {
+		severity: 'error',
+		evaluate: (description) => ({
+			valid: validateSpam(extractDescriptionText(description ?? '')).valid,
+		}),
+		presentation: {
+			message: messages.spam,
+			nag: { title: messages.removeSpam, ...commonNagPresentation },
+		},
+	},
 	'project-description-banned-link': {
 		severity: 'error',
 		evaluate: (description) => {
@@ -233,23 +277,6 @@ export const projectDescriptionValidationRules = {
 		presentation: {
 			message: messages.bannedLink,
 			nag: { title: messages.fixDescription, ...commonNagPresentation },
-		},
-	},
-	'description-too-short': {
-		severity: 'warning',
-		evaluate: (description) => {
-			const normalized = normalizeProjectFieldText(description ?? '')
-			if (!normalized) return { valid: true }
-			const length = countText(normalized)
-			if (length < MIN_DESCRIPTION_CHARS) {
-				return { valid: false, values: { length, minChars: MIN_DESCRIPTION_CHARS } }
-			} else {
-				return { valid: true }
-			}
-		},
-		presentation: {
-			message: messages.tooShort,
-			nag: { title: messages.expandDescription, ...commonNagPresentation },
 		},
 	},
 	'long-headers': {

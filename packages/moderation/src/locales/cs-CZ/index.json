@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Zkontrolovat zveřejnění obsahu"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Rozšiřte popis"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Upravte popis"
   },

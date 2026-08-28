@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecteer relevante tags"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Je beschrijving is {length, plural, one{# leesbare tekens}other {# leesbare tekens}}. Ten minste {minChars, plural, one {# teken}other {# tekens}} is aangeraden om een duidelijke en informatieve beschrijving te maken."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Verleng de beschrijving"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Pas de beschrijving aan"
   },

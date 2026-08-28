@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Ellenőrizd a tartalomnyilatkozatokat"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "A jelenlegi leírás {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Fejtsd ki a leírást"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Leírás szerkesztése"
   },

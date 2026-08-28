@@ -81,14 +81,14 @@ test('collects every matching project name rule', () => {
 	)
 	assert.deepEqual(matches[0]?.values, { value: 'fuck' })
 	assert.equal(matches[1]?.rule.severity, 'error')
-	assert.equal(matches[2]?.rule.severity, 'warning')
+	assert.equal(matches[2]?.rule.severity, 'error')
 })
 
 test('derives project name field presentation from the matching rule', () => {
 	assert.deepEqual(validateProjectNameField('Minecraft'), [
 		{
 			code: 'minecraft-title-clause',
-			severity: 'warning',
+			severity: 'error',
 			message: {
 				id: 'nags.minecraft-title-clause.description',
 				defaultMessage:
@@ -103,7 +103,7 @@ test('derives project name nags from the same matching rule', () => {
 	const [nag] = toNags(evaluateRules('Minecraft', projectNameValidationRules))
 
 	assert.equal(nag?.id, 'minecraft-title-clause')
-	assert.equal(nag?.status, 'warning')
+	assert.equal(nag?.status, 'required')
 	assert.equal(nag?.title.id, 'nags.minecraft-title-clause.title')
 	assert.equal(nag?.link?.path, 'settings')
 	assert.equal(nag?.link?.title.id, 'nags.edit-title.title')
@@ -116,7 +116,7 @@ test('validates summary content from one rule set', () => {
 			({ code, severity }) => ({ code, severity }),
 		),
 		[
-			{ code: 'summary-too-short', severity: 'warning' },
+			{ code: 'summary-too-short', severity: 'error' },
 			{ code: 'summary-special-formatting', severity: 'error' },
 		],
 	)
@@ -126,6 +126,16 @@ test('validates summary content from one rule set', () => {
 			name: 'Project title',
 		}),
 		[],
+	)
+})
+
+test('rejects repeated summary padding', () => {
+	assert.deepEqual(
+		validateProjectSummary({
+			summary: 'Useful project! '.repeat(3),
+			name: 'Project title',
+		}).map(({ code }) => code),
+		['project-summary-spam'],
 	)
 })
 
@@ -178,7 +188,26 @@ test('validates description requirements and simultaneous recommendations', () =
 	const description = `${'# '.concat('A'.repeat(81))}\n![](one.png)\n![](two.png)\n![](three.png)\n![](four.png)`
 	assert.deepEqual(
 		validateProjectDescription(description).map(({ code }) => code),
-		['description-too-short', 'long-headers', 'missing-alt-text'],
+		['description-too-short', 'project-description-spam', 'long-headers', 'missing-alt-text'],
+	)
+})
+
+test('requires 125 readable description characters', () => {
+	const description =
+		'This project adds useful tools, flexible behavior, accessible documentation, polished gameplay, and support for every player.'
+
+	assert.equal(countText(description), MIN_DESCRIPTION_CHARS)
+	assert.deepEqual(
+		validateProjectDescription(description.slice(0, -1)).map(({ code }) => code),
+		['description-too-short'],
+	)
+	assert.deepEqual(validateProjectDescription(description), [])
+})
+
+test('rejects repeated description padding', () => {
+	assert.deepEqual(
+		validateProjectDescription('Useful project! '.repeat(10)).map(({ code }) => code),
+		['project-description-spam'],
 	)
 })
 
@@ -190,10 +219,20 @@ test('requires alt text for description images', () => {
 	assert.deepEqual(analyzeImageContent('<img src="screenshot.png">'), { hasEmptyAltText: true })
 })
 
+test('counts image alt text as readable description text', () => {
+	assert.equal(countText('![Project screenshot](screenshot.png)'), 'Project screenshot'.length)
+	assert.equal(
+		countText('<img src="screenshot.png" alt="Project screenshot">'),
+		'Project screenshot'.length,
+	)
+})
+
 test('counts blockquote content as readable description text', () => {
 	assert.equal(countText('> Quoted text'), 'Quoted text'.length)
 
-	const quotedDescription = `> ${'A'.repeat(MIN_DESCRIPTION_CHARS)}`
+	const quotedDescription =
+		'> This project adds useful tools, flexible behavior, accessible documentation, polished gameplay, and support for every player.'
+	assert.equal(countText(quotedDescription), MIN_DESCRIPTION_CHARS)
 	assert.equal(
 		validateProjectDescription(quotedDescription).some(
 			({ code }) => code === 'description-too-short',

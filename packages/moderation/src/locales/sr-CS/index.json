@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Proverite obaveštenja o sadržaju"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Tvoj opis je {length, plural, one {# čitljiv karakter} few {# čitljiva karaktera} other {# čitljivih karaktera}}. Barem {minChars, plural, one {# karakter} other {# karaktera}} je preporučeno kreiranje jasnog i informativnog opisa."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Proširi opis"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Promeni opis"
   },

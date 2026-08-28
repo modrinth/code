@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Перевірте маркування вмісту"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Ваш опис містить {length, plural, one {# видимий символ} few {# видимі символів} other {# видимих символів}}. Радимо щонайменше {minChars, plural, one {# символ} few {# символи} other {# символів}} для чіткого й змістовного опису."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Доповніть опис"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Відредагуйте опис"
   },

@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Läs innehållsinformation"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Din beskrivning är {length, plural, one {# tecken} other {# tecken}} lång. Minst {minChars, plural, one {# tecken} other {# tecken}} rekommenderas för en klar och informativ beskrivning."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Utöka beskrivningen"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Redigera beskrivning"
   },

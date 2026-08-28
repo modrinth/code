@@ -3,6 +3,7 @@ import LinkifyIt from 'linkify-it'
 import tlds from 'tlds' with { type: 'json' }
 
 import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
+import { validateSpam } from '../../validators/spam/index.ts'
 import { evaluateRules } from '../evaluate-rules.ts'
 import {
 	evaluateNonStandardText,
@@ -26,6 +27,10 @@ const messages = defineMessages({
 	expandSummary: {
 		id: 'nags.summary-too-short.title',
 		defaultMessage: 'Expand the summary',
+	},
+	removeSpam: {
+		id: 'nags.project-summary-spam.title',
+		defaultMessage: 'Remove spam from the summary',
 	},
 	cleanUpSummary: {
 		id: 'nags.summary-special-formatting.title',
@@ -54,7 +59,12 @@ const messages = defineMessages({
 	tooShort: {
 		id: 'project.text-validation.summary-too-short',
 		defaultMessage:
-			'Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary.',
+			'Your summary is too short. Add a sentence or two which describes your project.',
+	},
+	spam: {
+		id: 'nags.project-summary-spam.description',
+		defaultMessage:
+			'Repeated characters, words, or phrases cannot be used to pad a project summary.',
 	},
 	specialFormatting: {
 		id: 'nags.summary-special-formatting.description',
@@ -157,6 +167,16 @@ export const projectSummaryValidationRules = {
 		presentation: {
 			message: messages.tooShort,
 			nag: { title: messages.expandSummary, ...commonNagPresentation },
+		},
+	},
+	'project-summary-spam': {
+		severity: 'error',
+		evaluate: ({ summary }) => ({
+			valid: validateSpam(normalizeProjectFieldText(summary ?? '')).valid,
+		}),
+		presentation: {
+			message: messages.spam,
+			nag: { title: messages.removeSpam, ...commonNagPresentation },
 		},
 	},
 	'summary-special-formatting': {

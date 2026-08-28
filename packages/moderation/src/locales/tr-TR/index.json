@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "İçerikle ilgili uyarıları kontrol edin"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Açıklamanız {length, plural, one {# okunabilir karakter} other {# okunabilir karakter}} uzunluğunda. Net ve bilgilendirici bir açıklama oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Açıklamayı genişlet"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Açıklamayı düzenle"
   },

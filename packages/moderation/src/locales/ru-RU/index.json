@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Проверьте маркировку"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Описание содержит {length, plural, one {# читаемый символ} few {# читаемых символа} other {# читаемых символов}}. Для ясного и информативного описания рекомендуется не менее {minChars, plural, one {# символа} other {# символов}}."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Расширьте описание"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Изменить описание"
   },

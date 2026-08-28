@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "בחר תגיות מדויקות"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "התיאור שלך הוא {length, plural, one {# דמות} other {# דמויות}}. מומלץ להשתמש לפחות ב-{minChars, plural, one {# דמות} other {# דמויות}} כדי ליצור תיאור ברור ואינפורמטיבי."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "הרחב את התיאור"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "ערוך תיאור"
   },

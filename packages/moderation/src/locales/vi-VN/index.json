@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Chọn các thẻ chính xác"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Mô tả của bạn hiện có {length, plural, one {# ký tự có thể đọc} other {# ký tự có thể đọc}}. Khuyến nghị nên có ít nhất {minChars, plural, one {# ký tự} other {# ký tự}} để tạo ra một mô tả rõ ràng và đầy đủ thông tin."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Mở rộng mô tả"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Chỉnh sửa mô tả"
   },

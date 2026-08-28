@@ -35,12 +35,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Pilih tag yang tepat"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Panjang keterangan anda ialah {length, plural, other {# aksara yang boleh dibaca}}. Sekurang-kurangnya {minChars, plural, other {# aksara}} disyorkan untuk membuat keterangan yang jelas dan bermaklumat."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Kembangkan keterangan"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Sunting keterangan"
   },

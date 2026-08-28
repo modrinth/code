@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Twój opis składa się z {length, plural, one {# czytenego znaku} other {# czytelnych znaków}}. Zalecane jest użycie chociaż {minChars, plural, one {# znaku} other {# znaków}} by stworzyć przejrzysty i informatywny opis."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Rozwiń opis"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Edytuj opis"
   },

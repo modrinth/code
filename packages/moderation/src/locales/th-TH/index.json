@@ -14,9 +14,6 @@
   "nags.add-links.title": {
     "defaultMessage": "เพิ่มลิงก์ภายนอก"
   },
-  "nags.description-too-short.title": {
-    "defaultMessage": "เพิ่มคำอธิบาย"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "แก้ไขคำอธิบาย"
   },

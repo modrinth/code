@@ -35,12 +35,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Pumili ng mga pinaktumpak na tag"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Ang iyong paglalarawan ay may {length, plural, one {# mababasang titik} other {# na mababasang titik}}. Hindi kumulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paglikha ng maliwanag at makabuluhang paglalarawan."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Palawakin ang paglalarawan"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Baguhin ang paglalarawan"
   },

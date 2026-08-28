@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Angaben zum Inhalt prüfen"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Deine Beschreibung enthält {length, plural, one {# lesbares Zeichen} other {# lesbare Zeichen}}. Es wird empfohlen, mindestens {minChars, plural, one {# Zeichen} other {# Zeichen}} zu verwenden, um eine klare und informative Beschreibung zu erstellen."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Beschreibung erweitern"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Beschreibung bearbeiten"
   },

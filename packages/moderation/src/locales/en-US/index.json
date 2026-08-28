@@ -60,7 +60,7 @@
     "defaultMessage": "Check content disclosures"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Your description is {length, plural, one {# readable character} other {# readable characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create a clear and informative description."
+    "defaultMessage": "Your description is too brief. Add more to clearly describe the project's purpose and function."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expand the description"
@@ -245,6 +245,12 @@
   "nags.project-description-slur.description": {
     "defaultMessage": "Your project cannot contain any slurs. Detected: “{value}”."
   },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "Repeated characters, words, or phrases cannot be used to pad a project description."
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "Remove spam from the description"
+  },
   "nags.project-name-non-standard-text.description": {
     "defaultMessage": "Non-standard text characters, such as “₮ɆӾ₮”, are not allowed."
   },
@@ -268,6 +274,12 @@
   },
   "nags.project-summary-slur.description": {
     "defaultMessage": "Your project summary cannot contain any slurs. Detected: “{value}”."
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "Repeated characters, words, or phrases cannot be used to pad a project summary."
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "Remove spam from the summary"
   },
   "nags.review-permissions.description": {
     "defaultMessage": "Make sure you have provided proof of your permission to distribute any external content in your Modpack."
@@ -390,7 +402,7 @@
     "defaultMessage": "A project summary cannot be the same as it's title."
   },
   "project.text-validation.summary-too-short": {
-    "defaultMessage": "Your summary is {length, plural, one {# character} other {# characters}}. At least {minChars, plural, one {# character} other {# characters}} is recommended to create an informative and enticing summary."
+    "defaultMessage": "Your summary is too short. Add a sentence or two which describes your project."
   },
   "project.text-validation.title-version-number": {
     "defaultMessage": "Names are not allowed to include version numbers."
