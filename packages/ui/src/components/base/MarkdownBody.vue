@@ -37,6 +37,7 @@ import MarkdownCollectionEmbed from './markdown/MarkdownCollectionEmbed.vue'
 import MarkdownHighlightedPre from './markdown/MarkdownHighlightedPre.vue'
 import MarkdownOrganizationEmbed from './markdown/MarkdownOrganizationEmbed.vue'
 import MarkdownProjectEmbed from './markdown/MarkdownProjectEmbed.vue'
+import MarkdownTaskCheckbox from './markdown/MarkdownTaskCheckbox.vue'
 import MarkdownUserEmbed from './markdown/MarkdownUserEmbed.vue'
 
 defineOptions({
@@ -82,6 +83,7 @@ const components = computed(() =>
 				user: MarkdownUserEmbed,
 				organization: MarkdownOrganizationEmbed,
 				collection: MarkdownCollectionEmbed,
+				input: MarkdownTaskCheckbox,
 				...(props.highlight ? { pre: MarkdownHighlightedPre } : {}),
 			},
 )

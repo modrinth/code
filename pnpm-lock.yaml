@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  comark@0.6.2:
+    hash: 4e73fba3ed127a788219ec2e7a413966f48fc7695802a1b0f2694ef2686d475c
+    path: patches/comark@0.6.2.patch
   readable-stream@2.3.8:
     hash: 3045f7adf989b4e668a4a13819b7285b0de186b79bbf22408acaf2a41c6eaa86
     path: patches/readable-stream@2.3.8.patch
@@ -708,7 +711,7 @@ importers:
         version: 4.7.0
       comark:
         specifier: ^0.6.2
-        version: 0.6.2
+        version: 0.6.2(patch_hash=4e73fba3ed127a788219ec2e7a413966f48fc7695802a1b0f2694ef2686d475c)
       dayjs:
         specifier: ^1.11.10
         version: 1.11.19
@@ -718,12 +721,12 @@ importers:
       es-toolkit:
         specifier: ^1.44.0
         version: 1.44.0
-      flatpickr:
-        specifier: ^4.6.13
-        version: 4.6.13
       fabric:
         specifier: ^7.4.0
         version: 7.4.0
+      flatpickr:
+        specifier: ^4.6.13
+        version: 4.6.13
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(@nuxt/kit@3.21.0(magicast@0.5.1))(vue@3.5.27(typescript@5.9.3))
@@ -859,7 +862,7 @@ importers:
         version: 0.172.0
       comark:
         specifier: ^0.6.2
-        version: 0.6.2
+        version: 0.6.2(patch_hash=4e73fba3ed127a788219ec2e7a413966f48fc7695802a1b0f2694ef2686d475c)
       dayjs:
         specifier: ^1.11.10
         version: 1.11.19
@@ -869,6 +872,9 @@ importers:
       highlightjs-mcfunction:
         specifier: github:modrinth/better-highlightjs-mcfunction
         version: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e
+      htmlparser2:
+        specifier: ^12.0.0
+        version: 12.0.0
       ofetch:
         specifier: ^1.3.4
         version: 1.5.1
@@ -882,6 +888,9 @@ importers:
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:../tooling-config
+      '@types/markdown-it':
+        specifier: 14.1.2
+        version: 14.1.2
 
 packages:
 
@@ -4684,6 +4693,9 @@ packages:
 
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
+
+  '@types/markdown-it@14.1.2':
+    resolution: {integrity: sha512-promo4eFwuiW+TfGxhi+0x3czqTYJkG8qB17ZUJiVF10Xm7NLVRSLUsfRTU/6h1e24VvRnXCx+hG7li58lkzog==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -10419,8 +10431,8 @@ packages:
   vue-component-type-helpers@3.2.4:
     resolution: {integrity: sha512-05lR16HeZDcDpB23ku5b5f1fBOoHqFnMiKRr2CiEvbG5Ux4Yi0McmQBOET0dR0nxDXosxyVqv67q6CzS3AK8rw==}
 
-  vue-component-type-helpers@3.3.10:
-    resolution: {integrity: sha512-t7IQivQ3oD4D01b7s7a9AWzHAcr3DGBIa/1jZREsFQJcFgSL92gqUkqNiHTYgzTt7QDuJa0I9wCeDwEtZICoBQ==}
+  vue-component-type-helpers@3.3.11:
+    resolution: {integrity: sha512-LwcxzeliO9fkQcpJG0PoX8X5kmAhKmH9wkpDLxNabwzkQ9Zeib2YVHwFV4pcWmMLfXVfjr/dSV+DaJ3cIPgSNA==}
 
   vue-confetti-explosion@1.0.2:
     resolution: {integrity: sha512-80OboM3/6BItIoZ6DpNcZFqGpF607kjIVc5af56oKgtFmt5yWehvJeoYhkzYlqxrqdBe0Ko4Ie3bWrmLau+dJw==}
@@ -10714,11 +10726,6 @@ packages:
 
   xmlchars@2.2.0:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
-
-  xss@1.0.15:
-    resolution: {integrity: sha512-FVdlVVC67WOIPvfOwhoMETV72f6GbW7aOabBC3WxN/oUdoEMDyLz4OgRv5/gck2ZeNqEQu+Tb0kloovXOfpYVg==}
-    engines: {node: '>= 0.10.0'}
-    hasBin: true
 
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
@@ -11303,13 +11310,13 @@ snapshots:
 
   '@comark/html@0.6.2':
     dependencies:
-      comark: 0.6.2
+      comark: 0.6.2(patch_hash=4e73fba3ed127a788219ec2e7a413966f48fc7695802a1b0f2694ef2686d475c)
     transitivePeerDependencies:
       - rangi
 
   '@comark/vue@0.6.2(vue@3.5.27(typescript@5.9.3))':
     dependencies:
-      comark: 0.6.2
+      comark: 0.6.2(patch_hash=4e73fba3ed127a788219ec2e7a413966f48fc7695802a1b0f2694ef2686d475c)
       vue: 3.5.27(typescript@5.9.3)
     transitivePeerDependencies:
       - rangi
@@ -14179,7 +14186,7 @@ snapshots:
       storybook: 10.2.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       type-fest: 2.19.0
       vue: 3.5.27(typescript@5.9.3)
-      vue-component-type-helpers: 3.3.10
+      vue-component-type-helpers: 3.3.11
 
   '@stripe/stripe-js@7.9.0': {}
 
@@ -14517,6 +14524,11 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/linkify-it@5.0.0': {}
+
+  '@types/markdown-it@14.1.2':
+    dependencies:
+      '@types/linkify-it': 5.0.0
+      '@types/mdurl': 2.0.0
 
   '@types/mdast@4.0.4':
     dependencies:
@@ -15939,7 +15951,7 @@ snapshots:
 
   colord@2.9.3: {}
 
-  comark@0.6.2:
+  comark@0.6.2(patch_hash=4e73fba3ed127a788219ec2e7a413966f48fc7695802a1b0f2694ef2686d475c):
     dependencies:
       entities: 8.0.0
       htmlparser2: 12.0.0
@@ -21616,7 +21628,7 @@ snapshots:
 
   vue-component-type-helpers@3.2.4: {}
 
-  vue-component-type-helpers@3.3.10: {}
+  vue-component-type-helpers@3.3.11: {}
 
   vue-confetti-explosion@1.0.2(vue@3.5.27(typescript@5.9.3)):
     dependencies:
@@ -21919,11 +21931,6 @@ snapshots:
 
   xmlchars@2.2.0:
     optional: true
-
-  xss@1.0.15:
-    dependencies:
-      commander: 2.20.3
-      cssfilter: 0.0.10
 
   xtend@4.0.2: {}
 

@@ -10,7 +10,8 @@
 	},
 	"devDependencies": {
 		"@modrinth/api-client": "workspace:*",
-		"@modrinth/tooling-config": "workspace:*"
+		"@modrinth/tooling-config": "workspace:*",
+		"@types/markdown-it": "14.1.2"
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.3.2",
@@ -24,6 +25,7 @@
 		"dayjs": "^1.11.10",
 		"highlight.js": "^11.9.0",
 		"highlightjs-mcfunction": "github:modrinth/better-highlightjs-mcfunction",
+		"htmlparser2": "^12.0.0",
 		"ofetch": "^1.3.4",
 		"three": "^0.172.0"
 	}

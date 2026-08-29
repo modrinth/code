@@ -825,15 +825,8 @@ a:not(.no-click-animation),
 		padding-block-start: 0;
 	}
 
-	blockquote,
-	details,
-	dl,
-	ol,
-	p,
-	code,
-	pre,
-	table,
-	ul {
+
+	> * {
 		margin-top: 0;
 		margin-bottom: 16px;
 	}
@@ -844,13 +837,31 @@ a:not(.no-click-animation),
 		line-height: 1.5;
 	}
 
-	ul.contains-task-list,
-	li.task-list-item {
-		list-style: none;
+	p {
+		margin-top: 0;
+		margin-bottom: 16px;
 	}
 
-	.task-list-item-checkbox {
-		margin-right: 0.5em;
+	ul {
+		list-style: disc;
+		padding-left: 1.5em;
+
+		ul {
+			list-style: circle;
+
+			ul {
+				list-style: square;
+			}
+		}
+	}
+
+	ol {
+		list-style: decimal;
+		padding-left: 1.5em;
+	}
+
+	li.task-list-item {
+		list-style: none;
 	}
 
 	h1 {

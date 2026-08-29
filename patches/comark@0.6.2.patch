@@ -1,0 +1,21 @@
+diff --git a/dist/internal/parse/token-processor.js b/dist/internal/parse/token-processor.js
+index 440841f8d9252067681f09df935dd0287fff2cf0..71c44f24a932a1f900329800f28029206aa5a13f 100644
+--- a/dist/internal/parse/token-processor.js
++++ b/dist/internal/parse/token-processor.js
+@@ -483,6 +483,20 @@ function processBlockChildren(tokens, startIndex, closeType, inlineOnly, inHeadi
+             }
+             i++;
+         }
++        else if (token.type === 'paragraph_open' && token.hidden) {
++            i++;
++            if (tokens[i] && tokens[i].type === 'inline') {
++                nodes.push(...processInlineTokens(tokens[i].children || [], inHeading));
++                i++;
++            }
++            if (tokens[i] && tokens[i].type === 'paragraph_close') {
++                i++;
++            }
++        }
+         else {
+             const result = processBlockToken(tokens, i, insideNestedContext, state);
+             i = result.nextIndex;
