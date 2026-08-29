@@ -95,6 +95,8 @@ hex = "0.4.3"
 hickory-resolver = "0.25.2"
 hmac = "0.12.1"
 httpdate = "1.0.3"
+subsecond = "0.7.10"
+dioxus-devtools = "0.7.10"
 hyper = "1.7.0"
 hyper-rustls = { version = "0.27.7", default-features = false, features = [
   "aws-lc-rs",

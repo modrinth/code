@@ -76,7 +76,8 @@ pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(super::teams::team_members_get_project)
         .service(super::versions::version_list)
         .service(super::versions::version_project_get)
-        .service(dependency_list);
+        .service(dependency_list)
+        .service(validate::validate);
 }
 
 pub async fn clear_project_cache_and_queue_search(

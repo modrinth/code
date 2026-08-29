@@ -29,8 +29,10 @@ base64 = { workspace = true }
 bitflags = { workspace = true }
 bytes = { workspace = true }
 censor = { workspace = true }
+dioxus-devtools = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 chumsky = { workspace = true }
+subsecond = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 clickhouse = { workspace = true, features = ["time", "uuid"] }
 color-eyre = { workspace = true }
