@@ -207,10 +207,10 @@ pub async fn report_create(
             .wrap_internal_err("querying database for `report_create`")?;
 
             if !result.exists.unwrap_or(false) {
-                return Err(ApiError::Request(eyre::eyre!(format!(
+                return Err(ApiError::Request(eyre::eyre!(
                     "Organization could not be found: {}",
                     new_report.item_id
-                ))));
+                )));
             }
 
             report.organization_id = Some(organization_id.into())
