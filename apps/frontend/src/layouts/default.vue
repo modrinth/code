@@ -970,13 +970,10 @@ const showTinMismatchBanner = computed(() => {
 
 const PRIDE_COLLECTION_ID = 'M4c3ITvd'
 const PRIDE_ARTICLE_SLUGS = ['pride-campaign-2025', 'pride-campaign-2026', 'proud-of-you-2026']
-const PRIDE_CACHE_TIME = 1000 * 60 * 60 * 24
 
 const { data: prideCollection } = useQuery({
 	queryKey: computed(() => ['collection', PRIDE_COLLECTION_ID]),
 	queryFn: () => client.labrinth.collections.get(PRIDE_COLLECTION_ID),
-	staleTime: PRIDE_CACHE_TIME,
-	gcTime: PRIDE_CACHE_TIME,
 })
 
 const prideProjectIds = computed(() => new Set(prideCollection.value?.projects ?? []))
