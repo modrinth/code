@@ -1,5 +1,9 @@
 import type { ProjectValidationContext } from '../types/nags.ts'
-import { validateEnglishSummaryText, validateEnglishText } from '../validators/language/index.ts'
+import {
+	validateEnglishSummaryText,
+	validateEnglishText,
+	validateEnglishTextBlocks,
+} from '../validators/language/index.ts'
 import {
 	getNonStandardTextRatio,
 	validateNonStandardText,
@@ -50,6 +54,11 @@ export function evaluateNonStandardText(
 
 export function evaluateEnglishText(text: string): ValidationRuleEvaluation {
 	const result = validateEnglishText(text)
+	return { valid: result.valid }
+}
+
+export function evaluateEnglishTextBlocks(blocks: string[]): ValidationRuleEvaluation {
+	const result = validateEnglishTextBlocks(blocks)
 	return { valid: result.valid }
 }
 

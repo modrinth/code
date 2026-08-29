@@ -14,7 +14,7 @@ import {
 import { validateSpam } from '../../validators/spam/index.ts'
 import { evaluateRules } from '../evaluate-rules.ts'
 import {
-	evaluateEnglishText,
+	evaluateEnglishTextBlocks,
 	evaluateNonStandardText,
 	evaluateProfanity,
 	evaluateSlur,
@@ -189,6 +189,16 @@ export function extractDescriptionText(markdown: string): string {
 	return withoutMarkdownSyntax.replace(/\s+/g, ' ').trim()
 }
 
+export function extractDescriptionTextBlocks(markdown: string): string[] {
+	if (!markdown) return []
+
+	return markdown
+		.replace(/```[\s\S]*?```/g, '')
+		.split(/\n\s*\n+/)
+		.map(extractDescriptionText)
+		.filter(Boolean)
+}
+
 export function countText(markdown: string): number {
 	return extractDescriptionText(markdown).length
 }
@@ -248,12 +258,13 @@ export const projectDescriptionValidationRules = {
 	'project-description-non-english': {
 		severity: 'warning',
 		evaluate: (description) => {
-			const text = extractDescriptionText(description ?? '')
+			const blocks = extractDescriptionTextBlocks(description ?? '')
+			const text = blocks.join(' ')
 			if (text.length < MIN_DESCRIPTION_CHARS || !validateSpam(text).valid) {
 				return { valid: true }
 			}
 
-			return evaluateEnglishText(text)
+			return evaluateEnglishTextBlocks(blocks)
 		},
 		presentation: {
 			message: messages.nonEnglish,

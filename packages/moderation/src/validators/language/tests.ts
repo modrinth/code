@@ -4,131 +4,143 @@ import test from 'node:test'
 import { francAll } from 'franc-min'
 
 import {
+	analyzeLanguageChunks,
+	LANGUAGE_CHUNK_STRIDE_WORDS,
+	LANGUAGE_CHUNK_WORDS,
+	MIN_ENGLISH_CHUNK_PERCENTAGE,
 	MIN_ENGLISH_SCORE,
+	MIN_ENGLISH_SUMMARY_SCORE,
 	MIN_LANGUAGE_DETECTION_CHARACTERS,
 	MIN_LANGUAGE_DETECTION_WORDS,
 	validateEnglishSummaryText,
 	validateEnglishText,
+	validateEnglishTextBlocks,
 } from './index.ts'
 
-test('accepts text when franc scores English above the minimum score', () => {
-	const text =
-		'This project adds configurable caves, useful tools, and polished world generation for every player.'
-	const result = validateEnglishText(text)
-	const english = result.detections.find(({ language }) => language === 'eng')
-	const alternative = result.detections.find(({ language }) => language !== 'eng')
+const english =
+	'This project adds useful tools, configurable settings, and clear documentation for every player.'
+const russian =
+	'Этот проект добавляет новые инструменты и значительно улучшает игровой процесс для всех игроков.'
+
+test('accepts English text and retains whole-text language diagnostics', () => {
+	const result = validateEnglishText(english)
+	const englishDetection = result.detections.find(({ language }) => language === 'eng')
 
 	assert.equal(result.valid, true)
-	assert.ok(english)
-	assert.ok(alternative)
-	assert.ok(english.accuracy > MIN_ENGLISH_SCORE)
+	assert.ok(englishDetection)
+	assert.ok(englishDetection.accuracy > MIN_ENGLISH_SCORE)
+	assert.deepEqual(result.reasons, [])
 	assert.deepEqual(
 		result.detections,
-		francAll(text).map(([language, accuracy]) => ({ language, accuracy })),
+		francAll(english).map(([language, accuracy]) => ({ language, accuracy })),
 	)
 })
 
-test('accepts mixed English and Chinese text above the minimum score', () => {
-	const result = validateEnglishText(
-		'A super light QQ bot for minecraft server and QQ group exchange msgs | 超轻量的QQ-MC群服插件',
-	)
-
-	assert.equal(result.valid, true)
-})
-
-test('rejects text when franc scores English below the minimum score', () => {
+test('rejects text containing only confidently non-English chunks', () => {
 	for (const text of [
-		'Чистый модпак для комфортной игры с друзьями, новыми заданиями и значительно улучшенной производительностью.',
+		russian,
 		'これは新しい洞窟と構造物を追加し、すべてのプレイヤーの世界生成を改善するプロジェクトです。',
+		'Um modpack focado em desempenho, imersão e exploração, mantendo a experiência próxima ao jogo original.',
 	]) {
-		assert.equal(validateEnglishText(text).valid, false, text)
+		const result = validateEnglishText(text)
+
+		assert.equal(result.valid, false, text)
+		assert.deepEqual(result.reasons, ['insufficient-english-chunk-coverage'])
 	}
 })
 
-test('validates production project text using the English score threshold', () => {
-	const cases = [
-		{
-			text: 'This mod adds some new things about turtles to Minecraft这个模组为Minecraft增加了一些关于乌龟的新东西',
-			valid: true,
-		},
-		{
-			text: 'Tenhle Project má super mody ktere zlepší kvalitu hraní PVP',
-			valid: true,
-		},
-		{
-			text: '此插件修复了Authme在lophine服务端上的登录漏洞 修复了玩家退出时SQL数据库的Logged依然为1的问题',
-			valid: false,
-		},
-		{
-			text: 'Мод добавляет рубин — новый драгоценный камень. Добывайте рубиновую руду, кристаллизующуюся в толще камня,  а закалив четыре рубина четырьмя незеритовыми ломами - можно будет сделать меч, кирку, броню и крюк захвата',
-			valid: false,
-		},
-		{
-			text: 'Um modpack Fabric focado em desempenho, imersão e exploração, mantendo a experiência próxima ao Minecraft Vanilla.  O objetivo é melhorar o visual, os sons, a geração de mundo e a qualidade de vida do jogo sem adicionar sistemas complexos.',
-			valid: true,
-		},
-		{
-			text: 'A Create Tacz Warfare Modpack for the Server Create: Warfare',
-			valid: true,
-		},
-		{
-			text: '一个集成了全息字和占位符创建的插件 A Plugin Integrating Holograms and Placeholder Support',
-			valid: true,
-		},
-		{
-			text: "A modpack that adds stuff from TaCZ guns, to shaders, to curios slots, and even create! And also, Superb Warfare, in case TaCZ isn't for you!",
-			valid: true,
-		},
-		{
-			text: 'Leichtes Client-Modpack für entspannte Feierabend-Sessions, bessere Performance, praktische QoL-Mods und ein aufgeräumtes Spielgefühl ohne unnötigen Ballast.',
-			valid: true,
-		},
-		{
-			text: 'A super light QQ bot for minecraft server and QQ group exchange msgs | 超轻量的QQ-MC群服插件',
-			valid: true,
-		},
-		{
-			text: 'Integrates MCP into minecraft, made for mapmakers and complex command block logic and datapack making.',
-			valid: true,
-		},
+test('accepts bilingual text when English chunks are 30% of classified chunks', () => {
+	const blocks = [
+		english,
+		english,
+		english,
+		russian,
+		russian,
+		russian,
+		russian,
+		russian,
+		russian,
+		russian,
 	]
+	const analysis = analyzeLanguageChunks(blocks)
+	const result = validateEnglishTextBlocks(blocks)
 
-	for (const { text, valid } of cases) {
-		assert.equal(validateEnglishText(text).valid, valid, text)
-	}
+	assert.equal(analysis.englishChunks, 3)
+	assert.equal(analysis.nonEnglishChunks, 7)
+	assert.equal(analysis.englishChunkPercentage, 0.3)
+	assert.equal(MIN_ENGLISH_CHUNK_PERCENTAGE, 0.3)
+	assert.equal(result.valid, true)
+	assert.deepEqual(result.reasons, [])
 })
 
-test('skips language detection for production text below the word minimum', () => {
-	for (const text of [
-		'You can chat Gemini AI in Minecraft',
-		'Create Mods X Zombie Apolcalypse',
-		'Open-world zombie survival modpack',
-		"BIG-GOOSE Minecraft server's modpack",
-	]) {
-		assert.deepEqual(validateEnglishText(text), { valid: true, detections: [] }, text)
-	}
-})
+test('rejects mixed-language text when English chunks are below 30% of classified chunks', () => {
+	const blocks = [english, english, russian, russian, russian, russian, russian]
+	const analysis = analyzeLanguageChunks(blocks)
+	const result = validateEnglishTextBlocks(blocks)
 
-test('skips language detection for text below the character minimum', () => {
-	const result = validateEnglishText('one two three four a b c d')
-
-	assert.deepEqual(result, { valid: true, detections: [] })
-	assert.equal(MIN_LANGUAGE_DETECTION_CHARACTERS, 35)
-})
-
-test('validates production text meeting both signal minimums', () => {
-	const text = '𝗔𝗶𝗺𝗶𝗻𝗴 𝘁𝗼 𝗲𝗻𝗵𝗮𝗻𝗰𝗲 𝗠𝗶𝗻𝗲𝗰𝗿𝗮𝗳𝘁 𝘄𝗵𝗶𝗹𝗲 𝗿𝗲𝘁𝗮𝗶𝗻𝗶𝗻𝗴 𝘁𝗵𝗮𝘁 𝗩𝗮𝗻𝗶𝗹𝗹𝗮 𝗳𝗲𝗲𝗹!'
-	const result = validateEnglishText(text)
-
+	assert.equal(analysis.englishChunks, 2)
+	assert.equal(analysis.nonEnglishChunks, 5)
+	assert.ok((analysis.englishChunkPercentage ?? 0) < MIN_ENGLISH_CHUNK_PERCENTAGE)
 	assert.equal(result.valid, false)
-	assert.ok(result.detections.length > 0)
+	assert.deepEqual(result.reasons, ['insufficient-english-chunk-coverage'])
+})
+
+test('uses overlapping 24-word windows with a 12-word stride', () => {
+	const text = Array.from({ length: 48 }, (_, index) => `word${index}`).join(' ')
+	const analysis = analyzeLanguageChunks([text])
+
+	assert.equal(LANGUAGE_CHUNK_WORDS, 24)
+	assert.equal(LANGUAGE_CHUNK_STRIDE_WORDS, 12)
+	assert.equal(analysis.totalChunks, 4)
+})
+
+test('skips chunks below the minimum word count', () => {
+	for (const text of [
+		'Minecraft',
+		'Minecraft server',
+		'This description has only seven English words',
+	]) {
+		assert.deepEqual(validateEnglishText(text), { valid: true, detections: [], reasons: [] })
+	}
+
 	assert.equal(MIN_LANGUAGE_DETECTION_WORDS, 8)
 })
 
-test('uses the same validation for summaries', () => {
-	assert.equal(validateEnglishSummaryText, validateEnglishText)
+test('skips chunks below the minimum character count', () => {
+	assert.deepEqual(validateEnglishText('a b c d e f g h'), {
+		valid: true,
+		detections: [],
+		reasons: [],
+	})
+	assert.equal(MIN_LANGUAGE_DETECTION_CHARACTERS, 35)
+})
+
+test('accepts summaries with an English score of at least 50% without changing description logic', () => {
+	const text =
+		'Um modpack Fabric focado em desempenho, imersão e exploração, mantendo a experiência próxima ao Minecraft Vanilla.'
+	const summaryResult = validateEnglishSummaryText(text)
+	const englishDetection = summaryResult.detections.find(({ language }) => language === 'eng')
+
+	assert.equal(MIN_ENGLISH_SUMMARY_SCORE, 0.5)
+	assert.ok(englishDetection)
+	assert.ok(englishDetection.accuracy >= MIN_ENGLISH_SUMMARY_SCORE)
+	assert.equal(summaryResult.valid, true)
+	assert.equal(validateEnglishText(text).valid, false)
+})
+
+test('skips summary detection below its word or character minimum', () => {
+	for (const text of ['This summary has only seven English words', 'a b c d e f g h']) {
+		assert.deepEqual(validateEnglishSummaryText(text), {
+			valid: true,
+			detections: [],
+			reasons: [],
+		})
+	}
+
+	assert.equal(MIN_LANGUAGE_DETECTION_WORDS, 8)
+	assert.equal(MIN_LANGUAGE_DETECTION_CHARACTERS, 35)
 })
 
 test('allows empty text to be handled by required-field validation', () => {
-	assert.deepEqual(validateEnglishText('  '), { valid: true, detections: [] })
+	assert.deepEqual(validateEnglishText('  '), { valid: true, detections: [], reasons: [] })
 })
