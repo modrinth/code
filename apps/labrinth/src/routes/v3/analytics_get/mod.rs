@@ -14,7 +14,6 @@ use xredis::RedisPool;
 
 pub mod facets;
 mod metrics;
-pub mod old;
 
 use std::{
     collections::{HashMap, HashSet},
@@ -61,7 +60,6 @@ pub use metrics::*;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(fetch_analytics);
     cfg.configure(facets::config);
-    cfg.configure(old::config);
 }
 
 // request
@@ -176,7 +174,7 @@ pub enum ProjectAnalyticsEventKind {
 
 // logic
 
-/// Fetch analytics data.  
+/// Fetch analytics data.
 #[utoipa::path(
 	context_path = "/analytics",
 	tag = "analytics",
