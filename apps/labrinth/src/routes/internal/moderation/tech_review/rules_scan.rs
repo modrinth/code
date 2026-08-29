@@ -57,7 +57,7 @@ struct RuleScanErrorEvent<'a> {
 pub struct RuleInput {
     pub schema_version: u32,
     pub trace: RuleTrace,
-    pub sibling_traces: Vec<RuleTrace>,
+    pub file_traces: Vec<RuleTrace>,
     pub scan: RuleScan,
     pub artifact: RuleArtifact,
     pub project: RuleProject,
@@ -209,8 +209,8 @@ pub async fn get_detail_rule_input(
             detail.jar,
             detail.file_path,
             detail.data AS "data: Json<HashMap<String, serde_json::Value>>",
-            COALESCE(sibling_traces.traces, '[]'::jsonb)
-                AS "sibling_traces!: Json<Vec<RuleTrace>>",
+            COALESCE(file_traces.traces, '[]'::jsonb)
+                AS "file_traces!: Json<Vec<RuleTrace>>",
             report.delphi_version,
             file.size AS "size?",
             file.id AS "file_id?",
@@ -229,21 +229,21 @@ pub async fn get_detail_rule_input(
             SELECT
                 jsonb_agg(
                     jsonb_build_object(
-                        'key', sibling_detail.key,
-                        'issue_type', sibling_issue.issue_type,
-                        'severity', sibling_detail.severity,
-                        'jar', sibling_detail.jar,
-                        'file_path', sibling_detail.file_path,
-                        'data', sibling_detail.data
+                        'key', file_detail.key,
+                        'issue_type', file_issue.issue_type,
+                        'severity', file_detail.severity,
+                        'jar', file_detail.jar,
+                        'file_path', file_detail.file_path,
+                        'data', file_detail.data
                     )
-                    ORDER BY sibling_detail.id
+                    ORDER BY file_detail.id
                 ) AS traces
-            FROM delphi_report_issues sibling_issue
-            INNER JOIN delphi_report_issue_details sibling_detail
-                ON sibling_detail.issue_id = sibling_issue.id
-            WHERE sibling_issue.report_id = issue.report_id
-                AND sibling_detail.id != detail.id
-        ) sibling_traces ON TRUE
+            FROM delphi_report_issues file_issue
+            INNER JOIN delphi_report_issue_details file_detail
+                ON file_detail.issue_id = file_issue.id
+            WHERE file_issue.report_id = issue.report_id
+                AND file_detail.file_path = detail.file_path
+        ) file_traces ON TRUE
         LEFT JOIN files file ON file.id = report.file_id
         LEFT JOIN versions version ON version.id = file.version_id
         LEFT JOIN LATERAL (
@@ -291,7 +291,7 @@ pub async fn get_detail_rule_input(
             file_path: detail.file_path,
             data: detail.data.0,
         },
-        sibling_traces: detail.sibling_traces.0,
+        file_traces: detail.file_traces.0,
         scan: RuleScan {
             delphi_version: detail.delphi_version,
         },
@@ -466,8 +466,8 @@ async fn run_scan(
             detail.jar,
             detail.file_path,
             detail.data AS "data: Json<HashMap<String, serde_json::Value>>",
-            COALESCE(sibling_traces.traces, '[]'::jsonb)
-                AS "sibling_traces!: Json<Vec<RuleTrace>>",
+            COALESCE(file_traces.traces, '[]'::jsonb)
+                AS "file_traces!: Json<Vec<RuleTrace>>",
             report.delphi_version,
             file.size AS "size?",
             file.id AS "file_id?",
@@ -486,21 +486,21 @@ async fn run_scan(
             SELECT
                 jsonb_agg(
                     jsonb_build_object(
-                        'key', sibling_detail.key,
-                        'issue_type', sibling_issue.issue_type,
-                        'severity', sibling_detail.severity,
-                        'jar', sibling_detail.jar,
-                        'file_path', sibling_detail.file_path,
-                        'data', sibling_detail.data
+                        'key', file_detail.key,
+                        'issue_type', file_issue.issue_type,
+                        'severity', file_detail.severity,
+                        'jar', file_detail.jar,
+                        'file_path', file_detail.file_path,
+                        'data', file_detail.data
                     )
-                    ORDER BY sibling_detail.id
+                    ORDER BY file_detail.id
                 ) AS traces
-            FROM delphi_report_issues sibling_issue
-            INNER JOIN delphi_report_issue_details sibling_detail
-                ON sibling_detail.issue_id = sibling_issue.id
-            WHERE sibling_issue.report_id = issue.report_id
-                AND sibling_detail.id != detail.id
-        ) sibling_traces ON TRUE
+            FROM delphi_report_issues file_issue
+            INNER JOIN delphi_report_issue_details file_detail
+                ON file_detail.issue_id = file_issue.id
+            WHERE file_issue.report_id = issue.report_id
+                AND file_detail.file_path = detail.file_path
+        ) file_traces ON TRUE
         LEFT JOIN files file ON file.id = report.file_id
         LEFT JOIN versions version ON version.id = file.version_id
         LEFT JOIN (
@@ -567,7 +567,7 @@ async fn run_scan(
                 file_path: detail.file_path,
                 data: detail.data.0,
             },
-            sibling_traces: detail.sibling_traces.0,
+            file_traces: detail.file_traces.0,
             scan: RuleScan {
                 delphi_version: detail.delphi_version,
             },
@@ -764,8 +764,8 @@ pub(crate) async fn materialize_current_rule_effects(
             detail.jar,
             detail.file_path,
             detail.data AS "data: Json<HashMap<String, serde_json::Value>>",
-            COALESCE(sibling_traces.traces, '[]'::jsonb)
-                AS "sibling_traces!: Json<Vec<RuleTrace>>",
+            COALESCE(file_traces.traces, '[]'::jsonb)
+                AS "file_traces!: Json<Vec<RuleTrace>>",
             report.delphi_version,
             file.size AS "size?",
             file.id AS "file_id?",
@@ -784,21 +784,21 @@ pub(crate) async fn materialize_current_rule_effects(
             SELECT
                 jsonb_agg(
                     jsonb_build_object(
-                        'key', sibling_detail.key,
-                        'issue_type', sibling_issue.issue_type,
-                        'severity', sibling_detail.severity,
-                        'jar', sibling_detail.jar,
-                        'file_path', sibling_detail.file_path,
-                        'data', sibling_detail.data
+                        'key', file_detail.key,
+                        'issue_type', file_issue.issue_type,
+                        'severity', file_detail.severity,
+                        'jar', file_detail.jar,
+                        'file_path', file_detail.file_path,
+                        'data', file_detail.data
                     )
-                    ORDER BY sibling_detail.id
+                    ORDER BY file_detail.id
                 ) AS traces
-            FROM delphi_report_issues sibling_issue
-            INNER JOIN delphi_report_issue_details sibling_detail
-                ON sibling_detail.issue_id = sibling_issue.id
-            WHERE sibling_issue.report_id = issue.report_id
-                AND sibling_detail.id != detail.id
-        ) sibling_traces ON TRUE
+            FROM delphi_report_issues file_issue
+            INNER JOIN delphi_report_issue_details file_detail
+                ON file_detail.issue_id = file_issue.id
+            WHERE file_issue.report_id = issue.report_id
+                AND file_detail.file_path = detail.file_path
+        ) file_traces ON TRUE
         LEFT JOIN files file ON file.id = report.file_id
         LEFT JOIN versions version ON version.id = file.version_id
         LEFT JOIN LATERAL (
@@ -848,7 +848,7 @@ pub(crate) async fn materialize_current_rule_effects(
                 file_path: detail.file_path,
                 data: detail.data.0,
             },
-            sibling_traces: detail.sibling_traces.0,
+            file_traces: detail.file_traces.0,
             scan: RuleScan {
                 delphi_version: detail.delphi_version,
             },
@@ -1006,8 +1006,8 @@ fn evaluate_rule_inner(
         .add_variable("trace", &input.trace)
         .wrap_err("failed to add `trace` to cel context")?;
     context
-        .add_variable("sibling_traces", &input.sibling_traces)
-        .wrap_err("failed to add `sibling_traces` to cel context")?;
+        .add_variable("file_traces", &input.file_traces)
+        .wrap_err("failed to add `file_traces` to cel context")?;
     context
         .add_variable("scan", &input.scan)
         .wrap_err("failed to add `scan` to cel context")?;

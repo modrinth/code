@@ -619,9 +619,8 @@ const TRACE_SEVERITIES: Labrinth.TechReview.Internal.DelphiSeverity[] = [
 	'hidden',
 ]
 
-const TEST_INPUT_METADATA: Omit<Labrinth.TechReview.Internal.RuleInput, 'trace'> = {
+const TEST_INPUT_METADATA: Omit<Labrinth.TechReview.Internal.RuleInput, 'trace' | 'file_traces'> = {
 	schema_version: 1,
-	sibling_traces: [],
 	scan: {
 		delphi_version: 17,
 	},
@@ -933,16 +932,19 @@ function getTestRuleInput(): Labrinth.TechReview.Internal.RuleInput | null {
 	}
 
 	traceDataError.value = null
+	const trace: Labrinth.TechReview.Internal.RuleTrace = {
+		key: testTraceForm.key,
+		issue_type: testTraceForm.issueType,
+		severity: testTraceForm.severity,
+		jar: testTraceForm.jar.trim() || null,
+		file_path: testTraceForm.filePath,
+		data: data as Record<string, unknown>,
+	}
+
 	return {
 		...TEST_INPUT_METADATA,
-		trace: {
-			key: testTraceForm.key,
-			issue_type: testTraceForm.issueType,
-			severity: testTraceForm.severity,
-			jar: testTraceForm.jar.trim() || null,
-			file_path: testTraceForm.filePath,
-			data: data as Record<string, unknown>,
-		},
+		trace,
+		file_traces: [trace],
 	}
 }
 

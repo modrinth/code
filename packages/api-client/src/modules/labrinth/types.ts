@@ -2471,7 +2471,7 @@ export namespace Labrinth {
 			export type RuleInput = {
 				schema_version: number
 				trace: RuleTrace
-				sibling_traces: RuleTrace[]
+				file_traces: RuleTrace[]
 				scan: {
 					delphi_version: number
 				}
