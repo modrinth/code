@@ -50,6 +50,8 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 use xredis::RedisPool;
 
+pub mod validate;
+
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_search)
         .service(project_search_post)
