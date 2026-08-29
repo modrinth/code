@@ -188,6 +188,32 @@ export function flattenStaticVariables(): Record<string, string> {
 		`[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962)`
 	vars[`DISCLOSURES_FAQ_FLINK`] =
 		`[Content Disclosures FAQ](https://support.modrinth.com/en/articles/16567675)`
+	vars[`DISCLOSURES_FAQ_AI_CONTENT_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_ec72dfca13`
+	vars[`DISCLOSURES_FAQ_AI_CODE_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_281356a403`
+	vars[`DISCLOSURES_FAQ_AI_ASSETS_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_e5f38e66a1`
+	vars[`DISCLOSURES_FAQ_AI_TEXT_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_6e56d3fe64`
+	vars[`DISCLOSURES_FAQ_AI_FUNCTIONALITY_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_4482fb3bf7`
+	vars[`DISCLOSURES_FAQ_ADS_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_d486036510`
+	vars[`DISCLOSURES_FAQ_PAID_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_37c3b31394`
+	vars[`DISCLOSURES_FAQ_TELEMETRY_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_490dcf364b`
+	vars[`DISCLOSURES_FAQ_TELEMTRY_CONSENT_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_d209c4c04c`
+	vars[`DISCLOSURES_FAQ_DERIVATIVE_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_6422cc821e`
+	vars[`DISCLOSURES_FAQ_PHOTOSENSITIVITY_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_22ffae0bb1`
+	vars[`DISCLOSURES_FAQ_EXTERNAL_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_4a6264f07c`
+	vars[`DISCLOSURES_FAQ_ARCHIVE_LINK`] =
+		`https://support.modrinth.com/en/articles/16567675#h_76b62c699c`
 	vars[`AI_USAGE_FLINK`] = `[AI Usage](https://support.modrinth.com/en/articles/16551575)`
 	vars[`LICENSING_GUIDE`] =
 		`our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
