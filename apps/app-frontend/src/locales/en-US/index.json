@@ -1719,28 +1719,28 @@
     "message": "Choose a sync source"
   },
   "app.settings.synced-options.command-history": {
-    "message": "Command history"
+    "message": "Sync command history"
   },
   "app.settings.synced-options.command-history.description": {
-    "message": "Sync command history across your instances."
+    "message": "Use the same command history across your instances."
   },
   "app.settings.synced-options.command-history.editor-title": {
     "message": "Edit command history"
   },
   "app.settings.synced-options.creative-hotbars": {
-    "message": "Saved creative hotbars"
+    "message": "Sync saved creative hotbars"
   },
   "app.settings.synced-options.creative-hotbars.description": {
-    "message": "Sync saved creative hotbars across your instances."
+    "message": "Use the same saved creative hotbars across your instances."
   },
   "app.settings.synced-options.multiplayer-servers": {
-    "message": "Multiplayer servers"
+    "message": "Sync multiplayer servers"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Server address"
   },
   "app.settings.synced-options.multiplayer-servers.description": {
-    "message": "Sync multiplayer servers across your instances."
+    "message": "Use the same multiplayer servers across your instances."
   },
   "app.settings.synced-options.multiplayer-servers.editor-title": {
     "message": "Edit synced servers"
@@ -2589,7 +2589,7 @@
     "message": "Select update channel"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Hooks allow advanced users to run certain system commands before and after launching the game."
+    "message": "Run instance-specific system commands before and after launching the game."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exit"
@@ -2610,7 +2610,7 @@
     "message": "Enter pre-launch command..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Game launch hooks"
+    "message": "Custom game launch hooks"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks run in the working directory of the instance, with the following variables:"
@@ -2652,16 +2652,16 @@
     "message": "Installation settings are unavailable while this instance is locked."
   },
   "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Use custom environment variables for this instance."
+    "message": "Set environment variables separately for this instance."
   },
   "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Use custom Java arguments for this instance."
+    "message": "Set Java arguments separately for this instance."
   },
   "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Use a custom Java installation for this instance."
+    "message": "Choose a different Java installation for this instance."
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Use a custom memory allocation for this instance."
+    "message": "Set the memory allocation separately for this instance."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Enter environmental variables..."
@@ -2670,19 +2670,19 @@
     "message": "Enter Java arguments..."
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Environment variables"
+    "message": "Custom environment variables"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Java arguments"
+    "message": "Custom Java arguments"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Java installation"
+    "message": "Custom Java installation"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Memory allocated"
+    "message": "Custom memory allocation"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
@@ -2694,7 +2694,7 @@
     "message": "Sharing"
   },
   "instance.settings.tabs.synced-options.command-history": {
-    "message": "Command history"
+    "message": "Unsync command history"
   },
   "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
     "message": "Command history syncing is turned off in app settings."
@@ -2703,7 +2703,7 @@
     "message": "Keep this instance's command history separate from synced command history."
   },
   "instance.settings.tabs.synced-options.creative-hotbars": {
-    "message": "Saved creative hotbars"
+    "message": "Unsync saved creative hotbars"
   },
   "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
     "message": "Saved creative hotbar syncing is turned off in app settings."
@@ -2727,7 +2727,7 @@
     "message": "Use synced"
   },
   "instance.settings.tabs.synced-options.multiplayer-servers": {
-    "message": "Multiplayer servers"
+    "message": "Unsync multiplayer servers"
   },
   "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
     "message": "Multiplayer server syncing is turned off in app settings."
@@ -2742,10 +2742,10 @@
     "message": "Enable an override to keep a synced setting separate for this instance."
   },
   "instance.settings.tabs.window": {
-    "message": "Window"
+    "message": "Custom window settings"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Use custom window settings for this instance."
+    "message": "Configure fullscreen and launch resolution separately for this instance."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullscreen"

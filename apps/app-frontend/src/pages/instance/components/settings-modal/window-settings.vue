@@ -56,11 +56,11 @@ watch(
 const messages = defineMessages({
 	window: {
 		id: 'instance.settings.tabs.window',
-		defaultMessage: 'Window',
+		defaultMessage: 'Custom window settings',
 	},
 	customWindowSettings: {
 		id: 'instance.settings.tabs.window.custom-window-settings',
-		defaultMessage: 'Use custom window settings for this instance.',
+		defaultMessage: 'Configure fullscreen and launch resolution separately for this instance.',
 	},
 	fullscreen: {
 		id: 'instance.settings.tabs.window.fullscreen',

@@ -155,11 +155,11 @@ watch(
 const messages = defineMessages({
 	javaInstallation: {
 		id: 'instance.settings.tabs.java.java-installation',
-		defaultMessage: 'Java installation',
+		defaultMessage: 'Custom Java installation',
 	},
 	customJavaInstallation: {
 		id: 'instance.settings.tabs.java.custom-java-installation',
-		defaultMessage: 'Use a custom Java installation for this instance.',
+		defaultMessage: 'Choose a different Java installation for this instance.',
 	},
 	javaPathPlaceholder: {
 		id: 'instance.settings.tabs.java.java-path-placeholder',
@@ -167,19 +167,19 @@ const messages = defineMessages({
 	},
 	javaMemory: {
 		id: 'instance.settings.tabs.java.java-memory',
-		defaultMessage: 'Memory allocated',
+		defaultMessage: 'Custom memory allocation',
 	},
 	customMemoryAllocation: {
 		id: 'instance.settings.tabs.java.custom-memory-allocation',
-		defaultMessage: 'Use a custom memory allocation for this instance.',
+		defaultMessage: 'Set the memory allocation separately for this instance.',
 	},
 	javaArguments: {
 		id: 'instance.settings.tabs.java.java-arguments',
-		defaultMessage: 'Java arguments',
+		defaultMessage: 'Custom Java arguments',
 	},
 	customJavaArguments: {
 		id: 'instance.settings.tabs.java.custom-java-arguments',
-		defaultMessage: 'Use custom Java arguments for this instance.',
+		defaultMessage: 'Set Java arguments separately for this instance.',
 	},
 	enterJavaArguments: {
 		id: 'instance.settings.tabs.java.enter-java-arguments',
@@ -187,11 +187,11 @@ const messages = defineMessages({
 	},
 	javaEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.environment-variables',
-		defaultMessage: 'Environment variables',
+		defaultMessage: 'Custom environment variables',
 	},
 	customEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.custom-environment-variables',
-		defaultMessage: 'Use custom environment variables for this instance.',
+		defaultMessage: 'Set environment variables separately for this instance.',
 	},
 	enterEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.enter-environment-variables',

@@ -45,7 +45,7 @@ const messages = defineMessages({
 	},
 	multiplayerServers: {
 		id: 'instance.settings.tabs.synced-options.multiplayer-servers',
-		defaultMessage: 'Multiplayer servers',
+		defaultMessage: 'Unsync multiplayer servers',
 	},
 	multiplayerServersDescription: {
 		id: 'instance.settings.tabs.synced-options.multiplayer-servers.override-description',
@@ -57,7 +57,7 @@ const messages = defineMessages({
 	},
 	commandHistory: {
 		id: 'instance.settings.tabs.synced-options.command-history',
-		defaultMessage: 'Command history',
+		defaultMessage: 'Unsync command history',
 	},
 	commandHistoryDescription: {
 		id: 'instance.settings.tabs.synced-options.command-history.override-description',
@@ -69,7 +69,7 @@ const messages = defineMessages({
 	},
 	creativeHotbars: {
 		id: 'instance.settings.tabs.synced-options.creative-hotbars',
-		defaultMessage: 'Saved creative hotbars',
+		defaultMessage: 'Unsync saved creative hotbars',
 	},
 	creativeHotbarsDescription: {
 		id: 'instance.settings.tabs.synced-options.creative-hotbars.override-description',

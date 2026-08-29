@@ -61,12 +61,11 @@ watch(
 const messages = defineMessages({
 	hooks: {
 		id: 'instance.settings.tabs.hooks.title',
-		defaultMessage: 'Game launch hooks',
+		defaultMessage: 'Custom game launch hooks',
 	},
 	hooksDescription: {
 		id: 'instance.settings.tabs.hooks.description',
-		defaultMessage:
-			'Hooks allow advanced users to run certain system commands before and after launching the game.',
+		defaultMessage: 'Run instance-specific system commands before and after launching the game.',
 	},
 	hookVariablesDescription: {
 		id: 'instance.settings.tabs.hooks.variables.description',

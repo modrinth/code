@@ -1353,6 +1353,16 @@ export function useImageEditor() {
 		applyDisplayScale()
 	}
 
+	function waitForRender() {
+		const editorCanvas = canvas.value
+		if (!editorCanvas) return Promise.resolve()
+
+		return new Promise<void>((resolve) => {
+			editorCanvas.once('after:render', () => resolve())
+			editorCanvas.requestRenderAll()
+		})
+	}
+
 	function applyDisplayScale() {
 		const editorCanvas = canvas.value
 		if (!editorCanvas) return
@@ -1621,6 +1631,7 @@ export function useImageEditor() {
 		fitToViewport,
 		setZoom,
 		setFit,
+		waitForRender,
 		exportPng,
 		handleKeyboardShortcut,
 		isTextEditing,

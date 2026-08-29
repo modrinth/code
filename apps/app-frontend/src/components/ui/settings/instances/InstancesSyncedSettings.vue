@@ -67,27 +67,27 @@ const messages = defineMessages({
 	// },
 	multiplayerServers: {
 		id: 'app.settings.synced-options.multiplayer-servers',
-		defaultMessage: 'Multiplayer servers',
+		defaultMessage: 'Sync multiplayer servers',
 	},
 	multiplayerServersDescription: {
 		id: 'app.settings.synced-options.multiplayer-servers.description',
-		defaultMessage: 'Sync multiplayer servers across your instances.',
+		defaultMessage: 'Use the same multiplayer servers across your instances.',
 	},
 	commandHistory: {
 		id: 'app.settings.synced-options.command-history',
-		defaultMessage: 'Command history',
+		defaultMessage: 'Sync command history',
 	},
 	commandHistoryDescription: {
 		id: 'app.settings.synced-options.command-history.description',
-		defaultMessage: 'Sync command history across your instances.',
+		defaultMessage: 'Use the same command history across your instances.',
 	},
 	creativeHotbars: {
 		id: 'app.settings.synced-options.creative-hotbars',
-		defaultMessage: 'Saved creative hotbars',
+		defaultMessage: 'Sync saved creative hotbars',
 	},
 	creativeHotbarsDescription: {
 		id: 'app.settings.synced-options.creative-hotbars.description',
-		defaultMessage: 'Sync saved creative hotbars across your instances.',
+		defaultMessage: 'Use the same saved creative hotbars across your instances.',
 	},
 	chooseSyncSourceTitle: {
 		id: 'app.settings.synced-options.choose-sync-source.title',
