@@ -34,6 +34,7 @@ mod liteloader;
 mod modpack;
 mod neoforge;
 pub mod plugin;
+pub mod project;
 mod quilt;
 mod resourcepack;
 mod rift;
