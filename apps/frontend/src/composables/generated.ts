@@ -1,5 +1,6 @@
 import type { ISO3166, Labrinth } from '@modrinth/api-client'
 import type { DisplayProjectType } from '@modrinth/utils'
+import type { ShallowRef } from 'vue'
 
 import {
 	apiUrl,
@@ -156,10 +157,22 @@ const generatedState = shallowRef<GeneratedState>(
 )
 
 /**
+ * Non-reactive server-side view of the state above.
+ *
+ * `generatedState` lives for the lifetime of the isolate, so every per-request `computed()` that
+ * reads it registers a subscriber link on its dep. SSR never unmounts, so those links are never
+ * released, and each one pins the whole request graph that created it. The data is frozen and
+ * `setGameVersions` is client-only, so the server has nothing to react to.
+ */
+const serverGeneratedState = {
+	value: generatedState.value,
+} as unknown as ShallowRef<GeneratedState>
+
+/**
  * Composable for accessing the globally used generated state.
  * This includes both fetched data and runtime-defined constants.
  */
-export const useGeneratedState = () => generatedState
+export const useGeneratedState = () => (import.meta.server ? serverGeneratedState : generatedState)
 
 /**
  * Replaces the build-time game versions with a freshly fetched list. Client-only: mutating this
