@@ -7,10 +7,12 @@ import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
 import { validateSpam } from '../../validators/spam/index.ts'
 import { evaluateRules } from '../evaluate-rules.ts'
 import {
+	evaluateEnglishSummaryText,
 	evaluateNonStandardText,
 	evaluateProfanity,
 	evaluateSlur,
 	normalizeProjectFieldText,
+	projectRequiresEnglishText,
 } from '../text.ts'
 import { toFieldMessages } from '../to-field-messages.ts'
 import { toNags } from '../to-nags.ts'
@@ -56,6 +58,11 @@ const messages = defineMessages({
 	nonStandardText: {
 		id: 'nags.project-summary-non-standard-text.description',
 		defaultMessage: 'Non-standard text characters, such as “₮ɆӾ₮”, are not allowed.',
+	},
+	nonEnglish: {
+		id: 'nags.project-summary-non-english.description',
+		defaultMessage:
+			'Your project summary must be written in English or include an English translation.',
 	},
 	matchesName: {
 		id: 'project.text-validation.summary-matches-title',
@@ -147,6 +154,25 @@ export const projectSummaryValidationRules = {
 			nag: { title: messages.fixSummary, ...commonNagPresentation },
 		},
 	},
+	'project-summary-non-english': {
+		severity: 'warning',
+		evaluate: ({ summary }) => {
+			const normalized = normalizeProjectFieldText(summary ?? '')
+			if (
+				!normalized ||
+				normalized.length < MIN_SUMMARY_CHARS ||
+				containsProjectSummaryLinkOrIp(normalized) ||
+				!validateSpam(normalized).valid
+			) {
+				return { valid: true }
+			}
+			return evaluateEnglishSummaryText(normalized)
+		},
+		presentation: {
+			message: messages.nonEnglish,
+			nag: { title: messages.fixSummary, ...commonNagPresentation },
+		},
+	},
 	'project-summary-matches-title': {
 		severity: 'error',
 		evaluate: ({ summary, name }) => ({
@@ -214,10 +240,13 @@ export function validateProjectSummary(
 }
 
 export function getSummaryNags(context: Pick<ProjectValidationContext, 'projectV3'>): Nag[] {
+	const matches = evaluateRules(
+		{ summary: context.projectV3.summary, name: context.projectV3.name },
+		projectSummaryValidationRules,
+	)
 	return toNags(
-		evaluateRules(
-			{ summary: context.projectV3.summary, name: context.projectV3.name },
-			projectSummaryValidationRules,
-		),
+		projectRequiresEnglishText(context.projectV3)
+			? matches
+			: matches.filter(({ code }) => code !== 'project-summary-non-english'),
 	)
 }

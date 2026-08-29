@@ -1,3 +1,5 @@
+import type { ProjectValidationContext } from '../types/nags.ts'
+import { validateEnglishSummaryText, validateEnglishText } from '../validators/language/index.ts'
 import {
 	getNonStandardTextRatio,
 	validateNonStandardText,
@@ -7,6 +9,17 @@ import type { ValidationRuleEvaluation } from './types.ts'
 
 export function normalizeProjectFieldText(value: string) {
 	return value.trim().normalize('NFC')
+}
+
+export function projectRequiresEnglishText(
+	project: Pick<
+		ProjectValidationContext['projectV3'],
+		'minecraft_java_server' | 'minecraft_server'
+	>,
+) {
+	return (
+		!project.minecraft_java_server || project.minecraft_server?.languages?.includes('en') === true
+	)
 }
 
 export function evaluateSlur(text: string): ValidationRuleEvaluation {
@@ -33,4 +46,14 @@ export function evaluateNonStandardText(
 	return {
 		valid: result.valid || getNonStandardTextRatio(text, result) < failureThreshold,
 	}
+}
+
+export function evaluateEnglishText(text: string): ValidationRuleEvaluation {
+	const result = validateEnglishText(text)
+	return { valid: result.valid }
+}
+
+export function evaluateEnglishSummaryText(text: string): ValidationRuleEvaluation {
+	const result = validateEnglishSummaryText(text)
+	return { valid: result.valid }
 }

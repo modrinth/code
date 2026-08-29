@@ -135,6 +135,17 @@ test('validates summary content from one rule set', () => {
 	)
 })
 
+test('warns when a project summary is mostly non-English', () => {
+	assert.deepEqual(
+		validateProjectSummary({
+			summary:
+				'これは新しい洞窟と構造物を追加し、すべてのプレイヤーの世界生成を改善するプロジェクトです。',
+			name: 'Project title',
+		}).map(({ code, severity }) => ({ code, severity })),
+		[{ code: 'project-summary-non-english', severity: 'warning' }],
+	)
+})
+
 test('rejects repeated summary padding', () => {
 	assert.deepEqual(
 		validateProjectSummary({
@@ -221,6 +232,22 @@ test('validates description requirements and simultaneous recommendations', () =
 	assert.deepEqual(
 		validateProjectDescription(description).map(({ code }) => code),
 		['description-too-short', 'project-description-spam', 'long-headers', 'missing-alt-text'],
+	)
+})
+
+test('warns when a project description is mostly non-English', () => {
+	const description = [
+		'このプロジェクトは設定可能な洞窟と新しい構造物を世界生成に追加します。',
+		'プレイヤーは設定ファイルを使って、それぞれの機能を個別に変更できます。',
+		'探索をより楽しくする便利な道具や新しい報酬もたくさん含まれています。',
+		'サーバーとクライアントの両方で快適に動作するように設計されています。',
+	].join(' ')
+
+	assert.deepEqual(
+		validateProjectDescription(description)
+			.filter(({ code }) => code === 'project-description-non-english')
+			.map(({ code, severity }) => ({ code, severity })),
+		[{ code: 'project-description-non-english', severity: 'warning' }],
 	)
 })
 

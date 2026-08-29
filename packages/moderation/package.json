@@ -12,9 +12,10 @@
 		"intl:prune-local": "pnpm -w scripts i18n-icu-contract prune-local --scope packages/moderation"
 	},
 	"dependencies": {
+		"@modrinth/api-client": "workspace:*",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/utils": "workspace:*",
-		"@modrinth/api-client": "workspace:*",
+		"franc-min": "^6.2.0",
 		"linkify-it": "^5.0.0",
 		"node-html-parser": "^9.0.1",
 		"obscenity": "^0.4.6",

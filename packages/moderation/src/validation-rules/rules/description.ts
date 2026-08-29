@@ -14,10 +14,12 @@ import {
 import { validateSpam } from '../../validators/spam/index.ts'
 import { evaluateRules } from '../evaluate-rules.ts'
 import {
+	evaluateEnglishText,
 	evaluateNonStandardText,
 	evaluateProfanity,
 	evaluateSlur,
 	normalizeProjectFieldText,
+	projectRequiresEnglishText,
 } from '../text.ts'
 import { toFieldMessages } from '../to-field-messages.ts'
 import { toNags } from '../to-nags.ts'
@@ -63,6 +65,11 @@ const messages = defineMessages({
 	nonStandardText: {
 		id: 'nags.project-description-non-standard-text.description',
 		defaultMessage: 'Non-standard text characters, such as “₮ɆӾ₮”, are not allowed.',
+	},
+	nonEnglish: {
+		id: 'nags.project-description-non-english.description',
+		defaultMessage:
+			'Your project description must be written in English or include an English translation.',
 	},
 	bannedLink: {
 		id: 'nags.project-description-banned-link.description',
@@ -238,6 +245,21 @@ export const projectDescriptionValidationRules = {
 			nag: { title: messages.fixDescription, ...commonNagPresentation },
 		},
 	},
+	'project-description-non-english': {
+		severity: 'warning',
+		evaluate: (description) => {
+			const text = extractDescriptionText(description ?? '')
+			if (text.length < MIN_DESCRIPTION_CHARS || !validateSpam(text).valid) {
+				return { valid: true }
+			}
+
+			return evaluateEnglishText(text)
+		},
+		presentation: {
+			message: messages.nonEnglish,
+			nag: { title: messages.fixDescription, ...commonNagPresentation },
+		},
+	},
 	'add-description': {
 		severity: 'error',
 		evaluate: (description) => ({
@@ -323,5 +345,10 @@ export function validateProjectDescription(
 }
 
 export function getDescriptionNags(context: Pick<ProjectValidationContext, 'projectV3'>): Nag[] {
-	return toNags(evaluateRules(context.projectV3.description, projectDescriptionValidationRules))
+	const matches = evaluateRules(context.projectV3.description, projectDescriptionValidationRules)
+	return toNags(
+		projectRequiresEnglishText(context.projectV3)
+			? matches
+			: matches.filter(({ code }) => code !== 'project-description-non-english'),
+	)
 }
