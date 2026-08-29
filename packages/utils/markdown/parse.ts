@@ -55,7 +55,7 @@ export const modrinthPlugins: ComarkPlugin[] = [
 	modrinthResolveMedia(),
 	modrinthSecurity(),
 	// shiki(), // needs dep + we have highlight.js
-	// summary(), //TODO
+	// summary(), //irrelevant
 	taskList(),
 	// toc() // would be cool to have but would need heavy changes to project pages
 ]
