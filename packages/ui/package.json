@@ -86,6 +86,7 @@
 		"highlight.js": "^11.9.0",
 		"intl-messageformat": "^10.7.7",
 		"jszip": "^3.10.1",
+		"katex": "^0.17.0",
 		"lru-cache": "^11.2.4",
 		"motion-v": "^2.2.1",
 		"overlayscrollbars": "^2.15.1",

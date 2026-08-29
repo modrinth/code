@@ -5,18 +5,19 @@ import { visitAsync } from 'comark/utils'
 
 const allowedClassPrefixes = ['hljs-', 'language-']
 
-const taskListClassByTag: Record<string, string> = {
-	input: 'task-list-item-checkbox',
-	li: 'task-list-item',
-	ul: 'contains-task-list',
+const exactClassesByTag: Record<string, string[]> = {
+	input: ['task-list-item-checkbox'],
+	li: ['task-list-item'],
+	math: ['math', 'inline', 'block'],
+	ul: ['contains-task-list'],
 }
 
 function filterClassValue(value: unknown, tag?: string): string | undefined {
 	if (typeof value !== 'string') return undefined
-	const exact = tag ? taskListClassByTag[tag] : undefined
+	const exact = tag ? exactClassesByTag[tag] : undefined
 	const kept = value
 		.split(/\s+/)
-		.filter((cls) => cls === exact || allowedClassPrefixes.some((prefix) => cls.startsWith(prefix)))
+		.filter((cls) => exact?.includes(cls) || allowedClassPrefixes.some((prefix) => cls.startsWith(prefix)))
 	return kept.length ? kept.join(' ') : undefined
 }
 
@@ -93,6 +94,7 @@ export const attributeAllowlist: Record<string, string[]> = {
 	li: ['class'],
 	map: ['name'],
 	mark: [],
+	math: ['content', 'class'],
 	mermaid: ['content', 'theme', 'theme-dark', 'class'],
 	nav: [],
 	ol: [],

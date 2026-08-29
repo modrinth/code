@@ -29,8 +29,11 @@
 
 <script setup lang="ts">
 import { Markdown } from '@comark/vue'
+import { Math as MarkdownMath } from '@comark/vue/plugins/math'
 import { modrinthBasicPlugins, modrinthForceLinkTarget, modrinthPlugins } from '@modrinth/utils'
 import { computed } from 'vue'
+
+import 'katex/dist/katex.min.css'
 
 import MarkdownAlert, { alertMarkerTypes } from './markdown/MarkdownAlert.vue'
 import MarkdownCollectionEmbed from './markdown/MarkdownCollectionEmbed.vue'
@@ -85,6 +88,7 @@ const components = computed(() =>
 				organization: MarkdownOrganizationEmbed,
 				collection: MarkdownCollectionEmbed,
 				input: MarkdownTaskCheckbox,
+				math: MarkdownMath,
 				mermaid: MarkdownMermaid,
 				...(props.highlight ? { pre: MarkdownHighlightedPre } : {}),
 			},
