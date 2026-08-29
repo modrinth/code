@@ -11,6 +11,7 @@ import components from 'comark/plugins/components'
 import emoji from 'comark/plugins/emoji'
 import footnotes from 'comark/plugins/footnotes'
 import html from 'comark/plugins/html'
+import mermaid from 'comark/plugins/mermaid'
 import punctuation from 'comark/plugins/punctuation'
 import taskList from 'comark/plugins/task-list'
 import { visitAsync } from 'comark/utils'
@@ -48,7 +49,7 @@ export const modrinthPlugins: ComarkPlugin[] = [
 	modrinthHtmlBlock(),
 	// json-render()
 	// math(), // needs dep
-	// mermaid(), // needs dep
+	mermaid(),
 	punctuation(),
 	// rangi() // needs dep + we have highlight.js + if we do want to switch I'd say shiki is better
 	modrinthEmbedSyntax(),

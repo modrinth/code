@@ -1,0 +1,56 @@
+diff --git a/dist/index.js b/dist/index.js
+index e7e087bcb6f29d0d8f36cd558e0183bc0f162fcb..500c550c2723be4e84775afbb680dc1e06351451 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -6985,14 +6985,18 @@ function markerSuffix(color) {
+ function renderGroup(group, font) {
+   const headerHeight = FONT_SIZES.groupHeader + 16;
+   const parts = [];
++  const clipId = `group-clip-${group.id.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
++  parts.push(
++    `<clipPath id="${clipId}"><rect x="${group.x}" y="${group.y}" width="${group.width}" height="${group.height}" rx="8" ry="8" /></clipPath>`
++  );
+   parts.push(
+     `<g class="subgraph" data-id="${escapeAttr(group.id)}" data-label="${escapeAttr(group.label)}">`
+   );
+   parts.push(
+-    `  <rect x="${group.x}" y="${group.y}" width="${group.width}" height="${group.height}" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="${STROKE_WIDTHS.outerBox}" />`
++    `  <rect x="${group.x}" y="${group.y}" width="${group.width}" height="${group.height}" rx="8" ry="8" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="${STROKE_WIDTHS.outerBox}" />`
+   );
+   parts.push(
+-    `  <rect x="${group.x}" y="${group.y}" width="${group.width}" height="${headerHeight}" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="${STROKE_WIDTHS.outerBox}" />`
++    `  <rect x="${group.x}" y="${group.y}" width="${group.width}" height="${headerHeight}" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="${STROKE_WIDTHS.outerBox}" clip-path="url(#${clipId})" />`
+   );
+   parts.push(
+     "  " + renderMultilineText(
+@@ -7134,10 +7138,10 @@ function renderNodeShape(node) {
+   }
+ }
+ function renderRect(x, y, w, h, fill, stroke, sw) {
+-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="0" ry="0" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" />`;
++  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" ry="6" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" />`;
+ }
+ function renderRoundedRect(x, y, w, h, fill, stroke, sw) {
+-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" ry="6" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" />`;
++  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" ry="10" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" />`;
+ }
+ function renderStadium(x, y, w, h, fill, stroke, sw) {
+   const r2 = h / 2;
+@@ -7168,7 +7172,7 @@ function renderDiamond(x, y, w, h, fill, stroke, sw) {
+ }
+ function renderSubroutine(x, y, w, h, fill, stroke, sw) {
+   const inset = 8;
+-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="0" ry="0" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" />
++  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" ry="6" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" />
+ <line x1="${x + inset}" y1="${y}" x2="${x + inset}" y2="${y + h}" stroke="${stroke}" stroke-width="${sw}" />
+ <line x1="${x + w - inset}" y1="${y}" x2="${x + w - inset}" y2="${y + h}" stroke="${stroke}" stroke-width="${sw}" />`;
+ }
+@@ -7645,7 +7649,7 @@ function renderActor(actor) {
+   } else {
+     const boxX = x - width / 2;
+     parts.push(
+-      `  <rect x="${boxX}" y="${y}" width="${width}" height="${height}" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="${STROKE_WIDTHS.outerBox}" />`
++      `  <rect x="${boxX}" y="${y}" width="${width}" height="${height}" rx="8" ry="8" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="${STROKE_WIDTHS.outerBox}" />`
+     );
+     parts.push(
+       "  " + renderMultilineText(

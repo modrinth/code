@@ -93,6 +93,7 @@ export const attributeAllowlist: Record<string, string[]> = {
 	li: ['class'],
 	map: ['name'],
 	mark: [],
+	mermaid: ['content', 'theme', 'theme-dark', 'class'],
 	nav: [],
 	ol: [],
 	organization: ['id'],

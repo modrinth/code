@@ -35,6 +35,7 @@ import { computed } from 'vue'
 import MarkdownAlert, { alertMarkerTypes } from './markdown/MarkdownAlert.vue'
 import MarkdownCollectionEmbed from './markdown/MarkdownCollectionEmbed.vue'
 import MarkdownHighlightedPre from './markdown/MarkdownHighlightedPre.vue'
+import MarkdownMermaid from './markdown/MarkdownMermaid.vue'
 import MarkdownOrganizationEmbed from './markdown/MarkdownOrganizationEmbed.vue'
 import MarkdownProjectEmbed from './markdown/MarkdownProjectEmbed.vue'
 import MarkdownTaskCheckbox from './markdown/MarkdownTaskCheckbox.vue'
@@ -84,6 +85,7 @@ const components = computed(() =>
 				organization: MarkdownOrganizationEmbed,
 				collection: MarkdownCollectionEmbed,
 				input: MarkdownTaskCheckbox,
+				mermaid: MarkdownMermaid,
 				...(props.highlight ? { pre: MarkdownHighlightedPre } : {}),
 			},
 )

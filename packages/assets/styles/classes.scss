@@ -953,6 +953,18 @@ a:not(.no-click-animation),
 		}
 	}
 
+	.mermaid {
+		@apply bg-surface-2 rounded-xl p-4 border border-solid border-surface-5;
+		margin-top: 1rem;
+		overflow-x: auto;
+
+		svg {
+			width: 100%;
+			max-width: 32rem;
+			height: auto;
+		}
+	}
+
 	code {
 		@apply bg-surface-3 rounded-md p-4 border border-solid border-surface-5;
 		padding: 0.2em 0.4em;

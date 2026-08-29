@@ -54,7 +54,8 @@
   "pnpm": {
     "patchedDependencies": {
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch",
-      "comark@0.6.2": "patches/comark@0.6.2.patch"
+      "comark@0.6.2": "patches/comark@0.6.2.patch",
+      "beautiful-mermaid@1.1.3": "patches/beautiful-mermaid@1.1.3.patch"
     },
     "peerDependencyRules": {
       "allowedVersions": {
