@@ -37,6 +37,7 @@ function hasEnoughWords(text: string): boolean {
 	return false
 }
 
+// TODO, the algorithm can still miss cases where english translation is provided and text primarily in another language
 export function validateEnglishText(text: string): EnglishTextResult {
 	if (!hasEnoughCharacters(text) || !hasEnoughWords(text)) {
 		return { valid: true, detections: [] }
