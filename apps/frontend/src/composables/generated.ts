@@ -1,6 +1,5 @@
 import type { ISO3166, Labrinth } from '@modrinth/api-client'
 import type { DisplayProjectType } from '@modrinth/utils'
-import type { ShallowRef } from 'vue'
 
 import {
 	apiUrl,
@@ -156,17 +155,24 @@ const generatedState = shallowRef<GeneratedState>(
 	}) as GeneratedState,
 )
 
+// Read once, with no effect active, so this does not register a subscriber on `generatedState`.
+const frozenState = generatedState.value
+
 /**
- * Non-reactive server-side view of the state above.
+ * Non-tracking server-side view of the state above.
  *
  * `generatedState` lives for the lifetime of the isolate, so every per-request `computed()` that
  * reads it registers a subscriber link on its dep. SSR never unmounts, so those links are never
- * released, and each one pins the whole request graph that created it. The data is frozen and
- * `setGameVersions` is client-only, so the server has nothing to react to.
+ * released, and each one pins the whole request graph that created it. This ref deliberately never
+ * calls `track()`, so reads register nothing. The data is frozen and `setGameVersions` is
+ * client-only, so the server has nothing to react to.
+ *
+ * It must stay a real ref: consumers pass it straight into templates and rely on Vue unwrapping it.
  */
-const serverGeneratedState = {
-	value: generatedState.value,
-} as unknown as ShallowRef<GeneratedState>
+const serverGeneratedState = customRef<GeneratedState>(() => ({
+	get: () => frozenState,
+	set: () => {},
+}))
 
 /**
  * Composable for accessing the globally used generated state.
