@@ -711,6 +711,18 @@ watch(
 						</div>
 					</Transition>
 				</div>
+
+				<ButtonLink
+					v-tooltip="'Open file in slicer'"
+					type="outlined"
+					:href="createSlicerLink(props.file.download_url, classItem)"
+					:target="props.file.file_id"
+					circular
+					icon-only
+					@click="$event.stopPropagation()"
+				>
+					<ExternalIcon />
+				</ButtonLink>
 			</div>
 
 			<Collapsible :collapsed="!expandedClasses.has(classItem.key)">
@@ -745,16 +757,6 @@ watch(
 							</div>
 
 							<div class="me-2 flex items-center justify-end gap-2">
-								<ButtonLink
-									v-tooltip="'Open file in slicer'"
-									type="outlined"
-									:href="createSlicerLink(props.file.download_url, classItem)"
-									:target="props.file.file_id"
-									circular
-									icon-only
-								>
-									<ExternalIcon />
-								</ButtonLink>
 								<TechRevVerdictButtons
 									variant="trace"
 									:detail="flag.detail"
