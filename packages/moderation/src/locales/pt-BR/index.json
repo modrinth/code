@@ -12,7 +12,7 @@
     "defaultMessage": "Adicione um ícone"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Adicione o endereço IP e a porta para que jogadores da Edição Java possam usar para entrar em seu servidor."
+    "defaultMessage": "Adicione o endereço IP e a porta para que os jogadores da Edição Java possam usar para entrar em seu servidor."
   },
   "nags.add-java-address.title": {
     "defaultMessage": "Adicione um endereço Java"
@@ -46,6 +46,12 @@
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecione etiquetas específicas"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Certifique-se de que os usuários estejam cientes de qualquer detalhe importante ao preencher a divulgação de conteúdo que se apliquem ao seu {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Verificar divulgações de conteúdo"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Sua descrição possui {length, plural, one {apenas # caractere legível} other {apenas # caracteres legíveis}}. No mínimo, {minChars, plural, one {# caractere é recomendado} other {# characteres são recomendados}} para criar uma descrição concisa e informativa."
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Visitar configurações de descrição"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Visitar configurações de divulgação"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Visitar configurações de licença"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Visitar configurações gerais"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Visitar configurações das versões"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Seu resumo não pode ser igual ao nome do seu projeto. É importante criar um resumo informativo e atraente."

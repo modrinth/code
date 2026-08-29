@@ -5,17 +5,20 @@
   "action.continue": {
     "message": "Devam et"
   },
-  "admin.billing.error.not-found": {
-    "message": "Kullanıcı bulunamadı"
-  },
   "ads-consent.accept": {
     "message": "Tümünü kabul et"
+  },
+  "ads-consent.body": {
+    "message": "Reklamlar, Modrinth'i mümkün kılar ve içerik oluşturucalara yapılan ödemeleri finanse eder."
   },
   "ads-consent.manage": {
     "message": "Tercihleri yönet"
   },
   "ads-consent.reject": {
     "message": "Tümünü reddet"
+  },
+  "ads-consent.title": {
+    "message": "Reklamlar Modrinth'i nasıl destekler ve gizliliğiniz"
   },
   "analytics.action.add": {
     "message": "Ekle"
@@ -185,6 +188,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Grafikte {name}'i gizle"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Veri yok"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Grafik ipucu sabitlendi"
   },
@@ -244,6 +250,9 @@
   },
   "analytics.empty.select-project": {
     "message": "Verileri görüntülemek için en az bir proje seçin"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Bağlı projeler yüklenemedi"
   },
   "analytics.filter.game-version-type": {
     "message": "Oyun sürüm türü"
@@ -1016,9 +1025,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Onaylandı, işlem tamamlandı"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Konuyu kapat"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Cevapla ve kapat"
   },
@@ -1127,6 +1133,30 @@
   "create-project-version.create-modal.stage.add-files.files-tab": {
     "message": "Dosyalar"
   },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metaveri"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "Ana dosya, kullanıcının projeyi kurarken indirdiği varsayılan dosyadır."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Ana dosya"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "İsteğe bağlı şekilde kaynak kodu, dokümentasyon, ya da gerekli kaynak paketleri gibi ek dosyalar ekleyebilirsiniz."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Ek dosyalar"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Ek dosya yükle"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Dosya yükle"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Ana ve desteklenilen dosyaları yükle"
+  },
   "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
     "message": "Dosyaları sürükleyip bırakın ya da göz atmak için tıklayın"
   },
@@ -1136,11 +1166,95 @@
   "create-project-version.create-modal.stage.details.files-tab": {
     "message": "Dosyalar"
   },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metaveri"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Sürüm güncellemeleri"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Sürüm numarası"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "Sürüm numarası, bu belirli sürümü diğerlerinden ayırır."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Sürüm numarası girin, örneğin 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Sürüm altyazısı"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Altyazı girin..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Sürüm tipi"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Bağımlılık ekle"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Bağımlılıklar"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Detaylar"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "Tespit edilen yükleyiciler"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "Tespit edilen sürümler"
+  },
   "create-project-version.create-modal.stage.metadata.edit-button": {
     "message": "Düzenle"
   },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Ortam"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Dosyalar"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "Yükleyiciler"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metaveri"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "Modpack yükleyicileri düzenlenemez"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "Modpack sürümleri düzenlenemez"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "Hiçbir bağımlılık eklenmedi."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "Hiçbir ortam ayarlanmadı."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "Hiçbir yükleyici seçilmedi."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "Mod yükleyici yok"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "Hiçbir sürüm seçilmedi."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "Daha önceki benzer bir sürümden doldurulmuştur"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "Kaynak paketi yükleyicileri düzenlenemez"
+  },
   "create-project-version.create-modal.stage.metadata.suggested": {
     "message": "Önerilen"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Yüklenen  dosyalar"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Sürümler"
   },
   "create.collection.collection-info": {
     "message": "Yeni koleksiyonunuz herkese açık olarak {count, plural, =0 {projesiz hâlde} other {# proje ile}} oluşturulacaktır."
@@ -1277,6 +1391,9 @@
   "create.project.url-label": {
     "message": "URL"
   },
+  "create.project.user-avatar-alt": {
+    "message": "Kullanıcı Avatarı"
+  },
   "create.project.visibility-description": {
     "message": "Projenizin onaylandıktan sonraki görünürlük ayarı."
   },
@@ -1385,6 +1502,12 @@
   "dashboard.creator-tax-form-modal.header": {
     "message": "Vergi formu"
   },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "Vergi formunu tamamlamadınız. Lütfen tekrar deneyiniz."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Vergi formu tamamlanmamış"
+  },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth, vergi formlarınızı güvenli bir şekilde toplamak ve saklamak için üçüncü taraf sağlayıcı Track1099'u kullanır. <security-link>Buradan daha fazla bilgi edinebilirsiniz.</security-link>"
   },
@@ -1424,6 +1547,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "İşletme kuruluşu"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Doğum tarihi giriniz"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "İşletme kuruluşu, şirket, ortaklık veya LLC gibi kayıtlı bir organizasyonu ifade eder."
   },
@@ -1432,6 +1558,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Özel şahıs"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Ülkeler ara..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Alt bölümlerde ara..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Ülkenizi seçin"
@@ -1568,6 +1700,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Miktar giriniz"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "Minimum tutar {min} ve bu tutar {balance} olan bakiyenizi aşıyor."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "Bu hediye kartını kullanmak için en az {min} kadar bakiyeye sahip olmanız lazım."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "Mevcut bakiyeniz için uygun bir tutar bulunmamaktadır"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "Bu tutara yakın bir değer bulunmamaktadır"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "Bu tutara yakın bir tutar bulunmamaktadır. Kullanılabilir en yüksek tutar {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Ödeme Yöntemi"
   },
@@ -1582,6 +1729,9 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Miktar arayın"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "{category} için arayın..."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
     "message": "{category} Seç"
@@ -1603,6 +1753,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "PayPal International için USD seçtiniz. Daha iyi ücretler için <direct-paypal-link>doğrudan PayPal'a geçin</direct-paypal-link> (≈%6 yerine ≈%2)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "En az {min}, en fazla {max} para çekilebilir."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "En az para çekme tutarı {min}."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Para Çek"
@@ -1970,6 +2126,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Miktar çok düşük"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "Bu ödeme yöntemi, ödeme sağlayıcısı tarafından devre dışı bırakıldı. Lütfen farklı bir ödeme yöntemi kullanın veya destek ekibiyle iletişime geçin."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "Ödeme yöntemi mevcut değil"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Lütfen bölgeniz için doğru PayPal transfer seçeneğini kullanın (ABD veya Uluslararası)."
   },
@@ -2267,6 +2429,24 @@
   "hosting-marketing.medal.text-secondary": {
     "message": "Sınırlı süreli teklif. Kredi kartı gerekli değildir. ABD sunucuları için geçerlidir."
   },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Ödeme bilgisi alınırken bir hata oluştu"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "Seçilen ürün bulundu, fakat gerekli verilere sahip değil. Lütfen destek ile iletişime geçin."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Geçersiz ürün"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "Şu anda kapasitemiz dolu. Lütfen daha sonra tekrar deneyin."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "Sunucu kapasitesi dolu"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "Beklenmeyen bir hata oluştu"
+  },
   "hosting-marketing.pick-customized-plan": {
     "message": "İhtiyacınız olan özelliklere sahip özelleştirilmiş bir plan seçin."
   },
@@ -2465,9 +2645,6 @@
   "layout.action.file-lookup": {
     "message": "Dosya bulma"
   },
-  "layout.action.lookup-by-email": {
-    "message": "E-posta ile arama"
-  },
   "layout.action.manage-affiliates": {
     "message": "Ortaklık linklerini yönet"
   },
@@ -2585,6 +2762,21 @@
   "layout.footer.about.status": {
     "message": "Durum"
   },
+  "layout.footer.based-on-label": {
+    "message": "Kaynak"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "Geliştirici modu açıldı"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Geliştirici modu aktif edildi"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "Geliştirici modu kapatıldı"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Geliştirici modu deaktive edildi"
+  },
   "layout.footer.legal": {
     "message": "Yasal"
   },
@@ -2648,8 +2840,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "bilinmeyen"
@@ -2714,6 +2912,36 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ Kullan"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Modrinth'e paylaşmadan önce e-postanızı doğrulamanız lazım."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "E-posta doğrulaması gerekli"
+  },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Onların oynadığı herşeyi otomatik olarak yükle"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Arkadaşların ile aynı içeriği oyna"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Paylaşılmış içerikler değiştikçe güncel tut"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Modrinth App'i indir"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Tarafından yönetiliyor"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "Modrinth App otomatik olarak açılacaktır..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Modrinth App açılıyor"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Neden Modrinth App'i kullanmalısın"
+  },
   "moderation.exclude-technical-review": {
     "message": "TR Hariç"
   },
@@ -2734,6 +2962,21 @@
   },
   "moderation.page.technicalReview": {
     "message": "Teknik inceleme"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "Grup başına {amount}"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Toplu miktar"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Bu işlem, bu projeye ait tüm atıf gruplarını ve bunların içindeki tüm dosyaları kalıcı olarak silecektir. Bu işlem geri alınamaz."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Tüm gruplar temizlenemedi: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Bütün gruplar başarılı bir şekilde silindi."
   },
   "modpack-scan-modal.failed": {
     "message": "Başarısız"
@@ -2764,6 +3007,9 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Tüm Dosyaları Tara"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Bazı dosyalar taranamadı:\n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Taranıyor..."
@@ -3062,6 +3308,15 @@
   "organization.project-transfer.name-column": {
     "message": "İsim"
   },
+  "organization.project-transfer.no-projects-available": {
+    "message": "Transfer için uygun proje yok."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "{name} için ikon"
+  },
+  "organization.project-transfer.title": {
+    "message": "Projeleri transfer et"
+  },
   "organization.project-transfer.type-column": {
     "message": "Tür"
   },
@@ -3179,6 +3434,15 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "Tüm projelere geri dön"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "Proje sayfasına geri dön"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "Kontrol ediliyor..."
+  },
   "project.actions.create-server": {
     "message": "Sunucu oluştur"
   },
@@ -3187,6 +3451,15 @@
   },
   "project.actions.dont-show-again": {
     "message": "Bir daha gösterme"
+  },
+  "project.actions.edit-project": {
+    "message": "Projeyi düzenle"
+  },
+  "project.actions.project-page": {
+    "message": "Proje Sayfası"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "Mod paketini yeniden incele"
   },
   "project.actions.review-project": {
     "message": "Projeyi incele"
@@ -3199,6 +3472,24 @@
   },
   "project.actions.servers-promo.title": {
     "message": "Sunucu oluştur"
+  },
+  "project.actions.view-dependents": {
+    "message": "Bağlılıkları görüntüle"
+  },
+  "project.actions.view-modpacks": {
+    "message": "Mod Paketlerini görüntüle"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "{projectType} bağımlılıklarını görüntüle"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "AI ile oluşturulmuş görselleri projenizi temsil etmek için kullanmak yasaktır. Tespiti atlatmaya çalışmak, Modrinth hesabınızın askıya alınmasına yol açabilir."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "Üretken AI politikamız hakkında daha fazla bilgi için <rules>Modrinth İçerik Kuralları</rules>’nın 6. bölümüne bakın."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "AI tarafından oluşturulmuş resimler kabul edilmiyor"
   },
   "project.collections.create-new": {
     "message": "Yeni koleksiyon oluştur"
@@ -3362,6 +3653,9 @@
   "project.gallery.title": {
     "message": "Galeri"
   },
+  "project.install-context.back-to-discover": {
+    "message": "Keşfete geri dön"
+  },
   "project.moderation.admonition.approved.body.private": {
     "message": "Projeniz özeldir, yani yalnızca siz ve davet ettiğiniz kişiler tarafından erişilebilir."
   },
@@ -3398,6 +3692,12 @@
   "project.moderation.admonition.under-review.body.3": {
     "message": "Projenizi değiştirmeye devam edebilirsiniz, bu kuyruktaki konumunuzu etkilemeyecektir."
   },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Gönderileri 24–48 saat içinde incelemeyi amaçlıyoruz, ancak bazı projelerde gecikmeler yaşanabilir. Bu durum gönderinizle ilgili bir sorun olduğu anlamına gelmez."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Gönderileri bir hafta içinde incelemeyi amaçlıyoruz, ancak bazı projelerde gecikmeler yaşanabilir. Bu durum, gönderinizle ilgili bir sorun olduğu anlamına gelmez."
+  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Moderatörlerimiz Modrinth'i güvende tutmak için çok çalışırken gösterdiğiniz sabır için teşekkür ediyor ve içeriğinizi paylaşmanıza yardımcı olmayı dört gözle bekliyoruz! 💚</emphasis>"
   },
@@ -3431,6 +3731,9 @@
   "project.navigation.changelog": {
     "message": "Değişiklikler"
   },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "Bu proje için .mrpack dosyası bulunamadı."
+  },
   "project.notification.icon-updated.message": {
     "message": "Projenizin simgesi güncellendi."
   },
@@ -3442,6 +3745,168 @@
   },
   "project.notification.updated.title": {
     "message": "Proje güncellendi"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "Tüm projelere geri dön"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "Proje sayfasına geri dön"
+  },
+  "project.settings.danger-zone": {
+    "message": "Tehlikeli bölge"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Projeyi kaldır"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Projeyi kalıcı olarak sil"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "Bu projeyi silmek istediğinizden emin misiniz?"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "Proje Modrinth'den kalıcı olarak kaldırıldı. Kaldırılan projeler Modrinth personeli veya destek ekibi tarafından <emphasis>kurtarılamaz</emphasis>."
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Bu projeye yüklenen ve Modrinth’te barındırılan Mod Paketlerinde aktif olarak kullanılan dosyalar varlığını sürdürebilir."
+  },
+  "project.settings.delete-project.title": {
+    "message": "Projeyi kaldır"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "Projeniz reklam, sponsorluk veya diğer çalışmaların tanıtımını içeriyorsa bunu etkinleştirmeniz gerekir."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Tanıtımın doğrudan parasal bir değeri yoksa <emphasis>ve</emphasis> ortalama bir kişinin <italic>ilgili</italic> ve <italic>rahatsız etmeyen</italic> olarak değerlendireceği bir şeyse (örneğin kendi modunuzun ayarlar sayfasının köşesinde Modrinth profilinize bir bağlantı), bunu bir reklam olarak değerlendirmeyiz."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "örn. Modrinth SMP sunucusunu sunucu listenize otomatik olarak ekler."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Reklam içerir"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "Daha fazla bilgi için lütfen <rules>Modrinth İçerik Kuralları</rules>’nın 6. bölümüne bakın."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "örn. AI tarafından oluşturulmuş Çince ve Arapça çeviriler."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "AI tarafından oluşturulmuş içerik"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "AI ne için kullanılıyor?"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "Afiş önizlemesi"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "Artık üzerinde çalışmadığınızı kullanıcılara bildirmek için projenizi arşivlenmiş olarak işaretleyin."
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "Arşivlenmiş projeler, görünürlükleri Herkese Açık olarak ayarlandığında keşfedilebilir olmaya devam eder. Projenizi listeden çıkarmak isterseniz, görünürlüğünü Listelenmemiş olarak ayarlayın."
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "örn. Bu projeyi geliştirmek için yeterli zamanım yok, isterseniz bu projeyi forklayabilirsiniz!"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "Projeyi arşivle"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "İçerik Uyarıları"
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "Orijinal çalışmaya bağlantı"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://ornek.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "Orijinal çalışmanın adı"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Örnek proje"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "Türetilmiş içerik"
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "Son güncelleme : {date}, {user} tarafından"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "Moderatör"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "Bu bilgilendirme metninin düzenlenmesi veya kaldırılması gerekiyorsa lütfen <contact-support-link>destek ekibiyle iletişime geçin</contact-support-link>."
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "Bu açıklama moderatörler tarafından kilitlenmiştir. Bunun bir hata olduğunu düşünüyorsanız lütfen <contact-support-link>destek ekibiyle iletişime geçin</contact-support-link>."
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "Bu bilgilendirme metninin düzenlenmesi veya kaldırılması gerekiyorsa lütfen <contact-support-link>destek ekibiyle iletişime geçin</contact-support-link>."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "Projeniz gerçek parayla satın alınabilecek özellikler içeriyorsa bunu etkinleştirmeniz gerekir."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "örn. Patreon üyelerine ödül olarak sunulan kozmetik ürünler"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "Ücretli özellikleri listeleyin"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Ücretli özellikler"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "Projenizde yanıp sönen ışıklara veya desenlere duyarlı kişiler için tehlikeli olabileceğini düşündüğünüz herhangi bir şey varsa bunu etkinleştirin."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "örn. Flaş modu bulunan bir el feneri öğesi ekler. Bu özellik oyun içindeki Erişilebilirlik ayarlarından devre dışı bırakılabilir."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "Işığa duyarlılık uyarısı"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "Reklam açıklaması detaylandırılmalıdır."
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "Türetilmiş çalışmların açıklanmasında en az bir kaynak çalışma belirtilmelidir."
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "Türetilmiş çalışma kaynaklarının bir adı olmalıdır."
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "Bu projenin gizlilik politikasını düzenleme izniniz yok."
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "Ücretli özellikler açıklamasında en az bir ücretli özellik belirtilmelidir."
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "Işık hassasiyeti uyarısı açıklamasında mutlaka bir tanım yer almalıdır."
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "Telemetrinizin onay modeli nedir?"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "Gizlilik politikası ekleyebilir veya toplanan veri türlerinin bir listesini ekleyebilirsiniz. Anonim olup olmadığını veya kişisel olarak tanımlanabilir bilgi (PII) içerip içermediğini belirtmeyi unutmayın."
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "Hangi veriler toplanıyor?"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "örn. Minecraft sürümü ve mod yükleyici kullanımını takip etmek için anonim başlatma analitikleri."
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "Projeniz kullanım verilerini size veya üçüncü bir tarafa geri gönderiyorsa bunu etkinleştirmeniz gerekir."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Telemetri içerir"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "Uyarı eklemeden önce sürümleri yükleyin"
+  },
+  "project.settings.editing-project": {
+    "message": "{projectType} projesi düzenleniyor"
   },
   "project.settings.general.name.description": {
     "message": "Önek, ek veya açıklayıcılardan kaçının—sadece projenin asıl adı."
@@ -3488,8 +3953,38 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.monetization.description": {
+    "message": "Modrinth’teki projeler otomatik olarak <rewards-program-link>Ödül Programı</rewards-program-link>’na kaydedilir. Bu projeden gelir elde etmek istemiyorsanız (veya yasal nedenlerle edemiyorsanız), buradan kapatabilirsiniz."
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "Bu proje para kazanmaya uygun değil. Bunun bir hata olduğunu düşünüyorsanız lütfen <contact-support-link>destek ile iletişime geçin</contact-support-link>."
+  },
+  "project.settings.monetization.title": {
+    "message": "Para Kazanma"
+  },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Aşağıdaki tüm dosyaları yeniden dağıtma izniniz olduğunu kanıtlayın. Tamamlandıktan sonra, bekletilen sürümler otomatik olarak yayınlanacaktır."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Projenizi inceleme için göndermeden önce, lütfen aşağıdaki dosyaların tümünü yeniden dağıtma izniniz olduğuna dair kanıt sunun."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Bilinmeyen harici içerik"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Modrinth moderasyon ekibi, harici içerikler için sağladığınız izin bilgilerini reddetti. Lütfen aşağıdaki reddedilen öğeleri inceleyin ve kabul edilebilir bir kanıt sağlayın veya içeriği kaldırın."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Bazı kanıtlar reddedildi"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Tümünü daralt"
+  },
   "project.settings.permissions.completed.title": {
     "message": "İzinler tamamlandı!"
+  },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Tüm grupları kaldır"
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "Hazırsınız!"
@@ -3515,6 +4010,33 @@
   "project.settings.permissions.sort.status": {
     "message": "Durum"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Bedrock adresi"
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Kaydedilemiyor"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Sunucu detayları"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Adresi gir"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Java adresi"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Diller"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Gecikme: {latency}ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "isteğe bağlı"
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Gecikmeyi yenile"
+  },
   "project.settings.server.region-label": {
     "message": "Bölge"
   },
@@ -3527,8 +4049,14 @@
   "project.settings.server.server-online": {
     "message": "Sunucu çevrimiçi!"
   },
+  "project.settings.tags.featured-tags": {
+    "message": "Öne çıkan etiketler"
+  },
   "project.settings.tags.title": {
     "message": "Etiketler"
+  },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "Etiket eklemeden önce sürümleri yükleyin"
   },
   "project.versions.copy-id-option": {
     "message": "ID'yi Kopyala"
@@ -3536,11 +4064,41 @@
   "project.versions.copy-link-option": {
     "message": "Bağlantıyı kopyala"
   },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Maven koordinatlarını kopyala"
+  },
   "project.versions.delete-button": {
     "message": "Sil"
   },
+  "project.versions.delete-confirm.title": {
+    "message": "Bu sürümü kaldırmak istediğinizden emin misiniz?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Detayları düzenle"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Dosyaları düzenle"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Meta verileri düzenle"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Sürümü düzenle"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Yeni sekmede aç"
+  },
+  "project.versions.share-option": {
+    "message": "Paylaş"
+  },
   "project.versions.title": {
     "message": "Sürümler"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "Sürüm başarıyla kaldırıldı."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Sürüm kaldırıldı"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Bu sürüm} other {Bu sürümler}} şu anda gizlenmiş durumda ve herkese açık olarak listelenmiyor. Lütfen {count, plural, one {sürüm} other {sürümler}} mod paketine dahil edilen belirli dosyaları yeniden dağıtma izniniz olduğuna dair kanıt sunun."
@@ -4109,6 +4667,9 @@
   "settings.account.security.passkey.modal.last-used": {
     "message": "En son kullanıldı {ago}"
   },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Geçiş anahtarkaru yükleniyor..."
+  },
   "settings.account.security.passkey.modal.never-used": {
     "message": "Hiçbir zaman kullanılmadı"
   },
@@ -4306,6 +4867,9 @@
   },
   "settings.authorizations.description": {
     "message": "Modrinth hesabınızla bir uygulamayı yetkilendirdiğinizde, ona hesabınıza erişim izni vermiş olursunuz. Hesabınıza verilen erişimi dilediğiniz zaman burada yönetebilir ve gözden geçirebilirsiniz."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "İzin verilen uygulama bulunamadı"
   },
   "settings.authorizations.head-title": {
     "message": "Yetkiler"
@@ -4616,6 +5180,21 @@
   "shared-instance.invite.inviter.unknown": {
     "message": "Bir Modrinth kullanıcısı"
   },
+  "shared-instance.invite.loading": {
+    "message": "Davet yükleniyor…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} seni oynamak için davet etti"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "Bu davetiye Modrinth tarafından değil, başka bir Modrinth kullanıcısı tarafından oluşturulmuştur. Sadece güvendiğiniz kişilerden gelen davetleri kabul edin."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "Bu kullanıcıyı tanıyor musun?"
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "Bu davet mevcut değil"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth'ten haberler"
   },
@@ -4687,6 +5266,12 @@
   },
   "version.environment.unknown.title": {
     "message": "Bilinmeyen ortam"
+  },
+  "version.notification.deleted-text": {
+    "message": "Sürüm başarıyla kaldırıldı."
+  },
+  "version.notification.deleted-title": {
+    "message": "Sürüm kaldırıldı"
   },
   "version.package-as-mod.button": {
     "message": "Mod olarak paketle"

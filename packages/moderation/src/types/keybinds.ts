@@ -40,6 +40,7 @@ export interface ModerationState {
 export type ModerationProjectContext = {
 	project: Labrinth.Projects.v2.Project
 	scope: 'project'
+	notifyCopied: (value: string, title: string) => void
 }
 
 export type ModerationChecklistContext = {
@@ -54,10 +55,18 @@ export type ModerationTechReviewContext = {
 	actions: TechReviewActions
 }
 
+export type ModerationGlobalContext = {
+	scope: 'global'
+	officialUrl: string
+	localhostUrl: string
+	notifyCopied: (value: string, title: string) => void
+}
+
 export type ModerationContext =
 	| ModerationProjectContext
 	| ModerationChecklistContext
 	| ModerationTechReviewContext
+	| ModerationGlobalContext
 
 export interface KeybindDefinition {
 	key: string
@@ -71,7 +80,7 @@ export interface KeybindDefinition {
 export type BaseKeybindListener<T> = {
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[]
 	description: string
-	scope: 'project' | 'checklist' | 'tech-review'
+	scope: 'project' | 'checklist' | 'tech-review' | 'global'
 	enabled?: (ctx: T) => boolean
 	action: (ctx: T) => void
 }
@@ -85,10 +94,14 @@ export type KeybindChecklistListener = BaseKeybindListener<ModerationChecklistCo
 export type KeybindTechReviewListener = BaseKeybindListener<ModerationTechReviewContext> & {
 	scope: 'tech-review'
 }
+export type KeybindGlobalListener = BaseKeybindListener<ModerationGlobalContext> & {
+	scope: 'global'
+}
 export type KeybindListener =
 	| KeybindProjectListener
 	| KeybindChecklistListener
 	| KeybindTechReviewListener
+	| KeybindGlobalListener
 
 export function parseKeybind(keybindString: string): KeybindDefinition {
 	const parts = keybindString.split('+').map((p) => p.trim().toLowerCase())
@@ -109,12 +122,13 @@ export function normalizeKeybind(keybind: KeybindDefinition | string): KeybindDe
 
 export function matchesKeybind(event: KeyboardEvent, keybind: KeybindDefinition | string): boolean {
 	const def = normalizeKeybind(keybind)
+	const wantsMod = !!(def.ctrl || def.meta)
+	const hasMod = event.ctrlKey || event.metaKey
 	return (
 		event.key.toLowerCase() === def.key.toLowerCase() &&
-		event.ctrlKey === (def.ctrl ?? false) &&
+		hasMod === wantsMod &&
 		event.shiftKey === (def.shift ?? false) &&
-		event.altKey === (def.alt ?? false) &&
-		event.metaKey === (def.meta ?? false)
+		event.altKey === (def.alt ?? false)
 	)
 }
 

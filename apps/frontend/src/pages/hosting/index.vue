@@ -644,6 +644,7 @@ import {
 	ModrinthServersPurchaseModal,
 	OptionGroup,
 	TagIcon,
+	useDebugLogger,
 	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'
@@ -658,6 +659,7 @@ import { products } from '~/generated/state.json'
 const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
+const debug = useDebugLogger('Hosting')
 
 const { setAffiliateCode, getAffiliateCode } = useAffiliates()
 
@@ -1199,7 +1201,7 @@ const selectProduct = async (product) => {
 	}
 
 	await refreshCapacity()
-	console.log(capacityStatuses.value)
+	debug(capacityStatuses.value)
 
 	if ((product === 'custom' && isCustomAtCapacity.value) || isAtCapacity.value) {
 		addNotification({

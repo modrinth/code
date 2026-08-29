@@ -1,23 +1,9 @@
 <script setup lang="ts">
-import {
-	ClipboardCopyIcon,
-	EditIcon,
-	EyeIcon,
-	FolderOpenIcon,
-	MinusIcon,
-	PaletteIcon,
-	PlayIcon,
-	PlusIcon,
-	StarIcon,
-	StopCircleIcon,
-	TrashIcon,
-	UploadIcon,
-} from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import { StarIcon } from '@modrinth/assets'
+import { ContextMenu, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
@@ -44,55 +30,9 @@ const messages = defineMessages({
 		id: 'app.library.search.no-results.title',
 		defaultMessage: 'No instances match your search.',
 	},
-	play: { id: 'app.library.instance.action.play', defaultMessage: 'Play' },
-	stop: { id: 'app.library.instance.action.stop', defaultMessage: 'Stop' },
-	addToFavorites: {
-		id: 'app.library.instance.action.add-to-favorites',
-		defaultMessage: 'Add to favorites',
-	},
-	removeFromFavorites: {
-		id: 'app.library.instance.action.remove-from-favorites',
-		defaultMessage: 'Remove from favorites',
-	},
-	addContent: { id: 'app.library.instance.action.add-content', defaultMessage: 'Add content' },
-	viewInstance: {
-		id: 'app.library.instance.action.view-instance',
-		defaultMessage: 'View instance',
-	},
-	editIcon: {
-		id: 'instance.settings.tabs.general.edit-icon',
-		defaultMessage: 'Edit icon',
-	},
-	selectIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.select',
-		defaultMessage: 'Select icon',
-	},
-	replaceIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.replace',
-		defaultMessage: 'Replace icon',
-	},
-	createIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.create',
-		defaultMessage: 'Create an icon',
-	},
-	editCreatedIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.edit-created',
-		defaultMessage: 'Edit icon',
-	},
-	removeIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.remove',
-		defaultMessage: 'Remove icon',
-	},
-	duplicateInstance: {
-		id: 'app.library.instance.action.duplicate',
-		defaultMessage: 'Duplicate instance',
-	},
-	delete: { id: 'app.library.instance.action.delete', defaultMessage: 'Delete' },
-	openFolder: { id: 'app.library.instance.action.open-folder', defaultMessage: 'Open folder' },
-	copyPath: { id: 'app.library.instance.action.copy-path', defaultMessage: 'Copy path' },
-	removeFromGroup: {
-		id: 'app.library.instance.action.remove-from-group',
-		defaultMessage: 'Remove from group',
+	instanceActionsLabel: {
+		id: 'app.library.instance.actions.label',
+		defaultMessage: 'Instance actions',
 	},
 })
 
@@ -111,7 +51,6 @@ const {
 	currentDeleteInstances,
 	clearLibraryInstanceSelection,
 	deleteInstance,
-	handleInstanceOption,
 	handleInstanceIconSaved,
 	selectedLibraryInstances,
 	setSelectedLibraryInstances,
@@ -371,7 +310,9 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 							>
 								<InstanceGroup
 									:can-drag-reorder="canDragReorderGroups"
-									:hide-header="visibleInstanceGroups.length === 1"
+									:hide-header="
+										instanceGroup.id === 'group:none' && visibleInstanceGroups.length === 1
+									"
 									:instance-group="instanceGroup"
 									:selection-anchor-instance-id="
 										anchorInstance?.groupId === instanceGroup.id ? anchorInstance?.instanceId : null
@@ -430,34 +371,10 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 		:config="currentIconEditorInstance?.icon_config"
 		@saved="handleInstanceIconSaved"
 	/>
-	<ContextMenu :ref="setInstanceOptions" @option-clicked="handleInstanceOption">
-		<template #play> <PlayIcon /> {{ formatMessage(messages.play) }} </template>
-		<template #stop> <StopCircleIcon /> {{ formatMessage(messages.stop) }} </template>
-		<template #add_to_favorites>
-			<StarIcon /> {{ formatMessage(messages.addToFavorites) }}
-		</template>
-		<template #remove_from_favorites>
+	<ContextMenu :ref="setInstanceOptions" :label="formatMessage(messages.instanceActionsLabel)">
+		<template #remove_from_favorites="{ option }">
 			<StarIcon style="color: var(--color-text-default); fill: var(--color-text-default)" />
-			{{ formatMessage(messages.removeFromFavorites) }}
-		</template>
-		<template #add_content> <PlusIcon /> {{ formatMessage(messages.addContent) }} </template>
-		<template #edit> <EyeIcon /> {{ formatMessage(messages.viewInstance) }} </template>
-		<template #edit_icon> <EditIcon /> {{ formatMessage(messages.editIcon) }} </template>
-		<template #select_icon> <UploadIcon /> {{ formatMessage(messages.selectIcon) }} </template>
-		<template #replace_icon> <UploadIcon /> {{ formatMessage(messages.replaceIcon) }} </template>
-		<template #create_icon> <PaletteIcon /> {{ formatMessage(messages.createIcon) }} </template>
-		<template #edit_created_icon>
-			<PaletteIcon /> {{ formatMessage(messages.editCreatedIcon) }}
-		</template>
-		<template #remove_icon> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
-		<template #duplicate>
-			<ClipboardCopyIcon /> {{ formatMessage(messages.duplicateInstance) }}
-		</template>
-		<template #delete> <TrashIcon /> {{ formatMessage(messages.delete) }} </template>
-		<template #open> <FolderOpenIcon /> {{ formatMessage(messages.openFolder) }} </template>
-		<template #copy> <ClipboardCopyIcon /> {{ formatMessage(messages.copyPath) }} </template>
-		<template #remove_from_group>
-			<MinusIcon /> {{ formatMessage(messages.removeFromGroup) }}
+			{{ option.label }}
 		</template>
 	</ContextMenu>
 </template>

@@ -89,6 +89,9 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Instância desconhecida"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "A atualizar conteúdo compartilhado"
+  },
   "app.action-bar.installs": {
     "message": "Instalações"
   },
@@ -141,34 +144,43 @@
     "message": "A sua privacidade e como os anúncios são financiados pela Modrinth"
   },
   "app.appearance-settings.default-landing-page.home": {
-    "message": "Casa"
+    "message": "Início"
   },
   "app.appearance-settings.default-landing-page.library": {
-    "message": "Livraria"
+    "message": "Biblioteca"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Desativa o nametag acima do seu player na página de skins."
+    "message": "Esconde o teu nome de utilizador acima da pré-visualização na página de seleção de Skin."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar nametag"
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Volte aos mundos"
-  },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiza o inicializador quando um processo Minecraft é iniciado."
+    "message": "Minimizar a Modrinth App quando o Minecraft iniciar."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimizar launcher"
+    "message": "Minimizar app"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Apresenta quanto tempo passou a jogar uma instância."
+    "message": "Mostrar quanto tempo jogaste cada instância."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Mostrar tempo de jogo"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Pular confirmações para ações de baixo risco como duplicar instalações, exclusão de conteúdo normal, atualizações em massa, desvinculação e reparos. Avisos para ações perigosas são sempre mostrados."
+  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Ignorar avisos não essenciais"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Esconde a barra lateral direita por defeito e adiciona uma barra para mostrar ou escondê-la."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Esconder barra lateral direita"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Mostrar um aviso de segurança antes de instalar um Modrinth Pack (.mrpack) que não está hospedado no Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Avise-me antes de instalar pacotes de mods desconhecidos."
@@ -178,6 +190,15 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Não foi possível alcançar os servidores de autenticação"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Confirmações"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Início e conteúdo"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Inicialização e navegação"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Adicionar servidor à instância"
@@ -200,17 +221,20 @@
   "app.browse.back-to-instance": {
     "message": "Voltar à instância"
   },
+  "app.browse.discover-project-type": {
+    "message": "Descobrir {projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "Descobrir servidores"
   },
   "app.browse.hide-added-servers": {
     "message": "Ocultar servidores já adicionados"
   },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Esconder já instalados"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Adicionar conteúdo pode quebrar a compatibilidade ao entrar no servidor. Qualquer conteúdo adicionado também será perdido ao atualizar o conteúdo da instância do servidor."
   },
   "app.browse.server.installing": {
     "message": "Instalando.."
@@ -292,6 +316,27 @@
   },
   "app.install.phase.running_loader_processors": {
     "message": "Executar processadores de carregamento"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Adicionado"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "A tua instância local está mais atualizada do que a dos utilizadores com quem tu a partilhaste."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "As tuas alterações ainda não foram partilhadas"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Enviar atualização"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Enviando..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Removido"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Enviar atualização"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Todos os dados da tua instância vão ser permanentemente apagados, incluídos os teus mundos, definições, e todos os conteúdos instalados."
@@ -395,6 +440,15 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Pesquisar {count} mundos..."
   },
+  "app.java-detection.columns.actions": {
+    "message": "Ações"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Caminho"
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/caminho/para/java"
+  },
   "app.modal.install-to-play.header": {
     "message": "Instala para jogar"
   },
@@ -409,9 +463,6 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {mod} other {mods}}"
-  },
-  "app.modal.install-to-play.reviewed-files": {
-    "message": "Um ficheiro só é analisado se for publicado no Modrinth, independentemente do seu formato (incluindo .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instância partilhada"
@@ -434,6 +485,15 @@
   "app.modal.update-to-play.removed": {
     "message": "Removido"
   },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Adicionado"
+  },
+  "app.nav.home": {
+    "message": "Início"
+  },
+  "app.news.title": {
+    "message": "Novidades"
+  },
   "app.project.install-button.already-installed": {
     "message": "Este projeto já está instalado."
   },
@@ -452,11 +512,17 @@
   "app.project.version.installing": {
     "message": "Instalando.."
   },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Largura"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo de desenvolvedor ativado."
   },
   "app.settings.downloading": {
     "message": "A transferir v{version}"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
   },
   "app.settings.privacy.ads-consent.intro": {
     "message": "Os anúncios tornam o Modrinth possível e financiam os pagamentos aos criadores. Os nossos parceiros podem armazenar ou aceder a cookies na aplicação para personalizar anúncios e medir o desempenho."
@@ -476,6 +542,9 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestão de recursos"
   },
+  "app.skins.apply-button": {
+    "message": "Aplicar"
+  },
   "app.skins.delete-button": {
     "message": "Apagar skin"
   },
@@ -494,8 +563,20 @@
   "app.skins.modal.add-title": {
     "message": "Adicionar uma skin"
   },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Fino"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Largo"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Capa"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Capa"
+  },
   "app.skins.modal.none-cape-option": {
-    "message": "Nada"
+    "message": "Nenhuma"
   },
   "app.skins.modal.saving-tooltip": {
     "message": "A guardar..."
@@ -671,6 +752,12 @@
   "instance.server-modal.resource-pack": {
     "message": "Pacote de recursos"
   },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Ações"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Usos"
+  },
   "instance.settings.tabs.general": {
     "message": "Geral"
   },
@@ -713,11 +800,11 @@
   "instance.settings.tabs.general.name": {
     "message": "Nome"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Ganchos de inicio"
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
   },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Ganchos de inicio personalizados"
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Ganchos permitem a utilizadores avançados executarem certos comandos de sistema antes e após abrir o jogo."
@@ -743,6 +830,24 @@
   "instance.settings.tabs.hooks.title": {
     "message": "Ganchos de inicio do jogo"
   },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: O caminho absoluto para a pasta da instância"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: O nome da pasta da instância"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: Os argumentos JVM fornecidos ao jogo"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: O caminho absoluto para o executável java"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: Um alias para "
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: O nome da instância"
+  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
@@ -758,9 +863,6 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versão {loader}"
   },
-  "instance.settings.tabs.java": {
-    "message": "Java e memória"
-  },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variáveis de ambiente"
   },
@@ -775,6 +877,9 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memória alocada"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/caminho/para/java"
   },
   "instance.settings.tabs.window": {
     "message": "Janela"
@@ -805,6 +910,9 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Inserir largura..."
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Adicionado"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Um Servidor de Minecraft"
@@ -848,6 +956,12 @@
   "instance.worlds.world_in_use": {
     "message": "Mundo está em uso"
   },
+  "modal.modrinth-account-required.browser-description": {
+    "message": "Uma nova aba abriu para iniciar sessão. Completa o início de sessão lá, depois volta para a app."
+  },
+  "modal.modrinth-account-required.header": {
+    "message": "Conta necessária"
+  },
   "search.filter.locked.instance": {
     "message": "Fornecido pela instância"
   },
@@ -862,5 +976,8 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Apenas mods no cliente podem ser adicionados à instância de servidor"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Conta"
   }
 }

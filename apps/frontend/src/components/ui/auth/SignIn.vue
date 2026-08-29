@@ -1,9 +1,30 @@
 <template>
 	<div v-if="subtleLauncherRedirectUri">
-		<iframe
-			:src="subtleLauncherRedirectUri"
-			class="fixed left-0 top-0 z-[9999] m-0 h-full w-full border-0 p-0"
-		></iframe>
+		<iframe :src="subtleLauncherRedirectUri" class="hidden"></iframe>
+		<div
+			class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6 text-center"
+		>
+			<div class="flex flex-col gap-2">
+				<h1 class="m-0 text-2xl font-semibold text-contrast">Opening Modrinth App...</h1>
+				<p class="m-0 text-left text-primary">
+					If the app doesn’t open, use the button below to finish signing in.
+				</p>
+			</div>
+			<div class="flex flex-col gap-2">
+				<Button
+					type="colored"
+					color="brand"
+					class="!w-full !justify-center"
+					@click="sendLauncherCallback"
+				>
+					{{ formatMessage(messages.returnToLauncherButton) }}
+					<RightArrowIcon />
+				</Button>
+				<ButtonLink to="/" class="!w-full !justify-center">
+					{{ formatMessage(messages.goToWebsiteButton) }}
+				</ButtonLink>
+			</div>
+		</div>
 	</div>
 	<div
 		v-else
@@ -18,7 +39,7 @@
 							{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						id="two-factor-code"
 						v-model="twoFactorCodeModel"
 						:maxlength="11"
@@ -35,111 +56,133 @@
 		</template>
 		<template v-else>
 			<div class="flex flex-col gap-5">
-				<div class="text-center text-2xl font-semibold text-contrast">
-					{{ formatMessage(messages.signInWithLabel) }}
-				</div>
-
-				<section class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-					<ButtonLink
-						v-for="provider in oauthProviders"
-						:key="provider.id"
-						class="relative w-full !justify-center overflow-visible"
-						:class="{
-							'!border !border-[var(--color-green)]': lastSignInProvider === provider.id,
-						}"
-						:href="getAuthUrl(provider.id, redirectTarget)"
-						:aria-label="formatMessage(messages.continueWithProvider, { provider: provider.name })"
-						@click="onOAuthProviderClick(provider.id)"
-					>
-						<component :is="provider.icon" />
-						<span>{{ provider.name }}</span>
-						<span
-							v-if="lastSignInProvider === provider.id"
-							class="oauth-provider-last-sign-in-badge"
-						>
-							{{ formatMessage(messages.lastSignInLabel) }}
-						</span>
-					</ButtonLink>
-					<Button
-						class="relative !w-full !justify-center overflow-visible sm:col-span-2"
-						:class="{ '!border !border-[var(--color-green)]': lastSignInProvider === 'passkey' }"
-						role="button"
-						tabindex="0"
-						@click="onPasskeySignIn"
-						@keydown.enter="onPasskeySignIn"
-					>
-						<UserKeyIcon />
-						<span class="ml-1">{{ formatMessage(messages.continueWithPasskey) }}</span>
-						<span v-if="lastSignInProvider === 'passkey'" class="oauth-provider-last-sign-in-badge">
-							{{ formatMessage(messages.lastSignInLabel) }}
-						</span>
-					</Button>
-				</section>
-
-				<div class="h-px w-full bg-surface-5"></div>
-
-				<section class="mx-auto flex w-full flex-col gap-2.5">
-					<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
-					<StyledInput
-						id="email"
-						v-model="emailModel"
-						:icon="MailIcon"
-						type="text"
-						inputmode="email"
-						autocomplete="username"
-						:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
-						wrapper-class="w-full"
-					/>
-
-					<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-					<StyledInput
-						id="password"
-						v-model="passwordModel"
-						:icon="KeyIcon"
-						type="password"
-						autocomplete="current-password"
-						:placeholder="formatMessage(commonMessages.passwordLabel)"
-						wrapper-class="w-full"
-					/>
-
-					<HCaptcha
-						v-if="globals?.captcha_enabled && emailModel && passwordModel"
-						:ref="onSetCaptchaRef"
-						v-model="tokenModel"
-					/>
-
-					<Button
-						type="colored"
-						color="brand"
-						class="!w-full"
-						:disabled="globals?.captcha_enabled ? !tokenModel : false"
-						@click="onPasswordSignIn()"
-					>
-						{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
-					</Button>
-
-					<div class="flex flex-wrap items-center justify-center gap-2.5 !text-base">
-						<NuxtLink
-							class="text-link"
-							:to="{
-								path: '/auth/reset-password',
-								query: routeQuery,
-							}"
-						>
-							{{ formatMessage(messages.forgotPasswordLabel) }}
-						</NuxtLink>
-						<div class="h-1.5 w-1.5 rounded-full bg-surface-5" />
-						<NuxtLink
-							class="inline text-link"
-							:to="{
-								path: '/auth/sign-up',
-								query: routeQuery,
-							}"
-						>
-							{{ formatMessage(messages.createAccountLabel) }}
-						</NuxtLink>
+				<template v-if="accounts.length && !addingAccount">
+					<div class="flex w-full flex-col gap-4">
+						<div class="text-center text-2xl font-semibold text-contrast">
+							{{ formatMessage(messages.chooseAccountLabel) }}
+						</div>
+						<AccountChoiceList
+							:accounts="accounts"
+							:add-account-label="formatMessage(messages.addAccountLabel)"
+							@select="emit('select', $event)"
+							@add="addingAccount = true"
+						/>
 					</div>
-				</section>
+				</template>
+				<template v-else>
+					<div class="text-center text-2xl font-semibold text-contrast">
+						{{ formatMessage(messages.signInWithLabel) }}
+					</div>
+
+					<section class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+						<ButtonLink
+							v-for="provider in oauthProviders"
+							:key="provider.id"
+							class="relative w-full !justify-center overflow-visible"
+							:class="{
+								'!border !border-[var(--color-green)]': lastSignInOAuthProvider === provider.id,
+							}"
+							:href="getAuthUrl(provider.id, redirectTarget)"
+							:aria-label="
+								formatMessage(messages.continueWithProvider, { provider: provider.name })
+							"
+							@click="onOAuthProviderClick(provider.id)"
+						>
+							<component :is="provider.icon" />
+							<span>{{ provider.name }}</span>
+							<span
+								v-if="lastSignInOAuthProvider === provider.id"
+								class="oauth-provider-last-sign-in-badge"
+							>
+								{{ formatMessage(messages.lastSignInLabel) }}
+							</span>
+						</ButtonLink>
+						<Button
+							class="relative !w-full !justify-center overflow-visible sm:col-span-2"
+							:class="{
+								'!border !border-[var(--color-green)]': lastSignInOAuthProvider === 'passkey',
+							}"
+							role="button"
+							tabindex="0"
+							@click="onPasskeySignIn"
+							@keydown.enter="onPasskeySignIn"
+						>
+							<UserKeyIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithPasskey) }}</span>
+							<span
+								v-if="lastSignInOAuthProvider === 'passkey'"
+								class="oauth-provider-last-sign-in-badge"
+							>
+								{{ formatMessage(messages.lastSignInLabel) }}
+							</span>
+						</Button>
+					</section>
+
+					<div class="h-px w-full bg-surface-5"></div>
+
+					<section class="mx-auto flex w-full flex-col gap-2.5">
+						<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
+						<Input
+							id="email"
+							v-model="emailModel"
+							:icon="MailIcon"
+							type="text"
+							inputmode="email"
+							autocomplete="username"
+							:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
+							wrapper-class="w-full"
+						/>
+
+						<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+						<Input
+							id="password"
+							v-model="passwordModel"
+							:icon="KeyIcon"
+							type="password"
+							autocomplete="current-password"
+							:placeholder="formatMessage(commonMessages.passwordLabel)"
+							wrapper-class="w-full"
+						/>
+
+						<HCaptcha
+							v-if="globals?.captcha_enabled && emailModel && passwordModel"
+							:ref="onSetCaptchaRef"
+							v-model="tokenModel"
+						/>
+
+						<Button
+							type="colored"
+							color="brand"
+							class="!w-full"
+							:disabled="globals?.captcha_enabled ? !tokenModel : false"
+							@click="onPasswordSignIn()"
+						>
+							{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
+						</Button>
+
+						<div class="flex flex-wrap items-center justify-center gap-2.5 !text-base">
+							<NuxtLink
+								class="text-link"
+								:to="{
+									path: '/auth/reset-password',
+									query: routeQuery,
+								}"
+							>
+								{{ formatMessage(messages.forgotPasswordLabel) }}
+							</NuxtLink>
+							<div class="h-1.5 w-1.5 rounded-full bg-surface-5" />
+							<NuxtLink
+								class="inline text-link"
+								:to="{
+									path: '/auth/sign-up',
+									query: routeQuery,
+								}"
+							>
+								{{ formatMessage(messages.createAccountLabel) }}
+							</NuxtLink>
+						</div>
+					</section>
+				</template>
 			</div>
 		</template>
 	</div>
@@ -159,23 +202,25 @@ import {
 	UserKeyIcon,
 } from '@modrinth/assets'
 import {
+	type AccountChoice,
+	AccountChoiceList,
 	Button,
 	ButtonLink,
 	commonMessages,
 	defineMessages,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
-import { computed } from 'vue'
+import { ref } from 'vue'
 import type { LocationQuery } from 'vue-router'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
 import {
-	getAuthUrl,
 	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-} from '@/composables/auth.ts'
+} from '@/composables/accounts.ts'
+import { getAuthUrl } from '@/composables/auth.ts'
 
 const oauthProviders = [
 	{ id: 'discord', name: 'Discord', icon: DiscordColorIcon },
@@ -203,6 +248,7 @@ interface Props {
 	onTwoFactorSignIn?: () => void
 	onPasskeySignIn?: () => void
 	onSetCaptchaRef?: ((captchaRef: unknown) => void) | undefined
+	accounts?: AccountChoice[]
 }
 
 const {
@@ -215,7 +261,14 @@ const {
 	onTwoFactorSignIn = () => {},
 	onPasskeySignIn = () => {},
 	onSetCaptchaRef = undefined,
+	accounts = [],
 } = defineProps<Props>()
+
+const addingAccount = ref(false)
+
+const emit = defineEmits<{
+	select: [account: AccountChoice]
+}>()
 
 const emailModel = defineModel<string>('email', { default: '' })
 const passwordModel = defineModel<string>('password', { default: '' })
@@ -234,9 +287,12 @@ const pendingSignInOAuthProvider = useStorage<AuthProvider | null>(
 	undefined,
 	{ initOnMounted: true },
 )
-const lastSignInProvider = computed(() => lastSignInOAuthProvider.value)
 const onOAuthProviderClick = (provider: AuthProvider) => {
 	pendingSignInOAuthProvider.value = provider
+}
+
+async function sendLauncherCallback() {
+	await fetch(subtleLauncherRedirectUri, { mode: 'no-cors' }).catch(() => undefined)
 }
 
 const { formatMessage } = useVIntl()
@@ -257,6 +313,14 @@ const messages = defineMessages({
 	signInWithLabel: {
 		id: 'auth.sign-in.sign-in-with',
 		defaultMessage: 'Sign into Modrinth',
+	},
+	chooseAccountLabel: {
+		id: 'auth.sign-in.choose-account',
+		defaultMessage: 'Choose an account to use in Modrinth App',
+	},
+	addAccountLabel: {
+		id: 'auth.sign-in.add-account',
+		defaultMessage: 'Add account',
 	},
 	twoFactorCodeInputPlaceholder: {
 		id: 'auth.sign-in.2fa.placeholder',
@@ -286,6 +350,23 @@ const messages = defineMessages({
 	continueWithPasskey: {
 		id: 'auth.sign-in.continue-with-passkey',
 		defaultMessage: 'Continue with passkey',
+	},
+	launcherSignInCompleteTitle: {
+		id: 'auth.sign-in.launcher.complete.title',
+		defaultMessage: 'You’re signed in',
+	},
+	launcherSignInCompleteDescription: {
+		id: 'auth.sign-in.launcher.complete.description',
+		defaultMessage:
+			'We’re returning you to the Modrinth App. If nothing happens, use the button below.',
+	},
+	returnToLauncherButton: {
+		id: 'auth.sign-in.launcher.complete.return-button',
+		defaultMessage: 'Open Modrinth App',
+	},
+	goToWebsiteButton: {
+		id: 'auth.sign-in.launcher.complete.go-to-website',
+		defaultMessage: 'Go to Modrinth.com',
 	},
 })
 </script>

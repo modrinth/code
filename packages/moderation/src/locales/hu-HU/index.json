@@ -18,7 +18,7 @@
     "defaultMessage": "Adj hozzá egy Java címet"
   },
   "nags.add-license-details.description": {
-    "defaultMessage": "Adjon meg az egyéni licenszének érvényes URL-címét és nevét, illetve SPDX-azonosítóját."
+    "defaultMessage": "Adj meg egy valós URL-t és nevet vagy egy SPDX azonosítót az egyedi licensedhez."
   },
   "nags.add-license-details.title": {
     "defaultMessage": "Add meg a license információit"
@@ -46,6 +46,12 @@
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Ügyelj arra, hogy a felhasználók tisztában legyenek a fontos részletekkel: töltsd ki a {type} típusra vonatkozó tartalmi tájékoztatókat."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Ellenőrizd a tartalomnyilatkozatokat"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "A jelenlegi leírás {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Látogasd meg a leírás beállításait"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Nyilatkozat-beállítások meglátogatása"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Látogasd meg a licenszbeállításokat"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "Látogasd meg az általános beállításokat"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Verzió-beállítások meglátogatása"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Az összegzés nem lehet azonos a projekt nevével. Fontos, hogy informatív és figyelemfelkeltő összegzést készíts."
@@ -253,6 +265,12 @@
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Legalább egy kép megadása szükséged a te {type}-od alapján."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "A forráscsomag tartalmának bemutatásához legalább egy galériakép szükséges, kivéve a hang- vagy lokalizációs csomagokat. Ha a csomagod ebbe a kategóriába tartozik, kérjük, válaszd ki a megfelelő címkét."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Legalább három galériakép szükséges a shader tartalmának különféle helyzetekben és körülmények között történő bemutatásához."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tölts fel egy képet"

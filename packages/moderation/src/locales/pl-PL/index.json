@@ -209,6 +209,9 @@
   "nags.settings.title": {
     "defaultMessage": "Odwiedź ogólne ustawienia"
   },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Zobacz ustawienia wersji"
+  },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Twoje podsumowanie nie może być kopią nazwy projektu. Ważne jest, by stworzyć bogate w informacje i interesujące podsumowanie."
   },

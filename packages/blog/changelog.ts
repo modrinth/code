@@ -11,6 +11,88 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-08-27T18:54:17+00:00`,
+		product: 'app',
+		version: '0.19.1',
+		body: `## Changed
+- Updated style of spoilers in descriptions.
+- Updated style of code formatting and snippets in descriptions.
+- Fourth-level headings in descriptions now have more contrast compared to regular body text.
+
+## Fixed
+- Fixed lag on Screenshots page/tab when you have a lot of screenshots`,
+	},
+	{
+		date: `2026-08-27T18:54:17+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated style of spoilers in descriptions.
+- Updated style of code formatting and snippets in descriptions.
+- Fourth-level headings in descriptions now have more contrast compared to regular body text.`,
+	},
+	{
+		date: `2026-08-27T17:07:29+00:00`,
+		product: 'app',
+		version: '0.19.0',
+		body: `## Added
+- Added option to switch between multiple signed-in Modrinth accounts.
+- Added the ability to view the app signed out as well even when accounts are added.
+- Added right-click context menu actions for Jump in items.
+- Added "Add a friend" to account menu.
+- Added a new global screenshots page accessible via the sidebar, which shows all screenshots you've taken from all of your instances.
+- Added an option to instances which allows you to opt-out an instance from the global screenshots page, which will enable an instance-local screenshot tab showing screenshots only for that instance.
+- Added a new screenshot editor, allowing you to annotate, doodle and blur out areas of your screenshots.
+- Added syncing between instances for command history, the in-game server list and creative hotbars. You will need to enable this for any existing instances in the Sync override tab of your instance settings.
+
+## Changed
+- Improved the consistency of filter dropdowns on the Versions page.
+- Improved the consistency of context menus, now they look the same as overflow menus.
+- Changed profile button to say "View profile" in account menu.
+- Added "Open backups folder" button from the state initialization error screen.
+- Appearance settings now remember your preferred dark theme when using "Sync with system".
+- Theme changes now happen instantly, disabling any funky transitions while it happens.
+- Splash screen is now responsive to color theme.
+- Made resize handle on "Jump in" section always visible.
+
+## Fixed
+- Non-instance icons with transparent corners are no longer padded, fixing many icons flashing in after a second.
+- Fixed window controls being covered by the splash screen.
+- Fixed "Official Modrinth account" badge on official profiles appearing gray instead of green
+- Fixed newer snapshots since 26.1 not being grouped properly.
+- Fixed settings menu headers being cut off when the window is small.
+- Fixed creating a new group when only one group exists does not show the group.
+- Fixed inconsistencies with text inputs.`,
+	},
+	{
+		date: `2026-08-27T17:07:29+00:00`,
+		product: 'web',
+		body: `## Added
+- Added option to switch between multiple signed-in Modrinth accounts.
+- Added the ability to view the site signed out as well even when accounts are added.
+
+## Changed
+- Improved the consistency of filter dropdowns on the Versions and Changelog pages.
+- When signing into Modrinth App, you're now given the choice of which account you'd like to sign into.
+- When you get a "You don't have access to this page" error, you are given the option to switch to another account.
+- Theme changes now happen instantly, disabling any funky transitions while it happens.
+- Renamed "Source jar" to "Sources jar" and "Javadoc jar" to "Javadocs jar"
+- Changed the icons for publish options to include a plus on them.
+- Redesigned the gallery image viewer to match what we have in Modrinth App for screenshots.
+- Opening an image in a new tab will now open the raw image.
+- Collections by non-creators are no longer indexed.
+- Changed Settings page favicons to have a Settings cog icon in the corner.
+- Removed cog emoji from project settings page titles.
+
+## Fixed
+- Non-instance icons with transparent corners are no longer padded, fixing many icons flashing in after a second.
+- Fixed color theme settings not showing what your preferred dark theme is.
+- Fixed "Official Modrinth account" badge on official profiles appearing gray instead of green
+- Fixed project status badges not visible on your projects in organizations
+- Fixed projects in organizations not being sorted by status.
+- Fixed newer snapshots since 26.1 not being grouped properly.
+- Fixed inconsistencies with text inputs.`,
+	},
+	{
 		date: `2026-08-20T22:10:10+00:00`,
 		product: 'app',
 		version: '0.18.2',

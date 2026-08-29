@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Continuer"
   },
-  "admin.billing.error.not-found": {
-    "message": "Utilisateur non trouvé"
-  },
   "ads-consent.accept": {
     "message": "Tout accepter"
   },
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Approuver avec réponse"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Fermer le fil"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Fermer avec réponse"
@@ -2651,9 +2645,6 @@
   "layout.action.file-lookup": {
     "message": "Recherche de fichier"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Recherche par adresse e-mail"
-  },
   "layout.action.manage-affiliates": {
     "message": "Gérer les liens affiliés"
   },
@@ -2849,8 +2840,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "inconnu"
@@ -3446,6 +3443,12 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "Retour à tous les projets"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "Retour à la page du projet"
+  },
   "project.actions.create-server": {
     "message": "Créer un serveur"
   },
@@ -3457,6 +3460,9 @@
   },
   "project.actions.edit-project": {
     "message": "Modifier le projet"
+  },
+  "project.actions.project-page": {
+    "message": "Page du projet"
   },
   "project.actions.rescan-modpack": {
     "message": "Rescanne le modpack"
@@ -3472,6 +3478,15 @@
   },
   "project.actions.servers-promo.title": {
     "message": "Créer un serveur"
+  },
+  "project.actions.view-dependents": {
+    "message": "Voir les dépendances"
+  },
+  "project.actions.view-modpacks": {
+    "message": "Voir les modpacks"
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "Les images générées par IA ne sont pas autorisées"
   },
   "project.collections.create-new": {
     "message": "Créer une collection"
@@ -3734,6 +3749,141 @@
   "project.notification.updated.title": {
     "message": "Projet mis à jour"
   },
+  "project.settings.back-to-all-projects": {
+    "message": "Retour à tous les projets"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "Retour à la page du projet"
+  },
+  "project.settings.danger-zone": {
+    "message": "Zone dangereuse"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Supprimer le projet"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Supprimer définitivement le projet"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "Êtes-vous sûr de vouloir supprimer ce projet ?"
+  },
+  "project.settings.delete-project.title": {
+    "message": "Supprimer le projet"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "Cette option doit être activée si votre projet contient des publicités, des partenariats ou des promotions pour d'autres contenus."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Si la promotion n'a aucune valeur monétaire directe <emphasis>et</emphasis> qu'elle concerne quelque chose que le grand public considérerait comme <italic>pertinent</italic> et <italic>discret</italic> (tel qu'un lien vers votre profil Modrinth dans un coin de la page des paramètres de votre propre mod), nous ne considérerions pas cela comme de la publicité."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "Par exemple : Ajoute automatiquement le serveur multijoueur Modrinth à votre liste de serveurs."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Contient des publicités"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "Pour plus d'informations, veuillez vous reporter à la section 6 des <rules>Règles relatives au contenu de Modrinth</rules>."
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "Cette option doit être activée si ce projet contient une quantité importante de code généré par IA, si des\néléments sont en grande partie générés par IA, si des fonctionnalités du projet reposent sur l'utilisation d'une\nIA générative, ou si un élément quelconque de la page de votre projet, tel que la description ou la publication,\nrepose sur une IA générative."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "Par exemple : Les traductions en chinois et en arabe ont été générées par IA."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "Contient du contenu généré par IA"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "Pour quoi l'IA générative a-t-elle été utilisée ?"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "Aperçu de la bannière"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "Indiquez que votre projet est archivé afin d'informer les utilisateurs que vous ne travaillez plus dessus."
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "Les projets archivés restent accessibles lorsque leur visibilité est définie sur Publique. Si vous souhaitez masquer votre projet, définissez sa visibilité sur Non-listé."
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "Par exemple : Je n'ai plus le temps de m'occuper de ce projet, n'hésitez pas à le fork !"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "Archiver le projet"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "Mentions relatives au contenu"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "Cette option doit être activée si votre projet est dérivé d'un autre projet, par exemple s'il s'agit d'un \"fork\" ou s'il contient une quantité importante de contenu créé par quelqu'un d'autre."
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "Lien vers le contenu original"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "Nom du contenu original"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Exemple de projet"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Expliquez dans quelle mesure votre projet repose sur le contenu original"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "Contient du contenu dérivé"
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "Dernière Mise à jour {date} par {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "Modérateur"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "Veuillez <contact-support-link>contacter le service d'assistance</contact-support-link> si cette mention doit être supprimée."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "Cette option doit être activée si votre projet comporte des fonctionnalités accessibles contre de l'argent réel."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "Par exemple : Des éléments cosmétiques offerts en récompense Patreon"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "Lister les types de fonctionnalités payantes"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Contient des fonctionnalités payantes"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "Activez cette option si votre projet contient des éléments qui pourraient présenter un risque pour certaines personnes sensibles aux lumières ou motifs clignotants."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "Par exemple : Ajoute une lampe torche dotée d'un mode stroboscopique pouvant être désactivé dans les paramètres d'accessibilité du jeu."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "Avertissement concernant la photosensibilité"
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "La mention d'avertissement concernant la photosensibilité doit comporter une description."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "Cette option doit être activée si votre projet lit ou modifie des éléments sur la machine de l'utilisateur en dehors du jeu."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Décrivez les interactions avec les systèmes externes"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "Par exemple : Ajoute un fichier nommé wake_up.txt sur le bureau"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "Interactions avec des systèmes externes"
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Contient de la télémétrie"
+  },
   "project.settings.general.name.description": {
     "message": "Évitez les préfixes, suffixes, parenthèses, ou les descriptions - juste le nom actuel du projet."
   },
@@ -3778,6 +3928,9 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.monetization.title": {
+    "message": "Monétisation"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Veuillez fournir la preuve que vous êtes autorisé à redistribuer tous les fichiers suivants. Une fois cette étape terminée, les versions actuellement retenues seront automatiquement publiées."
@@ -4096,6 +4249,9 @@
   },
   "report.report-item": {
     "message": "Signaler {title} aux modérateurs"
+  },
+  "report.reported-for": {
+    "message": "Signalé pour {type}"
   },
   "report.submit": {
     "message": "Soumettre le signalement"

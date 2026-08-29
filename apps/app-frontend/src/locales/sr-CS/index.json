@@ -155,12 +155,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sakrij ime"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Prikaži skorije igrane svetove na odeljku \"Vrati se u\" na početnoj stranici."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Vrati se u svetove"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Smanji Modrinth App kada se Minecraft pokrene."
   },
@@ -226,9 +220,6 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpackovi"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Dodavanje sadržaja može da prekine kompatibilnost prilikom pridruživanja serveru. Bilo koji dodat sadržaj će takođe biti izgubljen kada ažuriraš sadržaj instance servera."
   },
   "app.browse.server.installing": {
     "message": "Instaliranje"
@@ -428,9 +419,6 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# modova}}"
   },
-  "app.modal.install-to-play.reviewed-files": {
-    "message": "Datoteka se pregleda samo ako je postavljena na Modrinth, bez obzira na njen format (uključujući .mrpack)."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Deljena instanca"
   },
@@ -628,9 +616,6 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Prijavi se"
   },
   "app.skins.title": {
     "message": "Selektor skina"
@@ -863,12 +848,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Izaberi kanal ažuiranja"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Hookovi pokreta"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Prilagođeni hookovi za lansiranje"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hookovi omogućavaju naprednim korisnicima da pokreću određene sistemske komande pre i posle pokretanja igre."
   },
@@ -907,9 +886,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Verzija {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java i radna memorija"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Prilagođene promenljive okruženja"

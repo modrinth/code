@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "下載"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "隱藏正在下載的項目"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "隱藏更多執行中的實例"
   },
@@ -110,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "重新載入即可更新"
   },
+  "app.action-bar.show-downloads": {
+    "message": "顯示正在下載的項目"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "顯示更多執行中的實例"
   },
@@ -143,6 +149,12 @@
   "app.ads-consent.title": {
     "message": "關於你的隱私，以及廣告如何幫助 Modrinth"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "以密集的橫列版面顯示遊戲庫實例。"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "密集模式"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首頁"
   },
@@ -156,10 +168,10 @@
     "message": "隱藏名牌"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "在首頁的「繼續遊玩」區塊中顯示最近遊玩的世界。"
+    "message": "在首頁的「繼續遊玩」區塊中顯示最近遊玩的世界或實例。"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "繼續遊玩世界"
+    "message": "繼續遊玩世界或實例"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "當 Minecraft 啟動時將 Modrinth App 最小化。"
@@ -206,6 +218,15 @@
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "啟動與瀏覽"
   },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "在你登入的所有裝置套用這些行為設定。如果要在這個裝置上單獨設定，請關閉這個選項。"
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "登入 Modrinth 帳號即可同步設定。"
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "同步所有裝置的行為"
+  },
   "app.browse.add-servers-to-instance": {
     "message": "將伺服器新增至實例"
   },
@@ -239,11 +260,26 @@
   "app.browse.hide-installed-modpacks": {
     "message": "隱藏已安裝的內容"
   },
+  "app.browse.project-type.data-packs": {
+    "message": "資料包"
+  },
   "app.browse.project-type.modpacks": {
     "message": "模組包"
   },
+  "app.browse.project-type.mods": {
+    "message": "模組"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "資源包"
+  },
+  "app.browse.project-type.servers": {
+    "message": "伺服器"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "光影包"
+  },
   "app.browse.server-instance-content-warning": {
-    "message": "加入內容可能會導致加入伺服器時發生相容性問題。當你更新伺服器實例內容時，任何新增的內容也會遺失。"
+    "message": "新增內容可能會導致你無法加入這個伺服器。當受管理的伺服器內容更新時，你新增的任何內容都會被移除。"
   },
   "app.browse.server.installing": {
     "message": "安裝中"
@@ -256,6 +292,12 @@
   },
   "app.export-modal.export-button": {
     "message": "匯出"
+  },
+  "app.export-modal.export-complete": {
+    "message": "匯出完成"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "「{name}」已成功匯出。"
   },
   "app.export-modal.header": {
     "message": "匯出模組包"
@@ -271,6 +313,84 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "這個實例已被鎖定"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "實例已經開啟"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "更多選項"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "從未遊玩"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "新實例"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "拖曳調整大小"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "繼續遊玩"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "查看實例"
+  },
+  "app.hosting.update-required.description": {
+    "message": "你需要更新才能透過 Modrinth App 使用 Modrinth Hosting"
+  },
+  "app.hosting.update-required.download": {
+    "message": "下載即可更新"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "興奮的 Modrinth 機器人"
+  },
+  "app.hosting.update-required.title": {
+    "message": "需要更新 Modrinth App"
+  },
+  "app.icon-editor.apply-icons-modal.apply-error": {
+    "message": "無法將隨機圖示套用到實例。"
+  },
+  "app.icon-editor.apply-icons-modal.apply-success": {
+    "message": "已隨機產生 {num, plural, other {# 個實例}}的圖示。"
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "更新內容"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "關閉"
+  },
+  "app.icon-editor.apply-icons-modal.description": {
+    "message": "直接在 Modrinth App 中為你的實例建立自訂圖示。自由搭配 Minecraft 及熱門模組中的圖案與背景！"
+  },
+  "app.icon-editor.apply-icons-modal.instances-without-icons": {
+    "message": "你有 {count, plural, other {# 個實例}}還沒有圖示。要我們先幫你的{count, plural, other {實例}}隨機產生圖示嗎？"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "隨機產生圖示"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "跳過"
+  },
+  "app.icon-editor.apply-icons-modal.title": {
+    "message": "自訂圖示編輯器"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "關閉"
+  },
+  "app.icon-editor.notification.description": {
+    "message": "讓你的實例更具個人風格！"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "忽略"
+  },
+  "app.icon-editor.notification.title": {
+    "message": "新的圖示編輯器"
+  },
+  "app.icon-editor.notification.view-update": {
+    "message": "查看更新"
   },
   "app.install.phase.downloading_content": {
     "message": "正在下載內容"
@@ -326,6 +446,45 @@
   "app.install.phase.running_loader_processors": {
     "message": "正在執行載入器處理程式"
   },
+  "app.instance.action.add-content": {
+    "message": "新增內容"
+  },
+  "app.instance.action.copy-path": {
+    "message": "複製路徑"
+  },
+  "app.instance.action.edit": {
+    "message": "編輯"
+  },
+  "app.instance.action.open-folder": {
+    "message": "開啟資料夾"
+  },
+  "app.instance.action.play": {
+    "message": "遊玩"
+  },
+  "app.instance.action.stop": {
+    "message": "停止"
+  },
+  "app.instance.add-server.add": {
+    "message": "新增"
+  },
+  "app.instance.add-server.added": {
+    "message": "已新增"
+  },
+  "app.instance.add-server.adding": {
+    "message": "已經新增..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "取消"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "伺服器可能無法與所有實例相容。"
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "搜尋實例"
+  },
+  "app.instance.add-server.title": {
+    "message": "將伺服器新增至實例"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "已新增"
   },
@@ -356,17 +515,59 @@
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "正在檢視..."
   },
+  "app.instance.card.icon-alt": {
+    "message": "實例圖示"
+  },
+  "app.instance.card.installing": {
+    "message": "正在安裝..."
+  },
+  "app.instance.card.loading": {
+    "message": "正在載入實例..."
+  },
+  "app.instance.card.never-played": {
+    "message": "從未遊玩"
+  },
+  "app.instance.card.play": {
+    "message": "遊玩"
+  },
+  "app.instance.card.played": {
+    "message": "上次遊玩時間：{relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "修復"
+  },
+  "app.instance.card.stop": {
+    "message": "停止"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "你實例中的所有資料將被永久刪除，包含你的世界、設定檔以及所有已安裝的內容。"
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "這項動作無法復原"
   },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "這 {count} 個實例的所有資料將被永久刪除，包含世界、設定檔以及所有已安裝的內容。"
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "刪除 {count} 個實例"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "刪除 {count} 個實例"
+  },
   "app.instance.confirm-delete.delete-button": {
     "message": "刪除實例"
   },
   "app.instance.confirm-delete.header": {
     "message": "刪除實例"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, =1 {實例} other {實例 ({count})}}"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "模組包內容"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "共用內容"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "這個模組包已經安裝在實例「<bold>{instanceName}</bold>」中了，確定要再次安裝嗎？"
@@ -392,6 +593,9 @@
   "app.instance.mods.content-type-project": {
     "message": "專案"
   },
+  "app.instance.mods.freeze-content": {
+    "message": "鎖定版本"
+  },
   "app.instance.mods.locked-content": {
     "message": "已鎖定實例中的內容無法變更。"
   },
@@ -409,6 +613,12 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "已成功上傳"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "解除鎖定版本"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "回到實例"
   },
   "app.instance.share.empty.description": {
     "message": "你可以與好友共用這個實例！"
@@ -521,6 +731,27 @@
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "你目前使用的 Modrinth 帳號不正確"
   },
+  "app.instance.shortcut.created": {
+    "message": "已建立捷徑"
+  },
+  "app.instance.shortcut.creation-error": {
+    "message": "無法建立捷徑"
+  },
+  "app.instance.tab.content": {
+    "message": "內容"
+  },
+  "app.instance.tab.files": {
+    "message": "檔案"
+  },
+  "app.instance.tab.logs": {
+    "message": "紀錄"
+  },
+  "app.instance.tab.share": {
+    "message": "共用"
+  },
+  "app.instance.tab.worlds": {
+    "message": "世界"
+  },
   "app.instance.worlds.add-server": {
     "message": "新增伺服器"
   },
@@ -620,6 +851,258 @@
   "app.java-selector.test-installation": {
     "message": "測試 Java 安裝"
   },
+  "app.library.context-menu.create-instance": {
+    "message": "新增實例"
+  },
+  "app.library.filter.add": {
+    "message": "新增篩選條件"
+  },
+  "app.library.filter.clear": {
+    "message": "清除篩選條件"
+  },
+  "app.library.filter.game-version": {
+    "message": "遊戲版本"
+  },
+  "app.library.filter.instance-type": {
+    "message": "實例類型"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "自訂"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "模組包"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "伺服器"
+  },
+  "app.library.filter.label": {
+    "message": "篩選依據"
+  },
+  "app.library.filter.loader": {
+    "message": "載入器"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "自訂群組"
+  },
+  "app.library.group-by.game-version": {
+    "message": "遊戲版本"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "實例類型"
+  },
+  "app.library.group-by.label": {
+    "message": "分組依據"
+  },
+  "app.library.group-by.loader": {
+    "message": "載入器"
+  },
+  "app.library.group-by.none": {
+    "message": "不分組"
+  },
+  "app.library.group.collapse": {
+    "message": "摺疊群組"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "加入群組"
+  },
+  "app.library.group.create": {
+    "message": "建立群組"
+  },
+  "app.library.group.create.cancel": {
+    "message": "取消"
+  },
+  "app.library.group.delete": {
+    "message": "刪除群組"
+  },
+  "app.library.group.delete-description": {
+    "message": "這個群組中的實例將被取消分組。"
+  },
+  "app.library.group.edit-name": {
+    "message": "編輯群組名稱"
+  },
+  "app.library.group.empty": {
+    "message": "拖曳以新增實例。"
+  },
+  "app.library.group.expand": {
+    "message": "展開群組"
+  },
+  "app.library.group.favorites": {
+    "message": "我的最愛"
+  },
+  "app.library.group.instance.add": {
+    "message": "加入"
+  },
+  "app.library.group.instance.added": {
+    "message": "已加入"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "加入"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "已加入"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "找不到實例"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "搜尋實例"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "將實例加入「{groupName}」"
+  },
+  "app.library.group.move-down": {
+    "message": "將群組向下移動"
+  },
+  "app.library.group.move-up": {
+    "message": "將群組向上移動"
+  },
+  "app.library.group.name": {
+    "message": "群組名稱"
+  },
+  "app.library.group.name-empty": {
+    "message": "群組名稱不能為空。"
+  },
+  "app.library.group.name-placeholder": {
+    "message": "輸入群組名稱"
+  },
+  "app.library.group.name-reserved": {
+    "message": "「None」為保留名稱，不能用作群組名稱。"
+  },
+  "app.library.group.name-too-long": {
+    "message": "群組名稱的不能超過 {maxLength} 個字元。"
+  },
+  "app.library.group.new": {
+    "message": "新增群組"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "找不到實例"
+  },
+  "app.library.group.rename-failed": {
+    "message": "無法重新命名群組"
+  },
+  "app.library.group.search-instance": {
+    "message": "搜尋實例"
+  },
+  "app.library.group.ungrouped": {
+    "message": "未分組"
+  },
+  "app.library.group.unknown": {
+    "message": "未知的群組"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "新增內容"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "加入我的最愛"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "複製路徑"
+  },
+  "app.library.instance.action.delete": {
+    "message": "刪除"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "複製實例"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "開啟資料夾"
+  },
+  "app.library.instance.action.play": {
+    "message": "遊玩"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "從我的最愛中移除"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "從群組中移除"
+  },
+  "app.library.instance.action.stop": {
+    "message": "停止"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "查看實例"
+  },
+  "app.library.instance.deselect": {
+    "message": "取消選取實例"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "取消選取「{name}」"
+  },
+  "app.library.instance.installing": {
+    "message": "正在安裝..."
+  },
+  "app.library.instance.loading": {
+    "message": "正在載入實例..."
+  },
+  "app.library.instance.new": {
+    "message": "新增實例"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "開啟「{name}」"
+  },
+  "app.library.instance.play": {
+    "message": "遊玩"
+  },
+  "app.library.instance.repair": {
+    "message": "修復"
+  },
+  "app.library.instance.select": {
+    "message": "選取實例"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "選取「{name}」"
+  },
+  "app.library.instance.stop": {
+    "message": "停止"
+  },
+  "app.library.search.no-results.title": {
+    "message": "沒有實例符合你的搜尋字詞。"
+  },
+  "app.library.search.placeholder": {
+    "message": "搜尋"
+  },
+  "app.library.selection.aria-label": {
+    "message": "已選取實例"
+  },
+  "app.library.selection.deleting": {
+    "message": "正在刪除已選取的實例"
+  },
+  "app.library.selection.new-group": {
+    "message": "新增群組"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "從群組中移除"
+  },
+  "app.library.selection.selected-count": {
+    "message": "已選取 {count} 個"
+  },
+  "app.library.sort.date-created": {
+    "message": "建立日期"
+  },
+  "app.library.sort.date-modified": {
+    "message": "修改日期"
+  },
+  "app.library.sort.game-version": {
+    "message": "遊戲版本"
+  },
+  "app.library.sort.hours-played": {
+    "message": "遊玩時數"
+  },
+  "app.library.sort.label": {
+    "message": "排序依據"
+  },
+  "app.library.sort.last-played": {
+    "message": "最後遊玩時間"
+  },
+  "app.library.sort.loader": {
+    "message": "載入器"
+  },
+  "app.library.sort.name": {
+    "message": "名稱"
+  },
+  "app.library.title": {
+    "message": "遊戲庫"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "補充說明"
   },
@@ -653,6 +1136,9 @@
   "app.modal.install-to-play.invite-warning-with-creator": {
     "message": "這份邀請是由 <creator>{username}</creator> 建立，並非由 Modrinth 官方建立。請僅接受來自你信任的人的邀請。"
   },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "模組包內容"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# 個模組}}"
   },
@@ -681,7 +1167,7 @@
     "message": "如需客服支援，請聯絡我們的<support-link>客服團隊</support-link>。如需回報錯誤，請<github-link>在 GitHub 上提交 issue</github-link>。"
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
+    "message": "未在 Modrinth 上發布的檔案未經過審查。"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共用實例"
@@ -746,17 +1232,32 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "登入 Modrinth 帳號"
   },
-  "app.nav.signed-in-as": {
-    "message": "以 <user>{username}</user> 登入"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "升級至 Modrinth+"
+  },
+  "app.navigation.go-back": {
+    "message": "上一頁"
+  },
+  "app.navigation.go-forward": {
+    "message": "下一頁"
+  },
+  "app.navigation.home": {
+    "message": "首頁"
+  },
+  "app.navigation.next-image": {
+    "message": "下一張圖片"
   },
   "app.news.title": {
     "message": "新聞"
   },
   "app.news.view-all": {
     "message": "查看所有新聞"
+  },
+  "app.notification.warning": {
+    "message": "警告"
+  },
+  "app.project.coming-soon": {
+    "message": "即將推出"
   },
   "app.project.install-button.already-installed": {
     "message": "這個專案已安裝"
@@ -765,10 +1266,25 @@
     "message": "切換版本"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "返回瀏覽"
+    "message": "返回探索"
   },
   "app.project.install-context.back-to-instance": {
     "message": "回到實例"
+  },
+  "app.project.load-error": {
+    "message": "無法載入專案資料。"
+  },
+  "app.project.more-options": {
+    "message": "更多選項"
+  },
+  "app.project.tab.description": {
+    "message": "描述"
+  },
+  "app.project.tab.gallery": {
+    "message": "圖庫"
+  },
+  "app.project.tab.versions": {
+    "message": "版本"
   },
   "app.project.version.all-versions": {
     "message": "所有版本"
@@ -962,9 +1478,6 @@
   "app.settings.tabs.behavior": {
     "message": "行為"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "預設遊戲選項"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java 安裝"
   },
@@ -998,6 +1511,15 @@
   "app.skins.delete-modal.title": {
     "message": "確定要刪除這個外觀嗎？"
   },
+  "app.skins.demo.apply-tooltip": {
+    "message": "登入即可套用外觀。"
+  },
+  "app.skins.demo.description": {
+    "message": "登入 Minecraft 帳號即可儲存並套用外觀！"
+  },
+  "app.skins.demo.title": {
+    "message": "正在用試用帳號編輯"
+  },
   "app.skins.dropped-file-error.text": {
     "message": "無法讀取拖曳的檔案。"
   },
@@ -1030,6 +1552,9 @@
   },
   "app.skins.modal.cape-section": {
     "message": "披風"
+  },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "登入即可儲存外觀。"
   },
   "app.skins.modal.edit-title": {
     "message": "編輯外觀"
@@ -1119,7 +1644,7 @@
     "message": "小鬼當家"
   },
   "app.skins.sign-in.button": {
-    "message": "登入"
+    "message": "登入 Microsoft"
   },
   "app.skins.title": {
     "message": "外觀選擇工具"
@@ -1175,8 +1700,29 @@
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安裝！"
   },
+  "app.update.download-error.missing-version": {
+    "message": "無法下載更新：沒有可用版本"
+  },
   "app.user.project.install-to-instance": {
     "message": "安裝至實例"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "建立實例"
+  },
+  "app.welcome-screen.description": {
+    "message": "準備好開始遊戲了嗎？"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "從其他啟動器匯入"
+  },
+  "app.welcome-screen.import-prompt": {
+    "message": "你是從其他啟動器來的嗎？"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "按 <shortcut>N</shortcut> 快速建立實例"
+  },
+  "app.welcome-screen.title": {
+    "message": "歡迎使用 Modrinth"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -1192,6 +1738,9 @@
   },
   "app.world.world-item.offline": {
     "message": "離線"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} 人在線上"
   },
   "content.shared-instance.change-version-body": {
     "message": "變更版本只會影響本機副本。未來共用實例更新時可能會再次復原或變更這個專案。"
@@ -1400,6 +1949,222 @@
   "instance.files.save-as": {
     "message": "另存新檔..."
   },
+  "instance.icon-editor.background": {
+    "message": "背景"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "藍色"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "深灰色"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "深綠色"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "灰色"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "綠色"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "靛藍色"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "淡紫色"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "淺灰色"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "淺綠色"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "橙色"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "粉紅色"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "紫色"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "紅色"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "玫瑰色"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "黃色"
+  },
+  "instance.icon-editor.description": {
+    "message": "自由搭配各種元素，打造專屬圖示。"
+  },
+  "instance.icon-editor.recents": {
+    "message": "最近"
+  },
+  "instance.icon-editor.save": {
+    "message": "儲存圖示"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "隨機產生"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "圖案"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "背包"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "烽火台"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "藍鯊"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "書櫃"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "棕熊"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "蛋糕"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "營火"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "儲物箱"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "齒輪"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "指令方塊"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "烹飪鍋"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "沙發"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "工作台"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "扳手"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "苦力怕"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "附魔台"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "終界箱"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "終界龍"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "引擎"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "熔爐"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "地球儀"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "草地"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "燈籠"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "哞花"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr. Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "起源之球"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "氧氣分配器"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "鬆餅"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "鎬子"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "精靈球"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "紅石方塊"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "伏聆振測器"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "骷髏"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "平底鍋"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "史萊姆方塊"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "太空頭盔"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "黏性活塞"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "劍"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "終端機"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "小小馬鈴薯"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "車輪"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Modrinth 扳手"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "殭屍"
+  },
+  "instance.icon-editor.title": {
+    "message": "圖示編輯器"
+  },
+  "instance.last-played": {
+    "message": "最後遊玩時間："
+  },
   "instance.locked.delete-button": {
     "message": "刪除實例"
   },
@@ -1490,6 +2255,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "編輯圖示"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "建立圖示"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "編輯圖示"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "移除圖示"
   },
@@ -1498,6 +2269,9 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "選擇圖示"
+  },
+  "instance.settings.tabs.general.icon": {
+    "message": "圖示"
   },
   "instance.settings.tabs.general.name": {
     "message": "名稱"
@@ -1526,12 +2300,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "選擇更新通道"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "啟動掛勾"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "自訂啟動掛勾"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "掛勾讓進階使用者能在遊戲啟動前和啟動後執行特定的系統指令。"
   },
@@ -1557,7 +2325,7 @@
     "message": "遊戲啟動掛勾"
   },
   "instance.settings.tabs.hooks.variables.description": {
-    "message": "掛勾會在實例的工作目錄中執行，並具備以下變數："
+    "message": "掛勾會在實例的工作目錄中執行，可使用以下變數："
   },
   "instance.settings.tabs.hooks.variables.inst-dir.description": {
     "message": "$INST_DIR：實例資料夾的絕對路徑"
@@ -1594,9 +2362,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "實例被鎖定時無法使用安裝設定選項。"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java 和記憶體"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "自訂環境變數"
@@ -1748,20 +2513,32 @@
   "instance.worlds.incompatible_server": {
     "message": "伺服器不相容"
   },
+  "instance.worlds.instance-locked": {
+    "message": "這個實例已被鎖定"
+  },
   "instance.worlds.linked_server": {
     "message": "由伺服器專案管理"
+  },
+  "instance.worlds.more-options": {
+    "message": "更多選項"
   },
   "instance.worlds.no_contact": {
     "message": "伺服器沒有回應"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "你只能在 Minecraft Alpha 1.0.5 以上版本直接加入伺服器"
+    "message": "只能在 Minecraft Alpha 1.0.5 以上版本直接加入伺服器"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "你只能在 Minecraft 1.20 以上版本直接進入單人遊戲世界"
+    "message": "只能在 Minecraft 1.20 以上版本直接進入單人遊戲世界"
   },
   "instance.worlds.play_instance": {
     "message": "遊玩實例"
+  },
+  "instance.worlds.shortcut-created": {
+    "message": "已建立捷徑"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "無法建立捷徑"
   },
   "instance.worlds.view_instance": {
     "message": "查看實例"
@@ -1840,6 +2617,18 @@
   },
   "modal.modrinth-account-required.waiting-for-browser": {
     "message": "等待瀏覽器確認..."
+  },
+  "onboarding-checklist.create-instance": {
+    "message": "建立第一個實例"
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "登入 Minecraft"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "登入 Modrinth"
+  },
+  "onboarding-checklist.title": {
+    "message": "開始使用"
   },
   "search.filter.locked.instance": {
     "message": "由該實例提供"

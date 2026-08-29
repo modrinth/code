@@ -65,23 +65,8 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "ไลบรารี"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "ซ่อนป้ายชื่อบนศีรษะของผู้เล่นในหน้าแสดงสกิน"
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "ซ่อนป้ายชื่อ"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "เล่นต่อ"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "ย่อลันเชอร์เมื่อกระบวนการการรัน Minecraft เริ่มต้นแล้ว"
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "ย่อลันเชอร์"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "แสดงเวลาที่คุณใช้เล่นในแต่ละอินสแตนซ์"
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "แสดงระยะเวลาที่เล่น"
@@ -121,9 +106,6 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "แพ็กม็อด"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "การเพิ่มเนื้อหาอาจทำให้ใช้งานร่วมกันไม่ได้เมื่อเข้าร่วมเซิร์ฟเวอร์ เนื้อหาที่เพิ่มเข้ามาจะหายไปเมื่อคุณอัปเดตอินสแตนซ์ของเซิร์ฟเวอร์"
   },
   "app.browse.server.installing": {
     "message": "กำลังติดตั้ง"
@@ -395,9 +377,6 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
-  "app.skins.sign-in.button": {
-    "message": "ลงชื่อเข้าใช้"
-  },
   "app.update-popup.body.download-complete": {
     "message": "ดาวน์โหลด Modrinth v{version} สำเร็จแล้ว เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม Modrinth"
   },
@@ -599,12 +578,6 @@
   "instance.settings.tabs.general.name": {
     "message": "ชื่อ"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Launch Hook"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "กำหนด Launch Hook เอง"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Launch Hook จะช่วยให้ผู้เล่นที่ชำนาญสามารถใช้คำสั่งต่อระบบบางอย่างได้ ทั้งก่อนและหลังเกมถูกเปิด"
   },
@@ -643,9 +616,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "เวอร์ชัน {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java และ หน่วยความจำ"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Environment Variables"

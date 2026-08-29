@@ -18,7 +18,12 @@
 							>
 								<LeftArrowIcon />
 							</ButtonLink>
-							<Avatar :src="project.icon_url" :tint-by="project.id" size="64px" />
+							<Avatar
+								:src="project.icon_url"
+								:raw-src="project.raw_icon_url"
+								:tint-by="project.id"
+								size="64px"
+							/>
 						</template>
 						<template #metadata>
 							<PageHeaderMetadata>
@@ -633,6 +638,7 @@ import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
+import { notifyCopied } from '~/composables/moderation.ts'
 import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
@@ -1271,6 +1277,7 @@ const { data: thread } = useQuery({
 })
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
+useFavicon(() => (isSettings.value ? 'settings' : 'default'))
 
 // Jank modpack loaders fix
 const versionsRaw = computed(() => {
@@ -2075,7 +2082,7 @@ if (!route.name.startsWith('type-project-settings')) {
 		ogImage: () =>
 			project.value
 				? (project.value?.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png')
-				: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
+				: 'https://cdn-raw.modrinth.com/not-found.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})
@@ -2375,6 +2382,7 @@ function handleKeybinds(event) {
 	keybinds.value.handle(event, {
 		project: projectRaw.value,
 		scope: 'project',
+		notifyCopied,
 	})
 }
 

@@ -4,7 +4,7 @@ import { PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { Accordion, NewModal, StyledInput } from '#ui/components'
+import { Accordion, Input, NewModal } from '#ui/components'
 import { Button } from '#ui/components/base/buttons'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
@@ -45,7 +45,7 @@ const { addNotification } = injectNotificationManager()
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const searchAccordionRef = useTemplateRef<InstanceType<typeof Accordion>>('searchAccordionRef')
 const filesAccordionRef = useTemplateRef<InstanceType<typeof Accordion>>('filesAccordionRef')
-const searchInputRef = useTemplateRef<InstanceType<typeof StyledInput>>('searchInputRef')
+const searchInputRef = useTemplateRef<InstanceType<typeof Input>>('searchInputRef')
 
 const query = ref('')
 const isLoading = ref(false)
@@ -218,7 +218,7 @@ defineExpose({ show, hide })
 						class="flex flex-wrap gap-2 shrink-0 p-4 bg-surface-3 border-0 border-b border-solid border-surface-5"
 						@submit.prevent="executeSearch"
 					>
-						<StyledInput
+						<Input
 							ref="searchInputRef"
 							v-model="query"
 							:icon="SearchIcon"

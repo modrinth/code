@@ -924,6 +924,9 @@ pub async fn launch_minecraft(
 
     let env_args = Vec::from(env_args);
 
+    let _instance_content_lock =
+        state.lock_instance_content(&instance.id).await;
+
     // Check if instance has a running process, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
     let existing_processes = process::get_by_instance_id(&instance.id).await?;
@@ -931,6 +934,13 @@ pub async fn launch_minecraft(
         return Err(crate::ErrorKind::LauncherError(format!(
             "Instance {} is already running as process {}",
             instance.id, process.uuid
+        ))
+        .as_error());
+    }
+    if crate::state::instance_has_running_process(&instance.id, &state).await? {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Instance {} is already running",
+            instance.id
         ))
         .as_error());
     }

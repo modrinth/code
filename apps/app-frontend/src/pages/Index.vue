@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { PlayIcon, PlusIcon } from '@modrinth/assets'
-import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { ContextMenu, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, inject, onActivated, ref } from 'vue'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import LibrarySection from '@/components/ui/library/index.vue'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
@@ -35,6 +34,10 @@ const messages = defineMessages({
 	newInstance: {
 		id: 'app.library.context-menu.create-instance',
 		defaultMessage: 'New instance',
+	},
+	libraryActionsLabel: {
+		id: 'app.library.actions.label',
+		defaultMessage: 'Library actions',
 	},
 })
 
@@ -87,13 +90,14 @@ function openPageContextMenu(event: MouseEvent) {
 
 	event.preventDefault()
 	event.stopPropagation()
-	pageOptions.value?.showMenu(event, {}, [{ name: 'new_instance' }])
-}
-
-function handlePageOption({ option }: { option: string }) {
-	if (option === 'new_instance') {
-		showCreationModal?.()
-	}
+	pageOptions.value?.open(event, [
+		{
+			id: 'new_instance',
+			label: formatMessage(messages.newInstance),
+			icon: PlusIcon,
+			action: () => showCreationModal?.(),
+		},
+	])
 }
 </script>
 
@@ -110,8 +114,6 @@ function handlePageOption({ option }: { option: string }) {
 			:recent-instances="recentInstances"
 		/>
 		<LibrarySection :instances="instances" />
-		<ContextMenu ref="pageOptions" @option-clicked="handlePageOption">
-			<template #new_instance> <PlusIcon /> {{ formatMessage(messages.newInstance) }} </template>
-		</ContextMenu>
+		<ContextMenu ref="pageOptions" :label="formatMessage(messages.libraryActionsLabel)" />
 	</div>
 </template>

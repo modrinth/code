@@ -32,7 +32,7 @@
 			class="page-number-container"
 		>
 			<form v-if="item === '-'" class="grid place-content-center" @submit.prevent="goToPage">
-				<StyledInput
+				<Input
 					v-if="showPageInput === index"
 					:ref="focusInput"
 					v-model="pageInput"
@@ -118,7 +118,7 @@ import { type ComponentPublicInstance, computed, ref } from 'vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n.ts'
 
 import { Button, ButtonLink, IconButton } from './buttons'
-import StyledInput from './StyledInput.vue'
+import Input from './inputs/Input.vue'
 
 const emit = defineEmits<{
 	'switch-page': [page: number]
@@ -179,8 +179,8 @@ function switchPage(newPage: number) {
 
 function focusInput(element: Element | ComponentPublicInstance | null) {
 	if (element && 'focus' in element) {
-		const styledInput = element as InstanceType<typeof StyledInput>
-		styledInput.focus()
+		const input = element as InstanceType<typeof Input>
+		input.focus()
 	}
 }
 

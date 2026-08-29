@@ -632,9 +632,6 @@
   "settings.display.theme.dark": {
     "defaultMessage": "มืด"
   },
-  "settings.display.theme.description": {
-    "defaultMessage": "เลือกธีมสีที่คุณต้องการสำหรับ Modrinth บนอุปกรณ์นี้"
-  },
   "settings.display.theme.light": {
     "defaultMessage": "สว่าง"
   },
@@ -648,3 +645,4 @@
     "defaultMessage": "ภาษา"
   }
 }
+

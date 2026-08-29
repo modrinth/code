@@ -66,7 +66,7 @@
 
 		<section class="flex flex-col gap-2.5">
 			<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
-			<StyledInput
+			<Input
 				id="email"
 				v-model="emailModel"
 				:icon="MailIcon"
@@ -77,7 +77,7 @@
 			/>
 
 			<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-			<StyledInput
+			<Input
 				id="password"
 				v-model="passwordModel"
 				:icon="KeyIcon"
@@ -145,14 +145,15 @@ import {
 	ButtonLink,
 	commonMessages,
 	defineMessages,
+	Input,
 	IntlFormatted,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import type { LocationQuery } from 'vue-router'
 
-import { getAuthUrl, PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY } from '@/composables/auth.ts'
+import { PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY } from '@/composables/accounts.ts'
+import { getAuthUrl } from '@/composables/auth.ts'
 
 type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft'
 

@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Doorgaan"
   },
-  "admin.billing.error.not-found": {
-    "message": "Gebruiker niet gevonden"
-  },
   "ads-consent.accept": {
     "message": "Alles accepteren"
   },
@@ -1024,9 +1021,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Accepteren met antwoord"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Sluit thread"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Sluit met antwoord"
@@ -2648,9 +2642,6 @@
   "layout.action.file-lookup": {
     "message": "Bestand opzoeken"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Zoek op via email"
-  },
   "layout.action.manage-affiliates": {
     "message": "Beheer partner links"
   },
@@ -2846,8 +2837,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "onbekend"
@@ -3018,7 +3015,7 @@
     "message": "Modpack-scan ({scanned}/{total} bestanden)"
   },
   "muralpay.account-type.checking": {
-    "message": "Controleren"
+    "message": "Betaalrekening"
   },
   "muralpay.account-type.savings": {
     "message": "Besparingen"
@@ -3443,6 +3440,18 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "Terug naar alle projecten"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "Terug naar project pagina"
+  },
+  "project.actions.check-modpack-archives": {
+    "message": "Uitpakken van modpack controleren"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "Aan het controleren..."
+  },
   "project.actions.create-server": {
     "message": "Creëer een server"
   },
@@ -3454,6 +3463,9 @@
   },
   "project.actions.edit-project": {
     "message": "Project bewerken"
+  },
+  "project.actions.project-page": {
+    "message": "Project pagina"
   },
   "project.actions.rescan-modpack": {
     "message": "Modpack opnieuw scannen"
@@ -3469,6 +3481,24 @@
   },
   "project.actions.servers-promo.title": {
     "message": "Creëer een server"
+  },
+  "project.actions.view-dependents": {
+    "message": "Afhankelijkheden bekijken"
+  },
+  "project.actions.view-modpacks": {
+    "message": "Modpacks bekijken"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "Afhankelijkheden van {projectType} bekijken"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "Het gebruik van ai gemaakte afbeeldingen in je project is niet toegestaan. Het proberen van de detectie omzeilen is niet toegestaan en kan er voor zorgen voor het uitschakelen van uw account."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "Zie paragraaf 6 van <rules>de inhoudsregels van Modrinth</rules> voor meer informatie over ons beleid wat betreft generatieve AI."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "AI-gegenereerde afbeeldingen zijn niet toegestaan"
   },
   "project.collections.create-new": {
     "message": "Nieuwe collectie aanmaken"
@@ -3716,8 +3746,23 @@
   "project.moderation.title": {
     "message": "Moderatie"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "Het importeren van dit .mrpack-bestand werkt mogelijk niet."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "Dit modpack is tijdens een exportfout gepubliceerd"
+  },
   "project.navigation.changelog": {
     "message": "Changelog"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "Sommige modpack-bestanden konden niet worden uitgepakt"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "Er zijn geen .mrpack-bestanden gevonden voor dit project."
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {Het modpack-bestand kan worden uitgepakt.} other {Alle # modpack-bestanden kunnen worden uitgepakt.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "Het icoon van jouw project is bijgewerkt."
@@ -3730,6 +3775,87 @@
   },
   "project.notification.updated.title": {
     "message": "Project bijgewerkt"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "Terug naar alle projecten"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "Terug naar project pagina"
+  },
+  "project.settings.danger-zone": {
+    "message": "Gevaren zone"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Verwijder project"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "Als je doorgaat, gaat, al je project informatie en al zijn versies wil onmiddellijk verwijdert worden. Niks is terug te halen later als je je gedachte verandert. Overweeg je project op privé  te zetten voor een minder permanente optie.\n"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Permanent verwijder project"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "Weet je zeker dat je dit project wil verwijderen?"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "Permanent verwijder dit project van modrinth. Verwijderde projecten <emphasis>kunnen niet hersteld worden</emphasis> door modrinth of help medewerkers."
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Bestanden geüpload naar dit project zij actief gebruikt in modpacks op Modrith en kan nog steeds blijven bestaan"
+  },
+  "project.settings.delete-project.title": {
+    "message": "Verwijder project"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "Je moet dit inschakelen als je project advertenties, sponsoring of promoties van andere werken bevat."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Als de promotie geen directe geldwaarde heeft <emphasis>en</emphasis> betrekking heeft op iets dat de gemiddelde persoon als <italic>relevant</italic> en <italic>onopvallend</italic> zou beschouwen (zoals een link naar je Modrinth-profiel in de hoek van de instellingenpagina van je eigen mod), dan zouden we dat niet als een advertentie beschouwen."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "bijv: voegt de Modrinth SMP-server automatisch toe aan je serverlijst."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Bevat advertenties"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "Raadpleeg paragraaf 6 van <rules>de inhoudsregels van Modrinth</rules> voor meer informatie."
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "Je moet deze optie inschakelen als dit project een aanzienlijke hoeveelheid door AI gegenereerde code bevat, als er\n\t\t\t\tbronnen zijn die grotendeels door AI zijn gegenereerd, als de functionaliteit van het project afhankelijk is van het gebruik van\n\t\t\t\tgeneratieve AI, of als een onderdeel van de pagina van uw project, zoals de beschrijving of de publicatie,\n\t\t\t\tafhankelijk is van generatieve AI."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "Bijvoorbeeld: De Chinese en Arabische vertalingen zijn door AI gegenereerd."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "Bevat ai-gegenereerde content"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "Waarvoor wordt generatieve AI gebruikt?"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "Voorbeeld van de banner"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "Markeer je project als gearchiveerd om gebruikers te laten weten dat je er niet meer aan werkt."
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "Gearchiveerde projecten blijven vindbaar wanneer de zichtbaarheid is ingesteld op Openbaar. Als je je project uit de lijst wilt verwijderen, stel dan de zichtbaarheid in op Verborgen."
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://voorbeeld.com"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Voorbeeld project"
+  },
+  "project.settings.disclosures.description": {
+    "message": "Je moet alle relevante vermeldingen over de inhoud toevoegen aan je project, in overeenstemming met <rules>de inhoudsregels van Modrinth</rules>."
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "Voor het laatst veranderd op {date} door {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "moderator"
   },
   "project.settings.general.name.description": {
     "message": "Probeer voorvoegsels, achtervoegsels, tussenvoegsels en omschrijvingen te vermijden, alleen de echte naam."
@@ -3843,7 +3969,7 @@
     "message": "Geen externe bestanden voldoen aan de zoekopdracht."
   },
   "project.settings.permissions.not-allowed.description": {
-    "message": "Een deel van de opgenomen externe inhoud mag niet op Modrinth worden verspreid omdat deze in strijd is met onze inhoudsregels en daarom moet worden verwijderd."
+    "message": "Een deel van de opgenomen externe inhoud mag niet op Modrinth worden verspreid, omdat deze in strijd is met onze inhoudsregels en daarom moet worden verwijderd."
   },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural, =0 {Geen bronvermeldingen hebben goedkeuring nodig} one {# bronvermelding heeft goedkeuring nodig} other {# bronvermeldingen hebben goedkeuring nodig}}"
@@ -4419,7 +4545,7 @@
     "message": "Geen meldingen"
   },
   "servers.plan.large.description": {
-    "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
+    "message": "Ideaal voor 15–25 spelers, modpacks of uitgebreide modding."
   },
   "servers.plan.medium.description": {
     "message": "Goed voor 6-15 spelers en meerdere mods"

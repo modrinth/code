@@ -59,32 +59,8 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Pustaka"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Menyahdayakan tanda nama di atas pemain anda pada halaman kekulit."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan tanda nama"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Lompat kembali ke dalam dunia"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Meminimumkan pelancar apabila proses Minecraft bermula."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimumkan pelancar"
-  },
-  "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Melangkau pengesahan berisiko rendah secara automatik seperti pemasangan pek mod pendua, pemadaman kandungan biasa, kemas kini pukal, menyahpautkan pek mod dan gesaan pembaikan. Amaran berbahaya masih akan ditunjukkan."
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Membolehkan keupayaan untuk menogol bar sisi."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Togol bar sisi"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Jika anda cuba memasang fail Modrinth Pack (.mrpack) yang tidak dihoskan pada Modrinth, kami akan memastikan anda memahami risikonya sebelum memasangnya."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Beri saya amaran sebelum memasang pek mod yang tidak diketahui"
@@ -122,8 +98,8 @@
   "app.browse.project-type.modpacks": {
     "message": "Pek Mod"
   },
-  "app.browse.server-instance-content-warning": {
-    "message": "Menambah kandungan boleh merosakkan keserasian apabila menyertai pelayan. Sebarang kandungan yang ditambah juga akan hilang apabila anda mengemas kini kandungan pemasangan pelayan."
+  "app.browse.project-type.mods": {
+    "message": "Mod"
   },
   "app.browse.server.installing": {
     "message": "Sedang memasang"
@@ -149,6 +125,9 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "Langkau"
+  },
   "app.install.phase.preparing_java.downloading": {
     "message": "Sedang memuat turun Java {version}"
   },
@@ -167,8 +146,26 @@
   "app.install.phase.reading_pack_manifest": {
     "message": "Sedang membaca manifest pek"
   },
+  "app.instance.action.edit": {
+    "message": "Sunting"
+  },
+  "app.instance.action.play": {
+    "message": "Main"
+  },
+  "app.instance.action.stop": {
+    "message": "Hentikan"
+  },
+  "app.instance.add-server.add": {
+    "message": "Tambah"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Ditambah"
+  },
+  "app.instance.card.play": {
+    "message": "Main"
+  },
+  "app.instance.card.stop": {
+    "message": "Hentikan"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Semua data untuk pemasangan anda akan dipadamkan secara kekal, termasuk dunia, konfigurasi dan semua kandungan yang dipasang."
@@ -212,6 +209,9 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Berjaya dimuat naik"
   },
+  "app.instance.tab.logs": {
+    "message": "Log"
+  },
   "app.instance.worlds.add-server": {
     "message": "Tambah pelayan"
   },
@@ -248,6 +248,27 @@
   "app.java-detection.select": {
     "message": "Pilih"
   },
+  "app.library.group.instance.add": {
+    "message": "Tambah"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Tambah"
+  },
+  "app.library.instance.action.play": {
+    "message": "Main"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Hentikan"
+  },
+  "app.library.instance.play": {
+    "message": "Main"
+  },
+  "app.library.instance.stop": {
+    "message": "Hentikan"
+  },
+  "app.library.sort.name": {
+    "message": "Nama"
+  },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk mainkan"
   },
@@ -270,6 +291,9 @@
     "message": "Ditambah"
   },
   "app.nav.home": {
+    "message": "Laman utama"
+  },
+  "app.navigation.home": {
     "message": "Laman utama"
   },
   "app.news.title": {
@@ -397,9 +421,6 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Daftar Masuk"
   },
   "app.skins.title": {
     "message": "Pemilih kekulit"
@@ -551,6 +572,36 @@
   "instance.files.save-as": {
     "message": "Simpan sebagai..."
   },
+  "instance.icon-editor.background.blue": {
+    "message": "Biru"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Kelabu"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Hijau Muda"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Merah Jambu"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Merah"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "Mawar"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Kek"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Orb"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Tayar"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
   "instance.server-modal.address": {
     "message": "Alamat"
   },
@@ -614,12 +665,6 @@
   "instance.settings.tabs.general.update-channel.release": {
     "message": "Terbitan"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Cangkuk pelancaran"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Cangkuk pelancaran tersuai"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Cangkuk membenarkan pengguna lanjutan menjalankan perintah sistem tertentu sebelum dan selepas melancarkan permainan."
   },
@@ -658,9 +703,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versi {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java dan ingatan"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Pembolehubah persekitaran tersuai"

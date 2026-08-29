@@ -4,7 +4,7 @@ import { PlusIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { Accordion, Combobox, type ComboboxOption, NewModal, StyledInput } from '#ui/components'
+import { Accordion, Combobox, type ComboboxOption, Input, NewModal, Textarea } from '#ui/components'
 import { Button } from '#ui/components/base/buttons'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
@@ -143,7 +143,7 @@ defineExpose({ show, hide })
 		<div class="flex flex-col gap-4">
 			<div class="flex flex-col gap-2">
 				<label class="font-semibold text-contrast" for="add-global-title">Title</label>
-				<StyledInput
+				<Input
 					id="add-global-title"
 					v-model="title"
 					type="text"
@@ -152,7 +152,7 @@ defineExpose({ show, hide })
 			</div>
 			<div class="flex flex-col gap-2">
 				<label class="font-semibold text-contrast" for="add-global-link">Link</label>
-				<StyledInput
+				<Input
 					id="add-global-link"
 					v-model="link"
 					type="text"
@@ -164,12 +164,12 @@ defineExpose({ show, hide })
 					<label class="font-semibold text-contrast" for="add-global-flame-id">
 						CurseForge project ID
 					</label>
-					<StyledInput
+					<Input
 						id="add-global-flame-id"
 						v-model="flameProjectId"
 						type="text"
 						placeholder="1234567"
-						input-class="h-[40px]"
+						size="medium"
 						:disabled="createMutation.isPending.value"
 					/>
 				</div>
@@ -187,11 +187,9 @@ defineExpose({ show, hide })
 			</div>
 			<div class="flex flex-col gap-2">
 				<label class="font-semibold text-contrast" for="add-global-proof">Proof or notes</label>
-				<StyledInput
+				<Textarea
 					id="add-global-proof"
 					v-model="proof"
-					type="text"
-					multiline
 					input-class="min-h-[6rem]"
 					resize="vertical"
 					:disabled="createMutation.isPending.value"

@@ -5,11 +5,8 @@
   "action.continue": {
     "message": "Continuar"
   },
-  "admin.billing.error.not-found": {
-    "message": "Usuario no encontrado"
-  },
   "ads-consent.accept": {
-    "message": "Aceptar todas"
+    "message": "Aceptar todo"
   },
   "ads-consent.body": {
     "message": "Los anuncios hacen posible a Modrinth y financian los pagos a los creadores. Nuestros socios pueden guardar o acceder a cookies en la aplicación para personalizar anuncios y medir su rendimiento."
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Aprovar con respuesta"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Cerrar hilo"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cerrar con respuesta"
@@ -2651,9 +2645,6 @@
   "layout.action.file-lookup": {
     "message": "Buscar archivo"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Buscar por correo electrónico"
-  },
   "layout.action.manage-affiliates": {
     "message": "Gestionar enlaces de afiliado"
   },
@@ -2849,8 +2840,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "desconocido"
@@ -3446,6 +3443,18 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "Volver a todos los proyectos"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "Volver a la página del proyecto"
+  },
+  "project.actions.check-modpack-archives": {
+    "message": "Comprueba el descomprimido del Modpack"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "Comprobando..."
+  },
   "project.actions.create-server": {
     "message": "Crear un servidor"
   },
@@ -3457,6 +3466,9 @@
   },
   "project.actions.edit-project": {
     "message": "Editar proyecto"
+  },
+  "project.actions.project-page": {
+    "message": "Página del proyecto"
   },
   "project.actions.rescan-modpack": {
     "message": "Re-escanear modpack"
@@ -3472,6 +3484,24 @@
   },
   "project.actions.servers-promo.title": {
     "message": "Crear un servidor"
+  },
+  "project.actions.view-dependents": {
+    "message": "Ver dependencias"
+  },
+  "project.actions.view-modpacks": {
+    "message": "Ver modpacks"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "Ver dependencias de {projectType}"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "No está permitido utilizar imágenes generadas por IA para representar tu proyecto. Intentar eludir la detección puede conllevar la suspensión de tu cuenta de Modrinth."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "Consulte la sección 6 de <rules>Modrinth's Content Rules</rules> para obtener más información sobre nuestra política generativa de IA."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "Imágenes generadas por IA no son permitidas"
   },
   "project.collections.create-new": {
     "message": "Crear nueva colección"
@@ -3719,8 +3749,23 @@
   "project.moderation.title": {
     "message": "Moderación"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "Es probable que la importación de este .mrpack podría no funcionar o estar rota."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "Este Modpack ha sido publicado durante un error de exportación"
+  },
   "project.navigation.changelog": {
     "message": "Registro de cambios"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "Algunos archivos del Modpack podrían no haber sido descomprimidos"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "No se ha encontrado ningún archivo .mrpack en este proyecto."
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {El archivo modpack puede ser descomprimido.} other {Todos los # archivos modpack pueden ser descomprimidos.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "El ícono de tu proyecto se ha actualizado."
@@ -3733,6 +3778,201 @@
   },
   "project.notification.updated.title": {
     "message": "Proyecto actualizado"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "Volver a todos los proyectos"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "Volver a la página del proyecto"
+  },
+  "project.settings.danger-zone": {
+    "message": "Zona peligrosa"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Eliminar el proyecto"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "Si tu procedes con esto, toda la información y las versiones de este proyecto serán inmediatamente eliminadas de nuestra base de datos. Nada de esto podrá ser recuperado luego, si cambias de opinión. Considera ajustar la configuración de tu proyecto a Privado para una opción menos permanente."
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Eliminar el proyecto permanentemente"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "¿Estás seguro que deseas eliminar este proyecto?"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "Elimina permanentemente este proyecto de Modrinth. Los proyectos borrados <emphasis>no pueden ser recuperados</emphasis> por el personal o soporte de Modrinth."
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Los archivos subidos a este proyecto que son activamente usados en Modpacks alojados en Modrinth pueden seguir existiendo."
+  },
+  "project.settings.delete-project.title": {
+    "message": "Eliminar proyecto"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "Debes habilitar esta opción si tu proyecto contiene anuncios, patrocinios o promociones de otras obras."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Si la promoción no tiene valor monetario directo <emphasis>y</emphasis> es para algo que la persona promedio consideraría <italic>relevante</italic> y <italic>discreto</italic> (como un enlace a tu perfil de Modrinth en la esquina de la página de ajustes de tu propio mod), no lo consideraríamos como un anuncio."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "ej. Añadir el servidor Modrinth SMP a tu listado de servidores automáticamente."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Contiene publicidad"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "Consulte la Sección 6 de las <rules>Modrinth's Content Rules</rules> para obtener más información."
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "Debes habilitar esto si este proyecto contiene una cantidad sustancial de código generado por IA, si\n\t\t\t\talgún recurso es sustancialmente generado por IA, si la funcionalidad del proyecto depende del uso de\n\t\t\t\tIA generativa, o si algún elemento de la página de su proyecto, como la descripción o la publicación,\n\t\t\t\tdepende de la IA generativa."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "ej. Las traducciones a Chino y Árabe son generados por IA."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "Contiene contenido generada por IA"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "¿En qué se utiliza la IA generativa?"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "Previsualizar el banner"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "Marca tu proyecto como archivado para dar a conocer a los usuarios que tu ya no trabajas en él."
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "Los proyectos archivados siguen siendo detectables cuando su visibilidad está establecida en Público. Si desea deslistar su proyecto, establezca su visibilidad en No listado."
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "ej. Ya no tengo tiempo para mantener este proyecto, ¡siéntete libre de crear un fork!"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "Archivar el proyecto"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "Divulgación de contenido"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "Debes habilitar esto si tu proyecto es derivado de otro proyecto, ya sea un fork o contener una cantidad sustancial de trabajo de otra persona."
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "Enlace al trabajo original"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "Nombre del trabajo original"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Proyecto de ejemplo"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Explica cómo tu proyecto está basado en el proyecto original"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "Contiene contenido derivado"
+  },
+  "project.settings.disclosures.description": {
+    "message": "Debes agregar cualquier divulgación de contenido aplicable a su proyecto de acuerdo con <rules>Modrinth's Content Rules</rules>."
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "Última actualización el {date} por {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "Moderador"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "Por favor, <contact-support-link>contacta al soporte</contact-support-link> si esta divulgación necesita ser removida."
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "Esta divulgación ha sido bloqueada por los moderadores. Si cree que se trata de un error, póngase en <contact-support-link>contacto con el soporte</contact-support-link>."
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "Por favor, <contact-support-link>contacta al soporte</contact-support-link> si esta divulgación necesita ser editada o removida."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "Debes activar esto si tu proyecto contiene características que se pueden obtener gastando dinero del mundo real."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "ej. Cosméticos disponibles como recompensa de Patreon"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "Lista de los tipos de características de pago"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Contiene características de paga"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "Activa esto si tu proyecto contiene algo que creas que puede ser peligroso para ciertas personas que son sensibles a luces o patrones de parpadeo."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "ej. Este añade un ítem de linterna que tiene un modo estroboscópica. Esto puede desactivarse en los ajustes de accesibilidad en el juego."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "Advertencia de fotosensibilidad"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "La divulgación de publicidad requiere una explicación."
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "La divulgación de trabajos derivados debe listar al menos una fuente del trabajo."
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "Las fuentes de trabajo derivado deben tener un nombre."
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "No tienes permisos para editar las divulgaciones de este proyecto."
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "La divulgación de características de pago debe listar al menos una característica de pago."
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "La divulgación de advertencia de fotosensibilidad debe incluir una descripción."
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "La divulgación de interacciones externas del sistema debe incluir una descripción."
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "La divulgación de la telemetría debe listar al menos un tipo de dato recopilado."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "Debes habilitar esto si tu proyecto lee o edita cosas en el sistema del usuario fuera del juego."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Describa las interacciones que realiza externamente en el sistema"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "ej. Crea un archivo al escritorio llamado wake_up.txt"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "Contiene interacciones externas del sistema"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "¿Cuál es el modelo de consentimiento de su telemetría?"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "Puedes agregar una política de privacidad, o una lista de tipos de datos que se recopilan. Recuerde mencionar si es anónimo o contiene información de identificación personal (PII)."
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "¿Qué datos se recopilan?"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "ej. Análisis de lanzamiento anónimo para rastrear la versión de Minecraft y el uso del cargador de mods."
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "Debes activarlo si tu proyecto envía datos de uso a ti mismo o a un tercero."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Contiene telemetría"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "Sube versiones antes de añadir divulgaciones"
+  },
+  "project.settings.editing-project": {
+    "message": "Editando un proyecto {projectType}"
   },
   "project.settings.general.name.description": {
     "message": "Evita prefijos, sufijos, explicaciones entre paréntesis o descripciones añadidas—solo utiliza el nombre real del proyecto."
@@ -3778,6 +4018,15 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.monetization.description": {
+    "message": "Los proyectos en Modrinth están inscritos automáticamente en el <rewards-program-link>Rewards Program</rewards-program-link>. Si usted no quiere (o no puede por razones legales) obtener ingresos de este proyecto, puede desactivarlo aquí."
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "Este proyecto no es elegible para monetizar. Si tu crees que esto es un error, por favor <contact-support-link>contacta al soporte</contact-support-link>."
+  },
+  "project.settings.monetization.title": {
+    "message": "Monetización"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Por favor, proporcione prueba de que tiene permiso para redistribuir todos los siguientes archivos. Una vez completado, las versiones retenidas se publicarán automáticamente."
@@ -3971,6 +4220,9 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 12 o menos para mantener tu servidor enfocado y que sea más fácil de descubrir."
   },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "Sube versiones antes de añadir etiquetas"
+  },
   "project.versions.copy-id-option": {
     "message": "Copiar ID"
   },
@@ -4067,17 +4319,29 @@
   "report.not-for.dmca.description": {
     "message": "Consulta nuestra <policy-link>Política de derechos de autor</policy-link>."
   },
+  "report.note.ai-images.1": {
+    "message": "Acabamos de actualizar nuestras reglas para prohibir imágenes generadas por AIs en iconos, galerías y descripciones. Estamos dando a los creadores un período de gracia para eliminar imágenes hechas con IA de sus proyectos antes de empezar a aceptar reportes sobre ello."
+  },
+  "report.note.check-back-later": {
+    "message": "Vuelve a comprobar más tarde una vez finalizado el período de gracia. Los reportes de este tipo no están siendo aceptados en este momento."
+  },
   "report.note.copyright.1": {
     "message": "Ten en cuenta que *no* estás enviando una solicitud de retirada DMCA, sino reportando contenido re-subido."
   },
   "report.note.copyright.2": {
     "message": "Si lo que querías era presentar una solicitud de retirada DMCA (que es una acción legal), consulta nuestra <copyright-policy-link>Política de derechos de autor</copyright-policy-link>."
   },
+  "report.note.fully-ai-generated.1": {
+    "message": "Acabamos de actualizar nuestras reglas para prohibir proyectos totalmente generados por AI. Estamos dando a los creadores un período de gracia para actualizar o eliminar completamente los proyectos generados por AIs antes de empezar a aceptar reportes sobre ello."
+  },
   "report.note.malicious.1": {
     "message": "Los reportes de contenido malicioso o engañoso deben incluir evidencia sustancial de este comportamiento, como muestras de código."
   },
   "report.note.malicious.2": {
     "message": "Los resúmenes de Microsoft Defender, VirusTotal o la detección de malware por IA no son pruebas suficientes y no serán aceptados."
+  },
+  "report.note.missing-disclosure.1": {
+    "message": "Las divulgaciones de contenido son una nueva característica que acabamos de añadir. Estamos dando a los creadores un período de gracia para que se actualicen sus divulgaciones antes de empezar a aceptar los informes de divulgaciones faltantes o incorrectas."
   },
   "report.please-report": {
     "message": "Por favor, informa:"
@@ -4096,6 +4360,9 @@
   },
   "report.report-item": {
     "message": "Reportar {title} a moderadores"
+  },
+  "report.reported-for": {
+    "message": "Reportado por {type}"
   },
   "report.submit": {
     "message": "Enviar reporte"

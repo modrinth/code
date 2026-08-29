@@ -19,6 +19,7 @@ export function expandVariables(
 }
 
 export const licensesNotRequiringSource: string[] = [
+	// typos:off
 	'LicenseRef-All-Rights-Reserved',
 	'Apache-2.0',
 	'BSD-2-Clause',
@@ -33,6 +34,7 @@ export const licensesNotRequiringSource: string[] = [
 	'ISC',
 	'MIT',
 	'Zlib',
+	// typos:on
 ]
 
 export const licensesRequiringSource: string[] = [
@@ -179,11 +181,14 @@ export function flattenStaticVariables(): Record<string, string> {
 	vars[`SUPPORT`] =
 		`please visit the [Modrinth Help Center](https://support.modrinth.com/) and click the blue bubble to contact support.`
 	vars[`MODPACK_PERMISSIONS_GUIDE`] =
-		`our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions)`
+		`our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527)`
 	vars[`MODPACKS_ON_MODRINTH`] =
-		`[Modpacks on Modrinth](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth)`
+		`[Modpacks on Modrinth](https://support.modrinth.com/en/articles/8802250)`
 	vars[`ADVANCED_MARKDOWN`] =
-		`[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
+		`[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962)`
+	vars[`DISCLOSURES_FAQ_FLINK`] =
+		`[Content Disclosures FAQ](https://support.modrinth.com/en/articles/16567675)`
+	vars[`AI_USAGE_FLINK`] = `[AI Usage](https://support.modrinth.com/en/articles/16551575)`
 	vars[`LICENSING_GUIDE`] =
 		`our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
 	vars[`NEW_ENVIRONMENTS_LINK`] = `https://modrinth.com/news/article/new-environments`

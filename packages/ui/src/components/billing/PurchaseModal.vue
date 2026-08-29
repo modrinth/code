@@ -60,7 +60,7 @@
 			<div v-if="!existingSubscription">
 				<p class="my-2 text-lg font-bold">Configure your server</p>
 				<div class="flex flex-col gap-4">
-					<StyledInput v-model="serverName" placeholder="Server name" :maxlength="48" />
+					<Input v-model="serverName" placeholder="Server name" :maxlength="48" />
 					<!-- <DropdownSelect
             v-model="serverLoader"
             v-tooltip="'Select the mod loader for your server'"
@@ -136,7 +136,7 @@
 					>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Shared CPUs</div>
-							<StyledInput :model-value="sharedCpus" disabled wrapper-class="w-full" />
+							<Input :model-value="sharedCpus" disabled wrapper-class="w-full" />
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold flex items-center gap-1">
@@ -148,15 +148,11 @@
 									class="h-4 w-4text-secondary opacity-60"
 								/>
 							</div>
-							<StyledInput
-								:model-value="mutatedProduct.metadata.cpu"
-								disabled
-								wrapper-class="w-full"
-							/>
+							<Input :model-value="mutatedProduct.metadata.cpu" disabled wrapper-class="w-full" />
 						</div>
 						<div class="flex flex-col w-full gap-2">
 							<div class="font-semibold">Storage</div>
-							<StyledInput
+							<Input
 								v-model="customServerConfig.storageGbFormatted"
 								disabled
 								wrapper-class="w-full"
@@ -470,14 +466,15 @@ import { calculateSavings, createStripeElements, getCurrency } from '@modrinth/u
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
+import { useDebugLogger } from '../../composables/debug-logger'
 import { useVIntl } from '../../composables/i18n'
 import { useFormatDateTime, useFormatPrice } from '../../composables/index.ts'
 import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Combobox from '../base/Combobox.vue'
+import Input from '../base/inputs/Input.vue'
 import Slider from '../base/Slider.vue'
-import StyledInput from '../base/StyledInput.vue'
 import TagIcon from '../base/TagIcon.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
@@ -485,6 +482,7 @@ import NewModal from '../modal/NewModal.vue'
 const { formatMessage } = useVIntl()
 const formatPrice = useFormatPrice()
 const formatDate = useFormatDateTime({ dateStyle: 'long' })
+const debug = useDebugLogger('PurchaseModal')
 
 const props = defineProps({
 	product: {
@@ -652,7 +650,7 @@ const updateCustomServerStock = async () => {
 						mutatedProduct.value,
 					)
 					customOutOfStock.value = capacityStatus.custom?.available === 0
-					console.log(capacityStatus)
+					debug(capacityStatus)
 				}
 			} else {
 				const capacityStatus = await props.fetchCapacityStatuses(mutatedProduct.value)

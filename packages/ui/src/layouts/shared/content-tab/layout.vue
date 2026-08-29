@@ -23,11 +23,11 @@ import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import { Button, type OverflowMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -191,7 +191,7 @@ const sortLabels: Record<SortMode, () => string> = {
 	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
 }
 
-const sortOptions = computed<OverflowMenuOption[]>(() => [
+const sortOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'alphabetical-asc',
 		label: formatMessage(messages.sortAlphabeticalAscending),
@@ -936,19 +936,19 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				/>
 
 				<template v-if="ctx.items.value.length > 0">
-					<div class="flex flex-col gap-4">
-						<span v-if="ctx.managedContent.value" class="text-xl font-semibold text-contrast">
+					<div class="flex flex-col gap-2">
+						<span v-if="ctx.managedContent.value" class="mb-2 text-xl font-semibold text-contrast">
 							{{ formatMessage(messages.additionalContent) }}
 						</span>
 
 						<div class="flex flex-wrap items-center gap-2">
-							<StyledInput
+							<Input
 								v-model="searchQuery"
 								:icon="SearchIcon"
 								type="text"
 								autocomplete="off"
 								:spellcheck="false"
-								input-class="!h-10"
+								size="medium"
 								wrapper-class="flex-1 min-w-0"
 								clearable
 								:placeholder="
@@ -1217,6 +1217,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 						<ContentCardTable
 							v-model:selected-ids="selectedIds"
+							class="mt-2"
 							:items="tableItems"
 							:show-selection="true"
 							@update:enabled="handleToggleEnabledById"

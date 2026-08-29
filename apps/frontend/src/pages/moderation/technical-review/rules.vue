@@ -2,16 +2,16 @@
 	<NewModal ref="ruleModal" :header="modalTitle" :on-hide="handleRuleModalHide">
 		<form class="flex w-[48rem] max-w-full flex-col gap-3" @submit.prevent="saveRule">
 			<label class="font-semibold text-contrast" for="rule-name">Name</label>
-			<StyledInput
+			<Input
 				id="rule-name"
 				v-model="form.name"
 				type="text"
-				maxlength="256"
+				:maxlength="256"
 				placeholder="Known-safe obfuscated bootstrap"
 			/>
 
 			<label class="font-semibold text-contrast" for="rule-priority">Priority</label>
-			<StyledInput
+			<Input
 				id="rule-priority"
 				v-model="form.priority"
 				type="number"
@@ -160,11 +160,11 @@ IS_MATCH ? "low" : null</code></pre>
 						<div class="grid gap-3 sm:grid-cols-2">
 							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 								Key
-								<StyledInput v-model="testTraceForm.key" placeholder="unique-trace-key" />
+								<Input v-model="testTraceForm.key" placeholder="unique-trace-key" />
 							</label>
 							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 								Issue type
-								<StyledInput v-model="testTraceForm.issueType" placeholder="OBFUSCATED_NAMES" />
+								<Input v-model="testTraceForm.issueType" placeholder="OBFUSCATED_NAMES" />
 							</label>
 							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 								Severity
@@ -179,21 +179,17 @@ IS_MATCH ? "low" : null</code></pre>
 							</label>
 							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 								JAR
-								<StyledInput v-model="testTraceForm.jar" placeholder="META-INF/jars/embedded.jar" />
+								<Input v-model="testTraceForm.jar" placeholder="META-INF/jars/embedded.jar" />
 							</label>
 						</div>
 						<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 							File path
-							<StyledInput
-								v-model="testTraceForm.filePath"
-								placeholder="com/example/Bootstrap.class"
-							/>
+							<Input v-model="testTraceForm.filePath" placeholder="com/example/Bootstrap.class" />
 						</label>
 						<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
 							Data (JSON)
-							<StyledInput
+							<Textarea
 								v-model="testTraceForm.data"
-								multiline
 								:rows="4"
 								resize="vertical"
 								input-class="font-mono text-sm"
@@ -502,11 +498,12 @@ import {
 	ButtonLink,
 	ConfirmModal,
 	EmptyState,
+	Input,
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	ProgressBar,
-	StyledInput,
+	Textarea,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'
 import type { Ace } from 'ace-builds'
@@ -533,7 +530,12 @@ const CEL_LANGUAGE_COMPLETIONS: Ace.Completion[] = [
 	{ caption: 'url.parse()', snippet: 'url.parse("${1:url}")', score: 850, meta: 'URL' },
 	{ caption: 'url.is_valid()', snippet: 'url.is_valid("${1:url}")', score: 850, meta: 'URL' },
 	{ caption: '#define', snippet: '#define ${1:NAME} ${2:value}', score: 800, meta: 'preprocessor' },
-	{ caption: '#bind', snippet: '#bind ${1:NAME} ${2:expression}', score: 800, meta: 'preprocessor' },
+	{
+		caption: '#bind',
+		snippet: '#bind ${1:NAME} ${2:expression}',
+		score: 800,
+		meta: 'preprocessor',
+	},
 ]
 const CEL_MEMBER_COMPLETIONS: Ace.Completion[] = [
 	{ caption: 'contains()', snippet: 'contains("${1:value}")', score: 800, meta: 'string' },

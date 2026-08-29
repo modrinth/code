@@ -143,20 +143,11 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Slår nametagget over din spiller på skins siden fra."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gem nametag"
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Hop tilbage ind i verdener"
-  },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer app"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Vis hvor meget tid du har brugt på at spille en instance."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis tid spillet"
@@ -214,9 +205,6 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Ved at tilføje indhold kan der opstå kompatibilitetsproblemer, når du tilslutter dig serveren. Alt tilføjet indhold går desuden tabt, når du opdaterer indholdet på din server instance."
   },
   "app.browse.server.installing": {
     "message": "Installere"
@@ -641,9 +629,6 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
-  "app.skins.sign-in.button": {
-    "message": "Log Ind"
-  },
   "app.skins.title": {
     "message": "Skin vælger"
   },
@@ -896,12 +881,6 @@
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Startkommandoer"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Brugerfinansieret startkommandoer"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Startkommandoer giver avancerede brugere mulighed for at køre bestemte systemkommandoer før og efter spillet startes."
   },
@@ -940,9 +919,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java og hukommelse"
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Indskriv Java argumenter..."

@@ -65,11 +65,17 @@ export interface SharedInstanceReportDetails {
 	other_instances_loaded?: boolean
 }
 
-const props = defineProps<{
-	details: SharedInstanceReportDetails
-	banPending?: boolean
-	loadVersionContent?: (instanceId: string, version: number) => Promise<ContentItem[]>
-}>()
+const props = withDefaults(
+	defineProps<{
+		details: SharedInstanceReportDetails
+		banPending?: boolean
+		loadVersionContent?: (instanceId: string, version: number) => Promise<ContentItem[]>
+		contextType?: 'report' | 'moderation'
+	}>(),
+	{
+		contextType: 'report',
+	},
+)
 
 const emit = defineEmits<{
 	banOwner: [owner: SharedInstanceReportUser]
@@ -223,7 +229,7 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 			<span
 				class="border-blue/60 rounded-full border border-solid bg-highlight-blue px-2 py-0.5 text-xs font-semibold text-blue"
 			>
-				Report context
+				{{ contextType === 'report' ? 'Report context' : 'Moderation context' }}
 			</span>
 		</div>
 
@@ -310,7 +316,10 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 									<div class="flex flex-wrap items-center gap-2">
 										<span class="font-semibold text-contrast">Version {{ version.version }}</span>
 										<span
-											v-if="version.version === details.reported_version?.version"
+											v-if="
+												contextType === 'report' &&
+												version.version === details.reported_version?.version
+											"
 											class="bg-orange-highlight rounded-full px-2 py-0.5 text-xs font-semibold text-orange"
 										>
 											Reported
@@ -333,7 +342,11 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 						</div>
 					</div>
 					<span v-else class="text-sm text-secondary">
-						No version was attached to this report.
+						{{
+							contextType === 'report'
+								? 'No version was attached to this report.'
+								: 'No version history is available.'
+						}}
 					</span>
 				</div>
 			</div>
@@ -350,7 +363,13 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 						:key="instance.id"
 						class="flex min-w-0 items-center gap-2 rounded-xl bg-surface-2 p-3"
 					>
-						<Avatar :src="instance.icon_url" :tint-by="instance.id" size="2.5rem" no-shadow />
+						<Avatar
+							:src="instance.icon_url"
+							:tint-by="instance.id"
+							size="2.5rem"
+							no-shadow
+							pad-transparent-corners
+						/>
 						<div class="flex min-w-0 flex-1 flex-col">
 							<div class="flex min-w-0 items-center gap-1.5">
 								<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>

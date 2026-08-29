@@ -1,6 +1,9 @@
 <template>
-	<div class="overflow-hidden rounded-2xl">
-		<div class="bg-bg-raised p-4">
+	<div
+		class="relative overflow-hidden rounded-2xl border border-solid border-surface-4 transition-[transform,opacity] duration-[400ms] ease-in"
+		:class="{ 'pointer-events-none translate-x-[120%] opacity-0': isSwipingAway }"
+	>
+		<div class="border-0 border-b border-solid border-surface-4 bg-bg-raised p-4">
 			<div
 				class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
 			>
@@ -61,6 +64,7 @@
 						:src="reportItemAvatarUrl"
 						:circle="report.item_type === 'user'"
 						size="4rem"
+						:pad-transparent-corners="report.item_type === 'shared-instance'"
 						:class="[
 							'flex-shrink-0 border border-surface-5 bg-surface-4 !shadow-none',
 							report.item_type !== 'user' && 'rounded-2xl',
@@ -179,6 +183,7 @@
 			v-model:collapsed="isThreadCollapsed"
 			:expand-text="expandText"
 			collapse-text="Collapse thread"
+			:disabled="disableCollapsing"
 		>
 			<div class="bg-surface-2 pt-2">
 				<ThreadView
@@ -230,7 +235,7 @@
 							@click="reopenReport()"
 						>
 							<CheckCircleIcon class="size-4" />
-							Reopen Thread
+							Reopen report
 						</Button>
 					</template>
 					<template #additionalActions="{ hasReply }">
@@ -260,6 +265,17 @@
 				</ThreadView>
 			</div>
 		</CollapsibleRegion>
+		<div
+			v-if="pendingDismiss"
+			:key="dismissAnimationId"
+			class="pointer-events-none absolute inset-x-0 bottom-0 h-1.5 overflow-hidden bg-highlight-red"
+			aria-hidden="true"
+		>
+			<div
+				class="report-dismiss-progress h-full w-full bg-red"
+				:style="{ animationDuration: `${DISMISS_DELAY_MS}ms` }"
+			/>
+		</div>
 	</div>
 </template>
 <script setup lang="ts">
@@ -287,7 +303,8 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { computed, ref, watch } from 'vue'
+import { useQueryClient } from '@tanstack/vue-query'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
 import { isStaff } from '~/helpers/users.js'
 
@@ -301,21 +318,31 @@ import SharedInstanceReportContext, {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const auth = await useAuth()
+const queryClient = useQueryClient()
+const auth = useAuthState()
 
 type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 	project_id?: string
 	version_id?: string
 }
 
+const DISMISS_DELAY_MS = 3000
+const SWIPE_DURATION_MS = 400
+
 const props = defineProps<{
 	report: ExtendedReport
 	collapsed: boolean
+	disableCollapsing?: boolean
+	dismissAfterClose?: boolean
 	sharedInstanceDetailsLoader?: () => Promise<SharedInstanceReportDetails>
 	sharedInstanceVersionContentLoader?: (
 		instanceId: string,
 		version: number,
 	) => Promise<ContentItem[]>
+}>()
+
+const emit = defineEmits<{
+	dismiss: []
 }>()
 
 const reportThread = ref<{
@@ -338,17 +365,38 @@ watch(
 	{ immediate: true },
 )
 
-const didCloseReport = ref(false)
-const reportClosed = computed(() => {
-	return didCloseReport.value || props.report.closed
-})
+const closedOverride = ref<boolean | null>(null)
+const pendingDismiss = ref(false)
+const isSwipingAway = ref(false)
+const dismissAnimationId = ref(0)
+const thread = ref(props.report.thread)
+let dismissTimeout: ReturnType<typeof setTimeout> | null = null
+let swipeTimeout: ReturnType<typeof setTimeout> | null = null
+
+const reportClosed = computed(() => closedOverride.value ?? props.report.closed)
+
+watch(
+	() => props.report.thread,
+	(value) => {
+		thread.value = value
+	},
+)
+
+watch(
+	() => props.report.closed,
+	(closed) => {
+		if (closedOverride.value === closed) {
+			closedOverride.value = null
+		}
+	},
+)
 const sharedInstanceQuarantined = computed(
 	() =>
 		sharedInstanceDetails.value?.quarantine ?? props.report.shared_instance?.quarantine ?? false,
 )
 
 const threadWithReportBody = computed(() => {
-	if (!props.report.thread) return null
+	if (!thread.value) return null
 
 	const reportBodyMessage = {
 		id: `report-body-${props.report.id}`,
@@ -365,16 +413,15 @@ const threadWithReportBody = computed(() => {
 	}
 
 	return {
-		...props.report.thread,
-		messages: [reportBodyMessage, ...props.report.thread.messages],
-		members: [props.report.reporter_user, ...props.report.thread.members],
+		...thread.value,
+		messages: [reportBodyMessage, ...thread.value.messages],
+		members: [props.report.reporter_user, ...thread.value.members],
 	}
 })
 
 const remainingMessageCount = computed(() => {
-	if (!props.report.thread?.messages) return 0
-	// Thread messages count (report body is injected separately)
-	return props.report.thread.messages.length
+	if (!thread.value?.messages) return 0
+	return thread.value.messages.length
 })
 
 const expandText = computed(() => {
@@ -395,8 +442,10 @@ async function closeReport(reply = false) {
 				closed: true,
 			},
 		})
-		await refreshReportCaches()
-		didCloseReport.value = true
+		await refreshThread()
+		closedOverride.value = true
+		startDismissCountdown()
+		void refreshReportQuery()
 	} catch (err: any) {
 		addNotification({
 			title: 'Error closing report',
@@ -407,6 +456,8 @@ async function closeReport(reply = false) {
 }
 
 async function reopenReport() {
+	cancelDismissCountdown()
+
 	try {
 		await useBaseFetch(`report/${props.report.id}`, {
 			method: 'PATCH',
@@ -414,16 +465,58 @@ async function reopenReport() {
 				closed: false,
 			},
 		})
-		await refreshReportCaches()
-		didCloseReport.value = false
+		await refreshThread()
+		closedOverride.value = false
+		void refreshReportQuery()
 	} catch (err: any) {
 		addNotification({
 			title: 'Error reopening report',
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
+		if (reportClosed.value) {
+			startDismissCountdown()
+		}
 	}
 }
+
+function cancelDismissCountdown() {
+	pendingDismiss.value = false
+	if (dismissTimeout !== null) {
+		clearTimeout(dismissTimeout)
+		dismissTimeout = null
+	}
+}
+
+function startDismissCountdown() {
+	if (!props.dismissAfterClose || isSwipingAway.value) return
+
+	cancelDismissCountdown()
+	dismissAnimationId.value += 1
+	pendingDismiss.value = true
+	dismissTimeout = setTimeout(() => {
+		dismissTimeout = null
+		swipeAway()
+	}, DISMISS_DELAY_MS)
+}
+
+function swipeAway() {
+	if (isSwipingAway.value) return
+
+	isSwipingAway.value = true
+	swipeTimeout = setTimeout(() => {
+		swipeTimeout = null
+		emit('dismiss')
+	}, SWIPE_DURATION_MS)
+}
+
+onUnmounted(() => {
+	cancelDismissCountdown()
+	if (swipeTimeout !== null) {
+		clearTimeout(swipeTimeout)
+		swipeTimeout = null
+	}
+})
 
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
@@ -431,22 +524,23 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 })
 
-async function refreshReportCaches() {
-	await Promise.allSettled([refreshThread(), refreshNuxtData('new-moderation-reports')])
-}
-
 async function refreshThread() {
-	const threadId = props.report.thread?.id ?? props.report.thread_id
+	const threadId = thread.value?.id ?? props.report.thread?.id ?? props.report.thread_id
 	if (!threadId) return
 
-	const thread = await useBaseFetch(`thread/${threadId}`)
-	updateThread(thread)
+	const nextThread = await useBaseFetch(`thread/${threadId}`)
+	updateThread(nextThread)
 }
 
 function updateThread(newThread: any) {
+	thread.value = newThread
 	if (props.report.thread) {
 		Object.assign(props.report.thread, newThread)
 	}
+}
+
+function refreshReportQuery() {
+	return queryClient.invalidateQueries({ queryKey: ['report', props.report.id] })
 }
 
 async function getSharedInstanceVersion(
@@ -844,3 +938,21 @@ async function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
 	}
 }
 </script>
+
+<style scoped>
+.report-dismiss-progress {
+	transform-origin: left center;
+	animation-name: report-dismiss-fill;
+	animation-timing-function: linear;
+	animation-fill-mode: forwards;
+}
+
+@keyframes report-dismiss-fill {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
+	}
+}
+</style>

@@ -145,7 +145,7 @@
 					v-tooltip="`Link includes a domain which isn't common for this link type.`"
 					class="size-6 animate-pulse text-orange"
 				/>
-				<StyledInput
+				<Input
 					id="project-issue-tracker"
 					v-model="issuesUrl"
 					type="url"
@@ -179,7 +179,7 @@
 					v-tooltip="`Link includes a domain which isn't common for this link type.`"
 					class="size-6 animate-pulse text-orange"
 				/>
-				<StyledInput
+				<Input
 					id="project-source-code"
 					v-model="sourceUrl"
 					type="url"
@@ -208,7 +208,7 @@
 					v-tooltip="`Discord invites are not appropriate for this link type.`"
 					class="size-6 animate-pulse text-orange"
 				/>
-				<StyledInput
+				<Input
 					id="project-wiki-page"
 					v-model="wikiUrl"
 					type="url"
@@ -232,7 +232,7 @@
 					v-tooltip="`You're using a link which isn't common for this link type.`"
 					class="size-6 animate-pulse text-orange"
 				/>
-				<StyledInput
+				<Input
 					id="project-discord-invite"
 					v-model="discordUrl"
 					type="url"
@@ -253,7 +253,7 @@
 				:key="`donation-link-${index}`"
 				class="input-group donation-link-group"
 			>
-				<StyledInput
+				<Input
 					v-model="donationLink.url"
 					type="url"
 					:maxlength="2048"
@@ -292,7 +292,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	StyledInput,
+	Input,
 } from '@modrinth/ui'
 
 const tags = useGeneratedState()

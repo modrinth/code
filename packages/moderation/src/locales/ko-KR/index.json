@@ -189,7 +189,7 @@
     "defaultMessage": "태그 선택"
   },
   "nags.server.title": {
-    "defaultMessage": "서버 설정으로 이동"
+    "defaultMessage": "서버 설정 방문"
   },
   "nags.settings.description.title": {
     "defaultMessage": "설명 설정 방문"
@@ -208,6 +208,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "일반 설정 방문"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "버전 설정 방문"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "요약은 프로젝트 이름과 동일할 수 없습니다. 정보가 충분하고 흥미를 끄는 요약을 작성하는 것이 중요합니다."

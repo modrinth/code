@@ -21,5 +21,6 @@ pub mod routes;
 pub mod sentry;
 pub mod tags;
 pub mod tiltify;
+pub mod usercheck;
 pub mod validate;
 pub mod webhook;

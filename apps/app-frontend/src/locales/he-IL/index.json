@@ -11,6 +11,24 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "החבא יותר התקנים רצים"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "הועתק"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "העתקת הפרטים"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.action-bar.install.retry": {
+    "message": "נסה שוב"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "ביטול"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "לא נתן להוריד את הקבצים"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "הפוך למקרה ראשי"
   },
@@ -20,8 +38,8 @@
   "app.action-bar.stop-instance": {
     "message": ""
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "חזרה לעולמות"
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "ספרייה"
   },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
@@ -371,12 +389,6 @@
   "instance.settings.tabs.general.name": {
     "message": "שם"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "פעולות בעת הפעלה"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "פעולות בעת הפעלה מותאמות אישית"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "פעולות בעת הפעלה מאפשרות למשתמשים מתקדמים להריץ פקודות מערכת מסוימות לפני ואחרי שהמשחק מופעל."
   },
@@ -415,9 +427,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} גרסה"
-  },
-  "instance.settings.tabs.java": {
-    "message": "ג'אווה וזיכרון"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "משתני סביבה"

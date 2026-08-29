@@ -4,8 +4,9 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
+	Input,
 	SettingsFormGroup,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
@@ -131,7 +132,7 @@ function setOptionalField(
 					:title-for="`derivative-name-${index}`"
 					class="max-w-[40rem]"
 				>
-					<StyledInput
+					<Input
 						:id="`derivative-name-${index}`"
 						:model-value="source.label"
 						:disabled="disabled"
@@ -146,7 +147,7 @@ function setOptionalField(
 					:title-for="`derivative-link-${index}`"
 					class="max-w-[40rem]"
 				>
-					<StyledInput
+					<Input
 						:id="`derivative-link-${index}`"
 						:model-value="source.link ?? undefined"
 						type="url"
@@ -160,10 +161,9 @@ function setOptionalField(
 					:title-for="`derivative-note-${index}`"
 					class="max-w-[40rem]"
 				>
-					<StyledInput
+					<Textarea
 						:id="`derivative-note-${index}`"
 						:model-value="source.note ?? undefined"
-						multiline
 						:rows="3"
 						:disabled="disabled"
 						@update:model-value="(value) => setOptionalField(index, 'note', value)"

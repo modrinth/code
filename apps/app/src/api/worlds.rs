@@ -25,6 +25,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             add_server_to_instance,
             edit_server_in_instance,
             remove_server_from_instance,
+            desync_server,
             get_instance_protocol_version,
             get_server_status,
             start_join_singleplayer_world,
@@ -191,6 +192,15 @@ pub async fn remove_server_from_instance(
 ) -> Result<()> {
     worlds::remove_server_from_instance(instance_id, index).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn desync_server(
+    instance_id: &str,
+    server_id: &str,
+    mode: theseus::instance::DesyncServerMode,
+) -> Result<()> {
+    Ok(theseus::instance::desync_server(instance_id, server_id, mode).await?)
 }
 
 #[tauri::command]

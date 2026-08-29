@@ -8,19 +8,19 @@ import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 import type {
 	ButtonColor,
 	ButtonInteraction,
+	ButtonMenuAction,
+	ButtonMenuLink,
+	ButtonMenuOption,
 	ButtonNativeType,
 	ButtonSize,
 	ButtonType,
-	OverflowMenuAction,
-	OverflowMenuLink,
-	OverflowMenuOption,
 	TeleportPlacement,
 } from './types'
 
 const props = withDefaults(
 	defineProps<{
 		menuLabel: string
-		options: OverflowMenuOption[]
+		options: ButtonMenuOption[]
 		groupLabel?: string
 		type?: ButtonType
 		color?: ButtonColor
@@ -46,7 +46,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	click: [event: MouseEvent]
-	select: [option: OverflowMenuAction | OverflowMenuLink]
+	select: [option: ButtonMenuAction | ButtonMenuLink]
 }>()
 
 const slots = useSlots()

@@ -6,11 +6,22 @@ use neverbounce::{
     VerificationResult,
 };
 use tracing::{debug, error};
+use xredis::RedisPool;
 
 use crate::env::ENV;
 use crate::util::http::HTTP_CLIENT;
 
-pub async fn check_email(email: &str) -> eyre::Result<VerificationResult> {
+const CACHE_NAMESPACE: &str = "neverbounce:v1";
+const CACHE_EXPIRY_SECONDS: i64 = 60 * 60;
+
+/// Verdicts are cached in Redis for an hour, keyed by address. Only verdicts
+/// NeverBounce actually returned are cached; the `Unknown` we fall back to when
+/// the API is unreachable is not, so an outage cannot pin an address for an
+/// hour.
+pub async fn check_email(
+    redis: &RedisPool,
+    email: &str,
+) -> eyre::Result<VerificationResult> {
     if ENV.NEVERBOUNCE_API_KEY.is_empty() {
         debug!(
             result = "unknown",
@@ -18,6 +29,26 @@ pub async fn check_email(email: &str) -> eyre::Result<VerificationResult> {
         );
         return Ok(VerificationResult::Unknown);
     }
+
+    let cache_key = {
+        let mut redis = redis.connect().await?;
+        let key = redis
+            .key()
+            .entity(CACHE_NAMESPACE, email.to_ascii_lowercase());
+
+        if let Some(cached) = redis.get(&key).await? {
+            let result = VerificationResult::from_api_value(&cached);
+
+            debug!(
+                result = result.as_str(),
+                "NeverBounce email check served from cache",
+            );
+
+            return Ok(result);
+        }
+
+        key
+    };
 
     let params = SingleCheckParams::new(&ENV.NEVERBOUNCE_API_KEY, email)
         .with_api_url(&ENV.NEVERBOUNCE_BASE_URL);
@@ -72,6 +103,13 @@ pub async fn check_email(email: &str) -> eyre::Result<VerificationResult> {
                 request.time_ms = check_time.as_millis(),
                 "NeverBounce email check succeeded",
             );
+
+            redis
+                .connect()
+                .await?
+                .set(&cache_key, result.as_str(), Some(CACHE_EXPIRY_SECONDS))
+                .await?;
+
             Ok(result)
         }
         failure_type => {

@@ -10,11 +10,11 @@ import {
 } from '@modrinth/assets'
 import {
 	Button,
-	Checkbox,
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	Slider,
-	StyledInput,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -28,6 +28,7 @@ import { get, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
+import SettingsOptionsTransition from './settings-options-transition.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -41,9 +42,7 @@ const optimalJava = readonly(await get_optimal_jre_key(instance.value.id).catch(
 const overrideJavaInstall = ref(!!instance.value.java_path)
 const javaPath = ref(instance.value.java_path ?? optimalJava?.path ?? '')
 
-const activePath = computed(() =>
-	overrideJavaInstall.value ? javaPath.value : (optimalJava?.path ?? ''),
-)
+const activePath = computed(() => (overrideJavaInstall.value ? javaPath.value : ''))
 
 watch(overrideJavaInstall, (enabled) => {
 	if (enabled && !javaPath.value) {
@@ -140,7 +139,7 @@ const messages = defineMessages({
 	},
 	customJavaInstallation: {
 		id: 'instance.settings.tabs.java.custom-java-installation',
-		defaultMessage: 'Custom Java installation',
+		defaultMessage: 'Use a custom Java installation for this instance.',
 	},
 	javaPathPlaceholder: {
 		id: 'instance.settings.tabs.java.java-path-placeholder',
@@ -152,7 +151,7 @@ const messages = defineMessages({
 	},
 	customMemoryAllocation: {
 		id: 'instance.settings.tabs.java.custom-memory-allocation',
-		defaultMessage: 'Custom memory allocation',
+		defaultMessage: 'Use a custom memory allocation for this instance.',
 	},
 	javaArguments: {
 		id: 'instance.settings.tabs.java.java-arguments',
@@ -160,7 +159,7 @@ const messages = defineMessages({
 	},
 	customJavaArguments: {
 		id: 'instance.settings.tabs.java.custom-java-arguments',
-		defaultMessage: 'Custom Java arguments',
+		defaultMessage: 'Use custom Java arguments for this instance.',
 	},
 	enterJavaArguments: {
 		id: 'instance.settings.tabs.java.enter-java-arguments',
@@ -172,7 +171,7 @@ const messages = defineMessages({
 	},
 	customEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.custom-environment-variables',
-		defaultMessage: 'Custom environment variables',
+		defaultMessage: 'Use custom environment variables for this instance.',
 	},
 	enterEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.enter-environment-variables',
@@ -186,144 +185,175 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<div>
+	<div class="flex flex-col gap-6">
 		<JavaDetectionModal ref="javaDetectionModal" @submit="(val) => (javaPath = val.path)" />
-		<h2 class="m-0 mb-2 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.javaInstallation) }}
-		</h2>
-		<Checkbox
-			v-model="overrideJavaInstall"
-			:label="formatMessage(messages.customJavaInstallation)"
-			class="mb-2"
-		/>
-		<div class="flex gap-4 p-4 bg-bg rounded-2xl">
-			<div class="flex gap-3 items-start flex-1 min-w-0">
-				<div
-					class="w-10 h-10 flex items-center justify-center rounded-full bg-button-bg border-solid border-[1px] border-button-border p-2 mt-1 shrink-0 [&_svg]:h-full [&_svg]:w-full"
-				>
-					<CoffeeIcon />
+
+		<section class="flex flex-col">
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex min-w-0 flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.javaInstallation) }}
+					</h2>
+					<p class="m-0">{{ formatMessage(messages.customJavaInstallation) }}</p>
 				</div>
-				<div class="flex flex-col gap-2 flex-1 min-w-0">
-					<span class="font-semibold leading-none mt-2"
-						>Java {{ optimalJava?.parsed_version }}</span
-					>
-					<div class="flex gap-2 items-center">
-						<StyledInput
-							:model-value="activePath"
-							:disabled="!overrideJavaInstall"
-							autocomplete="off"
-							:placeholder="formatMessage(messages.javaPathPlaceholder)"
-							wrapper-class="flex-1 min-w-0"
-							@update:model-value="(val) => (javaPath = String(val))"
-						/>
-						<Button
-							type="quiet"
-							:color="
-								!hoveringTest && !testingJava
-									? javaTestResult === true
-										? 'green'
-										: 'red'
-									: undefined
-							"
-							:disabled="!overrideJavaInstall || testingJava"
-							:style="{
-								'--legacy-button-color':
-									(!hoveringTest && !testingJava
-										? javaTestResult === true
-											? 'green'
-											: 'red'
-										: 'standard') &&
-									(!hoveringTest && !testingJava
-										? javaTestResult === true
-											? 'green'
-											: 'red'
-										: 'standard') !== 'standard'
-										? `var(--color-${
-												!hoveringTest && !testingJava
+				<Toggle id="override-java-installation" v-model="overrideJavaInstall" />
+			</div>
+			<SettingsOptionsTransition :show="overrideJavaInstall">
+				<div class="pt-3">
+					<div class="flex gap-4 rounded-2xl bg-bg p-4">
+						<div class="flex gap-3 items-start flex-1 min-w-0">
+							<div
+								class="w-10 h-10 flex items-center justify-center rounded-full bg-button-bg border-solid border-[1px] border-button-border p-2 mt-1 shrink-0 [&_svg]:h-full [&_svg]:w-full"
+							>
+								<CoffeeIcon />
+							</div>
+							<div class="flex flex-col gap-2 flex-1 min-w-0">
+								<span class="font-semibold leading-none mt-2"
+									>Java {{ optimalJava?.parsed_version }}</span
+								>
+								<div class="flex gap-2 items-center">
+									<Input
+										:model-value="activePath"
+										autocomplete="off"
+										:placeholder="formatMessage(messages.javaPathPlaceholder)"
+										wrapper-class="flex-1 min-w-0"
+										@update:model-value="(val) => (javaPath = String(val))"
+									/>
+									<Button
+										type="quiet"
+										:color="
+											!hoveringTest && !testingJava
+												? javaTestResult === true
+													? 'green'
+													: 'red'
+												: undefined
+										"
+										:disabled="testingJava"
+										:style="{
+											'--legacy-button-color':
+												(!hoveringTest && !testingJava
 													? javaTestResult === true
 														? 'green'
 														: 'red'
-													: 'standard'
-											})`
-										: undefined,
-							}"
-							class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
-							@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
-							@mouseenter="overrideJavaInstall && (hoveringTest = true)"
-							@mouseleave="hoveringTest = false"
-						>
-							<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-							<CheckCircleIcon
-								v-else-if="javaTestResult === true && !hoveringTest"
-								class="h-4 w-4"
-							/>
-							<XCircleIcon v-else-if="javaTestResult !== true && !hoveringTest" class="h-4 w-4" />
-							<RefreshCwIcon v-else-if="overrideJavaInstall" class="h-4 w-4" />
-						</Button>
-					</div>
-					<div v-if="overrideJavaInstall" class="flex gap-2">
-						<Button @click="handleDetectJava">
-							<SearchIcon />
-							Detect
-						</Button>
-						<Button @click="handleBrowseJava">
-							<FolderSearchIcon />
-							Browse
-						</Button>
+													: 'standard') &&
+												(!hoveringTest && !testingJava
+													? javaTestResult === true
+														? 'green'
+														: 'red'
+													: 'standard') !== 'standard'
+													? `var(--color-${
+															!hoveringTest && !testingJava
+																? javaTestResult === true
+																	? 'green'
+																	: 'red'
+																: 'standard'
+														})`
+													: undefined,
+										}"
+										class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
+										@click="testJavaInstallation(activePath, optimalJava?.parsed_version, true)"
+										@mouseenter="hoveringTest = true"
+										@mouseleave="hoveringTest = false"
+									>
+										<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+										<CheckCircleIcon
+											v-else-if="javaTestResult === true && !hoveringTest"
+											class="h-4 w-4"
+										/>
+										<XCircleIcon
+											v-else-if="javaTestResult !== true && !hoveringTest"
+											class="h-4 w-4"
+										/>
+										<RefreshCwIcon v-else class="h-4 w-4" />
+									</Button>
+								</div>
+								<div class="flex gap-2">
+									<Button @click="handleDetectJava">
+										<SearchIcon />
+										Detect
+									</Button>
+									<Button @click="handleBrowseJava">
+										<FolderSearchIcon />
+										Browse
+									</Button>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
+			</SettingsOptionsTransition>
+		</section>
+
+		<section class="flex flex-col">
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex min-w-0 flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.javaMemory) }}
+					</h2>
+					<p class="m-0">{{ formatMessage(messages.customMemoryAllocation) }}</p>
+				</div>
+				<Toggle id="override-memory-allocation" v-model="overrideMemorySettings" />
 			</div>
-		</div>
-		<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.javaMemory) }}
-		</h2>
-		<Checkbox
-			v-model="overrideMemorySettings"
-			:label="formatMessage(messages.customMemoryAllocation)"
-			class="mb-2"
-		/>
-		<Slider
-			id="max-memory"
-			v-model="memory.maximum"
-			:disabled="!overrideMemorySettings"
-			:min="512"
-			:max="maxMemory"
-			:step="64"
-			:snap-points="snapPoints"
-			:snap-range="512"
-			unit="MB"
-		/>
-		<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.javaArguments) }}
-		</h2>
-		<Checkbox
-			v-model="overrideJavaArgs"
-			:label="formatMessage(messages.customJavaArguments)"
-			class="my-2"
-		/>
-		<StyledInput
-			id="java-args"
-			v-model="javaArgs"
-			autocomplete="off"
-			:disabled="!overrideJavaArgs"
-			:placeholder="formatMessage(messages.enterJavaArguments)"
-			wrapper-class="w-full"
-		/>
-		<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.javaEnvironmentVariables) }}
-		</h2>
-		<Checkbox
-			v-model="overrideEnvVars"
-			:label="formatMessage(messages.customEnvironmentVariables)"
-			class="mb-2"
-		/>
-		<StyledInput
-			id="env-vars"
-			v-model="envVars"
-			autocomplete="off"
-			:disabled="!overrideEnvVars"
-			:placeholder="formatMessage(messages.enterEnvironmentVariables)"
-			wrapper-class="w-full"
-		/>
+			<SettingsOptionsTransition :show="overrideMemorySettings">
+				<div class="pt-3">
+					<Slider
+						id="max-memory"
+						v-model="memory.maximum"
+						:min="512"
+						:max="maxMemory"
+						:step="64"
+						:snap-points="snapPoints"
+						:snap-range="512"
+						unit="MB"
+					/>
+				</div>
+			</SettingsOptionsTransition>
+		</section>
+
+		<section class="flex flex-col">
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex min-w-0 flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.javaArguments) }}
+					</h2>
+					<p class="m-0">{{ formatMessage(messages.customJavaArguments) }}</p>
+				</div>
+				<Toggle id="override-java-arguments" v-model="overrideJavaArgs" />
+			</div>
+			<SettingsOptionsTransition :show="overrideJavaArgs">
+				<div class="pt-3">
+					<Input
+						id="java-args"
+						v-model="javaArgs"
+						autocomplete="off"
+						:placeholder="formatMessage(messages.enterJavaArguments)"
+						wrapper-class="w-full"
+					/>
+				</div>
+			</SettingsOptionsTransition>
+		</section>
+
+		<section class="flex flex-col">
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex min-w-0 flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.javaEnvironmentVariables) }}
+					</h2>
+					<p class="m-0">{{ formatMessage(messages.customEnvironmentVariables) }}</p>
+				</div>
+				<Toggle id="override-environment-variables" v-model="overrideEnvVars" />
+			</div>
+			<SettingsOptionsTransition :show="overrideEnvVars">
+				<div class="pt-3">
+					<Input
+						id="env-vars"
+						v-model="envVars"
+						autocomplete="off"
+						:placeholder="formatMessage(messages.enterEnvironmentVariables)"
+						wrapper-class="w-full"
+					/>
+				</div>
+			</SettingsOptionsTransition>
+		</section>
 	</div>
 </template>

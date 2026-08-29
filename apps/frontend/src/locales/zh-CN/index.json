@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "继续"
   },
-  "admin.billing.error.not-found": {
-    "message": "未找到用户"
-  },
   "ads-consent.accept": {
     "message": "全部接受"
   },
@@ -438,7 +435,7 @@
     "message": "相较上一统计周期"
   },
   "analytics.stat.previous-period-comparison-short": {
-    "message": "相较上期."
+    "message": "相较上期。"
   },
   "analytics.stat.revenue": {
     "message": "收益"
@@ -762,7 +759,7 @@
     "message": "在响应中未找到重定向位置"
   },
   "auth.authorize.errro-title": {
-    "message": "一个错误发生了"
+    "message": "发生了一个错误"
   },
   "auth.authorize.redirect-url": {
     "message": "你将跳转至 <redirect-url>{url}</redirect-url>"
@@ -882,7 +879,7 @@
     "message": "没有账号？"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "登录到Modrinth"
+    "message": "登录到 Modrinth"
   },
   "auth.sign-in.title": {
     "message": "登录"
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "批准并回复"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "关闭对话消息"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "关闭并回复"
@@ -1905,7 +1899,7 @@
     "message": "一个包含项目信息、文档和帮助的页面"
   },
   "dashboard.projects.links.wiki-page.label": {
-    "message": "维基页面"
+    "message": "Wiki页面"
   },
   "dashboard.projects.notification.bulk-edit-success": {
     "message": "已批量编辑所选项目的链接。"
@@ -2651,9 +2645,6 @@
   "layout.action.file-lookup": {
     "message": "文件查询"
   },
-  "layout.action.lookup-by-email": {
-    "message": "通过电子邮箱查找"
-  },
   "layout.action.manage-affiliates": {
     "message": "管理推广链接"
   },
@@ -2849,8 +2840,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "未知"
@@ -2943,7 +2940,7 @@
     "message": "正在打开 Modrinth App"
   },
   "modal.shared-instance.open-in-app.why-use": {
-    "message": "为什么选择 Modrinth 客户端"
+    "message": "为什么选择 Modrinth APP"
   },
   "moderation.exclude-technical-review": {
     "message": "排除技术评审"
@@ -3446,6 +3443,18 @@
   "project-type.shader.singular": {
     "message": "光影包"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "回到全部项目列表"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "回到项目页"
+  },
+  "project.actions.check-modpack-archives": {
+    "message": "检查整合包解压"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "正在检查……"
+  },
   "project.actions.create-server": {
     "message": "创建服务器"
   },
@@ -3457,6 +3466,9 @@
   },
   "project.actions.edit-project": {
     "message": "编辑项目"
+  },
+  "project.actions.project-page": {
+    "message": "项目页"
   },
   "project.actions.rescan-modpack": {
     "message": "重新扫描整合包"
@@ -3472,6 +3484,24 @@
   },
   "project.actions.servers-promo.title": {
     "message": "创建服务器"
+  },
+  "project.actions.view-dependents": {
+    "message": "查看依赖项"
+  },
+  "project.actions.view-modpacks": {
+    "message": "查看整合包"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "查看{projectType}依赖项"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "不允许使用AI生成的图片来表示您的项目，不接受检测工作可能导致您的 Modrints 帐户被封禁。"
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "了解更多信息，请参阅 <rules>第6节的 Modrinth的Content Rules</rules>。"
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "不允许使用AI生成的图片"
   },
   "project.collections.create-new": {
     "message": "创建新收藏夹"
@@ -3513,7 +3543,7 @@
     "message": "此依赖项已包含"
   },
   "project.download.dependency-missing-version": {
-    "message": "次依赖项版本不可用"
+    "message": "此依赖项版本不可用"
   },
   "project.download.dependency-no-compatible-version": {
     "message": "此依赖项无兼容版本可用"
@@ -3672,13 +3702,13 @@
     "message": "如果反复提交你的项目而不预先处理管理问题，可能会导致账户被暂停。"
   },
   "project.moderation.admonition.under-review.body.1": {
-    "message": "你的项目已在排队等待 Modrinth 管理团队的审核。"
+    "message": "您的项目正在等待 Modrinth 审核团队审核。"
   },
   "project.moderation.admonition.under-review.body.2": {
     "message": "你的项目将先被扫描，然后由人工管理员来审核，以确保其符合 Modrinth 的<rules-link>内容规则</rules-link>和<terms-link>使用条款</terms-link>。"
   },
   "project.moderation.admonition.under-review.body.3": {
-    "message": "你仍然可以修改项目，这并不会影响你在队列中的位置。"
+    "message": "你仍然可以修改项目，这不会影响你在队列中的位置。"
   },
   "project.moderation.admonition.under-review.body.4": {
     "message": "我们计划在24-48小时内审查提交内容，但某些项目可能会有延迟。这并不意味着你的提交有问题。"
@@ -3719,8 +3749,23 @@
   "project.moderation.title": {
     "message": "审核"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "导入此 .mrpack 可能会出错。"
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "此整合包发布时存在导出错误"
+  },
   "project.navigation.changelog": {
     "message": "更新日志"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "无法解压部分整合包文件"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "找不到此项目的 .mrpack 文件。"
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {该整合包文件可被解压。} other {全部的 # 个整合包文件均可被解压。}}"
   },
   "project.notification.icon-updated.message": {
     "message": "你的项目的图标已更新。"
@@ -3733,6 +3778,198 @@
   },
   "project.notification.updated.title": {
     "message": "项目已更新"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "回到全部项目列表"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "回到项目页"
+  },
+  "project.settings.danger-zone": {
+    "message": "危险操作"
+  },
+  "project.settings.delete-project.button": {
+    "message": "删除项目"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "如果您继续，此项目的所有信息及其所有版本将立即从我们的数据库中永久删除，就算你改变主意，它也不可能在稍后恢复，请考虑只把你的项目设置为私有，以减少使用永久性选项。"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "永久删除项目"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "你真的确定要删除这个项目吗？"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "从Modrinth中永久删除此项目，已删除的项目 <emphasis>无法由 Modrinth 员工或支持恢复</emphasis>。"
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "上传到这个项目并且在Modrints托管的整合包中积极使用的文件可能仍然存在。"
+  },
+  "project.settings.delete-project.title": {
+    "message": "删除项目"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "如果你的项目包含其他作品的广告、赞助或促销，您必须启用此功能。"
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "例如：将 Modrinth SMP 服务器自动添加到你的服务器列表。"
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "包含广告推广内容"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "请参考第6节的 <rules>Modrinth Content Rules</rules> 获取更多信息。"
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "如果此项目包含大量AI生成的代码，您必须启用此功能，任何资产基本上是AI生成的、该项目的功能依赖于使用AI或您的项目页面中的任何元素的部分为AI所生成的，请描述或发布依赖于生成的AI所生成的部分。"
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "例如：中文和阿拉伯文的翻译是AI生成的。"
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "包含AI所生成的内容"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "用了什么样的AI所生成的内容？"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "提示横幅预览"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "标记你的项目状态为已归档，让用户知道你已经不再维护。"
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "当项目的可见性设置为公开时，存档项目仍然可以被发现。如果您想要将你的项目从列表中删除，请将其可见性设置为私有。"
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "例如，我没有时间维持这个项目，可以随时给它分支！"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "归档项目"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "内容发布"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "如果你的项目是另一个项目的衍生品，您必须启用此功能，比如作为一个分支或包含大量他人的工作。"
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "原始项目链接"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "原项目名称"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "示例项目"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "解释你的项目是如何基于原项目进行的更改"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "包含衍生内容"
+  },
+  "project.settings.disclosures.description": {
+    "message": "你必须按照 <rules>Modrinth的内容规则</rules> 向您的项目添加任何适用的内容披露。"
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "最后由用户 {user} 在 {date} 更新"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "管理员"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "如果需要删除此披露，请 <contact-support-link>联系支持</contact-support-link>。"
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "本披露内容已被管理员锁定，如果您认为此信息有误，请<contact-support-link>联系支持团队</contact-support-link>。"
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "如果需要删除此披露，请 <contact-support-link>联系支持</contact-support-link>。"
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "如果你的项目包含可以通过真金白银获得的功能，你必须启用此功能。"
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "例如：化妆品可用作Patreon奖励"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "列出支付功能的类型"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "包含付费功能"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "如果你的项目包含任何你认为可能对某些患有光敏性癫痫的人有危险的内容，请务必启用此功能。"
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "例如，它添加了一个手势模式的手电筒。它可以在游戏中的辅助功能设置中禁用。"
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "光敏性癫痫警告"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "广告披露需要解释。"
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "衍生作品的披露必须列出至少一个源项目。"
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "衍生工作源必须有名称。"
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "你没有权限编辑此项目的披露。"
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "支付功能披露必须列出至少一个付费功能。"
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "照片敏感性警告披露必须包括说明。"
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "请填写外部系统交互披露必须包括说明。"
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "远程披露必须列出至少一种类型的数据。"
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "如果您的项目在游戏外的用户系统上读取或编辑的话，您必须启用此功能。"
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "描述外部系统的交互"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "例如，它将一个文件添加到叫wake_up.txt的桌面"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "与外部系统的交互"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "您的收集器是什么样的同意模式？"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "如果它是匿名的或包含可识别个人身份的信息(PII)的话，您可以添加隐私政策，也可以添加所收集的数据类型列表。"
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "收集了哪些数据？"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "例如：用于跟踪 Minecraft 版本和模组加载器使用情况的匿名启动分析。"
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "如果你的项目将使用数据反馈给您自己或第三方的话，你就必须启用此功能。"
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "包含遥测功能"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "在添加披露前上传版本"
+  },
+  "project.settings.editing-project": {
+    "message": "编辑 {projectType} 项目"
   },
   "project.settings.general.name.description": {
     "message": "请勿添加前缀、后缀、括号内容或附加说明——仅填写项目实际名称。"
@@ -3778,6 +4015,15 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.monetization.description": {
+    "message": "Modrints上的项目自动注册于 <rewards-program-link>奖励方案</rewards-program-link>如果你不想(或由于法律原因不能)从这个项目赚取收入，你可以在这里关闭它。"
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "本项目不适用于变现。如果您认为此为错误，请<contact-support-link>联系支持团队</contact-support-link>。"
+  },
+  "project.settings.monetization.title": {
+    "message": "收益"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "请提供证明，表明您有权利对以下的所有内容进行再次分发。 文件。一旦完成，未公开的版本将自动发布。"
@@ -3971,6 +4217,9 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "你选择了 {count} 个标签。建议将数量减少到 12 个或更少，以确保你的服务器主题更明确，且更容易发现。"
   },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "添加标签前上传版本"
+  },
   "project.versions.copy-id-option": {
     "message": "复制 ID"
   },
@@ -4067,11 +4316,20 @@
   "report.not-for.dmca.description": {
     "message": "详见我们的<policy-link>版权政策</policy-link>。"
   },
+  "report.note.ai-images.1": {
+    "message": "我们刚刚更新了规则，禁止在图标、画廊及项目描述中使用 AI 生成的图像。在正式开始接收此类举报之前，我们正在向创作者提供一段宽限期，以便他们从自己的项目中移除 AI 图像。"
+  },
+  "report.note.check-back-later": {
+    "message": "请在宽限期结束后再来查看。目前暂不受理此类举报。"
+  },
   "report.note.copyright.1": {
     "message": "请注意，你提交的并非 DMCA 下架请求，而是对转载内容的举报。"
   },
   "report.note.copyright.2": {
     "message": "如果你需要填报 DMCA 删除请求（这是一个法务行为），请参见我们的<copyright-policy-link>版权政策</copyright-policy-link>。"
+  },
+  "report.note.fully-ai-generated.1": {
+    "message": "我们刚刚更新了规则，明确禁止完全由 AI 生成的项目。在正式开始接收此类举报之前，我们正在向创作者提供一段宽限期，以便他们更新或下架完全由 AI 生成的项目。"
   },
   "report.note.malicious.1": {
     "message": "报告恶意或欺骗性内容时必须附上行为的实质性证据，例如代码样本。"
@@ -4079,8 +4337,11 @@
   "report.note.malicious.2": {
     "message": "Microsoft Defender、VirusTotal 等杀毒软件的报告，或 AI 恶意软件检测结果不属于充分的证据形式，不会被接受。"
   },
+  "report.note.missing-disclosure.1": {
+    "message": "内容披露是我们新增的一个功能。 我们向创作者提供一个宽限期，以便在我们开始接受缺失或不正确的披露报告之前更新他们的披露。"
+  },
   "report.please-report": {
-    "message": "请报告："
+    "message": "请举报："
   },
   "report.question.content-id": {
     "message": "{item}的ID是什么？"
@@ -4096,6 +4357,9 @@
   },
   "report.report-item": {
     "message": "向管理员举报 {title}"
+  },
+  "report.reported-for": {
+    "message": "由于{type}而举报"
   },
   "report.submit": {
     "message": "提交举报"
@@ -4377,7 +4641,7 @@
     "message": "写入版本"
   },
   "search.filter.game-version-shader-message": {
-    "message": "旧版本的着色器也许在新版本上能正常运行，但可能遇到问题。"
+    "message": "旧版本的光影包也许在新版本上能正常运行，但可能遇到问题。"
   },
   "search.filter.locked.server": {
     "message": "由该服务器提供"
@@ -4683,7 +4947,7 @@
     "message": "如果二维码无法扫描，你可以手动输入密码："
   },
   "settings.account.two-factor.setup.scan": {
-    "message": "使用 <authy-link>Authy</authy-link>、<microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 等双因素验证应用，扫描二维码即可开始。"
+    "message": "使用 <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 或其他两步验证应用程序扫描此二维码即可开始。"
   },
   "settings.account.two-factor.verify.description": {
     "message": "输入验证器提供的一次性验证码以验证访问权限。"
@@ -4821,7 +5085,7 @@
     "message": "Modrinth Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth托管服务"
+    "message": "Modrinth Hostings"
   },
   "settings.billing.charges.title": {
     "message": "过去费用"
@@ -4842,10 +5106,10 @@
     "message": "在 modrinth.com 和 Modrinth 应用上无广告浏览"
   },
   "settings.billing.midas.benefits.badge": {
-    "message": "个人资料上显示Modrinth+徽章"
+    "message": "个人资料上显示 Modrinth+ 徽章"
   },
   "settings.billing.midas.benefits.support": {
-    "message": "直接支持Modrinth及其创作者"
+    "message": "直接支持 Modrinth 及其创作者"
   },
   "settings.billing.midas.benefits.title": {
     "message": "福利"
@@ -4869,7 +5133,7 @@
     "message": "你的付款正在处理中。付款完成后福利将立即生效。"
   },
   "settings.billing.midas.upsell": {
-    "message": "成为Modrinth Plus的订阅者吧！"
+    "message": "成为 Modrinth Plus 的订阅者吧！"
   },
   "settings.billing.modal.cancel.action": {
     "message": "取消订阅"
@@ -4884,7 +5148,7 @@
     "message": "移除这个支付方式"
   },
   "settings.billing.modal.delete.description": {
-    "message": "这将永久（真的是永久）删除此支付方式。"
+    "message": "这将永久（真的很久）删除此支付方式。"
   },
   "settings.billing.modal.delete.title": {
     "message": "确定要删除这个支付方式吗？"

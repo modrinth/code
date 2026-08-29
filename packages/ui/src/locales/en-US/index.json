@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "Continue"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copied to clipboard"
+  },
   "button.copy-filename": {
     "defaultMessage": "Copy filename"
   },
@@ -2018,11 +2021,116 @@
   "icon-select.select": {
     "defaultMessage": "Select icon"
   },
-  "input.clear": {
-    "defaultMessage": "Clear input"
+  "image-viewer.close": {
+    "defaultMessage": "Close"
   },
-  "input.search": {
-    "defaultMessage": "Search"
+  "image-viewer.edit": {
+    "defaultMessage": "Edit"
+  },
+  "image-viewer.editor.censor.blur": {
+    "defaultMessage": "Blur"
+  },
+  "image-viewer.editor.censor.mode": {
+    "defaultMessage": "Censor type"
+  },
+  "image-viewer.editor.censor.solid": {
+    "defaultMessage": "Solid"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Colour"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Reset crop"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Delete selected annotation"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Area"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Element"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Eraser mode"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Image editing tools"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "More save options"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Overwrite"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Redo"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Save copy"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Save image"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Size"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Arrow"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Censor"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Crop"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellipse"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Eraser"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Highlight"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Pen"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Rectangle"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Select"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Text"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Undo"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Width"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Fit"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "Fit to workspace"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Zoom in"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Zoom out"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Next image"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Previous image"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Search version..."
@@ -2615,6 +2723,9 @@
   "label.yes": {
     "defaultMessage": "Yes"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Switching accounts..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Czech"
   },
@@ -3118,6 +3229,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Set as affiliate"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "View shared instances"
   },
   "profile.button.unblock": {
     "defaultMessage": "Unblock"
@@ -4021,6 +4135,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Channel"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, number} selected"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Toggle filter for {filter}"
@@ -6674,6 +6794,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth Team"
   },
+  "user.role.moderator": {
+    "defaultMessage": "Content Moderator"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Modrinth Team"
+  },
   "version.content.name": {
     "defaultMessage": "Name"
   },
@@ -6684,7 +6810,7 @@
     "defaultMessage": "Dev jar"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
+    "defaultMessage": "Javadocs jar"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Optional resource pack"
@@ -6699,7 +6825,7 @@
     "defaultMessage": "Signature file"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "Source jar"
+    "defaultMessage": "Sources jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Other"

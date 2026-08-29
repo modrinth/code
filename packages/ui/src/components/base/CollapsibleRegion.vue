@@ -2,28 +2,29 @@
 	<div class="relative overflow-hidden">
 		<div
 			class="collapsible-region-content"
-			:class="{ open: !collapsed }"
+			:class="{ open: !collapsed || disabled }"
 			:style="{ '--collapsed-height': collapsedHeight }"
 		>
-			<div :class="{ 'pointer-events-none select-none pb-16': collapsed }">
+			<div :class="{ 'pointer-events-none select-none': collapsed }">
 				<slot />
 			</div>
 		</div>
 
 		<div
-			v-if="collapsed"
-			class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent"
-			:class="gradientTo"
+			v-if="!disabled"
+			class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent transition-opacity duration-250"
+			:class="[gradientTo, { 'opacity-0': !collapsed }]"
 		/>
 
-		<div class="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
-			<Button
-				type="quiet"
-				class="flex items-center gap-1 text-xs !rounded-full"
-				@click="collapsed = !collapsed"
-			>
-				<ExpandIcon v-if="collapsed" />
-				<CollapseIcon v-else />
+		<div v-if="!collapsed && !disabled" class="top-4 right-4 z-20 group absolute">
+			<Button v-tooltip="collapseText" type="quiet" circular icon-only @click="collapsed = true">
+				<DropdownIcon class="rotate-180" />
+			</Button>
+		</div>
+
+		<div v-if="!disabled" class="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
+			<Button type="quiet" class="text-xs" @click="collapsed = !collapsed">
+				<DropdownIcon class="transition-transform" :class="{ 'rotate-180': !collapsed }" />
 				{{ collapsed ? expandText : collapseText }}
 			</Button>
 		</div>
@@ -31,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { CollapseIcon, ExpandIcon } from '@modrinth/assets'
+import { DropdownIcon } from '@modrinth/assets'
 
 import { Button } from '#ui/components/base/buttons'
 
@@ -41,12 +42,14 @@ withDefaults(
 		collapseText?: string
 		collapsedHeight?: string
 		gradientTo?: string
+		disabled?: boolean
 	}>(),
 	{
 		expandText: 'Expand',
 		collapseText: 'Collapse',
 		collapsedHeight: '8rem',
 		gradientTo: 'to-surface-2',
+		disabled: false,
 	},
 )
 
@@ -56,8 +59,12 @@ const collapsed = defineModel<boolean>('collapsed', { default: true })
 <style scoped>
 .collapsible-region-content {
 	display: grid;
-	grid-template-rows: 0fr;
-	transition: grid-template-rows 0.3s linear;
+	grid-template-rows: minmax(var(--collapsed-height), 0fr);
+	transition: grid-template-rows 500ms var(--ease-out-expo);
+
+	& > div {
+		grid-row: 1 / span 2;
+	}
 }
 
 @media (prefers-reduced-motion) {
@@ -67,16 +74,10 @@ const collapsed = defineModel<boolean>('collapsed', { default: true })
 }
 
 .collapsible-region-content.open {
-	grid-template-rows: 1fr;
+	grid-template-rows: minmax(var(--collapsed-height), 1fr);
 }
 
 .collapsible-region-content > div {
 	overflow: hidden;
-	min-height: var(--collapsed-height);
-	transition: min-height 0.3s linear;
-}
-
-.collapsible-region-content.open > div {
-	min-height: 0;
 }
 </style>

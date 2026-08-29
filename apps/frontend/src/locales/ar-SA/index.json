@@ -5,17 +5,20 @@
   "action.continue": {
     "message": "متابعة"
   },
-  "admin.billing.error.not-found": {
-    "message": "المستخدم غير موجود"
-  },
   "ads-consent.accept": {
     "message": "قبول الكل"
+  },
+  "ads-consent.body": {
+    "message": "تساعد الإعلانات في استمرار Modrinth وتمويل مدفوعات المبدعين. قد يقوم شركاؤنا بتخزين ملفات تعريف الارتباط Cookies على الموقع أو الوصول إليها لتخصيص الإعلانات وقياس أدائها."
   },
   "ads-consent.manage": {
     "message": "إدارة التفضيلات"
   },
   "ads-consent.reject": {
     "message": "رفض الكل"
+  },
+  "ads-consent.title": {
+    "message": "خصوصيتك وكيف تساهم الإعلانات في دعم Modrinth"
   },
   "analytics.action.add": {
     "message": "إضافة"
@@ -185,6 +188,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "إخفاء {name} في الرسم البياني"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "لا توجد بيانات"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "تلميح الرسم البياني مثبت"
   },
@@ -211,6 +217,9 @@
   },
   "analytics.download-reason.dependency": {
     "message": "التبعية"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "مودباك"
   },
   "analytics.download-reason.standalone": {
     "message": "مستقل"
@@ -241,6 +250,9 @@
   },
   "analytics.empty.select-project": {
     "message": "حدد مشروعًا واحدًا على الأقل لعرض البيانات"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "تعذّر تحميل المشاريع التي تعتمد عليها"
   },
   "analytics.filter.game-version-type": {
     "message": "نوع إصدار اللعبة"
@@ -410,17 +422,125 @@
   "analytics.stat.monetization-banner.learn-more": {
     "message": "معرفة المزيد"
   },
+  "analytics.stat.monetization-banner.title": {
+    "message": "كيف تعمل آلية تحقيق الدخل؟"
+  },
   "analytics.stat.playtime": {
     "message": "وقت اللعب"
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours} ساعة"
   },
+  "analytics.stat.previous-period-comparison": {
+    "message": "مقارنةً بالفترة السابقة"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "مقارنةً بالسابق."
+  },
+  "analytics.stat.revenue": {
+    "message": "الإيرادات"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "غير متاح"
+  },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "الإحصائية غير متاحة للاستعلام الحالي"
+  },
   "analytics.stat.views": {
     "message": "المشاهدات"
   },
+  "analytics.table.csv.date-range": {
+    "message": "من {start} إلى {end}"
+  },
+  "analytics.table.csv.filename": {
+    "message": "تحليلات Modrinth — تفصيل {breakdown} — {dateRange}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "وقت اللعب (بالثواني)"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "النطاق المحدد"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {ساعة واحدة} two {ساعتان} few {# ساعات} many {# ساعة} other {# ساعة}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {دقيقة واحدة} two {دقيقتان} few {# دقائق} many {# دقيقة} other {# دقيقة}}"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "لا توجد بيانات مطابقة في التحليلات"
+  },
+  "analytics.table.export-csv": {
+    "message": "تصدير CSV"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "التراكمي"
+  },
+  "analytics.table.export.grouped": {
+    "message": "التجميع حسب {groupBy}"
+  },
+  "analytics.table.pagination.summary": {
+    "message": "عرض {start} إلى {end} من أصل {total}"
+  },
   "analytics.table.search.placeholder": {
     "message": "بحث..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "الدول أعلاه"
+  },
+  "analytics.threshold.country-downloads-aria": {
+    "message": "الحد الأدنى لتنزيلات الدولة"
+  },
+  "analytics.threshold.game-version-downloads-aria": {
+    "message": "الحد الأدنى لتنزيلات إصدار اللعبة"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "إصدارات اللعبة أعلاه"
+  },
+  "analytics.threshold.project-downloads-aria": {
+    "message": "الحد الأدنى لتنزيلات المشروع"
+  },
+  "analytics.threshold.project-version-downloads-aria": {
+    "message": "الحد الأدنى لتنزيلات إصدار المشروع"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "إصدارات المشروع أعلاه"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "المشاريع أعلاه"
+  },
+  "analytics.title": {
+    "message": "التحليلات"
+  },
+  "analytics.value.monetized": {
+    "message": "محقق للدخل"
+  },
+  "analytics.value.no-dependent": {
+    "message": "لا شيء"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "تم تنزيله لأسباب أخرى غير كونه تبعية"
+  },
+  "analytics.value.none": {
+    "message": "لا شيء"
+  },
+  "analytics.value.other": {
+    "message": "غير ذلك"
+  },
+  "analytics.value.unknown": {
+    "message": "غير معروف"
+  },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "لا توجد بيانات وصفية لتحديد المشروع الذي يعتمد عليه هذا التنزيل."
+  },
+  "analytics.value.unmonetized": {
+    "message": "غير محقق للدخل"
   },
   "app-marketing.download.description": {
     "message": "تطبيقنا لسطح المكتب متاح على جميع المنصات، اختر الإصدار الذي تريده."
@@ -536,6 +656,9 @@
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ ميغابايت"
   },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ × ∞ MB"
+  },
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 ميغابايت"
   },
@@ -558,22 +681,22 @@
     "message": "أداء قوي"
   },
   "app-marketing.features.play.description": {
-    "message": "استخدم Modrinth App لتنزيل ولعب موداتك وحزم المودات المفضلة لديك."
+    "message": "استخدم Modrinth App لتنزيل ولعب موداتك والمودباك المفضلة لديك."
   },
   "app-marketing.features.play.title": {
     "message": "العب مع موداتك المفضلة"
   },
   "app-marketing.features.sharing.description": {
-    "message": "أنشئ، شارك، والعب بحزم المودات مع أي من آلاف المودات والحزم المستضافة هنا على مودرنث."
+    "message": "أنشئ وشارك والعب المودباكات باستخدام أي من آلاف المودات والمودباكات المستضافة هنا على Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
-    "message": "حزم المودات"
+    "message": "مودباك"
   },
   "app-marketing.features.sharing.share-button": {
     "message": "مشاركة"
   },
   "app-marketing.features.sharing.title": {
-    "message": "مشاركة حزم المودات"
+    "message": "مشاركة المودباكات"
   },
   "app-marketing.features.unlike-any-launcher": {
     "message": "مختلف عن أي مشغل آخر"
@@ -591,7 +714,7 @@
     "message": "لقطة شاشة لـ Modrinth App مع نسخة Cobblemon مفتوحة في صفحة \"المحتوى\"."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App هو مشغل فريد ومفتوح المصدر يتيح لك لعب موداتك المفضلة والحفاظ عليها محدثة، وكل ذلك في حزمة واحدة بسيطة ومنظمة."
+    "message": "Modrinth App هو لانشر فريد ومفتوح المصدر، يتيح لك تشغيل موداتك المفضلة والحفاظ عليها محدثة، كل ذلك في تطبيق واحد سهل الاستخدام."
   },
   "app-marketing.hero.download-button": {
     "message": "تنزيل Modrinth App"
@@ -609,13 +732,13 @@
     "message": "المزيد من خيارات التنزيل"
   },
   "app-marketing.hide-other-packages": {
-    "message": "إخفاء الحزم الأخري"
+    "message": "إخفاء الحزم الأخرى"
   },
   "app-marketing.not-recommended": {
     "message": "لا ننصح باستخدام هؤلاء إذا لا تعلم ماذا تفعل."
   },
   "app-marketing.show-other-packages": {
-    "message": "إظهار الحزم الأخري"
+    "message": "إظهار الحزم الأخرى"
   },
   "auth.authorize.action.authorize": {
     "message": "سماح"
@@ -629,6 +752,9 @@
   "auth.authorize.authorize-app-name": {
     "message": "السماح لـ {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "معلمات استعلام OAuth المطلوبة مفقودة."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "لم يتم العثور على وجهة إعادة التوجيه في الاستجابة"
   },
@@ -637,6 +763,60 @@
   },
   "auth.authorize.redirect-url": {
     "message": "ستتم إعادة توجيهك إلى <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "المتابعة باستخدام {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "متطلبات العمر"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "إكمال التسجيل"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "يرجى إدخال تاريخ ميلاد صالح. لا يمكن أن تكون السنة 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "تاريخ الميلاد غير صالح"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "تاريخ الميلاد"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "اختر تاريخ ميلادك"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "يرجى إدخال تاريخ ميلادك قبل المتابعة."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "تاريخ الميلاد مطلوب"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "لا تستوفي متطلبات العمر لإنشاء حساب على Modrinth."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "شفرة المصدر ذات الصلة"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "نحن لا نخزّن تاريخ ميلادك. نستخدمه فقط أثناء التسجيل للتحقق من الامتثال لمتطلبات COPPA."
+  },
+  "auth.create-account.page-title": {
+    "message": "إنشاء حساب"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "فحص الأمان"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "أبقني على اطلاع بأحدث الأشياء الرائعة التي تعمل عليها Modrinth عبر البريد الإلكتروني"
+  },
+  "auth.create-account.title": {
+    "message": "إنشاء حساب"
+  },
+  "auth.create-account.username.label": {
+    "message": "اسم المستخدم"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "أدخل اسم المستخدم"
   },
   "auth.reset-password.method-choice.action": {
     "message": "إرسال بريد استعادة الحساب"
@@ -671,14 +851,53 @@
   "auth.reset-password.title.long": {
     "message": "تغيير كلمة المرور"
   },
+  "auth.sign-in.2fa.description": {
+    "message": "أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة، أو أحد رموزك الاحتياطية."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "المصادقة الثنائية"
+  },
   "auth.sign-in.2fa.placeholder": {
     "message": "أدخل الرمز..."
+  },
+  "auth.sign-in.continue-with-email": {
+    "message": "المتابعة باستخدام البريد الإلكتروني"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "المتابعة باستخدام مفتاح المرور"
+  },
+  "auth.sign-in.create-account": {
+    "message": "التسجيل"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "نسيت كلمة المرور"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "آخر استخدام"
+  },
+  "auth.sign-in.no-account": {
+    "message": "ليس لديك حساب؟"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "تسجيل الدخول إلى Modrinth"
   },
   "auth.sign-in.title": {
     "message": "تسجيل الدخول"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "متطلبات العمر"
+  },
+  "auth.sign-up.continue-with-email": {
+    "message": "المتابعة باستخدام البريد الإلكتروني"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "بإنشائك حسابًا، فإنك توافق على <terms-link>شروط مودرنث</terms-link> و<privacy-policy-link>سياسة الخصوصية</privacy-policy-link> الخاصة بها."
+  },
+  "auth.sign-up.show-fewer-options": {
+    "message": "عرض خيارات أقل"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "عرض خيارات أخرى"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "هل لديك حساب بالفعل؟"
@@ -686,8 +905,14 @@
   "auth.sign-up.title": {
     "message": "إنشاء حساب"
   },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "إنشاء حساب"
+  },
   "auth.verify-email.action.account-settings": {
     "message": "إعدادات الحساب"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "اكتشف المودات"
   },
   "auth.verify-email.already-verified.description": {
     "message": "تم توثيق بريدك الإلكتروني مسبقًا!"
@@ -707,6 +932,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "فشل التحقق من البريد الإلكتروني"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "تم إرسال رسالة بريد إلكتروني تحتوي على رابط للتحقق من حسابك إلى {email}."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "تم إرسال البريد الإلكتروني"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "حدث خطأ"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "تم التحقّق من عنوان بريدك الإلكتروني بنجاح!"
   },
@@ -715,6 +949,12 @@
   },
   "auth.verify-email.title": {
     "message": "تحقّق من البريد الإلكتروني"
+  },
+  "collection.aria-label.upload-icon": {
+    "message": "رفع الأيقونة"
+  },
+  "collection.button.discover-mods": {
+    "message": "اكتشف المودات"
   },
   "collection.button.edit-icon": {
     "message": "تعديل الأيقونة"
@@ -776,8 +1016,245 @@
   "collection.title": {
     "message": "{name} - مجموعة"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "إضافة ملاحظة خاصة"
+  },
+  "conversation-thread.action.approve": {
+    "message": "موافقة"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "الموافقة مع الرد"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "الإغلاق مع الرد"
+  },
+  "conversation-thread.action.reject": {
+    "message": "رفض"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "الرفض مع الرد"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "إعادة فتح سلسلة المحادثة"
+  },
+  "conversation-thread.action.reply": {
+    "message": "الرد"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "الرد على سلسلة المحادثة"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "إعادة الإرسال للمراجعة"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "إعادة الإرسال للمراجعة مع الرد"
+  },
+  "conversation-thread.action.send": {
+    "message": "إرسال"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "إرسال للمراجعة"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "الإرسال للمراجعة مع الرد"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "تعيين كمسودة"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "تعيين كمسودة مع الرد"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "حجب"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "الحجب مع الرد"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "هذه السلسلة مغلقة، ولا يمكن إرسال رسائل جديدة إليها."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "حدث خطأ أثناء إغلاق البلاغ"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "حدث خطأ أثناء إعادة فتح البلاغ"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "حدث خطأ أثناء إرسال الرسالة"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "الرد على سلسلة المحادثة..."
+  },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "إرسال رسالة..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "تأكيد أن المشرفين لا يراقبون هذا بشكل نشط"
+  },
+  "conversation-thread.reply-modal.confirmation.label": {
+    "message": "أقرّ بأن المشرفين لا يراقبون الموضوع بشكل نشط."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "مشروعك معتمد بالفعل. وبناءً على ذلك، لا يراقب فريق الإشراف هذا الموضوع بشكل نشط. ومع ذلك، قد يطّلعون على رسالتك إذا كانت هناك مشكلة في مشروعك."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "الرد على الموضوع"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "إذا كنت بحاجة إلى التواصل مع فريق الإشراف، يُرجى استخدام <help-center-link>مركز مساعدة Modrinth</help-center-link> والنقر على الفقاعة الزرقاء في الزاوية السفلية اليمنى للتواصل مع الدعم."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "تأكيد أنني قد عالجت رسائل المشرفين"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "أؤكد أنني تعاملت بشكل مناسب مع ملاحظات المشرفين."
+  },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "أنت تعيد إرسال <project-title>{projectTitle}</project-title> لمراجعته مرة أخرى من قِبل المشرفين."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "إعادة الإرسال للمراجعة"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "إرسال للمراجعة"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "تأكد من أنك قد تعاملت مع جميع ملاحظات فريق الإشراف."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "قد تؤدي عمليات الإرسال المتكررة دون معالجة ملاحظات المشرفين إلى تعليق الحساب."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "الملفات التكميلية تستخدم لدعم الموارد مثل كود المصدر، وليس للإصدارات أو الأنواع البديلة."
+  },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "التفاصيل"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "الملفات"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "البيانات الوصفية"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "الملف الأساسي هو الملف الافتراضي الذي ينزّله المستخدم عند تثبيت المشروع."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "الملف الأساسي"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "يمكنك اختياريًا إضافة ملفات إضافية مثل الشيفرة المصدرية أو الوثائق أو حزم الموارد المطلوبة."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "الملفات الإضافية"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "رفع ملف إضافي"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "رفع ملف"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "رفع الملفات الأساسية والإضافية"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "اسحب الملفات وأفلتها هنا أو انقر لاستعراض الملفات"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "التفاصيل"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "الملفات"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "البيانات الوصفية"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "سجل تغييرات الإصدار"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "رقم الإصدار"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "يميز رقم الإصدار هذا الإصدار المحدد عن الإصدارات الأخرى."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "أدخل رقم الإصدار، مثل: 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "العنوان الفرعي للإصدار"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "أدخل العنوان الفرعي..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "نوع الإصدار"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "إضافة تبعية"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "التبعيات"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "التفاصيل"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "محملات تم اكتشافها"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "إصدارات تم اكتشافها"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "تعديل"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "البيئة"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "الملفات"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "المحمّلات"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "البيانات الوصفية"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "لا يمكن تعديل محمّلات المودباك"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "لا يمكن تعديل إصدارات المودباك"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "لم تتم إضافة أي تبعيات."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "لم يتم تحديد أي بيئة."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "لم يتم تحديد أي محمّلات."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "لا يوجد محمّل للمودات"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "لم يتم تحديد أي إصدارات."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "تمت تعبئته مسبقًا من إصدار مشابه سابق"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "لا يمكن تعديل محمّلات الرسورسباك"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "مقترح"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "الملفات المرفوعة"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "الإصدارات"
   },
   "create.collection.collection-info": {
     "message": "سيتم إنشاء مجموعتك الجديدة كمجموعة عامة تحتوي على {count, plural,\n  one {# مشروع}\n  other {# مشاريع}\n}."
@@ -875,6 +1352,9 @@
   "create.project.name-placeholder": {
     "message": "أدخل اسم المشروع..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "أيقونة {name}"
+  },
   "create.project.owner-description": {
     "message": "عين مالك المشروع كنفسك أو كمنظمة أنت عضو منها."
   },
@@ -897,7 +1377,7 @@
     "message": "إنشاء مشروع"
   },
   "create.project.type-label": {
-    "message": "نوع"
+    "message": "النوع"
   },
   "create.project.type-project": {
     "message": "مشروع"
@@ -905,8 +1385,14 @@
   "create.project.type-server": {
     "message": "خادم"
   },
+  "create.project.unknown-user": {
+    "message": "مستخدم غير معروف"
+  },
   "create.project.url-label": {
     "message": "عنوان URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "صورة المستخدم"
   },
   "create.project.visibility-description": {
     "message": "رؤية مشروعك بعد الموافقة عليه."
@@ -921,25 +1407,37 @@
     "message": "غير مدرج"
   },
   "dashboard.affiliate-links.create.button": {
-    "message": "إنشاء رابط تابع"
+    "message": "إنشاء رابط عمولة"
+  },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "لم يتم العثور على أي أكواد عمولة."
   },
   "dashboard.affiliate-links.error.title": {
-    "message": "خطأ في تحميل روابط الشركاء"
+    "message": "حدث خطأ أثناء تحميل روابط العمولة"
   },
   "dashboard.affiliate-links.header": {
-    "message": "روابط الشريك الخاصة بك"
+    "message": "روابط العمولة الخاصة بك"
   },
   "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "سيؤدي هذا إلى إلغاء رمز الشريك `{id}` بشكل دائم، وأي روابط موجودة مرتبطة بهذا الرمز التي تم مشاركتها لن تكون صالحة بعد الآن."
+    "message": "سيؤدي هذا إلى إلغاء كود العمولة `{id}` نهائيًا، ولن تعود أي روابط موجودة تمت مشاركتها باستخدام هذا الكود صالحة."
   },
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "إلغاء"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "هل أنت متأكد من أنك تريد إلغاء رابط الشريك الخاص بـ ''{title}''؟"
+    "message": "هل أنت متأكد من رغبتك في إلغاء رابط العمولة ''{title}'' الخاص بك؟"
   },
   "dashboard.affiliate-links.search": {
-    "message": "ابحث عن روابط الشركاء..."
+    "message": "البحث عن روابط العمولة..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "{count, plural, one {من مشروع واحد} two {من مشروعين} few {من # مشاريع} many {من # مشروعًا} other {من # مشروع}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "إجمالي التنزيلات"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "إجمالي المتابعين"
   },
   "dashboard.collections.button.create-new": {
     "message": "إنشاء جديد"
@@ -964,6 +1462,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "مجموعاتك"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "البحث في المجموعات..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "الاسم (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "أُنشئت مؤخرًا"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "حُدّثت مؤخرًا"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "تحميل {formType}"
@@ -991,6 +1501,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "نموذج ضريبي"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "لم تُكمل نموذج الضرائب. يرجى المحاولة مرة أخرى."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "نموذج الضرائب غير مكتمل"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "تستخدم Modrinth المزود الخارجي Track1099 لجمع وتخزين نماذج الضرائب الخاصة بك بأمان. <security-link>تعرف على المزيد هنا.</security-link>"
@@ -1031,6 +1547,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "الكيان التجاري"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "اختر تاريخ الميلاد"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "تشير الكيان التجاري إلى منظمة مسجلة مثل شركة مساهمة أو شراكة أو شركة ذات مسؤولية محدودة."
   },
@@ -1039,6 +1558,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "فرد خاص"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "البحث عن الدول..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "البحث عن التقسيمات الإدارية..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "اختر البلد الذي تتواجد فيه"
@@ -1175,6 +1700,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "ضع مبلغ"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "الحد الأدنى للفئة هو {min}، وهو يتجاوز رصيدك البالغ {balance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "تحتاج إلى {min} على الأقل لاستخدام بطاقة الهدايا هذه."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "لا توجد فئات متاحة لرصيدك الحالي"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "لا توجد فئات قريبة من هذا المبلغ"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "لا توجد فئات قريبة من هذا المبلغ. أعلى فئة متاحة هي {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "طريقة دفع"
   },
@@ -1189,6 +1729,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "ابحث عن مبلغ"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "البحث عن {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "اختر {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "اختر فئة:"
@@ -1208,6 +1754,12 @@
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "لقد اخترت الدولار الأمريكي للدفع الدولي عبر باي بال. <direct-paypal-link>انتقل إلى باي بال المباشر</direct-paypal-link> للحصول على رسوم أفضل (حوالي 2% بدلاً من حوالي 6%)."
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "الحد الأدنى للسحب {min}، والحد الأقصى {max}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "الحد الأدنى لمبلغ السحب هو {min}."
+  },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "ينسحب "
   },
@@ -1216,6 +1768,138 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "لقد استنفدت رصيدك <b>{withdrawLimit}</b> حد السحب. يجب عليك تعبئة نموذج ضريبي لسحب مبلغ أكبر."
+  },
+  "dashboard.discord-roles.banner.body": {
+    "message": "أنت مؤهل للحصول على {roles}. اربط حساب Discord الخاص بك عبر Modrinth وسنزامنها تلقائيًا."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "ربط Discord"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "المطالبة بأدوار Discord الخاصة بك"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "أكثر من 1 مليون تنزيل"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "المنشئ"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
+  "dashboard.head-title": {
+    "message": "لوحة التحكم"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "ليس لديك إشعارات غير مقروءة."
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "عرض الكل"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "عرض سجل الإشعارات"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "عرض {extraNotifs, plural, one {إشعار واحد إضافي} two {إشعارين إضافيين} few {# إشعارات إضافية} many {# إشعارًا إضافيًا} other {# إشعار إضافي}}"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "إنشاء مؤسسة"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "أنشئ مؤسسة!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "فشل في جلب المؤسسات"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count, plural, one {عضو واحد} two {عضوان} few {# أعضاء} many {# عضوًا} other {# عضو}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "المؤسسات"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "تحديد الكل كمقروء"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "عرض السجل"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "ليس لديك أي إشعارات غير مقروءة."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "حدث خطأ أثناء تحميل الإشعارات:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "السجل"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "سجل الإشعارات"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "جارٍ تحميل الإشعارات..."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "مشاريع الخوادم لا تدعم التعديل الجماعي"
+  },
+  "dashboard.projects.empty": {
+    "message": "ليس لديك أي مشاريع حتى الآن. انقر على الزر الأخضر أعلاه للبدء."
+  },
+  "dashboard.projects.head-title": {
+    "message": "المشاريع"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "و{count} أخرى..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "إزالة الرابط"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "تعديل الروابط"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "سيتم تطبيق التغييرات على <strong>{count, plural, one {مشروع واحد} two {مشروعين} few {# مشاريع} many {# مشروعًا} other {# مشروع}}</strong>."
+  },
+  "dashboard.projects.links.description": {
+    "message": "سيتم استبدال أي روابط تحددها أدناه في جميع المشاريع المحددة. سيتم تجاهل أي روابط تتركها فارغة. يمكنك إزالة رابط من جميع المشاريع المحددة باستخدام زر سلة المهملات."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "رابط دعوة إلى خادم Discord الخاص بك."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "دعوة Discord"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "تعديل الروابط"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "مكان يمكن للمستخدمين فيه الإبلاغ عن الأخطاء والمشكلات والملاحظات المتعلقة بمشروعك."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "متتبع المشكلات"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "ستتم إزالة الرابط الحالي"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "أدخل عنوان URL صالحًا لدعوة Discord"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "أدخل عنوان URL صالحًا"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "عرض جميع المشاريع"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "صفحة أو مستودع يحتوي على الشفرة المصدرية لمشروعك"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "الشفرة المصدرية"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "صفحة تحتوي على معلومات ووثائق ومساعدة حول المشروع"
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "صفحة الويكي"
   },
   "dashboard.projects.notification.bulk-edit-success": {
     "message": "قم بتحرير روابط المشاريع المحددة دفعة واحدة."
@@ -1228,6 +1912,36 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "يرجى مراجعة بيانات تعريف البيئة"
+  },
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "إجراءات المشاريع المحددة"
+  },
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count, plural, one {تم تحديد مشروع واحد} two {تم تحديد مشروعين} few {تم تحديد # مشاريع} many {تم تحديد # مشروعًا} other {تم تحديد # مشروع}}"
+  },
+  "dashboard.projects.table.id": {
+    "message": "المعرّف"
+  },
+  "dashboard.projects.table.name": {
+    "message": "الإسم"
+  },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "حدد جميع المشاريع التي تدعم التعديل الجماعي"
+  },
+  "dashboard.projects.table.status": {
+    "message": "الحالة"
+  },
+  "dashboard.projects.table.type": {
+    "message": "النوع"
+  },
+  "dashboard.report.title": {
+    "message": "الإبلاغ عن {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "البلاغات النشطة"
+  },
+  "dashboard.reports.title": {
+    "message": "البلاغات"
   },
   "dashboard.revenue.available-now": {
     "message": "متاح الآن"
@@ -1248,43 +1962,82 @@
     "message": "معالجة"
   },
   "dashboard.revenue.processing.tooltip": {
-    "message": "تبقى الإيرادات قيد المعالجة حتى نهاية الشهر، ثم تصبح متاحة بعد 60 يومًا. "
+    "message": "تبقى الإيرادات قيد المعالجة حتى نهاية الشهر، ثم تصبح متاحة بعد 60 يومًا."
   },
   "dashboard.revenue.stats.received": {
-    "message": "تلقى "
+    "message": "تلقى"
   },
   "dashboard.revenue.stats.transactions": {
-    "message": ""
+    "message": "المعاملات"
   },
   "dashboard.revenue.stats.withdrawn": {
-    "message": "تم سحبه "
+    "message": "تم سحبه"
   },
   "dashboard.revenue.transactions.btn.download-csv": {
-    "message": "قم بالتنزيل كملف CSV "
+    "message": "قم بالتنزيل كملف CSV"
+  },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "سجل المعاملات"
   },
   "dashboard.revenue.transactions.header": {
-    "message": "المعاملات "
+    "message": "المعاملات"
   },
   "dashboard.revenue.transactions.none": {
-    "message": "لا توجد معاملات "
+    "message": "لا توجد معاملات"
   },
   "dashboard.revenue.transactions.none.desc": {
     "message": "ستظهر علميات الدفع والسحب الخاصة بك هنا."
   },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "الشهر الماضي"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "هذا الشهر"
+  },
   "dashboard.revenue.transactions.see-all": {
-    "message": ""
+    "message": "عرض الكل"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "كل السنوات"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
-    "message": "تم تعليق عمليات السحب مؤقتًا لأن رقم التعريف الضريبي أو رقم الضمان الاجتماعي الخاص بك لم يتطابق مع سجلات مصلحة الضرائب الأمريكية. يرجى التواصل مع الدعم لإعادة تعيين رقم التعريف الضريبي وإعادة إرسال نموذجك الضريبي. "
+    "message": "تم تعليق عمليات السحب مؤقتًا لأن رقم التعريف الضريبي أو رقم الضمان الاجتماعي الخاص بك لم يتطابق مع سجلات مصلحة الضرائب الأمريكية. يرجى التواصل مع الدعم لإعادة تعيين رقم التعريف الضريبي وإعادة إرسال نموذجك الضريبي."
   },
   "dashboard.revenue.withdraw.card.description": {
-    "message": "اسحب من رصيدك المتاح إلى أي طريقة دفع. "
+    "message": "اسحب من رصيدك المتاح إلى أي طريقة دفع."
   },
   "dashboard.revenue.withdraw.card.title": {
-    "message": "ينسحب"
+    "message": "سحب"
   },
   "dashboard.revenue.withdraw.header": {
-    "message": "ينسحب "
+    "message": "سحب"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "البلاغات النشطة"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "التحليلات"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "المنشئون"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "لوحة التحكم"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "الإشعارات"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "المؤسسات"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "نظرة عامة"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "المشاريع"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "الإيرادات"
   },
   "dashboard.withdraw.completion.account": {
     "message": "الحساب"
@@ -1296,25 +2049,25 @@
     "message": "موعد"
   },
   "dashboard.withdraw.completion.email-confirmation": {
-    "message": "ستتلقى رسالة بريد إلكتروني في <b>{email}</b> مع تعليمات لاسترداد المبلغ المسحوب. "
+    "message": "ستتلقى رسالة بريد إلكتروني في <b>{email}</b> مع تعليمات لاسترداد المبلغ المسحوب."
   },
   "dashboard.withdraw.completion.exchange-rate": {
-    "message": "سعر الصرف "
+    "message": "سعر الصرف"
   },
   "dashboard.withdraw.completion.fee": {
-    "message": "مصاريف "
+    "message": "رسوم"
   },
   "dashboard.withdraw.completion.method": {
-    "message": "طريقة "
+    "message": "طريقة"
   },
   "dashboard.withdraw.completion.net-amount": {
-    "message": "المبلغ الصافي "
+    "message": "المبلغ الصافي"
   },
   "dashboard.withdraw.completion.recipient": {
-    "message": "المستلم "
+    "message": "المستلم"
   },
   "dashboard.withdraw.completion.title": {
-    "message": "انسحاب كامل "
+    "message": "انسحاب كامل"
   },
   "dashboard.withdraw.completion.transactions-button": {
     "message": "المعاملات"
@@ -1370,6 +2123,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "المبلغ منخفض للغاية"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "تم تعطيل طريقة استلام الدفعات هذه من قِبل مزود الدفع. يُرجى استخدام طريقة استلام دفعات أخرى أو التواصل مع الدعم."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "طريقة استلام الدفعات غير متاحة"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "يرجى استخدام خيار التحويل الصحيح عبر PayPal لمنطقتك (الولايات المتحدة أو دوليًا)."
   },
@@ -1381,6 +2140,33 @@
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "يرجى تعبئة نموذج الضريبة"
+  },
+  "discover.install.back-to-server": {
+    "message": "العودة إلى الخادم"
+  },
+  "discover.install.back-to-setup": {
+    "message": "العودة إلى الإعداد"
+  },
+  "discover.install.cancel-reset": {
+    "message": "إلغاء إعادة التعيين"
+  },
+  "discover.install.error.no-server-world": {
+    "message": "لا يوجد عالم خادم متاح للتثبيت."
+  },
+  "discover.install.error.unsupported-content-type": {
+    "message": "لا يمكن تثبيت هذا النوع من المحتوى على خادم من قسم الاستكشاف."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "اختيار المودباك لتثبيته بعد إعادة التعيين"
+  },
+  "discover.seo.description": {
+    "message": "ابحث وتصفح آلاف {projectType} لماينكرافت على Modrinth مع نتائج بحث فورية ودقيقة. تساعدك عوامل التصفية لدينا في العثور بسرعة على أفضل {projectType} لماينكرافت."
+  },
+  "discover.seo.title": {
+    "message": "البحث عن {projectType}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "البحث عن {projectType} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "ربما تكون قد أخطأت في كتابة عنوان URL الخاص بالمجموعة."
@@ -1396,6 +2182,12 @@
   },
   "error.collection.404.title": {
     "message": "لم يتم العثور على المجموعة"
+  },
+  "error.generic.401.signed-in-as": {
+    "message": "أنت مسجّل الدخول حاليًا باسم:"
+  },
+  "error.generic.401.title": {
+    "message": "ليس لديك صلاحية للوصول إلى هذه الصفحة"
   },
   "error.generic.404.subtitle": {
     "message": "يبدو أن الصفحة التي كنت تبحث عنها غير موجودة."
@@ -1478,6 +2270,9 @@
   "frog.title": {
     "message": "ضفدع"
   },
+  "hosting-marketing.available-locations": {
+    "message": "متاح في أمريكا الشمالية وأوروبا وجنوب شرق آسيا وأستراليا لتغطية واسعة."
+  },
   "hosting-marketing.billing.monthly": {
     "message": "ادفع شهريا"
   },
@@ -1499,11 +2294,23 @@
   "hosting-marketing.faq.burst-threads.answer": {
     "message": "عندما يكون الخادم لديك تحت ضغطٍ عالٍ، نقوم مؤقتًا بمنحه وصولًا إلى خيوط معالجة إضافية (CPU threads) للمساعدة في تقليل التقطّعات وعدم الاستقرار. يساعد ذلك على منع انخفاض معدل النبضات في الثانية (TPS) إلى أقل من 20، مما يضمن تجربة سلسة قدر الإمكان. ونظرًا لأن خيوط المعالجة الإضافية هذه تكون متاحة لفترة قصيرة فقط أثناء فترات الضغط العالي، فقد لا تظهر في تقارير Spark أو أدوات تحليل الأداء الأخرى.\n"
   },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "ما نوع وحدات المعالجة المركزية التي تعمل بها خوادم Modrinth Hosting؟"
+  },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "تعمل استضافة خوادم مودرينث على AMD Ryzen 7900 و 7950X3D و وحدات معالجة مركزية مماثلة بسرعة 5+ غيغاهيرتز مقترنة بذاكرة وصول عشوائي من نوع DDR5"
+    "message": "تعمل خوادم Modrinth Hosting بمعالجات مكافئة لمعالجات AMD Ryzen 7900 و7950X3D بتردد يتجاوز 5 جيجاهرتز، ومزوّدة بذاكرة DDR5."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "ما العملة التي تُعرض بها الأسعار؟"
   },
   "hosting-marketing.faq.currency.answer": {
     "message": "جميع الأسعار مُدرجة بالدولار الأمريكي (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "هل تتمتع خوادم Modrinth Hosting بحماية من هجمات حجب الخدمة الموزعة DDoS؟"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "نعم. جميع خوادم Modrinth Hosting مزودة بحماية من هجمات حجب الخدمة الموزعة DDoS، بسعة تصل إلى 17 تيرابت في الثانية في بعض المواقع."
   },
   "hosting-marketing.faq.heading": {
     "message": "الأسئلة شائعه"
@@ -1511,8 +2318,32 @@
   "hosting-marketing.faq.how-fast": {
     "message": "ما سرعه خوادم modrinth؟"
   },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "تُستضاف خوادم Modrinth Hosting على أجهزة حديثة جدًا وعالية الأداء، ولكن من الصعب تحديد مدى تأثير ذلك على سرعة تشغيل خادمك بدقة، لأن هناك العديد من العوامل التي تؤثر في ذلك، مثل المودات أو الداتاباكات أو البلوقنات التي تشغّلها على خادمك، وحتى سلوك المستخدمين."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "غالبًا ما تكون معظم مشاكل الأداء الناتجة عن مودباك أو مود أو حزمة بيانات أو إضافة غير محسّنة، مما يتسبب في حدوث تأخير في الخادم. وبما أن خوادمنا عالية الأداء، فلن تواجه غالبًا مشاكل تُذكر، ما دمت تختار خطة مناسبة للمحتوى الذي تشغّله على الخادم."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "هل يمكنني زيادة مساحة التخزين على خادمي؟"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "نعم، يمكن زيادة مساحة التخزين على خادمك دون أي تكلفة إضافية. إذا كنت بحاجة إلى مساحة تخزين أكبر، فتواصل مع دعم Modrinth."
+  },
   "hosting-marketing.faq.location": {
     "message": "أين تقع استضافة خوادم Modrinth؟ هل يمكنني اختيار منطقة؟"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "لدينا حاليًا خوادم متاحة في أمريكا الشمالية وأوروبا وجنوب شرق آسيا وأستراليا، ويمكنك اختيار المنطقة عند الشراء. سنضيف المزيد من المناطق مستقبلًا! إذا كنت ترغب في تغيير منطقتك، فتواصل مع الدعم."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "ما إصدارات Minecraft ومحملات التعديلات التي يمكن استخدامها؟"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "يمكن لخوادم Modrinth Hosting تشغيل أي إصدار من Minecraft: Java Edition، بدءًا من الإصدار 1.2.5 وحتى الإصدارات الأحدث، بما في ذلك إصدارات اللقطات التجريبية."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "ندعم أيضًا مجموعة واسعة من محمّلات المودات والبلوقنات، بما في ذلك Fabric وQuilt وForge وNeoForge للمودات، بالإضافة إلى Paper وPurpur للبلوقنات. يعتمد توفرها على ما إذا كان محمّل المودات أو البلوقنات يدعم إصدار Minecraft المحدد."
   },
   "hosting-marketing.get-started": {
     "message": "ابدأ"
@@ -1529,14 +2360,56 @@
   "hosting-marketing.hero.host-with-modrinth": {
     "message": "أدر خادمك التالي مع Modrinth Hosting"
   },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting هي أسهل طريقة لاستضافة خادم Minecraft: Java Edition الخاص بك. ثبّت والعب موداتك ومودباكاتك المفضلة بسهولة، كل ذلك من داخل منصة Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "إدارة متقدمة للشبكة"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "أضف نطاقك الخاص إلى خادمك، واحجز ما يصل إلى 15 منفذًا للمودات التي تتطلبها، والمزيد."
+  },
   "hosting-marketing.included.backups-included": {
     "message": "النسخ الاحتياطية مضمنة"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "يأتي كل خادم مع 15 نسخة احتياطية مخزّنة بأمان في موقع فعلي مختلف عن موقع الخادم."
   },
   "hosting-marketing.included.custom-url": {
     "message": "رابط مخصص"
   },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "شارك خادمك باستخدام عنوان URL مخصص على <contrast>modrinth.gg</contrast>."
+  },
   "hosting-marketing.included.description": {
     "message": "."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "مدير ملفات سهل الاستخدام"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "ابحث عن الملفات على خادمك وأدرها وعدّلها وارفعها بسهولة."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "يأتي مع جميع الميزات التي تحتاجها."
+  },
+  "hosting-marketing.included.help": {
+    "message": "مساعدة عندما تحتاج إليها"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "تواصل مع فريق Modrinth للحصول على المساعدة بشأن خادمك في أي وقت."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "وحدة تحكم قوية، ومدير لخصائص الخادم، والمزيد"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "يأتي Modrinth Hosting مع أدوات قوية لإدارة خادمك."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "الوصول عبر SFTP"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "يمكنك الوصول إلى ملفات خادمك مباشرةً عبر SFTP المدمج في Modrinth Hosting."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "مرفق مع خادمك"
@@ -1544,8 +2417,32 @@
   "hosting-marketing.know-what-you-need": {
     "message": "هل تعرف بالضبط ما تحتاجه؟"
   },
+  "hosting-marketing.medal.info": {
+    "message": "جرّب خادمًا مجانيًا بسعة <orange>3 جيجابايت</orange> لمدة 5 أيام بدعم من <orange>Medal</orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "معرفة المزيد"
+  },
   "hosting-marketing.medal.text-secondary": {
     "message": "عرض لفترة محدودة. لا حاجة لبطاقة ائتمان. متوفر للخوادم الأمريكية."
+  },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "حدث خطأ أثناء جلب بيانات الدفع"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "تم العثور على المنتج المحدد، لكنه يفتقر إلى البيانات اللازمة. يُرجى التواصل مع الدعم."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "منتج غير صالح"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "السعة ممتلئة حاليًا. يُرجى المحاولة مرة أخرى لاحقًا."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "سعة الخوادم ممتلئة"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "حدث خطأ غير متوقع"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "اختر خطة مخصصة بالمواصفات التي تحتاجها فقط."
@@ -1566,10 +2463,10 @@
     "message": "لا يتم تحميل بنيتنا التحتية بشكل زائد أبدًا، مما يعني أن كل خادم مستضاف مع Modrinth يعمل دائمًا بكامل طاقته."
   },
   "hosting-marketing.why.description": {
-    "message": "اختر من بين آلاف حزم التعديلات المتوفرة على موقع Modrinth أو أنشئ حزمتك الخاصة. ادعُ أصدقاءك عندما تكون مستعدًا للعب."
+    "message": "اختر من بين آلاف المودباكات على Modrinth أو أنشئ مودباكك الخاص. ادعُ أصدقاءك عندما تكون مستعدًا للعب."
   },
   "hosting-marketing.why.heading": {
-    "message": "ابحث عن حزمة تعديلات. الآن أصبح خادمًا."
+    "message": "اعثر على مودباك. والآن أصبح خادمًا."
   },
   "hosting-marketing.why.modern-reliable-hosting": {
     "message": "استمتع بتجربة استضافة عصرية وموثوقة"
@@ -1581,7 +2478,7 @@
     "message": "العب حيث توجد تعديلاتك"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "تدمج خدمة Modrinth Hosting عملية تثبيت التعديلات وحزم التعديلات بسلاسة في خادمك."
+    "message": "تدمج Modrinth Hosting عملية تثبيت المودات والمودباكات في خادمك بسلاسة."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "لماذا استضافة Modrinth؟"
@@ -1668,7 +2565,7 @@
     "message": "داتاباك"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
-    "message": "حزم المودات"
+    "message": "مودباكات"
   },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "مودات"
@@ -1718,11 +2615,44 @@
   "landing.section.for-creators.tagline": {
     "message": ""
   },
+  "landing.section.for-players.description": {
+    "message": "من المناطق الأحيائية السحرية إلى الزنزانات الملعونة، ستجد بالتأكيد محتوى يرتقي بتجربة لعبك إلى مستوى جديد."
+  },
   "landing.section.for-players.label": {
     "message": "للاعبين"
   },
+  "landing.section.for-players.tagline": {
+    "message": "اكتشف أكثر من {count, number} إبداع"
+  },
   "landing.subheading": {
     "message": "اكتشف محتوى Minecraft والعب وشاركه من خلال منصتنا مفتوحة المصدر المصممة خصيصًا للمجتمع."
+  },
+  "layout.action.analytics-events": {
+    "message": "أحداث التحليلات"
+  },
+  "layout.action.change-theme": {
+    "message": "تغيير السمة"
+  },
+  "layout.action.create-new": {
+    "message": "إنشاء جديد..."
+  },
+  "layout.action.external-projects": {
+    "message": "المشاريع الخارجية"
+  },
+  "layout.action.file-lookup": {
+    "message": "البحث عن ملف"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "إدارة روابط العمولة"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "إدارة إشعارات الخادم"
+  },
+  "layout.action.new-collection": {
+    "message": "مجموعة جديدة"
+  },
+  "layout.action.new-organization": {
+    "message": "مؤسسة جديدة"
   },
   "layout.action.new-project": {
     "message": "مشروع جديد"
@@ -1733,23 +2663,80 @@
   "layout.action.publish": {
     "message": "نشر"
   },
+  "layout.action.reports": {
+    "message": "مراجعة البلاغات"
+  },
   "layout.action.review-projects": {
     "message": "مراجعه المشروع"
+  },
+  "layout.action.tech-review": {
+    "message": "المراجعة التقنية"
   },
   "layout.avatar.alt": {
     "message": "صورتك الرمزية"
   },
+  "layout.banner.account-action": {
+    "message": "يلزم اتخاذ إجراء بشأن الحساب"
+  },
+  "layout.banner.add-email.button": {
+    "message": "الانتقال إلى إعدادات الحساب"
+  },
   "layout.banner.add-email.description": {
     "message": "لأسباب أمنية، يحتاج مودرنث منك تسجيل عنوان بريد إلكتروني في حسابك."
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "تجاهل دائمًا"
+  },
   "layout.banner.build-fail.description": {
     "message": "فشل هذا الإصدار من واجهة مودرنث في توليد الحالة من واجهة برمجة التطبيقات. قد يكون السبب انقطاع الخدمة أو خطأ في الإعدادات. أعد البناء عندما تكون واجهة البرمجة متاحة. رموز الخطأ: {errors}؛ عنوان واجهة البرمجة الحالي: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "تجاهل"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "حدث خطأ أثناء إنشاء الحالة من واجهة برمجة التطبيقات API عند الإنشاء."
+  },
+  "layout.banner.preview.description": {
+    "message": "إذا كنت تقصد الوصول إلى موقع Modrinth الرسمي، فتفضل بزيارة {url}. تم إعداد هذا الإصدار التجريبي لاستخدامه من قِبل موظفي Modrinth لأغراض الاختبار. وقد تم إنشاؤه باستخدام {ref}."
+  },
+  "layout.banner.preview.title": {
+    "message": "هذا إصدار تجريبي من موقع Modrinth."
   },
   "layout.banner.staging.description": {
     "message": "بيئة الاختبار منفصلة تمامًا عن قاعدة بيانات مودرنث الإنتاجية. تُستخدم هذه البيئة للاختبار وتصحيح الأخطاء، وقد تعمل بإصدارات تطويرية من واجهة مودرنث الأمامية أو الخلفية أحدث من النسخة الإنتاجية."
   },
   "layout.banner.staging.title": {
     "message": "أنت الآن تشاهد بيئة الاختبار الخاصة بمودرنث"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "تحديث معلومات الفوترة"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "تعذّر تجديد اشتراك واحد أو أكثر. يُرجى تحديث طريقة الدفع لتجنب فقدان الوصول!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "يلزم اتخاذ إجراء بشأن الفوترة."
+  },
+  "layout.banner.tax.action": {
+    "message": "إكمال النموذج الضريبي"
+  },
+  "layout.banner.tax.description": {
+    "message": "لقد سحبت بالفعل أكثر من {threshold} من Modrinth هذا العام. للامتثال للوائح الضريبية، يتعين عليك إكمال نموذج ضريبي. تم إيقاف عمليات السحب مؤقتًا حتى يتم تقديم هذا النموذج."
+  },
+  "layout.banner.tax.title": {
+    "message": "يلزم تقديم نموذج ضريبي"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "التواصل مع الدعم"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "تم تعليق عمليات السحب مؤقتًا لأن رقم تعريفك الضريبي TIN أو رقم الضمان الاجتماعي SSN لم يتطابق مع سجلات مصلحة الضرائب الأمريكية IRS. يُرجى التواصل مع الدعم لإعادة تعيين نموذجك الضريبي وإعادة تقديمه."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "فشل النموذج الضريبي"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "إعادة إرسال رسالة التحقق عبر البريد الإلكتروني"
   },
   "layout.banner.verify-email.description": {
     "message": "لأسباب أمنية، يحتاج مودرنث منك التحقق من عنوان البريد الإلكتروني المرتبط بحسابك."
@@ -1771,6 +2758,21 @@
   },
   "layout.footer.about.status": {
     "message": "حالة"
+  },
+  "layout.footer.based-on-label": {
+    "message": "بناءً على"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "تم تفعيل وضع المطوّر"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "تم تفعيل وضع المطوّر"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "تم تعطيل وضع المطوّر"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "تم تعطيل وضع المطوّر"
   },
   "layout.footer.legal": {
     "message": "قانوني"
@@ -1820,29 +2822,650 @@
   "layout.footer.resources.help-center": {
     "message": "مركز المساعدة"
   },
+  "layout.footer.resources.report-issues": {
+    "message": "الإبلاغ عن المشكلات"
+  },
+  "layout.footer.resources.translate": {
+    "message": "ترجمة"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
+  },
+  "layout.footer.unknown-commit": {
+    "message": "غير معروف"
+  },
+  "layout.menu-toggle.action": {
+    "message": "تبديل القائمة"
+  },
+  "layout.meta.description": {
+    "message": "نزّل مودات وبلوقنات وداتاباكات وشيدرز وريسورسباكات ومودباكات لماينكرافت على Modrinth. اكتشف المشاريع وانشرها على Modrinth من خلال واجهة حديثة وسهلة الاستخدام وواجهة API."
+  },
+  "layout.meta.og-description": {
+    "message": "اكتشف محتوى Minecraft وانشره!"
+  },
+  "layout.mobile.close-menu": {
+    "message": "إغلاق القائمة"
+  },
+  "layout.mobile.open-menu": {
+    "message": "فتح القائمة"
+  },
+  "layout.nav.active-reports": {
+    "message": "البلاغات النشطة"
+  },
+  "layout.nav.discover": {
+    "message": "استكشاف"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "احصل على Modrinth App"
+  },
+  "layout.nav.home": {
+    "message": "الصفحة الرئيسية"
+  },
+  "layout.nav.host-a-server": {
+    "message": "استضف خادمًا"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
   "layout.nav.modrinth-home-page": {
     "message": "الصفحة الرئيسة لمودرينث"
   },
   "layout.nav.my-servers": {
     "message": "خوادمي"
   },
+  "layout.nav.organizations": {
+    "message": "المؤسسات"
+  },
+  "layout.nav.profile": {
+    "message": "الملف الشخصي"
+  },
+  "layout.nav.projects": {
+    "message": "المشاريع"
+  },
+  "layout.nav.revenue": {
+    "message": "الإيرادات"
+  },
   "layout.nav.saved-projects": {
     "message": "المشاريع المحفوظة"
+  },
+  "layout.nav.search": {
+    "message": "البحث"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "الترقية إلى Modrinth+"
+  },
+  "layout.publish.email-verification-required.description": {
+    "message": "يجب عليك التحقق من بريدك الإلكتروني قبل النشر على Modrinth."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "يلزم التحقق من البريد الإلكتروني"
+  },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "تثبيت كل ما يلعبونه تلقائيًا"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "العب نفس المحتوى الذي يلعبه أصدقاؤك"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "حافظ على تحديث المحتوى المشترك مع تغيّره"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "احصل على Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "تتم إدارته بواسطة"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "سيتم فتح Modrinth App تلقائيًا..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "جارٍ فتح Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "لماذا تستخدم Modrinth App"
+  },
+  "moderation.exclude-technical-review": {
+    "message": "استثناء TR"
+  },
+  "moderation.moderate": {
+    "message": "الإشراف"
+  },
+  "moderation.page.external-projects": {
+    "message": "المشاريع الخارجية"
+  },
+  "moderation.page.global-detail-traces": {
+    "message": "التتبعات العامة"
+  },
+  "moderation.page.projects": {
+    "message": "المشاريع"
+  },
+  "moderation.page.reports": {
+    "message": "البلاغات"
+  },
+  "moderation.page.technicalReview": {
+    "message": "المراجعة التقنية"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} لكل دفعة"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "كمية الدفعة"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "سيؤدي هذا إلى حذف جميع مجموعات الإسناد لهذا المشروع وجميع الملفات الموجودة بداخلها نهائيًا. لا يمكن التراجع عن هذا الإجراء."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "فشل في مسح جميع المجموعات: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "تم مسح جميع المجموعات بنجاح."
+  },
+  "modpack-scan-modal.failed": {
+    "message": "فشل"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "فشل تحميل الإصدارات: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "جارٍ تحميل الإصدارات..."
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "ملفات جديدة"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "مجموعات جديدة"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "لم يتم العثور على ملفات."
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "لم يتم فحصه"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "ملفات التجاوز ({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "اسم ملف الباك"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "فحص جميع الملفات"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "تعذّر فحص بعض الملفات:\n\n {error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "جارٍ الفحص..."
+  },
+  "modpack-scan-modal.title": {
+    "message": "فحص المودباك ({scanned}/{total} ملف)"
+  },
+  "muralpay.account-type.checking": {
+    "message": "حساب جارٍ"
+  },
+  "muralpay.account-type.savings": {
+    "message": "حساب توفير"
+  },
+  "muralpay.country.at": {
+    "message": "النمسا"
+  },
+  "muralpay.country.be": {
+    "message": "بلجيكا"
+  },
+  "muralpay.country.cy": {
+    "message": "قبرص"
+  },
+  "muralpay.country.de": {
+    "message": "ألمانيا"
+  },
+  "muralpay.country.ee": {
+    "message": "إستونيا"
+  },
+  "muralpay.country.es": {
+    "message": "إسبانيا"
+  },
+  "muralpay.country.fi": {
+    "message": "فنلندا"
+  },
+  "muralpay.country.fr": {
+    "message": "فرنسا"
+  },
+  "muralpay.country.gr": {
+    "message": "اليونان"
+  },
+  "muralpay.country.ie": {
+    "message": "أيرلندا"
+  },
+  "muralpay.country.it": {
+    "message": "إيطاليا"
+  },
+  "muralpay.country.lt": {
+    "message": "ليتوانيا"
+  },
+  "muralpay.country.lu": {
+    "message": "لوكسمبورغ"
+  },
+  "muralpay.country.lv": {
+    "message": "لاتفيا"
+  },
+  "muralpay.country.mt": {
+    "message": "مالطا"
+  },
+  "muralpay.country.nl": {
+    "message": "هولندا"
+  },
+  "muralpay.country.pt": {
+    "message": "البرتغال"
+  },
+  "muralpay.country.sk": {
+    "message": "سلوفاكيا"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "الهوية الوطنية"
+  },
+  "muralpay.document-type.passport": {
+    "message": "جواز السفر"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "هوية المقيم"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "الرقم الضريبي"
+  },
+  "muralpay.field.account-number": {
+    "message": "رقم الحساب"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "رقم الحساب (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "رقم الحساب (CCI)"
   },
   "muralpay.field.account-number-type": {
     "message": "نوع رقم الحساب"
   },
+  "muralpay.field.account-type": {
+    "message": "نوع الحساب"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "رقم الحساب"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "الدولة"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "نوع الوثيقة"
+  },
+  "muralpay.field.iban": {
+    "message": "الآيبان"
+  },
+  "muralpay.field.phone-number": {
+    "message": "رقم الهاتف"
+  },
+  "muralpay.field.pix-email": {
+    "message": "البريد الإلكتروني لـPIX"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "نوع مفتاح PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "رقم هاتف PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "مفتاح عشوائي"
+  },
+  "muralpay.field.routing-number": {
+    "message": "رقم التوجيه المصرفي"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
   "muralpay.field.wallet-address": {
     "message": "عنوان المحفظة"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "رمز الحساب المصرفي الموحد أو رمز الحساب الافتراضي الموحد"
+  },
+  "muralpay.help.cci": {
+    "message": "رمز الحساب بين البنوك"
+  },
+  "muralpay.help.clabe": {
+    "message": "رمز الحساب المصرفي الموحّد (رقم الحساب البنكي المكسيكي)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "رقم التعريف الضريبي البرازيلي"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "الرقم الضريبي الأرجنتيني"
+  },
+  "muralpay.help.iban": {
+    "message": "رقم الحساب المصرفي الدولي"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "رمز تعريف البنك"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "الحساب البنكي"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "البريد الإلكتروني"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "رقم الهاتف"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "أدخل رقم الحساب"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "أدخل CBU أو CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU أو CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "أدخل CCI المكوّن من 20 رقمًا"
   },
   "muralpay.placeholder.cuit-cuil": {
     "message": "أدخل CUIT أو CUIL"
   },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "أدخل رقم الحساب"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "أدخل CLABE المكوّن من 18 رقمًا"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "أدخل CPF أو CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "أدخل رقم الحساب المصرفي الدولي IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "أدخل البريد الإلكتروني لـPIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "أدخل المفتاح العشوائي"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "أدخل رقم التوجيه المصرفي المكوّن من 9 أرقام"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "أدخل رمز SWIFT/BIC"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "أدخل رقم الحساب المصرفي الدولي IBAN الكوستاريكي"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "تحويل بنكي (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "تحويل PIX (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "تحويل بنكي (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "تحويل بنكي (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "تحويل بنكي (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "تحويل بنكي (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "تحويل بنكي (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "تحويل بنكي (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "تحويل بنكي (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "تحويل بنكي (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "تحويل بنكي (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Crypto (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "تحقّق من عنوان محفظتك مرة أخرى. لا يمكن استرداد الأموال المُرسلة إلى عنوان خاطئ."
+  },
+  "organization.button.manage": {
+    "message": "إدارة"
+  },
+  "organization.button.manage-projects": {
+    "message": "إدارة المشاريع"
+  },
+  "organization.label.downloads": {
+    "message": "التنزيلات"
+  },
+  "organization.label.members": {
+    "message": "الأعضاء"
+  },
+  "organization.label.organization": {
+    "message": "المؤسسة"
+  },
+  "organization.label.projects": {
+    "message": "المشاريع"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "المعرّف"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "الاسم"
+  },
+  "organization.project-transfer.no-projects-available": {
+    "message": "لا توجد مشاريع متاحة للنقل."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "أيقونة {name}"
+  },
+  "organization.project-transfer.title": {
+    "message": "نقل المشاريع"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "نقل {count, plural, one {مشروع واحد} two {مشروعين} few {# مشاريع} many {# مشروع} other {# مشروع}}"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "النوع"
+  },
+  "organization.projects.none": {
+    "message": "لا تملك هذه المؤسسة أي مشاريع بعد."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "لا تملك هذه المؤسسة أي مشاريع بعد. هل ترغب في <create-link>إنشاء مشروع</create-link>؟"
+  },
+  "project-member-header.error-decline": {
+    "message": "تعذّر رفض دعوة الفريق"
+  },
+  "project-member-header.error-join": {
+    "message": "تعذّر قبول دعوة الفريق"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "تمت دعوتك للانضمام إلى هذا المشروع. يُرجى قبول الدعوة أو رفضها."
+  },
+  "project-member-header.invitation-title": {
+    "message": "دعوة للانضمام إلى المشروع"
+  },
   "project-member-header.success-decline": {
     "message": "لقد رفضت دعوة الفريق"
   },
+  "project-moderation-nags.suggestion": {
+    "message": "اقتراحات"
+  },
+  "project-moderation-nags.warning": {
+    "message": "تحذير"
+  },
+  "project-type.collection.plural": {
+    "message": "مجموعات"
+  },
+  "project-type.collection.singular": {
+    "message": "مجموعة"
+  },
+  "project-type.minecraft_java_server.plural": {
+    "message": "سيرفرات"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "سيرفر"
+  },
+  "project-type.mod.plural": {
+    "message": "مودات"
+  },
+  "project-type.mod.singular": {
+    "message": "مود"
+  },
+  "project-type.modpack.plural": {
+    "message": "المودباكات"
+  },
+  "project-type.modpack.singular": {
+    "message": "مودباك"
+  },
+  "project-type.plugin.plural": {
+    "message": "بلوقنات"
+  },
+  "project-type.plugin.singular": {
+    "message": "بلوقن"
+  },
+  "project-type.project.plural": {
+    "message": "مشاريع"
+  },
+  "project-type.project.singular": {
+    "message": "مشروع"
+  },
   "project-type.resourcepack.plural": {
-    "message": "حزم ال"
+    "message": "ريسورسباكات"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "رسورسباك"
+  },
+  "project-type.server.plural": {
+    "message": "السيرفرات"
+  },
+  "project-type.server.singular": {
+    "message": "السيرفر"
+  },
+  "project-type.shader.plural": {
+    "message": "شيدرات"
+  },
+  "project-type.shader.singular": {
+    "message": "شيدر"
+  },
+  "project.actions.create-server": {
+    "message": "إنشاء سيرفر"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "إنشاء سيرفر"
+  },
+  "project.actions.dont-show-again": {
+    "message": "لا تُظهر مجدّدًا"
+  },
+  "project.actions.edit-project": {
+    "message": "تحرير المشروع"
+  },
+  "project.actions.project-page": {
+    "message": "صفحة المشروع"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "إعادة مسح مودباك"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "إنشاء سيرفر"
+  },
+  "project.description.title": {
+    "message": "الوصف"
+  },
+  "project.download.download": {
+    "message": "تنزيل"
+  },
+  "project.download.download-as-zip": {
+    "message": "تحميل كـ .zip"
+  },
+  "project.download.download-version": {
+    "message": "تحميل {version}"
+  },
+  "project.download.install-with-app": {
+    "message": "تثبيت مع تطبيق Modrinth"
+  },
+  "project.download.manually": {
+    "message": "التنزيل يدويًا"
+  },
+  "project.download.no-app": {
+    "message": "ليس لديك تطبيق Modrinth؟"
+  },
+  "project.download.no-game-versions-found": {
+    "message": "لم يتم العثور على أي إصدارات"
+  },
+  "project.download.recommended-title": {
+    "message": "موصى به"
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "رسورسباك"
+  },
+  "project.download.search-game-versions": {
+    "message": "اختر إصدار اللعبة"
+  },
+  "project.download.select-game-version": {
+    "message": "اختر إصدار اللعبة"
+  },
+  "project.download.select-platform": {
+    "message": "اختر المنصة"
+  },
+  "project.download.show-all-versions": {
+    "message": "عرض جميع الإصدارات"
+  },
+  "project.download.title": {
+    "message": "تحميل {title}"
   },
   "project.environment.migration.message": {
     "message": "لقد قمنا بتحديث نظام البيئات في مودرينث، وأصبحت الخيارات الجديدة متاحة الآن. يرجى التأكد من صحة البيانات الوصفية."
@@ -1852,5 +3475,191 @@
   },
   "project.environment.migration.title": {
     "message": "يرجى مراجعة بيانات تعريف البيئة"
+  },
+  "project.gallery.title": {
+    "message": "مَعْرض"
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "تم الموافقة على المشروع"
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "تغييرات مطلوبة"
+  },
+  "project.settings.danger-zone": {
+    "message": "منطقة الخطر"
+  },
+  "project.settings.delete-project.button": {
+    "message": "حذف المشروع"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "حذف المشروع نهائيا"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "هل أنت متأكد انك تريد حذف هذا المشروع؟"
+  },
+  "project.settings.delete-project.title": {
+    "message": "حذف المشروع"
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "يحتوي على محتوى تم إنشاؤه AI"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "معاينة البانر"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "أرشفة مشروع"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "اسم العمل الأصلي"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "مثال لمشروع"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "اشرح كيف يعتمد مشروعك على العمل الأصلي"
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "آخر تحديث على {date} من قبل {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "مشرف"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "تحتوي على ميزات مدفوعة"
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "تحذير من الحساسية للضوء"
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "ما هي البيانات المجمعة؟"
+  },
+  "project.settings.editing-project": {
+    "message": "تحرير مشروع {projectType}"
+  },
+  "project.settings.general.name.title": {
+    "message": "إسم"
+  },
+  "project.settings.general.url.title": {
+    "message": "رابط"
+  },
+  "project.settings.monetization.title": {
+    "message": "تمويل"
+  },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "حذف كل المجموعات"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "معرفة المزيد"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "مرفوض"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "الحالة"
+  },
+  "project.settings.server.bedrock-address-label": {
+    "message": "عنوان البيدروك"
+  },
+  "project.settings.server.details-heading": {
+    "message": "تفاصيل السيرفر"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "ضع عنوان"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "عنوان جافا"
+  },
+  "project.settings.server.optional-label": {
+    "message": "اختياري"
+  },
+  "project.settings.server.region-label": {
+    "message": "منطقة"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "اختر اللغة"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "حدد المنطقة"
+  },
+  "project.settings.server.server-online": {
+    "message": "الخادم متصل!"
+  },
+  "project.settings.tags.title": {
+    "message": "تاق"
+  },
+  "project.versions.copy-id-option": {
+    "message": "نسخ ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "نسخ الرابط"
+  },
+  "project.versions.delete-button": {
+    "message": "حذف"
+  },
+  "project.versions.edit-files-option": {
+    "message": "تحرير الملفات"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "تعديل الإصدار"
+  },
+  "project.versions.share-option": {
+    "message": "مشارك"
+  },
+  "project.versions.title": {
+    "message": "إصدارات"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "تم حذف الإصدار بنجاح."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "تم حذف الإصدار"
+  },
+  "report.back-to-item": {
+    "message": "العودة إلى {item}"
+  },
+  "report.go-to-report": {
+    "message": "الذَّهاب إلى التقرير"
+  },
+  "report.not-for.bug-reports": {
+    "message": "تقارير الخلل"
+  },
+  "report.please-report": {
+    "message": "يرجى الإبلاغ:"
+  },
+  "scopes.category.analytics": {
+    "message": "تحليل"
+  },
+  "scopes.category.projects": {
+    "message": "مشاريع"
+  },
+  "scopes.category.reports": {
+    "message": "البلاغات"
+  },
+  "scopes.category.sessions": {
+    "message": "الجلسات"
+  },
+  "scopes.versionCreate.description": {
+    "message": "إنشاء إصدارة جديدة"
+  },
+  "scopes.versionCreate.label": {
+    "message": "إنشاء إصدار"
+  },
+  "scopes.versionDelete.description": {
+    "message": "حذف إصدار"
+  },
+  "scopes.versionDelete.label": {
+    "message": "حذف إصدارات"
+  },
+  "scopes.versionRead.label": {
+    "message": "قراءة إصدارات"
+  },
+  "scopes.versionWrite.description": {
+    "message": "كتابة إلى بيانات الإصدار"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "هذا التطبيق غير تابع لـ Modrinth بأي شكل من الأشكال، رغم اسمه."
   }
 }

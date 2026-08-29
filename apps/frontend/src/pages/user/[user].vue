@@ -112,7 +112,7 @@ useSeoMeta({
 	ogImage: () =>
 		prefetchedUser
 			? (prefetchedUser?.avatar_url ?? 'https://cdn-raw.modrinth.com/placeholder-circle.png')
-			: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
+			: 'https://cdn-raw.modrinth.com/not-found-circle.png',
 })
 
 const projectCreateModal = ref<InstanceType<typeof ProjectCreateModal> | null>(null)

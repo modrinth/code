@@ -1,21 +1,13 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<StyledInput
-				v-model="query"
-				:icon="SearchIcon"
-				type="text"
-				autocomplete="off"
-				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-				clearable
-				wrapper-class="flex-1"
-				input-class="h-[40px] w-full"
-				@input="goToPage(1)"
-			/>
-
-			<div
-				class="flex flex-col items-stretch justify-end gap-2 sm:flex-row sm:items-center lg:flex-shrink-0"
-			>
+		<ModerationQueueToolbar
+			v-model="query"
+			:page="currentPage"
+			:total-pages="totalPages"
+			@search="goToPage(1)"
+			@switch-page="goToPage"
+		>
+			<template #actions>
 				<Combobox
 					v-model="currentMessageFilter"
 					class="!w-full flex-grow sm:!w-[200px] sm:flex-grow-0"
@@ -25,12 +17,14 @@
 					trigger-size="lg"
 					@select="goToPage(1)"
 				>
-					<template #selected="{ label: messageLabel }">
+					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
 							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
-							<span class="truncate text-contrast"
-								>{{ messageLabel }} ({{ sortedReports.length }})</span
-							>
+							<ModerationFilterCount
+								:label="currentMessageFilterName"
+								:count="sortedReports.length"
+								:loading="isLoading"
+							/>
 						</span>
 					</template>
 				</Combobox>
@@ -78,7 +72,7 @@
 							<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-inherit">
 								{{
 									currentReporterOrProject.length === 0
-										? 'All Reports'
+										? 'All reports'
 										: `${currentReporterOrProject.length} selected`
 								}}
 							</span>
@@ -111,7 +105,7 @@
 									class="h-5 w-5 shrink-0 text-primary"
 									:class="currentReporterOrProject.length === 0 ? 'text-contrast' : 'text-primary'"
 								/>
-								<span class="min-w-0 flex-1 font-semibold leading-tight">All Reports</span>
+								<span class="min-w-0 flex-1 font-semibold leading-tight">All reports</span>
 								<span class="flex shrink-0 items-center justify-center text-brand">
 									<CheckIcon
 										v-if="currentReporterOrProject.length === 0"
@@ -136,6 +130,7 @@
 								<Combobox
 									v-model="currentReportTargetFilter"
 									class="!w-full"
+									dropdown-class="!z-[10000]"
 									:options="reportTargetFilterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									@select="goToPage(1)"
@@ -147,6 +142,7 @@
 									<Combobox
 										v-model="currentReportIssueFilter"
 										class="!w-full"
+										dropdown-class="!z-[10000]"
 										:options="reportIssueFilterTypes"
 										:placeholder="formatMessage(commonMessages.filterByLabel)"
 										@select="goToPage(1)"
@@ -158,6 +154,7 @@
 								<Combobox
 									v-model="currentProjectTypeFilter"
 									class="!w-full"
+									dropdown-class="!z-[10000]"
 									:options="projectTypeFilterTypes"
 									:placeholder="formatMessage(commonMessages.filterByLabel)"
 									@select="goToPage(1)"
@@ -166,35 +163,34 @@
 						</div>
 					</template>
 				</TeleportPopoutMenu>
-			</div>
-		</div>
+			</template>
+			<template #meta>
+				<div v-if="sortedReports.length > 0">
+					Showing {{ formatNumber(pageStart) }}–{{ formatNumber(pageEnd) }} of
+					{{ formatNumber(sortedReports.length) }} reports
+				</div>
+			</template>
+		</ModerationQueueToolbar>
 
-		<div v-if="totalPages > 1" class="flex items-center justify-between">
-			<div>
-				Showing
-				{{ itemsPerPage * (currentPage - 1) + 1 }}
-				–
-				{{ itemsPerPage * (currentPage - 1) + Math.min(itemsPerPage, paginatedReports.length) }}
-				of {{ sortedReports.length }} reports
-			</div>
-			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+		<ModerationQueueSkeleton v-if="isLoading" />
+		<div
+			v-else-if="paginatedReports.length === 0"
+			class="universal-card flex h-24 items-center justify-center text-secondary"
+		>
+			No reports in queue.
 		</div>
-
-		<div v-if="totalPages > 1" class="flex justify-center lg:hidden">
-			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
-		</div>
-
-		<div class="flex flex-col gap-4">
-			<div v-if="paginatedReports.length === 0" class="universal-card h-24 animate-pulse"></div>
+		<div v-else class="flex flex-col gap-4 overflow-x-clip">
 			<ReportCard
 				v-for="report in paginatedReports"
 				:key="report.id"
 				:report="report"
 				:collapsed="true"
+				dismiss-after-close
+				@dismiss="dismissReport(report.id)"
 			/>
 		</div>
 
-		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
+		<div v-if="totalPages > 1" class="flex justify-end">
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 		</div>
 	</div>
@@ -208,7 +204,6 @@ import {
 	ChevronLeftIcon,
 	LayersIcon,
 	ListFilterIcon,
-	SearchIcon,
 	SortAscIcon,
 	SortDescIcon,
 } from '@modrinth/assets'
@@ -222,158 +217,256 @@ import {
 	MultiSelect,
 	type MultiSelectItem,
 	Pagination,
-	StyledInput,
 	TeleportPopoutMenu,
+	useDebugLogger,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
 import Fuse from 'fuse.js'
 
+import ModerationFilterCount from '~/components/ui/moderation/ModerationFilterCount.vue'
+import ModerationQueueSkeleton from '~/components/ui/moderation/ModerationQueueSkeleton.vue'
+import ModerationQueueToolbar from '~/components/ui/moderation/ModerationQueueToolbar.vue'
 import ReportCard from '~/components/ui/moderation/ModerationReportCard.vue'
 import { enrichReportBatch } from '~/helpers/moderation.ts'
 
 useHead({ title: 'Reports queue - Modrinth' })
 
 const { formatMessage } = useVIntl()
+const formatNumber = useFormatNumber()
 const route = useRoute()
 const router = useRouter()
 const auth = await useAuth()
 const client = injectModrinthClient()
+const debug = useDebugLogger('ModerationReports')
 
-const { data: allReports } = await useLazyAsyncData('new-moderation-reports', async () => {
-	const startTime = performance.now()
-	let currentOffset = 0
-	const REPORT_ENDPOINT_COUNT = 350
-	const allReports: ExtendedReport[] = []
+const { data: allReports, pending: reportsPending } = await useLazyAsyncData(
+	'new-moderation-reports',
+	async () => {
+		const startTime = performance.now()
+		let currentOffset = 0
+		const REPORT_ENDPOINT_COUNT = 350
+		const allReports: ExtendedReport[] = []
 
-	const enrichmentPromises: Promise<ExtendedReport[]>[] = []
+		const enrichmentPromises: Promise<ExtendedReport[]>[] = []
 
-	let reports: Labrinth.Reports.v3.Report[]
-	let hasMoreReports = true
-	while (hasMoreReports) {
-		reports = (await useBaseFetch(
-			`report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}&all=true`,
-			{
-				apiVersion: 3,
-			},
-		)) as Labrinth.Reports.v3.Report[]
+		let reports: Labrinth.Reports.v3.Report[]
+		let hasMoreReports = true
+		while (hasMoreReports) {
+			reports = (await useBaseFetch(
+				`report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}&all=true`,
+				{
+					apiVersion: 3,
+				},
+			)) as Labrinth.Reports.v3.Report[]
 
-		hasMoreReports = reports.length > 0
-		if (!hasMoreReports) {
-			break
+			hasMoreReports = reports.length > 0
+			if (!hasMoreReports) {
+				break
+			}
+
+			const enrichmentPromise = enrichReportBatch(reports, client)
+			enrichmentPromises.push(enrichmentPromise)
+
+			// this is explicitly not the length of the reports array, because the API may return fewer reports due to a report in the middle not being
+			// serializable if the offset is set to the reports array you can get the same report from the end multiple times.
+			currentOffset += REPORT_ENDPOINT_COUNT
+
+			if (enrichmentPromises.length >= 3) {
+				const completed = await Promise.all(enrichmentPromises.splice(0, 2))
+				allReports.push(...completed.flat())
+			}
 		}
 
-		const enrichmentPromise = enrichReportBatch(reports, client)
-		enrichmentPromises.push(enrichmentPromise)
+		const remainingBatches = await Promise.all(enrichmentPromises)
+		allReports.push(...remainingBatches.flat())
 
-		// this is explicitly not the length of the reports array, because the API may return fewer reports due to a report in the middle not being
-		// serializable if the offset is set to the reports array you can get the same report from the end multiple times.
-		currentOffset += REPORT_ENDPOINT_COUNT
+		const endTime = performance.now()
+		const duration = endTime - startTime
 
-		if (enrichmentPromises.length >= 3) {
-			const completed = await Promise.all(enrichmentPromises.splice(0, 2))
-			allReports.push(...completed.flat())
-		}
-	}
+		debug(
+			`Reports fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
+		)
 
-	const remainingBatches = await Promise.all(enrichmentPromises)
-	allReports.push(...remainingBatches.flat())
-
-	const endTime = performance.now()
-	const duration = endTime - startTime
-
-	console.debug(
-		`Reports fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
-	)
-
-	return allReports
-})
-
-const query = ref(route.query.q?.toString() || '')
-
-watch(
-	query,
-	(newQuery) => {
-		const currentQuery = { ...route.query }
-		if (newQuery) {
-			currentQuery.q = newQuery
-		} else {
-			delete currentQuery.q
-		}
-
-		router.replace({
-			path: route.path,
-			query: currentQuery,
-		})
-	},
-	{ immediate: false },
-)
-
-watch(
-	() => route.query.q,
-	(newQueryParam) => {
-		const newValue = newQueryParam?.toString() || ''
-		if (query.value !== newValue) {
-			query.value = newValue
-		}
+		return allReports
 	},
 )
 
-const currentSortTypeSorting = ref('oldest')
+const isLoading = computed(() => reportsPending.value || allReports.value == null)
+
+const SORT_VALUES = ['oldest', 'newest'] as const
 const sortTypes: ComboboxOption<string>[] = [
 	{ value: 'oldest', label: 'Oldest' },
 	{ value: 'newest', label: 'Newest' },
 ]
 
-const currentMessageFilter = ref('all')
-const messageFilterTypes: ComboboxOption<string>[] = [
-	{ value: 'all', label: 'All' },
-	{ value: 'unread', label: 'Unread' },
-	{ value: 'read', label: 'Read' },
-	{ value: 'involved', label: 'Involved' },
-]
+const MESSAGE_FILTERS = [
+	{ value: 'all', name: 'All' },
+	{ value: 'unread', name: 'Unread' },
+	{ value: 'read', name: 'Read' },
+	{ value: 'involved', name: 'Involved' },
+] as const
+const MESSAGE_FILTER_VALUES = MESSAGE_FILTERS.map((filter) => filter.value)
 
-const currentProjectTypeFilter = ref('all')
-const projectTypeFilterTypes: ComboboxOption<string>[] = [
-	{ value: 'all', label: 'All project types' },
-	{ value: 'modpack', label: 'Modpacks' },
-	{ value: 'mod', label: 'Mods' },
-	{ value: 'resourcepack', label: 'Resource Packs' },
-	{ value: 'datapack', label: 'Data Packs' },
-	{ value: 'plugin', label: 'Plugins' },
-	{ value: 'shader', label: 'Shaders' },
-	{ value: 'minecraft_java_server', label: 'Servers' },
-	{ value: 'shared-instance', label: 'Shared instance' },
-]
+const PROJECT_TYPE_FILTERS = [
+	{ value: 'all', name: 'All project types' },
+	{ value: 'modpack', name: 'Modpacks' },
+	{ value: 'mod', name: 'Mods' },
+	{ value: 'resourcepack', name: 'Resource Packs' },
+	{ value: 'datapack', name: 'Data Packs' },
+	{ value: 'plugin', name: 'Plugins' },
+	{ value: 'shader', name: 'Shaders' },
+	{ value: 'minecraft_java_server', name: 'Servers' },
+	{ value: 'shared-instance', name: 'Shared instance' },
+] as const
+const PROJECT_TYPE_VALUES = PROJECT_TYPE_FILTERS.map((filter) => filter.value)
 
-const currentReportTargetFilter = ref('all')
-const reportTargetFilterTypes: ComboboxOption<string>[] = [
-	{ value: 'all', label: 'All' },
-	{ value: 'project', label: 'Projects' },
-	{ value: 'user', label: 'Users' },
-	{ value: 'version', label: 'Versions' },
-	{ value: 'shared-instance', label: 'Shared instances' },
-]
+const REPORT_TARGET_FILTERS = [
+	{ value: 'all', name: 'All' },
+	{ value: 'project', name: 'Projects' },
+	{ value: 'user', name: 'Users' },
+	{ value: 'version', name: 'Versions' },
+	{ value: 'shared-instance', name: 'Shared instances' },
+] as const
+const REPORT_TARGET_VALUES = REPORT_TARGET_FILTERS.map((filter) => filter.value)
 
-const currentReportIssueFilter = ref('all')
-const reportIssueFilterTypes = computed<ComboboxOption<string>[]>(() => {
-	const base: ComboboxOption<string>[] = [{ value: 'all', label: 'All' }]
-	if (!allReports.value) return base
+function parseAllowed<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+	const parsed = queryAsStringOrEmpty((value as string | string[] | null | undefined) ?? '')
+	return (allowed as readonly string[]).includes(parsed) ? (parsed as T) : fallback
+}
 
-	const issueTypes = new Set(allReports.value.map((report) => report.report_type))
+function parsePage(value: unknown): number {
+	const page = Number.parseInt(
+		queryAsStringOrEmpty((value as string | string[] | null | undefined) ?? ''),
+		10,
+	)
+	return Number.isInteger(page) && page > 0 ? page : 1
+}
 
-	const sortedTypes = Array.from(issueTypes).sort()
-	return [
-		...base,
-		...sortedTypes.map((type) => ({
-			value: type,
-			label: formatReportType(formatMessage, type),
-		})),
-	]
-})
+function selectedValuesEqual(left: string[], right: string[]): boolean {
+	if (left.length !== right.length) return false
+	return left.every((value, index) => value === right[index])
+}
+
+function serializeRouteQuery(query: typeof route.query): string {
+	const keys = Object.keys(query).sort()
+	return JSON.stringify(
+		Object.fromEntries(
+			keys.flatMap((key) => {
+				const value = query[key]
+				if (value == null || value === '') return []
+				return [[key, Array.isArray(value) ? value.map(String) : String(value)]]
+			}),
+		),
+	)
+}
+
+const query = ref(queryAsStringOrEmpty(route.query.q ?? ''))
+const currentSortTypeSorting = ref(parseAllowed(route.query.sort, SORT_VALUES, 'oldest'))
+const currentMessageFilter = ref(parseAllowed(route.query.messages, MESSAGE_FILTER_VALUES, 'all'))
+const currentMessageFilterName = computed(
+	() =>
+		MESSAGE_FILTERS.find((filter) => filter.value === currentMessageFilter.value)?.name ?? 'All',
+)
+const currentProjectTypeFilter = ref(
+	parseAllowed(route.query.projectType, PROJECT_TYPE_VALUES, 'all'),
+)
+const currentReportTargetFilter = ref(parseAllowed(route.query.target, REPORT_TARGET_VALUES, 'all'))
+const currentReportIssueFilter = ref(queryAsStringOrEmpty(route.query.issue ?? '') || 'all')
+const currentReporterOrProject = ref(queryAsStringArray(route.query.selected))
+const currentPage = ref(parsePage(route.query.page))
+
+function writeFiltersToRoute() {
+	const nextQuery = { ...route.query }
+
+	if (query.value) nextQuery.q = query.value
+	else delete nextQuery.q
+
+	if (currentSortTypeSorting.value !== 'oldest') nextQuery.sort = currentSortTypeSorting.value
+	else delete nextQuery.sort
+
+	if (currentMessageFilter.value !== 'all') nextQuery.messages = currentMessageFilter.value
+	else delete nextQuery.messages
+
+	if (currentReportTargetFilter.value !== 'all') nextQuery.target = currentReportTargetFilter.value
+	else delete nextQuery.target
+
+	if (currentReportIssueFilter.value !== 'all') nextQuery.issue = currentReportIssueFilter.value
+	else delete nextQuery.issue
+
+	if (currentProjectTypeFilter.value !== 'all') {
+		nextQuery.projectType = currentProjectTypeFilter.value
+	} else {
+		delete nextQuery.projectType
+	}
+
+	if (currentReporterOrProject.value.length === 1) {
+		nextQuery.selected = currentReporterOrProject.value[0]
+	} else if (currentReporterOrProject.value.length > 1) {
+		nextQuery.selected = currentReporterOrProject.value
+	} else {
+		delete nextQuery.selected
+	}
+
+	if (currentPage.value > 1) nextQuery.page = String(currentPage.value)
+	else delete nextQuery.page
+
+	if (serializeRouteQuery(route.query) === serializeRouteQuery(nextQuery)) return
+
+	router.replace({
+		path: route.path,
+		query: nextQuery,
+	})
+}
+
+function readFiltersFromRoute() {
+	const nextQuery = queryAsStringOrEmpty(route.query.q ?? '')
+	if (query.value !== nextQuery) query.value = nextQuery
+
+	const nextSort = parseAllowed(route.query.sort, SORT_VALUES, 'oldest')
+	if (currentSortTypeSorting.value !== nextSort) currentSortTypeSorting.value = nextSort
+
+	const nextMessages = parseAllowed(route.query.messages, MESSAGE_FILTER_VALUES, 'all')
+	if (currentMessageFilter.value !== nextMessages) currentMessageFilter.value = nextMessages
+
+	const nextProjectType = parseAllowed(route.query.projectType, PROJECT_TYPE_VALUES, 'all')
+	if (currentProjectTypeFilter.value !== nextProjectType) {
+		currentProjectTypeFilter.value = nextProjectType
+	}
+
+	const nextTarget = parseAllowed(route.query.target, REPORT_TARGET_VALUES, 'all')
+	if (currentReportTargetFilter.value !== nextTarget) currentReportTargetFilter.value = nextTarget
+
+	const nextIssue = queryAsStringOrEmpty(route.query.issue ?? '') || 'all'
+	if (currentReportIssueFilter.value !== nextIssue) currentReportIssueFilter.value = nextIssue
+
+	const nextSelected = queryAsStringArray(route.query.selected)
+	if (!selectedValuesEqual(currentReporterOrProject.value, nextSelected)) {
+		currentReporterOrProject.value = nextSelected
+	}
+
+	const nextPage = parsePage(route.query.page)
+	if (currentPage.value !== nextPage) currentPage.value = nextPage
+}
+
+watch(
+	[
+		query,
+		currentSortTypeSorting,
+		currentMessageFilter,
+		currentProjectTypeFilter,
+		currentReportTargetFilter,
+		currentReportIssueFilter,
+		currentReporterOrProject,
+		currentPage,
+	],
+	writeFiltersToRoute,
+	{ deep: true },
+)
+
+watch(() => route.query, readFiltersFromRoute, { deep: true })
 
 type ReportedType<T> = T & { report_item_count: number }
-
-const currentReporterOrProject = ref<string[]>([])
 const reporterOrProjectOptions = computed<MultiSelectItem<string>[]>(() => {
 	if (!allReports.value) return []
 	const options: MultiSelectItem<string>[] = []
@@ -405,7 +498,7 @@ const reporterOrProjectOptions = computed<MultiSelectItem<string>[]>(() => {
 			.forEach((project) => {
 				options.push({
 					value: `project/${project.id}`,
-					label: `${project.title} (${project.report_item_count})`,
+					label: `${project.title} (${formatNumber(project.report_item_count)})`,
 					icon: project.icon_url ? h('img', { src: project.icon_url }) : undefined,
 				})
 			})
@@ -421,7 +514,7 @@ const reporterOrProjectOptions = computed<MultiSelectItem<string>[]>(() => {
 		.forEach((reporter) => {
 			options.push({
 				value: `reporter/${reporter.id}`,
-				label: `${reporter.username} (${reporter.report_item_count})`,
+				label: `${reporter.username} (${formatNumber(reporter.report_item_count)})`,
 				icon: reporter.avatar_url ? h('img', { src: reporter.avatar_url }) : undefined,
 			})
 		})
@@ -429,7 +522,6 @@ const reporterOrProjectOptions = computed<MultiSelectItem<string>[]>(() => {
 	return options
 })
 
-const currentPage = ref(1)
 const itemsPerPage = 15
 const totalPages = computed(() => Math.ceil((sortedReports.value?.length || 0) / itemsPerPage))
 
@@ -496,63 +588,162 @@ const baseFiltered = computed(() => {
 })
 
 const filteredReports = computed(() => {
-	const messageFilter = currentMessageFilter.value
-	const projectTypeFilter = currentProjectTypeFilter.value
-	const reportTargetFilter = currentReportTargetFilter.value
-	const reportIssueFilter = currentReportIssueFilter.value
-
-	if (
-		messageFilter === 'all' &&
-		projectTypeFilter === 'all' &&
-		reportTargetFilter === 'all' &&
-		reportIssueFilter === 'all'
-	) {
-		return baseFiltered.value
-	}
-
-	const messageFilterPredicate = (report: ExtendedReport) => {
-		const messages = report.thread?.messages || []
-
-		if (messageFilter === 'all') return true
-		if (messages.length === 0) return messageFilter === 'Unread'
-		if (!messages[messages.length - 1].author_id) return false
-
-		if (messageFilter === 'involved') {
-			const userId = (auth.value.user as any)?.id
-			return userId && messages.some((message) => message.author_id === userId)
-		}
-
-		const roleMap = memberRoleMap.value.get(report.id)
-		if (!roleMap) return false
-
-		const authorRole = roleMap.get(messages[messages.length - 1].author_id)
-		const isModeratorMessage = authorRole === 'moderator' || authorRole === 'admin'
-
-		return messageFilter === 'Read' ? isModeratorMessage : !isModeratorMessage
-	}
-
-	const projectTypeFilterPredicate = (report: ExtendedReport) => {
-		if (projectTypeFilter === 'all') return true
-		if (projectTypeFilter === 'shared-instance') return report.item_type === 'shared-instance'
-		return report.project?.project_type === projectTypeFilter
-	}
-
-	const reportTargetFilterPredicate = (report: ExtendedReport) => {
-		return reportTargetFilter === 'all' || report.item_type === reportTargetFilter
-	}
-
-	const reportIssueFilterPredicate = (report: ExtendedReport) => {
-		return reportIssueFilter === 'all' || report.report_type === reportIssueFilter
-	}
-
 	return baseFiltered.value.filter((report) => {
 		return (
-			messageFilterPredicate(report) &&
-			projectTypeFilterPredicate(report) &&
-			reportTargetFilterPredicate(report) &&
-			reportIssueFilterPredicate(report)
+			matchesMessageFilter(report, currentMessageFilter.value) &&
+			matchesProjectTypeFilter(report, currentProjectTypeFilter.value) &&
+			matchesReportTargetFilter(report, currentReportTargetFilter.value) &&
+			matchesReportIssueFilter(report, currentReportIssueFilter.value)
 		)
 	})
+})
+
+function matchesMessageFilter(
+	report: ExtendedReport,
+	messageFilter: (typeof MESSAGE_FILTERS)[number]['value'] | string,
+): boolean {
+	if (messageFilter === 'all') return true
+
+	const messages = report.thread?.messages || []
+	if (messages.length === 0) return messageFilter === 'unread'
+	if (!messages[messages.length - 1].author_id) return false
+
+	if (messageFilter === 'involved') {
+		const userId = (auth.value.user as any)?.id
+		return !!userId && messages.some((message) => message.author_id === userId)
+	}
+
+	const roleMap = memberRoleMap.value.get(report.id)
+	if (!roleMap) return false
+
+	const authorRole = roleMap.get(messages[messages.length - 1].author_id)
+	const isModeratorMessage = authorRole === 'moderator' || authorRole === 'admin'
+
+	return messageFilter === 'read' ? isModeratorMessage : !isModeratorMessage
+}
+
+function matchesProjectTypeFilter(
+	report: ExtendedReport,
+	projectTypeFilter: (typeof PROJECT_TYPE_FILTERS)[number]['value'] | string,
+): boolean {
+	if (projectTypeFilter === 'all') return true
+	if (projectTypeFilter === 'shared-instance') return report.item_type === 'shared-instance'
+	return report.project?.project_type === projectTypeFilter
+}
+
+function matchesReportTargetFilter(
+	report: ExtendedReport,
+	reportTargetFilter: (typeof REPORT_TARGET_FILTERS)[number]['value'] | string,
+): boolean {
+	return reportTargetFilter === 'all' || report.item_type === reportTargetFilter
+}
+
+function matchesReportIssueFilter(report: ExtendedReport, reportIssueFilter: string): boolean {
+	return reportIssueFilter === 'all' || report.report_type === reportIssueFilter
+}
+
+function labelWithCount(name: string, count: number): string {
+	return `${name} (${formatNumber(count)})`
+}
+
+const reportsForMessageCounts = computed(() =>
+	baseFiltered.value.filter(
+		(report) =>
+			matchesProjectTypeFilter(report, currentProjectTypeFilter.value) &&
+			matchesReportTargetFilter(report, currentReportTargetFilter.value) &&
+			matchesReportIssueFilter(report, currentReportIssueFilter.value),
+	),
+)
+const reportsForProjectTypeCounts = computed(() =>
+	baseFiltered.value.filter(
+		(report) =>
+			matchesMessageFilter(report, currentMessageFilter.value) &&
+			matchesReportTargetFilter(report, currentReportTargetFilter.value) &&
+			matchesReportIssueFilter(report, currentReportIssueFilter.value),
+	),
+)
+const reportsForTargetCounts = computed(() =>
+	baseFiltered.value.filter(
+		(report) =>
+			matchesMessageFilter(report, currentMessageFilter.value) &&
+			matchesProjectTypeFilter(report, currentProjectTypeFilter.value) &&
+			matchesReportIssueFilter(report, currentReportIssueFilter.value),
+	),
+)
+const reportsForIssueCounts = computed(() =>
+	baseFiltered.value.filter(
+		(report) =>
+			matchesMessageFilter(report, currentMessageFilter.value) &&
+			matchesProjectTypeFilter(report, currentProjectTypeFilter.value) &&
+			matchesReportTargetFilter(report, currentReportTargetFilter.value),
+	),
+)
+
+const messageFilterTypes = computed<ComboboxOption<string>[]>(() =>
+	MESSAGE_FILTERS.map((filter) => ({
+		value: filter.value,
+		label: isLoading.value
+			? filter.name
+			: labelWithCount(
+					filter.name,
+					reportsForMessageCounts.value.filter((report) =>
+						matchesMessageFilter(report, filter.value),
+					).length,
+				),
+	})),
+)
+
+const projectTypeFilterTypes = computed<ComboboxOption<string>[]>(() =>
+	PROJECT_TYPE_FILTERS.map((filter) => ({
+		value: filter.value,
+		label: isLoading.value
+			? filter.name
+			: labelWithCount(
+					filter.name,
+					reportsForProjectTypeCounts.value.filter((report) =>
+						matchesProjectTypeFilter(report, filter.value),
+					).length,
+				),
+	})),
+)
+
+const reportTargetFilterTypes = computed<ComboboxOption<string>[]>(() =>
+	REPORT_TARGET_FILTERS.map((filter) => ({
+		value: filter.value,
+		label: isLoading.value
+			? filter.name
+			: labelWithCount(
+					filter.name,
+					reportsForTargetCounts.value.filter((report) =>
+						matchesReportTargetFilter(report, filter.value),
+					).length,
+				),
+	})),
+)
+
+const reportIssueFilterTypes = computed<ComboboxOption<string>[]>(() => {
+	const issueTypes = new Set((allReports.value ?? []).map((report) => report.report_type))
+	const options = [
+		{ value: 'all', name: 'All' },
+		...Array.from(issueTypes)
+			.sort()
+			.map((type) => ({
+				value: type,
+				name: formatReportType(formatMessage, type),
+			})),
+	]
+
+	return options.map((filter) => ({
+		value: filter.value,
+		label: isLoading.value
+			? filter.name
+			: labelWithCount(
+					filter.name,
+					reportsForIssueCounts.value.filter((report) =>
+						matchesReportIssueFilter(report, filter.value),
+					).length,
+				),
+	}))
 })
 
 const sortedReports = computed(() => {
@@ -586,7 +777,37 @@ const paginatedReports = computed(() => {
 	return sortedReports.value.slice(start, end)
 })
 
+const pageStart = computed(() =>
+	sortedReports.value.length === 0 ? 0 : itemsPerPage * (currentPage.value - 1) + 1,
+)
+const pageEnd = computed(
+	() =>
+		itemsPerPage * (currentPage.value - 1) + Math.min(itemsPerPage, paginatedReports.value.length),
+)
+
 function goToPage(page: number) {
 	currentPage.value = page
+}
+
+watch(totalPages, (pages) => {
+	if (isLoading.value) return
+
+	if (pages === 0) {
+		if (currentPage.value !== 1) goToPage(1)
+		return
+	}
+
+	if (currentPage.value > pages) {
+		goToPage(pages)
+	}
+})
+
+function dismissReport(reportId: string) {
+	if (!allReports.value) return
+
+	allReports.value = allReports.value.filter((report) => report.id !== reportId)
+	if (currentPage.value > totalPages.value) {
+		currentPage.value = Math.max(1, totalPages.value)
+	}
 }
 </script>

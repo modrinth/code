@@ -12,7 +12,7 @@
 				<label for="app-name" class="m-0 mb-2 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.nameLabel) }}
 				</label>
-				<StyledInput
+				<Input
 					id="app-name"
 					v-model="name"
 					:maxlength="2048"
@@ -41,7 +41,7 @@
 				<label v-if="editingId" for="app-url" class="mb-2 mt-4 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
 				</label>
-				<StyledInput
+				<Input
 					v-if="editingId"
 					id="app-url"
 					v-model="url"
@@ -57,11 +57,10 @@
 				>
 					{{ formatMessage(messages.descriptionLabel) }}
 				</label>
-				<StyledInput
+				<Textarea
 					v-if="editingId"
 					id="app-description"
 					v-model="description"
-					multiline
 					:maxlength="255"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
@@ -92,7 +91,7 @@
 				<div class="uri-input-list">
 					<div v-for="(_, index) in redirectUris" :key="index">
 						<div class="input-group url-input-group-fixes">
-							<StyledInput
+							<Input
 								v-model="redirectUris[index]"
 								:maxlength="2048"
 								type="url"
@@ -182,7 +181,7 @@
 		<div v-for="app in usersApps" :key="app.id" class="universal-card recessed token mt-4">
 			<div class="token-info">
 				<div class="token-icon">
-					<Avatar size="sm" :src="app.icon_url" />
+					<Avatar size="sm" :src="app.icon_url" :raw-src="app.raw_icon_url" />
 					<div>
 						<h2 class="token-title">{{ app.name }}</h2>
 						<div>
@@ -262,10 +261,11 @@ import {
 	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NewModal,
 	normalizeChildren,
-	StyledInput,
+	Textarea,
 	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'

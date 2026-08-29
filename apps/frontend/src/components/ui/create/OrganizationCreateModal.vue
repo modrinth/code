@@ -9,7 +9,7 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					id="name"
 					v-model="name"
 					:maxlength="64"
@@ -28,7 +28,7 @@
 				</label>
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
-					<StyledInput
+					<Input
 						id="slug"
 						v-model="slug"
 						:maxlength="64"
@@ -46,10 +46,9 @@
 					</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="additional-information"
 					v-model="description"
-					multiline
 					:maxlength="256"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
@@ -79,8 +78,9 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'

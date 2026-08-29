@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT EXISTS(\n\t\t\tSELECT 1 FROM synced_hotbar_state WHERE singleton = 1\n\t\t) AS \"exists!: bool\"\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists!: bool",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "f0b9a997d247d3b53604e96c075b5ef93185aab1e2722fd13bbdae287d988c2f"
+}

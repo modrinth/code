@@ -31,7 +31,7 @@
 
 				<div class="w-full text-sm">
 					<label for="search-server-properties" class="sr-only"> Search server properties </label>
-					<StyledInput
+					<Input
 						id="search-server-properties"
 						v-model="searchInput"
 						wrapper-class="w-full"
@@ -77,7 +77,7 @@
 
 								<div v-if="isPropertyVisible('max_players')" class="flex flex-col gap-2.5 my-1">
 									<span class="font-semibold text-contrast">Max players</span>
-									<StyledInput
+									<Input
 										id="server-property-max-players"
 										v-tooltip="advancedActionTooltip"
 										:model-value="liveProperties.max_players"
@@ -91,7 +91,7 @@
 
 								<div v-if="isPropertyVisible('motd')" class="flex flex-col gap-2.5 my-1">
 									<span class="font-semibold text-contrast">MOTD</span>
-									<StyledInput
+									<Input
 										id="server-property-motd"
 										v-model="liveProperties.motd"
 										v-tooltip="advancedActionTooltip"
@@ -160,7 +160,7 @@
 									class="flex items-center justify-between h-10"
 								>
 									<span class="font-semibold text-contrast">Protection radius</span>
-									<StyledInput
+									<Input
 										id="server-property-spawn-protection-radius"
 										v-tooltip="advancedActionTooltip"
 										:model-value="liveProperties.spawn_protection"
@@ -220,7 +220,7 @@
 													v-else-if="getPropertyDef(key).type === 'number'"
 													class="w-full sm:w-[320px]"
 												>
-													<StyledInput
+													<Input
 														:id="`server-property-${key}`"
 														v-tooltip="advancedActionTooltip"
 														:model-value="liveProperties[key]"
@@ -233,7 +233,7 @@
 													/>
 												</div>
 												<div v-else class="flex w-full justify-end sm:w-[320px]">
-													<StyledInput
+													<Input
 														:id="`server-property-${key}`"
 														v-model="liveProperties[key]"
 														v-tooltip="advancedActionTooltip"
@@ -298,7 +298,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
 import { computed, ref, watch } from 'vue'
 
-import { Accordion, Admonition, AutoLink, Chips, StyledInput, Toggle } from '#ui/components'
+import { Accordion, Admonition, AutoLink, Chips, Input, Toggle } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings'

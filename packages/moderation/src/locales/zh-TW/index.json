@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "填寫適用於你的{type}的內容揭露資訊，以確保使用者知悉所有重要資訊。"
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "檢查內容揭露資訊"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "你的描述目前長度為 {length, plural, other {# 個可閱讀字元}}。建議至少輸入 {minChars, plural, other {# 個字元}}，以建立清晰且資訊完整的描述。"
   },
@@ -114,7 +120,7 @@
     "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}字數過多。標題的作用是作為章節標題，應保持簡潔，避免使用完整的長句子。"
+    "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}{count, plural, other {}}字數過多。標題的作用是作為章節標題，應保持簡潔，避免使用完整的長句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "標題請簡短扼要"
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "前往描述設定"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "前往揭露資訊設定"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "前往授權設定"
   },
@@ -208,6 +217,9 @@
   },
   "nags.settings.title": {
     "defaultMessage": "前往一般設定"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "前往版本設定"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "你的摘要不能與你的專案名稱相同。撰寫一段既實用又吸引人的摘要非常重要。"
@@ -264,7 +276,7 @@
     "defaultMessage": "上傳圖庫圖片"
   },
   "nags.upload-version.description": {
-    "defaultMessage": "你的專案至少需要一個版本才能提交審查。"
+    "defaultMessage": "你的專案需要至少一個版本才能提交審查。"
   },
   "nags.upload-version.title": {
     "defaultMessage": "上傳版本"

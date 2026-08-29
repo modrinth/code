@@ -26,6 +26,17 @@ const copyProjectLink = async (
 	}
 
 	await navigator.clipboard.writeText(url)
+	return url
+}
+
+function isOfficialModrinthHost(): boolean {
+	const host = globalThis.location?.hostname
+	return host === 'modrinth.com' || host === 'www.modrinth.com' || host === 'staging.modrinth.com'
+}
+
+function isLocalhost(): boolean {
+	const host = globalThis.location?.hostname
+	return host === 'localhost' || host === '127.0.0.1' || host === '[::1]'
 }
 
 const keybinds: { [id: string]: KeybindListener } = {
@@ -71,31 +82,77 @@ const keybinds: { [id: string]: KeybindListener } = {
 		keybind: 'Ctrl+Alt+C',
 		description: 'Copy permalink',
 		scope: 'project',
-		action: async (ctx) => copyProjectLink(ctx.project, true, false, false),
+		action: async (ctx) => {
+			const url = await copyProjectLink(ctx.project, true, false, false)
+			ctx.notifyCopied(url, 'Copied permalink to clipboard')
+		},
 	},
 	'copy-relative-permalink': {
 		keybind: 'Ctrl+Alt+R',
 		description: 'Copy relative permalink',
 		scope: 'project',
-		action: async (ctx) => copyProjectLink(ctx.project, true, true, false),
+		action: async (ctx) => {
+			const url = await copyProjectLink(ctx.project, true, true, false)
+			ctx.notifyCopied(url, 'Copied relative permalink to clipboard')
+		},
 	},
 	'copy-page-permalink': {
 		keybind: 'Shift+Ctrl+Alt+C',
 		description: 'Copy permalink with page',
 		scope: 'project',
-		action: async (ctx) => copyProjectLink(ctx.project, true, false, true),
+		action: async (ctx) => {
+			const url = await copyProjectLink(ctx.project, true, false, true)
+			ctx.notifyCopied(url, 'Copied permalink with page to clipboard')
+		},
 	},
 	'copy-page-relative-permalink': {
 		keybind: 'Shift+Ctrl+Alt+R',
 		description: 'Copy relative permalink with page',
 		scope: 'project',
-		action: async (ctx) => copyProjectLink(ctx.project, true, true, true),
+		action: async (ctx) => {
+			const url = await copyProjectLink(ctx.project, true, true, true)
+			ctx.notifyCopied(url, 'Copied relative permalink with page to clipboard')
+		},
 	},
 	'copy-id': {
 		keybind: 'Ctrl+Alt+D',
 		description: 'Copy Project ID',
 		scope: 'project',
-		action: async (ctx) => await navigator.clipboard.writeText(ctx.project.id),
+		action: async (ctx) => {
+			await navigator.clipboard.writeText(ctx.project.id)
+			ctx.notifyCopied(ctx.project.id, 'Copied Project ID to clipboard')
+		},
+	},
+	'open-official-site': {
+		keybind: 'Ctrl+Shift+P',
+		description: 'Open current page on production/staging',
+		scope: 'global',
+		enabled: () => !isOfficialModrinthHost(),
+		action: (ctx) => {
+			globalThis.open(ctx.officialUrl, '_blank', 'noopener,noreferrer')
+		},
+	},
+	'open-localhost': {
+		keybind: [],
+		description: 'Open current page on localhost',
+		scope: 'global',
+		enabled: () => !isLocalhost(),
+		action: (ctx) => {
+			globalThis.open(ctx.localhostUrl, '_blank', 'noopener,noreferrer')
+		},
+	},
+	'copy-official-site': {
+		keybind: 'Ctrl+Shift+O',
+		description: 'Copy production/staging URL (localhost only)',
+		scope: 'global',
+		enabled: () => isLocalhost(),
+		action: async (ctx) => {
+			await navigator.clipboard.writeText(ctx.officialUrl)
+			const environment = ctx.officialUrl.startsWith('https://staging.modrinth.com')
+				? 'staging'
+				: 'production'
+			ctx.notifyCopied(ctx.officialUrl, `Copied ${environment} URL to clipboard`)
+		},
 	},
 	'approve-project': {
 		keybind: 'Shift+Alt+A',

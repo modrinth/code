@@ -25,6 +25,9 @@ use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::neverbounce::{check_email, email_check_error_generic};
+use crate::util::usercheck::{
+    DecisionAction, check_email_gate, gate_block_error,
+};
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
 use actix_web::http::StatusCode;
@@ -50,7 +53,7 @@ use sha2::Sha256;
 use std::collections::HashMap;
 use std::str::FromStr;
 use thiserror::Error;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use url::Url;
 use uuid::Uuid;
 use validator::Validate;
@@ -61,10 +64,6 @@ use webauthn_rs::prelude::{
 };
 use xredis::RedisPool;
 use zxcvbn::Score;
-
-/// Sourced from <https://github.com/disposable-email-domains/disposable-email-domains>.
-const DISPOSABLE_EMAIL_BLOCKLIST: &str =
-    include_str!("../../../assets/disposable_email_blocklist.txt");
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
@@ -247,7 +246,7 @@ impl TempUser {
             totp_secret: None,
             username,
             email: self.email.clone(),
-            email_verified: self.email.is_some(),
+            email_verified: false,
             avatar_url,
             raw_avatar_url,
             bio: self.bio,
@@ -1459,6 +1458,40 @@ fn validate_account_consent(account_consent: bool) -> Result<(), ApiError> {
     Ok(())
 }
 
+async fn send_verify_email(
+    email_queue: &EmailQueue,
+    txn: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    user_id: DBUserId,
+    email_address: String,
+) -> Result<(), ApiError> {
+    let mailbox: Mailbox = email_address
+        .parse()
+        .wrap_request_err("invalid email address!".to_string())?;
+
+    let flow = DBFlow::ConfirmEmail {
+        user_id,
+        confirm_email: email_address,
+    }
+    .insert(Duration::hours(24), redis)
+    .await
+    .wrap_internal_err("storing email-verification flow in Redis")?;
+
+    email_queue
+        .send_one(
+            txn,
+            NotificationBody::VerifyEmail { flow },
+            user_id,
+            mailbox,
+        )
+        .await
+        .wrap_api_err("sending account email")?
+        .as_user_error()
+        .wrap_api_err("validating email delivery status")?;
+
+    Ok(())
+}
+
 /// Create account with OAuth.
 #[utoipa::path(
 	context_path = "/auth",
@@ -1476,6 +1509,7 @@ pub async fn create_oauth_account(
     db: Data<PgPool>,
     file_host: Data<dyn FileHost>,
     redis: Data<RedisPool>,
+    email_queue: Data<EmailQueue>,
     web::Json(new_account): web::Json<NewOAuthAccount>,
 ) -> Result<HttpResponse, ApiError> {
     new_account
@@ -1510,14 +1544,17 @@ pub async fn create_oauth_account(
     };
 
     if let Some(email) = &user.email {
-        ensure_email_domain_is_allowed(email)
-            .wrap_api_err("validating email domain is allowed")?;
+        ensure_email_passes_gate(&redis, email)
+            .await
+            .wrap_api_err("validating email passes the signup gate")?;
     }
 
     let mut txn = db
         .begin()
         .await
         .wrap_internal_err("failed to begin transaction")?;
+
+    let account_email = user.email.clone();
 
     let user_id = user
         .create_account(
@@ -1531,6 +1568,23 @@ pub async fn create_oauth_account(
         )
         .await
         .wrap_auth_err("inserting user ID into database")?;
+
+    if let Some(email_address) = account_email {
+        // The address comes from the OAuth provider, so the user cannot correct
+        // it here. A failed send shouldn't block signup: they can resend the
+        // verification email once they're signed in.
+        if let Err(error) = send_verify_email(
+            &email_queue,
+            &mut txn,
+            &redis,
+            user_id,
+            email_address,
+        )
+        .await
+        {
+            warn!(%error, "failed to send OAuth signup verification email");
+        }
+    }
 
     let session = issue_session(req, user_id, &mut txn, &redis, None)
         .await
@@ -1847,82 +1901,29 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
-#[derive(PartialEq, Eq)]
-enum EmailDomainStatus {
-    Whitelisted,
-    Neutral,
-}
-
-/// Environment list entries are matched literally, unless they begin with `*.`,
-/// in which case they match any subdomain of the remaining suffix.
-fn matches_domain_entry(domain: &str, entry: &str) -> bool {
-    let entry = entry.trim().to_ascii_lowercase();
-
-    match entry.strip_prefix("*.") {
-        Some(suffix) => domain
-            .strip_suffix(suffix)
-            .is_some_and(|subdomain| subdomain.ends_with('.')),
-        None => entry == domain,
-    }
-}
-
-fn is_whitelisted_domain(domain: &str) -> bool {
-    let domain = domain.to_ascii_lowercase();
-
-    ENV.EMAIL_DOMAIN_WHITELIST
-        .iter()
-        .any(|entry| matches_domain_entry(&domain, entry))
-}
-
-/// The bundled disposable domain list is checked first, then the environment
-/// blacklist.
-fn is_blacklisted_domain(domain: &str) -> bool {
-    let domain = domain.to_ascii_lowercase();
-
-    if DISPOSABLE_EMAIL_BLOCKLIST.lines().any(|entry| {
-        // The upstream list expects listed domains to match subdomains too.
-        domain == entry
-            || domain
-                .strip_suffix(entry)
-                .is_some_and(|subdomain| subdomain.ends_with('.'))
-    }) {
-        return true;
-    }
-
-    ENV.EMAIL_DOMAIN_BLACKLIST
-        .iter()
-        .any(|entry| matches_domain_entry(&domain, entry))
-}
-
-fn ensure_email_domain_is_allowed(
+/// Runs the UserCheck gate, which covers both password and OAuth signups.
+async fn ensure_email_passes_gate(
+    redis: &RedisPool,
     email: &str,
-) -> Result<EmailDomainStatus, ApiError> {
-    let Some((_, domain)) = email.rsplit_once('@') else {
-        return Err(ApiError::Request(email_check_error_generic()));
-    };
+) -> Result<(), ApiError> {
+    let action = check_email_gate(redis, email)
+        .await
+        .wrap_request_err("checking email address")?;
 
-    if is_whitelisted_domain(domain) {
-        info!(email.domain = domain, "whitelisted email domain, allowing");
-        return Ok(EmailDomainStatus::Whitelisted);
+    if action == DecisionAction::Block {
+        return Err(ApiError::Request(gate_block_error()));
     }
 
-    if is_blacklisted_domain(domain) {
-        info!(email.domain = domain, "blacklisted email domain, denying");
-        return Err(ApiError::Request(email_check_error_generic()));
-    }
-
-    Ok(EmailDomainStatus::Neutral)
+    Ok(())
 }
 
-async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
-    let status = ensure_email_domain_is_allowed(email)
-        .wrap_api_err("validating email domain is allowed")?;
+async fn ensure_email_is_usable(
+    redis: &RedisPool,
+    email: &str,
+) -> Result<(), ApiError> {
+    ensure_email_passes_gate(redis, email).await?;
 
-    if status == EmailDomainStatus::Whitelisted {
-        return Ok(());
-    }
-
-    let result = check_email(email)
+    let result = check_email(redis, email)
         .await
         .wrap_request_err("checking email address")?;
 
@@ -2075,30 +2076,14 @@ impl ReadyAccountRegisterFlow {
             .wrap_auth_err("authenticating API request")?;
         let res = crate::models::sessions::Session::from(session, true, None);
 
-        let mailbox: Mailbox = register_flow
-            .email
-            .parse()
-            .wrap_request_err("invalid email address!".to_string())?;
-
-        let flow = DBFlow::ConfirmEmail {
+        send_verify_email(
+            email_queue,
+            transaction,
+            redis,
             user_id,
-            confirm_email: register_flow.email.clone(),
-        }
-        .insert(Duration::hours(24), redis)
-        .await
-        .wrap_internal_err("storing email-verification flow in Redis")?;
-
-        email_queue
-            .send_one(
-                transaction,
-                NotificationBody::VerifyEmail { flow },
-                user_id,
-                mailbox,
-            )
-            .await
-            .wrap_api_err("sending account email")?
-            .as_user_error()
-            .wrap_api_err("validating email delivery status")?;
+            register_flow.email,
+        )
+        .await?;
 
         Ok(res)
     }
@@ -2165,7 +2150,7 @@ pub async fn create_account_with_password(
         )));
     }
 
-    ensure_email_is_usable(&new_account.email)
+    ensure_email_is_usable(&redis, &new_account.email)
         .await
         .wrap_api_err("validating email is usable")?;
 
@@ -3150,7 +3135,7 @@ pub async fn set_email(
         )));
     }
 
-    ensure_email_is_usable(&email_address.email)
+    ensure_email_is_usable(&redis, &email_address.email)
         .await
         .wrap_api_err("validating email is usable")?;
 

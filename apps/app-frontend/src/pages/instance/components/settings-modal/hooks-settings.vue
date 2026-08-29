@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-	Checkbox,
-	defineMessages,
-	injectNotificationManager,
-	StyledInput,
-	useVIntl,
-} from '@modrinth/ui'
+import { defineMessages, injectNotificationManager, Input, Toggle, useVIntl } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/instance'
@@ -13,6 +7,7 @@ import { get } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
+import SettingsOptionsTransition from './settings-options-transition.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -21,12 +16,12 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
-const overrideHooks = ref(
+const hasCustomHooks =
 	!!instance.value.hooks.pre_launch ||
-		!!instance.value.hooks.wrapper ||
-		!!instance.value.hooks.post_exit,
-)
-const hooksRaw = instance.value.hooks ?? globalSettings.hooks
+	!!instance.value.hooks.wrapper ||
+	!!instance.value.hooks.post_exit
+const overrideHooks = ref(hasCustomHooks)
+const hooksRaw = hasCustomHooks ? instance.value.hooks : globalSettings.hooks
 const hooks = ref({
 	pre_launch: hooksRaw.pre_launch ?? '',
 	wrapper: hooksRaw.wrapper ?? '',
@@ -93,10 +88,6 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.hooks.variables.inst-java-args.description',
 		defaultMessage: '$INST_JAVA_ARGS: The JVM Arguments provided to the game',
 	},
-	customHooks: {
-		id: 'instance.settings.tabs.hooks.custom-hooks',
-		defaultMessage: 'Custom launch hooks',
-	},
 	preLaunch: {
 		id: 'instance.settings.tabs.hooks.pre-launch',
 		defaultMessage: 'Pre-launch',
@@ -138,69 +129,72 @@ const messages = defineMessages({
 
 <template>
 	<div>
-		<h2 class="m-0 m-0 text-lg font-semibold text-contrast">
-			{{ formatMessage(messages.hooks) }}
-		</h2>
-		<Checkbox v-model="overrideHooks" :label="formatMessage(messages.customHooks)" class="my-2.5" />
-		<p class="m-0">
-			{{ formatMessage(messages.hooksDescription) }}
-		</p>
-
-		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
-			{{ formatMessage(messages.preLaunch) }}
-		</h2>
-		<StyledInput
-			id="pre-launch"
-			v-model="hooks.pre_launch"
-			autocomplete="off"
-			:disabled="!overrideHooks"
-			:placeholder="formatMessage(messages.preLaunchEnter)"
-			wrapper-class="w-full my-2.5"
-		/>
-		<p class="m-0">
-			{{ formatMessage(messages.preLaunchDescription) }}
-		</p>
-
-		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
-			{{ formatMessage(messages.wrapper) }}
-		</h2>
-		<StyledInput
-			id="wrapper"
-			v-model="hooks.wrapper"
-			autocomplete="off"
-			:disabled="!overrideHooks"
-			:placeholder="formatMessage(messages.wrapperEnter)"
-			wrapper-class="w-full my-2.5"
-		/>
-		<p class="m-0">
-			{{ formatMessage(messages.wrapperDescription) }}
-		</p>
-
-		<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
-			{{ formatMessage(messages.postExit) }}
-		</h2>
-		<StyledInput
-			id="post-exit"
-			v-model="hooks.post_exit"
-			autocomplete="off"
-			:disabled="!overrideHooks"
-			:placeholder="formatMessage(messages.postExitEnter)"
-			wrapper-class="w-full my-2.5"
-		/>
-		<p class="m-0">
-			{{ formatMessage(messages.postExitDescription) }}
-		</p>
-
-		<div class="m-0 mt-6">
-			{{ formatMessage(messages.hookVariablesDescription) }}
+		<div class="flex items-center justify-between gap-4">
+			<div class="flex min-w-0 flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.hooks) }}
+				</h2>
+				<p class="m-0">{{ formatMessage(messages.hooksDescription) }}</p>
+			</div>
+			<Toggle id="override-launch-hooks" v-model="overrideHooks" />
 		</div>
-		<ul class="m-0 mt-2">
-			<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
-			<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
-			<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
-			<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
-			<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
-			<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
-		</ul>
+
+		<SettingsOptionsTransition :show="overrideHooks">
+			<div class="pt-6">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.preLaunch) }}
+				</h2>
+				<Input
+					id="pre-launch"
+					v-model="hooks.pre_launch"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.preLaunchEnter)"
+					wrapper-class="w-full my-2.5"
+				/>
+				<p class="m-0">
+					{{ formatMessage(messages.preLaunchDescription) }}
+				</p>
+
+				<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.wrapper) }}
+				</h2>
+				<Input
+					id="wrapper"
+					v-model="hooks.wrapper"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.wrapperEnter)"
+					wrapper-class="w-full my-2.5"
+				/>
+				<p class="m-0">
+					{{ formatMessage(messages.wrapperDescription) }}
+				</p>
+
+				<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.postExit) }}
+				</h2>
+				<Input
+					id="post-exit"
+					v-model="hooks.post_exit"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.postExitEnter)"
+					wrapper-class="w-full my-2.5"
+				/>
+				<p class="m-0">
+					{{ formatMessage(messages.postExitDescription) }}
+				</p>
+
+				<div class="m-0 mt-6">
+					{{ formatMessage(messages.hookVariablesDescription) }}
+				</div>
+				<ul class="m-0 mt-2">
+					<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
+					<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
+				</ul>
+			</div>
+		</SettingsOptionsTransition>
 	</div>
 </template>

@@ -18,7 +18,7 @@
 		<div class="flex flex-col gap-5" @submit.prevent="saveEvent">
 			<div class="flex flex-col gap-2">
 				<span class="label__title font-semibold">Title</span>
-				<StyledInput
+				<Input
 					id="analytics-event-title"
 					ref="titleInput"
 					v-model="form.title"
@@ -49,7 +49,7 @@
 					</ButtonLink>
 				</div>
 				<div class="flex items-center gap-2">
-					<StyledInput
+					<Input
 						id="analytics-event-link"
 						v-model="form.announcementUrl"
 						type="url"
@@ -125,108 +125,105 @@
 		</template>
 	</NewModal>
 
-	<div class="normal-page no-sidebar">
-		<div class="normal-page__content flex flex-col gap-4">
-			<div class="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-				<h1 class="m-0 text-2xl font-extrabold text-contrast">Analytics Events</h1>
+	<div class="flex flex-col gap-4">
+		<div class="flex items-center justify-between gap-4">
+			<h2 class="m-0 text-2xl font-semibold">Analytics events</h2>
+			<div class="flex flex-wrap items-center gap-2">
+				<Input
+					v-model="searchQuery"
+					:icon="SearchIcon"
+					type="search"
+					placeholder="Search..."
+					clearable
+					wrapper-class="w-full sm:w-72"
+				/>
+				<Button type="colored" color="brand" :disabled="isSaving" @click="openCreateModal">
+					<PlusIcon aria-hidden="true" />
+					New event
+				</Button>
+			</div>
+		</div>
 
-				<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-					<StyledInput
-						v-model="searchQuery"
-						:icon="SearchIcon"
-						type="search"
-						placeholder="Search..."
-						clearable
-						wrapper-class="w-full sm:w-72"
-					/>
-					<Button type="colored" color="brand" :disabled="isSaving" @click="openCreateModal">
-						<PlusIcon aria-hidden="true" />
-						New event
+		<Table
+			v-model:sort-column="sortColumn"
+			v-model:sort-direction="sortDirection"
+			:columns="columns"
+			:data="sortedEvents"
+			row-key="id"
+		>
+			<template #cell-title="{ row }">
+				<span class="line-clamp-2 font-medium text-primary">{{ row.title }}</span>
+			</template>
+
+			<template #cell-announcement="{ row }">
+				<a
+					v-if="row.announcement_url"
+					:href="row.announcement_url"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="inline-flex items-center gap-1 font-medium text-primary hover:text-contrast"
+				>
+					Open link
+					<ExternalIcon class="size-4" aria-hidden="true" />
+				</a>
+				<span v-else class="text-xs font-medium text-primary">—</span>
+			</template>
+
+			<template #cell-date="{ row }">
+				<div
+					v-if="isEventDateRange(row)"
+					class="flex flex-col gap-0.5 text-sm font-medium leading-5 text-primary"
+				>
+					<span>{{ formatEventDateRangeStart(row) }} -</span>
+					<span>{{ formatEventDateRangeEnd(row) }}</span>
+				</div>
+				<span v-else class="font-medium text-primary">{{ formatEventDateRange(row) }}</span>
+			</template>
+
+			<template #cell-metrics="{ row }">
+				<div class="flex flex-wrap gap-1">
+					<span
+						v-for="metric in getMetricKindOptions(row.for_metric_kind)"
+						:key="metric.value"
+						class="inline-flex items-center rounded-full border border-solid border-surface-5 px-2 py-0.5 text-xs font-medium text-secondary"
+					>
+						{{ metric.label }}
+					</span>
+				</div>
+			</template>
+
+			<template #cell-actions="{ row }">
+				<div class="flex justify-end gap-2">
+					<IconButton
+						type="outlined"
+						:label="`Delete ${row.title}`"
+						:disabled="isDeletingEvent(row.id)"
+						class="!text-red !shadow-[inset_0_0_0_1px_var(--color-red)] [&>svg]:!text-red"
+						@click="openDeleteEventModal(row)"
+					>
+						<TrashIcon aria-hidden="true" />
+					</IconButton>
+					<Button
+						type="outlined"
+						:disabled="isSaving || isDeletingEvent(row.id)"
+						@click="openEditModal(row)"
+					>
+						Edit
+						<EditIcon aria-hidden="true" />
 					</Button>
 				</div>
-			</div>
+			</template>
 
-			<Table
-				v-model:sort-column="sortColumn"
-				v-model:sort-direction="sortDirection"
-				:columns="columns"
-				:data="sortedEvents"
-				row-key="id"
-			>
-				<template #cell-title="{ row }">
-					<span class="line-clamp-2 font-medium text-primary">{{ row.title }}</span>
-				</template>
-
-				<template #cell-announcement="{ row }">
-					<a
-						v-if="row.announcement_url"
-						:href="row.announcement_url"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="inline-flex items-center gap-1 font-medium text-primary hover:text-contrast"
-					>
-						Open link
-						<ExternalIcon class="size-4" aria-hidden="true" />
-					</a>
-					<span v-else class="text-xs font-medium text-primary">—</span>
-				</template>
-
-				<template #cell-date="{ row }">
-					<div
-						v-if="isEventDateRange(row)"
-						class="flex flex-col gap-0.5 text-sm font-medium leading-5 text-primary"
-					>
-						<span>{{ formatEventDateRangeStart(row) }} -</span>
-						<span>{{ formatEventDateRangeEnd(row) }}</span>
+			<template #empty-state>
+				<div class="flex h-64 items-center justify-center text-secondary">
+					<div v-if="isFetchingEvents" class="flex items-center gap-2">
+						<SpinnerIcon class="size-5 animate-spin" aria-hidden="true" />
+						Loading
 					</div>
-					<span v-else class="font-medium text-primary">{{ formatEventDateRange(row) }}</span>
-				</template>
-
-				<template #cell-metrics="{ row }">
-					<div class="flex flex-wrap gap-1">
-						<span
-							v-for="metric in getMetricKindOptions(row.for_metric_kind)"
-							:key="metric.value"
-							class="inline-flex items-center rounded-full border border-solid border-surface-5 px-2 py-0.5 text-xs font-medium text-secondary"
-						>
-							{{ metric.label }}
-						</span>
-					</div>
-				</template>
-
-				<template #cell-actions="{ row }">
-					<div class="flex justify-end gap-2">
-						<IconButton
-							type="outlined"
-							:label="`Delete ${row.title}`"
-							:disabled="isDeletingEvent(row.id)"
-							class="!text-red !shadow-[inset_0_0_0_1px_var(--color-red)] [&>svg]:!text-red"
-							@click="openDeleteEventModal(row)"
-						>
-							<TrashIcon aria-hidden="true" />
-						</IconButton>
-						<Button
-							type="outlined"
-							:disabled="isSaving || isDeletingEvent(row.id)"
-							@click="openEditModal(row)"
-						>
-							Edit
-							<EditIcon aria-hidden="true" />
-						</Button>
-					</div>
-				</template>
-
-				<template #empty-state>
-					<div class="flex h-64 items-center justify-center text-secondary">
-						<div v-if="isFetchingEvents" class="flex items-center gap-2">
-							<SpinnerIcon class="size-5 animate-spin" aria-hidden="true" />
-							Loading
-						</div>
-						<template v-else>No results.</template>
-					</div>
-				</template>
-			</Table>
-		</div>
+					<template v-else>No results.</template>
+				</div>
+			</template>
+		</Table>
 	</div>
 </template>
 
@@ -241,17 +238,19 @@ import {
 	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
+	Button,
+	ButtonLink,
 	ConfirmModal,
 	DatePicker,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	MultiSelect,
 	type MultiSelectOption,
 	NewModal,
 	type SortDirection,
-	StyledInput,
 	Table,
 	type TableColumn,
 } from '@modrinth/ui'
@@ -321,7 +320,7 @@ const allMetricKinds = metricKindOptions.map((option) => option.value)
 
 const deleteEventModal = ref<InstanceType<typeof ConfirmModal> | null>(null)
 const eventModal = ref<InstanceType<typeof NewModal> | null>(null)
-const titleInput = ref<InstanceType<typeof StyledInput> | null>(null)
+const titleInput = ref<InstanceType<typeof Input> | null>(null)
 const searchQuery = ref('')
 const sortColumn = ref<EventColumnKey | undefined>('date')
 const sortDirection = ref<SortDirection>('desc')

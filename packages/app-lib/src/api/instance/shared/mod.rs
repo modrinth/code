@@ -15,7 +15,10 @@ use crate::state::{
     ContentSourceKind, EditInstance, ModLoader, ModrinthCredentials,
     ProjectType, SharedInstanceRole, State,
 };
-use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
+use crate::util::fetch::{
+    INSECURE_NO_TIMEOUT_REQWEST_CLIENT, INSECURE_REQWEST_CLIENT,
+    NO_TIMEOUT_REQWEST_CLIENT, REQWEST_CLIENT,
+};
 use chrono::{DateTime, Utc};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;

@@ -84,7 +84,7 @@
 						<label class="mb-2 block text-lg font-semibold text-contrast" for="collection-title">
 							{{ formatMessage(commonMessages.titleLabel) }}
 						</label>
-						<StyledInput
+						<Input
 							id="collection-title"
 							v-model="current.name"
 							:maxlength="255"
@@ -98,10 +98,9 @@
 					>
 						{{ formatMessage(commonMessages.descriptionLabel) }}
 					</label>
-					<StyledInput
+					<Textarea
 						id="collection-description"
 						v-model="current.description"
-						multiline
 						:maxlength="255"
 						wrapper-class="h-24"
 					/>
@@ -151,7 +150,7 @@
 						</nuxt-link>
 					</ClientOnly>
 					<div class="grid grid-cols-[auto_1fr] gap-4 sm:grid-cols-[auto_1fr_auto]">
-						<Avatar :src="collection.icon_url" size="64px" />
+						<Avatar :src="collection.icon_url" :raw-src="collection.raw_icon_url" size="64px" />
 						<div class="flex flex-col gap-3">
 							<h1 class="heading-2xl">
 								{{ collection.name }}
@@ -386,6 +385,7 @@ import {
 	HorizontalRule,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NavTabs,
 	NewModal,
@@ -395,8 +395,8 @@ import {
 	ProjectList,
 	RadioButtons,
 	SidebarCard,
-	StyledInput,
 	TeleportOverflowMenu,
+	Textarea,
 	useCompactNumber,
 	useFormatDateTime,
 	useRelativeTime,
@@ -409,6 +409,10 @@ import dayjs from 'dayjs'
 import { onServerPrefetch } from 'vue'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+
+useSeoMeta({
+	robots: 'noindex',
+})
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
@@ -614,6 +618,26 @@ const creator = computed(() =>
 
 const supportsMarkdown = computed(() => creator.value?.id === '2REoufqX')
 
+// Query for public projects
+const { data: creatorPublicProjectsSearch } = useQuery({
+	queryKey: computed(() => ['user', creator.value?.username, 'public-projects-search']),
+	queryFn: () =>
+		api.labrinth.projects_v3.search({
+			facets: [[`author:${creator.value.username}`]],
+			limit: 1,
+		}),
+	enabled: computed(
+		() =>
+			!isFollowingCollection.value &&
+			collection.value?.status === 'listed' &&
+			!!creator.value?.username,
+	),
+})
+
+const creatorHasPublicProjects = computed(
+	() => (creatorPublicProjectsSearch.value?.total_hits ?? 0) > 0,
+)
+
 // Query for followed projects
 const {
 	data: followedProjects,
@@ -673,10 +697,21 @@ onServerPrefetch(async () => {
 	})
 
 	if (collectionData?.user) {
-		await queryClient.ensureQueryData({
+		const creatorData = await queryClient.ensureQueryData({
 			queryKey: ['user', collectionData.user],
 			queryFn: () => api.labrinth.users_v2.get(collectionData.user),
 		})
+
+		if (collectionData.status === 'listed' && creatorData?.username) {
+			await queryClient.ensureQueryData({
+				queryKey: ['user', creatorData.username, 'public-projects-search'],
+				queryFn: () =>
+					api.labrinth.projects_v3.search({
+						facets: [[`author:${creatorData.username}`]],
+						limit: 1,
+					}),
+			})
+		}
 	}
 
 	if (collectionData?.projects?.length) {
@@ -688,8 +723,8 @@ onServerPrefetch(async () => {
 })
 
 watch(
-	[collection, creator],
-	([col, cre]) => {
+	[collection, creator, creatorHasPublicProjects],
+	([col, cre, hasPublicProjects]) => {
 		if (col && cre) {
 			const canonicalUrl = col ? `https://modrinth.com/collection/${col.id}` : undefined
 			useSeoMeta({
@@ -703,7 +738,7 @@ watch(
 				ogDescription: col.description,
 				ogImage: col.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png',
 				ogUrl: canonicalUrl,
-				robots: col.status === 'listed' ? 'all' : 'noindex',
+				robots: col.status === 'listed' && hasPublicProjects ? 'all' : 'noindex',
 			})
 			useHead({
 				link: [

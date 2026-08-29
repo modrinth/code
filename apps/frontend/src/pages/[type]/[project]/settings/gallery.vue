@@ -38,7 +38,7 @@
 				<label for="gallery-image-title">
 					<span class="label__title">Title</span>
 				</label>
-				<StyledInput
+				<Input
 					id="gallery-image-title"
 					v-model="editTitle"
 					:maxlength="64"
@@ -47,17 +47,16 @@
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="gallery-image-desc"
 					v-model="editDescription"
-					multiline
 					:maxlength="255"
 					placeholder="Enter description..."
 				/>
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>
-				<StyledInput
+				<Input
 					id="gallery-image-ordering"
 					v-model="editOrder"
 					type="number"
@@ -216,6 +215,7 @@
 					<img
 						:src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
 						:alt="item.title ? item.title : 'gallery-image'"
+						@contextmenu="onFullImageContextMenu($event, item.raw_url)"
 					/>
 				</a>
 				<div class="gallery-body">
@@ -296,9 +296,11 @@ import {
 	FileButton,
 	IconButton,
 	injectProjectPageContext,
+	Input,
 	NewModal as Modal,
-	StyledInput,
+	Textarea,
 	useFormatDateTime,
+	useFullImageContextMenu,
 } from '@modrinth/ui'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
@@ -310,6 +312,7 @@ const formatDate = useFormatDateTime({
 	month: 'long',
 	day: 'numeric',
 })
+const onFullImageContextMenu = useFullImageContextMenu()
 
 const {
 	projectV2: project,

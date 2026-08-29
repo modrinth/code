@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "ดำเนินการต่อ"
   },
-  "admin.billing.error.not-found": {
-    "message": "ไม่พบผู้ใช้นี้"
-  },
   "analytics.action.add": {
     "message": "เพิ่ม"
   },

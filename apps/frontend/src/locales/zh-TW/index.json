@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "繼續"
   },
-  "admin.billing.error.not-found": {
-    "message": "找不到使用者"
-  },
   "ads-consent.accept": {
     "message": "全部接受"
   },
@@ -705,7 +702,7 @@
     "message": "前所未有的"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App 已與網站完全整合，因此你可透過應用程式存取所有喜愛的專案！"
+    "message": "Modrinth App 已與網站完全整合，你可透過應用程式存取所有喜愛的專案！"
   },
   "app-marketing.features.website.title": {
     "message": "網站整合"
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "回覆並核准"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "關閉討論串"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "回覆並關閉"
@@ -1377,7 +1371,7 @@
     "message": "簡介"
   },
   "create.project.summary-placeholder": {
-    "message": "這個專案加入了……"
+    "message": "這個專案加入了..."
   },
   "create.project.title": {
     "message": "建立專案"
@@ -2172,10 +2166,10 @@
     "message": "在 Modrinth 搜尋並瀏覽數千個 Minecraft {projectType}，即時獲得精準的搜尋結果。我們的篩選功能可協助你快速找到最優質的 Minecraft {projectType}。"
   },
   "discover.seo.title": {
-    "message": "搜尋 {projectType}"
+    "message": "搜尋{projectType}"
   },
   "discover.seo.title-with-query": {
-    "message": "搜尋 {projectType} | {query}"
+    "message": "搜尋{projectType} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "你可能輸錯了該收藏的網址。"
@@ -2651,9 +2645,6 @@
   "layout.action.file-lookup": {
     "message": "檔案查詢"
   },
-  "layout.action.lookup-by-email": {
-    "message": "依電子郵件查詢"
-  },
   "layout.action.manage-affiliates": {
     "message": "管理聯盟連結"
   },
@@ -2849,8 +2840,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "未知"
@@ -3446,6 +3443,18 @@
   "project-type.shader.singular": {
     "message": "光影包"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "回到所有專案"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "回到專案頁面"
+  },
+  "project.actions.check-modpack-archives": {
+    "message": "檢查模組包解壓縮"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "正在檢查..."
+  },
   "project.actions.create-server": {
     "message": "建立伺服器"
   },
@@ -3457,6 +3466,9 @@
   },
   "project.actions.edit-project": {
     "message": "編輯專案"
+  },
+  "project.actions.project-page": {
+    "message": "專案頁面"
   },
   "project.actions.rescan-modpack": {
     "message": "重新掃描模組包"
@@ -3472,6 +3484,24 @@
   },
   "project.actions.servers-promo.title": {
     "message": "建立伺服器"
+  },
+  "project.actions.view-dependents": {
+    "message": "查看相依項"
+  },
+  "project.actions.view-modpacks": {
+    "message": "查看模組包"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "查看{projectType}相依項"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "Modrinth 上不允許使用 AI 生成的圖片來呈現你的專案。試圖規避檢測機制可能會導致你的 Modrinth 帳號遭到停權。"
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "關於 Modrinth 的生成式 AI 政策的更多資訊，請參閱我們的《<rules>內容規範</rules>》第 6 節。"
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "不允許使用 AI 生成的圖片"
   },
   "project.collections.create-new": {
     "message": "建立新收藏"
@@ -3719,8 +3749,23 @@
   "project.moderation.title": {
     "message": "審查"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "匯入這個 .mrpack 檔案時可能會出錯。"
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "系統在這個模組包發布時存在匯出錯誤"
+  },
   "project.navigation.changelog": {
     "message": "更新日誌"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "部分模組包檔案無法解壓縮"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "找不到這個專案的 .mrpack 檔案。"
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {模組包檔案可以解壓縮。} other {所有 # 個模組包檔案可以解壓縮。}}"
   },
   "project.notification.icon-updated.message": {
     "message": "你的專案圖示已更新。"
@@ -3733,6 +3778,198 @@
   },
   "project.notification.updated.title": {
     "message": "專案已更新"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "回到所有專案"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "回到專案頁面"
+  },
+  "project.settings.danger-zone": {
+    "message": "危險操作"
+  },
+  "project.settings.delete-project.button": {
+    "message": "刪除專案"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "如果繼續操作，這個專案的所有資訊及其所有版本將立即從我們的資料庫中刪除。即使你之後改變主意，這些資料將無法復原。你可以考慮較彈性的選項，將專案設為「私人」。"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "永久刪除專案"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "確定要刪除這個專案嗎？"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "將這個專案從 Modrinth 中永久刪除。Modrinth 的工作人員和客服團隊<emphasis>無法還原</emphasis>已刪除的專案。"
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "如果上傳到這個專案的檔案目前仍被 Modrinth 上的模組包使用，檔案可能會繼續存在。"
+  },
+  "project.settings.delete-project.title": {
+    "message": "刪除專案"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "如果這個專案包含其他作品的廣告、贊助或宣傳，則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "例如：Adds the Modrinth SMP server to your server list automatically."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "包含廣告宣傳"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "請參閱 Modrinth 的《<rules>內容規範</rules>》第 6 節以取得更多資訊。"
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "如果這個專案包含大量由 AI 生成的程式碼、任何主要由 AI 生成的資源、專案的功能仰賴生成式 AI，或是專案頁面的任何元素（例如描述或發布）仰賴生成式 AI，則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "例如：The Chinese and Arabic translations are AI-generated."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "包含 AI 生成的內容"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "生成式 AI 被用於製作哪些內容？"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "橫幅預覽"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "將你的專案標記為已封存，讓使用者知道你不再維護這個專案。"
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "即使將專案存檔，瀏覽權限設為「公開」的專案仍可被搜尋到。如果你不想讓專案被搜尋到，請將瀏覽權限設為「不公開」。"
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "例如：I don't have time to maintain this project anymore, feel free to fork it!"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "封存專案"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "內容揭露資訊"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "如果這個專案是基於其他專案衍生而來（例如分支專案，或包含大量他人作品），則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "原始作品連結"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "原始作品名稱"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "範例專案"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "請說明你的專案如何使用原始作品"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "包含衍生內容"
+  },
+  "project.settings.disclosures.description": {
+    "message": "你必須按照 Modrinth 的《<rules>內容規範</rules>》，在專案中加入任何適用的內容揭露資訊。"
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "最後於{date}由 {user} 更新"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "管理員"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "如果要移除這項揭露資訊，請<contact-support-link>聯絡客服</contact-support-link>。"
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "這項揭露資訊已被管理員鎖定。如果你認為此決定有誤，請<contact-support-link>聯絡客服</contact-support-link>。"
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "如果要移除或編輯這項揭露資訊，請<contact-support-link>聯絡客服</contact-support-link>。"
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "如果這個專案包含需要花費真實金錢才能獲得的功能，則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "例如：Cosmetics available as Patreon reward"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "列出付費功能的類型"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "包含付費功能"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "如果你的專案包含任何你認為可能對部分對閃光或圖形敏感的人造成危險的內容，請啟用這個選項。"
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "例如：It adds a flashlight item that has a strobe mode. It can be disabled in Accessibility settings in-game."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "光敏感警告"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "廣告宣傳披露必須附上說明。"
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "衍生作品揭露必須列出至少一個原始作品。"
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "衍生作品的來源必須有名稱。"
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "你沒有編輯這個專案的揭露資訊的權限。"
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "付費功能揭露必須列出至少一項付費功能。"
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "光敏感警告揭露必須附上說明。"
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "外部系統互動揭露必須附上說明。"
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "遙測揭露必須列出至少一種收集的資料類型。"
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "如果這個專案會在遊戲之外讀取或編輯使用者系統中的內容，則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "請說明與外部系統的互動"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "例如：It adds a file to the desktop called wake_up.txt"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "外部系統互動"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "你的遙測系統採用哪一種同意模式？"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "你可以新增隱私權政策，或是列出所收集的資料類型。請務必說明該資料是匿名資料，還是包含個人可識別資訊（PII）。"
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "哪些資料會被收集？"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "例如：Anonymous launch analytics to track Minecraft version and mod loader usage."
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "如果這個專案會將使用資料傳回給你自己或第三方，則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "包含遙測系統"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "請先上傳版本再新增揭露資訊"
+  },
+  "project.settings.editing-project": {
+    "message": "正在編輯{projectType}專案"
   },
   "project.settings.general.name.description": {
     "message": "請避免使用前綴、後綴、括弧內容或額外描述，僅填寫專案的實際名稱。"
@@ -3778,6 +4015,15 @@
   },
   "project.settings.general.url.title": {
     "message": "網址"
+  },
+  "project.settings.monetization.description": {
+    "message": "Modrinth 上的專案會自動加入<rewards-program-link>獎勵計畫</rewards-program-link>。如果你不想（或因法律原因無法）從專案獲取收益，可在這裡關閉營利功能。"
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "這個專案不符合營利資格。如果你有疑問，請<contact-support-link>聯絡客服</contact-support-link>。"
+  },
+  "project.settings.monetization.title": {
+    "message": "營利"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "請提供證明，以確認你擁有重新發布下列所有檔案的權限。提供完成後，任何遭保留的版本都將自動發布。"
@@ -3971,6 +4217,9 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "你選擇了 {count} 個標籤。請考慮減少到 12 個或更少，以確保你的伺服器主題更明確，並更容易被搜尋到。"
   },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "請先上傳版本再新增標籤"
+  },
   "project.versions.copy-id-option": {
     "message": "複製 ID"
   },
@@ -4059,7 +4308,7 @@
     "message": "錯誤報告"
   },
   "report.not-for.bug-reports.description": {
-    "message": "你可以將錯誤回報至他們的<issues-link>議題追蹤器</issues-link>。"
+    "message": "你可以將錯誤回報至他們的<issues-link>問題追蹤器</issues-link>。"
   },
   "report.not-for.dmca": {
     "message": "DMCA 下架"
@@ -4067,17 +4316,29 @@
   "report.not-for.dmca.description": {
     "message": "請參閱我們的《<policy-link>著作權政策</policy-link>》。"
   },
+  "report.note.ai-images.1": {
+    "message": "我們剛更新了內容規範，禁止在圖示、圖庫及描述中使用 AI 生成的圖片。在我們開始受理這類檢舉之前，我們將給予創作者一段寬限期，以便他們從專案中移除 AI 生成的圖片。"
+  },
+  "report.note.check-back-later": {
+    "message": "請在寬限期結束後再回來查看。目前暫不受理這類檢舉。"
+  },
   "report.note.copyright.1": {
-    "message": "請注意，你並「非」提交 DMCA 下架要求，而是針對重新上傳內容進行檢舉。"
+    "message": "請注意，這「不是」DMCA 下架要求，而是針對重新上傳內容進行檢舉。"
   },
   "report.note.copyright.2": {
     "message": "如果你原本打算提交 DMCA 下架要求（此為法律行動），則請參閱我們的《<copyright-policy-link>著作權政策</copyright-policy-link>》。"
+  },
+  "report.note.fully-ai-generated.1": {
+    "message": "我們剛更新了內容規範，禁止完全由 AI 生成的作品。在我們開始受理這類檢舉之前，我們將給予創作者一段寬限期，以便他們更新或下架完全由 AI 生成的專案。"
   },
   "report.note.malicious.1": {
     "message": "針對惡意或欺騙性內容的檢舉，必須附上該行為的實質證據，例如程式碼樣本。"
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender、VirusTotal 或 AI 惡意軟體偵測的摘要，不構成充分證據，且將不予採納。"
+  },
+  "report.note.missing-disclosure.1": {
+    "message": "內容揭露資訊是我們剛新增的功能。在我們開始受理缺少或不正確揭露資訊的檢舉之前，我們將給予創作者一段寬限期，以便他們將揭露資訊更新至最新狀態。"
   },
   "report.please-report": {
     "message": "請檢舉："
@@ -4096,6 +4357,9 @@
   },
   "report.report-item": {
     "message": "向管理員檢舉 {title}"
+  },
+  "report.reported-for": {
+    "message": "檢舉理由：{type}"
   },
   "report.submit": {
     "message": "提交檢舉"

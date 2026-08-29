@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "הוסף כתובת ג'אווה"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "תוסיף לינק ושם או SPDX איידי של ליצנסיה שלך."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "תוסיף פרטים של ליצנסיה"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "הוסיפו קישורים רלוונטיים מחוץ ל-Modrinth, כגון אתר אינטרנט, חנות או הזמנה לדיסקורד."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "הוסף קישורים חיצוניים"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "בחרת כל שפות זמינות. תבחר רק שפות שהסרור תומך בהן."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "בחר שפות מדויקות"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "בחרת את כל {totalAvailableTags, plural, one {# תג זמין} other {# תגיות זמינות}}. זה סותר את המטרה של תגים, שנועדו לעזור למשתמשים למצוא פרויקטים רלוונטיים. אנא בחר רק את התגים הרלוונטיים לפרויקט שלך."
@@ -65,11 +77,17 @@
   "nags.gallery.title": {
     "defaultMessage": "בקר בדף הגלריה"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "ה-{type} שלך משתמש ברישיון הדורש קוד מקור זמין. אנא ספק קישור לקוד המקור או קובץ מקורות עבור כל גרסה נוספת, או שקול להשתמש ברישיון אחר."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ספק קוד מקור"
   },
   "nags.identical-links.description": {
     "defaultMessage": "חלק מהקישורים החיצוניים שלך נראים זהים. יש להזין כל קישור פעם אחת בלבד ועם סוג הקישור המתאים."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "תמחק קישורים זהים"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "התיאור שלך צריך להכיל מספיק טקסט פשוט או טקסט חלופי לתמונה, כדי שיישאר נגיש למשתמשים עם הקראות מסך או חיבורי אינטרנט איטיים."
@@ -199,6 +217,9 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "בחר תגים מדוייקים"
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "צריך לעלות אפילו שלוש תמונות כדי לרואת את השיידר בסיטואציות שונות."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "העלה תמונת גלריה"

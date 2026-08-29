@@ -11,8 +11,38 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Itago ang mas marami pang tumatakbong instansiya"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Kinopya"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopyahin ang detalye"
+  },
   "app.action-bar.install.retry": {
     "message": "Subukan muli"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Kinansela dahil sa pagsara ng aplikasyon"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Hindi mabasa ang modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Kinansela"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Hindi matapos ang paglinis"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Hindi ma-download ang mga talaksan"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Hindi ma-save ang mga talaksan"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Hindi matapos ang pagdownload"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Hindi mahanap ang instansiya"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Gumawa ng pangunahing instansiya"
@@ -53,32 +83,8 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Librarya"
   },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Pagtatago ng nametag na nasa itaas ng iyong manlalaro sa loob ng pahina ng mga skin."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Itago ang nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Bumalik sa mga mundo"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Liitan ang launcher kung nag-start ang isang proseso ng Minecraft."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Liitin ang launcher"
-  },
-  "app.appearance-settings.show-play-time.description": {
-    "message": "Magpapakita ang katagal ng iyong paglalaro sa isang instansiya."
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Pagpapagana na mata-toggle ang sidebar."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "I-toggle ang sidebar"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Kung susubukan mong mag-install ng Modrinth Pack file (.mrpack) na hindi naka-host sa Modrinth, titiyakin namin na nakaaalam ka sa mga panganib bago ito ma-install."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Pakipaalala bago ko ma-install ang mga di-kilalang modpack"
@@ -115,9 +121,6 @@
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
-  },
-  "app.browse.server-instance-content-warning": {
-    "message": "Maaaring makasisira sa pagkakatugma sa pagsasali ng server ang pagdaragdag ng kontento. Ang anumang kontento ay mawawala sa pag-update ng kontento ng instansiyang pang-server."
   },
   "app.browse.server.installing": {
     "message": "Ini-install"
@@ -491,12 +494,6 @@
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Mga launch hook"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Mga pasadyang launch hook"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga pansistemang utos o system command bago at pagkatapos ma-launch ang laro."
   },
@@ -535,9 +532,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon ng {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java at memorya"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Environment variables"

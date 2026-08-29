@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Actieve downloads verbergen"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Verberg meer actieve instanties"
   },
@@ -110,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "Herlaadt om te updaten"
   },
+  "app.action-bar.show-downloads": {
+    "message": "Actieve downloads weergeven"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Toon meer actieve instanties"
   },
@@ -154,12 +160,6 @@
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Verberg nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Toon recent gespeelde werelden in het Ga terug-gedeelte op de startpagina."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Ga terug in werelden"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimaliseer de Modrinth-app zodra Minecraft opstart."
@@ -243,7 +243,7 @@
     "message": "Modpacks"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Het toevoegen van inhoud kan de compatibiliteit verstoren bij het verbinden met de server. Eventuele toegevoegde inhoud gaat bovendien verloren wanneer je de inhoud van de serverinstantie bijwerkt."
+    "message": "Als je inhoud toevoegt, kan dit ertoe leiden dat je geen toegang hebt tot deze server. Alle inhoud die je toevoegt, wordt verwijderd wanneer de beheerde inhoud van de server wordt bijgewerkt."
   },
   "app.browse.server.installing": {
     "message": "Installeren"
@@ -256,6 +256,12 @@
   },
   "app.export-modal.export-button": {
     "message": "Exporteer"
+  },
+  "app.export-modal.export-complete": {
+    "message": "Exporteren voltooid"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} is succesvol geëxporteerd."
   },
   "app.export-modal.header": {
     "message": "Exporteer modpack"
@@ -271,6 +277,12 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Opgewonden Modrinth-bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Update van Modrinth-app vereist"
   },
   "app.install.phase.downloading_content": {
     "message": "Inhoud aan het downloaden"
@@ -681,7 +693,7 @@
     "message": "Neem voor ondersteuningsverzoeken contact op met ons <support-link>ondersteuningsteam</support-link>. Voor bugmeldingen kun je een <github-link>GitHub-issue</github-link> aanmaken."
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "Een bestand wordt alleen beoordeeld als het op Modrinth wordt gepubliceerd, ongeacht het bestandsformaat (inclusief .mrpack)."
+    "message": "Bestanden die niet op Modrinth worden gepubliceerd, worden niet beoordeeld."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Gedeelde instantie"
@@ -745,9 +757,6 @@
   },
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Meld je aan bij een Modrinth-account"
-  },
-  "app.nav.signed-in-as": {
-    "message": "Aangemeld als <user>{username}</user>"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade naar Modrinth+"
@@ -962,9 +971,6 @@
   "app.settings.tabs.behavior": {
     "message": "Gedrag"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standaard spelopties"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
   },
@@ -1117,9 +1123,6 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
-  },
-  "app.skins.sign-in.button": {
-    "message": "Inloggen"
   },
   "app.skins.title": {
     "message": "Skinkiezer"
@@ -1526,12 +1529,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecteer updatekanaal"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Opstart haakjes"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Aangepaste opstart haakjes"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Haakjes maken het mogelijk voor gevorderde gebruikers om bepaalde systeemcommando's uit te voeren voor en na het opstarten van het spel."
   },
@@ -1594,9 +1591,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java en geheugen"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Aangepaste omgevingsvariabelen"

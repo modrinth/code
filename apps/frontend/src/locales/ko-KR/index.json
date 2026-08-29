@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "계속"
   },
-  "admin.billing.error.not-found": {
-    "message": "사용자를 찾을 수 없습니다"
-  },
   "ads-consent.accept": {
     "message": "모두 수용"
   },
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "답글과 함께 승인"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "스레드 닫기"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "답글과 함께 닫기"
@@ -2469,7 +2463,7 @@
     "message": "끊김없이 빠른 속도를 제공합니다"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "저희 인프라는 절대 과부하되지 않으며, Modrinth에서 호스팅되는 모든 서버는 항상 최대 성능으로 작동합니다."
+    "message": "저희 인프라는 절대 과부하되지 않습니다. 즉, Modrinth에서 호스트 중인 모든 서버는 항상 최선의 성능으로 돌아갑니다."
   },
   "hosting-marketing.why.description": {
     "message": "Modrinth에서 제공하는 수천 개의 모드팩 중에서 선택하거나 직접 만들어 보세요. 준비가 되면 친구들을 초대하여 함께 플레이하세요."
@@ -2650,9 +2644,6 @@
   },
   "layout.action.file-lookup": {
     "message": "파일 찾기"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "이메일로 찾기"
   },
   "layout.action.manage-affiliates": {
     "message": "제휴 링크 관리"
@@ -3446,6 +3437,9 @@
   "project-type.shader.singular": {
     "message": "셰이더"
   },
+  "project.actions.checking-modpack-archives": {
+    "message": "확인 중..."
+  },
   "project.actions.create-server": {
     "message": "서버 만들기"
   },
@@ -3457,6 +3451,9 @@
   },
   "project.actions.edit-project": {
     "message": "프로젝트 수정"
+  },
+  "project.actions.project-page": {
+    "message": "프로젝트 페이지"
   },
   "project.actions.rescan-modpack": {
     "message": "모드팩 재검사"
@@ -3472,6 +3469,15 @@
   },
   "project.actions.servers-promo.title": {
     "message": "서버 생성"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "AI로 생성된 이미지를 사용하여 프로젝트를 소개하는 것은 허용되지 않습니다. 탐지 시스템을 우회하려는 시도는 Modrinth 계정 정지 조치로 이어질 수 있습니다."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "생성형 AI 정책에 대한 자세한 내용은 <rules>Modrinth 콘텐츠 규정</rules>의 6항을 참조하십시오."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "AI로 생성된 이미지는 허용되지 않습니다"
   },
   "project.collections.create-new": {
     "message": "새 컬렉션 생성"
@@ -3719,8 +3725,20 @@
   "project.moderation.title": {
     "message": "관리"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "이 .mrpack 파일은 오류가 발생할 수 있습니다."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "이 모드팩은 내보내기 오류가 발생하였습니다"
+  },
   "project.navigation.changelog": {
     "message": "변경 사항"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "일부 모드팩 파일을 압축 해제할 수 없습니다"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "이 프로젝트에 .mrpack 파일을 찾을 수 없습니다."
   },
   "project.notification.icon-updated.message": {
     "message": "프로젝트 아이콘을 변경했습니다."
@@ -4572,7 +4590,7 @@
     "message": "패스키 로딩중..."
   },
   "settings.account.security.passkey.modal.never-used": {
-    "message": "사용 안 함"
+    "message": "사용한 적 없음"
   },
   "settings.account.security.passkey.modal.no-passkeys": {
     "message": "등록된 패스키가 없습니다."
@@ -5049,7 +5067,7 @@
     "message": "{ago} 에 사용됨"
   },
   "settings.pats.token.never-used": {
-    "message": "사용된 적 없음"
+    "message": "사용한 적 없음"
   },
   "settings.sessions.action.revoke-session": {
     "message": "세션 제거"

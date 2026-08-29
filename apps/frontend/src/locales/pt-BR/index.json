@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Continuar"
   },
-  "admin.billing.error.not-found": {
-    "message": "Usuário não encontrado"
-  },
   "ads-consent.accept": {
     "message": "Aceitar todos"
   },
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Aprovar com resposta"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Encerrar tópico"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Encerrar com resposta"
@@ -2651,9 +2645,6 @@
   "layout.action.file-lookup": {
     "message": "Procurar arquivo"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Procurar por e-mail"
-  },
   "layout.action.manage-affiliates": {
     "message": "Gerenciar links de afiliado"
   },
@@ -2849,8 +2840,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "desconhecido"
@@ -3446,6 +3443,18 @@
   "project-type.shader.singular": {
     "message": "Sombreador"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "Voltar aos projetos"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "Voltar à página do projeto"
+  },
+  "project.actions.check-modpack-archives": {
+    "message": "Verificar arquivo do pacote de mods"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "Verificando..."
+  },
   "project.actions.create-server": {
     "message": "Criar um servidor"
   },
@@ -3457,6 +3466,9 @@
   },
   "project.actions.edit-project": {
     "message": "Editar projeto"
+  },
+  "project.actions.project-page": {
+    "message": "Página do projeto"
   },
   "project.actions.rescan-modpack": {
     "message": "Rescanear pacote de mods"
@@ -3472,6 +3484,15 @@
   },
   "project.actions.servers-promo.title": {
     "message": "Criar um servidor"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "Não é permitido usar imagens geradas por IA para representar seu projeto. Tentar burlar a detecção pode resultar na suspensão da sua conta Modrinth."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "Consulte a seção 6 de <rules>Regras de conteúdo do Modrinth</rules> para mais informações sobre nossa política de IA generativa."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "Imagens geradas por IA não são permitidas"
   },
   "project.collections.create-new": {
     "message": "Criar nova coleção"
@@ -3719,8 +3740,23 @@
   "project.moderation.title": {
     "message": "Moderação"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "Importar este .mrpack talvez não esteja funcionando."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "Este pacote de mods foi publicado durante a falha de exportação"
+  },
   "project.navigation.changelog": {
     "message": "Mudanças"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "Alguns arquivos do pacote de mods não puderam ser descompactados"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "Nenhum arquivo .mrpack encontrado neste projeto."
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {O arquivo do pacote de mods pode ser descompactado.} other {Todos os # arquivos do pacote de mods podem ser descompactados.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "O ícone do seu projeto foi atualizado."
@@ -3733,6 +3769,144 @@
   },
   "project.notification.updated.title": {
     "message": "Projeto atualizado"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "Voltar para todos os projetos"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "Voltar à página do projeto"
+  },
+  "project.settings.danger-zone": {
+    "message": "Zona de perigo"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Excluir projeto"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "Se você prosseguir, todas as informações deste projeto e todas as suas versões serão imediatamente excluídas do nosso banco de dados. Nada poderá ser recuperado posteriormente caso você mude de ideia. Considere definir seu projeto como Privado para uma opção menos permanente."
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Excluir projeto permanentemente"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "Tem certeza de que deseja excluir este projeto?"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "Exclui permanentemente este projeto do Modrinth. Projetos excluídos <emphasis>não podem ser recuperados</emphasis> pela equipe ou suporte da Modrinth."
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Arquivos enviados para este projeto que são ativamente utilizados nos pacotes de mods hospedados no Modrinth podem continuar a existir."
+  },
+  "project.settings.delete-project.title": {
+    "message": "Excluir projeto"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "Você deve habilitar isso se o seu projeto contém anúncios, patrocínios ou promoções de outras obras."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Se a promoção não tiver valor monetário direto <emphasis>e</emphasis> for para algo que a pessoa média consideraria <italic>relevante</italic> e <italic>discreto</italic> (como um link para o seu perfil do Modrinth no canto da página de configurações do seu próprio mod), não a consideraríamos uma propaganda."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "ex: Adiciona o servidor Modrinth SMP à sua lista de servidores automaticamente."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Contém propagandas"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "Por favor, consulte a Seção 6 de <rules>Regras de conteúdo do Modrinth</rules> para obter mais informações."
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "Você deve habilitar esta opção se este projeto conter uma quantidade substancial de código gerado por IA, qualquer\n\t\t\t        ativo substancialmente gerado por IA, se a funcionalidade do projeto depende do uso de\n\t\t\t\tIA generativa, ou se qualquer elemento da página do seu projeto, como descrição ou publicação\n                                depender de IA generativa."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "ex.: as traduções em chinês e árabe são geradas por IA."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "Contém conteúdo gerado por IA"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "Para que está sendo usada a IA gerativa?"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "Prévia do banner"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "Marque seu projeto como arquivado para que os usuários saibam que você não está mais trabalhando nele."
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "Os projetos arquivados permanecem visíveis quando sua visibilidade está definida como pública. Se você deseja remover seu projeto da lista, defina sua visibilidade como Não listada."
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "ex: Não tenho mais tempo para manter este projeto, fique à vontade para criar um fork!"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "Arquivar projeto"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "Avisos de conteúdo"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "Você deve habilitar esta opção se o seu projeto for derivado de outro projeto, como, por exemplo, se for um fork ou contiver uma quantidade substancial do trabalho de outra pessoa."
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "Link para o trabalho original"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "Nome do trabalho original"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Projeto de exemplo"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Explique como seu projeto se baseia no trabalho original"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "Contém conteúdo derivado"
+  },
+  "project.settings.disclosures.description": {
+    "message": "Você deve adicionar todos os avisos de conteúdo aplicáveis ​​ao seu projeto em conformidade com as <rules>Regras de Conteúdo do Modrinth</rules>."
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "Última atualização em {date} por {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "Moderador"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "Por favor, entre em <contact-support-link>contato com o suporte</contact-support-link> caso precise remover esta informação."
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "Esta divulgação foi bloqueada pelos moderadores. <contact-support-link>Entre em contato</contact-support-link> se acredita que foi um erro."
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "<contact-support-link>Entre em contato com o suporte</contact-support-link> se esta divulgação precisa ser editada ou removida."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "Você deve ativar isso se seu projeto contém recursos que podem ser obtidos ao gastar dinheiro real."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "ex.: Cosméticos disponíveis como uma recompensa do Patreon"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "Listar os tipos de recursos pagos"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Contém recursos pagos"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "Habilite isso caso seu projeto tenha qualquer coisa que você considere perigoso para pessoas que são sensíveis a luzes ou padrões piscantes."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "e.g.: Adiciona um item da lanterna que tem um modo de estrobo. Pode ser desativado nas configurações de acessibilidade do jogo."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "Alerta de fotossensibilidade"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "A explicação para a sua divulgação é obrigatória."
   },
   "project.settings.general.name.description": {
     "message": "Evite prefixos, sufixos, parênteses ou descrições. Use apenas o nome do projeto."

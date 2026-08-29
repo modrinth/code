@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CircuitBoardIcon } from '@modrinth/assets'
-import { defineMessages, SettingsFormGroup, StyledInput, useVIntl } from '@modrinth/ui'
+import { defineMessages, SettingsFormGroup, Textarea, useVIntl } from '@modrinth/ui'
 
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
 import type {
@@ -54,10 +54,9 @@ const messages = defineMessages({
 				:title="formatMessage(messages.noteLabel)"
 				title-for="system-interactions-disclosure-note"
 			>
-				<StyledInput
+				<Textarea
 					id="system-interactions-disclosure-note"
 					v-model="model.note"
-					multiline
 					:rows="3"
 					class="max-w-[40rem]"
 					:disabled="disabled"
