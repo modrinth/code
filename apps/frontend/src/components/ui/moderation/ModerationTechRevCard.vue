@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	CheckIcon,
-	CodeIcon,
-	DownloadIcon,
-	ExternalIcon,
-	TimerIcon,
-	VersionIcon,
-} from '@modrinth/assets'
+import { CheckIcon, CodeIcon, ExternalIcon, TimerIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonLink,
@@ -15,19 +8,16 @@ import {
 	CopyLinkButton,
 	getProjectTypeIcon,
 	NavTabs,
-	useFormatBytes,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType } from '@modrinth/utils'
 import { computed, provide, ref, watch } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import {
-	getFileHighestSeverity,
+	getHighestSeverity,
 	getSeverityBadgeColor,
-	getVersionLabel,
-	getVersionPageHref,
-	severityOrder,
 } from '~/components/ui/moderation/tech-review/helpers'
+import TechRevFileActions from '~/components/ui/moderation/tech-review/TechRevFileActions.vue'
 import TechRevFileDetailTab from '~/components/ui/moderation/tech-review/TechRevFileDetailTab.vue'
 import TechRevFilesTab from '~/components/ui/moderation/tech-review/TechRevFilesTab.vue'
 import TechRevThreadTab from '~/components/ui/moderation/tech-review/TechRevThreadTab.vue'
@@ -50,8 +40,6 @@ const props = defineProps<{
 	collapsed: boolean
 	disableCollapsing?: boolean
 }>()
-
-const formatBytes = useFormatBytes()
 
 const emit = defineEmits<{
 	refetch: []
@@ -90,14 +78,11 @@ watch(selectedFile, (newFile) => {
 	}
 })
 
-const highestSeverity = computed(() => {
-	let highest: Labrinth.TechReview.Internal.DelphiSeverity = 'low'
-	for (const report of props.item.reports) {
-		const severity = getFileHighestSeverity(report)
-		if (severityOrder[severity] > severityOrder[highest]) highest = severity
-	}
-	return highest
-})
+const highestSeverity = computed(() =>
+	getHighestSeverity(
+		props.item.reports.flatMap((report) => report.issues.flatMap((issue) => issue.details)),
+	),
+)
 
 const navTabsLinks = computed(() => {
 	const links = tabs.map((tab) => ({
@@ -189,9 +174,9 @@ watch(
 		class="shadow-card overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-3"
 	>
 		<div
-			class="flex flex-col gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 p-4"
+			class="flex flex-col gap-3 border-0 border-b border-solid border-surface-4 bg-surface-3 p-4 pb-3"
 		>
-			<div class="flex items-start justify-between">
+			<div class="flex flex-wrap items-start justify-between">
 				<div class="flex items-center gap-3">
 					<NuxtLink
 						:to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
@@ -206,7 +191,7 @@ watch(
 					</NuxtLink>
 
 					<div class="flex flex-col gap-1.5">
-						<div class="flex items-center gap-2">
+						<div class="flex flex-wrap items-center gap-2">
 							<NuxtLink
 								:to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
 								target="_blank"
@@ -275,36 +260,38 @@ watch(
 					</div>
 				</div>
 
-				<div class="flex items-center gap-3">
-					<span class="text-base text-secondary">{{ formattedDate }}</span>
-					<div class="flex items-center gap-2">
-						<ButtonLink
-							v-if="props.item.project.link_urls?.['source']?.url"
-							v-tooltip="'Open sources in new tab'"
-							:href="props.item.project.link_urls?.['source']?.url"
-							target="_blank"
-							class="!w-9 !rounded-full !px-0"
-						>
-							<CodeIcon />
-						</ButtonLink>
-						<CopyCode v-tooltip="'Copy project ID'" :text="item.project.id" />
-						<CopyLinkButton
-							copy-label="Copy project link"
-							:url="`https://modrinth.com/moderation/technical-review/${props.item.project.id}`"
-						/>
-						<ButtonLink
-							v-tooltip="'Open tech review in new tab'"
-							:href="`/moderation/technical-review/${props.item.project.id}`"
-							target="_blank"
-							circular
-							icon-only
-						>
-							<ExternalIcon />
-						</ButtonLink>
+				<div class="flex flex-col items-end gap-2">
+					<div class="flex flex-wrap items-center justify-end gap-3">
+						<span class="text-base text-secondary">{{ formattedDate }}</span>
+						<div class="flex items-center gap-2">
+							<ButtonLink
+								v-if="props.item.project.link_urls?.['source']?.url"
+								v-tooltip="'Open sources in new tab'"
+								:href="props.item.project.link_urls?.['source']?.url"
+								target="_blank"
+								class="!w-9 !rounded-full !px-0"
+							>
+								<CodeIcon />
+							</ButtonLink>
+							<CopyLinkButton
+								copy-label="Copy project link"
+								:url="`https://modrinth.com/moderation/technical-review/${props.item.project.id}`"
+							/>
+							<ButtonLink
+								v-tooltip="'Open tech review in new tab'"
+								:href="`/moderation/technical-review/${props.item.project.id}`"
+								target="_blank"
+								circular
+								icon-only
+							>
+								<ExternalIcon />
+							</ButtonLink>
+						</div>
 					</div>
+					<CopyCode v-tooltip="'Copy project ID'" :text="item.project.id" />
 				</div>
 			</div>
-			<div class="flex flex-row justify-between">
+			<div class="flex flex-row flex-wrap justify-between">
 				<NavTabs
 					mode="local"
 					:links="navTabsLinks"
@@ -313,42 +300,7 @@ watch(
 					@tab-click="handleTabClick"
 				/>
 
-				<div v-if="currentTab === 'File' && selectedFile" class="flex flex-row items-end gap-2">
-					<ButtonLink
-						type="outlined"
-						target="_blank"
-						:href="getVersionPageHref(item.project, selectedFile.version_id)"
-						class="!bg-surface-2"
-						:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
-					>
-						<VersionIcon aria-hidden="true" />
-						{{ getVersionLabel(selectedFile) }}
-					</ButtonLink>
-					<ButtonLink
-						type="outlined"
-						:target="selectedFile.file_id"
-						:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
-						class="!bg-surface-2"
-						aria-label="Open in Slicer"
-					>
-						<ExternalIcon aria-hidden="true" /> Slicer
-					</ButtonLink>
-					<ButtonLink
-						v-tooltip="
-							`Download ${selectedFile.file_name} (${formatBytes(selectedFile.file_size)})`
-						"
-						type="outlined"
-						target="_blank"
-						:href="selectedFile.download_url"
-						:download="selectedFile.file_name"
-						class="!bg-surface-2"
-						aria-label="Download"
-						icon-only
-						circular
-					>
-						<DownloadIcon aria-hidden="true" />
-					</ButtonLink>
-				</div>
+				<TechRevFileActions v-if="currentTab === 'File' && selectedFile" :file="selectedFile" />
 			</div>
 		</div>
 
