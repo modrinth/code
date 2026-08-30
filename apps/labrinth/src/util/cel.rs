@@ -565,8 +565,7 @@ fn string_start(bytes: &[u8], index: usize) -> Option<(usize, LexState)> {
     let (prefix_length, raw) = if remaining.len() >= 3
         && matches!(remaining[0].to_ascii_lowercase(), b'b' | b'r')
         && matches!(remaining[1].to_ascii_lowercase(), b'b' | b'r')
-        && remaining[0].to_ascii_lowercase()
-            != remaining[1].to_ascii_lowercase()
+        && !remaining[0].eq_ignore_ascii_case(&remaining[1])
     {
         (2, true)
     } else if remaining.len() >= 2
