@@ -1,16 +1,23 @@
 <script setup lang="ts">
-import { CheckIcon, ChevronDownIcon, CopyIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { IconButton } from '@modrinth/ui'
+import {
+	CheckIcon,
+	ChevronDownIcon,
+	CopyIcon,
+	ExternalIcon,
+	LoaderCircleIcon,
+} from '@modrinth/assets'
+import { ButtonLink, IconButton } from '@modrinth/ui'
 import { capitalizeString, highlightCodeLines } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import { getSeverityBadgeColor, truncateMiddle } from './helpers'
 import TechRevFlagBadges from './TechRevFlagBadges.vue'
 import TechRevVerdictButtons from './TechRevVerdictButtons.vue'
-import type { ClassGroup, TraceVerdictEvent } from './types'
+import type { ClassGroup, FlattenedFileReport, TraceVerdictEvent } from './types'
 import { injectTechReviewDecisions } from './use-tech-review-decisions'
 
 const props = defineProps<{
+	file: FlattenedFileReport
 	classItem: ClassGroup
 	expanded: boolean
 	focusedDetailId?: string | null
@@ -73,6 +80,32 @@ async function copyToClipboard() {
 		console.error('Failed to copy code:', error)
 	}
 }
+
+function trimSlashes(path: string): string {
+	if (path.startsWith('/')) {
+		path = path.slice(1)
+	}
+	if (path.endsWith('/')) {
+		path = path.slice(0, -1)
+	}
+	return path
+}
+
+// Creates a slicer link with a group, removes trailing and leading slashes, and if no file extension found assume .class
+function createSlicerLink(url: string, group: ClassGroup | undefined) {
+	const uri = new URL(url)
+	const filename = uri.pathname.split('/').pop() || ''
+	if (group) {
+		const jarPath = trimSlashes(group.jar ? group.jar.replace('#', '/') : filename)
+		const filePath = trimSlashes(
+			group.filePath.startsWith('/') ? group.filePath.slice(1) : group.filePath,
+		)
+		const hasFileExtension = (filePath.split('/').pop() || '').includes('.')
+		const file = `${jarPath}/${hasFileExtension ? filePath : `${filePath}.class`}`
+		return `https://slicer.run/?url=${encodeURIComponent(url)}&file=${encodeURIComponent(file)}`
+	}
+	return `https://slicer.run/?url=${encodeURIComponent(url)}`
+}
 </script>
 
 <template>
@@ -101,6 +134,17 @@ async function copyToClipboard() {
 
 				<TechRevFlagBadges :details="flagDetails" />
 
+				<ButtonLink
+					v-tooltip="'Open file in slicer'"
+					type="outlined"
+					:href="createSlicerLink(file.download_url, classItem)"
+					:target="file.file_id"
+					circular
+					icon-only
+					@click="$event.stopPropagation()"
+				>
+					<ExternalIcon />
+				</ButtonLink>
 				<Transition name="fade">
 					<div
 						v-if="isLoadingSource"
@@ -147,9 +191,7 @@ async function copyToClipboard() {
 						<TechRevVerdictButtons
 							variant="trace"
 							:detail="flag.detail"
-							@global-safe="
-								emitVerdict({ detail: flag.detail, decision: 'safe', scope: 'global' })
-							"
+							@global-safe="emitVerdict({ detail: flag.detail, decision: 'safe', scope: 'global' })"
 							@local-safe="emitVerdict({ detail: flag.detail, decision: 'safe', scope: 'local' })"
 							@local-unsafe="
 								emitVerdict({ detail: flag.detail, decision: 'malware', scope: 'local' })

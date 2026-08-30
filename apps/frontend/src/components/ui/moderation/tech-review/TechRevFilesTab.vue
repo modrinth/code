@@ -31,7 +31,7 @@ const allFiles = computed(() => {
 		<TechRevFileItem
 			v-for="file in allFiles"
 			:key="file.id"
-			class="bg-surface-2 even:bg-surface-1.5 last:rounded-bl-2xl last:rounded-br-2xl"
+			class="bg-surface-2 last:rounded-bl-2xl last:rounded-br-2xl even:bg-surface-1.5"
 			:file="file"
 			:project="project"
 			@view-flags="emit('viewFlags', $event)"
