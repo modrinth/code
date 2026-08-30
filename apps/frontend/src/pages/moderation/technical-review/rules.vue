@@ -383,9 +383,9 @@ IS_MATCH ? "low" : null</code></pre>
 
 				<section class="flex flex-col gap-2">
 					<h3 class="m-0 text-sm font-semibold text-contrast">
-						Affected details ({{ rule.affected_details_count.toLocaleString() }})
+						Affected details ({{ getAffectedDetailsTotal(rule).toLocaleString() }})
 					</h3>
-					<p v-if="rule.affected_details_count === 0" class="m-0 text-sm text-secondary">
+					<p v-if="getAffectedDetailsTotal(rule) === 0" class="m-0 text-sm text-secondary">
 						No details are affected in the current revision.
 					</p>
 					<div v-else class="flex flex-col gap-2">
@@ -455,25 +455,27 @@ IS_MATCH ? "low" : null</code></pre>
 						</div>
 
 						<div
-							v-if="rule.affected_details_count > 3"
-							class="relative z-20 mt-1 flex justify-center"
+							v-if="getAffectedDetailsPageCount(rule) > 1"
+							class="mt-1 flex flex-wrap items-center justify-between gap-2"
 						>
-							<Button
-								type="quiet"
-								:disabled="loadingAffectedRuleIds.has(rule.id)"
-								@click="toggleAffectedDetails(rule)"
-							>
-								<LoaderCircleIcon v-if="loadingAffectedRuleIds.has(rule.id)" class="animate-spin" />
-								{{ expandedAffectedDetails.has(rule.id) ? 'Show less' : 'Show more' }}
-							</Button>
+							<p class="m-0 flex items-center gap-2 text-sm text-secondary">
+								<LoaderCircleIcon
+									v-if="loadingAffectedRuleIds.has(rule.id)"
+									class="size-4 animate-spin"
+								/>
+								Showing {{ getAffectedDetailsPageStart(rule).toLocaleString() }}–{{
+									getAffectedDetailsPageEnd(rule).toLocaleString()
+								}}
+								of {{ getAffectedDetailsTotal(rule).toLocaleString() }}
+							</p>
+							<Pagination
+								:page="getAffectedDetailsPage(rule)"
+								:count="getAffectedDetailsPageCount(rule)"
+								@switch-page="switchAffectedDetailsPage(rule, $event)"
+							/>
 						</div>
 					</div>
 				</section>
-				<div
-					v-if="rule.affected_details_count > 3 && !expandedAffectedDetails.has(rule.id)"
-					class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-transparent to-surface-3"
-					aria-hidden="true"
-				/>
 			</article>
 		</div>
 	</div>
@@ -502,6 +504,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
+	Pagination,
 	ProgressBar,
 	Textarea,
 } from '@modrinth/ui'
@@ -688,10 +691,18 @@ const ruleTestEffects = ref<Array<Labrinth.TechReview.Internal.DelphiRuleEffect 
 const ruleTestError = ref<RuleTestError | null>(null)
 const traceDataError = ref<string | null>(null)
 const scanProgress = ref<Labrinth.TechReview.Internal.DelphiRuleScanEvent | null>(null)
-const expandedAffectedDetails = reactive(
-	new Map<number, Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]>(),
+const affectedDetailsPages = reactive(
+	new Map<
+		number,
+		{
+			page: number
+			total: number
+			details: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]
+		}
+	>(),
 )
 const loadingAffectedRuleIds = reactive(new Set<number>())
+const AFFECTED_DETAILS_PAGE_SIZE = 3
 const form = reactive({
 	name: '',
 	priority: 0 as number | undefined,
@@ -1018,7 +1029,7 @@ async function loadRules() {
 	loadFailed.value = false
 	try {
 		rules.value = await client.labrinth.tech_review_internal.getRules()
-		expandedAffectedDetails.clear()
+		affectedDetailsPages.clear()
 	} catch (error) {
 		console.error('Failed to load Delphi rules', error)
 		loadFailed.value = true
@@ -1045,7 +1056,32 @@ async function loadRuleSchema() {
 function getVisibleRuleDetails(
 	rule: Labrinth.TechReview.Internal.DelphiRule,
 ): Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[] {
-	return expandedAffectedDetails.get(rule.id) ?? rule.affected_details
+	return affectedDetailsPages.get(rule.id)?.details ?? rule.affected_details
+}
+
+function getAffectedDetailsPage(rule: Labrinth.TechReview.Internal.DelphiRule): number {
+	return affectedDetailsPages.get(rule.id)?.page ?? 1
+}
+
+function getAffectedDetailsTotal(rule: Labrinth.TechReview.Internal.DelphiRule): number {
+	return affectedDetailsPages.get(rule.id)?.total ?? rule.affected_details_count
+}
+
+function getAffectedDetailsPageCount(rule: Labrinth.TechReview.Internal.DelphiRule): number {
+	return Math.max(Math.ceil(getAffectedDetailsTotal(rule) / AFFECTED_DETAILS_PAGE_SIZE), 1)
+}
+
+function getAffectedDetailsPageStart(rule: Labrinth.TechReview.Internal.DelphiRule): number {
+	const total = getAffectedDetailsTotal(rule)
+	if (total === 0) return 0
+	return (getAffectedDetailsPage(rule) - 1) * AFFECTED_DETAILS_PAGE_SIZE + 1
+}
+
+function getAffectedDetailsPageEnd(rule: Labrinth.TechReview.Internal.DelphiRule): number {
+	return Math.min(
+		getAffectedDetailsPage(rule) * AFFECTED_DETAILS_PAGE_SIZE,
+		getAffectedDetailsTotal(rule),
+	)
 }
 
 function getAffectedDetailLink(
@@ -1062,23 +1098,33 @@ function getVersionLink(detail: Labrinth.TechReview.Internal.DelphiRuleAffectedD
 	return `/project/${detail.project_id}/version/${detail.version_id}`
 }
 
-async function toggleAffectedDetails(rule: Labrinth.TechReview.Internal.DelphiRule) {
-	if (expandedAffectedDetails.has(rule.id)) {
-		expandedAffectedDetails.delete(rule.id)
+async function switchAffectedDetailsPage(
+	rule: Labrinth.TechReview.Internal.DelphiRule,
+	page: number,
+) {
+	if (loadingAffectedRuleIds.has(rule.id)) return
+	if (page === 1) {
+		affectedDetailsPages.delete(rule.id)
 		return
 	}
-	if (loadingAffectedRuleIds.has(rule.id)) return
 
 	loadingAffectedRuleIds.add(rule.id)
 	try {
-		const details = await client.labrinth.tech_review_internal.getRuleAffectedDetails(rule.id)
-		expandedAffectedDetails.set(rule.id, details)
+		const response = await client.labrinth.tech_review_internal.getRuleAffectedDetails(rule.id, {
+			limit: AFFECTED_DETAILS_PAGE_SIZE,
+			page: page - 1,
+		})
+		affectedDetailsPages.set(rule.id, {
+			page,
+			total: response.total,
+			details: response.details,
+		})
 	} catch (error) {
 		console.error('Failed to load details affected by Delphi rule', error)
 		addNotification({
 			type: 'error',
 			title: 'Failed to load affected details',
-			text: 'The complete list of affected details could not be loaded.',
+			text: 'The requested page of affected details could not be loaded.',
 		})
 	} finally {
 		loadingAffectedRuleIds.delete(rule.id)

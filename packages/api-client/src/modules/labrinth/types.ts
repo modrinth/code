@@ -2445,6 +2445,16 @@ export namespace Labrinth {
 				severity: DelphiSeverity
 			}
 
+			export type GetRuleAffectedDetailsRequest = {
+				limit?: number
+				page?: number
+			}
+
+			export type GetRuleAffectedDetailsResponse = {
+				total: number
+				details: DelphiRuleAffectedDetail[]
+			}
+
 			export type WriteDelphiRule = {
 				name: string
 				rule: string

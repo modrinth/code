@@ -410,6 +410,14 @@
 							to: '/moderation/global-traces',
 							tone: 'orange',
 						},
+						{
+							id: 'delphi-rules',
+							label: 'Delphi rules',
+							icon: SettingsIcon,
+							type: 'link',
+							to: '/moderation/technical-review/rules',
+							tone: 'orange',
+						},
 						{ type: 'divider' },
 						{
 							id: 'file-lookup',

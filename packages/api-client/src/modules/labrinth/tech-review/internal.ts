@@ -43,13 +43,15 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 
 	public async getRuleAffectedDetails(
 		id: number,
-	): Promise<Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]> {
-		return this.client.request<Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]>(
+		params: Labrinth.TechReview.Internal.GetRuleAffectedDetailsRequest = {},
+	): Promise<Labrinth.TechReview.Internal.GetRuleAffectedDetailsResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.GetRuleAffectedDetailsResponse>(
 			`/moderation/tech-review/rules/${id}/effects`,
 			{
 				api: 'labrinth',
 				version: 'internal',
 				method: 'GET',
+				params,
 			},
 		)
 	}

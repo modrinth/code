@@ -68,6 +68,26 @@ pub struct DelphiRuleAffectedDetail {
     pub severity: DelphiSeverity,
 }
 
+fn default_affected_details_limit() -> u64 {
+    5
+}
+
+#[derive(Debug, Deserialize, utoipa::ToSchema)]
+pub struct GetRuleAffectedDetailsRequest {
+    #[serde(default = "default_affected_details_limit")]
+    #[schema(default = 3)]
+    pub limit: u64,
+    #[serde(default)]
+    #[schema(default = 0)]
+    pub page: u64,
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct GetRuleAffectedDetailsResponse {
+    pub total: i64,
+    pub details: Vec<DelphiRuleAffectedDetail>,
+}
+
 #[derive(Debug, Deserialize, Validate, utoipa::ToSchema)]
 pub struct WriteDelphiRule {
     #[validate(length(min = 1, max = 256))]
@@ -366,7 +386,12 @@ pub async fn get_rules(
     context_path = "/moderation/tech-review",
     tag = "moderation",
     security(("bearer_auth" = [])),
-    responses((status = OK, body = Vec<DelphiRuleAffectedDetail>))
+    params(
+        ("id" = DelphiRuleId, Path),
+        ("limit" = Option<u64>, Query),
+        ("page" = Option<u64>, Query)
+    ),
+    responses((status = OK, body = GetRuleAffectedDetailsResponse))
 )]
 #[get("/rules/{id}/effects")]
 pub async fn get_rule_affected_details(
@@ -376,7 +401,8 @@ pub async fn get_rule_affected_details(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(DelphiRuleId,)>,
-) -> Result<web::Json<Vec<DelphiRuleAffectedDetail>>, ApiError> {
+    query: web::Query<GetRuleAffectedDetailsRequest>,
+) -> Result<web::Json<GetRuleAffectedDetailsResponse>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -387,6 +413,26 @@ pub async fn get_rule_affected_details(
     .await
     .wrap_auth_err("authenticating API request")?;
     let (rule_id,) = path.into_inner();
+    let limit = query.limit.clamp(1, 100);
+    let offset = limit.saturating_mul(query.page);
+    let limit =
+        i64::try_from(limit).wrap_request_err("limit cannot fit into `i64`")?;
+    let offset = i64::try_from(offset)
+        .wrap_request_err("offset cannot fit into `i64`")?;
+
+    let total = sqlx::query_scalar!(
+        r#"
+		SELECT COUNT(*) AS "count!"
+		FROM delphi_rule_effects effect
+		INNER JOIN delphi_rule_revisions published
+			ON published.revision = effect.revision
+		WHERE effect.rule_id = $1
+		"#,
+        rule_id as DelphiRuleId,
+    )
+    .fetch_one(&***ro_pool)
+    .await
+    .wrap_internal_err("failed to count details affected by delphi rule")?;
 
     let details = sqlx::query!(
         r#"
@@ -417,15 +463,19 @@ pub async fn get_rule_affected_details(
 		LEFT JOIN mods project ON project.id = version.mod_id
 		WHERE effect.rule_id = $1
 		ORDER BY effect.detail_id DESC
+		LIMIT $2 OFFSET $3
 		"#,
         rule_id as DelphiRuleId,
+        limit,
+        offset,
     )
     .fetch_all(&***ro_pool)
     .await
     .wrap_internal_err("failed to fetch details affected by delphi rule")?;
 
-    Ok(web::Json(
-        details
+    Ok(web::Json(GetRuleAffectedDetailsResponse {
+        total,
+        details: details
             .into_iter()
             .map(|detail| DelphiRuleAffectedDetail {
                 detail_id: detail.detail_id,
@@ -444,7 +494,7 @@ pub async fn get_rule_affected_details(
                 severity: detail.effect_severity,
             })
             .collect(),
-    ))
+    }))
 }
 
 /// Create a Delphi rule. It will be applied by the next manual rule scan.
