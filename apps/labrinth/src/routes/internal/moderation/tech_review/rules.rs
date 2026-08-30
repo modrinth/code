@@ -40,6 +40,8 @@ pub struct DelphiRule {
     pub name: String,
     pub rule: String,
     pub priority: i32,
+    /// Issue types this rule applies to. An empty list means all issue types.
+    pub on_issue_types: Vec<String>,
     pub revision: i64,
     pub current_revision: i64,
     pub created_at: DateTime<Utc>,
@@ -96,6 +98,9 @@ pub struct WriteDelphiRule {
     pub rule: String,
     #[serde(default)]
     pub priority: i32,
+    /// Issue types this rule applies to. An empty list means all issue types.
+    #[serde(default)]
+    pub on_issue_types: Vec<String>,
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
@@ -128,12 +133,21 @@ struct ValidatedRule {
     name: String,
     rule: String,
     priority: i32,
+    on_issue_types: Vec<String>,
 }
 
 impl WriteDelphiRule {
     async fn validate(mut self) -> Result<ValidatedRule, ApiError> {
         self.name = self.name.trim().to_string();
         self.rule = self.rule.trim().to_string();
+        self.on_issue_types = self
+            .on_issue_types
+            .into_iter()
+            .map(|issue_type| issue_type.trim().to_string())
+            .filter(|issue_type| !issue_type.is_empty())
+            .collect();
+        self.on_issue_types.sort();
+        self.on_issue_types.dedup();
         Validate::validate(&self).map_err(|error| {
             ApiError::Request(eyre!(validation_errors_to_string(error, None)))
         })?;
@@ -152,6 +166,7 @@ impl WriteDelphiRule {
             name: self.name,
             rule: self.rule,
             priority: self.priority,
+            on_issue_types: self.on_issue_types,
         })
     }
 }
@@ -245,6 +260,7 @@ pub async fn get_rules(
 			delphi_rule.name,
 			delphi_rule.rule,
 			delphi_rule.priority,
+			delphi_rule.on_issue_types,
 			delphi_rule.revision,
 			(
 				SELECT revision FROM delphi_rule_revisions LIMIT 1
@@ -367,6 +383,7 @@ pub async fn get_rules(
             name: rule.name,
             rule: rule.rule,
             priority: rule.priority,
+            on_issue_types: rule.on_issue_types,
             revision: rule.revision,
             current_revision: rule.current_revision,
             created_at: rule.created_at,
@@ -531,6 +548,7 @@ pub async fn create_rule(
 			name,
 			rule,
 			priority,
+			on_issue_types,
 			revision,
 			created_by,
 			updated_by
@@ -539,15 +557,17 @@ pub async fn create_rule(
 			$1,
 			$2,
 			$3,
-			(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),
 			$4,
-			$4
+			(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),
+			$5,
+			$5
 		)
 		RETURNING
 			id AS "id!: DelphiRuleId",
 			name,
 			rule,
 			priority,
+			on_issue_types,
 			revision,
 			created_at,
 			updated_at,
@@ -557,6 +577,7 @@ pub async fn create_rule(
         rule.name,
         rule.rule,
         rule.priority,
+        &rule.on_issue_types,
         user_id,
     )
     .fetch_one(&**pool)
@@ -568,6 +589,7 @@ pub async fn create_rule(
         name: rule.name,
         rule: rule.rule,
         priority: rule.priority,
+        on_issue_types: rule.on_issue_types,
         revision: rule.revision,
         current_revision: rule.revision - 1,
         created_at: rule.created_at,
@@ -616,17 +638,19 @@ pub async fn update_rule(
 			name = $2,
 			rule = $3,
 			priority = $4,
+			on_issue_types = $5,
 			revision = (
 				SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1
 			),
 			updated_at = CURRENT_TIMESTAMP,
-			updated_by = $5
+			updated_by = $6
 		WHERE id = $1 AND NOT delete_on_next_revision
 		RETURNING
 			id AS "id!: DelphiRuleId",
 			name,
 			rule,
 			priority,
+			on_issue_types,
 			revision,
 			created_at,
 			updated_at,
@@ -637,6 +661,7 @@ pub async fn update_rule(
         rule.name,
         rule.rule,
         rule.priority,
+        &rule.on_issue_types,
         user_id,
     )
     .fetch_optional(&**pool)
@@ -649,6 +674,7 @@ pub async fn update_rule(
         name: rule.name,
         rule: rule.rule,
         priority: rule.priority,
+        on_issue_types: rule.on_issue_types,
         revision: rule.revision,
         current_revision: rule.revision - 1,
         created_at: rule.created_at,

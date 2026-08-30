@@ -107,7 +107,18 @@ struct CompiledRule {
     id: DelphiRuleId,
     name: String,
     expression: String,
+    on_issue_types: Vec<String>,
     program: cel::Program,
+}
+
+impl CompiledRule {
+    fn applies_to_issue_type(&self, issue_type: &str) -> bool {
+        self.on_issue_types.is_empty()
+            || self
+                .on_issue_types
+                .iter()
+                .any(|rule_issue_type| rule_issue_type == issue_type)
+    }
 }
 
 struct MaterializedEffect {
@@ -589,6 +600,10 @@ async fn run_scan(
         };
 
         for rule in &rules {
+            if !rule.applies_to_issue_type(&input.trace.issue_type) {
+                continue;
+            }
+
             let effect = evaluate_rule(
                 &rule.program,
                 &rule.expression,
@@ -870,6 +885,10 @@ pub(crate) async fn materialize_current_rule_effects(
         };
 
         for rule in &rules {
+            if !rule.applies_to_issue_type(&input.trace.issue_type) {
+                continue;
+            }
+
             let effect = evaluate_rule(&rule.program, &rule.expression, &input)
                 .wrap_err_with(|| {
                     format!(
@@ -896,7 +915,7 @@ async fn fetch_compiled_rules(
 ) -> Result<Vec<CompiledRule>> {
     let rules = sqlx::query!(
         r#"
-        SELECT id AS "id!: DelphiRuleId", name, rule
+        SELECT id AS "id!: DelphiRuleId", name, rule, on_issue_types
         FROM delphi_rules
         WHERE NOT delete_on_next_revision
         ORDER BY priority DESC, id
@@ -921,6 +940,7 @@ async fn fetch_compiled_rules(
                     id: rule.id,
                     name: rule.name,
                     expression: rule.rule,
+                    on_issue_types: rule.on_issue_types,
                     program,
                 })
             })

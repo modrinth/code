@@ -2418,6 +2418,7 @@ export namespace Labrinth {
 				name: string
 				rule: string
 				priority: number
+				on_issue_types: string[]
 				revision: number
 				current_revision?: number
 				created_at: string
@@ -2459,7 +2460,10 @@ export namespace Labrinth {
 				name: string
 				rule: string
 				priority: number
+				on_issue_types: string[]
 			}
+
+			export type DelphiIssueTypeSchemaResponse = Record<string, unknown>
 
 			export type TestDelphiRuleRequest = {
 				rule: string

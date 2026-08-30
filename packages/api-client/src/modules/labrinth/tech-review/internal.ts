@@ -28,6 +28,17 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		)
 	}
 
+	public async getIssueTypeSchema(): Promise<Labrinth.TechReview.Internal.DelphiIssueTypeSchemaResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiIssueTypeSchemaResponse>(
+			'/delphi/issue_type/schema',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
 	public async getDetailRuleInput(
 		detailId: string,
 	): Promise<Labrinth.TechReview.Internal.RuleInput> {

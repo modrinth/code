@@ -23,6 +23,35 @@
 				Higher-priority rules run first. Rules with the same priority run in creation order.
 			</p>
 
+			<div class="flex flex-col gap-1">
+				<label class="font-semibold text-contrast">Issue types</label>
+				<p class="m-0 text-sm text-secondary">
+					Choose which issue types this rule evaluates. Leave empty to run it against every issue
+					type.
+				</p>
+				<MultiSelect
+					v-model="form.onIssueTypes"
+					:options="issueTypeOptions"
+					:disabled="isLoadingIssueTypes"
+					:placeholder="isLoadingIssueTypes ? 'Loading issue types…' : 'All issue types'"
+					:no-options-message="
+						hasIssueTypeSchemaError ? 'Issue types could not be loaded' : 'No issue types available'
+					"
+					search-placeholder="Search issue types…"
+					searchable
+					fuzzy-search
+					clearable
+					:max-tag-rows="2"
+				/>
+				<div v-if="hasIssueTypeSchemaError" class="flex items-center justify-between gap-2">
+					<p class="m-0 text-sm text-red">The available issue types could not be loaded.</p>
+					<Button size="sm" :disabled="isFetchingIssueTypes" @click="refetchIssueTypes()">
+						<LoaderCircleIcon v-if="isFetchingIssueTypes" class="animate-spin" />
+						Try again
+					</Button>
+				</div>
+			</div>
+
 			<label class="font-semibold text-contrast" for="rule-expression">CEL expression</label>
 			<div
 				class="relative overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
@@ -360,6 +389,15 @@ IS_MATCH ? "low" : null</code></pre>
 								{{ isRuleLive(rule) ? 'Live' : 'Outdated' }}
 							</span>
 						</div>
+						<div class="mt-2 flex flex-wrap items-center gap-1.5">
+							<span class="text-xs font-semibold text-secondary">Applies to</span>
+							<TagItem v-if="rule.on_issue_types.length === 0">All issue types</TagItem>
+							<template v-else>
+								<TagItem v-for="issueType in rule.on_issue_types" :key="issueType">
+									{{ issueType }}
+								</TagItem>
+							</template>
+						</div>
 					</div>
 					<div class="flex gap-2">
 						<Button :disabled="isScanning" @click="openEditModal(rule)">
@@ -503,11 +541,14 @@ import {
 	Input,
 	injectModrinthClient,
 	injectNotificationManager,
+	MultiSelect,
 	NewModal,
 	Pagination,
 	ProgressBar,
+	TagItem,
 	Textarea,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 import type { Ace } from 'ace-builds'
 import type { Component } from 'vue'
@@ -707,6 +748,7 @@ const form = reactive({
 	name: '',
 	priority: 0 as number | undefined,
 	rule: DEFAULT_RULE,
+	onIssueTypes: [] as string[],
 })
 const testTraceForm = reactive(createTestTraceForm())
 let ruleTestRequestId = 0
@@ -722,6 +764,25 @@ onMounted(async () => {
 })
 
 const modalTitle = computed(() => (editingRuleId.value === null ? 'Create rule' : 'Edit rule'))
+const {
+	data: issueTypeSchema,
+	isPending: isLoadingIssueTypes,
+	isError: hasIssueTypeSchemaError,
+	isFetching: isFetchingIssueTypes,
+	refetch: refetchIssueTypes,
+} = useQuery({
+	queryKey: ['delphi', 'issue-types', 'schema'] as const,
+	queryFn: () => client.labrinth.tech_review_internal.getIssueTypeSchema(),
+	staleTime: 60_000,
+})
+const issueTypeOptions = computed(() =>
+	[...new Set([...Object.keys(issueTypeSchema.value ?? {}), ...form.onIssueTypes])]
+		.sort((first, second) => first.localeCompare(second))
+		.map((issueType) => ({
+			value: issueType,
+			label: issueType,
+		})),
+)
 const ruleInputSchemaText = computed(() =>
 	ruleSchema.value ? formatRuleSchema(ruleSchema.value.input, ruleSchema.value.components) : '',
 )
@@ -1137,6 +1198,7 @@ function openCreateModal() {
 	form.name = ''
 	form.priority = 0
 	form.rule = DEFAULT_RULE
+	form.onIssueTypes = []
 	Object.assign(testTraceForm, createTestTraceForm())
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
@@ -1151,6 +1213,7 @@ function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
 	form.name = rule.name
 	form.priority = rule.priority
 	form.rule = rule.rule
+	form.onIssueTypes = [...rule.on_issue_types]
 	Object.assign(testTraceForm, createTestTraceForm())
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
@@ -1195,6 +1258,7 @@ async function saveRule() {
 		name: form.name,
 		priority,
 		rule: form.rule,
+		on_issue_types: form.onIssueTypes,
 	}
 
 	try {
