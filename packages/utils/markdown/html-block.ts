@@ -1,8 +1,5 @@
 import { defineComarkPlugin } from 'comark/parse'
 import { Parser as HtmlTagParser } from 'htmlparser2'
-import type Token from 'markdown-it/lib/token.mjs'
-
-import type MarkdownIt = require('markdown-it')
 
 // This is here to keep backwards compatibility
 // Comark closes most open html tags when it hits a blank line,
@@ -11,12 +8,10 @@ import type MarkdownIt = require('markdown-it')
 // whereas comark does its fancy AST which means it can't just emit the html raw
 // Thank you for coming to my TED talk -chyz
 
-type RuleBlock = MarkdownIt.ParserBlock.RuleBlock
-type StateBlock = MarkdownIt.StateBlock
 
 // If you know a better way to do this go ahead
-function findHtmlBlockRuleFn(md: MarkdownIt): RuleBlock | undefined {
-	const rules = (md.block.ruler as unknown as { __rules__: { name: string; fn: RuleBlock }[] })
+function findHtmlBlockRuleFn(md: any): any | undefined {
+	const rules = (md.block.ruler as unknown as { __rules__: { name: string; fn: any }[] })
 		.__rules__
 	return rules?.find((r) => r.name === 'comark_html_block')?.fn
 }
@@ -37,14 +32,14 @@ function parseOpenTagAttrs(line: string): [string, string][] {
 	return attrs
 }
 
-function markdownItModrinthHtmlBlock(md: MarkdownIt) {
+function htmlBlockCompatRule(md: any) {
 	const htmlBlockFn = findHtmlBlockRuleFn(md)
 	if (!htmlBlockFn) return
 
 	md.block.ruler.before(
 		'comark_html_block',
-		'modrinth_html_block',
-		(state: StateBlock, startLine: number, endLine: number, silent: boolean) => {
+		'html_block_compat',
+		(state: any, startLine: number, endLine: number, silent: boolean) => {
 			if (silent) return htmlBlockFn(state, startLine, endLine, true)
 
 			const tokensBefore = state.tokens.length
@@ -91,10 +86,10 @@ function markdownItModrinthHtmlBlock(md: MarkdownIt) {
 			const attrs = parseOpenTagAttrs(firstLine)
 			const oldParent = state.parentType
 			const oldLineMax = state.lineMax
-			state.parentType = 'comark_block' as StateBlock['parentType']
+			state.parentType = 'comark_block' as any
 			state.lineMax = closeLine
 
-			const tokenOpen: Token & { block?: boolean } = state.push('mdc_block_open', tagName, 1)
+			const tokenOpen: any = state.push('mdc_block_open', tagName, 1)
 			tokenOpen.block = true
 			tokenOpen.map = [startLine, closeLine + 1]
 			for (const [key, value] of attrs) tokenOpen.attrSet(key, value)
@@ -109,7 +104,7 @@ function markdownItModrinthHtmlBlock(md: MarkdownIt) {
 			state.blkIndent = blkIndent
 			env.comarkBlockTokens.shift()
 
-			const tokenClose: Token & { block?: boolean } = state.push('mdc_block_close', tagName, -1)
+			const tokenClose: any = state.push('mdc_block_close', tagName, -1)
 			tokenClose.map = [startLine, closeLine + 1]
 			tokenClose.block = true
 
@@ -122,7 +117,7 @@ function markdownItModrinthHtmlBlock(md: MarkdownIt) {
 	)
 }
 
-export const modrinthHtmlBlock = defineComarkPlugin(() => ({
-	name: 'modrinth-html-block',
-	markdownItPlugins: [markdownItModrinthHtmlBlock],
+export const htmlBlock = defineComarkPlugin(() => ({
+	name: 'html-block-compat',
+	markdownItPlugins: [htmlBlockCompatRule],
 }))

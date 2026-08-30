@@ -7,13 +7,7 @@
 				:class="{ basic: variant === 'basic' }"
 				v-bind="$attrs"
 			>
-				<Markdown
-					:value="source"
-					:unwrap="unwrap"
-					:plugins="plugins"
-					:components="components"
-					:options="{ registerDefaultPlugins: false }"
-				/>
+				<Markdown :value="parsed ?? source" :unwrap="unwrap" :plugins="plugins" :components="components" />
 			</component>
 		</template>
 		<template #fallback>
@@ -28,14 +22,17 @@
 </template>
 
 <script setup lang="ts">
-import { Markdown } from '@comark/vue'
-import { Math as MarkdownMath } from '@comark/vue/plugins/math'
-import { modrinthBasicPlugins, modrinthForceLinkTarget, modrinthPlugins } from '@modrinth/utils'
-import { computed } from 'vue'
-
 import 'katex/dist/katex.min.css'
 
-import MarkdownAlert, { alertMarkerTypes } from './markdown/MarkdownAlert.vue'
+import { Markdown } from '@comark/vue'
+import { Math as MarkdownMath } from '@comark/vue/plugins/math'
+import { basicPlugins, defaultPlugins, forceLinkTarget } from '@modrinth/utils'
+import { createSerializedMarkdownParser } from 'comark'
+import { computed } from 'vue'
+
+import { useAsyncData } from '#app'
+
+import MarkdownAlert from './markdown/MarkdownAlert.vue'
 import MarkdownCollectionEmbed from './markdown/MarkdownCollectionEmbed.vue'
 import MarkdownHighlightedPre from './markdown/MarkdownHighlightedPre.vue'
 import MarkdownMermaid from './markdown/MarkdownMermaid.vue'
@@ -70,19 +67,21 @@ const resolvedTag = computed(() => props.tag ?? (props.variant === 'basic' ? 'sp
 const unwrap = computed(() => (props.variant === 'basic' ? 'p' : props.unwrapParagraph))
 
 const plugins = computed(() => {
-	if (props.variant !== 'basic') return modrinthPlugins
-	return props.target
-		? [...modrinthBasicPlugins, modrinthForceLinkTarget(props.target)]
-		: modrinthBasicPlugins
+	if (props.variant !== 'basic') return defaultPlugins
+	return props.target ? [...basicPlugins, forceLinkTarget(props.target)] : basicPlugins
 })
 
-const alertComponents = Object.fromEntries(alertMarkerTypes.map((marker) => [marker, MarkdownAlert]))
+const { data: parsed } = await useAsyncData(
+	() => `markdown-body:${props.variant}:${unwrap.value}:${props.target ?? ''}:${props.source}`,
+	() => createSerializedMarkdownParser({ ...(unwrap.value ? { unwrap: unwrap.value } : {}), plugins: plugins.value })(props.source),
+	{ watch: [() => props.source, () => props.variant, unwrap, () => props.target] },
+)
 
 const components = computed(() =>
 	props.variant === 'basic'
 		? {}
 		: {
-				...alertComponents,
+				alert: MarkdownAlert,
 				project: MarkdownProjectEmbed,
 				user: MarkdownUserEmbed,
 				organization: MarkdownOrganizationEmbed,

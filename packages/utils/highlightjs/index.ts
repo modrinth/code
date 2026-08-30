@@ -20,7 +20,7 @@ import mcfunction from 'highlightjs-mcfunction'
 import type { ComponentRenderFn } from '@comark/html/render'
 import type { ElementNode } from 'comark'
 
-import { createModrinthHtmlRenderer, getFenceCodeText, getFenceLanguage } from '../markdown/parse'
+import { createRenderer, getFenceCodeText, getFenceLanguage } from '../markdown/parse'
 import skript from './skript'
 
 /* REGISTRATION */
@@ -101,7 +101,7 @@ const highlightedPreComponent: ComponentRenderFn = (node) => {
 	return `<pre><code${className ? ` class="${className}"` : ''}>${inner}</code></pre>`
 }
 
-export const renderHighlightedString = createModrinthHtmlRenderer({ pre: highlightedPreComponent })
+export const renderHighlightedString = createRenderer({ pre: highlightedPreComponent })
 
 export const highlightCodeLines = (code: string, language: string): string[] => {
 	if (!code) return []

@@ -10,8 +10,7 @@
 	},
 	"devDependencies": {
 		"@modrinth/api-client": "workspace:*",
-		"@modrinth/tooling-config": "workspace:*",
-		"@types/markdown-it": "14.1.2"
+		"@modrinth/tooling-config": "workspace:*"
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.3.2",

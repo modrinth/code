@@ -7,16 +7,41 @@
 			typeClasses[type],
 		]"
 	>
-		<slot name="icon" :icon-class="['h-6 w-6 flex-none', iconClasses[type]]">
+		<button
+			v-if="foldable"
+			type="button"
+			class="col-start-1 col-end-3 row-start-1 flex cursor-pointer flex-wrap items-center gap-2 border-none bg-transparent p-0 text-left text-lg font-semibold leading-6"
+			:aria-expanded="isOpen"
+			@click="isOpen = !isOpen"
+		>
+			<slot name="icon" :icon-class="['h-6 w-6 flex-none', iconClasses[type]]">
+				<component :is="getSeverityIcon(type)" :class="['h-6 w-6 flex-none', iconClasses[type]]" />
+			</slot>
+			<slot name="header">{{ header }}</slot>
+			<span
+				v-if="normalizedTimestamp"
+				v-tooltip="timestampTooltip"
+				class="flex items-center gap-1.5 text-base font-medium leading-normal text-secondary"
+			>
+				<ClockIcon class="size-4" />
+				{{ relativeTimeLabel }}
+			</span>
+			<ChevronDownIcon
+				class="ml-auto size-5 shrink-0 transition-transform duration-200"
+				:class="{ 'rotate-180': isOpen }"
+			/>
+		</button>
+		<slot v-else name="icon" :icon-class="['h-6 w-6 flex-none', iconClasses[type]]">
 			<component :is="getSeverityIcon(type)" :class="['h-6 w-6 flex-none', iconClasses[type]]" />
 		</slot>
 		<div
 			class="col-start-2 min-w-0"
-			:class="
+			:class="[
+				foldable ? 'row-start-2' : '',
 				inlineActions && !showActionsUnderneath && $slots.actions
 					? ['flex flex-wrap gap-x-4 gap-y-3', centerContent ? 'items-center' : 'items-start']
-					: 'flex flex-1 flex-col gap-2'
-			"
+					: 'flex flex-1 flex-col gap-2',
+			]"
 		>
 			<div
 				class="flex min-w-0 flex-1 flex-col gap-2"
@@ -27,7 +52,7 @@
 				"
 			>
 				<div
-					v-if="header || $slots.header || normalizedTimestamp"
+					v-if="!foldable && (header || $slots.header || normalizedTimestamp)"
 					class="flex flex-wrap items-center gap-2 text-lg font-semibold leading-6"
 				>
 					<slot name="header">{{ header }}</slot>
@@ -40,7 +65,16 @@
 						{{ relativeTimeLabel }}
 					</span>
 				</div>
-				<div v-if="!!$slots.default || body" class="font-normal text-contrast/85 leading-tight">
+				<div
+					v-if="foldable && (!!$slots.default || body)"
+					class="admonition-fold-track"
+					:class="{ 'admonition-fold-track--open': isOpen }"
+				>
+					<div class="admonition-fold-content font-normal text-contrast/85 leading-tight">
+						<slot>{{ body }}</slot>
+					</div>
+				</div>
+				<div v-else-if="!!$slots.default || body" class="font-normal text-contrast/85 leading-tight">
 					<slot>{{ body }}</slot>
 				</div>
 			</div>
@@ -98,14 +132,14 @@
 </template>
 
 <script setup lang="ts">
-import { ClockIcon, XIcon } from '@modrinth/assets'
+import { ChevronDownIcon, ClockIcon, XIcon } from '@modrinth/assets'
 import { useNow } from '@vueuse/core'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { IconButton } from '#ui/components/base/buttons'
 
-import { useFormatDateTime, useRelativeTime } from '../../composables'
-import { getSeverityIcon } from '../../utils'
+import { useFormatDateTime, useRelativeTime } from '#ui/composables'
+import { getSeverityIcon } from '#ui/utils'
 
 const props = withDefaults(
 	defineProps<{
@@ -121,6 +155,8 @@ const props = withDefaults(
 		/** Accepts a Date, an ISO string, or a millisecond Unix timestamp. */
 		timestamp?: Date | string | number
 		centerContent?: boolean
+		foldable?: boolean
+		defaultOpen?: boolean
 	}>(),
 	{
 		type: 'info',
@@ -134,12 +170,16 @@ const props = withDefaults(
 		waiting: false,
 		timestamp: undefined,
 		centerContent: false,
+		foldable: false,
+		defaultOpen: true,
 	},
 )
 
 defineEmits<{
 	dismiss: []
 }>()
+
+const isOpen = ref(props.defaultOpen)
 
 const relativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
@@ -225,6 +265,31 @@ const progressFillClasses = {
 <style scoped>
 .admonition-inline-content {
 	min-width: min(100%, 16rem);
+}
+
+.admonition-fold-track {
+	display: grid;
+	grid-template-rows: 0fr;
+	margin-top: 0;
+	transition:
+		grid-template-rows 0.3s var(--ease-out-expo),
+		margin-top 0.3s var(--ease-out-expo);
+}
+
+.admonition-fold-track--open {
+	grid-template-rows: 1fr;
+	margin-top: 0.5rem;
+}
+
+.admonition-fold-content {
+	overflow: hidden;
+	min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.admonition-fold-track {
+		transition: none;
+	}
 }
 
 .admonition-progress--waiting {

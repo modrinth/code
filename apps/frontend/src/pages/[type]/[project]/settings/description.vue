@@ -52,7 +52,7 @@ import {
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
-import { type MarkdownDocument, parseModrinthMarkdown, TeamMemberPermission } from '@modrinth/utils'
+import { type MarkdownDocument, parseDocument, TeamMemberPermission } from '@modrinth/utils'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
@@ -78,7 +78,7 @@ watch(
 	() => current.value.description,
 	async (text) => {
 		const trimmed = text?.trim() || ''
-		descriptionDocument.value = trimmed ? await parseModrinthMarkdown(trimmed) : null
+		descriptionDocument.value = trimmed ? await parseDocument(trimmed) : null
 	},
 	{ immediate: true },
 )

@@ -97,7 +97,7 @@ import { nags } from '@modrinth/moderation'
 import { Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import type { MarkdownDocument } from '@modrinth/utils'
-import { parseModrinthMarkdown } from '@modrinth/utils'
+import { parseDocument } from '@modrinth/utils'
 import type { Component } from 'vue'
 import { computed, ref, watch } from 'vue'
 
@@ -182,7 +182,7 @@ const descriptionDocument = ref<MarkdownDocument | null>(null)
 watch(
 	() => props.project.body,
 	async (body) => {
-		descriptionDocument.value = body ? await parseModrinthMarkdown(body) : null
+		descriptionDocument.value = body ? await parseDocument(body) : null
 	},
 	{ immediate: true },
 )

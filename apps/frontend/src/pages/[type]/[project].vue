@@ -625,7 +625,7 @@ import { formatProjectType, isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
-import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
+import { onScopeDispose, onServerPrefetch, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -948,14 +948,21 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 // Resolve route slug/ID to the canonical project ID (middleware warms this cache)
-const { data: projectCheck, error: projectCheckError } = useQuery({
+const projectCheckQuery = useQuery({
 	queryKey: computed(() => ['project', 'check', routeParam.value]),
 	queryFn: () => client.labrinth.projects_v2.check(routeParam.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!routeParam.value),
 })
+const { data: projectCheck, error: projectCheckError } = projectCheckQuery
+onServerPrefetch(() => projectCheckQuery.suspense())
 
 const projectId = computed(() => projectCheck.value?.id)
+
+const projectReady = (async () => {
+	await projectCheckQuery.suspense()
+	return !!projectId.value
+})()
 
 watch(
 	projectCheckError,
@@ -978,11 +985,15 @@ watch(
 )
 
 // V2 Project — keyed by canonical ID
-const { data: projectRaw, error: projectV2Error } = useQuery({
+const projectRawQuery = useQuery({
 	queryKey: computed(() => ['project', 'v2', projectId.value]),
 	queryFn: () => client.labrinth.projects_v2.get(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value),
+})
+const { data: projectRaw, error: projectV2Error } = projectRawQuery
+onServerPrefetch(async () => {
+	if (await projectReady) await projectRawQuery.suspense()
 })
 
 // Handle project not found - use showError since watch runs outside Nuxt context
@@ -1077,15 +1088,15 @@ if (sharedProjectId) {
 }
 
 // V3 Project
-const {
-	data: projectV3,
-	error: _projectV3Error,
-	isPending: projectV3Pending,
-} = useQuery({
+const projectV3Query = useQuery({
 	queryKey: computed(() => ['project', 'v3', projectId.value]),
 	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value),
+})
+const { data: projectV3, error: _projectV3Error, isPending: projectV3Pending } = projectV3Query
+onServerPrefetch(async () => {
+	if (await projectReady) await projectV3Query.suspense()
 })
 
 // Server sidebar: modpack version + project for required content
@@ -1094,11 +1105,19 @@ const serverModpackVersionId = computed(() => {
 	return content?.kind === 'modpack' ? content.version_id : null
 })
 
-const { data: serverModpackVersion, isPending: serverModpackVersionPending } = useQuery({
+const serverModpackVersionQuery = useQuery({
 	queryKey: computed(() => ['version', 'v3', serverModpackVersionId.value]),
 	queryFn: () => client.labrinth.versions_v3.getVersion(serverModpackVersionId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!serverModpackVersionId.value),
+})
+const { data: serverModpackVersion, isPending: serverModpackVersionPending } =
+	serverModpackVersionQuery
+
+onServerPrefetch(async () => {
+	if (!(await projectReady)) return
+	await projectV3Query.suspense()
+	if (serverModpackVersionId.value) await serverModpackVersionQuery.suspense()
 })
 
 const serverDataLoaded = computed(() => {
@@ -1182,15 +1201,15 @@ watch(serverModpackVersionId, (versionId) => {
 })
 
 // Members
-const {
-	data: allMembersRaw,
-	error: _membersError,
-	isPending: membersPending,
-} = useQuery({
+const allMembersQuery = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'members']),
 	queryFn: () => client.labrinth.projects_v3.getMembers(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value),
+})
+const { data: allMembersRaw, error: _membersError, isPending: membersPending } = allMembersQuery
+onServerPrefetch(async () => {
+	if (await projectReady) await allMembersQuery.suspense()
 })
 
 // Transform members via computed
@@ -1237,11 +1256,18 @@ const {
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organizationRaw, isPending: organizationPending } = useQuery({
+const organizationQuery = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value && !!projectRaw.value?.organization),
+})
+const { data: organizationRaw, isPending: organizationPending } = organizationQuery
+
+onServerPrefetch(async () => {
+	if (!(await projectReady)) return
+	await projectRawQuery.suspense()
+	if (projectRaw.value?.organization) await organizationQuery.suspense()
 })
 
 // When project is removed from org, enabled becomes false but TanStack keeps stale data.
@@ -1249,11 +1275,15 @@ const { data: organizationRaw, isPending: organizationPending } = useQuery({
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
 const DISCLOSURE_STALE_TIME = 1000 * 60 * 5
-const { data: disclosuresResponse } = useQuery({
+const disclosuresQuery = useQuery({
 	queryKey: computed(() => ['project', 'disclosures', 'v3', projectId.value]),
 	queryFn: () => client.labrinth.projects_v3.getDisclosures(projectId.value),
 	staleTime: DISCLOSURE_STALE_TIME,
 	enabled: computed(() => !!projectId.value),
+})
+const { data: disclosuresResponse } = disclosuresQuery
+onServerPrefetch(async () => {
+	if (await projectReady) await disclosuresQuery.suspense()
 })
 
 const archivedDisclosure = computed(() =>
@@ -1270,10 +1300,17 @@ const creatorsLoading = computed(
 		(!!projectRaw.value.organization && organizationPending.value),
 )
 
-const { data: thread } = useQuery({
+const threadQuery = useQuery({
 	queryKey: computed(() => ['thread', projectRaw.value?.thread_id]),
 	queryFn: () => client.labrinth.threads_v3.getThread(projectRaw.value.thread_id),
 	enabled: computed(() => !!projectRaw.value?.thread_id),
+})
+const { data: thread } = threadQuery
+
+onServerPrefetch(async () => {
+	if (!(await projectReady)) return
+	await projectRawQuery.suspense()
+	if (projectRaw.value?.thread_id) await threadQuery.suspense()
 })
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))

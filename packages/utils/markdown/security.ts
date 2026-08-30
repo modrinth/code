@@ -1,51 +1,9 @@
 import type { ElementNode } from 'comark'
 import { defineComarkPlugin } from 'comark/parse'
-import security from 'comark/plugins/security'
+import comarkSecurity from 'comark/plugins/security'
 import { visitAsync } from 'comark/utils'
 
-const allowedClassPrefixes = ['hljs-', 'language-']
-
-const exactClassesByTag: Record<string, string[]> = {
-	input: ['task-list-item-checkbox'],
-	li: ['task-list-item'],
-	math: ['math', 'inline', 'block'],
-	ul: ['contains-task-list'],
-}
-
-function filterClassValue(value: unknown, tag?: string): string | undefined {
-	if (typeof value !== 'string') return undefined
-	const exact = tag ? exactClassesByTag[tag] : undefined
-	const kept = value
-		.split(/\s+/)
-		.filter((cls) => exact?.includes(cls) || allowedClassPrefixes.some((prefix) => cls.startsWith(prefix)))
-	return kept.length ? kept.join(' ') : undefined
-}
-
-const allowedStyleDeclarations: [RegExp, RegExp][] = [
-	[/^image-rendering$/, /^pixelated$/],
-	[/^text-align$/, /^(center|left|right)$/],
-	[/^float$/, /^(left|right)$/],
-]
-
-export function filterStyleValue(value: unknown): string | undefined {
-	if (typeof value !== 'string') return undefined
-	const kept: string[] = []
-	for (const declaration of value.split(';')) {
-		const idx = declaration.indexOf(':')
-		if (idx === -1) continue
-		const prop = declaration.slice(0, idx).trim().toLowerCase()
-		const val = declaration
-			.slice(idx + 1)
-			.trim()
-			.toLowerCase()
-		if (!prop || !val) continue
-		const match = allowedStyleDeclarations.find(([propPattern]) => propPattern.test(prop))
-		if (match && match[1].test(val)) kept.push(`${prop}: ${val}`)
-	}
-	return kept.length ? kept.join('; ') : undefined
-}
-
-export const attributeAllowlist: Record<string, string[]> = {
+export const allowedAttributes: Record<string, string[]> = {
 	a: ['href', 'target', 'title', 'rel'],
 	abbr: ['title'],
 	address: [],
@@ -57,7 +15,7 @@ export const attributeAllowlist: Record<string, string[]> = {
 	bdi: ['dir'],
 	bdo: ['dir'],
 	big: [],
-	blockquote: ['cite', 'as'],
+	blockquote: ['cite', 'as', 'type', 'title', 'foldable', 'open', 'noBody'],
 	br: [],
 	caption: [],
 	center: [],
@@ -65,11 +23,10 @@ export const attributeAllowlist: Record<string, string[]> = {
 	code: ['class'],
 	col: ['align', 'valign', 'span', 'width'],
 	colgroup: ['align', 'valign', 'span', 'width'],
-	collection: ['id'],
 	dd: [],
 	del: ['datetime'],
-	details: ['open'],
-	div: ['align'],
+	details: ['open', 'class'],
+	div: ['align', 'class', 'id'],
 	dl: [],
 	dt: [],
 	em: [],
@@ -94,24 +51,16 @@ export const attributeAllowlist: Record<string, string[]> = {
 	li: ['class'],
 	map: ['name'],
 	mark: [],
-	math: ['content', 'class'],
-	mermaid: ['content', 'theme', 'theme-dark', 'class'],
 	nav: [],
 	ol: [],
-	organization: ['id'],
 	p: ['align'],
 	picture: [],
-	// Comark's own fence parsing puts the language on both `pre.language` and
-	// `code`'s `class="language-x"` — allowing it directly here lets the
-	// highlight.js renderer read `pre.language` straight off the node instead
-	// of regex-parsing it back out of the class string.
 	pre: ['language'],
-	project: ['id'],
 	s: [],
 	section: [],
 	small: [],
 	source: ['media', 'sizes', 'src', 'srcset', 'type'],
-	span: ['class'],
+	span: ['class', 'tabindex'],
 	strike: [],
 	strong: [],
 	sub: [],
@@ -127,7 +76,6 @@ export const attributeAllowlist: Record<string, string[]> = {
 	tt: [],
 	u: [],
 	ul: ['class'],
-	user: ['id'],
 	video: [
 		'autoplay',
 		'controls',
@@ -143,18 +91,95 @@ export const attributeAllowlist: Record<string, string[]> = {
 	],
 }
 
-const allAllowedTags = Object.keys(attributeAllowlist)
-
-export const securityOptions = {
-	allowedProtocols: ['http', 'https', 'mailto'],
-	allowDataImages: true,
-	allowedTags: allAllowedTags,
+const allowedStyles: Record<string, string[]> = {
+	'image-rendering': ['pixelated'],
+	'text-align': ['center', 'left', 'right', 'justify'],
+	float: ['left', 'right'],
 }
 
-export function modrinthSecurity(options: Parameters<typeof security>[0] = securityOptions) {
-	const securityPlugin = security(options)
+const allowedStylePatterns: Record<string, RegExp> = {
+	display: /^(flex|grid)$/,
+	'flex-direction': /^(row|column|row-reverse|column-reverse)$/,
+	'flex-wrap': /^(wrap|nowrap|wrap-reverse)$/,
+	flex: /^(1 1 0%|1 1 auto|0 1 auto|none)$/,
+	'flex-grow': /^[01]$/,
+	'flex-shrink': /^[01]$/,
+	order: /^-?\d+$/,
+	'grid-auto-flow': /^(row|column|dense|row dense|column dense)$/,
+	'grid-auto-columns': /^(auto|min-content|max-content|minmax\(0,1fr\))$/,
+	'grid-auto-rows': /^(auto|min-content|max-content|minmax\(0,1fr\))$/,
+	'grid-template-columns': /^(none|repeat\(\d+,minmax\(0,1fr\)\))$/,
+	'grid-template-rows': /^(none|repeat\(\d+,minmax\(0,1fr\)\))$/,
+	'grid-column': /^(1 \/ -1|span \d+ \/ span \d+)$/,
+	'grid-row': /^(1 \/ -1|span \d+ \/ span \d+)$/,
+	'grid-column-start': /^\d+$/,
+	'grid-column-end': /^\d+$/,
+	'grid-row-start': /^\d+$/,
+	'grid-row-end': /^\d+$/,
+	columns: /^\d+$/,
+	'column-span': /^all$/,
+	'justify-content': /^(flex-start|flex-end|center|space-between|space-around|space-evenly|stretch)$/,
+	'justify-items': /^(start|end|center|stretch)$/,
+	'justify-self': /^(auto|start|end|center|stretch)$/,
+	'align-content': /^(flex-start|flex-end|center|space-between|space-around|space-evenly|stretch)$/,
+	'align-items': /^(flex-start|flex-end|center|baseline|stretch)$/,
+	'align-self': /^(auto|flex-start|flex-end|center|baseline|stretch)$/,
+	'place-content': /^(start|end|center|space-between|space-around|space-evenly|stretch)$/,
+	'place-items': /^(start|end|center|stretch)$/,
+	'place-self': /^(auto|start|end|center|stretch)$/,
+	'aspect-ratio': /^(auto|1 \/ 1|16 \/ 9)$/,
+	'break-after': /^(auto|avoid|all|avoid-page|page|left|right|column)$/,
+	'break-before': /^(auto|avoid|all|avoid-page|page|left|right|column)$/,
+	'break-inside': /^(auto|avoid|avoid-page|avoid-column)$/,
+	gap: /^(1px|[\d.]+rem)$/,
+	'column-gap': /^(1px|[\d.]+rem)$/,
+	'row-gap': /^(1px|[\d.]+rem)$/,
+}
+
+function filterStyleValue(value: unknown): string | undefined {
+	if (typeof value !== 'string') return undefined
+	const kept: string[] = []
+	for (const declaration of value.split(';')) {
+		const idx = declaration.indexOf(':')
+		if (idx === -1) continue
+		const prop = declaration.slice(0, idx).trim().toLowerCase()
+		const val = declaration
+			.slice(idx + 1)
+			.trim()
+			.toLowerCase()
+		if (!prop || !val) continue
+		if (allowedStyles[prop]?.includes(val) || allowedStylePatterns[prop]?.test(val)) kept.push(`${prop}: ${val}`)
+	}
+	return kept.length ? kept.join('; ') : undefined
+}
+
+export const securityOptions = {
+	allowedLinkPrefixes: ['https://', 'mailto:'],
+	allowedImagePrefixes: ['https://', 'data:image/'],
+	allowDataImages: true,
+}
+
+function filterElementAttrs(tag: string, attrs: Record<string, unknown>) {
+	const knownAttrs = allowedAttributes[tag]
+
+	for (const key of Object.keys(attrs)) {
+		const bareKey = key.startsWith(':') ? key.slice(1) : key
+
+		if (bareKey === 'style') {
+			const filtered = filterStyleValue(attrs[key])
+			if (filtered) attrs[key] = filtered
+			else delete attrs[key]
+			continue
+		}
+
+		if (knownAttrs && !knownAttrs.includes(bareKey)) delete attrs[key]
+	}
+}
+
+export function security(options: Parameters<typeof comarkSecurity>[0] = securityOptions) {
+	const securityPlugin = comarkSecurity(options)
 	return defineComarkPlugin(() => ({
-		name: 'modrinth-security',
+		name: 'security',
 		async post(state) {
 			await securityPlugin.post?.(state)
 
@@ -163,37 +188,7 @@ export function modrinthSecurity(options: Parameters<typeof security>[0] = secur
 				(node) => typeof node !== 'string' && node[0] !== null,
 				(node) => {
 					const element = node as ElementNode
-					const tag = element[0].toLowerCase()
-					const attrs = element[1]
-					const allowed = new Set(attributeAllowlist[tag] ?? [])
-
-					for (const key of Object.keys(attrs)) {
-						const bareKey = key.startsWith(':') ? key.slice(1) : key
-
-						if (bareKey === 'class') {
-							if (!allowed.has('class')) {
-								delete attrs[key]
-								continue
-							}
-							const filtered = filterClassValue(attrs[key], tag)
-							if (filtered) attrs[key] = filtered
-							else delete attrs[key]
-							continue
-						}
-
-						if (bareKey === 'style') {
-							if (!allowed.has('style')) {
-								delete attrs[key]
-								continue
-							}
-							const filtered = filterStyleValue(attrs[key])
-							if (filtered) attrs[key] = filtered
-							else delete attrs[key]
-							continue
-						}
-
-						if (!allowed.has(bareKey)) delete attrs[key]
-					}
+					filterElementAttrs(element[0].toLowerCase(), element[1])
 				},
 			)
 		},

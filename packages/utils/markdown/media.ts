@@ -140,8 +140,8 @@ export function resolveLinkRel(href: unknown): string | undefined {
 	return 'noopener nofollow ugc'
 }
 
-export const modrinthResolveMedia = defineComarkPlugin(() => ({
-	name: 'modrinth-resolve-media',
+export const resolveMedia = defineComarkPlugin(() => ({
+	name: 'resolve-media',
 	async post(state) {
 		await visitAsync(
 			state.tree,

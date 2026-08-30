@@ -28,35 +28,39 @@ const embedSyntaxRegex = new RegExp(
 	'y',
 )
 
-const markdownItModrinthEmbed = (md: any) => {
-	md.inline.ruler.before(
-		'html_inline',
-		'modrinth-embed',
+const embedRule = (md: any) => {
+	md.block.ruler.before(
+		'paragraph',
+		'embed',
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(state: any, silent: boolean) => {
-			if (state.src.charCodeAt(state.pos) !== 0x3c) return false
+		(state: any, startLine: number, _endLine: number, silent: boolean) => {
+			const start = state.bMarks[startLine] + state.tShift[startLine]
+			const max = state.eMarks[startLine]
+			if (state.src.charCodeAt(start) !== 0x3c) return false
 
-			embedSyntaxRegex.lastIndex = state.pos
+			embedSyntaxRegex.lastIndex = start
 			const match = embedSyntaxRegex.exec(state.src)
-			if (!match) return false
+			if (!match || match.index !== start || state.src.slice(start, max).trim() !== match[0]) return false
+
+			if (silent) return true
 
 			const tag = match[1] ? embedTypeAliases[match[1]] : embedShorthandPrefixes[match[3]]
 			const id = match[2] ?? match[4]
 
-			if (!silent) {
-				state.push('mdc_inline_component', tag, 0)
-				const propsToken = state.push('mdc_inline_props', 'span', 0)
-				propsToken.attrs = [['id', id]]
-				propsToken.hidden = true
-			}
+			const tokenOpen = state.push('mdc_block_open', tag, 1)
+			tokenOpen.block = true
+			tokenOpen.map = [startLine, startLine + 1]
+			tokenOpen.attrSet('id', id)
+			state.push('mdc_block_close', tag, -1)
 
-			state.pos = embedSyntaxRegex.lastIndex
+			state.line = startLine + 1
 			return true
 		},
+		{ alt: ['paragraph', 'reference', 'blockquote', 'list'] },
 	)
 }
 
-export const modrinthEmbedSyntax = defineComarkPlugin(() => ({
-	name: 'modrinth-embed-syntax',
-	markdownItPlugins: [markdownItModrinthEmbed],
+export const embedSyntax = defineComarkPlugin(() => ({
+	name: 'embed-syntax',
+	markdownItPlugins: [embedRule],
 }))

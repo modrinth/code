@@ -12,8 +12,9 @@
 
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
+import { computed, onServerPrefetch } from 'vue'
 
-import { injectModrinthClient } from '../../../providers/api-client'
+import { injectModrinthClient } from '#ui/providers'
 import MarkdownEmbedCard from './MarkdownEmbedCard.vue'
 
 const props = defineProps<{
@@ -22,10 +23,13 @@ const props = defineProps<{
 
 const client = injectModrinthClient()
 
-const { data: user, isLoading } = useQuery({
-	queryKey: ['markdown-embed-user', () => props.id],
+const query = useQuery({
+	queryKey: computed(() => ['markdown-embed-user', props.id]),
 	queryFn: () => client.labrinth.users_v3.get(props.id),
 	enabled: () => !!props.id,
 	retry: false,
 })
+const { data: user, isLoading } = query
+
+onServerPrefetch(() => query.suspense())
 </script>

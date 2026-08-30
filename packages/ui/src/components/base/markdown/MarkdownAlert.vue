@@ -1,19 +1,28 @@
 <template>
-	<Admonition :type="admonitionTypeByMarker[as]" :header="capitalize(as)">
+	<Admonition
+		v-if="noBody"
+		:type="admonitionTypeByAlertType[type] ?? 'neutral'"
+		:header="title ?? capitalize(type)"
+		:foldable="foldable"
+		:default-open="!!open"
+	/>
+	<Admonition
+		v-else
+		:type="admonitionTypeByAlertType[type] ?? 'neutral'"
+		:header="title ?? capitalize(type)"
+		:foldable="foldable"
+		:default-open="!!open"
+	>
 		<slot />
 	</Admonition>
 </template>
-
-<script lang="ts">
-export const alertMarkerTypes = ['note', 'tip', 'important', 'warning', 'caution'] as const
-</script>
 
 <script setup lang="ts">
 import Admonition from '../Admonition.vue'
 
 type AdmonitionType = NonNullable<InstanceType<typeof Admonition>['$props']['type']>
 
-const admonitionTypeByMarker: Record<(typeof alertMarkerTypes)[number], AdmonitionType> = {
+const admonitionTypeByAlertType: Record<string, AdmonitionType> = {
 	note: 'neutral',
 	tip: 'success',
 	important: 'info',
@@ -26,6 +35,17 @@ function capitalize(value: string): string {
 }
 
 defineProps<{
-	as: (typeof alertMarkerTypes)[number]
+	type: string
+	title?: string
+	foldable?: boolean
+	open?: boolean
+	noBody?: boolean
 }>()
 </script>
+
+<style scoped>
+:deep(p) {
+	margin: 0;
+	line-height: inherit;
+}
+</style>
