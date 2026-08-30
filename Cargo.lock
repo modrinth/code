@@ -5601,6 +5601,7 @@ dependencies = [
  "json-patch 4.1.0",
  "labrinth",
  "lettre",
+ "linkify",
  "modrinth-content-management",
  "modrinth-util",
  "muralpay",
@@ -5610,6 +5611,7 @@ dependencies = [
  "path-util",
  "postcard",
  "prometheus",
+ "psl",
  "quick-xml 0.38.3",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
@@ -5651,6 +5653,7 @@ dependencies = [
  "webauthn-rs",
  "webauthn-rs-proto",
  "webp",
+ "whatlang",
  "woothee",
  "xredis",
  "yaserde",
@@ -5844,6 +5847,15 @@ name = "linked-hash-map"
 version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0717cef1bc8b636c6e1c1bbdefc09e6322da8a9321966e8928ef80d20f7f770f"
+
+[[package]]
+name = "linkify"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92f9ae2f3d31697697311f016320fe984127e636b45cf5eb5c175b7eb103dadb"
+dependencies = [
+ "memchr",
+]
 
 [[package]]
 name = "linux-raw-sys"
@@ -7993,6 +8005,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3e36c2f31e0a47f9280fb347ef5e461ffcd2c52dd520d8e216b52f93b0b0d7d6"
 dependencies = [
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "psl"
+version = "2.1.226"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7bc88482eea924ca3a2f56a547454169af58deef35567965eb4fc2392a834841"
+dependencies = [
+ "psl-types",
 ]
 
 [[package]]
@@ -12929,6 +12950,15 @@ checksum = "0c17bbfb155305bcb79144f568c3b796275ba4db5d5856597bc85acefe29b819"
 dependencies = [
  "libc",
  "winapi",
+]
+
+[[package]]
+name = "whatlang"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f5e8f38b596e2a359b755342473520a99421e43658548c79489ee221b728c107"
+dependencies = [
+ "hashbrown 0.15.5",
 ]
 
 [[package]]

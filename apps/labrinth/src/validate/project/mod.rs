@@ -18,7 +18,17 @@ mod text;
 mod versions;
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    strum::EnumIter,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "snake_case")]
 pub enum ProjectNagKind {

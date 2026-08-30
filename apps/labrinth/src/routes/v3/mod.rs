@@ -102,6 +102,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		payouts::platform_revenue,
 		projects::project_get,
 		projects::project_get_check,
+		projects::validate::validate,
 		projects::project_delete,
 		projects::project_edit,
 		projects::project_icon_edit,
