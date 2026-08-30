@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\tUPDATE delphi_rules\n\t\tSET\n\t\t\tname = $2,\n\t\t\trule = $3,\n\t\t\tpriority = $4,\n\t\t\trevision = (\n\t\t\t\tSELECT revision + 1 FROM delphi_rule_revisions LIMIT 1\n\t\t\t),\n\t\t\tupdated_at = CURRENT_TIMESTAMP,\n\t\t\tupdated_by = $5\n\t\tWHERE id = $1 AND NOT delete_on_next_revision\n\t\tRETURNING\n\t\t\tid AS \"id!: DelphiRuleId\",\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\trevision,\n\t\t\tcreated_at,\n\t\t\tupdated_at,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t",
+  "query": "\n\t\tINSERT INTO delphi_rules (\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\ton_issue_types,\n\t\t\trevision,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t)\n\t\tVALUES (\n\t\t\t$1,\n\t\t\t$2,\n\t\t\t$3,\n\t\t\t$4,\n\t\t\t(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),\n\t\t\t$5,\n\t\t\t$5\n\t\t)\n\t\tRETURNING\n\t\t\tid AS \"id!: DelphiRuleId\",\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\ton_issue_types,\n\t\t\trevision,\n\t\t\tcreated_at,\n\t\t\tupdated_at,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t",
   "describe": {
     "columns": [
       {
@@ -25,36 +25,41 @@
       },
       {
         "ordinal": 4,
+        "name": "on_issue_types",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 5,
         "name": "revision",
         "type_info": "Int8"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "updated_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "created_by",
         "type_info": "Int8"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "updated_by",
         "type_info": "Int8"
       }
     ],
     "parameters": {
       "Left": [
-        "Int8",
         "Varchar",
         "Varchar",
         "Int4",
+        "TextArray",
         "Int8"
       ]
     },
@@ -66,9 +71,10 @@
       false,
       false,
       false,
+      false,
       true,
       true
     ]
   },
-  "hash": "d973a1edd200b4cd68ec30556a1e12240885f2372265597efa6e0361831d1318"
+  "hash": "beac242c6a4f0f8502dcba5078d7aff5475e1b6e8f1cc63c8ea08c602efe0f12"
 }

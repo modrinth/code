@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\tSELECT\n\t\t\teffect.detail_id AS \"detail_id!: DelphiReportIssueDetailsId\",\n\t\t\tdetail.issue_id AS \"issue_id!: DelphiReportIssueId\",\n\t\t\tversion.mod_id AS \"project_id?: DBProjectId\",\n\t\t\tproject.name AS \"project_name?\",\n\t\t\tproject.icon_url AS \"project_icon_url?\",\n\t\t\tversion.id AS \"version_id?: DBVersionId\",\n\t\t\tversion.name AS \"version_name?\",\n\t\t\tversion.version_number AS \"version_number?\",\n\t\t\tissue.issue_type,\n\t\t\tdetail.key,\n\t\t\tdetail.jar,\n\t\t\tdetail.file_path,\n\t\t\tdetail.severity AS \"original_severity!: DelphiSeverity\",\n\t\t\teffect.severity AS \"effect_severity!: DelphiSeverity\"\n\t\tFROM delphi_rule_effects effect\n\t\tINNER JOIN delphi_rule_revisions published\n\t\t\tON published.revision = effect.revision\n\t\tINNER JOIN delphi_report_issue_details detail\n\t\t\tON detail.id = effect.detail_id\n\t\tINNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id\n\t\tINNER JOIN delphi_reports report ON report.id = issue.report_id\n\t\tLEFT JOIN files file ON file.id = report.file_id\n\t\tLEFT JOIN versions version ON version.id = file.version_id\n\t\tLEFT JOIN mods project ON project.id = version.mod_id\n\t\tWHERE effect.rule_id = $1\n\t\tORDER BY effect.detail_id DESC\n\t\t",
+  "query": "\n\t\tSELECT\n\t\t\teffect.detail_id AS \"detail_id!: DelphiReportIssueDetailsId\",\n\t\t\tdetail.issue_id AS \"issue_id!: DelphiReportIssueId\",\n\t\t\tversion.mod_id AS \"project_id?: DBProjectId\",\n\t\t\tproject.name AS \"project_name?\",\n\t\t\tproject.icon_url AS \"project_icon_url?\",\n\t\t\tversion.id AS \"version_id?: DBVersionId\",\n\t\t\tversion.name AS \"version_name?\",\n\t\t\tversion.version_number AS \"version_number?\",\n\t\t\tissue.issue_type,\n\t\t\tdetail.key,\n\t\t\tdetail.jar,\n\t\t\tdetail.file_path,\n\t\t\tdetail.severity AS \"original_severity!: DelphiSeverity\",\n\t\t\teffect.severity AS \"effect_severity!: DelphiSeverity\"\n\t\tFROM delphi_rule_effects effect\n\t\tINNER JOIN delphi_rule_revisions published\n\t\t\tON published.revision = effect.revision\n\t\tINNER JOIN delphi_report_issue_details detail\n\t\t\tON detail.id = effect.detail_id\n\t\tINNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id\n\t\tINNER JOIN delphi_reports report ON report.id = issue.report_id\n\t\tLEFT JOIN files file ON file.id = report.file_id\n\t\tLEFT JOIN versions version ON version.id = file.version_id\n\t\tLEFT JOIN mods project ON project.id = version.mod_id\n\t\tWHERE effect.rule_id = $1\n\t\tORDER BY effect.detail_id DESC\n\t\tLIMIT $2 OFFSET $3\n\t\t",
   "describe": {
     "columns": [
       {
@@ -104,6 +104,8 @@
     ],
     "parameters": {
       "Left": [
+        "Int8",
+        "Int8",
         "Int8"
       ]
     },
@@ -124,5 +126,5 @@
       false
     ]
   },
-  "hash": "e07b7f513dd5d2a0e06cc1880746cd8d7d4c27896cbfcb3e26085f99e3552c98"
+  "hash": "f40f23ca7f9d3c42a6f4c505afc7dd596c9829b5f0b42ca1b2830b0f68e33882"
 }
