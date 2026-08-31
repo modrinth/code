@@ -11172,7 +11172,6 @@ dependencies = [
  "thiserror 2.0.17",
  "tokio",
  "tracing",
- "tracing-error",
  "url",
  "urlencoding",
  "uuid 1.23.3",

@@ -872,15 +872,8 @@ watch(instanceId, (currentInstanceId, previousInstanceId) => {
 })
 
 useAppEvent('instance', async (event) => {
-	if (event.instance_id !== instanceId.value) return
-	if (event.event === 'removed' || route.path === '/') {
-		if (route.path !== '/') await router.push({ path: '/' })
-		return
-	}
-	await queryClient.invalidateQueries({
-		queryKey: instanceKeys.detail(event.instance_id),
-		exact: true,
-	})
+	if (event.instance_id !== instanceId.value || event.event !== 'removed') return
+	if (route.path !== '/') await router.push({ path: '/' })
 })
 
 useAppEvent('process', (event) => {
