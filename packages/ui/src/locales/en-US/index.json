@@ -380,9 +380,6 @@
   "content.card.uploaded": {
     "defaultMessage": "Uploaded"
   },
-  "content.card.use-enabled-for-controls": {
-    "defaultMessage": "Use the Enabled for controls to enable or disable this content."
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version? It's recommended to update content one-by-one."
   },
@@ -1961,6 +1958,9 @@
   "hosting.content.failed-to-set-side-lock": {
     "defaultMessage": "Failed to change the environment lock for {name}"
   },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Failed to enable or disable {name}"
+  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Failed to unlink modpack"
   },
@@ -2514,7 +2514,7 @@
     "defaultMessage": "This is a client-side mod and may cause issues when starting your server"
   },
   "label.client-retained-warning": {
-    "defaultMessage": "This is a client-side mod that was installed as a dependency and may cause issues when starting your server"
+    "defaultMessage": "This client-side mod was also installed on the server because another mod depends on it"
   },
   "label.collections": {
     "defaultMessage": "Collections"
