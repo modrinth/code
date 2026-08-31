@@ -1,23 +1,45 @@
 <template>
 	<div class="relative h-full w-full">
+		<ConfirmModal
+			ref="rollSftpModal"
+			:title="formatMessage(messages.rollCredentialsModalTitle)"
+			:description="formatMessage(messages.rollCredentialsModalDescription)"
+			:proceed-label="formatMessage(messages.rollCredentials)"
+			:proceed-icon="RefreshCwIcon"
+			:markdown="false"
+			@proceed="confirmRollSftp"
+		/>
+
 		<div class="flex h-full w-full flex-col gap-4">
 			<div class="flex flex-col gap-6">
 				<!-- SFTP section -->
 				<div class="flex flex-col gap-2">
-					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">
+					<div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
 						<span class="text-lg font-semibold text-contrast">SFTP</span>
-						<ButtonLink
-							v-tooltip="sftpActionTooltip"
-							class="!w-full sm:!w-auto"
-							:class="{ 'opacity-60': !canWriteFiles }"
-							:href="canWriteFiles ? sftpUrl : undefined"
-							:aria-disabled="!canWriteFiles"
-							target="_blank"
-							@click="handleSftpLaunchClick"
-						>
-							<ExternalIcon class="h-5 w-5" />
-							Launch SFTP
-						</ButtonLink>
+						<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+							<Button
+								v-tooltip="sftpRollTooltip"
+								class="!w-full sm:!w-auto"
+								:disabled="!canWriteFiles || isRollingSftp"
+								:loading="isRollingSftp"
+								@click="showRollSftpModal"
+							>
+								<RefreshCwIcon class="h-5 w-5" />
+								{{ formatMessage(messages.rollCredentials) }}
+							</Button>
+							<ButtonLink
+								v-tooltip="sftpActionTooltip"
+								class="!w-full sm:!w-auto"
+								:class="{ 'opacity-60': !canWriteFiles }"
+								:href="canWriteFiles ? sftpUrl : undefined"
+								:aria-disabled="!canWriteFiles"
+								target="_blank"
+								@click="handleSftpLaunchClick"
+							>
+								<ExternalIcon class="h-5 w-5" />
+								Launch SFTP
+							</ButtonLink>
+						</div>
 					</div>
 
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
@@ -211,15 +233,17 @@ import {
 	ExternalIcon,
 	EyeIcon,
 	EyeOffIcon,
+	RefreshCwIcon,
 	SpinnerIcon,
 	UpdatedIcon,
 } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { Combobox, Textarea } from '#ui/components'
+import { Combobox, ConfirmModal, Textarea } from '#ui/components'
 import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
@@ -231,9 +255,42 @@ const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const { formatMessage } = useVIntl()
 const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useServerPermissions()
 
+const messages = defineMessages({
+	rollCredentials: {
+		id: 'servers.settings.advanced.sftp.roll-credentials',
+		defaultMessage: 'Rotate credentials',
+	},
+	rollCredentialsModalTitle: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-modal-title',
+		defaultMessage: 'Rotate credentials',
+	},
+	rollCredentialsModalDescription: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-modal-description',
+		defaultMessage: 'The previous username and password will stop working.',
+	},
+	rollCredentialsSuccessTitle: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-success-title',
+		defaultMessage: 'SFTP credentials rotated',
+	},
+	rollCredentialsSuccessText: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-success-text',
+		defaultMessage: 'Your SFTP username and password have been regenerated.',
+	},
+	rollCredentialsErrorTitle: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-error-title',
+		defaultMessage: 'Failed to rotate SFTP credentials',
+	},
+	rollCredentialsErrorText: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-error-text',
+		defaultMessage: 'Please try again later.',
+	},
+})
+
 const showPassword = ref(false)
+const rollSftpModal = ref<InstanceType<typeof ConfirmModal>>()
 const sftpUrl = computed(() => `sftp://${server.value?.sftp_username}@${server.value?.sftp_host}`)
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
@@ -242,6 +299,9 @@ const sftpActionTooltip = computed(() =>
 	canWriteFiles.value
 		? 'This button only works with compatible SFTP clients (e.g. WinSCP)'
 		: permissionDeniedMessage.value,
+)
+const sftpRollTooltip = computed(() =>
+	canWriteFiles.value ? undefined : permissionDeniedMessage.value,
 )
 const sftpCopyTooltip = (label: string) =>
 	canWriteFiles.value ? label : permissionDeniedMessage.value
@@ -256,6 +316,46 @@ const passwordVisibilityTooltip = computed(() =>
 function handleSftpLaunchClick(event: MouseEvent) {
 	if (canWriteFiles.value) return
 	event.preventDefault()
+}
+
+function applySftpCredentials(credentials: Archon.Servers.v1.SftpCredentials) {
+	queryClient.setQueryData<Archon.Servers.v0.Server>(['servers', 'detail', serverId], (current) =>
+		current ? { ...current, ...credentials } : current,
+	)
+	queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
+		['servers', 'v1', 'detail', serverId],
+		(current) => (current ? { ...current, ...credentials } : current),
+	)
+}
+
+const { mutate: rollSftpMutation, isPending: isRollingSftp } = useMutation({
+	mutationFn: () => client.archon.servers_v1.rollSftp(serverId),
+	onSuccess: (credentials) => {
+		applySftpCredentials(credentials)
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.rollCredentialsSuccessTitle),
+			text: formatMessage(messages.rollCredentialsSuccessText),
+		})
+	},
+	onError: (error) => {
+		console.error(error)
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.rollCredentialsErrorTitle),
+			text: formatMessage(messages.rollCredentialsErrorText),
+		})
+	},
+})
+
+function showRollSftpModal() {
+	if (!canWriteFiles.value || isRollingSftp.value) return
+	rollSftpModal.value?.show()
+}
+
+function confirmRollSftp() {
+	if (!canWriteFiles.value) return
+	rollSftpMutation()
 }
 
 const copyToClipboard = (name: string, textToCopy?: string) => {

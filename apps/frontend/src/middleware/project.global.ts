@@ -87,7 +87,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	}
 })
 
-async function getProjectMiddlewareClient(route: RouteLocationNormalized) {
+export async function getProjectMiddlewareClient(route: RouteLocationNormalized) {
 	if (import.meta.server) {
 		const authToken = useCookie('auth-token')
 		return useServerModrinthClient({ authToken: authToken.value || undefined })
