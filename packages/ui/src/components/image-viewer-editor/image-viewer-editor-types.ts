@@ -12,8 +12,6 @@ export type ScreenshotEditorTool =
 	| 'ellipse'
 	| 'censor'
 
-export type ScreenshotCensorMode = 'blur' | 'solid'
-
 export type ScreenshotEraserMode = 'element' | 'area'
 
 export type ScreenshotEditorObjectKind =
@@ -42,7 +40,6 @@ export type ScreenshotEditorSourceRect = {
 export type ScreenshotEditorObjectState = Record<string, unknown> & {
 	editorKind?: ScreenshotEditorObjectKind
 	sourceRect?: ScreenshotEditorSourceRect
-	censorMode?: ScreenshotCensorMode
 	censorColor?: string
 }
 

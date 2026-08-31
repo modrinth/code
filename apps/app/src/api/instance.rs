@@ -2,7 +2,7 @@ use crate::api::Result;
 use dashmap::DashMap;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Manager, Runtime};
 use tauri_plugin_fs::FsExt;
@@ -12,7 +12,8 @@ use theseus::data::{
     AppliedContentSetPatch, ContentItem, Dependency,
     EditInstance as CoreEditInstance, InstanceInstallCandidate,
     InstanceInstallTarget, InstanceLaunchOverridesPatch,
-    InstanceLink as CoreInstanceLink, InstanceMetadata, LinkedModpackInfo,
+    InstanceLink as CoreInstanceLink, InstanceMetadata, InstanceTabVisibility,
+    LinkedModpackInfo,
     SharedInstanceAttachment as CoreSharedInstanceAttachment,
     SharedInstanceRole,
 };
@@ -140,6 +141,7 @@ pub struct Instance {
     pub force_fullscreen: Option<bool>,
     pub game_resolution: Option<WindowSize>,
     pub hooks: Hooks,
+    pub visible_tabs: InstanceTabVisibility,
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -280,6 +282,7 @@ pub struct EditInstance {
     )]
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
+    pub visible_tabs: Option<InstanceTabVisibility>,
 }
 
 impl From<InstanceMetadata> for Instance {
@@ -318,6 +321,7 @@ impl From<InstanceMetadata> for Instance {
             force_fullscreen: metadata.launch_overrides.force_fullscreen,
             game_resolution: metadata.launch_overrides.game_resolution,
             hooks: metadata.launch_overrides.hooks,
+            visible_tabs: metadata.launch_overrides.visible_tabs,
         }
     }
 }
@@ -486,6 +490,7 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
             force_fullscreen: edit_instance.force_fullscreen,
             game_resolution: edit_instance.game_resolution,
             hooks: edit_instance.hooks,
+            visible_tabs: edit_instance.visible_tabs,
         }),
         content_set_patch: Some(AppliedContentSetPatch {
             source_kind: None,
@@ -839,8 +844,14 @@ pub async fn instance_get_global_synced_options()
 pub async fn instance_set_global_synced_option(
     option: InstanceSyncedOption,
     enabled: bool,
+    base_instance_id: Option<String>,
 ) -> Result<theseus::instance::GlobalSyncedOptions> {
-    Ok(theseus::instance::set_global_synced_option(option, enabled).await?)
+    Ok(theseus::instance::set_global_synced_option(
+        option,
+        enabled,
+        base_instance_id.as_deref(),
+    )
+    .await?)
 }
 
 #[tauri::command]
@@ -900,13 +911,25 @@ fn serialize_screenshots<R: Runtime>(
     app_handle: &AppHandle<R>,
     screenshots: Vec<theseus::instance::InstanceScreenshot>,
 ) -> Result<Vec<InstanceScreenshot>> {
-    let mut result = Vec::with_capacity(screenshots.len());
-
-    for screenshot in screenshots {
-        result.push(serialize_screenshot(app_handle, screenshot)?);
+    let screenshot_directories = screenshots
+        .iter()
+        .filter_map(|screenshot| screenshot.path.parent())
+        .collect::<HashSet<_>>();
+    for directory in screenshot_directories {
+        app_handle
+            .asset_protocol_scope()
+            .allow_directory(directory, false)
+            .map_err(|error| std::io::Error::other(error.to_string()))?;
+        app_handle
+            .fs_scope()
+            .allow_directory(directory, false)
+            .map_err(|error| std::io::Error::other(error.to_string()))?;
     }
 
-    Ok(result)
+    screenshots
+        .into_iter()
+        .map(serialize_screenshot_data)
+        .collect()
 }
 
 fn serialize_screenshot<R: Runtime>(
@@ -921,6 +944,12 @@ fn serialize_screenshot<R: Runtime>(
         .fs_scope()
         .allow_file(&screenshot.path)
         .map_err(|error| std::io::Error::other(error.to_string()))?;
+    serialize_screenshot_data(screenshot)
+}
+
+fn serialize_screenshot_data(
+    screenshot: theseus::instance::InstanceScreenshot,
+) -> Result<InstanceScreenshot> {
     let mut url = super::utils::tauri_convert_file_src(&screenshot.path)?;
     url.query_pairs_mut()
         .append_pair("revision", &screenshot.modified_at.to_string());

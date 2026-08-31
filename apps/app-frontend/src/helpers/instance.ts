@@ -338,10 +338,12 @@ export async function get_global_synced_options(): Promise<GlobalSyncedOptions> 
 export async function set_global_synced_option(
 	option: SyncedOption,
 	enabled: boolean,
+	baseInstanceId?: string,
 ): Promise<GlobalSyncedOptions> {
 	return await invoke('plugin:instance|instance_set_global_synced_option', {
 		option,
 		enabled,
+		baseInstanceId,
 	})
 }
 

@@ -494,32 +494,6 @@ pub(crate) async fn get_instance_screenshot_source(
     Ok(source)
 }
 
-pub(crate) async fn list_synced_screenshot_sources(
-    pool: &SqlitePool,
-) -> crate::Result<Vec<InstanceScreenshotSource>> {
-    let sources = sqlx::query_as!(
-        InstanceScreenshotSource,
-        "
-		SELECT instances.id, instances.name, instances.path
-		FROM instances
-		INNER JOIN instance_sync_preferences preferences
-			ON preferences.instance_id = instances.id
-		WHERE preferences.feature = 'screenshots'
-			AND preferences.enabled = 1
-			AND EXISTS (
-				SELECT 1
-				FROM sync_feature_settings
-				WHERE feature = 'screenshots' AND globally_enabled = 1
-			)
-		ORDER BY instances.name, instances.id
-		",
-    )
-    .fetch_all(pool)
-    .await?;
-
-    Ok(sources)
-}
-
 pub(crate) async fn list_screenshot_sources(
     pool: &SqlitePool,
 ) -> crate::Result<Vec<InstanceScreenshotSource>> {
