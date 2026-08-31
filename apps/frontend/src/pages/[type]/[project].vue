@@ -844,14 +844,6 @@ const messages = defineMessages({
 		id: 'project.actions.project-page',
 		defaultMessage: 'Project page',
 	},
-	backToProjectPage: {
-		id: 'project.actions.back-to-project-page',
-		defaultMessage: 'Back to project page',
-	},
-	backToAllProjects: {
-		id: 'project.actions.back-to-all-projects',
-		defaultMessage: 'Back to all projects',
-	},
 	reviewProject: {
 		id: 'project.actions.review-project',
 		defaultMessage: 'Review project',

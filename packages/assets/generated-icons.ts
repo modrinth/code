@@ -279,6 +279,7 @@ import _SplitIcon from './icons/split.svg?component'
 import _SquareIcon from './icons/square.svg?component'
 import _SquarePlusIcon from './icons/square-plus.svg?component'
 import _StarIcon from './icons/star.svg?component'
+import _StickyNotePlusIcon from './icons/sticky-note-plus.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _StoreIcon from './icons/store.svg?component'
 import _StrikethroughIcon from './icons/strikethrough.svg?component'
@@ -737,6 +738,7 @@ export const SplitIcon = _SplitIcon
 export const SquareIcon = _SquareIcon
 export const SquarePlusIcon = _SquarePlusIcon
 export const StarIcon = _StarIcon
+export const StickyNotePlusIcon = _StickyNotePlusIcon
 export const StopCircleIcon = _StopCircleIcon
 export const StoreIcon = _StoreIcon
 export const StrikethroughIcon = _StrikethroughIcon

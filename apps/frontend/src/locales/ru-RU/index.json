@@ -3434,12 +3434,6 @@
   "project-type.shader.singular": {
     "message": "Шейдер"
   },
-  "project.actions.back-to-all-projects": {
-    "message": "Вернуться ко всем проектам"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Вернуться на страницу проекта"
-  },
   "project.actions.check-modpack-archives": {
     "message": "Проверить распаковку сборки"
   },
