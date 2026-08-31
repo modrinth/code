@@ -3,11 +3,16 @@
 <script setup lang="ts">
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, ClipboardCopyIcon, EditIcon, MoreHorizontalIcon } from '@modrinth/assets'
-import { defineMessages, IconButton, useFormatDateTime, useVIntl } from '@modrinth/ui'
-import { computed, onMounted, ref, watch } from 'vue'
+import {
+	defineMessages,
+	IconButton,
+	useDebugLogger,
+	useFormatDateTime,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import type { InstanceScreenshot } from '@/helpers/instance'
-const loadedScreenshotUrls = new Set<string>()
 
 const props = defineProps<{
 	screenshot: InstanceScreenshot
@@ -29,9 +34,12 @@ const emit = defineEmits<{
 
 const card = ref<HTMLElement>()
 const image = ref<HTMLImageElement>()
-const loaded = ref(loadedScreenshotUrls.has(props.screenshot.url))
+const imageReady = ref(false)
 const { formatMessage } = useVIntl()
+const debugImage = useDebugLogger('Screenshots:Card')
 const formatTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+let loadStartedAt = performance.now()
+let loadGeneration = 0
 const messages = defineMessages({
 	select: { id: 'app.screenshots.select', defaultMessage: 'Select {name}' },
 	deselect: { id: 'app.screenshots.deselect', defaultMessage: 'Deselect {name}' },
@@ -69,19 +77,86 @@ function activate(event: MouseEvent | KeyboardEvent) {
 	emit('activate', event)
 }
 
-function markImageLoaded() {
-	loadedScreenshotUrls.add(props.screenshot.url)
-	loaded.value = true
+async function markImageLoaded() {
+	const loadedImage = image.value
+	const loadedUrl = props.screenshot.url
+	const generation = loadGeneration
+	if (!loadedImage) return
+
+	try {
+		await loadedImage.decode()
+	} catch {
+		if (!loadedImage.complete || loadedImage.naturalWidth === 0) return
+	}
+
+	await new Promise<void>((resolve) => {
+		window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()))
+	})
+
+	if (
+		generation !== loadGeneration ||
+		image.value !== loadedImage ||
+		props.screenshot.url !== loadedUrl
+	) {
+		return
+	}
+
+	const wasReady = imageReady.value
+	imageReady.value = true
+	if (!wasReady) {
+		debugImage('image loaded', {
+			id: props.screenshot.id,
+			fileName: props.screenshot.file_name,
+			url: props.screenshot.url,
+			loadDurationMs: performance.now() - loadStartedAt,
+			naturalWidth: image.value?.naturalWidth,
+			naturalHeight: image.value?.naturalHeight,
+		})
+	}
+}
+
+function markImageFailed(event: Event) {
+	debugImage('image failed', {
+		id: props.screenshot.id,
+		fileName: props.screenshot.file_name,
+		url: props.screenshot.url,
+		loadDurationMs: performance.now() - loadStartedAt,
+		event,
+	})
 }
 
 onMounted(() => {
+	debugImage('mounted', {
+		id: props.screenshot.id,
+		fileName: props.screenshot.file_name,
+		url: props.screenshot.url,
+		complete: image.value?.complete,
+	})
 	if (image.value?.complete && image.value.naturalWidth > 0) markImageLoaded()
+})
+
+onBeforeUnmount(() => {
+	loadGeneration += 1
+	debugImage('unmounted', {
+		id: props.screenshot.id,
+		fileName: props.screenshot.file_name,
+		url: props.screenshot.url,
+		loaded: imageReady.value,
+	})
 })
 
 watch(
 	() => props.screenshot.url,
-	(url) => {
-		loaded.value = loadedScreenshotUrls.has(url)
+	(url, previousUrl) => {
+		loadGeneration += 1
+		loadStartedAt = performance.now()
+		imageReady.value = false
+		debugImage('source changed', {
+			id: props.screenshot.id,
+			fileName: props.screenshot.file_name,
+			previousUrl,
+			url,
+		})
 	},
 )
 </script>
@@ -91,7 +166,7 @@ watch(
 		ref="card"
 		role="button"
 		tabindex="0"
-		class="group relative aspect-video min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition-[filter] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+		class="group relative isolate aspect-video min-w-0 cursor-pointer overflow-hidden rounded-xl border border-solid border-surface-5 bg-surface-2 p-0 text-left shadow-sm transition-[filter] hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
 		:class="{
 			'!border-contrast brightness-110': selected,
 			'!border-brand ring-2 ring-brand animate-pulse': highlighted,
@@ -115,7 +190,7 @@ watch(
 	>
 		<button
 			type="button"
-			class="selection-button group/selection absolute right-0.5 top-0 z-[2] flex size-[50px] cursor-pointer items-start justify-center border-0 bg-transparent p-0 pt-4"
+			class="selection-button group/selection absolute right-0.5 top-0 z-[3] flex size-[50px] cursor-pointer items-start justify-center border-0 bg-transparent p-0 pt-4"
 			:aria-label="
 				formatMessage(selected ? messages.deselect : messages.select, {
 					name: screenshot.file_name,
@@ -134,19 +209,25 @@ watch(
 				<CheckIcon v-if="selected" class="relative size-4 invert [stroke-width:3]" />
 			</span>
 		</button>
-		<div v-if="!loaded" class="absolute inset-0 animate-pulse bg-surface-3" />
 		<img
 			ref="image"
 			:src="screenshot.url"
 			:alt="screenshot.file_name"
-			loading="lazy"
+			loading="eager"
+			decoding="async"
 			draggable="false"
-			class="h-full w-full object-cover transition duration-200"
-			:class="loaded ? 'opacity-100' : 'opacity-0'"
+			class="screenshot-card-fade absolute inset-0 z-[1] h-full w-full object-cover"
+			:class="imageReady ? 'opacity-100' : 'opacity-0'"
 			@load="markImageLoaded"
+			@error="markImageFailed"
 		/>
 		<div
-			class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-surface-1 to-transparent p-3 pt-[120px] text-contrast opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
+			aria-hidden="true"
+			class="pointer-events-none absolute inset-0 bg-button-bg"
+			:class="{ 'animate-pulse': !imageReady }"
+		/>
+		<div
+			class="absolute inset-x-0 bottom-0 z-[2] flex items-end justify-between gap-2 bg-gradient-to-t from-surface-1 to-transparent p-3 pt-[120px] text-contrast opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
 		>
 			<div class="min-w-0">
 				<div v-tooltip="screenshot.file_name" class="truncate text-sm font-semibold">
@@ -193,3 +274,9 @@ watch(
 		</div>
 	</article>
 </template>
+
+<style scoped>
+.screenshot-card-fade {
+	transition: opacity 350ms ease-in-out;
+}
+</style>

@@ -2027,15 +2027,6 @@
   "image-viewer.edit": {
     "defaultMessage": "Edit"
   },
-  "image-viewer.editor.censor.blur": {
-    "defaultMessage": "Blur"
-  },
-  "image-viewer.editor.censor.mode": {
-    "defaultMessage": "Censor type"
-  },
-  "image-viewer.editor.censor.solid": {
-    "defaultMessage": "Solid"
-  },
   "image-viewer.editor.colour": {
     "defaultMessage": "Colour"
   },
@@ -5647,6 +5638,27 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "What happens?"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Rotate credentials"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Please try again later."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "Failed to rotate SFTP credentials"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "The previous username and password will stop working."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Rotate credentials"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Your SFTP username and password have been regenerated."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "SFTP credentials rotated"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "An unexpected error occurred while installing. Please try again later."

@@ -66,4 +66,19 @@ export class ArchonServersV1Module extends AbstractModule {
 			method: 'POST',
 		})
 	}
+
+	/**
+	 * Roll SFTP credentials for a server
+	 * POST /v1/servers/:server_id/sftp/roll
+	 */
+	public async rollSftp(serverId: string): Promise<Archon.Servers.v1.SftpCredentials> {
+		return this.client.request<Archon.Servers.v1.SftpCredentials>(
+			`/servers/${serverId}/sftp/roll`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+			},
+		)
+	}
 }

@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronRightIcon, InfoIcon, Settings2Icon, UsersIcon, WrenchIcon } from '@modrinth/assets'
+import {
+	ChevronRightIcon,
+	EyeIcon,
+	InfoIcon,
+	Settings2Icon,
+	UsersIcon,
+	WrenchIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	commonMessages,
@@ -19,6 +26,7 @@ import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 
+import BehaviorSettings from './behavior-settings.vue'
 import GeneralSettings from './general-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
@@ -87,6 +95,14 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		}),
 		icon: WrenchIcon,
 		content: InstallationSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.tab-visibility',
+			defaultMessage: 'Tabs',
+		}),
+		icon: EyeIcon,
+		content: BehaviorSettings,
 	},
 	{
 		name: defineMessage({
