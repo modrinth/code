@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { Avatar } from '@modrinth/ui'
-import { computed } from 'vue'
 
 import ModerationOwnerLink, { type ModerationOwner } from './ModerationOwnerLink.vue'
-
 export type { ModerationOwner }
 
-const props = defineProps<{
+defineProps<{
 	avatarUrl?: string | null
 	title: string
 	titleTo?: string | null
@@ -23,7 +21,7 @@ const props = defineProps<{
 				:src="avatarUrl"
 				:circle="circle"
 				:pad-transparent-corners="padTransparentCorners"
-                no-shadow
+				no-shadow
 				size="4rem"
 			/>
 		</NuxtLink>

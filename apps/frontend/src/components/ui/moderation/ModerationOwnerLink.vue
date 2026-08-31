@@ -20,13 +20,7 @@ defineProps<{
 			target="_blank"
 			class="flex items-center gap-1 text-sm font-medium text-secondary hover:underline"
 		>
-			<Avatar
-				:src="owner.icon_url"
-				:circle="owner.kind === 'user'"
-				size="1.5rem"
-                no-shadow
-
-			/>
+			<Avatar :src="owner.icon_url" :circle="owner.kind === 'user'" size="1.5rem" no-shadow />
 			{{ owner.name }}
 		</NuxtLink>
 		<ClientOnly>

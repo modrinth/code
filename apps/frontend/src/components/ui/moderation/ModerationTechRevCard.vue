@@ -214,9 +214,9 @@ watch(
 						</div>
 
 						<div class="rounded-full border-solid px-2.5 py-1" :class="severityColor">
-							<span class="text-sm font-medium">{{
-								capitalizeString(highestSeverity.toLowerCase())
-							}}</span>
+							<span class="text-sm font-medium">
+								{{ capitalizeString(highestSeverity.toLowerCase()) }}
+							</span>
 						</div>
 					</template>
 				</ModerationItemHeader>
@@ -236,7 +236,7 @@ watch(
 								<CodeIcon />
 							</ButtonLink>
 							<CopyLinkButton
-								copy-label="Copy project link"
+								copy-label="Copy tech review link"
 								:url="`https://modrinth.com/moderation/technical-review/${props.item.project.id}`"
 							/>
 							<ButtonLink

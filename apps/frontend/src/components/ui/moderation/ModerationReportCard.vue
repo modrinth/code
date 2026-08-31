@@ -7,29 +7,17 @@
 			<div
 				class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
 			>
-				<span class="text-md flex flex-col gap-2 sm:flex-row sm:items-center">
-					<span class="flex items-center gap-2">
+				<span class="text-md flex flex-col flex-wrap gap-1 sm:flex-row sm:items-center">
+					<span class="flex items-center gap-1">
 						<span class="text-secondary">Reported for</span>
 						<span class="font-semibold text-contrast">
 							{{ formattedReportType }}
 						</span>
 					</span>
-					<span class="flex items-center gap-2">
-						<span class="hidden text-secondary sm:inline">By</span>
+					<span class="flex items-center gap-1">
+						<span class="hidden text-secondary sm:inline">by</span>
 						<span class="text-secondary sm:hidden">Reporter:</span>
-						<nuxt-link
-							:to="`/user/${report.reporter_user.username}`"
-							target="_blank"
-							class="inline-flex flex-row items-center gap-1 transition-colors duration-100 ease-in-out hover:text-brand"
-						>
-							<Avatar
-								:src="report.reporter_user.avatar_url"
-								circle
-								size="1.75rem"
-								class="flex-shrink-0"
-							/>
-							<span class="truncate">{{ report.reporter_user.username }}</span>
-						</nuxt-link>
+						<ModerationOwnerLink :owner="reporter" />
 					</span>
 				</span>
 
@@ -41,9 +29,11 @@
 						{{ formatRelativeTime(report.created) }}
 					</span>
 					<div class="flex items-center gap-2">
-						<IconButton v-tooltip="'Copy ID'" :label="'Copy ID'" @click="copyId">
-							<ClipboardCopyIcon />
-						</IconButton>
+						<CopyCode v-tooltip="'Copy report ID'" :text="report.id" />
+						<CopyLinkButton
+							copy-label="Copy report link"
+							:url="`https://modrinth.com/moderation/reports/${props.report.id}`"
+						/>
 						<ButtonLink
 							v-tooltip="'Open in new tab'"
 							:href="`/moderation/reports/${props.report.id}`"
@@ -231,19 +221,19 @@
 import type { Labrinth, SharedInstances } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
-	ClipboardCopyIcon,
 	ExternalIcon,
 	LoaderCircleIcon,
 	LockIcon,
 	ReceiptTextIcon,
 } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
-import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
-	Avatar,
+	Button,
+	ButtonLink,
 	CollapsibleRegion,
 	type ContentItem,
 	CopyCode,
+	CopyLinkButton,
 	formatReportType,
 	getProjectTypeIcon,
 	injectModrinthClient,
@@ -259,7 +249,8 @@ import { computed, onUnmounted, ref, watch } from 'vue'
 import { isStaff } from '~/helpers/users.js'
 
 import ThreadView from '../thread/ThreadView.vue'
-import ModerationItemHeader, { type ModerationOwner } from './ModerationItemHeader.vue'
+import ModerationItemHeader from './ModerationItemHeader.vue'
+import ModerationOwnerLink, { type ModerationOwner } from './ModerationOwnerLink.vue'
 import SharedInstanceReportContext, {
 	type SharedInstanceOwnerInstance,
 	type SharedInstanceReportDetails,
@@ -380,6 +371,13 @@ const expandText = computed(() => {
 	if (remainingMessageCount.value === 1) return 'Show 1 more message'
 	return `Show ${remainingMessageCount.value} more messages`
 })
+
+const reporter = computed<ModerationOwner>(() => ({
+	kind: 'user',
+	id: props.report.reporter_user.id,
+	name: props.report.reporter_user.username,
+	icon_url: props.report.reporter_user.avatar_url,
+}))
 
 async function closeReport(reply = false) {
 	if (reply && reportThread.value) {
@@ -872,16 +870,6 @@ const itemOwner = computed((): ModerationOwner | null => {
 const formattedReportType = computed(() =>
 	formatReportType(formatMessage, props.report.report_type),
 )
-
-function copyId() {
-	navigator.clipboard.writeText(props.report.id).then(() => {
-		addNotification({
-			type: 'success',
-			title: 'Report ID copied',
-			text: 'The ID of this report has been copied to your clipboard.',
-		})
-	})
-}
 
 async function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
 	if (sharedInstanceBanPending.value) return

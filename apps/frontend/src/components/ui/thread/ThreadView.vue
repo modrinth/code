@@ -49,14 +49,14 @@
 							color="brand"
 							:disabled="!replyBody"
 							class="w-full sm:w-auto"
-							@click="sendReply(true)"
+							@click="sendReply(false)"
 						>
-							<StickyNotePlusIcon />
-							Add note
-						</Button>
-						<Button :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(false)">
 							<SendIcon />
 							Send publicly
+						</Button>
+						<Button :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(true)">
+							<StickyNotePlusIcon />
+							Add private note
 						</Button>
 					</template>
 					<template v-else>
@@ -89,7 +89,7 @@
 							@click="sendReply(true)"
 						>
 							<StickyNotePlusIcon />
-							Add note
+							Add private note
 						</Button>
 					</template>
 					<TeleportOverflowMenu
