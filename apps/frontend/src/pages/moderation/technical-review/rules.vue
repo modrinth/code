@@ -142,6 +142,10 @@
 								</a>
 							</li>
 							<li>
+								<code>or_null(field)</code> returns the field's value when present or
+								<code>null</code> when it is missing.
+							</li>
+							<li>
 								<a
 									class="text-link"
 									href="https://docs.rs/url/latest/url/struct.Url.html"
@@ -617,6 +621,7 @@ const CEL_LANGUAGE_COMPLETIONS: Ace.Completion[] = [
 	{ caption: 'size()', snippet: 'size(${1:value})', score: 850, meta: 'function' },
 	{ caption: 'string()', snippet: 'string(${1:value})', score: 850, meta: 'function' },
 	{ caption: 'int()', snippet: 'int(${1:value})', score: 850, meta: 'function' },
+	{ caption: 'or_null()', snippet: 'or_null(${1:field})', score: 850, meta: 'function' },
 	{ caption: 'url.parse()', snippet: 'url.parse("${1:url}")', score: 850, meta: 'URL' },
 	{ caption: 'url.is_valid()', snippet: 'url.is_valid("${1:url}")', score: 850, meta: 'URL' },
 	{ caption: '#define', snippet: '#define ${1:NAME} ${2:value}', score: 800, meta: 'preprocessor' },

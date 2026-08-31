@@ -442,6 +442,48 @@ fn expand(
                         stack.push(identifier.to_string());
                         expand(replacement, definitions, stack, output)?;
                         stack.pop();
+                    } else if identifier == "or_null"
+                        && source[..start]
+                            .bytes()
+                            .rev()
+                            .find(|character| !character.is_ascii_whitespace())
+                            != Some(b'.')
+                    {
+                        let mut open_parenthesis = index;
+                        while bytes
+                            .get(open_parenthesis)
+                            .is_some_and(u8::is_ascii_whitespace)
+                        {
+                            open_parenthesis += 1;
+                        }
+
+                        if bytes.get(open_parenthesis) == Some(&b'(')
+                            && let Some(close_parenthesis) =
+                                find_closing_parenthesis(
+                                    source,
+                                    open_parenthesis,
+                                )
+                        {
+                            let argument = &source
+                                [open_parenthesis + 1..close_parenthesis];
+                            let mut expanded_argument =
+                                String::with_capacity(argument.len());
+                            expand(
+                                argument,
+                                definitions,
+                                stack,
+                                &mut expanded_argument,
+                            )?;
+
+                            push(output, "(has(")?;
+                            push(output, &expanded_argument)?;
+                            push(output, ") ? ")?;
+                            push(output, &expanded_argument)?;
+                            push(output, " : null)")?;
+                            index = close_parenthesis + 1;
+                        } else {
+                            push(output, identifier)?;
+                        }
                     } else {
                         push(output, identifier)?;
                     }
@@ -489,6 +531,78 @@ fn expand(
     }
 
     Ok(())
+}
+
+fn find_closing_parenthesis(source: &str, open: usize) -> Option<usize> {
+    let bytes = source.as_bytes();
+    let mut index = open + 1;
+    let mut depth = 1_usize;
+    let mut state = LexState::Normal;
+
+    while index < bytes.len() {
+        match state {
+            LexState::Normal => {
+                if bytes[index..].starts_with(b"//") {
+                    index += 2;
+                    while index < bytes.len() && bytes[index] != b'\n' {
+                        index += source[index..].chars().next()?.len_utf8();
+                    }
+                    continue;
+                }
+                if bytes[index..].starts_with(b"/*") {
+                    index += 2;
+                    state = LexState::BlockComment;
+                    continue;
+                }
+                if let Some((length, string_state)) = string_start(bytes, index)
+                {
+                    index += length;
+                    state = string_state;
+                    continue;
+                }
+
+                match bytes[index] {
+                    b'(' => depth += 1,
+                    b')' => {
+                        depth -= 1;
+                        if depth == 0 {
+                            return Some(index);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            LexState::String { quote, triple, raw } => {
+                if !raw && bytes[index] == b'\\' {
+                    index = (index + 2).min(bytes.len());
+                    continue;
+                }
+
+                let closing_length = if triple { 3 } else { 1 };
+                if bytes[index] == quote
+                    && bytes[index..].len() >= closing_length
+                    && bytes[index..index + closing_length]
+                        .iter()
+                        .all(|character| *character == quote)
+                {
+                    index += closing_length;
+                    state = LexState::Normal;
+                    continue;
+                }
+            }
+            LexState::BlockComment => {
+                if bytes[index..].starts_with(b"*/") {
+                    index += 2;
+                    state = LexState::Normal;
+                    continue;
+                }
+            }
+        }
+
+        index += source[index..].chars().next()?.len_utf8();
+    }
+
+    None
 }
 
 fn push(output: &mut String, value: &str) -> Result<(), PreprocessorError> {
@@ -634,6 +748,53 @@ mod tests {
             error.to_string(),
             "recursive macro expansion: FIRST -> SECOND -> FIRST"
         );
+    }
+
+    #[test]
+    fn expands_or_null_to_a_lazy_presence_check() {
+        assert_eq!(
+            preprocess("or_null(trace.data.url)").unwrap().expression,
+            "(has(trace.data.url) ? trace.data.url : null)"
+        );
+    }
+
+    #[test]
+    fn does_not_expand_or_null_in_strings_comments_or_member_calls() {
+        let source = r#""or_null(trace.data.url)"
+// or_null(trace.data.url)
+value.or_null()"#;
+        assert_eq!(preprocess(source).unwrap().expression, source);
+    }
+
+    #[test]
+    fn or_null_returns_null_for_a_missing_field() {
+        let program =
+            Program::compile("or_null(trace.data.url) == null").unwrap();
+        let mut context = Context::default();
+        context
+            .add_variable("trace", serde_json::json!({ "data": {} }))
+            .unwrap();
+
+        assert_eq!(program.execute(&context).unwrap(), Value::Bool(true));
+    }
+
+    #[test]
+    fn or_null_preserves_an_existing_value() {
+        let program = Program::compile(
+            r#"or_null(trace.data.url) == "https://modrinth.com/""#,
+        )
+        .unwrap();
+        let mut context = Context::default();
+        context
+            .add_variable(
+                "trace",
+                serde_json::json!({
+                    "data": { "url": "https://modrinth.com/" }
+                }),
+            )
+            .unwrap();
+
+        assert_eq!(program.execute(&context).unwrap(), Value::Bool(true));
     }
 
     #[test]
