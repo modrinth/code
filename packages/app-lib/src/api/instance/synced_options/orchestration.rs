@@ -288,47 +288,28 @@ async fn version_capability(
 pub async fn set_global_option(
     option: SyncedOption,
     enabled: bool,
+    base_instance_id: Option<&str>,
 ) -> crate::Result<GlobalSyncedOptions> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
-    let reset_participation =
-        enabled && !canonical_exists(option, &state).await?;
 
-    let option_name = option.as_str();
-    sqlx::query!(
-        "
-		INSERT INTO sync_feature_settings
-			(feature, globally_enabled, new_instance_default)
-		VALUES (?, ?, 1)
-		ON CONFLICT(feature) DO UPDATE SET
-			globally_enabled = excluded.globally_enabled
-		",
-        option_name,
-        enabled,
-    )
-    .execute(&state.pool)
-    .await?;
+    if enabled && option != SyncedOption::Screenshots {
+        let base_instance_id = base_instance_id.ok_or_else(|| {
+            ErrorKind::InputError(
+                "Choose an instance to use as the sync source.".to_string(),
+            )
+        })?;
+        return enable_global_option_from_base(
+            option,
+            base_instance_id,
+            &state,
+        )
+        .await;
+    }
+
+    set_global_option_enabled(option, enabled, &state).await?;
 
     let instances = crate::state::list_instances(&state.pool).await?;
-    if reset_participation {
-        for metadata in instances {
-            if instance_option_enabled(&metadata, option) {
-                instance_rows::set_instance_sync_preference(
-                    &metadata.instance.id,
-                    option,
-                    false,
-                    &state.pool,
-                )
-                .await?;
-            }
-            if !sync_files_are_protected(&metadata)
-                && !instance_is_running(&metadata, &state).await?
-            {
-                detach_option(&metadata, option, &state).await?;
-            }
-        }
-        return get_global_options_with_state(&state).await;
-    }
     for metadata in instances {
         if sync_files_are_protected(&metadata)
             || instance_is_running(&metadata, &state).await?
@@ -351,6 +332,112 @@ pub async fn set_global_option(
     }
 
     get_global_options_with_state(&state).await
+}
+
+async fn set_global_option_enabled(
+    option: SyncedOption,
+    enabled: bool,
+    state: &State,
+) -> crate::Result<()> {
+    let option_name = option.as_str();
+    sqlx::query!(
+        "
+		INSERT INTO sync_feature_settings
+			(feature, globally_enabled, new_instance_default)
+		VALUES (?, ?, 1)
+		ON CONFLICT(feature) DO UPDATE SET
+			globally_enabled = excluded.globally_enabled
+		",
+        option_name,
+        enabled,
+    )
+    .execute(&state.pool)
+    .await?;
+    Ok(())
+}
+
+async fn enable_global_option_from_base(
+    option: SyncedOption,
+    base_instance_id: &str,
+    state: &State,
+) -> crate::Result<GlobalSyncedOptions> {
+    let source = crate::state::get_instance(base_instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            ErrorKind::InputError("Unknown sync source instance.".to_string())
+        })?;
+    if sync_files_are_protected(&source)
+        || instance_is_running(&source, state).await?
+    {
+        return Err(ErrorKind::InputError(
+            "Close the source instance before using it for syncing."
+                .to_string(),
+        )
+        .into());
+    }
+    match capability_status(&source, option, true, state).await {
+        CapabilityStatus::Supported => {}
+        CapabilityStatus::Unsupported(reason)
+        | CapabilityStatus::Indeterminate(reason) => {
+            return Err(ErrorKind::InputError(reason).into());
+        }
+    }
+
+    let instances = crate::state::list_instances(&state.pool).await?;
+    for metadata in &instances {
+        if instance_option_enabled(metadata, option)
+            && (sync_files_are_protected(metadata)
+                || instance_is_running(metadata, state).await?)
+        {
+            return Err(ErrorKind::InputError(
+                "Close all instances using this synced setting before choosing a new sync source."
+                    .to_string(),
+            )
+            .into());
+        }
+    }
+
+    for metadata in &instances {
+        if instance_option_enabled(metadata, option) {
+            detach_option(metadata, option, state).await?;
+        }
+    }
+    if !instance_option_enabled(&source, option) {
+        detach_option(&source, option, state).await?;
+    }
+
+    seed_from_instance(&source, option, state).await?;
+    instance_rows::set_instance_sync_preference(
+        base_instance_id,
+        option,
+        true,
+        &state.pool,
+    )
+    .await?;
+    set_global_option_enabled(option, true, state).await?;
+
+    for metadata in crate::state::list_instances(&state.pool).await? {
+        if sync_files_are_protected(&metadata)
+            || instance_is_running(&metadata, state).await?
+        {
+            continue;
+        }
+        if !instance_option_enabled(&metadata, option) {
+            detach_option(&metadata, option, state).await?;
+            continue;
+        }
+        match capability_status(&metadata, option, true, state).await {
+            CapabilityStatus::Supported => {
+                ensure_option(&metadata, option, state).await?
+            }
+            CapabilityStatus::Unsupported(_) => {
+                detach_option(&metadata, option, state).await?
+            }
+            CapabilityStatus::Indeterminate(_) => {}
+        }
+    }
+
+    get_global_options_with_state(state).await
 }
 
 pub async fn set_instance_option(
