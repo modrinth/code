@@ -525,13 +525,13 @@
     "defaultMessage": "Видалено (вимкнено): {count}"
   },
   "content.diff-modal.reviewed-files": {
-    "defaultMessage": "Розглядатимуть лише ті файли, що викладені на Modrinth."
+    "defaultMessage": "Розглядатимуть лише ті файли, які опубліковані на Modrinth."
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Деякий уміст на вашому сервері не вдалося проаналізувати, тож ця зміна може вплинути на нього."
   },
   "content.diff-modal.unknown-files-description": {
-    "defaultMessage": "Це оновлення містить файли, які не викладені на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
+    "defaultMessage": "Це оновлення містить файли, які не опубліковані на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "content.diff-modal.unknown-files-warning": {
     "defaultMessage": "Попередження про невідомі файли"
@@ -2757,7 +2757,7 @@
     "defaultMessage": "Виникла помилка"
   },
   "notifications.instance-ready.open-instance": {
-    "defaultMessage": ""
+    "defaultMessage": "Примірник"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Прийнято"
@@ -5375,6 +5375,9 @@
   "settings.billing.title": {
     "defaultMessage": "Оплата й передплати"
   },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "defaultMessage": "Робить так, щоб посилання за межі Modrinth, відкривалися в новій вкладці. Незалежно від цього налаштування, посилання в одному домені й в описах з Markdown відкриватимуться в тій же вкладці, а посилання в рекламах і на сторінках редагування — в новій вкладці."
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "Темна"
   },
@@ -5437,6 +5440,9 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Особистий токен доступу"
+  },
+  "settings.preferences.update-failed.title": {
+    "defaultMessage": "Не вдалося синхронізувати налаштування"
   },
   "settings.profile.bio.description": {
     "defaultMessage": "Короткий опис, щоб розповісти іншим трохи про себе."
@@ -6201,19 +6207,19 @@
     "defaultMessage": "Шкідливе програмне забезпечення часто поширюють через моди, які публікуються на таких платформах, як Discord."
   },
   "unknown-file-warning-modal.mod-warning-body": {
-    "defaultMessage": " не викладено на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
+    "defaultMessage": " не опубліковано на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "unknown-file-warning-modal.mod-warning-title": {
     "defaultMessage": "Попередження про невідомий файл"
   },
   "unknown-file-warning-modal.modpack-warning-body": {
-    "defaultMessage": " містить файли, які не викладені на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
+    "defaultMessage": " містить файли, які не опубліковані на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "unknown-file-warning-modal.modpack-warning-title": {
     "defaultMessage": "Попередження про невідомі файли"
   },
   "unknown-file-warning-modal.reviewed-files": {
-    "defaultMessage": "Розглядатимуть лише ті файли, що викладені на Modrinth."
+    "defaultMessage": "Розглядатимуть лише ті файли, які опубліковані на Modrinth."
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Нерозпізнані файли"
@@ -6323,9 +6329,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "JAR для розробки"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "JAR із Javadoc"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Необов'язковий пакет ресурсів"
   },
@@ -6337,9 +6340,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "Файл підпису"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "JAR із вихідним кодом"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Інше"

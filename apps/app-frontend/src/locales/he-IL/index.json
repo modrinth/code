@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "הורדות"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "הסתר הורדות פעילות"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "החבא יותר התקנים רצים"
   },
@@ -17,17 +20,56 @@
   "app.action-bar.install.copy-details": {
     "message": "העתקת הפרטים"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "התעלם"
+  },
   "app.action-bar.install.open-instance": {
     "message": "הצג התקנה"
   },
   "app.action-bar.install.retry": {
     "message": "נסה שוב"
   },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "בוטל לאור סגירת האפליקציה"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "לא יכל לקרוא את חבילת המודים"
+  },
   "app.action-bar.install.summary.canceled": {
     "message": "ביטול"
   },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "ניקיון נכשל"
+  },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "לא נתן להוריד את הקבצים"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "הקובץ המורד מושחת"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "לא נתן לשמור את הקבצים"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "הורדה נכשלה"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "התקנה לא נמצאה"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "נתיב הקובץ לא קיים"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "מידע חבילת המודים שגוים"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "נתוני סביבת קבצי חבילת המודים שגוים"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "כשל בהתקנת ג'אווה"
+  },
+  "app.action-bar.installs": {
+    "message": "התקנות"
   },
   "app.action-bar.make-primary-instance": {
     "message": "הפוך למקרה ראשי"
@@ -38,8 +80,56 @@
   "app.action-bar.stop-instance": {
     "message": ""
   },
+  "app.action-bar.update": {
+    "message": "עדכן"
+  },
+  "app.action-bar.view-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.action-bar.view-logs": {
+    "message": "צפה בלוגים"
+  },
+  "app.ads-consent.accept": {
+    "message": "קבל הכל"
+  },
+  "app.ads-consent.body": {
+    "message": "פרסומות מאפשרות את הפעילות של Modrinth ואת הון התשלום ליוצרים. ייתכן כי השותפים שלנו ישמרו או יגשו לעוגיות באפליקציה על מנת להגיש פרסומות אישיות ולמדוד ביצועים."
+  },
+  "app.ads-consent.manage": {
+    "message": "ניהול העדפות"
+  },
+  "app.ads-consent.reject": {
+    "message": "דחה הכל"
+  },
+  "app.ads-consent.title": {
+    "message": "הפרטיות שלך ואיך פרסומות תומכות בModrinth"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "הצכ התקנות בפריסת שורות קומפקטית."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "מצב קומפקטי"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "דף בית"
+  },
   "app.appearance-settings.default-landing-page.library": {
     "message": "ספרייה"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "הסתר את שם המשתמש שלך מעל התצוגה המוקדמת של סקין השחקן בעמוד בחירת הסקינים."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "הסתר שם משתמש"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "הצג עולמות או התקנות ששוחקו לאחרונה במתחם ה\"קפוץ פנימה\" בדף הבית."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "הקטן אפליקציה"
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "הצג זמן משחק"
   },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
@@ -71,6 +161,9 @@
   "app.export-modal.header": {
     "message": "יצוא חבילת מודים"
   },
+  "app.export-modal.modpack-name-label": {
+    "message": "שם חבילת המודים"
+  },
   "app.export-modal.modpack-name-placeholder": {
     "message": "שם חבילת המודים"
   },
@@ -79,6 +172,63 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "התקנה זאת ננעלה"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "התקנה זאת כבר פתוחה"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "גרור כדי לשנות גודל"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "קפוץ פנימה"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.hosting.update-required.description": {
+    "message": "עליך לעדכן בכדי להשתמש ב- Modrinth Hosting דרך אפליקציית ה Modrinth"
+  },
+  "app.hosting.update-required.download": {
+    "message": "הורד על מנת לעדכן"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "רובוט Modrinth מתרגש"
+  },
+  "app.hosting.update-required.title": {
+    "message": "אפליקציית ה- Modrinth דורשת עדכון"
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "חדש בעדכון זה"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "סגור"
+  },
+  "app.icon-editor.apply-icons-modal.description": {
+    "message": "צור סמלים אישיים להתקנות שלך ישר בתוך אפליקציית ה Modrinth. בחר בין רקעים וסימנים מ Minecraft ומודים פופולריים!"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "סמל אקראי"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "דלג"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "סגור"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "התעלם"
+  },
+  "app.icon-editor.notification.title": {
+    "message": "עורך סמלים חדש"
+  },
+  "app.icon-editor.notification.view-update": {
+    "message": "הצג עדכון"
+  },
+  "app.instance.card.icon-alt": {
+    "message": "סמל התקנה"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "כל הנתונים של ההתקנה שלך ימחקו לתמיד, זה כולל את העולמות שלך, ההגדרות וכל התוכן שהתקנת."
@@ -335,6 +485,114 @@
   "instance.files.save-as": {
     "message": "שמור כ..."
   },
+  "instance.icon-editor.background": {
+    "message": "רקע"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "כחול"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "אפור כהה"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "ירוק כהה"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "אפור"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "ירוק"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "אינדיגו"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "לבנדר"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "אפור בהיר"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "ירוק ליים"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "כתום"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "ורוד"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "סגול"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "אדום"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "רוז"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "צהוב"
+  },
+  "instance.icon-editor.description": {
+    "message": "בחר אלמנטים ליצירת סמל אישי."
+  },
+  "instance.icon-editor.recents": {
+    "message": "אחרונים"
+  },
+  "instance.icon-editor.save": {
+    "message": "שמור סמל"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "אקראי"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "סמל"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "תיק גב"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "כריש כחול"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "מדף ספרים"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "דוב חום"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "עוגה"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "מדורה"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "תיבה"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "בלוק פקודה"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "סיר בישול"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "ספה"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "שולחן מלאכה"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "קריפר"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "שולחן כישופים"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "תיבת אנדר"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "דרקון אנדר"
+  },
   "instance.server-modal.address": {
     "message": "כתובת"
   },
@@ -445,9 +703,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "חלון"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "הגדרות חלון מותאמות אישית"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "מסך מלא"

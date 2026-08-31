@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Pregled analitike"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "Koristi naslovnu traku i kontrole prozora tvog operativnog sistema. Restart aplikacije obavezan."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "Sistemski okvir prozora"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Neuspeh sa učitavanjem podešavanja servera"
   },
@@ -553,6 +559,9 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Greška sa pokazivanjem sadržaja"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "Filter"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Učitavanje sadržaja..."
@@ -5576,9 +5585,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "Dev jar"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Opcionalni paket resursa"
   },
@@ -5590,9 +5596,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "Datoteka sa potpisom"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "Izvorni jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Drugo"

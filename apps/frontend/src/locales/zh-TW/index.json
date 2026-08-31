@@ -818,6 +818,33 @@
   "auth.create-account.username.placeholder": {
     "message": "輸入使用者名稱"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "請輸入驗證應用程式中的 6 位數驗證碼，或其中一個備用碼。"
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "雙重驗證"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "輸入驗證碼..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "使用通行金鑰繼續"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "上次使用{method, select, password {密碼} passkey {通行金鑰} github { GitHub } discord { Discord } google { Google } microsoft { Microsoft } gitlab { GitLab } steam { Steam } paypal { PayPal } other {{method}} }登入。"
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "重新驗證"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "其他登入方式"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "使用 {provider} 登入"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} 需要重新驗證。"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "傳送密碼重設電子郵件"
   },
@@ -860,6 +887,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "輸入驗證碼..."
   },
+  "auth.sign-in.add-account": {
+    "message": "新增帳號"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "選擇要在 Modrinth App 中使用的帳號"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "使用電子郵件繼續"
   },
@@ -874,6 +907,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "上次使用"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "我們正在帶你返回 Modrinth App。如果沒有出現任何反應，請點擊下方的按鈕。"
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "前往 Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "開啟 Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "你已登入"
   },
   "auth.sign-in.no-account": {
     "message": "還沒有帳號嗎？"
@@ -1024,6 +1069,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "回覆並核准"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "關閉檢舉"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "回覆並關閉"
@@ -2189,6 +2237,12 @@
   "error.generic.401.signed-in-as": {
     "message": "你目前登入的帳號："
   },
+  "error.generic.401.switch-account": {
+    "message": "或者，切換到另一個帳號："
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "無法切換帳號，請再試一次。"
+  },
   "error.generic.401.title": {
     "message": "你沒有這個頁面的存取權"
   },
@@ -2205,10 +2259,10 @@
     "message": "因法律原因無法提供內容"
   },
   "error.generic.default.list_item.1": {
-    "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Modrinth 是否停機。"
+    "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Modrinth 是不是停機了。"
   },
   "error.generic.default.list_item.2": {
-    "message": "如果這個問題持續發生，你或許會想加入我們的 <discord-link>Discord 伺服器</discord-link>，通知 Modrinth 團隊。"
+    "message": "如果這個問題持續發生，你可以考慮加入我們的 <discord-link>Discord 伺服器</discord-link>，通知 Modrinth 團隊。"
   },
   "error.generic.default.list_title": {
     "message": "請在幾分鐘後再試一次。"
@@ -2661,7 +2715,7 @@
     "message": "新增專案"
   },
   "layout.action.new-server-project": {
-    "message": "新的伺服器"
+    "message": "新增伺服器專案"
   },
   "layout.action.publish": {
     "message": "發布"
@@ -2674,6 +2728,9 @@
   },
   "layout.action.tech-review": {
     "message": "技術審查"
+  },
+  "layout.action.user-lookup": {
+    "message": "使用者查詢"
   },
   "layout.avatar.alt": {
     "message": "你的顯示圖片"
@@ -2870,6 +2927,9 @@
   "layout.nav.active-reports": {
     "message": "處理中的檢舉"
   },
+  "layout.nav.add-account": {
+    "message": "新增帳號"
+  },
   "layout.nav.discover": {
     "message": "探索"
   },
@@ -2900,6 +2960,9 @@
   "layout.nav.projects": {
     "message": "專案"
   },
+  "layout.nav.remove-account": {
+    "message": "移除帳號"
+  },
   "layout.nav.revenue": {
     "message": "收益"
   },
@@ -2908,6 +2971,12 @@
   },
   "layout.nav.search": {
     "message": "搜尋"
+  },
+  "layout.nav.switch-account": {
+    "message": "切換帳號"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "無法切換帳號，請再試一次。"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升級至 Modrinth+"
@@ -3811,6 +3880,9 @@
   },
   "project.settings.disclosures.advertising.description.1": {
     "message": "如果這個專案包含其他作品的廣告、贊助或宣傳，則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "如果該宣傳沒有直接的金錢價值，<emphasis>並且</emphasis>是一般人會認為「相關」且「不顯眼」的（例如在你自己所製作的模組的設定頁面角落，放置你的 Modrinth 個人檔案的連結），我們便不會將其視為廣告<italic></italic><italic></italic>。"
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "例如：Adds the Modrinth SMP server to your server list automatically."

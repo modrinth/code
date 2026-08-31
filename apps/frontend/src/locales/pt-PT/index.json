@@ -860,6 +860,9 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Inserir código..."
   },
+  "auth.sign-in.choose-account": {
+    "message": "Escolha uma conta para usar no App Modrinth"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar com e-mail"
   },
@@ -2332,9 +2335,6 @@
   },
   "layout.action.new-project": {
     "message": "Novo projeto"
-  },
-  "layout.action.new-server-project": {
-    "message": "Novo servidor"
   },
   "layout.action.publish": {
     "message": "Publicar"

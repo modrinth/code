@@ -11,6 +11,12 @@
   "ads-consent.body": {
     "message": "Reklamer gør Modrinth muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies på hjemmesiden for at personliggøre."
   },
+  "ads-consent.manage": {
+    "message": "Administrer præferencer"
+  },
+  "ads-consent.reject": {
+    "message": "Afvis alle"
+  },
   "ads-consent.title": {
     "message": "Dit privatliv og hvordan reklamer hjælper Modrinth"
   },
@@ -32,17 +38,35 @@
   "analytics.breakdown.dependent-on": {
     "message": "Afhængig af"
   },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Afhængigt projekt"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Type af afhængigt projekt"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "Årsag til download"
+  },
+  "analytics.breakdown.download-source": {
+    "message": "Downloadkilde"
+  },
   "analytics.breakdown.game-version": {
     "message": "Spil version"
   },
   "analytics.breakdown.members": {
     "message": "Medlem"
   },
+  "analytics.breakdown.monetization": {
+    "message": "Monetisering"
+  },
   "analytics.breakdown.project": {
     "message": "Projekt"
   },
   "analytics.breakdown.project-status": {
     "message": "Projekt status"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "Projektversion"
   },
   "analytics.chart.action.show-all": {
     "message": "Vis alle"
@@ -59,6 +83,15 @@
   "analytics.chart.controls.active-count": {
     "message": "{count} aktive"
   },
+  "analytics.chart.controls.display": {
+    "message": "Visning"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth begivenheder"
+  },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Ingen Modrinth-begivenheder i grafen."
+  },
   "analytics.chart.controls.previous-period": {
     "message": "Tidligere periode"
   },
@@ -68,8 +101,20 @@
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Se detaljer om monetiseringsanalyse"
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Detaljer om monetiseringsanalyse"
+  },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Skjul {name} i graf"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Ingen data"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Fastgjort"
   },
   "analytics.chart.tooltip.total": {
     "message": "Total"
@@ -91,6 +136,12 @@
   },
   "analytics.download-source.app": {
     "message": "Modrinth App"
+  },
+  "analytics.download-source.website": {
+    "message": "Modrinth-hjemmeside"
+  },
+  "analytics.downloads.suffix": {
+    "message": "downloads"
   },
   "analytics.empty.no-data": {
     "message": "Ingen data tilgængelig"
@@ -179,6 +230,24 @@
   "analytics.options.loading": {
     "message": "Indlæser..."
   },
+  "analytics.project-event.project-approved": {
+    "message": "Projekt godkendt"
+  },
+  "analytics.project-event.project-private": {
+    "message": "Projekt sat til privat"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Projektstatus ændret"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Projekt skjult"
+  },
+  "analytics.project-event.version-released": {
+    "message": "udgivet"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Version uploadet"
+  },
   "analytics.project-status.approved": {
     "message": "Godkendt"
   },
@@ -188,23 +257,53 @@
   "analytics.project-status.draft": {
     "message": "Kladde"
   },
+  "analytics.project-status.other": {
+    "message": "Andet"
+  },
   "analytics.project-status.private": {
     "message": "Privat"
   },
   "analytics.project-status.rejected": {
     "message": "Afvist"
   },
+  "analytics.project-status.unlisted": {
+    "message": "Skjult"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Tilbageholdt"
+  },
+  "analytics.project.all": {
+    "message": "Alle projekter"
+  },
+  "analytics.project.select": {
+    "message": "Vælg projekter"
+  },
   "analytics.project.your": {
     "message": "Dine projekter"
   },
+  "analytics.query.filter.add": {
+    "message": "Tilføj filter"
+  },
+  "analytics.query.label.project": {
+    "message": "Projekt:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Downloads"
+  },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Lær mere"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Hvordan fungerer monetisering?"
   },
   "analytics.stat.playtime": {
     "message": "Spilletid"
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours} timer"
+  },
+  "analytics.stat.revenue": {
+    "message": "Indtægt"
   },
   "analytics.stat.revenue-value": {
     "message": "${value}"
@@ -235,6 +334,21 @@
   },
   "analytics.table.search.placeholder": {
     "message": "Søg..."
+  },
+  "analytics.title": {
+    "message": "Analyser"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Ingen"
+  },
+  "analytics.value.none": {
+    "message": "Ingen"
+  },
+  "analytics.value.other": {
+    "message": "Andet"
+  },
+  "analytics.value.unknown": {
+    "message": "Ukendt"
   },
   "app-marketing.download.description": {
     "message": "Vores skrivebords-app er tilgængelig til alle platforme, vælg din ønsket version."
@@ -488,6 +602,9 @@
   "auth.create-account.username.placeholder": {
     "message": "Indtast brugernavn"
   },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Log ind på en anden måde"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Send gendannelses e-mail"
   },
@@ -524,11 +641,17 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Indtast kode..."
   },
+  "auth.sign-in.add-account": {
+    "message": "Tilføj konto"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Fortsæt med email"
   },
   "auth.sign-in.continue-with-passkey": {
     "message": "Fortsæt med passkey"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Opret konto"
   },
   "auth.sign-in.forgot-password": {
     "message": "Glemt adgangskode"
@@ -536,8 +659,17 @@
   "auth.sign-in.last-sign-in": {
     "message": "Sidst brugt"
   },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Åbn Modrinth-appen"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Du er logget ind"
+  },
   "auth.sign-in.no-account": {
     "message": "Har du ikke en konto?"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Log ind på Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Log ind"
@@ -671,6 +803,9 @@
   "collection.title": {
     "message": "{name} - samling"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Tilføj privat note"
+  },
   "conversation-thread.action.approve": {
     "message": "Godkend"
   },
@@ -701,8 +836,17 @@
   "conversation-thread.action.send-to-review-with-reply": {
     "message": "Send til gennemgang med svar"
   },
+  "conversation-thread.reply-editor.placeholder.send": {
+    "message": "Send en besked..."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Supplerende filer er til understøttende ressourcer som kildekode, ikke til alternative versioner eller varianter."
+  },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Detaljer"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Filer"
   },
   "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
     "message": "Upload fil"
@@ -1834,9 +1978,6 @@
   },
   "layout.action.new-project": {
     "message": "Nyt projekt"
-  },
-  "layout.action.new-server-project": {
-    "message": "Ny server"
   },
   "layout.action.publish": {
     "message": "Udgiv"

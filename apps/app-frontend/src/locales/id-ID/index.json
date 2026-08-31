@@ -632,18 +632,6 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versi {loader}"
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Variabel lingkungan tersuai"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Argumen Java tersuai"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Pemasangan Java tersuai"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Alokasi memori tersuai"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Masukkan variabel lingkungan..."
   },
@@ -670,9 +658,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Jendela"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Pengaturan jendela tersuai"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Layar penuh"

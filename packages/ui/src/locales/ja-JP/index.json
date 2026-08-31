@@ -1832,6 +1832,72 @@
   "icon-select.select": {
     "defaultMessage": "アイコンを選択"
   },
+  "image-viewer.editor.censor.blur": {
+    "defaultMessage": "ぼかし"
+  },
+  "image-viewer.editor.censor.mode": {
+    "defaultMessage": "修正の種類"
+  },
+  "image-viewer.editor.censor.solid": {
+    "defaultMessage": "塗りつぶし"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "色"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height}px"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "上書き保存"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "やり直し"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "コピーを保存"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "サイズ"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "矢印"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "修正"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "楕円"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "消しゴム"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "ぺン"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "四角形"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "選択"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "テキスト"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "元に戻す"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "線の幅"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "ワークスペースに合わせる"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "拡大"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "縮小"
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "バージョンを検索…"
   },

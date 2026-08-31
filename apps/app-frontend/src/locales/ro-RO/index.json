@@ -8,6 +8,12 @@
   "app.action-bar.downloads": {
     "message": "Descărcări"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Ascunde descărcările active"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Ascunde mai mult instanțe pornite"
+  },
   "app.action-bar.install.copied-details": {
     "message": "Copiat"
   },
@@ -23,8 +29,17 @@
   "app.action-bar.install.retry": {
     "message": "Reîncearcă"
   },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Anulat din cauza închiderii aplicației"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Nu s-a putut citi modpack-ul"
+  },
   "app.action-bar.install.summary.canceled": {
     "message": "Anulat"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Curățarea nu s-a terminat"
   },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "Nu s-au putut salva fișierele"
@@ -403,9 +418,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Ferească"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Setări personalizate de fereastră"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Ecran complet"

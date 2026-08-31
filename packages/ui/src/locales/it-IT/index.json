@@ -173,6 +173,9 @@
   "button.continue": {
     "defaultMessage": "Continua"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copiato negli appunti"
+  },
   "button.copy-filename": {
     "defaultMessage": "Copia nome del file"
   },
@@ -513,7 +516,7 @@
     "defaultMessage": "Nessun cambiamento"
   },
   "content.diff-modal.reviewed-files": {
-    "defaultMessage": "I file non pubblicati su Modrinth non sono revisionati."
+    "defaultMessage": "I file non provenienti da Modrinth non sono revisionati."
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Non è stato possibile analizzare alcuni contenuti sul tuo server, pertanto potrebbero essere toccati da questa modifica."
@@ -1461,7 +1464,7 @@
     "defaultMessage": "Ingrandisci"
   },
   "files.image_viewer.zoom_out": {
-    "defaultMessage": "Riduci"
+    "defaultMessage": "Rimpicciolisci"
   },
   "files.item-type.file": {
     "defaultMessage": "file"
@@ -1963,6 +1966,117 @@
   },
   "icon-select.select": {
     "defaultMessage": "Scegli icona"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Chiudi"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Modifica"
+  },
+  "image-viewer.editor.censor.blur": {
+    "defaultMessage": "Sfocatura"
+  },
+  "image-viewer.editor.censor.mode": {
+    "defaultMessage": "Tipo di censura"
+  },
+  "image-viewer.editor.censor.solid": {
+    "defaultMessage": "Solida"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Colore"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Reimposta"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Elimina annotazione selezionata"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Area"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Elemento"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Modalità gomma"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Strumenti di modifica immagini"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Altre opzioni di salvataggio"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Sovrascrivi"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Ripeti"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Salva copia"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Salva immagine"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Dimensione"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Freccia"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Censura"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Ritaglia"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellisse"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Gomma"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Evidenziatore"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Penna"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Rettangolo"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Selezione"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Testo"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Annulla"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Larghezza"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Adatta"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "Adatta allo spazio di lavoro"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Ingrandisci"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Rimpicciolisci"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Immagine successiva"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Immagine precedente"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Cerca tra le versioni..."
@@ -2552,6 +2666,9 @@
   "label.yes": {
     "defaultMessage": "Sì"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Cambio account..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Ceco"
   },
@@ -3056,6 +3173,9 @@
   "profile.button.set-affiliate": {
     "defaultMessage": "Imposta come affiliato"
   },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Mostra istanze condivise"
+  },
   "profile.button.unblock": {
     "defaultMessage": "Sblocca"
   },
@@ -3090,7 +3210,7 @@
     "defaultMessage": "Metodi di pagamento"
   },
   "profile.details.label.view-github-profile": {
-    "defaultMessage": "Visita profilo"
+    "defaultMessage": "Mostra profilo"
   },
   "profile.details.title": {
     "defaultMessage": "Informazioni"
@@ -3958,6 +4078,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "S"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Canale"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, plural, one {# selezionata} other {# selezionate}}"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Abilita filtro per {filter}"
@@ -6501,7 +6627,7 @@
     "defaultMessage": "File sconosciuti"
   },
   "unknown-file-warning-modal.reviewed-files": {
-    "defaultMessage": "I file non pubblicati su Modrinth non sono revisionati."
+    "defaultMessage": "I file non provenienti da Modrinth non sono revisionati."
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "File non riconosciuti"
@@ -6600,6 +6726,12 @@
     "defaultMessage": "Quest'utente lavora per Modrinth."
   },
   "user.profile.badge.staff.name": {
+    "defaultMessage": "Team di Modrinth"
+  },
+  "user.role.moderator": {
+    "defaultMessage": "Moderatore dei contenuti"
+  },
+  "user.role.modrinth-team": {
     "defaultMessage": "Team di Modrinth"
   },
   "version.content.name": {

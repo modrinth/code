@@ -92,6 +92,15 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Opnieuw abonneren op de server"
   },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Opgeslagen instellingen toepassen"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "De filters van deze link wijken af van je opgeslagen geavanceerde uitsluitingen"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Geavanceerde uitsluitingen worden tussen sessies door opgeslagen. Als je een gedeelde link met filters opent, worden deze overschreven."
+  },
   "browse.filter-results": {
     "defaultMessage": "Resultaten filteren..."
   },
@@ -130,6 +139,9 @@
   },
   "button.accept": {
     "defaultMessage": "Accepteer"
+  },
+  "button.add-another": {
+    "defaultMessage": "Nog een toevoegen"
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Voeg server toevoegen aan instantie"
@@ -202,6 +214,9 @@
   },
   "button.hide-snapshots": {
     "defaultMessage": "Verberg snapshots"
+  },
+  "button.i-understand": {
+    "defaultMessage": "Ik begrijp het"
   },
   "button.install": {
     "defaultMessage": "Installeer"
@@ -617,6 +632,12 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projectnamen"
   },
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "Naam (A-Z)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "Naam (Z-A)"
+  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Nieuwste eerst"
   },
@@ -715,6 +736,15 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Spelversie zoeken..."
+  },
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "Aanpassen"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "Willekeurig"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Uploaden"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Recentste"
@@ -889,6 +919,18 @@
   },
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Modpack zoeken"
+  },
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "Weet je al wat je wilt spelen?"
+  },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Instantie aanmaken"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Modpack installeren"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "Geen resultaten gevonden"
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Begin helemaal opnieuw door een loader en een spelversie te kiezen."
@@ -6002,9 +6044,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "Dev-jar"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc-jar"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Optioneel bronpakket"
   },
@@ -6016,9 +6055,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "Handtekeningbestand"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "Bron-jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Anders"

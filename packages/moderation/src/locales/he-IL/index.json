@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "בחר תגיות מדויקות"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "תוודאו שהמשתמשים יודעים מידע חשוב עם פרטים שמתאימים ל{type} שלך."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "תוודאו פרטים"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "התיאור שלך הוא {length, plural, one {# דמות} other {# דמויות}}. מומלץ להשתמש לפחות ב-{minChars, plural, one {# דמות} other {# דמויות}} כדי ליצור תיאור ברור ואינפורמטיבי."
   },
@@ -145,6 +151,9 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "בחר רזולוציה נכונה"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "תוודאו שיש הוכחה של אישור להפיץ תוכן חיצוני בתוך הModpack."
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "בחר באילו גרסאות השרת שלך תומך, בחר חבילת מודדים, או העלה משלך."

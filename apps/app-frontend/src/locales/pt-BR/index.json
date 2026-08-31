@@ -149,6 +149,9 @@
   "app.ads-consent.title": {
     "message": "Sua privacidade e como anúncios apoiam o Modrinth"
   },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Modo compacto"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Início"
   },
@@ -160,6 +163,9 @@
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar nametag"
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Ir para mundos ou instâncias"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiza o Modrinth App ao iniciar o Minecraft."
@@ -205,6 +211,9 @@
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicialização e navegação"
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Entre em uma conta Modrinth para sincronizar as configurações."
   },
   "app.browse.add-servers-to-instance": {
     "message": "Adicionando servidor à instância"
@@ -355,6 +364,9 @@
   },
   "app.icon-editor.notification.close": {
     "message": "Fechar"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "Dispensar"
   },
   "app.install.phase.downloading_content": {
     "message": "Instalando conteúdo"
@@ -847,9 +859,6 @@
   },
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
-  },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Iniciar sessão em uma conta Modrinth"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Assinar o Modrinth+"
@@ -1688,18 +1697,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "As opções de instalação estarão indisponíveis enquanto esta instância estiver privada."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Variáveis ​​de ambiente personalizadas"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Argumentos Java personalizados"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Instalação personalizada do Java"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Alocação de memória personalizada"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Insira as variáveis ​​de ambiente..."
   },
@@ -1729,9 +1726,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Janela"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Opções de janela personalizada"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tela cheia"

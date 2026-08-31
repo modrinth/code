@@ -174,13 +174,13 @@
     "message": "{dependentProject} は {dependencyProject} の {version} に依存しています"
   },
   "analytics.chart.tooltip.duration.days": {
-    "message": "{count, plural, one {# 日} other {# 日}}"
+    "message": "{count, plural, other {# 日}}"
   },
   "analytics.chart.tooltip.duration.hours": {
-    "message": "{count, plural, one {# 時間} other {# 時間}}"
+    "message": "{count, plural, other {# 時間}}"
   },
   "analytics.chart.tooltip.duration.minutes": {
-    "message": "{count, plural, one {# 分} other {# 分}}"
+    "message": "{count, plural, other {# 分}}"
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "グラフから {name} を非表示にする"
@@ -2546,9 +2546,6 @@
   "layout.action.new-project": {
     "message": "新規プロジェクト"
   },
-  "layout.action.new-server-project": {
-    "message": "新規サーバー"
-  },
   "layout.action.publish": {
     "message": "公開する"
   },
@@ -4476,7 +4473,7 @@
     "message": "Modrinthユーザー\n"
   },
   "shared-instance.invite.joined-count": {
-    "message": "すでに{count, plural, one {#person has} other {#person has}} が参加しています\n"
+    "message": "すでに {count, plural, other {# 人}}が参加しています"
   },
   "shared-instance.invite.loading": {
     "message": "招待を読み込んでいます…\n"

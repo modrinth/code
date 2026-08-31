@@ -165,7 +165,7 @@
     "message": "Показан топ‑{count} {itemType, select,\n  project {проектов}\n  country {стран}\n  monetization {типов монетизации}\n  downloadSource {источников скачивания}\n  downloadReason {причин скачивания}\n  member {участников}\n  projectVersion {версий проекта}\n  loader {загрузчиков}\n  gameVersion {версий игры}\n  other {элементов}\n} из таблицы"
   },
   "analytics.chart.tooltip.dependent-on-project": {
-    "message": "Зависит от {project}"
+    "message": "Зависит от {project}"
   },
   "analytics.chart.tooltip.dependent-project-version": {
     "message": "{dependentProject} зависит от {dependencyProject}, версия {version}"
@@ -810,7 +810,34 @@
     "message": "Имя пользователя"
   },
   "auth.create-account.username.placeholder": {
-    "message": "Введите никнейм"
+    "message": "Введите имя пользователя"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Введите 6‑значный код из аутентификатора или используйте резервный код."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Подтверждение входа"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Введите код..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Использовать ключ доступа"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "Способ последнего входа: {method, select, password {пароль} passkey {ключ доступа} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Повторный вход"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Войти другим способом"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Войти через {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} нуждается в повторном входе."
   },
   "auth.reset-password.method-choice.action": {
     "message": "Отправить письмо"
@@ -854,6 +881,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Введите код..."
   },
+  "auth.sign-in.add-account": {
+    "message": "Добавить аккаунт"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Выбор аккаунта в Modrinth App"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Войти по паролю"
   },
@@ -868,6 +901,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Последнее"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Вы вернётесь в Modrinth App. Если ничего не произойдёт, нажмите кнопку ниже."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Перейти на Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Открыть Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Вход выполнен"
   },
   "auth.sign-in.no-account": {
     "message": "Нет аккаунта?"
@@ -1019,6 +1064,9 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Одобрить с ответом"
   },
+  "conversation-thread.action.close-report": {
+    "message": "Закрыть жалобу"
+  },
   "conversation-thread.action.close-with-reply": {
     "message": "Закрыть с ответом"
   },
@@ -1152,7 +1200,7 @@
     "message": "Загрузите основные и вспомогательные файлы"
   },
   "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
-    "message": "Перетащите или выберите файлы"
+    "message": "Перетащите файлы или нажмите для обзора"
   },
   "create-project-version.create-modal.stage.details.details-tab": {
     "message": "Сведения"
@@ -1707,7 +1755,7 @@
     "message": "Нет близких по сумме номиналов"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
-    "message": "Рядом с вашим числом нет наименований. Самая высокая и доступная это {max}"
+    "message": "Нет близких к сумме номиналов. Доступный максимум — {max}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Способ вывода"
@@ -2121,7 +2169,7 @@
     "message": "Сумма слишком мала"
   },
   "dashboard.withdraw.error.payout-method-disabled.text": {
-    "message": "Этот способ вывода отключён платёжным сервисом. Выберите другой вывода или свяжитесь с поддержкой."
+    "message": "Этот способ вывода отключён платёжным сервисом. Выберите другой способ вывода или свяжитесь с поддержкой."
   },
   "dashboard.withdraw.error.payout-method-disabled.title": {
     "message": "Способ вывода недоступен"
@@ -2182,6 +2230,12 @@
   },
   "error.generic.401.signed-in-as": {
     "message": "Текущий аккаунт:"
+  },
+  "error.generic.401.switch-account": {
+    "message": "Или смените аккаунт:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Не удалось сменить аккаунт. Повторите попытку."
   },
   "error.generic.401.title": {
     "message": "У вас нет доступа к этой странице"
@@ -2655,7 +2709,7 @@
     "message": "Новый проект"
   },
   "layout.action.new-server-project": {
-    "message": "Новый сервер"
+    "message": "Новый серверный проект"
   },
   "layout.action.publish": {
     "message": "Опубликовать"
@@ -2668,6 +2722,9 @@
   },
   "layout.action.tech-review": {
     "message": "Техпроверка"
+  },
+  "layout.action.user-lookup": {
+    "message": "Поиск пользователя"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -2864,6 +2921,9 @@
   "layout.nav.active-reports": {
     "message": "Активные жалобы"
   },
+  "layout.nav.add-account": {
+    "message": "Добавить аккаунт"
+  },
   "layout.nav.discover": {
     "message": "Найти"
   },
@@ -2894,6 +2954,9 @@
   "layout.nav.projects": {
     "message": "Проекты"
   },
+  "layout.nav.remove-account": {
+    "message": "Удалить аккаунт"
+  },
   "layout.nav.revenue": {
     "message": "Доход"
   },
@@ -2902,6 +2965,12 @@
   },
   "layout.nav.search": {
     "message": "Поиск"
+  },
+  "layout.nav.switch-account": {
+    "message": "Сменить аккаунт"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Не удалось сменить аккаунт. Повторите попытку."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Перейти на Modrinth+"
