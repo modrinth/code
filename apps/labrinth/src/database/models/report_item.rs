@@ -9,6 +9,7 @@ pub struct DBReport {
     pub project_id: Option<DBProjectId>,
     pub version_id: Option<DBVersionId>,
     pub user_id: Option<DBUserId>,
+    pub organization_id: Option<DBOrganizationId>,
     pub shared_instance_id: Option<SharedInstanceId>,
     pub shared_instance_version_id: Option<i32>,
     pub body: String,
@@ -23,6 +24,7 @@ pub struct ReportQueryResult {
     pub project_id: Option<DBProjectId>,
     pub version_id: Option<DBVersionId>,
     pub user_id: Option<DBUserId>,
+    pub organization_id: Option<DBOrganizationId>,
     pub shared_instance_id: Option<SharedInstanceId>,
     pub shared_instance_version_id: Option<i32>,
     pub body: String,
@@ -40,12 +42,12 @@ impl DBReport {
         sqlx::query!(
             "
             INSERT INTO reports (
-                id, report_type_id, mod_id, version_id, user_id,
+                id, report_type_id, mod_id, version_id, user_id, organization_id,
                 shared_instance_id, shared_instance_version_id, body, reporter
             )
             VALUES (
                 $1, $2, $3, $4, $5,
-                $6, $7, $8, $9
+                $6, $7, $8, $9, $10
             )
             ",
             self.id as DBReportId,
@@ -53,6 +55,7 @@ impl DBReport {
             self.project_id.map(|x| x.0 as i64),
             self.version_id.map(|x| x.0 as i64),
             self.user_id.map(|x| x.0 as i64),
+            self.organization_id.map(|x| x.0 as i64),
             self.shared_instance_id.map(|x| x.0 as i64),
             self.shared_instance_version_id,
             self.body,
@@ -89,7 +92,7 @@ impl DBReport {
             report_ids.iter().map(|x| x.0).collect();
         let reports = sqlx::query!(
             "
-            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.shared_instance_id, r.shared_instance_version_id, r.body, r.reporter, r.created, t.id thread_id, r.closed
+            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.organization_id, r.shared_instance_id, r.shared_instance_version_id, r.body, r.reporter, r.created, t.id thread_id, r.closed
             FROM reports r
             INNER JOIN report_types rt ON rt.id = r.report_type_id
             INNER JOIN threads t ON t.report_id = r.id
@@ -105,6 +108,7 @@ impl DBReport {
             project_id: x.mod_id.map(DBProjectId),
             version_id: x.version_id.map(DBVersionId),
             user_id: x.user_id.map(DBUserId),
+            organization_id: x.organization_id.map(DBOrganizationId),
             shared_instance_id: x.shared_instance_id.map(SharedInstanceId),
             shared_instance_version_id: x.shared_instance_version_id,
             body: x.body,
