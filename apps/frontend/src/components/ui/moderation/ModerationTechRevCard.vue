@@ -326,7 +326,7 @@ watch(
 					</ButtonLink>
 					<ButtonLink
 						type="outlined"
-						target="_blank"
+						:target="selectedFile.file_id"
 						:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
 						class="!bg-surface-2"
 						aria-label="Open in Slicer"

@@ -5,9 +5,16 @@ import {
 	ChevronDownIcon,
 	ChevronRightIcon,
 	CopyIcon,
+	ExternalIcon,
 	LoaderCircleIcon,
 } from '@modrinth/assets'
-import { Collapsible, IconButton, injectNotificationManager, Toggle } from '@modrinth/ui'
+import {
+	ButtonLink,
+	Collapsible,
+	IconButton,
+	injectNotificationManager,
+	Toggle,
+} from '@modrinth/ui'
 import { capitalizeString, highlightCodeLines } from '@modrinth/utils'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
@@ -527,6 +534,32 @@ async function focusDetail(detailId: string) {
 	})
 }
 
+function trimSlashes(path: string): string {
+	if (path.startsWith('/')) {
+		path = path.slice(1)
+	}
+	if (path.endsWith('/')) {
+		path = path.slice(0, -1)
+	}
+	return path
+}
+
+// Creates a slicer link with a group, removes trailing and leading slashes, and if no file extension found assume .class
+function createSlicerLink(url: string, group: ClassGroup | undefined) {
+	const uri = new URL(url)
+	const filename = uri.pathname.split('/').pop() || ''
+	if (group) {
+		const jarPath = trimSlashes(group.jar ? group.jar.replace('#', '/') : filename)
+		const filePath = trimSlashes(
+			group.filePath.startsWith('/') ? group.filePath.slice(1) : group.filePath,
+		)
+		const hasFileExtension = (filePath.split('/').pop() || '').includes('.')
+		const file = `${jarPath}/${hasFileExtension ? filePath : `${filePath}.class`}`
+		return `https://slicer.run/?url=${encodeURIComponent(url)}&file=${encodeURIComponent(file)}`
+	}
+	return `https://slicer.run/?url=${encodeURIComponent(url)}`
+}
+
 watch(
 	[() => props.focusedDetailId, () => props.file.id],
 	([detailId]) => {
@@ -678,6 +711,18 @@ watch(
 						</div>
 					</Transition>
 				</div>
+
+				<ButtonLink
+					v-tooltip="'Open file in slicer'"
+					type="outlined"
+					:href="createSlicerLink(props.file.download_url, classItem)"
+					:target="props.file.file_id"
+					circular
+					icon-only
+					@click="$event.stopPropagation()"
+				>
+					<ExternalIcon />
+				</ButtonLink>
 			</div>
 
 			<Collapsible :collapsed="!expandedClasses.has(classItem.key)">
