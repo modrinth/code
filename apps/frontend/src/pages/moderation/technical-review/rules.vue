@@ -178,7 +178,7 @@ IS_MATCH ? "low" : null</code></pre>
 				>
 					<TriangleAlertIcon class="mt-0.5 size-5 shrink-0" />
 					<p class="m-0 text-sm">
-						The test trace issue type <strong>{{ testTraceForm.issueType || '(empty)' }}</strong> is
+						The test trace issue type <strong>{{ activeTestTraceIssueType || '(empty)' }}</strong> is
 						not selected for this rule. The CEL expression is still evaluated in this preview, but
 						the rule will not run for this issue type during a scan.
 					</p>
@@ -196,51 +196,81 @@ IS_MATCH ? "low" : null</code></pre>
 
 				<div class="grid items-stretch gap-3 md:grid-cols-[minmax(0,2fr)_auto_minmax(0,1fr)]">
 					<article class="universal-card flex min-w-0 flex-col gap-3">
-						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">
-							Trace details
-						</p>
-						<div class="grid gap-3 sm:grid-cols-2">
-							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
-								Key
-								<Input v-model="testTraceForm.key" placeholder="unique-trace-key" />
-							</label>
-							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
-								Issue type
-								<Input v-model="testTraceForm.issueType" placeholder="OBFUSCATED_NAMES" />
-							</label>
-							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
-								Severity
-								<select
-									v-model="testTraceForm.severity"
-									class="h-9 w-full rounded-xl border-none bg-surface-4 px-3 font-medium capitalize text-primary outline-none focus:ring-4 focus:ring-brand-shadow"
-								>
-									<option v-for="severity in TRACE_SEVERITIES" :key="severity" :value="severity">
-										{{ severity }}
-									</option>
-								</select>
-							</label>
-							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
-								JAR
-								<Input v-model="testTraceForm.jar" placeholder="META-INF/jars/embedded.jar" />
-							</label>
+						<div class="flex flex-wrap items-center justify-between gap-2">
+							<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">
+								Trace details
+							</p>
+							<Tabs
+								:value="testTraceMode"
+								:tabs="TEST_TRACE_TABS"
+								aria-label="Test trace input format"
+								@update:value="testTraceMode = $event as TestTraceMode"
+							/>
 						</div>
-						<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
-							File path
-							<Input v-model="testTraceForm.filePath" placeholder="com/example/Bootstrap.class" />
-						</label>
-						<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
-							Data (JSON)
+						<template v-if="testTraceMode === 'fields'">
+							<div class="grid gap-3 sm:grid-cols-2">
+								<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+									Key
+									<Input v-model="testTraceForm.key" placeholder="unique-trace-key" />
+								</label>
+								<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+									Issue type
+									<Input v-model="testTraceForm.issueType" placeholder="OBFUSCATED_NAMES" />
+								</label>
+								<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+									Severity
+									<select
+										v-model="testTraceForm.severity"
+										class="h-9 w-full rounded-xl border-none bg-surface-4 px-3 font-medium capitalize text-primary outline-none focus:ring-4 focus:ring-brand-shadow"
+									>
+										<option
+											v-for="severity in TRACE_SEVERITIES"
+											:key="severity"
+											:value="severity"
+										>
+											{{ severity }}
+										</option>
+									</select>
+								</label>
+								<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+									JAR
+									<Input v-model="testTraceForm.jar" placeholder="META-INF/jars/embedded.jar" />
+								</label>
+							</div>
+							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+								File path
+								<Input v-model="testTraceForm.filePath" placeholder="com/example/Bootstrap.class" />
+							</label>
+							<label class="flex min-w-0 flex-col gap-1 text-sm font-semibold text-contrast">
+								Data (JSON)
+								<Textarea
+									v-model="testTraceForm.data"
+									:rows="4"
+									resize="vertical"
+									input-class="font-mono text-sm"
+									:error="Boolean(traceDataError)"
+								/>
+							</label>
+							<p v-if="traceDataError" class="m-0 text-sm text-red">
+								{{ traceDataError }}
+							</p>
+						</template>
+						<template v-else>
+							<p class="m-0 text-sm text-secondary">
+								Paste the complete JSON object produced by the Copy CEL button.
+							</p>
 							<Textarea
-								v-model="testTraceForm.data"
-								:rows="4"
+								v-model="rawTestTraceInput"
+								:rows="16"
+								placeholder="Paste CEL JSON…"
 								resize="vertical"
 								input-class="font-mono text-sm"
-								:error="Boolean(traceDataError)"
+								:error="Boolean(rawTestTraceError)"
 							/>
-						</label>
-						<p v-if="traceDataError" class="m-0 text-sm text-red">
-							{{ traceDataError }}
-						</p>
+							<p v-if="rawTestTraceError" class="m-0 text-sm text-red">
+								{{ rawTestTraceError }}
+							</p>
+						</template>
 					</article>
 
 					<div
@@ -258,7 +288,7 @@ IS_MATCH ? "low" : null</code></pre>
 							<LoaderCircleIcon class="size-5 animate-spin" />
 							<span>Evaluating…</span>
 						</div>
-						<p v-else-if="traceDataError || ruleTestError" class="m-0 text-sm text-secondary">
+						<p v-else-if="testTraceInputError || ruleTestError" class="m-0 text-sm text-secondary">
 							Preview unavailable.
 						</p>
 						<div
@@ -280,7 +310,7 @@ IS_MATCH ? "low" : null</code></pre>
 								>
 									{{ testTracePreview.effectiveSeverity }}
 								</span>
-								<strong class="break-all text-contrast">{{ testTraceForm.issueType }}</strong>
+								<strong class="break-all text-contrast">{{ activeTestTraceIssueType }}</strong>
 							</div>
 							<p class="m-0 text-sm text-secondary">{{ testTracePreview.summary }}</p>
 						</template>
@@ -559,6 +589,8 @@ import {
 	NewModal,
 	Pagination,
 	ProgressBar,
+	Tabs,
+	type TabsTab,
 	TagItem,
 	Textarea,
 } from '@modrinth/ui'
@@ -668,6 +700,13 @@ type TestTraceForm = {
 	data: string
 }
 
+type TestTraceMode = 'fields' | 'json'
+
+const TEST_TRACE_TABS: TabsTab[] = [
+	{ label: 'Fields', value: 'fields' },
+	{ label: 'Raw CEL JSON', value: 'json' },
+]
+
 const TRACE_SEVERITIES: Labrinth.TechReview.Internal.DelphiSeverity[] = [
 	'low',
 	'medium',
@@ -745,6 +784,8 @@ const ruleToDelete = ref<Labrinth.TechReview.Internal.DelphiRule | null>(null)
 const ruleTestEffects = ref<Array<Labrinth.TechReview.Internal.DelphiRuleEffect | null>>([])
 const ruleTestError = ref<RuleTestError | null>(null)
 const traceDataError = ref<string | null>(null)
+const testTraceMode = ref<TestTraceMode>('fields')
+const rawTestTraceInput = ref('')
 const scanProgress = ref<Labrinth.TechReview.Internal.DelphiRuleScanEvent | null>(null)
 const affectedDetailsPages = reactive(
 	new Map<
@@ -803,19 +844,88 @@ const ruleInputSchemaText = computed(() =>
 const ruleOutputSchemaText = computed(() =>
 	ruleSchema.value ? formatRuleSchema(ruleSchema.value.output, ruleSchema.value.components) : '',
 )
+const parsedRawTestTraceInput = computed(() => {
+	if (!rawTestTraceInput.value.trim()) {
+		return {
+			input: null,
+			error: 'Paste a CEL JSON object to test it.',
+		}
+	}
+
+	let parsed: unknown
+	try {
+		parsed = JSON.parse(rawTestTraceInput.value)
+	} catch {
+		return {
+			input: null,
+			error: 'Enter valid CEL JSON.',
+		}
+	}
+
+	if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+		return {
+			input: null,
+			error: 'CEL JSON must be an object.',
+		}
+	}
+
+	const trace = (parsed as Record<string, unknown>).trace
+	if (typeof trace !== 'object' || trace === null || Array.isArray(trace)) {
+		return {
+			input: null,
+			error: 'CEL JSON must include a trace object.',
+		}
+	}
+
+	const { issue_type: issueType, severity } = trace as Record<string, unknown>
+	if (typeof issueType !== 'string') {
+		return {
+			input: null,
+			error: 'CEL JSON trace.issue_type must be a string.',
+		}
+	}
+	if (!TRACE_SEVERITIES.includes(severity as Labrinth.TechReview.Internal.DelphiSeverity)) {
+		return {
+			input: null,
+			error: 'CEL JSON trace.severity is invalid.',
+		}
+	}
+
+	return {
+		input: parsed as Labrinth.TechReview.Internal.RuleInput,
+		error: null,
+	}
+})
+const rawTestTraceError = computed(() => parsedRawTestTraceInput.value.error)
+const testTraceInputError = computed(() =>
+	testTraceMode.value === 'fields' ? traceDataError.value : rawTestTraceError.value,
+)
+const activeTestTraceIssueType = computed(() =>
+	testTraceMode.value === 'fields'
+		? testTraceForm.issueType
+		: parsedRawTestTraceInput.value.input?.trace.issue_type,
+)
+const activeTestTraceSeverity = computed(() =>
+	testTraceMode.value === 'fields'
+		? testTraceForm.severity
+		: parsedRawTestTraceInput.value.input?.trace.severity,
+)
 const isTestTraceIssueTypeExcluded = computed(
 	() =>
-		form.onIssueTypes.length > 0 && !form.onIssueTypes.includes(testTraceForm.issueType),
+		activeTestTraceIssueType.value !== undefined &&
+		form.onIssueTypes.length > 0 &&
+		!form.onIssueTypes.includes(activeTestTraceIssueType.value),
 )
 const testTracePreview = computed(() => {
 	const effect = ruleTestEffects.value[0] ?? null
-	const effectiveSeverity = effect?.severity ?? testTraceForm.severity
+	const originalSeverity = activeTestTraceSeverity.value ?? 'low'
+	const effectiveSeverity = effect?.severity ?? originalSeverity
 	let summary: string
 
 	if (!effect) {
 		summary = 'This rule would not change the trace.'
-	} else if (effect.severity !== testTraceForm.severity) {
-		summary = `Severity changed from ${testTraceForm.severity} to ${effect.severity}.`
+	} else if (effect.severity !== originalSeverity) {
+		summary = `Severity changed from ${originalSeverity} to ${effect.severity}.`
 	} else {
 		summary = 'The rule matched without changing the severity.'
 	}
@@ -1008,6 +1118,10 @@ function handleRuleInput(rule: string) {
 }
 
 function getTestRuleInput(): Labrinth.TechReview.Internal.RuleInput | null {
+	if (testTraceMode.value === 'json') {
+		return parsedRawTestTraceInput.value.input
+	}
+
 	let data: unknown
 	try {
 		data = JSON.parse(testTraceForm.data)
@@ -1101,7 +1215,21 @@ function queueRuleTest() {
 	void testRuleDebounced()
 }
 
-watch(testTraceForm, queueRuleTest, { flush: 'sync' })
+watch(
+	testTraceForm,
+	() => {
+		if (testTraceMode.value === 'fields') queueRuleTest()
+	},
+	{ flush: 'sync' },
+)
+watch(
+	rawTestTraceInput,
+	() => {
+		if (testTraceMode.value === 'json') queueRuleTest()
+	},
+	{ flush: 'sync' },
+)
+watch(testTraceMode, queueRuleTest, { flush: 'sync' })
 
 async function loadRules() {
 	isLoading.value = true
@@ -1218,6 +1346,8 @@ function openCreateModal() {
 	form.rule = DEFAULT_RULE
 	form.onIssueTypes = []
 	Object.assign(testTraceForm, createTestTraceForm())
+	testTraceMode.value = 'fields'
+	rawTestTraceInput.value = ''
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
 	nextTick(() => ruleEditorInstance.value?.resize(true))
@@ -1233,6 +1363,8 @@ function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
 	form.rule = rule.rule
 	form.onIssueTypes = [...rule.on_issue_types]
 	Object.assign(testTraceForm, createTestTraceForm())
+	testTraceMode.value = 'fields'
+	rawTestTraceInput.value = ''
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
 	nextTick(() => ruleEditorInstance.value?.resize(true))
