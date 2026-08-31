@@ -314,6 +314,8 @@ vars! {
     SENDY_LIST_ID: String = "none";
     SENDY_API_KEY: String = "none";
 
+    SKIP_EMAIL_CHECK_DOMAINS: String = "";
+
     NEVERBOUNCE_API_KEY: String = "";
     NEVERBOUNCE_BASE_URL: String = neverbounce::DEFAULT_API_URL;
 

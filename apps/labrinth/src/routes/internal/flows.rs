@@ -1901,11 +1901,28 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
+/// Domains listed in `SKIP_EMAIL_CHECK_DOMAINS` bypass every email check.
+fn email_checks_skipped(email: &str) -> bool {
+    let Some((_, domain)) = email.rsplit_once('@') else {
+        return false;
+    };
+
+    ENV.SKIP_EMAIL_CHECK_DOMAINS
+        .split(',')
+        .map(str::trim)
+        .filter(|skipped| !skipped.is_empty())
+        .any(|skipped| skipped.eq_ignore_ascii_case(domain))
+}
+
 /// Runs the UserCheck gate, which covers both password and OAuth signups.
 async fn ensure_email_passes_gate(
     redis: &RedisPool,
     email: &str,
 ) -> Result<(), ApiError> {
+    if email_checks_skipped(email) {
+        return Ok(());
+    }
+
     let action = check_email_gate(redis, email)
         .await
         .wrap_request_err("checking email address")?;
@@ -1922,6 +1939,10 @@ async fn ensure_email_is_usable(
     email: &str,
 ) -> Result<(), ApiError> {
     ensure_email_passes_gate(redis, email).await?;
+
+    if email_checks_skipped(email) {
+        return Ok(());
+    }
 
     let result = check_email(redis, email)
         .await
