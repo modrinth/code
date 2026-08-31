@@ -37,7 +37,7 @@ const displayedSettings = ref<{ [name: string]: SettingDefinition[] }>(flattened
 </script>
 
 <template>
-	<div v-for="[name, page] of Object.entries(displayedSettings)" :key="name" class="universal-card">
+	<div v-for="[name, page] in Object.entries(displayedSettings)" :key="name" class="universal-card">
 		<h2 class="text-2xl">{{ name }}</h2>
 		<div class="flex flex-col gap-3">
 			<div

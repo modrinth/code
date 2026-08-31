@@ -38,7 +38,8 @@
 							v-tooltip="'Open in new tab'"
 							:href="`/moderation/reports/${props.report.id}`"
 							target="_blank"
-							class="!w-9 !rounded-full !px-0"
+							circular
+							icon-only
 						>
 							<ExternalIcon />
 						</ButtonLink>
