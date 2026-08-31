@@ -2657,9 +2657,6 @@
   "layout.action.new-project": {
     "message": "مشروع جديد"
   },
-  "layout.action.new-server-project": {
-    "message": "خادم جديد"
-  },
   "layout.action.publish": {
     "message": "نشر"
   },

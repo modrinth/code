@@ -884,9 +884,6 @@
   "instance.settings.tabs.window": {
     "message": "Janela"
   },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Definições personalizadas de janela"
-  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Ecrã Inteiro"
   },

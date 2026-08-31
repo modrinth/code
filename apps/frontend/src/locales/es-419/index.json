@@ -818,6 +818,33 @@
   "auth.create-account.username.placeholder": {
     "message": "Ingresa tu nombre de usuario"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Ingresa el código de 6 dígitos de tu aplicación de autenticación o uno de tus códigos de respaldo."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Autenticación de dos factores"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Introduce el código..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Continuar con clave de acceso"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "La última vez se ha iniciado sesión con {method, select, password {una contraseña} passkey {una llave de acceso} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Reautenticar"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Iniciar sesión de otra forma"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Iniciar sesión con {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} necesita ser reautenticado."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Enviar correo de recuperación"
   },
@@ -860,6 +887,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Introduce el código..."
   },
+  "auth.sign-in.add-account": {
+    "message": "Añadir una cuenta"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Elige una cuenta para usar en la aplicación de Modrinth"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar con el correo electrónico"
   },
@@ -874,6 +907,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Último inicio de sesión"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Te estamos devolviendo a la aplicación Modrinth. Si nada sucede, usa el botón de abajo."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Ir a Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Abrir la aplicación de Modrinth"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Has iniciado sesión"
   },
   "auth.sign-in.no-account": {
     "message": "¿No tienes una cuenta?"
@@ -1024,6 +1069,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Aprovar con respuesta"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Cerrar informe"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cerrar con respuesta"
@@ -2189,6 +2237,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Has iniciado sesión como:"
   },
+  "error.generic.401.switch-account": {
+    "message": "O cambia a otra cuenta:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "No se consiguió cambiar la cuenta. Por favor, intenta de nuevo."
+  },
   "error.generic.401.title": {
     "message": "No tienes acceso a esta página"
   },
@@ -2661,7 +2715,7 @@
     "message": "Nuevo proyecto"
   },
   "layout.action.new-server-project": {
-    "message": "Nuevo servidor"
+    "message": "Nuevo proyecto de servidor"
   },
   "layout.action.publish": {
     "message": "Publicar"
@@ -2674,6 +2728,9 @@
   },
   "layout.action.tech-review": {
     "message": "Revisión técnica"
+  },
+  "layout.action.user-lookup": {
+    "message": "Buscar usuario"
   },
   "layout.avatar.alt": {
     "message": "Tu avatar"
@@ -2870,6 +2927,9 @@
   "layout.nav.active-reports": {
     "message": "Reportes activos"
   },
+  "layout.nav.add-account": {
+    "message": "Añadir una cuenta"
+  },
   "layout.nav.discover": {
     "message": "Descubre"
   },
@@ -2900,6 +2960,9 @@
   "layout.nav.projects": {
     "message": "Proyectos"
   },
+  "layout.nav.remove-account": {
+    "message": "Eliminar cuenta"
+  },
   "layout.nav.revenue": {
     "message": "Ingresos"
   },
@@ -2908,6 +2971,12 @@
   },
   "layout.nav.search": {
     "message": "Buscar"
+  },
+  "layout.nav.switch-account": {
+    "message": "Cambiar de cuenta"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "No se consiguió cambiar la cuenta. Por favor, intenta de nuevo."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Actualizar a Modrinth+"
@@ -3738,7 +3807,7 @@
     "message": "Los moderadores de contenido no pueden dar soporte a la mayoría de los problemas y los mensajes de este hilo no notifican al staff."
   },
   "project.moderation.thread.help-center-note.2": {
-    "message": "Si necesitas ayuda o tienes consultas adicionales, por favor visita el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz click en la burbuja azúl para contactar con soporte."
+    "message": "Si necesitas ayuda o tienes consultas adicionales, por favor visita el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz clic en la burbuja azúl para contactar con soporte."
   },
   "project.moderation.thread.private-description": {
     "message": "Este es un hilo de conversación con los moderadores de Modrinth. Es posible que te envíen mensajes sobre cuestiones relacionadas con este proyecto."

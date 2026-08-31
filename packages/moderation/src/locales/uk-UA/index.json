@@ -66,7 +66,7 @@
     "defaultMessage": "Відредагуйте ліцензію"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "Відредагуйте анотацію"
+    "defaultMessage": "Відредагуйте короткий зміст"
   },
   "nags.edit-tags.title": {
     "defaultMessage": "Відредагуйте позначки"
@@ -222,22 +222,22 @@
     "defaultMessage": "Відвідайте налаштування версій"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Ваша анотація не може бути такою ж, як назва вашого проєкту. Це важливо для створення інформативної та привабливої анотації."
+    "defaultMessage": "Короткий зміст не має повторювати назви проєкту. Це важливо для створення змістовного й привабливого змісту."
   },
   "nags.summary-same-as-title.title": {
-    "defaultMessage": "Зробіть анотацію унікальною"
+    "defaultMessage": "Зробіть короткий зміст унікальним"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Ваша анотація не має містити форматування, розривів рядків, спеціальних символів або посилань, оскільки анотація показує лише звичайний текст."
+    "defaultMessage": "Короткий зміст не має містити форматування, розривів рядків, спеціальних символів або посилань, оскільки він показує лише простий текст."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "Очистьте анотацію"
+    "defaultMessage": "Очистьте короткий зміст"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Ваша анотація складається з {length, plural, one {# символа} other {# символів}}. Рекомендуємо зробити анотацію хоча б з {minChars, plural, one {# символа} other {# символів}}, щоб вона виглядала інформативно й привабливо."
+    "defaultMessage": "Короткий зміст містить {length, plural, one {# символа} other {# символів}}. Ми радимо щоайменше {minChars, plural, one {# символ} few {# символи} other {# символів}} для змістовного й привабливого змісту."
   },
   "nags.summary-too-short.title": {
-    "defaultMessage": "Доповніть анотацію"
+    "defaultMessage": "Доповніть короткий зміст"
   },
   "nags.title-contains-technical-info.description": {
     "defaultMessage": "Якщо вибрати лаконічну назву для проєкту, його буде легше запам’ятати та знайти. Інформація про версію та завантажувач автоматично показується поруч із назвою."

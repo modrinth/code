@@ -818,6 +818,33 @@
   "auth.create-account.username.placeholder": {
     "message": "Kullanıcı adı giriniz"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Doğrulama uygulamanıza gelen 6 haneli kodu yazın ya da bir kurtarma kodunuzu yazın."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "İki aşamalı doğrulama"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Kodu girin..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Giriş anahtarı ile devam et"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "En son {method, select, password {bir şifre} passkey {bir geçiş anahtarı} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} } ile oturum açıldı."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Yeniden Doğrula"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Başka bir şekilde oturum açın"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "{provider} ile giriş yap"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} kimliğinin yeniden doğrulanması gerekiyor."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Kurtarma e-postası gönder"
   },
@@ -860,6 +887,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Kodu girin..."
   },
+  "auth.sign-in.add-account": {
+    "message": "Hesap ekle"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Modrinth App'de kullanılacak bir hesap seçin"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Email ile devam et"
   },
@@ -874,6 +907,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Son kullanılan hesap"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Sizi Modrinth App'e yönlendiriyoruz. Eğer hiçbir şey yaşanmazsa, aşağıdaki butonu kullanın."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Modrinth.com'a git"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Modrinth App'i aç"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Oturum açtınız"
   },
   "auth.sign-in.no-account": {
     "message": "Hesabınız yok mu?"
@@ -1024,6 +1069,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Onaylandı, işlem tamamlandı"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Raporu kapat"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cevapla ve kapat"
@@ -2189,6 +2237,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Şu anda şu hesapla oturum açtınız:"
   },
+  "error.generic.401.switch-account": {
+    "message": "Ya da farklı bir hesaba geç:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Hesaplar değiştirilemedi. Lütfen tekrar deneyin."
+  },
   "error.generic.401.title": {
     "message": "Bu sayfaya erişiminiz yok"
   },
@@ -2661,7 +2715,7 @@
     "message": "Yeni proje"
   },
   "layout.action.new-server-project": {
-    "message": "Yeni Sunucu"
+    "message": "Yeni sunucu projesi"
   },
   "layout.action.publish": {
     "message": "Yayınla"
@@ -2674,6 +2728,9 @@
   },
   "layout.action.tech-review": {
     "message": "Teknoloji incelemesi"
+  },
+  "layout.action.user-lookup": {
+    "message": "Kullanıcı arama"
   },
   "layout.avatar.alt": {
     "message": "Avatarınız"
@@ -2870,11 +2927,14 @@
   "layout.nav.active-reports": {
     "message": "Aktif Raporlar"
   },
+  "layout.nav.add-account": {
+    "message": "Hesap ekle"
+  },
   "layout.nav.discover": {
     "message": "Keşfet"
   },
   "layout.nav.get-modrinth-app": {
-    "message": "Modrinth App yükle"
+    "message": "Modrinth App'i yükle"
   },
   "layout.nav.home": {
     "message": "Anasayfa"
@@ -2900,6 +2960,9 @@
   "layout.nav.projects": {
     "message": "Projeler"
   },
+  "layout.nav.remove-account": {
+    "message": "Hesabı kaldır"
+  },
   "layout.nav.revenue": {
     "message": "Gelir"
   },
@@ -2908,6 +2971,12 @@
   },
   "layout.nav.search": {
     "message": "Arama"
+  },
+  "layout.nav.switch-account": {
+    "message": "Hesap değiştir"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Hesaplar değiştirilemedi. Lütfen tekrar deneyin."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ Kullan"
@@ -3317,8 +3386,17 @@
   "organization.project-transfer.title": {
     "message": "Projeleri transfer et"
   },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "{count, plural, one {# projeyi} other {# projeyi}} transfer et"
+  },
   "organization.project-transfer.type-column": {
     "message": "Tür"
+  },
+  "organization.projects.none": {
+    "message": "Bu organizasyon herhangi bir projeye sahip değil."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Bu organizasyon herhangi bir projeye sahip değil. Bir tane <create-link>oluşturmak</create-link> ister misiniz?"
   },
   "project-member-header.error-decline": {
     "message": "Ekip daveti reddedilemedi"
@@ -3439,6 +3517,9 @@
   },
   "project.actions.back-to-project-page": {
     "message": "Proje sayfasına geri dön"
+  },
+  "project.actions.check-modpack-archives": {
+    "message": "Mod paketi arşivlerini kontrol et"
   },
   "project.actions.checking-modpack-archives": {
     "message": "Kontrol ediliyor..."
@@ -3728,11 +3809,23 @@
   "project.moderation.title": {
     "message": "Moderasyon"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "Bu mod paketini içe aktarma işlemi bozuk olabilir"
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "Bu mod paketi bir dışa aktarma hatası sırasında yayınlandı"
+  },
   "project.navigation.changelog": {
     "message": "Değişiklikler"
   },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "Bazı mod paketi dosyaları paketten çıkarılamadı"
+  },
   "project.notification.check-modpack-archives.no-files": {
     "message": "Bu proje için .mrpack dosyası bulunamadı."
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural,one {Modpack dosyası açılabilir.}other {# modpack dosyasının tümü açılabilir.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "Projenizin simgesi güncellendi."
@@ -3757,6 +3850,9 @@
   },
   "project.settings.delete-project.button": {
     "message": "Projeyi kaldır"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "Eğer devam ederseniz, bu projenin tüm bilgileri ve sürümleri veritabanımızdan silinecektir. Silinen verilerin hiçbiri, fikrinizi değiştirseniz bile geri getirilemez. Geri getirilebilir bir seçenek olarak projenizi Özel olarak ayarlayabilirsiniz."
   },
   "project.settings.delete-project.confirmation.proceed-text": {
     "message": "Projeyi kalıcı olarak sil"
@@ -3788,6 +3884,9 @@
   "project.settings.disclosures.ai.content-rules": {
     "message": "Daha fazla bilgi için lütfen <rules>Modrinth İçerik Kuralları</rules>’nın 6. bölümüne bakın."
   },
+  "project.settings.disclosures.ai.description": {
+    "message": "Bu proje önemli miktarda yapay zeka tarafından oluşturulan kod içeriyorsa, büyük ölçüde yapay zeka tarafından oluşturulan herhangi bir varlık içeriyorsa, projenin işlevselliği üretken yapay zeka kullanımına dayanıyorsa veya projenizin sayfasının açıklama veya yayınlama gibi herhangi bir şeyi üretken yapay zekaya dayanıyorsa bunu etkinleştirmeniz gerekir."
+  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "örn. AI tarafından oluşturulmuş Çince ve Arapça çeviriler."
   },
@@ -3815,6 +3914,9 @@
   "project.settings.disclosures.content-disclosures": {
     "message": "İçerik Uyarıları"
   },
+  "project.settings.disclosures.derivative.description": {
+    "message": "Projeniz başka bir projenin türeviyse, örneğin bir çatalsa (fork) veya önemli miktarda başka birinin çalışmasını içeriyorsa bunu etkinleştirmeniz gerekir."
+  },
   "project.settings.disclosures.derivative.link-label": {
     "message": "Orijinal çalışmaya bağlantı"
   },
@@ -3826,6 +3928,9 @@
   },
   "project.settings.disclosures.derivative.name-placeholder": {
     "message": "Örnek proje"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Projenizin orijinal çalışmaya nasıl dayandığını açıklayın"
   },
   "project.settings.disclosures.derivative.title": {
     "message": "Türetilmiş içerik"
@@ -3883,6 +3988,24 @@
   },
   "project.settings.disclosures.save-blocked.photosensitivity-note": {
     "message": "Işık hassasiyeti uyarısı açıklamasında mutlaka bir tanım yer almalıdır."
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "Harici sistem etkileşimleri bildirimi bir açıklama içermelidir."
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "Telemetri bildirimi en az bir veri toplama türünü listelemelidir."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "Projeniz kullanıcının sisteminde şunların dışında bir şeyler okuyor veya yazıyorsa bunu etkinleştirmelisiniz..."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Harici sistem etkileşimlerini açıklayın"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "örn. Masaüstüne debug_log.txt adında bir dosya kaydeder"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "Harici sistem etkileşimleri"
   },
   "project.settings.disclosures.telemetry.consent-description": {
     "message": "Telemetrinizin onay modeli nedir?"
@@ -3980,11 +4103,20 @@
   "project.settings.permissions.collapse-all": {
     "message": "Tümünü daralt"
   },
+  "project.settings.permissions.completed.description": {
+    "message": "Tüm harici sistem etkileşim bilgileri ve atıflar sağlanmıştır."
+  },
   "project.settings.permissions.completed.title": {
     "message": "İzinler tamamlandı!"
   },
   "project.settings.permissions.delete-all-groups": {
     "message": "Tüm grupları kaldır"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Bu işlem, bu proje için {count, plural, one {# atıf grubunu} other {# atıf grubunu}} ve içindeki tüm dosyaları kalıcı olarak silecektir. Bu işlem geri alınamaz."
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Projenizin hiçbir sürümü harici içerik içermiyor, bu nedenle bu bölümü doldurmanıza gerek yoktur."
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "Hazırsınız!"
@@ -3992,11 +4124,32 @@
   "project.settings.permissions.expand-all": {
     "message": "Hepsini genişlet"
   },
+  "project.settings.permissions.fail.description": {
+    "message": "Projenizdeki bazı harici içerikleri yeniden dağıtma izniniz olmayabilir. Modrinth üzerinde yayınlamak için lütfen buna izin verildiğinden veya kullanma izniniz olduğuna dair kanıt sunduğunuzdan emin olun."
+  },
   "project.settings.permissions.fail.title": {
     "message": "Bazı içerikler dahil edilemez"
   },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Modrinth üzerinde barındırılmayan bir içerik ekliyorsanız, bunun nereden geldiğini bize bildirmeniz ve yeniden dağıtma izniniz olduğunu doğrulamanız gerekir. Emin değilseniz... <link>Daha fazla bilgi edinmek için tıklayın!</link>"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Dağıtım izinleri hakkında bilgi edinin"
+  },
   "project.settings.permissions.learn-more": {
     "message": "Daha Fazla Bilgi edinin"
+  },
+  "project.settings.permissions.no-results": {
+    "message": "Aramanızla eşleşen harici dosya yok."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Dahil edilen harici içeriklerin bazıları İçerik Kurallarımızı ihlal ettiği için Modrinth üzerinde dağıtılamaz ve kaldırılması gerekir."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {Onay gerektiren atıf yok} one {1 atıf onay gerektiriyor} other {# atıf onay gerektiriyor}}"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "{count} {count, plural, one {proje} other {proje}}de ara..."
   },
   "project.settings.permissions.sort.most-files": {
     "message": "Çoğu dosyalar"
@@ -4012,6 +4165,9 @@
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock adresi"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "Kaydetmeden önce Java sunucusu durdurulmalıdır. Lütfen sunucunun durdurulduğundan emin olun."
   },
   "project.settings.server.cannot-save-title": {
     "message": "Kaydedilemiyor"
@@ -4034,6 +4190,9 @@
   "project.settings.server.optional-label": {
     "message": "isteğe bağlı"
   },
+  "project.settings.server.ping-failed-message": {
+    "message": "Bu sunucuya ping atamadık. Barındırma sağlayıcınız tarafından engellenmiş olabilir, bu nedenle birkaç kez daha deneyin. Hala yanıt vermiyorsa lütfen <support-link>destek ile iletişime geçin</support-link>."
+  },
   "project.settings.server.refresh-ping-tooltip": {
     "message": "Gecikmeyi yenile"
   },
@@ -4049,8 +4208,29 @@
   "project.settings.server.server-online": {
     "message": "Sunucu çevrimiçi!"
   },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "Mevcut tüm {count} etiketi seçtiniz. Lütfen yalnızca projeniz için geçerli olan etiketleri seçin."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "{type} temanızı veya işlevini yansıtan tüm ayar etiketlerini seçin."
+  },
   "project.settings.tags.featured-tags": {
     "message": "Öne çıkan etiketler"
+  },
+  "project.settings.tags.featured-tags-required": {
+    "message": "En az bir biçim etiketiniz olmalıdır."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Görsel özellik etiketlerinizi seçin. Bunlar diğer etiketlerinizin önünde görüntülenir."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select,yes {{types} kategorileri}other {Kategoriler}}"
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "{type} içindeki dokuların çözünürlüğünü seçin."
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Bir kategoriyi öne çıkarmak için en az bir kategori seçin."
   },
   "project.settings.tags.title": {
     "message": "Etiketler"
@@ -4157,11 +4337,17 @@
   "report.note.copyright.2": {
     "message": "Eğer bir DMCA kaldırma talebi (yasal bir eylem olan) iletmeyi kastediyorsanız, bunun yerine <copyright-policy-link>Telif Hakkı Politikası</copyright-policy-link>'na göz atın."
   },
+  "report.note.fully-ai-generated.1": {
+    "message": "Kurallarımızı, tamamen yapay zekâ ile üretilmiş projeleri yasaklayacak şekilde güncelledik. Yapımcılara, tamamen yapay zekâ ile üretilmiş projelerini güncellemeleri veya kaldırmaları için bir süre tanıyoruz; bu sürenin ardından bu projelerle ilgili şikâyetleri kabul etmeye başlayacağız."
+  },
   "report.note.malicious.1": {
     "message": "Kötü niyetli ve yanıltıcı içeriklerin bildirimi, kod örnekleri gibi bu davranışın sağlam kanıtlarını içermeli."
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender, VirusTotal veya AI malware tespitlerinden çıkan özetler, yeterli kanıt biçimlerinden değildir ve kabul edilmeyecektir."
+  },
+  "report.note.missing-disclosure.1": {
+    "message": "İçerik açıklamaları, yeni eklediğimiz bir özelliktir. Yapımcılara, eksik veya yanlış açıklamalar için raporları kabul etmeye başlamadan önce açıklamalarını güncellemek için bir süre tanıyoruz."
   },
   "report.please-report": {
     "message": "Lütfen bildirin:"
@@ -4180,6 +4366,9 @@
   },
   "report.report-item": {
     "message": "Moderatörlere {title} bildir"
+  },
+  "report.reported-for": {
+    "message": "{type} nedeniyle bildirildi"
   },
   "report.submit": {
     "message": "Rapor gönder"
@@ -4868,11 +5057,17 @@
   "settings.authorizations.description": {
     "message": "Modrinth hesabınızla bir uygulamayı yetkilendirdiğinizde, ona hesabınıza erişim izni vermiş olursunuz. Hesabınıza verilen erişimi dilediğiniz zaman burada yönetebilir ve gözden geçirebilirsiniz."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Yetki verdiğiniz uygulamalar burada görünecektir."
+  },
   "settings.authorizations.empty-state.heading": {
     "message": "İzin verilen uygulama bulunamadı"
   },
   "settings.authorizations.head-title": {
     "message": "Yetkiler"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Bu uygulama resmi bir Modrinth hesabı tarafından oluşturulmuştur."
   },
   "settings.authorizations.revoke.action": {
     "message": "Kaldır"
@@ -4882,6 +5077,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Bu uygulamanın yetkisini kaldırmak istediğinizden emin misiniz?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Bu uygulama, ismine rağmen hiçbir şekilde Modrinth ile bağlı değildir."
   },
   "settings.billing.charges.description": {
     "message": "Modrinth hesabınıza geçmişte yapılan tüm ödemeleriniz burada listelenir:"
@@ -5180,6 +5378,9 @@
   "shared-instance.invite.inviter.unknown": {
     "message": "Bir Modrinth kullanıcısı"
   },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# kişi} other {# kişi}} zaten katıldı"
+  },
   "shared-instance.invite.loading": {
     "message": "Davet yükleniyor…"
   },
@@ -5191,6 +5392,9 @@
   },
   "shared-instance.invite.trust.heading": {
     "message": "Bu kullanıcıyı tanıyor musun?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "Süresi dolmuş, kullanım sınırına ulaşmış veya paylaşan kişi tarafından kaldırılmış olabilir."
   },
   "shared-instance.invite.unavailable.title": {
     "message": "Bu davet mevcut değil"
@@ -5273,6 +5477,12 @@
   "version.notification.deleted-title": {
     "message": "Sürüm kaldırıldı"
   },
+  "version.notification.packaging-success-text": {
+    "message": "Veri paketiniz başarıyla mod olarak paketlendi! Hataları kontrol etmek için oynama testi yaptığınızdan emin olun."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "Paketleme Başarılı"
+  },
   "version.package-as-mod.button": {
     "message": "Mod olarak paketle"
   },
@@ -5302,6 +5512,12 @@
   },
   "version.section.content.dev-info.maven-coordinates": {
     "message": "Maven koordinatları:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Modrinth'teki projeler, <gradle-link>Gradle</gradle-link> gibi JVM oluşturma araçlarıyla kullanılmak üzere bir Maven deposu aracılığıyla otomatik olarak kullanılabilir. Modrinth Maven API'si hakkında daha fazla bilgi edinmek için <article-link>buraya tıklayın</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Not: Mümkün olduğunda, Modrinth Maven API'sinin sahip olmadığı geçişli bağımlılık bilgilerine sahip olacağından bunun yerine oluşturucunun maven deposunu kullanmalısınız. Bağımlılıklarınız için Modrinth ve Modrinth olmayan Maven depolarının bir karışımını kullanırsanız yinelenen bağımlılıklarla da karşılaşabilirsiniz, çünkü grup tanımlayıcısı Modrinth Maven API'si aracılığıyla sunulduğunda farklı olacaktır."
   },
   "version.section.content.dev-info.version-id": {
     "message": "Sürüm Kimliği:"

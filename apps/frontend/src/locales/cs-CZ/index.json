@@ -1808,9 +1808,6 @@
   "layout.action.new-project": {
     "message": "Nový projekt"
   },
-  "layout.action.new-server-project": {
-    "message": "Nový server"
-  },
   "layout.action.publish": {
     "message": "Zveřejnit"
   },

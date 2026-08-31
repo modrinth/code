@@ -1028,9 +1028,6 @@
   "layout.action.manage-server-notices": {
     "message": "Upravljaj obaveštenjima servera"
   },
-  "layout.action.new-server-project": {
-    "message": "Novi server"
-  },
   "layout.avatar.alt": {
     "message": "Tvoj avatar"
   },

@@ -159,7 +159,7 @@
     "defaultMessage": "Välj korrekt upplösning"
   },
   "nags.review-permissions.description": {
-    "defaultMessage": "Se till att du har visat bevis för din tillåtelse att använda externt innehåll i ditt Modpack."
+    "defaultMessage": "Se till att du har försett bevis för din tillåtelse att distribuera externt innehåll i ditt modpaket."
   },
   "nags.review-permissions.title": {
     "defaultMessage": "Läs externa behörigheter"
@@ -240,7 +240,7 @@
     "defaultMessage": "Expandera sammanfattningen"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Om du håller projektetnamnet fint blir det minnesvärt och lättare att hitta. Versions- och laddarinformation visas automatiskt tillsammans med ditt projekt."
+    "defaultMessage": "Genom att hålla projektnamnet fint blir det minnesvärt och lättare att hitta. Versions- och läsarinformation visas automatiskt tillsammans med ditt projekt."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rensa upp namnet"
@@ -267,7 +267,7 @@
     "defaultMessage": "Minst en galleribild krävs för att visa innehållet i ditt {type}."
   },
   "nags.upload-gallery-image.description-resourcepack": {
-    "defaultMessage": "Minst en galleribild krävs för att visa innehållet i ditt resurspaket, utom för ljud- eller lokaliseringspaket. Beskriver det här ditt paket, vänligen välj lämplig tagg."
+    "defaultMessage": "Minst en galleribild krävs för att visa innehållet i ditt resurspaket, utom för ljud- eller lokaliseringspaket. Vänligen välj lämplig tagg om det här beskriver ditt paket."
   },
   "nags.upload-gallery-image.description-shader": {
     "defaultMessage": "Minst tre galleribilder krävs för att visa innehållet i din shader i flera olika situationer och förhållanden."
@@ -276,7 +276,7 @@
     "defaultMessage": "Ladda upp en galleribild"
   },
   "nags.upload-version.description": {
-    "defaultMessage": "Åtminstone en version krävs för att ett projekt ska kunna skickas in för granskning."
+    "defaultMessage": "Minst en version krävs för att ett projekt ska kunna skickas in för granskning."
   },
   "nags.upload-version.title": {
     "defaultMessage": "Ladda upp en version"

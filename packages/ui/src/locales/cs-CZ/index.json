@@ -1,6 +1,6 @@
 {
   "action.no-permission": {
-    "defaultMessage": "Nemáš oprávnění."
+    "defaultMessage": "Nemáte oprávnění."
   },
   "affiliate.create.button": {
     "defaultMessage": "Vytvořit affiliate odkaz"
@@ -18,7 +18,7 @@
     "defaultMessage": "např. YouTube"
   },
   "affiliate.create.user.description": {
-    "defaultMessage": "Uživatelské jméno uživatele, pro kterého se má vytvořit affiliate kód"
+    "defaultMessage": "Uživatelské jméno uživatele, pro kterého se má vytvořit partnerský kód"
   },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Zadejte uživatelské jméno..."
@@ -39,7 +39,7 @@
     "defaultMessage": "Načtení nastavení serveru se nezdařilo"
   },
   "badge.alpha": {
-    "defaultMessage": "Alfa"
+    "defaultMessage": "Alpha"
   },
   "badge.beta": {
     "defaultMessage": "Beta"
@@ -92,6 +92,9 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Znovu se přihlásit k odběru serveru"
   },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Používat uložené preference"
+  },
   "browse.filter-results": {
     "defaultMessage": "Filtrovat výsledky..."
   },
@@ -131,6 +134,9 @@
   "button.accept": {
     "defaultMessage": "Přijmout"
   },
+  "button.add-another": {
+    "defaultMessage": "Přidat jiné"
+  },
   "button.add-server-to-instance": {
     "defaultMessage": "Přidat server k instanci"
   },
@@ -157,6 +163,9 @@
   },
   "button.continue": {
     "defaultMessage": "Pokračovat"
+  },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Zkopírováno"
   },
   "button.copy-filename": {
     "defaultMessage": "Kopírovat jméno souboru"
@@ -203,6 +212,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Skrýt snapshoty"
   },
+  "button.i-understand": {
+    "defaultMessage": "Rozumím"
+  },
   "button.install": {
     "defaultMessage": "Nainstalovat"
   },
@@ -238,6 +250,9 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Znovunainstalovat modpack"
+  },
+  "button.remove": {
+    "defaultMessage": "Odstranit"
   },
   "button.remove-image": {
     "defaultMessage": "Odstranit obrázek"
@@ -347,6 +362,9 @@
   "content.card.select-project": {
     "defaultMessage": "Vybrat {project}"
   },
+  "content.card.uploaded": {
+    "defaultMessage": "Nahráno"
+  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Skutečně chceš aktualizovat {count, plural, one {# projekt} other {# projektů}} na jejich poslední kompatibilní verzi? Doporučujeme aktualizovat obsah jeden po jednom."
   },
@@ -373,6 +391,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Smazat {itemType}"
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Vypnout {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Downgrading} other {Updating}} může způsobit problémy s kompatibilitou. Mody nebo obsah, který jste přidali na modpack, zůstanou zachovány, ale nemusí být kompatibilní s novou verzí."
@@ -443,14 +464,53 @@
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Vypnutý"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Odstraněno (vypnuto)"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Aktualizováno"
+  },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Neinstalovat"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Přidáno"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Odebráno"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Aktualizováno"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Verze"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Přesto nainstalovat"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Modpack aktualizován"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Žádné změny obsahu"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "Odstraněno {count}"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Soubory, které nejsou publikovány do Modrinthu, nejsou zkontrolovány."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Některý obsah na vašem serveru nebylo možné analyzovat a tato změna se ho může týkat."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Tato aktualizace obsahuje soubory, které nejsou publikované na Modrinthu. Silně doporučujeme nainstalovat pouze soubory ze zdroje, kterému důveřujete."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Upozornění na neznámý soubor"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Neznámý"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "Aktualizováno {count}"
@@ -497,6 +557,75 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "svět"
   },
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "Obsah modpacku"
+  },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "Poskytnuto"
+  },
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "server"
+  },
+  "content.managed-card.settings": {
+    "defaultMessage": "Nastavení instalace"
+  },
+  "content.managed-card.shared-content": {
+    "defaultMessage": "Sdílený obsah"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "Instalování obsahu..."
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "Změnit verzi"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "Synchronizováno {time}"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "Je dostupná aktualizace"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "Aktualizováno {time}"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "Aktualizace..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "Zobrazit obsah"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "Autor"
+  },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "Prostředí"
+  },
+  "content.metadata-filter.open-source": {
+    "defaultMessage": "Otevřený zdroj"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "Sdílený obsah"
+  },
+  "content.metadata-filter.source.external": {
+    "defaultMessage": "Externí"
+  },
+  "content.metadata-filter.state": {
+    "defaultMessage": "Stav"
+  },
+  "content.metadata-filter.state.disabled": {
+    "defaultMessage": "Vypnuto"
+  },
+  "content.metadata-filter.state.enabled": {
+    "defaultMessage": "Zapnuto"
+  },
+  "content.metadata-filter.update.available": {
+    "defaultMessage": "Je dostupná aktualizace"
+  },
+  "content.metadata-filter.warning.none": {
+    "defaultMessage": "Žádná upozornění"
+  },
+  "content.metadata-filter.warnings": {
+    "defaultMessage": "Upozornění"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatečný obsah"
   },
@@ -520,6 +649,9 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Nepodařilo se načíst obsah"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "Třídit podle"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Načítání obsahu..."
@@ -547,6 +679,12 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Názvy projektů"
+  },
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "Název (A-Z)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "Název (Z-A)"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Od nejnovějších"
@@ -616,6 +754,15 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Hledat verzi hry..."
+  },
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "Přizpůsobit"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "Náhodné"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Nahrát"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Nejnovější"
@@ -785,6 +932,21 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Hledat modpack"
   },
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "Už víš, co chceš hrát?"
+  },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Vytvořit instanci"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Nainstalovat modpack"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "Nenalezeny žádné výsledky"
+  },
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "Hledat mody, modpacky a další..."
+  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Začněte od začátku výběrem loaderu a verze hry."
   },
@@ -796,6 +958,12 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Importovat instanci"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Začít z modu nebo modpacku"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "Nahrát modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Klasický Minecraft bez módů nebo pluginů."
@@ -839,6 +1007,9 @@
   "external-files.permissions-card.add-files-modal.no-search-results": {
     "defaultMessage": "Žádné soubory neodpovídají tvému vyhledávání."
   },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Hledat soubory..."
+  },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# soubor vybrán} few {# soubory vybrány} other {# souborů vybráno}}"
   },
@@ -872,6 +1043,9 @@
   "external-files.permissions-card.badge.pending": {
     "defaultMessage": "Čeká na vyřízení"
   },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Informace odmítnuty"
+  },
   "external-files.permissions-card.custom-license-option": {
     "defaultMessage": "Jiná"
   },
@@ -884,11 +1058,17 @@
   "external-files.permissions-card.editor.custom-license-label": {
     "defaultMessage": "Odkaz na licenci"
   },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "Název licence, pokud možno identifikátor SPDX"
+  },
   "external-files.permissions-card.editor.error.license-required": {
     "defaultMessage": "Prosím vyberte licenci."
   },
   "external-files.permissions-card.editor.error.link-invalid-url": {
     "defaultMessage": "Odkaz musí být platná URL adresa."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "např. MPL-1.1"
   },
   "external-files.permissions-card.editor.input-optional": {
     "defaultMessage": "(volitelné)"
@@ -925,6 +1105,9 @@
   },
   "external-files.permissions-card.editor.proof-images-upload-prompt": {
     "defaultMessage": "Přetažením nahrajte nebo kliknutím vyberte obrázek"
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinth pracovníci mohou ověřit předložené důkazy"
   },
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "Uložit uvedení autora"
@@ -1025,11 +1208,23 @@
   "external-files.permissions-card.reason.special-permission": {
     "defaultMessage": "Specíální povolení"
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Odstranit skupinu"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Smazat {title}?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Skupinu nelze odstranit"
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Odebrat ze skupiny"
   },
   "external-files.permissions-card.split-file-error.title": {
     "defaultMessage": "Soubor se nepodařilo rozdělit"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} + {count} další"
   },
   "external-files.permissions-card.updated-by-moderator": {
     "defaultMessage": "Moderátor"
@@ -1418,6 +1613,30 @@
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "Nahrání obsahu souboru .zip z URL"
   },
+  "filter-bar.add": {
+    "defaultMessage": "Přidat"
+  },
+  "filter-bar.clear": {
+    "defaultMessage": "Vymazat"
+  },
+  "filter-bar.clear-named-filter": {
+    "defaultMessage": "Vymazat filtr {name}"
+  },
+  "filter-bar.filtered-by": {
+    "defaultMessage": "Filtrovat podle"
+  },
+  "filter-bar.no-options": {
+    "defaultMessage": "Žádné dostupné možnosti."
+  },
+  "filter-bar.no-search-results": {
+    "defaultMessage": "Žádné možnosti nalezeny."
+  },
+  "filter-bar.search-placeholder": {
+    "defaultMessage": "Hledat..."
+  },
+  "filter-bar.select-all": {
+    "defaultMessage": "Vybrat vše"
+  },
   "form.label.address-line": {
     "defaultMessage": "Adresa"
   },
@@ -1601,6 +1820,9 @@
   "hosting.loader.reset-server": {
     "defaultMessage": "Resetovat server"
   },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Možnosti podpory"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Vylítne až na {cpus} CPUs"
   },
@@ -1627,6 +1849,93 @@
   },
   "icon-select.select": {
     "defaultMessage": "Vybrat ikonu"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Zavřít"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Upravit"
+  },
+  "image-viewer.editor.censor.blur": {
+    "defaultMessage": "Rozmazat"
+  },
+  "image-viewer.editor.censor.mode": {
+    "defaultMessage": "Typ cenzury"
+  },
+  "image-viewer.editor.censor.solid": {
+    "defaultMessage": "Plný"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Barva"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Plocha"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Opakovat"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Uložit kopii"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Uložit obrázek"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Velikost"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Šipka"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Cenzurovat"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Oříznout"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ovál"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Guma"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Zvýraznit"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Pero"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Obdélník"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Vybrat"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Text"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Vrátit zpět"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Šířka"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Přizpůsobit"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "Přizpůsobit na pracovní plochu"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Přiblížit"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Oddálit"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Další obrázek"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Předchozí obrázek"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Hledat verzi..."
@@ -1778,6 +2087,9 @@
   "instances.content-install.header": {
     "defaultMessage": "Instalace projektu"
   },
+  "instances.content-install.hide-unavailable": {
+    "defaultMessage": "Skrýt nedostupný"
+  },
   "instances.content-install.install-button": {
     "defaultMessage": "Nainstalovat"
   },
@@ -1804,6 +2116,18 @@
   },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Hledat instance"
+  },
+  "instances.content-install.show-unavailable": {
+    "defaultMessage": "Zobrazit nedostupné"
+  },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "Stáhnout soubor"
+  },
+  "instances.managed-content-modal.empty-title": {
+    "defaultMessage": "Nebyl nalezen obsah"
+  },
+  "instances.managed-content-modal.external-content": {
+    "defaultMessage": "Externí"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Mometálně"
@@ -2099,6 +2423,9 @@
   "label.yes": {
     "defaultMessage": "Ano"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Probíhá změna účtu..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Čeština"
   },
@@ -2201,6 +2528,9 @@
   "markdown-editor.error-label": {
     "defaultMessage": "Chyba"
   },
+  "markdown-editor.image-modal.description-field.placeholder": {
+    "defaultMessage": "Popište obrázek..."
+  },
   "markdown-editor.image-modal.description-field.title": {
     "defaultMessage": "Popisek (alt text)"
   },
@@ -2243,17 +2573,53 @@
   "markdown-editor.max-length.label": {
     "defaultMessage": "Maximální délka:"
   },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "Neomezené"
+  },
   "markdown-editor.max-length.value": {
     "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.preview-label": {
+    "defaultMessage": "Náhled"
+  },
+  "markdown-editor.preview-toggle.label": {
+    "defaultMessage": "Náhled"
+  },
+  "markdown-editor.toolbar.bold": {
+    "defaultMessage": "Tučně"
   },
   "markdown-editor.toolbar.code": {
     "defaultMessage": "Kód"
   },
+  "markdown-editor.toolbar.heading-1": {
+    "defaultMessage": "Nadpis 1"
+  },
+  "markdown-editor.toolbar.heading-2": {
+    "defaultMessage": "Nadpis 2"
+  },
+  "markdown-editor.toolbar.heading-3": {
+    "defaultMessage": "Nadpis 3"
+  },
   "markdown-editor.toolbar.image": {
     "defaultMessage": "Obrázek"
   },
+  "markdown-editor.toolbar.italic": {
+    "defaultMessage": "Kurzíva"
+  },
   "markdown-editor.toolbar.link": {
     "defaultMessage": "Odkaz"
+  },
+  "markdown-editor.toolbar.ordered-list": {
+    "defaultMessage": "Seřadit seznam"
+  },
+  "markdown-editor.toolbar.quote": {
+    "defaultMessage": "Citace"
+  },
+  "markdown-editor.toolbar.spoiler": {
+    "defaultMessage": "Spoiler"
+  },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "Přeškrtnutí"
   },
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
@@ -2287,6 +2653,33 @@
   },
   "notification.error.title": {
     "defaultMessage": "Došlo k chybě"
+  },
+  "notifications.actor.unknown": {
+    "defaultMessage": "Někdo"
+  },
+  "notifications.close": {
+    "defaultMessage": "Zavřít"
+  },
+  "notifications.dismiss": {
+    "defaultMessage": "Zavřít oznámení"
+  },
+  "notifications.friend-request.body": {
+    "defaultMessage": "<actor>{actor}</actor> ti poslal/a žádost o přátelství."
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "Spustit hru"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "Instance"
+  },
+  "notifications.instance-ready.status": {
+    "defaultMessage": "Nainstalováno a připraveno k přehrávání."
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "Přijmout"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "Odmítnout"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Přijato"
@@ -2435,8 +2828,74 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Opravdu si přeješ zablokovat tohoto uživatele?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Při blokování tohoto uživatele došlo k chybě. Zkuste to znovu."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Blokování uživatele se nezdařilo"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} byl zablokován."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Uživatel zablokován"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "Zablokovat {username}"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Zablokovat"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Odblokovat"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "Email ověřen"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "Má heslo"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "Má TOTP"
+  },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Načítání..."
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Zobrazit profil"
+  },
+  "profile.details.title": {
+    "defaultMessage": "Podrobnosti o uživateli"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "Email není ověřen"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "E-mail ověřen"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Uživatelský profil nelze načíst."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "Uživatel nenalezen"
+  },
   "profile.label.badges": {
     "defaultMessage": "Odznaky"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "Připojen/a"
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "Tento uživatel nemá žádné projekty!"
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "Organizace"
+  },
+  "profile.official-account": {
+    "defaultMessage": "Oficiální Modrinth účet"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Zveřejněno {date}"
@@ -2657,6 +3116,27 @@
   "project.about.tags.title": {
     "defaultMessage": "Štítky"
   },
+  "project.disclosure.ai-generated-content.title": {
+    "defaultMessage": "Obsahuje AI generované {types}"
+  },
+  "project.disclosure.ai-generated-content.use.code": {
+    "defaultMessage": "kód"
+  },
+  "project.disclosure.ai-generated-content.use.content": {
+    "defaultMessage": "obsah"
+  },
+  "project.disclosure.ai-generated-content.use.functionality": {
+    "defaultMessage": "funkčnost"
+  },
+  "project.disclosure.ai-generated-content.use.text": {
+    "defaultMessage": "text"
+  },
+  "project.disclosure.derivative-work.show-fewer": {
+    "defaultMessage": "Zobrazit méně"
+  },
+  "project.disclosure.derivative-work.show-more": {
+    "defaultMessage": "Zobrazit další {count}"
+  },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {stažení} other {stažení}}"
   },
@@ -2708,6 +3188,9 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {sledující} few {sledující} other {sledujících}}"
   },
+  "project.license.title": {
+    "defaultMessage": "Licence"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
   },
@@ -2717,14 +3200,29 @@
   "project.server.customModpackTooltip": {
     "defaultMessage": "Tento projekt používá vlastní modpack"
   },
+  "project.server.language.af": {
+    "defaultMessage": "Afrikánština"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Amharština"
+  },
   "project.server.language.ar": {
     "defaultMessage": "Arabština"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Ázerbájdžánština"
   },
   "project.server.language.be": {
     "defaultMessage": "Běloruština"
   },
   "project.server.language.bg": {
     "defaultMessage": "Bulharština"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Bengálština"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Bosenština"
   },
   "project.server.language.ca": {
     "defaultMessage": "Katalánština"
@@ -2753,6 +3251,9 @@
   "project.server.language.et": {
     "defaultMessage": "Estonština"
   },
+  "project.server.language.eu": {
+    "defaultMessage": "Baskičtina"
+  },
   "project.server.language.fa": {
     "defaultMessage": "Perština"
   },
@@ -2764,6 +3265,9 @@
   },
   "project.server.language.ga": {
     "defaultMessage": "Irština"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "Galicijština"
   },
   "project.server.language.he": {
     "defaultMessage": "Hebrejština"
@@ -2777,8 +3281,14 @@
   "project.server.language.hu": {
     "defaultMessage": "Maďarština"
   },
+  "project.server.language.hy": {
+    "defaultMessage": "Arménština"
+  },
   "project.server.language.id": {
     "defaultMessage": "Indonéština"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "Islandština"
   },
   "project.server.language.it": {
     "defaultMessage": "Italština"
@@ -2786,11 +3296,23 @@
   "project.server.language.ja": {
     "defaultMessage": "Japonština"
   },
+  "project.server.language.ka": {
+    "defaultMessage": "Gruzínština"
+  },
   "project.server.language.kk": {
     "defaultMessage": "Kazaština"
   },
+  "project.server.language.km": {
+    "defaultMessage": "Khmerština"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "Kannadština"
+  },
   "project.server.language.ko": {
     "defaultMessage": "Korejština"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "Laoština"
   },
   "project.server.language.lt": {
     "defaultMessage": "Litevština"
@@ -2798,14 +3320,35 @@
   "project.server.language.lv": {
     "defaultMessage": "Lotyština"
   },
+  "project.server.language.mk": {
+    "defaultMessage": "Makedonština"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Malajámština"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Mongolština"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Maráthština"
+  },
   "project.server.language.ms": {
     "defaultMessage": "Malajština"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Barmština"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Nepálština"
   },
   "project.server.language.nl": {
     "defaultMessage": "Dánština"
   },
   "project.server.language.no": {
     "defaultMessage": "Norština"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Paňdžábština"
   },
   "project.server.language.pl": {
     "defaultMessage": "Polština"
@@ -2924,6 +3467,21 @@
   "project.settings.description.title": {
     "defaultMessage": "Popis"
   },
+  "project.settings.disclosures.ai.types-assets": {
+    "defaultMessage": "Assety"
+  },
+  "project.settings.disclosures.ai.types-code": {
+    "defaultMessage": "Kód"
+  },
+  "project.settings.disclosures.ai.types-functionality": {
+    "defaultMessage": "Funkčnost"
+  },
+  "project.settings.disclosures.ai.types-text": {
+    "defaultMessage": "Text"
+  },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "defaultMessage": "Vždy aktivní"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
@@ -3029,6 +3587,9 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Kanál"
+  },
   "project.versions.version.withheld": {
     "defaultMessage": "Zadrženo"
   },
@@ -3079,6 +3640,12 @@
   },
   "report.item-type.version": {
     "defaultMessage": "verze"
+  },
+  "report.type.spam": {
+    "defaultMessage": "Spam"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "Volitelné"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filtr uzamčen"
@@ -3840,7 +4407,7 @@
     "defaultMessage": "Střední Evropa"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "Kolik paměti RAM má mít tvůj server?"
+    "defaultMessage": "Kolik paměti RAM má mít váš server?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
@@ -3855,10 +4422,10 @@
     "defaultMessage": "Západní Severní Amerika"
   },
   "servers.region.prompt": {
-    "defaultMessage": "Kde bys chtěl mít umístěný svůj server?"
+    "defaultMessage": "Kde byste chtěl/a mít umístěný svůj server?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Chybí vaše oblast? <link>Dejte nám vědět, kde byste chtěli vidět Modrinth Hosting příště!</link>"
+    "defaultMessage": "Chybí vaše oblast? <link>Dejte nám vědět, kde byste chtěl/a vidět Modrinth Hosting příště!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Jihovýchodní Asie"
@@ -3965,6 +4532,15 @@
   "settings.language.categories.search-result": {
     "defaultMessage": "Výsledky vyhledávání"
   },
+  "settings.language.coverage.app-tooltip": {
+    "defaultMessage": "Přibližně {percentage}% aplikace Modrinthu je k dispozici v tomto jazyce."
+  },
+  "settings.language.coverage.label": {
+    "defaultMessage": "{percentage}% podporováno"
+  },
+  "settings.language.coverage.website-tooltip": {
+    "defaultMessage": "Přibližně {percentage}% webu je k dispozici v tomto jazyce."
+  },
   "settings.language.description": {
     "defaultMessage": "Vyberte svůj preferovaný jazyk pro {platform}. Překlady jsou vytvářeny dobrovolníky na <crowdin-link>Crowdin</crowdin-link>."
   },
@@ -3985,6 +4561,9 @@
   },
   "settings.language.title": {
     "defaultMessage": "Jazyk"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Změna jazyka {platform} může způsobit, že se nějaký obsah objeví v angličtině, pokud překlad není k dispozici. {platform} ještě není plně přeloženo, takže nějaký obsah může zůstat v angličtině pro některé jazyky."
   },
   "settings.pats.title": {
     "defaultMessage": "Osobní přístupové tokeny"
@@ -4053,7 +4632,7 @@
     "defaultMessage": "Kompetetivní"
   },
   "tag.category.core-shaders": {
-    "defaultMessage": "Základní shadery"
+    "defaultMessage": "Jádro Shaderů"
   },
   "tag.category.creative-mode": {
     "defaultMessage": "Tvořivá hra"
@@ -4350,13 +4929,13 @@
     "defaultMessage": "Máte neuložené změny"
   },
   "user.profile.badge.alpha.name": {
-    "defaultMessage": "Alfa tester"
+    "defaultMessage": "Alpha tester"
   },
   "user.profile.badge.beta.name": {
     "defaultMessage": "Beta tester"
   },
   "user.profile.badge.downloads.name": {
-    "defaultMessage": "{download_sum} stažení"
+    "defaultMessage": "{download_sum} Stažení"
   },
   "user.profile.badge.moderator.about.1": {
     "defaultMessage": "Tento uživatel pracuje jako moderátor obsahu pro Modrinth."
@@ -4388,9 +4967,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "Vývojářský jar"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Nepovinný resource pack"
   },
@@ -4402,9 +4978,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "Soubor s podpisem"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "Zdrojový jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Jiný"

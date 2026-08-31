@@ -818,6 +818,33 @@
   "auth.create-account.username.placeholder": {
     "message": "닉네임을 입력하세요"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "인증 앱에서 받은 6자리 코드나 백업 코드 중 하나를 입력하세요."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "2단계 인증"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "코드 입력..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "패스키로 계속하기"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "마지막으로 {method, select, password {비밀번호} passkey {패스키} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }을(를) 사용하여 로그인했습니다."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "재인증"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "다른 방법으로 로그인 하세요"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "{provider}로 로그인"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name}은(는) 재인증이 필요합니다."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "복구 이메일 전송"
   },
@@ -860,6 +887,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "코드 입력..."
   },
+  "auth.sign-in.add-account": {
+    "message": "계정 추가"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Modrinth App에서 사용할 계정을 선택하세요"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "이메일로 계속하기"
   },
@@ -874,6 +907,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "마지막으로 사용됨"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Modrinth App으로 돌아갑니다. 아무 일도 일어나지 않으면 아래 버튼을 누르세요."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Modrinth.com으로 이동"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Modrinth App 열기"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "로그인되었습니다"
   },
   "auth.sign-in.no-account": {
     "message": "계정이 없으신가요?"
@@ -1024,6 +1069,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "답글과 함께 승인"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "티켓 닫기"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "답글과 함께 닫기"
@@ -2189,6 +2237,12 @@
   "error.generic.401.signed-in-as": {
     "message": "현재 로그인된 계정:"
   },
+  "error.generic.401.switch-account": {
+    "message": "또는 다른 계정으로 전환하세요:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "계정을 변경하지 못 했습니다. 나중에 다시 시도해주세요."
+  },
   "error.generic.401.title": {
     "message": "이 페이지에 접근할 권한이 없습니다"
   },
@@ -2675,6 +2729,9 @@
   "layout.action.tech-review": {
     "message": "기술 검토"
   },
+  "layout.action.user-lookup": {
+    "message": "사용자 조회"
+  },
   "layout.avatar.alt": {
     "message": "당신의 아바타"
   },
@@ -2840,8 +2897,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "확인되지 않음"
@@ -2863,6 +2926,9 @@
   },
   "layout.nav.active-reports": {
     "message": "활성된 신고"
+  },
+  "layout.nav.add-account": {
+    "message": "계정 추가"
   },
   "layout.nav.discover": {
     "message": "탐색"
@@ -2894,6 +2960,9 @@
   "layout.nav.projects": {
     "message": "프로젝트"
   },
+  "layout.nav.remove-account": {
+    "message": "계정 삭제"
+  },
   "layout.nav.revenue": {
     "message": "수익"
   },
@@ -2902,6 +2971,12 @@
   },
   "layout.nav.search": {
     "message": "검색"
+  },
+  "layout.nav.switch-account": {
+    "message": "계정 변경"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "계정을 변경하지 못 했습니다. 나중에 다시 시도해주세요."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ 로 업그레이드"
@@ -3437,6 +3512,15 @@
   "project-type.shader.singular": {
     "message": "셰이더"
   },
+  "project.actions.back-to-all-projects": {
+    "message": "프로젝트 목록으로 돌아가기"
+  },
+  "project.actions.back-to-project-page": {
+    "message": "프로젝트 페이지로 돌아가기"
+  },
+  "project.actions.check-modpack-archives": {
+    "message": "압축 해제 가능 여부 확인하기"
+  },
   "project.actions.checking-modpack-archives": {
     "message": "확인 중..."
   },
@@ -3469,6 +3553,15 @@
   },
   "project.actions.servers-promo.title": {
     "message": "서버 생성"
+  },
+  "project.actions.view-dependents": {
+    "message": "사용처 보기"
+  },
+  "project.actions.view-modpacks": {
+    "message": "모드팩 보기"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "{projectType} 사용처 보기"
   },
   "project.ai-image-warning-modal.body.1": {
     "message": "AI로 생성된 이미지를 사용하여 프로젝트를 소개하는 것은 허용되지 않습니다. 탐지 시스템을 우회하려는 시도는 Modrinth 계정 정지 조치로 이어질 수 있습니다."
@@ -3740,6 +3833,9 @@
   "project.notification.check-modpack-archives.no-files": {
     "message": "이 프로젝트에 .mrpack 파일을 찾을 수 없습니다."
   },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {압축 해제 가능한 모드팩입니다.} other {#개 모두 압축 해제 가능한 모드팩입니다.}}"
+  },
   "project.notification.icon-updated.message": {
     "message": "프로젝트 아이콘을 변경했습니다."
   },
@@ -3751,6 +3847,201 @@
   },
   "project.notification.updated.title": {
     "message": "프로젝트 수정됨"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "프로젝트 목록으로 돌아가기"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "프로젝트 페이지로 돌아가기"
+  },
+  "project.settings.danger-zone": {
+    "message": "주의"
+  },
+  "project.settings.delete-project.button": {
+    "message": "프로젝트 삭제"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "계속 진행하면 이 프로젝트의 모든 정보 및 업로드된 버전이 데이터베이스에서 삭제되며, 마음이 바뀌더라도 다시 복구할 수 없습니다. 삭제가 부담스럽다면 프로젝트를 비공개로 설정하는 방법을 고려해 보세요."
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "영구적으로 삭제하기"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "이 프로젝트를 삭제하시겠습니까?"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "Modrinth에서 이 프로젝트를 영구적으로 삭제합니다. 삭제된 프로젝트는 Modrinth에서 <emphasis>절대로 복구할 수 없습니다</emphasis>."
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Modrinth에 업로드된 모드팩에 이 프로젝트의 파일이 계속 남아있을 수 있습니다."
+  },
+  "project.settings.delete-project.title": {
+    "message": "프로젝트 삭제"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "이 프로젝트에 다른 콘텐츠의 광고, 스폰서십 또는 홍보가 포함된 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "홍보를 통해 <emphasis>직접적인 수익이 발생하지 않으며</emphasis>, 일반적으로 <italic>관련성이 있으며</italic> <italic>눈에 거슬리지 않는다고</italic> 판단할 만한 대상에 대한 홍보인 경우(예: 자체 모드의 설정 페이지 한쪽 구석에 Modrinth 프로필 링크를 표시하는 경우), 광고로 간주하지 않습니다."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "예: 사용자의 서버 목록에 Modrinth SMP 서버를 추가합니다."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "광고 포함"
+  },
+  "project.settings.disclosures.ai.content-rules": {
+    "message": "<rules>Modrinth 콘텐츠 규칙</rules>의 6번 항목을 참고하십시오."
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "이 프로젝트의 코드 상당 부분 또는 에셋이 AI로 생성되었거나, 프로젝트의 기능이 생성형 AI의 사용에 의존하거나, 설명이나 게시 등 프로젝트 페이지의 요소가 생성형 AI에 의존하는 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "예: 중국어 및 아랍어 번역이 AI로 생성되었습니다."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "AI 생성 콘텐츠 포함"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "어느 요소에 생성형 AI가 사용되었나요?"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "배너 미리보기"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "프로젝트를 보관됨으로 표시하여 더 이상 프로젝트를 관리하지 않음을 알릴 수 있습니다."
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "보관된 프로젝트는 공개로 설정할 경우 검색 결과에 계속해서 표시됩니다. 프로젝트를 목록에 표시하지 않으려면 일부 공개로 설정하세요."
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "예: 이 프로젝트를 유지 보수할 시간이 없습니다. 자유롭게 포크해 사용하셔도 됩니다!"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "프로젝트 보관"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "콘텐츠 고지 사항"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "만약 이 프로젝트가 다른 프로젝트의 파생작(포크하였거나, 다른 사람의 콘텐츠를 상당수 포함한 경우)이라면 활성화해야 합니다."
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "원작 링크"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "원작 이름"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "예시 프로젝트"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "이 프로젝트가 원작을 어떻게 기반으로 하는지 설명해주세요"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "파생 콘텐츠 포함"
+  },
+  "project.settings.disclosures.description": {
+    "message": "<rules>Modrinth 콘텐츠 규칙</rules>에 따라 해당하는 콘텐츠 고지 사항을 프로젝트에 추가해야 합니다."
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "{date}에 {user}님이 마지막으로 업데이트함"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "관리자"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "고지사항을 삭제해야 하는 경우 <contact-support-link>지원팀에 문의하세요</contact-support-link>."
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "관리자에 의해 고정된 고지 사항입니다. 만약 오류인 것 같다면 <contact-support-link>지원팀에 문의하세요</contact-support-link>."
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "고지 사항을 수정 또는 삭제해야 하는 경우 <contact-support-link>지원팀에 문의하세요</contact-support-link>."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "이 프로젝트에 실제 화폐를 사용하여 얻을 수 있는 기능이 포함된 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "예: Patreon 후원으로 치장품을 얻을 수 있습니다"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "유료 기능의 유형을 입력하세요"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "유료 기능 포함"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "이 프로젝트에 반짝이는 빛이나 패턴에 민감한 사람에게 위험할 수 있는 요소가 포함된 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "예: 점멸 모드가 있는 손전등 아이템을 추가합니다. 게임 내 접근성 설정에서 해당 기능을 비활성화할 수 있습니다."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "광과민성 경고"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "광고 고지 사항에 설명이 필요합니다."
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "파생 고지 사항에 최소 한 개 이상의 원작을 표시해야 합니다."
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "원작에 이름을 추가해야 합니다."
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "이 프로젝트의 고지 사항을 수정할 권한이 없습니다."
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "유료 기능 고지 사항에 최소 한 개 이상의 유료 기능을 표시해야 합니다."
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "광과민성 경고 고지 사항에 설명이 필요합니다."
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "외부 시스템 상호 작용 고지 사항에 설명이 필요합니다."
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "원격 측정 고지 사항에 최소 한 개 이상의 수집되는 데이터를 표시해야 합니다."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "이 프로젝트가 게임 외부에 존재하는 사용자 시스템을 확인하거나 수정할 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "이 프로젝트가 어떻게 외부 시스템과 상호 작용하는지 설명해주세요"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "예: 바탕 화면에 wake_up.txt 파일을 생성합니다"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "외부 시스템 상호 작용"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "원격 측정의 동의 방식은 무엇인가요?"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "개인정보 처리방침 또는 수집되는 데이터 유형 목록을 추가할 수 있습니다. 수집되는 데이터가 익명인지, 개인 식별 정보(PII)를 포함하는지도 명시해야 합니다."
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "어떤 데이터가 수집되나요?"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "예: Minecraft 버전 및 모드 로더 정보를 익명으로 수집합니다."
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "이 프로젝트가 당신, 또는 제삼자에게 사용 데이터를 전송할 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "원격 측정 포함"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "고지 사항을 추가하기 전에 버전을 업로드하세요"
+  },
+  "project.settings.editing-project": {
+    "message": "{projectType} 프로젝트 수정 중"
   },
   "project.settings.general.name.description": {
     "message": "접두사, 접미사, 괄호 속 설명 또는 추가 설명은 피하세요—프로젝트의 실제 이름만 기재하세요."
@@ -3796,6 +4087,15 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.monetization.description": {
+    "message": "Modrinth 프로젝트들은 자동으로 <rewards-program-link>보상 프로그램</rewards-program-link>에 등록됩니다. 수익 창출을 원하지 않거나 법적인 이유로 수익을 창출할 수 없는 경우 여기에서 비활성화할 수 있습니다."
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "이 프로젝트는 수익 창출 대상이 아닙니다. 잘못된 판단이라고 생각되는 경우 <contact-support-link>지원팀에 문의하세요</contact-support-link>."
+  },
+  "project.settings.monetization.title": {
+    "message": "수익 창출"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "다음의 모든 파일을 재배포할 수 있는 권한이 있음을 증명해 주세요. 확인이 완료되면 보류된 버전이 자동으로 게시됩니다."
@@ -3944,8 +4244,26 @@
   "project.settings.tags.featured-tags": {
     "message": "추천 태그"
   },
+  "project.settings.tags.featured-tags-required": {
+    "message": "추천 태그가 한 개 이상 필요합니다."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "가장 관련성 높은 태그를 선택하세요. 선택한 태그는 다른 태그보다 먼저 표시됩니다."
+  },
   "project.settings.tags.features-description": {
     "message": " {type}에서 사용하는 모든 기능을 선택하세요."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} 카테고리} other {카테고리}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} 기능 목록} other {기능 목록}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} 성능 영향 정도} other {성능 영향 정도}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} 해상도} other {해상도}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "현재 {count}개의 해상도 태그({tags})를 선택했습니다. 리소스 팩에는 보통 하나의 해상도 태그만 지정하는 것이 권장됩니다."
@@ -3970,6 +4288,9 @@
   },
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 12개 이하로 줄이는 것이 좋습니다."
+  },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "태그를 추가하기 전에 버전을 업로드하세요"
   },
   "project.versions.copy-id-option": {
     "message": "ID 복사"
@@ -4067,17 +4388,29 @@
   "report.not-for.dmca.description": {
     "message": "우리의 <policy-link>저작권 정책</policy-link>을 참조하세요."
   },
+  "report.note.ai-images.1": {
+    "message": "아이콘, 갤러리 및 설명에 AI로 생성된 이미지를 사용하지 못하도록 규정을 최근 변경했습니다. 신고 접수를 시작하기 전에 제작자가 프로젝트에서 AI 이미지를 삭제할 수 있도록 유예 기간을 제공하고 있습니다."
+  },
+  "report.note.check-back-later": {
+    "message": "유예 기간이 종료된 후 다시 확인해 주세요. 현재는 이러한 신고를 접수하지 않습니다."
+  },
   "report.note.copyright.1": {
     "message": "이것은 DMCA 삭제 요청이 아닌 재업로드된 콘텐츠에 대한 신고임을 유의해주시기 바랍니다."
   },
   "report.note.copyright.2": {
     "message": "DMCA 삭제 요청(법적 조치)을 하려는 경우, 대신 저희의 <copyright-policy-link>저작권 정책</copyright-policy-link>을 참조해주시기 바랍니다."
   },
+  "report.note.fully-ai-generated.1": {
+    "message": "완전히 AI로 생성한 프로젝트를 업로드하지 못하도록 규정을 최근 변경했습니다. 신고 접수를 시작하기 전에 제작자가 프로젝트에서 완전히 AI로 생성한 프로젝트를 업데이트하거나 삭제 수 있도록 유예 기간을 제공하고 있습니다."
+  },
   "report.note.malicious.1": {
     "message": "악성 또는 기만적인 콘텐츠에 대한 신고에는 코드 샘플과 같은 행위에 대한 실질적 증거가 포함되어야 합니다."
   },
   "report.note.malicious.2": {
     "message": "마이크로소프트 디펜더, VirusTotal 또는 인공지능 멀웨어 탐지의 요약은 충분한 증거가 아니므로 허용되지 않습니다."
+  },
+  "report.note.missing-disclosure.1": {
+    "message": "콘텐츠 고지 사항은 최근에 추가된 기능입니다. 누락되었거나 부정확한 고지 사항에 대한 신고 접수를 시작하기 전에 제작자가 고지 사항을 작성할 수 있도록 유예 기간을 제공하고 있습니다."
   },
   "report.please-report": {
     "message": "해당 상황에서 신고하세요:"
@@ -4096,6 +4429,9 @@
   },
   "report.report-item": {
     "message": "관리자에게 {title} 신고"
+  },
+  "report.reported-for": {
+    "message": "{type}(으)로 신고됨"
   },
   "report.submit": {
     "message": "신고 제출"

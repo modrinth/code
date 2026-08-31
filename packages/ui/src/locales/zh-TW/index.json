@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "繼續"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "已複製到剪貼簿"
+  },
   "button.copy-filename": {
     "defaultMessage": "複製檔案名稱"
   },
@@ -741,10 +744,10 @@
     "defaultMessage": "名稱（Z-A）"
   },
   "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "最新在前"
+    "defaultMessage": "由新到舊"
   },
   "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "最舊在前"
+    "defaultMessage": "由舊到新"
   },
   "content.page-layout.sort.label": {
     "defaultMessage": "排序依據：{mode}"
@@ -1290,7 +1293,7 @@
     "defaultMessage": "原始專案"
   },
   "external-files.permissions-card.proof-image-alt": {
-    "defaultMessage": "擷圖證明 {n}"
+    "defaultMessage": "證明擷圖 {n}"
   },
   "external-files.permissions-card.proof-images-label": {
     "defaultMessage": "證明圖片："
@@ -1401,10 +1404,10 @@
     "defaultMessage": "檔案將被覆寫"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "建立 {type}"
+    "defaultMessage": "建立{type}"
   },
   "files.create-modal.header": {
-    "defaultMessage": "建立一個 {type}"
+    "defaultMessage": "建立{type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "例如：my-folder"
@@ -2018,6 +2021,117 @@
   "icon-select.select": {
     "defaultMessage": "選擇圖示"
   },
+  "image-viewer.close": {
+    "defaultMessage": "關閉"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "編輯"
+  },
+  "image-viewer.editor.censor.blur": {
+    "defaultMessage": "模糊"
+  },
+  "image-viewer.editor.censor.mode": {
+    "defaultMessage": "打碼類型"
+  },
+  "image-viewer.editor.censor.solid": {
+    "defaultMessage": "實心"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "色彩"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} 像素"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "重設裁切"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "刪除選取的註解"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "區域"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "物件"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "橡皮擦模式"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "圖片編輯工具"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "更多儲存選項"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "覆寫"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "重做"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "儲存副本"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "儲存圖片"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "大小"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "箭頭"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "打碼"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "裁切"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "橢圓形"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "橡皮擦"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "螢光筆"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "筆"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "矩形"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "選取"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "文字"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "復原"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "大小"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "合適大小"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "調整成工作區大小"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "放大"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "縮小"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "下一張圖片"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "上一張圖片"
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "搜尋版本..."
   },
@@ -2609,6 +2723,9 @@
   "label.yes": {
     "defaultMessage": "是"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "正在切換帳號..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "捷克文"
   },
@@ -3112,6 +3229,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "設為聯盟行銷夥伴"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "查看共用實例"
   },
   "profile.button.unblock": {
     "defaultMessage": "解除封鎖"
@@ -4015,6 +4135,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "更新通道"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "已選取 {count, number} 項"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "切換篩選 {filter}"
@@ -5709,13 +5835,13 @@
     "defaultMessage": "搜尋結果"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Modrinth App 在這個語言的翻譯完成度為 {percentage}%。"
+    "defaultMessage": "Modrinth App 在這個語言的翻譯完成度約為 {percentage}%。"
   },
   "settings.language.coverage.label": {
     "defaultMessage": "翻譯完成度 {percentage}%"
   },
   "settings.language.coverage.website-tooltip": {
-    "defaultMessage": "本網站在這個語言的翻譯完成度為 {percentage}%。"
+    "defaultMessage": "本網站在這個語言的翻譯完成度約為 {percentage}%。"
   },
   "settings.language.description": {
     "defaultMessage": "選擇你偏好的{platform}語言。翻譯由 <crowdin-link>Crowdin</crowdin-link> 上的志願者所貢獻。"
@@ -6668,6 +6794,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth 團隊"
   },
+  "user.role.moderator": {
+    "defaultMessage": "內容管理員"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Modrinth 團隊"
+  },
   "version.content.name": {
     "defaultMessage": "名稱"
   },
@@ -6678,7 +6810,7 @@
     "defaultMessage": "開發用 jar"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
+    "defaultMessage": "Javadocs jar"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "可選資源包"
@@ -6693,7 +6825,7 @@
     "defaultMessage": "簽署檔案"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "原始碼 jar"
+    "defaultMessage": "Sources jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "其他"
@@ -6735,7 +6867,7 @@
     "defaultMessage": "已知不相容"
   },
   "version.section.no-changes": {
-    "defaultMessage": "未提供變更日誌。"
+    "defaultMessage": "未提供更新日誌。"
   },
   "version.section.no-modpack-mod-loader": {
     "defaultMessage": "無模組載入器"
@@ -6759,3 +6891,4 @@
     "defaultMessage": "類型"
   }
 }
+

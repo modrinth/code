@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "올바른 태그를 선택해 주세요"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "이 {type}에 해당하는 콘텐츠 고지 사항을 작성하여 사용자에게 중요한 정보를 알려주세요."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "콘텐츠 고지 사항 확인"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "작성한 설명이 {length, plural, one {#자} other {#자}}입니다. 명확하고 유익한 설명을 작성하려면 최소 {minChars, plural, one {#자} other {#자}}가 권장됩니다."
   },
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "설명 설정 방문"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "고지 사항 설정 방문"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "라이선스 설정 방문"
   },
@@ -256,6 +265,12 @@
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "{type}의 내용을 보여주기 위해서는 갤러리 이미지가 최소 한 장 이상 필요합니다."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "오디오 또는 현지화 팩을 제외한 리소스 팩의 경우(해당된다면 적절한 태그를 선택해 주세요)의 콘텐츠를 보여주기 위해서 최소 1장의 이미지가 필요합니다."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "이 셰이더의 여러 상황 및 조건에서의 모습을 보여주기 위해서 최소 3장의 이미지가 필요합니다."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "갤러리 이미지 업로드"

@@ -149,6 +149,12 @@
   "app.ads-consent.title": {
     "message": "プライバシーと広告がModrinthを支える仕組み"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "ライブラリをコンパクトに表示します。"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "コンパクトモード"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "ホーム"
   },
@@ -160,6 +166,12 @@
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "ネームタグを非表示にする"
+  },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "ホーム画面の「Jump in」セクションに、最近プレイしたワールドやインスタンスを表示します。"
+  },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "ワールドやインスタンスに参加する"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minecraftを起動したときにランチャーを最小化します。"
@@ -206,6 +218,15 @@
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "起動とナビゲーション"
   },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "ログイン中のすべての端末で同じ設定を使用します。オフにすると、端末ごとに個別の設定を使用できます。"
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "設定を同期するには、Modrinthアカウントにログインしてください。"
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "端末間での設定の同期"
+  },
   "app.browse.add-servers-to-instance": {
     "message": "インスタンスにサーバーを追加中"
   },
@@ -239,6 +260,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "インストール済みを非表示"
   },
+  "app.browse.project-actions.label": {
+    "message": "プロジェクトの操作"
+  },
   "app.browse.project-type.data-packs": {
     "message": "データパック"
   },
@@ -257,17 +281,29 @@
   "app.browse.project-type.shaders": {
     "message": "シェーダー"
   },
+  "app.browse.server-instance-content-warning": {
+    "message": "コンテンツを追加すると、このサーバーに参加できなくなる場合があります。追加したコンテンツは、サーバーで管理されているコンテンツが更新されると削除されます。"
+  },
   "app.browse.server.installing": {
     "message": "インストール中"
   },
   "app.content-install.no-compatible-versions": {
     "message": "{compatibilityLabel} に一致する利用可能なバージョンがありません。このままインストールしますか？依存関係は自動的にインストールされません。"
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "バックアップフォルダーを開く"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Modパックの説明を入力…"
   },
   "app.export-modal.export-button": {
     "message": "書き出し"
+  },
+  "app.export-modal.export-complete": {
+    "message": "エクスポートが完了しました"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} は正常にエクスポートされました。"
   },
   "app.export-modal.header": {
     "message": "Modパックを書き出す"
@@ -284,8 +320,77 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.home.jump-back-in.actions.label": {
+    "message": "インスタンスの操作"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "このインスタンスはロックされています"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "インスタンスは既に開いています"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "追加のオプション"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "未プレイ"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "新しいインスタンス"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "ドラッグしてサイズ変更"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "さっそく遊ぶ"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "インスタンスを表示"
+  },
+  "app.hosting.update-required.description": {
+    "message": "Modrinth Hostingを利用するには、Modrinth Appを更新してください"
+  },
+  "app.hosting.update-required.download": {
+    "message": "ダウンロードして更新"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "ワクワクしているModrinth Bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Modrinth Appの更新が必要です"
+  },
+  "app.icon-editor.apply-icons-modal.apply-error": {
+    "message": "インスタンスへのランダムアイコンの設定に失敗しました。"
+  },
+  "app.icon-editor.apply-icons-modal.apply-success": {
+    "message": "{num, plural, other {#個のインスタンスのアイコンをランダムに変更しました}}。"
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "今回の新機能"
+  },
   "app.icon-editor.apply-icons-modal.close": {
     "message": "閉じる"
+  },
+  "app.icon-editor.apply-icons-modal.description": {
+    "message": "Modrinth App内で、インスタンス用のカスタムアイコンを作成できます。背景とMinecraftや人気Modのシンボルを自由に組み合わせて、自分好みのアイコンを作りましょう！"
+  },
+  "app.icon-editor.apply-icons-modal.instances-without-icons": {
+    "message": "{count, plural, one {# 件} other {# 件}} には、まだアイコンが設定されていません。まずは、 {count, plural, one {こちら} other {これら}}にランダムなアイコンを割り当てますか？"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "ランダムのアイコン"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "スキップする"
+  },
+  "app.icon-editor.apply-icons-modal.title": {
+    "message": "カスタムアイコンエディター"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "閉じる"
+  },
+  "app.icon-editor.notification.description": {
+    "message": "起動構成をカスタマイズ編集しましょう！"
   },
   "app.install.phase.downloading_content": {
     "message": "コンテンツをダウンロード中"
@@ -773,9 +878,6 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Modrinthアカウントにサインイン"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+にアップグレード"
   },
@@ -817,6 +919,21 @@
   },
   "app.restarting": {
     "message": "再起動中..."
+  },
+  "app.screenshots.group.this-month": {
+    "message": "今月"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "今週"
+  },
+  "app.screenshots.group.today": {
+    "message": "今日"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "昨日"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -909,7 +1026,7 @@
     "message": "Java {version, number} の場所"
   },
   "app.settings.operating-system.macos": {
-    "message": "MacOS"
+    "message": "macOS"
   },
   "app.settings.privacy.ads-consent.intro": {
     "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。この機能は下のボタンから個別に拒否や許可または変更することができます。"
@@ -1742,18 +1859,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "このインスタンスがロックされている間は、インストール設定を利用できません。"
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "カスタム環境変数"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "カスタムJava引数"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "カスタムJavaインストール"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "カスタムメモリ割り当て"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "環境変数を入力…"
   },
@@ -1783,9 +1888,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "ウィンドウ"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "カスタムウィンドウ設定"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "フルスクリーン"

@@ -818,6 +818,33 @@
   "auth.create-account.username.placeholder": {
     "message": "Benutzername eingeben"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Gib den 6-stelligen Code aus deiner Authentifikator-App oder einen deiner Backup-Codes ein."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Zwei-Faktor-Authentifizierung"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Code eingeben..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Mit Passkey fortfahren"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "Es wurde zuletzt mit {method, select, password {einem Passwort} passkey {einem Passkey} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} } angemeldet."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Erneut authentifizieren"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Auf andere Weise anmelden"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Mit {provider} anmelden"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} muss erneut authentifiziert werden."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "E-Mail zur Wiederherstellung senden"
   },
@@ -860,6 +887,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Code eingeben..."
   },
+  "auth.sign-in.add-account": {
+    "message": "Konto hinzufügen"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Wähle ein Konto für die Modrinth App"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Weiter mit E-Mail"
   },
@@ -874,6 +907,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Zuletzt benutzt"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Wir leiten dich zurück zur Modrinth-App. Sollte nichts passieren, klicke bitte auf die Schaltfläche unten."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Gehe zu Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Modrinth App öffnen"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Du bist angemeldet"
   },
   "auth.sign-in.no-account": {
     "message": "Du hast kein Konto?"
@@ -1024,6 +1069,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Mit Antwort annehmen"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Meldung schließen"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Mit Antwort schließen"
@@ -2189,6 +2237,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Du bist aktuell angemeldet als:"
   },
+  "error.generic.401.switch-account": {
+    "message": "Oder wechsle zu einem anderen Konto:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Konto konnte nicht gewechselt werden. Bitte versuche es erneut."
+  },
   "error.generic.401.title": {
     "message": "Du hast keinen Zugriff auf diese Seite"
   },
@@ -2661,7 +2715,7 @@
     "message": "Neues Projekt"
   },
   "layout.action.new-server-project": {
-    "message": "Neuer Server"
+    "message": "Neues Serverprojekt"
   },
   "layout.action.publish": {
     "message": "Veröffentlichen"
@@ -2674,6 +2728,9 @@
   },
   "layout.action.tech-review": {
     "message": "Technische Überprüfung"
+  },
+  "layout.action.user-lookup": {
+    "message": "Benutzersuche"
   },
   "layout.avatar.alt": {
     "message": "Dein Avatar"
@@ -2870,6 +2927,9 @@
   "layout.nav.active-reports": {
     "message": "Aktive Meldungen"
   },
+  "layout.nav.add-account": {
+    "message": "Konto hinzufügen"
+  },
   "layout.nav.discover": {
     "message": "Entdecken"
   },
@@ -2900,6 +2960,9 @@
   "layout.nav.projects": {
     "message": "Projekte"
   },
+  "layout.nav.remove-account": {
+    "message": "Konto entfernen"
+  },
   "layout.nav.revenue": {
     "message": "Einnahmen"
   },
@@ -2908,6 +2971,12 @@
   },
   "layout.nav.search": {
     "message": "Suche"
+  },
+  "layout.nav.switch-account": {
+    "message": "Konto wechseln"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Konto konnte nicht gewechselt werden. Bitte versuche es erneut."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Auf Modrinth+ upgraden"

@@ -260,6 +260,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "隱藏已安裝的內容"
   },
+  "app.browse.project-actions.label": {
+    "message": "專案動作"
+  },
   "app.browse.project-type.data-packs": {
     "message": "資料包"
   },
@@ -287,6 +290,9 @@
   "app.content-install.no-compatible-versions": {
     "message": "沒有符合 {compatibilityLabel} 的可用版本。請選擇一個版本強制安裝。不會自動安裝相依模組。"
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "開啟備份資料夾"
+  },
   "app.export-modal.description-placeholder": {
     "message": "輸入模組包描述..."
   },
@@ -313,6 +319,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "實例動作"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "這個實例已被鎖定"
@@ -345,7 +354,7 @@
     "message": "下載即可更新"
   },
   "app.hosting.update-required.rinthbot-alt": {
-    "message": "興奮的 Modrinth 機器人"
+    "message": "興奮的 Modrinth Bot"
   },
   "app.hosting.update-required.title": {
     "message": "需要更新 Modrinth App"
@@ -464,6 +473,9 @@
   "app.instance.action.stop": {
     "message": "停止"
   },
+  "app.instance.actions.label": {
+    "message": "實例動作"
+  },
   "app.instance.add-server.add": {
     "message": "新增"
   },
@@ -471,7 +483,7 @@
     "message": "已新增"
   },
   "app.instance.add-server.adding": {
-    "message": "已經新增..."
+    "message": "正在新增..."
   },
   "app.instance.add-server.cancel": {
     "message": "取消"
@@ -507,7 +519,7 @@
     "message": "推送更新"
   },
   "app.instance.admonitions.shared-instance.review-description": {
-    "message": "審查即將與這個實例的所有使用者共用的內容變更。"
+    "message": "檢視即將與這個實例的所有使用者共用的內容變更。"
   },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "檢視變更"
@@ -746,6 +758,9 @@
   "app.instance.tab.logs": {
     "message": "紀錄"
   },
+  "app.instance.tab.screenshots": {
+    "message": "螢幕擷取畫面"
+  },
   "app.instance.tab.share": {
     "message": "共用"
   },
@@ -793,6 +808,9 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "移除伺服器"
+  },
+  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
+    "message": "由於這個伺服器已同步，因此也將從{count, plural, other {另外 # 個實例}}中移除。"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "移除伺服器"
@@ -851,6 +869,9 @@
   "app.java-selector.test-installation": {
     "message": "測試 Java 安裝"
   },
+  "app.library.actions.label": {
+    "message": "遊戲庫動作"
+  },
   "app.library.context-menu.create-instance": {
     "message": "新增實例"
   },
@@ -898,6 +919,9 @@
   },
   "app.library.group-by.none": {
     "message": "不分組"
+  },
+  "app.library.group.actions.label": {
+    "message": "群組動作"
   },
   "app.library.group.collapse": {
     "message": "摺疊群組"
@@ -1021,6 +1045,9 @@
   },
   "app.library.instance.action.view-instance": {
     "message": "查看實例"
+  },
+  "app.library.instance.actions.label": {
+    "message": "實例動作"
   },
   "app.library.instance.deselect": {
     "message": "取消選取實例"
@@ -1217,11 +1244,17 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新才能遊玩「{name}」。請更新至最新版本以啟動遊戲。"
   },
+  "app.nav.add-account": {
+    "message": "新增帳號"
+  },
   "app.nav.create-new-instance": {
     "message": "建立新實例"
   },
   "app.nav.home": {
     "message": "首頁"
+  },
+  "app.nav.loading-profile": {
+    "message": "正在載入個人檔案..."
   },
   "app.nav.modrinth-account": {
     "message": "Modrinth 帳號"
@@ -1229,11 +1262,23 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
+  "app.nav.remove-account": {
+    "message": "移除帳號"
+  },
+  "app.nav.screenshots": {
+    "message": "螢幕擷取畫面"
+  },
   "app.nav.sign-in-to-modrinth-account": {
-    "message": "登入 Modrinth 帳號"
+    "message": "登入 Modrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "切換帳號"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "升級至 Modrinth+"
+  },
+  "app.nav.view-profile": {
+    "message": "查看個人檔案"
   },
   "app.navigation.go-back": {
     "message": "上一頁"
@@ -1255,6 +1300,9 @@
   },
   "app.notification.warning": {
     "message": "警告"
+  },
+  "app.project.actions.label": {
+    "message": "專案動作"
   },
   "app.project.coming-soon": {
     "message": "即將推出"
@@ -1298,14 +1346,176 @@
   "app.project.versions.already-installed": {
     "message": "已安裝"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "實例動作"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "拖曳顯示最近遊玩的實例"
   },
   "app.quick-instance-switcher.drag-tooltip": {
     "message": "拖曳調整大小"
   },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "這個實例已被鎖定"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "查看實例"
+  },
   "app.restarting": {
     "message": "正在重新啟動..."
+  },
+  "app.screenshots.copied": {
+    "message": "已複製"
+  },
+  "app.screenshots.copy": {
+    "message": "複製圖片"
+  },
+  "app.screenshots.delete-description": {
+    "message": "確定要永久刪除 {name} 嗎？這項動作無法復原。"
+  },
+  "app.screenshots.delete-success": {
+    "message": "已刪除螢幕擷取畫面"
+  },
+  "app.screenshots.delete-title": {
+    "message": "刪除螢幕擷取畫面"
+  },
+  "app.screenshots.deselect": {
+    "message": "取消選取 {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "編輯螢幕擷取畫面"
+  },
+  "app.screenshots.empty-description": {
+    "message": "你在遊戲中擷取的螢幕畫面將顯示在這裡。"
+  },
+  "app.screenshots.empty-heading": {
+    "message": "目前還沒有螢幕擷取畫面"
+  },
+  "app.screenshots.error-heading": {
+    "message": "無法載入螢幕擷取畫面"
+  },
+  "app.screenshots.go-to-instance": {
+    "message": "前往實例"
+  },
+  "app.screenshots.group-by": {
+    "message": "分組依據"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "所有螢幕擷取畫面"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "摺疊群組"
+  },
+  "app.screenshots.group.custom": {
+    "message": "自訂群組"
+  },
+  "app.screenshots.group.date": {
+    "message": "日期"
+  },
+  "app.screenshots.group.delete": {
+    "message": "刪除群組"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "這個群組中的螢幕擷取畫面將被取消分組。"
+  },
+  "app.screenshots.group.edit": {
+    "message": "編輯群組名稱"
+  },
+  "app.screenshots.group.empty": {
+    "message": "拖曳以新增螢幕擷取畫面。"
+  },
+  "app.screenshots.group.expand": {
+    "message": "展開群組"
+  },
+  "app.screenshots.group.instance": {
+    "message": "實例"
+  },
+  "app.screenshots.group.new": {
+    "message": "新增群組"
+  },
+  "app.screenshots.group.none": {
+    "message": "不分組"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "這個月"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "這週"
+  },
+  "app.screenshots.group.today": {
+    "message": "今天"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "未分組"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "昨天"
+  },
+  "app.screenshots.heading": {
+    "message": "螢幕擷取畫面"
+  },
+  "app.screenshots.more-actions": {
+    "message": "更多動作"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "試試使用不同的搜尋字詞或篩選條件。"
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "沒有找到螢幕擷取畫面"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "搜尋"
+  },
+  "app.screenshots.select": {
+    "message": "選取 {name}"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "已選取螢幕擷取畫面"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "確定要刪除 {count, plural, other {# 張螢幕擷取畫面}}嗎？這項動作無法復原。"
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural, other {已刪除 # 張螢幕擷取畫面}}"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "刪除選取的螢幕擷取畫面"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "匯出 ZIP"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Modrinth 螢幕擷取畫面.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "{instance} 螢幕擷取畫面.zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "從群組中移除"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "已選取 {count} 個"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "ZIP 壓縮檔"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "開啟資料夾"
+  },
+  "app.screenshots.sort-by": {
+    "message": "排序依據"
+  },
+  "app.screenshots.sort.name": {
+    "message": "名稱"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "由新到舊"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "由舊到新"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -1334,6 +1544,9 @@
   "app.settings.default-instance-options.height.title": {
     "message": "高度"
   },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Java 和記憶體"
+  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "啟動實例時傳遞給 Java 的參數。"
   },
@@ -1342,6 +1555,9 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java 參數"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "啟動掛勾"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "各個實例可使用的記憶體上限。"
@@ -1375,6 +1591,9 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "寬度"
+  },
+  "app.settings.default-instance-options.window.title": {
+    "message": "視窗"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "用於包裝 Minecraft 啟動處理程序的指令。"
@@ -1472,6 +1691,48 @@
   "app.settings.sidebar.label.instances": {
     "message": "實例"
   },
+  "app.settings.synced-options.command-history": {
+    "message": "指令紀錄"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "跨實例同步指令紀錄。"
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "編輯指令紀錄"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "已儲存的創造模式快捷欄"
+  },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "跨實例同步已儲存的創造模式快捷欄。"
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "多人遊戲伺服器"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "伺服器位址"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "跨實例同步多人遊戲伺服器。"
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "編輯同步的伺服器"
+  },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "目前還沒有同步任何使用者新增的伺服器。"
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "伺服器名稱"
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "還沒有同步任何伺服器"
+  },
+  "app.settings.synced-options.screenshots": {
+    "message": "螢幕擷取畫面"
+  },
+  "app.settings.synced-options.screenshots.description": {
+    "message": "在同一個地方查看所有實例的螢幕擷取畫面。"
+  },
   "app.settings.tabs.appearance": {
     "message": "外觀"
   },
@@ -1489,6 +1750,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "資源管理"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "同步設定"
   },
   "app.sidebar.playing-as": {
     "message": "目前遊玩帳號"
@@ -1798,6 +2062,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>新增好友</link>即可查看他們正在玩什麼！"
+  },
+  "friends.friend.actions.label": {
+    "message": "好友動作"
   },
   "friends.friend.cancel-request": {
     "message": "取消請求"
@@ -2364,16 +2631,16 @@
     "message": "實例被鎖定時無法使用安裝設定選項。"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "自訂環境變數"
+    "message": "在這個實例使用自訂環境變數。"
   },
   "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "自訂 Java 參數"
+    "message": "在這個實例使用自訂 Java 參數。"
   },
   "instance.settings.tabs.java.custom-java-installation": {
-    "message": "自訂 Java 安裝"
+    "message": "在這個實例使用自訂 Java 安裝。"
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "自訂記憶體分配"
+    "message": "在這個實例使用自訂記憶體分配。"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "輸入環境變數..."
@@ -2399,14 +2666,74 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
+  "instance.settings.tabs.settings-overrides": {
+    "message": "覆寫同步設定"
+  },
   "instance.settings.tabs.sharing": {
     "message": "共用"
+  },
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "指令紀錄"
+  },
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "應用程式設定中已停用指令紀錄的同步功能。"
+  },
+  "instance.settings.tabs.synced-options.command-history.exclude-description": {
+    "message": "不要在這個實例同步指令紀錄。"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "已儲存的創造模式快捷欄"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "應用程式設定中已停用創造模式快捷欄的同步功能。"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.exclude-description": {
+    "message": "不要在這個實例同步已儲存的創造模式快捷欄。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
+    "message": "在進行任何變更之前，將會先備份即將被取代的版本。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "「{instance}」與你的同步版本有不同的創造模式快捷欄。請選擇要在所有實例中使用的版本。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.title": {
+    "message": "選擇創造模式快捷欄"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
+    "message": "覆寫其他實例"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
+    "message": "使用同步的版本"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "多人遊戲伺服器"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "應用程式設定中已停用多人遊戲伺服器的同步功能。"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.exclude-description": {
+    "message": "不要在這個實例同步多人遊戲伺服器。"
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "開啟同步設定"
+  },
+  "instance.settings.tabs.synced-options.screenshots": {
+    "message": "螢幕擷取畫面"
+  },
+  "instance.settings.tabs.synced-options.screenshots.disabled-in-app": {
+    "message": "應用程式設定中已停用「螢幕擷取畫面」頁面。"
+  },
+  "instance.settings.tabs.synced-options.screenshots.exclude-description": {
+    "message": "不要在「螢幕擷取畫面」頁面顯示這個實例的螢幕擷取畫面。"
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "遊戲設定可以跨實例共用。請在應用程式設定中選擇要共用的設定。"
   },
   "instance.settings.tabs.window": {
     "message": "視窗"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "自訂視窗設定"
+    "message": "在這個實例使用自訂視窗設定。"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "全螢幕"
@@ -2454,7 +2781,7 @@
     "message": "選擇設定檔"
   },
   "instance.shared-instance.publish-review.description": {
-    "message": "審查內容變更，並選擇要包含在本次更新的設定檔。"
+    "message": "檢視內容變更，並選擇要包含在本次更新的設定檔。"
   },
   "instance.shared-instance.publish-review.header": {
     "message": "檢視變更"
@@ -2492,6 +2819,9 @@
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 伺服器"
   },
+  "instance.worlds.actions.label": {
+    "message": "世界動作"
+  },
   "instance.worlds.cant_connect": {
     "message": "無法連線到伺服器"
   },
@@ -2500,6 +2830,21 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "建立捷徑"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "你要在其他已同步的實例中保留這個伺服器，還是一併將它移除？"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "保留"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "移除"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "取消同步伺服器"
+  },
+  "instance.worlds.desync_server": {
+    "message": "取消同步"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "不要在首頁顯示"
@@ -2533,6 +2878,9 @@
   },
   "instance.worlds.play_instance": {
     "message": "遊玩實例"
+  },
+  "instance.worlds.play_world": {
+    "message": "遊玩世界"
   },
   "instance.worlds.shortcut-created": {
     "message": "已建立捷徑"

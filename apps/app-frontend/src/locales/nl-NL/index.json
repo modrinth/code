@@ -755,9 +755,6 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Meld je aan bij een Modrinth-account"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade naar Modrinth+"
   },
@@ -1592,18 +1589,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Aangepaste omgevingsvariabelen"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Aangepaste Java-argumenten"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Aangepaste Java-installatie"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Aangepaste geheugentoewijzing"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Voer omgevingsvariabelen in…"
   },
@@ -1633,9 +1618,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Venster"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Aangepaste venster instellingen"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Volledig scherm"

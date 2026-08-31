@@ -1460,9 +1460,6 @@
   "layout.action.new-project": {
     "message": "פרוייקט חדש"
   },
-  "layout.action.new-server-project": {
-    "message": "יצירת שרת חדש"
-  },
   "layout.action.publish": {
     "message": "פרסם"
   },

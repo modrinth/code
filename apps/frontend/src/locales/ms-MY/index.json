@@ -2165,9 +2165,6 @@
   "layout.action.new-project": {
     "message": "Projek baharu"
   },
-  "layout.action.new-server-project": {
-    "message": "Pelayan baharu"
-  },
   "layout.action.publish": {
     "message": "Terbitkan"
   },

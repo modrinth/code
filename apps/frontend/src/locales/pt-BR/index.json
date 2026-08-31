@@ -2660,9 +2660,6 @@
   "layout.action.new-project": {
     "message": "Novo projeto"
   },
-  "layout.action.new-server-project": {
-    "message": "Novo servidor"
-  },
   "layout.action.publish": {
     "message": "Publicar"
   },

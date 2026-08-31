@@ -12,13 +12,13 @@
     "message": "Gem flere kørende instances"
   },
   "app.action-bar.install.copied-details": {
-    "message": "Kopiere"
+    "message": "Kopieret"
   },
   "app.action-bar.install.copy-details": {
     "message": "Kopier detaljer"
   },
   "app.action-bar.install.dismiss": {
-    "message": "Tilsidesæt"
+    "message": "Annuller"
   },
   "app.action-bar.install.open-instance": {
     "message": "Åben instance"
@@ -36,10 +36,10 @@
     "message": "Annulleret"
   },
   "app.action-bar.install.summary.content-download-failed": {
-    "message": "Kunne ikke download filer"
+    "message": "Kunne ikke downloade filer"
   },
   "app.action-bar.install.summary.corrupt-download": {
-    "message": "Downloaded filer er korrupt"
+    "message": "Downloadet fil er korrupt"
   },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "Kunne ikke gemme filer"
@@ -51,16 +51,16 @@
     "message": "Instance kunne ikke blive fundet"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "Fil sti er ugyldig"
+    "message": "Filstien er ugyldig"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "Modpack data ugyldig"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Modpack har ugyldig metadata"
+    "message": "Modpack filer har ugyldig metadata"
   },
   "app.action-bar.install.summary.java-setup-failed": {
-    "message": "Java setup kunne ikke færdiggøres"
+    "message": "Java opsætning kunne ikke fuldføres"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
     "message": "Loader setup fejlede"
@@ -69,13 +69,13 @@
     "message": "Kunne ikke opdatere lokal data"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Minecraft setup fejlede"
+    "message": "Opsætning af Minecraft fejlede"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
     "message": "Kunne ikke få forbindelse til Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Ingen adgang til at skrive"
+    "message": "Ingen tilladelse til at skrive"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "Kunne ikke download pack"
@@ -105,7 +105,7 @@
     "message": "Primære instance"
   },
   "app.action-bar.reload-to-update": {
-    "message": "Genindlæs for at opdater"
+    "message": "Genindlæs for at opdatere"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Vis flere kørende instances"
@@ -126,7 +126,7 @@
     "message": "Vis logs"
   },
   "app.ads-consent.accept": {
-    "message": "Tillad alle"
+    "message": "Accepter alle"
   },
   "app.ads-consent.body": {
     "message": "Reklamer gør Modrinth muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies i appen for at personliggøre reklamer og måle effektivitet."
@@ -150,13 +150,13 @@
     "message": "Minimer app"
   },
   "app.appearance-settings.show-play-time.title": {
-    "message": "Vis tid spillet"
+    "message": "Vis spilletid"
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Spring ikke nødvendige advarseler over"
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Gem højre sidebar"
+    "message": "Skjul højre sidebar"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Advar mig før jeg installere en ukendt modpacks"
@@ -165,7 +165,7 @@
     "message": "Minecraft authentication servere kan måske være nede lige nu. Tjek din internet forbindelse og prøv igen senere."
   },
   "app.auth-servers.unreachable.header": {
-    "message": "Kan ikke nå autentificeringsservere"
+    "message": "Kan ikke nå godkendelsesserverne"
   },
   "app.behavior-settings.content.title": {
     "message": "Hjem og indhold"
@@ -180,7 +180,7 @@
     "message": "Tilføj til instance"
   },
   "app.browse.add-to-instance-name": {
-    "message": "Tilføjet til {instanceName}"
+    "message": "Tilføj til {instanceName}"
   },
   "app.browse.added": {
     "message": "Tilføjet"
@@ -943,9 +943,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Vindue"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Brugerdefineret vindue indstillinger"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fuld skærm"

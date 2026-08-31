@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "통계 보기"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "운영 체제의 제목 표시줄 및 창 제어 기능을 사용합니다. 앱 재시작이 필요합니다."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "시스템 창 프레임"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "서버 설정 불러오기 실패"
   },
@@ -968,6 +974,15 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "모드팩 검색"
   },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "인스턴스 생성"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "모드팩 설치"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "검색 결과 없음"
+  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "로더와 게임 버전을 선택하여 처음부터 시작합니다."
   },
@@ -979,6 +994,9 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "인스턴스 가져오기"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "모드팩 업로드"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "모드나 플러그인이 없는 기본 Minecraft입니다."
@@ -1672,6 +1690,15 @@
   },
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "URL에서 .zip 파일 업로드"
+  },
+  "filter-bar.add": {
+    "defaultMessage": "추가"
+  },
+  "filter-bar.search-placeholder": {
+    "defaultMessage": "검색..."
+  },
+  "filter-bar.select-all": {
+    "defaultMessage": "전체 선택"
   },
   "form.label.address-line": {
     "defaultMessage": "주소"
@@ -2746,6 +2773,24 @@
   },
   "notification.error.title": {
     "defaultMessage": "오류가 발생했습니다"
+  },
+  "notifications.actor.unknown": {
+    "defaultMessage": "누군가"
+  },
+  "notifications.close": {
+    "defaultMessage": "닫기"
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "게임 실행"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "인스턴스"
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "수락"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "거절"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "수락됨"
@@ -3884,8 +3929,17 @@
   "report.type.inappropriate": {
     "defaultMessage": "부적절함"
   },
+  "report.type.spam": {
+    "defaultMessage": "스팸"
+  },
   "s.bg": {
     "defaultMessage": "백그라운드 작업 실행 중"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "선택사항"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "필수"
   },
   "search.filter.locked.default": {
     "defaultMessage": "필터 잠김"
@@ -3955,6 +4009,9 @@
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "모든 버전 보이기"
+  },
+  "search.filter_type.included_content": {
+    "defaultMessage": "포함된 컨텐츠"
   },
   "search.filter_type.license": {
     "defaultMessage": "라이선스"
@@ -5261,6 +5318,36 @@
   "settings.billing.title": {
     "defaultMessage": "결제 및 구독"
   },
+  "settings.display.project-list-layouts.mod": {
+    "defaultMessage": "모드 페이지"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "defaultMessage": "행"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "defaultMessage": "모드팩 페이지"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "defaultMessage": "플러그인 페이지"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "defaultMessage": "리소스팩 페이지"
+  },
+  "settings.display.project-list-layouts.server": {
+    "defaultMessage": "서버 페이지"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "defaultMessage": "셰이더 페이지"
+  },
+  "settings.display.project-list-layouts.title": {
+    "defaultMessage": "프로젝트 목록 레이아웃"
+  },
+  "settings.display.project-list-layouts.user": {
+    "defaultMessage": "사용자 프로필 페이지"
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "defaultMessage": "고급 렌더링"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "어두운 테마"
   },
@@ -5444,6 +5531,9 @@
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username} 님의 아바타"
   },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "취소"
+  },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "커스텀..."
   },
@@ -5479,6 +5569,9 @@
   },
   "sharing.invite-players-modal.friends-heading": {
     "defaultMessage": "당신의 친구 - {count}"
+  },
+  "sharing.invite-players-modal.heading": {
+    "defaultMessage": "플레이어 초대"
   },
   "sharing.invite-players-modal.invite": {
     "defaultMessage": "초대"
@@ -5524,6 +5617,21 @@
   },
   "sharing.invite-players-modal.update-invite-link-failed-title": {
     "defaultMessage": "초대 링크 업데이트 실패"
+  },
+  "sharing.invite-players-toast.accept": {
+    "defaultMessage": "수락"
+  },
+  "sharing.invite-players-toast.decline": {
+    "defaultMessage": "거절"
+  },
+  "sharing.invite-players-toast.server-suffix": {
+    "defaultMessage": "서버."
+  },
+  "skins.select": {
+    "defaultMessage": "스킨 선택"
+  },
+  "skins.select-named": {
+    "defaultMessage": "{name} 선택"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -6053,6 +6161,15 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "페이지를 떠나겠습니까?"
   },
+  "ui.pagination.go-to-page": {
+    "defaultMessage": "페이지로 이동"
+  },
+  "ui.pagination.next-page": {
+    "defaultMessage": "다음 페이지"
+  },
+  "ui.pagination.previous-page": {
+    "defaultMessage": "이전 페이지"
+  },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "알림 {count}개"
   },
@@ -6194,9 +6311,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "개발 jar"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "선택적 리소스 팩"
   },
@@ -6208,9 +6322,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "시그니처 파일"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "소스 jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "기타"

@@ -767,18 +767,6 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} versio"
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Mukautetut ympäristö muuttujat"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Mukautetut Java argumentit"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Mukautettu Java asennus"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Mukautettu muistin allokointi"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Syötä ympäristö muuttujat..."
   },
@@ -805,9 +793,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Ikkuna"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Mukautetut ikkuna asetukset"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Koko näyttö"

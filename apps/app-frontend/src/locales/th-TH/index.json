@@ -635,9 +635,6 @@
   "instance.settings.tabs.window": {
     "message": "หน้าต่าง"
   },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "การตั้งค่าการปรับแต่งหน้าต่าง"
-  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "เต็มหน้าจอ"
   },

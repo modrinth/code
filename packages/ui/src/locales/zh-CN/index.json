@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "继续"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "已复制到剪贴板"
+  },
   "button.copy-filename": {
     "defaultMessage": "复制文件名称"
   },
@@ -2018,6 +2021,117 @@
   "icon-select.select": {
     "defaultMessage": "选择图标"
   },
+  "image-viewer.close": {
+    "defaultMessage": "关闭"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "编辑"
+  },
+  "image-viewer.editor.censor.blur": {
+    "defaultMessage": "模糊"
+  },
+  "image-viewer.editor.censor.mode": {
+    "defaultMessage": "遮罩方式"
+  },
+  "image-viewer.editor.censor.solid": {
+    "defaultMessage": "纯色"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "颜色"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} 像素"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "重置裁剪"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "删除选中的标注"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "按区域擦除"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "按元素擦除"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "橡皮擦模式"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "图片编辑工具"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "更多保存选项"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "覆盖保存"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "重做"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "保存副本"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "保存图像"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "字号"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "箭头"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "遮罩"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "裁剪"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "椭圆"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "橡皮"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "荧光笔"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "画笔"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "矩形"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "选择"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "文本"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "撤销"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "线宽"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "适应窗口"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "适应窗口"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "放大"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "缩小"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "下一张图片"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "上一张图片"
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "查找版本……"
   },
@@ -2609,6 +2723,9 @@
   "label.yes": {
     "defaultMessage": "是"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "切换账户……"
+  },
   "locale.cs-CZ": {
     "defaultMessage": "捷克语"
   },
@@ -3112,6 +3229,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "设置为联盟伙伴"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "查看共享实例"
   },
   "profile.button.unblock": {
     "defaultMessage": "解除屏蔽"
@@ -4015,6 +4135,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "版本频道"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "已选择 {count, number} 项"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "切换 {filter} 筛选器"
@@ -5058,7 +5184,7 @@
     "defaultMessage": "正在搜索…"
   },
   "servers.installing-banner.description.applying": {
-    "defaultMessage": "正在应用安装更改..."
+    "defaultMessage": "正在应用安装更改……"
   },
   "servers.installing-banner.description.controls": {
     "defaultMessage": "服务器控制项将在安装完成后解锁。"
@@ -6668,6 +6794,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth 团队"
   },
+  "user.role.moderator": {
+    "defaultMessage": "内容审核员"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Modtinth 团队"
+  },
   "version.content.name": {
     "defaultMessage": "名称"
   },
@@ -6678,7 +6810,7 @@
     "defaultMessage": "开发用 jar 文件"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
+    "defaultMessage": "Javadocs jar"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "可选资源包"
@@ -6693,7 +6825,7 @@
     "defaultMessage": "签名文件"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "源 jar 文件"
+    "defaultMessage": "Sources jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "其他"
@@ -6759,3 +6891,4 @@
     "defaultMessage": "类型"
   }
 }
+

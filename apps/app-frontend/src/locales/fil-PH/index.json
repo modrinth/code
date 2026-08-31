@@ -551,9 +551,6 @@
   "instance.settings.tabs.window": {
     "message": "Window"
   },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Mga setting sa pasadyang window"
-  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullscreen"
   },
