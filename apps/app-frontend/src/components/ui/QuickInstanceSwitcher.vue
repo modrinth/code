@@ -8,7 +8,7 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -17,17 +17,17 @@ import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
-import { getInstanceIconUrl, kill, list, run } from '@/helpers/instance'
+import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
 import { showInstanceInFolder } from '@/helpers/utils'
-import { instanceKeys } from '@/pages/instance/query-options'
+import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
 const APPROX_USED_VERTICAL_SPACE = 475 // doesn't need to be exact lol just close enough so there's a little gap and no overflow
 const STORAGE_KEY = 'modrinth-quick-instance-count'
 
 const { handleError } = injectNotificationManager()
-const queryClient = useQueryClient()
+const instancesQuery = useQuery(instanceListQueryOptions())
 const router = useRouter()
 const instanceOptions = ref()
 const runningInstances = ref([])
@@ -35,7 +35,24 @@ const runningInstances = ref([])
 const { formatMessage } = useVIntl()
 
 const maxAuto = ref(0)
-const allInstances = ref([])
+const allInstances = computed(() =>
+	(instancesQuery.data.value ?? []).slice().sort((a, b) => {
+		const dateACreated = dayjs(a.created)
+		const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
+
+		const dateBCreated = dayjs(b.created)
+		const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
+
+		const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
+		const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
+
+		if (dateA.isSame(dateB)) {
+			return a.name.localeCompare(b.name)
+		}
+
+		return dateB - dateA
+	}),
+)
 const dragging = ref(false)
 
 const stored = localStorage.getItem(STORAGE_KEY)
@@ -134,39 +151,8 @@ const onDividerPointerUp = (event) => {
 	endDrag(event)
 }
 
-const getInstances = async () => {
-	const instances = await list().catch(handleError)
-
-	for (const instance of instances) {
-		queryClient.setQueryData(instanceKeys.detail(instance.id), instance)
-	}
-
-	allInstances.value = instances.sort((a, b) => {
-		const dateACreated = dayjs(a.created)
-		const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
-
-		const dateBCreated = dayjs(b.created)
-		const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
-
-		const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
-		const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
-
-		if (dateA.isSame(dateB)) {
-			return a.name.localeCompare(b.name)
-		}
-
-		return dateB - dateA
-	})
-}
-
-await getInstances()
+await instancesQuery.suspense().catch(handleError)
 updateMaxAuto()
-
-useAppEvent('instance', async (event) => {
-	if (event.event !== 'synced') {
-		await getInstances()
-	}
-})
 
 useAppEvent('process', checkProcesses)
 
