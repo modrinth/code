@@ -869,6 +869,7 @@ export namespace Labrinth {
 				id: string
 				name: string
 				icon_url: string | null
+				raw_icon_url: string | null
 				max_scopes: number
 				redirect_uris: OAuthRedirectUri[]
 				created_by: string
@@ -1002,6 +1003,7 @@ export namespace Labrinth {
 				loaders: string[]
 				versions: string[]
 				icon_url?: string
+				raw_icon_url?: string
 				issues_url?: string
 				source_url?: string
 				wiki_url?: string
@@ -1145,6 +1147,7 @@ export namespace Labrinth {
 				mrpack_loaders: string[]
 				versions: string[]
 				icon_url?: string
+				raw_icon_url?: string
 				link_urls: Record<string, Link>
 				gallery: GalleryItem[]
 				color?: number
@@ -1264,6 +1267,7 @@ export namespace Labrinth {
 				team_id: string
 				description: string
 				icon_url: string | null
+				raw_icon_url: string | null
 				color: number | null
 				members: TeamMember[]
 			}
@@ -1387,6 +1391,7 @@ export namespace Labrinth {
 				team_id: string
 				description: string
 				icon_url: string | null
+				raw_icon_url: string | null
 				color: number | null
 				members: Projects.v3.TeamMember[]
 				moderation_notes?: Users.Common.ModerationNote | null
@@ -2297,6 +2302,7 @@ export namespace Labrinth {
 			name: string
 			description: string | null
 			icon_url: string | null
+			raw_icon_url: string | null
 			color: number | null
 			status: CollectionStatus
 			created: string
@@ -2516,6 +2522,7 @@ export namespace Labrinth {
 
 			export type VersionReport = {
 				version_id: string
+				version_number?: string
 				files: FileReport[]
 			}
 

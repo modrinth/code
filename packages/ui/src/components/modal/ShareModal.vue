@@ -15,7 +15,10 @@ import { computed, nextTick, ref } from 'vue'
 import { ButtonLink, IconButton } from '#ui/components/base/buttons'
 import { injectNotificationManager } from '#ui/providers'
 
+import { useDebugLogger } from '../../composables/debug-logger'
 import { NewModal, Textarea } from '../index'
+
+const debug = useDebugLogger('ShareModal')
 
 const props = defineProps({
 	header: {
@@ -83,11 +86,11 @@ const show = async (passedContent) => {
 	if (props.link) {
 		url.value = passedContent
 		nextTick(() => {
-			console.log(qrCode.value)
+			debug(qrCode.value)
 			fetch(qrCode.value.getElementsByTagName('canvas')[0].toDataURL('image/png'))
 				.then((res) => res.blob())
 				.then((blob) => {
-					console.log(blob)
+					debug(blob)
 					qrImage.value = blob
 				})
 		})

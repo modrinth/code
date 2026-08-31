@@ -147,8 +147,7 @@ const chartOptions = ref({
 		},
 	},
 	tooltip: {
-		custom({ series, seriesIndex, dataPointIndex, w }) {
-			console.log(seriesIndex, w)
+		custom({ series, dataPointIndex, w }) {
 			return (
 				`<div class="bar-tooltip">` +
 				`<div class="seperated-entry title">` +

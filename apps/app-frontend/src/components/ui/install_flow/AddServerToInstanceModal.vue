@@ -121,7 +121,11 @@ async function addServer(instance) {
 						:to="`/instance/${encodeURIComponent(instance.id)}`"
 						@click="modal.hide()"
 					>
-						<Avatar :src="getInstanceIconUrl(instance.icon_path)" class="mr-2 [--size:2rem]" />
+						<Avatar
+							:src="getInstanceIconUrl(instance.icon_path)"
+							class="mr-2 [--size:2rem]"
+							pad-transparent-corners
+						/>
 						{{ instance.name }}
 					</router-link>
 					<Button :disabled="instance.added || instance.adding" @click="addServer(instance)">

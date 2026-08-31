@@ -1,78 +1,70 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<Input
-				v-model="query"
-				:icon="SearchIcon"
-				type="text"
-				autocomplete="off"
-				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-				clearable
-				wrapper-class="flex-1"
-				input-class="h-[40px] w-full"
-				@input="goToPage(1)"
-			/>
+		<ModerationQueueToolbar
+			v-model="query"
+			:page="currentPage"
+			:total-pages="totalPages"
+			@search="goToPage(1)"
+			@switch-page="goToPage"
+		>
+			<template #actions>
+				<Combobox
+					v-model="currentFilterType"
+					class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
+					trigger-type="base"
+					trigger-size="lg"
+					:options="filterTypes"
+					:placeholder="formatMessage(commonMessages.filterByLabel)"
+					@select="goToPage(1)"
+				>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+							<ModerationFilterCount
+								:label="currentFilterType"
+								:count="totalProjects"
+								:loading="pending"
+							/>
+						</span>
+					</template>
+				</Combobox>
 
-			<div class="flex flex-col flex-wrap justify-end gap-2 sm:flex-row lg:flex-shrink-0">
-				<div class="flex flex-col gap-2 sm:flex-row">
-					<div class="flex min-w-0 flex-grow gap-2 sm:flex-grow-0">
-						<Combobox
-							v-model="currentFilterType"
-							class="!w-full min-w-0 flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-							trigger-type="base"
-							trigger-size="lg"
-							:options="filterTypes"
-							:placeholder="formatMessage(commonMessages.filterByLabel)"
-							@select="goToPage(1)"
-						>
-							<template #selected>
-								<span class="flex flex-row gap-2 align-middle font-semibold">
-									<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
-									<span class="truncate text-contrast"
-										>{{ currentFilterType }} ({{ totalProjects }})</span
-									>
-								</span>
-							</template>
-						</Combobox>
-					</div>
+				<Combobox
+					v-model="currentSortType"
+					class="!w-full flex-grow sm:!w-[240px] sm:flex-grow-0"
+					trigger-type="base"
+					trigger-size="lg"
+					:options="sortTypes"
+					:placeholder="formatMessage(commonMessages.sortByLabel)"
+					@select="goToPage(1)"
+				>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<SortAscIcon
+								v-if="currentSortType === 'Oldest' || currentSortType === 'Least external deps'"
+								class="size-5 flex-shrink-0 text-secondary"
+							/>
+							<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+							<span class="truncate text-contrast">{{ currentSortType }}</span>
+						</span>
+					</template>
+				</Combobox>
 
-					<Combobox
-						v-model="currentSortType"
-						class="!w-full flex-grow sm:!w-[240px] sm:flex-grow-0"
-						trigger-type="base"
-						trigger-size="lg"
-						:options="sortTypes"
-						:placeholder="formatMessage(commonMessages.sortByLabel)"
-						@select="goToPage(1)"
-					>
-						<template #selected>
-							<span class="flex flex-row gap-2 align-middle font-semibold">
-								<SortAscIcon
-									v-if="currentSortType === 'Oldest' || currentSortType === 'Least external deps'"
-									class="size-5 flex-shrink-0 text-secondary"
-								/>
-								<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
-								<span class="truncate text-contrast">{{ currentSortType }}</span>
-							</span>
-						</template>
-					</Combobox>
-
-					<Combobox
-						v-model="itemsPerPage"
-						class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
-						trigger-type="base"
-						trigger-size="lg"
-						:options="itemsPerPageOptions"
-						placeholder="Items per page"
-						@select="goToPage(1)"
-					>
-						<template #selected>
-							<span class="flex flex-row gap-2 align-middle font-semibold">
-								<span class="truncate text-contrast">{{ itemsPerPage }} items</span>
-							</span>
-						</template>
-					</Combobox>
-				</div>
+				<Combobox
+					v-model="itemsPerPage"
+					class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
+					trigger-type="base"
+					trigger-size="lg"
+					:options="itemsPerPageOptions"
+					placeholder="Items per page"
+					@select="goToPage(1)"
+				>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<span class="truncate text-contrast">{{ itemsPerPage }} items</span>
+						</span>
+					</template>
+				</Combobox>
 
 				<Button
 					type="outlined"
@@ -86,21 +78,20 @@
 				<Button
 					type="colored"
 					color="orange"
-					class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+					size="lg"
+					class="w-full sm:w-auto"
 					:disabled="pending || paginatedProjects?.length === 0"
 					@click="moderateAllInFilter()"
 				>
-					<ScaleIcon class="flex-shrink-0" />
+					<ScaleIcon />
 					<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
 					<span class="sm:hidden">Moderate</span>
 				</Button>
-			</div>
-		</div>
-
-		<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-			<div class="flex flex-wrap items-center gap-3">
+			</template>
+			<template #meta>
 				<div v-if="totalProjects > 0">
-					Showing {{ pageStart }}–{{ pageEnd }} of {{ totalProjects }}
+					Showing {{ formatNumber(pageStart) }}–{{ formatNumber(pageEnd) }} of
+					{{ formatNumber(totalProjects) }}
 					{{
 						currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase()
 					}}
@@ -111,46 +102,34 @@
 						{{ formatMessage(messages.excludeTechnicalReview) }}
 					</label>
 				</div>
-			</div>
-			<Pagination
-				v-if="totalPages > 1"
-				:page="currentPage"
-				:count="totalPages"
-				@switch-page="goToPage"
-			/>
-			<ConfettiExplosion v-if="visible" />
-			<QueueSummaryModal
-				ref="queueSummaryModal"
-				:completed-ids="moderationQueue.currentQueue.completed"
-				:skipped-ids="moderationQueue.currentQueue.skipped"
-				@review-skipped="reviewSkippedQueue"
-			/>
-			<ModerateByIdsModal ref="moderateByIdsModal" @apply="startModeratingByIds" />
-		</div>
-
-		<div class="flex flex-col gap-3">
-			<template v-if="pending">
-				<div
-					v-for="i in 3"
-					:key="`loading-skeleton-${i}`"
-					class="flex h-[98px] w-full animate-pulse rounded-2xl bg-surface-3"
-				></div>
 			</template>
-			<EmptyState
-				v-else-if="loadError"
-				type="no-tasks"
-				heading="Failed to load projects"
-				:description="loadErrorMessage"
-			/>
-			<EmptyState
-				v-else-if="paginatedProjects.length === 0"
-				:type="!!query ? 'no-search-result' : 'no-tasks'"
-				:heading="emptyStateHeading"
-				:description="emptyStateDescription"
-			/>
+		</ModerationQueueToolbar>
+
+		<ConfettiExplosion v-if="visible" />
+		<QueueSummaryModal
+			ref="queueSummaryModal"
+			:completed-ids="moderationQueue.currentQueue.completed"
+			:skipped-ids="moderationQueue.currentQueue.skipped"
+			@review-skipped="reviewSkippedQueue"
+		/>
+		<ModerateByIdsModal ref="moderateByIdsModal" @apply="startModeratingByIds" />
+
+		<ModerationQueueSkeleton v-if="pending" />
+		<EmptyState
+			v-else-if="loadError"
+			type="no-tasks"
+			heading="Failed to load projects"
+			:description="loadErrorMessage"
+		/>
+		<EmptyState
+			v-else-if="paginatedProjects.length === 0"
+			:type="!!query ? 'no-search-result' : 'no-tasks'"
+			:heading="emptyStateHeading"
+			:description="emptyStateDescription"
+		/>
+		<div v-else class="flex flex-col gap-3">
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"
-				v-else
 				:key="item.project.id"
 				:queue-entry="item"
 				:show-external-dependencies="currentFilterType === MODPACK_FILTER_TYPE"
@@ -165,14 +144,7 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	CopyIcon,
-	ListFilterIcon,
-	ScaleIcon,
-	SearchIcon,
-	SortAscIcon,
-	SortDescIcon,
-} from '@modrinth/assets'
+import { CopyIcon, ListFilterIcon, ScaleIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	Combobox,
@@ -182,10 +154,10 @@ import {
 	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,
-	Input,
 	Pagination,
 	Toggle,
 	useDebugLogger,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -193,7 +165,10 @@ import { useDebounceFn } from '@vueuse/core'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import ModerateByIdsModal from '~/components/ui/moderation/ModerateByIdsModal.vue'
+import ModerationFilterCount from '~/components/ui/moderation/ModerationFilterCount.vue'
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
+import ModerationQueueSkeleton from '~/components/ui/moderation/ModerationQueueSkeleton.vue'
+import ModerationQueueToolbar from '~/components/ui/moderation/ModerationQueueToolbar.vue'
 import QueueSummaryModal from '~/components/ui/moderation/QueueSummaryModal.vue'
 import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
@@ -209,6 +184,7 @@ useHead({ title: 'Projects queue - Modrinth' })
 const { formatMessage } = useVIntl()
 const notificationManager = injectNotificationManager()
 const { addNotification } = notificationManager
+const formatNumber = useFormatNumber()
 const moderationQueue = useModerationQueue()
 const route = useRoute()
 const router = useRouter()

@@ -27,12 +27,12 @@ pub mod data {
         Hooks, InstanceIconBackground, InstanceIconConfig,
         InstanceInstallCandidate, InstanceInstallTarget,
         InstanceLaunchOverridesPatch, InstanceLink, InstanceMetadata,
-        JavaVersion, LinkedModpackInfo, MemorySettings, ModLoader,
-        ModrinthCredentials, OnboardingChecklist, Organization, OwnerType,
-        ProcessMetadata, Project, ProjectType, ProjectV3, SearchResult,
-        SearchResults, SearchResultsV3, Settings, SharedInstanceAttachment,
-        SharedInstanceRole, TeamMember, Theme, User, UserFriend, Version,
-        WindowSize,
+        InstanceSyncedOption, InstanceSyncedOptions, JavaVersion,
+        LinkedModpackInfo, MemorySettings, ModLoader, ModrinthCredentials,
+        OnboardingChecklist, Organization, OwnerType, ProcessMetadata, Project,
+        ProjectType, ProjectV3, SearchResult, SearchResults, SearchResultsV3,
+        Settings, SharedInstanceAttachment, SharedInstanceRole, TeamMember,
+        Theme, User, UserFriend, Version, WindowSize,
     };
     pub use ariadne::users::UserStatus;
     pub use modrinth_content_management::{

@@ -1232,9 +1232,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Bei einem Modrinth-Konto anmelden"
   },
-  "app.nav.signed-in-as": {
-    "message": "Angemeldet als <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Auf Modrinth+ upgraden"
   },
@@ -1246,9 +1243,6 @@
   },
   "app.navigation.home": {
     "message": "Start"
-  },
-  "app.navigation.more-options": {
-    "message": "Weitere Optionen"
   },
   "app.navigation.next-image": {
     "message": "Nächstes Bild"
@@ -1483,9 +1477,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "Verhalten"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standard-Spieloptionen"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java-Installationen"
@@ -2309,12 +2300,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Aktualisierungskanal auswählen"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Startargumente"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Benutzerdefinierte Startargumente"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooks ermöglichen es fortgeschrittenen Benutzern, bestimmte Systembefehle vor und nach dem Spielstart auszuführen."
   },
@@ -2377,9 +2362,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Installationseinstellungen sind nicht verfügbar, solange diese Instanz gesperrt ist."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java und Arbeitsspeicher"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Benutzerdefinierte Umgebungsvariablen"

@@ -20,6 +20,7 @@ import _ArrowLeftIcon from './icons/arrow-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpDownIcon from './icons/arrow-up-down.svg?component'
+import _ArrowUpFromLineIcon from './icons/arrow-up-from-line.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
 import _ArrowUpZAIcon from './icons/arrow-up-z-a.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
@@ -59,6 +60,7 @@ import _BookmarkIcon from './icons/bookmark.svg?component'
 import _BotIcon from './icons/bot.svg?component'
 import _BoxIcon from './icons/box.svg?component'
 import _BoxImportIcon from './icons/box-import.svg?component'
+import _BoxPlusIcon from './icons/box-plus.svg?component'
 import _BoxesIcon from './icons/boxes.svg?component'
 import _BracesIcon from './icons/braces.svg?component'
 import _BrushCleaningIcon from './icons/brush-cleaning.svg?component'
@@ -77,6 +79,7 @@ import _ChevronDownIcon from './icons/chevron-down.svg?component'
 import _ChevronLeftIcon from './icons/chevron-left.svg?component'
 import _ChevronRightIcon from './icons/chevron-right.svg?component'
 import _ChevronUpIcon from './icons/chevron-up.svg?component'
+import _CircleIcon from './icons/circle.svg?component'
 import _CircleAlertIcon from './icons/circle-alert.svg?component'
 import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
 import _CircleDashedIcon from './icons/circle-dashed.svg?component'
@@ -97,12 +100,14 @@ import _CogIcon from './icons/cog.svg?component'
 import _CoinsIcon from './icons/coins.svg?component'
 import _CollapseIcon from './icons/collapse.svg?component'
 import _CollectionIcon from './icons/collection.svg?component'
+import _CollectionPlusIcon from './icons/collection-plus.svg?component'
 import _CompassIcon from './icons/compass.svg?component'
 import _ComponentIcon from './icons/component.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
 import _CopyIcon from './icons/copy.svg?component'
 import _CopyrightIcon from './icons/copyright.svg?component'
 import _CpuIcon from './icons/cpu.svg?component'
+import _CropIcon from './icons/crop.svg?component'
 import _CrownIcon from './icons/crown.svg?component'
 import _CubeIcon from './icons/cube.svg?component'
 import _CurrencyIcon from './icons/currency.svg?component'
@@ -113,6 +118,7 @@ import _DownloadIcon from './icons/download.svg?component'
 import _DropdownIcon from './icons/dropdown.svg?component'
 import _EditIcon from './icons/edit.svg?component'
 import _EllipsisVerticalIcon from './icons/ellipsis-vertical.svg?component'
+import _EraserIcon from './icons/eraser.svg?component'
 import _ExpandIcon from './icons/expand.svg?component'
 import _ExternalIcon from './icons/external.svg?component'
 import _EyeIcon from './icons/eye.svg?component'
@@ -123,6 +129,7 @@ import _FileCodeIcon from './icons/file-code.svg?component'
 import _FileCogIcon from './icons/file-cog.svg?component'
 import _FileImageIcon from './icons/file-image.svg?component'
 import _FilePlusIcon from './icons/file-plus.svg?component'
+import _FileSearchCornerIcon from './icons/file-search-corner.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
@@ -154,6 +161,7 @@ import _Heading3Icon from './icons/heading-3.svg?component'
 import _HeartIcon from './icons/heart.svg?component'
 import _HeartHandshakeIcon from './icons/heart-handshake.svg?component'
 import _HeartMinusIcon from './icons/heart-minus.svg?component'
+import _HighlighterIcon from './icons/highlighter.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
@@ -202,13 +210,16 @@ import _MonitorSmartphoneIcon from './icons/monitor-smartphone.svg?component'
 import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
 import _MoreVerticalIcon from './icons/more-vertical.svg?component'
+import _MousePointer2Icon from './icons/mouse-pointer-2.svg?component'
 import _MoveIcon from './icons/move.svg?component'
+import _MoveUpRightIcon from './icons/move-up-right.svg?component'
 import _NewspaperIcon from './icons/newspaper.svg?component'
 import _NoSignalIcon from './icons/no-signal.svg?component'
 import _NotepadTextIcon from './icons/notepad-text.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OnlineIndicatorIcon from './icons/online-indicator.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
+import _OrganizationPlusIcon from './icons/organization-plus.svg?component'
 import _PackageIcon from './icons/package.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
@@ -247,6 +258,7 @@ import _SearchIcon from './icons/search.svg?component'
 import _SendIcon from './icons/send.svg?component'
 import _ServerIcon from './icons/server.svg?component'
 import _ServerPlusIcon from './icons/server-plus.svg?component'
+import _ServerSearchIcon from './icons/server-search.svg?component'
 import _ServerStackIcon from './icons/server-stack.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
 import _Settings2Icon from './icons/settings-2.svg?component'
@@ -264,6 +276,7 @@ import _SortDescIcon from './icons/sort-desc.svg?component'
 import _SparklesIcon from './icons/sparkles.svg?component'
 import _SpinnerIcon from './icons/spinner.svg?component'
 import _SplitIcon from './icons/split.svg?component'
+import _SquareIcon from './icons/square.svg?component'
 import _SquarePlusIcon from './icons/square-plus.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
@@ -419,6 +432,7 @@ import _TrashExclamationIcon from './icons/trash-exclamation.svg?component'
 import _TrendingDownIcon from './icons/trending-down.svg?component'
 import _TrendingUpIcon from './icons/trending-up.svg?component'
 import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
+import _TypeIcon from './icons/type.svg?component'
 import _UnderlineIcon from './icons/underline.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
 import _UnfoldHorizontalIcon from './icons/unfold-horizontal.svg?component'
@@ -464,6 +478,7 @@ export const ArrowLeftIcon = _ArrowLeftIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpDownIcon = _ArrowUpDownIcon
+export const ArrowUpFromLineIcon = _ArrowUpFromLineIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon
 export const ArrowUpZAIcon = _ArrowUpZAIcon
 export const AsteriskIcon = _AsteriskIcon
@@ -503,6 +518,7 @@ export const BookmarkIcon = _BookmarkIcon
 export const BotIcon = _BotIcon
 export const BoxIcon = _BoxIcon
 export const BoxImportIcon = _BoxImportIcon
+export const BoxPlusIcon = _BoxPlusIcon
 export const BoxesIcon = _BoxesIcon
 export const BracesIcon = _BracesIcon
 export const BrushCleaningIcon = _BrushCleaningIcon
@@ -521,6 +537,7 @@ export const ChevronDownIcon = _ChevronDownIcon
 export const ChevronLeftIcon = _ChevronLeftIcon
 export const ChevronRightIcon = _ChevronRightIcon
 export const ChevronUpIcon = _ChevronUpIcon
+export const CircleIcon = _CircleIcon
 export const CircleAlertIcon = _CircleAlertIcon
 export const CircleArrowRightIcon = _CircleArrowRightIcon
 export const CircleDashedIcon = _CircleDashedIcon
@@ -541,12 +558,14 @@ export const CogIcon = _CogIcon
 export const CoinsIcon = _CoinsIcon
 export const CollapseIcon = _CollapseIcon
 export const CollectionIcon = _CollectionIcon
+export const CollectionPlusIcon = _CollectionPlusIcon
 export const CompassIcon = _CompassIcon
 export const ComponentIcon = _ComponentIcon
 export const ContractIcon = _ContractIcon
 export const CopyIcon = _CopyIcon
 export const CopyrightIcon = _CopyrightIcon
 export const CpuIcon = _CpuIcon
+export const CropIcon = _CropIcon
 export const CrownIcon = _CrownIcon
 export const CubeIcon = _CubeIcon
 export const CurrencyIcon = _CurrencyIcon
@@ -557,6 +576,7 @@ export const DownloadIcon = _DownloadIcon
 export const DropdownIcon = _DropdownIcon
 export const EditIcon = _EditIcon
 export const EllipsisVerticalIcon = _EllipsisVerticalIcon
+export const EraserIcon = _EraserIcon
 export const ExpandIcon = _ExpandIcon
 export const ExternalIcon = _ExternalIcon
 export const EyeIcon = _EyeIcon
@@ -567,6 +587,7 @@ export const FileCodeIcon = _FileCodeIcon
 export const FileCogIcon = _FileCogIcon
 export const FileImageIcon = _FileImageIcon
 export const FilePlusIcon = _FilePlusIcon
+export const FileSearchCornerIcon = _FileSearchCornerIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon
 export const FilterXIcon = _FilterXIcon
@@ -598,6 +619,7 @@ export const Heading3Icon = _Heading3Icon
 export const HeartIcon = _HeartIcon
 export const HeartHandshakeIcon = _HeartHandshakeIcon
 export const HeartMinusIcon = _HeartMinusIcon
+export const HighlighterIcon = _HighlighterIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
 export const ImageIcon = _ImageIcon
@@ -646,13 +668,16 @@ export const MonitorSmartphoneIcon = _MonitorSmartphoneIcon
 export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
 export const MoreVerticalIcon = _MoreVerticalIcon
+export const MousePointer2Icon = _MousePointer2Icon
 export const MoveIcon = _MoveIcon
+export const MoveUpRightIcon = _MoveUpRightIcon
 export const NewspaperIcon = _NewspaperIcon
 export const NoSignalIcon = _NoSignalIcon
 export const NotepadTextIcon = _NotepadTextIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const OnlineIndicatorIcon = _OnlineIndicatorIcon
 export const OrganizationIcon = _OrganizationIcon
+export const OrganizationPlusIcon = _OrganizationPlusIcon
 export const PackageIcon = _PackageIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PackageOpenIcon = _PackageOpenIcon
@@ -691,6 +716,7 @@ export const SearchIcon = _SearchIcon
 export const SendIcon = _SendIcon
 export const ServerIcon = _ServerIcon
 export const ServerPlusIcon = _ServerPlusIcon
+export const ServerSearchIcon = _ServerSearchIcon
 export const ServerStackIcon = _ServerStackIcon
 export const SettingsIcon = _SettingsIcon
 export const Settings2Icon = _Settings2Icon
@@ -708,6 +734,7 @@ export const SortDescIcon = _SortDescIcon
 export const SparklesIcon = _SparklesIcon
 export const SpinnerIcon = _SpinnerIcon
 export const SplitIcon = _SplitIcon
+export const SquareIcon = _SquareIcon
 export const SquarePlusIcon = _SquarePlusIcon
 export const StarIcon = _StarIcon
 export const StopCircleIcon = _StopCircleIcon
@@ -863,6 +890,7 @@ export const TrashExclamationIcon = _TrashExclamationIcon
 export const TrendingDownIcon = _TrendingDownIcon
 export const TrendingUpIcon = _TrendingUpIcon
 export const TriangleAlertIcon = _TriangleAlertIcon
+export const TypeIcon = _TypeIcon
 export const UnderlineIcon = _UnderlineIcon
 export const UndoIcon = _UndoIcon
 export const UnfoldHorizontalIcon = _UnfoldHorizontalIcon

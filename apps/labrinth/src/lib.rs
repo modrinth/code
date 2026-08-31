@@ -265,11 +265,11 @@ pub fn app_setup(
     let active_sockets = web::Data::new(ActiveSockets::default());
 
     {
-        let pool = pool.clone();
+        let ro_pool = ro_pool.clone();
         let pubsub_messages = redis_pool.subscribe(FRIENDS_CHANNEL_NAME);
         let sockets = active_sockets.clone();
         actix_rt::spawn(async move {
-            handle_pubsub(pubsub_messages, pool, sockets).await;
+            handle_pubsub(pubsub_messages, ro_pool, sockets).await;
         });
     }
 

@@ -591,11 +591,7 @@ async fn censor_support_text(
     mut text: String,
     state: &State,
 ) -> crate::Result<String> {
-    for credentials in ModrinthCredentials::get_all(&state.pool)
-        .await?
-        .into_iter()
-        .map(|credentials| credentials.1)
-    {
+    for credentials in ModrinthCredentials::get_all(&state.pool).await? {
         replace_nonempty(
             &mut text,
             &credentials.session,

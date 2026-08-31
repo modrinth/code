@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM screenshots WHERE instance_id = ? AND file_name = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "a0705b02be354c37f7a1294eca7eba891c23cd79886a97d91bddb7019baab3ce"
+}

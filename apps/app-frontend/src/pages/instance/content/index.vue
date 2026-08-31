@@ -92,6 +92,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, FolderOpenIcon, LockIcon, LockOpenIcon } from '@modrinth/assets'
 import {
 	type BulkOperationStatus,
+	type ButtonMenuOption,
 	commonMessages,
 	ConfirmDisableModal,
 	ConfirmModpackUpdateModal,
@@ -107,7 +108,6 @@ import {
 	type ManagedContentModalState,
 	type ManagedContentProject,
 	type ManagedContentVersion,
-	type OverflowMenuOption,
 	provideContentManager,
 	ReadyTransition,
 	summarizeManagedContent,
@@ -1473,8 +1473,8 @@ async function handleShareItems(
 	await shareModal.value?.show(text)
 }
 
-function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
-	const options: OverflowMenuOption[] = []
+function getOverflowOptions(item: ContentItem): ButtonMenuOption[] {
+	const options: ButtonMenuOption[] = []
 
 	options.push({
 		id: 'show-file',

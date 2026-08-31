@@ -5,25 +5,52 @@
 			<LoadingBar />
 		</ClientOnly>
 		<NotificationPanel />
+		<AccountSwitchOverlay :show="isSwitchingAccount" />
 		<AdsConsentNotification />
 		<I18nDebugPanel />
 		<NuxtPage />
+		<div id="teleports"></div>
 	</NuxtLayout>
 </template>
 <script setup lang="ts">
-import { I18nDebugPanel, injectI18n, LoadingBar, NotificationPanel } from '@modrinth/ui'
+import {
+	AccountSwitchOverlay,
+	I18nDebugPanel,
+	injectI18n,
+	LoadingBar,
+	NotificationPanel,
+} from '@modrinth/ui'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
-import { isDarkTheme } from '~/plugins/theme/index.ts'
 import { setupProviders } from '~/providers/setup.ts'
 
+import {
+	hydrateStoredAccounts,
+	rememberStoredAccount,
+	rememberStoredAccountAppearance,
+	useIsSwitchingAccount,
+} from './composables/accounts'
 import { useAuth } from './composables/auth'
 
 const auth = await useAuth()
-const userPreferences = setupProviders(auth)
+const { userPreferences } = setupProviders(auth)
 const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()
+const isSwitchingAccount = useIsSwitchingAccount()
+
+// initAuth doesn't run again after SSR, so stash the current account for switching
+watch(
+	auth,
+	({ user, token }) => {
+		if (user && token) {
+			rememberStoredAccount(user, token)
+		}
+	},
+	{ immediate: true },
+)
+
+onMounted(hydrateStoredAccounts)
 
 watch(
 	userPreferences.preferences,
@@ -31,12 +58,12 @@ watch(
 		if (!preferences) return
 
 		if (theme.syncAcrossDevices) {
-			if (isDarkTheme(preferences.appearance.theme)) {
-				theme.preferences.dark = preferences.appearance.theme
-			} else {
-				theme.preferences.light = preferences.appearance.theme
-			}
-			theme.preferred = preferences.appearance.auto ? 'system' : preferences.appearance.theme
+			theme.applyAccountAppearance(preferences.appearance)
+		}
+
+		const userId = auth.value.user?.id
+		if (userId) {
+			rememberStoredAccountAppearance(userId, preferences.appearance)
 		}
 
 		if (locale.value !== preferences.localization.locale) {

@@ -19,7 +19,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import { Collapsible, ConfirmModal } from '#ui/components'
-import type { OverflowMenuOption } from '#ui/components/base'
+import type { ButtonMenuOption } from '#ui/components/base'
 import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { commonMessages } from '#ui/utils'
 
@@ -485,7 +485,7 @@ async function handleQuickReply(reply: QuickReply) {
 	reviewReasonInput.value = message
 }
 
-const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
+const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 	const replies = attributionModeration?.attributionQuickReplies
 
 	if (!replies) return []
@@ -501,7 +501,7 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 					id: reply.label,
 					label: reply.label,
 					action: () => handleQuickReply(reply),
-				}) as OverflowMenuOption,
+				}) as ButtonMenuOption,
 		)
 })
 </script>

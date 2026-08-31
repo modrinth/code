@@ -14,47 +14,49 @@
 			@dismiss="ctx.onDismissCrash?.()"
 		/>
 
-		<div class="flex items-center gap-2">
-			<Input
-				v-model="searchQuery"
-				:icon="SearchIcon"
-				placeholder="Search logs"
-				wrapper-class="flex-1"
-				size="medium"
-				clearable
-			/>
-			<div v-if="ctx.logSources?.value && ctx.activeLogSourceIndex" class="w-[220px]">
-				<Combobox
-					:model-value="ctx.activeLogSourceIndex.value"
-					:options="logSourceOptions"
-					trigger-size="lg"
-					@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
+		<div class="flex flex-col gap-2">
+			<div class="flex items-center gap-2">
+				<Input
+					v-model="searchQuery"
+					:icon="SearchIcon"
+					placeholder="Search logs"
+					wrapper-class="flex-1"
+					size="medium"
+					clearable
+				/>
+				<div v-if="ctx.logSources?.value && ctx.activeLogSourceIndex" class="w-[220px]">
+					<Combobox
+						:model-value="ctx.activeLogSourceIndex.value"
+						:options="logSourceOptions"
+						trigger-size="lg"
+						@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
+					/>
+				</div>
+			</div>
+
+			<div class="flex items-center justify-between">
+				<ConsoleFilterPills
+					v-model="activeFilters"
+					:present-levels="presentLevels"
+					@toggle="handleFilterToggle"
+				/>
+				<ConsoleActionButtons
+					:show-clear="isLiveSource"
+					:has-logs="hasLogs"
+					:share-disabled="resolvedShareDisabled"
+					:sharing="isSharing"
+					:fullscreen="isFullscreen"
+					:clear-disabled="resolvedClearDisabled"
+					:clear-disabled-tooltip="resolvedClearDisabledTooltip"
+					:show-delete="showDelete"
+					:delete-disabled="resolvedDeleteDisabled"
+					:delete-disabled-tooltip="ctx.deleteDisabledTooltip"
+					@clear="handleClear"
+					@share="handleShare"
+					@toggle-fullscreen="toggleFullscreen"
+					@delete="handleDelete"
 				/>
 			</div>
-		</div>
-
-		<div class="flex items-center justify-between">
-			<ConsoleFilterPills
-				v-model="activeFilters"
-				:present-levels="presentLevels"
-				@toggle="handleFilterToggle"
-			/>
-			<ConsoleActionButtons
-				:show-clear="isLiveSource"
-				:has-logs="hasLogs"
-				:share-disabled="resolvedShareDisabled"
-				:sharing="isSharing"
-				:fullscreen="isFullscreen"
-				:clear-disabled="resolvedClearDisabled"
-				:clear-disabled-tooltip="resolvedClearDisabledTooltip"
-				:show-delete="showDelete"
-				:delete-disabled="resolvedDeleteDisabled"
-				:delete-disabled-tooltip="ctx.deleteDisabledTooltip"
-				@clear="handleClear"
-				@share="handleShare"
-				@toggle-fullscreen="toggleFullscreen"
-				@delete="handleDelete"
-			/>
 		</div>
 
 		<BaseTerminal

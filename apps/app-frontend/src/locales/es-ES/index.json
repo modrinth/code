@@ -1202,9 +1202,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Iniciar sesión en una cuenta de Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Sesión iniciada como <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Actualizar a Modrinth+"
   },
@@ -1216,9 +1213,6 @@
   },
   "app.navigation.home": {
     "message": "Inicio"
-  },
-  "app.navigation.more-options": {
-    "message": "Más opciones"
   },
   "app.navigation.next-image": {
     "message": "Siguiente imagen"
@@ -1417,9 +1411,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "Comportamiento"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Opciones predeterminadas del juego"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalaciones de Java"
@@ -2237,12 +2228,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Seleccionar canal de actualizaciones"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Hooks de lanzamiento"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hooks de lanzamiento personalizados"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Los hooks permiten a los usuarios avanzados ejecutar ciertas funciones del sistema antes y después de lanzar el juego."
   },
@@ -2299,9 +2284,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Los ajustes de instalación no están disponibles mientras esta instancia esté bloqueada."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java y memoria"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Variables de entorno personalizadas"

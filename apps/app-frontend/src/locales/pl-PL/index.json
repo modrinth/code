@@ -1082,17 +1082,11 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Zaloguj się na konto Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Zalogowano jako <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Ulepsz do Modrinth+"
   },
   "app.navigation.home": {
     "message": "Strona główna"
-  },
-  "app.navigation.more-options": {
-    "message": "Więcej opcji"
   },
   "app.news.title": {
     "message": "Aktualności"
@@ -1285,9 +1279,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "Zachowanie"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Domyślne opcje gry"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalacje Java"
@@ -2024,12 +2015,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Wybierz kanał aktualizacji"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Haczyki startowe"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Własne haczyki przy uruchomieniu"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooki pozwalają zaawansowanym użytkownikom uruchamiać określone systemowe komendy przed i po uruchomieniu gry."
   },
@@ -2074,9 +2059,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Wersja {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java i pamięć"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Zmienne środowiskowe"

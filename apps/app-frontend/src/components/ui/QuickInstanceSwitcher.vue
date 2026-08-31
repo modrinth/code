@@ -1,13 +1,25 @@
 <script setup>
-import { SpinnerIcon } from '@modrinth/assets'
-import { Avatar, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { EyeIcon, FolderOpenIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
+import {
+	Avatar,
+	commonMessages,
+	ContextMenu,
+	defineMessages,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
-import { getInstanceIconUrl, list } from '@/helpers/instance'
+import { handleSevereError } from '@/composables/use-error.js'
+import { trackEvent } from '@/helpers/analytics'
+import { getInstanceIconUrl, kill, list, run } from '@/helpers/instance'
+import { get_all } from '@/helpers/process'
+import { showInstanceInFolder } from '@/helpers/utils'
 import { instanceKeys } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
@@ -16,6 +28,9 @@ const STORAGE_KEY = 'modrinth-quick-instance-count'
 
 const { handleError } = injectNotificationManager()
 const queryClient = useQueryClient()
+const router = useRouter()
+const instanceOptions = ref()
+const runningInstances = ref([])
 
 const { formatMessage } = useVIntl()
 
@@ -153,8 +168,11 @@ useAppEvent('instance', async (event) => {
 	}
 })
 
+useAppEvent('process', checkProcesses)
+
 onMounted(() => {
 	window.addEventListener('resize', updateMaxAuto)
+	checkProcesses()
 })
 
 onUnmounted(() => {
@@ -172,6 +190,18 @@ const messages = defineMessages({
 		id: 'app.quick-instance-switcher.drag-show-tooltip',
 		defaultMessage: 'Drag to show recent instances',
 	},
+	viewInstance: {
+		id: 'app.quick-instance-switcher.view-instance',
+		defaultMessage: 'View instance',
+	},
+	instanceActions: {
+		id: 'app.quick-instance-switcher.actions.label',
+		defaultMessage: 'Instance actions',
+	},
+	instanceLocked: {
+		id: 'app.quick-instance-switcher.instance-locked',
+		defaultMessage: 'This instance has been locked',
+	},
 })
 
 const dividerTooltip = computed(() => {
@@ -180,6 +210,69 @@ const dividerTooltip = computed(() => {
 	}
 	return formatMessage(visibleCount.value === 0 ? messages.dragShowTooltip : messages.dragTooltip)
 })
+
+async function checkProcesses() {
+	const processes = (await get_all().catch(handleError)) ?? []
+	runningInstances.value = processes.map((process) => process.instance_id)
+}
+
+async function playInstance(instance) {
+	if (instance.quarantined || instance.install_stage !== 'installed') return
+	await run(instance.id)
+		.catch((err) => handleSevereError(err, { instanceId: instance.id }))
+		.finally(() => {
+			trackEvent('InstanceStart', {
+				loader: instance.loader,
+				game_version: instance.game_version,
+				source: 'QuickInstanceSwitcher',
+			})
+		})
+}
+
+async function stopInstance(instance) {
+	await kill(instance.id).catch(handleError)
+	trackEvent('InstanceStop', {
+		loader: instance.loader,
+		game_version: instance.game_version,
+		source: 'QuickInstanceSwitcher',
+	})
+}
+
+function openContextMenu(event, instance) {
+	const playing = runningInstances.value.includes(instance.id)
+	instanceOptions.value?.open(event, [
+		playing
+			? {
+					id: 'stop',
+					label: formatMessage(commonMessages.stopButton),
+					icon: StopCircleIcon,
+					tone: 'red',
+					action: () => stopInstance(instance),
+				}
+			: {
+					id: 'play',
+					label: formatMessage(commonMessages.playButton),
+					icon: PlayIcon,
+					tone: 'brand',
+					disabled: instance.quarantined || instance.install_stage !== 'installed',
+					tooltip: instance.quarantined ? formatMessage(messages.instanceLocked) : undefined,
+					action: () => playInstance(instance),
+				},
+		{ type: 'divider' },
+		{
+			id: 'open-instance',
+			label: formatMessage(messages.viewInstance),
+			icon: EyeIcon,
+			action: () => router.push(`/instance/${encodeURIComponent(instance.id)}`),
+		},
+		{
+			id: 'open-folder',
+			label: formatMessage(commonMessages.openFolderButton),
+			icon: FolderOpenIcon,
+			action: () => showInstanceInFolder(instance.id),
+		},
+	])
+}
 </script>
 
 <template>
@@ -197,6 +290,7 @@ const dividerTooltip = computed(() => {
 			:key="instance.id"
 			v-tooltip.right="instance.name"
 			class="quick-instance-item"
+			@contextmenu.prevent.stop="(event) => openContextMenu(event, instance)"
 		>
 			<NavButton :to="`/instance/${encodeURIComponent(instance.id)}`" class="relative">
 				<Avatar
@@ -204,6 +298,7 @@ const dividerTooltip = computed(() => {
 					size="28px"
 					:tint-by="instance.id"
 					:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
+					pad-transparent-corners
 				/>
 				<div
 					v-if="instance.install_stage !== 'installed'"
@@ -214,6 +309,7 @@ const dividerTooltip = computed(() => {
 			</NavButton>
 		</div>
 	</TransitionGroup>
+	<ContextMenu ref="instanceOptions" :label="formatMessage(messages.instanceActions)" />
 	<div
 		v-tooltip.right="dividerTooltip"
 		class="flex items-center justify-center py-2 select-none"

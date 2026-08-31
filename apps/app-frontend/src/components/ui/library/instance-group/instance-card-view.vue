@@ -47,6 +47,7 @@ const versionRef = ref<HTMLElement | null>(null)
 				:tint-by="instance.id"
 				alt=""
 				no-shadow
+				pad-transparent-corners
 			/>
 			<slot name="loading" :compact="compactMode" />
 			<div

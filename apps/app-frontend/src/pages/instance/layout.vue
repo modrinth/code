@@ -82,16 +82,7 @@
 				</template>
 			</RouterView>
 		</div>
-		<ContextMenu ref="options" @option-clicked="handleOptionsClick">
-			<template #play> <PlayIcon /> {{ formatMessage(messages.play) }} </template>
-			<template #stop> <StopCircleIcon /> {{ formatMessage(messages.stop) }} </template>
-			<template #add_content> <PlusIcon /> {{ formatMessage(messages.addContent) }} </template>
-			<template #edit> <EditIcon /> {{ formatMessage(messages.edit) }} </template>
-			<template #copy_path> <ClipboardCopyIcon /> {{ formatMessage(messages.copyPath) }} </template>
-			<template #open_folder>
-				<FolderOpenIcon /> {{ formatMessage(messages.openFolder) }}
-			</template>
-		</ContextMenu>
+		<ContextMenu ref="options" :label="formatMessage(messages.instanceActionsLabel)" />
 	</div>
 </template>
 <script setup lang="ts">
@@ -101,6 +92,7 @@ import {
 	EditIcon,
 	FolderOpenIcon,
 	GlobeIcon,
+	ImagesIcon,
 	PlayIcon,
 	PlusIcon,
 	StopCircleIcon,
@@ -109,6 +101,7 @@ import {
 } from '@modrinth/assets'
 import {
 	commonMessages,
+	ContextMenu,
 	defineMessages,
 	injectNotificationManager,
 	NavTabs,
@@ -122,7 +115,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, type ComputedRef, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
@@ -148,6 +140,7 @@ import {
 } from '@/helpers/install'
 import {
 	get_full_path,
+	get_global_synced_options,
 	getInstanceIconUrl,
 	kill,
 	refresh_content_updates,
@@ -190,8 +183,13 @@ const messages = defineMessages({
 	edit: { id: 'app.instance.action.edit', defaultMessage: 'Edit' },
 	copyPath: { id: 'app.instance.action.copy-path', defaultMessage: 'Copy path' },
 	openFolder: { id: 'app.instance.action.open-folder', defaultMessage: 'Open folder' },
+	instanceActionsLabel: {
+		id: 'app.instance.actions.label',
+		defaultMessage: 'Instance actions',
+	},
 	contentTab: { id: 'app.instance.tab.content', defaultMessage: 'Content' },
 	filesTab: { id: 'app.instance.tab.files', defaultMessage: 'Files' },
+	screenshotsTab: { id: 'app.instance.tab.screenshots', defaultMessage: 'Screenshots' },
 	worldsTab: { id: 'app.instance.tab.worlds', defaultMessage: 'Worlds' },
 	logsTab: { id: 'app.instance.tab.logs', defaultMessage: 'Logs' },
 	shareTab: { id: 'app.instance.tab.share', defaultMessage: 'Share' },
@@ -235,6 +233,10 @@ useQuery(
 	})),
 )
 const instance = computed(() => instanceQuery.data.value)
+const globalSyncedOptionsQuery = useQuery({
+	queryKey: ['global-synced-options'],
+	queryFn: get_global_synced_options,
+})
 useQuery(
 	computed(() => ({
 		queryKey: instanceKeys.contentUpdateCheck(instanceId.value),
@@ -499,6 +501,17 @@ const tabs = computed(() => {
 			icon: TerminalSquareIcon,
 		},
 	]
+
+	const screenshotsSynced =
+		globalSyncedOptionsQuery.data.value?.screenshots === true &&
+		instance.value?.synced_options.screenshots === true
+	if (!screenshotsSynced) {
+		instanceTabs.splice(2, 0, {
+			label: formatMessage(messages.screenshotsTab),
+			href: `${basePath.value}/screenshots`,
+			icon: ImagesIcon,
+		})
+	}
 
 	if (showShareTab.value) {
 		instanceTabs.push({
@@ -765,63 +778,60 @@ async function deleteSelectedInstance() {
 }
 
 const handleRightClick = (event: MouseEvent) => {
-	const baseOptions = [
-		...(instance.value?.quarantined ? [] : [{ name: 'add_content' }, { type: 'divider' }]),
-		{ name: 'edit' },
-		{ name: 'open_folder' },
-		{ name: 'copy_path' },
-	]
+	const canAddContent = !instance.value?.quarantined
 
-	options.value?.showMenu(
-		event,
-		instance.value,
-		playing.value
-			? [
-					{
-						name: 'stop',
-						color: 'danger',
-					},
-					...baseOptions,
-				]
-			: [
-					...(instance.value?.quarantined
-						? []
-						: [
-								{
-									name: 'play',
-									color: 'primary',
-								},
-							]),
-					...baseOptions,
-				],
-	)
+	options.value?.open(event, [
+		{
+			id: 'stop',
+			label: formatMessage(messages.stop),
+			icon: StopCircleIcon,
+			shown: playing.value,
+			tone: 'red',
+			action: () => void stopInstance('InstancePageContextMenu'),
+		},
+		{
+			id: 'play',
+			label: formatMessage(messages.play),
+			icon: PlayIcon,
+			shown: !playing.value && canAddContent,
+			tone: 'brand',
+			action: () => void startInstance('InstancePageContextMenu'),
+		},
+		{
+			id: 'add_content',
+			label: formatMessage(messages.addContent),
+			icon: PlusIcon,
+			shown: canAddContent,
+			action: () => void browseContent(instance.value?.loader === 'vanilla' ? 'datapack' : 'mod'),
+		},
+		{ type: 'divider', shown: canAddContent },
+		{
+			id: 'edit',
+			label: formatMessage(messages.edit),
+			icon: EditIcon,
+			action: openSettings,
+		},
+		{
+			id: 'open_folder',
+			label: formatMessage(messages.openFolder),
+			icon: FolderOpenIcon,
+			action: () => {
+				if (instance.value) void showInstanceInFolder(instance.value.id)
+			},
+		},
+		{
+			id: 'copy_path',
+			label: formatMessage(messages.copyPath),
+			icon: ClipboardCopyIcon,
+			action: () => void copyInstancePath(),
+		},
+	])
 }
 
-const handleOptionsClick = async (args: { option: string; item: unknown }) => {
-	switch (args.option) {
-		case 'play':
-			await startInstance('InstancePageContextMenu')
-			break
-		case 'stop':
-			await stopInstance('InstancePageContextMenu')
-			break
-		case 'add_content':
-			await browseContent(instance.value?.loader === 'vanilla' ? 'datapack' : 'mod')
-			break
-		case 'edit':
-			openSettings()
-			break
-		case 'open_folder':
-			if (instance.value) await showInstanceInFolder(instance.value.id)
-			break
-		case 'copy_path': {
-			if (instance.value) {
-				const fullPath = await get_full_path(instance.value.id)
-				await navigator.clipboard.writeText(fullPath)
-			}
-			break
-		}
-	}
+const copyInstancePath = async () => {
+	if (!instance.value) return
+	const fullPath = await get_full_path(instance.value.id)
+	await navigator.clipboard.writeText(fullPath)
 }
 
 provideInstancePage({

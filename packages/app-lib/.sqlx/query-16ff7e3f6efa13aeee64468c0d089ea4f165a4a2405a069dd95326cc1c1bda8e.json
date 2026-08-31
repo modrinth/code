@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM instance_server_projection_entries WHERE instance_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "16ff7e3f6efa13aeee64468c0d089ea4f165a4a2405a069dd95326cc1c1bda8e"
+}

@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Teruskan"
   },
-  "admin.billing.error.not-found": {
-    "message": "Pengguna tidak dijumpai"
-  },
   "analytics.action.add": {
     "message": "Tambah"
   },
@@ -796,9 +793,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Luluskan dengan balasan"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Tutup bebenang"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Tutup dengan balasan"
@@ -2155,9 +2149,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Carian fail"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Cari melalui e-mel"
   },
   "layout.action.manage-affiliates": {
     "message": "Urus pautan afiliasi"

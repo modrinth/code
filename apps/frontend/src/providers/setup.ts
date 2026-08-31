@@ -28,5 +28,5 @@ export function setupProviders(auth: Awaited<ReturnType<typeof useAuth>>) {
 	setupLoadingStateProvider()
 	setupUserCountryProvider()
 
-	return userPreferences
+	return { userPreferences, notificationManager }
 }
