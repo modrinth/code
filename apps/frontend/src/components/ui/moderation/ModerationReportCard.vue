@@ -58,126 +58,75 @@
 
 			<div class="my-4 h-px bg-surface-5" />
 
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-4">
-					<Avatar
-						:src="reportItemAvatarUrl"
-						:circle="report.item_type === 'user'"
-						size="4rem"
-						:pad-transparent-corners="report.item_type === 'shared-instance'"
-						:class="[
-							'flex-shrink-0 border border-surface-5 bg-surface-4 !shadow-none',
-							report.item_type !== 'user' && 'rounded-2xl',
-						]"
-					/>
-
-					<div v-if="report.item_type === 'user'" class="flex flex-col gap-1.5">
-						<NuxtLink
-							:to="`/user/${report.user?.username}`"
-							target="_blank"
-							class="text-base font-semibold text-contrast hover:underline"
-						>
-							{{ report.user?.username || 'Unknown User' }}
-						</NuxtLink>
-
-						<span
-							v-if="report.user?.created"
-							v-tooltip="formatDateTime(report.user.created)"
-							class="cursor-help text-sm text-secondary"
-						>
-							Joined {{ formatRelativeTime(report.user.created) }}
+			<ModerationItemHeader
+				:avatar-url="reportItemAvatarUrl"
+				:title="reportItemTitle"
+				:title-to="reportItemTitleTo"
+				:owner="itemOwner"
+				:circle="report.item_type === 'user'"
+				:pad-transparent-corners="report.item_type === 'shared-instance'"
+			>
+				<template #badges>
+					<div
+						v-if="report.project?.project_type"
+						class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+					>
+						<component
+							:is="getProjectTypeIcon(report.project.project_type as any)"
+							aria-hidden="true"
+							class="h-4 w-4"
+						/>
+						<span class="text-sm font-medium text-secondary">
+							{{ formatProjectType(report.project.project_type, true) }}
 						</span>
 					</div>
 
-					<div v-else class="flex flex-col gap-1.5">
-						<div class="flex flex-wrap items-center gap-2">
-							<NuxtLink
-								v-if="report.item_type !== 'shared-instance'"
-								:to="reportItemUrl"
-								target="_blank"
-								class="text-base font-semibold text-contrast hover:underline"
-							>
-								{{ reportItemTitle }}
-							</NuxtLink>
-							<span v-else class="text-base font-semibold text-contrast">
-								{{ reportItemTitle }}
-							</span>
-
-							<div
-								v-if="report.project?.project_type"
-								class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
-							>
-								<component
-									:is="getProjectTypeIcon(report.project.project_type as any)"
-									aria-hidden="true"
-									class="h-4 w-4"
-								/>
-								<span class="text-sm font-medium text-secondary">
-									{{ formatProjectType(report.project.project_type, true) }}
-								</span>
-							</div>
-
-							<span
-								v-if="report.item_type === 'version' && report.version"
-								class="text-sm text-secondary"
-							>
-								{{ report.version.files.find((f) => f.primary)?.filename || 'Unknown Version' }}
-							</span>
-							<span
-								v-if="
-									report.item_type === 'shared-instance' &&
-									report.shared_instance_version_id !== undefined
-								"
-								class="text-sm text-secondary"
-							>
-								Version {{ report.shared_instance_version_id }}
-							</span>
-							<CopyCode v-if="report.item_type === 'shared-instance'" :text="report.item_id" />
-							<span
-								v-if="report.item_type === 'shared-instance' && sharedInstanceQuarantined"
-								class="bg-orange-highlight inline-flex items-center gap-1 rounded-full border border-solid border-orange px-2.5 py-1 text-sm font-semibold text-orange"
-							>
-								<LockIcon class="size-4" />
-								Quarantined
-							</span>
-						</div>
-
-						<div v-if="report.target" class="flex items-center gap-1">
-							<Avatar
-								:src="report.target.avatar_url"
-								size="1.5rem"
-								circle
-								class="border border-surface-5 bg-surface-4 !shadow-none"
-							/>
-							<NuxtLink
-								:to="`/${report.target.type}/${report.target.slug}`"
-								target="_blank"
-								class="text-sm font-medium text-secondary hover:underline"
-							>
-								{{ report.target.name }}
-							</NuxtLink>
-						</div>
-						<div
-							v-else-if="report.item_type === 'shared-instance' && sharedInstanceDetails"
-							class="flex items-center gap-1"
-						>
-							<Avatar
-								:src="sharedInstanceDetails.owner.avatar_url"
-								size="1.5rem"
-								circle
-								class="border border-surface-5 bg-surface-4 !shadow-none"
-							/>
-							<NuxtLink
-								:to="`/user/${sharedInstanceDetails.owner.username}`"
-								target="_blank"
-								class="text-sm font-medium text-secondary hover:underline"
-							>
-								{{ sharedInstanceDetails.owner.username }}
-							</NuxtLink>
-						</div>
-					</div>
-				</div>
-			</div>
+					<span
+						v-if="report.item_type === 'version' && report.version"
+						class="text-sm text-secondary"
+					>
+						{{ report.version.files.find((f) => f.primary)?.filename || 'Unknown Version' }}
+					</span>
+					<span
+						v-if="
+							report.item_type === 'shared-instance' &&
+							report.shared_instance_version_id !== undefined
+						"
+						class="text-sm text-secondary"
+					>
+						Version {{ report.shared_instance_version_id }}
+					</span>
+					<CopyCode v-if="report.item_type === 'shared-instance'" :text="report.item_id" />
+					<span
+						v-if="report.item_type === 'shared-instance' && sharedInstanceQuarantined"
+						class="bg-orange-highlight inline-flex items-center gap-1 rounded-full border border-solid border-orange px-2.5 py-1 text-sm font-semibold text-orange"
+					>
+						<LockIcon class="size-4" />
+						Quarantined
+					</span>
+				</template>
+				<template #subtitle>
+					<span
+						v-if="report.item_type === 'user' && report.user?.created"
+						v-tooltip="formatDateTime(report.user.created)"
+						class="cursor-help text-sm text-secondary"
+					>
+						Joined {{ formatRelativeTime(report.user.created) }}
+					</span>
+					<Button
+						v-else-if="report.item_type === 'shared-instance' && !itemOwner"
+						type="outlined"
+						size="sm"
+						class="w-fit"
+						:loading="sharedInstanceLoading"
+						@click="loadSharedInstanceDetails"
+					>
+						<LoaderCircleIcon v-if="sharedInstanceLoading" class="animate-spin" />
+						<ReceiptTextIcon v-else />
+						Load shared instance details
+					</Button>
+				</template>
+			</ModerationItemHeader>
 		</div>
 		<CollapsibleRegion
 			v-model:collapsed="isThreadCollapsed"
@@ -286,6 +235,7 @@ import {
 	ExternalIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	ReceiptTextIcon,
 } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
 import { Button, ButtonLink, IconButton } from '@modrinth/ui'
@@ -309,6 +259,7 @@ import { computed, onUnmounted, ref, watch } from 'vue'
 import { isStaff } from '~/helpers/users.js'
 
 import ThreadView from '../thread/ThreadView.vue'
+import ModerationItemHeader, { type ModerationOwner } from './ModerationItemHeader.vue'
 import SharedInstanceReportContext, {
 	type SharedInstanceOwnerInstance,
 	type SharedInstanceReportDetails,
@@ -885,6 +836,36 @@ const reportItemUrl = computed(() => {
 			return ''
 		default:
 			return `/${props.report.item_type}/${props.report.id}`
+	}
+})
+
+const reportItemTitleTo = computed(() =>
+	props.report.item_type === 'shared-instance' ? undefined : reportItemUrl.value,
+)
+
+const itemOwner = computed((): ModerationOwner | null => {
+	if (props.report.item_type === 'user') return null
+
+	if (props.report.item_type === 'shared-instance') {
+		const owner = sharedInstanceDetails.value?.owner
+		if (!owner) return null
+
+		return {
+			kind: 'user',
+			id: owner.id,
+			name: owner.username,
+			icon_url: owner.avatar_url ?? null,
+		}
+	}
+
+	const target = props.report.target
+	if (!target) return null
+
+	return {
+		kind: target.type,
+		id: target.id,
+		name: target.name,
+		icon_url: target.avatar_url ?? null,
 	}
 })
 

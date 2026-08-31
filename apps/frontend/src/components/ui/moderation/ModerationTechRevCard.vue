@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, CodeIcon, ExternalIcon, TimerIcon, VersionIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonLink,
-	CopyCode,
-	CopyLinkButton,
-	getProjectTypeIcon,
-	NavTabs,
-} from '@modrinth/ui'
+import { ButtonLink, CopyCode, CopyLinkButton, getProjectTypeIcon, NavTabs } from '@modrinth/ui'
 import { capitalizeString, formatProjectType } from '@modrinth/utils'
 import { computed, provide, ref, watch } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
+import ModerationItemHeader from '~/components/ui/moderation/ModerationItemHeader.vue'
 import {
 	getHighestSeverity,
 	getSeverityBadgeColor,
@@ -178,88 +172,54 @@ watch(
 			class="flex flex-col gap-3 border-0 border-b border-solid border-surface-4 bg-surface-3 p-4 pb-3"
 		>
 			<div class="flex flex-wrap items-start justify-between">
-				<div class="flex items-center gap-3">
-					<NuxtLink
-						:to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
-						target="_blank"
-						tabindex="-1"
-					>
-						<Avatar
-							:src="item.project.icon_url"
-							class="rounded-2xl border border-surface-5 bg-surface-4 !shadow-none"
-							size="4rem"
-						/>
-					</NuxtLink>
-
-					<div class="flex flex-col gap-1.5">
-						<div class="flex flex-wrap items-center gap-2">
-							<NuxtLink
-								:to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
-								target="_blank"
-								class="text-lg font-semibold text-contrast hover:underline focus-visible:underline"
+				<ModerationItemHeader
+					:avatar-url="item.project.icon_url"
+					:title="item.project.name"
+					:title-to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
+					:owner="item.project_owner"
+				>
+					<template #badges>
+						<div
+							class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+						>
+							<component
+								:is="getProjectTypeIcon(item.project.project_types[0] as any)"
+								aria-hidden="true"
+								class="h-4 w-4"
+							/>
+							<span
+								v-for="project_type in item.project.project_types"
+								:key="project_type + item.project.id"
+								class="text-sm font-medium text-secondary"
+								>{{ formatProjectType(project_type, true) }}</span
 							>
-								{{ item.project.name }}
-							</NuxtLink>
-
-							<div
-								class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
-							>
-								<component
-									:is="getProjectTypeIcon(item.project.project_types[0] as any)"
-									aria-hidden="true"
-									class="h-4 w-4"
-								/>
-								<span
-									v-for="project_type in item.project.project_types"
-									:key="project_type + item.project.id"
-									class="text-sm font-medium text-secondary"
-									>{{ formatProjectType(project_type, true) }}</span
-								>
-							</div>
-
-							<div
-								class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1"
-								:class="
-									isProjectApproved
-										? 'border-green bg-highlight-green'
-										: 'border-orange bg-highlight-orange'
-								"
-							>
-								<CheckIcon v-if="isProjectApproved" aria-hidden="true" class="h-4 w-4 text-green" />
-								<TimerIcon v-else aria-hidden="true" class="h-4 w-4 text-orange" />
-								<span
-									class="text-sm font-medium"
-									:class="isProjectApproved ? 'text-green' : 'text-orange'"
-								>
-									{{ isProjectApproved ? 'Live' : 'In review' }}
-								</span>
-							</div>
-
-							<div class="rounded-full border-solid px-2.5 py-1" :class="severityColor">
-								<span class="text-sm font-medium">{{
-									capitalizeString(highestSeverity.toLowerCase())
-								}}</span>
-							</div>
 						</div>
 
-						<div class="flex items-center gap-2">
-							<NuxtLink
-								:to="`/${item.project_owner.kind}/${item.project_owner.id}`"
-								target="_blank"
-								class="flex items-center gap-1 text-sm font-medium text-secondary hover:underline"
+						<div
+							class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1"
+							:class="
+								isProjectApproved
+									? 'border-green bg-highlight-green'
+									: 'border-orange bg-highlight-orange'
+							"
+						>
+							<CheckIcon v-if="isProjectApproved" aria-hidden="true" class="h-4 w-4 text-green" />
+							<TimerIcon v-else aria-hidden="true" class="h-4 w-4 text-orange" />
+							<span
+								class="text-sm font-medium"
+								:class="isProjectApproved ? 'text-green' : 'text-orange'"
 							>
-								<Avatar
-									:src="item.project_owner.icon_url"
-									class="rounded-full border border-surface-5 bg-surface-4 !shadow-none"
-									size="1.5rem"
-									circle
-								/>
-								{{ item.project_owner.name }}
-							</NuxtLink>
-							<CopyCode v-tooltip="'Copy user ID'" :text="item.project_owner.id" />
+								{{ isProjectApproved ? 'Live' : 'In review' }}
+							</span>
 						</div>
-					</div>
-				</div>
+
+						<div class="rounded-full border-solid px-2.5 py-1" :class="severityColor">
+							<span class="text-sm font-medium">{{
+								capitalizeString(highestSeverity.toLowerCase())
+							}}</span>
+						</div>
+					</template>
+				</ModerationItemHeader>
 
 				<div class="flex flex-col items-end gap-2">
 					<div class="flex flex-wrap items-center justify-end gap-3">
