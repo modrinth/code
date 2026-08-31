@@ -8,7 +8,6 @@ import {
 	LoaderCircleIcon,
 } from '@modrinth/assets'
 import {
-	Button,
 	Collapsible,
 	IconButton,
 	injectModrinthClient,
@@ -737,7 +736,10 @@ watch(
 							</div>
 
 							<div class="me-2 flex items-center justify-end gap-2">
-								<Button
+								<IconButton
+									v-tooltip="copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'"
+									type="quiet"
+									:label="copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'"
 									:disabled="copyingCelDetails.has(flag.detail.id)"
 									@click="copyDetailCelInput(flag.detail.id)"
 								>
@@ -746,11 +748,9 @@ watch(
 										class="animate-spin"
 										aria-hidden="true"
 									/>
+									<CheckIcon v-else-if="copiedCelDetails.has(flag.detail.id)" aria-hidden="true" />
 									<ClipboardCopyIcon v-else aria-hidden="true" />
-									<span aria-live="polite">
-										{{ copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL' }}
-									</span>
-								</Button>
+								</IconButton>
 								<TechRevVerdictButtons
 									variant="trace"
 									:detail="flag.detail"
