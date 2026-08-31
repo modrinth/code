@@ -42,10 +42,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
-        .service(get_user_project_grouped)
-        .service(get_users_project_grouped)
-        .service(get_organization_project_grouped)
-        .service(get_organizations_project_grouped)
+        .service(get_user_project_by_status)
+        .service(get_users_project_by_status)
+        .service(get_organization_project_by_status)
+        .service(get_organizations_project_by_status)
         .service(web::scope("/tech-review").configure(tech_review::config))
         .service(
             web::scope("/external-license").configure(external_license::config),
@@ -1691,8 +1691,8 @@ pub async fn delete_all_locks(
     security(("bearer_auth" = [])),
     responses((status = OK, body = HashMap<ProjectStatus, Vec<ProjectId>>))
 )]
-#[get("/user/{user_id}/all-projects-grouped")]
-pub async fn get_user_project_grouped(
+#[get("/user/{user_id}/all-projects-by-status")]
+pub async fn get_user_project_by_status(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1716,7 +1716,7 @@ pub async fn get_user_project_grouped(
             .wrap_not_found_err("resource not found")?;
 
     let counts =
-        user_projects_status_grouped(target_user.id, &**pool, &redis).await?;
+        user_projects_by_status(target_user.id, &**pool, &redis).await?;
 
     Ok(web::Json(counts))
 }
@@ -1732,8 +1732,8 @@ pub async fn get_user_project_grouped(
     params(("ids" = String, Query)),
     responses((status = OK, body = HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>))
 )]
-#[get("/users/all-projects-grouped")]
-pub async fn get_users_project_grouped(
+#[get("/users/all-projects-by-status")]
+pub async fn get_users_project_by_status(
     req: HttpRequest,
     ids: web::Query<UserIds>,
     pool: web::Data<PgPool>,
@@ -1770,12 +1770,9 @@ pub async fn get_users_project_grouped(
 
     let grouped_projects_by_user =
         try_join_all(target_users.into_iter().map(|target_user| async move {
-            let counts = user_projects_status_grouped(
-                target_user.id,
-                pool_ref,
-                redis_ref,
-            )
-            .await?;
+            let counts =
+                user_projects_by_status(target_user.id, pool_ref, redis_ref)
+                    .await?;
 
             Ok::<_, ApiError>((UserId::from(target_user.id), counts))
         }))
@@ -1795,8 +1792,8 @@ pub async fn get_users_project_grouped(
     security(("bearer_auth" = [])),
     responses((status = OK, body = HashMap<ProjectStatus, Vec<ProjectId>>))
 )]
-#[get("/organization/{organization_id}/all-projects-grouped")]
-pub async fn get_organization_project_grouped(
+#[get("/organization/{organization_id}/all-projects-by-status")]
+pub async fn get_organization_project_by_status(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1823,8 +1820,7 @@ pub async fn get_organization_project_grouped(
     .wrap_not_found_err("resource not found")?;
 
     let grouped_projects =
-        organization_projects_status_grouped(target_org.id, &**pool, &redis)
-            .await?;
+        organization_projects_by_status(target_org.id, &**pool, &redis).await?;
 
     Ok(web::Json(grouped_projects))
 }
@@ -1841,8 +1837,8 @@ pub async fn get_organization_project_grouped(
     params(("ids" = String, Query)),
     responses((status = OK, body = HashMap<OrganizationId, HashMap<ProjectStatus, Vec<ProjectId>>>))
 )]
-#[get("/organizations/all-projects-grouped")]
-pub async fn get_organizations_project_grouped(
+#[get("/organizations/all-projects-by-status")]
+pub async fn get_organizations_project_by_status(
     req: HttpRequest,
     ids: web::Query<OrganizationIds>,
     pool: web::Data<PgPool>,
@@ -1882,7 +1878,7 @@ pub async fn get_organizations_project_grouped(
 
     let grouped_projects_by_org =
         try_join_all(target_orgs.into_iter().map(|target_org| async move {
-            let counts = organization_projects_status_grouped(
+            let counts = organization_projects_by_status(
                 target_org.id,
                 pool_ref,
                 redis_ref,
@@ -1899,7 +1895,7 @@ pub async fn get_organizations_project_grouped(
 }
 
 /// Groups the given User projects by their `ProjectStatus`.
-async fn user_projects_status_grouped<'a, E>(
+async fn user_projects_by_status<'a, E>(
     user_id: database::models::DBUserId,
     pool: E,
     redis: &RedisPool,
@@ -1914,11 +1910,11 @@ where
             .await
             .wrap_internal_err("fetching user's projects from database")?;
 
-    grouped_projects_for(&project_ids, pool, redis).await
+    group_projects_by_status(&project_ids, pool, redis).await
 }
 
 /// Groups the given Organization projects by their `ProjectStatus`.
-async fn organization_projects_status_grouped<'a, E>(
+async fn organization_projects_by_status<'a, E>(
     organization_id: DBOrganizationId,
     pool: E,
     redis: &RedisPool,
@@ -1932,11 +1928,11 @@ where
         .await
         .wrap_internal_err("fetching project IDs from database")?;
 
-    grouped_projects_for(&project_ids, pool, redis).await
+    group_projects_by_status(&project_ids, pool, redis).await
 }
 
 /// Groups the given input Projects by their `ProjectStatus`.
-async fn grouped_projects_for<'a, E>(
+async fn group_projects_by_status<'a, E>(
     project_ids: &[DBProjectId],
     pool: E,
     redis: &RedisPool,
