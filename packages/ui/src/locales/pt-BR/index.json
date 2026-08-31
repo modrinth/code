@@ -6347,9 +6347,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "Dev jar"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Pacote de recursos opcional"
   },
@@ -6361,9 +6358,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "Arquivo de assinatura"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "Jar fonte"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Outro"

@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Upewnij się, że użytkownicy są świadomi wszelkich ważnych szczegółów, wypełniając informacje o treści, które dotyczą Twojego {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Sprawdź ujawnienia treści"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "Twój opis składa się z {length, plural, one {# czytenego znaku} other {# czytelnych znaków}}. Zalecane jest użycie chociaż {minChars, plural, one {# znaku} other {# znaków}} by stworzyć przejrzysty i informatywny opis."
   },
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Odwiedź ustawienia opisu"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Odwiedź ustawienia licencji"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Odwiedź ustawienia licencji"
   },
@@ -256,6 +265,12 @@
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Przynajmniej jeden z obrazów w galerii musi pokazywać zawartość {type}."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Co najmniej jeden obraz galerii jest wymagany do wyświetlenia zawartości paczki zasobów, z wyjątkiem paczek audio lub pakietów lokalizacyjnych. Jeśli to opisuje paczkę, wybierz odpowiedni tag."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Wymagane są co najmniej trzy zdjęcia galerii, aby zaprezentować zawartość twojego cienia w różnych sytuacjach i warunkach."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Prześlij obraz do galerii"

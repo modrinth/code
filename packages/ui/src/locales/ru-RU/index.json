@@ -173,6 +173,9 @@
   "button.continue": {
     "defaultMessage": "Продолжить"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Скопировано в буфер обмена"
+  },
   "button.copy-filename": {
     "defaultMessage": "Копировать имя файла"
   },
@@ -567,7 +570,7 @@
     "defaultMessage": "Контент сборки"
   },
   "content.managed-card.provided-by": {
-    "defaultMessage": "Источник:"
+    "defaultMessage": "Управляется"
   },
   "content.managed-card.server-suffix": {
     "defaultMessage": "сервер"
@@ -780,7 +783,7 @@
     "defaultMessage": "Поиск версии игры..."
   },
   "creation-flow.modal.custom-setup.icon.customize": {
-    "defaultMessage": "Настроить"
+    "defaultMessage": "Оформить"
   },
   "creation-flow.modal.custom-setup.icon.randomize": {
     "defaultMessage": "Рандомизировать"
@@ -1146,7 +1149,7 @@
     "defaultMessage": "Доказательства"
   },
   "external-files.permissions-card.editor.proof-images-upload-prompt": {
-    "defaultMessage": "Перетащите изображение или нажмите, чтобы выбрать"
+    "defaultMessage": "Перетащите изображение или нажмите для обзора"
   },
   "external-files.permissions-card.editor.proof-warning.body": {
     "defaultMessage": "Если будет выявлена ложь или подделка загруженных изображений, то ваш проект и аккаунт могут быть заблокированы."
@@ -1470,7 +1473,7 @@
     "defaultMessage": "Извлечение началось"
   },
   "files.layout.unsaved-changes": {
-    "defaultMessage": "Есть несохранённые изменения."
+    "defaultMessage": "Изменения не сохранены."
   },
   "files.move-modal.current-location": {
     "defaultMessage": "Текущий путь"
@@ -1539,7 +1542,7 @@
     "defaultMessage": "Извлечение {source} завершено"
   },
   "files.operations.extracting-failed": {
-    "defaultMessage": "Извлечение {source} не удалось"
+    "defaultMessage": "Не удалось извлечь {source}"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "сборки из URL"
@@ -1581,13 +1584,13 @@
     "defaultMessage": "Отменено"
   },
   "files.upload-dropdown.failed-file-exists": {
-    "defaultMessage": "Не удалось - Файл уже существует"
+    "defaultMessage": "Ошибка — файл уже существует"
   },
   "files.upload-dropdown.failed-generic": {
-    "defaultMessage": "Не удалось - {error}"
+    "defaultMessage": "Ошибка — {error}"
   },
   "files.upload-dropdown.failed-incorrect-type": {
-    "defaultMessage": "Не удалось - Неправильный тип файла"
+    "defaultMessage": "Ошибка — неверный тип файла"
   },
   "files.upload-dropdown.failed-to-upload": {
     "defaultMessage": "Не удалось загрузить {fileName}"
@@ -1605,7 +1608,10 @@
     "defaultMessage": "Произошла непредвиденная ошибка."
   },
   "files.upload-dropdown.uploads-left": {
-    "defaultMessage": " - {count} осталось"
+    "defaultMessage": " — осталось {count}"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Перетащите {type} сюда, чтобы загрузить"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Имя должно содержать только буквенные символы, дефисы, подчеркивания или пробелы."
@@ -1933,6 +1939,117 @@
   },
   "icon-select.select": {
     "defaultMessage": "Выбрать иконку"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Закрыть"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Изменить"
+  },
+  "image-viewer.editor.censor.blur": {
+    "defaultMessage": "Размытие"
+  },
+  "image-viewer.editor.censor.mode": {
+    "defaultMessage": "Тип цензуры"
+  },
+  "image-viewer.editor.censor.solid": {
+    "defaultMessage": "Заливка"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Цвет"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Сбросить"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Удалить выделенное"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Точка"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Элемент"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Режим ластика"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Инструменты рисования"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Другие варианты сохранения"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Перезаписать"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Повторить"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Сохранить копию"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Сохранить изображение"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Размер"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Стрелка"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Цензура"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Обрезка"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Овал"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Ластик"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Маркер"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Карандаш"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Прямоугольник"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Выделение"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Текст"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Отменить"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Ширина"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Авто"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "Сбросить масштаб"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Увеличить"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Уменьшить"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Следующее изображение"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Предыдущее изображение"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Поиск версии..."
@@ -2525,6 +2642,9 @@
   "label.yes": {
     "defaultMessage": "Да"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Смена аккаунта..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Чешский"
   },
@@ -2649,7 +2769,7 @@
     "defaultMessage": "Файл"
   },
   "markdown-editor.image-modal.upload.prompt": {
-    "defaultMessage": "Перетащите файл или нажмите, чтобы выбрать"
+    "defaultMessage": "Перетащите файл или нажмите для обзора"
   },
   "markdown-editor.image-modal.url-field.placeholder": {
     "defaultMessage": "Введите адрес изображения..."
@@ -3025,6 +3145,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Сделать партнёром"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Посмотреть совместные сборки"
   },
   "profile.button.unblock": {
     "defaultMessage": "Разблокировать"
@@ -3925,6 +4048,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "Р"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Канал"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, plural, one {# выбран} other {# выбрано}}"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Переключить фильтр: {filter}"
@@ -6414,7 +6543,7 @@
     "defaultMessage": "недель"
   },
   "ui.component.unsaved-changes-popup.body": {
-    "defaultMessage": "Есть несохранённые изменения."
+    "defaultMessage": "Изменения не сохранены."
   },
   "ui.confirm-leave-modal.body": {
     "defaultMessage": "Если уйти со страницы, несохранённые изменения будут потеряны."
@@ -6432,13 +6561,13 @@
     "defaultMessage": "Уйти со страницы?"
   },
   "ui.pagination.go-to-page": {
-    "defaultMessage": "Перейти"
+    "defaultMessage": "Перейти на страницу"
   },
   "ui.pagination.next-page": {
     "defaultMessage": "Следующая страница"
   },
   "ui.pagination.previous-page": {
-    "defaultMessage": "Прошлая страница"
+    "defaultMessage": "Предыдущая страница"
   },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count, plural, one {# уведомление} few {# уведомления} other {# уведомлений}}"
@@ -6575,6 +6704,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Команда Modrinth"
   },
+  "user.role.moderator": {
+    "defaultMessage": "Модератор контента"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Команда Modrinth"
+  },
   "version.content.name": {
     "defaultMessage": "Название"
   },
@@ -6642,7 +6777,7 @@
     "defaultMessage": "Известные несовместимости"
   },
   "version.section.no-changes": {
-    "defaultMessage": "Описание изменений отсутствует."
+    "defaultMessage": "Список изменений отсутствует."
   },
   "version.section.no-modpack-mod-loader": {
     "defaultMessage": "Без загрузчика"

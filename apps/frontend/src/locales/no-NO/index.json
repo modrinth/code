@@ -2087,9 +2087,6 @@
   "layout.action.new-project": {
     "message": "Nytt prosjekt"
   },
-  "layout.action.new-server-project": {
-    "message": "Ny server"
-  },
   "layout.action.publish": {
     "message": "Publiser"
   },

@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "Weiter"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "In Zwischenablage kopiert"
+  },
   "button.copy-filename": {
     "defaultMessage": "Dateinamen kopieren"
   },
@@ -2018,6 +2021,117 @@
   "icon-select.select": {
     "defaultMessage": "Icon auswählen"
   },
+  "image-viewer.close": {
+    "defaultMessage": "Schließen"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Bearbeiten"
+  },
+  "image-viewer.editor.censor.blur": {
+    "defaultMessage": "Verwischen"
+  },
+  "image-viewer.editor.censor.mode": {
+    "defaultMessage": "Zensurtyp"
+  },
+  "image-viewer.editor.censor.solid": {
+    "defaultMessage": "Ausgefüllt"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Farbe"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Zuschneiden zurücksetzen"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Ausgewählte Anmerkung löschen"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Fläche"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Element"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Radiermodus"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Werkzeuge zur Bildbearbeitung"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Weitere Speicheroptionen"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Überschreiben"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Wiederholen"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Kopie speichern"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Bild speichern"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Größe"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Pfeil"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Zensieren"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Zuschneiden"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellipse"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Radierer"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Markieren"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Stift"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Rechteck"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Auswählen"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Text"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Rückgängig"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Breite"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Anpassen"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "An Arbeitsbereich anpassen"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Vergrößern"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Verkleinern"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Nächstes Bild"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Vorheriges Bild"
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "Version suchen..."
   },
@@ -2609,6 +2723,9 @@
   "label.yes": {
     "defaultMessage": "Ja"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Konten werden gewechselt..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Tschechisch"
   },
@@ -3112,6 +3229,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Als Partner festlegen"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Geteilte Instanzen ansehen"
   },
   "profile.button.unblock": {
     "defaultMessage": "Freigeben"
@@ -4015,6 +4135,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Kanal"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, number} ausgewählt"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Filter für {filter} umschalten"
@@ -6668,6 +6794,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth-Team"
   },
+  "user.role.moderator": {
+    "defaultMessage": "Inhaltsmoderator"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Modrinth-Team"
+  },
   "version.content.name": {
     "defaultMessage": "Name"
   },
@@ -6678,7 +6810,7 @@
     "defaultMessage": "Dev-JAR"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc-JAR"
+    "defaultMessage": "Javadocs-JAR"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Optionales Ressourcenpaket"
@@ -6693,7 +6825,7 @@
     "defaultMessage": "Signaturdatei"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "Quellen-JAR"
+    "defaultMessage": "Quell-JAR"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Andere"
@@ -6759,3 +6891,4 @@
     "defaultMessage": "Typ"
   }
 }
+

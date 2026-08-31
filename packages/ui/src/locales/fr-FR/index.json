@@ -35,6 +35,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Voir les statistiques"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "Utiliser la barre de titre de votre système d'exploitation et les contrôles de fenêtre. Requiert un redémarrage de l'application."
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Impossible de charger les paramètres du serveur"
   },
@@ -137,6 +140,9 @@
   "button.accept": {
     "defaultMessage": "Accepter"
   },
+  "button.add-another": {
+    "defaultMessage": "Ajouter un autre"
+  },
   "button.add-server-to-instance": {
     "defaultMessage": "Ajouter le serveur à l'instance"
   },
@@ -163,6 +169,9 @@
   },
   "button.continue": {
     "defaultMessage": "Continuer"
+  },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copié dans le presse-papiers"
   },
   "button.copy-filename": {
     "defaultMessage": "Copier le nom du fichier"
@@ -356,8 +365,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural,one {objet} other {objets}}"
   },
+  "content.card.frozen": {
+    "defaultMessage": "Ce projet est verrouillé à sa version actuelle jusqu'à ce qu'il soit débloqué."
+  },
   "content.card.select-project": {
     "defaultMessage": "Sélectionner {project}"
+  },
+  "content.card.uploaded": {
+    "defaultMessage": "Publié"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Êtes vous sûr·e de vouloir télécharger la dernière mise à jour compatible de {count, plural, one {# projet} other {# projets}} ? Il est recommandé de mettre à jour le contenu un par un."
@@ -575,6 +590,12 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "monde"
   },
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "Contenu du Modpack"
+  },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "Fourni par"
+  },
   "content.managed-card.server-suffix": {
     "defaultMessage": "serveur"
   },
@@ -586,6 +607,9 @@
   },
   "content.managed-card.summary.installing": {
     "defaultMessage": "Contenu en cours d'installation..."
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "Changer de version"
   },
   "content.managed-card.update-available": {
     "defaultMessage": "Mise à jour disponible"
@@ -944,6 +968,18 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Rechercher un modpack"
   },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Créer une instance"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Installer le modpack"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "Aucun résultat trouvé"
+  },
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "Rechercher des mods, modpacks, et plus encore..."
+  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Partez de zéro en choisissant un loader et une version de jeu."
   },
@@ -955,6 +991,9 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Importer une instance"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Sélectionnez un projet et nous utiliserons sa dernière version."
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Minecraft tel qu'on le connaît sans mods ni plugins."
@@ -1643,6 +1682,24 @@
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "Importation du contenu du .zip par URL"
   },
+  "filter-bar.add": {
+    "defaultMessage": "Ajouter"
+  },
+  "filter-bar.filtered-by": {
+    "defaultMessage": "Filtrer par"
+  },
+  "filter-bar.no-options": {
+    "defaultMessage": "Aucune option disponible."
+  },
+  "filter-bar.no-search-results": {
+    "defaultMessage": "Aucune option trouvée."
+  },
+  "filter-bar.search-placeholder": {
+    "defaultMessage": "Rechercher..."
+  },
+  "filter-bar.select-all": {
+    "defaultMessage": "Tout sélectionner"
+  },
   "form.label.address-line": {
     "defaultMessage": "Ligne d'adresse"
   },
@@ -1880,6 +1937,69 @@
   "icon-select.select": {
     "defaultMessage": "Sélectionner l'icône"
   },
+  "image-viewer.close": {
+    "defaultMessage": "Fermer"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Modifier"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Mode effacement"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Outils d'édition d'image"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Plus d'options de sauvegarde"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Écraser"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Rétablir"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Enregistrer une copie"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Enregistrer l'image"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Taille"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Flèche"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Censurer"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Rogner"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellipse"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Gomme"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Surligner"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Sélectionner"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Texte"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Annuler"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Image suivante"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Image précédente"
+  },
   "input.search-version.placeholder": {
     "defaultMessage": "Rechercher la version..."
   },
@@ -2102,8 +2222,14 @@
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Rechercher une instance"
   },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "Télécharger le Fichier"
+  },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "Aucun contenu trouvé"
+  },
+  "instances.managed-content-modal.external-content-description": {
+    "defaultMessage": "Ce fichier n'est pas publié sur Modrinth."
   },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Contenu géré"
@@ -2717,6 +2843,27 @@
   "notification.error.title": {
     "defaultMessage": "Une erreur est survenue"
   },
+  "notifications.actor.unknown": {
+    "defaultMessage": "Quelqu'un"
+  },
+  "notifications.close": {
+    "defaultMessage": "Fermer"
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "Lancer le jeu"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "Instance"
+  },
+  "notifications.instance-ready.status": {
+    "defaultMessage": "Installé et prêt à jouer."
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "Accepter"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "Refuser"
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Accepté"
   },
@@ -2917,6 +3064,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Se mettre comme affilié"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Voir les instances partagées"
   },
   "profile.button.unblock": {
     "defaultMessage": "Débloquer"
@@ -3854,14 +4004,50 @@
   "report.item-type.version": {
     "defaultMessage": "version"
   },
+  "report.type.copyright": {
+    "defaultMessage": "Travail réuploadé"
+  },
+  "report.type.fully-ai-generated": {
+    "defaultMessage": "Projet entièrement généré par IA"
+  },
   "report.type.inappropriate": {
     "defaultMessage": "Inapproprié"
   },
   "report.type.malicious": {
     "defaultMessage": "Malicieux"
   },
+  "report.type.spam": {
+    "defaultMessage": "Spam"
+  },
   "s.bg": {
     "defaultMessage": "Tâche d'arrière-plan en exécution"
+  },
+  "search.filter.dependency_type.embedded": {
+    "defaultMessage": "Inclus"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "Optionnel"
+  },
+  "search.filter.dependency_type.optional_or_embedded": {
+    "defaultMessage": "Optionnel ou inclus"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "Requis"
+  },
+  "search.filter.dependency_type.required_or_embedded": {
+    "defaultMessage": "Requis ou inclus"
+  },
+  "search.filter.dependency_type.required_or_optional": {
+    "defaultMessage": "Requis ou optionnel"
+  },
+  "search.filter.dependent_project": {
+    "defaultMessage": "Dépend de : {project}"
+  },
+  "search.filter.included_content.exclude": {
+    "defaultMessage": "Exclure"
+  },
+  "search.filter.included_content.excluded": {
+    "defaultMessage": "Exclus"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filtre bloqué"
@@ -3922,6 +4108,9 @@
   },
   "search.filter_type.advanced.disclosure.telemetry": {
     "defaultMessage": "Télémétrie"
+  },
+  "search.filter_type.compatible_dependency_project_ids": {
+    "defaultMessage": "Dépend de"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environnement"
@@ -5279,6 +5468,9 @@
   "settings.billing.title": {
     "defaultMessage": "Facturation et abonnements"
   },
+  "settings.display.project-list-layouts.mode.grid": {
+    "defaultMessage": "Grille"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "Sombre"
   },
@@ -5296,6 +5488,9 @@
   },
   "settings.display.theme.retro": {
     "defaultMessage": "Rétro"
+  },
+  "settings.display.theme.sync-across-devices": {
+    "defaultMessage": "Synchroniser le thème avec tous les appareils"
   },
   "settings.display.theme.system": {
     "defaultMessage": "Synchroniser avec le système"
@@ -6092,6 +6287,15 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Quitter la page ?"
   },
+  "ui.pagination.go-to-page": {
+    "defaultMessage": "Aller à la page"
+  },
+  "ui.pagination.next-page": {
+    "defaultMessage": "Page suivante"
+  },
+  "ui.pagination.previous-page": {
+    "defaultMessage": "Page précédente"
+  },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count, plural, one {# alerte} other {# alertes}}"
   },
@@ -6236,9 +6440,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "JAR de développement"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "JAR Javadoc"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Pack de ressources facultatif"
   },
@@ -6250,9 +6451,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "Fichier de signature"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "Source jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Autres"

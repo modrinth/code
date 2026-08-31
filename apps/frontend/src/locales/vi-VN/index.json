@@ -2330,9 +2330,6 @@
   "layout.action.new-project": {
     "message": "Dự án mới"
   },
-  "layout.action.new-server-project": {
-    "message": "Máy chủ mới"
-  },
   "layout.action.publish": {
     "message": "Đăng tải"
   },

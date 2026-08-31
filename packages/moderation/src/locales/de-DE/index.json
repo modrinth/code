@@ -90,7 +90,7 @@
     "defaultMessage": "Quellcode bereitstellen"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem entsprechenden Linktyp eingegeben werden."
+    "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem entsprechenden Link-Typ eingegeben werden."
   },
   "nags.identical-links.title": {
     "defaultMessage": "Doppelte Links löschen"
@@ -117,7 +117,7 @@
     "defaultMessage": "Die Verwendung von Linkverkürzern oder anderen Methoden, um zu verschleiern, wohin ein Link in deinen externen Links oder Lizenz-Links führt, ist verboten. Bitte nutze nur vollständige, eindeutige Links."
   },
   "nags.link-shortener-usage.title": {
-    "defaultMessage": "Verwende keine Linkverkürzer"
+    "defaultMessage": "Verwende keine Link-Verkürzer"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# Überschrift} other {# Überschriften}} in deiner Beschreibung {count, plural, one {ist} other {sind}} zu lang. Überschriften sollten kurz sein und als Abschnittstitel dienen, nicht als vollständige Sätze."

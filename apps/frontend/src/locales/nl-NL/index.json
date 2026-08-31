@@ -818,6 +818,33 @@
   "auth.create-account.username.placeholder": {
     "message": "Voer je gebruikersnaam in"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Voer de 6-cijferige code uit je authenticator-app in, of een van je reservecodes."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Tweefactorauthenticatie"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Voer een code in..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Ga verder met toegangscode"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "De laatste keer dat er werd ingelogd, gebeurde dat met {method, select, password {een wachtwoord} passkey {een toegangscode} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Opnieuw authenticeren"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Op een andere manier inloggen"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Inloggen met {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} moet opnieuw worden geauthenticeerd."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Herstel email verzenden"
   },
@@ -860,6 +887,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Voer code in..."
   },
+  "auth.sign-in.add-account": {
+    "message": "Account toevoegen"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Kies een account om in de Modrinth-app te gebruiken"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Doorgaan met e-mail"
   },
@@ -874,6 +907,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Laatst gebruikt"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "We sturen je terug naar de Modrinth-app. Als er niets gebeurt, klik dan op de onderstaande knop."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Ga naar Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Modrinth-app openen"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Je bent aangemeld"
   },
   "auth.sign-in.no-account": {
     "message": "Heb je nog geen account?"
@@ -2657,9 +2702,6 @@
   "layout.action.new-project": {
     "message": "Nieuw project"
   },
-  "layout.action.new-server-project": {
-    "message": "Nieuwe server"
-  },
   "layout.action.publish": {
     "message": "Publiceer"
   },
@@ -2671,6 +2713,9 @@
   },
   "layout.action.tech-review": {
     "message": "Technologie beoordeling"
+  },
+  "layout.action.user-lookup": {
+    "message": "Gebruiker zoeken"
   },
   "layout.avatar.alt": {
     "message": "Jouw avatar"
@@ -2867,6 +2912,9 @@
   "layout.nav.active-reports": {
     "message": "Actieve meldingen"
   },
+  "layout.nav.add-account": {
+    "message": "Account toevoegen"
+  },
   "layout.nav.discover": {
     "message": "Ontdek"
   },
@@ -2897,6 +2945,9 @@
   "layout.nav.projects": {
     "message": "Projecten"
   },
+  "layout.nav.remove-account": {
+    "message": "Account verwijderen"
+  },
   "layout.nav.revenue": {
     "message": "Inkomsten"
   },
@@ -2905,6 +2956,12 @@
   },
   "layout.nav.search": {
     "message": "Zoeken"
+  },
+  "layout.nav.switch-account": {
+    "message": "Van account wisselen"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Kon niet van account wisselen. Probeer het nog eens."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade naar Modrinth+"
@@ -3842,6 +3899,9 @@
   "project.settings.disclosures.archived.description.2": {
     "message": "Gearchiveerde projecten blijven vindbaar wanneer de zichtbaarheid is ingesteld op Openbaar. Als je je project uit de lijst wilt verwijderen, stel dan de zichtbaarheid in op Verborgen."
   },
+  "project.settings.disclosures.derivative.description": {
+    "message": "Je moet deze optie inschakelen als je project is afgeleid van een ander project, bijvoorbeeld omdat het een afsplitsing is of een aanzienlijk deel van het werk van iemand anders bevat."
+  },
   "project.settings.disclosures.derivative.link-placeholder": {
     "message": "https://voorbeeld.com"
   },
@@ -3856,6 +3916,9 @@
   },
   "project.settings.disclosures.last-updated.moderator": {
     "message": "moderator"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "bijv. Er wordt een bestand met de naam wake_up.txt aan het bureaublad toegevoegd"
   },
   "project.settings.general.name.description": {
     "message": "Probeer voorvoegsels, achtervoegsels, tussenvoegsels en omschrijvingen te vermijden, alleen de echte naam."

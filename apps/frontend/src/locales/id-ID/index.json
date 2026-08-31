@@ -1652,9 +1652,6 @@
   "layout.action.new-project": {
     "message": "Proyek baru"
   },
-  "layout.action.new-server-project": {
-    "message": "Server baru"
-  },
   "layout.action.publish": {
     "message": "Terbitkan"
   },

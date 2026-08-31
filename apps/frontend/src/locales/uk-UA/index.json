@@ -815,6 +815,27 @@
   "auth.create-account.username.placeholder": {
     "message": "Уведіть ім’я користувача"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Уведіть 6-цифровий код з вашого автентифікатора або використайте один із резервних кодів."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Двофакторна автентифікація"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Уведіть код…"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Продовжити з ключем доступу"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "Спосіб останнього входу: {method, select, password {пароль} passkey {ключ доступу} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Увійти іншим способом"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Увійти через {provider}"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Надіслати лист для відновлення"
   },
@@ -857,6 +878,9 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Уведіть код…"
   },
+  "auth.sign-in.add-account": {
+    "message": "Додати обліковий запис"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Продовжити з електронною поштою"
   },
@@ -871,6 +895,15 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Востаннє використано"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Ми повертаємо вас до Modrinth App. Якщо нічого не відбудеться, натисніть на кнопку нижче."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Перейти на Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Відкрити Modrinth App"
   },
   "auth.sign-in.no-account": {
     "message": "Не маєте облікового запису?"
@@ -1203,7 +1236,7 @@
     "message": "Виявлені версії"
   },
   "create-project-version.create-modal.stage.metadata.edit-button": {
-    "message": "Змінити"
+    "message": "Редагувати"
   },
   "create-project-version.create-modal.stage.metadata.environment": {
     "message": "Середовище"
@@ -1269,7 +1302,7 @@
     "message": "Кілька речень, які описують вашу добірку."
   },
   "create.collection.summary-label": {
-    "message": "Зведення"
+    "message": "Короткий зміст"
   },
   "create.collection.summary-placeholder": {
     "message": "Це добірка з…"
@@ -1326,7 +1359,7 @@
     "message": "Кілька речень, які описують вашу організацію."
   },
   "create.organization.summary-label": {
-    "message": "Зведення"
+    "message": "Короткий зміст"
   },
   "create.organization.summary-placeholder": {
     "message": "Організація для…"
@@ -1365,7 +1398,7 @@
     "message": "Кілька речень, які описують ваш проєкт."
   },
   "create.project.summary-label": {
-    "message": "Зведення"
+    "message": "Короткий зміст"
   },
   "create.project.summary-placeholder": {
     "message": "Цей проєкт додає…"
@@ -1923,7 +1956,7 @@
     "message": "Назва"
   },
   "dashboard.projects.table.select-all-bulk-editable": {
-    "message": "Обрати всі проєкти, які підтримують масове редагування"
+    "message": "Вибрати всі проєкти, які підтримують масове редагування"
   },
   "dashboard.projects.table.status": {
     "message": "Статус"
@@ -2185,6 +2218,9 @@
   },
   "error.generic.401.signed-in-as": {
     "message": "Зараз ви ввійшли як:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Не вдалося змінити обліковий запис. Спробуйте ще раз."
   },
   "error.generic.401.title": {
     "message": "Ви не маєте доступу до цієї сторінки"
@@ -2469,7 +2505,7 @@
     "message": "Знайдіть збірку. Тепер це сервер."
   },
   "hosting-marketing.why.modern-reliable-hosting": {
-    "message": "Відчуйте сучасний, надійний хостинг"
+    "message": "Відчуйте сучасну, надійну мережеву гру"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
     "message": "Сервери Modrinth Hosting працюють на <contrast>високопродуктивних процесорах AMD з оперативною пам’яттю DDR5</contrast> і працюють на власному програмному забезпеченні, що забезпечує безперебійну роботу вашого сервера."
@@ -2656,9 +2692,6 @@
   },
   "layout.action.new-project": {
     "message": "Новий проєкт"
-  },
-  "layout.action.new-server-project": {
-    "message": "Новий сервер"
   },
   "layout.action.publish": {
     "message": "Опублікувати"
@@ -2867,6 +2900,9 @@
   "layout.nav.active-reports": {
     "message": "Активні скарги"
   },
+  "layout.nav.add-account": {
+    "message": "Додати обліковий запис"
+  },
   "layout.nav.discover": {
     "message": "Дослідити"
   },
@@ -2897,6 +2933,9 @@
   "layout.nav.projects": {
     "message": "Проєкти"
   },
+  "layout.nav.remove-account": {
+    "message": "Видалити обліковий запис"
+  },
   "layout.nav.revenue": {
     "message": "Дохід"
   },
@@ -2905,6 +2944,12 @@
   },
   "layout.nav.search": {
     "message": "Пошук"
+  },
+  "layout.nav.switch-account": {
+    "message": "Змінити обліковий запис"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Не вдалося змінити обліковий запис. Спробуйте ще раз."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Оновитись до Modrinth+"
@@ -3669,7 +3714,7 @@
     "message": "Ваш проєкт є приватним, тобто доступ до нього маєте лише ви та запрошені вами люди."
   },
   "project.moderation.admonition.approved.body.public": {
-    "message": "Ваш проєкт опубліковано та доступний для виявлення на Modrinth."
+    "message": "Ваш проєкт опубліковано і тепер його можна знайти на Modrinth."
   },
   "project.moderation.admonition.approved.body.unlisted": {
     "message": "Ваш проєкт приватний. Доступ до нього можна отримати лише за прямим посиланням. Його неможливо знайти на Modrinth."
@@ -4239,16 +4284,16 @@
     "message": "Справді бажаєте видалити цю версію?"
   },
   "project.versions.edit-details-option": {
-    "message": "Змінити деталі"
+    "message": "Редагувати деталі"
   },
   "project.versions.edit-files-option": {
-    "message": "Змінити файли"
+    "message": "Редагувати файли"
   },
   "project.versions.edit-metadata-option": {
-    "message": "Змінити метадані"
+    "message": "Редагувати метадані"
   },
   "project.versions.edit-version-tooltip": {
-    "message": "Змінити версію"
+    "message": "Редагувати версію"
   },
   "project.versions.open-in-new-tab-option": {
     "message": "Відкрити в новій укладці"
@@ -5310,7 +5355,7 @@
     "message": "Справді бажаєте видалити цей токен?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Редагувати особистий токен доступу"
+    "message": "Редагування особистого токену доступу"
   },
   "settings.pats.token.action.edit": {
     "message": "Редагувати токен"
@@ -5436,16 +5481,16 @@
     "message": "Завантажити {version} ({size})"
   },
   "version.edit.button": {
-    "message": "Змінити"
+    "message": "Редагувати"
   },
   "version.edit.details": {
-    "message": "Змінити деталі"
+    "message": "Редагувати деталі"
   },
   "version.edit.files": {
-    "message": "Змінити файли"
+    "message": "Редагувати файли"
   },
   "version.edit.metadata": {
-    "message": "Змінити метадані"
+    "message": "Редагувати метадані"
   },
   "version.environment.none.description": {
     "message": "Середовище для цієї версії не було вказано."
@@ -5475,7 +5520,7 @@
     "message": "Зібрати в мод"
   },
   "version.package-as-mod.description": {
-    "message": "Це створить нову версію з підтримкою обраних завантажувачів. Вас буде перенаправлено на нову версію, яку зможете змінювати на свій смак."
+    "message": "Це створить нову версію з підтримкою обраних завантажувачів. Вас буде перенаправлено на нову версію, яку зможете редагувати на свій смак."
   },
   "version.package-as-mod.header": {
     "message": "Спакувати пакет даних як мод"

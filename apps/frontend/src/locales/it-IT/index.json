@@ -705,7 +705,7 @@
     "message": "che tu abbia mai usato prima"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Screenshot di Modrinth App con un'istanza Cobblemon aperta sulla pagina 'Contenuto'."
+    "message": "Screenshot di Modrinth App con un'istanza di Cobblemon aperta sulla pagina \"Contenuto\"."
   },
   "app-marketing.hero.description": {
     "message": "Modrinth App è un launcher unico e open source che ti permette di giocare alle tue mod preferite e di tenerle aggiornate, il tutto in un unico e pratico pacchetto."
@@ -812,6 +812,33 @@
   "auth.create-account.username.placeholder": {
     "message": "Inserisci il nome utente"
   },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Inserisci il codice a 6 cifre dalla tua app di autenticazione, oppure uno dei tuoi codici di backup."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Autenticazione a due fattori"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "Inserisci il codice..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Continua con passkey"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "L'ultimo accesso è stato effettuato tramite {method, select, password {password} passkey {passkey} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Riautentica"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Accedi in un altro modo"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Accedi con {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} deve essere riautenticato."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Invia email di recupero"
   },
@@ -846,13 +873,19 @@
     "message": "Reimposta la password"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Inserisci il codice a 6 cifre dalla tua app di autenticazione oppure uno dei tuoi codici di backup."
+    "message": "Inserisci il codice a 6 cifre dalla tua app di autenticazione, oppure uno dei tuoi codici di backup."
   },
   "auth.sign-in.2fa.label": {
     "message": "Autenticazione a due fattori"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Inserisci il codice..."
+  },
+  "auth.sign-in.add-account": {
+    "message": "Aggiungi account"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Scegli un account da utilizzare su Modrinth App"
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continua con l'email"
@@ -868,6 +901,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Ultimo utilizzo"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Presto ritornerai all'app. Se non accade nulla, premi il pulsante sotto."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Vai su Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Apri Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Accesso effettuato"
   },
   "auth.sign-in.no-account": {
     "message": "Non hai un account?"
@@ -1018,6 +1063,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Approva con risposta"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Chiudi segnalazione"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Chiudi con risposta"
@@ -2180,6 +2228,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Accesso effettuato come:"
   },
+  "error.generic.401.switch-account": {
+    "message": "O passa a un altro account:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Impossibile cambiare account. Riprova più tardi."
+  },
   "error.generic.401.title": {
     "message": "Accesso non consentito"
   },
@@ -2190,7 +2244,7 @@
     "message": "Pagina non trovata"
   },
   "error.generic.451.subtitle": {
-    "message": "Questa pagina è stata bloccata per motivi legali, per esempio censura governativa o procedimenti legali in corso."
+    "message": "Questa pagina è stata bloccata per motivi legali, come censura governativa o altri procedimenti legali in corso."
   },
   "error.generic.451.title": {
     "message": "Contenuto non disponibile per motivi legali"
@@ -2666,6 +2720,9 @@
   "layout.action.tech-review": {
     "message": "Revisione tecnica"
   },
+  "layout.action.user-lookup": {
+    "message": "Utenti"
+  },
   "layout.avatar.alt": {
     "message": "La tua foto profilo"
   },
@@ -2861,6 +2918,9 @@
   "layout.nav.active-reports": {
     "message": "Segnalazioni attive"
   },
+  "layout.nav.add-account": {
+    "message": "Aggiungi account"
+  },
   "layout.nav.discover": {
     "message": "Esplora"
   },
@@ -2891,6 +2951,9 @@
   "layout.nav.projects": {
     "message": "Progetti"
   },
+  "layout.nav.remove-account": {
+    "message": "Rimuovi account"
+  },
   "layout.nav.revenue": {
     "message": "Guadagni"
   },
@@ -2899,6 +2962,12 @@
   },
   "layout.nav.search": {
     "message": "Cerca"
+  },
+  "layout.nav.switch-account": {
+    "message": "Cambia account"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Impossibile cambiare account. Riprova più tardi."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Abbonati a Modrinth+"
@@ -2928,7 +2997,7 @@
     "message": "Modrinth App si aprirà automaticamente..."
   },
   "modal.shared-instance.open-in-app.title": {
-    "message": "Aprendo Modrinth App"
+    "message": "Apri Modrinth App"
   },
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Perché usare Modrinth App"
@@ -5358,7 +5427,7 @@
     "message": "Ultime notizie da Modrinth"
   },
   "ui.latest-news-row.view-all": {
-    "message": "Leggi tutte le notizie"
+    "message": "Leggi altre notizie"
   },
   "ui.newsletter-button.subscribe": {
     "message": "Iscriviti"

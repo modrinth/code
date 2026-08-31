@@ -1151,9 +1151,6 @@
   "app.nav.modrinth-hosting": {
     "message": "استضافة Modrinth"
   },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "تسجيل الدخول إلى حساب Modrinth"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "الترقية إلى Modrinth+"
   },
@@ -2270,18 +2267,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "إعدادات التثبيت غير متاحة أثناء قفل هذه النسخة."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "متغيرات البيئة المخصصة"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "معلمات Java المخصصة"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "تثبيت Java المخصص"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "تخصيص الذاكرة حسب الطلب"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "أدخل المتغيرات البيئية..."
   },
@@ -2311,9 +2296,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "النافذة"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "إعدادات نافذة مخصّصة"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "ملء الشاشة"

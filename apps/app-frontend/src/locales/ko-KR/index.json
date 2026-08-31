@@ -1172,9 +1172,6 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth 호스팅"
   },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Modrinth 계정으로 로그인"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ 로 업그레이드"
   },
@@ -1997,18 +1994,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "이 인스턴스가 잠긴 상태에서는 설치 설정을 사용할 수 없습니다."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "사용자 지정 환경 변수"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "사용자 지정 Java 매개변수"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "사용자 지정 Java 설치"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "사용자 지정 메모리 할당"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "환경 변수를 입력하세요..."
   },
@@ -2038,9 +2023,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "창"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "창 맞춤 설정"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "전체 화면"

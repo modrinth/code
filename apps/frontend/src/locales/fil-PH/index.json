@@ -1637,9 +1637,6 @@
   "layout.action.new-project": {
     "message": "Bagong proyekto"
   },
-  "layout.action.new-server-project": {
-    "message": "Bagong server"
-  },
   "layout.action.publish": {
     "message": "Ilathala"
   },
