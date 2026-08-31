@@ -1,18 +1,14 @@
 <template>
 	<div class="relative h-full w-full">
-		<Teleport to="body">
-			<div class="relative z-[100]">
-				<ConfirmModal
-					ref="rollSftpModal"
-					:title="formatMessage(messages.rollCredentialsModalTitle)"
-					:description="formatMessage(messages.rollCredentialsModalDescription)"
-					:proceed-label="formatMessage(messages.rollCredentials)"
-					:proceed-icon="RefreshCwIcon"
-					:markdown="false"
-					@proceed="confirmRollSftp"
-				/>
-			</div>
-		</Teleport>
+		<ConfirmModal
+			ref="rollSftpModal"
+			:title="formatMessage(messages.rollCredentialsModalTitle)"
+			:description="formatMessage(messages.rollCredentialsModalDescription)"
+			:proceed-label="formatMessage(messages.rollCredentials)"
+			:proceed-icon="RefreshCwIcon"
+			:markdown="false"
+			@proceed="confirmRollSftp"
+		/>
 
 		<div class="flex h-full w-full flex-col gap-4">
 			<div class="flex flex-col gap-6">
