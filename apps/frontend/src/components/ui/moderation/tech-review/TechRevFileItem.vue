@@ -3,7 +3,7 @@ import { RightArrowIcon, VersionIcon } from '@modrinth/assets'
 import { Button, ButtonLink, useFormatBytes } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { getFileDetailCount, getVersionLabel, getVersionPageHref, truncateMiddle } from './helpers'
+import { getFileDetailCount, getVersionPageHref, truncateMiddle } from './helpers'
 import TechRevFileActions from './TechRevFileActions.vue'
 import TechRevFlagBadges from './TechRevFlagBadges.vue'
 import type { FlattenedFileReport, TechRevProjectRef } from './types'
@@ -28,7 +28,6 @@ const allFlagsMarked = computed(
 )
 
 const truncatedFileName = computed(() => truncateMiddle(props.file.file_name, 50))
-const versionLabel = computed(() => getVersionLabel(props.file))
 const versionHref = computed(() => getVersionPageHref(props.project, props.file.version_id))
 const fileSizeLabel = computed(() => formatBytes(props.file.file_size))
 

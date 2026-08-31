@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, CodeIcon, ExternalIcon, VersionIcon, TimerIcon } from '@modrinth/assets'
+import { CheckIcon, CodeIcon, ExternalIcon, TimerIcon, VersionIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonLink,
@@ -15,8 +15,8 @@ import { computed, provide, ref, watch } from 'vue'
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import {
 	getHighestSeverity,
-	getVersionPageHref,
 	getSeverityBadgeColor,
+	getVersionPageHref,
 } from '~/components/ui/moderation/tech-review/helpers'
 import TechRevFileActions from '~/components/ui/moderation/tech-review/TechRevFileActions.vue'
 import TechRevFileDetailTab from '~/components/ui/moderation/tech-review/TechRevFileDetailTab.vue'
