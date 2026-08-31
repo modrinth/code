@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, CodeIcon, ExternalIcon, TimerIcon } from '@modrinth/assets'
+import { CheckIcon, CodeIcon, ExternalIcon, VersionIcon, TimerIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonLink,
@@ -15,6 +15,7 @@ import { computed, provide, ref, watch } from 'vue'
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import {
 	getHighestSeverity,
+	getVersionPageHref,
 	getSeverityBadgeColor,
 } from '~/components/ui/moderation/tech-review/helpers'
 import TechRevFileActions from '~/components/ui/moderation/tech-review/TechRevFileActions.vue'
@@ -269,7 +270,8 @@ watch(
 								v-tooltip="'Open sources in new tab'"
 								:href="props.item.project.link_urls?.['source']?.url"
 								target="_blank"
-								class="!w-9 !rounded-full !px-0"
+								circular
+								icon-only
 							>
 								<CodeIcon />
 							</ButtonLink>
@@ -299,8 +301,20 @@ watch(
 					class="border border-solid border-surface-4 bg-surface-2"
 					@tab-click="handleTabClick"
 				/>
-
-				<TechRevFileActions v-if="currentTab === 'File' && selectedFile" :file="selectedFile" />
+				<div v-if="currentTab === 'File' && selectedFile" class="flex items-center gap-2">
+					<div class="flex items-center gap-1">
+						<ButtonLink
+							v-tooltip="'View version'"
+							type="outlined"
+							target="_blank"
+							:href="getVersionPageHref(item.project, selectedFile.version_id)"
+						>
+							<VersionIcon aria-hidden="true" />
+							{{ selectedFile.version_number }}
+						</ButtonLink>
+					</div>
+					<TechRevFileActions :file="selectedFile" />
+				</div>
 			</div>
 		</div>
 

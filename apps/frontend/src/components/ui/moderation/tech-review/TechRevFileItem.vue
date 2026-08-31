@@ -53,22 +53,18 @@ function viewFlags() {
 			>
 				<VersionIcon aria-hidden="true" />
 			</ButtonLink>
-			<div class="flex flex-col" :class="{ 'opacity-50': allFlagsMarked }">
-				<span
-					v-tooltip="file.file_name"
-					class="py-2 font-medium text-contrast"
-					:aria-label="`View flags for ${file.file_name}`"
-					tabindex="0"
-					:class="{ 'cursor-pointer hover:underline': hasFlags }"
-					@click="viewFlags"
-				>
-					{{ truncatedFileName }}
-				</span>
-				<span class="-mt-1.5 text-xs text-secondary">
-					Version {{ versionLabel }} / {{ file.version_id }}
-				</span>
+			<div
+				v-tooltip="file.file_name === truncatedFileName ? undefined : file.file_name"
+				class="group flex h-9 cursor-pointer flex-col justify-center rounded-sm font-medium text-contrast hover:underline"
+				:class="{ 'opacity-50': allFlagsMarked }"
+				@click="viewFlags"
+			>
+				{{ truncatedFileName }}
 			</div>
-			<div class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1">
+			<div
+				class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
+				:class="{ 'opacity-50': allFlagsMarked }"
+			>
 				<span class="text-sm font-medium text-secondary">{{ fileSizeLabel }}</span>
 			</div>
 			<TechRevFlagBadges v-if="hasFlags" :details="details" />

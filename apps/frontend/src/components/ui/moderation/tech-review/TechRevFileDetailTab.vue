@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ChevronRightIcon } from '@modrinth/assets'
-import { injectNotificationManager, Toggle } from '@modrinth/ui'
+import { CopyCode, injectNotificationManager, Toggle } from '@modrinth/ui'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
-import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from './helpers'
+import {
+	canUpdateGlobalDetail,
+	getFileDetailCount,
+	getVersionPageHref,
+	verdictToDecision,
+} from './helpers'
 import TechRevClassItem from './TechRevClassItem.vue'
 import TechRevVerdictButtons from './TechRevVerdictButtons.vue'
 import type {

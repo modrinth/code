@@ -114,7 +114,7 @@ function createSlicerLink(url: string, group: ClassGroup | undefined) {
 			class="flex cursor-pointer items-center justify-between rounded-xl px-2 py-1 transition-colors duration-200 hover:bg-surface-3"
 			@click="emit('toggle')"
 		>
-			<div class="my-auto flex items-center gap-2">
+			<div class="flex grow items-center gap-2">
 				<IconButton
 					type="quiet"
 					label="Toggle details"
@@ -126,7 +126,7 @@ function createSlicerLink(url: string, group: ClassGroup | undefined) {
 
 				<span
 					v-tooltip="pathTooltip"
-					class="font-mono text-xs font-semibold"
+					class="font-mono text-sm font-semibold"
 					:class="{ 'opacity-50': allFlagsMarked }"
 				>
 					{{ truncatedPath }}
@@ -134,28 +134,30 @@ function createSlicerLink(url: string, group: ClassGroup | undefined) {
 
 				<TechRevFlagBadges :details="flagDetails" />
 
-				<ButtonLink
-					v-tooltip="'Open file in slicer'"
-					type="outlined"
-					:href="createSlicerLink(file.download_url, classItem)"
-					:target="file.file_id"
-					circular
-					icon-only
-					@click="$event.stopPropagation()"
-				>
-					<ExternalIcon />
-				</ButtonLink>
-				<Transition name="fade">
-					<div
-						v-if="isLoadingSource"
-						class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
+				<div class="ml-auto flex items-center gap-2">
+					<Transition name="fade">
+						<div
+							v-if="isLoadingSource"
+							class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
+						>
+							<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
+								<LoaderCircleIcon class="size-4 animate-spin" />
+								Loading source...
+							</span>
+						</div>
+					</Transition>
+					<ButtonLink
+						v-tooltip="'Open file in slicer'"
+						type="outlined"
+						:href="createSlicerLink(file.download_url, classItem)"
+						:target="file.file_id"
+						circular
+						icon-only
+						@click="$event.stopPropagation()"
 					>
-						<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
-							<LoaderCircleIcon class="size-4 animate-spin" />
-							Loading source...
-						</span>
-					</div>
-				</Transition>
+						<ExternalIcon />
+					</ButtonLink>
+				</div>
 			</div>
 		</div>
 
