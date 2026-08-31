@@ -160,11 +160,13 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 	}
 
 	function applySftpCredentials(serverId: string, credentials: Archon.Servers.v1.SftpCredentials) {
-		queryClient.setQueryData<Archon.Servers.v0.Server>(legacyServerDetailKey(serverId), (current) =>
-			current ? { ...current, ...credentials } : current,
+		queryClient.setQueryData<Archon.Servers.v0.Server>(
+			legacyServerDetailKey(serverId),
+			(current) => (current ? { ...current, ...credentials } : current),
 		)
-		queryClient.setQueryData<Archon.Servers.v1.ServerFull>(serverV1DetailKey(serverId), (current) =>
-			current ? { ...current, ...credentials } : current,
+		queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
+			serverV1DetailKey(serverId),
+			(current) => (current ? { ...current, ...credentials } : current),
 		)
 	}
 
