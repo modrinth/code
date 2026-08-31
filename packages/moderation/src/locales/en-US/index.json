@@ -35,6 +35,12 @@
   "nags.add-links.title": {
     "defaultMessage": "Add external links"
   },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Headers of the same level cannot be placed next to each other. Combine them or add content between them."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Separate adjacent headers"
+  },
   "nags.all-languages.description": {
     "defaultMessage": "You've selected all available language options. Please list only the languages your server actively supports."
   },
@@ -58,6 +64,12 @@
   },
   "nags.check-disclosures.title": {
     "defaultMessage": "Check content disclosures"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Your description cannot end with a header. Add content below it or remove it."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "Add content after the final header"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Your description is too brief. Add more to clearly describe the project's purpose and function."

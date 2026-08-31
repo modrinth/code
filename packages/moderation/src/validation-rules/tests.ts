@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
+import type { ProjectValidationContext } from '../types/nags.ts'
 import { evaluateRules } from './evaluate-rules.ts'
 import {
 	analyzeHeaderLength,
+	analyzeHeaderStructure,
 	analyzeImageContent,
 	BANNED_DESCRIPTION_LINK_DOMAINS,
 	countText,
@@ -20,6 +22,7 @@ import {
 	projectSummaryMatchesName,
 	validateProjectSummary,
 } from './rules/summary.ts'
+import { projectVersionValidationRules } from './rules/versions.ts'
 import { toFieldMessages } from './to-field-messages.ts'
 import { toNags } from './to-nags.ts'
 import type { ValidationRuleSet } from './types.ts'
@@ -113,6 +116,26 @@ test('derives project name nags from the same matching rule', () => {
 	assert.equal(nag?.title.id, 'nags.minecraft-title-clause.title')
 	assert.equal(nag?.link?.path, 'settings')
 	assert.equal(nag?.link?.title.id, 'nags.edit-title.title')
+})
+
+test('requires known environments for mods and modpacks', () => {
+	const validateEnvironment = (
+		projectTypes: ProjectValidationContext['projectV3']['project_types'],
+		environment?: ProjectValidationContext['projectV3']['environment'],
+	) =>
+		projectVersionValidationRules['select-environment'].evaluate({
+			projectV3: { project_types: projectTypes, environment },
+		} as ProjectValidationContext).valid
+
+	for (const projectType of ['mod', 'modpack'] as const) {
+		assert.equal(validateEnvironment([projectType]), false)
+		assert.equal(validateEnvironment([projectType], []), false)
+		assert.equal(validateEnvironment([projectType], ['unknown']), false)
+		assert.equal(validateEnvironment([projectType], ['client_and_server', 'unknown']), false)
+		assert.equal(validateEnvironment([projectType], ['client_and_server']), true)
+	}
+
+	assert.equal(validateEnvironment(['resourcepack']), true)
 })
 
 test('validates summary content from one rule set', () => {
@@ -319,6 +342,50 @@ test('validates rendered heading levels one through three using grapheme counts'
 		hasLongHeaders: true,
 		longHeaders: [emoji.repeat(81)],
 	})
+})
+
+test('rejects descriptions that end with a header', () => {
+	for (const description of [
+		'Some content\n\n# Final header',
+		'Some content\n\n###### Final header',
+		'Some content\n\nFinal header\n---',
+		'Some content\n\n<h3>Final header</h3>',
+	]) {
+		assert.equal(analyzeHeaderStructure(description).descriptionEndsWithHeader, true)
+	}
+
+	assert.equal(
+		analyzeHeaderStructure('# Header\n\nContent beneath the header').descriptionEndsWithHeader,
+		false,
+	)
+})
+
+test('rejects adjacent headers of the same level from one through three', () => {
+	for (const description of [
+		'# First\n# Second',
+		'## First\n\n## Second',
+		'<h3>First</h3>\n<h3>Second</h3>',
+	]) {
+		assert.equal(analyzeHeaderStructure(description).hasAdjacentSameLevelHeaders, true)
+	}
+
+	for (const description of [
+		'# First\n## Second',
+		'## First\n\nContent between them\n\n## Second',
+		'#### First\n#### Second',
+	]) {
+		assert.equal(analyzeHeaderStructure(description).hasAdjacentSameLevelHeaders, false)
+	}
+})
+
+test('reports invalid description header structure', () => {
+	const description = `${'Useful description content. '.repeat(8)}\n\n## First\n## Second`
+	assert.deepEqual(
+		validateProjectDescription(description)
+			.filter(({ code }) => ['description-ends-with-header', 'adjacent-headers'].includes(code))
+			.map(({ code }) => code),
+		['description-ends-with-header', 'adjacent-headers'],
+	)
 })
 
 test('requires 125 readable description characters', () => {

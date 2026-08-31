@@ -9,6 +9,7 @@ export const EXTERNAL_LINKS_BLOCK_LIST = [
 	{ label: 'Bilibili', domains: ['bilibili.com'] },
 	{ label: 'Bluesky', domains: ['bsky.app'] },
 	{ label: 'Twitch', domains: ['twitch.tv'] },
+	{ label: 'YouTube', domains: ['youtube.com', 'youtu.be'] },
 	{ label: 'Reddit', domains: ['reddit.com', 'redd.it'] },
 	{ label: 'Modrinth', domains: ['modrinth.com'] },
 	{ label: 'Minecraft', domains: ['minecraft.net'] },

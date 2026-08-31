@@ -1,7 +1,7 @@
 import { defineMessages } from '@modrinth/ui/i18n'
 import { renderString } from '@modrinth/utils/parse.ts'
 import LinkifyIt from 'linkify-it'
-import { parse } from 'node-html-parser'
+import { type HTMLElement, type Node, NodeType, parse } from 'node-html-parser'
 import tlds from 'tlds' with { type: 'json' }
 
 import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
@@ -45,6 +45,14 @@ const messages = defineMessages({
 	shortenHeaders: {
 		id: 'nags.long-headers.title',
 		defaultMessage: 'Shorten headers',
+	},
+	addContentAfterHeader: {
+		id: 'nags.description-ends-with-header.title',
+		defaultMessage: 'Add content after the final header',
+	},
+	separateHeaders: {
+		id: 'nags.adjacent-headers.title',
+		defaultMessage: 'Separate adjacent headers',
 	},
 	addImageAltText: {
 		id: 'nags.missing-alt-text.title',
@@ -94,6 +102,14 @@ const messages = defineMessages({
 		id: 'nags.long-headers.description',
 		defaultMessage:
 			'{count, plural, one {# header} other {# headers}} in your description {count, plural, one {is} other {are}} too long. Headers should be concise and act as section titles, not full sentences.',
+	},
+	descriptionEndsWithHeader: {
+		id: 'nags.description-ends-with-header.description',
+		defaultMessage: 'Your description cannot end with a header.',
+	},
+	adjacentHeaders: {
+		id: 'nags.adjacent-headers.description',
+		defaultMessage: 'Headers of the same level cannot be placed next to each other.',
 	},
 	missingAltText: {
 		id: 'nags.missing-alt-text.description',
@@ -166,6 +182,56 @@ export function analyzeHeaderLength(markdown: string): {
 	)
 
 	return { hasLongHeaders: longHeaders.length > 0, longHeaders }
+}
+
+function isHeader(element: HTMLElement, minimumLevel = 1, maximumLevel = 6): boolean {
+	const match = /^h([1-6])$/i.exec(element.rawTagName)
+	if (!match) return false
+
+	const level = Number(match[1])
+	return level >= minimumLevel && level <= maximumLevel
+}
+
+function isMeaningfulNode(node: Node): boolean {
+	return (
+		node.nodeType === NodeType.ELEMENT_NODE ||
+		(node.nodeType === NodeType.TEXT_NODE && node.textContent.trim().length > 0)
+	)
+}
+
+function endsWithHeader(element: HTMLElement): boolean {
+	const lastNode = element.childNodes.findLast(isMeaningfulNode)
+	if (!lastNode || lastNode.nodeType !== NodeType.ELEMENT_NODE) return false
+
+	const lastElement = lastNode as HTMLElement
+	return isHeader(lastElement) || endsWithHeader(lastElement)
+}
+
+export function analyzeHeaderStructure(markdown: string): {
+	descriptionEndsWithHeader: boolean
+	hasAdjacentSameLevelHeaders: boolean
+} {
+	if (!markdown) {
+		return { descriptionEndsWithHeader: false, hasAdjacentSameLevelHeaders: false }
+	}
+
+	const renderedDescription = parse(renderString(markdown))
+	const hasAdjacentSameLevelHeaders = renderedDescription
+		.querySelectorAll('h1, h2, h3')
+		.some((header) => {
+			const siblings = header.parentNode?.childNodes ?? []
+			const nextNode = siblings.slice(siblings.indexOf(header) + 1).find(isMeaningfulNode)
+
+			return (
+				nextNode?.nodeType === NodeType.ELEMENT_NODE &&
+				(nextNode as HTMLElement).rawTagName.toLowerCase() === header.rawTagName.toLowerCase()
+			)
+		})
+
+	return {
+		descriptionEndsWithHeader: endsWithHeader(renderedDescription),
+		hasAdjacentSameLevelHeaders,
+	}
 }
 
 export function extractDescriptionText(markdown: string): string {
@@ -335,6 +401,26 @@ export const projectDescriptionValidationRules = {
 		presentation: {
 			message: messages.longHeaders,
 			nag: { title: messages.shortenHeaders, ...commonNagPresentation },
+		},
+	},
+	'description-ends-with-header': {
+		severity: 'error',
+		evaluate: (description) => ({
+			valid: !analyzeHeaderStructure(description ?? '').descriptionEndsWithHeader,
+		}),
+		presentation: {
+			message: messages.descriptionEndsWithHeader,
+			nag: { title: messages.addContentAfterHeader, ...commonNagPresentation },
+		},
+	},
+	'adjacent-headers': {
+		severity: 'error',
+		evaluate: (description) => ({
+			valid: !analyzeHeaderStructure(description ?? '').hasAdjacentSameLevelHeaders,
+		}),
+		presentation: {
+			message: messages.adjacentHeaders,
+			nag: { title: messages.separateHeaders, ...commonNagPresentation },
 		},
 	},
 	'missing-alt-text': {
