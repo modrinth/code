@@ -64,6 +64,10 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-remove',
 		defaultMessage: 'Failed to remove content',
 	},
+	failedToToggle: {
+		id: 'hosting.content.failed-to-toggle',
+		defaultMessage: 'Failed to enable or disable {name}',
+	},
 	failedToSetEnabledFor: {
 		id: 'hosting.content.failed-to-set-enabled-for',
 		defaultMessage: 'Failed to change where {name} is enabled',
@@ -622,6 +626,53 @@ const deleteMutation = useMutation({
 	},
 })
 
+const toggleEnabledMutation = useMutation({
+	mutationFn: async ({ addon, enabled }: { addon: Archon.Content.v1.Addon; enabled: boolean }) => {
+		const request: Archon.Content.v1.RemoveAddonRequest = {
+			filename: addon.filename,
+			kind: addon.kind,
+		}
+		if (enabled) {
+			await client.archon.content_v1.enableAddon(serverId, worldId.value!, request)
+		} else {
+			await client.archon.content_v1.disableAddon(serverId, worldId.value!, request)
+		}
+	},
+	onMutate: async ({ addon, enabled }) => {
+		const targetQueryKey = getAddonQueryKey(addon)
+		await queryClient.cancelQueries({ queryKey: targetQueryKey })
+		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(targetQueryKey)
+		queryClient.setQueryData(targetQueryKey, (oldData: Archon.Content.v1.Addons | undefined) => {
+			if (!oldData) return oldData
+			return {
+				...oldData,
+				addons: (oldData.addons ?? []).map((candidate) =>
+					candidate.filename === addon.filename && candidate.kind === addon.kind
+						? { ...candidate, disabled: !enabled }
+						: candidate,
+				),
+			}
+		})
+		return { previousData, targetQueryKey }
+	},
+	onError: (error, { addon }, context) => {
+		if (context?.previousData) {
+			queryClient.setQueryData(context.targetQueryKey, context.previousData)
+		}
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToToggle, {
+				name: friendlyAddonName(addon),
+			}),
+			text: error instanceof Error ? error.message : undefined,
+		})
+	},
+	onSettled: () => {
+		void queryClient.invalidateQueries({ queryKey: queryKey.value })
+		void queryClient.invalidateQueries({ queryKey: modpackContentQueryKey.value })
+	},
+})
+
 type SetEnabledForVariables = {
 	addon: Archon.Content.v1.Addon
 	sides: ContentSide[]
@@ -733,15 +784,10 @@ async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled
 }
 
 async function handleToggleEnabled(item: ContentItem) {
-	if (contentActionDisabled.value || !item.enabledFor) return
-	if (item.enabledFor.server !== item.enabledFor.player) return
+	if (contentActionDisabled.value) return
 	const addon = getAddonForItem(item)
 	if (!addon) return
-	await setEnabledForMutation.mutateAsync({
-		addon,
-		sides: ['server', 'player'],
-		enabled: !item.enabledFor.server,
-	})
+	await toggleEnabledMutation.mutateAsync({ addon, enabled: addon.disabled })
 }
 
 async function handleModpackSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
@@ -1000,7 +1046,7 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 		id: addon.id ?? addon.filename,
 		external: !addon.project_id,
 		source_kind: addon.from_modpack ? 'modrinth_modpack' : undefined,
-		enabled: serverEnabled || playerEnabled,
+		enabled: !addon.disabled,
 		enabledFor: {
 			server: serverEnabled,
 			player: playerEnabled,
@@ -1320,8 +1366,6 @@ provideContentManager({
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
 	setEnabledFor: handleSetEnabledFor,
-	canToggleItem: (item) =>
-		item.enabledFor !== undefined && item.enabledFor.server === item.enabledFor.player,
 	deleteItem: handleDeleteItem,
 	bulkDeleteItems: handleBulkDelete,
 	refresh: async () => {

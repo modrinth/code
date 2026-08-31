@@ -750,7 +750,7 @@ async function confirmDisable() {
 	if (itemsToDisable.length === 1) {
 		const item = itemsToDisable[0]
 		const id = getItemId(item)
-		if (!item.enabledFor) markChanging(id)
+		markChanging(id)
 		try {
 			if (ctx.bulkDisableItems) {
 				await ctx.bulkDisableItems(itemsToDisable)
@@ -758,7 +758,7 @@ async function confirmDisable() {
 				await ctx.toggleEnabled?.(item)
 			}
 		} finally {
-			if (!item.enabledFor) unmarkChanging(id)
+			unmarkChanging(id)
 		}
 		return
 	}
@@ -777,11 +777,11 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 		await promptDisableItems([item])
 		return
 	}
-	if (!item.enabledFor) markChanging(id)
+	markChanging(id)
 	try {
 		await ctx.toggleEnabled(item)
 	} finally {
-		if (!item.enabledFor) unmarkChanging(id)
+		unmarkChanging(id)
 	}
 }
 

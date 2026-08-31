@@ -54,10 +54,6 @@ const messages = defineMessages({
 		id: 'content.card.frozen',
 		defaultMessage: 'This project is locked to its current version until unfrozen.',
 	},
-	useEnabledForControls: {
-		id: 'content.card.use-enabled-for-controls',
-		defaultMessage: 'Use the Enabled for controls to enable or disable this content.',
-	},
 })
 
 interface Props {
@@ -141,16 +137,8 @@ const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
-const isToggleIndeterminate = computed(
-	() => props.enabledFor !== undefined && props.enabledFor.server !== props.enabledFor.player,
-)
-const isToggleDisabled = computed(
-	() => isDisabled.value || props.toggleDisabled || isToggleIndeterminate.value,
-)
+const isToggleDisabled = computed(() => isDisabled.value || props.toggleDisabled)
 const toggleTooltip = computed(() => {
-	if (isToggleIndeterminate.value) {
-		return formatMessage(messages.useEnabledForControls)
-	}
 	if (!isToggleDisabled.value) return undefined
 	return props.toggleDisabledTooltip ?? props.disabledTooltip ?? undefined
 })
@@ -186,7 +174,8 @@ const installTooltip = computed(() => {
 			'gap-3': inline,
 			'justify-between': !enabledFor,
 			'opacity-50 grayscale': disabled && !installing,
-			'opacity-50': installing || (enabledFor && isEnabledForDisabled && !disabled),
+			'opacity-50':
+				installing || (enabledFor && (isEnabledForDisabled || enabled === false) && !disabled),
 		}"
 	>
 		<div
@@ -444,7 +433,6 @@ const installTooltip = computed(() => {
 				v-tooltip="toggleTooltip"
 				:model-value="enabled"
 				:disabled="isToggleDisabled"
-				:indeterminate="isToggleIndeterminate"
 				:aria-label="project.title"
 				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"

@@ -24,7 +24,8 @@ const messages = defineMessages({
 	},
 	enabledForDescription: {
 		id: 'content.enabled-for.description',
-		defaultMessage: 'Choose where this content is enabled. Turn both off to disable it.',
+		defaultMessage:
+			'Choose where this content is enabled. Use the Actions toggle to enable or disable it entirely.',
 	},
 })
 
