@@ -7,7 +7,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { useReadyState } from '#ui/composables'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
@@ -50,11 +50,35 @@ const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
 
+const messages = defineMessages({
+	zipCreated: {
+		id: 'servers.files.zip-created',
+		defaultMessage: 'ZIP created',
+	},
+	zipCreatedDescription: {
+		id: 'servers.files.zip-created-description',
+		defaultMessage: 'Created {destination}',
+	},
+	zipFailed: {
+		id: 'servers.files.zip-failed',
+		defaultMessage: 'Could not create ZIP',
+	},
+	downloadAllFailed: {
+		id: 'servers.files.download-all-failed',
+		defaultMessage: 'Could not download server files',
+	},
+})
+
+const zippingFolder = ref(false)
+const downloadingAllFiles = ref(false)
+
 const serverBusy = computed(() => busyReasons.value.length > 0)
 const busyTooltip = computed(() =>
 	busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
 )
-const fileWriteDisabled = computed(() => !canWriteFiles.value || serverBusy.value)
+const fileWriteDisabled = computed(
+	() => !canWriteFiles.value || serverBusy.value || zippingFolder.value,
+)
 const fileWriteDisabledTooltip = computed(() =>
 	canWriteFiles.value ? busyTooltip.value : permissionDeniedMessage.value,
 )
@@ -362,12 +386,7 @@ async function downloadFile(path: string, fileName: string): Promise<void> {
 	try {
 		const fileData = await client.kyros.files_v0.downloadFile(path)
 		if (fileData) {
-			const blob = new Blob([fileData], { type: 'application/octet-stream' })
-			const link = document.createElement('a')
-			link.href = window.URL.createObjectURL(blob)
-			link.download = fileName
-			link.click()
-			window.URL.revokeObjectURL(link.href)
+			saveBlob(fileData, fileName)
 		}
 	} catch {
 		addNotification({
@@ -375,6 +394,55 @@ async function downloadFile(path: string, fileName: string): Promise<void> {
 			text: 'Could not download the file.',
 			type: 'error',
 		})
+	}
+}
+
+function saveBlob(blob: Blob, fileName: string) {
+	const link = document.createElement('a')
+	link.href = window.URL.createObjectURL(blob)
+	link.download = fileName
+	link.click()
+	window.URL.revokeObjectURL(link.href)
+}
+
+async function downloadAllFiles(): Promise<void> {
+	if (!worldId.value || downloadingAllFiles.value) return
+	downloadingAllFiles.value = true
+	try {
+		const archive = await client.kyros.files_v1.downloadWorldZip(worldId.value)
+		saveBlob(archive, `${serverId}.zip`)
+	} catch (error) {
+		addNotification({
+			title: formatMessage(messages.downloadAllFailed),
+			text: error instanceof Error ? error.message : undefined,
+			type: 'error',
+		})
+	} finally {
+		downloadingAllFiles.value = false
+	}
+}
+
+async function zipFolder(path: string): Promise<void> {
+	if (!worldId.value || fileWriteDisabled.value) return
+	zippingFolder.value = true
+	try {
+		const result = await client.kyros.files_v1.zipFolder(worldId.value, { path })
+		addNotification({
+			title: formatMessage(messages.zipCreated),
+			text: formatMessage(messages.zipCreatedDescription, {
+				destination: result.destination,
+			}),
+			type: 'success',
+		})
+		refreshList()
+	} catch (error) {
+		addNotification({
+			title: formatMessage(messages.zipFailed),
+			text: error instanceof Error ? error.message : undefined,
+			type: 'error',
+		})
+	} finally {
+		zippingFolder.value = false
 	}
 }
 
@@ -455,6 +523,9 @@ provideFileManager({
 	readFileAsBlob,
 	writeFile,
 	downloadFile,
+	downloadAllFiles,
+	downloadingAllFiles,
+	zipFolder,
 	uploadFiles,
 	cancelUpload,
 	uploadState,

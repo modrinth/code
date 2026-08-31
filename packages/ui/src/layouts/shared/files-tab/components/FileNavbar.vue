@@ -108,6 +108,17 @@
 					@update:model-value="$emit('update:searchQuery', $event)"
 				/>
 
+				<IconButton
+					v-if="showDownloadAll"
+					v-tooltip="formatMessage(messages.downloadAll)"
+					type="outlined"
+					:label="formatMessage(messages.downloadAll)"
+					:disabled="downloadAllDisabled"
+					@click="$emit('downloadAll')"
+				>
+					<DownloadIcon aria-hidden="true" class="h-5 w-5" />
+				</IconButton>
+
 				<Button
 					v-if="showRefreshButton"
 					type="outlined"
@@ -222,6 +233,7 @@ import {
 	BoxIcon,
 	ChevronRightIcon,
 	CurseForgeIcon,
+	DownloadIcon,
 	DropdownIcon,
 	FileArchiveIcon,
 	FolderOpenIcon,
@@ -291,6 +303,10 @@ const messages = defineMessages({
 		id: 'files.navbar.install-curseforge-pack',
 		defaultMessage: 'Install CurseForge pack',
 	},
+	downloadAll: {
+		id: 'files.navbar.download-all',
+		defaultMessage: 'Download all',
+	},
 	shareToMclogs: {
 		id: 'files.navbar.share-to-mclogs',
 		defaultMessage: 'Share to mclo.gs',
@@ -311,6 +327,8 @@ const props = defineProps<{
 	searchQuery: string
 	showRefreshButton?: boolean
 	showInstallFromUrl?: boolean
+	showDownloadAll?: boolean
+	downloadAllDisabled?: boolean
 	baseId: string
 	disabled?: boolean
 	disabledTooltip?: string
@@ -328,6 +346,7 @@ const emit = defineEmits<{
 	refresh: []
 	share: []
 	find: []
+	downloadAll: []
 }>()
 
 const refreshing = ref(false)

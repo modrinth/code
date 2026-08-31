@@ -31,6 +31,8 @@
 					:search-query="searchQuery"
 					:show-refresh-button="showRefreshButton"
 					:show-install-from-url="ctx.showInstallFromUrl"
+					:show-download-all="!!ctx.downloadAllFiles"
+					:download-all-disabled="ctx.downloadingAllFiles?.value"
 					:base-id="baseId"
 					:disabled="isBusy"
 					:disabled-tooltip="busyTooltip"
@@ -43,6 +45,7 @@
 					@upload-zip="() => {}"
 					@unzip-from-url="showUnzipFromUrlModal"
 					@refresh="ctx.refresh"
+					@download-all="ctx.downloadAllFiles?.()"
 					@share="() => fileEditorRef?.shareToMclogs()"
 					@find="() => fileEditorRef?.toggleFind()"
 				/>
@@ -90,6 +93,7 @@
 									@delete="() => showDeleteModal(item)"
 									@rename="() => showRenameModal(item)"
 									@download="() => handleDownload(item)"
+									@zip="() => handleZip(item)"
 									@move="() => showMoveModal(item)"
 									@move-direct-to="handleDirectMove"
 									@edit="() => handleEditFile(item)"
@@ -471,6 +475,11 @@ async function handleDownload(item: FileItem) {
 	if (item.type === 'file') {
 		await ctx.downloadFile(item.path, item.name)
 	}
+}
+
+async function handleZip(item: FileItem) {
+	if (isBusy.value || item.type !== 'directory' || !ctx.zipFolder) return
+	await ctx.zipFolder(item.path)
 }
 
 // Extract

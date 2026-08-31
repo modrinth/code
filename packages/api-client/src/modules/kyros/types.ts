@@ -28,6 +28,17 @@ export namespace Kyros {
 	}
 
 	export namespace Files {
+		export namespace v1 {
+			export interface ZipFolderRequest {
+				path: string
+			}
+
+			export interface FileMutationResponse {
+				source: string
+				destination: string
+			}
+		}
+
 		export namespace v0 {
 			export interface DirectoryItem {
 				name: string
