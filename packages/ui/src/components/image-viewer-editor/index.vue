@@ -34,16 +34,11 @@ const emit = defineEmits<{
 
 const activeId = ref<string | null>(null)
 const mode = ref<ImageViewerEditorMode>('view')
-const titleContrast = ref<'dark' | 'light'>('light')
-const descriptionContrast = ref<'dark' | 'light'>('light')
 const closeAfterEditing = ref(false)
 const editorComponent = ref<InstanceType<typeof Editor>>()
-const titleElement = ref<HTMLElement>()
-const descriptionElement = ref<HTMLElement>()
 const context = injectImageViewerEditor(null)
 const itemDataCache = new Map<string, Promise<ImageViewerEditorData>>()
 const itemImageCache = new Map<string, HTMLImageElement>()
-let headingContrastTimer: ReturnType<typeof setTimeout> | undefined
 
 const activeIndex = computed(() => props.items.findIndex((item) => item.id === activeId.value))
 const activeItem = computed(() => props.items[activeIndex.value] ?? null)
@@ -129,11 +124,8 @@ function preloadItemsAround(index: number) {
 function show(index: number) {
 	const item = props.items[index]
 	if (!item) return
-	cancelHeadingContrastUpdate()
 	preloadItemsAround(index)
 	if (activeId.value === null) {
-		titleContrast.value = 'light'
-		descriptionContrast.value = 'light'
 		context?.onShow?.()
 	}
 	activeId.value = item.id
@@ -165,7 +157,6 @@ function finishEditing() {
 
 function hide() {
 	if (activeId.value === null || props.saving) return
-	cancelHeadingContrastUpdate()
 	activeId.value = null
 	mode.value = 'view'
 	closeAfterEditing.value = false
@@ -177,31 +168,10 @@ function hide() {
 
 function navigate(offset: number, direction: 'next' | 'previous') {
 	if (mode.value !== 'view' || props.items.length < 2) return
-	cancelHeadingContrastUpdate()
 	const index = (activeIndex.value + offset + props.items.length) % props.items.length
 	preloadItemsAround(index)
 	activeId.value = props.items[index].id
 	emit('navigate', props.items[index], index, direction)
-}
-
-function updateHeadingContrast() {
-	cancelHeadingContrastUpdate()
-	headingContrastTimer = setTimeout(() => {
-		headingContrastTimer = undefined
-		if (titleElement.value) {
-			titleContrast.value = editorComponent.value?.getTextContrast(titleElement.value) ?? 'light'
-		}
-		if (descriptionElement.value) {
-			descriptionContrast.value =
-				editorComponent.value?.getTextContrast(descriptionElement.value) ?? 'light'
-		}
-	}, 120)
-}
-
-function cancelHeadingContrastUpdate() {
-	if (headingContrastTimer === undefined) return
-	clearTimeout(headingContrastTimer)
-	headingContrastTimer = undefined
 }
 
 function next() {
@@ -237,7 +207,6 @@ function handleKeydown(event: KeyboardEvent) {
 onMounted(() => document.addEventListener('keydown', handleKeydown))
 onBeforeUnmount(() => {
 	document.removeEventListener('keydown', handleKeydown)
-	cancelHeadingContrastUpdate()
 	itemDataCache.clear()
 	itemImageCache.clear()
 	if (activeId.value !== null) context?.onHide?.()
@@ -261,20 +230,16 @@ defineExpose({ show, edit, hide, next, previous, markSavedAndView })
 				class="absolute inset-x-6 top-[calc(var(--top-bar-height,3rem)_+_1.5rem)] z-10 min-w-0"
 				@click.stop
 			>
-				<div class="w-fit min-w-0 max-w-full">
+				<div class="viewer-heading-text w-fit min-w-0 max-w-full">
 					<h2
 						v-if="activeItem.title"
-						ref="titleElement"
-						class="m-0 max-w-[min(42rem,70vw)] truncate text-base font-semibold leading-snug transition-colors duration-200 ease-out"
-						:class="titleContrast === 'dark' ? 'text-gray-950' : 'text-white'"
+						class="m-0 max-w-[min(42rem,70vw)] truncate text-base font-semibold leading-snug text-contrast"
 					>
 						{{ activeItem.title }}
 					</h2>
 					<p
 						v-if="activeItem.description"
-						ref="descriptionElement"
-						class="mb-0 mt-1 max-w-[min(42rem,70vw)] truncate text-xs leading-snug opacity-70 transition-colors duration-200 ease-out"
-						:class="descriptionContrast === 'dark' ? 'text-gray-950' : 'text-white'"
+						class="mb-0 mt-1 max-w-[min(42rem,70vw)] truncate text-xs leading-snug text-white"
 					>
 						{{ activeItem.description }}
 					</p>
@@ -296,7 +261,6 @@ defineExpose({ show, edit, hide, next, previous, markSavedAndView })
 				@previous="previous"
 				@cancel="finishEditing"
 				@save="emit('save', $event)"
-				@image-ready="updateHeadingContrast"
 			>
 				<template #actions>
 					<slot name="actions" :item="activeItem" :index="activeIndex" :hide="hide" />
@@ -305,3 +269,9 @@ defineExpose({ show, edit, hide, next, previous, markSavedAndView })
 		</div>
 	</Teleport>
 </template>
+
+<style scoped>
+.viewer-heading-text {
+	filter: drop-shadow(0 2px 3px rgb(0 0 0 / 90%));
+}
+</style>

@@ -2,11 +2,15 @@
 import {
 	EditIcon,
 	// FolderOpenIcon,
+	RefreshCwIcon,
 	SaveIcon,
+	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Avatar,
 	Button,
+	CheckCircleButton,
 	commonMessages,
 	defineMessages,
 	IconButton,
@@ -26,7 +30,9 @@ import useMemorySlider from '@/composables/useMemorySlider'
 import {
 	get_command_history,
 	get_global_synced_options,
+	getInstanceIconUrl,
 	type GlobalSyncedOptions,
+	list as listInstances,
 	list_synced_servers,
 	// open_synced_options_folder,
 	remove_synced_server,
@@ -43,7 +49,7 @@ import {
 	type ServerData,
 	type ServerWorld,
 } from '@/helpers/worlds.ts'
-import { instanceKeys, screenshotKeys } from '@/pages/instance/query-options'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -61,35 +67,55 @@ const messages = defineMessages({
 	// },
 	multiplayerServers: {
 		id: 'app.settings.synced-options.multiplayer-servers',
-		defaultMessage: 'Multiplayer servers',
+		defaultMessage: 'Sync multiplayer servers',
 	},
 	multiplayerServersDescription: {
 		id: 'app.settings.synced-options.multiplayer-servers.description',
-		defaultMessage: 'Sync multiplayer servers across your instances.',
+		defaultMessage: 'Use the same multiplayer servers across your instances.',
 	},
 	commandHistory: {
 		id: 'app.settings.synced-options.command-history',
-		defaultMessage: 'Command history',
+		defaultMessage: 'Sync command history',
 	},
 	commandHistoryDescription: {
 		id: 'app.settings.synced-options.command-history.description',
-		defaultMessage: 'Sync command history across your instances.',
+		defaultMessage: 'Use the same command history across your instances.',
 	},
 	creativeHotbars: {
 		id: 'app.settings.synced-options.creative-hotbars',
-		defaultMessage: 'Saved creative hotbars',
+		defaultMessage: 'Sync saved creative hotbars',
 	},
 	creativeHotbarsDescription: {
 		id: 'app.settings.synced-options.creative-hotbars.description',
-		defaultMessage: 'Sync saved creative hotbars across your instances.',
+		defaultMessage: 'Use the same saved creative hotbars across your instances.',
 	},
-	screenshots: {
-		id: 'app.settings.synced-options.screenshots',
-		defaultMessage: 'Screenshots',
+	chooseSyncSourceTitle: {
+		id: 'app.settings.synced-options.choose-sync-source.title',
+		defaultMessage: 'Choose a sync source',
 	},
-	screenshotsDescription: {
-		id: 'app.settings.synced-options.screenshots.description',
-		defaultMessage: 'View screenshots from your instances in one place.',
+	multiplayerServersSyncSourceDescription: {
+		id: 'app.settings.synced-options.choose-sync-source.multiplayer-servers-description',
+		defaultMessage: 'Pick the instance whose multiplayer servers become the shared copy.',
+	},
+	commandHistorySyncSourceDescription: {
+		id: 'app.settings.synced-options.choose-sync-source.command-history-description',
+		defaultMessage: 'Pick the instance whose command history becomes the shared copy.',
+	},
+	creativeHotbarsSyncSourceDescription: {
+		id: 'app.settings.synced-options.choose-sync-source.creative-hotbars-description',
+		defaultMessage: 'Pick the instance whose saved creative hotbars become the shared copy.',
+	},
+	searchInstance: {
+		id: 'app.settings.synced-options.choose-sync-source.search-placeholder',
+		defaultMessage: 'Search instance',
+	},
+	noInstancesFound: {
+		id: 'app.settings.synced-options.choose-sync-source.no-instances-found',
+		defaultMessage: 'No instances found',
+	},
+	syncButton: {
+		id: 'app.settings.synced-options.choose-sync-source.sync',
+		defaultMessage: 'Sync',
 	},
 	commandHistoryEditorTitle: {
 		id: 'app.settings.synced-options.command-history.editor-title',
@@ -285,11 +311,6 @@ const globalRows: Array<{
 		title: 'creativeHotbars',
 		description: 'creativeHotbarsDescription',
 	},
-	{
-		option: 'screenshots',
-		title: 'screenshots',
-		description: 'screenshotsDescription',
-	},
 ]
 
 const globalSyncedOptionsQueryKey = ['global-synced-options'] as const
@@ -306,6 +327,11 @@ const globalOptionsQuery = useQuery({
 	queryFn: get_global_synced_options,
 })
 const globalOptions = computed(() => globalOptionsQuery.data.value ?? defaultGlobalOptions)
+const instances = ref(await listInstances().catch(() => []))
+const baseOption = ref<SyncedOption | null>(null)
+const baseInstanceId = ref(instances.value[0]?.id ?? '')
+const baseInstanceSearch = ref('')
+const baseModal = ref<InstanceType<typeof NewModal> | null>(null)
 const commandHistoryModal = ref<InstanceType<typeof NewModal> | null>(null)
 const serverEditorModal = ref<InstanceType<typeof NewModal> | null>(null)
 const editServerModal = ref<InstanceType<typeof NewModal> | null>(null)
@@ -340,24 +366,43 @@ const syncedServerCards = computed(() =>
 	})),
 )
 
+const baseInstanceDescription = computed(() => {
+	switch (baseOption.value) {
+		case 'multiplayer_servers':
+			return formatMessage(messages.multiplayerServersSyncSourceDescription)
+		case 'command_history':
+			return formatMessage(messages.commandHistorySyncSourceDescription)
+		case 'creative_hotbars':
+			return formatMessage(messages.creativeHotbarsSyncSourceDescription)
+		default:
+			return ''
+	}
+})
+
+const filteredBaseInstances = computed(() => {
+	const search = baseInstanceSearch.value.trim().toLowerCase()
+	if (!search) return instances.value
+	return instances.value.filter((instance) => instance.name.toLowerCase().includes(search))
+})
+
 async function invalidateSyncedOptions() {
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
 		queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
 		queryClient.invalidateQueries({ queryKey: globalSyncedOptionsQueryKey }),
-		queryClient.invalidateQueries({ queryKey: screenshotKeys.all }),
 	])
 }
 
 type GlobalOptionMutationVariables = {
 	option: SyncedOption
 	enabled: boolean
+	baseInstanceId?: string
 }
 
 const globalOptionMutation = useMutation({
 	mutationKey: globalSyncedOptionsMutationKey,
-	mutationFn: ({ option, enabled }: GlobalOptionMutationVariables) =>
-		set_global_synced_option(option, enabled),
+	mutationFn: ({ option, enabled, baseInstanceId }: GlobalOptionMutationVariables) =>
+		set_global_synced_option(option, enabled, baseInstanceId),
 	onMutate: async ({ option, enabled }) => {
 		await queryClient.cancelQueries({ queryKey: globalSyncedOptionsQueryKey })
 		const previous = globalOptions.value[option]
@@ -376,6 +421,15 @@ const globalOptionMutation = useMutation({
 		}))
 		handleError(error)
 	},
+	onSuccess: async (_options, { option, enabled }) => {
+		if (enabled) baseModal.value?.hide()
+		if (enabled && option === 'multiplayer_servers') {
+			syncedServers.value = await list_synced_servers().catch((error) => {
+				handleError(error)
+				return []
+			})
+		}
+	},
 	onSettled: async () => {
 		if (queryClient.isMutating({ mutationKey: globalSyncedOptionsMutationKey }) === 1) {
 			await invalidateSyncedOptions()
@@ -383,12 +437,25 @@ const globalOptionMutation = useMutation({
 	},
 })
 
-function applyGlobalOption(option: SyncedOption, enabled: boolean) {
-	globalOptionMutation.mutate({ option, enabled })
+function applyGlobalOption(option: SyncedOption, enabled: boolean, baseInstanceId?: string) {
+	globalOptionMutation.mutate({ option, enabled, baseInstanceId })
 }
 
 function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
-	applyGlobalOption(option, enabled)
+	if (!enabled) {
+		applyGlobalOption(option, false)
+		return
+	}
+
+	baseOption.value = option
+	baseInstanceId.value = instances.value[0]?.id ?? ''
+	baseInstanceSearch.value = ''
+	baseModal.value?.show()
+}
+
+function confirmBaseInstance() {
+	if (!baseOption.value || !baseInstanceId.value) return
+	applyGlobalOption(baseOption.value, true, baseInstanceId.value)
 }
 
 async function openCommandHistoryEditor() {
@@ -502,6 +569,79 @@ watch(
 
 <template>
 	<div>
+		<NewModal
+			ref="baseModal"
+			:header="formatMessage(messages.chooseSyncSourceTitle)"
+			no-padding
+			actions-divider
+			max-width="560px"
+			width="560px"
+		>
+			<p class="m-0 border-0 border-b border-solid border-surface-5 p-6 text-primary">
+				{{ baseInstanceDescription }}
+			</p>
+
+			<div class="flex h-[400px] flex-col gap-3 overflow-y-auto bg-surface-2 px-6 py-4">
+				<Input
+					v-model="baseInstanceSearch"
+					:icon="SearchIcon"
+					type="search"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.searchInstance)"
+					class="shrink-0"
+				/>
+
+				<div
+					v-if="filteredBaseInstances.length === 0"
+					class="flex flex-1 items-center justify-center text-secondary"
+				>
+					{{ formatMessage(messages.noInstancesFound) }}
+				</div>
+				<div
+					v-else
+					role="radiogroup"
+					:aria-label="formatMessage(messages.chooseSyncSourceTitle)"
+					class="flex flex-col gap-1"
+				>
+					<CheckCircleButton
+						v-for="instance in filteredBaseInstances"
+						:key="instance.id"
+						:checked="baseInstanceId === instance.id"
+						class="h-10"
+						@click="baseInstanceId = instance.id"
+					>
+						<span class="size-5 shrink-0 overflow-hidden rounded-[6px]">
+							<Avatar
+								:src="getInstanceIconUrl(instance.icon_path)"
+								:alt="instance.name"
+								:tint-by="instance.id"
+								size="1.25rem"
+								no-shadow
+							/>
+						</span>
+						<span class="truncate">{{ instance.name }}</span>
+					</CheckCircleButton>
+				</div>
+			</div>
+			<template #actions>
+				<div class="flex justify-end gap-2 p-2">
+					<Button type="outlined" @click="baseModal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="!baseInstanceId || globalOptionMutation.isPending.value"
+						@click="confirmBaseInstance"
+					>
+						<RefreshCwIcon />
+						{{ formatMessage(messages.syncButton) }}
+					</Button>
+				</div>
+			</template>
+		</NewModal>
+
 		<NewModal
 			ref="commandHistoryModal"
 			:header="formatMessage(messages.commandHistoryEditorTitle)"

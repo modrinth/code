@@ -7,7 +7,6 @@ import { get } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
-import SettingsOptionsTransition from './settings-options-transition.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -26,6 +25,16 @@ const hooks = ref({
 	pre_launch: hooksRaw.pre_launch ?? '',
 	wrapper: hooksRaw.wrapper ?? '',
 	post_exit: hooksRaw.post_exit ?? '',
+})
+
+watch(overrideHooks, (enabled) => {
+	if (!enabled) {
+		hooks.value = {
+			pre_launch: globalSettings.hooks.pre_launch ?? '',
+			wrapper: globalSettings.hooks.wrapper ?? '',
+			post_exit: globalSettings.hooks.post_exit ?? '',
+		}
+	}
 })
 
 const editInstanceObject = computed(() => ({
@@ -52,12 +61,11 @@ watch(
 const messages = defineMessages({
 	hooks: {
 		id: 'instance.settings.tabs.hooks.title',
-		defaultMessage: 'Game launch hooks',
+		defaultMessage: 'Custom game launch hooks',
 	},
 	hooksDescription: {
 		id: 'instance.settings.tabs.hooks.description',
-		defaultMessage:
-			'Hooks allow advanced users to run certain system commands before and after launching the game.',
+		defaultMessage: 'Run instance-specific system commands before and after launching the game.',
 	},
 	hookVariablesDescription: {
 		id: 'instance.settings.tabs.hooks.variables.description',
@@ -139,62 +147,63 @@ const messages = defineMessages({
 			<Toggle id="override-launch-hooks" v-model="overrideHooks" />
 		</div>
 
-		<SettingsOptionsTransition :show="overrideHooks">
-			<div class="pt-6">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.preLaunch) }}
-				</h2>
-				<Input
-					id="pre-launch"
-					v-model="hooks.pre_launch"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.preLaunchEnter)"
-					wrapper-class="w-full my-2.5"
-				/>
-				<p class="m-0">
-					{{ formatMessage(messages.preLaunchDescription) }}
-				</p>
+		<div class="pt-6" :class="{ 'opacity-50': !overrideHooks }">
+			<h2 class="m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.preLaunch) }}
+			</h2>
+			<Input
+				id="pre-launch"
+				v-model="hooks.pre_launch"
+				autocomplete="off"
+				:disabled="!overrideHooks"
+				:placeholder="formatMessage(messages.preLaunchEnter)"
+				wrapper-class="w-full my-2.5"
+			/>
+			<p class="m-0">
+				{{ formatMessage(messages.preLaunchDescription) }}
+			</p>
 
-				<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.wrapper) }}
-				</h2>
-				<Input
-					id="wrapper"
-					v-model="hooks.wrapper"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.wrapperEnter)"
-					wrapper-class="w-full my-2.5"
-				/>
-				<p class="m-0">
-					{{ formatMessage(messages.wrapperDescription) }}
-				</p>
+			<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.wrapper) }}
+			</h2>
+			<Input
+				id="wrapper"
+				v-model="hooks.wrapper"
+				autocomplete="off"
+				:disabled="!overrideHooks"
+				:placeholder="formatMessage(messages.wrapperEnter)"
+				wrapper-class="w-full my-2.5"
+			/>
+			<p class="m-0">
+				{{ formatMessage(messages.wrapperDescription) }}
+			</p>
 
-				<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.postExit) }}
-				</h2>
-				<Input
-					id="post-exit"
-					v-model="hooks.post_exit"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.postExitEnter)"
-					wrapper-class="w-full my-2.5"
-				/>
-				<p class="m-0">
-					{{ formatMessage(messages.postExitDescription) }}
-				</p>
+			<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.postExit) }}
+			</h2>
+			<Input
+				id="post-exit"
+				v-model="hooks.post_exit"
+				autocomplete="off"
+				:disabled="!overrideHooks"
+				:placeholder="formatMessage(messages.postExitEnter)"
+				wrapper-class="w-full my-2.5"
+			/>
+			<p class="m-0">
+				{{ formatMessage(messages.postExitDescription) }}
+			</p>
 
-				<div class="m-0 mt-6">
-					{{ formatMessage(messages.hookVariablesDescription) }}
-				</div>
-				<ul class="m-0 mt-2">
-					<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
-					<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
-					<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
-					<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
-					<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
-					<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
-				</ul>
+			<div class="m-0 mt-6">
+				{{ formatMessage(messages.hookVariablesDescription) }}
 			</div>
-		</SettingsOptionsTransition>
+			<ul class="m-0 mt-2">
+				<li>{{ formatMessage(messages.instanceNameDescription) }}</li>
+				<li>{{ formatMessage(messages.instanceIdDescription) }}</li>
+				<li>{{ formatMessage(messages.instanceDirDescription) }}</li>
+				<li>{{ formatMessage(messages.instanceMcDirDescription) }}</li>
+				<li>{{ formatMessage(messages.instanceJavaDescription) }}</li>
+				<li>{{ formatMessage(messages.instanceJavaArgsDescription) }}</li>
+			</ul>
+		</div>
 	</div>
 </template>

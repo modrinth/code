@@ -19,7 +19,7 @@ import { useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import { imageViewerEditorMessages as messages } from './image-viewer-editor-messages'
-import type { ScreenshotCensorMode, ScreenshotEraserMode } from './image-viewer-editor-types'
+import type { ScreenshotEraserMode } from './image-viewer-editor-types'
 import type { useImageEditor } from './use-image-editor'
 
 const props = defineProps<{
@@ -37,7 +37,6 @@ const {
 	color,
 	strokeWidth,
 	fontSize,
-	censorMode,
 	eraserMode,
 	zoom,
 	isFit,
@@ -48,7 +47,6 @@ const {
 	canZoomIn,
 	hasColorProperty,
 	propertyValueKind,
-	showCensorMode,
 	showEraserMode,
 	showCropControls,
 	cropWidth,
@@ -79,11 +77,9 @@ const hasPropertyControls = computed(
 	() =>
 		showCropControls.value ||
 		showEraserMode.value ||
-		showCensorMode.value ||
 		hasColorProperty.value ||
 		Boolean(propertyValueKind.value),
 )
-const censorModes: ScreenshotCensorMode[] = ['blur', 'solid']
 const eraserModes: ScreenshotEraserMode[] = ['element', 'area']
 const saveOptions = computed<OverflowMenuOption[]>(() => [
 	{
@@ -112,10 +108,6 @@ function handleColorInput(event: Event) {
 	updateColor((event.target as HTMLInputElement).value)
 }
 
-function formatCensorMode(value: ScreenshotCensorMode) {
-	return formatMessage(value === 'blur' ? messages.blur : messages.solid)
-}
-
 function formatEraserMode(value: ScreenshotEraserMode) {
 	return formatMessage(value === 'element' ? messages.element : messages.area)
 }
@@ -141,15 +133,6 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 				:items="eraserModes"
 				:format-label="formatEraserMode"
 				:aria-label="formatMessage(messages.eraserMode)"
-				size="small"
-				hide-checkmark-icon
-			/>
-			<Chips
-				v-if="showCensorMode"
-				v-model="censorMode"
-				:items="censorModes"
-				:format-label="formatCensorMode"
-				:aria-label="formatMessage(messages.censorMode)"
 				size="small"
 				hide-checkmark-icon
 			/>

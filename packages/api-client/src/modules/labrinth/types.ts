@@ -1732,6 +1732,7 @@ export namespace Labrinth {
 				compact_instance_cards: boolean
 				show_play_time: boolean
 				hide_nametag: boolean
+				show_all_screenshots: boolean
 				warn_on_unknown_modpacks: boolean
 				skip_non_essential_warnings: boolean
 			}
