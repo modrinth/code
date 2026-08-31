@@ -172,7 +172,48 @@ pub(in crate::api::instance) async fn detach_servers(
 ) -> crate::Result<()> {
     let generated = generated_path(state, &metadata.instance.id);
     let local = instance_dir(metadata, state).join(SERVERS_FILE);
-    detach_link(&generated, &local).await
+    let Some(current_checkpoint) = checkpoint(
+        &metadata.instance.id,
+        SyncedOption::MultiplayerServers,
+        "default",
+        state,
+    )
+    .await?
+    else {
+        return detach_link(&generated, &local).await;
+    };
+    let linked_to_generated = tokio::fs::symlink_metadata(&local)
+        .await
+        .is_ok_and(|metadata| metadata.file_type().is_symlink())
+        && tokio::fs::read_link(&local)
+            .await
+            .is_ok_and(|target| target == generated);
+    let matches_checkpoint = local.exists()
+        && sha1_file(&local).await? == current_checkpoint.expected_sha1;
+    if current_checkpoint.status != CheckpointStatus::Ready
+        || (!linked_to_generated && !matches_checkpoint)
+    {
+        return detach_link(&generated, &local).await;
+    }
+
+    let current = read_servers(&local).await?;
+    let projections =
+        load_projection_entries(&metadata.instance.id, state).await?;
+    let projection_matches = match_projection_entries(&current, &projections);
+    let instance_servers = current
+        .into_iter()
+        .zip(projection_matches)
+        .filter_map(|(server, projection)| {
+            projection
+                .is_none_or(|projection| {
+                    projection.owner == ProjectionOwner::Instance
+                })
+                .then_some(server)
+        })
+        .collect::<Vec<_>>();
+
+    detach_link(&generated, &local).await?;
+    write_servers(&local, &instance_servers).await
 }
 
 pub(in crate::api::instance) async fn reconcile_servers(
