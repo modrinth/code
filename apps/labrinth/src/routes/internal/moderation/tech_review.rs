@@ -205,11 +205,18 @@ pub enum FlagReason {
     Delphi,
 }
 
+#[derive(Debug, Deserialize, utoipa::IntoParams)]
+pub struct GetIssue {
+    #[serde(default)]
+    pub include_hidden: bool,
+}
+
 /// Get a Delphi report issue.  
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
     security(("bearer_auth" = [])),
+    params(GetIssue),
     responses((status = OK, body = inline(FileIssue)))
 )]
 #[get("/issue/{issue_id}")]
@@ -219,6 +226,7 @@ pub async fn get_issue(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(DelphiReportIssueId,)>,
+    query: web::Query<GetIssue>,
 ) -> Result<web::Json<FileIssue>, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -255,13 +263,14 @@ pub async fn get_issue(
                     FROM delphi_issue_details_with_statuses didws
                     WHERE
                         didws.issue_id = dri.id
-                        AND didws.severity != 'hidden'
+                        AND ($2 OR didws.severity != 'hidden')
                 )
             ) AS "data!: sqlx::types::Json<FileIssue>"
         FROM delphi_report_issues dri
         WHERE dri.id = $1
         "#,
         issue_id as DelphiReportIssueId,
+        query.include_hidden,
     )
     .fetch_optional(&**pool)
     .await
@@ -444,6 +453,7 @@ async fn fetch_project_reports(
     project_ids: &[DBProjectId],
     pool: &PgPool,
     redis: &RedisPool,
+    include_hidden: bool,
 ) -> Result<Vec<ProjectReport>, ApiError> {
     struct FileRow {
         file_id: DBFileId,
@@ -556,10 +566,11 @@ async fn fetch_project_reports(
         FROM delphi_issue_details_with_statuses didws
         WHERE
             didws.issue_id = ANY($1::bigint[])
-            AND didws.severity != 'hidden'
+            AND ($2 OR didws.severity != 'hidden')
         ORDER BY didws.issue_id, didws.id
         "#,
-        &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
+        &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>(),
+        include_hidden
     )
     .fetch_all(pool)
     .await
@@ -877,9 +888,10 @@ pub async fn search_projects(
         thread_ids.push(row.thread_id);
     }
 
-    let project_reports = fetch_project_reports(&project_ids, &pool, &redis)
-        .await
-        .wrap_api_err("fetching project reports")?;
+    let project_reports =
+        fetch_project_reports(&project_ids, &pool, &redis, false)
+            .await
+            .wrap_api_err("fetching project reports")?;
 
     let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
         .await
@@ -992,7 +1004,7 @@ pub async fn get_project_report(
     .wrap_not_found_err("resource not found")?;
 
     let project_reports =
-        fetch_project_reports(&[db_project_id], &pool, &redis)
+        fetch_project_reports(&[db_project_id], &pool, &redis, true)
             .await
             .wrap_api_err("fetching project reports")?;
 

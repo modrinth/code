@@ -15,6 +15,7 @@ import {
 	CopyLinkButton,
 	getProjectTypeIcon,
 	NavTabs,
+	Toggle,
 	useFormatBytes,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType } from '@modrinth/utils'
@@ -48,6 +49,7 @@ const props = defineProps<{
 	loadingIssues: Set<string>
 	decompiledSources: Map<string, string>
 	collapsed: boolean
+	allowShowingHiddenTraces?: boolean
 	disableCollapsing?: boolean
 }>()
 
@@ -60,7 +62,33 @@ const emit = defineEmits<{
 	showMaliciousSummary: [unsafeFiles: UnsafeFile[]]
 }>()
 
-const decisions = useTechReviewDecisions(() => props.item.reports)
+const showHiddenTraces = ref(false)
+const hiddenTraceCount = computed(() =>
+	props.item.reports.reduce(
+		(reportCount, report) =>
+			reportCount +
+			report.issues.reduce(
+				(issueCount, issue) =>
+					issueCount + issue.details.filter((detail) => detail.severity === 'hidden').length,
+				0,
+			),
+		0,
+	),
+)
+const nonHiddenReports = computed(() =>
+	props.item.reports.flatMap((report) => {
+		const issues = report.issues.flatMap((issue) => {
+			const details = issue.details.filter((detail) => detail.severity !== 'hidden')
+			return details.length > 0 ? [{ ...issue, details }] : []
+		})
+		return issues.length > 0 ? [{ ...report, issues }] : []
+	}),
+)
+const visibleReports = computed(() =>
+	showHiddenTraces.value ? props.item.reports : nonHiddenReports.value,
+)
+
+const decisions = useTechReviewDecisions(visibleReports)
 provide(TECH_REVIEW_DECISIONS_KEY, decisions)
 
 const projectStatus = ref<Labrinth.Projects.v2.ProjectStatus>(props.item.project.status)
@@ -81,7 +109,7 @@ const selectedFileId = ref<string | null>(null)
 
 const selectedFile = computed(() => {
 	if (!selectedFileId.value) return null
-	return props.item.reports.find((r) => r.id === selectedFileId.value) ?? null
+	return visibleReports.value.find((r) => r.id === selectedFileId.value) ?? null
 })
 
 watch(selectedFile, (newFile) => {
@@ -92,7 +120,7 @@ watch(selectedFile, (newFile) => {
 
 const highestSeverity = computed(() => {
 	let highest: Labrinth.TechReview.Internal.DelphiSeverity = 'low'
-	for (const report of props.item.reports) {
+	for (const report of visibleReports.value) {
 		const severity = getFileHighestSeverity(report)
 		if (severityOrder[severity] > severityOrder[highest]) highest = severity
 	}
@@ -153,11 +181,14 @@ function viewFileFlags(file: FlattenedFileReport) {
 	currentTab.value = 'File'
 }
 
-function findFileForDetail(detailId: string): FlattenedFileReport | null {
+function findFileForDetail(
+	detailId: string,
+): { file: FlattenedFileReport; hidden: boolean } | null {
 	for (const report of props.item.reports) {
 		for (const issue of report.issues) {
-			if (issue.details.some((detail) => detail.id === detailId)) {
-				return report
+			const detail = issue.details.find((detail) => detail.id === detailId)
+			if (detail) {
+				return { file: report, hidden: detail.severity === 'hidden' }
 			}
 		}
 	}
@@ -175,10 +206,15 @@ function backToFileList() {
 watch(
 	() => props.focusedDetailId,
 	(detailId) => {
-		if (detailId) {
-			const file = findFileForDetail(detailId)
-			if (file) viewFileFlags(file)
+		if (!detailId) return
+
+		const result = findFileForDetail(detailId)
+		if (!result) return
+		if (result.hidden) {
+			if (!props.allowShowingHiddenTraces) return
+			showHiddenTraces.value = true
 		}
+		viewFileFlags(result.file)
 	},
 	{ immediate: true },
 )
@@ -304,7 +340,7 @@ watch(
 					</div>
 				</div>
 			</div>
-			<div class="flex flex-row justify-between">
+			<div class="flex flex-wrap items-end justify-between gap-3">
 				<NavTabs
 					mode="local"
 					:links="navTabsLinks"
@@ -313,41 +349,53 @@ watch(
 					@tab-click="handleTabClick"
 				/>
 
-				<div v-if="currentTab === 'File' && selectedFile" class="flex flex-row items-end gap-2">
-					<ButtonLink
-						type="outlined"
-						target="_blank"
-						:href="getVersionPageHref(item.project, selectedFile.version_id)"
-						class="!bg-surface-2"
-						:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
+				<div class="flex flex-wrap items-end justify-end gap-4">
+					<label
+						v-if="allowShowingHiddenTraces"
+						class="flex cursor-pointer items-center gap-3 text-sm"
 					>
-						<VersionIcon aria-hidden="true" />
-						{{ getVersionLabel(selectedFile) }}
-					</ButtonLink>
-					<ButtonLink
-						type="outlined"
-						target="_blank"
-						:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
-						class="!bg-surface-2"
-						aria-label="Open in Slicer"
-					>
-						<ExternalIcon aria-hidden="true" /> Slicer
-					</ButtonLink>
-					<ButtonLink
-						v-tooltip="
-							`Download ${selectedFile.file_name} (${formatBytes(selectedFile.file_size)})`
-						"
-						type="outlined"
-						target="_blank"
-						:href="selectedFile.download_url"
-						:download="selectedFile.file_name"
-						class="!bg-surface-2"
-						aria-label="Download"
-						icon-only
-						circular
-					>
-						<DownloadIcon aria-hidden="true" />
-					</ButtonLink>
+						<span class="text-right text-secondary">
+							Show hidden traces
+							<span class="block text-xs text-tertiary">{{ hiddenTraceCount }} hidden</span>
+						</span>
+						<Toggle v-model="showHiddenTraces" :disabled="hiddenTraceCount === 0" small />
+					</label>
+					<div v-if="currentTab === 'File' && selectedFile" class="flex flex-row items-end gap-2">
+						<ButtonLink
+							type="outlined"
+							target="_blank"
+							:href="getVersionPageHref(item.project, selectedFile.version_id)"
+							class="!bg-surface-2"
+							:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
+						>
+							<VersionIcon aria-hidden="true" />
+							{{ getVersionLabel(selectedFile) }}
+						</ButtonLink>
+						<ButtonLink
+							type="outlined"
+							target="_blank"
+							:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
+							class="!bg-surface-2"
+							aria-label="Open in Slicer"
+						>
+							<ExternalIcon aria-hidden="true" /> Slicer
+						</ButtonLink>
+						<ButtonLink
+							v-tooltip="
+								`Download ${selectedFile.file_name} (${formatBytes(selectedFile.file_size)})`
+							"
+							type="outlined"
+							target="_blank"
+							:href="selectedFile.download_url"
+							:download="selectedFile.file_name"
+							class="!bg-surface-2"
+							aria-label="Download"
+							icon-only
+							circular
+						>
+							<DownloadIcon aria-hidden="true" />
+						</ButtonLink>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -359,7 +407,7 @@ watch(
 				:project="item.project"
 				:project-owner="item.project_owner"
 				:thread="item.thread"
-				:reports="item.reports"
+				:reports="nonHiddenReports"
 				:disable-collapsing="disableCollapsing"
 				@refetch="emit('refetch')"
 				@mark-complete="emit('markComplete', $event)"
@@ -368,7 +416,7 @@ watch(
 			/>
 			<TechRevFilesTab
 				v-else-if="currentTab === 'Files'"
-				:reports="item.reports"
+				:reports="visibleReports"
 				:project="item.project"
 				@view-flags="viewFileFlags"
 			/>

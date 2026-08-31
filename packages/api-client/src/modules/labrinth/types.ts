@@ -2658,6 +2658,10 @@ export namespace Labrinth {
 				issues: FileIssue[]
 			}
 
+			export type GetIssueRequest = {
+				include_hidden?: boolean
+			}
+
 			export type FileIssue = {
 				id: string
 				report_id: string

@@ -191,6 +191,7 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	 * Get detailed information about a specific issue.
 	 *
 	 * @param issueId - The issue ID
+	 * @param params - Options controlling which issue details are returned
 	 * @returns Issue with all its details
 	 *
 	 * @example
@@ -199,13 +200,17 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	 * console.log(issue.issue_type, issue.status)
 	 * ```
 	 */
-	public async getIssue(issueId: string): Promise<Labrinth.TechReview.Internal.FileIssue> {
+	public async getIssue(
+		issueId: string,
+		params: Labrinth.TechReview.Internal.GetIssueRequest = {},
+	): Promise<Labrinth.TechReview.Internal.FileIssue> {
 		return this.client.request<Labrinth.TechReview.Internal.FileIssue>(
 			`/moderation/tech-review/issue/${issueId}`,
 			{
 				api: 'labrinth',
 				version: 'internal',
 				method: 'GET',
+				params,
 			},
 		)
 	}
