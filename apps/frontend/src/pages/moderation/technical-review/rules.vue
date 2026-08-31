@@ -171,6 +171,19 @@ IS_MATCH ? "low" : null</code></pre>
 			</details>
 
 			<section class="mt-2 flex flex-col gap-3">
+				<div
+					v-if="isTestTraceIssueTypeExcluded"
+					role="alert"
+					class="flex items-start gap-2 rounded-lg border border-orange/40 bg-highlight-orange p-3 text-orange"
+				>
+					<TriangleAlertIcon class="mt-0.5 size-5 shrink-0" />
+					<p class="m-0 text-sm">
+						The test trace issue type <strong>{{ testTraceForm.issueType || '(empty)' }}</strong> is
+						not selected for this rule. The CEL expression is still evaluated in this preview, but
+						the rule will not run for this issue type during a scan.
+					</p>
+				</div>
+
 				<div class="flex items-center justify-between gap-3">
 					<div>
 						<h3 class="m-0 text-base font-bold text-contrast">Test trace</h3>
@@ -531,6 +544,7 @@ import {
 	PlayIcon,
 	PlusIcon,
 	TrashIcon,
+	TriangleAlertIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
@@ -788,6 +802,10 @@ const ruleInputSchemaText = computed(() =>
 )
 const ruleOutputSchemaText = computed(() =>
 	ruleSchema.value ? formatRuleSchema(ruleSchema.value.output, ruleSchema.value.components) : '',
+)
+const isTestTraceIssueTypeExcluded = computed(
+	() =>
+		form.onIssueTypes.length > 0 && !form.onIssueTypes.includes(testTraceForm.issueType),
 )
 const testTracePreview = computed(() => {
 	const effect = ruleTestEffects.value[0] ?? null
