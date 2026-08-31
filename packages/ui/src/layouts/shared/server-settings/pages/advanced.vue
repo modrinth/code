@@ -265,11 +265,11 @@ const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useSe
 const messages = defineMessages({
 	rollCredentials: {
 		id: 'servers.settings.advanced.sftp.roll-credentials',
-		defaultMessage: 'Roll credentials',
+		defaultMessage: 'Rotate credentials',
 	},
 	rollCredentialsModalTitle: {
 		id: 'servers.settings.advanced.sftp.roll-credentials-modal-title',
-		defaultMessage: 'Roll credentials',
+		defaultMessage: 'Rotate credentials',
 	},
 	rollCredentialsModalDescription: {
 		id: 'servers.settings.advanced.sftp.roll-credentials-modal-description',
@@ -277,7 +277,7 @@ const messages = defineMessages({
 	},
 	rollCredentialsSuccessTitle: {
 		id: 'servers.settings.advanced.sftp.roll-credentials-success-title',
-		defaultMessage: 'SFTP credentials rolled',
+		defaultMessage: 'SFTP credentials rotated',
 	},
 	rollCredentialsSuccessText: {
 		id: 'servers.settings.advanced.sftp.roll-credentials-success-text',
@@ -285,7 +285,7 @@ const messages = defineMessages({
 	},
 	rollCredentialsErrorTitle: {
 		id: 'servers.settings.advanced.sftp.roll-credentials-error-title',
-		defaultMessage: 'Failed to roll SFTP credentials',
+		defaultMessage: 'Failed to rotate SFTP credentials',
 	},
 	rollCredentialsErrorText: {
 		id: 'servers.settings.advanced.sftp.roll-credentials-error-text',
