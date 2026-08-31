@@ -1,5 +1,5 @@
-import { formatProjectTypeSentence } from '@modrinth/ui'
 import { defineMessages } from '@modrinth/ui/i18n'
+import { formatProjectTypeSentence } from '@modrinth/ui/src/utils/common-messages.ts'
 
 import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
 import { evaluateRules } from '../evaluate-rules.ts'

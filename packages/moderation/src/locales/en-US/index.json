@@ -36,7 +36,7 @@
     "defaultMessage": "Add external links"
   },
   "nags.adjacent-headers.description": {
-    "defaultMessage": "Headers of the same level cannot be placed next to each other. Combine them or add content between them."
+    "defaultMessage": "Headers of the same level cannot be placed next to each other."
   },
   "nags.adjacent-headers.title": {
     "defaultMessage": "Separate adjacent headers"
@@ -54,7 +54,7 @@
     "defaultMessage": "Select accurate tags"
   },
   "nags.banned-link-usage.description": {
-    "defaultMessage": "“{url}” is not allowed in project links."
+    "defaultMessage": "Remove the prohibited external link: “{url}\""
   },
   "nags.banned-link-usage.title": {
     "defaultMessage": "Remove prohibited links"
@@ -66,7 +66,7 @@
     "defaultMessage": "Check content disclosures"
   },
   "nags.description-ends-with-header.description": {
-    "defaultMessage": "Your description cannot end with a header. Add content below it or remove it."
+    "defaultMessage": "Your description cannot end with a header."
   },
   "nags.description-ends-with-header.title": {
     "defaultMessage": "Add content after the final header"
@@ -248,6 +248,9 @@
   "nags.project-description-banned-link.description": {
     "defaultMessage": "“{fullUrl}” is not allowed in project descriptions."
   },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "Your project description must be written in English or include an English translation."
+  },
   "nags.project-description-non-standard-text.description": {
     "defaultMessage": "Non-standard text characters, such as “₮ɆӾ₮”, are not allowed."
   },
@@ -279,10 +282,13 @@
     "defaultMessage": "Review the project summary"
   },
   "nags.project-summary-links.description": {
-    "defaultMessage": "Any links, URLs, or IPs are not allowed in the project summary."
+    "defaultMessage": "Links, URLs, or IPs are not allowed in the project summary."
   },
   "nags.project-summary-links.title": {
     "defaultMessage": "Remove links from the summary"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "Your project summary must be written in English or include an English translation."
   },
   "nags.project-summary-non-standard-text.description": {
     "defaultMessage": "Non-standard text characters, such as “₮ɆӾ₮”, are not allowed."
@@ -316,6 +322,12 @@
   },
   "nags.select-country.title": {
     "defaultMessage": "Select a region"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "Specify the environment where your project can run."
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "Select an environment"
   },
   "nags.select-language.description": {
     "defaultMessage": "List the language or languages supported by your server."
@@ -363,10 +375,10 @@
     "defaultMessage": "Visit versions settings"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Your summary cannot not contain Markdown or HTML, as it displays in plain text."
+    "defaultMessage": "Your summary cannot contain Markdown or HTML, as it displays in plain text."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "Clean up the summary"
+    "defaultMessage": "Remove Markdown and HTML from the summary"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Expand the summary"

@@ -75,7 +75,14 @@
 							/>
 							{{ getFormattedMessage(nag.title) }}
 						</span>
-						{{ getNagDescription(nag) }}
+						<span>
+							<span
+								v-for="(segment, index) in getNagDescriptionSegments(nag)"
+								:key="index"
+								:class="{ 'break-all': segment.isUrl }"
+								v-text="segment.text"
+							/>
+						</span>
 						<NuxtLink
 							v-if="nag.link && shouldShowLink(nag)"
 							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
@@ -437,6 +444,13 @@ function getNagDescription(nag: Nag): string {
 		return nag.description(nagContext.value)
 	}
 	return formatMessage(nag.description)
+}
+
+function getNagDescriptionSegments(nag: Nag): { text: string; isUrl: boolean }[] {
+	return getNagDescription(nag)
+		.split(/(https?:\/\/[^\s"'<>“”]+)/gi)
+		.filter(Boolean)
+		.map((text) => ({ text, isUrl: /^https?:\/\//i.test(text) }))
 }
 
 function getFormattedMessage(message: string | MessageDescriptor): string {

@@ -1,5 +1,5 @@
-import { formatProjectTypeSentence } from '@modrinth/ui'
 import { defineMessages } from '@modrinth/ui/i18n'
+import { formatProjectTypeSentence } from '@modrinth/ui/src/utils/common-messages.ts'
 
 import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
 import { licenseRequiresSource, notSourceAsDistributed } from '../../utils.ts'
@@ -64,7 +64,7 @@ const messages = defineMessages({
 	},
 	removeBannedLinksDescription: {
 		id: 'nags.banned-link-usage.description',
-		defaultMessage: '“{url}” is not allowed in project links.',
+		defaultMessage: 'Remove the prohibited external link: “{url}"',
 	},
 	provideSource: {
 		id: 'nags.gpl-license-source-required.title',
@@ -190,7 +190,11 @@ export const projectLinksValidationRules = {
 		},
 		presentation: {
 			message: messages.removeBannedLinksDescription,
-			nag: { title: messages.removeBannedLinks },
+			nag: {
+				title: messages.removeBannedLinks,
+				destination: 'links',
+				linkTitle: messages.visitLinks,
+			},
 		},
 	},
 	'gpl-license-source-required': {
