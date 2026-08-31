@@ -1,14 +1,11 @@
 use std::collections::BTreeSet;
 use std::sync::LazyLock;
 
-use censor::Censor;
 use linkify::{LinkFinder, LinkKind};
 use regex::Regex;
+use rustrict::{Censor, Type};
 use url::Url;
 use whatlang::{Detector, Lang};
-
-static PROFANITY_CENSOR: LazyLock<Censor> =
-	LazyLock::new(|| Censor::Standard + Censor::Sex);
 
 static WORD: LazyLock<Regex> =
 	LazyLock::new(|| Regex::new(r"[\p{L}\p{M}\p{N}]+").unwrap());
@@ -49,11 +46,37 @@ const URL_SHORTENERS: &[&str] =
 	&["bit.ly", "adf.ly", "tinyurl.com", "short.io", "is.gd"];
 
 pub(super) fn contains_profanity(text: &str) -> bool {
-	PROFANITY_CENSOR.check(text)
+	let mut censor = Censor::from_str(text);
+	censor.with_ignore_self_censoring(true);
+	censor.analyze().is(profanity_types())
 }
 
 pub(super) fn profanity_count(text: &str) -> usize {
-	PROFANITY_CENSOR.count(text)
+	// Rustrict only exposes match counts through its tracing features.
+	const CENSORED: char = '\0';
+
+	let threshold = profanity_types();
+	let mut censor = Censor::from_str(text);
+	censor
+		.with_ignore_self_censoring(true)
+		.with_censor_threshold(threshold)
+		.with_censor_first_character_threshold(threshold)
+		.with_censor_replacement(CENSORED);
+
+	let mut count = 0;
+	let mut in_censored_text = false;
+	for character in censor.censor().chars() {
+		let is_censored = character == CENSORED;
+		if is_censored && !in_censored_text {
+			count += 1;
+		}
+		in_censored_text = is_censored;
+	}
+	count
+}
+
+fn profanity_types() -> Type {
+	Type::PROFANE & Type::MODERATE_OR_HIGHER
 }
 
 pub(super) fn has_non_standard_text(text: &str) -> bool {

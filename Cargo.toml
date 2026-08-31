@@ -165,6 +165,7 @@ reqwest = { version = "0.12.24", default-features = false }
 rgb = "0.8.52"
 rust_decimal = { version = "1.39.0", features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = "0.1.14"
+rustrict = { version = "0.7.39", default-features = false, features = ["censor"] }
 rust-s3 = { version = "0.37.0", default-features = false, features = [
   "fail-on-err",
   "tags",

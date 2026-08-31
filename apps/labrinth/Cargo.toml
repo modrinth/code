@@ -91,6 +91,7 @@ regex = { workspace = true }
 reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls-tls-webpki-roots"] }
 rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
+rustrict = { workspace = true }
 rustls.workspace = true
 rusty-money = { workspace = true }
 scalar_api_reference = { workspace = true, features = ["actix-web"] }
