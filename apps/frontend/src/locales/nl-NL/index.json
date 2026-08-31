@@ -3440,12 +3440,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.actions.back-to-all-projects": {
-    "message": "Terug naar alle projecten"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Terug naar project pagina"
-  },
   "project.actions.check-modpack-archives": {
     "message": "Uitpakken van modpack controleren"
   },

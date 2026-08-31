@@ -3512,12 +3512,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.actions.back-to-all-projects": {
-    "message": "Back to all projects"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Back to project page"
-  },
   "project.actions.check-modpack-archives": {
     "message": "Check modpack unzip"
   },
