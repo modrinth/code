@@ -314,7 +314,7 @@ vars! {
     SENDY_LIST_ID: String = "none";
     SENDY_API_KEY: String = "none";
 
-    SKIP_EMAIL_CHECK_DOMAINS: String = "";
+    SKIP_EMAIL_CHECK_DOMAINS: StringCsv = StringCsv(vec![]);
 
     NEVERBOUNCE_API_KEY: String = "";
     NEVERBOUNCE_BASE_URL: String = neverbounce::DEFAULT_API_URL;
@@ -322,6 +322,8 @@ vars! {
     USERCHECK_API_KEY: String = "";
     USERCHECK_GATE_ID: String = "";
     USERCHECK_BASE_URL: String = crate::util::usercheck::DEFAULT_API_URL;
+
+    EMAIL_DOMAIN_BLACKLIST: StringCsv = StringCsv(vec![]);
 
     CLICKHOUSE_REPLICATED: bool = false;
     CLICKHOUSE_URL: String = "http://localhost:8123";

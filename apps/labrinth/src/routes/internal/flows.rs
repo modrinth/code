@@ -1901,17 +1901,54 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
-/// Domains listed in `SKIP_EMAIL_CHECK_DOMAINS` bypass every email check.
+/// List entries are matched literally, unless they begin with `*.`, in which
+/// case they match any subdomain of the remaining suffix.
+fn matches_domain_entry(domain: &str, entry: &str) -> bool {
+    let entry = entry.trim().to_ascii_lowercase();
+
+    match entry.strip_prefix("*.") {
+        Some(suffix) => domain
+            .strip_suffix(suffix)
+            .is_some_and(|subdomain| subdomain.ends_with('.')),
+        None => entry == domain,
+    }
+}
+
+fn domain_of(email: &str) -> Option<String> {
+    email
+        .rsplit_once('@')
+        .map(|(_, domain)| domain.to_ascii_lowercase())
+}
+
+fn domain_matches_list(domain: &str, list: &[String]) -> bool {
+    list.iter().any(|entry| matches_domain_entry(domain, entry))
+}
+
+/// Domains listed in `SKIP_EMAIL_CHECK_DOMAINS` bypass every email check,
+/// including the blacklist.
 fn email_checks_skipped(email: &str) -> bool {
-    let Some((_, domain)) = email.rsplit_once('@') else {
-        return false;
+    domain_of(email).is_some_and(|domain| {
+        domain_matches_list(&domain, &ENV.SKIP_EMAIL_CHECK_DOMAINS)
+    })
+}
+
+fn ensure_email_domain_is_not_blacklisted(email: &str) -> Result<(), ApiError> {
+    let Some(domain) = domain_of(email) else {
+        return Ok(());
     };
 
-    ENV.SKIP_EMAIL_CHECK_DOMAINS
-        .split(',')
-        .map(str::trim)
-        .filter(|skipped| !skipped.is_empty())
-        .any(|skipped| skipped.eq_ignore_ascii_case(domain))
+    if !domain_matches_list(&domain, &ENV.EMAIL_DOMAIN_BLACKLIST) {
+        return Ok(());
+    }
+
+    info!(
+        email.domain = domain.as_str(),
+        "blacklisted email domain, denying",
+    );
+
+    Err(ApiError::Request(eyre!(
+        "This domain name may not be used ({domain})!"
+    )))
 }
 
 /// Runs the UserCheck gate, which covers both password and OAuth signups.
@@ -1922,6 +1959,8 @@ async fn ensure_email_passes_gate(
     if email_checks_skipped(email) {
         return Ok(());
     }
+
+    ensure_email_domain_is_not_blacklisted(email)?;
 
     let action = check_email_gate(redis, email)
         .await
