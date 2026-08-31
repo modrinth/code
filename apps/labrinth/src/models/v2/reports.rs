@@ -32,6 +32,7 @@ impl From<ItemType> for LegacyItemType {
             ItemType::Version => LegacyItemType::Version,
             ItemType::User => LegacyItemType::User,
             ItemType::SharedInstance => LegacyItemType::Unknown,
+            ItemType::Organization => LegacyItemType::Unknown,
             ItemType::Unknown => LegacyItemType::Unknown,
         }
     }

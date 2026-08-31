@@ -4,6 +4,7 @@
 			v-model="query"
 			:page="currentPage"
 			:total-pages="totalPages"
+			:loading="isLoading"
 			@search="goToPage(1)"
 			@switch-page="goToPage"
 		>
@@ -179,7 +180,7 @@
 				</TeleportPopoutMenu>
 			</template>
 			<template #meta>
-				<div v-if="sortedReports.length > 0">
+				<div v-if="!isLoading && sortedReports.length > 0">
 					Showing {{ formatNumber(pageStart) }}–{{ formatNumber(pageEnd) }} of
 					{{ formatNumber(sortedReports.length) }} reports
 				</div>
