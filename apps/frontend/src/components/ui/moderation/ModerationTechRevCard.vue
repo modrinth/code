@@ -356,7 +356,7 @@ watch(
 					>
 						<span class="text-right text-secondary">
 							Show hidden traces
-							<span class="block text-xs text-tertiary">{{ hiddenTraceCount }} hidden</span>
+							<span class="text-tertiary block text-xs">{{ hiddenTraceCount }} hidden</span>
 						</span>
 						<Toggle v-model="showHiddenTraces" :disabled="hiddenTraceCount === 0" small />
 					</label>

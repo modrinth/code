@@ -178,13 +178,14 @@ IS_MATCH ? "low" : null</code></pre>
 				<div
 					v-if="isTestTraceIssueTypeExcluded"
 					role="alert"
-					class="flex items-start gap-2 rounded-lg border border-orange/40 bg-highlight-orange p-3 text-orange"
+					class="border-orange/40 flex items-start gap-2 rounded-lg border bg-highlight-orange p-3 text-orange"
 				>
 					<TriangleAlertIcon class="mt-0.5 size-5 shrink-0" />
 					<p class="m-0 text-sm">
-						The test trace issue type <strong>{{ activeTestTraceIssueType || '(empty)' }}</strong> is
-						not selected for this rule. The CEL expression is still evaluated in this preview, but
-						the rule will not run for this issue type during a scan.
+						The test trace issue type
+						<strong>{{ activeTestTraceIssueType || '(empty)' }}</strong> is not selected for this
+						rule. The CEL expression is still evaluated in this preview, but the rule will not run
+						for this issue type during a scan.
 					</p>
 				</div>
 
@@ -227,11 +228,7 @@ IS_MATCH ? "low" : null</code></pre>
 										v-model="testTraceForm.severity"
 										class="h-9 w-full rounded-xl border-none bg-surface-4 px-3 font-medium capitalize text-primary outline-none focus:ring-4 focus:ring-brand-shadow"
 									>
-										<option
-											v-for="severity in TRACE_SEVERITIES"
-											:key="severity"
-											:value="severity"
-										>
+										<option v-for="severity in TRACE_SEVERITIES" :key="severity" :value="severity">
 											{{ severity }}
 										</option>
 									</select>
@@ -586,9 +583,9 @@ import {
 	ButtonLink,
 	ConfirmModal,
 	EmptyState,
-	Input,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	MultiSelect,
 	NewModal,
 	Pagination,
