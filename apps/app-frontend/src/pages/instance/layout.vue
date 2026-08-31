@@ -485,31 +485,38 @@ const tabs = computed(() => {
 			href: `${basePath.value}`,
 			icon: BoxesIcon,
 		},
-		{
+	]
+
+	if (instance.value?.visible_tabs.files !== false) {
+		instanceTabs.push({
 			label: formatMessage(messages.filesTab),
 			href: `${basePath.value}/files`,
 			icon: FolderOpenIcon,
-		},
-		{
-			label: formatMessage(messages.worldsTab),
-			href: `${basePath.value}/worlds`,
-			icon: GlobeIcon,
-		},
-		{
-			label: formatMessage(messages.logsTab),
-			href: `${basePath.value}/logs`,
-			icon: TerminalSquareIcon,
-		},
-	]
+		})
+	}
 
-	const screenshotsSynced = globalSyncedOptionsQuery.data.value?.screenshots === true
-	if (!screenshotsSynced) {
-		instanceTabs.splice(2, 0, {
+	const screenshotsGloballyAvailable = globalSyncedOptionsQuery.data.value?.screenshots === true
+	if (!screenshotsGloballyAvailable || instance.value?.visible_tabs.screenshots !== false) {
+		instanceTabs.push({
 			label: formatMessage(messages.screenshotsTab),
 			href: `${basePath.value}/screenshots`,
 			icon: ImagesIcon,
 		})
 	}
+
+	if (instance.value?.visible_tabs.worlds !== false) {
+		instanceTabs.push({
+			label: formatMessage(messages.worldsTab),
+			href: `${basePath.value}/worlds`,
+			icon: GlobeIcon,
+		})
+	}
+
+	instanceTabs.push({
+		label: formatMessage(messages.logsTab),
+		href: `${basePath.value}/logs`,
+		icon: TerminalSquareIcon,
+	})
 
 	if (showShareTab.value) {
 		instanceTabs.push({

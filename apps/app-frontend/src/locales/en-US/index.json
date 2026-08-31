@@ -2513,6 +2513,21 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revoke invite"
   },
+  "instance.settings.tabs.behavior.description": {
+    "message": "Choose which tabs appear on this instance."
+  },
+  "instance.settings.tabs.behavior.files": {
+    "message": "Show Files tab"
+  },
+  "instance.settings.tabs.behavior.screenshots": {
+    "message": "Show Screenshots tab"
+  },
+  "instance.settings.tabs.behavior.screenshots.required": {
+    "message": "The Screenshots tab cannot be hidden while the global Screenshots page is turned off."
+  },
+  "instance.settings.tabs.behavior.worlds": {
+    "message": "Show Worlds tab"
+  },
   "instance.settings.tabs.general": {
     "message": "General"
   },
@@ -2740,6 +2755,9 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Enable an override to keep a synced setting separate for this instance."
+  },
+  "instance.settings.tabs.tab-visibility": {
+    "message": "Tabs"
   },
   "instance.settings.tabs.window": {
     "message": "Custom window settings"

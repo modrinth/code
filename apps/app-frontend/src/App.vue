@@ -125,6 +125,7 @@ import {
 	get as getInstance,
 	get_global_synced_options,
 	run,
+	set_global_synced_option,
 } from '@/helpers/instance'
 import {
 	get as getCreds,
@@ -151,7 +152,7 @@ import {
 } from '@/helpers/utils.js'
 import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n from '@/i18n.config'
-import { instanceKeys } from '@/pages/instance/query-options'
+import { instanceKeys, screenshotKeys } from '@/pages/instance/query-options'
 import {
 	appUpdateState,
 	downloadAvailableAppUpdate,
@@ -1116,6 +1117,25 @@ watch(
 						settings.hide_nametag_skins_page = behavior.hide_nametag
 						settingsChanged = true
 					}
+
+					const showAllScreenshots = behavior.show_all_screenshots
+					if (typeof showAllScreenshots === 'boolean') {
+						const globalSyncedOptions =
+							globalSyncedOptionsQuery.data.value ??
+							(await queryClient.fetchQuery({
+								queryKey: ['global-synced-options'],
+								queryFn: get_global_synced_options,
+							}))
+						if (globalSyncedOptions.screenshots !== showAllScreenshots) {
+							const updatedGlobalSyncedOptions = await set_global_synced_option(
+								'screenshots',
+								showAllScreenshots,
+							)
+							queryClient.setQueryData(['global-synced-options'], updatedGlobalSyncedOptions)
+							await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
+						}
+					}
+
 					for (const [flag, value] of Object.entries(behaviorFeatureFlags)) {
 						if (settings.feature_flags[flag] !== value) {
 							settings.feature_flags[flag] = value

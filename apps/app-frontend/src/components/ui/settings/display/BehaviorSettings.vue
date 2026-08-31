@@ -208,6 +208,7 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 					compact_instance_cards: value.compactInstanceCards,
 					show_play_time: value.showPlayTime,
 					hide_nametag: value.hideNametag,
+					show_all_screenshots: value.showAllScreenshots,
 					warn_on_unknown_modpacks: value.warnOnUnknownModpacks,
 					skip_non_essential_warnings: value.skipNonEssentialWarnings,
 				},
