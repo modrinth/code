@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\tINSERT INTO sync_feature_settings\n\t\t\t\t(feature, globally_enabled, new_instance_default)\n\t\t\tVALUES (?, ?, 1)\n\t\t\tON CONFLICT(feature) DO UPDATE SET\n\t\t\t\tglobally_enabled = excluded.globally_enabled\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "76896bb2061e4c839a53bed4a221be42650f58edf2045fe1b85d418a537382e2"
+}

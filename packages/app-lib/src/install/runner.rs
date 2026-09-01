@@ -1021,6 +1021,7 @@ async fn run_request(
         } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
             lock_existing_instance(&instance_id, state).await?;
+            crate::api::instance::prepare_instance_update(&instance_id).await?;
             let disabled_project_ids = remove_existing_pack_content(
                 job_id,
                 job_state,

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT globally_enabled AS \"globally_enabled!: bool\"\n\t\tFROM sync_feature_settings\n\t\tWHERE feature = 'game_options'\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "globally_enabled!: bool",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ec00a599037bcf5fb080eb0f7cab1beaaca1254a4abcf2955c7af3bc5086f9cc"
+}

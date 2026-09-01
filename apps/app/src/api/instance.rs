@@ -66,6 +66,10 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_synced_options_overview,
             instance_get_global_synced_options,
             instance_set_global_synced_option,
+            instance_list_game_options_sync_sources,
+            instance_get_synced_game_options_config,
+            instance_preview_synced_game_option_changes,
+            instance_save_synced_game_option_changes,
             instance_get_command_history,
             instance_set_command_history,
             instance_open_synced_options_folder,
@@ -852,6 +856,32 @@ pub async fn instance_set_global_synced_option(
         base_instance_id.as_deref(),
     )
     .await?)
+}
+
+#[tauri::command]
+pub async fn instance_list_game_options_sync_sources()
+-> Result<Vec<theseus::instance::GameOptionsSourceCandidate>> {
+    Ok(theseus::instance::list_game_options_sync_sources().await?)
+}
+
+#[tauri::command]
+pub async fn instance_get_synced_game_options_config()
+-> Result<theseus::instance::GameSettingsEditorState> {
+    Ok(theseus::instance::get_synced_game_options_config().await?)
+}
+
+#[tauri::command]
+pub async fn instance_preview_synced_game_option_changes(
+    request: theseus::instance::UpdateGameSettingsRequest,
+) -> Result<theseus::instance::GameSettingsEditorState> {
+    Ok(theseus::instance::preview_synced_game_option_changes(request).await?)
+}
+
+#[tauri::command]
+pub async fn instance_save_synced_game_option_changes(
+    request: theseus::instance::UpdateGameSettingsRequest,
+) -> Result<theseus::instance::SaveGameSettingsResult> {
+    Ok(theseus::instance::save_synced_game_option_changes(request).await?)
 }
 
 #[tauri::command]

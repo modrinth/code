@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_sync_preferences (instance_id, feature, enabled)\n\t\tVALUES (?, 'game_options', 1)\n\t\tON CONFLICT(instance_id, feature) DO UPDATE SET enabled = 1\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "1d66f3fb56c2e74146f8bc3b2985ed33f902980977f795d38f062bf7438c8334"
+}

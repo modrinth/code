@@ -289,6 +289,7 @@ export async function set_synced_option(
 }
 
 export type SyncedOption =
+	| 'game_options'
 	| 'command_history'
 	| 'multiplayer_servers'
 	| 'creative_hotbars'
@@ -346,6 +347,8 @@ export async function set_global_synced_option(
 		baseInstanceId,
 	})
 }
+
+export * from './game-options'
 
 export async function get_command_history(): Promise<string> {
 	return await invoke('plugin:instance|instance_get_command_history')

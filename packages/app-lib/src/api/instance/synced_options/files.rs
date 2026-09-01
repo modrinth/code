@@ -87,6 +87,7 @@ pub(in crate::api::instance) fn instance_option_enabled(
     option: SyncedOption,
 ) -> bool {
     match option {
+        SyncedOption::GameOptions => metadata.synced_options.game_options,
         SyncedOption::CommandHistory => metadata.synced_options.command_history,
         SyncedOption::MultiplayerServers => {
             metadata.synced_options.multiplayer_servers
@@ -208,6 +209,28 @@ pub(in crate::api::instance) async fn finish_checkpoint(
 		WHERE instance_id = ? AND feature = ? AND variant = ?
 		",
         link_mode,
+        instance_id,
+        option_name,
+        variant,
+    )
+    .execute(&state.pool)
+    .await?;
+    Ok(())
+}
+
+pub(in crate::api::instance) async fn finish_plain_checkpoint(
+    instance_id: &str,
+    option: SyncedOption,
+    variant: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let option_name = option.as_str();
+    sqlx::query!(
+        "
+		UPDATE instance_sync_checkpoints
+		SET status = 'ready', link_mode = NULL
+		WHERE instance_id = ? AND feature = ? AND variant = ?
+		",
         instance_id,
         option_name,
         variant,

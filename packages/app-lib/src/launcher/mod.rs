@@ -25,9 +25,7 @@ use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::{LoaderVersion, Manifest};
-use regex::Regex;
 use serde::Deserialize;
-use std::fmt::Write;
 use std::path::PathBuf;
 use tokio::process::Command;
 
@@ -1067,48 +1065,21 @@ pub async fn launch_minecraft(
 
     command.envs(env_args.iter().cloned());
 
-    // Overwrites the minecraft options.txt file with the settings from the profile
-    // Uses 'a:b' syntax which is not quite yaml
-    if !mc_set_options.is_empty() {
-        let options_path = instance_path.join("options.txt");
-
-        let (mut options_string, input_encoding) = if options_path.exists() {
-            io::read_any_encoding_to_string(&options_path).await?
-        } else {
-            (String::new(), encoding_rs::UTF_8)
-        };
-
-        // UTF-16 encodings may be successfully detected and read, but we cannot encode
-        // them back, and it's technically possible that the game client strongly expects
-        // such encoding
-        if input_encoding != input_encoding.output_encoding() {
-            return Err(crate::ErrorKind::LauncherError(format!(
-                "The instance options.txt file uses an unsupported encoding: {}. \
-                Please either turn off instance options that need to modify this file, \
-                or convert the file to an encoding that both the game and this app support, \
-                such as UTF-8.",
-                input_encoding.name()
-            ))
-            .into());
-        }
-
-        for (key, value) in mc_set_options {
-            let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
-            // check if the regex exists in the file
-            if !re.is_match(&options_string) {
-                // The key was not found in the file, so append it
-                write!(&mut options_string, "\n{key}:{value}").unwrap();
-            } else {
-                let replaced_string = re
-                    .replace_all(&options_string, &format!("{key}:{value}"))
-                    .to_string();
-                options_string = replaced_string;
-            }
-        }
-
-        io::write(&options_path, input_encoding.encode(&options_string).0)
-            .await?;
+    if let Err(error) =
+        crate::api::instance::sync_game_options_before_launch(&instance.id)
+            .await
+    {
+        tracing::warn!(
+            "Failed to reconcile game options before launching {}: {error}",
+            instance.id
+        );
     }
+
+    crate::api::instance::apply_game_options_launcher_overrides(
+        &instance.id,
+        mc_set_options,
+    )
+    .await?;
 
     crate::state::instances::commands::set_instance_last_played(
         &instance.id,
