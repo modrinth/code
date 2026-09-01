@@ -50,6 +50,7 @@ pub enum SyncedOptionJoinResolution {
 
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
 pub struct GlobalSyncedOptions {
+    pub game_options: bool,
     pub command_history: bool,
     pub multiplayer_servers: bool,
     pub creative_hotbars: bool,
@@ -59,6 +60,7 @@ pub struct GlobalSyncedOptions {
 impl GlobalSyncedOptions {
     pub fn get(self, option: SyncedOption) -> bool {
         match option {
+            SyncedOption::GameOptions => self.game_options,
             SyncedOption::CommandHistory => self.command_history,
             SyncedOption::MultiplayerServers => self.multiplayer_servers,
             SyncedOption::CreativeHotbars => self.creative_hotbars,
@@ -68,6 +70,7 @@ impl GlobalSyncedOptions {
 
     fn set(&mut self, option: SyncedOption, enabled: bool) {
         match option {
+            SyncedOption::GameOptions => self.game_options = enabled,
             SyncedOption::CommandHistory => self.command_history = enabled,
             SyncedOption::MultiplayerServers => {
                 self.multiplayer_servers = enabled
@@ -223,7 +226,7 @@ async fn version_capability(
     option: SyncedOption,
     state: &State,
 ) -> CapabilityStatus {
-    if option == SyncedOption::Screenshots {
+    if matches!(option, SyncedOption::GameOptions | SyncedOption::Screenshots) {
         return CapabilityStatus::Supported;
     }
 
@@ -237,6 +240,7 @@ async fn version_capability(
 		);
     };
     let cutoff_id = match option {
+        SyncedOption::GameOptions => unreachable!(),
         // Mojang's manifest does not include Beta 1.8 Pre-release as a
         // separate entry, so b1.8 is the first resolvable version at that
         // boundary.
@@ -270,6 +274,7 @@ async fn version_capability(
 
     CapabilityStatus::Unsupported(
 		match option {
+			SyncedOption::GameOptions => unreachable!(),
 			SyncedOption::MultiplayerServers => {
 				"Multiplayer server syncing requires Minecraft Beta 1.8 Pre-release or newer."
 			}
@@ -292,42 +297,103 @@ pub async fn set_global_option(
 ) -> crate::Result<GlobalSyncedOptions> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
+    let was_enabled = get_global_options_with_state(&state).await?.get(option);
 
-    if enabled && option != SyncedOption::Screenshots {
+    if enabled && !was_enabled && option != SyncedOption::Screenshots {
         let base_instance_id = base_instance_id.ok_or_else(|| {
             ErrorKind::InputError(
                 "Choose an instance to use as the sync source.".to_string(),
             )
         })?;
-        return enable_global_option_from_base(
-            option,
-            base_instance_id,
-            &state,
-        )
-        .await;
+        if option == SyncedOption::GameOptions {
+            let source = crate::state::get_instance(
+                base_instance_id,
+                &state.pool,
+            )
+            .await?
+            .ok_or_else(|| {
+                ErrorKind::InputError(
+                    "Unknown sync source instance.".to_string(),
+                )
+            })?;
+            if sync_files_are_protected(&source)
+                || instance_is_running(&source, &state).await?
+            {
+                return Err(ErrorKind::InputError(
+                    "Close the source instance before using it for syncing."
+                        .to_string(),
+                )
+                .into());
+            }
+            match capability_status(&source, option, true, &state).await {
+                CapabilityStatus::Supported => {}
+                CapabilityStatus::Unsupported(reason)
+                | CapabilityStatus::Indeterminate(reason) => {
+                    return Err(ErrorKind::InputError(reason).into());
+                }
+            }
+            seed_from_instance(&source, option, &state).await?;
+        } else {
+            return enable_global_option_from_base(
+                option,
+                base_instance_id,
+                &state,
+            )
+            .await;
+        }
     }
 
-    set_global_option_enabled(option, enabled, &state).await?;
+    if !(enabled && !was_enabled && option == SyncedOption::GameOptions) {
+        set_global_option_enabled(option, enabled, &state).await?;
+    }
 
-    let instances = crate::state::list_instances(&state.pool).await?;
+    let instances = match crate::state::list_instances(&state.pool).await {
+        Ok(instances) => instances,
+        Err(error) if option == SyncedOption::GameOptions => {
+            tracing::warn!(
+                "Game-settings sync changed, but participating instances could not be listed yet: {error}"
+            );
+            return get_global_options_with_state(&state).await;
+        }
+        Err(error) => return Err(error),
+    };
     for metadata in instances {
-        if sync_files_are_protected(&metadata)
-            || instance_is_running(&metadata, &state).await?
-        {
+        let running = match instance_is_running(&metadata, &state).await {
+            Ok(running) => running,
+            Err(error) if option == SyncedOption::GameOptions => {
+                tracing::warn!(
+                    "Game-settings sync changed, but {} could not be inspected yet: {error}",
+                    metadata.instance.id
+                );
+                continue;
+            }
+            Err(error) => return Err(error),
+        };
+        if sync_files_are_protected(&metadata) || running {
             continue;
         }
-        if !instance_option_enabled(&metadata, option) {
-            detach_option(&metadata, option, &state).await?;
-            continue;
-        }
-        match capability_status(&metadata, option, enabled, &state).await {
-            CapabilityStatus::Supported => {
-                reconcile_option(&metadata, option, &state).await?
+        let result = if !instance_option_enabled(&metadata, option) {
+            detach_option(&metadata, option, &state).await
+        } else {
+            match capability_status(&metadata, option, enabled, &state).await {
+                CapabilityStatus::Supported => {
+                    reconcile_option(&metadata, option, &state).await
+                }
+                CapabilityStatus::Unsupported(_) => {
+                    detach_option(&metadata, option, &state).await
+                }
+                CapabilityStatus::Indeterminate(_) => Ok(()),
             }
-            CapabilityStatus::Unsupported(_) => {
-                detach_option(&metadata, option, &state).await?
+        };
+        if let Err(error) = result {
+            if option == SyncedOption::GameOptions {
+                tracing::warn!(
+                    "Game-settings sync changed, but {} could not be reconciled yet: {error}",
+                    metadata.instance.id
+                );
+                continue;
             }
-            CapabilityStatus::Indeterminate(_) => {}
+            return Err(error);
         }
     }
 
@@ -451,7 +517,8 @@ pub async fn set_instance_option(
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
-    if instance_option_enabled(&metadata, option) == enabled {
+    let previous_enabled = instance_option_enabled(&metadata, option);
+    if previous_enabled == enabled {
         return Ok(metadata);
     }
     let global = get_global_options_with_state(&state).await?;
@@ -504,7 +571,9 @@ pub async fn set_instance_option(
                     )
                     .await?;
                 }
-                SyncedOption::CreativeHotbars | SyncedOption::Screenshots => {
+                SyncedOption::GameOptions
+                | SyncedOption::CreativeHotbars
+                | SyncedOption::Screenshots => {
                     unreachable!()
                 }
             },
@@ -527,10 +596,28 @@ pub async fn set_instance_option(
     )
     .await?;
     if can_reconcile {
-        if enabled {
-            ensure_option(&metadata, option, &state).await?;
+        let result = if enabled {
+            ensure_option(&metadata, option, &state).await
         } else {
-            detach_option(&metadata, option, &state).await?;
+            detach_option(&metadata, option, &state).await
+        };
+        if let Err(error) = result {
+            if option == SyncedOption::GameOptions {
+                if let Err(rollback_error) =
+                    instance_rows::set_instance_sync_preference(
+                        instance_id,
+                        option,
+                        previous_enabled,
+                        &state.pool,
+                    )
+                    .await
+                {
+                    tracing::error!(
+                        "Failed to roll back the game-settings sync preference for {instance_id}: {rollback_error}"
+                    );
+                }
+            }
+            return Err(error);
         }
     }
 
@@ -584,6 +671,7 @@ async fn instance_option_join_action(
         return Ok(SyncedOptionJoinAction::SeedShared);
     }
     Ok(match option {
+        SyncedOption::GameOptions => SyncedOptionJoinAction::Attach,
         SyncedOption::CommandHistory | SyncedOption::MultiplayerServers => {
             SyncedOptionJoinAction::Merge
         }
@@ -605,7 +693,7 @@ pub async fn reconcile_all() -> crate::Result<()> {
     let instances = crate::state::list_instances(&state.pool).await?;
     for metadata in instances {
         if let Err(error) =
-            reconcile_instance_with_state(&metadata, &state).await
+            reconcile_instance_with_state(&metadata, &state, false).await
         {
             tracing::warn!(
                 "Failed to reconcile synced options for {}: {error}",
@@ -668,7 +756,18 @@ pub async fn reconcile_instance(instance_id: &str) -> crate::Result<()> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
-    reconcile_instance_with_state(&metadata, &state).await
+    reconcile_instance_with_state(&metadata, &state, false).await
+}
+
+pub(crate) async fn reconcile_instance_after_pack_update(
+    instance_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    reconcile_instance_with_state(&metadata, &state, true).await
 }
 
 pub(crate) async fn prepare_instance_update(
@@ -680,10 +779,24 @@ pub(crate) async fn prepare_instance_update(
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
     for option in [
+        SyncedOption::GameOptions,
         SyncedOption::CommandHistory,
         SyncedOption::CreativeHotbars,
         SyncedOption::MultiplayerServers,
     ] {
+        if option == SyncedOption::GameOptions {
+            if let Err(error) =
+                super::super::game_options::prepare_instance_update_with_state(
+                    &metadata, &state,
+                )
+                .await
+            {
+                tracing::warn!(
+                    "The modpack update will continue, but options.txt could not be prepared for game-settings sync: {error}"
+                );
+            }
+            continue;
+        }
         if instance_option_enabled(&metadata, option) {
             detach_option(&metadata, option, &state).await?;
         }
@@ -694,8 +807,9 @@ pub(crate) async fn prepare_instance_update(
 async fn reconcile_instance_with_state(
     metadata: &InstanceMetadata,
     state: &State,
+    allow_protected: bool,
 ) -> crate::Result<()> {
-    if sync_files_are_protected(metadata)
+    if (!allow_protected && sync_files_are_protected(metadata))
         || instance_is_running(metadata, state).await?
     {
         return Ok(());
@@ -710,7 +824,28 @@ async fn reconcile_instance_with_state(
             .await
         {
             CapabilityStatus::Supported => {
-                reconcile_option(metadata, option, state).await?
+                let result = if option == SyncedOption::GameOptions
+                    && allow_protected
+                {
+                    super::super::game_options::sync_instance_with_state(
+                        metadata,
+                        state,
+                        super::super::game_options::SyncReason::PackExtracted,
+                    )
+                    .await
+                } else {
+                    reconcile_option(metadata, option, state).await
+                };
+                if let Err(error) = result {
+                    if option == SyncedOption::GameOptions {
+                        tracing::warn!(
+                            "Game settings could not be reconciled for {}, continuing with the remaining synced options: {error}",
+                            metadata.instance.id
+                        );
+                    } else {
+                        return Err(error);
+                    }
+                }
             }
             CapabilityStatus::Unsupported(_) => {
                 detach_option(metadata, option, state).await?
@@ -727,6 +862,14 @@ async fn reconcile_option(
     state: &State,
 ) -> crate::Result<()> {
     match option {
+        SyncedOption::GameOptions => {
+            super::super::game_options::sync_instance_with_state(
+                metadata,
+                state,
+                super::super::game_options::SyncReason::Normal,
+            )
+            .await
+        }
         SyncedOption::CommandHistory => {
             reconcile_command_history(metadata, state).await
         }
@@ -753,6 +896,19 @@ pub async fn reconcile_changed_file(
         return Ok(());
     }
     match file_name {
+        "options.txt" => {
+            if option_effective(&metadata, SyncedOption::GameOptions, &state)
+                .await?
+            {
+                super::super::game_options::sync_instance_with_state(
+                    &metadata,
+                    &state,
+                    super::super::game_options::SyncReason::Normal,
+                )
+                .await?;
+            }
+            Ok(())
+        }
         COMMAND_HISTORY_FILE => {
             reconcile_command_history(&metadata, &state).await
         }
@@ -812,6 +968,7 @@ async fn backup_instance_option_file(
 ) -> crate::Result<()> {
     let directory = instance_dir(metadata, state);
     let path = match option {
+        SyncedOption::GameOptions => directory.join("options.txt"),
         SyncedOption::CommandHistory => directory.join(COMMAND_HISTORY_FILE),
         SyncedOption::CreativeHotbars => directory.join(HOTBAR_FILE),
         SyncedOption::MultiplayerServers => directory.join("servers.dat"),
@@ -860,6 +1017,12 @@ pub(super) async fn seed_from_instance(
     create_synced_directories(state).await?;
     let instance_dir = instance_dir(metadata, state);
     match option {
+        SyncedOption::GameOptions => {
+            super::super::game_options::initialize_from_source_instance(
+                metadata, state,
+            )
+            .await?;
+        }
         SyncedOption::CommandHistory => {
             let path = instance_dir.join(COMMAND_HISTORY_FILE);
             let contents = if path.exists() {
@@ -913,6 +1076,14 @@ async fn ensure_option(
     state: &State,
 ) -> crate::Result<()> {
     match option {
+        SyncedOption::GameOptions => {
+            super::super::game_options::sync_instance_with_state(
+                metadata,
+                state,
+                super::super::game_options::SyncReason::Normal,
+            )
+            .await
+        }
         SyncedOption::CommandHistory => {
             ensure_command_history(metadata, state).await
         }
@@ -931,6 +1102,9 @@ async fn detach_option(
 ) -> crate::Result<()> {
     let instance_dir = instance_dir(metadata, state);
     match option {
+        SyncedOption::GameOptions => {
+            super::super::game_options::detach_instance(metadata, state).await
+        }
         SyncedOption::CommandHistory => {
             detach_link(
                 &command_history_path(state),
@@ -960,6 +1134,9 @@ async fn canonical_exists(
     state: &State,
 ) -> crate::Result<bool> {
     Ok(match option {
+        SyncedOption::GameOptions => {
+            super::super::game_options::canonical_exists(state).await?
+        }
         SyncedOption::CommandHistory => command_history_path(state).exists(),
         SyncedOption::CreativeHotbars => hotbar_state_exists(state).await?,
         SyncedOption::MultiplayerServers => {
@@ -997,6 +1174,7 @@ fn is_linked_server_project(link: &InstanceLink) -> bool {
 
 fn option_from_str(value: &str) -> Option<SyncedOption> {
     match value {
+        "game_options" => Some(SyncedOption::GameOptions),
         "command_history" => Some(SyncedOption::CommandHistory),
         "multiplayer_servers" => Some(SyncedOption::MultiplayerServers),
         "creative_hotbars" => Some(SyncedOption::CreativeHotbars),

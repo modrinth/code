@@ -26,7 +26,16 @@ import type { Component } from 'vue'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
+import {
+	formatSourceDisabledReason,
+	formatSourceSettingsSummary,
+} from '@/components/ui/settings/instances/game-settings/game-setting-messages'
 import useMemorySlider from '@/composables/useMemorySlider'
+import {
+	type GameOptionsSourceCandidate,
+	list_game_options_sync_sources,
+} from '@/helpers/game-options'
 import {
 	get_command_history,
 	get_global_synced_options,
@@ -65,6 +74,23 @@ const messages = defineMessages({
 	// 	id: 'app.settings.synced-options.folder',
 	// 	defaultMessage: 'Synced folder',
 	// },
+	gameSettings: {
+		id: 'app.settings.synced-options.game-settings',
+		defaultMessage: 'Game settings',
+	},
+	gameSettingsDescription: {
+		id: 'app.settings.synced-options.game-settings.description',
+		defaultMessage:
+			'You can choose which options to sync across instances so they apply on top of a modpack’s options.txt.',
+	},
+	gameSettingsButton: {
+		id: 'app.settings.synced-options.game-settings.button',
+		defaultMessage: 'Settings',
+	},
+	gameSettingsDisabledTooltip: {
+		id: 'app.settings.synced-options.game-settings.disabled-tooltip',
+		defaultMessage: 'Enable game settings sync before choosing individual settings.',
+	},
 	multiplayerServers: {
 		id: 'app.settings.synced-options.multiplayer-servers',
 		defaultMessage: 'Sync multiplayer servers',
@@ -104,6 +130,11 @@ const messages = defineMessages({
 	creativeHotbarsSyncSourceDescription: {
 		id: 'app.settings.synced-options.choose-sync-source.creative-hotbars-description',
 		defaultMessage: 'Pick the instance whose saved creative hotbars become the shared copy.',
+	},
+	gameSettingsSyncSourceDescription: {
+		id: 'app.settings.synced-options.choose-sync-source.game-settings-description',
+		defaultMessage:
+			'Pick the instance whose options.txt values become the shared game settings baseline.',
 	},
 	searchInstance: {
 		id: 'app.settings.synced-options.choose-sync-source.search-placeholder',
@@ -292,8 +323,14 @@ const globalRows: Array<{
 	option: SyncedOption
 	title: keyof typeof messages
 	description?: keyof typeof messages
-	editable?: 'servers' | 'commands'
+	editable?: 'game-settings' | 'servers' | 'commands'
 }> = [
+	{
+		option: 'game_options',
+		title: 'gameSettings',
+		description: 'gameSettingsDescription',
+		editable: 'game-settings',
+	},
 	{
 		option: 'multiplayer_servers',
 		title: 'multiplayerServers',
@@ -316,6 +353,7 @@ const globalRows: Array<{
 const globalSyncedOptionsQueryKey = ['global-synced-options'] as const
 const globalSyncedOptionsMutationKey = ['global-synced-options', 'set'] as const
 const defaultGlobalOptions: GlobalSyncedOptions = {
+	game_options: false,
 	command_history: false,
 	multiplayer_servers: false,
 	creative_hotbars: false,
@@ -332,6 +370,7 @@ const baseOption = ref<SyncedOption | null>(null)
 const baseInstanceId = ref(instances.value[0]?.id ?? '')
 const baseInstanceSearch = ref('')
 const baseModal = ref<InstanceType<typeof NewModal> | null>(null)
+const gameSettingsModal = ref<InstanceType<typeof GameSettingsModal> | null>(null)
 const commandHistoryModal = ref<InstanceType<typeof NewModal> | null>(null)
 const serverEditorModal = ref<InstanceType<typeof NewModal> | null>(null)
 const editServerModal = ref<InstanceType<typeof NewModal> | null>(null)
@@ -345,6 +384,20 @@ const syncedServers = ref<SyncedServer[]>(
 const editedServer = ref<SyncedServer | null>(null)
 const serverData = ref<Record<string, ServerData>>({})
 const editorComponent = shallowRef<Component | null>(null)
+const gameOptionSources = ref<GameOptionsSourceCandidate[]>([])
+const baseSourcesLoading = ref(false)
+let baseSourceGeneration = 0
+
+type BaseSourceCandidate = {
+	id: string
+	name: string
+	icon_path?: string | null
+	game_version?: string | null
+	eligible: boolean
+	disabled_reason?: GameOptionsSourceCandidate['disabled_reason']
+	recognized_setting_count?: number
+	custom_setting_count?: number
+}
 
 const syncedServerCards = computed(() =>
 	syncedServers.value.map((server, index) => ({
@@ -368,6 +421,8 @@ const syncedServerCards = computed(() =>
 
 const baseInstanceDescription = computed(() => {
 	switch (baseOption.value) {
+		case 'game_options':
+			return formatMessage(messages.gameSettingsSyncSourceDescription)
 		case 'multiplayer_servers':
 			return formatMessage(messages.multiplayerServersSyncSourceDescription)
 		case 'command_history':
@@ -381,9 +436,43 @@ const baseInstanceDescription = computed(() => {
 
 const filteredBaseInstances = computed(() => {
 	const search = baseInstanceSearch.value.trim().toLowerCase()
-	if (!search) return instances.value
-	return instances.value.filter((instance) => instance.name.toLowerCase().includes(search))
+	const candidates: BaseSourceCandidate[] =
+		baseOption.value === 'game_options'
+			? gameOptionSources.value.map((source) => ({
+					id: source.source_id,
+					name: source.name,
+					icon_path: source.icon_path,
+					game_version: source.game_version,
+					eligible: source.eligible,
+					disabled_reason: source.disabled_reason,
+					recognized_setting_count: source.recognized_setting_count,
+					custom_setting_count: source.custom_setting_count,
+				}))
+			: instances.value.map((instance) => ({
+					id: instance.id,
+					name: instance.name,
+					icon_path: instance.icon_path,
+					game_version: instance.game_version,
+					eligible: true,
+				}))
+	if (!search) return candidates
+	return candidates.filter((instance) => instance.name.toLowerCase().includes(search))
 })
+
+function baseSourceDescription(source: BaseSourceCandidate): string | null {
+	if (source.disabled_reason) {
+		return formatSourceDisabledReason(formatMessage, source.disabled_reason)
+	}
+	if (
+		source.recognized_setting_count === undefined ||
+		source.custom_setting_count === undefined
+	)
+		return null
+	return formatSourceSettingsSummary(formatMessage, {
+		recognized_setting_count: source.recognized_setting_count,
+		custom_setting_count: source.custom_setting_count,
+	})
+}
 
 async function invalidateSyncedOptions() {
 	await Promise.all([
@@ -407,10 +496,12 @@ const globalOptionMutation = useMutation({
 		await queryClient.cancelQueries({ queryKey: globalSyncedOptionsQueryKey })
 		const previous = globalOptions.value[option]
 
-		queryClient.setQueryData<GlobalSyncedOptions>(globalSyncedOptionsQueryKey, (current) => ({
-			...(current ?? defaultGlobalOptions),
-			[option]: enabled,
-		}))
+		if (option !== 'game_options' || !enabled) {
+			queryClient.setQueryData<GlobalSyncedOptions>(globalSyncedOptionsQueryKey, (current) => ({
+				...(current ?? defaultGlobalOptions),
+				[option]: enabled,
+			}))
+		}
 
 		return { previous }
 	},
@@ -421,7 +512,8 @@ const globalOptionMutation = useMutation({
 		}))
 		handleError(error)
 	},
-	onSuccess: async (_options, { option, enabled }) => {
+	onSuccess: async (options, { option, enabled }) => {
+		queryClient.setQueryData(globalSyncedOptionsQueryKey, options)
 		if (enabled) baseModal.value?.hide()
 		if (enabled && option === 'multiplayer_servers') {
 			syncedServers.value = await list_synced_servers().catch((error) => {
@@ -441,21 +533,59 @@ function applyGlobalOption(option: SyncedOption, enabled: boolean, baseInstanceI
 	globalOptionMutation.mutate({ option, enabled, baseInstanceId })
 }
 
-function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
-	if (!enabled) {
-		applyGlobalOption(option, false)
+async function chooseBaseInstance(option: SyncedOption) {
+	const generation = ++baseSourceGeneration
+	baseOption.value = option
+	baseInstanceSearch.value = ''
+	baseSourcesLoading.value = option === 'game_options'
+	baseModal.value?.show()
+
+	if (option === 'game_options') {
+		try {
+			const sources = await list_game_options_sync_sources()
+			if (generation !== baseSourceGeneration || baseOption.value !== option) return
+			gameOptionSources.value = sources
+			baseInstanceId.value =
+				gameOptionSources.value.find((source) => source.eligible)?.source_id ?? ''
+		} catch (error) {
+			if (generation !== baseSourceGeneration || baseOption.value !== option) return
+			gameOptionSources.value = []
+			baseInstanceId.value = ''
+			handleError(error)
+		} finally {
+			if (generation === baseSourceGeneration && baseOption.value === option) {
+				baseSourcesLoading.value = false
+			}
+		}
 		return
 	}
 
-	baseOption.value = option
 	baseInstanceId.value = instances.value[0]?.id ?? ''
-	baseInstanceSearch.value = ''
-	baseModal.value?.show()
 }
 
-function confirmBaseInstance() {
+function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
+	if (enabled && option !== 'screenshots') {
+		void chooseBaseInstance(option)
+		return
+	}
+	applyGlobalOption(option, enabled)
+}
+
+async function confirmBaseInstance() {
 	if (!baseOption.value || !baseInstanceId.value) return
-	applyGlobalOption(baseOption.value, true, baseInstanceId.value)
+	try {
+		await globalOptionMutation.mutateAsync({
+			option: baseOption.value,
+			enabled: true,
+			baseInstanceId: baseInstanceId.value,
+		})
+	} catch {
+		return
+	}
+}
+
+function openGameSettings() {
+	gameSettingsModal.value?.show()
 }
 
 async function openCommandHistoryEditor() {
@@ -569,6 +699,8 @@ watch(
 
 <template>
 	<div>
+		<GameSettingsModal ref="gameSettingsModal" @saved="invalidateSyncedOptions" />
+
 		<NewModal
 			ref="baseModal"
 			:header="formatMessage(messages.chooseSyncSourceTitle)"
@@ -576,6 +708,7 @@ watch(
 			actions-divider
 			max-width="560px"
 			width="560px"
+			:disable-close="globalOptionMutation.isPending.value"
 		>
 			<p class="m-0 border-0 border-b border-solid border-surface-5 p-6 text-primary">
 				{{ baseInstanceDescription }}
@@ -591,8 +724,11 @@ watch(
 					class="shrink-0"
 				/>
 
+				<div v-if="baseSourcesLoading" class="flex flex-1 items-center justify-center">
+					<RefreshCwIcon class="size-5 animate-spin text-secondary" />
+				</div>
 				<div
-					v-if="filteredBaseInstances.length === 0"
+					v-else-if="filteredBaseInstances.length === 0"
 					class="flex flex-1 items-center justify-center text-secondary"
 				>
 					{{ formatMessage(messages.noInstancesFound) }}
@@ -607,8 +743,9 @@ watch(
 						v-for="instance in filteredBaseInstances"
 						:key="instance.id"
 						:checked="baseInstanceId === instance.id"
-						class="h-10"
-						@click="baseInstanceId = instance.id"
+						:disabled="!instance.eligible"
+						class="min-h-10"
+						@click="instance.eligible && (baseInstanceId = instance.id)"
 					>
 						<span class="size-5 shrink-0 overflow-hidden rounded-[6px]">
 							<Avatar
@@ -619,23 +756,40 @@ watch(
 								no-shadow
 							/>
 						</span>
-						<span class="truncate">{{ instance.name }}</span>
+						<span class="flex min-w-0 flex-1 flex-col">
+							<span class="truncate">{{ instance.name }}</span>
+							<span
+								v-if="instance.game_version || baseSourceDescription(instance)"
+								class="truncate text-xs font-normal text-secondary"
+							>
+								<span v-if="instance.game_version">{{ instance.game_version }}</span>
+								<span v-if="instance.game_version && baseSourceDescription(instance)" aria-hidden="true">
+									·
+								</span>
+								<span v-if="baseSourceDescription(instance)">{{ baseSourceDescription(instance) }}</span>
+							</span>
+						</span>
 					</CheckCircleButton>
 				</div>
 			</div>
 			<template #actions>
 				<div class="flex justify-end gap-2 p-2">
-					<Button type="outlined" @click="baseModal?.hide()">
+					<Button
+						type="outlined"
+						:disabled="globalOptionMutation.isPending.value"
+						@click="baseModal?.hide()"
+					>
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
 					<Button
 						type="colored"
 						color="brand"
-						:disabled="!baseInstanceId || globalOptionMutation.isPending.value"
+						:disabled="!baseInstanceId || baseSourcesLoading || globalOptionMutation.isPending.value"
+						:loading="globalOptionMutation.isPending.value"
 						@click="confirmBaseInstance"
 					>
-						<RefreshCwIcon />
+						<RefreshCwIcon v-if="!globalOptionMutation.isPending.value" />
 						{{ formatMessage(messages.syncButton) }}
 					</Button>
 				</div>
@@ -774,7 +928,25 @@ watch(
 						</div>
 						<div class="flex shrink-0 items-center gap-2">
 							<span
-								v-if="row.editable"
+								v-if="row.editable === 'game-settings'"
+								v-tooltip="
+									!globalOptions.game_options
+										? formatMessage(messages.gameSettingsDisabledTooltip)
+										: formatMessage(messages.gameSettingsButton)
+								"
+								class="flex"
+							>
+								<Button
+									type="outlined"
+									size="sm"
+									:disabled="!globalOptions.game_options || globalOptionMutation.isPending.value"
+									@click="openGameSettings"
+								>
+									{{ formatMessage(messages.gameSettingsButton) }}
+								</Button>
+							</span>
+							<span
+								v-else-if="row.editable"
 								v-tooltip="
 									row.editable === 'servers' && syncedServers.length === 0
 										? formatMessage(messages.noServersSyncedYet)
@@ -800,6 +972,7 @@ watch(
 							<Toggle
 								:id="`global-sync-${row.option}`"
 								:model-value="globalOptions[row.option]"
+								:disabled="globalOptionMutation.isPending.value"
 								@update:model-value="(enabled) => toggleGlobalOption(row.option, enabled)"
 							/>
 						</div>

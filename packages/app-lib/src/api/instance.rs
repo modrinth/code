@@ -3,6 +3,7 @@
 mod content;
 mod content_set_diff;
 mod export_mrpack;
+mod game_options;
 mod get;
 mod groups;
 mod icon;
@@ -26,6 +27,23 @@ pub use self::content::{
 pub use self::export_mrpack::{
     PackExportCandidate, create_mrpack_json, export_mrpack,
     get_pack_export_candidates, get_pack_export_candidates_for_parent,
+};
+pub use self::game_options::{
+    CanonicalValue as GameOptionCanonicalValue, EditableGameSetting,
+    GameOptionCompatibility, GameOptionCompatibilityBucket,
+    GameOptionCompatibilityReason, GameOptionCompatibilityStatus,
+    GameOptionEditorChoice, GameOptionEditorDefinition, GameOptionKind,
+    GameOptionMappingKind, GameOptionValidationIssue, GameOptionValueState,
+    GameOptionsSourceCandidate, GameOptionsSourceIssue, GameSettingCategory,
+    GameSettingChange, GameSettingsEditorState, SaveGameSettingsResult,
+    UpdateGameSettingsRequest,
+    apply_launcher_overrides as apply_game_options_launcher_overrides,
+    capture_pack_base as capture_game_options_pack_base,
+    get_config as get_synced_game_options_config,
+    list_sync_sources as list_game_options_sync_sources,
+    preview_changes as preview_synced_game_option_changes,
+    save_changes as save_synced_game_option_changes,
+    sync_before_launch as sync_game_options_before_launch,
 };
 pub use self::get::{get, get_many, list};
 pub use self::groups::{
@@ -103,7 +121,7 @@ pub use self::synced_options::{
 pub(crate) use self::synced_options::{
     monitor_persisted_processes, prepare_instance_update,
     reconcile_changed_file as reconcile_synced_option_file,
-    remove_generated_instance_files,
+    reconcile_instance_after_pack_update, remove_generated_instance_files,
 };
 pub use self::synced_options::{
     reconcile_all as reconcile_all_synced_options,

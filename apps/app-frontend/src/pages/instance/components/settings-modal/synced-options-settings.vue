@@ -43,6 +43,15 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.synced-options.open-app-settings',
 		defaultMessage: 'Manage synced settings',
 	},
+	gameSettings: {
+		id: 'instance.settings.tabs.synced-options.game-settings',
+		defaultMessage: 'Game settings',
+	},
+	gameSettingsDescription: {
+		id: 'instance.settings.tabs.synced-options.game-settings.description',
+		defaultMessage:
+			'Apply the selected shared game settings on top of this instance’s options.txt.',
+	},
 	multiplayerServers: {
 		id: 'instance.settings.tabs.synced-options.multiplayer-servers',
 		defaultMessage: 'Unsync multiplayer servers',
@@ -115,6 +124,11 @@ const rows: Array<{
 	title: keyof typeof messages
 	description?: keyof typeof messages
 }> = [
+	{
+		option: 'game_options',
+		title: 'gameSettings',
+		description: 'gameSettingsDescription',
+	},
 	{
 		option: 'multiplayer_servers',
 		title: 'multiplayerServers',
@@ -374,6 +388,9 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 					<p v-if="row.description" class="m-0 text-secondary">
 						{{ formatMessage(messages[row.description]) }}
 					</p>
+					<p v-if="disabledReason(row.option)" class="m-0 text-xs text-orange">
+						{{ disabledReason(row.option) }}
+					</p>
 				</div>
 				<div class="flex shrink-0 items-center">
 					<span v-tooltip="disabledReason(row.option)" class="flex">
@@ -383,7 +400,7 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 							:disabled="
 								previewingOption !== null ||
 								overviewQuery.isPending.value ||
-								!!disabledReason(row.option)
+								(!!disabledReason(row.option) && !enabled(row.option))
 							"
 							@update:model-value="(excluded) => setExcluded(row.option, excluded)"
 						/>

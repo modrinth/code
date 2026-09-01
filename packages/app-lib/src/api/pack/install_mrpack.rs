@@ -630,8 +630,6 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         );
     }
 
-    crate::api::instance::prepare_instance_update(&instance_id).await?;
-
     set_instance_information(
         instance_id.clone(),
         &description,
@@ -957,6 +955,11 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     )
     .await?;
 
+    let has_client_options_override =
+        zip_reader.file().entries().iter().any(|file| {
+            file.filename().as_str().unwrap_or_default()
+                == "client-overrides/options.txt"
+        });
     let override_file_entries = zip_reader
         .file()
         .entries()
@@ -964,10 +967,13 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         .enumerate()
         .filter_map(|(index, file)| {
             let filename = file.filename().as_str().unwrap_or_default();
-            ((filename.starts_with("overrides/")
+            let is_override = (filename.starts_with("overrides/")
                 || filename.starts_with("client-overrides/"))
-                && !filename.ends_with('/'))
-            .then(|| (index, file.clone()))
+                && !filename.ends_with('/');
+            let shadowed_game_options = has_client_options_override
+                && filename == "overrides/options.txt";
+            (is_override && !shadowed_game_options)
+                .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();
     let override_total_bytes = override_file_entries
@@ -979,6 +985,15 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         filename == "overrides/servers.dat"
             || filename == "client-overrides/servers.dat"
     });
+    let game_options_override_source = if has_client_options_override {
+        Some("client_overrides")
+    } else if override_file_entries.iter().any(|(_, file)| {
+        file.filename().as_str().unwrap_or_default() == "overrides/options.txt"
+    }) {
+        Some("overrides")
+    } else {
+        None
+    };
     let progress = (override_total_bytes > 0).then_some(InstallProgress {
         current: 0,
         total: override_total_bytes,
@@ -1034,8 +1049,8 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 file.filename().as_str().unwrap().to_string(),
             )?;
         let relative_override_file_path = relative_override_file_path
-            .strip_prefix("overrides")
-            .or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
+			.strip_prefix("overrides")
+			.or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
             .map_err(|_| {
                 crate::Error::from(crate::ErrorKind::OtherError(
                     format!("Failed to strip override prefix from override file path: {relative_override_file_path}")
@@ -1141,7 +1156,17 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         )
         .await?;
     }
-    crate::api::instance::reconcile_instance_synced_options(&instance_id)
+    if let Err(error) = crate::api::instance::capture_game_options_pack_base(
+        &instance_id,
+        game_options_override_source,
+    )
+    .await
+    {
+        tracing::warn!(
+            "The modpack was installed, but its options.txt could not be captured for game-settings sync: {error}"
+        );
+    }
+    crate::api::instance::reconcile_instance_after_pack_update(&instance_id)
         .await?;
 
     // If the icon doesn't exist, we expect icon.png to be a potential icon.
@@ -1299,8 +1324,11 @@ pub async fn remove_all_related_files(
             .map_err(|_| {
                 crate::Error::from(crate::ErrorKind::OtherError(
                     format!("Failed to strip override prefix from override file path: {relative_override_file_path}")
-                ))
-            })?;
+				))
+			})?;
+        if relative_override_file_path.as_str() == "options.txt" {
+            continue;
+        }
 
         // Remove this file if a corresponding one exists in the filesystem
         match io::remove_file(

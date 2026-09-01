@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM instance_game_option_update_state WHERE instance_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "7a91c72a32d0d8cf712ddcbe9746d3d8c7b10211f275e0db81fa1eda5196c2e5"
+}
