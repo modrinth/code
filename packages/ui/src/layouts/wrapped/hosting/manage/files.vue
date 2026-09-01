@@ -63,14 +63,9 @@ const messages = defineMessages({
 		id: 'servers.files.zip-failed',
 		defaultMessage: 'Could not create ZIP',
 	},
-	downloadAllFailed: {
-		id: 'servers.files.download-all-failed',
-		defaultMessage: 'Could not download server files',
-	},
 })
 
 const zippingFolder = ref(false)
-const downloadingAllFiles = ref(false)
 
 const serverBusy = computed(() => busyReasons.value.length > 0)
 const busyTooltip = computed(() =>
@@ -356,10 +351,11 @@ const createMutation = useMutation({
 // Extraction
 async function extractFile(path: string, override: boolean, dry: boolean) {
 	if (fileWriteDisabled.value) return
+	const target = path.slice(0, path.lastIndexOf('/')) || '/'
 	if (dry) {
-		return await client.kyros.files_v0.extractFile(path, override, true)
+		return await client.kyros.files_v0.extractFile(path, override, true, target)
 	}
-	await client.kyros.files_v0.extractFile(path, override, false)
+	await client.kyros.files_v0.extractFile(path, override, false, target)
 }
 
 // File I/O
@@ -405,37 +401,40 @@ function saveBlob(blob: Blob, fileName: string) {
 	window.URL.revokeObjectURL(link.href)
 }
 
-async function downloadAllFiles(): Promise<void> {
-	if (!worldId.value || downloadingAllFiles.value) return
-	downloadingAllFiles.value = true
-	try {
-		const archive = await client.kyros.files_v1.downloadWorldZip(worldId.value)
-		saveBlob(archive, `${serverId}.zip`)
-	} catch (error) {
-		addNotification({
-			title: formatMessage(messages.downloadAllFailed),
-			text: error instanceof Error ? error.message : undefined,
-			type: 'error',
-		})
-	} finally {
-		downloadingAllFiles.value = false
-	}
-}
-
-async function zipFolder(path: string): Promise<void> {
+async function createZip(data: Kyros.Files.v1.ZipRequest, destination?: string): Promise<void> {
 	if (!worldId.value || fileWriteDisabled.value) return
+	const operationId = `local-zip-${crypto.randomUUID()}`
+	const source =
+		data.target_type === 'Directory'
+			? `${data.path.split('/').pop() || data.path}.zip`
+			: data.target
+	const updateOperation = (record: Partial<Kyros.Files.v1.ZipProgress>, state = 'ongoing') => {
+		serverContext.upsertLocalFileOperation?.({
+			id: operationId,
+			op: 'zip',
+			src: source,
+			state,
+			progress: (record.progress ?? 0) / 100,
+			cancellable: false,
+		})
+	}
 	zippingFolder.value = true
+	updateOperation({ progress: 0 })
 	try {
-		const result = await client.kyros.files_v1.zipFolder(worldId.value, { path })
+		await client.kyros.files_v1.createZip(worldId.value, data, (record) => {
+			updateOperation(record, record.done ? 'done' : 'ongoing')
+		})
+		updateOperation({ progress: 100 }, 'done')
 		addNotification({
 			title: formatMessage(messages.zipCreated),
-			text: formatMessage(messages.zipCreatedDescription, {
-				destination: result.destination,
-			}),
+			text: destination
+				? formatMessage(messages.zipCreatedDescription, { destination })
+				: undefined,
 			type: 'success',
 		})
 		refreshList()
 	} catch (error) {
+		updateOperation({ progress: 0 }, 'failure-error')
 		addNotification({
 			title: formatMessage(messages.zipFailed),
 			text: error instanceof Error ? error.message : undefined,
@@ -444,6 +443,17 @@ async function zipFolder(path: string): Promise<void> {
 	} finally {
 		zippingFolder.value = false
 	}
+}
+
+async function zipFolder(path: string): Promise<void> {
+	await createZip({ target_type: 'Directory', path })
+}
+
+async function zipPaths(parent: string, include: string[], target: string): Promise<void> {
+	await createZip(
+		{ target_type: 'ManyPaths', parent, include, target },
+		`${parent}/${target}`.replace('//', '/'),
+	)
 }
 
 watch(
@@ -523,9 +533,8 @@ provideFileManager({
 	readFileAsBlob,
 	writeFile,
 	downloadFile,
-	downloadAllFiles,
-	downloadingAllFiles,
 	zipFolder,
+	zipPaths,
 	uploadFiles,
 	cancelUpload,
 	uploadState,

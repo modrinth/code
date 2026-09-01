@@ -27,6 +27,7 @@ export interface FileOperation {
 	bytes_processed?: number
 	files_processed?: number
 	current_file?: string
+	cancellable?: boolean
 }
 
 export interface UndoableOperation {

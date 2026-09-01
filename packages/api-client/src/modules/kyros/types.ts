@@ -29,13 +29,22 @@ export namespace Kyros {
 
 	export namespace Files {
 		export namespace v1 {
-			export interface ZipFolderRequest {
-				path: string
-			}
+			export type ZipRequest =
+				| {
+						target_type: 'Directory'
+						path: string
+				  }
+				| {
+						target_type: 'ManyPaths'
+						parent: string
+						include: string[]
+						target: string
+				  }
 
-			export interface FileMutationResponse {
-				source: string
-				destination: string
+			export interface ZipProgress {
+				progress: number
+				done?: boolean
+				error?: string
 			}
 		}
 

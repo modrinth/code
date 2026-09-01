@@ -1415,6 +1415,21 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "e.g. config.yml"
   },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "Create ZIP"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "Create ZIP"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "The archive name must be a single file name."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Archive name"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "Enter an archive name."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "Deleting \"{name}\""
   },
@@ -1526,6 +1541,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "File operations are disabled while the operation is in progress."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "Create ZIP"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Error running dry run"
   },
@@ -1607,6 +1625,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Upload from .zip URL"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "{progress}% compressed"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "Creating {source}"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "Creating {source} finished"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "Creating {source} failed"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Current file: {file}"
   },
@@ -1630,6 +1660,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "New name"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "Create ZIP"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
@@ -5131,6 +5164,15 @@
   },
   "servers.busy.installing": {
     "defaultMessage": "Server is installing"
+  },
+  "servers.files.zip-created": {
+    "defaultMessage": "ZIP created"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "Created {destination}"
+  },
+  "servers.files.zip-failed": {
+    "defaultMessage": "Could not create ZIP"
   },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Also send a friend request"

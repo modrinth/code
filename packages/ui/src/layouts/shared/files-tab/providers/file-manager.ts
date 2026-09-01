@@ -31,9 +31,8 @@ export interface FileManagerContext {
 	readFileAsBlob: (path: string) => Promise<Blob>
 	writeFile: (path: string, content: string) => Promise<void>
 	downloadFile: (path: string, fileName: string) => Promise<void>
-	downloadAllFiles?: () => Promise<void>
-	downloadingAllFiles?: Ref<boolean> | ComputedRef<boolean>
 	zipFolder?: (path: string) => Promise<void>
+	zipPaths?: (parent: string, include: string[], target: string) => Promise<void>
 
 	uploadFiles: (files: File[]) => void
 	cancelUpload?: () => void
