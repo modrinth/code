@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use std::fmt;
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufReader, IsTerminal};
 use std::path::{Path, PathBuf};
 
 use clap::Parser;
@@ -18,6 +18,9 @@ use serde::de::{
 use strum::IntoEnumIterator;
 use url::Url;
 
+#[path = "check_project/profanity.rs"]
+mod profanity;
+
 const API_BASE_URL: &str = "https://api.modrinth.com/v3/";
 
 #[derive(Parser)]
@@ -29,18 +32,52 @@ struct Args {
 	/// The ID of the project to validate
 	#[arg(
 		value_name = "PROJECT_ID",
-		required_unless_present = "file",
-		conflicts_with = "file"
+		required_unless_present_any = ["file", "read_profanity_report"],
+		conflicts_with_all = ["file", "read_profanity_report"]
 	)]
 	project_id: Option<String>,
 
 	/// Validate all projects in a moderation project dataset
-	#[arg(long, value_name = "PATH", conflicts_with = "token")]
+	#[arg(
+		long,
+		value_name = "PATH",
+		conflicts_with_all = ["token", "read_profanity_report"]
+	)]
 	file: Option<PathBuf>,
 
 	/// A Modrinth token to send as bearer authentication
 	#[arg(long, value_name = "TOKEN")]
 	token: Option<String>,
+
+	/// Show this many descriptions flagged for profanity
+	#[arg(long, value_name = "COUNT", default_value_t = 0, requires = "file")]
+	show_description_profanity: usize,
+
+	/// Scan every profanity-bearing field into a reusable JSON report
+	#[arg(
+		long,
+		value_name = "PATH",
+		requires = "file",
+		conflicts_with = "show_description_profanity"
+	)]
+	write_profanity_report: Option<PathBuf>,
+
+	/// Render a previously generated profanity report
+	#[arg(long, value_name = "PATH", conflicts_with = "file")]
+	read_profanity_report: Option<PathBuf>,
+
+	/// Render at most this many projects from a profanity report (0 means all)
+	#[arg(
+		long,
+		value_name = "COUNT",
+		default_value_t = 0,
+		requires = "read_profanity_report"
+	)]
+	profanity_report_limit: usize,
+
+	/// Use bracket markers instead of ANSI colors when rendering a report
+	#[arg(long, requires = "read_profanity_report")]
+	profanity_report_brackets: bool,
 }
 
 #[derive(Serialize)]
@@ -49,15 +86,27 @@ struct BatchSummary {
 	projects_with_at_least_one_required_nag: usize,
 	version_details_available: bool,
 	nag_counts: BTreeMap<ProjectNagKind, usize>,
+	#[serde(skip)]
+	description_profanity_sample_limit: usize,
+	#[serde(skip)]
+	description_profanity_samples: Vec<DescriptionProfanitySample>,
+}
+
+struct DescriptionProfanitySample {
+	id: String,
+	name: String,
+	description: String,
 }
 
 impl BatchSummary {
-	fn new() -> Self {
+	fn new(description_profanity_sample_limit: usize) -> Self {
 		Self {
 			projects: 0,
 			projects_with_at_least_one_required_nag: 0,
 			version_details_available: false,
 			nag_counts: ProjectNagKind::iter().map(|kind| (kind, 0)).collect(),
+			description_profanity_sample_limit,
+			description_profanity_samples: Vec::new(),
 		}
 	}
 
@@ -70,6 +119,19 @@ impl BatchSummary {
 		{
 			self.projects_with_at_least_one_required_nag += 1;
 		}
+		if self.description_profanity_samples.len()
+			< self.description_profanity_sample_limit
+			&& nags.iter().any(|nag| {
+				nag.kind == ProjectNagKind::ProjectDescriptionProfanity
+			}) {
+			self.description_profanity_samples.push(
+				DescriptionProfanitySample {
+					id: project.id.to_string(),
+					name: project.name.clone(),
+					description: project.description.clone(),
+				},
+			);
+		}
 		for nag in nags {
 			*self.nag_counts.entry(nag.kind).or_default() += 1;
 		}
@@ -81,8 +143,26 @@ async fn main() -> Result<()> {
 	color_eyre::install().wrap_err("installing color-eyre")?;
 	let args = Args::parse();
 
-	if let Some(path) = args.file {
-		let summary = summarize_file(&path)?;
+	if let Some(report_path) = args.read_profanity_report.as_deref() {
+		return profanity::render_report(
+			report_path,
+			args.profanity_report_limit,
+			args.profanity_report_brackets,
+		);
+	}
+
+	if let Some(report_path) = args.write_profanity_report.as_deref() {
+		let dataset_path = args.file.as_deref().ok_or_else(|| {
+			eyre!("`--write-profanity-report` requires `--file`")
+		})?;
+		return profanity::write_report(dataset_path, report_path);
+	}
+
+	if let Some(path) = args.file.as_deref() {
+		let summary = summarize_file(path, args.show_description_profanity)?;
+		print_description_profanity_samples(
+			&summary.description_profanity_samples,
+		);
 		print_json(&summary)?;
 		return Ok(());
 	}
@@ -119,18 +199,52 @@ async fn check_api_project(
 	print_json(&validate(&project, &versions))
 }
 
-fn summarize_file(path: &Path) -> Result<BatchSummary> {
+fn summarize_file(
+	path: &Path,
+	description_profanity_sample_limit: usize,
+) -> Result<BatchSummary> {
 	let file = File::open(path)
 		.wrap_err_with(|| format!("opening `{}`", path.display()))?;
 	let mut deserializer =
 		serde_json::Deserializer::from_reader(BufReader::new(file));
-	let summary = DatasetSeed
-		.deserialize(&mut deserializer)
-		.wrap_err_with(|| format!("reading `{}`", path.display()))?;
+	let summary = DatasetSeed {
+		description_profanity_sample_limit,
+	}
+	.deserialize(&mut deserializer)
+	.wrap_err_with(|| format!("reading `{}`", path.display()))?;
 	deserializer
 		.end()
 		.wrap_err_with(|| format!("reading `{}`", path.display()))?;
 	Ok(summary)
+}
+
+fn print_description_profanity_samples(samples: &[DescriptionProfanitySample]) {
+	if samples.is_empty() {
+		return;
+	}
+
+	let use_color = std::io::stderr().is_terminal()
+		&& std::env::var_os("NO_COLOR").is_none();
+	eprintln!("\n=== Description profanity samples ===");
+	if use_color {
+		eprintln!(
+			"Detected text is shown with a bold white-on-red background."
+		);
+	} else {
+		eprintln!("Detected text is enclosed in ⟦double brackets⟧.");
+	}
+
+	for (index, sample) in samples.iter().enumerate() {
+		eprintln!("\n--- Sample {} of {} ---", index + 1, samples.len());
+		eprintln!("Project: {}", sample.name);
+		eprintln!("ID:      {}", sample.id);
+		eprintln!("URL:     https://modrinth.com/project/{}", sample.id);
+		eprintln!(
+			"\n{}",
+			profanity::highlight_text(&sample.description, use_color)
+		);
+	}
+	eprintln!("\n=== End description profanity samples ===\n");
 }
 
 fn print_json(value: &impl Serialize) -> Result<()> {
@@ -172,7 +286,9 @@ async fn fetch<T: DeserializeOwned>(
 		.wrap_err_with(|| format!("deserializing response from `{url}`"))
 }
 
-struct DatasetSeed;
+struct DatasetSeed {
+	description_profanity_sample_limit: usize,
+}
 
 impl<'de> DeserializeSeed<'de> for DatasetSeed {
 	type Value = BatchSummary;
@@ -181,11 +297,16 @@ impl<'de> DeserializeSeed<'de> for DatasetSeed {
 	where
 		D: serde::Deserializer<'de>,
 	{
-		deserializer.deserialize_map(DatasetVisitor)
+		deserializer.deserialize_map(DatasetVisitor {
+			description_profanity_sample_limit: self
+				.description_profanity_sample_limit,
+		})
 	}
 }
 
-struct DatasetVisitor;
+struct DatasetVisitor {
+	description_profanity_sample_limit: usize,
+}
 
 impl<'de> Visitor<'de> for DatasetVisitor {
 	type Value = BatchSummary;
@@ -204,7 +325,10 @@ impl<'de> Visitor<'de> for DatasetVisitor {
 				if summary.is_some() {
 					return Err(serde::de::Error::duplicate_field("projects"));
 				}
-				summary = Some(map.next_value_seed(ProjectsSeed)?);
+				summary = Some(map.next_value_seed(ProjectsSeed {
+					description_profanity_sample_limit:
+						self.description_profanity_sample_limit,
+				})?);
 			} else {
 				map.next_value::<IgnoredAny>()?;
 			}
@@ -214,7 +338,9 @@ impl<'de> Visitor<'de> for DatasetVisitor {
 	}
 }
 
-struct ProjectsSeed;
+struct ProjectsSeed {
+	description_profanity_sample_limit: usize,
+}
 
 impl<'de> DeserializeSeed<'de> for ProjectsSeed {
 	type Value = BatchSummary;
@@ -223,11 +349,16 @@ impl<'de> DeserializeSeed<'de> for ProjectsSeed {
 	where
 		D: serde::Deserializer<'de>,
 	{
-		deserializer.deserialize_seq(ProjectsVisitor)
+		deserializer.deserialize_seq(ProjectsVisitor {
+			description_profanity_sample_limit: self
+				.description_profanity_sample_limit,
+		})
 	}
 }
 
-struct ProjectsVisitor;
+struct ProjectsVisitor {
+	description_profanity_sample_limit: usize,
+}
 
 impl<'de> Visitor<'de> for ProjectsVisitor {
 	type Value = BatchSummary;
@@ -240,7 +371,8 @@ impl<'de> Visitor<'de> for ProjectsVisitor {
 	where
 		A: SeqAccess<'de>,
 	{
-		let mut summary = BatchSummary::new();
+		let mut summary =
+			BatchSummary::new(self.description_profanity_sample_limit);
 		while let Some(project) = sequence.next_element::<Project>()? {
 			summary.add_project(&project);
 		}

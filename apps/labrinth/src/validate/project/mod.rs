@@ -102,6 +102,7 @@ pub enum ProjectNagKind {
 
     // Versions
     UploadVersion,
+    SelectEnvironment,
 
     // Disclosures
     CheckDisclosures,
@@ -152,11 +153,11 @@ pub fn validate(project: &Project, versions: &[Version]) -> Vec<ProjectNag> {
 
     nags.extend(links::validate(project, versions));
     nags.extend(permissions::validate(versions));
+    nags.extend(versions::validate(project, versions));
     nags.extend(
         [
             server_settings::validate,
             tags::validate,
-            versions::validate,
             disclosures::validate,
             moderation::validate,
         ]
@@ -164,4 +165,10 @@ pub fn validate(project: &Project, versions: &[Version]) -> Vec<ProjectNag> {
         .flat_map(|validate| validate(project)),
     );
     nags
+}
+
+pub fn has_required_nags(project: &Project, versions: &[Version]) -> bool {
+    validate(project, versions)
+        .iter()
+        .any(|nag| nag.severity == ProjectNagSeverity::Required)
 }

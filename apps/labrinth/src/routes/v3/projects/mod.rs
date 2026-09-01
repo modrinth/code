@@ -6,7 +6,9 @@ use std::collections::HashMap;
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
+use crate::database::models::project_item::{
+    DBGalleryItem, DBModCategory, ProjectQueryResult,
+};
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
     DBModerationLock, DBProjectId, DBTeamMember, ids as db_ids, image_item,
@@ -24,10 +26,11 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     MonetizationStatus, Project, ProjectStatus, SideTypesMigrationReviewStatus,
+    Version,
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
-use crate::models::users::DELETED_USER;
+use crate::models::users::{DELETED_USER, User};
 use crate::models::{self, exp};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -39,6 +42,7 @@ use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
+use crate::validate::project::has_required_nags;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use chrono::Utc;
 use eyre::eyre;
@@ -494,6 +498,22 @@ pub async fn project_edit_internal(
         )));
     };
 
+    let submit_for_review = new_project.status
+        == Some(ProjectStatus::Processing)
+        && !user.role.is_mod();
+    if submit_for_review {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::Auth(eyre!(
+                "you do not have permission to submit this project for review"
+            )));
+        }
+        if project_item.inner.status.is_approved() {
+            return Err(ApiError::Auth(eyre!(
+                "you do not have permission to submit this project for review"
+            )));
+        }
+    }
+
     let mut transaction = pool
         .begin()
         .await
@@ -541,7 +561,9 @@ pub async fn project_edit_internal(
         .wrap_internal_err("querying database for `project_edit_internal`")?;
     }
 
-    if let Some(status) = &new_project.status {
+    if let Some(status) = &new_project.status
+        && !submit_for_review
+    {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have the permissions to edit the status of this project!",
@@ -614,12 +636,6 @@ pub async fn project_edit_internal(
             }
 
             if status == &ProjectStatus::Processing {
-                if project_item.versions.is_empty() {
-                    return Err(ApiError::Request(eyre::eyre!(String::from(
-                        "Project submitted for review with no initial versions",
-                    ))));
-                }
-
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -704,7 +720,7 @@ pub async fn project_edit_internal(
                 .ok();
             }
 
-            if team_member.is_none_or(|x| !x.accepted) {
+            if team_member.as_ref().is_none_or(|x| !x.accepted) {
                 let notified_members = sqlx::query!(
                     "
                     SELECT tm.user_id id
@@ -1342,6 +1358,47 @@ pub async fn project_edit_internal(
     .await
     .wrap_api_err("deleting unused images")?;
 
+    if submit_for_review {
+        let mut projects = db_models::DBProject::get_many_uncached(
+            &[ProjectId::from(id)],
+            &mut transaction,
+            &redis,
+        )
+        .await
+        .wrap_internal_err("reloading project for submission validation")?;
+        let reloaded_project =
+            projects.pop().wrap_not_found_err("resource not found")?;
+        let versions = db_models::DBVersion::get_many_uncached(
+            &reloaded_project.versions,
+            &mut transaction,
+            &redis,
+        )
+        .await
+        .wrap_internal_err(
+            "reloading project versions for submission validation",
+        )?
+        .into_iter()
+        .map(Version::from)
+        .collect::<Vec<_>>();
+        let project = Project::from(reloaded_project.clone());
+
+        if has_required_nags(&project, &versions) {
+            return Err(ApiError::Request(eyre!(
+                "project must have no required validation nags before being submitted for review"
+            )));
+        }
+
+        submit_project_for_review(
+            &reloaded_project,
+            &user,
+            team_member.as_ref().is_none_or(|member| !member.accepted),
+            sync_archival_disclosure,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
+    }
+
     transaction
         .commit()
         .await
@@ -1386,6 +1443,127 @@ pub async fn project_edit_internal(
     }
 
     Ok(HttpResponse::NoContent().body(""))
+}
+
+async fn submit_project_for_review(
+    project: &ProjectQueryResult,
+    user: &User,
+    notify_team_members: bool,
+    sync_archival_disclosure: bool,
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    let archival_disclosure =
+        db_models::DBProjectDisclosure::get_many_for_project(
+            project.inner.id,
+            false,
+            &mut *transaction,
+        )
+        .await
+        .wrap_internal_err("failed to fetch project disclosures")?
+        .into_iter()
+        .find(|disclosure| {
+            matches!(disclosure.disclosure, ProjectDisclosure::Archived { .. })
+        });
+
+    sqlx::query!(
+        "
+                    UPDATE mods
+                    SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
+                    WHERE (id = $1)
+                    ",
+        project.inner.id as db_ids::DBProjectId,
+    )
+    .execute(&mut *transaction)
+    .await
+    .wrap_internal_err("querying database for `project_edit_internal`")?;
+
+    if notify_team_members {
+        let notified_members = sqlx::query!(
+            "
+                    SELECT tm.user_id id
+                    FROM team_members tm
+                    WHERE tm.team_id = $1 AND tm.accepted
+                    ",
+            project.inner.team_id as db_ids::DBTeamId
+        )
+        .fetch(&mut *transaction)
+        .map_ok(|row| db_models::DBUserId(row.id))
+        .try_collect::<Vec<_>>()
+        .await
+        .wrap_internal_err("fetching notified members from database")?;
+
+        NotificationBuilder {
+            body: NotificationBody::StatusChange {
+                project_id: project.inner.id.into(),
+                old_status: project.inner.status,
+                new_status: ProjectStatus::Processing,
+            },
+        }
+        .insert_many(notified_members.clone(), &mut *transaction, redis)
+        .await
+        .wrap_internal_err(
+            "inserting database records for `project_edit_internal`",
+        )?;
+
+        NotificationBuilder {
+            body: NotificationBody::ProjectStatusNeutral {
+                project_id: project.inner.id.into(),
+                old_status: project.inner.status,
+                new_status: ProjectStatus::Processing,
+            },
+        }
+        .insert_many(notified_members, &mut *transaction, redis)
+        .await
+        .wrap_internal_err(
+            "inserting database records for `project_edit_internal`",
+        )?;
+    }
+
+    ThreadMessageBuilder {
+        author_id: Some(user.id.into()),
+        body: MessageBody::StatusChange {
+            new_status: ProjectStatus::Processing,
+            old_status: project.inner.status,
+        },
+        thread_id: project.thread_id,
+        hide_identity: false,
+    }
+    .insert(&mut *transaction)
+    .await
+    .wrap_internal_err(
+        "inserting database records for `project_edit_internal`",
+    )?;
+
+    sqlx::query!(
+        "
+                UPDATE mods
+                SET status = $1
+                WHERE (id = $2)
+                ",
+        ProjectStatus::Processing.as_str(),
+        project.inner.id as db_ids::DBProjectId,
+    )
+    .execute(&mut *transaction)
+    .await
+    .wrap_internal_err("querying database for `project_edit_internal`")?;
+
+    if sync_archival_disclosure
+        && archival_disclosure
+            .is_some_and(|disclosure| disclosure.lock_status.allows_removal())
+    {
+        db_models::DBProjectDisclosure::remove(
+            project.inner.id,
+            ProjectDisclosureType::Archived,
+            user.id.into(),
+            false,
+            &mut *transaction,
+        )
+        .await
+        .wrap_internal_err("failed to remove archival disclosure")?;
+    }
+
+    Ok(())
 }
 
 pub async fn edit_project_categories(

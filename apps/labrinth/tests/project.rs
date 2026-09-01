@@ -23,6 +23,7 @@ use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE, ProjectQueryResult,
 };
 use labrinth::models::ids::ProjectId;
+use labrinth::models::projects::ProjectStatus;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
@@ -496,6 +497,51 @@ pub async fn test_patch_project() {
                 api.get_project_deserialized("newslug", USER_USER_PAT).await;
             assert_eq!(project.link_urls.len(), 3);
             assert!(!project.link_urls.contains_key("issues"));
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_submit_invalid_project_for_review() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({ "status": "draft" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let project_before = api
+                .get_project_deserialized(project_slug, USER_USER_PAT)
+                .await;
+            assert_eq!(project_before.status, ProjectStatus::Draft);
+            let original_description = project_before.description;
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({
+                        "description": "",
+                        "status": "processing",
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let project_after = api
+                .get_project_deserialized(project_slug, USER_USER_PAT)
+                .await;
+            assert_eq!(project_after.status, ProjectStatus::Draft);
+            assert_eq!(project_after.description, original_description);
         },
     )
     .await;
