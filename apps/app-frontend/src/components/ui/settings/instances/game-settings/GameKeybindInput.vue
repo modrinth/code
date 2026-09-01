@@ -206,6 +206,7 @@ onBeforeUnmount(cancelRecording)
 				:class="{
 					'!bg-brand-highlight !text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]': recording,
 					'keybind-button--conflict': !recording && conflicts.length,
+					'!bg-transparent': !recording && !conflicts.length,
 				}"
 				@click="handleClick"
 				@contextmenu.prevent.stop

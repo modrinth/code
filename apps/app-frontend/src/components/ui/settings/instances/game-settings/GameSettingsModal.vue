@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
 	EyeIcon,
-	FilterIcon,
 	LanguagesIcon,
+	LinkIcon,
 	MessageIcon,
 	MonitorIcon,
 	RefreshCwIcon,
@@ -13,12 +13,12 @@ import {
 	SpinnerIcon,
 	TagCategoryAudioIcon,
 	TagCategoryGamepad2Icon,
+	UnlinkIcon,
 	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Button,
-	ButtonGroup,
 	commonMessages,
 	ConfirmLeaveModal,
 	defineMessages,
@@ -27,8 +27,6 @@ import {
 	Input,
 	TabbedModal,
 	type TabbedModalTab,
-	Tabs,
-	type TabsTab,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Component } from 'vue'
@@ -79,37 +77,26 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.game-settings.title',
 		defaultMessage: 'Game settings',
 	},
+	syncTitle: {
+		id: 'app.settings.synced-options.game-settings.sync-title',
+		defaultMessage: 'Sync game settings',
+	},
+	syncedOptionsDescription: {
+		id: 'app.settings.synced-options.game-settings.description',
+		defaultMessage:
+			'Synced options are applied to every instance and override the values included with a modpack.',
+	},
 	search: {
 		id: 'app.settings.synced-options.game-settings.search',
 		defaultMessage: 'Search settings...',
 	},
-	all: {
-		id: 'app.settings.synced-options.game-settings.filter.all',
-		defaultMessage: 'All',
-	},
-	on: {
-		id: 'app.settings.synced-options.game-settings.filter.on',
-		defaultMessage: 'Syncing',
-	},
-	off: {
-		id: 'app.settings.synced-options.game-settings.filter.off',
-		defaultMessage: 'Not syncing',
-	},
 	enableAll: {
 		id: 'app.settings.synced-options.game-settings.enable-all',
-		defaultMessage: 'Sync all',
-	},
-	enableAllCount: {
-		id: 'app.settings.synced-options.game-settings.enable-all-count',
-		defaultMessage: 'Sync all ({count})',
+		defaultMessage: 'Sync tab',
 	},
 	disableAll: {
 		id: 'app.settings.synced-options.game-settings.disable-all',
-		defaultMessage: 'Stop syncing all',
-	},
-	disableAllCount: {
-		id: 'app.settings.synced-options.game-settings.disable-all-count',
-		defaultMessage: 'Stop syncing all ({count})',
+		defaultMessage: 'Unsync all',
 	},
 	customEmpty: {
 		id: 'app.settings.synced-options.game-settings.custom-empty',
@@ -134,7 +121,7 @@ const messages = defineMessages({
 	},
 	saveSettings: {
 		id: 'app.settings.synced-options.game-settings.save',
-		defaultMessage: 'Save changes',
+		defaultMessage: 'Save settings',
 	},
 	unsavedChanges: {
 		id: 'app.settings.synced-options.game-settings.unsaved-changes',
@@ -157,10 +144,6 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.game-settings.saved-with-problems',
 		defaultMessage: 'Your changes were saved, but some instances could not be updated.',
 	},
-	previewFailed: {
-		id: 'app.settings.synced-options.game-settings.preview-failed',
-		defaultMessage: 'We couldn’t check which instances support your changes. Try again.',
-	},
 	conflictTitle: {
 		id: 'app.settings.synced-options.game-settings.conflict-title',
 		defaultMessage: 'These settings changed elsewhere',
@@ -171,19 +154,15 @@ const messages = defineMessages({
 	},
 })
 
-type SelectionFilter = 'all' | 'on' | 'off'
-
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 const baseState = ref<GameSettingsEditorState | null>(null)
 const draftState = ref<GameSettingsEditorState | null>(null)
 const activeCategoryId = ref('')
 const search = ref('')
-const selectionFilter = ref<SelectionFilter>('all')
 const loading = ref(false)
 const saving = ref(false)
 const loadError = ref(false)
-const previewError = ref(false)
 const touchedValueOptionIds = ref<Set<string>>(new Set())
 let allowClose = false
 let previewTimer: ReturnType<typeof setTimeout> | null = null
@@ -205,12 +184,6 @@ const categoryIcons: Record<string, Component> = {
 	custom: WrenchIcon,
 	custom_settings: WrenchIcon,
 }
-
-const filterTabs = computed<TabsTab[]>(() => [
-	{ value: 'all', label: formatMessage(messages.all) },
-	{ value: 'on', label: formatMessage(messages.on) },
-	{ value: 'off', label: formatMessage(messages.off) },
-])
 
 const categories = computed<GameSettingCategory[]>(() => {
 	if (!draftState.value) return []
@@ -254,10 +227,6 @@ const categorySettings = computed(() => {
 				formatGameSettingDescription(formatMessage, setting),
 			).includes(query)
 		)
-			return false
-		if (!isLocalEditor.value && selectionFilter.value === 'on' && !setting.sync_enabled)
-			return false
-		if (!isLocalEditor.value && selectionFilter.value === 'off' && setting.sync_enabled)
 			return false
 		return true
 	})
@@ -310,13 +279,20 @@ const enableCandidates = computed(() =>
 const disableCandidates = computed(() =>
 	categorySettings.value.filter((setting) => setting.sync_enabled && !setting.controlled),
 )
+const toggleableCategorySettings = computed(() =>
+	categorySettings.value.filter((setting) => !setting.controlled),
+)
+const allCategorySettingsSynced = computed(
+	() =>
+		toggleableCategorySettings.value.length > 0 &&
+		toggleableCategorySettings.value.every((setting) => setting.sync_enabled),
+)
+const modalTitle = computed(() =>
+	formatMessage(isLocalEditor.value ? messages.title : messages.syncTitle),
+)
 
 function categoryIcon(category: GameSettingCategory): Component {
 	return categoryIcons[category.id] ?? SettingsIcon
-}
-
-function setSelectionFilter(value: string | number) {
-	selectionFilter.value = value as SelectionFilter
 }
 
 function changeCategory(_fromIndex: number, toIndex: number): boolean {
@@ -342,7 +318,6 @@ async function load() {
 	previewGeneration++
 	loading.value = true
 	loadError.value = false
-	previewError.value = false
 	try {
 		const state = props.instanceId
 			? await get_local_game_options_config(props.instanceId)
@@ -372,7 +347,6 @@ async function load() {
 function show() {
 	allowClose = false
 	search.value = ''
-	selectionFilter.value = 'all'
 	modal.value?.show()
 	void load()
 }
@@ -391,7 +365,6 @@ function reset() {
 	loading.value = false
 	saving.value = false
 	loadError.value = false
-	previewError.value = false
 	touchedValueOptionIds.value = new Set()
 	allowClose = false
 }
@@ -416,7 +389,6 @@ function cancelChanges() {
 	previewGeneration++
 	draftState.value = cloneGameSettingsState(baseState.value)
 	touchedValueOptionIds.value = new Set()
-	previewError.value = false
 }
 
 function settingById(optionId: string): EditableGameSetting | undefined {
@@ -485,8 +457,15 @@ function disableVisible() {
 	schedulePreview()
 }
 
+function toggleVisibleSync() {
+	if (allCategorySettingsSynced.value) {
+		disableVisible()
+	} else {
+		enableVisible()
+	}
+}
+
 function schedulePreview() {
-	previewError.value = false
 	previewGeneration++
 	if (previewTimer) clearTimeout(previewTimer)
 	previewTimer = setTimeout(() => void preview(), 350)
@@ -545,9 +524,8 @@ async function preview() {
 			: await preview_synced_game_option_changes(request)
 		if (generation !== previewGeneration) return
 		mergePreview(previewState)
-		previewError.value = false
 	} catch {
-		if (generation === previewGeneration) previewError.value = true
+		return
 	}
 }
 
@@ -626,7 +604,6 @@ async function save() {
 		baseState.value = cloneGameSettingsState(refreshed)
 		draftState.value = cloneGameSettingsState(refreshed)
 		touchedValueOptionIds.value = new Set()
-		previewError.value = false
 		emit('saved')
 	} catch (error) {
 		handleError(error)
@@ -646,7 +623,7 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="modal"
 		:tabs="categoryTabs"
-		:header="formatMessage(messages.title)"
+		:header="modalTitle"
 		:before-hide="beforeHide"
 		:before-tab-change="changeCategory"
 		:on-after-hide="reset"
@@ -672,28 +649,28 @@ defineExpose({ show, hide })
 			<div class="flex min-h-full min-w-0 flex-col">
 				<div
 					v-if="!isLocalEditor"
-					class="flex shrink-0 flex-wrap items-center justify-between gap-3 pb-3 pt-2"
+					class="flex shrink-0 flex-wrap items-start justify-between gap-4 pb-4"
 				>
-					<div class="flex items-center gap-2">
-						<FilterIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-						<Tabs :value="selectionFilter" :tabs="filterTabs" @update:value="setSelectionFilter" />
-					</div>
-					<ButtonGroup>
-						<Button :disabled="saving || enableCandidates.length === 0" @click="enableVisible">
-							{{
-								enableCandidates.length
-									? formatMessage(messages.enableAllCount, { count: enableCandidates.length })
-									: formatMessage(messages.enableAll)
-							}}
-						</Button>
-						<Button :disabled="saving || disableCandidates.length === 0" @click="disableVisible">
-							{{
-								disableCandidates.length
-									? formatMessage(messages.disableAllCount, { count: disableCandidates.length })
-									: formatMessage(messages.disableAll)
-							}}
-						</Button>
-					</ButtonGroup>
+					<p class="m-0 min-w-60 flex-1 text-primary">
+						{{ formatMessage(messages.syncedOptionsDescription) }}
+					</p>
+					<Button
+						class="w-48 justify-center"
+						size="lg"
+						:disabled="
+							saving ||
+							(allCategorySettingsSynced
+								? disableCandidates.length === 0
+								: enableCandidates.length === 0)
+						"
+						@click="toggleVisibleSync"
+					>
+						<LinkIcon v-if="allCategorySettingsSynced" />
+						<UnlinkIcon v-else />
+						{{
+							formatMessage(allCategorySettingsSynced ? messages.disableAll : messages.enableAll)
+						}}
+					</Button>
 				</div>
 
 				<div
@@ -714,12 +691,6 @@ defineExpose({ show, hide })
 					</Button>
 				</div>
 				<div v-else class="min-h-0 flex-1">
-					<p
-						v-if="previewError"
-						class="m-0 border-0 border-b border-solid border-surface-5 py-3 text-sm text-orange"
-					>
-						{{ formatMessage(messages.previewFailed) }}
-					</p>
 					<div
 						v-if="categorySettings.length === 0"
 						class="flex h-full min-h-40 items-center justify-center px-8 text-center text-secondary"
@@ -730,27 +701,24 @@ defineExpose({ show, hide })
 								: formatMessage(messages.empty)
 						}}
 					</div>
-					<GameSettingRow
-						v-for="setting in categorySettings"
-						:key="setting.option_id"
-						:setting="setting"
-						:keybind-conflicts="keybindConflicts.get(setting.option_id)"
-						:disabled="saving"
-						:show-sync-toggle="!isLocalEditor"
-						@update:sync-enabled="setSyncEnabled(setting.option_id, $event)"
-						@update:canonical-value="setCanonicalValue(setting.option_id, $event)"
-					/>
+					<div v-else class="flex flex-col gap-4">
+						<GameSettingRow
+							v-for="setting in categorySettings"
+							:key="setting.option_id"
+							:setting="setting"
+							:keybind-conflicts="keybindConflicts.get(setting.option_id)"
+							:disabled="saving"
+							:show-sync-toggle="!isLocalEditor"
+							@update:sync-enabled="setSyncEnabled(setting.option_id, $event)"
+							@update:canonical-value="setCanonicalValue(setting.option_id, $event)"
+						/>
+					</div>
 				</div>
 			</div>
 		</template>
 
 		<template #floating-action-bar>
-			<FloatingActionBar
-				v-if="isDirty"
-				:shown="true"
-				:inline="true"
-				:aria-label="formatMessage(messages.title)"
-			>
+			<FloatingActionBar v-if="isDirty" :shown="true" :inline="true" :aria-label="modalTitle">
 				<p class="m-0 text-sm font-semibold md:text-base">
 					{{ formatMessage(messages.unsavedChanges) }}
 				</p>
@@ -762,7 +730,7 @@ defineExpose({ show, hide })
 					<Button
 						type="colored"
 						color="brand"
-						:disabled="!isDirty || loading || saving || previewError || hasBlockingDraft"
+						:disabled="!isDirty || loading || saving || hasBlockingDraft"
 						:loading="saving"
 						@click="save"
 					>

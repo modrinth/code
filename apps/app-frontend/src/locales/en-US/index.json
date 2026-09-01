@@ -2379,13 +2379,10 @@
     "message": "Settings added by mods will appear here after Modrinth finds them in one of your instances."
   },
   "app.settings.synced-options.game-settings.description": {
-    "message": "Use the same graphics, keybinds, and other game settings across your instances."
+    "message": "Synced options are applied to every instance and override the values included with a modpack."
   },
   "app.settings.synced-options.game-settings.disable-all": {
-    "message": "Stop syncing all"
-  },
-  "app.settings.synced-options.game-settings.disable-all-count": {
-    "message": "Stop syncing all ({count})"
+    "message": "Unsync all"
   },
   "app.settings.synced-options.game-settings.disabled-tooltip": {
     "message": "Enable game settings sync before choosing individual settings."
@@ -2394,19 +2391,7 @@
     "message": "No settings match your search or filter."
   },
   "app.settings.synced-options.game-settings.enable-all": {
-    "message": "Sync all"
-  },
-  "app.settings.synced-options.game-settings.enable-all-count": {
-    "message": "Sync all ({count})"
-  },
-  "app.settings.synced-options.game-settings.filter.all": {
-    "message": "All"
-  },
-  "app.settings.synced-options.game-settings.filter.off": {
-    "message": "Not syncing"
-  },
-  "app.settings.synced-options.game-settings.filter.on": {
-    "message": "Syncing"
+    "message": "Sync tab"
   },
   "app.settings.synced-options.game-settings.load-failed": {
     "message": "We couldn’t load your game settings."
@@ -2414,14 +2399,11 @@
   "app.settings.synced-options.game-settings.loading": {
     "message": "Loading settings..."
   },
-  "app.settings.synced-options.game-settings.preview-failed": {
-    "message": "We couldn’t check which instances support your changes. Try again."
-  },
   "app.settings.synced-options.game-settings.retry": {
     "message": "Retry"
   },
   "app.settings.synced-options.game-settings.save": {
-    "message": "Save changes"
+    "message": "Save settings"
   },
   "app.settings.synced-options.game-settings.saved": {
     "message": "Game settings updated"
@@ -2441,11 +2423,17 @@
   "app.settings.synced-options.game-settings.sync-setting": {
     "message": "Sync {setting} across instances"
   },
+  "app.settings.synced-options.game-settings.sync-title": {
+    "message": "Sync game settings"
+  },
   "app.settings.synced-options.game-settings.title": {
     "message": "Game settings"
   },
   "app.settings.synced-options.game-settings.unsaved-changes": {
     "message": "You have unsaved changes."
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "Stop syncing {setting} across instances"
   },
   "app.settings.synced-options.game-settings.value-label": {
     "message": "Value"
