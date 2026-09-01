@@ -15,14 +15,12 @@ export function normalizeProjectFieldText(value: string) {
 	return value.trim().normalize('NFC')
 }
 
-export function projectRequiresEnglishText(
-	project: Pick<
-		ProjectValidationContext['projectV3'],
-		'minecraft_java_server' | 'minecraft_server'
-	>,
-) {
+export function projectRequiresEnglishText(project: ProjectValidationContext['projectV3']) {
 	return (
-		!project.minecraft_java_server || project.minecraft_server?.languages?.includes('en') === true
+		(!project.minecraft_java_server &&
+			!project.categories?.includes('locale') &&
+			!project.additional_categories?.includes('locale')) ||
+		project.minecraft_server?.languages?.includes('en') === true
 	)
 }
 
