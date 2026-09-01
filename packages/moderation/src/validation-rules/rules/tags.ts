@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { formatCategory } from '@modrinth/ui/src/utils/tag-messages.ts'
 import { defineMessages } from '@modrinth/ui/i18n'
+import { formatCategory } from '@modrinth/ui/src/utils/tag-messages.ts'
 
 import type { Nag, ProjectValidationContext } from '../../types/nags.ts'
 import { evaluateRules } from '../evaluate-rules.ts'

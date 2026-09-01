@@ -18,13 +18,19 @@ const allowedPlainTextBlockTokenTypes = new Set(['paragraph_open', 'inline', 'pa
 const allowedPlainTextInlineTokenTypes = new Set(['text', 'softbreak', 'hardbreak'])
 
 export function hasProjectTextFormatting(text: string) {
-	return projectPlainTextMarkdown.parse(text, {}).some((token) => {
+	const hasMarkdownFormatting = projectPlainTextMarkdown.parse(text, {}).some((token) => {
+		if (token.type === 'html_block') return false
 		if (!allowedPlainTextBlockTokenTypes.has(token.type)) return true
 
 		return (
-			token.children?.some((child) => !allowedPlainTextInlineTokenTypes.has(child.type)) ?? false
+			token.children?.some(
+				(child) =>
+					child.type !== 'html_inline' && !allowedPlainTextInlineTokenTypes.has(child.type),
+			) ?? false
 		)
 	})
+
+	return hasMarkdownFormatting || hasProjectTextHtmlFormatting(text)
 }
 
 const pairedHtmlTagPattern = /<([a-z][\w:-]*)\b[^>]*>[\s\S]*?<\/\1\s*>/i

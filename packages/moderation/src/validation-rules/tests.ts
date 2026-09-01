@@ -81,7 +81,31 @@ test('evaluates matching rules in definition order and converts them to field me
 
 test('allows clean project names and versioned ports', () => {
 	assert.deepEqual(evaluateRules('Sodium Extras', projectNameValidationRules), [])
-	assert.deepEqual(evaluateRules('Sodium 1.20 Port', projectNameValidationRules), [])
+
+	for (const name of [
+		'Sodium 1.20 Port',
+		'Port Sodium 1.20',
+		'Sodium Fork Edition 1.20',
+		'1.20 Sodium Fork',
+		'Sodium 1.20 Forked',
+		'Sodium 1.20 Teleport',
+		'Sodium 1.20 Port:',
+	]) {
+		assert.equal(
+			evaluateRules(name, projectNameValidationRules).some(
+				({ code }) => code === 'project-name-version',
+			),
+			false,
+			name,
+		)
+	}
+
+	assert.equal(
+		evaluateRules('Sodium Edition 1.20', projectNameValidationRules).some(
+			({ code }) => code === 'project-name-version',
+		),
+		true,
+	)
 })
 
 test('collects every matching project name rule', () => {
@@ -186,13 +210,23 @@ test('detects Markdown and HTML formatting in project summaries', () => {
 	for (const summary of [
 		'Unknown <span>🩸</span>Unknown is a dark and unsettling horror-survival mod.',
 		'<custom-element>Custom HTML content</custom-element>',
-		'Visible content <!-- hidden HTML content -->',
 		'**Bold text** in a detailed project summary',
 		'# Heading in a detailed project summary',
 		'- A list item in a detailed project summary',
 		'`Inline code` in a detailed project summary',
 	]) {
 		assert.equal(hasProjectSummaryFormatting(summary), true, summary)
+	}
+})
+
+test('requires paired HTML tags in project summaries', () => {
+	for (const summary of [
+		'<b>Bold summary',
+		'Bold summary</strong>',
+		'A summary with a line break<br>',
+		'Visible content <!-- hidden HTML content -->',
+	]) {
+		assert.equal(hasProjectSummaryFormatting(summary), false, summary)
 	}
 })
 
@@ -273,14 +307,17 @@ test('rejects HTML in disclosure text', () => {
 })
 
 test('rejects every link and IP address in project summaries', () => {
-	for (const summary of [
-		'Visit https://example.dev for more information about this project',
-		'Visit example.dev for more information about this project',
-		'Join 127.0.0.1:25565 for more information about this project',
+	for (const [summary, value] of [
+		['Visit https://example.dev for more information about this project', 'https://example.dev'],
+		['Visit example.dev for more information about this project', 'example.dev'],
+		['Join 127.0.0.1:25565 for more information about this project', '127.0.0.1:25565'],
 	]) {
 		assert.deepEqual(
-			validateProjectSummary({ summary, name: 'Project title' }).map(({ code }) => code),
-			['project-summary-links'],
+			validateProjectSummary({ summary, name: 'Project title' }).map(({ code, values }) => ({
+				code,
+				values,
+			})),
+			[{ code: 'project-summary-links', values: { value } }],
 		)
 	}
 

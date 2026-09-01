@@ -84,7 +84,7 @@ const messages = defineMessages({
 	},
 	links: {
 		id: 'nags.project-summary-links.description',
-		defaultMessage: 'Links, URLs, or IPs are not allowed in the project summary.',
+		defaultMessage: 'Links, URLs, or IPs are not allowed in the project summary. Detected: {value}',
 	},
 })
 
@@ -101,8 +101,8 @@ const summaryLinkify = new LinkifyIt({
 	fuzzyLink: true,
 }).tlds(tlds)
 
-function containsProjectSummaryLinkOrIp(summary: string): boolean {
-	return summaryLinkify.test(summary)
+function findProjectSummaryLinkOrIp(summary: string): string | null {
+	return summaryLinkify.match(summary)?.[0].raw ?? null
 }
 
 export function projectSummaryMatchesName(summary: string, name: string) {
@@ -153,7 +153,7 @@ export const projectSummaryValidationRules = {
 			if (
 				!normalized ||
 				normalized.length < MIN_SUMMARY_CHARS ||
-				containsProjectSummaryLinkOrIp(normalized) ||
+				findProjectSummaryLinkOrIp(normalized) !== null ||
 				!validateSpam(normalized).valid
 			) {
 				return { valid: true }
@@ -170,7 +170,7 @@ export const projectSummaryValidationRules = {
 		evaluate: ({ summary, name }) => ({
 			valid:
 				!summary ||
-				containsProjectSummaryLinkOrIp(summary) ||
+				findProjectSummaryLinkOrIp(summary) !== null ||
 				!name ||
 				!projectSummaryMatchesName(summary, name),
 		}),
@@ -182,7 +182,7 @@ export const projectSummaryValidationRules = {
 	'summary-too-short': {
 		severity: 'error',
 		evaluate: ({ summary }) => {
-			if (!summary || containsProjectSummaryLinkOrIp(summary)) return { valid: true }
+			if (!summary || findProjectSummaryLinkOrIp(summary) !== null) return { valid: true }
 			const length = normalizeProjectFieldText(summary).length
 			return length < MIN_SUMMARY_CHARS
 				? { valid: false, values: { length, minChars: MIN_SUMMARY_CHARS } }
@@ -215,9 +215,10 @@ export const projectSummaryValidationRules = {
 	},
 	'project-summary-links': {
 		severity: 'error',
-		evaluate: ({ summary }) => ({
-			valid: !summary || !containsProjectSummaryLinkOrIp(summary),
-		}),
+		evaluate: ({ summary }) => {
+			const match = summary ? findProjectSummaryLinkOrIp(summary) : null
+			return match ? { valid: false, values: { value: match } } : { valid: true }
+		},
 		presentation: {
 			message: messages.links,
 			nag: { title: messages.removeSummaryLinks, ...commonNagPresentation },

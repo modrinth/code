@@ -105,11 +105,9 @@ export const projectNameValidationRules = {
 		severity: 'error',
 		evaluate: (projectName) => {
 			const normalizedName = projectName.normalize('NFC').toLowerCase()
-			const includesVersionNumber = [...normalizedName.matchAll(/\d+(?:\.\d+)+/g)].some((match) => {
-				const textAfterVersion = normalizedName.slice((match.index ?? 0) + match[0].length)
-				return !/\b(?:port|fork)\b/.test(textAfterVersion)
-			})
-			return { valid: !includesVersionNumber }
+			const isPortOrFork = normalizedName.includes('port') || normalizedName.includes('fork')
+			const includesVersionNumber = /\d+(?:\.\d+)+/.test(normalizedName)
+			return { valid: !includesVersionNumber || isPortOrFork }
 		},
 		presentation: {
 			message: messages.versionNumber,

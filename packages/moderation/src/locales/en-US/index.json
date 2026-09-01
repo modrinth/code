@@ -77,6 +77,12 @@
   "nags.description-too-short.title": {
     "defaultMessage": "Expand the description"
   },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "Content disclosures cannot contain HTML, as they display in plain text."
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "Remove HTML from content disclosures"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Edit description"
   },
@@ -282,7 +288,7 @@
     "defaultMessage": "Review the project summary"
   },
   "nags.project-summary-links.description": {
-    "defaultMessage": "Links, URLs, or IPs are not allowed in the project summary."
+    "defaultMessage": "Links, URLs, or IPs are not allowed in the project summary. Detected: {value}"
   },
   "nags.project-summary-links.title": {
     "defaultMessage": "Remove links from the summary"
