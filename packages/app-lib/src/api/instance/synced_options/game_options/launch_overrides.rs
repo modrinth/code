@@ -1,6 +1,6 @@
 //! Updates shared settings, then applies launcher settings before Minecraft starts.
 
-use super::super::synced_options;
+use super::super as synced_options;
 use super::CATALOG_REVISION;
 use super::api_types::SyncReason;
 use super::options_file::{
@@ -8,7 +8,7 @@ use super::options_file::{
     validate_raw_key_value,
 };
 use super::read_instance_changes::previous_applied_settings;
-use super::supported_settings::setting_by_file_key;
+use super::catalog::setting_by_file_key;
 use super::write_shared_settings::{
     sync_instance_options, sync_is_active_for_instance,
 };

@@ -8,7 +8,7 @@ use super::instance_support::{
     load_participating_instances, summary_revision,
 };
 use super::options_file::input_error;
-use super::supported_settings::*;
+use super::catalog::*;
 use super::write_shared_settings::sync_all_participating_instances;
 use crate::state::{
     CanonicalValue, GameOptionKind, State, StoredOption,
