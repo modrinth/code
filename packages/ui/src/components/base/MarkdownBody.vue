@@ -7,7 +7,13 @@
 				:class="{ basic: variant === 'basic' }"
 				v-bind="$attrs"
 			>
-				<Markdown :value="parsed ?? source" :unwrap="unwrap" :plugins="plugins" :components="components" />
+				<Markdown
+					:value="source"
+					:unwrap="unwrap"
+					:plugins="plugins"
+					:components="components"
+					:options="parserOptions"
+				/>
 			</component>
 		</template>
 		<template #fallback>
@@ -27,10 +33,7 @@ import 'katex/dist/katex.min.css'
 import { Markdown } from '@comark/vue'
 import { Math as MarkdownMath } from '@comark/vue/plugins/math'
 import { basicPlugins, defaultPlugins, forceLinkTarget } from '@modrinth/utils'
-import { createSerializedMarkdownParser } from 'comark'
 import { computed } from 'vue'
-
-import { useAsyncData } from '#app'
 
 import MarkdownAlert from './markdown/MarkdownAlert.vue'
 import MarkdownCollectionEmbed from './markdown/MarkdownCollectionEmbed.vue'
@@ -66,16 +69,12 @@ const props = withDefaults(
 const resolvedTag = computed(() => props.tag ?? (props.variant === 'basic' ? 'span' : 'div'))
 const unwrap = computed(() => (props.variant === 'basic' ? 'p' : props.unwrapParagraph))
 
+const parserOptions = { autoClose: false }
+
 const plugins = computed(() => {
 	if (props.variant !== 'basic') return defaultPlugins
 	return props.target ? [...basicPlugins, forceLinkTarget(props.target)] : basicPlugins
 })
-
-const { data: parsed } = await useAsyncData(
-	() => `markdown-body:${props.variant}:${unwrap.value}:${props.target ?? ''}:${props.source}`,
-	() => createSerializedMarkdownParser({ ...(unwrap.value ? { unwrap: unwrap.value } : {}), plugins: plugins.value })(props.source),
-	{ watch: [() => props.source, () => props.variant, unwrap, () => props.target] },
-)
 
 const components = computed(() =>
 	props.variant === 'basic'

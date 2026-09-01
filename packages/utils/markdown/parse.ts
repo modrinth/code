@@ -17,11 +17,10 @@ import taskList from 'comark/plugins/task-list'
 import { visitAsync } from 'comark/utils'
 
 import { alert } from './alert'
-import { containers } from './containers'
+import { inlineMarkers } from './custom-syntax'
 import { detailsRegion } from './details-region'
 import { embedSyntax } from './embeds'
 import { htmlBlock } from './html-block'
-import { inlineMarkers } from './inline-markers'
 import { resolveMedia } from './media'
 import { security } from './security'
 
@@ -48,8 +47,13 @@ export const defaultPlugins: ComarkPlugin[] = [
 	binding(),
 	htmlBlock(),
 	detailsRegion(),
-	containers(),
-	inlineMarkers(),
+	inlineMarkers([
+		{ markers: ['^'], tag: 'sup' },
+		{ markers: ['~'], tag: 'sub' },
+		{ markers: ['!!', '||'], tag: 'span', attrs: { class: 'spoiler', tabindex: '0' } },
+		{ markers: ['=='], tag: 'mark' },
+		{ markers: ['+'], tag: 'ins' },
+	]),
 	alert(),
 	math(),
 	mermaid(),
@@ -64,6 +68,7 @@ export function createRenderer(extraComponents: Record<string, ComponentRenderFn
 	const renderer = createHtmlRenderer({
 		linkify: true,
 		registerDefaultPlugins: false,
+		autoClose: false,
 		plugins: defaultPlugins,
 		components: extraComponents,
 	})
@@ -76,6 +81,7 @@ export function parseDocument(markdown: string): Promise<MarkdownDocument> {
 	return parseMarkdown(markdown, {
 		linkify: true,
 		registerDefaultPlugins: false,
+		autoClose: false,
 		plugins: defaultPlugins,
 	})
 }

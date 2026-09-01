@@ -91,49 +91,25 @@ export const allowedAttributes: Record<string, string[]> = {
 	],
 }
 
-const allowedStyles: Record<string, string[]> = {
-	'image-rendering': ['pixelated'],
-	'text-align': ['center', 'left', 'right', 'justify'],
-	float: ['left', 'right'],
-}
-
-const allowedStylePatterns: Record<string, RegExp> = {
-	display: /^(flex|grid)$/,
-	'flex-direction': /^(row|column|row-reverse|column-reverse)$/,
-	'flex-wrap': /^(wrap|nowrap|wrap-reverse)$/,
-	flex: /^(1 1 0%|1 1 auto|0 1 auto|none)$/,
-	'flex-grow': /^[01]$/,
-	'flex-shrink': /^[01]$/,
-	order: /^-?\d+$/,
-	'grid-auto-flow': /^(row|column|dense|row dense|column dense)$/,
-	'grid-auto-columns': /^(auto|min-content|max-content|minmax\(0,1fr\))$/,
-	'grid-auto-rows': /^(auto|min-content|max-content|minmax\(0,1fr\))$/,
-	'grid-template-columns': /^(none|repeat\(\d+,minmax\(0,1fr\)\))$/,
-	'grid-template-rows': /^(none|repeat\(\d+,minmax\(0,1fr\)\))$/,
-	'grid-column': /^(1 \/ -1|span \d+ \/ span \d+)$/,
-	'grid-row': /^(1 \/ -1|span \d+ \/ span \d+)$/,
-	'grid-column-start': /^\d+$/,
-	'grid-column-end': /^\d+$/,
-	'grid-row-start': /^\d+$/,
-	'grid-row-end': /^\d+$/,
-	columns: /^\d+$/,
-	'column-span': /^all$/,
-	'justify-content': /^(flex-start|flex-end|center|space-between|space-around|space-evenly|stretch)$/,
-	'justify-items': /^(start|end|center|stretch)$/,
-	'justify-self': /^(auto|start|end|center|stretch)$/,
-	'align-content': /^(flex-start|flex-end|center|space-between|space-around|space-evenly|stretch)$/,
-	'align-items': /^(flex-start|flex-end|center|baseline|stretch)$/,
-	'align-self': /^(auto|flex-start|flex-end|center|baseline|stretch)$/,
-	'place-content': /^(start|end|center|space-between|space-around|space-evenly|stretch)$/,
-	'place-items': /^(start|end|center|stretch)$/,
-	'place-self': /^(auto|start|end|center|stretch)$/,
-	'aspect-ratio': /^(auto|1 \/ 1|16 \/ 9)$/,
-	'break-after': /^(auto|avoid|all|avoid-page|page|left|right|column)$/,
-	'break-before': /^(auto|avoid|all|avoid-page|page|left|right|column)$/,
-	'break-inside': /^(auto|avoid|avoid-page|avoid-column)$/,
-	gap: /^(1px|[\d.]+rem)$/,
-	'column-gap': /^(1px|[\d.]+rem)$/,
-	'row-gap': /^(1px|[\d.]+rem)$/,
+const allowedStyles: Record<string, true | (string | RegExp)[]> = {
+	'image-rendering': true,
+	'text-align': true,
+	float: true,
+	border: true,
+	'border-width': true,
+	'border-style': true,
+	'border-color': true,
+	'border-radius': true,
+	margin: [/^[^-]+$/],
+	padding: [/^[^-]+$/],
+	'text-transform': true,
+	'line-height': true,
+	'overflow-wrap': true,
+	'word-break': true,
+	'text-shadow': true,
+	color: true,
+	'font-family': true,
+	'font-size': [/^(0\.[5-9]|[12](\.\d+)?|3)(em|rem)$/, /^([89]|[1-3]\d|4[0-8])px$/],
 }
 
 function filterStyleValue(value: unknown): string | undefined {
@@ -148,7 +124,11 @@ function filterStyleValue(value: unknown): string | undefined {
 			.trim()
 			.toLowerCase()
 		if (!prop || !val) continue
-		if (allowedStyles[prop]?.includes(val) || allowedStylePatterns[prop]?.test(val)) kept.push(`${prop}: ${val}`)
+		const rules = allowedStyles[prop]
+		const allowed =
+			rules === true ||
+			(rules?.some((rule) => (typeof rule === 'string' ? rule === val : rule.test(val))) ?? false)
+		if (allowed) kept.push(`${prop}: ${val}`)
 	}
 	return kept.length ? kept.join('; ') : undefined
 }
@@ -157,6 +137,7 @@ export const securityOptions = {
 	allowedLinkPrefixes: ['https://', 'mailto:'],
 	allowedImagePrefixes: ['https://', 'data:image/'],
 	allowDataImages: true,
+	allowedTags: Object.keys(allowedAttributes),
 }
 
 function filterElementAttrs(tag: string, attrs: Record<string, unknown>) {

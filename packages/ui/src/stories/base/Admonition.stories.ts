@@ -161,3 +161,19 @@ export const WithProgressBar: Story = {
 		`,
 	}),
 }
+
+export const Collapsible: Story = {
+	render: () => ({
+		components: { Admonition },
+		template: /*html*/ `
+			<div style="display: flex; flex-direction: column; gap: 1rem;">
+				<Admonition type="info" header="Expanded by default" foldable>
+					Click the header to collapse this, foldable defaults to open, so it starts expanded.
+				</Admonition>
+				<Admonition type="warning" header="Collapsed by default" foldable :default-open="false">
+					Click the header to expand this, it starts closed.
+				</Admonition>
+			</div>
+		`,
+	}),
+}

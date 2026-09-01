@@ -4,6 +4,19 @@ import { visitAsync } from 'comark/utils'
 
 const MARKER_RE = /^!([\w-]+)$/
 
+function nodeHasRenderableChildFrom(node: ElementNode | undefined, fromIndex: number): boolean {
+	if (!node) return false
+	for (let i = fromIndex; i < node.length; i++) {
+		const child = node[i]
+		if (typeof child === 'string') {
+			if (child.trim()) return true
+		} else if (child) {
+			return true
+		}
+	}
+	return false
+}
+
 function splitAlertRemainder(remainder: string): {
 	open?: boolean
 	title?: string
@@ -47,7 +60,10 @@ export const alert = defineComarkPlugin(() => ({
 				element[1].as = 'alert'
 				element[1].type = match[1].toLowerCase()
 				if (title) element[1].title = title
-				if (!body.trim()) element[1].noBody = true
+
+				const holderHasContent = nodeHasRenderableChildFrom(holder, 2)
+				const hasSiblingBlocks = holder !== element && nodeHasRenderableChildFrom(element, 3)
+				if (!holderHasContent && !hasSiblingBlocks) element[1].noBody = true
 				if (open !== undefined) {
 					element[1].foldable = true
 					if (open) element[1].open = true

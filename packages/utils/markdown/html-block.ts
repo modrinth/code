@@ -33,13 +33,16 @@ function parseOpenTagAttrs(line: string): [string, string][] {
 }
 
 function htmlBlockCompatRule(md: any) {
-	const htmlBlockFn = findHtmlBlockRuleFn(md)
-	if (!htmlBlockFn) return
+	let htmlBlockFn: any
 
 	md.block.ruler.before(
-		'comark_html_block',
+		'html_block',
 		'html_block_compat',
 		(state: any, startLine: number, endLine: number, silent: boolean) => {
+			if (!htmlBlockFn) {
+				htmlBlockFn = findHtmlBlockRuleFn(md)
+				if (!htmlBlockFn) return false
+			}
 			if (silent) return htmlBlockFn(state, startLine, endLine, true)
 
 			const tokensBefore = state.tokens.length
