@@ -59,35 +59,3 @@ pub(crate) struct StoredPreference {
     pub(crate) enabled: bool,
     pub(crate) revision: u64,
 }
-
-/// A snapshot of the settings Modrinth last wrote to an instance's `options.txt`.
-///
-/// On the next sync, we compare the file with this snapshot to find changes the
-/// player made in Minecraft.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub(crate) struct GameOptionsProjection {
-    pub(crate) schema_version: u32,
-    pub(crate) target_game_version: String,
-    pub(crate) input_sha1: String,
-    pub(crate) canonical_revision: u64,
-    pub(crate) fields: Vec<ProjectedField>,
-}
-
-/// One setting from the last-written snapshot, using its actual file key and value.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub(crate) struct ProjectedField {
-    pub(crate) option_id: String,
-    pub(crate) physical_key: String,
-    pub(crate) raw_value: String,
-    pub(crate) origin: ProjectionOrigin,
-    #[serde(default)]
-    pub(crate) migrated: bool,
-}
-
-/// Why Modrinth wrote a setting to `options.txt`.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub(crate) enum ProjectionOrigin {
-    Shared,
-    LauncherOverride,
-}

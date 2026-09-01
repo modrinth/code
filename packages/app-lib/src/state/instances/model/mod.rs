@@ -18,8 +18,7 @@ pub use self::file::*;
 mod game_options;
 pub use self::game_options::{CanonicalValue, GameOptionKind};
 pub(crate) use self::game_options::{
-    GameOptionsProjection, ProjectedField, ProjectionOrigin, StoredOption,
-    StoredPreference,
+    StoredOption, StoredPreference,
 };
 
 mod instance;

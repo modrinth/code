@@ -7,12 +7,9 @@ use super::catalog::*;
 use super::fullscreen::update_app_fullscreen_setting;
 use super::launch_overrides::currently_launcher_owned_keys;
 use super::options_file::{
-    input_error, options_path, read_document, sha1_bytes,
-    validate_raw_key_value,
+    input_error, options_path, read_document, validate_raw_key_value,
 };
-use super::read_instance_changes::{
-    custom_setting_id, launcher_keys_for_document,
-};
+use super::read_instance_changes::custom_setting_id;
 use crate::state::{
     CanonicalValue, InstanceMetadata, State, load_game_option_preferences,
     load_game_options_sync_state, load_shared_game_options,
@@ -30,16 +27,8 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
             "Launch the source instance once so Minecraft can create options.txt.",
         ));
     }
-    let (document, input_bytes) = read_document(&path).await?;
-    let input_sha1 = sha1_bytes(&input_bytes);
-    let mut launcher_keys =
-        launcher_keys_for_document(&metadata.instance.id, &input_sha1, state)
-            .await?;
-    let currently_launcher_owned = currently_launcher_owned_keys(metadata);
-    if !currently_launcher_owned.contains("fullscreen") {
-        launcher_keys.remove("fullscreen");
-    }
-    launcher_keys.extend(currently_launcher_owned);
+    let (document, _) = read_document(&path).await?;
+    let launcher_keys = currently_launcher_owned_keys(metadata);
     let entries = document.effective_entries();
     let current_values = load_shared_game_options(&state.pool).await?;
     let current_preferences = load_game_option_preferences(&state.pool).await?;
@@ -332,28 +321,14 @@ pub async fn list_sync_sources()
             eligible = false;
             disabled_reason =
                 Some(GameOptionsSourceIssue::InstallingOrUpdating);
-        } else if synced_options::instance_is_running(&metadata, &state).await?
-        {
-            eligible = false;
-            disabled_reason = Some(GameOptionsSourceIssue::Running);
         } else if !path.exists() {
             eligible = false;
             disabled_reason = Some(GameOptionsSourceIssue::MissingOptionsFile);
         } else {
             match read_document(&path).await {
-                Ok((document, input_bytes)) => {
-                    let mut launcher_keys = launcher_keys_for_document(
-                        &metadata.instance.id,
-                        &sha1_bytes(&input_bytes),
-                        &state,
-                    )
-                    .await?;
-                    let currently_launcher_owned =
+                Ok((document, _)) => {
+                    let launcher_keys =
                         currently_launcher_owned_keys(&metadata);
-                    if !currently_launcher_owned.contains("fullscreen") {
-                        launcher_keys.remove("fullscreen");
-                    }
-                    launcher_keys.extend(currently_launcher_owned);
                     let entries = document.effective_entries();
                     let source_version =
                         metadata.applied_content_set.game_version.as_str();

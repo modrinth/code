@@ -4,8 +4,7 @@ pub use self::content::*;
 mod model;
 pub use self::model::*;
 pub(crate) use self::model::{
-    GameOptionsProjection, ProjectedField, ProjectionOrigin, StoredOption,
-    StoredPreference,
+    StoredOption, StoredPreference,
 };
 
 pub(crate) mod adapters;

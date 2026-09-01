@@ -1,6 +1,5 @@
-//! Finds settings changed in Minecraft and shares those changes with other instances.
+//! Imports saved `options.txt` settings into the canonical values.
 
-use super::super as synced_options;
 use super::CATALOG_REVISION;
 use super::api_types::canonical_values_equal;
 use super::catalog::*;
@@ -8,9 +7,9 @@ use super::fullscreen::update_app_fullscreen_setting;
 use super::launch_overrides::currently_launcher_owned_keys;
 use super::options_file::{GameOptionsDocument, validate_raw_key_value};
 use crate::state::{
-    CanonicalValue, GameOptionKind, GameOptionsProjection, InstanceMetadata,
-    ProjectionOrigin, State, SyncedOption, load_game_option_preferences,
-    load_game_options_sync_state, load_shared_game_options,
+    CanonicalValue, GameOptionKind, InstanceMetadata, State,
+    load_game_option_preferences, load_game_options_sync_state,
+    load_shared_game_options,
 };
 use chrono::Utc;
 use std::collections::HashSet;
@@ -19,80 +18,25 @@ pub(super) fn custom_setting_id(key: &str) -> String {
     format!("external:{key}")
 }
 
-pub(super) fn previous_applied_settings(
-    bytes: Option<&[u8]>,
-) -> Option<GameOptionsProjection> {
-    serde_json::from_slice(bytes?).ok()
-}
-
-pub(super) async fn launcher_keys_for_document(
-    instance_id: &str,
-    input_sha1: &str,
-    state: &State,
-) -> crate::Result<HashSet<String>> {
-    Ok(synced_options::checkpoint(
-        instance_id,
-        SyncedOption::GameOptions,
-        "default",
-        state,
-    )
-    .await?
-    .filter(|checkpoint| checkpoint.expected_sha1 == input_sha1)
-    .and_then(|checkpoint| {
-        previous_applied_settings(checkpoint.merge_base.as_deref())
-    })
-    .into_iter()
-    .flat_map(|projection| projection.fields.into_iter())
-    .filter(|field| field.origin == ProjectionOrigin::LauncherOverride)
-    .map(|field| field.physical_key)
-    .collect())
-}
-
-/// Compares `options.txt` with what Modrinth last wrote. A valid change becomes
-/// the new shared value unless the launcher made it.
+/// Imports every enabled setting present in `options.txt`. The caller skips file
+/// hashes produced by app writes.
 pub(super) async fn read_instance_changes_into_shared_settings(
     metadata: &InstanceMetadata,
     document: &GameOptionsDocument,
-    projection: Option<&GameOptionsProjection>,
     state: &State,
 ) -> crate::Result<bool> {
     let values = load_shared_game_options(&state.pool).await?;
     let preferences = load_game_option_preferences(&state.pool).await?;
-    let currently_launcher_owned = currently_launcher_owned_keys(metadata);
-    let Some(projection) = projection else {
-        return discover_custom_settings(
-            metadata,
-            document,
-            &currently_launcher_owned,
-            state,
-        )
-        .await;
-    };
-    let mut launcher_keys = projection
-        .fields
-        .iter()
-        .filter(|field| field.origin == ProjectionOrigin::LauncherOverride)
-        .map(|field| field.physical_key.clone())
-        .collect::<HashSet<_>>();
-    if !currently_launcher_owned.contains("fullscreen") {
-        launcher_keys.remove("fullscreen");
-    }
-    launcher_keys.extend(currently_launcher_owned);
+    let launcher_keys = currently_launcher_owned_keys(metadata);
     let now = Utc::now().timestamp();
     let mut updates = Vec::new();
-
-    for field in &projection.fields {
-        if field.origin == ProjectionOrigin::LauncherOverride
-            || launcher_keys.contains(&field.physical_key)
-            || !preferences
-                .get(&field.option_id)
-                .is_some_and(|preference| preference.enabled)
+    for (option_id, stored) in &values {
+        if !preferences
+            .get(option_id)
+            .is_some_and(|preference| preference.enabled)
         {
             continue;
         }
-        let Some(stored) = values.get(&field.option_id) else {
-            continue;
-        };
         if matches!(stored.kind, GameOptionKind::External)
             && stored.raw_key.is_none()
         {
@@ -105,7 +49,7 @@ pub(super) async fn read_instance_changes_into_shared_settings(
         {
             continue;
         }
-        let definition = setting_by_id(&field.option_id);
+        let definition = setting_by_id(option_id);
         if definition.is_some()
             && !supported_settings_cover_game_version(
                 &metadata.applied_content_set.game_version,
@@ -113,21 +57,14 @@ pub(super) async fn read_instance_changes_into_shared_settings(
         {
             continue;
         }
-        let current_key = if document.value(&field.physical_key).is_some() {
-            Some(field.physical_key.clone())
-        } else if let Some(definition) = definition {
+        let current_key = if let Some(definition) = definition {
             observed_physical_key(
                 definition,
                 document,
                 &metadata.applied_content_set.game_version,
             )
         } else {
-            target_physical_key(
-                None,
-                stored,
-                document,
-                &metadata.applied_content_set.game_version,
-            )
+            stored.raw_key.clone()
         };
         let Some(current_key) = current_key else {
             continue;
@@ -138,19 +75,17 @@ pub(super) async fn read_instance_changes_into_shared_settings(
         let Some(current_raw) = document.value(&current_key) else {
             continue;
         };
-        if current_key == field.physical_key && current_raw == field.raw_value {
-            continue;
-        }
-        let projected_candidate = if let Some(definition) = definition {
-            decode_value(definition, &field.physical_key, &field.raw_value)
-        } else if matches!(stored.kind, GameOptionKind::External) {
-            Some(CanonicalValue::ExternalRaw(field.raw_value.clone()))
-        } else {
-            None
-        };
         let candidate = if let Some(definition) = definition {
-            decode_value(definition, &current_key, current_raw)
+            decode_value_for_version(
+                definition,
+                &current_key,
+                current_raw,
+                &metadata.applied_content_set.game_version,
+            )
         } else if matches!(stored.kind, GameOptionKind::External) {
+            if validate_raw_key_value(&current_key, current_raw).is_err() {
+                continue;
+            }
             Some(CanonicalValue::ExternalRaw(current_raw.to_string()))
         } else {
             None
@@ -158,14 +93,6 @@ pub(super) async fn read_instance_changes_into_shared_settings(
         let Some(candidate) = candidate else {
             continue;
         };
-        if validate_canonical_value(definition, &candidate).is_err() {
-            continue;
-        }
-        if projected_candidate.as_ref().is_some_and(|projected| {
-            canonical_values_equal(projected, &candidate)
-        }) {
-            continue;
-        }
         if stored
             .value
             .as_ref()
@@ -173,15 +100,7 @@ pub(super) async fn read_instance_changes_into_shared_settings(
         {
             continue;
         }
-        let ambiguous_lossy_migration = definition.is_some_and(|definition| {
-            matches!(definition.encoding, ValueEncoding::AmbientOcclusion)
-                && matches!(field.raw_value.as_str(), "1" | "2")
-                && current_raw == "true"
-        });
-        if ambiguous_lossy_migration {
-            continue;
-        }
-        updates.push((field.option_id.clone(), candidate, stored.revision));
+        updates.push((option_id.to_string(), candidate, stored.revision));
     }
 
     let mut changed = false;
@@ -191,14 +110,11 @@ pub(super) async fn read_instance_changes_into_shared_settings(
             load_game_options_sync_state(&state.pool, CATALOG_REVISION).await?;
         let mut tx = state.pool.begin().await?;
         for (option_id, candidate, revision) in updates {
-            if option_id == "fullscreen" {
-                fullscreen_value = Some(candidate.clone());
-            }
             let next_revision = revision.saturating_add(1) as i64;
             let current_revision = revision as i64;
             let value_json = serde_json::to_string(&candidate)?;
             let canonical_type = candidate.type_name();
-            sqlx::query!(
+            let result = sqlx::query!(
                 "
 				UPDATE synced_game_option_values
 				SET canonical_type = ?, canonical_value_json = ?, seeded = 1,
@@ -217,6 +133,12 @@ pub(super) async fn read_instance_changes_into_shared_settings(
             )
             .execute(&mut *tx)
             .await?;
+            if result.rows_affected() == 0 {
+                continue;
+            }
+            if option_id == "fullscreen" {
+                fullscreen_value = Some(candidate.clone());
+            }
             changed = true;
         }
         if changed {
@@ -238,11 +160,10 @@ pub(super) async fn read_instance_changes_into_shared_settings(
         }
         tx.commit().await?;
     }
-    Ok(
+    let discovered =
         discover_custom_settings(metadata, document, &launcher_keys, state)
-            .await?
-            || changed,
-    )
+            .await?;
+    Ok(discovered || changed)
 }
 
 /// Finds settings added by mods and adds them to the shared settings list.

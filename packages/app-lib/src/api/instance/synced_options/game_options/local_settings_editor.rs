@@ -100,11 +100,6 @@ async fn load_instance_document(
             "Game settings cannot be edited while this instance is installing or updating.",
         ));
     }
-    if synced_options::instance_is_running(&metadata, state).await? {
-        return Err(input_error(
-            "Game settings cannot be edited while this instance is running.",
-        ));
-    }
     let path = options_path(&metadata, state);
     if !path.exists() {
         return Err(input_error(

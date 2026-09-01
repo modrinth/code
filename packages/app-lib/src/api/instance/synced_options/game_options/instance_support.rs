@@ -39,8 +39,7 @@ pub(super) async fn load_participating_instances(
         if !metadata.synced_options.game_options {
             continue;
         }
-        let deferred = synced_options::sync_files_are_protected(&metadata)
-            || synced_options::instance_is_running(&metadata, state).await?;
+        let deferred = synced_options::sync_files_are_protected(&metadata);
         let path = options_path(&metadata, state);
         let (document, inspection_error) = if path.exists() {
             match read_document(&path).await {
@@ -487,7 +486,7 @@ pub(super) fn find_common_local_value(
             Some(CanonicalValue::ExternalRaw(raw_value.to_string()))
         };
         if let Some(value) = value
-            .filter(|value| validate_canonical_value(definition, value).is_ok())
+            .filter(|value| validate_file_value(definition, value).is_ok())
         {
             values.push(value);
         } else {
