@@ -11,36 +11,34 @@ const meta = {
 
 export default meta
 
-export const Test: StoryObj = {
-	render: () => ({
-		components: { MarkdownEditor },
-		setup() {
-			const content = ref('# Hello World\n\nThis is some **markdown** content.')
-			return { content }
-		},
-		template: /*html*/ `
-			<div class="h-96">
-				<MarkdownEditor v-model="content" />
-			</div>
-		`,
-	}),
-}
-
 function md(source: string, heightClass = 'h-96'): StoryObj {
 	return {
 		render: () => ({
-			components: { MarkdownBody },
+			components: { MarkdownBody, MarkdownEditor },
 			setup() {
-				return { source, heightClass }
+				const content = ref(source.trim())
+				return { content, heightClass }
 			},
 			template: /*html*/ `
 				<div :class="heightClass">
-					<MarkdownBody :source="source" />
+					<MarkdownEditor v-model="content" />
+					<MarkdownBody :source="content" />
 				</div>
 			`,
 		}),
 	}
 }
+
+
+export const Modrinth: StoryObj = md(`
+<project/sodium>
+
+<@modrinth>
+
+<org/modrinth>
+
+<collection/wL9BPICg>
+`)
 
 export const Headers: StoryObj = md(`
 # Header 1
@@ -90,6 +88,13 @@ https://example.com
 [A Link](example.com)
 
 [No way a Title?](example.com "Damn, that's cool")
+
+[This one uses a reference][1]
+
+[This one is referenced by name]
+
+[1]: https://example.com
+[This one is referenced by name]: https://example.com
 `)
 
 export const List: StoryObj = md(`
@@ -207,16 +212,6 @@ export const Alert: StoryObj = md(`
 > > [!TIP]- And They can Nest?
 > > > [!IMPORTANT] Nesting doesn't look very good tho
 > > > Wait a minute, they support custom titles!
-`)
-
-export const SpecialEmbed: StoryObj = md(`
-<project/wearthat>
-
-<@chyzman>
-
-<org/wisp-forest>
-
-<collection/oNg43Dsq>
 `)
 
 export const Footnote: StoryObj = md(`

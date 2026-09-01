@@ -137,7 +137,7 @@ export const securityOptions = {
 	allowedLinkPrefixes: ['https://', 'mailto:'],
 	allowedImagePrefixes: ['https://', 'data:image/'],
 	allowDataImages: true,
-	allowedTags: Object.keys(allowedAttributes),
+	blockedTags: ['style', 'script', 'head', 'body', 'html', 'base', 'meta'],
 }
 
 function filterElementAttrs(tag: string, attrs: Record<string, unknown>) {
@@ -157,11 +157,23 @@ function filterElementAttrs(tag: string, attrs: Record<string, unknown>) {
 	}
 }
 
+const knownHtmlTags = new Set(Object.keys(allowedAttributes))
+
 export function security(options: Parameters<typeof comarkSecurity>[0] = securityOptions) {
 	const securityPlugin = comarkSecurity(options)
 	return defineComarkPlugin(() => ({
 		name: 'security',
 		async post(state) {
+			await visitAsync(
+				state.tree,
+				(node) => typeof node !== 'string' && node[0] !== null,
+				(node) => {
+					const element = node as ElementNode
+					const fromRawHtml = !!(element[1] as { $?: { html?: number } })?.$?.html
+					if (fromRawHtml && !knownHtmlTags.has(element[0].toLowerCase())) return false
+				},
+			)
+
 			await securityPlugin.post?.(state)
 
 			await visitAsync(

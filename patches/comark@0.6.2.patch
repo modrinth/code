@@ -19,3 +19,28 @@ index 440841f8d9252067681f09df935dd0287fff2cf0..e71c6f763d8520c53d7f7d8a1e9bcdc5
          else {
              const result = processBlockToken(tokens, i, insideNestedContext, state);
              i = result.nextIndex;
+diff --git a/dist/plugins/components.js b/dist/plugins/components.js
+index 2316267fddc0211964f4444a927cb50cb076a0b7..4db9f14f919ee5ea311661ee2e75be5131704582 100644
+--- a/dist/plugins/components.js
++++ b/dist/plugins/components.js
+@@ -11,6 +11,16 @@ import { defineComarkPlugin } from "../utils/helpers.js";
+ import { findClosingBracket, parseBracketContent } from "../internal/parse/syntax/brackets.js";
+ import { parseBlockParams } from "../internal/parse/syntax/block-params.js";
+ import { parseYaml } from "../internal/yaml.js";
++function normalizeReference(str) {
++    str = str.trim().replace(/\s+/g, " ");
++    if ("ẞ".toLowerCase() === "Ṿ")
++        str = str.replace(/ẞ/g, "ß");
++    return str.toLowerCase().toUpperCase();
++}
+ /**
+  * A component name must start with a letter or `$`, followed by word chars,
+  * `$` or `-`. Mirrors the block name grammar (`RE_BLOCK_NAME = /^[a-z$]/i`).
+@@ -398,6 +408,14 @@ const markdownItInlineSpan = (md) => {
+         const nextChar = state.src[index + 1];
+         if (nextChar === '(' || nextChar === '[')
+             return false;
++        if (nextChar !== '{' && state.env.references?.[normalizeReference(state.src.slice(start + 1, index))]) {
++            return false;
++        }
+         if (state.linkLevel > 0 && nextChar !== '{')

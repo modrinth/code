@@ -9,7 +9,7 @@ patchedDependencies:
     hash: 51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47
     path: patches/beautiful-mermaid@1.1.3.patch
   comark@0.6.2:
-    hash: c8af805d46dd2a152fda357d551ed56a0a876f61520b78ad6fe250b82afd17f8
+    hash: 05b644f175a452f5e4a729728a78164a25e8a070f5b6b7054e8fb091fcb62f3f
     path: patches/comark@0.6.2.patch
   readable-stream@2.3.8:
     hash: 3045f7adf989b4e668a4a13819b7285b0de186b79bbf22408acaf2a41c6eaa86
@@ -717,7 +717,7 @@ importers:
         version: 1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47)
       comark:
         specifier: ^0.6.2
-        version: 0.6.2(patch_hash=c8af805d46dd2a152fda357d551ed56a0a876f61520b78ad6fe250b82afd17f8)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)
+        version: 0.6.2(patch_hash=05b644f175a452f5e4a729728a78164a25e8a070f5b6b7054e8fb091fcb62f3f)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)
       dayjs:
         specifier: ^1.11.10
         version: 1.11.19
@@ -871,7 +871,7 @@ importers:
         version: 0.172.0
       comark:
         specifier: ^0.6.2
-        version: 0.6.2(patch_hash=c8af805d46dd2a152fda357d551ed56a0a876f61520b78ad6fe250b82afd17f8)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)
+        version: 0.6.2(patch_hash=05b644f175a452f5e4a729728a78164a25e8a070f5b6b7054e8fb091fcb62f3f)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)
       dayjs:
         specifier: ^1.11.10
         version: 1.11.19
@@ -11327,7 +11327,7 @@ snapshots:
 
   '@comark/html@0.6.2(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)':
     dependencies:
-      comark: 0.6.2(patch_hash=c8af805d46dd2a152fda357d551ed56a0a876f61520b78ad6fe250b82afd17f8)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)
+      comark: 0.6.2(patch_hash=05b644f175a452f5e4a729728a78164a25e8a070f5b6b7054e8fb091fcb62f3f)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)
     optionalDependencies:
       beautiful-mermaid: 1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47)
       katex: 0.17.0
@@ -11336,7 +11336,7 @@ snapshots:
 
   '@comark/vue@0.6.2(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)(vue@3.5.27(typescript@5.9.3))':
     dependencies:
-      comark: 0.6.2(patch_hash=c8af805d46dd2a152fda357d551ed56a0a876f61520b78ad6fe250b82afd17f8)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)
+      comark: 0.6.2(patch_hash=05b644f175a452f5e4a729728a78164a25e8a070f5b6b7054e8fb091fcb62f3f)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0)
       vue: 3.5.27(typescript@5.9.3)
     optionalDependencies:
       beautiful-mermaid: 1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47)
@@ -15974,7 +15974,7 @@ snapshots:
 
   colord@2.9.3: {}
 
-  comark@0.6.2(patch_hash=c8af805d46dd2a152fda357d551ed56a0a876f61520b78ad6fe250b82afd17f8)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0):
+  comark@0.6.2(patch_hash=05b644f175a452f5e4a729728a78164a25e8a070f5b6b7054e8fb091fcb62f3f)(beautiful-mermaid@1.1.3(patch_hash=51834efb99f2945be29ce3a3cbc45a3b9ff4cde6ca80ba6d2c22e85d9b9cbd47))(katex@0.17.0):
     dependencies:
       entities: 8.0.0
       htmlparser2: 12.0.0
