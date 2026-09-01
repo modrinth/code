@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { ModrinthApiError, type Kyros } from '@modrinth/api-client'
+import { type Kyros, ModrinthApiError } from '@modrinth/api-client'
 import { FolderArchiveIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref, watch } from 'vue'
 
