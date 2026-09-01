@@ -174,3 +174,29 @@ export async function save_synced_game_option_changes(
 ): Promise<SaveGameSettingsResult> {
 	return await invoke('plugin:instance|instance_save_synced_game_option_changes', { request })
 }
+
+export async function get_local_game_options_config(
+	instanceId: string,
+): Promise<GameSettingsEditorState> {
+	return await invoke('plugin:instance|instance_get_local_game_options_config', { instanceId })
+}
+
+export async function preview_local_game_option_changes(
+	instanceId: string,
+	request: UpdateGameSettingsRequest,
+): Promise<GameSettingsEditorState> {
+	return await invoke('plugin:instance|instance_preview_local_game_option_changes', {
+		instanceId,
+		request,
+	})
+}
+
+export async function save_local_game_option_changes(
+	instanceId: string,
+	request: UpdateGameSettingsRequest,
+): Promise<SaveGameSettingsResult> {
+	return await invoke('plugin:instance|instance_save_local_game_option_changes', {
+		instanceId,
+		request,
+	})
+}

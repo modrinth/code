@@ -70,6 +70,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_synced_game_options_config,
             instance_preview_synced_game_option_changes,
             instance_save_synced_game_option_changes,
+            instance_get_local_game_options_config,
+            instance_preview_local_game_option_changes,
+            instance_save_local_game_option_changes,
             instance_get_command_history,
             instance_set_command_history,
             instance_open_synced_options_folder,
@@ -882,6 +885,41 @@ pub async fn instance_save_synced_game_option_changes(
     request: theseus::instance::UpdateGameSettingsRequest,
 ) -> Result<theseus::instance::SaveGameSettingsResult> {
     Ok(theseus::instance::save_synced_game_option_changes(request).await?)
+}
+
+#[tauri::command]
+pub async fn instance_get_local_game_options_config(
+    instance_id: &str,
+) -> Result<theseus::instance::GameSettingsEditorState> {
+    Ok(theseus::instance::get_local_game_options_config(instance_id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_preview_local_game_option_changes(
+    instance_id: &str,
+    request: theseus::instance::UpdateGameSettingsRequest,
+) -> Result<theseus::instance::GameSettingsEditorState> {
+    Ok(
+        theseus::instance::preview_local_game_option_changes(
+            instance_id,
+            request,
+        )
+        .await?,
+    )
+}
+
+#[tauri::command]
+pub async fn instance_save_local_game_option_changes(
+    instance_id: &str,
+    request: theseus::instance::UpdateGameSettingsRequest,
+) -> Result<theseus::instance::SaveGameSettingsResult> {
+    Ok(
+        theseus::instance::save_local_game_option_changes(
+            instance_id,
+            request,
+        )
+        .await?,
+    )
 }
 
 #[tauri::command]

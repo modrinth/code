@@ -35,10 +35,12 @@ const props = withDefaults(
 		setting: EditableGameSetting
 		keybindConflicts?: string[]
 		disabled?: boolean
+		showSyncToggle?: boolean
 	}>(),
 	{
 		keybindConflicts: () => [],
 		disabled: false,
+		showSyncToggle: true,
 	},
 )
 
@@ -124,7 +126,10 @@ const sliderValue = computed(() => {
 	return Number.isFinite(value) ? value : (inputMin.value ?? 0)
 })
 const editorDisabled = computed(
-	() => props.disabled || props.setting.controlled || !props.setting.sync_enabled,
+	() =>
+		props.disabled ||
+		props.setting.controlled ||
+		(props.showSyncToggle && !props.setting.sync_enabled),
 )
 const syncToggleDisabled = computed(
 	() =>
@@ -186,8 +191,12 @@ function updateValue(value: string | number | boolean | undefined) {
 		class="grid min-w-0 items-center gap-3 py-3"
 		:class="
 			isVolumeSlider
-				? 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)_4rem]'
-				: 'grid-cols-[minmax(0,1fr)_12rem_4rem]'
+				? showSyncToggle
+					? 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)_4rem]'
+					: 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)]'
+				: showSyncToggle
+					? 'grid-cols-[minmax(0,1fr)_12rem_4rem]'
+					: 'grid-cols-[minmax(0,1fr)_12rem]'
 		"
 	>
 		<div class="min-w-0">
@@ -279,6 +288,7 @@ function updateValue(value: string | number | boolean | undefined) {
 		</div>
 
 		<span
+			v-if="showSyncToggle"
 			v-tooltip="syncToggleDisabled ? syncDisabledReason : undefined"
 			class="flex justify-center"
 		>

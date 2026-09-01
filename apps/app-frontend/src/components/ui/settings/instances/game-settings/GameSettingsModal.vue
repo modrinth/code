@@ -39,8 +39,11 @@ import {
 	type GameOptionCanonicalValue,
 	type GameSettingCategory,
 	type GameSettingsEditorState,
+	get_local_game_options_config,
 	get_synced_game_options_config,
+	preview_local_game_option_changes,
 	preview_synced_game_option_changes,
+	save_local_game_option_changes,
 	save_synced_game_option_changes,
 	type UpdateGameSettingsRequest,
 } from '@/helpers/game-options'
@@ -59,6 +62,10 @@ import {
 	gameSettingCategoryMessage,
 } from './game-setting-messages'
 import GameSettingRow from './GameSettingRow.vue'
+
+const props = defineProps<{
+	instanceId?: string
+}>()
 
 const emit = defineEmits<{
 	saved: []
@@ -183,6 +190,8 @@ let previewTimer: ReturnType<typeof setTimeout> | null = null
 let previewGeneration = 0
 let loadGeneration = 0
 
+const isLocalEditor = computed(() => !!props.instanceId)
+
 const categoryIcons: Record<string, Component> = {
 	skin_customization: ShirtIcon,
 	video: MonitorIcon,
@@ -246,8 +255,10 @@ const categorySettings = computed(() => {
 			).includes(query)
 		)
 			return false
-		if (selectionFilter.value === 'on' && !setting.sync_enabled) return false
-		if (selectionFilter.value === 'off' && setting.sync_enabled) return false
+		if (!isLocalEditor.value && selectionFilter.value === 'on' && !setting.sync_enabled)
+			return false
+		if (!isLocalEditor.value && selectionFilter.value === 'off' && setting.sync_enabled)
+			return false
 		return true
 	})
 })
@@ -289,7 +300,7 @@ const hasBlockingDraft = computed(
 		draftState.value?.settings.some(
 			(setting) =>
 				dirtyOptionIds.value.has(setting.option_id) &&
-				setting.sync_enabled &&
+				(isLocalEditor.value || setting.sync_enabled) &&
 				(!!setting.validation_error || ['mixed', 'unset', 'invalid'].includes(setting.value_state)),
 		) ?? false,
 )
@@ -333,7 +344,9 @@ async function load() {
 	loadError.value = false
 	previewError.value = false
 	try {
-		const state = await get_synced_game_options_config()
+		const state = props.instanceId
+			? await get_local_game_options_config(props.instanceId)
+			: await get_synced_game_options_config()
 		if (generation !== loadGeneration) return
 		baseState.value = cloneGameSettingsState(state)
 		draftState.value = cloneGameSettingsState(state)
@@ -527,7 +540,9 @@ async function preview() {
 
 	const generation = ++previewGeneration
 	try {
-		const previewState = await preview_synced_game_option_changes(request)
+		const previewState = props.instanceId
+			? await preview_local_game_option_changes(props.instanceId, request)
+			: await preview_synced_game_option_changes(request)
 		if (generation !== previewGeneration) return
 		mergePreview(previewState)
 		previewError.value = false
@@ -545,9 +560,15 @@ async function save() {
 	previewGeneration++
 	saving.value = true
 	try {
-		const result = await save_synced_game_option_changes(request)
+		const result = props.instanceId
+			? await save_local_game_option_changes(props.instanceId, request)
+			: await save_synced_game_option_changes(request)
 		if (result.conflicts?.length) {
-			const refreshed = result.state ?? (await get_synced_game_options_config())
+			const refreshed =
+				result.state ??
+				(props.instanceId
+					? await get_local_game_options_config(props.instanceId)
+					: await get_synced_game_options_config())
 			const previousDraft = draftState.value
 			const stagedChanges = new Map(request.changes.map((change) => [change.option_id, change]))
 			const conflicts = new Set(result.conflicts)
@@ -597,7 +618,11 @@ async function save() {
 						: messages.savedSummary,
 			),
 		})
-		const refreshed = result.state ?? (await get_synced_game_options_config())
+		const refreshed =
+			result.state ??
+			(props.instanceId
+				? await get_local_game_options_config(props.instanceId)
+				: await get_synced_game_options_config())
 		baseState.value = cloneGameSettingsState(refreshed)
 		draftState.value = cloneGameSettingsState(refreshed)
 		touchedValueOptionIds.value = new Set()
@@ -645,7 +670,10 @@ defineExpose({ show, hide })
 
 		<template #content>
 			<div class="flex min-h-full min-w-0 flex-col">
-				<div class="flex shrink-0 flex-wrap items-center justify-between gap-3 pb-3 pt-2">
+				<div
+					v-if="!isLocalEditor"
+					class="flex shrink-0 flex-wrap items-center justify-between gap-3 pb-3 pt-2"
+				>
 					<div class="flex items-center gap-2">
 						<FilterIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 						<Tabs :value="selectionFilter" :tabs="filterTabs" @update:value="setSelectionFilter" />
@@ -708,6 +736,7 @@ defineExpose({ show, hide })
 						:setting="setting"
 						:keybind-conflicts="keybindConflicts.get(setting.option_id)"
 						:disabled="saving"
+						:show-sync-toggle="!isLocalEditor"
 						@update:sync-enabled="setSyncEnabled(setting.option_id, $event)"
 						@update:canonical-value="setCanonicalValue(setting.option_id, $event)"
 					/>

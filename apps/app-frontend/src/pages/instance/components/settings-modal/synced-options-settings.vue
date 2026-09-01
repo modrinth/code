@@ -175,6 +175,12 @@ const hotbarResolutionModal = ref<InstanceType<typeof NewModal> | null>(null)
 const previewingOption = ref<InstanceSyncedOption | null>(null)
 const previewExcluded = ref<Partial<Record<InstanceSyncedOption, boolean>>>({})
 
+const gameSettingsInstanceId = computed(() =>
+	overviewQuery.data.value?.global_options.game_options && enabled('game_options')
+		? undefined
+		: instance.value.id,
+)
+
 function excluded(option: InstanceSyncedOption): boolean {
 	const preview = previewExcluded.value[option]
 	if (preview !== undefined) return preview
@@ -347,7 +353,11 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 
 <template>
 	<div class="flex flex-col gap-6">
-		<GameSettingsModal ref="gameSettingsModal" @saved="handleGameSettingsSaved" />
+		<GameSettingsModal
+			ref="gameSettingsModal"
+			:instance-id="gameSettingsInstanceId"
+			@saved="handleGameSettingsSaved"
+		/>
 
 		<NewModal
 			ref="hotbarResolutionModal"
@@ -422,17 +432,14 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 				</div>
 				<div class="flex shrink-0 items-center gap-2">
 					<span
-						v-if="
-							row.option === 'game_options' &&
-							enabled(row.option) &&
-							overviewQuery.data.value?.global_options.game_options
-						"
+						v-if="row.option === 'game_options'"
 						v-tooltip="formatMessage(messages.editGameSettings)"
 						class="flex"
 					>
 						<IconButton
 							type="outlined"
 							circular
+							:disabled="mutation.isPending.value || overviewQuery.isPending.value"
 							:label="formatMessage(messages.editGameSettings)"
 							@click="openGameSettings"
 						>
