@@ -382,13 +382,21 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	type QueuedOpWithState = Archon.Websocket.v0.QueuedFilesystemOp & { state: 'queued' }
 	const dismissedOpIds = ref<Set<string>>(new Set())
+	const localFileOperations = ref<FileOperation[]>([])
 
 	const activeOperations = computed<FileOperation[]>(() => [
+		...localFileOperations.value,
 		...fsQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
 		...(fsOps.value.filter((op) => !op.id || !dismissedOpIds.value.has(op.id)) as FileOperation[]),
 	])
 
 	async function dismissOperation(opId: string, action: 'dismiss' | 'cancel') {
+		if (localFileOperations.value.some((operation) => operation.id === opId)) {
+			localFileOperations.value = localFileOperations.value.filter(
+				(operation) => operation.id !== opId,
+			)
+			return
+		}
 		if (action === 'dismiss') {
 			dismissedOpIds.value = new Set([...dismissedOpIds.value, opId])
 		}
@@ -398,6 +406,17 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			if (action === 'dismiss') return
 			console.error(`Failed to ${action} operation:`, error)
 		}
+	}
+
+	function upsertLocalFileOperation(operation: FileOperation) {
+		const index = localFileOperations.value.findIndex((item) => item.id === operation.id)
+		if (index === -1) {
+			localFileOperations.value = [...localFileOperations.value, operation]
+			return
+		}
+		localFileOperations.value = localFileOperations.value.map((item, itemIndex) =>
+			itemIndex === index ? operation : item,
+		)
 	}
 
 	const refreshFsAuth = async () => {
@@ -439,6 +458,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		cancelUpload,
 		activeOperations,
 		dismissOperation,
+		upsertLocalFileOperation,
 	})
 
 	setNodeAuthState(() => fsAuth.value, refreshFsAuth)
