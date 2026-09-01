@@ -41,5 +41,7 @@
 				</dict>
 			</dict>
 		</dict>
+		<key>CFBundleIconName</key>
+		<string>apple</string>
 	</dict>
 </plist>
