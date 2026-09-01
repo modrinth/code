@@ -2073,8 +2073,8 @@ if (!route.name.startsWith('type-project-settings')) {
 		ogDescription: () => project.value?.description ?? PROJECT_NOT_FOUND_DESCRIPTION,
 		ogImage: () =>
 			project.value
-				? (project.value?.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png')
-				: 'https://cdn-raw.modrinth.com/not-found.png',
+				? (project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder-square.png')
+				: 'https://cdn.modrinth.com/not-found.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})
