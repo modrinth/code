@@ -92,7 +92,8 @@ const props = withDefaults(defineProps<Props>(), {
 const currentValue = ref(clampValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value))
 const valueInputWidth = computed(
-	() => `calc(${Math.max(String(currentValue.value).length, 1)}ch + 2.125rem)`,
+	() =>
+		`calc(${Math.max(String(props.min).length, String(props.max).length, 1)}ch + 2.125rem)`,
 )
 const visibleSnapPoints = computed(() =>
 	props.snapPoints.filter((snapPoint) => snapPoint >= props.min && snapPoint <= props.max),

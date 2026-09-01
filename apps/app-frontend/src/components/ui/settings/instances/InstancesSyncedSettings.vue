@@ -23,14 +23,10 @@ import {
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { Component } from 'vue'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
-import {
-	formatSourceDisabledReason,
-	formatSourceSettingsSummary,
-} from '@/components/ui/settings/instances/game-settings/game-setting-messages'
 import useMemorySlider from '@/composables/useMemorySlider'
 import {
 	type GameOptionsSourceCandidate,
@@ -76,16 +72,15 @@ const messages = defineMessages({
 	// },
 	gameSettings: {
 		id: 'app.settings.synced-options.game-settings',
-		defaultMessage: 'Game settings',
+		defaultMessage: 'Sync game options',
 	},
 	gameSettingsDescription: {
 		id: 'app.settings.synced-options.game-settings.description',
-		defaultMessage:
-			'You can choose which options to sync across instances so they apply on top of a modpack’s options.txt.',
+		defaultMessage: 'Use the same graphics, keybinds, and other game settings across your instances',
 	},
 	gameSettingsButton: {
 		id: 'app.settings.synced-options.game-settings.button',
-		defaultMessage: 'Settings',
+		defaultMessage: 'Edit game settings',
 	},
 	gameSettingsDisabledTooltip: {
 		id: 'app.settings.synced-options.game-settings.disabled-tooltip',
@@ -133,8 +128,7 @@ const messages = defineMessages({
 	},
 	gameSettingsSyncSourceDescription: {
 		id: 'app.settings.synced-options.choose-sync-source.game-settings-description',
-		defaultMessage:
-			'Pick the instance whose options.txt values become the shared game settings baseline.',
+		defaultMessage: 'Choose which instance to copy game settings from.',
 	},
 	searchInstance: {
 		id: 'app.settings.synced-options.choose-sync-source.search-placeholder',
@@ -392,11 +386,7 @@ type BaseSourceCandidate = {
 	id: string
 	name: string
 	icon_path?: string | null
-	game_version?: string | null
 	eligible: boolean
-	disabled_reason?: GameOptionsSourceCandidate['disabled_reason']
-	recognized_setting_count?: number
-	custom_setting_count?: number
 }
 
 const syncedServerCards = computed(() =>
@@ -442,37 +432,17 @@ const filteredBaseInstances = computed(() => {
 					id: source.source_id,
 					name: source.name,
 					icon_path: source.icon_path,
-					game_version: source.game_version,
 					eligible: source.eligible,
-					disabled_reason: source.disabled_reason,
-					recognized_setting_count: source.recognized_setting_count,
-					custom_setting_count: source.custom_setting_count,
 				}))
 			: instances.value.map((instance) => ({
 					id: instance.id,
 					name: instance.name,
 					icon_path: instance.icon_path,
-					game_version: instance.game_version,
 					eligible: true,
 				}))
 	if (!search) return candidates
 	return candidates.filter((instance) => instance.name.toLowerCase().includes(search))
 })
-
-function baseSourceDescription(source: BaseSourceCandidate): string | null {
-	if (source.disabled_reason) {
-		return formatSourceDisabledReason(formatMessage, source.disabled_reason)
-	}
-	if (
-		source.recognized_setting_count === undefined ||
-		source.custom_setting_count === undefined
-	)
-		return null
-	return formatSourceSettingsSummary(formatMessage, {
-		recognized_setting_count: source.recognized_setting_count,
-		custom_setting_count: source.custom_setting_count,
-	})
-}
 
 async function invalidateSyncedOptions() {
 	await Promise.all([
@@ -514,7 +484,9 @@ const globalOptionMutation = useMutation({
 	},
 	onSuccess: async (options, { option, enabled }) => {
 		queryClient.setQueryData(globalSyncedOptionsQueryKey, options)
-		if (enabled) baseModal.value?.hide()
+		if (option === 'game_options') {
+			await refreshSettings()
+		}
 		if (enabled && option === 'multiplayer_servers') {
 			syncedServers.value = await list_synced_servers().catch((error) => {
 				handleError(error)
@@ -579,6 +551,8 @@ async function confirmBaseInstance() {
 			enabled: true,
 			baseInstanceId: baseInstanceId.value,
 		})
+		await nextTick()
+		baseModal.value?.hide()
 	} catch {
 		return
 	}
@@ -666,11 +640,32 @@ async function removeSyncedServer(serverId: string) {
 	}
 }
 
-const fetchSettings = await get()
-fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')
-fetchSettings.envVars = serializeEnvVars(fetchSettings.custom_env_vars)
+function addEditableSettingsFields(fetchSettings: Awaited<ReturnType<typeof get>>) {
+	return Object.assign(fetchSettings, {
+		launchArgs: fetchSettings.extra_launch_args.join(' '),
+		envVars: serializeEnvVars(fetchSettings.custom_env_vars),
+	})
+}
 
-const settings = ref(fetchSettings)
+const settings = ref(addEditableSettingsFields(await get()))
+let applyingFetchedSettings = false
+
+async function refreshSettings() {
+	try {
+		const refreshedSettings = addEditableSettingsFields(await get())
+		applyingFetchedSettings = true
+		settings.value = refreshedSettings
+		await nextTick()
+	} catch (error) {
+		handleError(error)
+	} finally {
+		applyingFetchedSettings = false
+	}
+}
+
+async function handleGameSettingsSaved() {
+	await Promise.all([invalidateSyncedOptions(), refreshSettings()])
+}
 
 const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) as unknown as {
 	maxMemory: number
@@ -680,6 +675,7 @@ const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) a
 watch(
 	settings,
 	async () => {
+		if (applyingFetchedSettings) return
 		const setSettings = JSON.parse(JSON.stringify(settings.value))
 
 		setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
@@ -699,7 +695,7 @@ watch(
 
 <template>
 	<div>
-		<GameSettingsModal ref="gameSettingsModal" @saved="invalidateSyncedOptions" />
+		<GameSettingsModal ref="gameSettingsModal" @saved="handleGameSettingsSaved" />
 
 		<NewModal
 			ref="baseModal"
@@ -756,19 +752,7 @@ watch(
 								no-shadow
 							/>
 						</span>
-						<span class="flex min-w-0 flex-1 flex-col">
-							<span class="truncate">{{ instance.name }}</span>
-							<span
-								v-if="instance.game_version || baseSourceDescription(instance)"
-								class="truncate text-xs font-normal text-secondary"
-							>
-								<span v-if="instance.game_version">{{ instance.game_version }}</span>
-								<span v-if="instance.game_version && baseSourceDescription(instance)" aria-hidden="true">
-									·
-								</span>
-								<span v-if="baseSourceDescription(instance)">{{ baseSourceDescription(instance) }}</span>
-							</span>
-						</span>
+						<span class="min-w-0 flex-1 truncate">{{ instance.name }}</span>
 					</CheckCircleButton>
 				</div>
 			</div>
@@ -936,14 +920,15 @@ watch(
 								"
 								class="flex"
 							>
-								<Button
+								<IconButton
 									type="outlined"
-									size="sm"
+									circular
 									:disabled="!globalOptions.game_options || globalOptionMutation.isPending.value"
+									:label="formatMessage(messages.gameSettingsButton)"
 									@click="openGameSettings"
 								>
-									{{ formatMessage(messages.gameSettingsButton) }}
-								</Button>
+									<EditIcon />
+								</IconButton>
 							</span>
 							<span
 								v-else-if="row.editable"

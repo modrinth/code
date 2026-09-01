@@ -3,6 +3,7 @@
 use super::super::synced_options;
 use super::CATALOG_REVISION;
 use super::api_types::{GameOptionsSourceCandidate, GameOptionsSourceIssue};
+use super::fullscreen::update_app_fullscreen_setting;
 use super::launch_overrides::currently_launcher_owned_keys;
 use super::options_file::{
     input_error, options_path, read_document, sha1_bytes,
@@ -34,7 +35,11 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
     let mut launcher_keys =
         launcher_keys_for_document(&metadata.instance.id, &input_sha1, state)
             .await?;
-    launcher_keys.extend(currently_launcher_owned_keys(metadata, state).await?);
+    let currently_launcher_owned = currently_launcher_owned_keys(metadata);
+    if !currently_launcher_owned.contains("fullscreen") {
+        launcher_keys.remove("fullscreen");
+    }
+    launcher_keys.extend(currently_launcher_owned);
     let entries = document.effective_entries();
     let current_values = load_shared_game_options(&state.pool).await?;
     let current_preferences = load_game_option_preferences(&state.pool).await?;
@@ -125,6 +130,7 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
         }
     }
     let mut seeded_any = false;
+    let mut fullscreen_value = None;
 
     for definition in all_supported_settings() {
         if !supported_settings_cover_game_version(source_version) {
@@ -147,6 +153,9 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
         let Some((_physical_key, value)) = found else {
             continue;
         };
+        if definition.id == "fullscreen" {
+            fullscreen_value = Some(value.clone());
+        }
         seeded_any = true;
         let option_revision = current_values
             .get(definition.id)
@@ -291,6 +300,9 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
     )
     .execute(&mut *tx)
     .await?;
+    if let Some(value) = fullscreen_value.as_ref() {
+        update_app_fullscreen_setting(&mut tx, value).await?;
+    }
     tx.commit().await?;
     Ok(())
 }
@@ -330,10 +342,12 @@ pub async fn list_sync_sources()
                         &state,
                     )
                     .await?;
-                    launcher_keys.extend(
-                        currently_launcher_owned_keys(&metadata, &state)
-                            .await?,
-                    );
+                    let currently_launcher_owned =
+                        currently_launcher_owned_keys(&metadata);
+                    if !currently_launcher_owned.contains("fullscreen") {
+                        launcher_keys.remove("fullscreen");
+                    }
+                    launcher_keys.extend(currently_launcher_owned);
                     let entries = document.effective_entries();
                     let source_version =
                         metadata.applied_content_set.game_version.as_str();

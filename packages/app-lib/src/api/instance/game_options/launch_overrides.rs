@@ -19,18 +19,14 @@ use crate::state::{
 use crate::util::io;
 use std::collections::HashSet;
 
-pub(super) async fn currently_launcher_owned_keys(
+pub(super) fn currently_launcher_owned_keys(
     metadata: &InstanceMetadata,
-    state: &State,
-) -> crate::Result<HashSet<String>> {
-    let settings = crate::state::Settings::get(&state.pool).await?;
+) -> HashSet<String> {
     let mut keys = HashSet::new();
-    if metadata.launch_overrides.force_fullscreen.is_some()
-        || settings.force_fullscreen
-    {
+    if metadata.launch_overrides.force_fullscreen.is_some() {
         keys.insert("fullscreen".to_string());
     }
-    Ok(keys)
+    keys
 }
 
 /// Reads changes made in Minecraft and writes the latest shared values before launch.

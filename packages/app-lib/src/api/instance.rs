@@ -45,6 +45,10 @@ pub use self::game_options::{
     save_changes as save_synced_game_option_changes,
     sync_before_launch as sync_game_options_before_launch,
 };
+pub(crate) use self::game_options::{
+    shared_fullscreen_value, sync_all_participating_instances,
+    update_shared_fullscreen_from_app,
+};
 pub use self::get::{get, get_many, list};
 pub use self::groups::{
     FAVORITES_GROUP_ID, InstanceGroup, InstanceGroupMembershipUpdate,

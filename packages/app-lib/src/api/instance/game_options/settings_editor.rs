@@ -2,6 +2,7 @@
 
 use super::CATALOG_REVISION;
 use super::api_types::*;
+use super::fullscreen::update_app_fullscreen_setting;
 use super::instance_support::{
     describe_instance_support, find_common_local_value,
     load_participating_instances, summary_revision,
@@ -380,6 +381,7 @@ pub async fn save_changes(
     }
 
     let mut changed = false;
+    let mut fullscreen_value = None;
     let mut tx = state.pool.begin().await?;
     for (setting, change) in accepted {
         let value_changed =
@@ -392,6 +394,12 @@ pub async fn save_changes(
             .is_some_and(|enabled| enabled != setting.sync_enabled);
         if !value_changed && !selection_changed {
             continue;
+        }
+        if value_changed
+            && setting.option_id == "fullscreen"
+            && let Some(Some(value)) = change.canonical_value.as_ref()
+        {
+            fullscreen_value = Some(value.clone());
         }
         changed = true;
         let revision = setting.option_revision.saturating_add(1) as i64;
@@ -494,6 +502,9 @@ pub async fn save_changes(
         )
         .execute(&mut *tx)
         .await?;
+    }
+    if let Some(value) = fullscreen_value.as_ref() {
+        update_app_fullscreen_setting(&mut tx, value).await?;
     }
     tx.commit().await?;
 

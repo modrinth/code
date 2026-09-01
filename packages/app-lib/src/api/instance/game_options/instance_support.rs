@@ -33,7 +33,6 @@ pub(super) async fn load_participating_instances(
     if !game_options_sync_is_enabled(&state.pool).await? {
         return Ok(Vec::new());
     }
-    let settings = crate::state::Settings::get(&state.pool).await?;
     let instances = crate::state::list_instances(&state.pool).await?;
     let mut participants = Vec::new();
     for metadata in instances {
@@ -61,8 +60,7 @@ pub(super) async fn load_participating_instances(
             fullscreen_controlled: metadata
                 .launch_overrides
                 .force_fullscreen
-                .is_some()
-                || settings.force_fullscreen,
+                .is_some(),
             metadata,
             deferred,
             document,
@@ -241,20 +239,22 @@ pub(super) fn describe_instance_support(
                                     definition, document, &key,
                                 )
                             });
-                        let representable = match (definition, value) {
-                            (Some(definition), Some(value)) => encode_value(
-                                definition,
-                                &key,
-                                value,
-                                &version,
-                                document.value(&key),
-                            )
-                            .is_some(),
-                            (None, Some(CanonicalValue::ExternalRaw(_))) => {
-                                true
+                        let representable = value.is_none_or(|value| {
+                            match definition {
+                                Some(definition) => encode_value(
+                                    definition,
+                                    &key,
+                                    value,
+                                    &version,
+                                    document.value(&key),
+                                )
+                                .is_some(),
+                                None => matches!(
+                                    value,
+                                    CanonicalValue::ExternalRaw(_)
+                                ),
                             }
-                            _ => false,
-                        };
+                        });
                         if !representable {
                             (
 							GameOptionCompatibilityStatus::UnsupportedValue,
@@ -334,15 +334,20 @@ pub(super) fn describe_instance_support(
                                         })
                                         .map(|key| (*key).to_string())
                                 });
-                        let representable = eventual_key
-                            .as_deref()
-                            .zip(value)
-                            .is_some_and(|(key, value)| {
-                                encode_value(
-                                    definition, key, value, &version, None,
-                                )
-                                .is_some()
-                            });
+                        let representable = eventual_key.as_deref().is_some_and(
+                            |key| {
+                                value.is_none_or(|value| {
+                                    encode_value(
+                                        definition,
+                                        key,
+                                        value,
+                                        &version,
+                                        None,
+                                    )
+                                    .is_some()
+                                })
+                            },
+                        );
                         if representable {
                             (
 							GameOptionCompatibilityStatus::WaitingForBase,
