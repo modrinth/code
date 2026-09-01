@@ -188,7 +188,7 @@
 								class="animate-spin"
 								aria-hidden="true"
 							/>
-							<ScaleIcon v-else aria-hidden="true" />
+							<StickyNotePlusIcon v-else aria-hidden="true" />
 							{{ formatMessage(messages.actionAddPrivateNote) }}
 						</Button>
 						<template v-if="currentMember && !currentMember.staffOnly">
@@ -403,6 +403,7 @@ import {
 	ScaleIcon,
 	SendIcon,
 	SpinnerIcon,
+	StickyNotePlusIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {

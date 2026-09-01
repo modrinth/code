@@ -3,6 +3,23 @@ use crate::state::{
 };
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+pub struct InstanceTabVisibility {
+    pub files: bool,
+    pub worlds: bool,
+    pub screenshots: bool,
+}
+
+impl Default for InstanceTabVisibility {
+    fn default() -> Self {
+        Self {
+            files: true,
+            worlds: true,
+            screenshots: false,
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceLaunchOverrides {
     pub instance_id: String,
@@ -13,6 +30,7 @@ pub struct InstanceLaunchOverrides {
     pub force_fullscreen: Option<bool>,
     pub game_resolution: Option<WindowSize>,
     pub hooks: Hooks,
+    pub visible_tabs: InstanceTabVisibility,
 }
 
 impl InstanceLaunchOverrides {
@@ -30,6 +48,7 @@ impl InstanceLaunchOverrides {
                 wrapper: None,
                 post_exit: None,
             },
+            visible_tabs: InstanceTabVisibility::default(),
         }
     }
 }
@@ -50,6 +69,8 @@ pub(crate) struct InstanceLaunchOverridesData {
     pub game_resolution: Option<WindowSize>,
     #[serde(default)]
     pub hooks: Hooks,
+    #[serde(default)]
+    pub visible_tabs: InstanceTabVisibility,
 }
 
 impl InstanceLaunchOverridesData {
@@ -66,6 +87,7 @@ impl InstanceLaunchOverridesData {
             force_fullscreen: self.force_fullscreen,
             game_resolution: self.game_resolution,
             hooks: self.hooks,
+            visible_tabs: self.visible_tabs,
         }
     }
 }
@@ -80,6 +102,7 @@ impl From<&InstanceLaunchOverrides> for InstanceLaunchOverridesData {
             force_fullscreen: overrides.force_fullscreen,
             game_resolution: overrides.game_resolution,
             hooks: overrides.hooks.clone(),
+            visible_tabs: overrides.visible_tabs,
         }
     }
 }

@@ -8,7 +8,7 @@ use crate::database::models::thread_item::{
     ThreadBuilder, ThreadMessageBuilder,
 };
 use crate::env::ENV;
-use crate::models::ids::ImageId;
+use crate::models::ids::{ImageId, OrganizationId};
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
@@ -113,6 +113,7 @@ pub async fn report_create(
         project_id: None,
         version_id: None,
         user_id: None,
+        organization_id: None,
         shared_instance_id: None,
         shared_instance_version_id: None,
         body: new_report.body.clone(),
@@ -190,6 +191,29 @@ pub async fn report_create(
             }
 
             report.user_id = Some(user_id.into())
+        }
+        ItemType::Organization => {
+            let organization_id = OrganizationId(
+                parse_base62(new_report.item_id.as_str())
+                    .wrap_request_err("parsing reported organization ID")?,
+            );
+
+            let result = sqlx::query!(
+                "SELECT EXISTS(SELECT 1 FROM organizations WHERE id = $1)",
+                organization_id.0 as i64
+            )
+            .fetch_one(&mut transaction)
+            .await
+            .wrap_internal_err("querying database for `report_create`")?;
+
+            if !result.exists.unwrap_or(false) {
+                return Err(ApiError::Request(eyre::eyre!(
+                    "Organization could not be found: {}",
+                    new_report.item_id
+                )));
+            }
+
+            report.organization_id = Some(organization_id.into())
         }
         ItemType::SharedInstance => {
             // parsing

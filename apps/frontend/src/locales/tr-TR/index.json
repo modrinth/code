@@ -3434,12 +3434,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.actions.back-to-all-projects": {
-    "message": "Tüm projelere geri dön"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Proje sayfasına geri dön"
-  },
   "project.actions.checking-modpack-archives": {
     "message": "Kontrol ediliyor..."
   },

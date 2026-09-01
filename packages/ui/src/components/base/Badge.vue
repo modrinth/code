@@ -74,7 +74,7 @@
 			<ShieldCheckIcon aria-hidden="true" /> {{ formatMessage(messages.safeLabel) }}
 		</template>
 		<template v-else-if="type === 'unsafe'">
-			<BugIcon aria-hidden="true" /> {{ formatMessage(messages.unsafeLabel) }}
+			<ShieldAlertIcon aria-hidden="true" /> {{ formatMessage(messages.unsafeLabel) }}
 		</template>
 
 		<!-- Other -->
@@ -86,7 +86,6 @@
 import {
 	ArchiveIcon,
 	BoxIcon,
-	BugIcon,
 	CalendarIcon,
 	CheckIcon,
 	FileTextIcon,
@@ -95,6 +94,7 @@ import {
 	LockIcon,
 	ModrinthIcon,
 	ScaleIcon,
+	ShieldAlertIcon,
 	ShieldCheckIcon,
 	UpdatedIcon,
 	XIcon,

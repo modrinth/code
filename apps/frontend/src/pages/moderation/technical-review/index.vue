@@ -616,6 +616,7 @@ onUnmounted(() => {
 			v-model="query"
 			:page="currentPage"
 			:total-pages="totalPages"
+			:loading="isLoading"
 			@search="goToPage(1)"
 			@switch-page="goToPage"
 		>

@@ -6,6 +6,12 @@ export type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 	version_number?: string
 }
 
+export type TechRevProjectRef = {
+	id: string
+	slug?: string
+	project_types: string[]
+}
+
 export type DetailDecision = 'safe' | 'malware' | 'pending'
 export type DetailDecisionScope = 'local' | 'global'
 
@@ -27,4 +33,10 @@ export type JarGroup = {
 	jar: string | null
 	segments: string[]
 	classes: ClassGroup[]
+}
+
+export type TraceVerdictEvent = {
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail
+	decision: Exclude<DetailDecision, 'pending'>
+	scope: DetailDecisionScope
 }
