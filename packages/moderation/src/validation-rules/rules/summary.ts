@@ -155,7 +155,7 @@ export const projectSummaryValidationRules = {
 		},
 	},
 	'project-summary-non-english': {
-		severity: 'warning',
+		severity: 'error',
 		evaluate: ({ summary }) => {
 			const normalized = normalizeProjectFieldText(summary ?? '')
 			if (

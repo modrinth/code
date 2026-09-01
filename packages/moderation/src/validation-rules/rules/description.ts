@@ -322,7 +322,7 @@ export const projectDescriptionValidationRules = {
 		},
 	},
 	'project-description-non-english': {
-		severity: 'warning',
+		severity: 'error',
 		evaluate: (description) => {
 			const blocks = extractDescriptionTextBlocks(description ?? '')
 			const text = blocks.join(' ')
