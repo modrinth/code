@@ -354,48 +354,48 @@ watch(
 						v-if="allowShowingHiddenTraces"
 						class="flex cursor-pointer items-center gap-3 text-sm"
 					>
-							<span class="text-right text-secondary">
-								Show hidden traces
-								<span class="text-tertiary block text-xs">{{ hiddenTraceCount }} hidden</span>
-							</span>
-							<Toggle v-model="showHiddenTraces" :disabled="hiddenTraceCount === 0" small />
-						</label>
-						<div v-if="currentTab === 'File' && selectedFile" class="flex flex-row items-end gap-2">
-							<ButtonLink
-								type="outlined"
-								target="_blank"
-								:href="getVersionPageHref(item.project, selectedFile.version_id)"
-								class="!bg-surface-2"
-								:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
-							>
-								<VersionIcon aria-hidden="true" />
-								{{ getVersionLabel(selectedFile) }}
-							</ButtonLink>
-							<ButtonLink
-								type="outlined"
-								:target="selectedFile.file_id"
-								:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
-								class="!bg-surface-2"
-								aria-label="Open in Slicer"
-							>
-								<ExternalIcon aria-hidden="true" /> Slicer
-							</ButtonLink>
-							<ButtonLink
-								v-tooltip="
-									`Download ${selectedFile.file_name} (${formatBytes(selectedFile.file_size)})`
-								"
-								type="outlined"
-								target="_blank"
-								:href="selectedFile.download_url"
-								:download="selectedFile.file_name"
-								class="!bg-surface-2"
-								aria-label="Download"
-								icon-only
-								circular
-							>
-								<DownloadIcon aria-hidden="true" />
-							</ButtonLink>
-						</div>
+						<span class="text-right text-secondary">
+							Show hidden traces
+							<span class="text-tertiary block text-xs">{{ hiddenTraceCount }} hidden</span>
+						</span>
+						<Toggle v-model="showHiddenTraces" :disabled="hiddenTraceCount === 0" small />
+					</label>
+					<div v-if="currentTab === 'File' && selectedFile" class="flex flex-row items-end gap-2">
+						<ButtonLink
+							type="outlined"
+							target="_blank"
+							:href="getVersionPageHref(item.project, selectedFile.version_id)"
+							class="!bg-surface-2"
+							:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
+						>
+							<VersionIcon aria-hidden="true" />
+							{{ getVersionLabel(selectedFile) }}
+						</ButtonLink>
+						<ButtonLink
+							type="outlined"
+							:target="selectedFile.file_id"
+							:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
+							class="!bg-surface-2"
+							aria-label="Open in Slicer"
+						>
+							<ExternalIcon aria-hidden="true" /> Slicer
+						</ButtonLink>
+						<ButtonLink
+							v-tooltip="
+								`Download ${selectedFile.file_name} (${formatBytes(selectedFile.file_size)})`
+							"
+							type="outlined"
+							target="_blank"
+							:href="selectedFile.download_url"
+							:download="selectedFile.file_name"
+							class="!bg-surface-2"
+							aria-label="Download"
+							icon-only
+							circular
+						>
+							<DownloadIcon aria-hidden="true" />
+						</ButtonLink>
+					</div>
 				</div>
 			</div>
 		</div>

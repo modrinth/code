@@ -777,9 +777,13 @@ watch(
 
 							<div class="me-2 flex items-center justify-end gap-2">
 								<IconButton
-									v-tooltip="copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'"
+									v-tooltip="
+										copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
+									"
 									type="quiet"
-									:label="copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'"
+									:label="
+										copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
+									"
 									:disabled="copyingCelDetails.has(flag.detail.id)"
 									@click="copyDetailCelInput(flag.detail.id)"
 								>
