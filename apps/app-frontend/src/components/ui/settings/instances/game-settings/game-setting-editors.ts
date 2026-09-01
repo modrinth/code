@@ -29,10 +29,7 @@ export function gameSettingChanges(
 		if (!previous) return []
 
 		const syncChanged = previous.sync_enabled !== setting.sync_enabled
-		const valueChanged = !canonicalValuesEqual(
-			previous.canonical_value,
-			setting.canonical_value,
-		)
+		const valueChanged = !canonicalValuesEqual(previous.canonical_value, setting.canonical_value)
 		const promoteLocalValue =
 			forcedValueOptionIds.has(setting.option_id) &&
 			previous.value_state !== 'canonical' &&
@@ -125,12 +122,7 @@ export function settingSearchText(
 	label: string,
 	description: string,
 ): string {
-	return [
-		label,
-		description,
-		setting.option_id,
-		setting.raw_key,
-	]
+	return [label, description, setting.option_id, setting.raw_key]
 		.filter(Boolean)
 		.join(' ')
 		.toLocaleLowerCase()
@@ -141,7 +133,6 @@ export function settingCanBeEnabled(setting: EditableGameSetting): boolean {
 		!setting.controlled &&
 		!setting.validation_error &&
 		!['mixed', 'unset', 'invalid'].includes(setting.value_state) &&
-		(setting.compatibility.total_participating === 0 ||
-			setting.compatibility.will_receive > 0)
+		(setting.compatibility.total_participating === 0 || setting.compatibility.will_receive > 0)
 	)
 }

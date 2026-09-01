@@ -27,11 +27,7 @@
 				:style="{ zIndex: stackOverlayZ }"
 				@click="() => (closeOnClickOutside && closable ? hide() : {})"
 			/>
-			<div
-				class="modal-container"
-				:class="{ shown: visible }"
-				:style="{ zIndex: stackContainerZ }"
-			>
+			<div class="modal-container" :class="{ shown: visible }" :style="{ zIndex: stackContainerZ }">
 				<div
 					ref="modalBodyRef"
 					role="dialog"

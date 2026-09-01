@@ -48,7 +48,11 @@ pub(crate) async fn update_shared_fullscreen_from_app(
     let option_revision = stored
         .map(|stored| stored.revision)
         .unwrap_or(0)
-        .max(preference.map(|preference| preference.revision).unwrap_or(0))
+        .max(
+            preference
+                .map(|preference| preference.revision)
+                .unwrap_or(0),
+        )
         .saturating_add(1) as i64;
     let (canonical_revision, _) =
         load_game_options_sync_state(&state.pool, CATALOG_REVISION).await?;

@@ -1619,6 +1619,630 @@
   "app.settings.downloading": {
     "message": "Downloading v{version}"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "Accessibility preferences"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "Accessibility"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Chat visibility and appearance"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "Mouse, movement, and key bindings"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "Controls"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Settings added by mods"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Custom settings"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "Game language"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Language"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Volume and audio preferences"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Music and sound"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "Online and Realms preferences"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Online"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "Skin layers and main hand"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "Skin customization"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Camera and display settings"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "Video"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "All"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Chat"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Commands only"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "Custom"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "Decreased"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "Fabulous"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "Fancy"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "Fast"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "Hidden"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "Left"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Maximum"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "Minimal"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Minimum"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "Never"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "Off"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "On"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "Pause menu"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "Pause menu and toast"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "Right"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "Shown"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "System"
+  },
+  "app.settings.game-options.compatibility.all": {
+    "message": "Syncs to {count, plural, one {# instance} other {# instances}}"
+  },
+  "app.settings.game-options.compatibility.all-disabled": {
+    "message": "Sync is off"
+  },
+  "app.settings.game-options.compatibility.no-participants": {
+    "message": "Add an instance to start syncing"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "Some of your instances cannot use this setting"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "This setting is managed by Modrinth’s launch settings."
+  },
+  "app.settings.game-options.compatibility.some": {
+    "message": "Some of your instances cannot use this setting"
+  },
+  "app.settings.game-options.compatibility.some-disabled": {
+    "message": "Some of your instances cannot use this setting"
+  },
+  "app.settings.game-options.compatibility.tooltip.all": {
+    "message": "All of your instances can use this setting."
+  },
+  "app.settings.game-options.compatibility.tooltip.no-participants": {
+    "message": "Add an instance to start syncing this setting."
+  },
+  "app.settings.game-options.compatibility.tooltip.recipients": {
+    "message": "Some of your instances cannot use this setting"
+  },
+  "app.settings.game-options.compatibility.tooltip.waiting": {
+    "message": "{count, plural, one {Launch this instance once before syncing this setting.} other {Launch these instances once before syncing this setting.}}"
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "Enter a value"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} is now bound to {binding}."
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "Key binding change cancelled."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. Activate to change the binding."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "Choose a key"
+  },
+  "app.settings.game-options.keybind.conflict": {
+    "message": "This key is also used for {settings}."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "Down Arrow"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "Left Arrow"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "Right Arrow"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "Up Arrow"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Backspace"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Caps Lock"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Delete"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "End"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Escape"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Insert"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "Numpad {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Left Alt"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Left Command"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Left Ctrl"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Left Shift"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "Left Super"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page Down"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page Up"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pause"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Right Alt"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Right Command"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Right Ctrl"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Right Shift"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "Right Super"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Space"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "Unbound"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "Unknown key"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "Press a key…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "Listening for a key or mouse button. Press Escape to clear this binding."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "Different across instances"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Command"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "Mouse {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "Left Mouse"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "Middle Mouse"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "Right Mouse"
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Scancode {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "That input cannot be used by Minecraft. Press another key."
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Allow the player's name to appear in server listings."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Server listings"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Smooth lighting"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Automatically jump up one-block-high obstacles."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Auto-jump"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "The distance over which biome colors transition."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Biome blend"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Blocks"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Show the player's cape, including its elytra texture."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Cape"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Chat colors"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Ask before opening links from chat."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Prompt on links"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Allow web links in chat to be opened."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Web links"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "The opacity of chat text."
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Chat opacity"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Chat scale"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Chat visibility"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Clouds"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Change the Mojang Studios loading screen from red to black."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Monochrome logo"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Treat each mouse-wheel input as a single scroll step."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Discrete scrolling"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Entity shadows"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Field of view"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Fullscreen"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "Controls visual quality and performance."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Graphics"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "The size of the game interface and HUD."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "GUI scale"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Show the hat skin layer."
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Hat"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "Enhance the contrast of interface elements."
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "High contrast"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Hostile creatures"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "Invert vertical mouse movement."
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "Invert mouse"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "Show the jacket skin layer."
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "Jacket"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "Advancements"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "Attack"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Move backward"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "Open chat"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Command"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Drop item"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "Move forward"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "Toggle fullscreen"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "Inventory"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Jump"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "Strafe left"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Change perspective"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Pick block"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Player list"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "Strafe right"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Screenshot"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Sneak"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Sprint"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Swap offhand"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Use item"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "Language"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "Choose whether the main hand is left or right."
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Main hand"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Master volume"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "Maximum framerate"
+  },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Texture smoothing at a distance."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Mipmap levels"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "Choose whether music titles appear in the pause menu and as toasts."
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "Music notification"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "Music"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "Choose what the narrator reads."
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "Narrator"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "How long toast notifications remain visible."
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "Notification time"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "Particles"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "Players"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Realms notifications"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Render distance"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Mouse sensitivity"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "How far away entities update and blocks and fluids tick."
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "Simulation distance"
+  },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "Show captions for sounds played in the game."
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "Subtitles"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "Press once to remain crouched."
+  },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": "Toggle crouch"
+  },
+  "app.settings.game-options.setting.toggle-sprint.description": {
+    "message": "Press once to remain sprinting."
+  },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "Toggle sprint"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "Add a bobbing motion to the camera while walking."
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "View bobbing"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "Voice and speech"
+  },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "Limit the frame rate to the display refresh rate to prevent screen tearing."
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "VSync"
+  },
+  "app.settings.game-options.source.disabled.installing-or-updating": {
+    "message": "Installing or updating"
+  },
+  "app.settings.game-options.source.disabled.missing-options-file": {
+    "message": "No options.txt file"
+  },
+  "app.settings.game-options.source.disabled.no-syncable-settings": {
+    "message": "No syncable settings found"
+  },
+  "app.settings.game-options.source.disabled.running": {
+    "message": "Currently running"
+  },
+  "app.settings.game-options.source.disabled.unreadable-options-file": {
+    "message": "options.txt could not be read"
+  },
+  "app.settings.game-options.source.disabled.unsupported-version": {
+    "message": "Unsupported Minecraft version"
+  },
+  "app.settings.game-options.source.settings-summary": {
+    "message": "{recognized, plural, one {# recognized setting} other {# recognized settings}}, {custom, plural, one {# custom setting} other {# custom settings}}"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "This setting changed elsewhere. Check it and try again."
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Choose a valid value."
+  },
+  "app.settings.game-options.validation.local-value-needs-saving": {
+    "message": "Save this value before turning sync back on."
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "Choose a value first."
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Some of your instances cannot use this setting"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} location"
   },
@@ -1703,6 +2327,9 @@
   "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
     "message": "Pick the instance whose saved creative hotbars become the shared copy."
   },
+  "app.settings.synced-options.choose-sync-source.game-settings-description": {
+    "message": "Choose which instance to copy game settings from."
+  },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
     "message": "Pick the instance whose multiplayer servers become the shared copy."
   },
@@ -1732,6 +2359,108 @@
   },
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "Use the same saved creative hotbars across your instances."
+  },
+  "app.settings.synced-options.game-settings": {
+    "message": "Sync game options"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "Edit game settings"
+  },
+  "app.settings.synced-options.game-settings.compatibility-details": {
+    "message": "Why this setting may not sync"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "We loaded the latest settings. Check your changes, then save again."
+  },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "These settings changed elsewhere"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "Settings added by mods will appear here after Modrinth finds them in one of your instances."
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "Use the same graphics, keybinds, and other game settings across your instances"
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "Stop syncing all"
+  },
+  "app.settings.synced-options.game-settings.disable-all-count": {
+    "message": "Stop syncing all ({count})"
+  },
+  "app.settings.synced-options.game-settings.disabled-tooltip": {
+    "message": "Enable game settings sync before choosing individual settings."
+  },
+  "app.settings.synced-options.game-settings.empty": {
+    "message": "No settings match your search or filter."
+  },
+  "app.settings.synced-options.game-settings.enable-all": {
+    "message": "Sync all"
+  },
+  "app.settings.synced-options.game-settings.enable-all-count": {
+    "message": "Sync all ({count})"
+  },
+  "app.settings.synced-options.game-settings.filter.all": {
+    "message": "All"
+  },
+  "app.settings.synced-options.game-settings.filter.off": {
+    "message": "Not syncing"
+  },
+  "app.settings.synced-options.game-settings.filter.on": {
+    "message": "Syncing"
+  },
+  "app.settings.synced-options.game-settings.load-failed": {
+    "message": "We couldn’t load your game settings."
+  },
+  "app.settings.synced-options.game-settings.loading": {
+    "message": "Loading settings..."
+  },
+  "app.settings.synced-options.game-settings.preview-failed": {
+    "message": "We couldn’t check which instances support your changes. Try again."
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "Retry"
+  },
+  "app.settings.synced-options.game-settings.save": {
+    "message": "Save changes"
+  },
+  "app.settings.synced-options.game-settings.saved": {
+    "message": "Game settings updated"
+  },
+  "app.settings.synced-options.game-settings.saved-later": {
+    "message": "Your changes were saved and will finish syncing when your instances are ready."
+  },
+  "app.settings.synced-options.game-settings.saved-summary": {
+    "message": "Your changes were saved."
+  },
+  "app.settings.synced-options.game-settings.saved-with-problems": {
+    "message": "Your changes were saved, but some instances could not be updated."
+  },
+  "app.settings.synced-options.game-settings.search": {
+    "message": "Search settings..."
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "Sync {setting} across instances"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "Game settings"
+  },
+  "app.settings.synced-options.game-settings.unsaved-changes": {
+    "message": "You have unsaved changes."
+  },
+  "app.settings.synced-options.game-settings.value-label": {
+    "message": "Value"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "Different across instances"
+  },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "Off"
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "On"
+  },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "Choose a value"
   },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "Sync multiplayer servers"
@@ -2725,6 +3454,12 @@
   },
   "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
     "message": "Keep this instance's saved creative hotbars separate from synced hotbars."
+  },
+  "instance.settings.tabs.synced-options.game-settings": {
+    "message": "Game settings"
+  },
+  "instance.settings.tabs.synced-options.game-settings.description": {
+    "message": "Apply the selected shared game settings on top of this instance’s options.txt."
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "The version being replaced will be backed up before anything changes."

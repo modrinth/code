@@ -35,29 +35,29 @@ import type { Component } from 'vue'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 import {
-	get_synced_game_options_config,
 	type EditableGameSetting,
 	type GameOptionCanonicalValue,
 	type GameSettingCategory,
 	type GameSettingsEditorState,
+	get_synced_game_options_config,
 	preview_synced_game_option_changes,
 	save_synced_game_option_changes,
 	type UpdateGameSettingsRequest,
 } from '@/helpers/game-options'
 
-import GameSettingRow from './GameSettingRow.vue'
+import { minecraftKeybindConflictKey } from './game-keybinds'
 import {
 	cloneGameSettingsState,
 	gameSettingChanges,
 	settingCanBeEnabled,
 	settingSearchText,
 } from './game-setting-editors'
-import { minecraftKeybindConflictKey } from './game-keybinds'
 import {
 	formatGameSettingDescription,
 	formatGameSettingLabel,
 	gameSettingCategoryMessage,
 } from './game-setting-messages'
+import GameSettingRow from './GameSettingRow.vue'
 
 const emit = defineEmits<{
 	saved: []
@@ -142,7 +142,8 @@ const messages = defineMessages({
 	},
 	savedLater: {
 		id: 'app.settings.synced-options.game-settings.saved-later',
-		defaultMessage: 'Your changes were saved and will finish syncing when your instances are ready.',
+		defaultMessage:
+			'Your changes were saved and will finish syncing when your instances are ready.',
 	},
 	savedWithProblems: {
 		id: 'app.settings.synced-options.game-settings.saved-with-problems',
@@ -158,8 +159,7 @@ const messages = defineMessages({
 	},
 	conflictText: {
 		id: 'app.settings.synced-options.game-settings.conflict-text',
-		defaultMessage:
-			'We loaded the latest settings. Check your changes, then save again.',
+		defaultMessage: 'We loaded the latest settings. Check your changes, then save again.',
 	},
 })
 
@@ -256,10 +256,7 @@ const keybindConflicts = computed(() => {
 
 	const bindings = new Map<string, EditableGameSetting[]>()
 	for (const setting of draftState.value.settings) {
-		if (
-			setting.editor.type !== 'key_binding' ||
-			setting.canonical_value?.type !== 'key_binding'
-		)
+		if (setting.editor.type !== 'key_binding' || setting.canonical_value?.type !== 'key_binding')
 			continue
 		const key = minecraftKeybindConflictKey(setting.canonical_value.value)
 		if (!key) continue
@@ -285,9 +282,7 @@ const dirtyChanges = computed(() =>
 	gameSettingChanges(baseState.value, draftState.value, touchedValueOptionIds.value),
 )
 const isDirty = computed(() => dirtyChanges.value.length > 0)
-const dirtyOptionIds = computed(
-	() => new Set(dirtyChanges.value.map((change) => change.option_id)),
-)
+const dirtyOptionIds = computed(() => new Set(dirtyChanges.value.map((change) => change.option_id)))
 const hasBlockingDraft = computed(
 	() =>
 		draftState.value?.settings.some(
@@ -345,7 +340,8 @@ async function load() {
 		const currentCategoryExists = categories.value.some(
 			(category) => category.id === activeCategoryId.value,
 		)
-		if (!currentCategoryExists) activeCategoryId.value = categories.value[0]?.id ?? 'custom_settings'
+		if (!currentCategoryExists)
+			activeCategoryId.value = categories.value[0]?.id ?? 'custom_settings'
 		const activeCategoryIndex = categories.value.findIndex(
 			(category) => category.id === activeCategoryId.value,
 		)
@@ -462,11 +458,9 @@ function mergePreview(preview: GameSettingsEditorState) {
 	if (!baseState.value || !draftState.value) return
 	const previousBase = baseState.value
 	const dirtyIds = new Set(
-		gameSettingChanges(
-			previousBase,
-			draftState.value,
-			touchedValueOptionIds.value,
-		).map((change) => change.option_id),
+		gameSettingChanges(previousBase, draftState.value, touchedValueOptionIds.value).map(
+			(change) => change.option_id,
+		),
 	)
 	const stagedSettings = new Map(
 		draftState.value.settings
@@ -557,11 +551,8 @@ async function save() {
 				text: formatMessage(messages.conflictText),
 			})
 			if (
-				gameSettingChanges(
-					baseState.value,
-					draftState.value,
-					touchedValueOptionIds.value,
-				).length > 0
+				gameSettingChanges(baseState.value, draftState.value, touchedValueOptionIds.value).length >
+				0
 			) {
 				schedulePreview()
 			}
@@ -630,27 +621,17 @@ defineExpose({ show, hide })
 				<div class="flex shrink-0 flex-wrap items-center justify-between gap-3 pb-3 pt-2">
 					<div class="flex items-center gap-2">
 						<FilterIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-						<Tabs
-							:value="selectionFilter"
-							:tabs="filterTabs"
-							@update:value="setSelectionFilter"
-						/>
+						<Tabs :value="selectionFilter" :tabs="filterTabs" @update:value="setSelectionFilter" />
 					</div>
 					<ButtonGroup>
-						<Button
-							:disabled="saving || enableCandidates.length === 0"
-							@click="enableVisible"
-						>
+						<Button :disabled="saving || enableCandidates.length === 0" @click="enableVisible">
 							{{
 								enableCandidates.length
 									? formatMessage(messages.enableAllCount, { count: enableCandidates.length })
 									: formatMessage(messages.enableAll)
 							}}
 						</Button>
-						<Button
-							:disabled="saving || disableCandidates.length === 0"
-							@click="disableVisible"
-						>
+						<Button :disabled="saving || disableCandidates.length === 0" @click="disableVisible">
 							{{
 								disableCandidates.length
 									? formatMessage(messages.disableAllCount, { count: disableCandidates.length })
@@ -678,7 +659,10 @@ defineExpose({ show, hide })
 					</Button>
 				</div>
 				<div v-else class="min-h-0 flex-1">
-					<p v-if="previewError" class="m-0 border-0 border-b border-solid border-surface-5 py-3 text-sm text-orange">
+					<p
+						v-if="previewError"
+						class="m-0 border-0 border-b border-solid border-surface-5 py-3 text-sm text-orange"
+					>
 						{{ formatMessage(messages.previewFailed) }}
 					</p>
 					<div
@@ -722,9 +706,7 @@ defineExpose({ show, hide })
 					<Button
 						type="colored"
 						color="brand"
-						:disabled="
-							!isDirty || loading || saving || previewError || hasBlockingDraft
-						"
+						:disabled="!isDirty || loading || saving || previewError || hasBlockingDraft"
 						:loading="saving"
 						@click="save"
 					>

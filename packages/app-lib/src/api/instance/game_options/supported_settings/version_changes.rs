@@ -302,9 +302,7 @@ pub(in crate::api::instance) fn decode_value(
                     "2" => "fabulous",
                     _ => return None,
                 },
-                "graphicsPreset"
-                    if GRAPHICS_VALUES.contains(&raw.as_str()) =>
-                {
+                "graphicsPreset" if GRAPHICS_VALUES.contains(&raw.as_str()) => {
                     raw.as_str()
                 }
                 _ => return None,
@@ -326,10 +324,9 @@ pub(in crate::api::instance) fn decode_value(
             let value = match (physical_key, raw.as_str()) {
                 ("showNowPlayingToast", "false") => "never",
                 ("showNowPlayingToast", "true") => "pause_and_toast",
-                (
-                    "musicToast",
-                    "never" | "pause" | "pause_and_toast",
-                ) => raw.as_str(),
+                ("musicToast", "never" | "pause" | "pause_and_toast") => {
+                    raw.as_str()
+                }
                 _ => return None,
             };
             Some(CanonicalValue::Enum(value.to_string()))

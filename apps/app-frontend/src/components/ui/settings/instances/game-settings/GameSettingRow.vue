@@ -18,7 +18,6 @@ import {
 	canonicalValueFromInput,
 	canonicalValueText,
 } from './game-setting-editors'
-import GameKeybindInput from './GameKeybindInput.vue'
 import {
 	formatCompatibilityTooltip,
 	formatGameSettingChoice,
@@ -28,6 +27,7 @@ import {
 	presentationMessages,
 	shouldShowCompatibilityIndicator,
 } from './game-setting-messages'
+import GameKeybindInput from './GameKeybindInput.vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -121,9 +121,7 @@ const sliderValue = computed(() => {
 	const value = Number(valueText.value)
 	return Number.isFinite(value) ? value : (inputMin.value ?? 0)
 })
-const editorDisabled = computed(
-	() => props.disabled || props.setting.controlled,
-)
+const editorDisabled = computed(() => props.disabled || props.setting.controlled)
 const syncToggleDisabled = computed(
 	() =>
 		props.disabled ||
@@ -258,7 +256,9 @@ function updateValue(value: string | number | boolean | undefined) {
 			<Input
 				v-else
 				:model-value="valueText"
-				:type="setting.editor.type === 'integer' || setting.editor.type === 'decimal' ? 'number' : 'text'"
+				:type="
+					setting.editor.type === 'integer' || setting.editor.type === 'decimal' ? 'number' : 'text'
+				"
 				:min="inputMin"
 				:max="inputMax"
 				:step="inputStep"
