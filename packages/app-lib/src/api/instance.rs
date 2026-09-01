@@ -103,8 +103,11 @@ pub use self::synced_options::game_options::{
     apply_launcher_overrides as apply_game_options_launcher_overrides,
     capture_pack_base as capture_game_options_pack_base,
     get_config as get_synced_game_options_config,
+    get_local_config as get_local_game_options_config,
     list_sync_sources as list_game_options_sync_sources,
+    preview_local_changes as preview_local_game_option_changes,
     preview_changes as preview_synced_game_option_changes,
+    save_local_changes as save_local_game_option_changes,
     save_changes as save_synced_game_option_changes,
     sync_before_launch as sync_game_options_before_launch,
 };
