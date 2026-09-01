@@ -139,7 +139,6 @@ export type GameOptionsSourceCandidate = {
 
 export type GameOptionsSourceDisabledReason =
 	| 'installing_or_updating'
-	| 'running'
 	| 'unsupported_version'
 	| 'missing_options_file'
 	| 'no_syncable_settings'

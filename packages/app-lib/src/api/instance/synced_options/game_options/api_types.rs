@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "snake_case")]
 pub enum GameOptionsSourceIssue {
     InstallingOrUpdating,
-    Running,
     UnsupportedVersion,
     MissingOptionsFile,
     NoSyncableSettings,
@@ -181,14 +180,6 @@ pub struct SaveGameSettingsResult {
     pub unsupported: u32,
     pub failed: u32,
     pub conflicts: Vec<String>,
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(in crate::api::instance) enum SyncReason {
-    Normal,
-    BeforePackUpdate,
-    PackExtracted,
-    BeforeLaunch,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

@@ -452,9 +452,10 @@ pub(in crate::api::instance) fn encode_value(
     }
 }
 
-pub(in crate::api::instance) fn validate_canonical_value(
+fn validate_value(
     definition: Option<&SupportedSetting>,
     value: &CanonicalValue,
+    enforce_editor_increment: bool,
 ) -> crate::Result<()> {
     if let Some(definition) = definition {
         let type_valid = match definition.encoding {
@@ -490,7 +491,9 @@ pub(in crate::api::instance) fn validate_canonical_value(
                 CanonicalValue::Integer(value),
             ) if *value < min
                 || *value > max
-                || step > 0 && (*value - min) % step != 0 =>
+                || enforce_editor_increment
+                    && step > 0
+                    && (*value - min) % step != 0 =>
             {
                 return Err(input_error(format!(
                     "{} is outside its supported range or increment",
@@ -508,7 +511,8 @@ pub(in crate::api::instance) fn validate_canonical_value(
                 if !parsed.is_finite()
                     || parsed < min
                     || parsed > max
-                    || step > 0.0
+                    || enforce_editor_increment
+                        && step > 0.0
                         && (increment - increment.round()).abs() > 0.000_001
                 {
                     return Err(input_error(format!(
@@ -525,7 +529,8 @@ pub(in crate::api::instance) fn validate_canonical_value(
                 let increment = (parsed - min) / step;
                 if parsed < min
                     || parsed > max
-                    || step > 0.0
+                    || enforce_editor_increment
+                        && step > 0.0
                         && (increment - increment.round()).abs() > 0.000_001
                 {
                     return Err(input_error(format!(
@@ -566,6 +571,20 @@ pub(in crate::api::instance) fn validate_canonical_value(
     Ok(())
 }
 
+pub(in crate::api::instance) fn validate_canonical_value(
+    definition: Option<&SupportedSetting>,
+    value: &CanonicalValue,
+) -> crate::Result<()> {
+    validate_value(definition, value, true)
+}
+
+pub(in crate::api::instance) fn validate_file_value(
+    definition: Option<&SupportedSetting>,
+    value: &CanonicalValue,
+) -> crate::Result<()> {
+    validate_value(definition, value, false)
+}
+
 pub(in crate::api::instance) fn decode_value_for_version(
     definition: &SupportedSetting,
     physical_key: &str,
@@ -573,7 +592,7 @@ pub(in crate::api::instance) fn decode_value_for_version(
     game_version: &str,
 ) -> Option<CanonicalValue> {
     let value = decode_value(definition, physical_key, raw)?;
-    validate_canonical_value(Some(definition), &value).ok()?;
+    validate_file_value(Some(definition), &value).ok()?;
     let target_key = if definition.versioned_keys.is_empty() {
         physical_key
     } else {

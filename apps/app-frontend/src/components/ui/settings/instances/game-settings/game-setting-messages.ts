@@ -110,6 +110,14 @@ const settingMessages = defineMessages({
 		id: 'app.settings.game-options.setting.music-toast.description',
 		defaultMessage: 'Choose whether music titles appear in the pause menu and as toasts.',
 	},
+	recordVolumeLabel: {
+		id: 'app.settings.game-options.setting.record-volume.label',
+		defaultMessage: 'Jukebox/Note Blocks',
+	},
+	weatherVolumeLabel: {
+		id: 'app.settings.game-options.setting.weather-volume.label',
+		defaultMessage: 'Weather',
+	},
 	blocksVolumeLabel: {
 		id: 'app.settings.game-options.setting.blocks-volume.label',
 		defaultMessage: 'Blocks',
@@ -118,13 +126,25 @@ const settingMessages = defineMessages({
 		id: 'app.settings.game-options.setting.hostile-volume.label',
 		defaultMessage: 'Hostile creatures',
 	},
+	neutralVolumeLabel: {
+		id: 'app.settings.game-options.setting.neutral-volume.label',
+		defaultMessage: 'Friendly creatures',
+	},
 	playersVolumeLabel: {
 		id: 'app.settings.game-options.setting.players-volume.label',
 		defaultMessage: 'Players',
 	},
+	ambientVolumeLabel: {
+		id: 'app.settings.game-options.setting.ambient-volume.label',
+		defaultMessage: 'Ambient/Environment',
+	},
 	voiceVolumeLabel: {
 		id: 'app.settings.game-options.setting.voice-volume.label',
 		defaultMessage: 'Voice and speech',
+	},
+	uiVolumeLabel: {
+		id: 'app.settings.game-options.setting.ui-volume.label',
+		defaultMessage: 'UI',
 	},
 	sensitivityLabel: {
 		id: 'app.settings.game-options.setting.sensitivity.label',
@@ -530,10 +550,6 @@ export const presentationMessages = defineMessages({
 		id: 'app.settings.game-options.source.disabled.installing-or-updating',
 		defaultMessage: 'Installing or updating',
 	},
-	sourceRunning: {
-		id: 'app.settings.game-options.source.disabled.running',
-		defaultMessage: 'Currently running',
-	},
 	sourceUnsupportedVersion: {
 		id: 'app.settings.game-options.source.disabled.unsupported-version',
 		defaultMessage: 'Unsupported Minecraft version',
@@ -599,10 +615,15 @@ const knownSettings: Record<string, { label: MessageDescriptor; description?: Me
 			label: settingMessages.musicToastLabel,
 			description: settingMessages.musicToastDescription,
 		},
+		record_volume: { label: settingMessages.recordVolumeLabel },
+		weather_volume: { label: settingMessages.weatherVolumeLabel },
 		blocks_volume: { label: settingMessages.blocksVolumeLabel },
 		hostile_volume: { label: settingMessages.hostileVolumeLabel },
+		neutral_volume: { label: settingMessages.neutralVolumeLabel },
 		players_volume: { label: settingMessages.playersVolumeLabel },
+		ambient_volume: { label: settingMessages.ambientVolumeLabel },
 		voice_volume: { label: settingMessages.voiceVolumeLabel },
+		ui_volume: { label: settingMessages.uiVolumeLabel },
 		sensitivity: { label: settingMessages.sensitivityLabel },
 		invert_mouse: {
 			label: settingMessages.invertMouseLabel,
@@ -771,7 +792,6 @@ const validationMessages: Record<GameOptionValidationError, MessageDescriptor> =
 
 const sourceDisabledMessages: Record<GameOptionsSourceDisabledReason, MessageDescriptor> = {
 	installing_or_updating: presentationMessages.sourceInstallingOrUpdating,
-	running: presentationMessages.sourceRunning,
 	unsupported_version: presentationMessages.sourceUnsupportedVersion,
 	missing_options_file: presentationMessages.sourceMissingOptionsFile,
 	no_syncable_settings: presentationMessages.sourceNoSyncableSettings,

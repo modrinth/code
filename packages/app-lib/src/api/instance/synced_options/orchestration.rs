@@ -320,11 +320,9 @@ pub async fn set_global_option(
                             "Unknown sync source instance.".to_string(),
                         )
                     })?;
-            if sync_files_are_protected(&source)
-                || instance_is_running(&source, &state).await?
-            {
+            if sync_files_are_protected(&source) {
                 return Err(ErrorKind::InputError(
-                    "Close the source instance before using it for syncing."
+                    "Wait for the source instance to finish installing or updating."
                         .to_string(),
                 )
                 .into());
@@ -362,17 +360,8 @@ pub async fn set_global_option(
         Err(error) => return Err(error),
     };
     for metadata in instances {
-        let running = match instance_is_running(&metadata, &state).await {
-            Ok(running) => running,
-            Err(error) if option == SyncedOption::GameOptions => {
-                tracing::warn!(
-                    "Game-settings sync changed, but {} could not be inspected yet: {error}",
-                    metadata.instance.id
-                );
-                continue;
-            }
-            Err(error) => return Err(error),
-        };
+        let running = option != SyncedOption::GameOptions
+            && instance_is_running(&metadata, &state).await?;
         if sync_files_are_protected(&metadata) || running {
             continue;
         }
@@ -527,7 +516,8 @@ pub async fn set_instance_option(
     }
     let global = get_global_options_with_state(&state).await?;
     let can_reconcile = !sync_files_are_protected(&metadata)
-        && !instance_is_running(&metadata, &state).await?;
+        && (option == SyncedOption::GameOptions
+            || !instance_is_running(&metadata, &state).await?);
     if enabled {
         let eligibility =
             capability(&metadata, option, global.get(option), &state).await;
@@ -537,7 +527,11 @@ pub async fn set_instance_option(
             )
             .into());
         }
-        if option != SyncedOption::Screenshots && !can_reconcile {
+        if !matches!(
+            option,
+            SyncedOption::GameOptions | SyncedOption::Screenshots
+        ) && !can_reconcile
+        {
             return Err(ErrorKind::InputError(
                 "Close the instance before including it in file syncing."
                     .to_string(),
@@ -650,7 +644,10 @@ pub async fn get_instance_option_join_preview(
         )
         .into());
     }
-    if option != SyncedOption::Screenshots
+    if !matches!(
+        option,
+        SyncedOption::GameOptions | SyncedOption::Screenshots
+    )
         && (sync_files_are_protected(&metadata)
             || instance_is_running(&metadata, &state).await?)
     {
@@ -731,13 +728,6 @@ pub(crate) async fn monitor_persisted_processes() -> crate::Result<()> {
                             .await;
                     }
                     Ok(false) => {
-                        if let Err(error) =
-                            reconcile_instance(&instance_id).await
-                        {
-                            tracing::warn!(
-                                "Failed to reconcile synced options after a persisted process exited for {instance_id}: {error}"
-                            );
-                        }
                         break;
                     }
                     Err(error) => {
@@ -828,17 +818,10 @@ async fn reconcile_instance_with_state(
             .await
         {
             CapabilityStatus::Supported => {
-                let result =
-                    if option == SyncedOption::GameOptions && allow_protected {
-                        reconcile_game_options(
-                            metadata,
-                            state,
-                            super::game_options::SyncReason::PackExtracted,
-                        )
-                        .await
-                    } else {
-                        reconcile_option(metadata, option, state).await
-                    };
+                if option == SyncedOption::GameOptions {
+                    continue;
+                }
+                let result = reconcile_option(metadata, option, state).await;
                 if let Err(error) = result {
                     if option == SyncedOption::GameOptions {
                         tracing::warn!(
@@ -866,12 +849,8 @@ async fn reconcile_option(
 ) -> crate::Result<()> {
     match option {
         SyncedOption::GameOptions => {
-            reconcile_game_options(
-                metadata,
-                state,
-                super::game_options::SyncReason::Normal,
-            )
-            .await
+            super::game_options::apply_instance_with_state(metadata, state)
+                .await
         }
         SyncedOption::CommandHistory => {
             reconcile_command_history(metadata, state).await
@@ -884,21 +863,6 @@ async fn reconcile_option(
         }
         SyncedOption::Screenshots => Ok(()),
     }
-}
-
-async fn reconcile_game_options(
-    metadata: &InstanceMetadata,
-    state: &State,
-    reason: super::game_options::SyncReason,
-) -> crate::Result<()> {
-    if !canonical_exists(SyncedOption::GameOptions, state).await? {
-        let source = instance_dir(metadata, state).join("options.txt");
-        if !source.exists() {
-            return Ok(());
-        }
-        seed_from_instance(metadata, SyncedOption::GameOptions, state).await?;
-    }
-    super::game_options::sync_instance_with_state(metadata, state, reason).await
 }
 
 pub async fn reconcile_changed_file(
@@ -915,13 +879,15 @@ pub async fn reconcile_changed_file(
     }
     match file_name {
         "options.txt" => {
-            if option_effective(&metadata, SyncedOption::GameOptions, &state)
-                .await?
-            {
-                reconcile_game_options(
-                    &metadata,
-                    &state,
-                    super::game_options::SyncReason::Normal,
+            let participates = option_participates(
+                &metadata,
+                SyncedOption::GameOptions,
+                &state,
+            )
+            .await?;
+            if participates {
+                super::game_options::capture_instance_file_change(
+                    &metadata, &state,
                 )
                 .await?;
             }
@@ -1095,12 +1061,8 @@ async fn ensure_option(
 ) -> crate::Result<()> {
     match option {
         SyncedOption::GameOptions => {
-            super::game_options::sync_instance_with_state(
-                metadata,
-                state,
-                super::game_options::SyncReason::Normal,
-            )
-            .await
+            super::game_options::apply_instance_with_state(metadata, state)
+                .await
         }
         SyncedOption::CommandHistory => {
             ensure_command_history(metadata, state).await
@@ -1174,6 +1136,14 @@ pub(super) async fn option_effective(
     {
         return Ok(false);
     }
+    option_participates(metadata, option, state).await
+}
+
+async fn option_participates(
+    metadata: &InstanceMetadata,
+    option: SyncedOption,
+    state: &State,
+) -> crate::Result<bool> {
     let global = get_global_options_with_state(state).await?;
     Ok(instance_option_enabled(metadata, option)
         && capability(metadata, option, global.get(option), state)

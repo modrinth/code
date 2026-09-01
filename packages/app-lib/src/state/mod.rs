@@ -18,8 +18,7 @@ pub use self::instance_types::*;
 pub(crate) mod instances;
 pub use self::instances::*;
 pub(crate) use self::instances::{
-    GameOptionsProjection, ProjectedField, ProjectionOrigin, StoredOption,
-    StoredPreference,
+    StoredOption, StoredPreference,
 };
 pub(crate) use self::instances::{
     game_options_sync_is_enabled, load_game_option_preferences,

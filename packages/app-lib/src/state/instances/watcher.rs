@@ -68,8 +68,9 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                         if let Some(instance_path) = instance_path {
                             let instance_path_str =
                                 instance_path.to_string_lossy().to_string();
-                            let Some(instance_id) =
-                                instance_ids.get(&instance_path_str).cloned()
+                            let Some(instance_id) = instance_ids
+                                .get(&instance_path_str)
+                                .cloned()
                             else {
                                 continue;
                             };

@@ -514,7 +514,7 @@ pub async fn save_changes(
     }
     tx.commit().await?;
 
-    let projection = if changed {
+    let write_result = if changed {
         sync_all_participating_instances(&state).await
     } else {
         SaveGameSettingsResult {
@@ -530,6 +530,6 @@ pub async fn save_changes(
     Ok(SaveGameSettingsResult {
         state: Some(load_settings_editor(&state).await?),
         conflicts,
-        ..projection
+        ..write_result
     })
 }

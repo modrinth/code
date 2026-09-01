@@ -1,10 +1,10 @@
 //! Keeps game settings intact when a modpack is installed or updated.
 
 use super::MAX_OPTIONS_BYTES;
-use super::api_types::SyncReason;
 use super::options_file::{input_error, options_path, sha1_bytes};
 use super::write_shared_settings::{
-    sync_instance_options, sync_is_active_for_instance,
+    apply_shared_settings_to_instance, capture_instance_options,
+    sync_is_active_for_instance,
 };
 use crate::state::{InstanceLink, InstanceMetadata, State, SyncedOption};
 use crate::util::io;
@@ -154,13 +154,7 @@ pub(in crate::api::instance) async fn prepare_instance_update_with_state(
     .execute(&state.pool)
     .await?;
     if sync_is_active_for_instance(metadata, state).await? {
-        let _ = sync_instance_options(
-            metadata,
-            state,
-            SyncReason::BeforePackUpdate,
-            true,
-        )
-        .await?;
+        let _ = capture_instance_options(metadata, state, true).await?;
     }
     let path = options_path(metadata, state);
     let (had_file, bytes, sha1) = if path.exists() {
@@ -297,13 +291,8 @@ pub async fn capture_pack_base(
     .await?;
 
     if sync_is_active_for_instance(&metadata, &state).await? {
-        if let Err(error) = sync_instance_options(
-            &metadata,
-            &state,
-            SyncReason::PackExtracted,
-            false,
-        )
-        .await
+        if let Err(error) =
+            apply_shared_settings_to_instance(&metadata, &state, true).await
         {
             tracing::warn!(
                 "Captured the modpack options.txt for {}, but shared settings could not be overlaid yet: {error}",
