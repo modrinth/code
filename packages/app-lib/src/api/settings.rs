@@ -39,17 +39,16 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
         current_settings.force_fullscreen
     };
     let fullscreen_changed = current_fullscreen != settings.force_fullscreen;
-    let shared_fullscreen_changed = if game_options_sync_enabled
-        && fullscreen_changed
-    {
-        crate::api::instance::update_shared_fullscreen_from_app(
-            &state,
-            settings.force_fullscreen,
-        )
-        .await?
-    } else {
-        false
-    };
+    let shared_fullscreen_changed =
+        if game_options_sync_enabled && fullscreen_changed {
+            crate::api::instance::update_shared_fullscreen_from_app(
+                &state,
+                settings.force_fullscreen,
+            )
+            .await?
+        } else {
+            false
+        };
     settings.update(&state.pool).await?;
 
     if shared_fullscreen_changed {

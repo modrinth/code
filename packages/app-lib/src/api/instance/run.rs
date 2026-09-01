@@ -74,7 +74,8 @@ async fn run_credentials(
             &state.pool,
         )
         .await?;
-    let fullscreen_is_shared = game_options_sync_is_enabled(&state.pool).await?
+    let fullscreen_is_shared = game_options_sync_is_enabled(&state.pool)
+        .await?
         && instance_sync_preferences.game_options
         && load_game_option_preferences(&state.pool)
             .await?

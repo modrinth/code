@@ -192,8 +192,8 @@ onBeforeUnmount(cancelRecording)
 	<div class="flex w-full min-w-0 items-center gap-1.5">
 		<span
 			ref="controlElement"
-			data-game-keybind-control
 			v-tooltip="!recording && conflictMessage ? conflictMessage : undefined"
+			data-game-keybind-control
 			class="flex min-w-0 flex-1"
 		>
 			<Button
@@ -204,8 +204,7 @@ onBeforeUnmount(cancelRecording)
 				:aria-describedby="recording ? statusId : undefined"
 				class="keybind-button !w-full overflow-hidden"
 				:class="{
-					'!bg-brand-highlight !text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]':
-						recording,
+					'!bg-brand-highlight !text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]': recording,
 					'keybind-button--conflict': !recording && conflicts.length,
 				}"
 				@click="handleClick"

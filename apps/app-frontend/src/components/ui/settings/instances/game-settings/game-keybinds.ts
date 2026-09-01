@@ -298,9 +298,7 @@ const keyboardLabels: Record<string, MessageDescriptor | string> = {
 
 function splitKeybind(value: string): [key: string, modifier?: string] {
 	const separator = value.indexOf(':')
-	return separator === -1
-		? [value]
-		: [value.slice(0, separator), value.slice(separator + 1)]
+	return separator === -1 ? [value] : [value.slice(0, separator), value.slice(separator + 1)]
 }
 
 function keyboardIdentifierFromCode(code: string): string | null {

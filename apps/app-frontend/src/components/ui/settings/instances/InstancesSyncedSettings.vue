@@ -25,8 +25,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { Component } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 
-import WorldItem from '@/components/ui/world/WorldItem.vue'
 import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
+import WorldItem from '@/components/ui/world/WorldItem.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
 import {
 	type GameOptionsSourceCandidate,
@@ -76,7 +76,8 @@ const messages = defineMessages({
 	},
 	gameSettingsDescription: {
 		id: 'app.settings.synced-options.game-settings.description',
-		defaultMessage: 'Use the same graphics, keybinds, and other game settings across your instances',
+		defaultMessage:
+			'Use the same graphics, keybinds, and other game settings across your instances',
 	},
 	gameSettingsButton: {
 		id: 'app.settings.synced-options.game-settings.button',
@@ -769,7 +770,9 @@ watch(
 					<Button
 						type="colored"
 						color="brand"
-						:disabled="!baseInstanceId || baseSourcesLoading || globalOptionMutation.isPending.value"
+						:disabled="
+							!baseInstanceId || baseSourcesLoading || globalOptionMutation.isPending.value
+						"
 						:loading="globalOptionMutation.isPending.value"
 						@click="confirmBaseInstance"
 					>

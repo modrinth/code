@@ -239,8 +239,8 @@ pub(super) fn describe_instance_support(
                                     definition, document, &key,
                                 )
                             });
-                        let representable = value.is_none_or(|value| {
-                            match definition {
+                        let representable =
+                            value.is_none_or(|value| match definition {
                                 Some(definition) => encode_value(
                                     definition,
                                     &key,
@@ -253,8 +253,7 @@ pub(super) fn describe_instance_support(
                                     value,
                                     CanonicalValue::ExternalRaw(_)
                                 ),
-                            }
-                        });
+                            });
                         if !representable {
                             (
 							GameOptionCompatibilityStatus::UnsupportedValue,
@@ -334,20 +333,15 @@ pub(super) fn describe_instance_support(
                                         })
                                         .map(|key| (*key).to_string())
                                 });
-                        let representable = eventual_key.as_deref().is_some_and(
-                            |key| {
+                        let representable =
+                            eventual_key.as_deref().is_some_and(|key| {
                                 value.is_none_or(|value| {
                                     encode_value(
-                                        definition,
-                                        key,
-                                        value,
-                                        &version,
-                                        None,
+                                        definition, key, value, &version, None,
                                     )
                                     .is_some()
                                 })
-                            },
-                        );
+                            });
                         if representable {
                             (
 							GameOptionCompatibilityStatus::WaitingForBase,

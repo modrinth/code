@@ -226,7 +226,10 @@ async fn version_capability(
     option: SyncedOption,
     state: &State,
 ) -> CapabilityStatus {
-    if matches!(option, SyncedOption::GameOptions | SyncedOption::Screenshots) {
+    if matches!(
+        option,
+        SyncedOption::GameOptions | SyncedOption::Screenshots
+    ) {
         return CapabilityStatus::Supported;
     }
 
@@ -306,16 +309,14 @@ pub async fn set_global_option(
             )
         })?;
         if option == SyncedOption::GameOptions {
-            let source = crate::state::get_instance(
-                base_instance_id,
-                &state.pool,
-            )
-            .await?
-            .ok_or_else(|| {
-                ErrorKind::InputError(
-                    "Unknown sync source instance.".to_string(),
-                )
-            })?;
+            let source =
+                crate::state::get_instance(base_instance_id, &state.pool)
+                    .await?
+                    .ok_or_else(|| {
+                        ErrorKind::InputError(
+                            "Unknown sync source instance.".to_string(),
+                        )
+                    })?;
             if sync_files_are_protected(&source)
                 || instance_is_running(&source, &state).await?
             {
@@ -824,18 +825,17 @@ async fn reconcile_instance_with_state(
             .await
         {
             CapabilityStatus::Supported => {
-                let result = if option == SyncedOption::GameOptions
-                    && allow_protected
-                {
-                    super::super::game_options::sync_instance_with_state(
+                let result =
+                    if option == SyncedOption::GameOptions && allow_protected {
+                        super::super::game_options::sync_instance_with_state(
                         metadata,
                         state,
                         super::super::game_options::SyncReason::PackExtracted,
                     )
                     .await
-                } else {
-                    reconcile_option(metadata, option, state).await
-                };
+                    } else {
+                        reconcile_option(metadata, option, state).await
+                    };
                 if let Err(error) = result {
                     if option == SyncedOption::GameOptions {
                         tracing::warn!(
