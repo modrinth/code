@@ -41,7 +41,7 @@ pub(in crate::api::instance) const GRAPHICS_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "graphicsPreset",
         since: "1.21.11",
-        until: "26.2",
+        until: "26.3",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -56,7 +56,7 @@ pub(in crate::api::instance) const AMBIENT_OCCLUSION_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "ao",
         since: "1.19.4",
-        until: "26.2",
+        until: "26.3",
         mapping: GameOptionMappingKind::Migrated,
     },
 ];
@@ -71,7 +71,7 @@ pub(in crate::api::instance) const MUSIC_TOAST_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "musicToast",
         since: "1.21.11",
-        until: "26.2",
+        until: "26.3",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -86,7 +86,7 @@ pub(in crate::api::instance) const SWAP_OFFHAND_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "key_key.swapOffhand",
         since: "1.16",
-        until: "26.2",
+        until: "26.3",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -243,7 +243,7 @@ pub(in crate::api::instance) fn supported_settings_cover_game_version(
     match components.as_slice() {
         [1, minor] => *minor <= 21,
         [1, minor, patch] => *minor < 21 || (*minor == 21 && *patch <= 11),
-        [26, minor] | [26, minor, _] => (1..=2).contains(minor),
+        [26, minor] | [26, minor, _] => (1..=3).contains(minor),
         _ => false,
     }
 }
