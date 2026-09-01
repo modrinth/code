@@ -17,6 +17,7 @@
 //! mistaken for changes made by the player.
 
 mod api_types;
+mod fullscreen;
 mod instance_support;
 mod launch_overrides;
 mod options_file;
@@ -43,6 +44,11 @@ pub use pack_updates::capture_pack_base;
 pub use settings_editor::{get_config, preview_changes, save_changes};
 pub use source_selection::list_sync_sources;
 
+pub(crate) use fullscreen::{
+    shared_fullscreen_value, update_shared_fullscreen_from_app,
+};
+pub(crate) use write_shared_settings::sync_all_participating_instances;
+
 pub(in crate::api::instance) use api_types::SyncReason;
 pub(in crate::api::instance) use pack_updates::{
     detach_instance, prepare_instance_update_with_state,
@@ -57,7 +63,7 @@ pub(in crate::api::instance) async fn canonical_exists(
 }
 
 const OPTIONS_FILE: &str = "options.txt";
-const CATALOG_REVISION: u32 = 2;
+const CATALOG_REVISION: u32 = 3;
 const MAX_OPTIONS_BYTES: usize = 2 * 1024 * 1024;
 const MAX_OPTIONS_LINES: usize = 16_384;
 const MAX_KEY_BYTES: usize = 1_024;

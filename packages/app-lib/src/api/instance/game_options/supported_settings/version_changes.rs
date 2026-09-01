@@ -10,8 +10,20 @@ use super::{
 };
 use crate::state::{CanonicalValue, StoredOption};
 
-const GRAPHICS_VALUES: &[&str] = &["fast", "fancy", "fabulous"];
+const GRAPHICS_VALUES: &[&str] = &["fast", "fancy", "fabulous", "custom"];
 const MUSIC_TOAST_VALUES: &[&str] = &["never", "pause", "pause_and_toast"];
+
+fn decode_string_token(raw: &str) -> Option<String> {
+    if raw.starts_with('"') {
+        serde_json::from_str(raw).ok()
+    } else {
+        Some(raw.to_string())
+    }
+}
+
+fn encode_string_token(value: &str) -> Option<String> {
+    serde_json::to_string(value).ok()
+}
 
 pub(in crate::api::instance) const GRAPHICS_KEYS: &[VersionedKey] = &[
     VersionedKey {
@@ -255,9 +267,12 @@ pub(in crate::api::instance) fn decode_value(
             .ok()
             .filter(|value| value.is_finite())
             .map(|_| CanonicalValue::Decimal(raw.to_string())),
-        ValueEncoding::Enum(choices) => choices
-            .contains(&raw)
-            .then(|| CanonicalValue::Enum(raw.to_string())),
+        ValueEncoding::Enum(choices) => {
+            let value = decode_string_token(raw)?;
+            choices
+                .contains(&value.as_str())
+                .then(|| CanonicalValue::Enum(value))
+        }
         ValueEncoding::Text => Some(CanonicalValue::Text(raw.to_string())),
         ValueEncoding::KeyBinding => {
             if valid_modern_key_binding(raw) {
@@ -274,19 +289,24 @@ pub(in crate::api::instance) fn decode_value(
                 .then(|| CanonicalValue::Integer(degrees.round() as i64))
         }),
         ValueEncoding::Graphics => {
+            let raw = decode_string_token(raw)?;
             let value = match physical_key {
-                "fancyGraphics" => match raw {
+                "fancyGraphics" => match raw.as_str() {
                     "false" => "fast",
                     "true" => "fancy",
                     _ => return None,
                 },
-                "graphicsMode" => match raw {
+                "graphicsMode" => match raw.as_str() {
                     "0" => "fast",
                     "1" => "fancy",
                     "2" => "fabulous",
                     _ => return None,
                 },
-                "graphicsPreset" if GRAPHICS_VALUES.contains(&raw) => raw,
+                "graphicsPreset"
+                    if GRAPHICS_VALUES.contains(&raw.as_str()) =>
+                {
+                    raw.as_str()
+                }
                 _ => return None,
             };
             Some(CanonicalValue::Enum(value.to_string()))
@@ -302,10 +322,14 @@ pub(in crate::api::instance) fn decode_value(
             Some(CanonicalValue::Enum(value.to_string()))
         }
         ValueEncoding::MusicToast => {
-            let value = match (physical_key, raw) {
+            let raw = decode_string_token(raw)?;
+            let value = match (physical_key, raw.as_str()) {
                 ("showNowPlayingToast", "false") => "never",
                 ("showNowPlayingToast", "true") => "pause_and_toast",
-                ("musicToast", "never" | "pause" | "pause_and_toast") => raw,
+                (
+                    "musicToast",
+                    "never" | "pause" | "pause_and_toast",
+                ) => raw.as_str(),
                 _ => return None,
             };
             Some(CanonicalValue::Enum(value.to_string()))
@@ -349,7 +373,11 @@ pub(in crate::api::instance) fn encode_value(
         (ValueEncoding::Enum(choices), CanonicalValue::Enum(value))
             if choices.contains(&value.as_str()) =>
         {
-            Some(value.clone())
+            if current_raw.is_some_and(|raw| raw.starts_with('"')) {
+                encode_string_token(value)
+            } else {
+                Some(value.clone())
+            }
         }
         (ValueEncoding::Text, CanonicalValue::Text(value)) => {
             Some(value.clone())
@@ -385,7 +413,7 @@ pub(in crate::api::instance) fn encode_value(
                 "graphicsPreset"
                     if GRAPHICS_VALUES.contains(&value.as_str()) =>
                 {
-                    Some(value.clone())
+                    encode_string_token(value)
                 }
                 _ => None,
             }
@@ -418,7 +446,7 @@ pub(in crate::api::instance) fn encode_value(
                 "musicToast"
                     if MUSIC_TOAST_VALUES.contains(&value.as_str()) =>
                 {
-                    Some(value.clone())
+                    encode_string_token(value)
                 }
                 _ => None,
             }

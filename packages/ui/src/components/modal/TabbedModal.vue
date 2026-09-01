@@ -18,6 +18,14 @@ export interface Tab {
 	shown?: boolean
 }
 
+defineSlots<{
+	title?(): unknown
+	'sidebar-header'?(): unknown
+	footer?(): unknown
+	content?(props: { tab: Tab | undefined; index: number }): unknown
+	'floating-action-bar'?(): unknown
+}>()
+
 const { formatMessage } = useVIntl()
 
 const props = withDefaults(
@@ -28,10 +36,12 @@ const props = withDefaults(
 		width?: string
 		closable?: boolean
 		onHide?: () => void
+		onAfterHide?: () => void
 		onShow?: () => void
 		beforeHide?: () => boolean
 		beforeTabChange?: (fromIndex: number, toIndex: number) => boolean
 		floatingActionBarShown?: boolean
+		disableClose?: boolean
 	}>(),
 	{
 		header: undefined,
@@ -39,10 +49,12 @@ const props = withDefaults(
 		width: undefined,
 		closable: true,
 		onHide: undefined,
+		onAfterHide: undefined,
 		onShow: undefined,
 		beforeHide: undefined,
 		beforeTabChange: undefined,
 		floatingActionBarShown: false,
+		disableClose: false,
 	},
 )
 
@@ -102,8 +114,10 @@ defineExpose({ show, hide, selectedTab, setTab })
 		:width="width"
 		:closable="closable"
 		:on-hide="onHide"
+		:on-after-hide="onAfterHide"
 		:on-show="onShow"
 		:before-hide="beforeHide"
+		:disable-close="disableClose"
 		no-padding
 	>
 		<template v-if="$slots.title" #title>
@@ -113,6 +127,8 @@ defineExpose({ show, hide, selectedTab, setTab })
 			<div
 				class="flex min-w-0 max-h-[min(65vh,600px)] flex-col border-0 border-r-[1px] border-solid border-divider pr-4"
 			>
+				<slot name="sidebar-header" />
+
 				<div class="relative min-h-0 flex-1">
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
@@ -205,12 +221,14 @@ defineExpose({ show, hide, selectedTab, setTab })
 					:class="floatingActionBarShown ? 'pb-24' : 'pb-6'"
 					@scroll="checkScrollState"
 				>
-					<Suspense>
-						<component
-							:is="visibleTabs[selectedTab]?.content"
-							v-if="visibleTabs[selectedTab]?.content"
-						/>
-					</Suspense>
+					<slot name="content" :tab="visibleTabs[selectedTab]" :index="selectedTab">
+						<Suspense>
+							<component
+								:is="visibleTabs[selectedTab]?.content"
+								v-if="visibleTabs[selectedTab]?.content"
+							/>
+						</Suspense>
+					</slot>
 				</div>
 
 				<Transition

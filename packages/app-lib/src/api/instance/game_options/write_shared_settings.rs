@@ -39,15 +39,13 @@ pub(super) async fn apply_shared_settings_to_document(
 ) -> crate::Result<Vec<ProjectedField>> {
     let values = load_shared_game_options(&state.pool).await?;
     let preferences = load_game_option_preferences(&state.pool).await?;
-    let settings = crate::state::Settings::get(&state.pool).await?;
     let mut fields = Vec::new();
     for (option_id, preference) in preferences {
         if !preference.enabled {
             continue;
         }
         if option_id == "fullscreen"
-            && (metadata.launch_overrides.force_fullscreen.is_some()
-                || settings.force_fullscreen)
+            && metadata.launch_overrides.force_fullscreen.is_some()
         {
             continue;
         }
@@ -346,7 +344,7 @@ pub(super) async fn sync_other_participating_instances(
     result
 }
 
-pub(super) async fn sync_all_participating_instances(
+pub(crate) async fn sync_all_participating_instances(
     state: &State,
 ) -> SaveGameSettingsResult {
     sync_other_participating_instances(state, None).await

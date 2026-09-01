@@ -3,7 +3,7 @@ use super::{
     version_changes, versioned_setting,
 };
 
-const GRAPHICS: &[&str] = &["fast", "fancy", "fabulous"];
+const GRAPHICS: &[&str] = &["fast", "fancy", "fabulous", "custom"];
 const AMBIENT_OCCLUSION: &[&str] = &["off", "on", "minimum", "maximum"];
 const PARTICLES: &[&str] = &["0", "1", "2"];
 const CLOUDS: &[&str] = &["false", "fast", "true"];
