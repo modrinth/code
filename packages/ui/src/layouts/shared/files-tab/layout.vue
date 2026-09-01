@@ -2,7 +2,12 @@
 	<slot name="modals" />
 	<FileUnsavedChangesModal ref="unsavedChangesModal" />
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
-	<FileCreateZipModal ref="createZipModal" @create="handleZipSelection" />
+	<FileCreateZipModal
+		ref="createZipModal"
+		:parent="ctx.currentPath.value"
+		:stat-file="ctx.statFile"
+		@create="handleZipSelection"
+	/>
 	<FileUploadConflictModal ref="uploadConflictModal" @proceed="handleExtractConfirm" />
 	<FileUploadZipUrlModal
 		v-if="ctx.showInstallFromUrl"
@@ -507,8 +512,8 @@ async function handleZipSelection(target: string) {
 	const include = items.value
 		.filter((item) => selectedItems.value.has(item.path))
 		.map((item) => item.name)
-	await ctx.zipPaths(ctx.currentPath.value, include, target)
 	deselectAll()
+	await ctx.zipPaths(ctx.currentPath.value, include, target)
 }
 
 // Extract

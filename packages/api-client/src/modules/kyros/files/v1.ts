@@ -7,6 +7,22 @@ export class KyrosFilesV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Get metadata for a path in world storage.
+	 */
+	public async stat(
+		worldId: string,
+		data: Kyros.Files.v1.FileStatRequest,
+	): Promise<Kyros.Files.v1.FileStatResponse> {
+		return this.client.request<Kyros.Files.v1.FileStatResponse>(`/worlds/${worldId}/files/stat`, {
+			api: '',
+			version: 'v1',
+			method: 'POST',
+			body: data,
+			useNodeAuth: true,
+		})
+	}
+
+	/**
 	 * Create a ZIP archive beside a directory in world storage.
 	 */
 	public async createZip(

@@ -4,7 +4,7 @@
 		:dismissible="dismissible && isTerminal"
 		:progress="'progress' in op ? (op.progress ?? 0) : 0"
 		:progress-color="op.state === 'done' ? 'green' : op.state?.startsWith('fail') ? 'red' : 'blue'"
-		:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
+		:waiting="!isTerminal && (op.state === 'queued' || !op.progress || op.progress === 0)"
 		@dismiss="$emit('dismiss')"
 	>
 		<template #icon="{ iconClass }">
@@ -13,7 +13,10 @@
 		</template>
 		<template #header>{{ title }}</template>
 		<span class="text-secondary">
-			<span v-if="op.op === 'zip'">
+			<span v-if="op.state?.startsWith('fail') && op.error">
+				{{ op.error }}
+			</span>
+			<span v-else-if="op.op === 'zip'">
 				{{ formatMessage(messages.compressed, { progress: Math.round((op.progress ?? 0) * 100) }) }}
 			</span>
 			<span v-else>

@@ -29,6 +29,21 @@ export namespace Kyros {
 
 	export namespace Files {
 		export namespace v1 {
+			export type DescendantType = 'regular' | 'directory' | 'symlink' | 'other'
+
+			export interface FileStatRequest {
+				path: string
+			}
+
+			export interface FileStatResponse {
+				name: string
+				full_path: string
+				size_bytes: number
+				type: DescendantType
+				mtime: string
+				ctime: string
+			}
+
 			export type ZipRequest =
 				| {
 						target_type: 'Directory'

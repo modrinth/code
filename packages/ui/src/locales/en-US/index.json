@@ -1415,6 +1415,12 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "e.g. config.yml"
   },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "A file with this name already exists."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "Could not check whether this file already exists."
+  },
   "files.create-zip-modal.create-button": {
     "defaultMessage": "Create ZIP"
   },
@@ -5170,9 +5176,6 @@
   },
   "servers.files.zip-created-description": {
     "defaultMessage": "Created {destination}"
-  },
-  "servers.files.zip-failed": {
-    "defaultMessage": "Could not create ZIP"
   },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Also send a friend request"

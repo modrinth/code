@@ -9,7 +9,7 @@
 					placeholder="archive.zip"
 					wrapper-class="w-full"
 				/>
-				<div v-if="submitted && error" class="text-sm text-red">{{ error }}</div>
+				<div class="min-h-5 text-sm text-red" aria-live="polite">{{ displayedError }}</div>
 			</label>
 		</form>
 		<template #actions>
@@ -17,7 +17,7 @@
 				<Button type="outlined" @click="hide">
 					<XIcon class="h-5 w-5" /> {{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" :disabled="!!error && submitted" @click="handleSubmit">
+				<Button type="colored" color="brand" :disabled="!!displayedError" @click="handleSubmit">
 					<FolderArchiveIcon class="h-5 w-5" /> {{ formatMessage(messages.createButton) }}
 				</Button>
 			</div>
@@ -26,8 +26,9 @@
 </template>
 
 <script setup lang="ts">
+import { ModrinthApiError, type Kyros } from '@modrinth/api-client'
 import { FolderArchiveIcon, XIcon } from '@modrinth/assets'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import Input from '#ui/components/base/inputs/Input.vue'
@@ -45,33 +46,115 @@ const messages = defineMessages({
 		id: 'files.create-zip-modal.invalid',
 		defaultMessage: 'The archive name must be a single file name.',
 	},
+	alreadyExists: {
+		id: 'files.create-zip-modal.already-exists',
+		defaultMessage: 'A file with this name already exists.',
+	},
+	checkFailed: {
+		id: 'files.create-zip-modal.check-failed',
+		defaultMessage: 'Could not check whether this file already exists.',
+	},
 })
+const props = defineProps<{
+	parent: string
+	statFile?: (path: string) => Promise<Kyros.Files.v1.FileStatResponse>
+}>()
 const emit = defineEmits<{ create: [target: string] }>()
 const modal = ref<InstanceType<typeof NewModal>>()
 const targetInput = ref<HTMLInputElement | null>(null)
 const target = ref('archive.zip')
 const submitted = ref(false)
-const error = computed(() => {
+const availabilityError = ref('')
+let checkGeneration = 0
+let submitting = false
+
+const normalizedTarget = computed(() =>
+	target.value.toLowerCase().endsWith('.zip') ? target.value : `${target.value}.zip`,
+)
+const localError = computed(() => {
 	if (!target.value) return formatMessage(messages.required)
 	if (target.value === '.' || target.value === '..' || /[\\/]/.test(target.value)) {
 		return formatMessage(messages.invalid)
 	}
 	return ''
 })
-function handleSubmit() {
+const displayedError = computed(
+	() => (submitted.value ? localError.value : '') || availabilityError.value,
+)
+
+function getTargetPath(fileName: string) {
+	return `${props.parent}/${fileName}`.replace('//', '/')
+}
+
+async function fileExists(fileName: string) {
+	if (!props.statFile) throw new Error('File stat is unavailable')
+	try {
+		await props.statFile(getTargetPath(fileName))
+		return true
+	} catch (error) {
+		if (error instanceof ModrinthApiError && error.statusCode === 404) return false
+		throw error
+	}
+}
+
+function checkAvailability() {
+	const generation = ++checkGeneration
+	availabilityError.value = ''
+	if (localError.value) return
+
+	const fileName = normalizedTarget.value
+	void fileExists(fileName)
+		.then((exists) => {
+			if (generation !== checkGeneration || fileName !== normalizedTarget.value) return
+			availabilityError.value = exists ? formatMessage(messages.alreadyExists) : ''
+		})
+		.catch(() => {
+			if (generation !== checkGeneration || fileName !== normalizedTarget.value) return
+			availabilityError.value = formatMessage(messages.checkFailed)
+		})
+}
+
+async function handleSubmit() {
 	submitted.value = true
-	if (error.value) return
-	emit('create', target.value)
-	hide()
+	availabilityError.value = ''
+	if (localError.value || submitting) return
+
+	const generation = ++checkGeneration
+	const fileName = normalizedTarget.value
+	submitting = true
+	try {
+		const exists = await fileExists(fileName)
+		if (generation !== checkGeneration || fileName !== normalizedTarget.value) return
+		if (exists) {
+			availabilityError.value = formatMessage(messages.alreadyExists)
+			return
+		}
+		emit('create', fileName)
+		hide()
+	} catch {
+		if (generation !== checkGeneration || fileName !== normalizedTarget.value) return
+		availabilityError.value = formatMessage(messages.checkFailed)
+	} finally {
+		submitting = false
+	}
 }
 function show() {
+	const targetUnchanged = target.value === 'archive.zip'
 	target.value = 'archive.zip'
 	submitted.value = false
+	availabilityError.value = ''
+	submitting = false
 	modal.value?.show()
+	if (targetUnchanged) checkAvailability()
 	nextTick(() => targetInput.value?.focus())
 }
 function hide() {
+	checkGeneration++
+	availabilityError.value = ''
 	modal.value?.hide()
 }
+
+watch(target, checkAvailability)
+
 defineExpose({ show, hide })
 </script>

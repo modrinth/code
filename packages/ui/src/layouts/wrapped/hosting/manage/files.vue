@@ -59,10 +59,6 @@ const messages = defineMessages({
 		id: 'servers.files.zip-created-description',
 		defaultMessage: 'Created {destination}',
 	},
-	zipFailed: {
-		id: 'servers.files.zip-failed',
-		defaultMessage: 'Could not create ZIP',
-	},
 })
 
 const zippingFolder = ref(false)
@@ -401,6 +397,11 @@ function saveBlob(blob: Blob, fileName: string) {
 	window.URL.revokeObjectURL(link.href)
 }
 
+async function statFile(path: string): Promise<Kyros.Files.v1.FileStatResponse> {
+	if (!worldId.value) throw new Error('No active world')
+	return client.kyros.files_v1.stat(worldId.value, { path })
+}
+
 async function createZip(data: Kyros.Files.v1.ZipRequest, destination?: string): Promise<void> {
 	if (!worldId.value || fileWriteDisabled.value) return
 	const operationId = `local-zip-${crypto.randomUUID()}`
@@ -416,6 +417,7 @@ async function createZip(data: Kyros.Files.v1.ZipRequest, destination?: string):
 			state,
 			progress: (record.progress ?? 0) / 100,
 			cancellable: false,
+			error: record.error,
 		})
 	}
 	zippingFolder.value = true
@@ -434,12 +436,10 @@ async function createZip(data: Kyros.Files.v1.ZipRequest, destination?: string):
 		})
 		refreshList()
 	} catch (error) {
-		updateOperation({ progress: 0 }, 'failure-error')
-		addNotification({
-			title: formatMessage(messages.zipFailed),
-			text: error instanceof Error ? error.message : undefined,
-			type: 'error',
-		})
+		updateOperation(
+			{ progress: 0, error: error instanceof Error ? error.message : undefined },
+			'failure-error',
+		)
 	} finally {
 		zippingFolder.value = false
 	}
@@ -533,6 +533,7 @@ provideFileManager({
 	readFileAsBlob,
 	writeFile,
 	downloadFile,
+	statFile,
 	zipFolder,
 	zipPaths,
 	uploadFiles,
