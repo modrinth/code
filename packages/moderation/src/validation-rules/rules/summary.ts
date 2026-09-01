@@ -1,5 +1,4 @@
 import { defineMessages } from '@modrinth/ui/i18n'
-import { md } from '@modrinth/utils/parse.ts'
 import LinkifyIt from 'linkify-it'
 import tlds from 'tlds' with { type: 'json' }
 
@@ -11,6 +10,7 @@ import {
 	evaluateNonStandardText,
 	evaluateProfanity,
 	evaluateSlur,
+	hasProjectTextFormatting,
 	normalizeProjectFieldText,
 	projectRequiresEnglishText,
 } from '../text.ts'
@@ -101,10 +101,6 @@ const summaryLinkify = new LinkifyIt({
 	fuzzyLink: true,
 }).tlds(tlds)
 
-const summaryMarkdown = md({ linkify: false })
-const allowedSummaryBlockTokenTypes = new Set(['paragraph_open', 'inline', 'paragraph_close'])
-const allowedSummaryInlineTokenTypes = new Set(['text', 'softbreak', 'hardbreak'])
-
 function containsProjectSummaryLinkOrIp(summary: string): boolean {
 	return summaryLinkify.test(summary)
 }
@@ -117,11 +113,7 @@ export function projectSummaryMatchesName(summary: string, name: string) {
 }
 
 export function hasProjectSummaryFormatting(summary: string) {
-	return summaryMarkdown.parse(summary, {}).some((token) => {
-		if (!allowedSummaryBlockTokenTypes.has(token.type)) return true
-
-		return token.children?.some((child) => !allowedSummaryInlineTokenTypes.has(child.type)) ?? false
-	})
+	return hasProjectTextFormatting(summary)
 }
 
 const commonNagPresentation = {

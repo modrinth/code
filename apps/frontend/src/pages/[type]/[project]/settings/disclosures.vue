@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { validateProjectDisclosures } from '@modrinth/moderation'
 import {
 	commonMessages,
 	ConfirmLeaveModal,
@@ -30,6 +31,7 @@ import {
 	type DisclosureType,
 	type DisclosureUpdatedByUser,
 	findDisclosureData,
+	formToDisclosures,
 	getDisclosureFormIssues,
 	getDisclosureFormSnapshot,
 	PaidFeaturesDisclosureCard,
@@ -251,9 +253,15 @@ watch(
 )
 
 const issues = computed(() => getDisclosureFormIssues(current.value, projectTypes.value))
+const disclosureTextValidation = computed(() =>
+	validateProjectDisclosures(formToDisclosures(current.value)),
+)
 
 const canSave = computed(
-	() => hasPermission.value && (isAdminUser.value || issues.value.length === 0),
+	() =>
+		hasPermission.value &&
+		disclosureTextValidation.value.length === 0 &&
+		(isAdminUser.value || issues.value.length === 0),
 )
 
 const saveDisabledReason = computed(() => {
@@ -261,7 +269,10 @@ const saveDisabledReason = computed(() => {
 		// should never come up but y'never know
 		return formatMessage(messages.noPermission)
 	}
-	return issues.value.map((issue) => formatMessage(issueMessages[issue]))
+	return [
+		...issues.value.map((issue) => formatMessage(issueMessages[issue])),
+		...disclosureTextValidation.value.map(({ message, values }) => formatMessage(message, values)),
+	]
 })
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)

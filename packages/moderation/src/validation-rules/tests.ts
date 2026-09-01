@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
+import type { Labrinth } from '@modrinth/api-client'
+
 import type { ProjectValidationContext } from '../types/nags.ts'
 import { evaluateRules } from './evaluate-rules.ts'
 import {
@@ -15,6 +17,7 @@ import {
 	MIN_DESCRIPTION_CHARS,
 	validateProjectDescription,
 } from './rules/description.ts'
+import { validateProjectDisclosures } from './rules/disclosures.ts'
 import { validateProjectGalleryDescription, validateProjectGalleryName } from './rules/gallery.ts'
 import { projectNameValidationRules, validateProjectNameField } from './rules/name.ts'
 import {
@@ -203,6 +206,70 @@ test('allows plain-text punctuation in project summaries', () => {
 	]) {
 		assert.equal(hasProjectSummaryFormatting(summary), false, summary)
 	}
+})
+
+test('rejects HTML in disclosure text', () => {
+	const formattedDisclosures = [
+		{ type: 'ai_content', uses: [], note: '<b>Bold disclosure</b>' },
+		{ type: 'advertisements', note: '<strong>HTML disclosure</strong>' },
+		{ type: 'paid_features', features: ['<code>Paid feature</code>'] },
+		{ type: 'telemetry', consent: 'opt_in', data_collected: ['<h1>Collected data</h1>'] },
+		{
+			type: 'derivative_work',
+			sources: [{ label: 'Original work', note: '<li>Derived feature</li>' }],
+		},
+		{ type: 'epilepsy_triggers', note: '<em>Flashing lights</em>' },
+		{
+			type: 'system_interactions',
+			interactions: [],
+			note: '<strong>Desktop file access</strong>',
+		},
+		{ type: 'archived', note: '<span>No longer maintained</span>' },
+	] satisfies Labrinth.Projects.v3.ProjectDisclosure[]
+
+	for (const disclosure of formattedDisclosures) {
+		assert.deepEqual(
+			validateProjectDisclosures([disclosure]).map(({ code }) => code),
+			['disclosures-special-formatting'],
+		)
+	}
+
+	const markdownDisclosures = [
+		{ type: 'ai_content', uses: [], note: '**Bold disclosure**' },
+		{ type: 'paid_features', features: ['`Paid feature`'] },
+		{ type: 'telemetry', consent: 'opt_in', data_collected: ['# Collected data'] },
+		{
+			type: 'derivative_work',
+			sources: [{ label: 'Original work', note: '- Derived feature' }],
+		},
+	] satisfies Labrinth.Projects.v3.ProjectDisclosure[]
+
+	assert.deepEqual(validateProjectDisclosures(markdownDisclosures), [])
+
+	const unpairedHtmlDisclosures = [
+		{ type: 'ai_content', uses: [], note: '<b>Bold disclosure' },
+		{ type: 'advertisements', note: 'HTML disclosure</strong>' },
+		{ type: 'paid_features', features: ['A line break<br>'] },
+		{ type: 'epilepsy_triggers', note: 'Visible content <!-- hidden HTML content -->' },
+	] satisfies Labrinth.Projects.v3.ProjectDisclosure[]
+
+	assert.deepEqual(validateProjectDisclosures(unpairedHtmlDisclosures), [])
+
+	assert.deepEqual(
+		validateProjectDisclosures([
+			{
+				type: 'derivative_work',
+				sources: [
+					{
+						label: 'Example project',
+						link: 'https://example.com/path_with_underscores',
+						note: 'First line\nSecond line',
+					},
+				],
+			},
+		]),
+		[],
+	)
 })
 
 test('rejects every link and IP address in project summaries', () => {
