@@ -302,12 +302,15 @@ pub async fn set_global_option(
     let _guard = state.lock_synced_options().await;
     let was_enabled = get_global_options_with_state(&state).await?.get(option);
 
-    if enabled && !was_enabled && option != SyncedOption::Screenshots {
-        let base_instance_id = base_instance_id.ok_or_else(|| {
-            ErrorKind::InputError(
-                "Choose an instance to use as the sync source.".to_string(),
-            )
-        })?;
+    let initializing_game_options_from_base = enabled
+        && !was_enabled
+        && option == SyncedOption::GameOptions
+        && base_instance_id.is_some();
+    if enabled
+        && !was_enabled
+        && option != SyncedOption::Screenshots
+        && let Some(base_instance_id) = base_instance_id
+    {
         if option == SyncedOption::GameOptions {
             let source =
                 crate::state::get_instance(base_instance_id, &state.pool)
@@ -344,7 +347,7 @@ pub async fn set_global_option(
         }
     }
 
-    if !(enabled && !was_enabled && option == SyncedOption::GameOptions) {
+    if !initializing_game_options_from_base {
         set_global_option_enabled(option, enabled, &state).await?;
     }
 
@@ -827,12 +830,12 @@ async fn reconcile_instance_with_state(
             CapabilityStatus::Supported => {
                 let result =
                     if option == SyncedOption::GameOptions && allow_protected {
-                        super::game_options::sync_instance_with_state(
-                        metadata,
-                        state,
-                        super::game_options::SyncReason::PackExtracted,
-                    )
-                    .await
+                        reconcile_game_options(
+                            metadata,
+                            state,
+                            super::game_options::SyncReason::PackExtracted,
+                        )
+                        .await
                     } else {
                         reconcile_option(metadata, option, state).await
                     };
@@ -863,7 +866,7 @@ async fn reconcile_option(
 ) -> crate::Result<()> {
     match option {
         SyncedOption::GameOptions => {
-            super::game_options::sync_instance_with_state(
+            reconcile_game_options(
                 metadata,
                 state,
                 super::game_options::SyncReason::Normal,
@@ -883,6 +886,21 @@ async fn reconcile_option(
     }
 }
 
+async fn reconcile_game_options(
+    metadata: &InstanceMetadata,
+    state: &State,
+    reason: super::game_options::SyncReason,
+) -> crate::Result<()> {
+    if !canonical_exists(SyncedOption::GameOptions, state).await? {
+        let source = instance_dir(metadata, state).join("options.txt");
+        if !source.exists() {
+            return Ok(());
+        }
+        seed_from_instance(metadata, SyncedOption::GameOptions, state).await?;
+    }
+    super::game_options::sync_instance_with_state(metadata, state, reason).await
+}
+
 pub async fn reconcile_changed_file(
     instance_id: &str,
     file_name: &str,
@@ -900,7 +918,7 @@ pub async fn reconcile_changed_file(
             if option_effective(&metadata, SyncedOption::GameOptions, &state)
                 .await?
             {
-                super::game_options::sync_instance_with_state(
+                reconcile_game_options(
                     &metadata,
                     &state,
                     super::game_options::SyncReason::Normal,

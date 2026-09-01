@@ -4,6 +4,7 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	NewModal,
 	Toggle,
@@ -12,6 +13,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, ref } from 'vue'
 
+import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
 import {
 	get_synced_option_join_preview,
 	get_synced_options_overview,
@@ -45,12 +47,15 @@ const messages = defineMessages({
 	},
 	gameSettings: {
 		id: 'instance.settings.tabs.synced-options.game-settings',
-		defaultMessage: 'Game settings',
+		defaultMessage: 'Unsync game settings',
 	},
 	gameSettingsDescription: {
 		id: 'instance.settings.tabs.synced-options.game-settings.description',
-		defaultMessage:
-			'Apply the selected shared game settings on top of this instance’s options.txt.',
+		defaultMessage: "Keep this instance's options.txt separate from the synced copy",
+	},
+	editGameSettings: {
+		id: 'app.settings.synced-options.game-settings.button',
+		defaultMessage: 'Edit game settings',
 	},
 	gameSettingsDisabled: {
 		id: 'instance.settings.tabs.synced-options.game-settings.disabled-in-app',
@@ -165,6 +170,7 @@ const capabilities = computed(
 				[],
 		),
 )
+const gameSettingsModal = ref<InstanceType<typeof GameSettingsModal> | null>(null)
 const hotbarResolutionModal = ref<InstanceType<typeof NewModal> | null>(null)
 const previewingOption = ref<InstanceSyncedOption | null>(null)
 const previewExcluded = ref<Partial<Record<InstanceSyncedOption, boolean>>>({})
@@ -205,6 +211,17 @@ function showAppSyncedOptions(): void {
 	} else {
 		openAppSettingsSyncedOptions()
 	}
+}
+
+function openGameSettings(): void {
+	gameSettingsModal.value?.show()
+}
+
+async function handleGameSettingsSaved(): Promise<void> {
+	await Promise.all([
+		queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
+		queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
+	])
 }
 
 type SyncedOptionMutationVariables = {
@@ -330,6 +347,8 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 
 <template>
 	<div class="flex flex-col gap-6">
+		<GameSettingsModal ref="gameSettingsModal" @saved="handleGameSettingsSaved" />
+
 		<NewModal
 			ref="hotbarResolutionModal"
 			:header="formatMessage(messages.hotbarConflictTitle)"
@@ -400,11 +419,26 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 					<p v-if="row.description" class="m-0 text-secondary">
 						{{ formatMessage(messages[row.description]) }}
 					</p>
-					<p v-if="disabledReason(row.option)" class="m-0 text-xs text-orange">
-						{{ disabledReason(row.option) }}
-					</p>
 				</div>
-				<div class="flex shrink-0 items-center">
+				<div class="flex shrink-0 items-center gap-2">
+					<span
+						v-if="
+							row.option === 'game_options' &&
+							enabled(row.option) &&
+							overviewQuery.data.value?.global_options.game_options
+						"
+						v-tooltip="formatMessage(messages.editGameSettings)"
+						class="flex"
+					>
+						<IconButton
+							type="outlined"
+							circular
+							:label="formatMessage(messages.editGameSettings)"
+							@click="openGameSettings"
+						>
+							<EditIcon />
+						</IconButton>
+					</span>
 					<span v-tooltip="disabledReason(row.option)" class="flex">
 						<Toggle
 							:id="`exclude-${row.option}`"

@@ -3,10 +3,10 @@
 use super::super as synced_options;
 use super::CATALOG_REVISION;
 use super::api_types::canonical_values_equal;
+use super::catalog::*;
 use super::fullscreen::update_app_fullscreen_setting;
 use super::launch_overrides::currently_launcher_owned_keys;
 use super::options_file::{GameOptionsDocument, validate_raw_key_value};
-use super::catalog::*;
 use crate::state::{
     CanonicalValue, GameOptionKind, GameOptionsProjection, InstanceMetadata,
     ProjectionOrigin, State, SyncedOption, load_game_option_preferences,

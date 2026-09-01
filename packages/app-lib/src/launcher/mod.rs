@@ -671,6 +671,17 @@ pub async fn install_minecraft_with_reporter(
 			&state.pool,
 		)
 		.await?;
+		if let Err(error) =
+			crate::api::instance::reconcile_instance_synced_options(
+				&instance.id,
+			)
+			.await
+		{
+			tracing::warn!(
+				"Failed to reconcile synced options after installing {}: {error}",
+				instance.id
+			);
+		}
 		emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 	}
     if let Some(loading_bar) = &loading_bar {

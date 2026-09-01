@@ -77,7 +77,7 @@ const messages = defineMessages({
 	gameSettingsDescription: {
 		id: 'app.settings.synced-options.game-settings.description',
 		defaultMessage:
-			'Use the same graphics, keybinds, and other game settings across your instances',
+			'Use the same graphics, keybinds, and other game settings across your instances.',
 	},
 	gameSettingsButton: {
 		id: 'app.settings.synced-options.game-settings.button',
@@ -511,7 +511,6 @@ async function chooseBaseInstance(option: SyncedOption) {
 	baseOption.value = option
 	baseInstanceSearch.value = ''
 	baseSourcesLoading.value = option === 'game_options'
-	baseModal.value?.show()
 
 	if (option === 'game_options') {
 		try {
@@ -525,15 +524,26 @@ async function chooseBaseInstance(option: SyncedOption) {
 			gameOptionSources.value = []
 			baseInstanceId.value = ''
 			handleError(error)
+			return
 		} finally {
 			if (generation === baseSourceGeneration && baseOption.value === option) {
 				baseSourcesLoading.value = false
 			}
 		}
+		if (!baseInstanceId.value) {
+			applyGlobalOption(option, true)
+			return
+		}
+		baseModal.value?.show()
 		return
 	}
 
+	if (instances.value.length === 0) {
+		applyGlobalOption(option, true)
+		return
+	}
 	baseInstanceId.value = instances.value[0]?.id ?? ''
+	baseModal.value?.show()
 }
 
 function toggleGlobalOption(option: SyncedOption, enabled: boolean) {

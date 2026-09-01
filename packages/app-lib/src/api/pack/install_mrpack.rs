@@ -1,5 +1,6 @@
 use crate::State;
 use crate::api::instance::CONFIG_FILE_EXTENSIONS;
+use crate::api::instance::GameOptionsPackSource;
 use crate::event::emit::loading_try_for_each_concurrent;
 use crate::install::{
     InstallErrorContext, InstallJobEventKind, InstallPhaseDetails,
@@ -955,11 +956,19 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     )
     .await?;
 
+    let has_override =
+        |path: &str| {
+            zip_reader.file().entries().iter().any(|file| {
+                file.filename().as_str().unwrap_or_default() == path
+            })
+        };
     let has_client_options_override =
-        zip_reader.file().entries().iter().any(|file| {
-            file.filename().as_str().unwrap_or_default()
-                == "client-overrides/options.txt"
-        });
+        has_override("client-overrides/options.txt");
+    let has_options_override = has_override("overrides/options.txt");
+    let has_client_yosbr_options_override =
+        has_override("client-overrides/config/yosbr/options.txt");
+    let has_yosbr_options_override =
+        has_override("overrides/config/yosbr/options.txt");
     let override_file_entries = zip_reader
         .file()
         .entries()
@@ -972,7 +981,9 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 && !filename.ends_with('/');
             let shadowed_game_options = has_client_options_override
                 && filename == "overrides/options.txt";
-            (is_override && !shadowed_game_options)
+            let shadowed_yosbr_options = has_client_yosbr_options_override
+                && filename == "overrides/config/yosbr/options.txt";
+            (is_override && !shadowed_game_options && !shadowed_yosbr_options)
                 .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();
@@ -986,11 +997,13 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             || filename == "client-overrides/servers.dat"
     });
     let game_options_override_source = if has_client_options_override {
-        Some("client_overrides")
-    } else if override_file_entries.iter().any(|(_, file)| {
-        file.filename().as_str().unwrap_or_default() == "overrides/options.txt"
-    }) {
-        Some("overrides")
+        Some(GameOptionsPackSource::ClientOverrides)
+    } else if has_options_override {
+        Some(GameOptionsPackSource::Overrides)
+    } else if has_client_yosbr_options_override {
+        Some(GameOptionsPackSource::ClientOverridesYosbr)
+    } else if has_yosbr_options_override {
+        Some(GameOptionsPackSource::OverridesYosbr)
     } else {
         None
     };

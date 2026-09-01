@@ -43,7 +43,7 @@ pub use api_types::{
     UpdateGameSettingsRequest,
 };
 pub use launch_overrides::{apply_launcher_overrides, sync_before_launch};
-pub use pack_updates::capture_pack_base;
+pub use pack_updates::{GameOptionsPackSource, capture_pack_base};
 pub use settings_editor::{get_config, preview_changes, save_changes};
 pub use source_selection::list_sync_sources;
 

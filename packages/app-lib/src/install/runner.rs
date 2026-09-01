@@ -693,6 +693,16 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
             if let Some(record) =
                 store::complete_success(job_id, &job_state, &state).await?
             {
+                if let Err(error) =
+                    crate::api::instance::reconcile_instance_synced_options(
+                        &instance_id,
+                    )
+                    .await
+                {
+                    tracing::warn!(
+                        "Failed to reconcile synced options after installing {instance_id}: {error}"
+                    );
+                }
                 recovery::clear_staging_dir(&job_state).await;
                 if let Err(error) =
                     emit_instance(&instance_id, InstancePayloadType::Edited)
