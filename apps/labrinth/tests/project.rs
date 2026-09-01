@@ -6,7 +6,9 @@ use common::dummy_data::DUMMY_CATEGORIES;
 
 use crate::common::api_common::models::CommonProject;
 use crate::common::api_common::request_data::ProjectCreationRequestData;
-use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion};
+use crate::common::api_common::{
+    ApiProject, ApiTeams, ApiVersion, AppendsOptionalPat,
+};
 use crate::common::dummy_data::{
     DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
     TestFile,
@@ -106,6 +108,99 @@ async fn test_get_project() {
         let resp = api.get_project(beta_project_id, ENEMY_USER_PAT).await;
         assert_status!(&resp, StatusCode::NOT_FOUND);
     })
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_project_follow_counter() {
+    with_test_environment(
+        Some(8),
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let project_id = test_env.dummy.project_alpha.project_id.clone();
+
+            let follow_test_env = test_env.clone();
+            let follow_project_id = project_id.clone();
+            let follow_requests = (0..4).map(move |_| {
+                let test_env = follow_test_env.clone();
+                let project_id = follow_project_id.clone();
+
+                async move {
+                    let request = test::TestRequest::post()
+                        .uri(&format!("/v3/project/{project_id}/follow"))
+                        .append_pat(ENEMY_USER_PAT)
+                        .to_request();
+                    test_env.call(request).await
+                }
+            });
+            let responses = futures::future::join_all(follow_requests).await;
+
+            assert_eq!(
+                responses
+                    .iter()
+                    .filter(
+                        |response| response.status() == StatusCode::NO_CONTENT
+                    )
+                    .count(),
+                1
+            );
+            assert_eq!(
+                responses
+                    .iter()
+                    .filter(
+                        |response| response.status() == StatusCode::BAD_REQUEST
+                    )
+                    .count(),
+                3
+            );
+
+            let project = test_env
+                .api
+                .get_project_deserialized_common(&project_id, ENEMY_USER_PAT)
+                .await;
+            assert_eq!(project.followers, 1);
+
+            let unfollow_test_env = test_env.clone();
+            let unfollow_project_id = project_id.clone();
+            let unfollow_requests = (0..4).map(move |_| {
+                let test_env = unfollow_test_env.clone();
+                let project_id = unfollow_project_id.clone();
+
+                async move {
+                    let request = test::TestRequest::delete()
+                        .uri(&format!("/v3/project/{project_id}/follow"))
+                        .append_pat(ENEMY_USER_PAT)
+                        .to_request();
+                    test_env.call(request).await
+                }
+            });
+            let responses = futures::future::join_all(unfollow_requests).await;
+
+            assert_eq!(
+                responses
+                    .iter()
+                    .filter(
+                        |response| response.status() == StatusCode::NO_CONTENT
+                    )
+                    .count(),
+                1
+            );
+            assert_eq!(
+                responses
+                    .iter()
+                    .filter(
+                        |response| response.status() == StatusCode::BAD_REQUEST
+                    )
+                    .count(),
+                3
+            );
+
+            let project = test_env
+                .api
+                .get_project_deserialized_common(&project_id, ENEMY_USER_PAT)
+                .await;
+            assert_eq!(project.followers, 0);
+        },
+    )
     .await;
 }
 
