@@ -11,6 +11,34 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-01T00:51:50+00:00`,
+		product: 'app',
+		version: '0.19.2',
+		body: `## Added
+- Added options to hide Files, Worlds, and Screenshots tabs in instance settings.
+- Added a sync source picker when enabling command history, multiplayer servers, or creative hotbars sync.
+
+## Changed
+- Moved the global Screenshots page toggle from Synced settings into Behavior settings as "Show all screenshots together".
+- Screenshots tab on instances is now independent of sync settings.
+- Redesigned the slider control used for settings such as memory allocation.
+- Removed the blur censor tool in the screenshot editor. It did not work properly and was not functional as a censor.
+- Command history, multiplayer servers, and creative hotbars are now disabled by default until you choose a sync source.
+
+## Fixed
+- Fixed issues with java, window, and hooks overrides in instance settings.
+- Fixed remaining lag when scrolling large screenshot libraries.
+- Fixed GIF and WebP images not displaying correctly in the screenshot viewer.
+- Fixed screenshot cards flashing or failing to fade in while the gallery loads.
+- Fixed log spam on event updates.`,
+	},
+	{
+		date: `2026-09-01T00:51:50+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed error page not working.`,
+	},
+	{
 		date: `2026-08-27T18:54:17+00:00`,
 		product: 'app',
 		version: '0.19.1',
