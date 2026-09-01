@@ -21,8 +21,8 @@ import { validateProjectDisclosures } from './rules/disclosures.ts'
 import { validateProjectGalleryDescription, validateProjectGalleryName } from './rules/gallery.ts'
 import { projectNameValidationRules, validateProjectNameField } from './rules/name.ts'
 import {
+	getProjectSummaryNameSimilarity,
 	hasProjectSummaryFormatting,
-	projectSummaryMatchesName,
 	validateProjectSummary,
 } from './rules/summary.ts'
 import { projectVersionValidationRules } from './rules/versions.ts'
@@ -166,7 +166,7 @@ test('requires known environments for mods and modpacks', () => {
 })
 
 test('validates summary content from one rule set', () => {
-	assert.equal(projectSummaryMatchesName('  Caf\u00e9  ', 'Cafe\u0301'), true)
+	assert.equal(getProjectSummaryNameSimilarity('  Caf\u00e9  ', 'Cafe\u0301'), 1)
 	assert.deepEqual(
 		validateProjectSummary({ summary: '# Short summary', name: 'Project title' }).map(
 			({ code, severity }) => ({ code, severity }),
@@ -182,6 +182,26 @@ test('validates summary content from one rule set', () => {
 			name: 'Project title',
 		}),
 		[],
+	)
+})
+
+test('rejects project summaries that are too similar to the project name', () => {
+	for (const summary of ['My Project', 'myproject', 'My Projec', 'My Projects']) {
+		assert.equal(
+			validateProjectSummary({ summary, name: 'My Project' }).some(
+				({ code }) => code === 'project-summary-matches-title',
+			),
+			true,
+			summary,
+		)
+	}
+
+	assert.equal(
+		validateProjectSummary({
+			summary: 'A detailed summary of what My Project provides',
+			name: 'My Project',
+		}).some(({ code }) => code === 'project-summary-matches-title'),
+		false,
 	)
 })
 

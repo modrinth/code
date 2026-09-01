@@ -435,7 +435,7 @@
     "defaultMessage": "Visit links settings"
   },
   "project.text-validation.summary-matches-title": {
-    "defaultMessage": "A project summary cannot be the same as it's title."
+    "defaultMessage": "A project summary cannot be the same as or too similar to its title."
   },
   "project.text-validation.summary-too-short": {
     "defaultMessage": "Your summary is too short. Add a sentence or two which describes your project."

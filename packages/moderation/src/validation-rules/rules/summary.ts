@@ -66,7 +66,7 @@ const messages = defineMessages({
 	},
 	matchesName: {
 		id: 'project.text-validation.summary-matches-title',
-		defaultMessage: "A project summary cannot be the same as it's title.",
+		defaultMessage: 'A project summary cannot be the same as or too similar to its title.',
 	},
 	tooShort: {
 		id: 'project.text-validation.summary-too-short',
@@ -89,6 +89,7 @@ const messages = defineMessages({
 })
 
 export const MIN_SUMMARY_CHARS = 25
+export const MAX_SUMMARY_NAME_SIMILARITY = 0.8
 
 export interface ProjectSummaryValidationInput {
 	summary: string | null | undefined
@@ -105,11 +106,42 @@ function findProjectSummaryLinkOrIp(summary: string): string | null {
 	return summaryLinkify.match(summary)?.[0].raw ?? null
 }
 
-export function projectSummaryMatchesName(summary: string, name: string) {
-	const normalizedSummary = normalizeProjectFieldText(summary).replace(/\s+/g, '')
-	const normalizedName = normalizeProjectFieldText(name).replace(/\s+/g, '')
+function getLevenshteinDistance(left: string[], right: string[]) {
+	if (left.length > right.length) return getLevenshteinDistance(right, left)
 
-	return normalizedSummary.length > 0 && normalizedSummary === normalizedName
+	let previousRow = Array.from({ length: left.length + 1 }, (_, index) => index)
+
+	for (let rightIndex = 0; rightIndex < right.length; rightIndex++) {
+		const currentRow = [rightIndex + 1]
+
+		for (let leftIndex = 0; leftIndex < left.length; leftIndex++) {
+			currentRow.push(
+				Math.min(
+					currentRow[leftIndex] + 1,
+					previousRow[leftIndex + 1] + 1,
+					previousRow[leftIndex] + (left[leftIndex] === right[rightIndex] ? 0 : 1),
+				),
+			)
+		}
+
+		previousRow = currentRow
+	}
+
+	return previousRow[left.length]
+}
+
+function normalizeProjectFieldTextForSimilarity(value: string) {
+	return Array.from(normalizeProjectFieldText(value).toLocaleLowerCase('en-US').replace(/\s+/g, ''))
+}
+
+export function getProjectSummaryNameSimilarity(summary: string, name: string) {
+	const normalizedSummary = normalizeProjectFieldTextForSimilarity(summary)
+	const normalizedName = normalizeProjectFieldTextForSimilarity(name)
+	const longestLength = Math.max(normalizedSummary.length, normalizedName.length)
+
+	if (longestLength === 0) return 0
+
+	return 1 - getLevenshteinDistance(normalizedSummary, normalizedName) / longestLength
 }
 
 export function hasProjectSummaryFormatting(summary: string) {
@@ -172,7 +204,7 @@ export const projectSummaryValidationRules = {
 				!summary ||
 				findProjectSummaryLinkOrIp(summary) !== null ||
 				!name ||
-				!projectSummaryMatchesName(summary, name),
+				getProjectSummaryNameSimilarity(summary, name) < MAX_SUMMARY_NAME_SIMILARITY,
 		}),
 		presentation: {
 			message: messages.matchesName,
