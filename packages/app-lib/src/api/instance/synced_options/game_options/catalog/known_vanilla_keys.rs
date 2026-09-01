@@ -72,6 +72,7 @@ pub(super) const NEVER_SYNC_KEYS: &[&str] = &[
     "soundCategory_records",
     "shieldAnimation",
     "serverTextures",
+    "rawMouseInput",
 ];
 
 pub(super) const KNOWN_VANILLA_KEYS: &[&str] = &[
@@ -95,8 +96,10 @@ pub(super) const KNOWN_VANILLA_KEYS: &[&str] = &[
     "prioritizeChunkUpdates",
     "fullscreen",
     "exclusiveFullscreen",
+    "macFullscreenMenuVisibility",
     "gamma",
     "guiScale",
+    "debugGuiScale",
     "maxAnisotropyBit",
     "textureFiltering",
     "maxFps",
@@ -166,8 +169,9 @@ pub(super) const KNOWN_VANILLA_KEYS: &[&str] = &[
     "attackIndicator",
     "tutorialStep",
     "mouseWheelSensitivity",
-    "rawMouseInput",
     "allowCursorChanges",
+    "quitShortcuts",
+    "ctrlClickEmulatesRightClick",
     "glDebugVerbosity",
     "skipMultiplayerWarning",
     "hideMatchedNames",
@@ -247,6 +251,7 @@ pub(super) const KNOWN_VANILLA_KEYS: &[&str] = &[
     "key_key.debug.fpsCharts",
     "key_key.debug.networkCharts",
     "key_key.debug.lightmapTexture",
+    "key_key.debug.improvedTransparency",
     "soundCategory_master",
     "soundCategory_music",
     "soundCategory_record",

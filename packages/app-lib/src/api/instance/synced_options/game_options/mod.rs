@@ -13,6 +13,9 @@
 //! key is treated as a custom setting and copied as-is to every synced instance.
 //! Custom settings can be turned off individually in the settings screen.
 //!
+//! `catalog` will need to be checked every time a Minecraft update comes out. For maintenance reasons we will just
+//! do this for major releases, no snapshots/pre-releases.
+//!
 //! Launcher-enforced settings, such as fullscreen, are applied last and are not
 //! mistaken for changes made by the player.
 
@@ -63,7 +66,7 @@ pub(in crate::api::instance) async fn canonical_exists(
 }
 
 const OPTIONS_FILE: &str = "options.txt";
-const CATALOG_REVISION: u32 = 3;
+const CATALOG_REVISION: u32 = 4;
 const MAX_OPTIONS_BYTES: usize = 2 * 1024 * 1024;
 const MAX_OPTIONS_LINES: usize = 16_384;
 const MAX_KEY_BYTES: usize = 1_024;
