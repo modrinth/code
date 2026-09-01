@@ -72,12 +72,12 @@
 						</span>
 					</div>
 
-							<div
-								v-if="report.project?.status"
-								class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
-							>
-								<Badge :type="report.project?.status" class="text-sm" />
-							</div>
+					<div
+						v-if="report.project?.status"
+						class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+					>
+						<Badge :type="report.project?.status" class="text-sm" />
+					</div>
 
 					<span
 						v-if="report.item_type === 'version' && report.version"
