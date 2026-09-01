@@ -1,6 +1,6 @@
 //! Reads and edits `options.txt` without changing unrelated lines or file formatting.
 
-use super::super::synced_options;
+use super::super as synced_options;
 use super::{
     MAX_KEY_BYTES, MAX_OPTIONS_BYTES, MAX_OPTIONS_LINES, MAX_VALUE_BYTES,
     OPTIONS_FILE,

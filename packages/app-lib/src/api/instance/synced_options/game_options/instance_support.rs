@@ -1,12 +1,12 @@
 //! Works out which instances can receive each shared setting.
 
-use super::super::synced_options;
+use super::super as synced_options;
 use super::CATALOG_REVISION;
 use super::api_types::*;
 use super::options_file::{
     GameOptionsDocument, options_path, read_document, sha1_bytes,
 };
-use super::supported_settings::*;
+use super::catalog::*;
 use crate::state::{
     CanonicalValue, InstanceMetadata, State, StoredOption,
     game_options_sync_is_enabled,

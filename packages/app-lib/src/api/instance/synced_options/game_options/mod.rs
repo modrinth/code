@@ -8,7 +8,7 @@
 //! lets changes made in Minecraft become the new shared values. When multiple
 //! instances change the same setting, the latest change processed by sync wins.
 //!
-//! Minecraft has renamed and reformatted settings over time. `supported_settings`
+//! Minecraft has renamed and reformatted settings over time. `catalog`
 //! contains the file keys and conversions for the versions we support. Any other
 //! key is treated as a custom setting and copied as-is to every synced instance.
 //! Custom settings can be turned off individually in the settings screen.
@@ -17,6 +17,7 @@
 //! mistaken for changes made by the player.
 
 mod api_types;
+mod catalog;
 mod fullscreen;
 mod instance_support;
 mod launch_overrides;
@@ -25,7 +26,6 @@ mod pack_updates;
 mod read_instance_changes;
 mod settings_editor;
 mod source_selection;
-mod supported_settings;
 mod write_shared_settings;
 
 pub use crate::state::{CanonicalValue, GameOptionKind};

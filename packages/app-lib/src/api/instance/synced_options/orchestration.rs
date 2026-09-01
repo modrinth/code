@@ -787,7 +787,7 @@ pub(crate) async fn prepare_instance_update(
     ] {
         if option == SyncedOption::GameOptions {
             if let Err(error) =
-                super::super::game_options::prepare_instance_update_with_state(
+                super::game_options::prepare_instance_update_with_state(
                     &metadata, &state,
                 )
                 .await
@@ -827,10 +827,10 @@ async fn reconcile_instance_with_state(
             CapabilityStatus::Supported => {
                 let result =
                     if option == SyncedOption::GameOptions && allow_protected {
-                        super::super::game_options::sync_instance_with_state(
+                        super::game_options::sync_instance_with_state(
                         metadata,
                         state,
-                        super::super::game_options::SyncReason::PackExtracted,
+                        super::game_options::SyncReason::PackExtracted,
                     )
                     .await
                     } else {
@@ -863,10 +863,10 @@ async fn reconcile_option(
 ) -> crate::Result<()> {
     match option {
         SyncedOption::GameOptions => {
-            super::super::game_options::sync_instance_with_state(
+            super::game_options::sync_instance_with_state(
                 metadata,
                 state,
-                super::super::game_options::SyncReason::Normal,
+                super::game_options::SyncReason::Normal,
             )
             .await
         }
@@ -900,10 +900,10 @@ pub async fn reconcile_changed_file(
             if option_effective(&metadata, SyncedOption::GameOptions, &state)
                 .await?
             {
-                super::super::game_options::sync_instance_with_state(
+                super::game_options::sync_instance_with_state(
                     &metadata,
                     &state,
-                    super::super::game_options::SyncReason::Normal,
+                    super::game_options::SyncReason::Normal,
                 )
                 .await?;
             }
@@ -1018,7 +1018,7 @@ pub(super) async fn seed_from_instance(
     let instance_dir = instance_dir(metadata, state);
     match option {
         SyncedOption::GameOptions => {
-            super::super::game_options::initialize_from_source_instance(
+            super::game_options::initialize_from_source_instance(
                 metadata, state,
             )
             .await?;
@@ -1077,10 +1077,10 @@ async fn ensure_option(
 ) -> crate::Result<()> {
     match option {
         SyncedOption::GameOptions => {
-            super::super::game_options::sync_instance_with_state(
+            super::game_options::sync_instance_with_state(
                 metadata,
                 state,
-                super::super::game_options::SyncReason::Normal,
+                super::game_options::SyncReason::Normal,
             )
             .await
         }
@@ -1103,7 +1103,7 @@ async fn detach_option(
     let instance_dir = instance_dir(metadata, state);
     match option {
         SyncedOption::GameOptions => {
-            super::super::game_options::detach_instance(metadata, state).await
+            super::game_options::detach_instance(metadata, state).await
         }
         SyncedOption::CommandHistory => {
             detach_link(
@@ -1135,7 +1135,7 @@ async fn canonical_exists(
 ) -> crate::Result<bool> {
     Ok(match option {
         SyncedOption::GameOptions => {
-            super::super::game_options::canonical_exists(state).await?
+            super::game_options::canonical_exists(state).await?
         }
         SyncedOption::CommandHistory => command_history_path(state).exists(),
         SyncedOption::CreativeHotbars => hotbar_state_exists(state).await?,

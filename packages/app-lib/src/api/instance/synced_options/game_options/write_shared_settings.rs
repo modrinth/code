@@ -1,6 +1,6 @@
 //! Writes shared settings into an instance without replacing the rest of `options.txt`.
 
-use super::super::synced_options::{self, CheckpointStatus};
+use super::super::{self as synced_options, CheckpointStatus};
 use super::CATALOG_REVISION;
 use super::api_types::{
     GameOptionMappingKind, SaveGameSettingsResult, SyncOutcome, SyncReason,
@@ -12,7 +12,7 @@ use super::read_instance_changes::{
     discover_custom_settings, previous_applied_settings,
     read_instance_changes_into_shared_settings,
 };
-use super::supported_settings::*;
+use super::catalog::*;
 use crate::state::{
     CanonicalValue, GameOptionsProjection, InstanceMetadata, ProjectedField,
     ProjectionOrigin, State, SyncedOption, game_options_sync_is_enabled,

@@ -3,7 +3,6 @@
 mod content;
 mod content_set_diff;
 mod export_mrpack;
-mod game_options;
 mod get;
 mod groups;
 mod icon;
@@ -28,7 +27,7 @@ pub use self::export_mrpack::{
     PackExportCandidate, create_mrpack_json, export_mrpack,
     get_pack_export_candidates, get_pack_export_candidates_for_parent,
 };
-pub use self::game_options::{
+pub use self::synced_options::game_options::{
     CanonicalValue as GameOptionCanonicalValue, EditableGameSetting,
     GameOptionCompatibility, GameOptionCompatibilityBucket,
     GameOptionCompatibilityReason, GameOptionCompatibilityStatus,
@@ -45,7 +44,7 @@ pub use self::game_options::{
     save_changes as save_synced_game_option_changes,
     sync_before_launch as sync_game_options_before_launch,
 };
-pub(crate) use self::game_options::{
+pub(crate) use self::synced_options::game_options::{
     shared_fullscreen_value, sync_all_participating_instances,
     update_shared_fullscreen_from_app,
 };
