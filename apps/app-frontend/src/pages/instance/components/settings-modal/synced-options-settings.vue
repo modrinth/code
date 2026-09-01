@@ -52,6 +52,10 @@ const messages = defineMessages({
 		defaultMessage:
 			'Apply the selected shared game settings on top of this instance’s options.txt.',
 	},
+	gameSettingsDisabled: {
+		id: 'instance.settings.tabs.synced-options.game-settings.disabled-in-app',
+		defaultMessage: 'Game settings syncing is turned off in app settings.',
+	},
 	multiplayerServers: {
 		id: 'instance.settings.tabs.synced-options.multiplayer-servers',
 		defaultMessage: 'Unsync multiplayer servers',
@@ -114,6 +118,7 @@ const messages = defineMessages({
 type InstanceSyncedOption = Exclude<SyncedOption, 'screenshots'>
 
 const globalDisabledMessages: Record<InstanceSyncedOption, keyof typeof messages> = {
+	game_options: 'gameSettingsDisabled',
 	multiplayer_servers: 'multiplayerServersDisabled',
 	command_history: 'commandHistoryDisabled',
 	creative_hotbars: 'creativeHotbarsDisabled',
@@ -174,6 +179,10 @@ function excluded(option: InstanceSyncedOption): boolean {
 	)
 }
 
+function enabled(option: InstanceSyncedOption): boolean {
+	return instance.value.synced_options[option]
+}
+
 function setPreviewExcluded(option: InstanceSyncedOption, value?: boolean) {
 	if (value === undefined) {
 		const { [option]: _, ...next } = previewExcluded.value
@@ -191,8 +200,11 @@ function disabledReason(option: InstanceSyncedOption): string | undefined {
 }
 
 function showAppSyncedOptions(): void {
-	closeModal?.()
-	openAppSettingsSyncedOptions()
+	if (closeModal) {
+		closeModal(openAppSettingsSyncedOptions)
+	} else {
+		openAppSettingsSyncedOptions()
+	}
 }
 
 type SyncedOptionMutationVariables = {

@@ -7,9 +7,10 @@ import {
 	Input,
 	Slider,
 	Toggle,
+	truncatedTooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { EditableGameSetting, GameOptionCanonicalValue } from '@/helpers/game-options'
 
@@ -47,6 +48,7 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const settingLabelRef = ref<HTMLElement | null>(null)
 
 const messages = defineMessages({
 	valueLabel: {
@@ -121,7 +123,9 @@ const sliderValue = computed(() => {
 	const value = Number(valueText.value)
 	return Number.isFinite(value) ? value : (inputMin.value ?? 0)
 })
-const editorDisabled = computed(() => props.disabled || props.setting.controlled)
+const editorDisabled = computed(
+	() => props.disabled || props.setting.controlled || !props.setting.sync_enabled,
+)
 const syncToggleDisabled = computed(
 	() =>
 		props.disabled ||
@@ -179,16 +183,20 @@ function updateValue(value: string | number | boolean | undefined) {
 
 <template>
 	<div
-		class="grid min-w-0 items-center gap-3 border-0 border-b border-solid border-surface-5 py-3"
+		class="grid min-w-0 items-center gap-3 py-3"
 		:class="
 			isVolumeSlider
-				? 'grid-cols-[minmax(8rem,0.5fr)_minmax(0,1.5fr)_4rem]'
+				? 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)_4rem]'
 				: 'grid-cols-[minmax(0,1fr)_12rem_4rem]'
 		"
 	>
 		<div class="min-w-0">
 			<div class="flex items-center gap-2">
-				<h3 class="m-0 truncate text-base font-semibold text-contrast">
+				<h3
+					ref="settingLabelRef"
+					v-tooltip="truncatedTooltip(settingLabelRef, settingLabel)"
+					class="m-0 truncate text-lg font-semibold text-contrast"
+				>
 					{{ settingLabel }}
 				</h3>
 				<span
@@ -203,7 +211,7 @@ function updateValue(value: string | number | boolean | undefined) {
 					<UnknownIcon class="size-4" aria-hidden="true" />
 				</span>
 			</div>
-			<p v-if="settingDescription" class="m-0 mt-0.5 text-sm text-primary">
+			<p v-if="settingDescription" class="m-0 mt-0.5 text-primary">
 				{{ settingDescription }}
 			</p>
 		</div>

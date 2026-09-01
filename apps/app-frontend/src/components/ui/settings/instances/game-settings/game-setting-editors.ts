@@ -1,3 +1,5 @@
+import { toRaw } from 'vue'
+
 import type {
 	EditableGameSetting,
 	GameOptionCanonicalValue,
@@ -6,7 +8,7 @@ import type {
 } from '@/helpers/game-options'
 
 export function cloneGameSettingsState(state: GameSettingsEditorState): GameSettingsEditorState {
-	return structuredClone(state)
+	return structuredClone(toRaw(state))
 }
 
 export function canonicalValuesEqual(

@@ -234,7 +234,7 @@ pub(super) async fn read_instance_changes_into_shared_settings(
             .await?;
         }
         if let Some(value) = fullscreen_value.as_ref() {
-            update_app_fullscreen_setting(&mut tx, value).await?;
+            update_app_fullscreen_setting(&mut tx, value, true).await?;
         }
         tx.commit().await?;
     }

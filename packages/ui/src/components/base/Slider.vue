@@ -31,7 +31,7 @@
 				:min="min"
 				:max="max"
 				:step="step"
-				class="slider absolute top-0 h-10 min-h-0 appearance-none border-0 bg-transparent p-0 shadow-none outline-none"
+				class="slider absolute top-0 h-10 min-h-0 appearance-none overflow-visible border-0 bg-transparent p-0 shadow-none outline-none"
 				:class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
 				:disabled="disabled"
 				@input="onInputWithSnap(($event.target as HTMLInputElement).value)"

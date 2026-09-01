@@ -49,9 +49,17 @@ const handleUnlinked = () => emit('unlinked')
 
 const instanceRef = computed(() => props.instance)
 const tabbedModal = ref<InstanceType<typeof TabbedModal> | null>(null)
+let onAfterClose: (() => void) | undefined
 
-function hide() {
-	tabbedModal.value?.hide()
+function hide(callback?: () => void) {
+	onAfterClose = callback
+	if (!tabbedModal.value?.hide()) onAfterClose = undefined
+}
+
+function handleAfterHide() {
+	const callback = onAfterClose
+	onAfterClose = undefined
+	callback?.()
 }
 
 provideInstanceSettings({
@@ -181,6 +189,7 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="tabbedModal"
 		:tabs="tabs"
+		:on-after-hide="handleAfterHide"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
 	>
