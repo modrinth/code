@@ -1,6 +1,6 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" max-width="500px">
-		<form class="space-y-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
+	<NewModal ref="modal" :header="formatMessage(messages.header)" max-width="500px" no-padding>
+		<form class="px-6 pt-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
 			<label class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">{{ formatMessage(messages.nameLabel) }}</span>
 				<Input
