@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { UnknownIcon } from '@modrinth/assets'
+import { LinkIcon, UnknownIcon, UnlinkIcon } from '@modrinth/assets'
 import {
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
+	IconButton,
 	Input,
 	Slider,
-	Toggle,
 	truncatedTooltip,
 	useVIntl,
 } from '@modrinth/ui'
@@ -14,6 +14,7 @@ import { computed, ref } from 'vue'
 
 import type { EditableGameSetting, GameOptionCanonicalValue } from '@/helpers/game-options'
 
+import GameSettingBooleanControl from './game-setting-boolean-control.vue'
 import {
 	canonicalBooleanValue,
 	canonicalValueFromInput,
@@ -81,6 +82,10 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.game-settings.sync-setting',
 		defaultMessage: 'Sync {setting} across instances',
 	},
+	unsyncSetting: {
+		id: 'app.settings.synced-options.game-settings.unsync-setting',
+		defaultMessage: 'Stop syncing {setting} across instances',
+	},
 })
 
 const settingLabel = computed(() => formatGameSettingLabel(formatMessage, props.setting))
@@ -94,10 +99,6 @@ const enumOptions = computed<ComboboxOption<string>[]>(() =>
 		label: formatGameSettingChoice(formatMessage, props.setting.option_id, choice.value),
 	})),
 )
-const booleanOptions = computed<ComboboxOption<boolean>[]>(() => [
-	{ value: true, label: formatMessage(messages.on) },
-	{ value: false, label: formatMessage(messages.off) },
-])
 const isVolumeSlider = computed(
 	() =>
 		props.setting.category_id === 'music_and_sound' &&
@@ -180,6 +181,11 @@ const syncDisabledReason = computed(() => {
 	}
 	return undefined
 })
+const syncActionLabel = computed(() =>
+	formatMessage(props.setting.sync_enabled ? messages.unsyncSetting : messages.syncSetting, {
+		setting: settingLabel.value,
+	}),
+)
 
 function updateValue(value: string | number | boolean | undefined) {
 	emit('update:canonical-value', canonicalValueFromInput(props.setting, value))
@@ -188,14 +194,14 @@ function updateValue(value: string | number | boolean | undefined) {
 
 <template>
 	<div
-		class="grid min-w-0 items-center gap-3 py-3"
+		class="grid min-h-[54px] min-w-0 items-center gap-2"
 		:class="
 			isVolumeSlider
 				? showSyncToggle
-					? 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)_4rem]'
+					? 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)_2.25rem]'
 					: 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)]'
 				: showSyncToggle
-					? 'grid-cols-[minmax(0,1fr)_12rem_4rem]'
+					? 'grid-cols-[minmax(0,1fr)_12rem_2.25rem]'
 					: 'grid-cols-[minmax(0,1fr)_12rem]'
 		"
 	>
@@ -225,7 +231,7 @@ function updateValue(value: string | number | boolean | undefined) {
 			</p>
 		</div>
 
-		<div class="flex min-w-0 items-center">
+		<div class="flex min-w-0 items-center justify-end">
 			<Slider
 				v-if="isVolumeSlider"
 				:model-value="sliderValue"
@@ -238,14 +244,14 @@ function updateValue(value: string | number | boolean | undefined) {
 				@update:model-value="updateValue"
 			/>
 
-			<Combobox
+			<GameSettingBooleanControl
 				v-else-if="setting.editor.type === 'bool'"
 				:model-value="booleanValue"
-				:options="booleanOptions"
+				:label="formatMessage(messages.valueLabel)"
+				:on-label="formatMessage(messages.on)"
+				:off-label="formatMessage(messages.off)"
 				:placeholder="placeholder"
 				:disabled="editorDisabled"
-				:aria-label="formatMessage(messages.valueLabel)"
-				class="min-w-0"
 				@update:model-value="updateValue"
 			/>
 
@@ -256,6 +262,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:placeholder="placeholder"
 				:disabled="editorDisabled"
 				:aria-label="formatMessage(messages.valueLabel)"
+				trigger-class="!bg-transparent"
 				class="min-w-0"
 				@update:model-value="updateValue"
 			/>
@@ -282,7 +289,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:placeholder="placeholder"
 				:disabled="editorDisabled"
 				:aria-label="formatMessage(messages.valueLabel)"
-				wrapper-class="w-full"
+				wrapper-class="w-full !bg-transparent"
 				@update:model-value="updateValue"
 			/>
 		</div>
@@ -292,13 +299,20 @@ function updateValue(value: string | number | boolean | undefined) {
 			v-tooltip="syncToggleDisabled ? syncDisabledReason : undefined"
 			class="flex justify-center"
 		>
-			<Toggle
-				:id="`sync-game-setting-${setting.option_id}`"
-				:model-value="setting.sync_enabled"
+			<IconButton
+				:label="syncActionLabel"
 				:disabled="syncToggleDisabled"
-				:aria-label="formatMessage(messages.syncSetting, { setting: settingLabel })"
-				@update:model-value="(enabled) => emit('update:sync-enabled', enabled)"
-			/>
+				:aria-pressed="setting.sync_enabled"
+				:class="
+					setting.sync_enabled
+						? '!bg-highlight-green !text-green !shadow-[inset_0_0_0_1px_var(--color-green)] [&>svg]:!text-green'
+						: ''
+				"
+				@click="emit('update:sync-enabled', !setting.sync_enabled)"
+			>
+				<LinkIcon v-if="setting.sync_enabled" />
+				<UnlinkIcon v-else />
+			</IconButton>
 		</span>
 	</div>
 </template>
