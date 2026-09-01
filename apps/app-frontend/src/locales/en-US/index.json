@@ -3461,6 +3461,9 @@
   "instance.settings.tabs.synced-options.game-settings.description": {
     "message": "Apply the selected shared game settings on top of this instance’s options.txt."
   },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "Game settings syncing is turned off in app settings."
+  },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "The version being replaced will be backed up before anything changes."
   },

@@ -384,6 +384,8 @@ pub async fn save_changes(
     let mut fullscreen_value = None;
     let mut tx = state.pool.begin().await?;
     for (setting, change) in accepted {
+        let resulting_enabled =
+            change.sync_enabled.unwrap_or(setting.sync_enabled);
         let value_changed =
             change.canonical_value.as_ref().is_some_and(|value| {
                 setting.value_state != GameOptionValueState::Canonical
@@ -395,9 +397,13 @@ pub async fn save_changes(
         if !value_changed && !selection_changed {
             continue;
         }
-        if value_changed
+        if resulting_enabled
             && setting.option_id == "fullscreen"
-            && let Some(Some(value)) = change.canonical_value.as_ref()
+            && let Some(value) = change
+                .canonical_value
+                .as_ref()
+                .and_then(|value| value.as_ref())
+                .or(setting.canonical_value.as_ref())
         {
             fullscreen_value = Some(value.clone());
         }
@@ -504,7 +510,7 @@ pub async fn save_changes(
         .await?;
     }
     if let Some(value) = fullscreen_value.as_ref() {
-        update_app_fullscreen_setting(&mut tx, value).await?;
+        update_app_fullscreen_setting(&mut tx, value, true).await?;
     }
     tx.commit().await?;
 

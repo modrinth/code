@@ -131,6 +131,7 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
     }
     let mut seeded_any = false;
     let mut fullscreen_value = None;
+    let mut fullscreen_sync_enabled = false;
 
     for definition in all_supported_settings() {
         if !supported_settings_cover_game_version(source_version) {
@@ -155,6 +156,10 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
         };
         if definition.id == "fullscreen" {
             fullscreen_value = Some(value.clone());
+            fullscreen_sync_enabled = current_preferences
+                .get(definition.id)
+                .map(|preference| preference.enabled)
+                .unwrap_or(definition.default_on);
         }
         seeded_any = true;
         let option_revision = current_values
@@ -301,7 +306,8 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
     .execute(&mut *tx)
     .await?;
     if let Some(value) = fullscreen_value.as_ref() {
-        update_app_fullscreen_setting(&mut tx, value).await?;
+        update_app_fullscreen_setting(&mut tx, value, fullscreen_sync_enabled)
+            .await?;
     }
     tx.commit().await?;
     Ok(())

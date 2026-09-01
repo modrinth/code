@@ -13,6 +13,13 @@ const FULLSCREEN_OPTION_ID: &str = "fullscreen";
 pub(crate) async fn shared_fullscreen_value(
     state: &State,
 ) -> crate::Result<Option<bool>> {
+    let preferences = load_game_option_preferences(&state.pool).await?;
+    if !preferences
+        .get(FULLSCREEN_OPTION_ID)
+        .is_some_and(|preference| preference.enabled)
+    {
+        return Ok(None);
+    }
     let values = load_shared_game_options(&state.pool).await?;
     Ok(values.get(FULLSCREEN_OPTION_ID).and_then(|stored| {
         if !stored.seeded {
@@ -41,7 +48,7 @@ pub(crate) async fn update_shared_fullscreen_from_app(
             )
     });
     let sync_enabled = preference.is_some_and(|preference| preference.enabled);
-    if value_matches && sync_enabled {
+    if !sync_enabled || value_matches {
         return Ok(false);
     }
 
@@ -105,7 +112,11 @@ pub(crate) async fn update_shared_fullscreen_from_app(
 pub(super) async fn update_app_fullscreen_setting(
     tx: &mut Transaction<'_, Sqlite>,
     value: &CanonicalValue,
+    sync_enabled: bool,
 ) -> crate::Result<()> {
+    if !sync_enabled {
+        return Ok(());
+    }
     let CanonicalValue::Bool(value) = value else {
         return Ok(());
     };

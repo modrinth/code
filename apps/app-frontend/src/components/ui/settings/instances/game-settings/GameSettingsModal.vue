@@ -32,7 +32,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { Component } from 'vue'
-import { computed, nextTick, onUnmounted, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 
 import {
 	type EditableGameSetting,
@@ -47,6 +47,7 @@ import {
 
 import { minecraftKeybindConflictKey } from './game-keybinds'
 import {
+	canonicalValuesEqual,
 	cloneGameSettingsState,
 	gameSettingChanges,
 	settingCanBeEnabled,
@@ -395,6 +396,16 @@ async function confirmDiscard() {
 	modal.value?.hide()
 }
 
+function cancelChanges() {
+	if (saving.value || !baseState.value) return
+	if (previewTimer) clearTimeout(previewTimer)
+	previewTimer = null
+	previewGeneration++
+	draftState.value = cloneGameSettingsState(baseState.value)
+	touchedValueOptionIds.value = new Set()
+	previewError.value = false
+}
+
 function settingById(optionId: string): EditableGameSetting | undefined {
 	return draftState.value?.settings.find((setting) => setting.option_id === optionId)
 }
@@ -410,15 +421,29 @@ function setSyncEnabled(optionId: string, enabled: boolean) {
 }
 
 function setCanonicalValue(optionId: string, value: GameOptionCanonicalValue | null) {
-	if (!draftState.value || !settingById(optionId)) return
-	touchedValueOptionIds.value = new Set(touchedValueOptionIds.value).add(optionId)
+	if (!draftState.value) return
+	const currentSetting = settingById(optionId)
+	const baseSetting = baseState.value?.settings.find((setting) => setting.option_id === optionId)
+	if (!currentSetting) return
+
+	const revertedToBase =
+		!!baseSetting &&
+		!canonicalValuesEqual(currentSetting.canonical_value, baseSetting.canonical_value) &&
+		canonicalValuesEqual(value, baseSetting.canonical_value)
+	const touchedOptionIds = new Set(touchedValueOptionIds.value)
+	if (revertedToBase) {
+		touchedOptionIds.delete(optionId)
+	} else {
+		touchedOptionIds.add(optionId)
+	}
+	touchedValueOptionIds.value = touchedOptionIds
 	draftState.value.settings = draftState.value.settings.map((setting) =>
 		setting.option_id === optionId
 			? {
 					...setting,
 					canonical_value: value,
-					value_state: value ? 'canonical' : 'unset',
-					validation_error: null,
+					value_state: revertedToBase ? baseSetting.value_state : value ? 'canonical' : 'unset',
+					validation_error: revertedToBase ? baseSetting.validation_error : null,
 				}
 			: setting,
 	)
@@ -571,11 +596,12 @@ async function save() {
 						: messages.savedSummary,
 			),
 		})
+		const refreshed = result.state ?? (await get_synced_game_options_config())
+		baseState.value = cloneGameSettingsState(refreshed)
+		draftState.value = cloneGameSettingsState(refreshed)
+		touchedValueOptionIds.value = new Set()
+		previewError.value = false
 		emit('saved')
-		allowClose = true
-		saving.value = false
-		await nextTick()
-		modal.value?.hide()
 	} catch (error) {
 		handleError(error)
 	} finally {
@@ -600,8 +626,8 @@ defineExpose({ show, hide })
 		:on-after-hide="reset"
 		:disable-close="saving"
 		:floating-action-bar-shown="isDirty"
-		:max-width="'min(930px, calc(95vw - 2rem))'"
-		:width="'min(930px, calc(95vw - 2rem))'"
+		:max-width="'min(1080px, calc(95vw - 2rem))'"
+		:width="'min(1080px, calc(95vw - 2rem))'"
 	>
 		<template #sidebar-header>
 			<div class="pb-4">
@@ -699,7 +725,7 @@ defineExpose({ show, hide })
 					{{ formatMessage(messages.unsavedChanges) }}
 				</p>
 				<div class="ml-auto flex gap-2">
-					<Button type="outlined" :disabled="saving" @click="modal?.hide()">
+					<Button type="outlined" :disabled="saving" @click="cancelChanges">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
