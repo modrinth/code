@@ -2,13 +2,13 @@
 
 use super::CATALOG_REVISION;
 use super::api_types::*;
+use super::catalog::*;
 use super::fullscreen::update_app_fullscreen_setting;
 use super::instance_support::{
     describe_instance_support, find_common_local_value,
     load_participating_instances, summary_revision,
 };
 use super::options_file::input_error;
-use super::catalog::*;
 use super::write_shared_settings::sync_all_participating_instances;
 use crate::state::{
     CanonicalValue, GameOptionKind, State, StoredOption,

@@ -3,10 +3,10 @@
 use super::super as synced_options;
 use super::CATALOG_REVISION;
 use super::api_types::*;
+use super::catalog::*;
 use super::options_file::{
     GameOptionsDocument, options_path, read_document, sha1_bytes,
 };
-use super::catalog::*;
 use crate::state::{
     CanonicalValue, InstanceMetadata, State, StoredOption,
     game_options_sync_is_enabled,

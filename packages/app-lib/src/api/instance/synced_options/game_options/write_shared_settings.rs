@@ -5,14 +5,15 @@ use super::CATALOG_REVISION;
 use super::api_types::{
     GameOptionMappingKind, SaveGameSettingsResult, SyncOutcome, SyncReason,
 };
+use super::catalog::*;
 use super::options_file::{
     GameOptionsDocument, options_path, read_document, sha1_bytes,
 };
+use super::pack_updates::materialize_yosbr_options_if_missing;
 use super::read_instance_changes::{
     discover_custom_settings, previous_applied_settings,
     read_instance_changes_into_shared_settings,
 };
-use super::catalog::*;
 use crate::state::{
     CanonicalValue, GameOptionsProjection, InstanceMetadata, ProjectedField,
     ProjectionOrigin, State, SyncedOption, game_options_sync_is_enabled,
@@ -35,6 +36,7 @@ pub(super) async fn sync_is_active_for_instance(
 pub(super) async fn apply_shared_settings_to_document(
     metadata: &InstanceMetadata,
     document: &mut GameOptionsDocument,
+    add_missing_keys: bool,
     state: &State,
 ) -> crate::Result<Vec<ProjectedField>> {
     let values = load_shared_game_options(&state.pool).await?;
@@ -72,12 +74,29 @@ pub(super) async fn apply_shared_settings_to_document(
         {
             continue;
         }
-        let Some(key) = target_physical_key(
-            definition,
-            stored,
-            document,
-            &metadata.applied_content_set.game_version,
-        ) else {
+        let target_version = &metadata.applied_content_set.game_version;
+        let key =
+            target_physical_key(definition, stored, document, target_version)
+                .or_else(|| {
+                    if !add_missing_keys {
+                        return None;
+                    }
+                    definition.and_then(|definition| {
+                        if definition.versioned_keys.is_empty() {
+                            definition
+                                .keys
+                                .first()
+                                .map(|key| (*key).to_string())
+                        } else {
+                            physical_variant_for_version(
+                                definition,
+                                target_version,
+                            )
+                            .map(|variant| variant.key.to_string())
+                        }
+                    })
+                });
+        let Some(key) = key else {
             continue;
         };
         let migrated = definition.is_some_and(|definition| {
@@ -137,10 +156,19 @@ pub(super) async fn sync_instance_options(
         return Ok(SyncOutcome::Deferred);
     }
     let path = options_path(metadata, state);
-    if !path.exists() {
-        return Ok(SyncOutcome::WaitingForFile);
+    let file_was_missing = !path.exists();
+    if file_was_missing && reason != SyncReason::BeforePackUpdate {
+        materialize_yosbr_options_if_missing(metadata, state).await?;
     }
-    let (mut document, input_bytes) = read_document(&path).await?;
+    let creating_empty_document =
+        !path.exists() && reason != SyncReason::BeforePackUpdate;
+    let (mut document, input_bytes) = if path.exists() {
+        read_document(&path).await?
+    } else if creating_empty_document {
+        (GameOptionsDocument::empty(), Vec::new())
+    } else {
+        return Ok(SyncOutcome::WaitingForFile);
+    };
     let input_sha1 = sha1_bytes(&input_bytes);
     let checkpoint = synced_options::checkpoint(
         &metadata.instance.id,
@@ -153,6 +181,7 @@ pub(super) async fn sync_instance_options(
         previous_applied_settings(checkpoint.merge_base.as_deref())
     });
     let should_publish = allow_publish
+        && !file_was_missing
         && reason != SyncReason::PackExtracted
         && checkpoint.as_ref().is_none_or(|checkpoint| {
             match checkpoint.status {
@@ -175,7 +204,10 @@ pub(super) async fn sync_instance_options(
             state,
         )
         .await?
-    } else if allow_publish && reason != SyncReason::PackExtracted {
+    } else if allow_publish
+        && !file_was_missing
+        && reason != SyncReason::PackExtracted
+    {
         let launcher_keys = prior_projection
             .as_ref()
             .into_iter()
@@ -199,9 +231,13 @@ pub(super) async fn sync_instance_options(
         return Ok(SyncOutcome::Unchanged);
     }
 
-    let fields =
-        apply_shared_settings_to_document(metadata, &mut document, state)
-            .await?;
+    let fields = apply_shared_settings_to_document(
+        metadata,
+        &mut document,
+        creating_empty_document,
+        state,
+    )
+    .await?;
     let used_migration = fields.iter().any(|field| {
         field.migrated
             || setting_by_id(&field.option_id).is_some_and(|definition| {
@@ -246,7 +282,7 @@ pub(super) async fn sync_instance_options(
         state,
     )
     .await?;
-    let changed = output_bytes != input_bytes;
+    let changed = file_was_missing || output_bytes != input_bytes;
     if changed {
         io::write(&path, output_bytes).await?;
     }

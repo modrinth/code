@@ -9,6 +9,33 @@ use super::write_shared_settings::{
 use crate::state::{InstanceLink, InstanceMetadata, State, SyncedOption};
 use crate::util::io;
 use encoding_rs::{UTF_8, UTF_16BE, UTF_16LE};
+use std::io::ErrorKind;
+use std::path::Path;
+
+const YOSBR_OPTIONS_PATH: &str = "config/yosbr/options.txt";
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum GameOptionsPackSource {
+    ClientOverrides,
+    Overrides,
+    ClientOverridesYosbr,
+    OverridesYosbr,
+}
+
+impl GameOptionsPackSource {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::ClientOverrides | Self::ClientOverridesYosbr => {
+                "client_overrides"
+            }
+            Self::Overrides | Self::OverridesYosbr => "overrides",
+        }
+    }
+
+    fn is_yosbr(self) -> bool {
+        matches!(self, Self::ClientOverridesYosbr | Self::OverridesYosbr)
+    }
+}
 
 fn detected_encoding_name(bytes: &[u8]) -> String {
     if bytes.starts_with(&[0xFF, 0xFE]) {
@@ -39,6 +66,61 @@ fn pack_version_id(metadata: &InstanceMetadata) -> Option<&str> {
         } => modpack_version_id.as_deref(),
         _ => None,
     }
+}
+
+async fn read_pack_options(
+    path: &Path,
+    name: &str,
+) -> crate::Result<Option<(Vec<u8>, String, String)>> {
+    let metadata = match tokio::fs::symlink_metadata(path).await {
+        Ok(metadata) => metadata,
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(io::IOError::with_path(error, path).into()),
+    };
+    if metadata.file_type().is_symlink() {
+        return Err(input_error(format!(
+            "Refusing to capture a symlinked {name}"
+        )));
+    }
+    if metadata.len() > MAX_OPTIONS_BYTES as u64 {
+        return Err(input_error(format!(
+            "The modpack {name} is too large to capture for syncing"
+        )));
+    }
+    let bytes = io::read(path).await?;
+    let sha1 = sha1_bytes(&bytes);
+    let encoding = detected_encoding_name(&bytes);
+    Ok(Some((bytes, sha1, encoding)))
+}
+
+async fn options_target_exists(path: &Path) -> crate::Result<bool> {
+    match tokio::fs::symlink_metadata(path).await {
+        Ok(metadata) if metadata.file_type().is_symlink() => {
+            Err(input_error("Refusing to replace a symlinked options.txt"))
+        }
+        Ok(_) => Ok(true),
+        Err(error) if error.kind() == ErrorKind::NotFound => Ok(false),
+        Err(error) => Err(io::IOError::with_path(error, path).into()),
+    }
+}
+
+pub(super) async fn materialize_yosbr_options_if_missing(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<()> {
+    let path = options_path(metadata, state);
+    if options_target_exists(&path).await? {
+        return Ok(());
+    }
+    let template_path =
+        super::super::instance_dir(metadata, state).join(YOSBR_OPTIONS_PATH);
+    let Some((bytes, _, _)) =
+        read_pack_options(&template_path, "YOSBR options.txt").await?
+    else {
+        return Ok(());
+    };
+    io::write(&path, bytes).await?;
+    Ok(())
 }
 
 pub(in crate::api::instance) async fn detach_instance(
@@ -123,11 +205,8 @@ pub(in crate::api::instance) async fn prepare_instance_update_with_state(
 /// shared settings.
 pub async fn capture_pack_base(
     instance_id: &str,
-    source: Option<&str>,
+    source: Option<GameOptionsPackSource>,
 ) -> crate::Result<()> {
-    if !matches!(source, None | Some("client_overrides") | Some("overrides")) {
-        return Err(input_error("Unknown modpack options.txt source"));
-    }
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
@@ -168,28 +247,28 @@ pub async fn capture_pack_base(
         }
     }
 
-    let (document_bytes, sha1, encoding) = if path.exists() {
-        let file_metadata = tokio::fs::symlink_metadata(&path)
-            .await
-            .map_err(|error| io::IOError::with_path(error, &path))?;
-        if file_metadata.file_type().is_symlink() {
-            return Err(input_error(
-                "Refusing to capture a symlinked options.txt",
-            ));
+    let captured = if source.is_some_and(GameOptionsPackSource::is_yosbr) {
+        let template_path = super::super::instance_dir(&metadata, &state)
+            .join(YOSBR_OPTIONS_PATH);
+        let template = read_pack_options(&template_path, "YOSBR options.txt")
+            .await?
+            .ok_or_else(|| {
+                input_error("The modpack YOSBR options.txt is missing")
+            })?;
+        if !options_target_exists(&path).await? {
+            io::write(&path, template.0.clone()).await?;
         }
-        let bytes = io::read(&path).await?;
-        if bytes.len() > MAX_OPTIONS_BYTES {
-            return Err(input_error(
-                "The modpack options.txt is too large to capture for syncing",
-            ));
-        }
-        let sha1 = sha1_bytes(&bytes);
-        let encoding = detected_encoding_name(&bytes);
-        (Some(bytes), Some(sha1), Some(encoding))
+        Some(template)
     } else {
-        (None, None, None)
+        read_pack_options(&path, "options.txt").await?
     };
-    let source_name = source.unwrap_or("none");
+    let (document_bytes, sha1, encoding) = captured
+        .map(|(document, sha1, encoding)| {
+            (Some(document), Some(sha1), Some(encoding))
+        })
+        .unwrap_or((None, None, None));
+    let source_name =
+        source.map(GameOptionsPackSource::as_str).unwrap_or("none");
     let version_id = pack_version_id(&metadata);
     sqlx::query!(
         "

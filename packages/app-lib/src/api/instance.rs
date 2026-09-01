@@ -27,27 +27,6 @@ pub use self::export_mrpack::{
     PackExportCandidate, create_mrpack_json, export_mrpack,
     get_pack_export_candidates, get_pack_export_candidates_for_parent,
 };
-pub use self::synced_options::game_options::{
-    CanonicalValue as GameOptionCanonicalValue, EditableGameSetting,
-    GameOptionCompatibility, GameOptionCompatibilityBucket,
-    GameOptionCompatibilityReason, GameOptionCompatibilityStatus,
-    GameOptionEditorChoice, GameOptionEditorDefinition, GameOptionKind,
-    GameOptionMappingKind, GameOptionValidationIssue, GameOptionValueState,
-    GameOptionsSourceCandidate, GameOptionsSourceIssue, GameSettingCategory,
-    GameSettingChange, GameSettingsEditorState, SaveGameSettingsResult,
-    UpdateGameSettingsRequest,
-    apply_launcher_overrides as apply_game_options_launcher_overrides,
-    capture_pack_base as capture_game_options_pack_base,
-    get_config as get_synced_game_options_config,
-    list_sync_sources as list_game_options_sync_sources,
-    preview_changes as preview_synced_game_option_changes,
-    save_changes as save_synced_game_option_changes,
-    sync_before_launch as sync_game_options_before_launch,
-};
-pub(crate) use self::synced_options::game_options::{
-    shared_fullscreen_value, sync_all_participating_instances,
-    update_shared_fullscreen_from_app,
-};
 pub use self::get::{get, get_many, list};
 pub use self::groups::{
     FAVORITES_GROUP_ID, InstanceGroup, InstanceGroupMembershipUpdate,
@@ -111,6 +90,27 @@ pub use self::shared::{
     invite_shared_instance_users, publish_shared_instance,
     remove_shared_instance_users, revoke_shared_instance_invite,
     unlink_shared_instance, unpublish_shared_instance, update_shared_instance,
+};
+pub use self::synced_options::game_options::{
+    CanonicalValue as GameOptionCanonicalValue, EditableGameSetting,
+    GameOptionCompatibility, GameOptionCompatibilityBucket,
+    GameOptionCompatibilityReason, GameOptionCompatibilityStatus,
+    GameOptionEditorChoice, GameOptionEditorDefinition, GameOptionKind,
+    GameOptionMappingKind, GameOptionValidationIssue, GameOptionValueState,
+    GameOptionsPackSource, GameOptionsSourceCandidate, GameOptionsSourceIssue,
+    GameSettingCategory, GameSettingChange, GameSettingsEditorState,
+    SaveGameSettingsResult, UpdateGameSettingsRequest,
+    apply_launcher_overrides as apply_game_options_launcher_overrides,
+    capture_pack_base as capture_game_options_pack_base,
+    get_config as get_synced_game_options_config,
+    list_sync_sources as list_game_options_sync_sources,
+    preview_changes as preview_synced_game_option_changes,
+    save_changes as save_synced_game_option_changes,
+    sync_before_launch as sync_game_options_before_launch,
+};
+pub(crate) use self::synced_options::game_options::{
+    shared_fullscreen_value, sync_all_participating_instances,
+    update_shared_fullscreen_from_app,
 };
 pub use self::synced_options::{
     GlobalSyncedOptions, SyncedOptionCapability, SyncedOptionJoinAction,

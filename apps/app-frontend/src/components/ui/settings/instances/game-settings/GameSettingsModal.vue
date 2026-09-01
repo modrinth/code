@@ -481,14 +481,15 @@ function schedulePreview() {
 
 function mergePreview(preview: GameSettingsEditorState) {
 	if (!baseState.value || !draftState.value) return
-	const previousBase = baseState.value
+	const previousBase = cloneGameSettingsState(baseState.value)
+	const previousDraft = cloneGameSettingsState(draftState.value)
 	const dirtyIds = new Set(
-		gameSettingChanges(previousBase, draftState.value, touchedValueOptionIds.value).map(
+		gameSettingChanges(previousBase, previousDraft, touchedValueOptionIds.value).map(
 			(change) => change.option_id,
 		),
 	)
 	const stagedSettings = new Map(
-		draftState.value.settings
+		previousDraft.settings
 			.filter((setting) => dirtyIds.has(setting.option_id))
 			.map((setting) => [setting.option_id, setting]),
 	)

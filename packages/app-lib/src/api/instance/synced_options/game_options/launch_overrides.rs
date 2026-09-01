@@ -3,12 +3,13 @@
 use super::super as synced_options;
 use super::CATALOG_REVISION;
 use super::api_types::SyncReason;
+use super::catalog::setting_by_file_key;
 use super::options_file::{
     GameOptionsDocument, input_error, options_path, read_document, sha1_bytes,
     validate_raw_key_value,
 };
+use super::pack_updates::materialize_yosbr_options_if_missing;
 use super::read_instance_changes::previous_applied_settings;
-use super::catalog::setting_by_file_key;
 use super::write_shared_settings::{
     sync_instance_options, sync_is_active_for_instance,
 };
@@ -36,6 +37,7 @@ pub async fn sync_before_launch(instance_id: &str) -> crate::Result<()> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| input_error("Unknown instance"))?;
+    materialize_yosbr_options_if_missing(&metadata, &state).await?;
     if sync_is_active_for_instance(&metadata, &state).await? {
         let _ = sync_instance_options(
             &metadata,

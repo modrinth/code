@@ -3,6 +3,7 @@
 use super::super as synced_options;
 use super::CATALOG_REVISION;
 use super::api_types::{GameOptionsSourceCandidate, GameOptionsSourceIssue};
+use super::catalog::*;
 use super::fullscreen::update_app_fullscreen_setting;
 use super::launch_overrides::currently_launcher_owned_keys;
 use super::options_file::{
@@ -12,7 +13,6 @@ use super::options_file::{
 use super::read_instance_changes::{
     custom_setting_id, launcher_keys_for_document,
 };
-use super::catalog::*;
 use crate::state::{
     CanonicalValue, InstanceMetadata, State, load_game_option_preferences,
     load_game_options_sync_state, load_shared_game_options,
