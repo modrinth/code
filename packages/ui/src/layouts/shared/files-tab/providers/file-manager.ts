@@ -1,3 +1,4 @@
+import type { Kyros } from '@modrinth/api-client'
 import type { ComputedRef, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'
@@ -31,6 +32,9 @@ export interface FileManagerContext {
 	readFileAsBlob: (path: string) => Promise<Blob>
 	writeFile: (path: string, content: string) => Promise<void>
 	downloadFile: (path: string, fileName: string) => Promise<void>
+	statFile?: (path: string) => Promise<Kyros.Files.v1.FileStatResponse>
+	zipFolder?: (path: string) => Promise<void>
+	zipPaths?: (parent: string, include: string[], target: string) => Promise<void>
 
 	uploadFiles: (files: File[]) => void
 	cancelUpload?: () => void

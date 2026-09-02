@@ -3434,12 +3434,6 @@
   "project-type.shader.singular": {
     "message": "Sombreador"
   },
-  "project.actions.back-to-all-projects": {
-    "message": "Volver a todos los proyectos"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Volver a la página del proyecto"
-  },
   "project.actions.checking-modpack-archives": {
     "message": "Comprobando..."
   },

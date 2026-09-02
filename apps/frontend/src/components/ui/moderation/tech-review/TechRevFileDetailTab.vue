@@ -1,26 +1,19 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	CheckIcon,
-	ChevronDownIcon,
-	ChevronRightIcon,
-	CopyIcon,
-	LoaderCircleIcon,
-} from '@modrinth/assets'
-import { Collapsible, IconButton, injectNotificationManager, Toggle } from '@modrinth/ui'
-import { capitalizeString, highlightCodeLines } from '@modrinth/utils'
+import { ChevronRightIcon } from '@modrinth/assets'
+import { injectNotificationManager, Toggle } from '@modrinth/ui'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
-import {
-	canUpdateGlobalDetail,
-	getFileDetailCount,
-	getSeverityBadgeColor,
-	severityOrder,
-	truncateMiddle,
-	verdictToDecision,
-} from './helpers'
+import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from './helpers'
+import TechRevClassItem from './TechRevClassItem.vue'
 import TechRevVerdictButtons from './TechRevVerdictButtons.vue'
-import type { ClassGroup, FlagItem, FlattenedFileReport, JarGroup } from './types'
+import type {
+	ClassGroup,
+	FlagItem,
+	FlattenedFileReport,
+	JarGroup,
+	TraceVerdictEvent,
+} from './types'
 import { injectTechReviewDecisions } from './use-tech-review-decisions'
 
 const props = defineProps<{
@@ -56,8 +49,6 @@ const hideGloballyPassed = ref(true)
 const isBatchUpdating = ref(false)
 const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
-const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
-const highlightedSourceCache = reactive<Map<string, { source: string; lines: string[] }>>(new Map())
 const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 2
 
 const globallyPassedCount = computed(() => {
@@ -109,9 +100,32 @@ function getRemainingGlobalDetailCount(flags: FlagItem[]): number {
 	).size
 }
 
+function notifySuccess(title: string, text: string) {
+	addNotification({ type: 'success', title, text, autoCloseMs: 3000 })
+}
+
+function notifyError(title: string, text: string) {
+	addNotification({ type: 'error', title, text })
+}
+
 function maybeReturnToFileList() {
 	if (getFileMarkedCount(props.file) === getFileDetailCount(props.file)) {
 		emit('allFlagsResolved')
+	}
+}
+
+function collapseCompletedClasses() {
+	for (const classGroup of groupedByClass.value) {
+		if (getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
+			expandedClasses.delete(classGroup.key)
+		}
+	}
+}
+
+function afterSuccessfulMark(previousMarkedCount: number) {
+	collapseCompletedClasses()
+	if (previousMarkedCount !== getFileMarkedCount(props.file)) {
+		maybeReturnToFileList()
 	}
 }
 
@@ -141,23 +155,18 @@ async function batchMarkRemainingGlobally(flags: FlagItem[], verdict: 'safe' | '
 			'global',
 		)
 
-		addNotification({
-			type: 'success',
-			title: `Globally marked ${details.length} trace keys as ${verdict}`,
-			text: `All remaining eligible traces have been globally marked as ${
+		notifySuccess(
+			`Globally marked ${details.length} trace keys as ${verdict}`,
+			`All remaining eligible traces have been globally marked as ${
 				verdict === 'safe' ? 'false positives' : 'malicious'
 			}.`,
-		})
+		)
 
 		maybeReturnToFileList()
 		emit('refetch')
 	} catch (error) {
 		console.error('Failed to batch update global traces:', error)
-		addNotification({
-			type: 'error',
-			title: 'Global batch update failed',
-			text: 'An error occurred while globally updating traces.',
-		})
+		notifyError('Global batch update failed', 'An error occurred while globally updating traces.')
 	} finally {
 		isBatchUpdating.value = false
 	}
@@ -177,23 +186,18 @@ async function batchMarkRemaining(flags: FlagItem[], verdict: 'safe' | 'unsafe',
 		await updateIssueDetails(detailIds.map((detail_id) => ({ detail_id, verdict })))
 		applyDecisionToRelatedDetails(detailIds, verdictToDecision(verdict), 'local')
 
-		addNotification({
-			type: 'success',
-			title: `Marked ${detailIds.length} traces as ${verdict}`,
-			text: `All remaining traces${inJar ? ' in this JAR' : ''} have been marked as ${
+		notifySuccess(
+			`Marked ${detailIds.length} traces as ${verdict}`,
+			`All remaining traces${inJar ? ' in this JAR' : ''} have been marked as ${
 				verdict === 'safe' ? 'false positives' : 'malicious'
 			}.`,
-		})
+		)
 
 		maybeReturnToFileList()
 		emit('refetch')
 	} catch (error) {
 		console.error('Failed to batch update:', error)
-		addNotification({
-			type: 'error',
-			title: 'Batch update failed',
-			text: 'An error occurred while updating traces.',
-		})
+		notifyError('Batch update failed', 'An error occurred while updating traces.')
 	} finally {
 		isBatchUpdating.value = false
 	}
@@ -213,13 +217,17 @@ function updateGlobalDetailAction(
 	return updateGlobalDetailStatus(detail, getToggledDetailVerdict(detail, decision, 'global'))
 }
 
+function handleTraceVerdict({ detail, decision, scope }: TraceVerdictEvent) {
+	if (scope === 'global') {
+		return updateGlobalDetailAction(detail, decision)
+	}
+	return updateLocalDetailAction(detail, decision)
+}
+
 async function updateDetailStatus(
 	detailId: string,
 	verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
 ) {
-	const detail = props.file.issues.flatMap((issue) => issue.details).find((d) => d.id === detailId)
-	const priorDecision = detail ? getDetailDecision(detail.id, detail.status) : 'pending'
-
 	updatingDetails.add(detailId)
 
 	const previousMarkedCount = getFileMarkedCount(props.file)
@@ -233,22 +241,8 @@ async function updateDetailStatus(
 			'local',
 		)
 
-		if (verdict !== 'pending' && priorDecision === 'pending') {
-			for (const classGroup of groupedByClass.value) {
-				const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
-				if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
-					expandedClasses.delete(classGroup.key)
-					break
-				}
-			}
-		}
-
 		if (verdict !== 'pending') {
-			const markedCount = getFileMarkedCount(props.file)
-			const totalCount = getFileDetailCount(props.file)
-			if (previousMarkedCount != markedCount && markedCount === totalCount) {
-				emit('allFlagsResolved')
-			}
+			afterSuccessfulMark(previousMarkedCount)
 		}
 
 		const otherText =
@@ -257,33 +251,23 @@ async function updateDetailStatus(
 				: ''
 
 		if (verdict === 'pending') {
-			addNotification({
-				type: 'success',
-				title: 'Local trace verdict unset',
-				text: `The project-local verdict has been removed.${otherText}`,
-			})
+			notifySuccess(
+				'Local trace verdict unset',
+				`The project-local verdict has been removed.${otherText}`,
+			)
 		} else if (verdict === 'safe') {
-			addNotification({
-				type: 'success',
-				title: 'Issue marked as pass',
-				text: `This issue has been marked as a false positive.${otherText}`,
-			})
+			notifySuccess(
+				'Issue marked as pass',
+				`This issue has been marked as a false positive.${otherText}`,
+			)
 		} else {
-			addNotification({
-				type: 'success',
-				title: 'Issue marked as fail',
-				text: `This issue has been flagged as malicious.${otherText}`,
-			})
+			notifySuccess('Issue marked as fail', `This issue has been flagged as malicious.${otherText}`)
 		}
 
 		emit('refetch')
 	} catch (error) {
 		console.error('Failed to update detail status:', error)
-		addNotification({
-			type: 'error',
-			title: 'Failed to update issue',
-			text: 'An error occurred while updating the issue status.',
-		})
+		notifyError('Failed to update issue', 'An error occurred while updating the issue status.')
 	} finally {
 		updatingDetails.delete(detailId)
 	}
@@ -294,11 +278,7 @@ async function updateGlobalDetailStatus(
 	verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
 ) {
 	if (!canUpdateGlobalDetail(detail)) {
-		addNotification({
-			type: 'error',
-			title: 'Global update unavailable',
-			text: 'Generated trace keys cannot be marked globally.',
-		})
+		notifyError('Global update unavailable', 'Generated trace keys cannot be marked globally.')
 		return
 	}
 
@@ -316,19 +296,7 @@ async function updateGlobalDetailStatus(
 		)
 
 		if (verdict !== 'pending') {
-			for (const classGroup of groupedByClass.value) {
-				if (getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
-					expandedClasses.delete(classGroup.key)
-				}
-			}
-		}
-
-		if (verdict !== 'pending') {
-			const markedCount = getFileMarkedCount(props.file)
-			const totalCount = getFileDetailCount(props.file)
-			if (previousMarkedCount != markedCount && markedCount === totalCount) {
-				emit('allFlagsResolved')
-			}
+			afterSuccessfulMark(previousMarkedCount)
 		}
 
 		const otherText =
@@ -337,31 +305,26 @@ async function updateGlobalDetailStatus(
 				: ''
 
 		if (verdict === 'pending') {
-			addNotification({
-				type: 'success',
-				title: 'Global trace verdict unset',
-				text: `The global verdict for this trace key has been removed.${otherText}`,
-			})
+			notifySuccess(
+				'Global trace verdict unset',
+				`The global verdict for this trace key has been removed.${otherText}`,
+			)
 		} else {
-			addNotification({
-				type: 'success',
-				title:
-					verdict === 'safe' ? 'Trace globally marked as pass' : 'Trace globally marked as fail',
-				text:
-					verdict === 'safe'
-						? `This trace key has been marked as a global false positive.${otherText}`
-						: `This trace key has been globally flagged as malicious.${otherText}`,
-			})
+			notifySuccess(
+				verdict === 'safe' ? 'Trace globally marked as pass' : 'Trace globally marked as fail',
+				verdict === 'safe'
+					? `This trace key has been marked as a global false positive.${otherText}`
+					: `This trace key has been globally flagged as malicious.${otherText}`,
+			)
 		}
 
 		emit('refetch')
 	} catch (error) {
 		console.error('Failed to update global detail status:', error)
-		addNotification({
-			type: 'error',
-			title: 'Failed to update global trace',
-			text: 'An error occurred while updating the global trace status.',
-		})
+		notifyError(
+			'Failed to update global trace',
+			'An error occurred while updating the global trace status.',
+		)
 	} finally {
 		updatingGlobalDetailKeys.delete(detail.key)
 	}
@@ -439,38 +402,6 @@ const groupedByJar = computed<JarGroup[]>(() => {
 	})
 })
 
-function getHighestSeverityInClass(flags: FlagItem[]): Labrinth.TechReview.Internal.DelphiSeverity {
-	return flags.reduce(
-		(highest, flag) =>
-			severityOrder[flag.detail.severity] > severityOrder[highest] ? flag.detail.severity : highest,
-		'low' as Labrinth.TechReview.Internal.DelphiSeverity,
-	)
-}
-
-function getClassDecompiledSource(classItem: ClassGroup): string | undefined {
-	for (const flag of classItem.flags) {
-		const source = props.decompiledSources.get(flag.detail.id)
-		if (source) return source
-	}
-	return undefined
-}
-
-function getHighlightedClassSource(classItem: ClassGroup): string[] {
-	const source = getClassDecompiledSource(classItem)
-	if (!source) return []
-
-	const cached = highlightedSourceCache.get(classItem.key)
-	if (cached?.source === source) return cached.lines
-
-	const lines = highlightCodeLines(source, 'java')
-	highlightedSourceCache.set(classItem.key, { source, lines })
-	return lines
-}
-
-function isClassLoadingSource(classItem: ClassGroup): boolean {
-	return classItem.flags.some((flag) => props.loadingIssues.has(flag.issueId))
-}
-
 function loadClassSources(classItem: ClassGroup) {
 	const issueIds = [...new Set(classItem.flags.map((flag) => flag.issueId))]
 	if (issueIds.length > 0) {
@@ -489,18 +420,6 @@ function toggleClass(classItem: ClassGroup) {
 		expandedClasses.delete(classItem.key)
 	} else {
 		expandClass(classItem)
-	}
-}
-
-async function copyToClipboard(code: string, detailId: string) {
-	try {
-		await navigator.clipboard.writeText(code)
-		showCopyFeedback.set(detailId, true)
-		setTimeout(() => {
-			showCopyFeedback.delete(detailId)
-		}, 2000)
-	} catch (error) {
-		console.error('Failed to copy code:', error)
 	}
 }
 
@@ -619,206 +538,17 @@ watch(
 			</div>
 		</div>
 
-		<div
+		<TechRevClassItem
 			v-for="classItem in jarGroup.classes"
 			:key="classItem.key"
-			class="overflow-clip rounded-xl border border-solid border-surface-4"
-		>
-			<div
-				class="flex cursor-pointer items-center justify-between bg-surface-3 p-2 transition-colors duration-200 hover:bg-surface-4"
-				@click="toggleClass(classItem)"
-			>
-				<div class="my-auto flex items-center gap-2">
-					<IconButton
-						type="quiet"
-						label="Toggle details"
-						class="transition-transform"
-						:class="{ 'rotate-180': expandedClasses.has(classItem.key) }"
-					>
-						<ChevronDownIcon class="h-5 w-5 text-contrast" />
-					</IconButton>
-
-					<span v-tooltip="classItem.filePath" class="font-mono text-sm font-semibold">{{
-						truncateMiddle(classItem.filePath)
-					}}</span>
-
-					<div
-						class="rounded-full border-solid px-2.5 py-1"
-						:class="getSeverityBadgeColor(getHighestSeverityInClass(classItem.flags))"
-					>
-						<span class="text-sm font-medium">{{
-							capitalizeString(getHighestSeverityInClass(classItem.flags))
-						}}</span>
-					</div>
-
-					<div
-						class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1 text-sm"
-						:class="
-							getMarkedFlagsCount(classItem.flags) === classItem.flags.length
-								? 'border-green/60 bg-highlight-green text-green'
-								: 'border-red/60 bg-highlight-red text-red'
-						"
-					>
-						<CheckIcon
-							v-if="getMarkedFlagsCount(classItem.flags) === classItem.flags.length"
-							class="size-4"
-						/>
-						{{ getMarkedFlagsCount(classItem.flags) }}/{{ classItem.flags.length }} flags
-					</div>
-
-					<Transition name="fade">
-						<div
-							v-if="isClassLoadingSource(classItem)"
-							class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
-						>
-							<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
-								<LoaderCircleIcon class="size-4 animate-spin" />
-								Loading source...
-							</span>
-						</div>
-					</Transition>
-				</div>
-			</div>
-
-			<Collapsible :collapsed="!expandedClasses.has(classItem.key)">
-				<div class="flex flex-col gap-2 border-0 border-t border-solid border-surface-4 p-2">
-					<div
-						v-for="flag in classItem.flags"
-						:id="`tech-review-detail-${flag.detail.id}`"
-						:key="`${flag.issueId}-${flag.detail.id}`"
-						class="flex flex-col gap-2 rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
-						:class="{
-							'!border-brand bg-brand-highlight': focusedDetailId === flag.detail.id,
-						}"
-					>
-						<div class="grid grid-cols-[1fr_auto] items-center">
-							<div
-								class="flex items-center gap-2"
-								:class="{
-									'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-								}"
-							>
-								<span class="text-base font-semibold text-contrast">{{
-									flag.issueType.replace(/_/g, ' ')
-								}}</span>
-								<div
-									class="rounded-full border-solid px-2.5 py-1"
-									:class="getSeverityBadgeColor(flag.detail.severity)"
-								>
-									<span class="text-sm font-medium">{{
-										capitalizeString(flag.detail.severity)
-									}}</span>
-								</div>
-							</div>
-
-							<div class="me-2 flex items-center justify-end gap-2">
-								<TechRevVerdictButtons
-									variant="trace"
-									:detail="flag.detail"
-									@global-safe="updateGlobalDetailAction(flag.detail, 'safe')"
-									@local-safe="updateLocalDetailAction(flag.detail, 'safe')"
-									@local-unsafe="updateLocalDetailAction(flag.detail, 'malware')"
-									@global-unsafe="updateGlobalDetailAction(flag.detail, 'malware')"
-								/>
-							</div>
-						</div>
-						<div
-							v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
-							class="flex flex-wrap gap-x-4 gap-y-1 pr-4 text-sm"
-						>
-							<div
-								v-for="[key, value] in Object.entries(flag.detail.data).sort(([a], [b]) =>
-									a.localeCompare(b),
-								)"
-								:key="key"
-								class="flex items-center gap-1.5"
-							>
-								<span class="text-secondary">{{ key }}:</span>
-								<a
-									v-if="typeof value === 'string' && value.startsWith('http')"
-									:href="value"
-									target="_blank"
-									rel="noopener noreferrer"
-									class="text-brand-blue hover:underline"
-								>
-									{{ value }}
-								</a>
-								<span v-else class="font-mono text-contrast">{{ value }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div
-						v-if="getHighlightedClassSource(classItem).length > 0"
-						class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
-					>
-						<IconButton
-							v-tooltip="`Copy code`"
-							type="quiet"
-							:label="`Copy code`"
-							class="!absolute right-2 top-2 border-[1px]"
-							@click="copyToClipboard(getClassDecompiledSource(classItem)!, classItem.key)"
-						>
-							<CopyIcon v-if="!showCopyFeedback.get(classItem.key)" />
-							<CheckIcon v-else />
-						</IconButton>
-
-						<div class="overflow-x-auto bg-surface-3 py-3">
-							<div
-								v-for="(line, n) in getHighlightedClassSource(classItem)"
-								:key="n"
-								class="flex font-mono text-[13px] leading-[1.6]"
-							>
-								<div
-									class="select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
-									style="min-width: 3.5rem"
-								>
-									{{ n + 1 }}
-								</div>
-								<div class="flex-1 px-4 py-0 text-primary">
-									<pre v-html="line || ' '"></pre>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div
-						v-else-if="isClassLoadingSource(classItem)"
-						class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4"
-					>
-						<p class="flex items-center gap-2 text-sm text-secondary">
-							<LoaderCircleIcon class="size-4 animate-spin" />
-							Loading source...
-						</p>
-					</div>
-					<div v-else class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4">
-						<p class="text-sm text-secondary">
-							Source code not available or failed to decompile for this file.
-						</p>
-					</div>
-				</div>
-			</Collapsible>
-		</div>
+			:file="file"
+			:class-item="classItem"
+			:expanded="expandedClasses.has(classItem.key)"
+			:focused-detail-id="focusedDetailId"
+			:loading-issues="loadingIssues"
+			:decompiled-sources="decompiledSources"
+			@toggle="toggleClass(classItem)"
+			@verdict="handleTraceVerdict"
+		/>
 	</div>
 </template>
-
-<style scoped>
-pre {
-	all: unset;
-	display: inline;
-	white-space: pre;
-}
-
-.fade-enter-active {
-	transition: opacity 0.3s ease-in;
-	transition-delay: 0.2s;
-}
-
-.fade-leave-active {
-	transition: opacity 0.15s ease-out;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-	opacity: 0;
-}
-</style>

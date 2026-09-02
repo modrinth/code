@@ -67,9 +67,14 @@ pub async fn list_screenshots(
 
 pub async fn list_synced_screenshots() -> crate::Result<Vec<InstanceScreenshot>>
 {
+    if !super::super::synced_options::get_global_options()
+        .await?
+        .screenshots
+    {
+        return Ok(Vec::new());
+    }
     let state = State::get().await?;
-    let sources =
-        instance_rows::list_synced_screenshot_sources(&state.pool).await?;
+    let sources = instance_rows::list_screenshot_sources(&state.pool).await?;
     list_source_screenshot_sets(&state, sources).await
 }
 

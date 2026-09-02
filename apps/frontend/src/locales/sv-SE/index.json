@@ -3113,12 +3113,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.actions.back-to-all-projects": {
-    "message": "Tillbaka till alla projekt"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Tillbaka till projektsidan"
-  },
   "project.actions.create-server": {
     "message": "Skapa en server"
   },
