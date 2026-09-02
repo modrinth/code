@@ -31,7 +31,6 @@ const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
 const queryClient = useQueryClient()
 
-const worldsInHomeFlag: FeatureFlag = 'worlds_in_home'
 const compactInstanceCardsFlag: FeatureFlag = 'compact_instance_cards'
 const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
 const skipUnknownPackWarningFlag: FeatureFlag = 'skip_unknown_pack_warning'
@@ -95,15 +94,6 @@ const messages = defineMessages({
 		id: 'app.appearance-settings.toggle-sidebar.description',
 		defaultMessage: 'Hide the right sidebar by default and add a button to show or hide it.',
 	},
-	jumpBackIntoWorldsTitle: {
-		id: 'app.appearance-settings.jump-back-into-worlds.title',
-		defaultMessage: 'Jump into worlds or instances',
-	},
-	jumpBackIntoWorldsDescription: {
-		id: 'app.appearance-settings.jump-back-into-worlds.description',
-		defaultMessage:
-			'Show recently played worlds or instances in the "Jump in" section on the Home page.',
-	},
 	compactModeTitle: {
 		id: 'app.appearance-settings.compact-mode.title',
 		defaultMessage: 'Compact mode',
@@ -152,7 +142,6 @@ type BehaviorSettingsState = {
 	syncBehaviorAcrossDevices: boolean
 	minimizeApp: boolean
 	hideRightSidebar: boolean
-	showJumpIn: boolean
 	showAllScreenshots: boolean
 	compactInstanceCards: boolean
 	showPlayTime: boolean
@@ -176,7 +165,6 @@ function getBehaviorSettingsState(
 		syncBehaviorAcrossDevices: settings.sync_behavior_across_devices,
 		minimizeApp: settings.hide_on_process_start,
 		hideRightSidebar: settings.toggle_sidebar,
-		showJumpIn: settings.feature_flags[worldsInHomeFlag] ?? DEFAULT_FEATURE_FLAGS[worldsInHomeFlag],
 		showAllScreenshots: globalSyncedOptions.screenshots,
 		compactInstanceCards:
 			settings.feature_flags[compactInstanceCardsFlag] ??
@@ -204,7 +192,6 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 				behavior: {
 					minimize_app: value.minimizeApp,
 					hide_right_sidebar: value.hideRightSidebar,
-					show_jump_in: value.showJumpIn,
 					compact_instance_cards: value.compactInstanceCards,
 					show_play_time: value.showPlayTime,
 					hide_nametag: value.hideNametag,
@@ -223,7 +210,6 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 			hide_nametag_skins_page: value.hideNametag,
 			feature_flags: {
 				...persistedSettings.value.feature_flags,
-				[worldsInHomeFlag]: value.showJumpIn,
 				[compactInstanceCardsFlag]: value.compactInstanceCards,
 				[showPlayTimeFlag]: value.showPlayTime,
 				[skipUnknownPackWarningFlag]: !value.warnOnUnknownModpacks,
@@ -248,7 +234,6 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 		appSettings.setBehaviorSyncAcrossDevices(value.syncBehaviorAcrossDevices)
 		appSettings.toggleSidebar = value.hideRightSidebar
 		appSettings.hideNametagSkinsPage = value.hideNametag
-		appSettings.featureFlags[worldsInHomeFlag] = value.showJumpIn
 		appSettings.featureFlags[compactInstanceCardsFlag] = value.compactInstanceCards
 		appSettings.featureFlags[showPlayTimeFlag] = value.showPlayTime
 		appSettings.featureFlags[skipUnknownPackWarningFlag] = !value.warnOnUnknownModpacks
@@ -351,18 +336,6 @@ onBeforeUnmount(() => {
 					</p>
 				</div>
 				<Toggle id="show-all-screenshots" v-model="current.showAllScreenshots" />
-			</div>
-
-			<div class="flex items-center justify-between gap-4">
-				<div>
-					<h3 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.jumpBackIntoWorldsTitle) }}
-					</h3>
-					<p class="m-0 mt-1">
-						{{ formatMessage(messages.jumpBackIntoWorldsDescription) }}
-					</p>
-				</div>
-				<Toggle id="jump-back-into-worlds" v-model="current.showJumpIn" />
 			</div>
 
 			<div class="flex items-center justify-between gap-4">

@@ -326,6 +326,51 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instance pages"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Play page"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Choose the maximum number of recent instances shown in the left sidebar. You can also adjust this by dragging the divider."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Quick instances in sidebar"
+  },
+  "app.features-settings.show-files-tab.description": {
+    "message": "Browse the files in each instance from its navigation."
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Show Files tab in instances"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Show recently played worlds and instances at the top of the Play page."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Show Jump in section"
+  },
+  "app.features-settings.show-screenshots-tab.description": {
+    "message": "Browse screenshots from the instance where they were taken."
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Show Screenshots tab in instances"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Add a shortcut to the skin selector to the left sidebar."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Show skin selector in sidebar"
+  },
+  "app.features-settings.show-worlds-tab.description": {
+    "message": "Browse and launch worlds from each instance."
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Show Worlds tab in instances"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Sidebar"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Instance actions"
   },
@@ -1844,8 +1889,8 @@
   "app.settings.game-options.keybind.choose": {
     "message": "Choose a key"
   },
-  "app.settings.game-options.keybind.conflict": {
-    "message": "This key is also used for {settings}."
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "This is already used by {settings}."
   },
   "app.settings.game-options.keybind.key.arrow-down": {
     "message": "Down Arrow"
@@ -2801,9 +2846,6 @@
   "app.settings.synced-options.game-settings.button": {
     "message": "Edit game settings"
   },
-  "app.settings.synced-options.game-settings.compatibility-details": {
-    "message": "Why this setting may not sync"
-  },
   "app.settings.synced-options.game-settings.conflict-text": {
     "message": "We loaded the latest settings. Check your changes, then save again."
   },
@@ -2826,7 +2868,7 @@
     "message": "No settings match your search or filter."
   },
   "app.settings.synced-options.game-settings.enable-all": {
-    "message": "Sync tab"
+    "message": "Sync all"
   },
   "app.settings.synced-options.game-settings.load-failed": {
     "message": "We couldn’t load your game settings."
@@ -2834,23 +2876,17 @@
   "app.settings.synced-options.game-settings.loading": {
     "message": "Loading settings..."
   },
+  "app.settings.synced-options.game-settings.no-options-to-edit": {
+    "message": "You haven't got any options yet to edit"
+  },
+  "app.settings.synced-options.game-settings.not-being-synced": {
+    "message": "Not being synced"
+  },
   "app.settings.synced-options.game-settings.retry": {
     "message": "Retry"
   },
   "app.settings.synced-options.game-settings.save": {
     "message": "Save settings"
-  },
-  "app.settings.synced-options.game-settings.saved": {
-    "message": "Game settings updated"
-  },
-  "app.settings.synced-options.game-settings.saved-later": {
-    "message": "Your changes were saved and will finish syncing when your instances are ready."
-  },
-  "app.settings.synced-options.game-settings.saved-summary": {
-    "message": "Your changes were saved."
-  },
-  "app.settings.synced-options.game-settings.saved-with-problems": {
-    "message": "Your changes were saved, but some instances could not be updated."
   },
   "app.settings.synced-options.game-settings.search": {
     "message": "Search settings..."
@@ -2861,11 +2897,11 @@
   "app.settings.synced-options.game-settings.sync-title": {
     "message": "Sync game settings"
   },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "Synced across instances"
+  },
   "app.settings.synced-options.game-settings.title": {
     "message": "Game settings"
-  },
-  "app.settings.synced-options.game-settings.unavailable-tooltip": {
-    "message": "Choose an instance with an options.txt file before editing game settings."
   },
   "app.settings.synced-options.game-settings.unsaved-changes": {
     "message": "You have unsaved changes."
@@ -2894,6 +2930,12 @@
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Server address"
   },
+  "app.settings.synced-options.multiplayer-servers.copy-address": {
+    "message": "Copy address"
+  },
+  "app.settings.synced-options.multiplayer-servers.count": {
+    "message": "{count, plural, one {# server} other {# servers}}"
+  },
   "app.settings.synced-options.multiplayer-servers.description": {
     "message": "Use the same multiplayer servers across your instances."
   },
@@ -2903,17 +2945,41 @@
   "app.settings.synced-options.multiplayer-servers.empty": {
     "message": "No user-added servers are currently synced."
   },
+  "app.settings.synced-options.multiplayer-servers.filter-offline": {
+    "message": "Offline"
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-online": {
+    "message": "Online"
+  },
+  "app.settings.synced-options.multiplayer-servers.more-options": {
+    "message": "More server options"
+  },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "Server name"
   },
+  "app.settings.synced-options.multiplayer-servers.no-results": {
+    "message": "No synced servers match your search or filters."
+  },
   "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
     "message": "No servers synced yet"
+  },
+  "app.settings.synced-options.multiplayer-servers.players-online": {
+    "message": "{count, number} online"
+  },
+  "app.settings.synced-options.multiplayer-servers.search": {
+    "message": "Search {count, number} {count, plural, one {synced server} other {synced servers}}..."
+  },
+  "app.settings.synced-options.multiplayer-servers.status": {
+    "message": "Status"
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
   },
   "app.settings.tabs.behavior": {
     "message": "Behavior"
+  },
+  "app.settings.tabs.features": {
+    "message": "Features"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installations"
@@ -3919,9 +3985,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Enable an override to keep a synced setting separate for this instance."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Tabs"
   },
   "instance.settings.tabs.window": {
     "message": "Custom window settings"

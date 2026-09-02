@@ -21,13 +21,11 @@ import {
 	canonicalValueText,
 } from './game-setting-editors'
 import {
-	formatCompatibilityTooltip,
 	formatGameSettingChoice,
 	formatGameSettingDescription,
 	formatGameSettingLabel,
 	formatGameSettingValidation,
 	presentationMessages,
-	shouldShowCompatibilityIndicator,
 } from './game-setting-messages'
 import GameKeybindInput from './GameKeybindInput.vue'
 
@@ -74,10 +72,6 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.game-settings.value-unset',
 		defaultMessage: 'Choose a value',
 	},
-	compatibilityDetails: {
-		id: 'app.settings.synced-options.game-settings.compatibility-details',
-		defaultMessage: 'Why this setting may not sync',
-	},
 	syncSetting: {
 		id: 'app.settings.synced-options.game-settings.sync-setting',
 		defaultMessage: 'Sync {setting} across instances',
@@ -85,6 +79,14 @@ const messages = defineMessages({
 	unsyncSetting: {
 		id: 'app.settings.synced-options.game-settings.unsync-setting',
 		defaultMessage: 'Stop syncing {setting} across instances',
+	},
+	syncedAcrossInstances: {
+		id: 'app.settings.synced-options.game-settings.synced-across-instances',
+		defaultMessage: 'Synced across instances',
+	},
+	notBeingSynced: {
+		id: 'app.settings.synced-options.game-settings.not-being-synced',
+		defaultMessage: 'Not being synced',
 	},
 })
 
@@ -150,17 +152,8 @@ const placeholder = computed(() => {
 	}
 	return undefined
 })
-const compatibilityTooltip = computed(() =>
-	formatCompatibilityTooltip(formatMessage, props.setting),
-)
 const validationMessage = computed(() =>
 	formatGameSettingValidation(formatMessage, props.setting.validation_error),
-)
-const detailsTooltip = computed(() => validationMessage.value ?? compatibilityTooltip.value)
-const compatibilityTone = computed(() =>
-	validationMessage.value || props.setting.compatibility.left_local > 0
-		? 'text-orange'
-		: 'text-secondary',
 )
 const syncDisabledReason = computed(() => {
 	if (validationMessage.value) return validationMessage.value
@@ -185,6 +178,11 @@ const syncActionLabel = computed(() =>
 	formatMessage(props.setting.sync_enabled ? messages.unsyncSetting : messages.syncSetting, {
 		setting: settingLabel.value,
 	}),
+)
+const syncStatusTooltip = computed(() =>
+	formatMessage(
+		props.setting.sync_enabled ? messages.syncedAcrossInstances : messages.notBeingSynced,
+	),
 )
 
 function updateValue(value: string | number | boolean | undefined) {
@@ -215,13 +213,12 @@ function updateValue(value: string | number | boolean | undefined) {
 					{{ settingLabel }}
 				</h3>
 				<span
-					v-if="validationMessage || shouldShowCompatibilityIndicator(setting)"
-					v-tooltip="detailsTooltip"
+					v-if="validationMessage"
+					v-tooltip="validationMessage"
 					tabindex="0"
 					role="img"
-					:aria-label="formatMessage(messages.compatibilityDetails)"
-					class="flex shrink-0 rounded-md outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
-					:class="compatibilityTone"
+					:aria-label="validationMessage"
+					class="flex shrink-0 rounded-md text-orange outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 				>
 					<UnknownIcon class="size-4" aria-hidden="true" />
 				</span>
@@ -299,7 +296,7 @@ function updateValue(value: string | number | boolean | undefined) {
 
 		<span
 			v-if="showSyncToggle"
-			v-tooltip="syncToggleDisabled ? syncDisabledReason : undefined"
+			v-tooltip="syncToggleDisabled && syncDisabledReason ? syncDisabledReason : syncStatusTooltip"
 			class="flex justify-center"
 		>
 			<IconButton
@@ -308,7 +305,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:aria-pressed="setting.sync_enabled"
 				:class="
 					setting.sync_enabled
-						? '!bg-highlight-green !text-green !shadow-[inset_0_0_0_1px_var(--color-green)] [&>svg]:!text-green'
+						? '!bg-highlight-blue !text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)] [&>svg]:!text-blue'
 						: ''
 				"
 				@click="emit('update:sync-enabled', !setting.sync_enabled)"

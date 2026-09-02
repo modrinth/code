@@ -414,8 +414,13 @@ export function formatMinecraftKeybind(
 	return [...modifiers, label].join(' + ')
 }
 
-export function minecraftKeybindConflictKey(value: string): string | null {
+export function minecraftKeybindConflictKey(optionId: string, value: string): string | null {
 	const normalized = value.trim().toLowerCase()
 	if (!normalized || normalized === 'key.keyboard.unknown') return null
-	return normalized
+
+	if (optionId === 'key.debug.modifier') return null
+	if (optionId.startsWith('key.debug.') && optionId !== 'key.debug.overlay') {
+		return `debug:${normalized}`
+	}
+	return `direct:${normalized}`
 }

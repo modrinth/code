@@ -46,6 +46,11 @@ export type AppSettings = {
 	toggle_sidebar: boolean
 	sync_theme_across_devices: boolean
 	sync_behavior_across_devices: boolean
+	sync_features_across_devices: boolean
+	show_files_tab_in_instances: boolean
+	show_worlds_tab_in_instances: boolean
+	show_screenshots_tab_in_instances: boolean
+	show_skin_selector_in_sidebar: boolean
 
 	telemetry: boolean
 	discord_rpc: boolean

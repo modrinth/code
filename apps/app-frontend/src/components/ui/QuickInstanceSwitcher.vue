@@ -16,6 +16,7 @@ import { useRouter } from 'vue-router'
 import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
+import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
@@ -24,8 +25,6 @@ import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
 const APPROX_USED_VERTICAL_SPACE = 475 // doesn't need to be exact lol just close enough so there's a little gap and no overflow
-const STORAGE_KEY = 'modrinth-quick-instance-count'
-
 const { handleError } = injectNotificationManager()
 const instancesQuery = useQuery(instanceListQueryOptions())
 const router = useRouter()
@@ -54,12 +53,12 @@ const allInstances = computed(() =>
 	}),
 )
 const dragging = ref(false)
-
-const stored = localStorage.getItem(STORAGE_KEY)
-const userLimit = ref(stored === null ? null : Number(stored))
+const quickInstances = useQuickInstanceLimit()
 
 const maxVisible = computed(() => Math.min(maxAuto.value, allInstances.value.length))
-const visibleCount = computed(() => Math.min(userLimit.value ?? maxVisible.value, maxVisible.value))
+const visibleCount = computed(() =>
+	Math.min(quickInstances.limit.value ?? maxVisible.value, maxVisible.value),
+)
 const recentInstances = computed(() => allInstances.value.slice(0, visibleCount.value))
 const canDrag = computed(() => maxVisible.value > 0)
 const showOverdrag = ref(false)
@@ -74,11 +73,9 @@ const updateMaxAuto = () => {
 const setLimit = (count) => {
 	const clamped = Math.max(0, Math.min(count, maxVisible.value))
 	if (clamped >= maxVisible.value) {
-		userLimit.value = null
-		localStorage.removeItem(STORAGE_KEY)
+		quickInstances.setLimit(null)
 	} else {
-		userLimit.value = clamped
-		localStorage.setItem(STORAGE_KEY, String(clamped))
+		quickInstances.setLimit(clamped)
 	}
 }
 

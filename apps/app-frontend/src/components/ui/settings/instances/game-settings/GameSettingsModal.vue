@@ -35,8 +35,8 @@ import { computed, onUnmounted, ref } from 'vue'
 import {
 	type EditableGameSetting,
 	type GameOptionCanonicalValue,
-	type GameSettingChange,
 	type GameSettingCategory,
+	type GameSettingChange,
 	type GameSettingsEditorState,
 	get_local_game_options_config,
 	get_synced_game_options_config,
@@ -93,7 +93,7 @@ const messages = defineMessages({
 	},
 	enableAll: {
 		id: 'app.settings.synced-options.game-settings.enable-all',
-		defaultMessage: 'Sync tab',
+		defaultMessage: 'Sync all',
 	},
 	disableAll: {
 		id: 'app.settings.synced-options.game-settings.disable-all',
@@ -224,7 +224,7 @@ const keybindConflicts = computed(() => {
 	for (const setting of draftState.value.settings) {
 		if (setting.editor.type !== 'key_binding' || setting.canonical_value?.type !== 'key_binding')
 			continue
-		const key = minecraftKeybindConflictKey(setting.canonical_value.value)
+		const key = minecraftKeybindConflictKey(setting.option_id, setting.canonical_value.value)
 		if (!key) continue
 		bindings.set(key, [...(bindings.get(key) ?? []), setting])
 	}
@@ -590,11 +590,7 @@ async function save() {
 				...previouslyTouchedOptionIds,
 				...touchedValueOptionIds.value,
 			])
-			const stagedChanges = gameSettingChanges(
-				previousBase,
-				stagedDraft,
-				retainedTouchedOptionIds,
-			)
+			const stagedChanges = gameSettingChanges(previousBase, stagedDraft, retainedTouchedOptionIds)
 			const conflicts = new Set(result.conflicts)
 			applyChangesToRefreshedState(
 				refreshed,
@@ -631,17 +627,8 @@ async function save() {
 		previewGeneration++
 		const stagedDraft = cloneGameSettingsState(draftState.value)
 		const touchedSinceSave = new Set(touchedValueOptionIds.value)
-		const changesSinceSave = gameSettingChanges(
-			optimisticState,
-			stagedDraft,
-			touchedSinceSave,
-		)
-		applyChangesToRefreshedState(
-			refreshed,
-			stagedDraft,
-			changesSinceSave,
-			touchedSinceSave,
-		)
+		const changesSinceSave = gameSettingChanges(optimisticState, stagedDraft, touchedSinceSave)
+		applyChangesToRefreshedState(refreshed, stagedDraft, changesSinceSave, touchedSinceSave)
 		if (changesSinceSave.length > 0) schedulePreview()
 		emit('saved')
 	} catch (error) {
@@ -695,8 +682,8 @@ defineExpose({ show, hide })
 		<template #content>
 			<div class="flex min-h-full min-w-0 flex-col">
 				<div
-					v-if="!isLocalEditor"
-					class="flex shrink-0 flex-wrap items-start justify-between gap-4 pb-4"
+					v-if="!isLocalEditor && (loading || loadError || categorySettings.length > 0)"
+					class="mb-4 flex shrink-0 flex-wrap items-start justify-between gap-4 border-0 border-b border-solid border-divider pb-4"
 				>
 					<p class="m-0 min-w-60 flex-1 text-primary">
 						{{ formatMessage(messages.syncedOptionsDescription) }}

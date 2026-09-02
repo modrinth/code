@@ -140,7 +140,6 @@ import {
 } from '@/helpers/install'
 import {
 	get_full_path,
-	get_global_synced_options,
 	getInstanceIconUrl,
 	kill,
 	refresh_content_updates,
@@ -233,10 +232,6 @@ useQuery(
 	})),
 )
 const instance = computed(() => instanceQuery.data.value)
-const globalSyncedOptionsQuery = useQuery({
-	queryKey: ['global-synced-options'],
-	queryFn: get_global_synced_options,
-})
 useQuery(
 	computed(() => ({
 		queryKey: instanceKeys.contentUpdateCheck(instanceId.value),
@@ -487,7 +482,7 @@ const tabs = computed(() => {
 		},
 	]
 
-	if (instance.value?.visible_tabs.files !== false) {
+	if (appSettings.showFilesTabInInstances) {
 		instanceTabs.push({
 			label: formatMessage(messages.filesTab),
 			href: `${basePath.value}/files`,
@@ -495,8 +490,7 @@ const tabs = computed(() => {
 		})
 	}
 
-	const screenshotsGloballyAvailable = globalSyncedOptionsQuery.data.value?.screenshots === true
-	if (!screenshotsGloballyAvailable || instance.value?.visible_tabs.screenshots !== false) {
+	if (appSettings.showScreenshotsTabInInstances) {
 		instanceTabs.push({
 			label: formatMessage(messages.screenshotsTab),
 			href: `${basePath.value}/screenshots`,
@@ -504,7 +498,7 @@ const tabs = computed(() => {
 		})
 	}
 
-	if (instance.value?.visible_tabs.worlds !== false) {
+	if (appSettings.showWorldsTabInInstances) {
 		instanceTabs.push({
 			label: formatMessage(messages.worldsTab),
 			href: `${basePath.value}/worlds`,
