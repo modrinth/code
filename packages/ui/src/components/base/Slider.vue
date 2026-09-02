@@ -46,7 +46,7 @@
 			:model-value="String(currentValue)"
 			type="number"
 			size="medium"
-			:appearance="valueInputAppearance"
+			:class="valueInputClass"
 			wrapper-class="slider-value shrink-0"
 			input-class="!font-semibold"
 			:style="{ width: valueInputWidth }"
@@ -63,7 +63,6 @@
 import { computed, ref, watch } from 'vue'
 
 import Input from './inputs/Input.vue'
-import type { InputAppearance } from './inputs/types'
 
 const emit = defineEmits<{ 'update:modelValue': [number] }>()
 
@@ -77,7 +76,7 @@ interface Props {
 	snapRange?: number
 	disabled?: boolean
 	unit?: string
-	valueInputAppearance?: InputAppearance
+	valueInputClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -90,7 +89,7 @@ const props = withDefaults(defineProps<Props>(), {
 	snapRange: 100,
 	disabled: false,
 	unit: '',
-	valueInputAppearance: 'surface',
+	valueInputClass: '',
 })
 
 const currentValue = ref(clampValue(props.modelValue))
