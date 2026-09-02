@@ -3318,7 +3318,7 @@ pub async fn project_follow_internal(
     .1;
     let string = info.into_inner().0;
 
-    let result = db_models::DBProject::get(&string, &**pool, &redis)
+    let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
         .wrap_api_err("fetching project from database")?
         .wrap_request_err_with(|| {
@@ -3326,68 +3326,66 @@ pub async fn project_follow_internal(
         })?;
 
     let user_id: db_ids::DBUserId = user.id.into();
-    let project_id: db_ids::DBProjectId = result.inner.id;
+    let project_id: db_ids::DBProjectId = project.inner.id;
 
-    if !is_visible_project(&result.inner, &Some(user), &pool, false)
+    if !is_visible_project(&project.inner, &Some(user), &pool, false)
         .await
         .wrap_api_err("checking project visibility")?
     {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
-    let following = sqlx::query!(
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+
+    let insert_result = sqlx::query!(
         "
-        SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)
-        ",
+            INSERT INTO mod_follows (follower_id, mod_id)
+            VALUES ($1, $2)
+            ON CONFLICT DO NOTHING
+            ",
         user_id as db_ids::DBUserId,
         project_id as db_ids::DBProjectId
     )
-    .fetch_one(&**pool)
-    .await.wrap_internal_err("fetching project follow status from database")?
-    .exists
-    .unwrap_or(false);
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("querying database for `project_follow_internal`")?;
 
-    if !following {
-        let mut transaction = pool
-            .begin()
-            .await
-            .wrap_internal_err("starting database transaction")?;
+    if insert_result.rows_affected() == 0 {
+        return Err(ApiError::Request(eyre::eyre!(
+            "you are already following this project",
+        )));
+    }
 
-        sqlx::query!(
-            "
+    sqlx::query!(
+        "
             UPDATE mods
             SET follows = follows + 1
             WHERE id = $1
             ",
-            project_id as db_ids::DBProjectId,
-        )
-        .execute(&mut transaction)
+        project_id as db_ids::DBProjectId,
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("querying database for `project_follow_internal`")?;
+
+    transaction
+        .commit()
         .await
-        .wrap_internal_err("querying database for `project_follow_internal`")?;
+        .wrap_internal_err("committing database transaction")?;
 
-        sqlx::query!(
-            "
-            INSERT INTO mod_follows (follower_id, mod_id)
-            VALUES ($1, $2)
-            ",
-            user_id as db_ids::DBUserId,
-            project_id as db_ids::DBProjectId
-        )
-        .execute(&mut transaction)
-        .await
-        .wrap_internal_err("querying database for `project_follow_internal`")?;
+    db_models::DBProject::clear_cache(
+        project_id,
+        project.inner.slug,
+        None,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("clearing cached project data")?;
 
-        transaction
-            .commit()
-            .await
-            .wrap_internal_err("committing database transaction")?;
-
-        Ok(HttpResponse::NoContent().body(""))
-    } else {
-        Err(ApiError::Request(eyre::eyre!(
-            "You are already following this project!",
-        )))
-    }
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 /// Unfollow a project.
@@ -3425,7 +3423,7 @@ pub async fn project_unfollow_internal(
     .1;
     let string = info.into_inner().0;
 
-    let result = db_models::DBProject::get(&string, &**pool, &redis)
+    let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
         .wrap_api_err("fetching project from database")?
         .wrap_request_err_with(|| {
@@ -3433,65 +3431,58 @@ pub async fn project_unfollow_internal(
         })?;
 
     let user_id: db_ids::DBUserId = user.id.into();
-    let project_id = result.inner.id;
+    let project_id = project.inner.id;
 
-    let following = sqlx::query!(
-        "
-        SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)
-        ",
-        user_id as db_ids::DBUserId,
-        project_id as db_ids::DBProjectId
-    )
-    .fetch_one(&**pool)
-    .await.wrap_internal_err("fetching project follow status from database")?
-    .exists
-    .unwrap_or(false);
-
-    if following {
-        let mut transaction = pool
-            .begin()
-            .await
-            .wrap_internal_err("starting database transaction")?;
-
-        sqlx::query!(
-            "
-            UPDATE mods
-            SET follows = follows - 1
-            WHERE id = $1
-            ",
-            project_id as db_ids::DBProjectId,
-        )
-        .execute(&mut transaction)
+    let mut transaction = pool
+        .begin()
         .await
-        .wrap_internal_err(
-            "querying database for `project_unfollow_internal`",
-        )?;
+        .wrap_internal_err("starting database transaction")?;
 
-        sqlx::query!(
-            "
+    let delete_result = sqlx::query!(
+        "
             DELETE FROM mod_follows
             WHERE follower_id = $1 AND mod_id = $2
             ",
-            user_id as db_ids::DBUserId,
-            project_id as db_ids::DBProjectId
-        )
-        .execute(&mut transaction)
-        .await
-        .wrap_internal_err(
-            "querying database for `project_unfollow_internal`",
-        )?;
+        user_id as db_ids::DBUserId,
+        project_id as db_ids::DBProjectId
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("querying database for `project_unfollow_internal`")?;
 
-        transaction
-            .commit()
-            .await
-            .wrap_internal_err("committing database transaction")?;
-
-        Ok(HttpResponse::NoContent().body(""))
-    } else {
-        Err(ApiError::Request(eyre::eyre!(
-            "You are not following this project!",
-        )))
+    if delete_result.rows_affected() == 0 {
+        return Err(ApiError::Request(eyre::eyre!(
+            "you are not following this project",
+        )));
     }
+
+    sqlx::query!(
+        "
+            UPDATE mods
+            SET follows = GREATEST(follows - 1, 0)
+            WHERE id = $1
+            ",
+        project_id as db_ids::DBProjectId,
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("querying database for `project_unfollow_internal`")?;
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
+
+    db_models::DBProject::clear_cache(
+        project_id,
+        project.inner.slug,
+        None,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("clearing cached project data")?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 /// Get a project's organization.
