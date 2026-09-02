@@ -1238,6 +1238,7 @@ function handleDropdownKeydown(event: KeyboardEvent) {
 	switch (event.key) {
 		case 'Escape':
 			event.preventDefault()
+			event.stopPropagation()
 			closeDropdown()
 			break
 		case 'ArrowDown':
