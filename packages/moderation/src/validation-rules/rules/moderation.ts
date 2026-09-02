@@ -8,11 +8,11 @@ import type { ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	title: {
 		id: 'nags.moderator-feedback.title',
-		defaultMessage: 'Review feedback',
+		defaultMessage: `Review feedback`,
 	},
 	description: {
 		id: 'nags.moderator-feedback.description',
-		defaultMessage: 'Review and address all concerns from the moderation team before resubmitting.',
+		defaultMessage: `Review and address all concerns from the moderation team before resubmitting.`,
 	},
 })
 

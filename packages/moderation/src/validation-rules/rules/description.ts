@@ -28,93 +28,87 @@ import type { FieldValidationMessage, ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	fixDescription: {
 		id: 'nags.invalid-project-description.title',
-		defaultMessage: 'Fix the project description',
+		defaultMessage: `Modify the description`,
 	},
 	addDescription: {
 		id: 'nags.add-description.title',
-		defaultMessage: 'Add a description',
+		defaultMessage: `Add a description`,
 	},
 	expandDescription: {
 		id: 'nags.description-too-short.title',
-		defaultMessage: 'Expand the description',
+		defaultMessage: `Expand the description`,
 	},
 	removeSpam: {
 		id: 'nags.project-description-spam.title',
-		defaultMessage: 'Remove spam from the description',
+		defaultMessage: `Remove description spam`,
 	},
 	shortenHeaders: {
 		id: 'nags.long-headers.title',
-		defaultMessage: 'Shorten headers',
+		defaultMessage: `Shorten headers`,
 	},
 	addContentAfterHeader: {
 		id: 'nags.description-ends-with-header.title',
-		defaultMessage: 'Add content after the final header',
+		defaultMessage: `Remove ending header`,
 	},
 	separateHeaders: {
 		id: 'nags.adjacent-headers.title',
-		defaultMessage: 'Separate adjacent headers',
+		defaultMessage: `Remove adjacent headers`,
 	},
 	addImageAltText: {
 		id: 'nags.missing-alt-text.title',
-		defaultMessage: 'Add image alt text',
+		defaultMessage: `Add image alt text`,
 	},
 	editDescription: {
 		id: 'nags.edit-description.title',
-		defaultMessage: 'Edit description',
+		defaultMessage: `Edit description`,
 	},
 	slur: {
 		id: 'nags.project-description-slur.description',
-		defaultMessage: 'Your project cannot contain any slurs. Detected: “{value}”.',
+		defaultMessage: `Your project's description must not contain offensive terms. Detected: “{value}”.`,
 	},
 	profanity: {
 		id: 'nags.project-description-profanity.description',
-		defaultMessage: 'Your project cannot contain excessive profanity. Detected: “{value}”.',
+		defaultMessage: `Your project's description cannot contain excessive profanity. Detected: “{value}”.`,
 	},
 	nonStandardText: {
 		id: 'nags.project-description-non-standard-text.description',
-		defaultMessage: 'Non-standard text characters, such as “₮ɆӾ₮”, are not allowed.',
+		defaultMessage: `Excessive use of non-standard text characters, such as “Fancy text” or “Zalgo”, is not allowed in your project's description.`,
 	},
 	nonEnglish: {
 		id: 'nags.project-description-non-english.description',
-		defaultMessage:
-			'Your project description must be written in English or include an English translation.',
+		defaultMessage: `Your project's description must be written in English or include an English translation.`,
 	},
 	bannedLink: {
 		id: 'nags.project-description-banned-link.description',
-		defaultMessage: '“{fullUrl}” is not allowed in project descriptions.',
+		defaultMessage: `The link “{fullUrl}” is not allowed in project descriptions.`,
 	},
 	required: {
 		id: 'nags.add-description.description',
-		defaultMessage:
-			"A description that clearly describes the project's purpose and function is required.",
+		defaultMessage: `A description that clearly describes your project's content, purpose, and appeal is required.`,
 	},
 	tooShort: {
 		id: 'nags.description-too-short.description',
-		defaultMessage:
-			"Your description is too brief. Add more to clearly describe the project's purpose and function.",
+		defaultMessage: `Your project's description is too brief. Add more details to clearly describe the project's content, purpose, and appeal.`,
 	},
 	spam: {
 		id: 'nags.project-description-spam.description',
-		defaultMessage:
-			'Repeated characters, words, or phrases cannot be used to pad a project description.',
+		defaultMessage: `Repeated characters, words, or phrases cannot be used to pad a project description.`,
 	},
 	longHeaders: {
 		id: 'nags.long-headers.description',
-		defaultMessage:
-			'{count, plural, one {# header} other {# headers}} in your description {count, plural, one {is} other {are}} too long. Headers should be concise and act as section titles, not full sentences.',
+		defaultMessage: `{count, plural, one {# header} other {# headers}} in your description {count, plural, one {is} other {are}} too long. Headers should be concise and act as section titles, not full sentences.`,
 	},
 	descriptionEndsWithHeader: {
 		id: 'nags.description-ends-with-header.description',
-		defaultMessage: 'Your description cannot end with a header.',
+		defaultMessage: `Your project's description should not end with a header that is not followed by any text.`,
 	},
 	adjacentHeaders: {
 		id: 'nags.adjacent-headers.description',
-		defaultMessage: 'Headers of the same level cannot be placed next to each other.',
+		defaultMessage: `Headers of the same level should be placed next to each other.`,
 	},
 	missingAltText: {
 		id: 'nags.missing-alt-text.description',
-		defaultMessage:
-			'Some of your images are missing alt text, which is important for accessibility, especially for visually impaired users.',
+		defaultMessage: `Some of your images are missing alt text, which is important for accessibility, especially for visually impaired users.`,
 	},
 })
 

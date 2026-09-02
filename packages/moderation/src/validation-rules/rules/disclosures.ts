@@ -12,20 +12,19 @@ import type { FieldValidationMessage, ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	title: {
 		id: 'nags.check-disclosures.title',
-		defaultMessage: 'Check content disclosures',
+		defaultMessage: `Review disclosures`,
 	},
 	description: {
 		id: 'nags.check-disclosures.description',
-		defaultMessage:
-			'Make sure users are aware of any important details by filling in content disclosures that apply to your {type}.',
+		defaultMessage: `Make sure users are aware of any important details by filling in content disclosures that apply to your {type}.`,
 	},
 	removeFormatting: {
 		id: 'nags.disclosures-special-formatting.title',
-		defaultMessage: 'Remove HTML from content disclosures',
+		defaultMessage: `Fix disclosure formatting`,
 	},
 	specialFormatting: {
 		id: 'nags.disclosures-special-formatting.description',
-		defaultMessage: 'Content disclosures cannot contain HTML, as they display in plain text.',
+		defaultMessage: `Content disclosures should not contain HTML, since they can only display inline Markdown and plain text.`,
 	},
 })
 

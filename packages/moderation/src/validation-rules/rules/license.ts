@@ -10,41 +10,39 @@ import type { ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	selectLicense: {
 		id: 'nags.select-license.title',
-		defaultMessage: 'Select a license',
+		defaultMessage: `Select a license`,
 	},
 	selectLicenseDescription: {
 		id: 'nags.select-license.description',
-		defaultMessage: 'Select the license your {type} is distributed under.',
+		defaultMessage: `Select the license your {type} is distributed under.`,
 	},
 	addDetails: {
 		id: 'nags.add-license-details.title',
-		defaultMessage: 'Add license details',
+		defaultMessage: `Add license details`,
 	},
 	addDetailsDescription: {
 		id: 'nags.add-license-details.description',
-		defaultMessage: 'Add a valid URL and name or SPDX identifier for your custom license.',
+		defaultMessage: `Add a valid URL and name or SPDX identifier for your custom license.`,
 	},
 	invalidUrl: {
 		id: 'nags.invalid-license-url.title',
-		defaultMessage: 'Add a valid license link',
+		defaultMessage: `Add a valid license link`,
 	},
 	invalidUrlDefault: {
 		id: 'nags.invalid-license-url.description.default',
-		defaultMessage: 'License URL is invalid.',
+		defaultMessage: `License URL is invalid.`,
 	},
 	invalidUrlDomain: {
 		id: 'nags.invalid-license-url.description.domain',
-		defaultMessage:
-			'Your license URL points to {domain}, which is not appropriate for license information. License URLs should link directly to your license file, not social media, gaming platforms, etc.',
+		defaultMessage: `Your license URL points to {domain}, which is not appropriate for license information. License URLs should link directly to your license text.`,
 	},
 	invalidUrlMalformed: {
 		id: 'nags.invalid-license-url.description.malformed',
-		defaultMessage:
-			'Your license URL appears to be malformed. Please provide a valid URL to your license text.',
+		defaultMessage: `Your license URL appears to be malformed. Please provide a valid URL to your license text.`,
 	},
 	editLicense: {
 		id: 'nags.edit-license.title',
-		defaultMessage: 'Edit license',
+		defaultMessage: `Edit license`,
 	},
 })
 

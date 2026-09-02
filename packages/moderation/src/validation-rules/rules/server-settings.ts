@@ -8,54 +8,51 @@ import type { ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	selectCountry: {
 		id: 'nags.select-country.title',
-		defaultMessage: 'Select a region',
+		defaultMessage: `Select a region`,
 	},
 	selectCountryDescription: {
 		id: 'nags.select-country.description',
-		defaultMessage: 'Let players know what region your server is located in.',
+		defaultMessage: `Let players know what region your server is located in.`,
 	},
 	selectAccurateLanguages: {
 		id: 'nags.all-languages.title',
-		defaultMessage: 'Select accurate languages',
+		defaultMessage: `Select accurate languages`,
 	},
 	allLanguages: {
 		id: 'nags.all-languages.description',
-		defaultMessage:
-			"You've selected all available language options. Please list only the languages your server actively supports.",
+		defaultMessage: `You've selected all available language options. Please list only the languages your server actively supports.`,
 	},
 	addJavaAddress: {
 		id: 'nags.add-java-address.title',
-		defaultMessage: 'Add a Java address',
+		defaultMessage: `Add a Java address`,
 	},
 	addJavaAddressDescription: {
 		id: 'nags.add-java-address.description',
-		defaultMessage: 'Add the IP address and port Java Edition players can use to join your server.',
+		defaultMessage: `Add the IP address and port Java Edition players can use to join your server.`,
 	},
 	selectCompatibility: {
 		id: 'nags.select-compatibility.title',
-		defaultMessage: 'Select compatibility',
+		defaultMessage: `Select compatibility`,
 	},
 	selectCompatibilityDescription: {
 		id: 'nags.select-compatibility.description',
-		defaultMessage:
-			'Select what versions your server supports, choose a Modpack, or upload your own.',
+		defaultMessage: `Select what versions your server supports, choose a Modpack, or upload your own.`,
 	},
 	tooManyLanguages: {
 		id: 'nags.too-many-languages.title',
-		defaultMessage: 'Select accurate languages',
+		defaultMessage: `Select accurate languages`,
 	},
 	tooManyLanguagesDescription: {
 		id: 'nags.too-many-languages.description',
-		defaultMessage:
-			"You've selected {languageCount, plural, one {# language} other {# languages}}. Please list only the languages your server actively supports.",
+		defaultMessage: `You've selected {languageCount, plural, one {# language} other {# languages}}. Please list only the languages your server actively supports.`,
 	},
 	selectLanguage: {
 		id: 'nags.select-language.title',
-		defaultMessage: 'Select a language',
+		defaultMessage: `Select a language`,
 	},
 	selectLanguageDescription: {
 		id: 'nags.select-language.description',
-		defaultMessage: 'List the language or languages supported by your server.',
+		defaultMessage: `List the language or languages supported by your server.`,
 	},
 })
 

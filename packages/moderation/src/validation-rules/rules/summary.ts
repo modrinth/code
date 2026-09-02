@@ -21,70 +21,67 @@ import type { FieldValidationMessage, ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	fixSummary: {
 		id: 'nags.invalid-project-summary.title',
-		defaultMessage: 'Fix the project summary',
+		defaultMessage: `Modify the summary`,
 	},
 	reviewSummary: {
 		id: 'nags.project-summary-content.title',
-		defaultMessage: 'Review the project summary',
+		defaultMessage: `Review the summary`,
 	},
 	expandSummary: {
 		id: 'nags.summary-too-short.title',
-		defaultMessage: 'Expand the summary',
+		defaultMessage: `Expand the summary`,
 	},
 	removeSpam: {
 		id: 'nags.project-summary-spam.title',
-		defaultMessage: 'Remove spam from the summary',
+		defaultMessage: `Remove summary spam`,
 	},
 	cleanUpSummary: {
 		id: 'nags.summary-special-formatting.title',
-		defaultMessage: 'Remove Markdown and HTML from the summary',
+		defaultMessage: `Fix summary formatting`,
 	},
 	removeSummaryLinks: {
 		id: 'nags.project-summary-links.title',
-		defaultMessage: 'Remove links from the summary',
+		defaultMessage: `Remove summary links`,
 	},
 	editSummary: {
 		id: 'nags.edit-summary.title',
-		defaultMessage: 'Edit summary',
+		defaultMessage: `Edit summary`,
 	},
 	slur: {
 		id: 'nags.project-summary-slur.description',
-		defaultMessage: 'Your project summary cannot contain any slurs. Detected: “{value}”.',
+		defaultMessage: `Your project's summary must not contain offensive terms. Detected: “{value}”.`,
 	},
 	profanity: {
 		id: 'nags.project-summary-profanity.description',
-		defaultMessage: 'Your project summary cannot contain profanity. Detected: “{value}”.',
+		defaultMessage: `Your project's summary cannot contain profanity. Detected: “{value}”.`,
 	},
 	nonStandardText: {
 		id: 'nags.project-summary-non-standard-text.description',
-		defaultMessage: 'Non-standard text characters, such as “₮ɆӾ₮”, are not allowed.',
+		defaultMessage: `Non-standard text characters, such as “Fancy text” or “Zalgo”, are not allowed in the summary.`,
 	},
 	nonEnglish: {
 		id: 'nags.project-summary-non-english.description',
-		defaultMessage:
-			'Your project summary must be written in English or include an English translation.',
+		defaultMessage: `Your project's summary must be written in English or include an English translation.`,
 	},
 	matchesName: {
 		id: 'project.text-validation.summary-matches-title',
-		defaultMessage: 'A project summary cannot be the same as or too similar to its title.',
+		defaultMessage: `Your project's summary should provide unique information and not repeat the project's name.`,
 	},
 	tooShort: {
 		id: 'project.text-validation.summary-too-short',
-		defaultMessage:
-			'Your summary is too short. Add a sentence or two which describes your project.',
+		defaultMessage: `Your summary is too brief. Add a sentence or two that describes your project.`,
 	},
 	spam: {
 		id: 'nags.project-summary-spam.description',
-		defaultMessage:
-			'Repeated characters, words, or phrases cannot be used to pad a project summary.',
+		defaultMessage: `Repeated characters, words, or phrases should be used to pad your project's summary.`,
 	},
 	specialFormatting: {
 		id: 'nags.summary-special-formatting.description',
-		defaultMessage: 'Your summary cannot contain Markdown or HTML, as it displays in plain text.',
+		defaultMessage: `Your summary should not contain Markdown or HTML, since it can only display plain text.`,
 	},
 	links: {
 		id: 'nags.project-summary-links.description',
-		defaultMessage: 'Links, URLs, or IPs are not allowed in the project summary. Detected: {value}',
+		defaultMessage: `Links, URLs, and IPs should not be placed in the summary. Detected: "{value}"`,
 	},
 })
 

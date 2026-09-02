@@ -33,7 +33,7 @@ const messages = defineMessages({
 	},
 	permissions: {
 		id: 'nags.settings.permissions.title',
-		defaultMessage: 'Visit permissions dashboard',
+		defaultMessage: 'Visit permissions settings',
 	},
 	server: {
 		id: 'nags.server.title',

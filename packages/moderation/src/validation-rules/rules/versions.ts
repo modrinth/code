@@ -8,19 +8,19 @@ import type { ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	title: {
 		id: 'nags.upload-version.title',
-		defaultMessage: 'Upload a version',
+		defaultMessage: `Upload a version`,
 	},
 	description: {
 		id: 'nags.upload-version.description',
-		defaultMessage: 'At least one version is required for a project to be submitted for review.',
+		defaultMessage: `At least one version is required for a project to be submitted for review.`,
 	},
 	selectEnvironmentTitle: {
 		id: 'nags.select-environment.title',
-		defaultMessage: 'Select an environment',
+		defaultMessage: `Select an environment`,
 	},
 	selectEnvironmentDescription: {
 		id: 'nags.select-environment.description',
-		defaultMessage: 'Specify the environment where your project can run.',
+		defaultMessage: `Specify the environment where your project can run.`,
 	},
 })
 

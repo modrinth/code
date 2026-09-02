@@ -10,51 +10,47 @@ import type { FieldValidationMessage, ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	uploadImage: {
 		id: 'nags.upload-gallery-image.title',
-		defaultMessage: 'Upload a gallery image',
+		defaultMessage: `Upload a gallery image`,
 	},
 	uploadResourcePackImage: {
 		id: 'nags.upload-gallery-image.description-resourcepack',
-		defaultMessage:
-			'At least one gallery image is required to showcase the content of your resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag.',
+		defaultMessage: `At least one gallery image is required to showcase the content of your resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag.`,
 	},
 	uploadShaderImages: {
 		id: 'nags.upload-gallery-image.description-shader',
-		defaultMessage:
-			'At least three gallery images are required to showcase the content of your shader in a variety of situations and conditions.',
+		defaultMessage: `At least three gallery images are required to showcase the content of your shader in a variety of situations and conditions.`,
 	},
 	uploadImageDescription: {
 		id: 'nags.upload-gallery-image.description',
-		defaultMessage:
-			'At least one gallery image is required to showcase the content of your {type}.',
+		defaultMessage: `At least one gallery image is required to showcase the content of your {type}.`,
 	},
 	featureImage: {
 		id: 'nags.feature-gallery-image.title',
-		defaultMessage: 'Feature a gallery image',
+		defaultMessage: `Feature a gallery image`,
 	},
 	featureImageDescription: {
 		id: 'nags.feature-gallery-image.description',
-		defaultMessage:
-			'The featured gallery image is often how your project makes its first impression.',
+		defaultMessage: `The featured gallery image is often how your project makes its first impression.`,
 	},
 	fixText: {
 		id: 'nags.invalid-gallery-text.title',
-		defaultMessage: 'Fix gallery text',
+		defaultMessage: `Modify gallery image text`,
 	},
 	editGallery: {
 		id: 'nags.edit-gallery.title',
-		defaultMessage: 'Edit gallery',
+		defaultMessage: `Edit gallery`,
 	},
 	slur: {
 		id: 'nags.gallery-text-slur.description',
-		defaultMessage: 'Your gallery cannot contain any slurs. Detected: “{value}”.',
+		defaultMessage: `Your gallery image titles and descriptions must not contain offensive terms. Detected: “{value}”.`,
 	},
 	profanity: {
 		id: 'nags.gallery-text-profanity.description',
-		defaultMessage: 'Your gallery cannot contain excessive profanity. Detected: “{value}”.',
+		defaultMessage: `Your gallery image titles and descriptions cannot contain excessive profanity. Detected: “{value}”.`,
 	},
 	nonStandardText: {
 		id: 'nags.gallery-text-non-standard.description',
-		defaultMessage: 'Non-standard text characters, such as “₮ɆӾ₮”, are not allowed.',
+		defaultMessage: `Non-standard text characters, such as “Fancy text” or “Zalgo”, are not allowed in gallery image titles or descriptions.`,
 	},
 })
 

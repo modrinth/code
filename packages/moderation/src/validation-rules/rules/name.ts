@@ -11,40 +11,39 @@ import type { FieldValidationMessage, ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	fixName: {
 		id: 'nags.invalid-project-name.title',
-		defaultMessage: 'Fix the project name',
+		defaultMessage: `Modify project name`,
 	},
 	fixVersion: {
 		id: 'nags.project-name-version.title',
-		defaultMessage: 'Fix project name',
+		defaultMessage: `Modify project name`,
 	},
 	avoidBrandInfringement: {
 		id: 'nags.minecraft-title-clause.title',
-		defaultMessage: 'Avoid brand infringement',
+		defaultMessage: `Avoid brand infringement`,
 	},
 	editName: {
 		id: 'nags.edit-title.title',
-		defaultMessage: 'Edit title',
+		defaultMessage: `Edit name`,
 	},
 	slur: {
 		id: 'nags.project-name-slur.description',
-		defaultMessage: 'Your project name cannot contain any slurs. Detected: “{value}”.',
+		defaultMessage: `Your project's name must not contain offensive terms. Detected: “{value}”.`,
 	},
 	profanity: {
 		id: 'nags.project-name-profanity.description',
-		defaultMessage: 'Your project name cannot contain profanity. Detected: “{value}”.',
+		defaultMessage: `Your project's name cannot contain profanity. Detected: “{value}”.`,
 	},
 	nonStandardText: {
 		id: 'nags.project-name-non-standard-text.description',
-		defaultMessage: 'Non-standard text characters, such as “₮ɆӾ₮”, are not allowed.',
+		defaultMessage: `Non-standard text characters, such as “Fancy text” or “Zalgo”, are not allowed in the project name.`,
 	},
 	versionNumber: {
 		id: 'project.text-validation.title-version-number',
-		defaultMessage: 'Names are not allowed to include version numbers.',
+		defaultMessage: `Project names should not include version numbers.`,
 	},
 	minecraftBranding: {
 		id: 'nags.minecraft-title-clause.description',
-		defaultMessage:
-			'Projects must not use Minecraft\'s branding or include "Minecraft" as a significant part of the name.',
+		defaultMessage: `Projects must not use Minecraft's branding or include "Minecraft" as a significant part of the name.`,
 	},
 })
 

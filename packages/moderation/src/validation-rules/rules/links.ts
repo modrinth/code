@@ -15,69 +15,63 @@ import type { ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	addLinks: {
 		id: 'nags.add-links.title',
-		defaultMessage: 'Add external links',
+		defaultMessage: `Add external links`,
 	},
 	addServerLinks: {
 		id: 'nags.add-links-server.title',
-		defaultMessage: 'Add external links',
+		defaultMessage: `Add external links`,
 	},
 	addLinksDescription: {
 		id: 'nags.add-links.description',
-		defaultMessage:
-			'Add any relevant links targeted outside of Modrinth, such as source code, an issue tracker, or a Discord invite.',
+		defaultMessage: `Add any relevant links to external resources, such as source code, an issue tracker, or a permanent Discord invite.`,
 	},
 	addServerLinksDescription: {
 		id: 'nags.add-links-server.description',
-		defaultMessage:
-			'Add any relevant links targeted outside of Modrinth, such as a website, store, or a Discord invite.',
+		defaultMessage: `Add any relevant links to external resources, such as a website, store, or a permanent Discord invite.`,
 	},
 	identicalLinks: {
 		id: 'nags.identical-links.title',
-		defaultMessage: 'Clean up identical links',
+		defaultMessage: `Remove identical links`,
 	},
 	identicalLinksDescription: {
 		id: 'nags.identical-links.description',
-		defaultMessage:
-			'Some of your external links appear to be identical. Each link should be entered only once and with the appropriate link type.',
+		defaultMessage: `Some of your external links appear to be identical. Each link should be listed only once and with the appropriate link type.`,
 	},
 	verifyLinks: {
 		id: 'nags.verify-external-links.title',
-		defaultMessage: 'Verify external links',
+		defaultMessage: `Review external links`,
 	},
 	verifyLinksDescription: {
 		id: 'nags.verify-external-links.description',
-		defaultMessage:
-			'Some of your external links may be using domains that are inappropriate for that type of link.',
+		defaultMessage: `Some of your external links may lead to domains that are inappropriate for that link type.`,
 	},
 	moveDiscordInvite: {
 		id: 'nags.misused-discord-link.title',
-		defaultMessage: 'Move Discord invite',
+		defaultMessage: `Move Discord invite`,
 	},
 	moveDiscordInviteDescription: {
 		id: 'nags.misused-discord-link-description',
-		defaultMessage:
-			'Discord invites can not be used for other link types. Please put your Discord link in the Discord Invite link field only.',
+		defaultMessage: `Discord invites can not be used for other link types. Please only put your Discord link in the Discord Invite link field.`,
 	},
 	removeBannedLinks: {
 		id: 'nags.banned-link-usage.title',
-		defaultMessage: 'Remove prohibited links',
+		defaultMessage: `Remove prohibited links`,
 	},
 	removeBannedLinksDescription: {
 		id: 'nags.banned-link-usage.description',
-		defaultMessage: 'Remove the prohibited external link: “{url}"',
+		defaultMessage: `The link “{url}” is not allowed as an external link.`,
 	},
 	provideSource: {
 		id: 'nags.gpl-license-source-required.title',
-		defaultMessage: 'Provide source code',
+		defaultMessage: `Provide source code`,
 	},
 	provideSourceDescription: {
 		id: 'nags.gpl-license-source-required.description',
-		defaultMessage:
-			'Your {type} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license.',
+		defaultMessage: `Your {type}'s license requires source code to be published. Please provide a source code link, add sources files, or change license.`,
 	},
 	visitLinks: {
 		id: 'nags.visit-links-settings.title',
-		defaultMessage: 'Visit links settings',
+		defaultMessage: `Visit links settings`,
 	},
 })
 

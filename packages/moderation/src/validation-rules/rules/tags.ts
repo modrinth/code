@@ -10,7 +10,7 @@ import type { ValidationRuleSet } from '../types.ts'
 const messages = defineMessages({
 	selectTags: {
 		id: 'nags.select-tags.title',
-		defaultMessage: 'Select tags',
+		defaultMessage: `Select tags`,
 	},
 	selectTagsDescription: {
 		id: 'nags.select-tags.description',
@@ -19,43 +19,39 @@ const messages = defineMessages({
 	},
 	selectAccurateTags: {
 		id: 'nags.too-many-tags.title',
-		defaultMessage: 'Select accurate tags',
+		defaultMessage: `Select accurate tags`,
 	},
 	selectAccurateServerTags: {
 		id: 'nags.too-many-tags-server.title',
-		defaultMessage: 'Select accurate tags',
+		defaultMessage: `Select accurate tags`,
 	},
 	selectAllTags: {
 		id: 'nags.all-tags-selected.title',
-		defaultMessage: 'Select accurate tags',
+		defaultMessage: `Select accurate tags`,
 	},
 	tooManyTags: {
 		id: 'nags.too-many-tags.description',
-		defaultMessage:
-			"You've selected {tagCount, plural, one {# tag} other {# tags}}. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results.",
+		defaultMessage: `You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to ensure your project appears in relevant search results.`,
 	},
 	tooManyServerTags: {
 		id: 'nags.too-many-tags-server.description',
-		defaultMessage:
-			"You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to make sure your server appears in relevant search results.",
+		defaultMessage: `You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to ensure your project appears in relevant search results.`,
 	},
 	selectResolution: {
 		id: 'nags.multiple-resolution-tags.title',
-		defaultMessage: 'Select correct resolution',
+		defaultMessage: `Select correct resolution`,
 	},
 	multipleResolutionTags: {
 		id: 'nags.multiple-resolution-tags.description',
-		defaultMessage:
-			"You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution.",
+		defaultMessage: `You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have the tag that matches the primary resolution.`,
 	},
 	allTagsSelected: {
 		id: 'nags.all-tags-selected.description',
-		defaultMessage:
-			"You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project.",
+		defaultMessage: `You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. Tags should be used to help users find relevant projects. Please only select relevant select.`,
 	},
 	editTags: {
 		id: 'nags.edit-tags.title',
-		defaultMessage: 'Edit tags',
+		defaultMessage: `Edit tags`,
 	},
 })
 
