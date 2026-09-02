@@ -14,9 +14,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, ref } from 'vue'
 
 import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
+import { list_game_options_sync_sources } from '@/helpers/game-options'
 import {
+	get_initialized_synced_options,
 	get_synced_option_join_preview,
 	get_synced_options_overview,
+	list as listInstances,
 	set_synced_option,
 	type SyncedOption,
 	type SyncedOptionJoinResolution,
@@ -56,6 +59,10 @@ const messages = defineMessages({
 	editGameSettings: {
 		id: 'app.settings.synced-options.game-settings.button',
 		defaultMessage: 'Edit game settings',
+	},
+	noGameOptionsToEdit: {
+		id: 'app.settings.synced-options.game-settings.no-options-to-edit',
+		defaultMessage: "You haven't got any options yet to edit",
 	},
 	gameSettingsDisabled: {
 		id: 'instance.settings.tabs.synced-options.game-settings.disabled-in-app',
@@ -162,6 +169,18 @@ const overviewQuery = useQuery(
 		queryFn: () => get_synced_options_overview(instance.value.id),
 	})),
 )
+const initializedOptionsQuery = useQuery({
+	queryKey: ['initialized-synced-options'],
+	queryFn: get_initialized_synced_options,
+})
+const instancesQuery = useQuery({
+	queryKey: instanceKeys.list(),
+	queryFn: listInstances,
+})
+const gameOptionSourcesQuery = useQuery({
+	queryKey: ['game-options-sync-sources'],
+	queryFn: list_game_options_sync_sources,
+})
 
 const capabilities = computed(
 	() =>
@@ -179,6 +198,39 @@ const gameSettingsInstanceId = computed(() =>
 	overviewQuery.data.value?.global_options.game_options && enabled('game_options')
 		? undefined
 		: instance.value.id,
+)
+const eligibleGameOptionSourceIds = computed(
+	() =>
+		new Set(
+			(gameOptionSourcesQuery.data.value ?? [])
+				.filter((source) => source.eligible)
+				.map((source) => source.source_id),
+		),
+)
+const hasSyncedGameOptionsToEdit = computed(
+	() =>
+		initializedOptionsQuery.data.value?.game_options === true ||
+		(instancesQuery.data.value ?? []).some(
+			(candidate) =>
+				candidate.synced_options.game_options &&
+				eligibleGameOptionSourceIds.value.has(candidate.id),
+		),
+)
+const hasGameOptionsToEdit = computed(() =>
+	gameSettingsInstanceId.value
+		? eligibleGameOptionSourceIds.value.has(gameSettingsInstanceId.value)
+		: hasSyncedGameOptionsToEdit.value,
+)
+const gameOptionsAvailabilityPending = computed(
+	() =>
+		gameOptionSourcesQuery.isPending.value ||
+		(gameSettingsInstanceId.value === undefined &&
+			(initializedOptionsQuery.isPending.value || instancesQuery.isPending.value)),
+)
+const gameSettingsTooltip = computed(() =>
+	!gameOptionsAvailabilityPending.value && !hasGameOptionsToEdit.value
+		? formatMessage(messages.noGameOptionsToEdit)
+		: formatMessage(messages.editGameSettings),
 )
 
 function excluded(option: InstanceSyncedOption): boolean {
@@ -220,6 +272,7 @@ function showAppSyncedOptions(): void {
 }
 
 function openGameSettings(): void {
+	if (!hasGameOptionsToEdit.value || gameOptionsAvailabilityPending.value) return
 	gameSettingsModal.value?.show()
 }
 
@@ -227,6 +280,8 @@ async function handleGameSettingsSaved(): Promise<void> {
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
 		queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
+		queryClient.invalidateQueries({ queryKey: ['initialized-synced-options'] }),
+		queryClient.invalidateQueries({ queryKey: ['game-options-sync-sources'] }),
 	])
 }
 
@@ -296,6 +351,9 @@ const mutation = useMutation({
 		handleError(error)
 	},
 	onSettled: async (_data, _error, variables) => {
+		if (variables.option === 'game_options') {
+			await queryClient.invalidateQueries({ queryKey: ['game-options-sync-sources'] })
+		}
 		if (variables.option === 'multiplayer_servers') {
 			await queryClient.invalidateQueries({
 				queryKey: instanceKeys.worlds(instance.value.id),
@@ -431,15 +489,16 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 					</p>
 				</div>
 				<div class="flex shrink-0 items-center gap-2">
-					<span
-						v-if="row.option === 'game_options'"
-						v-tooltip="formatMessage(messages.editGameSettings)"
-						class="flex"
-					>
+					<span v-if="row.option === 'game_options'" v-tooltip="gameSettingsTooltip" class="flex">
 						<IconButton
 							type="outlined"
 							circular
-							:disabled="mutation.isPending.value || overviewQuery.isPending.value"
+							:disabled="
+								mutation.isPending.value ||
+								overviewQuery.isPending.value ||
+								gameOptionsAvailabilityPending ||
+								!hasGameOptionsToEdit
+							"
 							:label="formatMessage(messages.editGameSettings)"
 							@click="openGameSettings"
 						>

@@ -7,8 +7,20 @@ import type {
 	GameSettingsEditorState,
 } from '@/helpers/game-options'
 
+function clonePlainValue(value: unknown): unknown {
+	if (Array.isArray(value)) {
+		return toRaw(value).map(clonePlainValue)
+	}
+	if (value !== null && typeof value === 'object') {
+		return Object.fromEntries(
+			Object.entries(toRaw(value)).map(([key, nestedValue]) => [key, clonePlainValue(nestedValue)]),
+		)
+	}
+	return value
+}
+
 export function cloneGameSettingsState(state: GameSettingsEditorState): GameSettingsEditorState {
-	return structuredClone(toRaw(state))
+	return clonePlainValue(state) as GameSettingsEditorState
 }
 
 export function canonicalValuesEqual(

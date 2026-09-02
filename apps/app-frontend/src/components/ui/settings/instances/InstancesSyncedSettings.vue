@@ -1,23 +1,33 @@
 <script setup lang="ts">
 import {
+	ClipboardCopyIcon,
 	EditIcon,
 	// FolderOpenIcon,
+	MoreVerticalIcon,
+	NoSignalIcon,
 	RefreshCwIcon,
 	SaveIcon,
 	SearchIcon,
+	SignalIcon,
+	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
+	type ButtonMenuOption,
 	CheckCircleButton,
 	commonMessages,
 	defineMessages,
+	FilterPills,
 	IconButton,
 	injectNotificationManager,
 	Input,
 	NewModal,
 	Slider,
+	Table,
+	type TableColumn,
+	TeleportOverflowMenu,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -26,12 +36,8 @@ import type { Component } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 
 import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
-import WorldItem from '@/components/ui/world/WorldItem.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
-import {
-	type GameOptionsSourceCandidate,
-	list_game_options_sync_sources,
-} from '@/helpers/game-options'
+import { list_game_options_sync_sources } from '@/helpers/game-options'
 import {
 	get_command_history,
 	get_global_synced_options,
@@ -49,6 +55,7 @@ import {
 	update_synced_server,
 } from '@/helpers/instance'
 import { get, parseEnvVars, serializeEnvVars, set } from '@/helpers/settings.ts'
+import { copyToClipboard } from '@/helpers/utils'
 import {
 	refreshServerData,
 	refreshServers,
@@ -88,9 +95,9 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.game-settings.disabled-tooltip',
 		defaultMessage: 'Enable game settings sync before choosing individual settings.',
 	},
-	gameSettingsUnavailableTooltip: {
-		id: 'app.settings.synced-options.game-settings.unavailable-tooltip',
-		defaultMessage: 'Choose an instance with an options.txt file before editing game settings.',
+	noGameOptionsToEdit: {
+		id: 'app.settings.synced-options.game-settings.no-options-to-edit',
+		defaultMessage: "You haven't got any options yet to edit",
 	},
 	multiplayerServers: {
 		id: 'app.settings.synced-options.multiplayer-servers',
@@ -167,6 +174,43 @@ const messages = defineMessages({
 	serverAddress: {
 		id: 'app.settings.synced-options.multiplayer-servers.address',
 		defaultMessage: 'Server address',
+	},
+	searchServers: {
+		id: 'app.settings.synced-options.multiplayer-servers.search',
+		defaultMessage:
+			'Search {count, number} {count, plural, one {synced server} other {synced servers}}...',
+	},
+	serverStatus: {
+		id: 'app.settings.synced-options.multiplayer-servers.status',
+		defaultMessage: 'Status',
+	},
+	onlineFilter: {
+		id: 'app.settings.synced-options.multiplayer-servers.filter-online',
+		defaultMessage: 'Online',
+	},
+	offlineFilter: {
+		id: 'app.settings.synced-options.multiplayer-servers.filter-offline',
+		defaultMessage: 'Offline',
+	},
+	playersOnline: {
+		id: 'app.settings.synced-options.multiplayer-servers.players-online',
+		defaultMessage: '{count, number} online',
+	},
+	noMatchingServers: {
+		id: 'app.settings.synced-options.multiplayer-servers.no-results',
+		defaultMessage: 'No synced servers match your search or filters.',
+	},
+	serverCount: {
+		id: 'app.settings.synced-options.multiplayer-servers.count',
+		defaultMessage: '{count, plural, one {# server} other {# servers}}',
+	},
+	moreServerOptions: {
+		id: 'app.settings.synced-options.multiplayer-servers.more-options',
+		defaultMessage: 'More server options',
+	},
+	copyServerAddress: {
+		id: 'app.settings.synced-options.multiplayer-servers.copy-address',
+		defaultMessage: 'Copy address',
 	},
 	noSyncedServers: {
 		id: 'app.settings.synced-options.multiplayer-servers.empty',
@@ -360,6 +404,7 @@ const globalRows: Array<{
 
 const globalSyncedOptionsQueryKey = ['global-synced-options'] as const
 const initializedSyncedOptionsQueryKey = ['initialized-synced-options'] as const
+const gameOptionsSyncSourcesQueryKey = ['game-options-sync-sources'] as const
 const globalSyncedOptionsMutationKey = ['global-synced-options', 'set'] as const
 const defaultGlobalOptions: GlobalSyncedOptions = {
 	game_options: false,
@@ -377,11 +422,30 @@ const initializedOptionsQuery = useQuery({
 	queryKey: initializedSyncedOptionsQueryKey,
 	queryFn: get_initialized_synced_options,
 })
+const gameOptionSourcesQuery = useQuery({
+	queryKey: gameOptionsSyncSourcesQueryKey,
+	queryFn: list_game_options_sync_sources,
+})
 const globalOptions = computed(() => globalOptionsQuery.data.value ?? defaultGlobalOptions)
 const initializedOptions = computed(
 	() => initializedOptionsQuery.data.value ?? defaultGlobalOptions,
 )
+const gameOptionSources = computed(() => gameOptionSourcesQuery.data.value ?? [])
 const instances = ref(await listInstances().catch(() => []))
+const eligibleGameOptionSourceIds = computed(
+	() =>
+		new Set(
+			gameOptionSources.value.filter((source) => source.eligible).map((source) => source.source_id),
+		),
+)
+const hasGameOptionsToEdit = computed(
+	() =>
+		initializedOptions.value.game_options ||
+		instances.value.some(
+			(instance) =>
+				instance.synced_options.game_options && eligibleGameOptionSourceIds.value.has(instance.id),
+		),
+)
 const baseOption = ref<SyncedOption | null>(null)
 const baseInstanceId = ref(instances.value[0]?.id ?? '')
 const baseInstanceSearch = ref('')
@@ -399,8 +463,10 @@ const syncedServers = ref<SyncedServer[]>(
 )
 const editedServer = ref<SyncedServer | null>(null)
 const serverData = ref<Record<string, ServerData>>({})
+const serverSearch = ref('')
+const selectedServerFilters = ref<string[]>([])
+const refreshingAllSyncedServers = ref(false)
 const editorComponent = shallowRef<Component | null>(null)
-const gameOptionSources = ref<GameOptionsSourceCandidate[]>([])
 const baseSourcesLoading = ref(false)
 let baseSourceGeneration = 0
 
@@ -430,6 +496,74 @@ const syncedServerCards = computed(() =>
 		} satisfies ServerWorld,
 	})),
 )
+
+type SyncedServerTableColumn = 'server' | 'status' | 'version' | 'actions'
+type SyncedServerTableRow = SyncedServer &
+	Record<SyncedServerTableColumn, unknown> & {
+		server: string
+		status: 'online' | 'offline'
+		version: string
+	}
+
+const syncedServerColumns = computed<TableColumn<SyncedServerTableColumn>[]>(() => [
+	{
+		key: 'server',
+		label: formatMessage(commonMessages.serverLabel),
+		width: '45%',
+		cellClass: '!h-16',
+	},
+	{
+		key: 'status',
+		label: formatMessage(messages.serverStatus),
+		width: '25%',
+		cellClass: '!h-16',
+	},
+	{
+		key: 'version',
+		label: formatMessage(commonMessages.versionLabel),
+		width: '22%',
+		cellClass: '!h-16',
+	},
+	{
+		key: 'actions',
+		label: formatMessage(commonMessages.actionsLabel),
+		align: 'right',
+		width: '6rem',
+		cellClass: '!h-16',
+	},
+])
+
+const syncedServerFilterOptions = computed(() => [
+	{ id: 'online', label: formatMessage(messages.onlineFilter) },
+	{ id: 'offline', label: formatMessage(messages.offlineFilter) },
+])
+
+const syncedServerRows = computed<SyncedServerTableRow[]>(() =>
+	syncedServers.value.map((server) => ({
+		...server,
+		server: server.name,
+		status: serverData.value[server.address]?.status ? 'online' : 'offline',
+		version: serverData.value[server.address]?.status?.version?.name ?? '',
+		actions: null,
+	})),
+)
+
+const statusFilteredSyncedServerRows = computed(() => {
+	if (selectedServerFilters.value.length === 0) return syncedServerRows.value
+	return syncedServerRows.value.filter((server) =>
+		selectedServerFilters.value.includes(server.status),
+	)
+})
+
+const filteredSyncedServerRows = computed(() => {
+	const search = serverSearch.value.trim().toLocaleLowerCase()
+	if (!search) return statusFilteredSyncedServerRows.value
+	return statusFilteredSyncedServerRows.value.filter(
+		(server) =>
+			server.name.toLocaleLowerCase().includes(search) ||
+			server.address.toLocaleLowerCase().includes(search),
+	)
+})
 
 const baseInstanceDescription = computed(() => {
 	switch (baseOption.value) {
@@ -476,35 +610,33 @@ async function invalidateSyncedOptions() {
 }
 
 function canEditGlobalOption(row: (typeof globalRows)[number]): boolean {
+	if (!row.editable || !globalOptions.value[row.option]) return false
+	if (row.editable === 'game-settings') return hasGameOptionsToEdit.value
 	return (
-		!!row.editable &&
 		instances.value.length > 0 &&
-		globalOptions.value[row.option] &&
 		initializedOptions.value[row.option] &&
 		(row.editable !== 'servers' || syncedServers.value.length > 0)
 	)
 }
 
 function editGlobalOptionTooltip(row: (typeof globalRows)[number]): string {
-	if (!globalOptions.value[row.option] && row.editable === 'game-settings') {
-		return formatMessage(messages.gameSettingsDisabledTooltip)
+	if (row.editable === 'game-settings') {
+		if (!hasGameOptionsToEdit.value) return formatMessage(messages.noGameOptionsToEdit)
+		if (!globalOptions.value[row.option]) {
+			return formatMessage(messages.gameSettingsDisabledTooltip)
+		}
+		return formatMessage(messages.gameSettingsButton)
 	}
 	if (instances.value.length === 0) {
 		return formatMessage(messages.noInstancesToEdit)
 	}
 	if (!initializedOptions.value[row.option]) {
-		return formatMessage(
-			row.editable === 'game-settings'
-				? messages.gameSettingsUnavailableTooltip
-				: messages.noSyncedDataToEdit,
-		)
+		return formatMessage(messages.noSyncedDataToEdit)
 	}
 	if (row.editable === 'servers' && syncedServers.value.length === 0) {
 		return formatMessage(messages.noServersSyncedYet)
 	}
-	return formatMessage(
-		row.editable === 'game-settings' ? messages.gameSettingsButton : commonMessages.editButton,
-	)
+	return formatMessage(commonMessages.editButton)
 }
 
 type GlobalOptionMutationVariables = {
@@ -568,14 +700,21 @@ async function chooseBaseInstance(option: SyncedOption) {
 
 	if (option === 'game_options') {
 		try {
-			const sources = await list_game_options_sync_sources()
+			const sources = await queryClient.fetchQuery({
+				queryKey: gameOptionsSyncSourcesQueryKey,
+				queryFn: list_game_options_sync_sources,
+				staleTime: 0,
+			})
 			if (generation !== baseSourceGeneration || baseOption.value !== option) return
-			gameOptionSources.value = sources
-			baseInstanceId.value =
-				gameOptionSources.value.find((source) => source.eligible)?.source_id ?? ''
+			const eligibleSources = sources.filter((source) => source.eligible)
+			baseInstanceId.value = eligibleSources[0]?.source_id ?? ''
+			if (eligibleSources.length === 1) {
+				applyGlobalOption(option, true, eligibleSources[0].source_id)
+				return
+			}
 		} catch (error) {
 			if (generation !== baseSourceGeneration || baseOption.value !== option) return
-			gameOptionSources.value = []
+			queryClient.setQueryData(gameOptionsSyncSourcesQueryKey, [])
 			baseInstanceId.value = ''
 			handleError(error)
 			return
@@ -597,6 +736,10 @@ async function chooseBaseInstance(option: SyncedOption) {
 		return
 	}
 	baseInstanceId.value = instances.value[0]?.id ?? ''
+	if (instances.value.length === 1) {
+		applyGlobalOption(option, true, baseInstanceId.value)
+		return
+	}
 	baseModal.value?.show()
 }
 
@@ -624,6 +767,7 @@ async function confirmBaseInstance() {
 }
 
 function openGameSettings() {
+	if (!hasGameOptionsToEdit.value) return
 	gameSettingsModal.value?.show()
 }
 
@@ -657,13 +801,11 @@ async function openServerEditor() {
 		handleError(error)
 		return []
 	})
+	serverSearch.value = ''
+	selectedServerFilters.value = []
 	serverData.value = {}
 	serverEditorModal.value?.show()
-	await refreshServers(
-		syncedServerCards.value.map(({ world }) => world),
-		serverData.value,
-		null,
-	)
+	await refreshAllSyncedServers()
 }
 
 function openSyncedServerEditor(server: SyncedServer) {
@@ -693,6 +835,51 @@ async function saveSyncedServer() {
 async function refreshSyncedServer(address: string) {
 	serverData.value[address] ??= { refreshing: true }
 	await refreshServerData(serverData.value[address], null, address)
+}
+
+async function refreshAllSyncedServers() {
+	if (refreshingAllSyncedServers.value) return
+	refreshingAllSyncedServers.value = true
+	try {
+		await refreshServers(
+			syncedServerCards.value.map(({ world }) => world),
+			serverData.value,
+			null,
+		)
+	} finally {
+		refreshingAllSyncedServers.value = false
+	}
+}
+
+function syncedServerMenuOptions(server: SyncedServer): ButtonMenuOption[] {
+	return [
+		{
+			id: 'refresh',
+			label: formatMessage(commonMessages.refreshButton),
+			icon: RefreshCwIcon,
+			action: () => void refreshSyncedServer(server.address),
+		},
+		{
+			id: 'copy-address',
+			label: formatMessage(messages.copyServerAddress),
+			icon: ClipboardCopyIcon,
+			action: () => copyToClipboard(server.address),
+		},
+		{
+			id: 'edit',
+			label: formatMessage(commonMessages.editButton),
+			icon: EditIcon,
+			action: () => openSyncedServerEditor(server),
+		},
+		{ type: 'divider' },
+		{
+			id: 'remove',
+			label: formatMessage(commonMessages.removeButton),
+			icon: TrashIcon,
+			tone: 'red',
+			action: () => void removeSyncedServer(server.id),
+		},
+	]
 }
 
 async function removeSyncedServer(serverId: string) {
@@ -881,40 +1068,137 @@ watch(
 
 		<NewModal
 			ref="serverEditorModal"
-			:header="formatMessage(messages.serverEditorTitle)"
-			scrollable
-			actions-divider
 			no-padding
-			max-content-height="34.5rem"
-			max-width="750px"
-			width="750px"
+			:max-width="'min(928px, calc(95vw - 10rem))'"
+			:width="'min(928px, calc(95vw - 10rem))'"
 		>
-			<p v-if="syncedServers.length === 0" class="m-0 px-6 py-4 text-secondary">
-				{{ formatMessage(messages.noSyncedServers) }}
-			</p>
-			<div v-else class="flex flex-col gap-2 px-6 py-4">
-				<WorldItem
-					v-for="{ server, world } in syncedServerCards"
-					:key="server.id"
-					:world="world"
-					card-background="surface-2"
-					:show-play-button="false"
-					:refreshing="serverData[server.address]?.refreshing"
-					:server-status="serverData[server.address]?.status"
-					:rendered-motd="serverData[server.address]?.renderedMotd"
-					@refresh="refreshSyncedServer(server.address)"
-					@edit="openSyncedServerEditor(server)"
-					@delete="removeSyncedServer(server.id)"
-				/>
-			</div>
-			<template #actions>
-				<div class="flex justify-end">
-					<Button type="outlined" @click="serverEditorModal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.closeButton) }}
-					</Button>
-				</div>
+			<template #title>
+				<span class="text-lg font-extrabold text-contrast">
+					{{ formatMessage(messages.serverEditorTitle) }}
+				</span>
 			</template>
+			<div class="flex h-[min(600px,calc(95vh-10rem))] flex-col">
+				<div
+					class="flex shrink-0 flex-col gap-4 border-0 border-b border-solid border-surface-4 px-6 py-4"
+				>
+					<Input
+						v-model="serverSearch"
+						:icon="SearchIcon"
+						type="search"
+						autocomplete="off"
+						:spellcheck="false"
+						:placeholder="formatMessage(messages.searchServers, { count: syncedServers.length })"
+						input-class="!h-10"
+						clearable
+					/>
+
+					<div class="flex flex-wrap items-center justify-between gap-3">
+						<FilterPills v-model="selectedServerFilters" :options="syncedServerFilterOptions">
+							<template #all>
+								{{ formatMessage(commonMessages.allProjectType) }}
+							</template>
+						</FilterPills>
+						<Button
+							type="quiet"
+							:disabled="refreshingAllSyncedServers || syncedServers.length === 0"
+							class="hover:!bg-transparent focus-visible:!bg-transparent"
+							@click="refreshAllSyncedServers"
+						>
+							<RefreshCwIcon :class="{ 'animate-spin': refreshingAllSyncedServers }" />
+							{{ formatMessage(commonMessages.refreshButton) }}
+						</Button>
+					</div>
+				</div>
+
+				<div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+					<div
+						v-if="syncedServers.length === 0"
+						class="flex flex-1 items-center justify-center p-8 text-center text-secondary"
+					>
+						{{ formatMessage(messages.noSyncedServers) }}
+					</div>
+					<div
+						v-else-if="filteredSyncedServerRows.length === 0"
+						class="flex flex-1 items-center justify-center p-8 text-center text-secondary"
+					>
+						{{ formatMessage(messages.noMatchingServers) }}
+					</div>
+					<div v-else class="min-h-0 flex-1 overflow-y-auto">
+						<Table
+							:columns="syncedServerColumns"
+							:data="filteredSyncedServerRows"
+							row-key="id"
+							table-min-width="44rem"
+							class="!rounded-none !border-0"
+						>
+							<template #cell-server="{ row }">
+								<div class="flex min-w-0 items-center gap-3">
+									<Avatar
+										:src="serverData[row.address]?.status?.favicon"
+										:alt="row.name"
+										:tint-by="row.address"
+										size="32px"
+										no-shadow
+										class="shrink-0 !rounded-lg"
+									/>
+									<div class="flex min-w-0 flex-col">
+										<span class="truncate font-semibold text-contrast">{{ row.name }}</span>
+										<span class="truncate text-sm text-secondary">{{ row.address }}</span>
+									</div>
+								</div>
+							</template>
+							<template #cell-status="{ row }">
+								<span class="inline-flex items-center gap-1.5 font-medium">
+									<RefreshCwIcon
+										v-if="serverData[row.address]?.refreshing"
+										class="size-4 shrink-0 animate-spin"
+										aria-hidden="true"
+									/>
+									<SignalIcon
+										v-else-if="serverData[row.address]?.status"
+										class="size-4 shrink-0 text-green"
+										aria-hidden="true"
+									/>
+									<NoSignalIcon v-else class="size-4 shrink-0" aria-hidden="true" />
+									<template v-if="serverData[row.address]?.refreshing">
+										{{ formatMessage(commonMessages.loadingLabel) }}
+									</template>
+									<template v-else-if="serverData[row.address]?.status">
+										{{
+											formatMessage(messages.playersOnline, {
+												count: serverData[row.address]?.status?.players?.online ?? 0,
+											})
+										}}
+									</template>
+									<template v-else>{{ formatMessage(messages.offlineFilter) }}</template>
+								</span>
+							</template>
+							<template #cell-version="{ row }">
+								<span class="block truncate">{{ row.version || '—' }}</span>
+							</template>
+							<template #cell-actions="{ row }">
+								<div class="flex justify-end">
+									<TeleportOverflowMenu
+										type="quiet"
+										:label="formatMessage(messages.moreServerOptions)"
+										:options="syncedServerMenuOptions(row)"
+									>
+										<MoreVerticalIcon aria-hidden="true" />
+									</TeleportOverflowMenu>
+								</div>
+							</template>
+						</Table>
+					</div>
+				</div>
+
+				<div
+					class="flex shrink-0 items-center border-0 border-t border-solid border-surface-4 px-6 py-4"
+				>
+					<span class="font-medium text-primary">
+						{{ formatMessage(messages.serverCount, { count: syncedServers.length }) }}
+					</span>
+				</div>
+			</div>
 		</NewModal>
 
 		<NewModal

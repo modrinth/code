@@ -71,8 +71,8 @@ const messages = defineMessages({
 		defaultMessage: '{setting} is now bound to {binding}.',
 	},
 	conflict: {
-		id: 'app.settings.game-options.keybind.conflict',
-		defaultMessage: 'This key is also used for {settings}.',
+		id: 'app.settings.game-options.keybind.conflict-description',
+		defaultMessage: 'This is already used by {settings}.',
 	},
 })
 
@@ -86,7 +86,9 @@ const visibleLabel = computed(() =>
 	recording.value ? formatMessage(messages.listen) : bindingLabel.value,
 )
 const conflictSettings = computed(() =>
-	new Intl.ListFormat(locale.value, { style: 'long', type: 'conjunction' }).format(props.conflicts),
+	new Intl.ListFormat(locale.value, { style: 'long', type: 'conjunction' }).format(
+		props.conflicts.map((setting) => `‘${setting}’`),
+	),
 )
 const conflictMessage = computed(() =>
 	props.conflicts.length

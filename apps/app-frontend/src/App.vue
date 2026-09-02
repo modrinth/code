@@ -106,6 +106,10 @@ import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useError } from '@/composables/use-error.js'
 import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-refresh'
+import {
+	QUICK_INSTANCE_LIMIT_MAX,
+	useQuickInstanceLimit,
+} from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
 import { getAccountAppearance, rememberAccountAppearance } from '@/helpers/account-appearance.ts'
@@ -189,6 +193,7 @@ import {
 
 const appSettings = useAppSettings()
 const appTheme = useTheme()
+const quickInstances = useQuickInstanceLimit()
 const router = useRouter()
 const route = useRoute()
 const { channel: appEventChannel, events: appEvents } = setupAppEventsProvider()
@@ -725,6 +730,11 @@ async function setupApp() {
 		toggle_sidebar,
 		sync_theme_across_devices,
 		sync_behavior_across_devices,
+		sync_features_across_devices,
+		show_files_tab_in_instances,
+		show_worlds_tab_in_instances,
+		show_screenshots_tab_in_instances,
+		show_skin_selector_in_sidebar,
 		developer_mode,
 		feature_flags,
 		pending_update_toast_for_version,
@@ -749,8 +759,13 @@ async function setupApp() {
 	appTheme.advancedRendering = advanced_rendering
 	appTheme.syncAcrossDevices = sync_theme_across_devices
 	appSettings.syncBehaviorAcrossDevices = sync_behavior_across_devices
+	appSettings.syncFeaturesAcrossDevices = sync_features_across_devices
 	appSettings.hideNametagSkinsPage = hide_nametag_skins_page
 	appSettings.toggleSidebar = toggle_sidebar
+	appSettings.showFilesTabInInstances = show_files_tab_in_instances
+	appSettings.showWorldsTabInInstances = show_worlds_tab_in_instances
+	appSettings.showScreenshotsTabInInstances = show_screenshots_tab_in_instances
+	appSettings.showSkinSelectorInSidebar = show_skin_selector_in_sidebar
 	appSettings.devMode = developer_mode
 	stateInitialized.value = true
 
@@ -1096,7 +1111,6 @@ watch(
 
 				if (behavior && appSettings.syncBehaviorAcrossDevices) {
 					const behaviorFeatureFlags = {
-						worlds_in_home: behavior.show_jump_in,
 						compact_instance_cards: behavior.compact_instance_cards,
 						show_instance_play_time: behavior.show_play_time,
 						skip_unknown_pack_warning: !behavior.warn_on_unknown_modpacks,
@@ -1119,7 +1133,6 @@ watch(
 						settings.hide_nametag_skins_page = behavior.hide_nametag
 						settingsChanged = true
 					}
-
 					const showAllScreenshots = behavior.show_all_screenshots
 					if (typeof showAllScreenshots === 'boolean') {
 						const globalSyncedOptions =
@@ -1139,6 +1152,61 @@ watch(
 					}
 
 					for (const [flag, value] of Object.entries(behaviorFeatureFlags)) {
+						if (settings.feature_flags[flag] !== value) {
+							settings.feature_flags[flag] = value
+							settingsChanged = true
+						}
+					}
+				}
+
+				if (behavior && appSettings.syncFeaturesAcrossDevices) {
+					const featureFlags = {
+						worlds_in_home: behavior.show_jump_in,
+					}
+					const showFilesTab =
+						behavior.show_files_tab_in_instances ?? settings.show_files_tab_in_instances
+					const showWorldsTab =
+						behavior.show_worlds_tab_in_instances ?? settings.show_worlds_tab_in_instances
+					const showScreenshotsTab =
+						behavior.show_screenshots_tab_in_instances ?? settings.show_screenshots_tab_in_instances
+					const showSkinSelector =
+						behavior.show_skin_selector_in_sidebar ?? settings.show_skin_selector_in_sidebar
+					const quickInstanceCount = Math.min(
+						Math.max(
+							typeof behavior.quick_instance_count === 'number'
+								? behavior.quick_instance_count
+								: (quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX),
+							0,
+						),
+						QUICK_INSTANCE_LIMIT_MAX,
+					)
+
+					appSettings.showFilesTabInInstances = showFilesTab
+					appSettings.showWorldsTabInInstances = showWorldsTab
+					appSettings.showScreenshotsTabInInstances = showScreenshotsTab
+					appSettings.showSkinSelectorInSidebar = showSkinSelector
+					Object.assign(appSettings.featureFlags, featureFlags)
+					quickInstances.setLimit(
+						quickInstanceCount >= QUICK_INSTANCE_LIMIT_MAX ? null : quickInstanceCount,
+					)
+
+					if (settings.show_files_tab_in_instances !== showFilesTab) {
+						settings.show_files_tab_in_instances = showFilesTab
+						settingsChanged = true
+					}
+					if (settings.show_worlds_tab_in_instances !== showWorldsTab) {
+						settings.show_worlds_tab_in_instances = showWorldsTab
+						settingsChanged = true
+					}
+					if (settings.show_screenshots_tab_in_instances !== showScreenshotsTab) {
+						settings.show_screenshots_tab_in_instances = showScreenshotsTab
+						settingsChanged = true
+					}
+					if (settings.show_skin_selector_in_sidebar !== showSkinSelector) {
+						settings.show_skin_selector_in_sidebar = showSkinSelector
+						settingsChanged = true
+					}
+					for (const [flag, value] of Object.entries(featureFlags)) {
 						if (settings.feature_flags[flag] !== value) {
 							settings.feature_flags[flag] = value
 							settingsChanged = true
@@ -2082,7 +2150,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<CompassIcon />
 			</NavButton>
-			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
+			<NavButton
+				v-if="appSettings.showSkinSelectorInSidebar"
+				v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)"
+				to="/skins"
+			>
 				<ShirtIcon />
 			</NavButton>
 			<NavButton
