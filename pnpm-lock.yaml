@@ -563,6 +563,9 @@ importers:
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../utils
+      '@tanstack/vue-query':
+        specifier: 5.101.4
+        version: 5.101.4(vue@3.5.27(typescript@5.9.3))
       franc-min:
         specifier: ^6.2.0
         version: 6.2.0

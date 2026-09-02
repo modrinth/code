@@ -38,13 +38,16 @@
 		<Accordion :open-by-default="!collapsed" content-class="mt-4">
 			<div class="relative">
 				<div
+					v-if="!disableHorizontalScroll"
 					class="nag-scroll-shadow-left pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
 					:class="showLeftNagShadow ? 'opacity-100' : 'opacity-0'"
 				/>
 				<div
 					ref="nagScroller"
-					class="flex w-full gap-2 overflow-x-auto overflow-y-hidden pb-2"
+					class="flex w-full gap-2 pb-2"
 					:class="{
+						'grid grid-cols-4': disableHorizontalScroll,
+						'overflow-x-auto overflow-y-hidden': !disableHorizontalScroll,
 						'cursor-grab select-none': canScrollNags,
 						'is-dragging': draggingNags,
 					}"
@@ -111,6 +114,7 @@
 					</div>
 				</div>
 				<div
+					v-if="!disableHorizontalScroll"
 					class="nag-scroll-shadow-right pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
 					:class="showRightNagShadow ? 'opacity-100' : 'opacity-0'"
 				/>
@@ -148,8 +152,10 @@ interface Props {
 	project: Labrinth.Projects.v2.Project
 	projectV3: Labrinth.Projects.v3.Project
 	versions?: Labrinth.Versions.v3.Version[]
+	nags?: Nag[]
 	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
+	disableHorizontalScroll?: boolean
 	routeName?: string
 	tags: Tags
 }
@@ -209,6 +215,7 @@ const props = withDefaults(defineProps<Props>(), {
 	versions: () => [],
 	currentMember: null,
 	collapsed: false,
+	disableHorizontalScroll: false,
 	routeName: '',
 })
 
@@ -235,7 +242,7 @@ let suppressNagClickTimeout: ReturnType<typeof setTimeout> | null = null
 
 function updateNagScrollShadows() {
 	const el = nagScroller.value
-	if (!el) {
+	if (!el || props.disableHorizontalScroll) {
 		canScrollNags.value = false
 		showLeftNagShadow.value = false
 		showRightNagShadow.value = false
@@ -250,7 +257,7 @@ function updateNagScrollShadows() {
 
 function onNagWheel(event: WheelEvent) {
 	const el = nagScroller.value
-	if (!el || el.scrollWidth <= el.clientWidth) return
+	if (props.disableHorizontalScroll || !el || el.scrollWidth <= el.clientWidth) return
 
 	const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
 	event.preventDefault()
@@ -260,6 +267,7 @@ function onNagWheel(event: WheelEvent) {
 function onNagPointerDown(event: PointerEvent) {
 	const el = nagScroller.value
 	if (
+		props.disableHorizontalScroll ||
 		!el ||
 		el.scrollWidth <= el.clientWidth + 1 ||
 		event.pointerType === 'touch' ||
@@ -335,6 +343,11 @@ watch(nagScroller, (el, previousEl) => {
 	nextTick(updateNagScrollShadows)
 })
 
+watch(
+	() => props.disableHorizontalScroll,
+	() => nextTick(updateNagScrollShadows),
+)
+
 const nagContext = computed<NagContext>(() => ({
 	project: props.project,
 	projectV3: props.projectV3,
@@ -355,6 +368,8 @@ async function submitForReview() {
 }
 
 const applicableNags = computed<Nag[]>(() => {
+	if (props.nags) return props.nags
+
 	return getNags(nagContext.value).filter((nag) => {
 		return nag.shouldShow(nagContext.value)
 	})
