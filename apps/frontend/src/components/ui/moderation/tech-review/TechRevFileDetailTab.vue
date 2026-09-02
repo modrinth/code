@@ -426,7 +426,6 @@ function toggleClass(classItem: ClassGroup) {
 	}
 }
 
-
 async function focusDetail(detailId: string) {
 	await nextTick()
 

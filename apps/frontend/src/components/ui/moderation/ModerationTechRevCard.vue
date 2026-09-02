@@ -110,9 +110,7 @@ watch(selectedFile, (newFile) => {
 
 const highestSeverity = computed(() =>
 	getHighestSeverity(
-		visibleReports.value.flatMap((report) =>
-			report.issues.flatMap((issue) => issue.details),
-		),
+		visibleReports.value.flatMap((report) => report.issues.flatMap((issue) => issue.details)),
 	),
 )
 
@@ -298,7 +296,7 @@ watch(
 					<CopyCode v-tooltip="'Copy project ID'" :text="item.project.id" />
 				</div>
 			</div>
-				<div class="flex flex-wrap items-end justify-between gap-3">
+			<div class="flex flex-wrap items-end justify-between gap-3">
 				<NavTabs
 					mode="local"
 					:links="navTabsLinks"
@@ -307,31 +305,31 @@ watch(
 					@tab-click="handleTabClick"
 				/>
 
-					<div class="flex flex-wrap items-end justify-end gap-4">
-						<label
-							v-if="allowShowingHiddenTraces"
-							class="flex cursor-pointer items-center gap-3 text-sm"
+				<div class="flex flex-wrap items-end justify-end gap-4">
+					<label
+						v-if="allowShowingHiddenTraces"
+						class="flex cursor-pointer items-center gap-3 text-sm"
+					>
+						<span class="text-right text-secondary">
+							Show hidden traces
+							<span class="text-tertiary block text-xs">{{ hiddenTraceCount }} hidden</span>
+						</span>
+						<Toggle v-model="showHiddenTraces" :disabled="hiddenTraceCount === 0" small />
+					</label>
+					<div v-if="currentTab === 'File' && selectedFile" class="flex items-center gap-2">
+						<ButtonLink
+							v-tooltip="'View version'"
+							type="outlined"
+							target="_blank"
+							:href="getVersionPageHref(item.project, selectedFile.version_id)"
+							:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
 						>
-							<span class="text-right text-secondary">
-								Show hidden traces
-								<span class="text-tertiary block text-xs">{{ hiddenTraceCount }} hidden</span>
-							</span>
-							<Toggle v-model="showHiddenTraces" :disabled="hiddenTraceCount === 0" small />
-						</label>
-						<div v-if="currentTab === 'File' && selectedFile" class="flex items-center gap-2">
-							<ButtonLink
-								v-tooltip="'View version'"
-								type="outlined"
-								target="_blank"
-								:href="getVersionPageHref(item.project, selectedFile.version_id)"
-								:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
-							>
-								<VersionIcon aria-hidden="true" />
-								{{ getVersionLabel(selectedFile) }}
-							</ButtonLink>
-							<TechRevFileActions :file="selectedFile" />
-						</div>
+							<VersionIcon aria-hidden="true" />
+							{{ getVersionLabel(selectedFile) }}
+						</ButtonLink>
+						<TechRevFileActions :file="selectedFile" />
 					</div>
+				</div>
 			</div>
 		</div>
 
