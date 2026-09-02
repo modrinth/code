@@ -289,7 +289,10 @@ IS_MATCH ? "low" : null</code></pre>
 							<LoaderCircleIcon class="size-5 animate-spin" />
 							<span>Evaluating…</span>
 						</div>
-						<p v-else-if="testTraceInputError || ruleTestError" class="m-0 text-sm text-secondary">
+						<p
+							v-else-if="isTestTraceInputMissing || testTraceInputError || ruleTestError"
+							class="m-0 text-sm text-secondary"
+						>
 							Preview unavailable.
 						</p>
 						<div
@@ -850,7 +853,7 @@ const parsedRawTestTraceInput = computed(() => {
 	if (!rawTestTraceInput.value.trim()) {
 		return {
 			input: null,
-			error: 'Paste a CEL JSON object to test it.',
+			error: null,
 		}
 	}
 
@@ -899,6 +902,9 @@ const parsedRawTestTraceInput = computed(() => {
 	}
 })
 const rawTestTraceError = computed(() => parsedRawTestTraceInput.value.error)
+const isTestTraceInputMissing = computed(
+	() => testTraceMode.value === 'json' && !rawTestTraceInput.value.trim(),
+)
 const testTraceInputError = computed(() =>
 	testTraceMode.value === 'fields' ? traceDataError.value : rawTestTraceError.value,
 )
