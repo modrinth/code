@@ -481,6 +481,14 @@
 							to: '/admin/analytics/events',
 							shown: isAdmin(auth.user),
 						},
+						{
+							id: 'creator-payouts',
+							label: 'Creator payouts',
+							icon: BadgeDollarSignIcon,
+							type: 'link',
+							to: '/admin/creator-payouts',
+							shown: isAdmin(auth.user),
+						},
 						{ type: 'divider' },
 						{
 							id: 'email-templates',
@@ -806,6 +814,7 @@ import {
 	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	ArrowLeftRightIcon,
+	BadgeDollarSignIcon,
 	BellIcon,
 	BookOpenIcon,
 	BoxIcon,
