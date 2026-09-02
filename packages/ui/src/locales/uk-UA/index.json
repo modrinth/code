@@ -5168,9 +5168,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "стягується {interval, select, monthly {щомісячно} quarterly {щоквартально} yearly {щорічно} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Доступно у Північній Америці, Європі та Південно-східній Азії."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Виберіть індивідуальний план із необхідними вам характеристиками."
   },

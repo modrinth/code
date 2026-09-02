@@ -4838,9 +4838,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Betalningsmetod"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Tillgänglig i Nordamerika, Europa och Sydostasien."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Välj en anpassad plan med just de specifikationer du behöver."
   },

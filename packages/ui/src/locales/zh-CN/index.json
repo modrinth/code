@@ -5393,9 +5393,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "计费{interval, select, monthly {按月} quarterly {按季度} yearly {按年} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "在北美、欧洲和东南亚可用。"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "按照你特定需要的配置选择一个定制方案。"
   },

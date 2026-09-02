@@ -5054,9 +5054,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "{interval, select, monthly {매 월} quarterly {3개월 마다} yearly {매 년} other {{interval}}} 청구"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "북미, 유럽, 동남아시아에서 이용 가능합니다."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "필요한 사양만을 갖춘 맞춤형 플랜을 선택하세요."
   },

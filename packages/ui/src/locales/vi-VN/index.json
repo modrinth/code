@@ -4121,9 +4121,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "trả tiền hàng {interval, select, monthly {tháng} quarterly {quý (3 tháng)} yearly {năm} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Có sẵn ở Đông Nam Á, Châu Âu và Bắc Mỹ."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Chọn gói tùy chỉnh với đúng những cấu hình bạn cần."
   },
@@ -4974,4 +4971,3 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
-
