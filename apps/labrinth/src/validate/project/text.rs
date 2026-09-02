@@ -4,8 +4,13 @@ use std::sync::LazyLock;
 use linkify::{LinkFinder, LinkKind};
 use regex::Regex;
 use rustrict::{Censor, Type};
+use unicode_normalization::UnicodeNormalization;
+use unicode_segmentation::UnicodeSegmentation;
 use url::Url;
 use whatlang::{Detector, Lang};
+
+use crate::models::exp::minecraft::Language;
+use crate::models::projects::Project;
 
 static WORD: LazyLock<Regex> =
 	LazyLock::new(|| Regex::new(r"[\p{L}\p{M}\p{N}]+").unwrap());
@@ -16,11 +21,17 @@ static SUMMARY_LINK_FINDER: LazyLock<LinkFinder> = LazyLock::new(|| {
 });
 static LANGUAGE_DETECTOR: LazyLock<Detector> = LazyLock::new(Detector::new);
 static MARKDOWN_LINK: LazyLock<Regex> =
-	LazyLock::new(|| Regex::new(r"!?\[[^\]]*\]\([^)]+\)").unwrap());
+	LazyLock::new(|| Regex::new(r"!?\[([^\]]*)\]\([^)]+\)").unwrap());
 static HTML_TAG: LazyLock<Regex> =
-	LazyLock::new(|| Regex::new(r"(?is)<[a-z][^>]*>").unwrap());
+	LazyLock::new(|| Regex::new(r"(?is)<!--.*?-->|</?[a-z][^>]*>").unwrap());
+static HTML_OPEN_TAG: LazyLock<Regex> =
+	LazyLock::new(|| Regex::new(r"(?is)<([a-z][\w:-]*)\b[^>]*>").unwrap());
+static HTML_CLOSE_TAG: LazyLock<Regex> =
+	LazyLock::new(|| Regex::new(r"(?is)</([a-z][\w:-]*)\s*>").unwrap());
 static CODE_BLOCK: LazyLock<Regex> =
 	LazyLock::new(|| Regex::new(r"(?s)```.*?```").unwrap());
+static DESCRIPTION_BLOCK_BREAK: LazyLock<Regex> =
+	LazyLock::new(|| Regex::new(r"\n\s*\n+").unwrap());
 static INLINE_CODE: LazyLock<Regex> =
 	LazyLock::new(|| Regex::new(r"`[^`]*`").unwrap());
 static MARKDOWN_IMAGE: LazyLock<Regex> =
@@ -30,32 +41,117 @@ static HTML_IMAGE: LazyLock<Regex> =
 static ALT_ATTRIBUTE: LazyLock<Regex> = LazyLock::new(|| {
 	Regex::new(r#"(?is)\balt\s*=\s*(?:"([^"]*)"|'([^']*)')"#).unwrap()
 });
-static DESCRIPTION_LINK: LazyLock<Regex> = LazyLock::new(|| {
-	Regex::new(r"(?i)(?:https?://|www\.)[^\s<>()\]]+").unwrap()
+static DESCRIPTION_LINK_FINDER: LazyLock<LinkFinder> = LazyLock::new(|| {
+	let mut finder = LinkFinder::new();
+	finder.kinds(&[LinkKind::Url]).url_must_have_scheme(false);
+	finder
 });
 static HEADER: LazyLock<Regex> =
 	LazyLock::new(|| Regex::new(r"(?m)^#{1,3}[\t ]+(.+?)\s*#*\s*$").unwrap());
+static HEADER_LINE: LazyLock<Regex> =
+	LazyLock::new(|| Regex::new(r"^([#]{1,6})[\t ]+.+?\s*#*\s*$").unwrap());
+static SETEXT_HEADER: LazyLock<Regex> = LazyLock::new(|| {
+	Regex::new(r"(?m)^([^\r\n]+)\r?\n[\t ]*(?:=+|-+)[\t ]*$").unwrap()
+});
 static HTML_HEADER: LazyLock<Regex> = LazyLock::new(|| {
 	Regex::new(r"(?is)<h[1-3]\b[^>]*>(.*?)</h[1-3]>").unwrap()
 });
-static INLINE_MARKDOWN: LazyLock<Regex> = LazyLock::new(|| {
-	Regex::new(r"[*_~`]|!?\[([^\]]*)\]\([^)]+\)|<[^>]+>").unwrap()
+static ADJACENT_HTML_HEADERS: LazyLock<Regex> =
+	LazyLock::new(|| Regex::new(r"(?is)</h([1-3])>\s*<h([1-3])\b").unwrap());
+static TRAILING_HTML_HEADER: LazyLock<Regex> = LazyLock::new(|| {
+	Regex::new(r"(?is)</h[1-6]>\s*(?:</[a-z][^>]*>\s*)*$").unwrap()
 });
 
 const URL_SHORTENERS: &[&str] =
 	&["bit.ly", "adf.ly", "tinyurl.com", "short.io", "is.gd"];
 
-pub(super) fn contains_profanity(text: &str) -> bool {
-	let mut censor = Censor::from_str(text);
-	censor.with_ignore_self_censoring(true);
-	censor.analyze().is(profanity_types())
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum ProfanityKind {
+	Profanity,
+	Slur,
 }
 
-pub(super) fn profanity_count(text: &str) -> usize {
-	// Rustrict only exposes match counts through its tracing features.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(super) struct ProfanityMatch {
+	pub(super) kind: ProfanityKind,
+	pub(super) raw_text: String,
+}
+
+const SLUR_TERMS: &[&str] = &[
+	"beaner",
+	"cameljockey",
+	"chankoro",
+	"chink",
+	"chingchong",
+	"coon",
+	"cottonpic",
+	"cottonpik",
+	"darkie",
+	"downie",
+	"dyke",
+	"fag",
+	"gook",
+	"jap",
+	"jigabo",
+	"junglebunny",
+	"kike",
+	"koon",
+	"niqa",
+	"nigga",
+	"niqqa",
+	"niggu",
+	"niqqu",
+	"niggr",
+	"nigger",
+	"niglet",
+	"nignog",
+	"paki",
+	"raghead",
+	"retard",
+	"trannie",
+	"tranny",
+	"wetback",
+];
+
+pub(super) fn normalize_project_field_text(text: &str) -> String {
+	text.trim().nfc().collect()
+}
+
+pub(super) fn js_string_length(text: &str) -> usize {
+	text.encode_utf16().count()
+}
+
+pub(super) fn profanity_matches(text: &str) -> Vec<ProfanityMatch> {
+	let (prepared, raw_ranges) = prepare_profanity_text(text);
+	let mut spans = censored_spans(&prepared, profanity_types());
+	for span in censored_spans(&prepared, slur_types()) {
+		if spans.contains(&span) {
+			continue;
+		}
+		if raw_text_for_span(text, &raw_ranges, span).is_some_and(is_slur) {
+			spans.push(span);
+		}
+	}
+	spans.extend(frontend_slur_spans(&prepared));
+	spans.sort_unstable_by(|left, right| {
+		left.0.cmp(&right.0).then_with(|| right.1.cmp(&left.1))
+	});
+
+	let mut matches = Vec::new();
+	let mut previous_end = 0;
+	for (start, end) in spans {
+		if start < previous_end {
+			continue;
+		}
+		push_profanity_match(text, &raw_ranges, start, end, &mut matches);
+		previous_end = end;
+	}
+	matches
+}
+
+fn censored_spans(text: &str, threshold: Type) -> Vec<(usize, usize)> {
 	const CENSORED: char = '\0';
 
-	let threshold = profanity_types();
 	let mut censor = Censor::from_str(text);
 	censor
 		.with_ignore_self_censoring(true)
@@ -63,20 +159,270 @@ pub(super) fn profanity_count(text: &str) -> usize {
 		.with_censor_first_character_threshold(threshold)
 		.with_censor_replacement(CENSORED);
 
-	let mut count = 0;
-	let mut in_censored_text = false;
-	for character in censor.censor().chars() {
-		let is_censored = character == CENSORED;
-		if is_censored && !in_censored_text {
-			count += 1;
+	let mut spans = Vec::new();
+	let mut start = None;
+	let mut character_count = 0;
+	for (index, character) in censor.censor().chars().enumerate() {
+		character_count = index + 1;
+		match (start, character == CENSORED) {
+			(None, true) => start = Some(index),
+			(Some(match_start), false) => {
+				spans.push((match_start, index));
+				start = None;
+			}
+			_ => {}
 		}
-		in_censored_text = is_censored;
 	}
-	count
+	if let Some(start) = start {
+		spans.push((start, character_count));
+	}
+	spans
+}
+
+fn frontend_slur_spans(text: &str) -> Vec<(usize, usize)> {
+	let characters = text.chars().collect::<Vec<_>>();
+	let mut spans = Vec::new();
+
+	for start in 0..characters.len() {
+		if start > 0 && is_profanity_word_character(characters[start - 1]) {
+			continue;
+		}
+
+		let end = SLUR_TERMS
+			.iter()
+			.flat_map(|term| {
+				[
+					match_repeated_term(&characters, start, term),
+					match_separated_term(&characters, start, term),
+				]
+			})
+			.flatten()
+			.max();
+		if let Some(end) = end {
+			spans.push((start, end));
+		}
+	}
+
+	spans
+}
+
+fn match_repeated_term(
+	characters: &[char],
+	start: usize,
+	term: &str,
+) -> Option<usize> {
+	let term = term.as_bytes();
+	let mut input_index = start;
+	let mut term_index = 0;
+
+	while term_index < term.len() {
+		let expected = term[term_index] as char;
+		let mut required = 1;
+		while term.get(term_index + required) == Some(&term[term_index]) {
+			required += 1;
+		}
+
+		let mut matched = 0;
+		while characters.get(input_index) == Some(&expected) {
+			matched += 1;
+			input_index += 1;
+		}
+		if matched < required {
+			return None;
+		}
+		term_index += required;
+	}
+
+	is_whole_word_end(characters, input_index).then_some(input_index)
+}
+
+fn match_separated_term(
+	characters: &[char],
+	start: usize,
+	term: &str,
+) -> Option<usize> {
+	let mut input_index = start;
+	let mut term = term.bytes().peekable();
+
+	while let Some(expected) = term.next() {
+		if characters.get(input_index) != Some(&(expected as char)) {
+			return None;
+		}
+		input_index += 1;
+
+		if term.peek().is_some() {
+			let separator_start = input_index;
+			while characters.get(input_index).is_some_and(|character| {
+				!is_profanity_word_character(*character)
+			}) {
+				input_index += 1;
+			}
+			if input_index == separator_start {
+				return None;
+			}
+		}
+	}
+
+	is_whole_word_end(characters, input_index).then_some(input_index)
+}
+
+fn is_whole_word_end(characters: &[char], end: usize) -> bool {
+	characters
+		.get(end)
+		.is_none_or(|character| !is_profanity_word_character(*character))
+}
+
+fn is_profanity_word_character(character: char) -> bool {
+	character.is_alphanumeric()
+		|| character == '_'
+		|| is_in_ranges(
+			character as u32,
+			&[
+				(0x0300, 0x036f),
+				(0x1ab0, 0x1aff),
+				(0x1dc0, 0x1dff),
+				(0x20d0, 0x20ff),
+				(0xfe20, 0xfe2f),
+			],
+		)
+}
+
+fn prepare_profanity_text(text: &str) -> (String, Vec<(usize, usize)>) {
+	let mut prepared = String::new();
+	let mut raw_ranges = Vec::new();
+
+	for (start, grapheme) in text.grapheme_indices(true) {
+		let end = start + grapheme.len();
+		for character in grapheme.nfkc().flat_map(char::to_lowercase) {
+			if is_invisible_separator(character) {
+				continue;
+			}
+
+			prepared.push(normalize_obfuscated_character(character));
+			raw_ranges.push((start, end));
+		}
+	}
+
+	(prepared, raw_ranges)
+}
+
+fn push_profanity_match(
+	text: &str,
+	raw_ranges: &[(usize, usize)],
+	start: usize,
+	end: usize,
+	matches: &mut Vec<ProfanityMatch>,
+) {
+	let Some(raw_text) = raw_text_for_span(text, raw_ranges, (start, end))
+	else {
+		return;
+	};
+	if normalize_project_field_text(raw_text).to_lowercase() == "кооп" {
+		return;
+	}
+
+	matches.push(ProfanityMatch {
+		kind: if is_slur(raw_text) {
+			ProfanityKind::Slur
+		} else {
+			ProfanityKind::Profanity
+		},
+		raw_text: raw_text.to_owned(),
+	});
+}
+
+fn raw_text_for_span<'a>(
+	text: &'a str,
+	raw_ranges: &[(usize, usize)],
+	(start, end): (usize, usize),
+) -> Option<&'a str> {
+	let &(raw_start, _) = raw_ranges.get(start)?;
+	let &(_, raw_end) = raw_ranges.get(end.checked_sub(1)?)?;
+	text.get(raw_start..raw_end)
+}
+
+fn is_slur(raw_text: &str) -> bool {
+	let normalized = normalized_profanity_term(raw_text);
+	SLUR_TERMS
+		.iter()
+		.any(|term| collapse_duplicate_letters(term) == normalized)
+}
+
+fn normalized_profanity_term(text: &str) -> String {
+	let (prepared, _) = prepare_profanity_text(text);
+	collapse_duplicate_letters(
+		&prepared
+			.chars()
+			.filter(char::is_ascii_alphabetic)
+			.collect::<String>(),
+	)
+}
+
+fn collapse_duplicate_letters(text: &str) -> String {
+	let mut collapsed = String::with_capacity(text.len());
+	let mut previous = None;
+	for character in text.chars() {
+		if previous != Some(character) {
+			collapsed.push(character);
+			previous = Some(character);
+		}
+	}
+	collapsed
+}
+
+fn normalize_obfuscated_character(character: char) -> char {
+	match character {
+		'@' | '4' => 'a',
+		'8' => 'b',
+		'(' | '[' | '{' | 'с' | 'ϲ' => 'c',
+		'3' | 'е' | 'ε' => 'e',
+		'6' | '9' => 'g',
+		'!' | '1' | '/' | '|' | 'і' | 'ι' | 'ı' => 'i',
+		'ј' => 'j',
+		'к' | 'κ' => 'k',
+		'м' | 'μ' => 'm',
+		'п' => 'n',
+		'0' | 'о' | 'ο' => 'o',
+		'р' | 'ρ' => 'p',
+		'$' | '5' | 'ѕ' => 's',
+		'+' | '7' | 'т' | 'τ' => 't',
+		'υ' | 'ս' => 'u',
+		'х' | 'χ' => 'x',
+		'у' | 'γ' => 'y',
+		'2' => 'z',
+		_ => character,
+	}
+}
+
+fn is_invisible_separator(character: char) -> bool {
+	let code = character as u32;
+	is_in_ranges(
+		code,
+		&[
+			(0x00ad, 0x00ad),
+			(0x034f, 0x034f),
+			(0x061c, 0x061c),
+			(0x115f, 0x1160),
+			(0x17b4, 0x17b5),
+			(0x180b, 0x180f),
+			(0x200b, 0x200f),
+			(0x202a, 0x202e),
+			(0x2060, 0x206f),
+			(0x3164, 0x3164),
+			(0xfe00, 0xfe0f),
+			(0xfeff, 0xfeff),
+			(0xffa0, 0xffa0),
+			(0xe0100, 0xe01ef),
+		],
+	)
 }
 
 fn profanity_types() -> Type {
 	Type::PROFANE & Type::MODERATE_OR_HIGHER
+}
+
+fn slur_types() -> Type {
+	Type::OFFENSIVE & Type::MILD_OR_HIGHER
 }
 
 pub(super) fn has_non_standard_text(text: &str) -> bool {
@@ -177,7 +523,8 @@ fn is_in_ranges(code: u32, ranges: &[(u32, u32)]) -> bool {
 }
 
 pub(super) fn contains_spam(text: &str) -> bool {
-	let normalized = text.to_lowercase();
+	let normalized =
+		text.nfc().flat_map(char::to_lowercase).collect::<String>();
 	let mut previous = None;
 	let mut repeated = 0;
 	for character in normalized.chars() {
@@ -224,24 +571,29 @@ pub(super) fn contains_spam(text: &str) -> bool {
 	false
 }
 
-pub(super) fn contains_link_or_ip(text: &str) -> bool {
-	SUMMARY_LINK_FINDER.links(text).any(|link| {
+pub(super) fn find_link_or_ip(text: &str) -> Option<String> {
+	SUMMARY_LINK_FINDER.links(text).find_map(|link| {
 		let raw = link.as_str();
 		if raw.contains("://") {
-			return true;
+			return Some(raw.to_owned());
 		}
 
-		Url::parse(&format!("https://{raw}")).is_ok_and(|url| {
-			url.host_str().is_some_and(|hostname| {
-				psl::domain(hostname.as_bytes())
-					.is_some_and(|domain| domain.suffix().typ().is_some())
+		Url::parse(&format!("https://{raw}"))
+			.ok()
+			.filter(|url| {
+				url.host_str().is_some_and(|hostname| {
+					hostname.parse::<std::net::IpAddr>().is_ok()
+						|| psl::domain(hostname.as_bytes()).is_some_and(
+							|domain| domain.suffix().typ().is_some(),
+						)
+				})
 			})
-		})
+			.map(|_| raw.to_owned())
 	})
 }
 
 pub(super) fn has_summary_formatting(summary: &str) -> bool {
-	HTML_TAG.is_match(summary)
+	has_paired_html_formatting(summary)
 		|| MARKDOWN_LINK.is_match(summary)
 		|| summary.lines().any(|line| {
 			let line = line.trim_start();
@@ -258,13 +610,50 @@ pub(super) fn has_summary_formatting(summary: &str) -> bool {
 		})
 }
 
+pub(super) fn has_paired_html_formatting(text: &str) -> bool {
+	let without_code = CODE_BLOCK.replace_all(text, "");
+	let without_code = INLINE_CODE.replace_all(&without_code, "");
+	HTML_OPEN_TAG.captures_iter(&without_code).any(|opening| {
+		let Some(tag) = opening.get(1) else {
+			return false;
+		};
+		let Some(opening_match) = opening.get(0) else {
+			return false;
+		};
+		HTML_CLOSE_TAG
+			.captures_iter(&without_code[opening_match.end()..])
+			.any(|closing| {
+				closing.get(1).is_some_and(|closing_tag| {
+					closing_tag.as_str().eq_ignore_ascii_case(tag.as_str())
+				})
+			})
+	})
+}
+
 pub(super) fn extract_description_text(markdown: &str) -> String {
 	let without_code = CODE_BLOCK.replace_all(markdown, " ");
 	let without_code = INLINE_CODE.replace_all(&without_code, " ");
 	let with_image_alt = MARKDOWN_IMAGE.replace_all(&without_code, "$1");
 	let without_links = MARKDOWN_LINK.replace_all(&with_image_alt, " ");
-	let without_html = HTML_TAG.replace_all(&without_links, " ");
+	let with_html_image_alt = HTML_IMAGE.replace_all(
+		&without_links,
+		|captures: &regex::Captures<'_>| {
+			ALT_ATTRIBUTE
+				.captures(&captures[0])
+				.and_then(|captures| {
+					captures.get(1).or_else(|| captures.get(2))
+				})
+				.map_or_else(|| " ".to_owned(), |alt| alt.as_str().to_owned())
+		},
+	);
+	let without_html = HTML_TAG.replace_all(&with_html_image_alt, " ");
 	without_html
+		.lines()
+		.map(|line| {
+			line.trim_start_matches(|character| matches!(character, '>' | '#'))
+		})
+		.collect::<Vec<_>>()
+		.join("\n")
 		.replace(['*', '_', '~', '`', '>', '-', '|'], " ")
 		.split_whitespace()
 		.collect::<Vec<_>>()
@@ -272,30 +661,120 @@ pub(super) fn extract_description_text(markdown: &str) -> String {
 }
 
 pub(super) fn extract_description_blocks(markdown: &str) -> Vec<String> {
-	CODE_BLOCK
-		.replace_all(markdown, "")
-		.split("\n\n")
+	let without_code = CODE_BLOCK.replace_all(markdown, "");
+	DESCRIPTION_BLOCK_BREAK
+		.split(&without_code)
 		.map(extract_description_text)
 		.filter(|block| !block.is_empty())
 		.collect()
 }
 
-pub(super) fn has_long_header(markdown: &str) -> bool {
-	HEADER.captures_iter(markdown).any(|captures| {
-		INLINE_MARKDOWN
-			.replace_all(&captures[1], "$1")
-			.trim()
-			.chars()
-			.count() > 80
-	}) || HTML_HEADER.captures_iter(markdown).any(|captures| {
-		HTML_TAG
-			.replace_all(&captures[1], " ")
-			.split_whitespace()
-			.collect::<Vec<_>>()
-			.join(" ")
-			.chars()
-			.count() > 80
-	})
+pub(super) fn long_header_count(markdown: &str) -> usize {
+	let markdown_headers = HEADER
+		.captures_iter(markdown)
+		.filter(|captures| header_is_long(&captures[1]))
+		.count();
+	let setext_headers = SETEXT_HEADER
+		.captures_iter(markdown)
+		.filter(|captures| !captures[1].trim_start().starts_with('#'))
+		.filter(|captures| header_is_long(&captures[1]))
+		.count();
+	let html_headers = HTML_HEADER
+		.captures_iter(markdown)
+		.filter(|captures| header_is_long(&captures[1]))
+		.count();
+
+	markdown_headers + setext_headers + html_headers
+}
+
+fn header_is_long(header: &str) -> bool {
+	let with_image_alt = MARKDOWN_IMAGE.replace_all(header, "$1");
+	let with_link_text = MARKDOWN_LINK.replace_all(&with_image_alt, "$1");
+	let without_html = HTML_TAG.replace_all(&with_link_text, " ");
+	let rendered = without_html
+		.replace(['*', '_', '~', '`'], "")
+		.split_whitespace()
+		.collect::<Vec<_>>()
+		.join(" ");
+
+	rendered.graphemes(true).count() > 80
+}
+
+pub(super) fn description_ends_with_header(markdown: &str) -> bool {
+	let trimmed = markdown.trim_end();
+	if trimmed.is_empty() {
+		return false;
+	}
+
+	let lines = trimmed.lines().collect::<Vec<_>>();
+	let last_line = lines.last().map_or("", |line| line.trim());
+	if HEADER_LINE.is_match(last_line) {
+		return true;
+	}
+	if lines.len() >= 2
+		&& is_setext_underline(last_line)
+		&& !lines[lines.len() - 2].trim().is_empty()
+	{
+		return true;
+	}
+
+	TRAILING_HTML_HEADER.is_match(trimmed)
+}
+
+pub(super) fn has_adjacent_same_level_headers(markdown: &str) -> bool {
+	let lines = markdown.lines().collect::<Vec<_>>();
+	let mut previous_header = None;
+	let mut index = 0;
+	while index < lines.len() {
+		let line = lines[index].trim();
+		if line.is_empty() {
+			index += 1;
+			continue;
+		}
+
+		let mut header_level = HEADER_LINE
+			.captures(line)
+			.and_then(|captures| captures.get(1))
+			.map(|hashes| hashes.as_str().len());
+		if header_level.is_none()
+			&& lines
+				.get(index + 1)
+				.is_some_and(|underline| is_setext_underline(underline.trim()))
+		{
+			header_level =
+				Some(if lines[index + 1].trim_start().starts_with('=') {
+					1
+				} else {
+					2
+				});
+			index += 1;
+		}
+
+		if let Some(level) = header_level {
+			if level <= 3 && previous_header == Some(level) {
+				return true;
+			}
+			previous_header = Some(level);
+		} else {
+			previous_header = None;
+		}
+		index += 1;
+	}
+
+	ADJACENT_HTML_HEADERS
+		.captures_iter(markdown)
+		.any(|captures| {
+			captures.get(1).map(|level| level.as_str())
+				== captures.get(2).map(|level| level.as_str())
+		})
+}
+
+fn is_setext_underline(line: &str) -> bool {
+	let mut characters = line.chars();
+	let Some(marker @ ('=' | '-')) = characters.next() else {
+		return false;
+	};
+	characters.all(|character| character == marker)
 }
 
 pub(super) fn has_image_without_alt_text(markdown: &str) -> bool {
@@ -314,21 +793,24 @@ pub(super) fn has_image_without_alt_text(markdown: &str) -> bool {
 		})
 }
 
-pub(super) fn contains_banned_description_link(markdown: &str) -> bool {
-	DESCRIPTION_LINK.find_iter(markdown).any(|link| {
+pub(super) fn find_banned_description_link(markdown: &str) -> Option<String> {
+	DESCRIPTION_LINK_FINDER.links(markdown).find_map(|link| {
 		let raw = link.as_str();
-		let normalized = if raw.to_ascii_lowercase().starts_with("www.") {
-			format!("https://{raw}")
-		} else {
+		let normalized = if raw.contains("://") {
 			raw.to_owned()
+		} else {
+			format!("http://{raw}")
 		};
-		Url::parse(&normalized).is_ok_and(|url| {
-			url.host_str().is_some_and(|hostname| {
-				URL_SHORTENERS
-					.iter()
-					.any(|domain| hostname_matches_domain(hostname, domain))
+		Url::parse(&normalized)
+			.ok()
+			.filter(|url| {
+				url.host_str().is_some_and(|hostname| {
+					URL_SHORTENERS
+						.iter()
+						.any(|domain| hostname_matches_domain(hostname, domain))
+				})
 			})
-		})
+			.map(|_| normalized)
 	})
 }
 
@@ -337,6 +819,22 @@ fn hostname_matches_domain(hostname: &str, domain: &str) -> bool {
 		|| hostname
 			.to_ascii_lowercase()
 			.ends_with(&format!(".{domain}"))
+}
+
+pub(super) fn project_requires_english(project: &Project) -> bool {
+	let has_locale_tag = project
+		.categories
+		.iter()
+		.chain(&project.additional_categories)
+		.any(|category| category == "locale");
+	let is_english_server = project
+		.components
+		.minecraft_server
+		.as_ref()
+		.is_some_and(|server| server.languages.contains(&Language::En));
+
+	(project.components.minecraft_java_server.is_none() && !has_locale_tag)
+		|| is_english_server
 }
 
 pub(super) fn is_likely_english_summary(text: &str) -> bool {
@@ -408,5 +906,6 @@ fn language_chunks(block: &str) -> Vec<String> {
 }
 
 fn has_enough_language_content(text: &str) -> bool {
-	WORD.find_iter(text).count() >= 8 && text.trim().chars().count() >= 35
+	WORD.find_iter(text).count() >= 8
+		&& text.trim().graphemes(true).count() >= 35
 }

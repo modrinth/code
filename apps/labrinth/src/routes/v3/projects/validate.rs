@@ -11,7 +11,9 @@ use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
-use crate::validate::project::{ProjectNag, validate as validate_project};
+use crate::validate::project::{
+	ProjectNag, validate_with_context as validate_project,
+};
 
 #[derive(Serialize, utoipa::ToSchema)]
 pub struct ProjectValidationResponse {
@@ -78,9 +80,28 @@ pub async fn validate(
 			.into_iter()
 			.map(Version::from)
 			.collect::<Vec<_>>();
+	let available_categories =
+		db_models::categories::Category::list(&**pool, &redis)
+			.await
+			.wrap_internal_err("fetching project categories")?;
+	let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
+		project.inner.id,
+		false,
+		&***ro_pool,
+	)
+	.await
+	.wrap_internal_err("fetching project disclosures")?
+	.into_iter()
+	.map(|disclosure| disclosure.disclosure)
+	.collect::<Vec<_>>();
 	let project = Project::from(project);
 
 	Ok(web::Json(ProjectValidationResponse {
-		nags: validate_project(&project, &versions),
+		nags: validate_project(
+			&project,
+			&versions,
+			&available_categories,
+			&disclosures,
+		),
 	}))
 }

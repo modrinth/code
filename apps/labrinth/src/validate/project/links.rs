@@ -3,7 +3,7 @@ use std::net::IpAddr;
 use url::Url;
 
 use super::{ProjectNagKind, ProjectNagSeverity};
-use crate::models::projects::Version;
+use crate::models::{projects::Version, v2::projects::LegacyProject};
 
 const SOURCE_DOMAINS: &[&str] = &[
     "github.com",
@@ -37,6 +37,8 @@ const BLOCKED_EXTERNAL_LINK_DOMAINS: &[&str] = &[
     "bilibili.com",
     "bsky.app",
     "twitch.tv",
+    "youtube.com",
+    "youtu.be",
     "reddit.com",
     "redd.it",
     "modrinth.com",
@@ -129,20 +131,14 @@ pub(super) fn validate(
         ));
     }
 
-    if project
-        .link_urls
-        .values()
-        .any(|link| is_blocked_external_link(&link.url))
-        || project
-            .license
-            .url
-            .as_deref()
-            .is_some_and(is_blocked_external_link)
-    {
-        nags.push(super::ProjectNag::new(
-            ProjectNagKind::BannedLinkUsage,
-            ProjectNagSeverity::Required,
-        ));
+    if let Some(url) = find_blocked_external_link(project) {
+        nags.push(
+            super::ProjectNag::new(
+                ProjectNagKind::BannedLinkUsage,
+                ProjectNagSeverity::Required,
+            )
+            .with_details(serde_json::json!({ "url": url })),
+        );
     }
 
     let is_source_project = project
@@ -164,10 +160,15 @@ pub(super) fn validate(
         && !has_source_link
         && !every_version_has_additional_files
     {
-        nags.push(super::ProjectNag::new(
-            ProjectNagKind::GplLicenseSourceRequired,
-            ProjectNagSeverity::Required,
-        ));
+        let (project_type, _) =
+            LegacyProject::get_project_type(&project.project_types);
+        nags.push(
+            super::ProjectNag::new(
+                ProjectNagKind::GplLicenseSourceRequired,
+                ProjectNagSeverity::Required,
+            )
+            .with_details(serde_json::json!({ "project_type": project_type })),
+        );
     }
 
     nags
@@ -191,6 +192,39 @@ fn named_link_is_uncommon(
 
 fn is_discord_link(url: &str) -> bool {
     is_link_from_domains(url, DISCORD_DOMAINS)
+}
+
+fn find_blocked_external_link(
+    project: &crate::models::projects::Project,
+) -> Option<&str> {
+    const LEGACY_LINK_KEYS: &[&str] = &["source", "issues", "wiki", "discord"];
+
+    for key in LEGACY_LINK_KEYS {
+        if let Some(url) =
+            named_link(project, key).filter(|url| is_blocked_external_link(url))
+        {
+            return Some(url);
+        }
+    }
+    if let Some(url) = project
+        .license
+        .url
+        .as_deref()
+        .filter(|url| is_blocked_external_link(url))
+    {
+        return Some(url);
+    }
+
+    let mut remaining_links = project
+        .link_urls
+        .iter()
+        .filter(|(key, _)| !LEGACY_LINK_KEYS.contains(&key.as_str()))
+        .collect::<Vec<_>>();
+    remaining_links.sort_unstable_by_key(|(key, _)| key.as_str());
+    remaining_links
+        .into_iter()
+        .map(|(_, link)| link.url.as_str())
+        .find(|url| is_blocked_external_link(url))
 }
 
 fn is_blocked_external_link(url: &str) -> bool {

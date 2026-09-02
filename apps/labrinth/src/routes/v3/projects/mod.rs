@@ -42,7 +42,7 @@ use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
-use crate::validate::project::has_required_nags;
+use crate::validate::project::has_required_nags_with_context;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use chrono::Utc;
 use eyre::eyre;
@@ -1380,9 +1380,28 @@ pub async fn project_edit_internal(
         .into_iter()
         .map(Version::from)
         .collect::<Vec<_>>();
+        let available_categories =
+            db_models::categories::Category::list(&**pool, &redis)
+                .await
+                .wrap_internal_err("fetching project categories")?;
+        let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
+            reloaded_project.inner.id,
+            false,
+            &mut transaction,
+        )
+        .await
+        .wrap_internal_err("fetching project disclosures")?
+        .into_iter()
+        .map(|disclosure| disclosure.disclosure)
+        .collect::<Vec<_>>();
         let project = Project::from(reloaded_project.clone());
 
-        if has_required_nags(&project, &versions) {
+        if has_required_nags_with_context(
+            &project,
+            &versions,
+            &available_categories,
+            &disclosures,
+        ) {
             return Err(ApiError::Request(eyre!(
                 "project must have no required validation nags before being submitted for review"
             )));

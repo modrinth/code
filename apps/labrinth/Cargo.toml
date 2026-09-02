@@ -124,6 +124,8 @@ tracing = { workspace = true }
 tracing-actix-web = { workspace = true }
 url = { workspace = true }
 urlencoding = { workspace = true }
+unicode-normalization = { workspace = true }
+unicode-segmentation = { workspace = true }
 utoipa = { workspace = true, features = ["url"] }
 uuid = { workspace = true, features = ["fast-rng", "serde", "v4", "v7"] }
 validator = { workspace = true, features = ["derive"] }

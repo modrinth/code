@@ -50,12 +50,19 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
         ));
     }
 
-    if server.is_some_and(|server| server.languages.len() > MAX_LANGUAGE_COUNT)
+    if let Some(language_count) = server
+        .map(|server| server.languages.len())
+        .filter(|language_count| *language_count > MAX_LANGUAGE_COUNT)
     {
-        nags.push(ProjectNag::new(
-            ProjectNagKind::TooManyLanguages,
-            ProjectNagSeverity::Warning,
-        ));
+        nags.push(
+            ProjectNag::new(
+                ProjectNagKind::TooManyLanguages,
+                ProjectNagSeverity::Warning,
+            )
+            .with_details(serde_json::json!({
+                "language_count": language_count,
+            })),
+        );
     }
 
     if server.is_some_and(|server| server.languages.is_empty()) {

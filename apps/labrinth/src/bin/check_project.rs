@@ -122,7 +122,11 @@ impl BatchSummary {
 		if self.description_profanity_samples.len()
 			< self.description_profanity_sample_limit
 			&& nags.iter().any(|nag| {
-				nag.kind == ProjectNagKind::ProjectDescriptionProfanity
+				matches!(
+					nag.kind,
+					ProjectNagKind::ProjectDescriptionSlur
+						| ProjectNagKind::ProjectDescriptionProfanity
+				)
 			}) {
 			self.description_profanity_samples.push(
 				DescriptionProfanitySample {

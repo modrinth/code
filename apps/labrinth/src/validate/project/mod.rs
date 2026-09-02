@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
+use serde_json::{Value, json};
 
+use crate::database::models::categories::Category;
+use crate::models::disclosures::ProjectDisclosure;
 use crate::models::projects::{Project, Version};
 
 mod description;
@@ -33,12 +36,14 @@ mod versions;
 #[serde(rename_all = "snake_case")]
 pub enum ProjectNagKind {
     // Project name
+    ProjectNameSlur,
     ProjectNameProfanity,
     ProjectNameNonStandardText,
     ProjectNameVersion,
     MinecraftTitleClause,
 
     // Project summary
+    ProjectSummarySlur,
     ProjectSummaryProfanity,
     ProjectSummaryNonStandardText,
     ProjectSummaryNonEnglish,
@@ -52,12 +57,14 @@ pub enum ProjectNagKind {
     AddIcon,
 
     // Gallery
+    GalleryTextSlur,
     GalleryTextProfanity,
     GalleryTextNonStandard,
     UploadGalleryImage,
     FeatureGalleryImage,
 
     // Project description
+    ProjectDescriptionSlur,
     ProjectDescriptionProfanity,
     ProjectDescriptionNonStandardText,
     ProjectDescriptionNonEnglish,
@@ -66,6 +73,8 @@ pub enum ProjectNagKind {
     ProjectDescriptionSpam,
     ProjectDescriptionBannedLink,
     LongHeaders,
+    DescriptionEndsWithHeader,
+    AdjacentHeaders,
     MissingAltText,
 
     // License
@@ -106,6 +115,7 @@ pub enum ProjectNagKind {
 
     // Disclosures
     CheckDisclosures,
+    DisclosuresSpecialFormatting,
 
     // Moderation
     ModeratorFeedback,
@@ -122,11 +132,13 @@ pub enum ProjectNagSeverity {
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+    Debug, Clone, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
 )]
 pub struct ProjectNag {
     pub kind: ProjectNagKind,
     pub severity: ProjectNagSeverity,
+    #[schema(value_type = serde_json::Value)]
+    pub details: Value,
 }
 
 impl ProjectNag {
@@ -134,11 +146,44 @@ impl ProjectNag {
         kind: ProjectNagKind,
         severity: ProjectNagSeverity,
     ) -> Self {
-        Self { kind, severity }
+        Self {
+            kind,
+            severity,
+            details: json!({}),
+        }
+    }
+
+    pub(super) fn with_details(mut self, details: Value) -> Self {
+        debug_assert!(details.is_object());
+        self.details = details;
+        self
     }
 }
 
 pub fn validate(project: &Project, versions: &[Version]) -> Vec<ProjectNag> {
+    validate_inner(project, versions, None, None)
+}
+
+pub fn validate_with_context(
+    project: &Project,
+    versions: &[Version],
+    available_categories: &[Category],
+    disclosures: &[ProjectDisclosure],
+) -> Vec<ProjectNag> {
+    validate_inner(
+        project,
+        versions,
+        Some(available_categories),
+        Some(disclosures),
+    )
+}
+
+fn validate_inner(
+    project: &Project,
+    versions: &[Version],
+    available_categories: Option<&[Category]>,
+    disclosures: Option<&[ProjectDisclosure]>,
+) -> Vec<ProjectNag> {
     let mut nags = [
         name::validate,
         summary::validate,
@@ -155,20 +200,28 @@ pub fn validate(project: &Project, versions: &[Version]) -> Vec<ProjectNag> {
     nags.extend(permissions::validate(versions));
     nags.extend(versions::validate(project, versions));
     nags.extend(
-        [
-            server_settings::validate,
-            tags::validate,
-            disclosures::validate,
-            moderation::validate,
-        ]
-        .into_iter()
-        .flat_map(|validate| validate(project)),
+        [server_settings::validate, moderation::validate]
+            .into_iter()
+            .flat_map(|validate| validate(project)),
     );
+    nags.extend(tags::validate(project, available_categories));
+    nags.extend(disclosures::validate(project, disclosures));
     nags
 }
 
 pub fn has_required_nags(project: &Project, versions: &[Version]) -> bool {
     validate(project, versions)
+        .iter()
+        .any(|nag| nag.severity == ProjectNagSeverity::Required)
+}
+
+pub fn has_required_nags_with_context(
+    project: &Project,
+    versions: &[Version],
+    available_categories: &[Category],
+    disclosures: &[ProjectDisclosure],
+) -> bool {
+    validate_with_context(project, versions, available_categories, disclosures)
         .iter()
         .any(|nag| nag.severity == ProjectNagSeverity::Required)
 }

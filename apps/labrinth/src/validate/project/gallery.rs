@@ -1,22 +1,60 @@
-use super::text::{contains_profanity, has_non_standard_text};
+use serde_json::json;
+
+use super::text::{ProfanityKind, has_non_standard_text, profanity_matches};
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
-fn validate_text(text: Option<&str>) -> Vec<ProjectNag> {
+fn validate_text(
+    text: Option<&str>,
+    gallery_index: usize,
+    field: &'static str,
+) -> Vec<ProjectNag> {
     let text = text.unwrap_or_default();
     let mut nags = Vec::new();
+    let profanity = profanity_matches(text);
 
-    if contains_profanity(text) {
-        nags.push(ProjectNag::new(
-            ProjectNagKind::GalleryTextProfanity,
-            ProjectNagSeverity::Required,
-        ));
+    if let Some(matched) = profanity
+        .iter()
+        .find(|matched| matched.kind == ProfanityKind::Slur)
+    {
+        nags.push(
+            ProjectNag::new(
+                ProjectNagKind::GalleryTextSlur,
+                ProjectNagSeverity::Required,
+            )
+            .with_details(json!({
+                "gallery_index": gallery_index,
+                "field": field,
+                "value": matched.raw_text,
+            })),
+        );
     }
-
+    if let Some(matched) = profanity
+        .iter()
+        .find(|matched| matched.kind == ProfanityKind::Profanity)
+    {
+        nags.push(
+            ProjectNag::new(
+                ProjectNagKind::GalleryTextProfanity,
+                ProjectNagSeverity::Required,
+            )
+            .with_details(json!({
+                "gallery_index": gallery_index,
+                "field": field,
+                "value": matched.raw_text,
+            })),
+        );
+    }
     if has_non_standard_text(text) {
-        nags.push(ProjectNag::new(
-            ProjectNagKind::GalleryTextNonStandard,
-            ProjectNagSeverity::Required,
-        ));
+        nags.push(
+            ProjectNag::new(
+                ProjectNagKind::GalleryTextNonStandard,
+                ProjectNagSeverity::Required,
+            )
+            .with_details(json!({
+                "gallery_index": gallery_index,
+                "field": field,
+            })),
+        );
     }
 
     nags
@@ -36,13 +74,22 @@ pub(super) fn validate(
         .chain(&project.additional_categories)
         .any(|category| category == "audio" || category == "locale");
 
-    if (is_shader && project.gallery.len() < 3)
-        || (is_resource_pack && gallery_is_empty && !has_gallery_exemption)
-    {
-        nags.push(ProjectNag::new(
-            ProjectNagKind::UploadGalleryImage,
-            ProjectNagSeverity::Required,
-        ));
+    if is_shader && project.gallery.len() < 3 {
+        nags.push(
+            ProjectNag::new(
+                ProjectNagKind::UploadGalleryImage,
+                ProjectNagSeverity::Required,
+            )
+            .with_details(json!({ "project_type": "shader" })),
+        );
+    } else if is_resource_pack && gallery_is_empty && !has_gallery_exemption {
+        nags.push(
+            ProjectNag::new(
+                ProjectNagKind::UploadGalleryImage,
+                ProjectNagSeverity::Required,
+            )
+            .with_details(json!({ "project_type": "resourcepack" })),
+        );
     }
 
     let is_minecraft_server = project.components.minecraft_server.is_some();
@@ -54,9 +101,13 @@ pub(super) fn validate(
         ));
     }
 
-    for item in &project.gallery {
-        nags.extend(validate_text(item.name.as_deref()));
-        nags.extend(validate_text(item.description.as_deref()));
+    for (index, item) in project.gallery.iter().enumerate() {
+        nags.extend(validate_text(item.name.as_deref(), index, "name"));
+        nags.extend(validate_text(
+            item.description.as_deref(),
+            index,
+            "description",
+        ));
     }
 
     nags
