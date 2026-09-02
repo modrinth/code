@@ -61,7 +61,7 @@ import { PlusIcon, TrashIcon } from '@modrinth/assets'
 import { ButtonStyled, ConfirmModal, StyledInput } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { type DistributionAdjustment,formatCurrency } from '../utils'
+import { type DistributionAdjustment, formatCurrency } from '../utils'
 
 const adjustments = defineModel<DistributionAdjustment[]>({ required: true })
 const pendingDeleteIndex = ref<number | null>(null)

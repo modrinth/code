@@ -85,7 +85,9 @@ export function getModrinthShare(amount: number): number {
 }
 
 export function getDistributionCreatorAmount(distribution: DistributionRun): number {
-	return getCreatorShare(getNetActualRevenue(distribution.amount_received, distribution.adjustments))
+	return getCreatorShare(
+		getNetActualRevenue(distribution.amount_received, distribution.adjustments),
+	)
 }
 
 export function roundCurrency(amount: number): number {

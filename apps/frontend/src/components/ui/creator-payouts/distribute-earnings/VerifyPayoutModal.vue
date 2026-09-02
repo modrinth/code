@@ -66,7 +66,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ChevronRightIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
-import { type ComponentPublicInstance,computed, nextTick, ref } from 'vue'
+import { type ComponentPublicInstance, computed, nextTick, ref } from 'vue'
 
 import {
 	type DistributionAdjustment,
