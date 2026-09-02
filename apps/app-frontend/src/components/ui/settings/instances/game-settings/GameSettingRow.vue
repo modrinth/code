@@ -241,7 +241,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:snap-points="[0, 50, 100]"
 				:snap-range="5"
 				:disabled="editorDisabled"
-				value-input-appearance="transparent"
+				value-input-class="!bg-transparent"
 				class="[&_input]:!text-secondary"
 				@update:model-value="updateValue"
 			/>

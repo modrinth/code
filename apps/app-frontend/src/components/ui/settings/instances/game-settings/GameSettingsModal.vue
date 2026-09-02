@@ -35,6 +35,7 @@ import { computed, onUnmounted, ref } from 'vue'
 import {
 	type EditableGameSetting,
 	type GameOptionCanonicalValue,
+	type GameSettingChange,
 	type GameSettingCategory,
 	type GameSettingsEditorState,
 	get_local_game_options_config,
@@ -127,23 +128,6 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.game-settings.unsaved-changes',
 		defaultMessage: 'You have unsaved changes.',
 	},
-	saved: {
-		id: 'app.settings.synced-options.game-settings.saved',
-		defaultMessage: 'Game settings updated',
-	},
-	savedSummary: {
-		id: 'app.settings.synced-options.game-settings.saved-summary',
-		defaultMessage: 'Your changes were saved.',
-	},
-	savedLater: {
-		id: 'app.settings.synced-options.game-settings.saved-later',
-		defaultMessage:
-			'Your changes were saved and will finish syncing when your instances are ready.',
-	},
-	savedWithProblems: {
-		id: 'app.settings.synced-options.game-settings.saved-with-problems',
-		defaultMessage: 'Your changes were saved, but some instances could not be updated.',
-	},
 	conflictTitle: {
 		id: 'app.settings.synced-options.game-settings.conflict-title',
 		defaultMessage: 'These settings changed elsewhere',
@@ -168,6 +152,7 @@ let allowClose = false
 let previewTimer: ReturnType<typeof setTimeout> | null = null
 let previewGeneration = 0
 let loadGeneration = 0
+let saveGeneration = 0
 
 const isLocalEditor = computed(() => !!props.instanceId)
 
@@ -360,6 +345,7 @@ function reset() {
 	previewTimer = null
 	previewGeneration++
 	loadGeneration++
+	saveGeneration++
 	baseState.value = null
 	draftState.value = null
 	loading.value = false
@@ -383,7 +369,7 @@ async function confirmDiscard() {
 }
 
 function cancelChanges() {
-	if (saving.value || !baseState.value) return
+	if (!baseState.value) return
 	if (previewTimer) clearTimeout(previewTimer)
 	previewTimer = null
 	previewGeneration++
@@ -436,7 +422,7 @@ function setCanonicalValue(optionId: string, value: GameOptionCanonicalValue | n
 }
 
 function enableVisible() {
-	if (saving.value || !draftState.value) return
+	if (!draftState.value) return
 	const optionIds = new Set(enableCandidates.value.map((setting) => setting.option_id))
 	draftState.value.settings = draftState.value.settings.map((setting) =>
 		optionIds.has(setting.option_id)
@@ -447,7 +433,7 @@ function enableVisible() {
 }
 
 function disableVisible() {
-	if (saving.value || !draftState.value) return
+	if (!draftState.value) return
 	const optionIds = new Set(disableCandidates.value.map((setting) => setting.option_id))
 	draftState.value.settings = draftState.value.settings.map((setting) =>
 		optionIds.has(setting.option_id)
@@ -495,7 +481,7 @@ function mergePreview(preview: GameSettingsEditorState) {
 			? { ...(previousBaseSettings.get(setting.option_id) ?? setting) }
 			: setting,
 	)
-	nextDraft.settings = nextDraft.settings.map((setting) => {
+	nextDraft.settings = nextDraft.settings.map((setting): EditableGameSetting => {
 		const staged = stagedSettings.get(setting.option_id)
 		if (!staged) return setting
 		return {
@@ -529,13 +515,63 @@ async function preview() {
 	}
 }
 
+function applyChangesToRefreshedState(
+	refreshed: GameSettingsEditorState,
+	stagedDraft: GameSettingsEditorState,
+	changes: GameSettingChange[],
+	touchedOptionIds: ReadonlySet<string>,
+	conflictOptionIds: ReadonlySet<string> = new Set(),
+) {
+	const changesById = new Map(changes.map((change) => [change.option_id, change]))
+	const stagedSettings = new Map(
+		stagedDraft.settings.map((setting) => [setting.option_id, setting]),
+	)
+	const nextBase = cloneGameSettingsState(refreshed)
+	const nextDraft = cloneGameSettingsState(refreshed)
+
+	nextDraft.settings = nextDraft.settings.map((setting) => {
+		const change = changesById.get(setting.option_id)
+		const staged = stagedSettings.get(setting.option_id)
+		if (!change || !staged) return setting
+
+		return {
+			...setting,
+			...(change.sync_enabled !== undefined ? { sync_enabled: staged.sync_enabled } : {}),
+			...(change.canonical_value !== undefined
+				? {
+						canonical_value: staged.canonical_value,
+						value_state: staged.value_state,
+					}
+				: {}),
+			validation_error: conflictOptionIds.has(setting.option_id)
+				? 'changed_since_opened'
+				: staged.validation_error,
+		}
+	})
+
+	baseState.value = nextBase
+	draftState.value = nextDraft
+	touchedValueOptionIds.value = new Set(
+		[...touchedOptionIds].filter(
+			(optionId) => changesById.get(optionId)?.canonical_value !== undefined,
+		),
+	)
+}
+
 async function save() {
+	if (saving.value) return
 	const request = editorRequest()
-	if (!request || request.changes.length === 0) return
+	if (!request || request.changes.length === 0 || !baseState.value || !draftState.value) return
 
 	if (previewTimer) clearTimeout(previewTimer)
 	previewTimer = null
 	previewGeneration++
+	const generation = ++saveGeneration
+	const previousBase = cloneGameSettingsState(baseState.value)
+	const optimisticState = cloneGameSettingsState(draftState.value)
+	const previouslyTouchedOptionIds = new Set(touchedValueOptionIds.value)
+	baseState.value = cloneGameSettingsState(optimisticState)
+	touchedValueOptionIds.value = new Set()
 	saving.value = true
 	try {
 		const result = props.instanceId
@@ -547,28 +583,26 @@ async function save() {
 				(props.instanceId
 					? await get_local_game_options_config(props.instanceId)
 					: await get_synced_game_options_config())
-			const previousDraft = draftState.value
-			const stagedChanges = new Map(request.changes.map((change) => [change.option_id, change]))
+			if (generation !== saveGeneration || !draftState.value) return
+			previewGeneration++
+			const stagedDraft = cloneGameSettingsState(draftState.value)
+			const retainedTouchedOptionIds = new Set([
+				...previouslyTouchedOptionIds,
+				...touchedValueOptionIds.value,
+			])
+			const stagedChanges = gameSettingChanges(
+				previousBase,
+				stagedDraft,
+				retainedTouchedOptionIds,
+			)
 			const conflicts = new Set(result.conflicts)
-			baseState.value = cloneGameSettingsState(refreshed)
-			draftState.value = cloneGameSettingsState(refreshed)
-
-			for (const setting of draftState.value.settings) {
-				const previous = previousDraft?.settings.find(
-					(candidate) => candidate.option_id === setting.option_id,
-				)
-				if (conflicts.has(setting.option_id)) {
-					setting.validation_error = 'changed_since_opened'
-					continue
-				}
-				const change = stagedChanges.get(setting.option_id)
-				if (!change || !previous) continue
-				if (change.sync_enabled !== undefined) setting.sync_enabled = previous.sync_enabled
-				if (change.canonical_value !== undefined) {
-					setting.canonical_value = previous.canonical_value
-					setting.value_state = previous.value_state
-				}
-			}
+			applyChangesToRefreshedState(
+				refreshed,
+				stagedDraft,
+				stagedChanges,
+				retainedTouchedOptionIds,
+				conflicts,
+			)
 
 			addNotification({
 				type: 'warning',
@@ -584,31 +618,45 @@ async function save() {
 			return
 		}
 
-		const savedWithProblems = result.failed > 0 || result.unsupported > 0
-		addNotification({
-			type: savedWithProblems ? 'warning' : 'success',
-			title: formatMessage(messages.saved),
-			text: formatMessage(
-				savedWithProblems
-					? messages.savedWithProblems
-					: result.deferred > 0
-						? messages.savedLater
-						: messages.savedSummary,
-			),
-		})
 		const refreshed =
 			result.state ??
 			(props.instanceId
 				? await get_local_game_options_config(props.instanceId)
 				: await get_synced_game_options_config())
-		baseState.value = cloneGameSettingsState(refreshed)
-		draftState.value = cloneGameSettingsState(refreshed)
-		touchedValueOptionIds.value = new Set()
+		if (generation !== saveGeneration) {
+			emit('saved')
+			return
+		}
+		if (!baseState.value || !draftState.value) return
+		previewGeneration++
+		const stagedDraft = cloneGameSettingsState(draftState.value)
+		const touchedSinceSave = new Set(touchedValueOptionIds.value)
+		const changesSinceSave = gameSettingChanges(
+			optimisticState,
+			stagedDraft,
+			touchedSinceSave,
+		)
+		applyChangesToRefreshedState(
+			refreshed,
+			stagedDraft,
+			changesSinceSave,
+			touchedSinceSave,
+		)
+		if (changesSinceSave.length > 0) schedulePreview()
 		emit('saved')
 	} catch (error) {
+		if (generation === saveGeneration && draftState.value) {
+			previewGeneration++
+			baseState.value = previousBase
+			touchedValueOptionIds.value = new Set([
+				...previouslyTouchedOptionIds,
+				...touchedValueOptionIds.value,
+			])
+			if (dirtyChanges.value.length > 0) schedulePreview()
+		}
 		handleError(error)
 	} finally {
-		saving.value = false
+		if (generation === saveGeneration) saving.value = false
 	}
 }
 
@@ -627,7 +675,6 @@ defineExpose({ show, hide })
 		:before-hide="beforeHide"
 		:before-tab-change="changeCategory"
 		:on-after-hide="reset"
-		:disable-close="saving"
 		:floating-action-bar-shown="isDirty"
 		:max-width="'min(1080px, calc(95vw - 2rem))'"
 		:width="'min(1080px, calc(95vw - 2rem))'"
@@ -658,10 +705,9 @@ defineExpose({ show, hide })
 						<Button
 							size="lg"
 							:disabled="
-								saving ||
-								(allCategorySettingsSynced
+								allCategorySettingsSynced
 									? disableCandidates.length === 0
-									: enableCandidates.length === 0)
+									: enableCandidates.length === 0
 							"
 							@click="toggleVisibleSync"
 						>
@@ -708,7 +754,6 @@ defineExpose({ show, hide })
 							:key="setting.option_id"
 							:setting="setting"
 							:keybind-conflicts="keybindConflicts.get(setting.option_id)"
-							:disabled="saving"
 							:show-sync-toggle="!isLocalEditor"
 							@update:sync-enabled="setSyncEnabled(setting.option_id, $event)"
 							@update:canonical-value="setCanonicalValue(setting.option_id, $event)"
@@ -724,7 +769,7 @@ defineExpose({ show, hide })
 					{{ formatMessage(messages.unsavedChanges) }}
 				</p>
 				<div class="ml-auto flex gap-2">
-					<Button type="outlined" :disabled="saving" @click="cancelChanges">
+					<Button type="outlined" @click="cancelChanges">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
