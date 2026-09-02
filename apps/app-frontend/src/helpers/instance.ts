@@ -336,6 +336,10 @@ export async function get_global_synced_options(): Promise<GlobalSyncedOptions> 
 	return await invoke('plugin:instance|instance_get_global_synced_options')
 }
 
+export async function get_initialized_synced_options(): Promise<GlobalSyncedOptions> {
+	return await invoke('plugin:instance|instance_get_initialized_synced_options')
+}
+
 export async function set_global_synced_option(
 	option: SyncedOption,
 	enabled: boolean,

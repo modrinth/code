@@ -654,23 +654,24 @@ defineExpose({ show, hide })
 					<p class="m-0 min-w-60 flex-1 text-primary">
 						{{ formatMessage(messages.syncedOptionsDescription) }}
 					</p>
-					<Button
-						class="w-48 justify-center"
-						size="lg"
-						:disabled="
-							saving ||
-							(allCategorySettingsSynced
-								? disableCandidates.length === 0
-								: enableCandidates.length === 0)
-						"
-						@click="toggleVisibleSync"
-					>
-						<LinkIcon v-if="allCategorySettingsSynced" />
-						<UnlinkIcon v-else />
-						{{
-							formatMessage(allCategorySettingsSynced ? messages.disableAll : messages.enableAll)
-						}}
-					</Button>
+					<div class="ml-auto flex w-48 justify-end">
+						<Button
+							size="lg"
+							:disabled="
+								saving ||
+								(allCategorySettingsSynced
+									? disableCandidates.length === 0
+									: enableCandidates.length === 0)
+							"
+							@click="toggleVisibleSync"
+						>
+							<LinkIcon v-if="allCategorySettingsSynced" />
+							<UnlinkIcon v-else />
+							{{
+								formatMessage(allCategorySettingsSynced ? messages.disableAll : messages.enableAll)
+							}}
+						</Button>
+					</div>
 				</div>
 
 				<div
