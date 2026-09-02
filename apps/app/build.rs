@@ -236,6 +236,7 @@ fn main() {
                         "instance_get_synced_option_join_preview",
                         "instance_get_synced_options_overview",
                         "instance_get_global_synced_options",
+                        "instance_get_initialized_synced_options",
                         "instance_set_global_synced_option",
                         "instance_list_game_options_sync_sources",
                         "instance_get_synced_game_options_config",

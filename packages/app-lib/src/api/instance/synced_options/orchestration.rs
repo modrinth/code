@@ -105,6 +105,18 @@ pub async fn get_global_options() -> crate::Result<GlobalSyncedOptions> {
     get_global_options_with_state(&state).await
 }
 
+pub async fn get_initialized_options() -> crate::Result<GlobalSyncedOptions> {
+    let state = State::get().await?;
+    let _guard = state.lock_synced_options().await;
+    let mut options = GlobalSyncedOptions::default();
+
+    for option in SyncedOption::ALL {
+        options.set(option, canonical_exists(option, &state).await?);
+    }
+
+    Ok(options)
+}
+
 pub async fn get_synced_options_folder() -> crate::Result<PathBuf> {
     let state = State::get().await?;
     create_synced_directories(&state).await?;
@@ -647,9 +659,8 @@ pub async fn get_instance_option_join_preview(
     if !matches!(
         option,
         SyncedOption::GameOptions | SyncedOption::Screenshots
-    )
-        && (sync_files_are_protected(&metadata)
-            || instance_is_running(&metadata, &state).await?)
+    ) && (sync_files_are_protected(&metadata)
+        || instance_is_running(&metadata, &state).await?)
     {
         return Err(ErrorKind::InputError(
             "Close the instance before including it in file syncing."

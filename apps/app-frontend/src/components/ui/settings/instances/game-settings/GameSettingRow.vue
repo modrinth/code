@@ -205,7 +205,7 @@ function updateValue(value: string | number | boolean | undefined) {
 					: 'grid-cols-[minmax(0,1fr)_12rem]'
 		"
 	>
-		<div class="min-w-0">
+		<div class="min-w-0 pr-2">
 			<div class="flex items-center gap-2">
 				<h3
 					ref="settingLabelRef"
@@ -241,6 +241,8 @@ function updateValue(value: string | number | boolean | undefined) {
 				:snap-points="[0, 50, 100]"
 				:snap-range="5"
 				:disabled="editorDisabled"
+				value-input-appearance="transparent"
+				class="[&_input]:!text-secondary"
 				@update:model-value="updateValue"
 			/>
 
@@ -262,7 +264,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:placeholder="placeholder"
 				:disabled="editorDisabled"
 				:aria-label="formatMessage(messages.valueLabel)"
-				trigger-class="!bg-transparent"
+				trigger-class="!bg-transparent !text-secondary"
 				class="min-w-0"
 				@update:model-value="updateValue"
 			/>
@@ -290,6 +292,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:disabled="editorDisabled"
 				:aria-label="formatMessage(messages.valueLabel)"
 				wrapper-class="w-full !bg-transparent"
+				input-class="!text-secondary"
 				@update:model-value="updateValue"
 			/>
 		</div>

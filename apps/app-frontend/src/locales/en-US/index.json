@@ -1676,11 +1676,23 @@
   "app.settings.game-options.choice.all": {
     "message": "All"
   },
+  "app.settings.game-options.choice.balanced": {
+    "message": "Balanced"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "By player"
+  },
   "app.settings.game-options.choice.chat": {
     "message": "Chat"
   },
   "app.settings.game-options.choice.commands-only": {
     "message": "Commands only"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "Constant"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "Crosshair"
   },
   "app.settings.game-options.choice.custom": {
     "message": "Custom"
@@ -1688,20 +1700,38 @@
   "app.settings.game-options.choice.decreased": {
     "message": "Decreased"
   },
+  "app.settings.game-options.choice.default": {
+    "message": "Default"
+  },
   "app.settings.game-options.choice.fabulous": {
     "message": "Fabulous"
   },
   "app.settings.game-options.choice.fancy": {
     "message": "Fancy"
   },
+  "app.settings.game-options.choice.far": {
+    "message": "Far"
+  },
   "app.settings.game-options.choice.fast": {
     "message": "Fast"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "Frequent"
   },
   "app.settings.game-options.choice.hidden": {
     "message": "Hidden"
   },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "Hotbar"
+  },
   "app.settings.game-options.choice.left": {
     "message": "Left"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Limited"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "Max FPS"
   },
   "app.settings.game-options.choice.maximum": {
     "message": "Maximum"
@@ -1712,8 +1742,17 @@
   "app.settings.game-options.choice.minimum": {
     "message": "Minimum"
   },
+  "app.settings.game-options.choice.nearby": {
+    "message": "Nearby"
+  },
   "app.settings.game-options.choice.never": {
     "message": "Never"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "None"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "Normal"
   },
   "app.settings.game-options.choice.off": {
     "message": "Off"
@@ -1721,20 +1760,41 @@
   "app.settings.game-options.choice.on": {
     "message": "On"
   },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
   "app.settings.game-options.choice.pause": {
     "message": "Pause menu"
   },
   "app.settings.game-options.choice.pause-and-toast": {
     "message": "Pause menu and toast"
   },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "Power saver"
+  },
   "app.settings.game-options.choice.right": {
     "message": "Right"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "Short"
   },
   "app.settings.game-options.choice.shown": {
     "message": "Shown"
   },
   "app.settings.game-options.choice.system": {
     "message": "System"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "Tiny"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "When minimized"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "While AFK"
   },
   "app.settings.game-options.compatibility.all": {
     "message": "Syncs to {count, plural, one {# instance} other {# instances}}"
@@ -1931,20 +1991,50 @@
   "app.settings.game-options.keybind.unsupported-status": {
     "message": "That input cannot be used by Minecraft. Press another key."
   },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "Advanced OpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "Allow cursor changes"
+  },
   "app.settings.game-options.setting.allow-server-listing.description": {
     "message": "Allow the player's name to appear in server listings."
   },
   "app.settings.game-options.setting.allow-server-listing.label": {
     "message": "Server listings"
   },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Alternate blocks"
+  },
   "app.settings.game-options.setting.ambient-occlusion.label": {
     "message": "Smooth lighting"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Ambient/Environment"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3D anaglyph"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Anisotropic filtering"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Anisotropy"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Attack indicator"
   },
   "app.settings.game-options.setting.auto-jump.description": {
     "message": "Automatically jump up one-block-high obstacles."
   },
   "app.settings.game-options.setting.auto-jump.label": {
     "message": "Auto-jump"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Command suggestions"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Autosave indicator"
   },
   "app.settings.game-options.setting.biome-blend-radius.description": {
     "message": "The distance over which biome colors transition."
@@ -1955,14 +2045,26 @@
   "app.settings.game-options.setting.blocks-volume.label": {
     "message": "Blocks"
   },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Brightness"
+  },
   "app.settings.game-options.setting.cape.description": {
     "message": "Show the player's cape, including its elytra texture."
   },
   "app.settings.game-options.setting.cape.label": {
     "message": "Cape"
   },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Chat background only"
+  },
   "app.settings.game-options.setting.chat-colors.label": {
     "message": "Chat colors"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Chat delay"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Chat line spacing"
   },
   "app.settings.game-options.setting.chat-links-prompt.description": {
     "message": "Ask before opening links from chat."
@@ -1982,14 +2084,35 @@
   "app.settings.game-options.setting.chat-opacity.label": {
     "message": "Chat opacity"
   },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Chat preview"
+  },
   "app.settings.game-options.setting.chat-scale.label": {
     "message": "Chat scale"
   },
   "app.settings.game-options.setting.chat-visibility.label": {
     "message": "Chat visibility"
   },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Chat width"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Chunk fade time"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Cloud distance"
+  },
   "app.settings.game-options.setting.clouds.label": {
     "message": "Clouds"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Control-click as right-click"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Cutout leaves"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Damage tilt"
   },
   "app.settings.game-options.setting.dark-splash.description": {
     "message": "Change the Mojang Studios loading screen from red to black."
@@ -1997,20 +2120,56 @@
   "app.settings.game-options.setting.dark-splash.label": {
     "message": "Monochrome logo"
   },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Darkness pulsing"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Debug GUI scale"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Directional audio"
+  },
   "app.settings.game-options.setting.discrete-mouse-scroll.description": {
     "message": "Treat each mouse-wheel input as a single scroll step."
   },
   "app.settings.game-options.setting.discrete-mouse-scroll.label": {
     "message": "Discrete scrolling"
   },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Entity distance"
+  },
   "app.settings.game-options.setting.entity-shadows.label": {
     "message": "Entity shadows"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Exclusive fullscreen"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "Optional telemetry"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Focused chat height"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Force Unicode font"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "FOV effects"
   },
   "app.settings.game-options.setting.fov.label": {
     "message": "Field of view"
   },
   "app.settings.game-options.setting.fullscreen.label": {
     "message": "Fullscreen"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "Glint speed"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "Glint strength"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "Graphics backend"
   },
   "app.settings.game-options.setting.graphics.description": {
     "message": "Controls visual quality and performance."
@@ -2030,6 +2189,24 @@
   "app.settings.game-options.setting.hat.label": {
     "message": "Hat"
   },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "Held item tooltips"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "Hide lightning flashes"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "Hide matched names"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "Hide server address"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "Hide splash texts"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "High contrast block outline"
+  },
   "app.settings.game-options.setting.high-contrast.description": {
     "message": "Enhance the contrast of interface elements."
   },
@@ -2038,6 +2215,18 @@
   },
   "app.settings.game-options.setting.hostile-volume.label": {
     "message": "Hostile creatures"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Improved transparency"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "In-game notifications"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "Reduced framerate"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Invert horizontal mouse"
   },
   "app.settings.game-options.setting.invert-mouse.description": {
     "message": "Invert vertical mouse movement."
@@ -2050,6 +2239,9 @@
   },
   "app.settings.game-options.setting.jacket.label": {
     "message": "Jacket"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "Japanese glyph variants"
   },
   "app.settings.game-options.setting.key-advancements.label": {
     "message": "Advancements"
@@ -2066,14 +2258,113 @@
   "app.settings.game-options.setting.key-command.label": {
     "message": "Command"
   },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "Show advanced tooltips"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Show chunk borders"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Clear chat"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Copy location"
+  },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "Copy recreate command"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "Trigger debug crash"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "Dump dynamic textures"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "Dump version"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "Pause on lost focus"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "FPS charts"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Show hitboxes"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "Improved transparency debug view"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "Lightmap texture"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "Debug modifier"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "Network charts"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "Debug options"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "Debug overlay"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Profiling chart"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "Start profiling"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Reload chunks"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Reload resource packs"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Spectate entity"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "Switch game mode"
+  },
   "app.settings.game-options.setting.key-drop.label": {
     "message": "Drop item"
   },
   "app.settings.game-options.setting.key-forward.label": {
     "message": "Move forward"
   },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "Friends"
+  },
   "app.settings.game-options.setting.key-fullscreen.label": {
     "message": "Toggle fullscreen"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "Hotbar 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Hotbar 2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "Hotbar 3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "Hotbar 4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "Hotbar 5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "Hotbar 6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "Hotbar 7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "Hotbar 8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "Hotbar 9"
   },
   "app.settings.game-options.setting.key-inventory.label": {
     "message": "Inventory"
@@ -2084,6 +2375,9 @@
   "app.settings.game-options.setting.key-left.label": {
     "message": "Strafe left"
   },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "Load toolbar"
+  },
   "app.settings.game-options.setting.key-perspective.label": {
     "message": "Change perspective"
   },
@@ -2093,14 +2387,32 @@
   "app.settings.game-options.setting.key-player-list.label": {
     "message": "Player list"
   },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "Quick actions"
+  },
   "app.settings.game-options.setting.key-right.label": {
     "message": "Strafe right"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "Save toolbar"
   },
   "app.settings.game-options.setting.key-screenshot.label": {
     "message": "Screenshot"
   },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Toggle cinematic camera"
+  },
   "app.settings.game-options.setting.key-sneak.label": {
     "message": "Sneak"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Social interactions"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "Spectator hotbar"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "Highlight spectators"
   },
   "app.settings.game-options.setting.key-sprint.label": {
     "message": "Sprint"
@@ -2108,11 +2420,32 @@
   "app.settings.game-options.setting.key-swap-offhand.label": {
     "message": "Swap offhand"
   },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "Toggle HUD"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "Toggle spectator shader"
+  },
   "app.settings.game-options.setting.key-use.label": {
     "message": "Use item"
   },
   "app.settings.game-options.setting.language.label": {
     "message": "Language"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Left pants leg"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "Left sleeve"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Framerate limit"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "View distance"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "Show macOS menu in fullscreen"
   },
   "app.settings.game-options.setting.main-hand.description": {
     "message": "Choose whether the main hand is left or right."
@@ -2126,11 +2459,20 @@
   "app.settings.game-options.setting.max-framerate.label": {
     "message": "Maximum framerate"
   },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "Menu background blur"
+  },
   "app.settings.game-options.setting.mipmap-levels.description": {
     "message": "Texture smoothing at a distance."
   },
   "app.settings.game-options.setting.mipmap-levels.label": {
     "message": "Mipmap levels"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "Mouse wheel sensitivity"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "Music frequency"
   },
   "app.settings.game-options.setting.music-toast.description": {
     "message": "Choose whether music titles appear in the pause menu and as toasts."
@@ -2141,11 +2483,17 @@
   "app.settings.game-options.setting.music-volume.label": {
     "message": "Music"
   },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Narrator hotkey"
+  },
   "app.settings.game-options.setting.narrator.description": {
     "message": "Choose what the narrator reads."
   },
   "app.settings.game-options.setting.narrator.label": {
     "message": "Narrator"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "Friendly creatures"
   },
   "app.settings.game-options.setting.notification-time.description": {
     "message": "How long toast notifications remain visible."
@@ -2153,20 +2501,65 @@
   "app.settings.game-options.setting.notification-time.label": {
     "message": "Notification time"
   },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "Operator items tab"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "Panorama speed"
+  },
   "app.settings.game-options.setting.particles.label": {
     "message": "Particles"
   },
   "app.settings.game-options.setting.players-volume.label": {
     "message": "Players"
   },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Prioritize chunk updates"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "Quit shortcuts"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "Raw mouse input"
+  },
   "app.settings.game-options.setting.realms-notifications.label": {
     "message": "Realms notifications"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "Jukebox/Note Blocks"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Reduced debug information"
   },
   "app.settings.game-options.setting.render-distance.label": {
     "message": "Render distance"
   },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "Right pants leg"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "Right sleeve"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "Rotate with minecart"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "Save chat drafts"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "Screen effects"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "Only show secure chat"
+  },
   "app.settings.game-options.setting.sensitivity.label": {
     "message": "Mouse sensitivity"
+  },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "Server textures"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "Share presence"
   },
   "app.settings.game-options.setting.simulation-distance.description": {
     "message": "How far away entities update and blocks and fluids tick."
@@ -2174,11 +2567,26 @@
   "app.settings.game-options.setting.simulation-distance.label": {
     "message": "Simulation distance"
   },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "Snooper"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "Sprint window"
+  },
   "app.settings.game-options.setting.subtitles.description": {
     "message": "Show captions for sounds played in the game."
   },
   "app.settings.game-options.setting.subtitles.label": {
     "message": "Subtitles"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "Text background opacity"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "Texture filtering"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "Toggle attack"
   },
   "app.settings.game-options.setting.toggle-crouch.description": {
     "message": "Press once to remain crouched."
@@ -2192,11 +2600,29 @@
   "app.settings.game-options.setting.toggle-sprint.label": {
     "message": "Toggle sprint"
   },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "Toggle use"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Touchscreen mode"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "UI"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "Unfocused chat height"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "Use VBOs"
+  },
   "app.settings.game-options.setting.view-bobbing.description": {
     "message": "Add a bobbing motion to the camera while walking."
   },
   "app.settings.game-options.setting.view-bobbing.label": {
     "message": "View bobbing"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vignette"
   },
   "app.settings.game-options.setting.voice-volume.label": {
     "message": "Voice and speech"
@@ -2207,6 +2633,12 @@
   "app.settings.game-options.setting.vsync.label": {
     "message": "VSync"
   },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Weather radius"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Weather"
+  },
   "app.settings.game-options.source.disabled.installing-or-updating": {
     "message": "Installing or updating"
   },
@@ -2215,9 +2647,6 @@
   },
   "app.settings.game-options.source.disabled.no-syncable-settings": {
     "message": "No syncable settings found"
-  },
-  "app.settings.game-options.source.disabled.running": {
-    "message": "Currently running"
   },
   "app.settings.game-options.source.disabled.unreadable-options-file": {
     "message": "options.txt could not be read"
@@ -2360,6 +2789,12 @@
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "Use the same saved creative hotbars across your instances."
   },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "Add an instance before editing synced data."
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "Choose a sync source before editing this setting."
+  },
   "app.settings.synced-options.game-settings": {
     "message": "Sync game options"
   },
@@ -2428,6 +2863,9 @@
   },
   "app.settings.synced-options.game-settings.title": {
     "message": "Game settings"
+  },
+  "app.settings.synced-options.game-settings.unavailable-tooltip": {
+    "message": "Choose an instance with an options.txt file before editing game settings."
   },
   "app.settings.synced-options.game-settings.unsaved-changes": {
     "message": "You have unsaved changes."

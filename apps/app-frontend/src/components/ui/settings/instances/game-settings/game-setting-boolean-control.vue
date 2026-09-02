@@ -25,10 +25,10 @@ const emit = defineEmits<{
 			type="button"
 			:aria-pressed="modelValue === true"
 			:disabled="disabled"
-			class="flex h-8 cursor-pointer items-center rounded-[10px] border border-solid px-3 text-base font-medium leading-5 text-contrast transition-all active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed"
+			class="flex h-8 cursor-pointer items-center rounded-[10px] border border-solid px-3 text-base font-medium leading-5 text-secondary transition-all active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed"
 			:class="
 				modelValue === true
-					? 'border-green bg-highlight-green text-green'
+					? 'border-green bg-highlight-green !text-green'
 					: 'border-transparent bg-transparent hover:bg-surface-4'
 			"
 			@click="emit('update:model-value', true)"
@@ -39,7 +39,7 @@ const emit = defineEmits<{
 			type="button"
 			:aria-pressed="modelValue === false"
 			:disabled="disabled"
-			class="flex h-8 cursor-pointer items-center rounded-[10px] border border-solid px-3 text-base font-medium leading-5 text-contrast transition-all active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed"
+			class="flex h-8 cursor-pointer items-center rounded-[10px] border border-solid px-3 text-base font-medium leading-5 text-secondary transition-all active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed"
 			:class="
 				modelValue === false
 					? 'border-surface-5 bg-surface-4'

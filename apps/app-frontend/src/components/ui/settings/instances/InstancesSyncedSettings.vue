@@ -35,6 +35,7 @@ import {
 import {
 	get_command_history,
 	get_global_synced_options,
+	get_initialized_synced_options,
 	getInstanceIconUrl,
 	type GlobalSyncedOptions,
 	list as listInstances,
@@ -86,6 +87,10 @@ const messages = defineMessages({
 	gameSettingsDisabledTooltip: {
 		id: 'app.settings.synced-options.game-settings.disabled-tooltip',
 		defaultMessage: 'Enable game settings sync before choosing individual settings.',
+	},
+	gameSettingsUnavailableTooltip: {
+		id: 'app.settings.synced-options.game-settings.unavailable-tooltip',
+		defaultMessage: 'Choose an instance with an options.txt file before editing game settings.',
 	},
 	multiplayerServers: {
 		id: 'app.settings.synced-options.multiplayer-servers',
@@ -170,6 +175,14 @@ const messages = defineMessages({
 	noServersSyncedYet: {
 		id: 'app.settings.synced-options.multiplayer-servers.none-synced-yet',
 		defaultMessage: 'No servers synced yet',
+	},
+	noInstancesToEdit: {
+		id: 'app.settings.synced-options.edit.no-instances',
+		defaultMessage: 'Add an instance before editing synced data.',
+	},
+	noSyncedDataToEdit: {
+		id: 'app.settings.synced-options.edit.no-synced-data',
+		defaultMessage: 'Choose a sync source before editing this setting.',
 	},
 	windowSectionTitle: {
 		id: 'app.settings.default-instance-options.window.title',
@@ -346,6 +359,7 @@ const globalRows: Array<{
 ]
 
 const globalSyncedOptionsQueryKey = ['global-synced-options'] as const
+const initializedSyncedOptionsQueryKey = ['initialized-synced-options'] as const
 const globalSyncedOptionsMutationKey = ['global-synced-options', 'set'] as const
 const defaultGlobalOptions: GlobalSyncedOptions = {
 	game_options: false,
@@ -359,7 +373,14 @@ const globalOptionsQuery = useQuery({
 	queryKey: globalSyncedOptionsQueryKey,
 	queryFn: get_global_synced_options,
 })
+const initializedOptionsQuery = useQuery({
+	queryKey: initializedSyncedOptionsQueryKey,
+	queryFn: get_initialized_synced_options,
+})
 const globalOptions = computed(() => globalOptionsQuery.data.value ?? defaultGlobalOptions)
+const initializedOptions = computed(
+	() => initializedOptionsQuery.data.value ?? defaultGlobalOptions,
+)
 const instances = ref(await listInstances().catch(() => []))
 const baseOption = ref<SyncedOption | null>(null)
 const baseInstanceId = ref(instances.value[0]?.id ?? '')
@@ -450,7 +471,40 @@ async function invalidateSyncedOptions() {
 		queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
 		queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
 		queryClient.invalidateQueries({ queryKey: globalSyncedOptionsQueryKey }),
+		queryClient.invalidateQueries({ queryKey: initializedSyncedOptionsQueryKey }),
 	])
+}
+
+function canEditGlobalOption(row: (typeof globalRows)[number]): boolean {
+	return (
+		!!row.editable &&
+		instances.value.length > 0 &&
+		globalOptions.value[row.option] &&
+		initializedOptions.value[row.option] &&
+		(row.editable !== 'servers' || syncedServers.value.length > 0)
+	)
+}
+
+function editGlobalOptionTooltip(row: (typeof globalRows)[number]): string {
+	if (!globalOptions.value[row.option] && row.editable === 'game-settings') {
+		return formatMessage(messages.gameSettingsDisabledTooltip)
+	}
+	if (instances.value.length === 0) {
+		return formatMessage(messages.noInstancesToEdit)
+	}
+	if (!initializedOptions.value[row.option]) {
+		return formatMessage(
+			row.editable === 'game-settings'
+				? messages.gameSettingsUnavailableTooltip
+				: messages.noSyncedDataToEdit,
+		)
+	}
+	if (row.editable === 'servers' && syncedServers.value.length === 0) {
+		return formatMessage(messages.noServersSyncedYet)
+	}
+	return formatMessage(
+		row.editable === 'game-settings' ? messages.gameSettingsButton : commonMessages.editButton,
+	)
 }
 
 type GlobalOptionMutationVariables = {
@@ -796,7 +850,8 @@ watch(
 		<NewModal
 			ref="commandHistoryModal"
 			:header="formatMessage(messages.commandHistoryEditorTitle)"
-			class="command-history-modal"
+			no-padding
+			actions-divider
 			max-width="700px"
 			width="700px"
 		>
@@ -807,7 +862,7 @@ watch(
 				lang="mcfunction"
 				theme="modrinth"
 				:print-margin="false"
-				class="command-history-editor ace-modrinth rounded-[20px] !border !border-solid !border-surface-5"
+				class="command-history-editor ace-modrinth"
 				style="height: 420px; font-size: 0.875rem"
 			/>
 			<template #actions>
@@ -926,38 +981,31 @@ watch(
 						<div class="flex shrink-0 items-center gap-2">
 							<span
 								v-if="row.editable === 'game-settings'"
-								v-tooltip="
-									!globalOptions.game_options
-										? formatMessage(messages.gameSettingsDisabledTooltip)
-										: formatMessage(messages.gameSettingsButton)
-								"
-								class="flex"
-							>
-								<IconButton
-									type="outlined"
-									circular
-									:disabled="!globalOptions.game_options || globalOptionMutation.isPending.value"
-									:label="formatMessage(messages.gameSettingsButton)"
-									@click="openGameSettings"
-								>
-									<EditIcon />
-								</IconButton>
-							</span>
-							<span
-								v-else-if="row.editable"
-								v-tooltip="
-									row.editable === 'servers' && syncedServers.length === 0
-										? formatMessage(messages.noServersSyncedYet)
-										: formatMessage(commonMessages.editButton)
-								"
+								v-tooltip="editGlobalOptionTooltip(row)"
 								class="flex"
 							>
 								<IconButton
 									type="outlined"
 									circular
 									:disabled="
-										!globalOptions[row.option] ||
-										(row.editable === 'servers' && syncedServers.length === 0)
+										!canEditGlobalOption(row) ||
+										initializedOptionsQuery.isPending.value ||
+										globalOptionMutation.isPending.value
+									"
+									:label="formatMessage(messages.gameSettingsButton)"
+									@click="openGameSettings"
+								>
+									<EditIcon />
+								</IconButton>
+							</span>
+							<span v-else-if="row.editable" v-tooltip="editGlobalOptionTooltip(row)" class="flex">
+								<IconButton
+									type="outlined"
+									circular
+									:disabled="
+										!canEditGlobalOption(row) ||
+										initializedOptionsQuery.isPending.value ||
+										globalOptionMutation.isPending.value
 									"
 									:label="formatMessage(commonMessages.editButton)"
 									@click="
@@ -1190,9 +1238,5 @@ watch(
 
 .command-history-editor.ace-modrinth.ace_multiselect .ace_selection.ace_start {
 	box-shadow: 0 0 3px 0 var(--surface-2);
-}
-
-.command-history-modal > [data-modal-content] {
-	padding-bottom: 0;
 }
 </style>

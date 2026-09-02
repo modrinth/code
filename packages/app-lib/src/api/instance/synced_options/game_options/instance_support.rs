@@ -176,21 +176,16 @@ pub(super) fn describe_instance_support(
 					)
                     } else if let Some((key, mapping)) =
                         definition.and_then(|definition| {
-                            physical_variant_for_version(definition, &version)
-                                .map(|variant| (variant.key, variant.mapping))
-                                .or_else(|| {
-                                    definition
-                                        .versioned_keys
-                                        .is_empty()
-                                        .then(|| {
-                                            definition
-										.keys
-										.first()
-										.copied()
-										.map(|key| (key, GameOptionMappingKind::Direct))
-                                        })
-                                        .flatten()
-                                })
+                            target_key_for_version(definition, &version).map(
+                                |key| {
+                                    let mapping = physical_variant_for_version(
+                                        definition, &version,
+                                    )
+                                    .map(|variant| variant.mapping)
+                                    .unwrap_or(GameOptionMappingKind::Direct);
+                                    (key, mapping)
+                                },
+                            )
                         })
                     {
                         let representable = value.is_none_or(|value| {
@@ -309,11 +304,7 @@ pub(super) fn describe_instance_support(
                         }
                     } else if let Some(definition) =
                         definition.filter(|definition| {
-                            (definition.versioned_keys.is_empty()
-                                || physical_variant_for_version(
-                                    definition, &version,
-                                )
-                                .is_some())
+                            setting_available_for_version(definition, &version)
                                 && definition
                                     .keys
                                     .iter()
@@ -321,17 +312,8 @@ pub(super) fn describe_instance_support(
                         })
                     {
                         let eventual_key =
-                            physical_variant_for_version(definition, &version)
-                                .map(|variant| variant.key.to_string())
-                                .or_else(|| {
-                                    definition
-                                        .keys
-                                        .iter()
-                                        .find(|key| {
-                                            document.value(key).is_some()
-                                        })
-                                        .map(|key| (*key).to_string())
-                                });
+                            target_key_for_version(definition, &version)
+                                .map(str::to_string);
                         let representable =
                             eventual_key.as_deref().is_some_and(|key| {
                                 value.is_none_or(|value| {
@@ -485,8 +467,8 @@ pub(super) fn find_common_local_value(
         } else {
             Some(CanonicalValue::ExternalRaw(raw_value.to_string()))
         };
-        if let Some(value) = value
-            .filter(|value| validate_file_value(definition, value).is_ok())
+        if let Some(value) =
+            value.filter(|value| validate_file_value(definition, value).is_ok())
         {
             values.push(value);
         } else {

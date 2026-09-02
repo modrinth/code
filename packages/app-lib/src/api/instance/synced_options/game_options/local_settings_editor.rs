@@ -28,9 +28,7 @@ fn compatibility(controlled: bool) -> GameOptionCompatibility {
                 game_versions: Vec::new(),
                 status: GameOptionCompatibilityStatus::Controlled,
                 mapping: None,
-                reason: Some(
-                    GameOptionCompatibilityReason::LauncherControlled,
-                ),
+                reason: Some(GameOptionCompatibilityReason::LauncherControlled),
             }],
         }
     } else {
@@ -237,10 +235,9 @@ fn encode_setting_value(
         Ok((key, raw))
     } else {
         validate_canonical_value(None, value)?;
-        let key = setting
-            .raw_key
-            .clone()
-            .ok_or_else(|| input_error("Custom setting is missing its file key"))?;
+        let key = setting.raw_key.clone().ok_or_else(|| {
+            input_error("Custom setting is missing its file key")
+        })?;
         let CanonicalValue::ExternalRaw(raw) = value else {
             return Err(input_error(
                 "Custom settings require a raw string value",
@@ -313,10 +310,7 @@ pub async fn preview_changes(
             match value {
                 Some(value)
                     if encode_setting_value(
-                        &metadata,
-                        &document,
-                        setting,
-                        &value,
+                        &metadata, &document, setting, &value,
                     )
                     .is_ok() =>
                 {

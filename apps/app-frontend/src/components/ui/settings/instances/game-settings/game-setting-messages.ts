@@ -380,6 +380,488 @@ const settingMessages = defineMessages({
 	},
 })
 
+const catalogSettingMessages = defineMessages({
+	brightnessLabel: {
+		id: 'app.settings.game-options.setting.brightness.label',
+		defaultMessage: 'Brightness',
+	},
+	legacyViewDistanceLabel: {
+		id: 'app.settings.game-options.setting.legacy-view-distance.label',
+		defaultMessage: 'View distance',
+	},
+	entityDistanceLabel: {
+		id: 'app.settings.game-options.setting.entity-distance.label',
+		defaultMessage: 'Entity distance',
+	},
+	debugGuiScaleLabel: {
+		id: 'app.settings.game-options.setting.debug-gui-scale.label',
+		defaultMessage: 'Debug GUI scale',
+	},
+	graphicsBackendLabel: {
+		id: 'app.settings.game-options.setting.graphics-backend.label',
+		defaultMessage: 'Graphics backend',
+	},
+	cloudRangeLabel: {
+		id: 'app.settings.game-options.setting.cloud-range.label',
+		defaultMessage: 'Cloud distance',
+	},
+	exclusiveFullscreenLabel: {
+		id: 'app.settings.game-options.setting.exclusive-fullscreen.label',
+		defaultMessage: 'Exclusive fullscreen',
+	},
+	macFullscreenMenuLabel: {
+		id: 'app.settings.game-options.setting.mac-fullscreen-menu.label',
+		defaultMessage: 'Show macOS menu in fullscreen',
+	},
+	legacyFramerateLimitLabel: {
+		id: 'app.settings.game-options.setting.legacy-framerate-limit.label',
+		defaultMessage: 'Framerate limit',
+	},
+	inactivityFramerateLimitLabel: {
+		id: 'app.settings.game-options.setting.inactivity-framerate-limit.label',
+		defaultMessage: 'Reduced framerate',
+	},
+	prioritizeChunkUpdatesLabel: {
+		id: 'app.settings.game-options.setting.prioritize-chunk-updates.label',
+		defaultMessage: 'Prioritize chunk updates',
+	},
+	attackIndicatorLabel: {
+		id: 'app.settings.game-options.setting.attack-indicator.label',
+		defaultMessage: 'Attack indicator',
+	},
+	reducedDebugInfoLabel: {
+		id: 'app.settings.game-options.setting.reduced-debug-info.label',
+		defaultMessage: 'Reduced debug information',
+	},
+	chunkFadeTimeLabel: {
+		id: 'app.settings.game-options.setting.chunk-fade-time.label',
+		defaultMessage: 'Chunk fade time',
+	},
+	cutoutLeavesLabel: {
+		id: 'app.settings.game-options.setting.cutout-leaves.label',
+		defaultMessage: 'Cutout leaves',
+	},
+	improvedTransparencyLabel: {
+		id: 'app.settings.game-options.setting.improved-transparency.label',
+		defaultMessage: 'Improved transparency',
+	},
+	textureFilteringLabel: {
+		id: 'app.settings.game-options.setting.texture-filtering.label',
+		defaultMessage: 'Texture filtering',
+	},
+	anisotropyLabel: {
+		id: 'app.settings.game-options.setting.anisotropy.label',
+		defaultMessage: 'Anisotropy',
+	},
+	vignetteLabel: {
+		id: 'app.settings.game-options.setting.vignette.label',
+		defaultMessage: 'Vignette',
+	},
+	weatherRadiusLabel: {
+		id: 'app.settings.game-options.setting.weather-radius.label',
+		defaultMessage: 'Weather radius',
+	},
+	advancedOpenGlLabel: {
+		id: 'app.settings.game-options.setting.advanced-opengl.label',
+		defaultMessage: 'Advanced OpenGL',
+	},
+	anaglyph3dLabel: {
+		id: 'app.settings.game-options.setting.anaglyph-3d.label',
+		defaultMessage: '3D anaglyph',
+	},
+	anisotropicFilteringLabel: {
+		id: 'app.settings.game-options.setting.anisotropic-filtering.label',
+		defaultMessage: 'Anisotropic filtering',
+	},
+	alternateBlocksLabel: {
+		id: 'app.settings.game-options.setting.alternate-blocks.label',
+		defaultMessage: 'Alternate blocks',
+	},
+	heldItemTooltipsLabel: {
+		id: 'app.settings.game-options.setting.held-item-tooltips.label',
+		defaultMessage: 'Held item tooltips',
+	},
+	useVboLabel: {
+		id: 'app.settings.game-options.setting.use-vbo.label',
+		defaultMessage: 'Use VBOs',
+	},
+	forceUnicodeFontLabel: {
+		id: 'app.settings.game-options.setting.force-unicode-font.label',
+		defaultMessage: 'Force Unicode font',
+	},
+	japaneseGlyphVariantsLabel: {
+		id: 'app.settings.game-options.setting.japanese-glyph-variants.label',
+		defaultMessage: 'Japanese glyph variants',
+	},
+	musicFrequencyLabel: {
+		id: 'app.settings.game-options.setting.music-frequency.label',
+		defaultMessage: 'Music frequency',
+	},
+	directionalAudioLabel: {
+		id: 'app.settings.game-options.setting.directional-audio.label',
+		defaultMessage: 'Directional audio',
+	},
+	invertHorizontalMouseLabel: {
+		id: 'app.settings.game-options.setting.invert-horizontal-mouse.label',
+		defaultMessage: 'Invert horizontal mouse',
+	},
+	toggleAttackLabel: {
+		id: 'app.settings.game-options.setting.toggle-attack.label',
+		defaultMessage: 'Toggle attack',
+	},
+	toggleUseLabel: {
+		id: 'app.settings.game-options.setting.toggle-use.label',
+		defaultMessage: 'Toggle use',
+	},
+	mouseWheelSensitivityLabel: {
+		id: 'app.settings.game-options.setting.mouse-wheel-sensitivity.label',
+		defaultMessage: 'Mouse wheel sensitivity',
+	},
+	rawMouseInputLabel: {
+		id: 'app.settings.game-options.setting.raw-mouse-input.label',
+		defaultMessage: 'Raw mouse input',
+	},
+	touchscreenLabel: {
+		id: 'app.settings.game-options.setting.touchscreen.label',
+		defaultMessage: 'Touchscreen mode',
+	},
+	allowCursorChangesLabel: {
+		id: 'app.settings.game-options.setting.allow-cursor-changes.label',
+		defaultMessage: 'Allow cursor changes',
+	},
+	sprintWindowLabel: {
+		id: 'app.settings.game-options.setting.sprint-window.label',
+		defaultMessage: 'Sprint window',
+	},
+	operatorItemsTabLabel: {
+		id: 'app.settings.game-options.setting.operator-items-tab.label',
+		defaultMessage: 'Operator items tab',
+	},
+	ctrlClickRightClickLabel: {
+		id: 'app.settings.game-options.setting.ctrl-click-right-click.label',
+		defaultMessage: 'Control-click as right-click',
+	},
+	quitShortcutsLabel: {
+		id: 'app.settings.game-options.setting.quit-shortcuts.label',
+		defaultMessage: 'Quit shortcuts',
+	},
+	chatWidthLabel: {
+		id: 'app.settings.game-options.setting.chat-width.label',
+		defaultMessage: 'Chat width',
+	},
+	focusedChatHeightLabel: {
+		id: 'app.settings.game-options.setting.focused-chat-height.label',
+		defaultMessage: 'Focused chat height',
+	},
+	unfocusedChatHeightLabel: {
+		id: 'app.settings.game-options.setting.unfocused-chat-height.label',
+		defaultMessage: 'Unfocused chat height',
+	},
+	chatLineSpacingLabel: {
+		id: 'app.settings.game-options.setting.chat-line-spacing.label',
+		defaultMessage: 'Chat line spacing',
+	},
+	chatDelayLabel: {
+		id: 'app.settings.game-options.setting.chat-delay.label',
+		defaultMessage: 'Chat delay',
+	},
+	textBackgroundOpacityLabel: {
+		id: 'app.settings.game-options.setting.text-background-opacity.label',
+		defaultMessage: 'Text background opacity',
+	},
+	chatBackgroundOnlyLabel: {
+		id: 'app.settings.game-options.setting.chat-background-only.label',
+		defaultMessage: 'Chat background only',
+	},
+	autoSuggestionsLabel: {
+		id: 'app.settings.game-options.setting.auto-suggestions.label',
+		defaultMessage: 'Command suggestions',
+	},
+	secureChatOnlyLabel: {
+		id: 'app.settings.game-options.setting.secure-chat-only.label',
+		defaultMessage: 'Only show secure chat',
+	},
+	saveChatDraftsLabel: {
+		id: 'app.settings.game-options.setting.save-chat-drafts.label',
+		defaultMessage: 'Save chat drafts',
+	},
+	hideMatchedNamesLabel: {
+		id: 'app.settings.game-options.setting.hide-matched-names.label',
+		defaultMessage: 'Hide matched names',
+	},
+	chatPreviewLabel: {
+		id: 'app.settings.game-options.setting.chat-preview.label',
+		defaultMessage: 'Chat preview',
+	},
+	fovEffectsLabel: {
+		id: 'app.settings.game-options.setting.fov-effects.label',
+		defaultMessage: 'FOV effects',
+	},
+	screenEffectsLabel: {
+		id: 'app.settings.game-options.setting.screen-effects.label',
+		defaultMessage: 'Screen effects',
+	},
+	darknessPulsingLabel: {
+		id: 'app.settings.game-options.setting.darkness-pulsing.label',
+		defaultMessage: 'Darkness pulsing',
+	},
+	damageTiltLabel: {
+		id: 'app.settings.game-options.setting.damage-tilt.label',
+		defaultMessage: 'Damage tilt',
+	},
+	glintSpeedLabel: {
+		id: 'app.settings.game-options.setting.glint-speed.label',
+		defaultMessage: 'Glint speed',
+	},
+	glintStrengthLabel: {
+		id: 'app.settings.game-options.setting.glint-strength.label',
+		defaultMessage: 'Glint strength',
+	},
+	hideLightningFlashesLabel: {
+		id: 'app.settings.game-options.setting.hide-lightning-flashes.label',
+		defaultMessage: 'Hide lightning flashes',
+	},
+	hideSplashTextsLabel: {
+		id: 'app.settings.game-options.setting.hide-splash-texts.label',
+		defaultMessage: 'Hide splash texts',
+	},
+	highContrastOutlineLabel: {
+		id: 'app.settings.game-options.setting.high-contrast-outline.label',
+		defaultMessage: 'High contrast block outline',
+	},
+	narratorHotkeyLabel: {
+		id: 'app.settings.game-options.setting.narrator-hotkey.label',
+		defaultMessage: 'Narrator hotkey',
+	},
+	autosaveIndicatorLabel: {
+		id: 'app.settings.game-options.setting.autosave-indicator.label',
+		defaultMessage: 'Autosave indicator',
+	},
+	panoramaSpeedLabel: {
+		id: 'app.settings.game-options.setting.panorama-speed.label',
+		defaultMessage: 'Panorama speed',
+	},
+	menuBackgroundBlurLabel: {
+		id: 'app.settings.game-options.setting.menu-background-blur.label',
+		defaultMessage: 'Menu background blur',
+	},
+	rotateWithMinecartLabel: {
+		id: 'app.settings.game-options.setting.rotate-with-minecart.label',
+		defaultMessage: 'Rotate with minecart',
+	},
+	leftSleeveLabel: {
+		id: 'app.settings.game-options.setting.left-sleeve.label',
+		defaultMessage: 'Left sleeve',
+	},
+	rightSleeveLabel: {
+		id: 'app.settings.game-options.setting.right-sleeve.label',
+		defaultMessage: 'Right sleeve',
+	},
+	leftPantsLegLabel: {
+		id: 'app.settings.game-options.setting.left-pants-leg.label',
+		defaultMessage: 'Left pants leg',
+	},
+	rightPantsLegLabel: {
+		id: 'app.settings.game-options.setting.right-pants-leg.label',
+		defaultMessage: 'Right pants leg',
+	},
+	hideServerAddressLabel: {
+		id: 'app.settings.game-options.setting.hide-server-address.label',
+		defaultMessage: 'Hide server address',
+	},
+	serverTexturesLabel: {
+		id: 'app.settings.game-options.setting.server-textures.label',
+		defaultMessage: 'Server textures',
+	},
+	snooperLabel: {
+		id: 'app.settings.game-options.setting.snooper.label',
+		defaultMessage: 'Snooper',
+	},
+	extraTelemetryLabel: {
+		id: 'app.settings.game-options.setting.extra-telemetry.label',
+		defaultMessage: 'Optional telemetry',
+	},
+	inGameNotificationsLabel: {
+		id: 'app.settings.game-options.setting.in-game-notifications.label',
+		defaultMessage: 'In-game notifications',
+	},
+	sharePresenceLabel: {
+		id: 'app.settings.game-options.setting.share-presence.label',
+		defaultMessage: 'Share presence',
+	},
+})
+
+const catalogKeyMessages = defineMessages({
+	smoothCameraLabel: {
+		id: 'app.settings.game-options.setting.key-smooth-camera.label',
+		defaultMessage: 'Toggle cinematic camera',
+	},
+	spectatorOutlinesLabel: {
+		id: 'app.settings.game-options.setting.key-spectator-outlines.label',
+		defaultMessage: 'Highlight spectators',
+	},
+	saveToolbarLabel: {
+		id: 'app.settings.game-options.setting.key-save-toolbar.label',
+		defaultMessage: 'Save toolbar',
+	},
+	loadToolbarLabel: {
+		id: 'app.settings.game-options.setting.key-load-toolbar.label',
+		defaultMessage: 'Load toolbar',
+	},
+	socialInteractionsLabel: {
+		id: 'app.settings.game-options.setting.key-social-interactions.label',
+		defaultMessage: 'Social interactions',
+	},
+	quickActionsLabel: {
+		id: 'app.settings.game-options.setting.key-quick-actions.label',
+		defaultMessage: 'Quick actions',
+	},
+	spectatorHotbarLabel: {
+		id: 'app.settings.game-options.setting.key-spectator-hotbar.label',
+		defaultMessage: 'Spectator hotbar',
+	},
+	friendsLabel: {
+		id: 'app.settings.game-options.setting.key-friends.label',
+		defaultMessage: 'Friends',
+	},
+	toggleGuiLabel: {
+		id: 'app.settings.game-options.setting.key-toggle-gui.label',
+		defaultMessage: 'Toggle HUD',
+	},
+	toggleSpectatorShaderLabel: {
+		id: 'app.settings.game-options.setting.key-toggle-spectator-shader.label',
+		defaultMessage: 'Toggle spectator shader',
+	},
+	hotbar1Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-1.label',
+		defaultMessage: 'Hotbar 1',
+	},
+	hotbar2Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-2.label',
+		defaultMessage: 'Hotbar 2',
+	},
+	hotbar3Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-3.label',
+		defaultMessage: 'Hotbar 3',
+	},
+	hotbar4Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-4.label',
+		defaultMessage: 'Hotbar 4',
+	},
+	hotbar5Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-5.label',
+		defaultMessage: 'Hotbar 5',
+	},
+	hotbar6Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-6.label',
+		defaultMessage: 'Hotbar 6',
+	},
+	hotbar7Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-7.label',
+		defaultMessage: 'Hotbar 7',
+	},
+	hotbar8Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-8.label',
+		defaultMessage: 'Hotbar 8',
+	},
+	hotbar9Label: {
+		id: 'app.settings.game-options.setting.key-hotbar-9.label',
+		defaultMessage: 'Hotbar 9',
+	},
+	debugOverlayLabel: {
+		id: 'app.settings.game-options.setting.key-debug-overlay.label',
+		defaultMessage: 'Debug overlay',
+	},
+	debugModifierLabel: {
+		id: 'app.settings.game-options.setting.key-debug-modifier.label',
+		defaultMessage: 'Debug modifier',
+	},
+	debugReloadChunksLabel: {
+		id: 'app.settings.game-options.setting.key-debug-reload-chunks.label',
+		defaultMessage: 'Reload chunks',
+	},
+	debugHitboxesLabel: {
+		id: 'app.settings.game-options.setting.key-debug-hitboxes.label',
+		defaultMessage: 'Show hitboxes',
+	},
+	debugClearChatLabel: {
+		id: 'app.settings.game-options.setting.key-debug-clear-chat.label',
+		defaultMessage: 'Clear chat',
+	},
+	debugCrashLabel: {
+		id: 'app.settings.game-options.setting.key-debug-crash.label',
+		defaultMessage: 'Trigger debug crash',
+	},
+	debugChunkBordersLabel: {
+		id: 'app.settings.game-options.setting.key-debug-chunk-borders.label',
+		defaultMessage: 'Show chunk borders',
+	},
+	debugAdvancedTooltipsLabel: {
+		id: 'app.settings.game-options.setting.key-debug-advanced-tooltips.label',
+		defaultMessage: 'Show advanced tooltips',
+	},
+	debugCopyRecreateCommandLabel: {
+		id: 'app.settings.game-options.setting.key-debug-copy-recreate-command.label',
+		defaultMessage: 'Copy recreate command',
+	},
+	debugSpectateLabel: {
+		id: 'app.settings.game-options.setting.key-debug-spectate.label',
+		defaultMessage: 'Spectate entity',
+	},
+	debugSwitchGameModeLabel: {
+		id: 'app.settings.game-options.setting.key-debug-switch-game-mode.label',
+		defaultMessage: 'Switch game mode',
+	},
+	debugOptionsLabel: {
+		id: 'app.settings.game-options.setting.key-debug-options.label',
+		defaultMessage: 'Debug options',
+	},
+	debugFocusPauseLabel: {
+		id: 'app.settings.game-options.setting.key-debug-focus-pause.label',
+		defaultMessage: 'Pause on lost focus',
+	},
+	debugDumpDynamicTexturesLabel: {
+		id: 'app.settings.game-options.setting.key-debug-dump-dynamic-textures.label',
+		defaultMessage: 'Dump dynamic textures',
+	},
+	debugReloadResourcePacksLabel: {
+		id: 'app.settings.game-options.setting.key-debug-reload-resource-packs.label',
+		defaultMessage: 'Reload resource packs',
+	},
+	debugProfilingLabel: {
+		id: 'app.settings.game-options.setting.key-debug-profiling.label',
+		defaultMessage: 'Start profiling',
+	},
+	debugCopyLocationLabel: {
+		id: 'app.settings.game-options.setting.key-debug-copy-location.label',
+		defaultMessage: 'Copy location',
+	},
+	debugDumpVersionLabel: {
+		id: 'app.settings.game-options.setting.key-debug-dump-version.label',
+		defaultMessage: 'Dump version',
+	},
+	debugProfilingChartLabel: {
+		id: 'app.settings.game-options.setting.key-debug-profiling-chart.label',
+		defaultMessage: 'Profiling chart',
+	},
+	debugFpsChartsLabel: {
+		id: 'app.settings.game-options.setting.key-debug-fps-charts.label',
+		defaultMessage: 'FPS charts',
+	},
+	debugNetworkChartsLabel: {
+		id: 'app.settings.game-options.setting.key-debug-network-charts.label',
+		defaultMessage: 'Network charts',
+	},
+	debugLightmapTextureLabel: {
+		id: 'app.settings.game-options.setting.key-debug-lightmap-texture.label',
+		defaultMessage: 'Lightmap texture',
+	},
+	debugImprovedTransparencyLabel: {
+		id: 'app.settings.game-options.setting.key-debug-improved-transparency.label',
+		defaultMessage: 'Improved transparency debug view',
+	},
+})
+
 const categoryMessages = defineMessages({
 	skinCustomizationLabel: {
 		id: 'app.settings.game-options.category.skin-customization.label',
@@ -474,6 +956,29 @@ const choiceMessages = defineMessages({
 		id: 'app.settings.game-options.choice.pause-and-toast',
 		defaultMessage: 'Pause menu and toast',
 	},
+	far: { id: 'app.settings.game-options.choice.far', defaultMessage: 'Far' },
+	normal: { id: 'app.settings.game-options.choice.normal', defaultMessage: 'Normal' },
+	short: { id: 'app.settings.game-options.choice.short', defaultMessage: 'Short' },
+	tiny: { id: 'app.settings.game-options.choice.tiny', defaultMessage: 'Tiny' },
+	maxFps: { id: 'app.settings.game-options.choice.max-fps', defaultMessage: 'Max FPS' },
+	balanced: { id: 'app.settings.game-options.choice.balanced', defaultMessage: 'Balanced' },
+	powerSaver: { id: 'app.settings.game-options.choice.power-saver', defaultMessage: 'Power saver' },
+	whileAfk: { id: 'app.settings.game-options.choice.while-afk', defaultMessage: 'While AFK' },
+	whenMinimized: {
+		id: 'app.settings.game-options.choice.when-minimized',
+		defaultMessage: 'When minimized',
+	},
+	none: { id: 'app.settings.game-options.choice.none', defaultMessage: 'None' },
+	byPlayer: { id: 'app.settings.game-options.choice.by-player', defaultMessage: 'By player' },
+	nearby: { id: 'app.settings.game-options.choice.nearby', defaultMessage: 'Nearby' },
+	crosshair: { id: 'app.settings.game-options.choice.crosshair', defaultMessage: 'Crosshair' },
+	hotbar: { id: 'app.settings.game-options.choice.hotbar', defaultMessage: 'Hotbar' },
+	constant: { id: 'app.settings.game-options.choice.constant', defaultMessage: 'Constant' },
+	default: { id: 'app.settings.game-options.choice.default', defaultMessage: 'Default' },
+	frequent: { id: 'app.settings.game-options.choice.frequent', defaultMessage: 'Frequent' },
+	limited: { id: 'app.settings.game-options.choice.limited', defaultMessage: 'Limited' },
+	openGl: { id: 'app.settings.game-options.choice.opengl', defaultMessage: 'OpenGL' },
+	vulkan: { id: 'app.settings.game-options.choice.vulkan', defaultMessage: 'Vulkan' },
 })
 
 export const presentationMessages = defineMessages({
@@ -712,6 +1217,137 @@ const knownSettings: Record<string, { label: MessageDescriptor; description?: Me
 			description: settingMessages.allowServerListingDescription,
 		},
 		realms_notifications: { label: settingMessages.realmsNotificationsLabel },
+		brightness: { label: catalogSettingMessages.brightnessLabel },
+		legacy_view_distance: { label: catalogSettingMessages.legacyViewDistanceLabel },
+		entity_distance: { label: catalogSettingMessages.entityDistanceLabel },
+		debug_gui_scale: { label: catalogSettingMessages.debugGuiScaleLabel },
+		graphics_backend: { label: catalogSettingMessages.graphicsBackendLabel },
+		cloud_range: { label: catalogSettingMessages.cloudRangeLabel },
+		exclusive_fullscreen: { label: catalogSettingMessages.exclusiveFullscreenLabel },
+		mac_fullscreen_menu: { label: catalogSettingMessages.macFullscreenMenuLabel },
+		legacy_framerate_limit: { label: catalogSettingMessages.legacyFramerateLimitLabel },
+		inactivity_framerate_limit: {
+			label: catalogSettingMessages.inactivityFramerateLimitLabel,
+		},
+		prioritize_chunk_updates: { label: catalogSettingMessages.prioritizeChunkUpdatesLabel },
+		attack_indicator: { label: catalogSettingMessages.attackIndicatorLabel },
+		reduced_debug_info: { label: catalogSettingMessages.reducedDebugInfoLabel },
+		chunk_fade_time: { label: catalogSettingMessages.chunkFadeTimeLabel },
+		cutout_leaves: { label: catalogSettingMessages.cutoutLeavesLabel },
+		improved_transparency: { label: catalogSettingMessages.improvedTransparencyLabel },
+		texture_filtering: { label: catalogSettingMessages.textureFilteringLabel },
+		anisotropy: { label: catalogSettingMessages.anisotropyLabel },
+		vignette: { label: catalogSettingMessages.vignetteLabel },
+		weather_radius: { label: catalogSettingMessages.weatherRadiusLabel },
+		advanced_opengl: { label: catalogSettingMessages.advancedOpenGlLabel },
+		anaglyph_3d: { label: catalogSettingMessages.anaglyph3dLabel },
+		anisotropic_filtering: { label: catalogSettingMessages.anisotropicFilteringLabel },
+		alternate_blocks: { label: catalogSettingMessages.alternateBlocksLabel },
+		held_item_tooltips: { label: catalogSettingMessages.heldItemTooltipsLabel },
+		use_vbo: { label: catalogSettingMessages.useVboLabel },
+		force_unicode_font: { label: catalogSettingMessages.forceUnicodeFontLabel },
+		japanese_glyph_variants: { label: catalogSettingMessages.japaneseGlyphVariantsLabel },
+		music_frequency: { label: catalogSettingMessages.musicFrequencyLabel },
+		directional_audio: { label: catalogSettingMessages.directionalAudioLabel },
+		invert_horizontal_mouse: { label: catalogSettingMessages.invertHorizontalMouseLabel },
+		toggle_attack: { label: catalogSettingMessages.toggleAttackLabel },
+		toggle_use: { label: catalogSettingMessages.toggleUseLabel },
+		mouse_wheel_sensitivity: { label: catalogSettingMessages.mouseWheelSensitivityLabel },
+		raw_mouse_input: { label: catalogSettingMessages.rawMouseInputLabel },
+		touchscreen: { label: catalogSettingMessages.touchscreenLabel },
+		allow_cursor_changes: { label: catalogSettingMessages.allowCursorChangesLabel },
+		sprint_window: { label: catalogSettingMessages.sprintWindowLabel },
+		operator_items_tab: { label: catalogSettingMessages.operatorItemsTabLabel },
+		ctrl_click_right_click: { label: catalogSettingMessages.ctrlClickRightClickLabel },
+		quit_shortcuts: { label: catalogSettingMessages.quitShortcutsLabel },
+		chat_width: { label: catalogSettingMessages.chatWidthLabel },
+		focused_chat_height: { label: catalogSettingMessages.focusedChatHeightLabel },
+		unfocused_chat_height: { label: catalogSettingMessages.unfocusedChatHeightLabel },
+		chat_line_spacing: { label: catalogSettingMessages.chatLineSpacingLabel },
+		chat_delay: { label: catalogSettingMessages.chatDelayLabel },
+		text_background_opacity: { label: catalogSettingMessages.textBackgroundOpacityLabel },
+		chat_background_only: { label: catalogSettingMessages.chatBackgroundOnlyLabel },
+		auto_suggestions: { label: catalogSettingMessages.autoSuggestionsLabel },
+		secure_chat_only: { label: catalogSettingMessages.secureChatOnlyLabel },
+		save_chat_drafts: { label: catalogSettingMessages.saveChatDraftsLabel },
+		hide_matched_names: { label: catalogSettingMessages.hideMatchedNamesLabel },
+		chat_preview: { label: catalogSettingMessages.chatPreviewLabel },
+		fov_effects: { label: catalogSettingMessages.fovEffectsLabel },
+		screen_effects: { label: catalogSettingMessages.screenEffectsLabel },
+		darkness_pulsing: { label: catalogSettingMessages.darknessPulsingLabel },
+		damage_tilt: { label: catalogSettingMessages.damageTiltLabel },
+		glint_speed: { label: catalogSettingMessages.glintSpeedLabel },
+		glint_strength: { label: catalogSettingMessages.glintStrengthLabel },
+		hide_lightning_flashes: { label: catalogSettingMessages.hideLightningFlashesLabel },
+		hide_splash_texts: { label: catalogSettingMessages.hideSplashTextsLabel },
+		high_contrast_outline: { label: catalogSettingMessages.highContrastOutlineLabel },
+		narrator_hotkey: { label: catalogSettingMessages.narratorHotkeyLabel },
+		autosave_indicator: { label: catalogSettingMessages.autosaveIndicatorLabel },
+		panorama_speed: { label: catalogSettingMessages.panoramaSpeedLabel },
+		menu_background_blur: { label: catalogSettingMessages.menuBackgroundBlurLabel },
+		rotate_with_minecart: { label: catalogSettingMessages.rotateWithMinecartLabel },
+		left_sleeve: { label: catalogSettingMessages.leftSleeveLabel },
+		right_sleeve: { label: catalogSettingMessages.rightSleeveLabel },
+		left_pants_leg: { label: catalogSettingMessages.leftPantsLegLabel },
+		right_pants_leg: { label: catalogSettingMessages.rightPantsLegLabel },
+		hide_server_address: { label: catalogSettingMessages.hideServerAddressLabel },
+		server_textures: { label: catalogSettingMessages.serverTexturesLabel },
+		snooper: { label: catalogSettingMessages.snooperLabel },
+		extra_telemetry: { label: catalogSettingMessages.extraTelemetryLabel },
+		in_game_notifications: { label: catalogSettingMessages.inGameNotificationsLabel },
+		share_presence: { label: catalogSettingMessages.sharePresenceLabel },
+		'key.smooth_camera': { label: catalogKeyMessages.smoothCameraLabel },
+		'key.spectator_outlines': { label: catalogKeyMessages.spectatorOutlinesLabel },
+		'key.save_toolbar': { label: catalogKeyMessages.saveToolbarLabel },
+		'key.load_toolbar': { label: catalogKeyMessages.loadToolbarLabel },
+		'key.social_interactions': { label: catalogKeyMessages.socialInteractionsLabel },
+		'key.quick_actions': { label: catalogKeyMessages.quickActionsLabel },
+		'key.spectator_hotbar': { label: catalogKeyMessages.spectatorHotbarLabel },
+		'key.friends': { label: catalogKeyMessages.friendsLabel },
+		'key.toggle_gui': { label: catalogKeyMessages.toggleGuiLabel },
+		'key.toggle_spectator_shader': { label: catalogKeyMessages.toggleSpectatorShaderLabel },
+		'key.hotbar.1': { label: catalogKeyMessages.hotbar1Label },
+		'key.hotbar.2': { label: catalogKeyMessages.hotbar2Label },
+		'key.hotbar.3': { label: catalogKeyMessages.hotbar3Label },
+		'key.hotbar.4': { label: catalogKeyMessages.hotbar4Label },
+		'key.hotbar.5': { label: catalogKeyMessages.hotbar5Label },
+		'key.hotbar.6': { label: catalogKeyMessages.hotbar6Label },
+		'key.hotbar.7': { label: catalogKeyMessages.hotbar7Label },
+		'key.hotbar.8': { label: catalogKeyMessages.hotbar8Label },
+		'key.hotbar.9': { label: catalogKeyMessages.hotbar9Label },
+		'key.debug.overlay': { label: catalogKeyMessages.debugOverlayLabel },
+		'key.debug.modifier': { label: catalogKeyMessages.debugModifierLabel },
+		'key.debug.reload_chunks': { label: catalogKeyMessages.debugReloadChunksLabel },
+		'key.debug.hitboxes': { label: catalogKeyMessages.debugHitboxesLabel },
+		'key.debug.clear_chat': { label: catalogKeyMessages.debugClearChatLabel },
+		'key.debug.crash': { label: catalogKeyMessages.debugCrashLabel },
+		'key.debug.chunk_borders': { label: catalogKeyMessages.debugChunkBordersLabel },
+		'key.debug.advanced_tooltips': {
+			label: catalogKeyMessages.debugAdvancedTooltipsLabel,
+		},
+		'key.debug.copy_recreate_command': {
+			label: catalogKeyMessages.debugCopyRecreateCommandLabel,
+		},
+		'key.debug.spectate': { label: catalogKeyMessages.debugSpectateLabel },
+		'key.debug.switch_game_mode': { label: catalogKeyMessages.debugSwitchGameModeLabel },
+		'key.debug.options': { label: catalogKeyMessages.debugOptionsLabel },
+		'key.debug.focus_pause': { label: catalogKeyMessages.debugFocusPauseLabel },
+		'key.debug.dump_dynamic_textures': {
+			label: catalogKeyMessages.debugDumpDynamicTexturesLabel,
+		},
+		'key.debug.reload_resource_packs': {
+			label: catalogKeyMessages.debugReloadResourcePacksLabel,
+		},
+		'key.debug.profiling': { label: catalogKeyMessages.debugProfilingLabel },
+		'key.debug.copy_location': { label: catalogKeyMessages.debugCopyLocationLabel },
+		'key.debug.dump_version': { label: catalogKeyMessages.debugDumpVersionLabel },
+		'key.debug.profiling_chart': { label: catalogKeyMessages.debugProfilingChartLabel },
+		'key.debug.fps_charts': { label: catalogKeyMessages.debugFpsChartsLabel },
+		'key.debug.network_charts': { label: catalogKeyMessages.debugNetworkChartsLabel },
+		'key.debug.lightmap_texture': { label: catalogKeyMessages.debugLightmapTextureLabel },
+		'key.debug.improved_transparency': {
+			label: catalogKeyMessages.debugImprovedTransparencyLabel,
+		},
 	}
 
 const categories: Record<string, { label: MessageDescriptor; description: MessageDescriptor }> = {
@@ -780,6 +1416,33 @@ const choices: Record<string, MessageDescriptor> = {
 	'music_toast:never': choiceMessages.never,
 	'music_toast:pause': choiceMessages.pause,
 	'music_toast:pause_and_toast': choiceMessages.pauseAndToast,
+	'legacy_view_distance:0': choiceMessages.far,
+	'legacy_view_distance:1': choiceMessages.normal,
+	'legacy_view_distance:2': choiceMessages.short,
+	'legacy_view_distance:3': choiceMessages.tiny,
+	'legacy_framerate_limit:0': choiceMessages.maxFps,
+	'legacy_framerate_limit:1': choiceMessages.balanced,
+	'legacy_framerate_limit:2': choiceMessages.powerSaver,
+	'inactivity_framerate_limit:afk': choiceMessages.whileAfk,
+	'inactivity_framerate_limit:minimized': choiceMessages.whenMinimized,
+	'prioritize_chunk_updates:0': choiceMessages.none,
+	'prioritize_chunk_updates:1': choiceMessages.byPlayer,
+	'prioritize_chunk_updates:2': choiceMessages.nearby,
+	'attack_indicator:0': choiceMessages.off,
+	'attack_indicator:1': choiceMessages.crosshair,
+	'attack_indicator:2': choiceMessages.hotbar,
+	'chat_preview:0': choiceMessages.off,
+	'chat_preview:1': choiceMessages.commandsOnly,
+	'chat_preview:2': choiceMessages.on,
+	'music_frequency:CONSTANT': choiceMessages.constant,
+	'music_frequency:DEFAULT': choiceMessages.default,
+	'music_frequency:FREQUENT': choiceMessages.frequent,
+	'share_presence:all': choiceMessages.all,
+	'share_presence:limited': choiceMessages.limited,
+	'share_presence:none': choiceMessages.none,
+	'graphics_backend:default': choiceMessages.default,
+	'graphics_backend:opengl': choiceMessages.openGl,
+	'graphics_backend:vulkan': choiceMessages.vulkan,
 }
 
 const validationMessages: Record<GameOptionValidationError, MessageDescriptor> = {

@@ -3,9 +3,7 @@ pub use self::content::*;
 
 mod model;
 pub use self::model::*;
-pub(crate) use self::model::{
-    StoredOption, StoredPreference,
-};
+pub(crate) use self::model::{StoredOption, StoredPreference};
 
 pub(crate) mod adapters;
 pub(crate) mod commands;

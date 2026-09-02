@@ -1,6 +1,6 @@
 // Never treat these Minecraft keys as settings added by mods. NEVER_SYNC_KEYS are
-// not safe to share; KNOWN_VANILLA_KEYS are Minecraft settings the editor does not
-// support yet.
+// not safe or useful to share; KNOWN_VANILLA_KEYS covers the vanilla catalog,
+// including entries that have a dedicated editor.
 pub(super) const NEVER_SYNC_KEYS: &[&str] = &[
     "version",
     "resourcePacks",
@@ -14,16 +14,9 @@ pub(super) const NEVER_SYNC_KEYS: &[&str] = &[
     "fullscreenResolution",
     "overrideWidth",
     "overrideHeight",
-    "preferredGraphicsBackend",
     "difficulty",
-    "snooperEnabled",
-    "touchscreen",
-    "heldItemTooltips",
-    "useVbo",
     "fboEnable",
     "saturation",
-    "anaglyph3d",
-    "advancedOpengl",
     "streamBytesPerPixel",
     "streamMicVolume",
     "streamGameVolume",
@@ -35,15 +28,7 @@ pub(super) const NEVER_SYNC_KEYS: &[&str] = &[
     "streamChatEnabled",
     "streamChatUserFilter",
     "streamMicToggleBehavior",
-    "fpsLimit",
-    "music",
     "skin",
-    "sound",
-    "viewDistance",
-    "anisotropicFiltering",
-    "clouds",
-    "showCape",
-    "allowBlockAlternatives",
     "key_key.streamCommercial",
     "key_key.streamPauseUnpause",
     "key_key.streamStartStop",
@@ -51,9 +36,7 @@ pub(super) const NEVER_SYNC_KEYS: &[&str] = &[
     "streamSystemVolume",
     "showInventoryAchievementHint",
     "enableWeakAttacks",
-    "chatPreview",
     "skipRealms32bitWarning",
-    "showNowPlayingToast",
     "key_Build",
     "key_Load location",
     "key_Save location",
@@ -71,8 +54,6 @@ pub(super) const NEVER_SYNC_KEYS: &[&str] = &[
     "soundCategory_players",
     "soundCategory_records",
     "shieldAnimation",
-    "serverTextures",
-    "rawMouseInput",
 ];
 
 pub(super) const KNOWN_VANILLA_KEYS: &[&str] = &[
@@ -143,7 +124,7 @@ pub(super) const KNOWN_VANILLA_KEYS: &[&str] = &[
     "damageTiltStrength",
     "highContrast",
     "highContrastBlockOutline",
-    "narratorHotKey",
+    "narratorHotkey",
     "resourcePacks",
     "incompatibleResourcePacks",
     "lastServer",

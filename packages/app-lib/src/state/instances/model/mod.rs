@@ -17,9 +17,7 @@ pub use self::file::*;
 
 mod game_options;
 pub use self::game_options::{CanonicalValue, GameOptionKind};
-pub(crate) use self::game_options::{
-    StoredOption, StoredPreference,
-};
+pub(crate) use self::game_options::{StoredOption, StoredPreference};
 
 mod instance;
 pub use self::instance::*;

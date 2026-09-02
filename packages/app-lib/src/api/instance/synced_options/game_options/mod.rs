@@ -45,8 +45,7 @@ pub use api_types::{
 };
 pub use launch_overrides::{apply_launcher_overrides, sync_before_launch};
 pub use local_settings_editor::{
-    get_config as get_local_config,
-    preview_changes as preview_local_changes,
+    get_config as get_local_config, preview_changes as preview_local_changes,
     save_changes as save_local_changes,
 };
 pub use pack_updates::{GameOptionsPackSource, capture_pack_base};
@@ -73,7 +72,7 @@ pub(in crate::api::instance) async fn canonical_exists(
 }
 
 const OPTIONS_FILE: &str = "options.txt";
-const CATALOG_REVISION: u32 = 5;
+const CATALOG_REVISION: u32 = 6;
 const MAX_OPTIONS_BYTES: usize = 2 * 1024 * 1024;
 const MAX_OPTIONS_LINES: usize = 16_384;
 const MAX_KEY_BYTES: usize = 1_024;

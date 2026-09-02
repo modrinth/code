@@ -105,10 +105,10 @@ pub use self::synced_options::game_options::{
     get_config as get_synced_game_options_config,
     get_local_config as get_local_game_options_config,
     list_sync_sources as list_game_options_sync_sources,
-    preview_local_changes as preview_local_game_option_changes,
     preview_changes as preview_synced_game_option_changes,
-    save_local_changes as save_local_game_option_changes,
+    preview_local_changes as preview_local_game_option_changes,
     save_changes as save_synced_game_option_changes,
+    save_local_changes as save_local_game_option_changes,
     sync_before_launch as sync_game_options_before_launch,
 };
 pub(crate) use self::synced_options::game_options::{
@@ -120,6 +120,7 @@ pub use self::synced_options::{
     SyncedOptionJoinPreview, SyncedOptionJoinResolution, SyncedOptionsOverview,
     get_capabilities as get_synced_option_capabilities, get_command_history,
     get_global_options as get_global_synced_options,
+    get_initialized_options as get_initialized_synced_options,
     get_instance_option_join_preview as get_synced_option_join_preview,
     get_overview as get_synced_options_overview, get_synced_options_folder,
     set_command_history, set_global_option as set_global_synced_option,

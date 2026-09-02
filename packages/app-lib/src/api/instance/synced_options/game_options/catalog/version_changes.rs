@@ -7,10 +7,12 @@ use super::super::options_file::{
 use super::{
     GameOptionMappingKind, LEGACY_KEY_BINDINGS, SettingEditor,
     SupportedSetting, ValueEncoding, VersionedKey,
+    setting_available_for_version,
 };
 use crate::state::{CanonicalValue, StoredOption};
 
 const GRAPHICS_VALUES: &[&str] = &["fast", "fancy", "fabulous", "custom"];
+const CLOUD_VALUES: &[&str] = &["false", "fast", "true"];
 const MUSIC_TOAST_VALUES: &[&str] = &["never", "pause", "pause_and_toast"];
 
 fn decode_string_token(raw: &str) -> Option<String> {
@@ -29,7 +31,7 @@ pub(in crate::api::instance) const GRAPHICS_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "fancyGraphics",
         since: "1.0",
-        until: "1.16.1",
+        until: "1.15.2",
         mapping: GameOptionMappingKind::Legacy,
     },
     VersionedKey {
@@ -50,14 +52,132 @@ pub(in crate::api::instance) const AMBIENT_OCCLUSION_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "ao",
         since: "1.0",
-        until: "1.19.3",
+        until: "1.4.7",
         mapping: GameOptionMappingKind::Legacy,
     },
     VersionedKey {
         key: "ao",
-        since: "1.19.4",
+        since: "1.5.1",
+        until: "1.19.2",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "ao",
+        since: "1.19.3",
         until: "26.3",
+        mapping: GameOptionMappingKind::Direct,
+    },
+];
+
+pub(in crate::api::instance) const FOV_KEYS: &[VersionedKey] = &[
+    VersionedKey {
+        key: "fov",
+        since: "1.0",
+        until: "1.18.2",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "fov",
+        since: "1.19",
+        until: "26.3",
+        mapping: GameOptionMappingKind::Direct,
+    },
+];
+
+pub(in crate::api::instance) const CLOUD_KEYS: &[VersionedKey] = &[
+    VersionedKey {
+        key: "clouds",
+        since: "1.0",
+        until: "1.7.10",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "renderClouds",
+        since: "1.8",
+        until: "1.8",
         mapping: GameOptionMappingKind::Migrated,
+    },
+    VersionedKey {
+        key: "renderClouds",
+        since: "1.8.1",
+        until: "26.3",
+        mapping: GameOptionMappingKind::Direct,
+    },
+];
+
+pub(in crate::api::instance) const CHAT_PREVIEW_KEYS: &[VersionedKey] = &[
+    VersionedKey {
+        key: "chatPreview",
+        since: "1.19",
+        until: "1.19",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "chatPreview",
+        since: "1.19.1",
+        until: "1.19.2",
+        mapping: GameOptionMappingKind::Direct,
+    },
+];
+
+pub(in crate::api::instance) const MENU_BACKGROUND_BLUR_KEYS:
+    &[VersionedKey] = &[
+    VersionedKey {
+        key: "menuBackgroundBlurriness",
+        since: "1.20.5",
+        until: "1.20.6",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "menuBackgroundBlurriness",
+        since: "1.21",
+        until: "26.3",
+        mapping: GameOptionMappingKind::Direct,
+    },
+];
+
+pub(in crate::api::instance) const MASTER_VOLUME_KEYS: &[VersionedKey] = &[
+    VersionedKey {
+        key: "sound",
+        since: "1.0",
+        until: "1.6.4",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "soundCategory_master",
+        since: "1.7.2",
+        until: "26.3",
+        mapping: GameOptionMappingKind::Direct,
+    },
+];
+
+pub(in crate::api::instance) const MUSIC_VOLUME_KEYS: &[VersionedKey] = &[
+    VersionedKey {
+        key: "music",
+        since: "1.0",
+        until: "1.6.4",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "soundCategory_music",
+        since: "1.7.2",
+        until: "26.3",
+        mapping: GameOptionMappingKind::Direct,
+    },
+];
+
+pub(in crate::api::instance) const CAPE_KEYS: &[VersionedKey] = &[
+    VersionedKey {
+        key: "showCape",
+        since: "1.4.2",
+        until: "1.7.10",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "modelPart_cape",
+        since: "1.8",
+        until: "26.3",
+        mapping: GameOptionMappingKind::Direct,
     },
 ];
 
@@ -79,7 +199,7 @@ pub(in crate::api::instance) const MUSIC_TOAST_KEYS: &[VersionedKey] = &[
 pub(in crate::api::instance) const SWAP_OFFHAND_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "key_key.swapHands",
-        since: "1.0",
+        since: "1.9",
         until: "1.15.2",
         mapping: GameOptionMappingKind::Legacy,
     },
@@ -273,6 +393,12 @@ pub(in crate::api::instance) fn decode_value(
                 .contains(&value.as_str())
                 .then(|| CanonicalValue::Enum(value))
         }
+        ValueEncoding::QuotedEnum(choices) => {
+            let value = decode_string_token(raw)?;
+            choices
+                .contains(&value.as_str())
+                .then(|| CanonicalValue::Enum(value))
+        }
         ValueEncoding::Text => Some(CanonicalValue::Text(raw.to_string())),
         ValueEncoding::KeyBinding => {
             if valid_modern_key_binding(raw) {
@@ -282,12 +408,23 @@ pub(in crate::api::instance) fn decode_value(
             }
         }
         ValueEncoding::Fov => raw.parse::<f64>().ok().and_then(|value| {
+            if value.fract() == 0.0 && (30.0..=110.0).contains(&value) {
+                return Some(CanonicalValue::Integer(value as i64));
+            }
             let degrees = value * 40.0 + 70.0;
             (value.is_finite()
                 && (-1.0..=1.0).contains(&value)
                 && (degrees - degrees.round()).abs() <= 0.000_001)
                 .then(|| CanonicalValue::Integer(degrees.round() as i64))
         }),
+        ValueEncoding::GuiScale => {
+            raw.parse::<i64>().ok().map(CanonicalValue::Integer)
+        }
+        ValueEncoding::MenuBackgroundBlur => raw
+            .parse::<f64>()
+            .ok()
+            .filter(|value| value.is_finite() && value.fract() == 0.0)
+            .map(|value| CanonicalValue::Integer(value as i64)),
         ValueEncoding::Graphics => {
             let raw = decode_string_token(raw)?;
             let value = match physical_key {
@@ -319,6 +456,21 @@ pub(in crate::api::instance) fn decode_value(
             };
             Some(CanonicalValue::Enum(value.to_string()))
         }
+        ValueEncoding::ChatPreview => {
+            let value = match raw {
+                "false" | "0" => "0",
+                "1" => "1",
+                "true" | "2" => "2",
+                _ => return None,
+            };
+            Some(CanonicalValue::Enum(value.to_string()))
+        }
+        ValueEncoding::Clouds => {
+            let raw = decode_string_token(raw)?;
+            CLOUD_VALUES
+                .contains(&raw.as_str())
+                .then(|| CanonicalValue::Enum(raw))
+        }
         ValueEncoding::MusicToast => {
             let raw = decode_string_token(raw)?;
             let value = match (physical_key, raw.as_str()) {
@@ -341,6 +493,9 @@ pub(in crate::api::instance) fn encode_value(
     game_version: &str,
     current_raw: Option<&str>,
 ) -> Option<String> {
+    if !setting_available_for_version(definition, game_version) {
+        return None;
+    }
     if let Some(current_raw) = current_raw
         && physical_representation_supported_for_target(
             definition,
@@ -376,6 +531,11 @@ pub(in crate::api::instance) fn encode_value(
                 Some(value.clone())
             }
         }
+        (ValueEncoding::QuotedEnum(choices), CanonicalValue::Enum(value))
+            if choices.contains(&value.as_str()) =>
+        {
+            encode_string_token(value)
+        }
         (ValueEncoding::Text, CanonicalValue::Text(value)) => {
             Some(value.clone())
         }
@@ -391,8 +551,33 @@ pub(in crate::api::instance) fn encode_value(
         (ValueEncoding::Fov, CanonicalValue::Integer(value))
             if (30..=110).contains(value) =>
         {
-            let normalized = (*value as f64 - 70.0) / 40.0;
-            Some(format_decimal(normalized))
+            if release_version(game_version)
+                .is_some_and(|version| version >= (1, 19, 0))
+            {
+                Some(value.to_string())
+            } else {
+                let normalized = (*value as f64 - 70.0) / 40.0;
+                Some(format_decimal(normalized))
+            }
+        }
+        (ValueEncoding::GuiScale, CanonicalValue::Integer(value))
+            if (0..=8).contains(value)
+                && (release_version(game_version)
+                    .is_some_and(|version| version >= (1, 13, 0))
+                    || *value <= 3) =>
+        {
+            Some(value.to_string())
+        }
+        (ValueEncoding::MenuBackgroundBlur, CanonicalValue::Integer(value))
+            if (0..=10).contains(value) =>
+        {
+            if release_version(game_version)
+                .is_some_and(|version| version >= (1, 21, 0))
+            {
+                Some(value.to_string())
+            } else {
+                Some(format!("{value}.0"))
+            }
         }
         (ValueEncoding::Graphics, CanonicalValue::Enum(value)) => {
             match physical_key {
@@ -416,9 +601,8 @@ pub(in crate::api::instance) fn encode_value(
             }
         }
         (ValueEncoding::AmbientOcclusion, CanonicalValue::Enum(value)) => {
-            let target_is_legacy = release_version(game_version)
-                .is_some_and(|version| version <= (1, 19, 3));
-            if target_is_legacy {
+            let version = release_version(game_version)?;
+            if ((1, 5, 1)..=(1, 19, 2)).contains(&version) {
                 match value.as_str() {
                     "off" => Some("0".to_string()),
                     "minimum" => Some("1".to_string()),
@@ -431,6 +615,32 @@ pub(in crate::api::instance) fn encode_value(
                     "on" => Some("true".to_string()),
                     _ => None,
                 }
+            }
+        }
+        (ValueEncoding::ChatPreview, CanonicalValue::Enum(value)) => {
+            if release_version(game_version) == Some((1, 19, 0)) {
+                match value.as_str() {
+                    "0" => Some("false".to_string()),
+                    "2" => Some("true".to_string()),
+                    _ => None,
+                }
+            } else if matches!(value.as_str(), "0" | "1" | "2") {
+                Some(value.clone())
+            } else {
+                None
+            }
+        }
+        (ValueEncoding::Clouds, CanonicalValue::Enum(value)) => {
+            let version = release_version(game_version)?;
+            if version <= (1, 8, 0) {
+                match value.as_str() {
+                    "false" | "true" => Some(value.clone()),
+                    _ => None,
+                }
+            } else if CLOUD_VALUES.contains(&value.as_str()) {
+                Some(value.clone())
+            } else {
+                None
             }
         }
         (ValueEncoding::MusicToast, CanonicalValue::Enum(value)) => {
@@ -460,7 +670,9 @@ fn validate_value(
     if let Some(definition) = definition {
         let type_valid = match definition.encoding {
             ValueEncoding::Bool => matches!(value, CanonicalValue::Bool(_)),
-            ValueEncoding::Integer => {
+            ValueEncoding::Integer
+            | ValueEncoding::GuiScale
+            | ValueEncoding::MenuBackgroundBlur => {
                 matches!(value, CanonicalValue::Integer(_))
             }
             ValueEncoding::Decimal => matches!(
@@ -468,8 +680,11 @@ fn validate_value(
                 CanonicalValue::Decimal(_) | CanonicalValue::Integer(_)
             ),
             ValueEncoding::Enum(_)
+            | ValueEncoding::QuotedEnum(_)
             | ValueEncoding::Graphics
             | ValueEncoding::AmbientOcclusion
+            | ValueEncoding::ChatPreview
+            | ValueEncoding::Clouds
             | ValueEncoding::MusicToast => {
                 matches!(value, CanonicalValue::Enum(_))
             }
@@ -486,6 +701,16 @@ fn validate_value(
             )));
         }
         match (definition.editor, value) {
+            (
+                SettingEditor::UnboundedDecimal,
+                CanonicalValue::Decimal(value),
+            ) if value
+                .parse::<f64>()
+                .ok()
+                .is_none_or(|value| !value.is_finite()) =>
+            {
+                return Err(input_error("Invalid decimal value"));
+            }
             (
                 SettingEditor::Integer { min, max, step },
                 CanonicalValue::Integer(value),
@@ -591,6 +816,9 @@ pub(in crate::api::instance) fn decode_value_for_version(
     raw: &str,
     game_version: &str,
 ) -> Option<CanonicalValue> {
+    if !setting_available_for_version(definition, game_version) {
+        return None;
+    }
     let value = decode_value(definition, physical_key, raw)?;
     validate_file_value(Some(definition), &value).ok()?;
     let target_key = if definition.versioned_keys.is_empty() {
@@ -609,6 +837,9 @@ pub(in crate::api::instance) fn target_physical_key(
     game_version: &str,
 ) -> Option<String> {
     if let Some(definition) = definition {
+        if !setting_available_for_version(definition, game_version) {
+            return None;
+        }
         if !definition.versioned_keys.is_empty() {
             observed_physical_key(definition, document, game_version)?;
             return physical_variant_for_version(definition, game_version)
@@ -629,6 +860,9 @@ pub(in crate::api::instance) fn observed_physical_key(
     document: &GameOptionsDocument,
     game_version: &str,
 ) -> Option<String> {
+    if !setting_available_for_version(definition, game_version) {
+        return None;
+    }
     if let Some(target) = physical_variant_for_version(definition, game_version)
         && document.value(target.key).is_some()
     {
@@ -659,6 +893,9 @@ pub(in crate::api::instance) fn physical_representation_supported_for_target(
     raw: &str,
     game_version: &str,
 ) -> bool {
+    if !setting_available_for_version(definition, game_version) {
+        return false;
+    }
     let Some(target_version) = release_version(game_version) else {
         return false;
     };
@@ -670,10 +907,56 @@ pub(in crate::api::instance) fn physical_representation_supported_for_target(
         };
     }
     if matches!(definition.encoding, ValueEncoding::AmbientOcclusion) {
-        return if target_version >= (1, 19, 4) {
+        return if ((1, 5, 1)..=(1, 19, 2)).contains(&target_version) {
+            matches!(raw, "0" | "1" | "2")
+        } else {
+            matches!(raw, "true" | "false")
+        };
+    }
+    if matches!(definition.encoding, ValueEncoding::Fov) {
+        return if target_version >= (1, 19, 0) {
+            raw.parse::<i64>()
+                .is_ok_and(|value| (30..=110).contains(&value))
+        } else {
+            raw.parse::<f64>().is_ok_and(|value| {
+                value.is_finite() && (-1.0..=1.0).contains(&value)
+            })
+        };
+    }
+    if matches!(definition.encoding, ValueEncoding::ChatPreview) {
+        return if target_version == (1, 19, 0) {
             matches!(raw, "true" | "false")
         } else {
             matches!(raw, "0" | "1" | "2")
+        };
+    }
+    if matches!(definition.encoding, ValueEncoding::GuiScale) {
+        return raw.parse::<i64>().is_ok_and(|value| {
+            if target_version >= (1, 13, 0) {
+                (0..=8).contains(&value)
+            } else {
+                (0..=3).contains(&value)
+            }
+        });
+    }
+    if matches!(definition.encoding, ValueEncoding::MenuBackgroundBlur) {
+        return if target_version >= (1, 21, 0) {
+            raw.parse::<i64>()
+                .is_ok_and(|value| (0..=10).contains(&value))
+        } else {
+            raw.parse::<f64>().is_ok_and(|value| {
+                value.is_finite()
+                    && value.fract() == 0.0
+                    && (0.0..=10.0).contains(&value)
+            })
+        };
+    }
+    if matches!(definition.encoding, ValueEncoding::Clouds) {
+        return if target_version <= (1, 8, 0) {
+            matches!(raw, "true" | "false")
+        } else {
+            decode_string_token(raw)
+                .is_some_and(|value| CLOUD_VALUES.contains(&value.as_str()))
         };
     }
 
