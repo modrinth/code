@@ -1,7 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBProject;
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::analytics::{MinecraftServerPlay, PageView, Playtime};
 use crate::models::ids::ProjectId;
@@ -10,6 +9,7 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::http::HttpClient;
 use actix_web::{HttpRequest, HttpResponse};
@@ -22,6 +22,7 @@ use std::sync::Arc;
 use tracing::trace;
 use url::Url;
 use uuid::Uuid;
+use xredis::RedisPool;
 
 pub const FILTERED_HEADERS: &[&str] = &[
     "authorization",
@@ -46,20 +47,26 @@ pub const FILTERED_HEADERS: &[&str] = &[
     "x-vercel-ip-country",
 ];
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(page_view_ingest)
         .service(playtime_ingest)
         .service(minecraft_server_play_ingest);
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct UrlInput {
     url: String,
 }
 
 //this route should be behind the cloudflare WAF to prevent non-browsers from calling it
-#[post("view")]
-async fn page_view_ingest(
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = UrlInput,
+	responses((status = NO_CONTENT))
+)]
+#[post("/view")]
+pub async fn page_view_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -78,11 +85,11 @@ async fn page_view_ingest(
     .ok();
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
-    let url = Url::parse(&url_input.url).map_err(|_| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
-    })?;
-    let domain = url.host_str().ok_or_else(|| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+    let url = Url::parse(&url_input.url)
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_request_err("invalid page view URL specified!".to_string())?;
+    let domain = url.host_str().wrap_request_err_with(|| {
+        "invalid page view URL specified!".to_string()
     })?;
     let url_origin = url.origin().ascii_serialization();
 
@@ -92,9 +99,9 @@ async fn page_view_ingest(
         .any(|origin| origin == "*" || url_origin == *origin);
 
     if !is_valid_url_origin {
-        return Err(ApiError::InvalidInput(
-            "invalid page view URL specified!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "invalid page view URL specified!",
+        )));
     }
 
     let headers = req
@@ -152,7 +159,8 @@ async fn page_view_ingest(
                     &**pool,
                     &redis,
                 )
-                .await?;
+                .await
+                .wrap_api_err("fetching project from database")?;
 
                 if let Some(project) = project {
                     view.project_id = project.inner.id.0 as u64;
@@ -171,7 +179,7 @@ async fn page_view_ingest(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, utoipa::ToSchema)]
 pub struct PlaytimeInput {
     seconds: u16,
     loader: String,
@@ -179,8 +187,14 @@ pub struct PlaytimeInput {
     parent: Option<crate::models::ids::VersionId>,
 }
 
-#[post("playtime")]
-async fn playtime_ingest(
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = serde_json::Value,
+	responses((status = NO_CONTENT))
+)]
+#[post("/playtime")]
+pub async fn playtime_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -197,14 +211,15 @@ async fn playtime_ingest(
         &session_queue,
         Scopes::PERFORM_ANALYTICS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let playtimes = playtime_input.0;
 
     if playtimes.len() > 2000 {
-        return Err(ApiError::InvalidInput(
-            "Too much playtime entered for version!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "Too much playtime entered for version!",
+        )));
     }
 
     let versions = crate::database::models::DBVersion::get_many(
@@ -212,7 +227,8 @@ async fn playtime_ingest(
         &**pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching versions from database")?;
 
     let headers = req.headers();
 
@@ -249,7 +265,7 @@ struct MinecraftProfile {
     name: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
     username: String,
@@ -258,8 +274,14 @@ pub struct MinecraftJavaServerPlayInput {
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
 
-#[post("minecraft-server-play")]
-async fn minecraft_server_play_ingest(
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = MinecraftJavaServerPlayInput,
+	responses((status = NO_CONTENT))
+)]
+#[post("/minecraft-server-play")]
+pub async fn minecraft_server_play_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -282,8 +304,9 @@ async fn minecraft_server_play_ingest(
     let project_id = play_input.project_id;
 
     let project = DBProject::get(&project_id.to_string(), &**pool, &redis)
-        .await?
-        .ok_or(ApiError::NotFound)?;
+        .await
+        .wrap_api_err("fetching project from database")?
+        .wrap_not_found_err("resource not found")?;
 
     if project.components.minecraft_server.is_none() {
         return Err(ApiError::Request(eyre!(

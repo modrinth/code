@@ -2,11 +2,11 @@
 import { ChevronRightIcon, SaveIcon, UndoIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
@@ -40,14 +40,14 @@ const hideFromHome = ref(false)
 const newDisplayStatus = computed(() => (hideFromHome.value ? 'hidden' : 'normal'))
 
 async function saveWorld() {
-	await rename_world(props.instance.path, path.value, name.value).catch(handleError)
+	await rename_world(props.instance.id, path.value, name.value).catch(handleError)
 
 	if (removeIcon.value) {
-		await reset_world_icon(props.instance.path, path.value).catch(handleError)
+		await reset_world_icon(props.instance.id, path.value).catch(handleError)
 	}
 	if (newDisplayStatus.value !== displayStatus.value) {
 		await set_world_display_status(
-			props.instance.path,
+			props.instance.id,
 			'singleplayer',
 			path.value,
 			newDisplayStatus.value,
@@ -104,7 +104,7 @@ const messages = defineMessages({
 			<h2 class="text-lg font-extrabold text-contrast mt-0 mb-1">
 				{{ formatMessage(messages.name) }}
 			</h2>
-			<StyledInput
+			<Input
 				v-model="name"
 				:placeholder="formatMessage(messages.placeholderName)"
 				autocomplete="off"
@@ -113,24 +113,18 @@ const messages = defineMessages({
 			<HideFromHomeOption v-model="hideFromHome" class="mt-3" />
 		</div>
 		<div class="flex gap-2 mt-4">
-			<ButtonStyled color="brand">
-				<button @click="saveWorld">
-					<SaveIcon />
-					{{ formatMessage(commonMessages.saveChangesButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button :disabled="removeIcon || !icon" @click="removeIcon = true">
-					<UndoIcon />
-					{{ formatMessage(messages.resetIcon) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="hide()">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" @click="saveWorld">
+				<SaveIcon />
+				{{ formatMessage(commonMessages.saveChangesButton) }}
+			</Button>
+			<Button :disabled="removeIcon || !icon" @click="removeIcon = true">
+				<UndoIcon />
+				{{ formatMessage(messages.resetIcon) }}
+			</Button>
+			<Button @click="hide()">
+				<XIcon />
+				{{ formatMessage(commonMessages.cancelButton) }}
+			</Button>
 		</div>
 	</ModalWrapper>
 </template>

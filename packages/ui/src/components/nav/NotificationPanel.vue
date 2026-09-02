@@ -16,26 +16,32 @@
 				@mouseenter="stopTimer(item)"
 				@mouseleave="setNotificationTimer(item)"
 			>
-				<div class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised shadow-xl">
+				<div
+					class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised border border-solid border-surface-5"
+					:class="item.containerClass"
+				>
 					<div
 						class="w-2"
 						:class="{
 							'bg-red': item.type === 'error',
 							'bg-orange': item.type === 'warning',
 							'bg-green': item.type === 'success',
-							'bg-blue': !item.type || !['error', 'warning', 'success'].includes(item.type),
+							'bg-blue': !item.type || item.type === 'info',
+							'bg-transparent': item.type === 'neutral',
 						}"
 					></div>
 					<div
 						class="grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-2 gap-y-1 py-2 pl-1 pr-3"
 					>
 						<div
+							v-if="!item.noIcon"
 							class="flex items-center"
 							:class="{
 								'text-red': item.type === 'error',
 								'text-orange': item.type === 'warning',
 								'text-green': item.type === 'success',
-								'text-blue': !item.type || !['error', 'warning', 'success'].includes(item.type),
+								'text-blue': !item.type || item.type === 'info',
+								'text-contrast': item.type === 'neutral',
 							}"
 						>
 							<IssuesIcon v-if="item.type === 'warning'" class="h-6 w-6" />
@@ -43,34 +49,68 @@
 							<XCircleIcon v-else-if="item.type === 'error'" class="h-6 w-6" />
 							<InfoIcon v-else class="h-6 w-6" />
 						</div>
-						<div class="m-0 text-wrap font-bold text-contrast">{{ item.title }}</div>
+						<div
+							class="m-0 text-wrap font-bold text-contrast"
+							:class="{ 'col-span-2': item.noIcon }"
+						>
+							{{ item.title }}
+						</div>
 						<div class="flex items-center gap-1">
 							<div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
 								x{{ item.count }}
 							</div>
-							<ButtonStyled circular size="small">
-								<button
-									v-tooltip="
-										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
-									"
-									@click="copyToClipboard(item)"
-								>
-									<CheckIcon v-if="copied[getCopyKey(item)]" />
-									<CopyIcon v-else />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular size="small">
-								<button v-tooltip="`Dismiss`" @click="dismissNotification(index)">
-									<XIcon />
-								</button>
-							</ButtonStyled>
+							<IconButton
+								v-if="item.copyable !== false"
+								v-tooltip="
+									item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
+								"
+								size="xs"
+								:label="item.supportData ? 'Copy error details for support' : 'Copy to clipboard'"
+								@click="copyToClipboard(item)"
+							>
+								<CheckIcon v-if="copied[getCopyKey(item)]" />
+								<CopyIcon v-else />
+							</IconButton>
+							<IconButton
+								v-if="item.dismissible !== false"
+								v-tooltip="`Dismiss`"
+								size="xs"
+								:label="`Dismiss`"
+								@click="dismissNotification(index)"
+							>
+								<XIcon />
+							</IconButton>
 						</div>
-						<div></div>
-						<div class="col-span-2 text-sm text-primary">{{ item.text }}</div>
+						<div v-if="item.type !== 'neutral'"></div>
+						<div
+							class="col-span-2 whitespace-pre-wrap text-sm text-primary max-h-[80vh] overflow-y-auto"
+						>
+							{{ item.text }}
+						</div>
 						<template v-if="item.errorCode">
 							<div></div>
 							<div class="m-0 text-wrap text-xs font-medium text-secondary">
 								{{ item.errorCode }}
+							</div>
+						</template>
+						<template v-if="item.buttons?.length">
+							<div class="col-span-2 flex flex-wrap gap-1.5 pt-1">
+								<Button
+									v-for="(button, buttonIndex) in item.buttons"
+									:key="buttonIndex"
+									:type="button.color && button.color !== 'standard' ? 'colored' : 'base'"
+									:color="
+										button.color && button.color !== 'standard'
+											? button.color === 'medal-promo'
+												? 'medal_promotion'
+												: button.color
+											: undefined
+									"
+									@click="handleButtonClick(item, button)"
+								>
+									<component :is="button.icon" v-if="button.icon" />
+									{{ button.label }}
+								</Button>
 							</div>
 						</template>
 					</div>
@@ -92,10 +132,14 @@ import {
 } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
+import { Button, IconButton } from '#ui/components/base/buttons'
 import { useModalStack } from '#ui/composables/modal-stack.ts'
 
-import { injectNotificationManager, type WebNotification } from '../../providers'
-import ButtonStyled from '../base/ButtonStyled.vue'
+import {
+	injectNotificationManager,
+	type WebNotification,
+	type WebNotificationButton,
+} from '../../providers'
 
 const notificationManager = injectNotificationManager()
 const notifications = computed<WebNotification[]>(() => notificationManager.getNotifications())
@@ -107,6 +151,13 @@ const copied = ref<Record<string, boolean>>({})
 const stopTimer = (n: WebNotification) => notificationManager.stopNotificationTimer(n)
 const setNotificationTimer = (n: WebNotification) => notificationManager.setNotificationTimer(n)
 const dismissNotification = (n: number) => notificationManager.removeNotificationByIndex(n)
+
+async function handleButtonClick(item: WebNotification, button: WebNotificationButton) {
+	await button.action()
+	if (!button.keepOpen) {
+		notificationManager.removeNotification(item.id)
+	}
+}
 
 function createNotifText(notif: WebNotification): string {
 	return [notif.title, notif.text, notif.errorCode].filter(Boolean).join('\n')
@@ -170,7 +221,7 @@ withDefaults(
 	position: fixed;
 	bottom: 1.5rem;
 	z-index: 200;
-	width: 450px;
+	width: 460px;
 	transition: bottom 0.25s ease-in-out;
 
 	&.location-right {

@@ -1,10 +1,35 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { ClientIcon, getCategoryIcon, getLoaderIcon, ServerIcon } from '@modrinth/assets'
+import {
+	ArchiveIcon,
+	CircleDollarSignIcon,
+	CircuitBoardIcon,
+	ClientIcon,
+	EyeIcon,
+	getCategoryIcon,
+	getLoaderIcon,
+	GitForkIcon,
+	MegaphoneIcon,
+	RadioTowerIcon,
+	ServerIcon,
+	SparklesIcon,
+} from '@modrinth/assets'
 import { sortedCategories } from '@modrinth/utils'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
 import { defineMessage, useVIntl } from '../composables/i18n'
+import { getProjectTypeIcon } from './auto-icons'
+import {
+	disclosureAiUsageMessages,
+	disclosureTelemetryConsentMessages,
+	getProjectTypeCategoryMessage,
+} from './common-messages'
+import {
+	AI_USAGE_TYPES,
+	isDisclosureCompatibleWithProjectTypes,
+	PROJECT_DISCLOSURE_TYPES,
+	TELEMETRY_CONSENT_TYPES,
+} from './disclosures'
 import {
 	DEFAULT_MOD_LOADERS,
 	DEFAULT_PLUGIN_LOADERS,
@@ -21,6 +46,7 @@ type BaseOption = {
 	icon?: string | Component
 	query_value?: string
 	group?: string
+	sub_options?: FilterOption[]
 }
 
 export type FilterOption = BaseOption &
@@ -29,13 +55,49 @@ export type FilterOption = BaseOption &
 		| { method: 'environment'; environment: 'client' | 'server' }
 	)
 
+export function flattenFilterOptions(options: readonly FilterOption[]): FilterOption[] {
+	return options.flatMap((option) => [
+		option,
+		...(option.sub_options ? flattenFilterOptions(option.sub_options) : []),
+	])
+}
+
+export function findFilterOption(
+	options: readonly FilterOption[],
+	optionId: string,
+): FilterOption | undefined {
+	for (const option of options) {
+		if (option.id === optionId) {
+			return option
+		}
+		if (option.sub_options) {
+			const nested = findFilterOption(option.sub_options, optionId)
+			if (nested) {
+				return nested
+			}
+		}
+	}
+	return undefined
+}
+
+export function findParentFilterOption(
+	options: readonly FilterOption[],
+	optionId: string,
+): FilterOption | undefined {
+	return options.find((option) =>
+		option.sub_options?.some((subOption) => subOption.id === optionId),
+	)
+}
+
+export type FilterMode = 'include' | 'exclude'
+
 export type FilterType = {
 	id: string
 	formatted_name: string
 	options: FilterOption[]
 	supported_project_types: ProjectType[]
 	query_param: string
-	supports_negative_filter: boolean
+	supports: FilterMode[]
 	toggle_groups?: {
 		id: string
 		formatted_name: string
@@ -43,10 +105,11 @@ export type FilterType = {
 	}[]
 	searchable: boolean
 	allows_custom_options?: 'and' | 'or'
+	custom_option_field?: string
 	ordering?: number
 } & (
 	| {
-			display: 'all' | 'scrollable' | 'none'
+			display: 'all' | 'scrollable' | 'none' | 'depends-on-project'
 	  }
 	| {
 			display: 'expandable'
@@ -59,6 +122,49 @@ export type FilterValue = {
 	option: string
 	negative?: boolean
 }
+
+export type DependencyType = 'required' | 'optional' | 'embedded'
+
+const DEPENDENCY_TYPE_FIELDS: Record<DependencyType, string> = {
+	required: 'required_dependency_project_ids',
+	optional: 'optional_dependency_project_ids',
+	embedded: 'embedded_dependency_project_ids',
+}
+
+const DEPENDENCY_TYPES = Object.keys(DEPENDENCY_TYPE_FIELDS) as DependencyType[]
+
+export function formatDependencyProjectFilterOption(
+	projectId: string,
+	dependencyTypes: readonly DependencyType[],
+): string {
+	return `${dependencyTypes.join(',')}:${projectId}`
+}
+
+export function parseDependencyProjectFilterOption(option: string): {
+	projectId: string
+	dependencyTypes: DependencyType[]
+} {
+	const separatorIndex = option.indexOf(':')
+	if (separatorIndex === -1) {
+		return { projectId: option, dependencyTypes: ['required'] }
+	}
+
+	const dependencyTypes = option
+		.slice(0, separatorIndex)
+		.split(',')
+		.filter((type): type is DependencyType => DEPENDENCY_TYPES.includes(type as DependencyType))
+	const projectId = option.slice(separatorIndex + 1)
+
+	if (dependencyTypes.length === 0 || !projectId) {
+		return { projectId: option, dependencyTypes: ['required'] }
+	}
+
+	return { projectId, dependencyTypes }
+}
+
+export type EnvironmentSearchOverride =
+	| { mode: 'include'; values: string[] }
+	| { mode: 'exclude'; values: string[] }
 
 export const LOADER_FILTER_TYPES = [
 	'mod_loader',
@@ -87,10 +193,10 @@ export type ProjectType =
 
 const ALL_PROJECT_TYPES: ProjectType[] = [
 	'mod',
-	'modpack',
 	'resourcepack',
-	'shader',
 	'datapack',
+	'shader',
+	'modpack',
 	'plugin',
 	'server',
 ]
@@ -108,10 +214,163 @@ export interface SortType {
 
 const PLUGIN_PLATFORMS = ['bungeecord', 'waterfall', 'velocity', 'geyser']
 
+const PROJECT_TYPE_EXCLUSION_FILTERS: Partial<Record<ProjectType, ProjectType[]>> = {
+	mod: ['plugin', 'datapack'],
+	plugin: ['mod', 'datapack'],
+	datapack: ['mod', 'plugin'],
+}
+
+export type DisclosureTypeFilter = Labrinth.Projects.v3.ProjectDisclosureType
+
+const DISCLOSURE_TYPE_ICONS: Record<DisclosureTypeFilter, Component> = {
+	ai_content: SparklesIcon,
+	advertisements: MegaphoneIcon,
+	epilepsy_triggers: EyeIcon,
+	system_interactions: CircuitBoardIcon,
+	telemetry: RadioTowerIcon,
+	derivative_work: GitForkIcon,
+	paid_features: CircleDollarSignIcon,
+	archived: ArchiveIcon,
+}
+
+function isProjectTypeExclusionOption(optionId: string): optionId is ProjectType {
+	return (ALL_PROJECT_TYPES as string[]).includes(optionId)
+}
+
+type FormatMessage = (
+	descriptor: { id: string; defaultMessage: string },
+	values?: Record<string, unknown>,
+) => string
+
+export function formatDisclosureTypeLabel(
+	formatMessage: FormatMessage,
+	disclosureType: DisclosureTypeFilter,
+): string {
+	switch (disclosureType) {
+		case 'ai_content':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.ai_content',
+					defaultMessage: 'AI-generated content',
+				}),
+			)
+		case 'advertisements':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.advertisements',
+					defaultMessage: 'Advertisements',
+				}),
+			)
+		case 'epilepsy_triggers':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.epilepsy_triggers',
+					defaultMessage: 'Photosensitivity triggers',
+				}),
+			)
+		case 'system_interactions':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.system_interactions',
+					defaultMessage: 'External system interactions',
+				}),
+			)
+		case 'telemetry':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.telemetry',
+					defaultMessage: 'Telemetry',
+				}),
+			)
+		case 'derivative_work':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.derivative_work',
+					defaultMessage: 'Derivative content',
+				}),
+			)
+		case 'paid_features':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.paid_features',
+					defaultMessage: 'Paid features',
+				}),
+			)
+		case 'archived':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.archived',
+					defaultMessage: 'Archived',
+				}),
+			)
+	}
+}
+
+export function formatAiUsageFilterLabel(
+	formatMessage: FormatMessage,
+	usage: Labrinth.Projects.v3.AiUsage,
+): string {
+	return formatMessage(
+		defineMessage({
+			id: 'search.filter_type.advanced.disclosure.ai_content.usage',
+			defaultMessage: 'AI {usage}',
+		}),
+		{ usage: formatMessage(disclosureAiUsageMessages[usage]) },
+	)
+}
+
+export function formatTelemetryConsentFilterLabel(
+	formatMessage: FormatMessage,
+	consent: Labrinth.Projects.v3.TelemetryConsent,
+): string {
+	return formatMessage(disclosureTelemetryConsentMessages[consent])
+}
+
+function createDisclosureSubOptions(
+	formatMessage: FormatMessage,
+	disclosureType: DisclosureTypeFilter,
+): FilterOption[] | undefined {
+	switch (disclosureType) {
+		case 'ai_content':
+			return AI_USAGE_TYPES.map((usage) => ({
+				id: `${disclosureType}_${usage}`,
+				formatted_name: formatAiUsageFilterLabel(formatMessage, usage),
+				method: 'or' as const,
+				value: `disclosure_types:${disclosureType}_${usage}`,
+			}))
+		case 'telemetry':
+			return TELEMETRY_CONSENT_TYPES.map((consent) => ({
+				id: `${disclosureType}_${consent}`,
+				formatted_name: formatTelemetryConsentFilterLabel(formatMessage, consent),
+				method: 'or' as const,
+				value: `disclosure_types:${disclosureType}_${consent}`,
+			}))
+		default:
+			return undefined
+	}
+}
+
+export function createDisclosureFilterOptions(
+	formatMessage: FormatMessage,
+	projectTypes: readonly ProjectType[],
+): FilterOption[] {
+	return PROJECT_DISCLOSURE_TYPES.filter((disclosureType) =>
+		isDisclosureCompatibleWithProjectTypes(disclosureType, projectTypes),
+	).map((disclosureType) => ({
+		id: disclosureType,
+		formatted_name: formatDisclosureTypeLabel(formatMessage, disclosureType),
+		icon: DISCLOSURE_TYPE_ICONS[disclosureType],
+		method: 'or' as const,
+		value: `disclosure_types:${disclosureType}`,
+		sub_options: createDisclosureSubOptions(formatMessage, disclosureType),
+	}))
+}
+
 export function useSearch(
 	projectTypes: Ref<ProjectType[]>,
 	tags: Ref<Tags>,
 	providedFilters: Ref<FilterValue[]>,
+	environmentOverride: Ref<EnvironmentSearchOverride | undefined> = ref(undefined),
 ) {
 	const query = ref('')
 	const maxResults = ref(20)
@@ -134,6 +393,14 @@ export function useSearch(
 	const overriddenProvidedFilterTypes = ref<string[]>([])
 
 	const { formatMessage, locale } = useVIntl()
+	const dependsOnFilterName = defineMessage({
+		id: 'search.filter_type.compatible_dependency_project_ids',
+		defaultMessage: 'Depends on',
+	})
+	const includedContentFilterName = defineMessage({
+		id: 'search.filter_type.included_content',
+		defaultMessage: 'Included content',
+	})
 	const formatCategoryName = (categoryName: string) => {
 		return formatCategory(formatMessage, categoryName)
 	}
@@ -152,7 +419,7 @@ export function useSearch(
 							: ([category.project_type] as ProjectType[]),
 					display: 'all',
 					query_param: category.header === 'resolutions' ? 'g' : 'f',
-					supports_negative_filter: true,
+					supports: ['include', 'exclude'],
 					searchable: false,
 					options: [],
 				}
@@ -166,8 +433,32 @@ export function useSearch(
 			})
 		}
 
+		const excludeableProjectTypes: ProjectType[] = []
+		for (const projectType of projectTypes.value) {
+			for (const target of PROJECT_TYPE_EXCLUSION_FILTERS[projectType] ?? []) {
+				if (!excludeableProjectTypes.includes(target)) {
+					excludeableProjectTypes.push(target)
+				}
+			}
+		}
+
 		const filterTypes: FilterType[] = [
 			...Object.values(categoryFilters),
+			{
+				id: 'compatible_dependency_project_ids',
+				formatted_name: formatMessage(
+					projectTypes.value.includes('modpack') ? includedContentFilterName : dependsOnFilterName,
+				),
+				supported_project_types: ALL_PROJECT_TYPES,
+				query_param: 'dep',
+				supports: ['include'],
+				display: 'depends-on-project',
+				searchable: false,
+				options: [],
+				allows_custom_options: 'and',
+				custom_option_field: 'compatible_dependency_project_ids',
+				ordering: projectTypes.value.includes('modpack') ? undefined : -999,
+			},
 			{
 				id: 'environment',
 				formatted_name: formatMessage(
@@ -179,7 +470,7 @@ export function useSearch(
 				supported_project_types: ['mod', 'modpack'],
 				display: 'all',
 				query_param: 'e',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: false,
 				options: [
 					{
@@ -219,7 +510,7 @@ export function useSearch(
 				supported_project_types: ALL_PROJECT_TYPES,
 				display: 'scrollable',
 				query_param: 'v',
-				supports_negative_filter: false,
+				supports: ['include'],
 				toggle_groups: [
 					{
 						id: 'all_versions',
@@ -257,7 +548,7 @@ export function useSearch(
 				supported_project_types: ['mod'],
 				display: 'expandable',
 				query_param: 'g',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				default_values: DEFAULT_MOD_LOADERS,
 				searchable: false,
 				options: tags.value.loaders
@@ -289,7 +580,7 @@ export function useSearch(
 				supported_project_types: ['modpack'],
 				display: 'all',
 				query_param: 'g',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				searchable: false,
 				options: tags.value.loaders
 					.filter((loader) => loader.supported_project_types.includes('modpack'))
@@ -315,7 +606,7 @@ export function useSearch(
 				display: 'expandable',
 				default_values: DEFAULT_PLUGIN_LOADERS,
 				query_param: 'g',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				searchable: false,
 				options: tags.value.loaders
 					.filter(
@@ -344,7 +635,7 @@ export function useSearch(
 				supported_project_types: ['plugin'],
 				display: 'all',
 				query_param: 'g',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				searchable: false,
 				options: tags.value.loaders
 					.filter((loader) => PLUGIN_PLATFORMS.includes(loader.name))
@@ -368,7 +659,7 @@ export function useSearch(
 				),
 				supported_project_types: ['shader'],
 				query_param: 'g',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				searchable: false,
 				display: 'expandable',
 				default_values: DEFAULT_SHADER_LOADERS,
@@ -391,7 +682,7 @@ export function useSearch(
 				),
 				supported_project_types: ['mod', 'modpack', 'resourcepack', 'shader', 'plugin', 'datapack'],
 				query_param: 'l',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				display: 'all',
 				searchable: false,
 				options: [
@@ -418,11 +709,36 @@ export function useSearch(
 				),
 				supported_project_types: ALL_PROJECT_TYPES,
 				query_param: 'pid',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				display: 'none',
 				searchable: false,
 				options: [],
 				allows_custom_options: 'and',
+			},
+			{
+				id: 'advanced',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced',
+						defaultMessage: 'Advanced exclusions',
+					}),
+				),
+				supported_project_types: ALL_PROJECT_TYPES,
+				display: 'all',
+				query_param: 'a',
+				supports: ['exclude'],
+				searchable: false,
+				ordering: -1000,
+				options: [
+					...createDisclosureFilterOptions(formatMessage, projectTypes.value),
+					...excludeableProjectTypes.map((target) => ({
+						id: target,
+						formatted_name: formatMessage(getProjectTypeCategoryMessage(target)),
+						icon: getProjectTypeIcon(target),
+						method: 'and' as const,
+						value: `all_project_types:${mapProjectTypeToSearch(target)}`,
+					})),
+				],
 			},
 		]
 
@@ -432,6 +748,7 @@ export function useSearch(
 					projectTypes.value.includes(projectType),
 				),
 			)
+			.filter((filterType) => filterType.id !== 'advanced' || filterType.options.length > 0)
 			.sort((a, b) => (b.ordering ?? 0) - (a.ordering ?? 0))
 	})
 
@@ -450,19 +767,44 @@ export function useSearch(
 		const negativeByType: Record<string, string[]> = {}
 
 		for (const filterValue of filterValues) {
+			if (filterValue.type === 'compatible_dependency_project_ids') {
+				const { projectId, dependencyTypes } = parseDependencyProjectFilterOption(
+					filterValue.option,
+				)
+				const fields = projectTypes.value.includes('modpack')
+					? ['compatible_dependency_project_ids']
+					: dependencyTypes.map((type) => DEPENDENCY_TYPE_FIELDS[type])
+				const operator = filterValue.negative ? '!=' : '='
+				const conditions = fields.map(
+					(field) => `${field} ${operator} ${formatSearchFilterValue(projectId)}`,
+				)
+
+				if (conditions.length === 1) {
+					parts.push(conditions[0])
+				} else {
+					parts.push(`(${conditions.join(filterValue.negative ? ' AND ' : ' OR ')})`)
+				}
+				continue
+			}
+
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			if (!type) {
 				console.error(`Filter type ${filterValue.type} not found`)
 				continue
 			}
-			let option = type?.options.find((option) => option.id === filterValue.option)
+			if (type.id === 'advanced' && isProjectTypeExclusionOption(filterValue.option)) {
+				continue
+			}
+			let option = type ? findFilterOption(type.options, filterValue.option) : undefined
 			if (!option && type.allows_custom_options) {
 				option = {
 					id: filterValue.option,
 					formatted_name: filterValue.option,
 					icon: undefined,
 					method: type.allows_custom_options,
-					value: filterValue.option,
+					value: type.custom_option_field
+						? `${type.custom_option_field}:${filterValue.option}`
+						: filterValue.option,
 				}
 			} else if (!option) {
 				console.error(`Filter option ${filterValue.option} not found`)
@@ -484,7 +826,7 @@ export function useSearch(
 					}
 					orGroups[field].push(val)
 				} else {
-					parts.push(`${field} = ${enquoteNonBools(val)}`)
+					parts.push(`${field} = ${formatSearchFilterValue(val)}`)
 				}
 			}
 		}
@@ -492,45 +834,69 @@ export function useSearch(
 		for (const [field, values] of Object.entries(orGroups)) {
 			if (values.length === 1) {
 				const val = values[0]
-				parts.push(`${field} = ${enquoteNonBools(val)}`)
+				parts.push(`${field} = ${formatSearchFilterValue(val)}`)
 			} else {
-				const quoted = values.map(enquoteNonBools).join(', ')
+				const quoted = values.map(formatSearchFilterValue).join(', ')
 				parts.push(`${field} IN [${quoted}]`)
 			}
 		}
 
 		for (const [field, values] of Object.entries(negativeByType)) {
-			const quoted = values.map(enquoteNonBools).join(', ')
+			const quoted = values.map(formatSearchFilterValue).join(', ')
 			parts.push(`${field} NOT IN [${quoted}]`)
 		}
 
 		// Environment facets
-		const client = filterValues.some(
-			(filter) => filter.type === 'environment' && filter.option === 'client',
-		)
-		const server = filterValues.some(
-			(filter) => filter.type === 'environment' && filter.option === 'server',
-		)
-		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
-			if (envGroup.length === 1) {
-				const [field, val] = envGroup[0].split(':')
-				parts.push(`${field} = ${enquoteNonBools(val)}`)
-			} else if (envGroup.length > 1) {
-				const conditions = envGroup.map((f) => {
-					const [field, val] = f.split(':')
-					return `${field} = ${enquoteNonBools(val)}`
-				})
-				parts.push(`(${conditions.join(' OR ')})`)
+		const override = environmentOverride.value
+		if (override) {
+			if (override.values.length === 1) {
+				const operator = override.mode === 'include' ? '=' : '!='
+				parts.push(`environment ${operator} ${formatSearchFilterValue(override.values[0])}`)
+			} else if (override.values.length > 1) {
+				const operator = override.mode === 'include' ? 'IN' : 'NOT IN'
+				const quoted = override.values.map(formatSearchFilterValue).join(', ')
+				parts.push(`environment ${operator} [${quoted}]`)
+			}
+		} else {
+			const client = filterValues.some(
+				(filter) => filter.type === 'environment' && filter.option === 'client',
+			)
+			const server = filterValues.some(
+				(filter) => filter.type === 'environment' && filter.option === 'server',
+			)
+			for (const envGroup of getEnvironmentFilterGroups(client, server)) {
+				if (envGroup.length === 1) {
+					const [field, val] = envGroup[0].split(':')
+					parts.push(`${field} = ${formatSearchFilterValue(val)}`)
+				} else if (envGroup.length > 1) {
+					const conditions = envGroup.map((f) => {
+						const [field, val] = f.split(':')
+						return `${field} = ${formatSearchFilterValue(val)}`
+					})
+					parts.push(`(${conditions.join(' OR ')})`)
+				}
 			}
 		}
 
 		// Project types
 		const mappedProjectTypes = projectTypes.value.map(mapProjectTypeToSearch)
 		if (mappedProjectTypes.length === 1) {
-			parts.push(`project_types = ${enquoteNonBools(mappedProjectTypes[0])}`)
+			parts.push(`project_types = ${formatSearchFilterValue(mappedProjectTypes[0])}`)
 		} else if (mappedProjectTypes.length > 1) {
-			const quoted = mappedProjectTypes.map(enquoteNonBools).join(', ')
+			const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
 			parts.push(`project_types IN [${quoted}]`)
+		}
+
+		const excludedProjectTypes = filterValues
+			.filter(
+				(filterValue) =>
+					filterValue.type === 'advanced' && isProjectTypeExclusionOption(filterValue.option),
+			)
+			.map((filterValue) =>
+				formatSearchFilterValue(mapProjectTypeToSearch(filterValue.option as ProjectType)),
+			)
+		if (excludedProjectTypes.length > 0) {
+			parts.push(`all_project_types NOT IN [${excludedProjectTypes.join(', ')}]`)
 		}
 
 		return parts.join(' AND ')
@@ -580,7 +946,7 @@ export function useSearch(
 			const set = typeof filter === 'string' ? new Set([filter]) : new Set(filter)
 
 			typesLoop: for (const type of filters.value) {
-				for (const option of type.options) {
+				for (const option of flattenFilterOptions(type.options)) {
 					const value = getOptionValue(option, false)
 					if (
 						set.has(value) &&
@@ -639,7 +1005,9 @@ export function useSearch(
 				let matched = false
 
 				for (const type of types) {
-					const option = type.options.find((option) => getOptionValue(option, negative) === value)
+					const option = flattenFilterOptions(type.options).find(
+						(option) => getOptionValue(option, negative) === value,
+					)
 					if (!option) {
 						continue
 					}
@@ -678,9 +1046,9 @@ export function useSearch(
 
 		currentFilters.value.forEach((filterValue) => {
 			const type = filters.value.find((type) => type.id === filterValue.type)
-			const option = type?.options.find((option) => option.id === filterValue.option)
-			if (type && option) {
-				const value = getOptionValue(option, filterValue.negative)
+			const option = type ? findFilterOption(type.options, filterValue.option) : undefined
+			if (type && (option || type.allows_custom_options)) {
+				const value = option ? getOptionValue(option, filterValue.negative) : filterValue.option
 				if (items[type.query_param]) {
 					items[type.query_param].push(value)
 				} else {
@@ -777,26 +1145,37 @@ function mapProjectTypeToSearch(projectType: ProjectType): string {
 function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {
 	const groups: string[][] = []
 	if (client && server) {
-		groups.push(
-			['client_side:required', 'client_side:optional', 'client_side:unsupported'],
-			['server_side:required', 'server_side:optional'],
-		)
+		groups.push([
+			'environment:client_only_server_optional',
+			'environment:server_only_client_optional',
+			'environment:client_and_server',
+			'environment:client_or_server',
+			'environment:client_or_server_prefers_both',
+		])
 	} else if (client) {
-		groups.push(
-			['client_side:optional', 'client_side:required'],
-			['server_side:optional', 'server_side:unsupported'],
-		)
+		groups.push([
+			'environment:client_only',
+			'environment:client_only_server_optional',
+			'environment:client_or_server_prefers_both',
+			'environment:client_or_server',
+		])
 	} else if (server) {
-		groups.push(['server_side:optional', 'server_side:required'])
+		groups.push([
+			'environment:server_only',
+			'environment:dedicated_server_only',
+			'environment:server_only_client_optional',
+			'environment:client_or_server_prefers_both',
+			'environment:client_or_server',
+		])
 	}
 	return groups
 }
 
-function enquoteNonBools(value: string): string {
+export function formatSearchFilterValue(value: string): string {
 	if (value === 'true' || value === 'false') {
 		return value
 	}
-	return `"${value}"`
+	return `\`${value}\``
 }
 
 function getOptionValue(option: FilterOption, negative?: boolean): string {
@@ -822,4 +1201,33 @@ function getParamValuesAsArray(x: LocationQueryValue | LocationQueryValue[]): st
 	} else {
 		return x.filter((x) => x !== null)
 	}
+}
+
+export function buildDependentsSearchFilters(
+	projectTypes: readonly ProjectType[],
+	dependencyProjectIds: readonly string[],
+): string {
+	const parts: string[] = []
+	const mappedProjectTypes = projectTypes.map(mapProjectTypeToSearch)
+
+	if (mappedProjectTypes.length === 1) {
+		parts.push(`project_types = ${formatSearchFilterValue(mappedProjectTypes[0])}`)
+	} else if (mappedProjectTypes.length > 1) {
+		const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
+		parts.push(`project_types IN [${quoted}]`)
+	}
+
+	const normalizedProjectIds = Array.from(
+		new Set(dependencyProjectIds.map((projectId) => projectId.trim()).filter(Boolean)),
+	)
+	if (normalizedProjectIds.length === 1) {
+		parts.push(
+			`compatible_dependency_project_ids = ${formatSearchFilterValue(normalizedProjectIds[0])}`,
+		)
+	} else if (normalizedProjectIds.length > 1) {
+		const quoted = normalizedProjectIds.map(formatSearchFilterValue).join(', ')
+		parts.push(`compatible_dependency_project_ids IN [${quoted}]`)
+	}
+
+	return parts.join(' AND ')
 }

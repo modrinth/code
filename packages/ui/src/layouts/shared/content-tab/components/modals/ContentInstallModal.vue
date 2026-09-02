@@ -67,21 +67,25 @@
 			style="height: 400px; overflow-y: auto"
 		>
 			<div class="flex items-start gap-3 px-6">
-				<StyledInput
+				<Input
 					v-model="searchFilter"
 					:icon="SearchIcon"
 					:placeholder="formatMessage(messages.searchPlaceholder)"
 					class="flex-1"
 				/>
-				<ButtonStyled type="outlined" circular>
-					<button
-						v-tooltip="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
-						@click="hideUninstallable = !hideUninstallable"
-					>
-						<EyeOffIcon v-if="hideUninstallable" />
-						<EyeIcon v-else />
-					</button>
-				</ButtonStyled>
+				<IconButton
+					v-tooltip="
+						formatMessage(hideUninstallable ? messages.showUnavailable : messages.hideUnavailable)
+					"
+					type="outlined"
+					:label="
+						formatMessage(hideUninstallable ? messages.showUnavailable : messages.hideUnavailable)
+					"
+					@click="hideUninstallable = !hideUninstallable"
+				>
+					<EyeOffIcon v-if="hideUninstallable" />
+					<EyeIcon v-else />
+				</IconButton>
 			</div>
 
 			<div v-if="loading" class="flex items-center justify-center py-12">
@@ -105,56 +109,87 @@
 						class="flex min-w-0 cursor-pointer items-center gap-2.5 overflow-hidden border-0 bg-transparent p-0 text-left"
 						@click="emit('navigate', inst)"
 					>
-						<Avatar :src="inst.iconUrl ?? undefined" size="2rem" rounded="md" />
+						<Avatar
+							:src="inst.iconUrl ?? undefined"
+							size="2rem"
+							rounded="md"
+							pad-transparent-corners
+						/>
 						<span class="truncate font-semibold text-contrast hover:underline">{{
 							inst.name
 						}}</span>
 					</button>
-					<ButtonStyled v-if="inst.installed">
-						<button disabled>
-							<CheckIcon />
-							{{ formatMessage(messages.installedBadge) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled
+					<Button v-if="inst.installed" disabled>
+						<CheckIcon />
+						{{ formatMessage(messages.installedBadge) }}
+					</Button>
+					<Button
 						v-else
-						:type="inst.compatible ? 'standard' : 'outlined'"
-						:color="inst.compatible ? 'standard' : 'orange'"
+						v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
+						:type="inst.compatible ? 'base' : 'outlined'"
+						:class="
+							inst.compatible
+								? undefined
+								: '!text-orange [&>svg]:!text-orange !shadow-[inset_0_0_0_1px_var(--color-orange)]'
+						"
+						:disabled="inst.installing"
+						@click="emit('install', inst)"
 					>
-						<button
-							v-tooltip="!inst.compatible ? formatMessage(messages.incompatibleTooltip) : undefined"
-							:disabled="inst.installing"
-							@click="emit('install', inst)"
-						>
-							<TriangleAlertIcon v-if="!inst.compatible" />
-							{{
-								inst.installing
-									? formatMessage(commonMessages.installingLabel)
-									: formatMessage(messages.installButton)
-							}}
-						</button>
-					</ButtonStyled>
+						<TriangleAlertIcon v-if="!inst.compatible" />
+						{{
+							inst.installing
+								? formatMessage(commonMessages.installingLabel)
+								: formatMessage(messages.installButton)
+						}}
+					</Button>
 				</div>
 			</div>
 		</div>
 
 		<!-- New instance tab -->
 		<div v-else class="flex flex-col gap-6 p-6">
-			<div class="flex items-center gap-4">
-				<Avatar :src="iconPreviewUrl ?? undefined" size="5rem" rounded="2xl" />
-				<div class="flex flex-col gap-2">
-					<ButtonStyled type="outlined">
-						<button @click="selectIcon">
-							<UploadIcon />
-							{{ formatMessage(messages.selectIcon) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="outlined">
-						<button :disabled="!iconPreviewUrl" @click="removeIcon">
+			<div class="flex items-center gap-2.5">
+				<div class="group relative size-[7.75rem] shrink-0">
+					<Avatar
+						:src="iconPreviewUrl ?? undefined"
+						size="100%"
+						no-shadow
+						pad-transparent-corners
+					/>
+					<div
+						v-if="iconPreviewUrl"
+						class="pointer-events-none absolute right-1.5 top-1.5 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+					>
+						<Button
+							size="sm"
+							class="!p-2"
+							:aria-label="formatMessage(commonMessages.removeImageButton)"
+							@click="removeIcon"
+						>
 							<XIcon />
-							{{ formatMessage(messages.removeIcon) }}
-						</button>
-					</ButtonStyled>
+						</Button>
+					</div>
+				</div>
+				<div class="flex flex-col gap-1.5">
+					<Button type="outlined" @click="selectIcon">
+						<UploadIcon />
+						{{ formatMessage(messages.selectIcon) }}
+					</Button>
+					<Button
+						v-if="props.randomizeIcon"
+						type="outlined"
+						:disabled="randomizing"
+						class="disabled:!cursor-default"
+						@click="randomizeInstanceIcon"
+					>
+						<SpinnerIcon v-if="randomizing" class="animate-spin" />
+						<RefreshCwIcon v-else />
+						{{ formatMessage(messages.randomizeIcon) }}
+					</Button>
+					<Button v-if="props.customizeIcon" type="outlined" @click="props.customizeIcon?.()">
+						<PaletteIcon />
+						{{ formatMessage(messages.customizeIcon) }}
+					</Button>
 				</div>
 			</div>
 
@@ -162,10 +197,7 @@
 				<span class="font-semibold text-contrast">
 					{{ formatMessage(messages.nameLabel) }}
 				</span>
-				<StyledInput
-					v-model="instanceName"
-					:placeholder="formatMessage(messages.namePlaceholder)"
-				/>
+				<Input v-model="instanceName" :placeholder="formatMessage(messages.namePlaceholder)" />
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -218,27 +250,26 @@
 						{{ formatMessage(messages.compatibleCount, { count: compatibleCount }) }}
 					</span>
 				</div>
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
 			</div>
 
 			<div v-else class="flex items-center justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!instanceName" @click="handleCreateAndInstall">
-						<DownloadIcon />
-						{{ formatMessage(messages.installButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!instanceName"
+					@click="handleCreateAndInstall"
+				>
+					<DownloadIcon />
+					{{ formatMessage(messages.installButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -251,20 +282,23 @@ import {
 	DownloadIcon,
 	EyeIcon,
 	EyeOffIcon,
+	PaletteIcon,
+	RefreshCwIcon,
 	SearchIcon,
+	SpinnerIcon,
 	TriangleAlertIcon,
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectFilePicker } from '#ui/providers'
@@ -294,6 +328,14 @@ const messages = defineMessages({
 		id: 'instances.content-install.search-placeholder',
 		defaultMessage: 'Search instance',
 	},
+	showUnavailable: {
+		id: 'instances.content-install.show-unavailable',
+		defaultMessage: 'Show unavailable',
+	},
+	hideUnavailable: {
+		id: 'instances.content-install.hide-unavailable',
+		defaultMessage: 'Hide unavailable',
+	},
 	installedBadge: {
 		id: 'instances.content-install.installed-badge',
 		defaultMessage: 'Installed',
@@ -308,12 +350,16 @@ const messages = defineMessages({
 			'This instance uses a different loader or game version than this project supports.',
 	},
 	selectIcon: {
-		id: 'instances.content-install.select-icon',
-		defaultMessage: 'Select icon',
+		id: 'creation-flow.modal.custom-setup.icon.select',
+		defaultMessage: 'Upload',
 	},
-	removeIcon: {
-		id: 'instances.content-install.remove-icon',
-		defaultMessage: 'Remove icon',
+	randomizeIcon: {
+		id: 'creation-flow.modal.custom-setup.icon.randomize',
+		defaultMessage: 'Randomize',
+	},
+	customizeIcon: {
+		id: 'creation-flow.modal.custom-setup.icon.customize',
+		defaultMessage: 'Customize',
 	},
 	nameLabel: {
 		id: 'instances.content-install.name-label',
@@ -374,6 +420,8 @@ const props = defineProps<{
 	preferredLoader?: string | null
 	preferredGameVersion?: string | null
 	projectInfo?: ContentInstallProjectInfo | null
+	randomizeIcon?: () => Promise<{ path: string; previewUrl: string } | null>
+	customizeIcon?: () => void
 }>()
 
 const emit = defineEmits<{
@@ -430,6 +478,7 @@ const selectedLoader = ref<string | null>(null)
 const selectedGameVersion = ref<string | null>(null)
 const iconPath = ref<string | null>(null)
 const iconPreviewUrl = ref<string | null>(null)
+const randomizing = ref(false)
 const showSnapshots = ref(false)
 
 const hasReleaseData = computed(
@@ -460,6 +509,20 @@ function removeIcon() {
 	iconPreviewUrl.value = null
 }
 
+async function randomizeInstanceIcon() {
+	if (!props.randomizeIcon || randomizing.value) return
+
+	randomizing.value = true
+	try {
+		const generated = await props.randomizeIcon()
+		if (!generated) return
+		iconPath.value = generated.path
+		iconPreviewUrl.value = generated.previewUrl
+	} finally {
+		randomizing.value = false
+	}
+}
+
 function resetState() {
 	tab.value = props.defaultTab ?? 'existing'
 	searchFilter.value = ''
@@ -467,6 +530,7 @@ function resetState() {
 	instanceName.value = `New instance (${props.instances.length + 1})`
 	iconPath.value = null
 	iconPreviewUrl.value = null
+	void randomizeInstanceIcon()
 	selectedLoader.value = props.preferredLoader ?? props.compatibleLoaders[0] ?? null
 
 	const preferred = props.preferredGameVersion
@@ -481,6 +545,15 @@ function resetState() {
 	selectedGameVersion.value = preferred ?? defaultVersion
 }
 
+watch(
+	() => props.loading,
+	(loading, wasLoading) => {
+		if (wasLoading && !loading) {
+			tab.value = props.defaultTab ?? 'existing'
+		}
+	},
+)
+
 function handleHide() {
 	emit('cancel')
 }
@@ -492,6 +565,11 @@ function show() {
 
 function hide() {
 	modal.value?.hide()
+}
+
+function setIcon(path: string, previewUrl: string) {
+	iconPath.value = path
+	iconPreviewUrl.value = previewUrl
 }
 
 function handleCreateAndInstall() {
@@ -506,5 +584,5 @@ function handleCreateAndInstall() {
 	hide()
 }
 
-defineExpose({ show, hide })
+defineExpose({ show, hide, setIcon })
 </script>

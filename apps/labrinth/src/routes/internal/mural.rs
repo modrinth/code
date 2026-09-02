@@ -6,18 +6,23 @@ use crate::{
     queue::payouts::PayoutsQueue, routes::ApiError, util::error::Context,
 };
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_bank_details);
 }
 
+/// Get bank details.  
+#[utoipa::path(
+	tag = "mural",
+	responses((status = OK, body = serde_json::Value))
+)]
 #[get("/mural/bank-details")]
-async fn get_bank_details(
+pub async fn get_bank_details(
     payouts_queue: web::Data<PayoutsQueue>,
 ) -> Result<web::Json<muralpay::BankDetailsResponse>, ApiError> {
     let mural = payouts_queue.muralpay.load();
     let mural = mural
         .as_ref()
-        .wrap_internal_err("Mural API not available")?;
+        .wrap_internal_err("required Mural API is not available")?;
     let fiat_and_rail_codes = FiatAndRailCode::iter().collect::<Vec<_>>();
     let details = mural
         .client

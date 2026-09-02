@@ -23,7 +23,7 @@
 					</div>
 
 					<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
-						<StyledInput
+						<Input
 							v-model="searchQuery"
 							:icon="SearchIcon"
 							:placeholder="formatMessage(analyticsTableMessages.searchPlaceholder)"
@@ -31,23 +31,22 @@
 							wrapper-class="w-full sm:w-64"
 							@focusin="selectSearchInputText"
 						/>
-						<ButtonStyled>
-							<OverflowMenu
-								class="!shadow-none"
-								:options="csvExportOptions"
-								:disabled="isDataLoading || filteredRows.length === 0"
-							>
-								<DownloadIcon />
-								{{ formatMessage(analyticsTableMessages.exportCsvButton) }}
-								<DropdownIcon />
-								<template #cumulative-csv>
-									{{ formatMessage(analyticsTableMessages.cumulativeCsv) }}
-								</template>
-								<template #grouped-csv>
-									{{ formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel }) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
+						<TeleportOverflowMenu
+							label="More options"
+							class="!w-auto !rounded-xl !px-2.5"
+							:options="csvExportOptions"
+							:disabled="isDataLoading || filteredRows.length === 0"
+						>
+							<DownloadIcon />
+							{{ formatMessage(analyticsTableMessages.exportCsvButton) }}
+							<DropdownIcon />
+							<template #cumulative-csv>
+								{{ formatMessage(analyticsTableMessages.cumulativeCsv) }}
+							</template>
+							<template #grouped-csv>
+								{{ formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel }) }}
+							</template>
+						</TeleportOverflowMenu>
 					</div>
 				</div>
 			</template>
@@ -55,32 +54,92 @@
 			<template #cell-date="{ value }">
 				<span class="text-primary">{{ value }}</span>
 			</template>
-			<template #cell-breakdown_project="{ value }">
-				<span class="text-primary">{{ value }}</span>
+			<template #cell-breakdown_project="{ row, value }">
+				<ProjectCell
+					:label="getProjectCellLabel(value)"
+					:icon-url="getProjectIconUrl(row.breakdownValues.project)"
+					:icon-tooltip="getProjectCellLabel(value)"
+					:label-href="getProjectPageHref(row.breakdownValues.project)"
+					:organization-href="getProjectOrganizationPageHref(row.breakdownValues.project)"
+					:organization-tooltip="getProjectOrganizationName(row.breakdownValues.project)"
+				/>
 			</template>
 			<template #cell-breakdown_country="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_monetization="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_user_agent="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_download_reason="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
-			<template #cell-breakdown_version_id="{ value }">
-				<span class="text-primary">{{ value }}</span>
+			<template #cell-breakdown_user_id="{ row, value }">
+				<component
+					:is="getUserPageHref(row.breakdownValues.user_id) ? 'a' : 'span'"
+					:href="getUserPageHref(row.breakdownValues.user_id)"
+					:target="getUserPageHref(row.breakdownValues.user_id) ? '_blank' : undefined"
+					:rel="getUserPageHref(row.breakdownValues.user_id) ? 'noopener noreferrer' : undefined"
+					class="mr-2.5 flex min-w-0 items-center gap-2 text-primary"
+					:class="{ 'hover:underline': getUserPageHref(row.breakdownValues.user_id) }"
+				>
+					<span
+						v-tooltip="getUserCellLabel(value)"
+						class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-primary"
+					>
+						<img
+							v-if="getUserAvatarUrl(row.breakdownValues.user_id)"
+							:src="getUserAvatarUrl(row.breakdownValues.user_id)"
+							:alt="getUserCellLabel(value)"
+							class="h-6 w-6 rounded-full object-cover"
+						/>
+						<UserIcon v-else class="h-full w-full" />
+					</span>
+					<span class="min-w-0 truncate font-semibold leading-tight text-primary">
+						{{ value }}
+					</span>
+				</component>
+			</template>
+			<template #cell-breakdown_dependent_project_download="{ row, value }">
+				<ProjectCell
+					:label="getProjectCellLabel(value)"
+					:icon-url="
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
+							? undefined
+							: getProjectIconUrl(row.breakdownValues.dependent_project_download)
+					"
+					:icon-tooltip="getProjectCellLabel(value)"
+					:hide-icon="
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
+					"
+					:label-href="
+						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
+							? undefined
+							: getProjectPageHref(row.breakdownValues.dependent_project_download)
+					"
+					:label-tooltip="getDependentProjectTooltip(row)"
+				/>
+			</template>
+			<template #cell-breakdown_version_id="{ row, value }">
+				<component
+					:is="getVersionPageHref(row.projectVersionId) ? 'a' : 'span'"
+					v-tooltip="getVersionProjectName(row.projectVersionId)"
+					:href="getVersionPageHref(row.projectVersionId)"
+					:target="getVersionPageHref(row.projectVersionId) ? '_blank' : undefined"
+					:rel="getVersionPageHref(row.projectVersionId) ? 'noopener noreferrer' : undefined"
+					class="mr-2.5 text-primary"
+					:class="{ 'hover:underline': getVersionPageHref(row.projectVersionId) }"
+				>
+					{{ value }}
+				</component>
 			</template>
 			<template #cell-breakdown_loader="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_game_version="{ value }">
-				<span class="text-primary">{{ value }}</span>
-			</template>
-			<template #cell-project="{ value }">
-				<span class="text-primary">{{ value }}</span>
+				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-views="{ row }">
 				<span>{{ formatInteger(row.views) }}</span>
@@ -130,13 +189,12 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
+import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
+import { TeleportOverflowMenu } from '@modrinth/ui'
 import {
-	ButtonStyled,
-	OverflowMenu,
-	type OverflowMenuOption,
+	type ButtonMenuOption,
+	Input,
 	Pagination,
-	StyledInput,
 	Table,
 	useFormatNumber,
 	useVIntl,
@@ -159,10 +217,15 @@ import {
 } from '../analytics-chart/analytics-chart-utils.ts'
 import {
 	analyticsBreakdownMessages,
+	analyticsChartMessages,
 	analyticsMessages,
 	analyticsTableMessages,
 } from '../analytics-messages.ts'
 import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
+import {
+	isNoDependentAnalyticsBreakdownValue,
+	isUnknownAnalyticsBreakdownValue,
+} from '../breakdown.ts'
 import {
 	buildAnalyticsTableColumns,
 	getAnalyticsTableBreakdownColumnLabel,
@@ -194,8 +257,10 @@ import { sortAnalyticsTableRows } from './analytics-table-sorting.ts'
 import type {
 	AnalyticsTableColumnKey,
 	AnalyticsTableMode,
+	AnalyticsTableRow,
 	AnalyticsTableSortDirectionValue,
 } from './analytics-table-types.ts'
+import ProjectCell from './ProjectCell.vue'
 import { useAnalyticsTableGraphSelection } from './use-analytics-table-graph-selection.ts'
 import { useAnalyticsTablePagination } from './use-analytics-table-pagination.ts'
 import { useAnalyticsTableRowCache } from './use-analytics-table-row-cache.ts'
@@ -221,7 +286,15 @@ const {
 	getRelevantAnalyticsDashboardStats,
 	isLoading,
 	versionNumbersById,
+	versionProjectIdsById,
 	versionProjectNamesById,
+	projectNamesById,
+	projectIconUrlsById,
+	projectOrganizationIdsById,
+	projectOrganizationNamesById,
+	userNamesById,
+	userAvatarUrlsById,
+	dependentProjectTypesById,
 	getVersionDisplayName,
 	getVersionProjectName,
 } = injectAnalyticsDashboardContext()
@@ -263,11 +336,10 @@ const showGraphDatasetSelection = computed(() =>
 		? selectedProjectIdSet.value.size > 1
 		: selectedBreakdowns.value.length > 0,
 )
-const showProjectVersionProjectColumn = computed(
+const includeDependentProjectTooltipContext = computed(
 	() =>
-		selectedBreakdownSet.value.has('version_id') &&
-		!selectedBreakdownSet.value.has('project') &&
-		selectedProjectIdSet.value.size > 1,
+		selectedBreakdownSet.value.has('dependent_project_download') &&
+		!selectedBreakdownSet.value.has('project'),
 )
 const includeDateColumn = computed(
 	() =>
@@ -291,15 +363,17 @@ const displayedIncludeDateColumn = computed(() =>
 const groupByLabel = computed(() =>
 	getAnalyticsTableGroupByLabel(selectedGroupBy.value, formatMessage),
 )
-const csvExportOptions = computed<OverflowMenuOption[]>(() => {
+const csvExportOptions = computed<ButtonMenuOption[]>(() => {
 	if (showGraphDatasetSelection.value) {
 		return [
 			{
 				id: 'cumulative-csv',
+				label: formatMessage(analyticsTableMessages.cumulativeCsv),
 				action: () => downloadCsv('breakdown_only'),
 			},
 			{
 				id: 'grouped-csv',
+				label: formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel.value }),
 				action: () => downloadCsv('date_breakdown'),
 			},
 		]
@@ -310,13 +384,14 @@ const csvExportOptions = computed<OverflowMenuOption[]>(() => {
 	return [
 		{
 			id: mode === 'date_breakdown' ? 'grouped-csv' : 'cumulative-csv',
+			label:
+				mode === 'date_breakdown'
+					? formatMessage(analyticsTableMessages.groupedCsv, { groupBy: groupByLabel.value })
+					: formatMessage(analyticsTableMessages.cumulativeCsv),
 			action: () => downloadCsv(mode),
 		},
 	]
 })
-const projectNamesById = computed(
-	() => new Map(projects.value.map((project) => [project.id, project.name])),
-)
 const hasAvailableProjects = computed(() => projects.value.length > 0)
 const analyticsPointCount = computed(() =>
 	timeSlices.value.reduce((sum, slice) => sum + slice.length, 0),
@@ -360,8 +435,12 @@ function buildTableRows(mode: AnalyticsTableMode) {
 		timeSlices: timeSlices.value,
 		selectedBreakdowns: selectedBreakdowns.value,
 		selectedProjectIds: selectedProjectIdSet.value,
+		selectedFilters: selectedFilters.value,
+		dependentProjectTypesById: dependentProjectTypesById.value,
+		includeDependentProjectTooltipContext: includeDependentProjectTooltipContext.value,
 		relevantStats: relevantStats.value,
 		projectNamesById: projectNamesById.value,
+		userNamesById: userNamesById.value,
 		getVersionDisplayName,
 		getVersionProjectName,
 		showTimeInBucketLabel: showTimeInBucketLabel.value,
@@ -379,10 +458,84 @@ function buildColumns(includeDate: boolean) {
 		selectedBreakdowns: selectedBreakdowns.value,
 		selectedFilters: selectedFilters.value,
 		showBreakdownColumn: showBreakdownColumn.value,
-		showProjectVersionProjectColumn: showProjectVersionProjectColumn.value,
 		formatMessage,
 		getRelevantAnalyticsDashboardStats,
 	})
+}
+
+function getProjectIconUrl(projectId: string | undefined) {
+	return projectId ? projectIconUrlsById.value.get(projectId) : undefined
+}
+
+function getProjectOrganizationName(projectId: string | undefined) {
+	return projectId ? projectOrganizationNamesById.value.get(projectId) : undefined
+}
+
+function getProjectCellLabel(value: unknown) {
+	return typeof value === 'string' ? value : String(value ?? '')
+}
+
+function getUserAvatarUrl(userId: string | undefined) {
+	return userId ? userAvatarUrlsById.value.get(userId) : undefined
+}
+
+function getUserCellLabel(value: unknown) {
+	return typeof value === 'string' ? value : String(value ?? '')
+}
+
+function getUserPageHref(userId: string | undefined) {
+	if (!userId) return undefined
+	const username = userNamesById.value.get(userId) ?? userId
+
+	return `/user/${encodeURIComponent(username)}`
+}
+
+function getProjectPageHref(projectId: string | undefined) {
+	return projectId ? `/project/${encodeURIComponent(projectId)}` : undefined
+}
+
+function getProjectOrganizationPageHref(projectId: string | undefined) {
+	if (!projectId) return undefined
+	const organizationId = projectOrganizationIdsById.value.get(projectId)
+	if (!organizationId) return undefined
+
+	return `/organization/${encodeURIComponent(organizationId)}`
+}
+
+function getVersionPageHref(versionId: string | undefined) {
+	if (!versionId) return undefined
+	const projectId = versionProjectIdsById.value.get(versionId)
+	if (!projectId) return undefined
+
+	return `/project/${encodeURIComponent(projectId)}/version/${encodeURIComponent(versionId)}`
+}
+
+function isMissingDependentProjectValue(value: string | undefined) {
+	return isUnknownAnalyticsBreakdownValue(value) || isNoDependentAnalyticsBreakdownValue(value)
+}
+
+function getDependentProjectTooltip(row: AnalyticsTableRow) {
+	if (isNoDependentAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
+		return formatMessage(analyticsMessages.noDependentTooltip)
+	}
+	if (isUnknownAnalyticsBreakdownValue(row.breakdownValues.dependent_project_download)) {
+		return formatMessage(analyticsMessages.unknownDependentTooltip)
+	}
+
+	const dependencyProjectIds = new Set(row.dependentOnProjectIds)
+	if (row.dependentOnProjectId) {
+		dependencyProjectIds.add(row.dependentOnProjectId)
+	}
+
+	const dependencyProjectNames = [...dependencyProjectIds]
+		.map((projectId) => projectNamesById.value.get(projectId) ?? projectId)
+		.sort((left, right) => left.localeCompare(right))
+
+	return dependencyProjectNames.length > 0
+		? formatMessage(analyticsChartMessages.dependentOnProjectTooltip, {
+				project: dependencyProjectNames.join(', '),
+			})
+		: undefined
 }
 
 watch(
@@ -445,6 +598,9 @@ watch(
 		selectedBreakdowns,
 		selectedFilters,
 		projects,
+		dependentProjectTypesById,
+		projectNamesById,
+		userNamesById,
 		versionNumbersById,
 		versionProjectNamesById,
 	],

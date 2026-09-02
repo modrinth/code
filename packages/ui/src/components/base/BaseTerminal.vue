@@ -12,11 +12,9 @@
 				/>
 			</Transition>
 			<div v-if="!isAtBottom" class="absolute bottom-4 right-4 z-10">
-				<ButtonStyled circular type="highlight" size="large">
-					<button class="!shadow-2xl" aria-label="Scroll to bottom" @click="scrollToBottom">
-						<ChevronDownIcon />
-					</button>
-				</ButtonStyled>
+				<IconButton size="xl" label="Scroll to bottom" class="!shadow-2xl" @click="scrollToBottom">
+					<ChevronDownIcon />
+				</IconButton>
 			</div>
 		</div>
 		<div
@@ -24,14 +22,14 @@
 			ref="inputRef"
 			class="border-t border-solid border-b-0 border-x-0 border-surface-4 bg-surface-3 p-4"
 		>
-			<StyledInput
+			<Input
 				v-model="commandInput"
 				v-tooltip="disableInput ? disableInputTooltip : undefined"
 				:icon="TerminalSquareIcon"
 				:placeholder="disableInput ? disabledInputPlaceholder : 'Send a command'"
 				:disabled="disableInput"
 				wrapper-class="w-full"
-				input-class="!h-10"
+				size="medium"
 				@keydown.enter="submitCommand"
 			/>
 		</div>
@@ -43,8 +41,8 @@ import { ChevronDownIcon, TerminalSquareIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import { IconButton } from '#ui/components/base/buttons'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { useTerminal } from '#ui/composables/terminal'
 
 const props = withDefaults(
@@ -189,14 +187,31 @@ function handleDocumentPointerDown(event: PointerEvent) {
 	terminal.value.clearSelection()
 }
 
+function handleDocumentKeyDown(event: KeyboardEvent) {
+	if (!event.metaKey || event.key.toLowerCase() !== 'a') return
+	const target = event.target as Node | null
+	const active = document.activeElement
+	if (
+		!(target && containerRef.value?.contains(target)) &&
+		!(active && containerRef.value?.contains(active))
+	) {
+		return
+	}
+
+	event.preventDefault()
+	terminal.value?.selectAll()
+}
+
 onMounted(() => {
 	window.addEventListener('resize', handleWindowResize)
 	document.addEventListener('pointerdown', handleDocumentPointerDown)
+	document.addEventListener('keydown', handleDocumentKeyDown, true)
 })
 
 onBeforeUnmount(() => {
 	window.removeEventListener('resize', handleWindowResize)
 	document.removeEventListener('pointerdown', handleDocumentPointerDown)
+	document.removeEventListener('keydown', handleDocumentKeyDown, true)
 	if (resizeDebounce) clearTimeout(resizeDebounce)
 })
 

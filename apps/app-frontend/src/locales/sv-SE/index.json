@@ -2,17 +2,104 @@
   "app.action-bar.downloading-java": {
     "message": "Laddar ner Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Laddar ner uppdatering"
+  },
   "app.action-bar.downloads": {
     "message": "Nedladdningar"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Dölj aktiva nedladdningar"
+  },
   "app.action-bar.hide-more-running-instances": {
-    "message": "Göm fler pågående instanser"
+    "message": "Göm fler aktiva instanser"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopierat"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopiera detaljer"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Avvisa"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Öppna instans"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Försök igen"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Avbröts på grund av att appen stängdes"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Kunde inte läsa modpaket"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Avbruten"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Rensningen avslutades inte"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Kunde inte ladda ner filer"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Nedladdad fil är korrupt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Kunde inte spara filer"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Nedladdning kunde inte slutföras"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instans kunde inte hittas"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Sökväg är ogiltig"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Ogiltigt modpaketsdata"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Modpaketets filer har ogiltig metadata"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java-installationen kunde inte slutföras"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Konfigurering av loader misslyckades"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Kunde inte uppdatera lokal data"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Kunde inte nå Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Ingen behörighet att skriva"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Kunde inte ladda ner paket"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Någonting gick fel"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Okänd instans"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Uppdaterar delat innehåll"
+  },
+  "app.action-bar.installs": {
+    "message": "Installationer"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Gör till primärinstans"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Ingen pågående instans"
+    "message": "Inga aktiva instanser"
   },
   "app.action-bar.offline": {
     "message": "Offline"
@@ -20,11 +107,20 @@
   "app.action-bar.primary-instance": {
     "message": "Primärinstans"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Uppdatera (ladda om)"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Visa aktiva nedladdningar"
+  },
   "app.action-bar.show-more-running-instances": {
-    "message": "Visa fler pågående instanser"
+    "message": "Visa fler aktiva instanser"
   },
   "app.action-bar.stop-instance": {
     "message": "Avsluta instans"
+  },
+  "app.action-bar.update": {
+    "message": "Uppdatera"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Visa aktiva nedladdningar"
@@ -35,20 +131,23 @@
   "app.action-bar.view-logs": {
     "message": "Visa loggar"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Aktiverar avancerad rendering som till exempel oskärpa vilket kan leda till prestandaproblem utan hårdvaruaccelererad rendering."
+  "app.ads-consent.accept": {
+    "message": "Godkänn alla"
   },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Avancerad rendering"
+  "app.ads-consent.body": {
+    "message": "Reklam gör Modrinth möjligt och finansierar utbetalningar till skapare. Våra partner kan lagra eller komma åt kakor i appen för att rikta reklam och mäta statistik."
   },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Välj färgtema för Modrinth-appen."
+  "app.ads-consent.manage": {
+    "message": "Hantera inställningar"
   },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Färgtema"
+  "app.ads-consent.reject": {
+    "message": "Neka alla"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Ändrar sidan som launchern öppnas på."
+  "app.ads-consent.title": {
+    "message": "Din integritet och hur reklam stödjer Modrinth"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Kompakt läge"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hem"
@@ -56,38 +155,65 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "Bibliotek"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standardlandingssida"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Inaktiverar namnskylten ovanför din spelare på utseende-sidan."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
   },
+  "app.appearance-settings.jump-back-into-worlds.title": {
+    "message": "Hoppa in i världar eller instanser"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimera Modrinth App när Minecraft startar."
+  },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimera programstartare"
+    "message": "Minimera app"
   },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Använd systemets fönsterram (omstart av app krävs)."
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Visa hur länge du spelat varje instans."
   },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Inbyggda fönsterdekorationer"
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Visa speltid"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Välj ett alternativ"
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Hoppa över bekräftelser för lågriskåtgärder, som att duplicera installationer, vanlig innehållsradering, bulk-uppdateringar, avlänkning och reparationer. Varningar för högriskåtgärder visas alltid."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Hoppa över icke nödvändiga varningar"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Låter dig växla sidofältet."
+    "message": "Dölj det högra sidofältet och lägg till en knapp för att visa eller dölja det."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Växla sidofält"
+    "message": "Dölj högra sidofält"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Visa en säkerhetsvarning innan du installerar ett Modrinth Pack (.mrpack) som inte finns på Modrinth."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Varna mig innan jag installerar okända modpaket"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Minecrafts autentiseringsservrar kan vara nere just nu. Kontrollera din internetanslutning och försök igen senare."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Bekräftelser"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Hem och innehåll"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Uppstart och navigering"
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Logga in på ett Modrinth-konto för att synkronisera inställningar."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Synkronisera beteende mellan enheter"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Lägger till server till instans"
   },
   "app.browse.add-to-an-instance": {
     "message": "Lägg till i en instans"
@@ -107,26 +233,41 @@
   "app.browse.back-to-instance": {
     "message": "Tillbaka till instans"
   },
-  "app.browse.discover-content": {
-    "message": "Upptäck innehåll"
+  "app.browse.discover-project-type": {
+    "message": "Utforska {projectType}"
   },
   "app.browse.discover-servers": {
-    "message": "Upptäck servrar"
+    "message": "Utforska servrar"
   },
   "app.browse.hide-added-servers": {
-    "message": "Dölj servrar som redan är tillagda"
+    "message": "Göm redan tillagda servrar"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Dölj redan installerade"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Datapaket"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpaket"
   },
+  "app.browse.project-type.mods": {
+    "message": "Moddar"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Resurspaket"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Servrar"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shaders"
+  },
   "app.browse.server.installing": {
     "message": "Installerar"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Installerar modpaket..."
+  "app.content-install.no-compatible-versions": {
+    "message": "Ingen tillgänglig version matchar {compatibilityLabel}. Välj en version att installera ändå. Beroenden kommer inte installeras automatiskt."
   },
   "app.export-modal.description-placeholder": {
     "message": "Ange modpaketets beskrivning..."
@@ -134,11 +275,11 @@
   "app.export-modal.export-button": {
     "message": "Exportera"
   },
+  "app.export-modal.export-complete": {
+    "message": "Export slutförd"
+  },
   "app.export-modal.header": {
     "message": "Exportera modpaket"
-  },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Inkludera \"{file}\"?"
   },
   "app.export-modal.modpack-name-label": {
     "message": "Modpaketets namn"
@@ -152,17 +293,248 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "Denna instans har låsts"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "Instansen är redan öppen"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Mer alternativ"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Aldrig spelat"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Ny instans"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "Dra för att ändra storlek"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "Hoppa in"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "Visa instans"
+  },
+  "app.hosting.update-required.description": {
+    "message": "Du behöver uppdatera för att använda Modrinth Hosting genom Modrinth App"
+  },
+  "app.hosting.update-required.download": {
+    "message": "Ladda ner för att uppdatera"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Exalterad Modrinth-bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Modrinth App-uppdatering krävs"
+  },
+  "app.icon-editor.apply-icons-modal.apply-error": {
+    "message": "Kunde inte tillämpa slumpmässiga ikoner till instanser."
+  },
+  "app.icon-editor.apply-icons-modal.apply-success": {
+    "message": "Slumpmässig ikon för {num, plural, one {# instans} other {# instanser}}."
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "Nytt den här uppdateringen"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "Stäng"
+  },
+  "app.icon-editor.apply-icons-modal.instances-without-icons": {
+    "message": "{count, plural, one {# instans har ingen ikon} other {# instanser har inga ikoner}} än. Vill du att vi ska ge {count, plural, one {den en slumpmässig} other {dem slumpmässiga}} för att komma igång?"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "Slumpmässiga ikoner"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "Hoppa över"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "Stäng"
+  },
+  "app.icon-editor.notification.description": {
+    "message": "Anpassa dina instanser!"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "Avfärda"
+  },
+  "app.icon-editor.notification.title": {
+    "message": "Ny ikonredigerare"
+  },
+  "app.icon-editor.notification.view-update": {
+    "message": "Visa uppdatering"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Laddar ner innehåll"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Laddar ner Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Laddar ner pack fil"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Extraherar överskrivningar"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Avslutar"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Köad för installering"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Förbereder Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Laddar ner Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Extraherar Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Hämtar Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Förbereder Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Bekräftar Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Läser pack information"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Fastställer loader"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Fastställer Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Fastställer innehåll"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Återställer"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Kör loader-processorer"
+  },
+  "app.instance.action.add-content": {
+    "message": "Lägg till innehåll"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Kopiera sökväg"
+  },
+  "app.instance.action.edit": {
+    "message": "Redigera"
+  },
+  "app.instance.action.open-folder": {
+    "message": "Öppna mapp"
+  },
+  "app.instance.action.play": {
+    "message": "Spela"
+  },
+  "app.instance.action.stop": {
+    "message": "Stoppa"
+  },
+  "app.instance.add-server.add": {
+    "message": "Lägg till"
+  },
+  "app.instance.add-server.added": {
+    "message": "Tillagd"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Lägger till..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Avbryt"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "Den här server kanske inte är kompatibel med alla instanser."
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "Sök efter en instans"
+  },
+  "app.instance.add-server.title": {
+    "message": "Lägg till server till instansen"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Tillagd"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Din lokala instans ligger före användarna du delar den med."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Dina ändringar har inte delats än"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Ge ut en uppdatering"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Ger ut..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Borttagen"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Ge ut en uppdatering"
+  },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "Granska innehållsändringarna som kommer delas med alla som använder den här instansen."
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Granskar ändringar"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "Granskar..."
+  },
+  "app.instance.card.icon-alt": {
+    "message": "Instans ikon"
+  },
+  "app.instance.card.installing": {
+    "message": "Installerar..."
+  },
+  "app.instance.card.never-played": {
+    "message": "Aldrig spelad"
+  },
+  "app.instance.card.play": {
+    "message": "Spela"
+  },
+  "app.instance.card.repair": {
+    "message": "Reparera"
+  },
+  "app.instance.card.stop": {
+    "message": "Stoppa"
+  },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "All data från din instans kommer att raderas permanent, inklusive dina världar, konfigurationer och allt installerat innehåll."
+    "message": "All data från din instans kommer permanent raderas, däribland dina världar, konfigurationer samt allt installerat innehåll."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Detta kan inte ogöras"
+    "message": "Denna åtgärd kan inte ångras"
+  },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "All data för dessa {count} instanser kommer att tas bort permanent, inklusive deras världar, konfigurationer och allt installerat innehåll."
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "Radera {count} instanser"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "Radera {count} instanser"
   },
   "app.instance.confirm-delete.delete-button": {
     "message": "Radera instans"
   },
   "app.instance.confirm-delete.header": {
     "message": "Radera instans"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {Instans} other {Instanser ({count})}}"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Modpaketsinnehåll"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "Delat innehåll"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "Detta modpaket är redan installerat i instansen <bold>{instanceName}</bold>. Är du säker på att du vill duplicera det?"
@@ -176,8 +548,23 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instans"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Laddar ner {current, number}/{total, number} projekt..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Slutför uppdatering..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Fastställer versioner..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
+  },
+  "app.instance.mods.freeze-content": {
+    "message": "Frys version"
+  },
+  "app.instance.mods.locked-content": {
+    "message": "Innehåll i låsta instanser kan inte ändras."
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" lades till"
@@ -194,17 +581,161 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Uppladdning lyckades"
   },
+  "app.instance.mods.unfreeze-content": {
+    "message": "Avfrys version"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "Tillbaka till instans"
+  },
+  "app.instance.share.empty.description": {
+    "message": "Du kan dela denna instansen med dina vänner!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Inga inbjudna vänner"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Bjud in vänner"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Dela {name}"
+  },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Instansen har nått gränsen på {limit} användare."
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "Du behöver logga in som"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "för att komma åt denna sida."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "det länkade kontot"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Inte inloggad"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Byt konto"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Fel konto"
+  },
+  "app.instance.share.members.empty": {
+    "message": "Inga användare har anslutit än"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Ingen användare matchade dina filter."
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "De kommer inte längre få uppdateringar för denna delade instansen"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Alla kopior de redan har installerat kommer vara kvar på deras enhet"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "Du kan bjuda in dem igen senare"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "Detta är den sista användaren, delning kommer avaktiveras för den här instansen"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "Vad händer?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Återkalla åtkomst"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Återkalla åtkomst"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "{username}s avatar"
+  },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "Återkallar du {username}s åtkomst till denna delade instansen behöver du bjuda in dem igen innan de kan få uppdateringar."
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Logga in"
+  },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "Delade instanser-tjänsten är inte tillgänglig för tillfället, vänligen försök igen senare"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Kunde inte ansluta"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "Du måste avlänka detta modpaket för att dela din instans"
+  },
+  "app.instance.share.unlink.header": {
+    "message": "Delning kräver avlänkning"
+  },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "Denna delade instansen är redan installerad som <bold>{instanceName}</bold>. Är du säker på att du vill installera en till kopia?"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "Delad instans redan installerad"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Installera ändå"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Instans"
+  },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "det länkade kontot"
+  },
+  "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
+    "message": "för att hantera denna delade instans. Du kommer inte ge ut uppdateringar till användare."
+  },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "Logga in som"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "Du behöver logga in på Modrinth"
+  },
+  "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
+    "message": "för att få uppdateringar till den här delade instansen."
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "Du använder fel Modrinth-konto"
+  },
+  "app.instance.shortcut.created": {
+    "message": "Genväg skapad"
+  },
+  "app.instance.shortcut.creation-error": {
+    "message": "Ett fel uppstod när genvägen skulle skapas"
+  },
+  "app.instance.tab.content": {
+    "message": "Innehåll"
+  },
+  "app.instance.tab.files": {
+    "message": "Filer"
+  },
+  "app.instance.tab.logs": {
+    "message": "Loggar"
+  },
+  "app.instance.tab.share": {
+    "message": "Dela"
+  },
+  "app.instance.tab.worlds": {
+    "message": "Världar"
+  },
   "app.instance.worlds.add-server": {
     "message": "Lägg till server"
   },
   "app.instance.worlds.browse-servers": {
-    "message": "Utforska servrar"
+    "message": "Bläddra servrar"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' kommer ** tas bort permanent**, och det kommer inte finnas något sätt att återskapa den."
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Radera värld"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Är du säker på att du vill permanent radera denna värld?"
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Radera värld"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Denna värld kommer permanent raderas från instansen. Detta kan inte ångras."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Raderar {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Moddad"
@@ -224,44 +755,386 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Inga servrar eller världar tillagda"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' kommer bli borttagen från din lista, inklusive i spelet, och det kommer inte finnas något sätt att återskapa den."
+  "app.instance.worlds.refreshing": {
+    "message": "Uppdaterar..."
   },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) kommer bli borttagen från din lista, inklusive i spelet, och det kommer inte finnas något sätt att återskapa den."
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Ta bort server"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Är du säker på att du vill radera {name}?"
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Ta bort server"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Denna server kommer att tas bort från din serverlista och serverlistan i spelet. Du kan lägga till den igen senare om du känner till adressen."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Tar bort {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Sök {count} världar..."
   },
-  "app.instance.worlds.this-server": {
-    "message": "denna server"
+  "app.java-detection.cancel": {
+    "message": "Avbryt"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Innehåll krävs"
+  "app.java-detection.columns.actions": {
+    "message": "Åtgärder"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Sökväg"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Version"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Inga Java-installationer hittades."
+  },
+  "app.java-detection.select": {
+    "message": "Välj"
+  },
+  "app.java-detection.selected": {
+    "message": "Vald"
+  },
+  "app.java-detection.title": {
+    "message": "Välj java-installation"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Redan installerad"
+  },
+  "app.java-selector.browse": {
+    "message": "Bläddra"
+  },
+  "app.java-selector.detect": {
+    "message": "Hitta"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Installation rekommenderas"
+  },
+  "app.java-selector.installing": {
+    "message": "Installerar..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/sökväg/till/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Testa Java-installationen"
+  },
+  "app.library.context-menu.create-instance": {
+    "message": "Ny instans"
+  },
+  "app.library.filter.add": {
+    "message": "Lägg till filter"
+  },
+  "app.library.filter.clear": {
+    "message": "Rensa filter"
+  },
+  "app.library.filter.game-version": {
+    "message": "Spelversion"
+  },
+  "app.library.filter.instance-type": {
+    "message": "Instanstyp"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "Anpassad"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "Modpaket"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "Server"
+  },
+  "app.library.filter.label": {
+    "message": "Filtrera efter"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "Anpassad grupp"
+  },
+  "app.library.group-by.game-version": {
+    "message": "Spelversion"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "Instanstyp"
+  },
+  "app.library.group-by.label": {
+    "message": "Gruppera efter"
+  },
+  "app.library.group-by.none": {
+    "message": "Ingen gruppering"
+  },
+  "app.library.group.collapse": {
+    "message": "Fäll ihop grupp"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "Lägg till i grupp"
+  },
+  "app.library.group.create": {
+    "message": "Skapa grupp"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Avbryt"
+  },
+  "app.library.group.delete": {
+    "message": "Radera grupp"
+  },
+  "app.library.group.empty": {
+    "message": "Dra och släpp för att lägga till instanser."
+  },
+  "app.library.group.expand": {
+    "message": "Utöka grupp"
+  },
+  "app.library.group.favorites": {
+    "message": "Favoriter"
+  },
+  "app.library.group.instance.add": {
+    "message": "Lägg till"
+  },
+  "app.library.group.instance.added": {
+    "message": "Tillagd"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Lägg till"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Tillagd"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "Inga instanser hittades"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "Sök instans"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "Lägg till instanser i \"{groupName}\""
+  },
+  "app.library.group.move-down": {
+    "message": "Flytta ner grupp"
+  },
+  "app.library.group.move-up": {
+    "message": "Flytta upp grupp"
+  },
+  "app.library.group.name": {
+    "message": "Gruppnamn"
+  },
+  "app.library.group.name-empty": {
+    "message": "Gruppnamn kan inte vara tomt."
+  },
+  "app.library.group.name-placeholder": {
+    "message": "Ange gruppnamn"
+  },
+  "app.library.group.name-reserved": {
+    "message": "\"None\" är reserverat och kan inte användas som gruppnamn."
+  },
+  "app.library.group.name-too-long": {
+    "message": "Gruppnamn kan inte vara längre än {maxLength} tecken."
+  },
+  "app.library.group.new": {
+    "message": "Ny grupp"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "Inga instanser hittades"
+  },
+  "app.library.group.rename-failed": {
+    "message": "Kunde inte byta gruppnamn"
+  },
+  "app.library.group.search-instance": {
+    "message": "Sök instans"
+  },
+  "app.library.group.ungrouped": {
+    "message": "Ogrupperad"
+  },
+  "app.library.group.unknown": {
+    "message": "Okänd grupp"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "Lägg till innehåll"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "Lägg till i favoriter"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "Kopiera sökväg"
+  },
+  "app.library.instance.action.delete": {
+    "message": "Radera"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "Duplicera instans"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "Öppna mapp"
+  },
+  "app.library.instance.action.play": {
+    "message": "Spela"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "Ta bort från favoriter"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "Ta bort från grupp"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Stoppa"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "Visa instans"
+  },
+  "app.library.instance.deselect": {
+    "message": "Avmarkera instans"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "Avmarkera {name}"
+  },
+  "app.library.instance.installing": {
+    "message": "Installerar..."
+  },
+  "app.library.instance.new": {
+    "message": "Ny instans"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "Öppna {name}"
+  },
+  "app.library.instance.play": {
+    "message": "Spela"
+  },
+  "app.library.instance.repair": {
+    "message": "Reparera"
+  },
+  "app.library.instance.select": {
+    "message": "Markera instans"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "Markera {name}"
+  },
+  "app.library.instance.stop": {
+    "message": "Stoppa"
+  },
+  "app.library.search.no-results.title": {
+    "message": "Inga instanser matchar din sökning."
+  },
+  "app.library.search.placeholder": {
+    "message": "Sök"
+  },
+  "app.library.selection.aria-label": {
+    "message": "Markerade instanser"
+  },
+  "app.library.selection.deleting": {
+    "message": "Radera markerade instanser"
+  },
+  "app.library.selection.new-group": {
+    "message": "Ny grupp"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "Ta bort från grupp"
+  },
+  "app.library.sort.date-created": {
+    "message": "Datum skapad"
+  },
+  "app.library.sort.date-modified": {
+    "message": "Datum ändrad"
+  },
+  "app.library.sort.game-version": {
+    "message": "Spelversion"
+  },
+  "app.library.sort.hours-played": {
+    "message": "Timmar spelade"
+  },
+  "app.library.sort.label": {
+    "message": "Sortera efter"
+  },
+  "app.library.sort.last-played": {
+    "message": "Senast spelade"
+  },
+  "app.library.sort.name": {
+    "message": "Namn"
+  },
+  "app.library.title": {
+    "message": "Bibliotek"
+  },
+  "app.modal.install-to-play.additional-context": {
+    "message": "Ytterligare sammanhang"
+  },
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "Inkludera länkar och bilder om möjligt och relevant"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Blockera användare"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "Instans du anmäler"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Radera instans"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "Installera inte"
   },
   "app.modal.install-to-play.header": {
     "message": "Installera för att spela"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Installera andå"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Installera"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Denna inbjudan skapades av en annan Modrinth-användare, inte Modrinth. Acceptera endast inbjudningar från personer du litar på."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "Denna inbjudan skapades av <creator>{username}</creator>, inte Modrinth. Acceptera endast inbjudningar från personer du litar på."
+  },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "Modpaketsinnehåll"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# moddar}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Modpaket som krävs"
+  "app.modal.install-to-play.report-description": {
+    "message": "Använd denna formulär för att anmäla instanser som kan bryta mot våra <rules-link>Regler</rules-link> eller <terms-link>Användarvillkor</terms-link>."
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Servern kräver moddar för att du ska kunna spela. Klicka på Installera för att sätta upp dem nödvändiga filerna från Modrinth, och starta sedan på servern direkt."
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "Filen är inte en godkänd bildtyp"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "Fil överskrider storleksgränsen på 1 MiB"
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "För DMCA-meddelanden eller andra juridiska anspråk, se våran <copyright-link>Copyright Policy</copyright-link>."
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "Vilken regel bryter instansen mot?"
+  },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "Rapportera delad instans"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Rapport skickad"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "För supportärenden, kontakta vårt <support-link>supportteam</support-link>. För buggrapporter, öppna ett <github-link>GitHub issue</github-link>."
+  },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Filer som inte publiceras på Modrinth granskas inte."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Delad instans"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Delad serverinstans"
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "Delat instansinnehåll"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "Denna delad instans innehåller filer som inte är publicerade på Modrinth. Vi rekommenderar stark att du endast installerar filer från källor du litar på."
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Detta server-modpaket innehåller filer som inte är utgivna på Modrinth. Vi rekommenderar att endast installera filer från källor du litar på."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Okända filvarningar"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Okända filer"
+  },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "Användare blockerad"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Visa innehåll"
@@ -269,11 +1142,167 @@
   "app.modal.update-to-play.header": {
     "message": "Uppdatera för att spela"
   },
+  "app.modal.update-to-play.removed": {
+    "message": "Tog bort"
+  },
+  "app.modal.update-to-play.server-modpack-unknown-files-description": {
+    "message": "Uppdateringen för detta server-modpaket innehåller filer som inte är utgivna på Modrinth. Vi rekommenderar att endast installera filer från källor du litar på."
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Lade till"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "Tog bort"
+  },
+  "app.modal.update-to-play.shared-instance-unknown-files-description": {
+    "message": "Uppdateringen för denna delad instans innehåller filer som inte är publicerade på Modrinth. Vi rekommenderar stark att du endast installerar filer från källor du litar på."
+  },
   "app.modal.update-to-play.update-required": {
     "message": "Uppdatering krävs"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "En uppdatering krävs för att spela {name}. Vänligen uppdatera till senaste version för att starta spelet."
+    "message": "En uppdatering krävs för att spela {name}. Vänligen uppdatera till den senaste verisoner för att köra spelet."
+  },
+  "app.nav.create-new-instance": {
+    "message": "Skapa ny instans"
+  },
+  "app.nav.home": {
+    "message": "Hem"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Modrinth-konto"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Logga in till ett Modrinth-konto"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Uppgradera till Modrinth+"
+  },
+  "app.navigation.go-back": {
+    "message": "Gå tillbaka"
+  },
+  "app.navigation.go-forward": {
+    "message": "Gå framåt"
+  },
+  "app.navigation.home": {
+    "message": "Hem"
+  },
+  "app.navigation.next-image": {
+    "message": "Nästa bild"
+  },
+  "app.news.title": {
+    "message": "Nyheter"
+  },
+  "app.news.view-all": {
+    "message": "Se alla nyheter"
+  },
+  "app.notification.warning": {
+    "message": "Varning"
+  },
+  "app.project.coming-soon": {
+    "message": "Kommer snart"
+  },
+  "app.project.install-button.already-installed": {
+    "message": "Detta projekt är redan installerat"
+  },
+  "app.project.install-button.switch-version": {
+    "message": "Byt version"
+  },
+  "app.project.install-context.back-to-browse": {
+    "message": "Tillbaka till upptäck"
+  },
+  "app.project.install-context.back-to-instance": {
+    "message": "Tillbaka till instans"
+  },
+  "app.project.more-options": {
+    "message": "Mer alternativ"
+  },
+  "app.project.tab.description": {
+    "message": "Beskrivning"
+  },
+  "app.project.tab.gallery": {
+    "message": "Galleri"
+  },
+  "app.project.tab.versions": {
+    "message": "Versioner"
+  },
+  "app.project.version.all-versions": {
+    "message": "Alla versioner"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Ladda ner i webbläsare"
+  },
+  "app.project.version.installing": {
+    "message": "Installerar"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Redan installerat"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Dra för att ändra storlek"
+  },
+  "app.restarting": {
+    "message": "Startar om..."
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth App {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Ange miljövariabler..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Miljövariabler"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "Starta instanser i helskärm genom att uppdatera deras option.txt-fil."
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Helskärm"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "Höjden på spelfönstret vid uppstart."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Ange höjd..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Höjd"
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Ange Java-argument..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java-argument"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Maximalt minne tillgängligt för varje instans."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Minnestilldelning"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Körs efter att spelet stängs."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "Körs innan instansen startar."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Ange för-startskommando..."
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "Bredden på spelfönstret vid uppstart."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Ange bredd..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Bredd"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Växla utvecklarläge"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Utvecklarläge aktiverat."
@@ -281,11 +1310,68 @@
   "app.settings.downloading": {
     "message": "Ladda ner v{version}"
   },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Reklam gör Modrinth möjligt och finansierar utbetalningar till skapare. Våra partner kan lagra eller komma åt kakor i appen för att rikta reklam och mäta statistik. Du kan välja bort eller hantera dina preferenser nedan."
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Visa Modrinth App som din nuvarande aktivitet på Discord. Detta påverkar inte Rich Presence som lagts till i instanser av moddar. Kräver en app omstart."
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth samlar in anonymiserad statistik och användningsdata för att förbättra vår användarupplevelse och anpassa din upplevelse. Genom att inaktivera det här alternativet avanmäler du dig och din data kommer inte längre samlas in."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetri"
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Visa alltid kopieringsdetaljer"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "Appen kan laddas in långsammare tills cachen är återuppbyggd."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Rensa app-cachen?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Rensa cachad data och ladda ner den igen från Modrinth. Appen kan laddas in långsammare tills cachen är återuppbyggd."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Rensa cache"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "App-cache"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Säkerhetskopior av viktig appdata lagras här utifall att du behöver återställa dem senare."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Öppna mappen för säkerhetskopior"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Säkerhetskopior av appdatabas"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Bläddra efter en appmapp"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Var Modrinth App lagrar instanser och andra filer. Ändringar tar effekt efter appen startas om."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Välj en ny appmapp"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "Appmapp"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Instanser"
+  },
   "app.settings.tabs.appearance": {
     "message": "Utseende"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standardinställningar för instanser"
+  "app.settings.tabs.behavior": {
+    "message": "Beteende"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java-installationer"
@@ -299,14 +1385,41 @@
   "app.settings.tabs.resource-management": {
     "message": "Resurshantering"
   },
+  "app.sidebar.playing-as": {
+    "message": "Spelar som"
+  },
   "app.skins.add-button": {
     "message": "Lägg till utseende"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Dra och släpp"
+  },
+  "app.skins.apply-button": {
+    "message": "Tillämpa"
   },
   "app.skins.delete-button": {
     "message": "Ta bort utseende"
   },
+  "app.skins.delete-modal.description": {
+    "message": "Du kommer permanent radera det valda utseendet. Detta kan inte ångras."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Är du säker på att du vill radera utseendet?"
+  },
+  "app.skins.demo.apply-tooltip": {
+    "message": "Logga in för att tillämpa utseenden."
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Kunde inte att läsa den släppta filen."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Fel med behandlingen av filen"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Detta utseende använder funktioner från {ears}-modden"
+  },
   "app.skins.edit-button": {
-    "message": "Redigera utseende"
+    "message": "Ändra utseende"
   },
   "app.skins.modal.add-skin-button": {
     "message": "Lägg till utseende"
@@ -329,8 +1442,11 @@
   "app.skins.modal.cape-section": {
     "message": "Mantel"
   },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "Logga in för att spara utseenden."
+  },
   "app.skins.modal.edit-title": {
-    "message": "Redigerar utseende"
+    "message": "Ändrar utseende"
   },
   "app.skins.modal.make-edit-first-tooltip": {
     "message": "Gör en ändring på utseendet först!"
@@ -353,6 +1469,90 @@
   "app.skins.modal.texture-section": {
     "message": "Textur"
   },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Ladda upp utseende först!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Ändra utseende"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Förhandsvisa"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Du ändrar ditt utseende för ofta. Mojangs servrar har temporärt blockerat ytterligare förfrågningar. Vänligen vänta en stund innan du försöker igen."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Sakta ner!"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "Din ordning av utseenden kunde inte sparas."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Kunde inte ordna om utseenden"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Standard utseenden"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Du har fått dessa utseende eftersom du donerat till en Modrinth Pride insamling under pride månaden."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Sparade utseenden"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Logga in på Microsoft"
+  },
+  "app.skins.title": {
+    "message": "Utseende väljare"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Växla av"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Växla på"
+  },
+  "app.survey.footer": {
+    "message": "Den här återkopplingen kommer gå direkt till Modrinth-teamet och hjälper till att vägleda framtida uppdateringar!"
+  },
+  "app.survey.no-thanks": {
+    "message": "Nej tack"
+  },
+  "app.survey.title": {
+    "message": "Hej där Modrinth-användare!"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
   },
@@ -372,7 +1572,7 @@
     "message": "Nedladdning slutförd"
   },
   "app.update-popup.reload": {
-    "message": "Ladda om"
+    "message": "Ladda om för att uppdatera"
   },
   "app.update-popup.title": {
     "message": "Uppdatering tillgänglig"
@@ -383,8 +1583,26 @@
   "app.update.complete-toast.title": {
     "message": "Version {version} har installerats!"
   },
+  "app.update.download-error.missing-version": {
+    "message": "Kunde inte ladda ner uppdatering: ingen version tillgänglig"
+  },
+  "app.user.project.install-to-instance": {
+    "message": "Installera till instans"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "Skapa en instans"
+  },
+  "app.welcome-screen.description": {
+    "message": "Redo att börja spela?"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "Tryck på <shortcut>N</shortcut> för att snabbt skapa en instans"
+  },
+  "app.welcome-screen.title": {
+    "message": "Välkommen till Modrinth"
+  },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "exempel.modrinth.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Välj ett alternativ"
@@ -400,6 +1618,33 @@
   },
   "app.world.world-item.players-online": {
     "message": "{count} online"
+  },
+  "content.shared-instance.change-version-body": {
+    "message": "Att ändra versionen ändrar endast din lokala kopia. Framtida uppdateringar till den delade instansen kan återställa eller ändra den igen."
+  },
+  "content.shared-instance.delete-bulk-body": {
+    "message": "Vissa valda projekt är en del av den delade instansen. Att radera dem ändrar endast din lokala kopia och framtida uppdateringar till den delade instansen kan återställa eller ändra dem igen."
+  },
+  "content.shared-instance.delete-button": {
+    "message": "Radera ändå"
+  },
+  "content.shared-instance.delete-many-button": {
+    "message": "Radera {count, number} projekt ändå"
+  },
+  "content.shared-instance.delete-single-body": {
+    "message": "Att radera den ändrar endast din lokala kopia. Framtida uppdateringar till den delade instansen kan återställa eller ändra den igen."
+  },
+  "content.shared-instance.disable-button": {
+    "message": "Inaktivera ändå"
+  },
+  "content.shared-instance.disable-many-button": {
+    "message": "Inaktivera {count, number} projekt ändå"
+  },
+  "content.shared-instance.unlink-body": {
+    "message": "Avlänkning ändrar endast din lokala kopia. Framtida uppdateringar av den delade instansen kan återställa och ändra den igen."
+  },
+  "content.shared-instance.warning-header": {
+    "message": "Det här är en del av den delade instansen"
   },
   "friends.action.add-friend": {
     "message": "Lägg till en vän"
@@ -459,10 +1704,73 @@
     "message": "Sök efter vänner..."
   },
   "friends.section.heading": {
-    "message": "{title}: {count}"
+    "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Logga in på ett Modrinth-konto</link> för att lägga till vänner och se vad de spelar!"
+  },
+  "installation-settings.shared-instance.linked-title": {
+    "message": "Länkad delad instans"
+  },
+  "installation-settings.shared-instance.title": {
+    "message": "Avpublicera instans"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "message": "Avlänka delad instans"
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "Avlänkar..."
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Avpublicera delad instans"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Ta bort den delade instansen från Modrinth och sluta skicka uppdateringar till alla som använder den. Din lokala instans kommer inte att påverkas."
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "message": "Avpublicerar..."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-header": {
+    "message": "Avlänkar delad instans"
+  },
+  "installation-settings.unlink-shared-instance.modal.header": {
+    "message": "Avlänka delad instans"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "Det här raderar den delade instansen från Modrinths servrar. De som använder den i Modrinth App kommer inte längre få uppdateringar, men din lokala instans och dess innehåll är kvar på den här enheten."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Avpublicerar delad instans"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Avpublicera delad instans"
+  },
+  "instance.action.create-shortcut": {
+    "message": "Skapa genväg"
+  },
+  "instance.action.export-modpack": {
+    "message": "Exportera modpaket"
+  },
+  "instance.action.launch-instance": {
+    "message": "Kör instans"
+  },
+  "instance.action.more-actions": {
+    "message": "Fler åtgärder"
+  },
+  "instance.action.open-folder": {
+    "message": "Öppna mapp"
+  },
+  "instance.action.repair": {
+    "message": "Reparera"
+  },
+  "instance.action.settings": {
+    "message": "Instans-inställningar"
+  },
+  "instance.action.starting": {
+    "message": "Startar..."
+  },
+  "instance.action.stopping": {
+    "message": "Stoppar..."
   },
   "instance.add-server.add-and-play": {
     "message": "Lägg till och spela"
@@ -506,6 +1814,201 @@
   "instance.files.save-as": {
     "message": "Spara som..."
   },
+  "instance.icon-editor.background": {
+    "message": "Bakgrund"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "Blå"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "Mörkgrå"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "Mörkgrön"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Grå"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "Grön"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "Lavendel"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "Ljusgrå"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Limegrön"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Rosa"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "Lila"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Röd"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "Gul"
+  },
+  "instance.icon-editor.recents": {
+    "message": "Senaste"
+  },
+  "instance.icon-editor.save": {
+    "message": "Spara ikon"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "Slumpa"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "Ryggsäck"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Fyr"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Blåhaj"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Bokhylla"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Brunbjörn"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Tårta"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "Lägereld"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "Kista"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Kugghjul"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Kommandoblock"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Gryta"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "Soffa"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Arbetsbänk"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Skiftnyckel"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "Förtrollningsbord"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "Enderkista"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "Enderdrake"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "Motor"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "Ugn"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Glob"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "Gräsblock"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "Lykta"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "Pannkakor"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "Hacka"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "Skelett"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "Stekpanna"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "Slemblock"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "Rymdhjälm"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Klibbig Kolv"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "Svärd"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Liten potatis"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Däck"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "Dynamit"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Modrinth skiftnyckel"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "message": "Ikon redigerare"
+  },
+  "instance.last-played": {
+    "message": "Senast spelad"
+  },
+  "instance.locked.delete-button": {
+    "message": "Radera instans"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "Denna instans har låsts"
+  },
+  "instance.playtime.never-played": {
+    "message": "Aldrig spelad"
+  },
   "instance.server-modal.address": {
     "message": "Adress"
   },
@@ -517,6 +2020,45 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Resurs pack"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Åtgärder"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Inbjudningslänk"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "Vem som helst med en av de här inbjudningslänkarna kan ansluta medan den är aktiv."
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "Det finns inga aktiva inbjudningar."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Går ut"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Återkalla inbjudan"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Återkalla inbjudan {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Aktiva inbjudningar"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Användningar"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "Inbjudningslänken <monospace>{code}</monospace> kommer sluta fungera omedelbart. De som redan gått med kommer ha kvar åtkomst."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "Den här åtgärden kan inte ångras"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Återkalla inbjudan"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Återkalla inbjudan"
   },
   "instance.settings.tabs.general": {
     "message": "Allmänt"
@@ -548,6 +2090,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "Redigera ikon"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "Skapa en ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "Redigera ikon"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Ta bort ikon"
   },
@@ -557,26 +2105,35 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Välj ikon"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Biblioteksgrupper"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Skapa ny grupp"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Biblioteksgrupper tillåter dig att organisera dina instanser till olika sektioner i ditt bibliotek."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ange grupp namn"
+  "instance.settings.tabs.general.icon": {
+    "message": "Ikon"
   },
   "instance.settings.tabs.general.name": {
     "message": "Namn"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Startkrokar"
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Uppdateringskanal"
   },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Egendefinierade startkrokar"
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release-, beta- och alfaversioner kommer visas som tillgängliga uppdateringar."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release- och betaversioner kommer visas som tillgängliga uppdateringar."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Release"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Endast realeseversioner kommer visas som tillgängliga uppdateringar."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Välj uppdateringskanal"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Krokar gör det möjligt för avancerade användare att köra vissa systemkommandon före och efter att spelet startas."
@@ -602,6 +2159,18 @@
   "instance.settings.tabs.hooks.title": {
     "message": "Hooks för spelstart"
   },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: den absoluta sökvägen till instansmappen"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: Instansmappens namn"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: ett alias för $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: Instansnamnet"
+  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Omslag"
   },
@@ -617,8 +2186,26 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
   },
-  "instance.settings.tabs.java": {
-    "message": "Java och minne"
+  "instance.settings.tabs.installation.locked": {
+    "message": "Installationsinställningar är otillgängligt medan den här instansen är låst."
+  },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Anpassade miljövariabler"
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Anpassade Java-argument"
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Anpassad Java-installation"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Anpassad minnestilldelning"
+  },
+  "instance.settings.tabs.java.enter-environment-variables": {
+    "message": "Ange miljövariabler..."
+  },
+  "instance.settings.tabs.java.enter-java-arguments": {
+    "message": "Ange Java-argument..."
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Miljövariabler"
@@ -634,6 +2221,12 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Tilldelat minne"
+  },
+  "instance.settings.tabs.java.java-path-placeholder": {
+    "message": "/sökväg/till/java"
+  },
+  "instance.settings.tabs.sharing": {
+    "message": "Dela"
   },
   "instance.settings.tabs.window": {
     "message": "Fönster"
@@ -651,7 +2244,7 @@
     "message": "Höjd"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "Höjden på spel-fönstret vid uppstart."
+    "message": "Höjden på spelfönstret vid uppstart."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Ange höjd..."
@@ -660,10 +2253,67 @@
     "message": "Bredd"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Bredden på spel-fönstret vid uppstart."
+    "message": "Bredden på spelfönstret vid uppstart."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Ange bredd..."
+  },
+  "instance.shared-instance.error.title": {
+    "message": "Något gick fel"
+  },
+  "instance.shared-instance.network-error.text": {
+    "message": "Kan inte ansluta till den delade instansens API"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Nätverksfel"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "Den här instansens innehåll delas med andra användare."
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Lade till"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Skicka uppdatering till spelare"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Välj konfigurationsfiler"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "Granska innehållsändringar och välj vilka konfigurationsfiler att inkludera i den här uppdateringen."
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Granska ändringar"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "Skicka uppdatering"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Tog bort"
+  },
+  "instance.shared-instance.tooltip": {
+    "message": "Den här instansens innehåll hanteras av någon annan."
+  },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "Din åtkomst till den delade instansen återkallades. Den här instansen är fortfarande tillgänglig, men är inte längre länkad och kommer inte längre få uppdateringar."
+  },
+  "instance.shared-instance.unavailable.deleted-text": {
+    "message": "Primärinstansen raderades. Den här instansen är fortfarande tillgänglig, men är inte längre länkad och kommer inte längre få uppdateringar."
+  },
+  "instance.shared-instance.unavailable.locked-text": {
+    "message": "Den här instansen låstes av innehållsmodereringsteamet. Den kommer inte längre få uppdateringar från primärinstansen och kan inte spelas."
+  },
+  "instance.shared-instance.unavailable.locked-title": {
+    "message": "Instans låst"
+  },
+  "instance.shared-instance.unavailable.manager-fallback": {
+    "message": "instanshanteraren"
+  },
+  "instance.shared-instance.unavailable.text": {
+    "message": "Din lokala instans är fortfarande tillgänglig, men är inte längre länkad och kommer inte få uppdateringar."
+  },
+  "instance.shared-instance.unavailable.title": {
+    "message": "Delad instans inte längre tillgänglig"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "En Minecraft Server"
@@ -674,32 +2324,47 @@
   "instance.worlds.copy_address": {
     "message": "Kopiera adress"
   },
+  "instance.worlds.create_shortcut": {
+    "message": "Skapa genväg"
+  },
   "instance.worlds.dont_show_on_home": {
-    "message": "Visa inte på Startsidan"
+    "message": "Visa inte på startsidan"
   },
   "instance.worlds.game_already_open": {
     "message": "Instans är redan öppen"
   },
   "instance.worlds.hardcore": {
-    "message": "Hardcore läge"
+    "message": "Hardcore-läge"
   },
   "instance.worlds.incompatible_server": {
     "message": "Servern är inkompatibel"
   },
+  "instance.worlds.instance-locked": {
+    "message": "Den här instansen har låsts"
+  },
   "instance.worlds.linked_server": {
     "message": "Hanteras av serverprojekt"
+  },
+  "instance.worlds.more-options": {
+    "message": "Mer alternativ"
   },
   "instance.worlds.no_contact": {
     "message": "Servern kunde inte kontaktas"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Du kan bara hoppa rakt in till servers på Minecraft Alfa 1.0.5+"
+    "message": "Du kan endast gå direkt in i servrar på Minecraft Alfa 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Du kan bara hoppa rakt in till enspelarläge världar på Minecraft 1,20+"
+    "message": "Du kan endast gå direkt in i enspelarläge världar på Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Spela instans"
+  },
+  "instance.worlds.shortcut-created": {
+    "message": "Genväg skapad"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "Kunde inte skapa genväg"
   },
   "instance.worlds.view_instance": {
     "message": "Visa instans"
@@ -725,6 +2390,72 @@
   "minecraft-account.sign-in": {
     "message": "Logga in till Minecraft"
   },
+  "minecraft-required.description": {
+    "message": "Du behöver ett Microsoft-konto som äger Minecraft innan du kan köra och spela."
+  },
+  "minecraft-required.description-header": {
+    "message": "Logga in till ett Microsoft-konto"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Har du inget konto?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Skaffa Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Få stöd"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft behövs"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Logga in på Microsoft"
+  },
+  "modal.modrinth-account-required.browser-description": {
+    "message": "En ny flik öppnades för att logga in. Slutför inloggningen där, kom sedan tillbaka till appen."
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Fortsätt i din webbläsare"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Skapa ett konto"
+  },
+  "modal.modrinth-account-required.description": {
+    "message": "Du behöver logga in på ditt Modrinth-konto innan du kan använda den här funktionen."
+  },
+  "modal.modrinth-account-required.header": {
+    "message": "Konto behövs"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Öppna webbläsare igen"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "Logga in på Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "Logga in till ett Modrinth-konto"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Loggar in"
+  },
+  "modal.modrinth-account-required.support-prompt": {
+    "message": "Har du problem med att logga in? <support>Få hjälp</support>"
+  },
+  "modal.modrinth-account-required.waiting-for-browser": {
+    "message": "Väntar på bekräftelse från webbläsaren..."
+  },
+  "onboarding-checklist.create-instance": {
+    "message": "Skapa först en instans"
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "Logga på Minecraft"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "Logga in på Modrinth"
+  },
+  "onboarding-checklist.title": {
+    "message": "Kom igång"
+  },
   "search.filter.locked.instance": {
     "message": "Tillhandahållet av instansen"
   },
@@ -732,24 +2463,18 @@
     "message": "Spel version är tillhandahållet av instansen"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Laddaren tillhandahålls av instansen"
+    "message": "Loader tillhandahålls av instansen"
   },
   "search.filter.locked.instance.sync": {
     "message": "Synkronisera med instansen"
   },
-  "search.filter.locked.server": {
-    "message": "Tillhandahållet av servern"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Endast klient-sido moddar kan läggas till i serverinstansen"
   },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Spelversion tillhandahålls av servern"
+  "settings.sidebar.label.account": {
+    "message": "Konto"
   },
-  "search.filter.locked.server-loader.title": {
-    "message": "Loader tillhandahålls av servern"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Installera ändå"
+  "settings.sidebar.label.display": {
+    "message": "Visning"
   }
 }

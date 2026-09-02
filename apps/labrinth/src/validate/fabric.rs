@@ -1,5 +1,6 @@
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult, filter_out_packs,
+    SupportedGameVersions, ValidationError, ValidationResult,
+    validate_pack_formats,
 };
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -29,8 +30,6 @@ impl super::Validator for FabricValidator {
             ));
         }
 
-        filter_out_packs(archive)?;
-
-        Ok(ValidationResult::Pass)
+        Ok(validate_pack_formats(archive))
     }
 }

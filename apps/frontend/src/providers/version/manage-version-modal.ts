@@ -3,9 +3,11 @@ import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	type ComboboxOption,
 	createContext,
+	defineMessage,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	type MessageDescriptor,
 	type MultiStageModal,
 	resolveCtxFn,
 	type StageButtonConfig,
@@ -164,6 +166,44 @@ export const fileTypeLabels: Record<Labrinth.Versions.v3.FileType | 'primary', s
 	signature: 'Signature',
 }
 
+export const fileTypeMessages: Record<
+	Labrinth.Versions.v3.FileType | 'primary',
+	MessageDescriptor
+> = {
+	primary: defineMessage({
+		id: 'version.file-type.primary',
+		defaultMessage: 'Primary',
+	}),
+	unknown: defineMessage({
+		id: 'version.file-type.unknown',
+		defaultMessage: 'Other',
+	}),
+	'required-resource-pack': defineMessage({
+		id: 'version.file-type.required-resource-pack',
+		defaultMessage: 'Required resource pack',
+	}),
+	'optional-resource-pack': defineMessage({
+		id: 'version.file-type.optional-resource-pack',
+		defaultMessage: 'Optional resource pack',
+	}),
+	'sources-jar': defineMessage({
+		id: 'version.file-type.sources-jar',
+		defaultMessage: 'Sources jar',
+	}),
+	'dev-jar': defineMessage({
+		id: 'version.file-type.dev-jar',
+		defaultMessage: 'Dev jar',
+	}),
+	'javadoc-jar': defineMessage({
+		id: 'version.file-type.javadoc-jar',
+		defaultMessage: 'Javadoc jar',
+	}),
+	signature: defineMessage({
+		id: 'version.file-type.signature',
+		defaultMessage: 'Signature file',
+	}),
+}
+
 export const [injectManageVersionContext, provideManageVersionContext] =
 	createContext<ManageVersionContextValue>('CreateProjectVersionModal')
 
@@ -272,6 +312,12 @@ export function createManageVersionContext(
 		handlingNewFiles.value = true
 		// detect primary file if no primary file is set
 		const primaryFileIndex = primaryFile.value ? null : detectPrimaryFileIndex(newFiles)
+
+		if (hasSupplementaryMrpackFile(newFiles, primaryFileIndex)) {
+			notifyInvalidSupplementaryMrpack()
+			handlingNewFiles.value = false
+			return
+		}
 
 		newFiles.forEach((file) => filesToAdd.value.push({ file }))
 
@@ -527,6 +573,29 @@ export function createManageVersionContext(
 	})
 
 	// File handling helpers
+	function isMrpackFile(file: File): boolean {
+		const name = file.name.toLowerCase()
+		return name.endsWith('.mrpack') || name.endsWith('.mrpack-primary')
+	}
+
+	function hasSupplementaryMrpackFile(
+		files: File[] | Labrinth.Versions.v3.DraftVersionFile[],
+		primaryFileIndex: number | null = 0,
+	): boolean {
+		return files.some((file, index) => {
+			const rawFile = 'file' in file ? file.file : file
+			return index !== primaryFileIndex && isMrpackFile(rawFile)
+		})
+	}
+
+	function notifyInvalidSupplementaryMrpack() {
+		addNotification({
+			title: 'Invalid supplementary file',
+			text: 'mrpacks cannot be uploaded as supplementary files, only as the primary file',
+			type: 'error',
+		})
+	}
+
 	function detectPrimaryFileIndex(files: File[]): number {
 		const extensionPriority = ['.jar', '.zip', '.litemod', '.mrpack', '.mrpack-primary']
 
@@ -698,6 +767,12 @@ export function createManageVersionContext(
 	async function handleCreateVersion() {
 		const version = toRaw(draftVersion.value)
 		const files = toRaw(filesToAdd.value)
+
+		if (hasSupplementaryMrpackFile(files)) {
+			notifyInvalidSupplementaryMrpack()
+			return
+		}
+
 		isSubmitting.value = true
 		isUploading.value = true
 

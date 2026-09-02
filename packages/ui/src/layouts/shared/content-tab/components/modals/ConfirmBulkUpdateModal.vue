@@ -22,22 +22,20 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="orange">
-					<button
-						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
-						:disabled="buttonsDisabled || props.actionDisabled"
-						@click="confirm"
-					>
-						<DownloadIcon />
-						{{ formatMessage(messages.updateButton, { count: visibleCount }) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+					type="colored"
+					color="orange"
+					:disabled="buttonsDisabled || props.actionDisabled"
+					@click="confirm"
+				>
+					<DownloadIcon />
+					{{ formatMessage(messages.updateButton, { count: visibleCount }) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -45,10 +43,10 @@
 
 <script setup lang="ts">
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -100,7 +98,8 @@ const buttonsDisabled = ref(false)
 const visibleCount = ref(props.count)
 const visibleBackupTip = ref(props.backupTip)
 
-function show() {
+async function show() {
+	await nextTick()
 	visibleCount.value = props.count
 	visibleBackupTip.value = props.backupTip
 	modal.value?.show()

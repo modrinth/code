@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO app_metadata (key, value, updated_at)\n\t\tVALUES ('app_version', ?, unixepoch())\n\t\tON CONFLICT(key) DO UPDATE SET\n\t\t\tvalue = excluded.value,\n\t\t\tupdated_at = excluded.updated_at\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "30584f38b7833c2b772a644dfcf2832810a9599e6bb655f775df7d0cdb25dd30"
+}

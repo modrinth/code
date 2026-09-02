@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT DISTINCT f.version_id AS \"version_id: DBVersionId\"\n\t\tFROM project_attribution_files paf\n\t\tINNER JOIN project_attribution_groups pag ON pag.id = paf.group_id\n\t\tINNER JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1\n\t\tINNER JOIN files f ON f.id = ofs.file_id\n\t\tINNER JOIN versions v ON v.id = f.version_id\n\t\tWHERE paf.group_id = ANY($1)\n\t\t\tAND pag.project_id = v.mod_id\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "bfc67441eb246ac6b155db36919a7a62e19e0dd0c87916e761175ec909add15b"
+}

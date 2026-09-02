@@ -1,44 +1,21 @@
 <template>
 	<div class="flex gap-2 items-center">
-		<ButtonStyled
-			v-if="hasActiveLoadingBars && !hasVisibleActiveDownloadToasts"
-			color="brand"
-			type="transparent"
-			circular
-		>
-			<button v-tooltip="formatMessage(messages.viewActiveDownloads)" @click="openDownloadToast()">
+		<div v-if="downloadState.total > 0 || hasActiveLoadingBars" class="relative">
+			<IconButton
+				v-tooltip="downloadToggleLabel"
+				:color="downloadState.hidden > 0 ? 'brand' : undefined"
+				type="quiet"
+				:label="downloadToggleLabel"
+				@click="toggleDownloadNotifications"
+			>
 				<DownloadIcon />
-			</button>
-		</ButtonStyled>
+			</IconButton>
+		</div>
 		<div v-if="offline" class="flex items-center gap-1">
 			<UnplugIcon class="text-secondary" />
 			<span class="text-sm text-contrast"> {{ formatMessage(messages.offline) }} </span>
 		</div>
-		<ButtonStyled color="brand" type="outlined" hover-color-fill="background">
-			<button
-				v-if="showUpdatePill"
-				type="button"
-				class="!h-[34px] overflow-hidden text-sm !transition-[width,opacity,transform,background-color,color,filter] !duration-200 ease-out"
-				:class="[
-					updatePillWidthClass,
-					{
-						'update-pill-ready-hidden': finishedDownloading && !animateReadyPill,
-						'update-pill-ready-visible': finishedDownloading && animateReadyPill,
-					},
-				]"
-				:disabled="isUpdateDownloading"
-				:aria-busy="isUpdateDownloading"
-				@click="handleUpdateClick"
-			>
-				<RefreshCwIcon v-if="finishedDownloading" :class="{ 'animate-spin': restarting }" />
-				<DownloadIcon v-else />
-				<span v-if="isUpdateDownloading">
-					{{ formatMessage(messages.downloadingUpdate) }}
-					<span class="inline-block w-[3ch] text-right tabular-nums">{{ downloadPercent }}%</span>
-				</span>
-				<span v-else>{{ updateLabel }}</span>
-			</button>
-		</ButtonStyled>
+		<AppUpdateButton />
 		<div
 			class="flex border-solid border-surface-5 text-sm items-center gap-2 py-1.5 px-3 rounded-xl border"
 		>
@@ -47,30 +24,36 @@
 				<div class="text-contrast flex items-center gap-2">
 					<router-link
 						v-tooltip="formatMessage(messages.viewInstance)"
-						:to="`/instance/${encodeURIComponent(selectedProcess.profile.path)}`"
+						:to="`/instance/${encodeURIComponent(selectedProcess.instance.id)}`"
 						class="hover:underline"
 					>
-						{{ selectedProcess.profile.name }}
+						{{ selectedProcess.instance.name }}
 					</router-link>
 					<Dropdown
 						v-if="currentProcesses.length > 1"
 						placement="bottom"
 						:triggers="['click']"
 						:hide-triggers="['click']"
-						@show="showProfiles = true"
-						@hide="showProfiles = false"
+						@show="showInstances = true"
+						@hide="showInstances = false"
 					>
-						<ButtonStyled type="transparent" circular size="small">
-							<button
-								v-tooltip="
-									showProfiles
-										? formatMessage(messages.hideMoreRunningInstances)
-										: formatMessage(messages.showMoreRunningInstances)
-								"
-							>
-								<DropdownIcon :class="{ 'rotate-180': !!showProfiles }" />
-							</button>
-						</ButtonStyled>
+						<IconButton
+							v-tooltip="
+								showInstances
+									? formatMessage(messages.hideMoreRunningInstances)
+									: formatMessage(messages.showMoreRunningInstances)
+							"
+							class="!size-6"
+							type="quiet"
+							size="xs"
+							:label="
+								showInstances
+									? formatMessage(messages.hideMoreRunningInstances)
+									: formatMessage(messages.showMoreRunningInstances)
+							"
+						>
+							<DropdownIcon :class="{ 'rotate-180': !!showInstances }" />
+						</IconButton>
 						<template #popper>
 							<div class="flex w-[20rem] max-h-[24rem] flex-col gap-2 overflow-auto">
 								<div
@@ -93,7 +76,7 @@
 									>
 										<OnlineIndicatorIcon />
 										<span class="mr-auto text-contrast flex items-center gap-2">
-											{{ process.profile.name }}
+											{{ process.instance.name }}
 											<StarIcon v-if="process.uuid === selectedProcess.uuid" class="text-orange" />
 										</span>
 									</button>
@@ -107,7 +90,7 @@
 									<button
 										v-tooltip="formatMessage(messages.viewLogs)"
 										class="active:scale-95 flex"
-										@click.stop="goToTerminal(process.profile.path)"
+										@click.stop="goToTerminal(process.instance.id)"
 									>
 										<TerminalSquareIcon class="text-secondary size-5" />
 									</button>
@@ -144,38 +127,35 @@ import {
 	DownloadIcon,
 	DropdownIcon,
 	OnlineIndicatorIcon,
-	RefreshCwIcon,
 	StarIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
 	UnplugIcon,
 } from '@modrinth/assets'
+import { IconButton } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
 	injectPopupNotificationManager,
-	type PopupNotification,
 	type PopupNotificationProgressItem,
+	type PopupNotificationStandard,
 	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { Dropdown } from 'floating-vue'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import AppUpdateButton from '@/components/ui/app-update-button/index.vue'
+import { useInstallJobNotifications } from '@/composables/browse/install-job-notifications'
+import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
-import { loading_listener, process_listener } from '@/helpers/events'
+import { toError } from '@/helpers/errors'
+import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
-import { get_many as getInstances } from '@/helpers/profile.js'
 import type { LoadingBar } from '@/helpers/state'
 import { progress_bars_list } from '@/helpers/state'
 import type { GameInstance } from '@/helpers/types'
-import {
-	appUpdateState,
-	downloadAvailableAppUpdate,
-	installAvailableAppUpdate,
-} from '@/providers/app-update'
 
 const { handleError } = injectNotificationManager()
 const popupNotificationManager = injectPopupNotificationManager()
@@ -183,12 +163,12 @@ const { formatMessage } = useVIntl()
 
 const router = useRouter()
 
-const showProfiles = ref(false)
+const showInstances = ref(false)
 
 interface RunningProcess {
 	uuid: string
-	profile_path: string
-	profile: GameInstance
+	instance_id: string
+	instance: GameInstance
 }
 
 const messages = defineMessages({
@@ -240,93 +220,32 @@ const messages = defineMessages({
 		id: 'app.action-bar.view-active-downloads',
 		defaultMessage: 'View active downloads',
 	},
-	update: {
-		id: 'app.action-bar.update',
-		defaultMessage: 'Update',
+	hideDownloads: {
+		id: 'app.action-bar.hide-downloads',
+		defaultMessage: 'Hide active downloads',
 	},
-	downloadingUpdate: {
-		id: 'app.action-bar.downloading-update',
-		defaultMessage: 'Downloading update',
-	},
-	reloadToUpdate: {
-		id: 'app.action-bar.reload-to-update',
-		defaultMessage: 'Reload to update',
+	showDownloads: {
+		id: 'app.action-bar.show-downloads',
+		defaultMessage: 'Show active downloads',
 	},
 })
 
-const {
-	downloading,
-	downloadPercent,
-	downloadProgress,
-	finishedDownloading,
-	isVisible: isUpdateVisible,
-	metered,
-	restarting,
-} = appUpdateState
-
-const isUpdateDownloading = computed(
-	() =>
-		downloading.value ||
-		(downloadProgress.value > 0 && downloadProgress.value < 1 && !finishedDownloading.value),
+const downloadState = computed(() => popupNotificationManager.getDownloadState())
+const downloadToggleLabel = computed(() =>
+	formatMessage(
+		downloadState.value.hidden > 0
+			? messages.showDownloads
+			: downloadState.value.total > 0
+				? messages.hideDownloads
+				: messages.viewActiveDownloads,
+	),
 )
-const showUpdatePill = computed(
-	() => isUpdateVisible.value && (finishedDownloading.value || metered.value),
-)
-const animateReadyPill = ref(false)
-const updateLabel = computed(() => {
-	if (isUpdateDownloading.value) {
-		return formatMessage(messages.downloadingUpdate)
-	}
 
-	if (finishedDownloading.value) {
-		return formatMessage(messages.reloadToUpdate)
-	}
-
-	return formatMessage(messages.update)
-})
-const updatePillWidthClass = computed(() => {
-	if (isUpdateDownloading.value) {
-		return 'w-[219px]'
-	}
-
-	if (finishedDownloading.value) {
-		return 'w-[166px]'
-	}
-
-	return '!w-[96px]'
-})
-let readyPillAnimationFrame: number | null = null
-watch([showUpdatePill, finishedDownloading], async ([show, ready], [wasShown, wasReady]) => {
-	if (readyPillAnimationFrame !== null) {
-		cancelAnimationFrame(readyPillAnimationFrame)
-		readyPillAnimationFrame = null
-	}
-
-	if (!show || !ready) {
-		animateReadyPill.value = false
-		return
-	}
-
-	if (wasShown && wasReady) {
-		return
-	}
-
-	animateReadyPill.value = false
-	await nextTick()
-	readyPillAnimationFrame = requestAnimationFrame(() => {
-		animateReadyPill.value = true
-		readyPillAnimationFrame = null
-	})
-})
-async function handleUpdateClick() {
-	if (isUpdateDownloading.value) {
-		return
-	}
-
-	if (finishedDownloading.value) {
-		await installAvailableAppUpdate()
-	} else {
-		await downloadAvailableAppUpdate()
+function toggleDownloadNotifications(): void {
+	if (downloadState.value.total > 0) {
+		popupNotificationManager.toggleDownloadNotifications()
+	} else if (hasActiveLoadingBars.value) {
+		openDownloadToast()
 	}
 }
 
@@ -337,22 +256,22 @@ const refresh = async () => {
 	const processes = ((await getRunningProcesses().catch((error) => {
 		handleError(error)
 		return []
-	})) ?? []) as Array<{ uuid: string; profile_path: string }>
-	const paths = processes.map((process) => process.profile_path)
-	const profiles: GameInstance[] = await getInstances(paths).catch((error) => {
+	})) ?? []) as Array<{ uuid: string; instance_id: string }>
+	const instanceIds = processes.map((process) => process.instance_id)
+	const instances: GameInstance[] = await getInstances(instanceIds).catch((error) => {
 		handleError(error)
 		return []
 	})
 
 	currentProcesses.value = processes
 		.map((process) => {
-			const profile = profiles.find((item) => process.profile_path === item.path)
-			if (!profile) {
+			const instance = instances.find((item) => process.instance_id === item.id)
+			if (!instance) {
 				return null
 			}
 			return {
 				...process,
-				profile,
+				instance,
 			}
 		})
 		.filter((process): process is RunningProcess => process !== null)
@@ -376,7 +295,7 @@ onMounted(() => {
 	window.addEventListener('online', handleOnline)
 })
 
-const unlistenProcess = await process_listener(async () => {
+useAppEvent('process', async () => {
 	await refresh()
 })
 
@@ -385,8 +304,8 @@ const stop = async (process: RunningProcess) => {
 		await killProcess(process.uuid).catch(handleError)
 
 		trackEvent('InstanceStop', {
-			loader: process.profile.loader,
-			game_version: process.profile.game_version,
+			loader: process.instance.loader,
+			game_version: process.instance.game_version,
 			source: 'AppBar',
 		})
 	} catch (e) {
@@ -395,17 +314,18 @@ const stop = async (process: RunningProcess) => {
 	await refresh()
 }
 
-function goToTerminal(path?: string) {
-	const selectedPath = path ?? selectedProcess.value?.profile.path
-	if (!selectedPath) {
+function goToTerminal(instanceId?: string) {
+	const selectedInstanceId = instanceId ?? selectedProcess.value?.instance.id
+	if (!selectedInstanceId) {
 		return
 	}
-	router.push(`/instance/${encodeURIComponent(selectedPath)}/logs`)
+	router.push(`/instance/${encodeURIComponent(selectedInstanceId)}/logs`)
 }
 
 const currentLoadingBars = ref<LoadingBar[]>([])
 const currentLoadingBarIconUrls = ref<Record<string, string | null>>({})
 const notificationId = ref<string | number | null>(null)
+const terminalNotificationIds = new Map<string, string | number>()
 const dismissed = ref(false)
 
 function getLoadingBarKey(loadingBar: LoadingBar): string {
@@ -420,8 +340,7 @@ function getLoadingProgress(loadingBar: LoadingBar): number {
 }
 
 function getLoadingText(loadingBar: LoadingBar): string {
-	const percent = Math.floor(getLoadingProgress(loadingBar) * 100)
-	return loadingBar.message ? `${percent}% ${loadingBar.message}` : `${percent}%`
+	return loadingBar.message ?? ''
 }
 
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
@@ -434,14 +353,16 @@ function getDisplayIconUrl(icon: string | null | undefined): string | null {
 	return convertFileSrc(icon)
 }
 
-function getNotification(): PopupNotification | null {
+function getNotification(): PopupNotificationStandard | null {
 	if (!notificationId.value) {
 		return null
 	}
 	const notification = popupNotificationManager
 		.getNotifications()
 		.find((notification) => notification.id === notificationId.value)
-	return notification ?? null
+	return notification?.contentType === 'standard' && notification.type === 'download'
+		? notification
+		: null
 }
 
 function removeNotification(): void {
@@ -452,26 +373,79 @@ function removeNotification(): void {
 	notificationId.value = null
 }
 
-function buildDownloadItems(): PopupNotificationProgressItem[] {
-	return currentLoadingBars.value.map((bar) => ({
-		id: getLoadingBarKey(bar),
-		title: bar.title ?? '',
-		text: getLoadingText(bar),
-		iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
-		progress: getLoadingProgress(bar),
-		waiting: !bar.total || bar.total <= 0,
-	}))
+function syncTerminalNotifications(): void {
+	const terminalNotifications = installJobNotifications.terminalNotifications.value
+	const currentJobIds = new Set(terminalNotifications.map((notification) => notification.id))
+
+	for (const terminal of terminalNotifications) {
+		const popupId = terminalNotificationIds.get(terminal.id)
+		let notification = popupId
+			? popupNotificationManager
+					.getNotifications()
+					.find(
+						(candidate): candidate is PopupNotificationStandard =>
+							candidate.id === popupId && candidate.contentType === 'standard',
+					)
+			: undefined
+
+		if (!notification) {
+			notification = popupNotificationManager.addPopupNotification({
+				contentType: 'standard',
+				title: terminal.title,
+				text: terminal.text,
+				type: terminal.type,
+				buttons: terminal.buttons,
+				onDismiss: terminal.onDismiss,
+				autoCloseMs: null,
+			})
+			terminalNotificationIds.set(terminal.id, notification.id)
+			continue
+		}
+
+		notification.title = terminal.title
+		notification.text = terminal.text
+		notification.type = terminal.type
+		notification.buttons = terminal.buttons
+		notification.onDismiss = terminal.onDismiss
+	}
+
+	for (const [jobId, popupId] of terminalNotificationIds) {
+		if (!currentJobIds.has(jobId)) {
+			popupNotificationManager.removeNotification(popupId)
+			terminalNotificationIds.delete(jobId)
+		}
+	}
 }
 
-const hasVisibleActiveDownloadToasts = computed(() => !!getNotification())
-const hasActiveLoadingBars = computed(() => currentLoadingBars.value.length > 0)
+function buildDownloadItems(): PopupNotificationProgressItem[] {
+	return [
+		...installJobNotifications.progressItems.value,
+		...currentLoadingBars.value.map<PopupNotificationProgressItem>((bar) => ({
+			id: getLoadingBarKey(bar),
+			title: bar.title ?? '',
+			text: getLoadingText(bar),
+			iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
+			progress: getLoadingProgress(bar),
+			waiting: !bar.total || bar.total <= 0,
+			progressType: bar.bar_type?.type === 'pack_import' ? 'bytes' : 'percentage',
+			progressCurrent: bar.current,
+			progressTotal: bar.total,
+		})),
+	]
+}
+
+const hasActiveLoadingBars = computed(
+	() => currentLoadingBars.value.length > 0 || installJobNotifications.active.value,
+)
 
 function updateNotification(resummon = false): void {
+	syncTerminalNotifications()
+
 	if (resummon) {
 		dismissed.value = false
 	}
 
-	if (currentLoadingBars.value.length === 0) {
+	if (currentLoadingBars.value.length === 0 && !installJobNotifications.active.value) {
 		removeNotification()
 		dismissed.value = false
 		return
@@ -486,23 +460,28 @@ function updateNotification(resummon = false): void {
 		return
 	}
 
-	let notif = getNotification()
+	const notif = getNotification()
 	const progressItems = buildDownloadItems()
 
 	if (notif) {
-		notif.title = formatMessage(messages.downloads)
+		notif.title = installJobNotifications.active.value
+			? installJobNotifications.title.value
+			: formatMessage(messages.downloads)
 		notif.text = undefined
 		notif.progressItems = progressItems
 		notif.progress = undefined
 		notif.waiting = undefined
 	} else {
-		notif = popupNotificationManager.addPopupNotification({
-			title: formatMessage(messages.downloads),
+		const notification = popupNotificationManager.addPopupNotification({
+			contentType: 'standard',
+			title: installJobNotifications.active.value
+				? installJobNotifications.title.value
+				: formatMessage(messages.downloads),
 			type: 'download',
 			autoCloseMs: null,
 			progressItems,
 		})
-		notificationId.value = notif.id
+		notificationId.value = notification.id
 	}
 }
 
@@ -513,8 +492,8 @@ function formatLoadingBars(loadingBar: LoadingBar): LoadingBar {
 			version: formatted.bar_type.version,
 		})
 	}
-	if (formatted.bar_type?.profile_path) {
-		formatted.title = formatted.bar_type.profile_path
+	if (formatted.bar_type?.instance_id) {
+		formatted.title = formatted.bar_type.instance_name ?? formatted.bar_type.instance_id
 	}
 	if (formatted.bar_type?.pack_name) {
 		formatted.title = formatted.bar_type.pack_name
@@ -530,31 +509,41 @@ async function refreshLoadingBars() {
 
 	currentLoadingBars.value = Object.values(bars)
 		.map(formatLoadingBars)
-		.filter((bar) => bar?.bar_type?.type !== 'launcher_update')
+		.filter(
+			(bar) =>
+				bar?.bar_type?.type !== 'launcher_update' &&
+				![
+					'java_download',
+					'pack_file_download',
+					'pack_download',
+					'minecraft_download',
+					'copy_instance',
+				].includes(bar?.bar_type?.type ?? ''),
+		)
 
-	const profilePaths = Array.from(
+	const instanceIds = Array.from(
 		new Set(
 			currentLoadingBars.value
-				.map((bar) => bar.bar_type?.profile_path)
-				.filter((path): path is string => !!path),
+				.map((bar) => bar.bar_type?.instance_id)
+				.filter((instanceId): instanceId is string => !!instanceId),
 		),
 	)
-	const profiles = profilePaths.length
-		? await getInstances(profilePaths).catch((error) => {
+	const instances = instanceIds.length
+		? await getInstances(instanceIds).catch((error) => {
 				handleError(error)
 				return []
 			})
 		: []
-	const profileIconUrls = new Map(
-		profiles.map((profile) => [profile.path, getDisplayIconUrl(profile.icon_path)]),
+	const instanceIconUrls = new Map(
+		instances.map((instance) => [instance.id, getDisplayIconUrl(instance.icon_path)]),
 	)
 	currentLoadingBarIconUrls.value = Object.fromEntries(
 		currentLoadingBars.value.map((bar) => {
 			const barIconUrl = getDisplayIconUrl(bar.bar_type?.icon)
-			const profileIconUrl = bar.bar_type?.profile_path
-				? profileIconUrls.get(bar.bar_type.profile_path)
+			const instanceIconUrl = bar.bar_type?.instance_id
+				? instanceIconUrls.get(bar.bar_type.instance_id)
 				: null
-			return [getLoadingBarKey(bar), barIconUrl ?? profileIconUrl ?? null]
+			return [getLoadingBarKey(bar), barIconUrl ?? instanceIconUrl ?? null]
 		}),
 	)
 
@@ -567,9 +556,15 @@ async function refreshLoadingBars() {
 	updateNotification()
 }
 
+const installJobNotifications = await useInstallJobNotifications({
+	router,
+	handleError: (error) => handleError(toError(error)),
+	onChange: updateNotification,
+})
+
 await refreshLoadingBars()
 
-const unlistenLoading = await loading_listener(async () => {
+useAppEvent('loading', async () => {
 	await refreshLoadingBars()
 })
 
@@ -583,25 +578,11 @@ function selectProcess(process: RunningProcess) {
 
 onBeforeUnmount(() => {
 	removeNotification()
+	terminalNotificationIds.forEach((id) => popupNotificationManager.removeNotification(id))
+	terminalNotificationIds.clear()
 	dismissed.value = false
 	window.removeEventListener('offline', handleOffline)
 	window.removeEventListener('online', handleOnline)
-	unlistenProcess()
-	unlistenLoading()
-	if (readyPillAnimationFrame !== null) {
-		cancelAnimationFrame(readyPillAnimationFrame)
-	}
+	installJobNotifications.dispose()
 })
 </script>
-
-<style scoped>
-.update-pill-ready-hidden {
-	opacity: 0;
-	transform: scale(0.96);
-}
-
-.update-pill-ready-visible {
-	opacity: 1;
-	transform: scale(1);
-}
-</style>

@@ -14,14 +14,11 @@ export interface ModerationActions {
 	tryReject: () => void
 	tryWithhold: () => void
 	tryEditMessage: () => void
+}
 
-	tryToggleAction: (actionIndex: number) => void
-	trySelectDropdownOption: (actionIndex: number, optionIndex: number) => void
-	tryToggleChip: (actionIndex: number, chipIndex: number) => void
-
-	tryFocusNextAction: () => void
-	tryFocusPreviousAction: () => void
-	tryActivateFocusedAction: () => void
+export interface TechReviewActions {
+	goToTop: () => void
+	goToBottom: () => void
 }
 
 export interface ModerationState {
@@ -38,16 +35,38 @@ export interface ModerationState {
 
 	futureProjectCount: number
 	visibleActionsCount: number
-
-	focusedActionIndex: number | null
-	focusedActionType: 'button' | 'toggle' | 'dropdown' | 'multi-select' | null
 }
 
-export interface ModerationContext {
+export type ModerationProjectContext = {
 	project: Labrinth.Projects.v2.Project
+	scope: 'project'
+	notifyCopied: (value: string, title: string) => void
+}
+
+export type ModerationChecklistContext = {
+	project: Labrinth.Projects.v2.Project
+	scope: 'checklist'
 	state: ModerationState
 	actions: ModerationActions
 }
+
+export type ModerationTechReviewContext = {
+	scope: 'tech-review'
+	actions: TechReviewActions
+}
+
+export type ModerationGlobalContext = {
+	scope: 'global'
+	officialUrl: string
+	alternativeUrl: string
+	notifyCopied: (value: string, title: string) => void
+}
+
+export type ModerationContext =
+	| ModerationProjectContext
+	| ModerationChecklistContext
+	| ModerationTechReviewContext
+	| ModerationGlobalContext
 
 export interface KeybindDefinition {
 	key: string
@@ -58,13 +77,31 @@ export interface KeybindDefinition {
 	preventDefault?: boolean
 }
 
-export interface KeybindListener {
-	id: string
+export type BaseKeybindListener<T> = {
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[]
 	description: string
-	enabled?: (ctx: ModerationContext) => boolean
-	action: (ctx: ModerationContext) => void
+	scope: 'project' | 'checklist' | 'tech-review' | 'global'
+	enabled?: (ctx: T) => boolean
+	action: (ctx: T) => void
 }
+
+export type KeybindProjectListener = BaseKeybindListener<ModerationProjectContext> & {
+	scope: 'project'
+}
+export type KeybindChecklistListener = BaseKeybindListener<ModerationChecklistContext> & {
+	scope: 'checklist'
+}
+export type KeybindTechReviewListener = BaseKeybindListener<ModerationTechReviewContext> & {
+	scope: 'tech-review'
+}
+export type KeybindGlobalListener = BaseKeybindListener<ModerationGlobalContext> & {
+	scope: 'global'
+}
+export type KeybindListener =
+	| KeybindProjectListener
+	| KeybindChecklistListener
+	| KeybindTechReviewListener
+	| KeybindGlobalListener
 
 export function parseKeybind(keybindString: string): KeybindDefinition {
 	const parts = keybindString.split('+').map((p) => p.trim().toLowerCase())
@@ -85,52 +122,23 @@ export function normalizeKeybind(keybind: KeybindDefinition | string): KeybindDe
 
 export function matchesKeybind(event: KeyboardEvent, keybind: KeybindDefinition | string): boolean {
 	const def = normalizeKeybind(keybind)
+	const wantsMod = !!(def.ctrl || def.meta)
+	const hasMod = event.ctrlKey || event.metaKey
 	return (
 		event.key.toLowerCase() === def.key.toLowerCase() &&
-		event.ctrlKey === (def.ctrl ?? false) &&
+		hasMod === wantsMod &&
 		event.shiftKey === (def.shift ?? false) &&
-		event.altKey === (def.alt ?? false) &&
-		event.metaKey === (def.meta ?? false)
+		event.altKey === (def.alt ?? false)
 	)
 }
 
-export function handleKeybind(
-	event: KeyboardEvent,
-	ctx: ModerationContext,
-	keybinds: KeybindListener[],
-): boolean {
-	if (
-		event.target instanceof HTMLInputElement ||
-		event.target instanceof HTMLTextAreaElement ||
-		(event.target as HTMLElement)?.closest('.cm-editor') ||
-		(event.target as HTMLElement)?.classList?.contains('cm-content') ||
-		(event.target as HTMLElement)?.classList?.contains('cm-line')
-	) {
-		return false
+export function toKeybindDefinition(event: KeyboardEvent): KeybindDefinition {
+	return {
+		key: event.key.toLowerCase(),
+		ctrl: event.ctrlKey,
+		shift: event.shiftKey,
+		alt: event.altKey,
+		meta: event.metaKey,
+		preventDefault: true,
 	}
-
-	for (const keybind of keybinds) {
-		if (keybind.enabled && !keybind.enabled(ctx)) {
-			continue
-		}
-
-		const keybindDefs = Array.isArray(keybind.keybind)
-			? keybind.keybind.map(normalizeKeybind)
-			: [normalizeKeybind(keybind.keybind)]
-
-		const matches = keybindDefs.some((def) => matchesKeybind(event, def))
-
-		if (matches) {
-			keybind.action(ctx)
-
-			const shouldPrevent = keybindDefs.some((def) => def.preventDefault !== false)
-			if (shouldPrevent) {
-				event.preventDefault()
-			}
-
-			return true
-		}
-	}
-
-	return false
 }

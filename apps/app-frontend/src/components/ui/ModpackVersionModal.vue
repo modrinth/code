@@ -1,11 +1,11 @@
 <script setup>
 import { CheckIcon } from '@modrinth/assets'
-import { Badge, ButtonStyled } from '@modrinth/ui'
+import { Badge, IconButton } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { SwapIcon } from '@/assets/icons/index.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { update_managed_modrinth_version } from '@/helpers/profile'
+import { update_managed_modrinth_version } from '@/helpers/instance'
 import { releaseColor } from '@/helpers/utils'
 
 const props = defineProps({
@@ -32,14 +32,14 @@ const filteredVersions = computed(() => {
 })
 
 const modpackVersionModal = ref(null)
-const installedVersion = computed(() => props.instance?.linked_data?.version_id)
+const installedVersion = computed(() => props.instance?.link?.version_id)
 const installing = computed(() => props.instance.install_stage !== 'installed')
 const inProgress = ref(false)
 
 const switchVersion = async (versionId) => {
 	modpackVersionModal.value.hide()
 	inProgress.value = true
-	await update_managed_modrinth_version(props.instance.path, versionId)
+	await update_managed_modrinth_version(props.instance.id, versionId)
 	inProgress.value = false
 	emit('finish-install')
 }
@@ -59,7 +59,7 @@ const onHide = () => {
 		:on-hide="onHide"
 	>
 		<div class="modal-body">
-			<div v-if="instance.linked_data" class="mod-card">
+			<div v-if="instance.link" class="mod-card">
 				<div class="table">
 					<div class="table-row with-columns table-head">
 						<div class="table-cell table-text download-cell" />
@@ -74,18 +74,16 @@ const onHide = () => {
 							@click="$router.push(`/project/${version.project_id}/version/${version.id}`)"
 						>
 							<div class="table-cell table-text">
-								<ButtonStyled
-									circular
-									:color="version.id === installedVersion ? 'standard' : 'brand'"
+								<IconButton
+									:type="version.id === installedVersion ? 'base' : 'colored'"
+									:color="version.id === installedVersion ? undefined : 'brand'"
+									label="Switch version"
+									:disabled="inProgress || installing || version.id === installedVersion"
+									@click.stop="() => switchVersion(version.id)"
 								>
-									<button
-										:disabled="inProgress || installing || version.id === installedVersion"
-										@click.stop="() => switchVersion(version.id)"
-									>
-										<SwapIcon v-if="version.id !== installedVersion" />
-										<CheckIcon v-else />
-									</button>
-								</ButtonStyled>
+									<SwapIcon v-if="version.id !== installedVersion" />
+									<CheckIcon v-else />
+								</IconButton>
 							</div>
 							<div class="name-cell table-cell table-text">
 								<div class="version-link">

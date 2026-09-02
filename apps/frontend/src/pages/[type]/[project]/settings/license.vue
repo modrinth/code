@@ -28,12 +28,13 @@
 				</label>
 
 				<div class="w-1/2">
-					<DropdownSelect
-						v-model="current.license"
-						name="License selector"
-						:options="builtinLicenses"
-						:display-name="(chosen: BuiltinLicense) => chosen.friendly"
+					<Combobox
+						v-model="selectedLicense"
+						:options="licenseOptions"
+						:display-value="current.license.friendly || undefined"
 						placeholder="Select license..."
+						:disabled="!hasPermission"
+						trigger-type="base"
 					/>
 				</div>
 			</div>
@@ -72,7 +73,7 @@
 				</label>
 
 				<div class="w-1/2">
-					<StyledInput
+					<Input
 						id="license-url"
 						v-model="current.licenseUrl"
 						type="url"
@@ -105,7 +106,7 @@
 				</label>
 
 				<div class="flex w-1/2 flex-col gap-2">
-					<StyledInput
+					<Input
 						v-if="!current.nonSpdxLicense"
 						id="license-spdx"
 						v-model="current.license.short"
@@ -114,7 +115,7 @@
 						placeholder="SPDX identifier"
 						:disabled="!hasPermission"
 					/>
-					<StyledInput
+					<Input
 						v-else
 						id="license-name"
 						v-model="current.license.short"
@@ -155,23 +156,27 @@
 <script setup lang="ts">
 import {
 	Checkbox,
+	Combobox,
+	type ComboboxOption,
+	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
-	DropdownSelect,
 	injectProjectPageContext,
-	StyledInput,
+	Input,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
-import {
-	type BuiltinLicense,
-	builtinLicenses,
-	formatProjectType,
-	TeamMemberPermission,
-} from '@modrinth/utils'
+import { builtinLicenses, formatProjectType, TeamMemberPermission } from '@modrinth/utils'
 import { computed } from 'vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.license)
+
+const licenseOptions: ComboboxOption<string>[] = builtinLicenses.map((license) => ({
+	value: license.short,
+	label: license.friendly,
+}))
 
 function getInitialLicense() {
 	const oldLicenseId = project.value.license.id
@@ -223,6 +228,14 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
+
+const selectedLicense = computed({
+	get: () => (current.value.license.friendly === 'Custom' ? '' : current.value.license.short),
+	set: (short: string) => {
+		const license = builtinLicenses.find((option) => option.short === short)
+		if (license) current.value.license = license
+	},
+})
 
 const hasPermission = computed(() => {
 	return (currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS

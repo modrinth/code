@@ -14,13 +14,17 @@ use common::asserts::assert_common_version_ids;
 use common::database::USER_USER_PAT;
 use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
-use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
+use labrinth::database::models::DBVersionId;
+use labrinth::database::models::version_item::{
+    VERSIONS_NAMESPACE, VersionQueryResult,
+};
 use labrinth::models::ids::VersionId;
 use labrinth::models::projects::{
     Dependency, DependencyType, VersionStatus, VersionType,
 };
 use labrinth::routes::v3::version_file::FileUpdateData;
 use serde_json::json;
+use xredis::RedisValue;
 
 pub mod common;
 
@@ -47,18 +51,21 @@ async fn test_get_version() {
         assert_eq!(&version.id.to_string(), alpha_version_id);
 
         let mut redis_conn = test_env.db.redis_pool.connect().await.unwrap();
-        let cached_project = redis_conn
-            .get(
-                VERSIONS_NAMESPACE,
-                &parse_base62(alpha_version_id).unwrap().to_string(),
-            )
+        let version_key = redis_conn.key().entity(
+            VERSIONS_NAMESPACE,
+            parse_base62(alpha_version_id).unwrap(),
+        );
+        let cached_version: RedisValue<
+            VersionQueryResult,
+            DBVersionId,
+            String,
+        > = redis_conn
+            .get_deserialized(&version_key)
             .await
             .unwrap()
             .unwrap();
-        let cached_project: serde_json::Value =
-            serde_json::from_str(&cached_project).unwrap();
         assert_eq!(
-            cached_project["val"]["inner"]["project_id"],
+            cached_version.value().inner.project_id.0,
             json!(parse_base62(alpha_project_id).unwrap())
         );
 
@@ -81,6 +88,48 @@ async fn test_get_version() {
         let resp = api.get_version(beta_version_id, ENEMY_USER_PAT).await;
         assert_status!(&resp, StatusCode::NOT_FOUND);
     })
+    .await;
+}
+
+#[actix_rt::test]
+async fn rejects_duplicate_filename_when_uploading_file_to_version() {
+    with_test_environment(
+        None,
+        |test_env: common::environment::TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let version_id = &test_env.dummy.project_alpha.version_id;
+            let version_before = api
+                .get_version_deserialized_common(version_id, USER_USER_PAT)
+                .await;
+            assert_eq!(version_before.files.len(), 1);
+            let primary_before = version_before.files[0].clone();
+
+            let conflicting_file = TestFile::BasicModRandom {
+                filename: primary_before.filename.clone(),
+                bytes: TestFile::build_random_jar().bytes(),
+            };
+            let response = api
+                .upload_file_to_version(
+                    version_id,
+                    &conflicting_file,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let version_after = api
+                .get_version_deserialized_common(version_id, USER_USER_PAT)
+                .await;
+            assert_eq!(version_after.files.len(), 1);
+            let primary_after = &version_after.files[0];
+            assert_eq!(primary_after.id, primary_before.id);
+            assert_eq!(primary_after.hashes, primary_before.hashes);
+            assert_eq!(primary_after.url, primary_before.url);
+            assert_eq!(primary_after.filename, primary_before.filename);
+            assert_eq!(primary_after.primary, primary_before.primary);
+            assert_eq!(primary_after.size, primary_before.size);
+        },
+    )
     .await;
 }
 
@@ -494,7 +543,8 @@ pub async fn test_patch_version() {
                 project_id: Some(*beta_project_id_parsed),
                 version_id: None,
                 file_name: Some("dummy_file_name".to_string()),
-                dependency_type: DependencyType::Required
+                dependency_type: DependencyType::Required,
+                attribution: None,
             }]
         );
         assert_eq!(version.loaders, vec!["forge".to_string()]);

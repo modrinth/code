@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
 use crate::models::v2::notifications::LegacyNotification;
@@ -7,15 +6,17 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::v2_reroute;
 use crate::routes::v3;
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(notifications_get);
     cfg.service(notifications_delete);
     cfg.service(notifications_read);
     cfg.service(
-        utoipa_actix_web::scope("/notification")
+        web::scope("/notification")
             .service(notification_get)
             .service(notification_read)
             .service(notification_delete),
@@ -27,19 +28,16 @@ pub struct NotificationIds {
     pub ids: String,
 }
 
-/// Get multiple notifications by ID.
+/// Get multiple notifications by ID.  
 #[utoipa::path(
+	tag = "notifications",
     get,
     operation_id = "getNotifications",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of notification IDs"
-        )
+        ("ids" = String, Query, description = "The JSON array of notification IDs")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyNotification>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -68,7 +66,11 @@ pub async fn notifications_get(
     )
     .await
     .or_else(v2_reroute::flatten_404_error);
-    match v2_reroute::extract_ok_json::<Vec<Notification>>(resp?).await {
+    match v2_reroute::extract_ok_json::<Vec<Notification>>(
+        resp.wrap_api_err("extracting v2 response body")?,
+    )
+    .await
+    {
         Ok(notifications) => {
             let notifications: Vec<LegacyNotification> = notifications
                 .into_iter()
@@ -80,13 +82,17 @@ pub async fn notifications_get(
     }
 }
 
-/// Get a notification by ID.
+/// Get a notification by ID.  
 #[utoipa::path(
+	context_path = "/notification",
+	tag = "notifications",
     get,
     operation_id = "getNotification",
-    params(("id" = NotificationId, Path, description = "The ID of the notification")),
+    params(
+        ("id" = NotificationId, Path, description = "The ID of the notification")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyNotification),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -114,7 +120,8 @@ pub async fn notification_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
     match v2_reroute::extract_ok_json::<Notification>(response).await {
         Ok(notification) => {
             let notification = LegacyNotification::from(notification);
@@ -124,11 +131,15 @@ pub async fn notification_get(
     }
 }
 
-/// Mark a notification as read.
+/// Mark a notification as read.  
 #[utoipa::path(
+	context_path = "/notification",
+	tag = "notifications",
     patch,
     operation_id = "readNotification",
-    params(("id" = NotificationId, Path, description = "The ID of the notification")),
+    params(
+        ("id" = NotificationId, Path, description = "The ID of the notification")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -156,11 +167,15 @@ pub async fn notification_read(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a notification by ID.
+/// Delete a notification by ID.  
 #[utoipa::path(
+	context_path = "/notification",
+	tag = "notifications",
     delete,
     operation_id = "deleteNotification",
-    params(("id" = NotificationId, Path, description = "The ID of the notification")),
+    params(
+        ("id" = NotificationId, Path, description = "The ID of the notification")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -194,16 +209,13 @@ pub async fn notification_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Mark multiple notifications as read.
+/// Mark multiple notifications as read.  
 #[utoipa::path(
+	tag = "notifications",
     patch,
     operation_id = "readNotifications",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of notification IDs"
-        )
+        ("ids" = String, Query, description = "The JSON array of notification IDs")
     ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -238,16 +250,13 @@ pub async fn notifications_read(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete multiple notifications by ID.
+/// Delete multiple notifications by ID.  
 #[utoipa::path(
+	tag = "notifications",
     delete,
     operation_id = "deleteNotifications",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of notification IDs"
-        )
+        ("ids" = String, Query, description = "The JSON array of notification IDs")
     ),
     responses(
         (status = 204, description = "Expected response to a valid request"),

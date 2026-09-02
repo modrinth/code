@@ -1,6 +1,9 @@
 <template>
-	<div class="relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6">
-		<h1>Moderation</h1>
+	<div
+		class="relative mb-6 mt-4 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
+		:class="`m${marginTarget}-auto`"
+	>
+		<h1 class="mb-4 mt-0 text-3xl font-semibold">Moderation</h1>
 		<NavTabs :links="moderationLinks" class="mb-4 hidden sm:flex" />
 		<div class="mb-4 sm:hidden">
 			<Chips
@@ -15,7 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { FolderIcon, GlobeIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
+import { FolderIcon, GlobeIcon, HashIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
+import { getMarginTarget } from '@modrinth/moderation'
 import { Chips, defineMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 definePageMeta({
@@ -29,6 +33,9 @@ useSeoMeta({
 const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
+
+const modSettings = useModerationSettings()
+const marginTarget = computed(() => getMarginTarget(modSettings.value))
 
 const messages = defineMessages({
 	projectsTitle: {
@@ -47,6 +54,10 @@ const messages = defineMessages({
 		id: 'moderation.page.external-projects',
 		defaultMessage: 'External projects',
 	},
+	globalDetailTracesTitle: {
+		id: 'moderation.page.global-detail-traces',
+		defaultMessage: 'Global traces',
+	},
 })
 
 const moderationLinks = [
@@ -62,6 +73,11 @@ const moderationLinks = [
 		href: '/moderation/external-projects',
 		icon: GlobeIcon,
 	},
+	{
+		label: formatMessage(messages.globalDetailTracesTitle),
+		href: '/moderation/global-traces',
+		icon: HashIcon,
+	},
 ]
 
 const mobileNavOptions = [
@@ -69,15 +85,20 @@ const mobileNavOptions = [
 	formatMessage(messages.technicalReviewTitle),
 	formatMessage(messages.reportsTitle),
 	formatMessage(messages.externalFilesTitle),
+	formatMessage(messages.globalDetailTracesTitle),
 ]
 
 const selectedChip = computed({
 	get() {
 		const path = route.path
-		if (path === '/moderation/technical-review') {
+		if (path.startsWith('/moderation/technical-review')) {
 			return formatMessage(messages.technicalReviewTitle)
-		} else if (path.startsWith('/moderation/reports/')) {
+		} else if (path.startsWith('/moderation/reports')) {
 			return formatMessage(messages.reportsTitle)
+		} else if (path.startsWith('/moderation/external-projects')) {
+			return formatMessage(messages.externalFilesTitle)
+		} else if (path.startsWith('/moderation/global-traces')) {
+			return formatMessage(messages.globalDetailTracesTitle)
 		} else {
 			return formatMessage(messages.projectsTitle)
 		}
@@ -92,6 +113,10 @@ function navigateToPage(selectedOption: string) {
 		router.push('/moderation/technical-review')
 	} else if (selectedOption === formatMessage(messages.reportsTitle)) {
 		router.push('/moderation/reports')
+	} else if (selectedOption === formatMessage(messages.externalFilesTitle)) {
+		router.push('/moderation/external-projects')
+	} else if (selectedOption === formatMessage(messages.globalDetailTracesTitle)) {
+		router.push('/moderation/global-traces')
 	} else {
 		router.push('/moderation')
 	}

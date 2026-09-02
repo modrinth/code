@@ -1,7 +1,6 @@
 <template>
-	<KeybindsModal ref="keybindsModal" />
 	<ConfirmModal
-		v-if="lockStatus?.locked && !lockStatus?.isOwnLock"
+		v-if="isLockedByOther"
 		ref="takeOverModal"
 		title="Override moderation lock"
 		description="Are you sure you want to override?"
@@ -12,44 +11,142 @@
 	/>
 	<div
 		tabindex="0"
-		class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
-		:class="{ '!w-fit': collapsed, locked: lockStatus?.locked && !lockStatus?.isOwnLock }"
+		class="moderation-checklist flex max-h-[calc(100vh-2rem)] w-[600px] max-w-full flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
+		:class="{
+			'!w-fit': collapsed,
+			locked: isLockedByOther,
+			'right-4': settings.get(moderationSettings.General.ChecklistPosition) === 'right',
+			'left-4': settings.get(moderationSettings.General.ChecklistPosition) === 'left',
+		}"
 	>
-		<div class="flex grow-0 items-center gap-2">
-			<h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
-				<ScaleIcon class="text-orange" /> Moderation
-			</h1>
-			<ButtonStyled circular>
-				<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
-					<KeyboardIcon />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled circular>
-				<a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj.guidance_url">
+		<div class="flex grow-0 flex-col gap-1">
+			<div class="flex items-center gap-2">
+				<h1 class="m-0 mr-auto">
+					<TeleportOverflowMenu
+						v-if="canOpenStageSelectorFromTitle"
+						:label="checklistTitleText"
+						:options="stageOptions"
+						:icon-only="false"
+						type="quiet"
+						size="xl"
+						placement="bottom-center"
+						class="!h-auto !w-auto !gap-2 !bg-transparent !p-0 !text-2xl !font-extrabold !text-contrast [&>svg]:!text-orange"
+					>
+						<component
+							:is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)"
+							class="text-orange"
+						/>
+						{{ checklistTitleText }}
+						<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
+							<component
+								:is="opt.icon"
+								v-if="opt.icon"
+								class="mr-2"
+								:class="{ 'opacity-50': opt.visited }"
+							/>
+							<span :class="{ 'opacity-50': opt.visited }">
+								{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span>
+							</span>
+							<span v-if="opt.messages" class="ml-auto pl-2 font-semibold opacity-75">{{
+								opt.messages
+							}}</span>
+							<span v-if="opt.fixes" class="pl-2 font-semibold text-blue">{{ opt.fixes }}</span>
+						</template>
+					</TeleportOverflowMenu>
+					<button
+						v-else
+						disabled
+						class="inline-flex cursor-default items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
+					>
+						<component
+							:is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)"
+							class="text-orange"
+						/>
+						{{ checklistTitleText }}
+					</button>
+				</h1>
+				<IconButton
+					v-if="!isPseudoStage && stageNavigateTarget"
+					v-tooltip="`Navigate to ${stageNavigateLabel}`"
+					type="quiet"
+					:label="`Navigate to ${stageNavigateLabel}`"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					:disabled="route.path === stageNavigateTarget"
+					@click="navigateToStagePage"
+				>
+					<MapPinIcon />
+				</IconButton>
+				<ButtonLink
+					v-if="!isPseudoStage && currentStageObj._guidanceUrl"
+					v-tooltip="`Stage guidance`"
+					type="quiet"
+					target="_blank"
+					:href="currentStageObj._guidanceUrl"
+					class="!w-9 !rounded-full !bg-button-bg !px-0 !text-primary ![box-shadow:var(--shadow-button)]"
+				>
 					<FileTextIcon />
-				</a>
-			</ButtonStyled>
-			<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-				<button v-tooltip="`Reset progress`" @click="resetProgress">
-					<BrushCleaningIcon />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-				<button v-tooltip="`Exit moderation`" @click="handleExit">
+				</ButtonLink>
+				<IconButton
+					v-tooltip="
+						!isPseudoStage && currentStageHasState
+							? 'Reset Stage'
+							: !isPseudoStage && !checklistHasState
+								? 'Return to Start'
+								: 'Reset Checklist'
+					"
+					type="quiet"
+					interaction="filled"
+					:color="!isPseudoStage && currentStageHasState ? 'orange' : 'red'"
+					:label="
+						!isPseudoStage && currentStageHasState
+							? 'Reset Stage'
+							: !isPseudoStage && !checklistHasState
+								? 'Return to Start'
+								: 'Reset Checklist'
+					"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					:disabled="!isPseudoStage && !checklistHasState && isOnFirstStage"
+					@click="resetProgress"
+				>
+					<UndoIcon v-if="!isPseudoStage && !checklistHasState" />
+					<BrushCleaningIcon v-else />
+				</IconButton>
+				<IconButton
+					v-tooltip="`Exit moderation`"
+					type="quiet"
+					interaction="filled"
+					color="red"
+					label="Exit moderation"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					@click="handleExit"
+				>
 					<XIcon />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled circular>
-				<button v-tooltip="collapsed ? `Expand` : `Collapse`" @click="emit('toggleCollapsed')">
+				</IconButton>
+				<IconButton
+					v-tooltip="collapsed ? `Expand` : `Collapse`"
+					type="quiet"
+					:label="collapsed ? `Expand` : `Collapse`"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					@click="emit('toggleCollapsed')"
+				>
 					<DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
-				</button>
-			</ButtonStyled>
+				</IconButton>
+			</div>
 		</div>
+		<p
+			v-if="currentStageObj._hint && !collapsed && !isPseudoStage"
+			class="m-0 text-sm text-secondary"
+		>
+			{{ currentStageObj._hint }}
+		</p>
+		<Collapsible
+			base-class="grow min-h-0"
+			class="flex min-h-0 grow flex-col"
+			:collapsed="collapsed"
+		>
+			<div class="mb-3 mt-2 h-[1px] w-full bg-divider" />
 
-		<Collapsible base-class="grow" class="flex grow flex-col" :collapsed="collapsed">
-			<div class="my-4 h-[1px] w-full bg-divider" />
-
-			<div v-if="lockStatus?.locked && !lockStatus?.isOwnLock" class="flex flex-1 flex-col">
+			<div v-if="isLockedByOther" class="flex flex-1 flex-col">
 				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
 					<LockIcon class="size-8 text-orange" />
 					<span class="text-secondary">
@@ -70,24 +167,21 @@
 						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
-							<ButtonStyled @click="openTakeOverModal">
-								<button>
-									<LockIcon aria-hidden="true" />
-									Take over
-								</button>
-							</ButtonStyled>
+							<Button @click="openTakeOverModal">
+								<LockIcon aria-hidden="true" />
+								Take over
+							</Button>
 						</div>
 						<div class="flex items-center gap-2">
-							<ButtonStyled
+							<Button
 								v-if="moderationQueue.isQueueMode && moderationQueue.queueLength > 1"
+								type="colored"
 								color="brand"
 								@click="skipToNextProject"
 							>
-								<button>
-									<RightArrowIcon aria-hidden="true" />
-									Next project ({{ moderationQueue.queueLength }} left)
-								</button>
-							</ButtonStyled>
+								<RightArrowIcon aria-hidden="true" />
+								Next project ({{ moderationQueue.queueLength }} left)
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -103,31 +197,28 @@
 						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
-							<ButtonStyled @click="reviewAnyway">
-								<button>
-									<ScaleIcon aria-hidden="true" />
-									Review anyway
-								</button>
-							</ButtonStyled>
+							<Button @click="reviewAnyway">
+								<ScaleIcon aria-hidden="true" />
+								Review anyway
+							</Button>
 						</div>
 						<div class="flex items-center gap-2">
-							<ButtonStyled
+							<Button
 								v-if="moderationQueue.isQueueMode && moderationQueue.queueLength > 1"
+								type="colored"
 								color="brand"
 								@click="skipToNextProject"
 							>
-								<button>
-									<RightArrowIcon aria-hidden="true" />
-									Next project ({{ moderationQueue.queueLength }} left)
-								</button>
-							</ButtonStyled>
+								<RightArrowIcon aria-hidden="true" />
+								Next project ({{ moderationQueue.queueLength }} left)
+							</Button>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<template v-else>
-				<div class="flex-1">
+				<div class="flex min-h-0 flex-1 flex-col">
 					<div v-if="done">
 						<p>
 							You are done moderating this project!
@@ -137,192 +228,46 @@
 							</template>
 						</p>
 					</div>
-					<div v-else-if="generatedMessage">
-						<div>
-							<ButtonStyled>
-								<button class="mb-2" @click="useSimpleEditor = !useSimpleEditor">
-									<template v-if="!useSimpleEditor">
-										<ToggleLeftIcon aria-hidden="true" />
-										Use simple mode
-									</template>
-									<template v-else>
-										<ToggleRightIcon aria-hidden="true" />
-										Use advanced mode
-									</template>
-								</button>
-							</ButtonStyled>
+					<div v-else-if="generatedMessage" class="flex min-h-0 flex-1 flex-col gap-2">
+						<Button class="shrink-0 self-start" @click="useSimpleEditor = !useSimpleEditor">
+							<template v-if="!useSimpleEditor">
+								<ToggleLeftIcon aria-hidden="true" />
+								Use simple mode
+							</template>
+							<template v-else>
+								<ToggleRightIcon aria-hidden="true" />
+								Use advanced mode
+							</template>
+						</Button>
+						<div class="min-h-0 flex-1 overflow-y-auto">
 							<MarkdownEditor
 								v-if="!useSimpleEditor"
-								v-model="message"
+								v-model="messageText"
 								:max-height="400"
 								placeholder="No message generated."
 								:disabled="false"
 								:heading-buttons="false"
 								:on-image-upload="onUploadHandler"
-								@input="persistGeneratedMessageState"
 							/>
-							<StyledInput
+							<Textarea
 								v-else
-								v-model="message"
-								multiline
+								v-model="messageText"
 								placeholder="No message generated."
 								autocomplete="off"
 								input-class="h-[400px] font-mono"
-								@input="persistGeneratedMessageState"
 							/>
 						</div>
 					</div>
-					<div v-else-if="isModpackPermissionsStage">
-						<ModpackPermissionsFlow
-							v-model="modpackJudgements"
-							:project-id="projectV2.id"
-							:project-updated="projectV2.updated"
-							@complete="handleModpackPermissionsComplete"
+					<div v-else class="flex min-h-0 flex-1 flex-col">
+						<NodeRenderer
+							class="min-h-0 flex-1 overflow-y-auto p-1"
+							:nodes="stageNodes"
+							:state="stageState"
+							:write="stageWriter"
+							:on-image-upload="onUploadHandler"
+							:app-components="appComponentsByKey"
+							:global-state="nodeStates"
 						/>
-					</div>
-					<div v-else>
-						<h2 class="m-0 mb-2 text-lg font-extrabold">
-							{{ currentStageObj.title }}
-						</h2>
-
-						<div v-if="currentStageObj.text" class="mb-4">
-							<div v-if="stageTextExpanded" class="markdown-body" v-html="stageTextExpanded"></div>
-							<div v-else class="markdown-body">Loading stage content...</div>
-						</div>
-
-						<!-- Action components grouped by type -->
-						<div class="space-y-4">
-							<!-- Button actions group -->
-							<div v-if="buttonActions.length > 0" class="button-actions-group">
-								<div class="flex flex-wrap gap-2">
-									<template v-for="action in buttonActions" :key="getActionKey(action)">
-										<ButtonStyled
-											:color="isActionSelected(action) ? 'brand' : 'standard'"
-											@click="toggleAction(action)"
-										>
-											<button>
-												{{ action.label }}
-											</button>
-										</ButtonStyled>
-									</template>
-								</div>
-							</div>
-
-							<!-- Toggle actions group -->
-							<div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
-								<template v-for="action in toggleActions" :key="getActionKey(action)">
-									<Checkbox
-										:model-value="isActionSelected(action)"
-										:label="action.label"
-										:description="action.description"
-										:disabled="false"
-										@update:model-value="toggleAction(action)"
-									/>
-								</template>
-							</div>
-
-							<!-- Dropdown actions group -->
-							<div v-if="dropdownActions.length > 0" class="dropdown-actions-group space-y-3">
-								<template v-for="action in dropdownActions" :key="getActionKey(action)">
-									<div class="inputs universal-labels">
-										<div>
-											<label :for="`dropdown-${getActionId(action)}`">
-												<span class="label__title">{{ action.label }}</span>
-											</label>
-											<DropdownSelect
-												:max-visible-options="3"
-												render-up
-												:name="`dropdown-${getActionId(action)}`"
-												:options="getVisibleDropdownOptions(action)"
-												:model-value="getDropdownValue(action)"
-												:placeholder="'Select an option'"
-												:disabled="false"
-												:display-name="(opt: any) => opt?.label || 'Unknown option'"
-												@update:model-value="
-													(selected: any) => selectDropdownOption(action, selected)
-												"
-											/>
-										</div>
-									</div>
-								</template>
-							</div>
-
-							<!-- Multi-select chips actions group -->
-							<div
-								v-if="multiSelectActions.length > 0"
-								class="multi-select-actions-group space-y-3"
-							>
-								<template v-for="action in multiSelectActions" :key="getActionKey(action)">
-									<div>
-										<div class="mb-2 font-semibold">{{ action.label }}</div>
-										<div class="flex flex-wrap gap-2">
-											<ButtonStyled
-												v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
-												:key="`${getActionId(action)}-chip-${optIndex}`"
-												:color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
-												@click="toggleChip(action, optIndex)"
-											>
-												<button>
-													{{ option.label }}
-												</button>
-											</ButtonStyled>
-										</div>
-									</div>
-								</template>
-							</div>
-						</div>
-
-						<div v-if="isAnyVisibleInputs" class="my-4 h-[1px] w-full bg-divider" />
-
-						<!-- Additional text inputs -->
-						<div class="space-y-4">
-							<template v-for="action in visibleActions" :key="`inputs-${getActionKey(action)}`">
-								<div
-									v-if="action.relevantExtraInput && isActionSelected(action)"
-									class="inputs universal-labels"
-								>
-									<div
-										v-for="(input, inputIndex) in getVisibleInputs(action, actionStates)"
-										:key="`input-${getActionId(action)}-${inputIndex}`"
-										class="mt-2"
-									>
-										<template v-if="input.large">
-											<label :for="`input-${getActionId(action)}-${inputIndex}`">
-												<span class="label__title">
-													{{ input.label }}
-													<span v-if="input.required" class="required">*</span>
-												</span>
-											</label>
-											<MarkdownEditor
-												:id="`input-${getActionId(action)}-${inputIndex}`"
-												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-												:placeholder="input.placeholder"
-												:max-height="300"
-												:disabled="false"
-												:heading-buttons="false"
-												:on-image-upload="onUploadHandler"
-												@input="persistState"
-											/>
-										</template>
-										<template v-else>
-											<label :for="`input-${getActionId(action)}-${inputIndex}`">
-												<span class="label__title">
-													{{ input.label }}
-													<span v-if="input.required" class="required">*</span>
-												</span>
-											</label>
-											<StyledInput
-												:id="`input-${getActionId(action)}-${inputIndex}`"
-												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-												:placeholder="input.placeholder"
-												autocomplete="off"
-												@update:model-value="persistState"
-											/>
-										</template>
-									</div>
-								</div>
-							</template>
-						</div>
 					</div>
 				</div>
 
@@ -332,106 +277,120 @@
 						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
-							<ButtonStyled v-if="!done && !generatedMessage && moderationQueue.hasItems">
-								<button @click="skipCurrentProject">
-									<XIcon aria-hidden="true" />
-									Skip ({{ moderationQueue.queueLength }} left)
-								</button>
-							</ButtonStyled>
+							<Button
+								v-if="!done && !generatedMessage && moderationQueue.hasItems"
+								@click="skipCurrentProject"
+							>
+								<XIcon aria-hidden="true" />
+								Skip ({{ moderationQueue.queueLength }} left)
+							</Button>
 						</div>
 
 						<div class="flex items-center gap-2">
+							<TeleportOverflowMenu
+								v-if="!done"
+								label="More options"
+								:options="stageOptions"
+								placement="bottom-end"
+							>
+								<ListBulletedIcon />
+								<span class="sr-only">Stages</span>
+								<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
+									<component
+										:is="opt.icon"
+										v-if="opt.icon"
+										class="mr-2"
+										:class="{ 'opacity-50': opt.visited }"
+									/>
+									<span :class="{ 'opacity-50': opt.visited }">
+										{{ opt.text
+										}}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span>
+									</span>
+									<span v-if="opt.messages" class="ml-auto pl-2 font-semibold opacity-75">{{
+										opt.messages
+									}}</span>
+									<span v-if="opt.fixes" class="pl-2 font-semibold text-blue">{{ opt.fixes }}</span>
+								</template>
+							</TeleportOverflowMenu>
+
 							<div v-if="done">
-								<ButtonStyled color="brand">
-									<button @click="endChecklist(undefined)">
-										<template v-if="hasNextProject">
-											<RightArrowIcon aria-hidden="true" />
-											Next project ({{ moderationQueue.queueLength }} left)
-										</template>
-										<template v-else>
-											<CheckIcon aria-hidden="true" />
-											All done!
-										</template>
-									</button>
-								</ButtonStyled>
+								<Button type="colored" color="brand" @click="endChecklist(undefined)">
+									<template v-if="hasNextProject">
+										<RightArrowIcon aria-hidden="true" />
+										Next project ({{ moderationQueue.queueLength }} left)
+									</template>
+									<template v-else>
+										<CheckIcon aria-hidden="true" />
+										All done!
+									</template>
+								</Button>
 							</div>
 
 							<div v-else-if="generatedMessage" class="flex items-center gap-2">
-								<ButtonStyled>
-									<button :disabled="loadingModerationDecision" @click="goBackToStages">
-										<LeftArrowIcon aria-hidden="true" />
-										Edit
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="red">
-									<button :disabled="loadingModerationDecision" @click="sendMessage('rejected')">
-										<SpinnerIcon
-											v-if="moderationDecision === 'rejected'"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<XIcon v-else aria-hidden="true" />
-										Reject
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="orange">
-									<button :disabled="loadingModerationDecision" @click="sendMessage('withheld')">
-										<SpinnerIcon
-											v-if="moderationDecision === 'withheld'"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<LinkIcon v-else aria-hidden="true" />
-										Withhold
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="green">
-									<button
-										:disabled="loadingModerationDecision"
-										@click="sendMessage(approveSendStatus)"
-									>
-										<SpinnerIcon
-											v-if="moderationDecision === approveSendStatus"
-											class="animate-spin"
-											aria-hidden="true"
-										/>
-										<CheckIcon v-else aria-hidden="true" />
-										Approve
-									</button>
-								</ButtonStyled>
+								<Button :disabled="loadingModerationDecision" @click="previousStage">
+									<LeftArrowIcon aria-hidden="true" />
+									Edit
+								</Button>
+								<Button
+									type="colored"
+									color="red"
+									:disabled="loadingModerationDecision"
+									@click="sendMessage('rejected')"
+								>
+									<SpinnerIcon
+										v-if="moderationDecision === 'rejected'"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<XIcon v-else aria-hidden="true" />
+									Reject
+								</Button>
+								<Button
+									type="colored"
+									color="orange"
+									:disabled="loadingModerationDecision"
+									@click="sendMessage('withheld')"
+								>
+									<SpinnerIcon
+										v-if="moderationDecision === 'withheld'"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<LinkIcon v-else aria-hidden="true" />
+									Withhold
+								</Button>
+								<Button
+									type="colored"
+									color="green"
+									:disabled="loadingModerationDecision"
+									@click="sendMessage(approveSendStatus)"
+								>
+									<SpinnerIcon
+										v-if="moderationDecision === approveSendStatus"
+										class="animate-spin"
+										aria-hidden="true"
+									/>
+									<CheckIcon v-else aria-hidden="true" />
+									Approve
+								</Button>
 							</div>
 
 							<div v-else class="flex items-center gap-2">
-								<OverflowMenu
-									v-if="!generatedMessage"
-									:options="stageOptions"
-									class="bg-transparent p-0"
+								<Button :disabled="!hasValidPreviousStage" @click="previousStage">
+									<LeftArrowIcon aria-hidden="true" /> Previous
+								</Button>
+								<Button
+									type="colored"
+									color="brand"
+									:disabled="isLastVisibleStage && loadingMessage"
+									@click="nextStage"
 								>
-									<ButtonStyled circular>
-										<button v-tooltip="`Stages`">
-											<ListBulletedIcon />
-										</button>
-									</ButtonStyled>
-
-									<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
-										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-										{{ opt.text }}
-									</template>
-								</OverflowMenu>
-								<ButtonStyled>
-									<button :disabled="!hasValidPreviousStage" @click="previousStage">
-										<LeftArrowIcon aria-hidden="true" /> Previous
-									</button>
-								</ButtonStyled>
-								<ButtonStyled v-if="!isLastVisibleStage" color="brand">
-									<button @click="nextStage"><RightArrowIcon aria-hidden="true" /> Next</button>
-								</ButtonStyled>
-								<ButtonStyled v-else color="brand" :disabled="loadingMessage">
-									<button @click="generateMessage">
+									<template v-if="isLastVisibleStage">
 										<CheckIcon aria-hidden="true" />
 										{{ loadingMessage ? 'Generating...' : 'Generate Message' }}
-									</button>
-								</ButtonStyled>
+									</template>
+									<template v-else> <RightArrowIcon aria-hidden="true" /> Next </template>
+								</Button>
 							</div>
 						</div>
 					</div>
@@ -447,101 +406,113 @@ import {
 	CheckIcon,
 	DropdownIcon,
 	FileTextIcon,
-	KeyboardIcon,
 	LeftArrowIcon,
 	LinkIcon,
 	ListBulletedIcon,
 	LockIcon,
+	MapPinIcon,
 	RightArrowIcon,
 	ScaleIcon,
 	SpinnerIcon,
 	ToggleLeftIcon,
 	ToggleRightIcon,
+	UndoIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type { Priority } from '@modrinth/moderation'
 import {
-	type Action,
-	type ActionState,
-	type ButtonAction,
-	checklist,
-	type ConditionalButtonAction,
-	type DropdownAction,
 	expandVariables,
-	finalPermissionMessages,
-	findMatchingVariant,
-	flattenProjectV3Variables,
-	flattenProjectVariables,
-	flattenStaticVariables,
-	getActionIdForStage,
-	getActionMessage,
-	getVisibleInputs,
-	handleKeybind,
-	initializeActionState,
 	kebabToTitleCase,
-	keybinds,
-	type MultiSelectChipsAction,
-	processMessage,
-	type Stage,
-	type ToggleAction,
+	moderationSettings,
+	useStages,
 } from '@modrinth/moderation'
+import type { ActiveAction, NodeState, StageNode } from '@modrinth/moderation/src/types/node'
+import {
+	CHECKLIST_META_KEY,
+	collectActiveActions,
+	collectMessageNodes,
+	computeAttentionMap,
+	computeNodeMeta,
+	createTrackedPatch,
+	evalActiveAction,
+	evalSegment,
+	resolve,
+	resolveChildren,
+	setMessageProject,
+	setMissingMdHandler,
+} from '@modrinth/moderation/src/types/node'
+import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
+import type { FixBuilder } from '@modrinth/moderation/src/types/node/fix'
+import type { Writer } from '@modrinth/moderation/src/types/node/mutate'
 import {
 	Avatar,
-	ButtonStyled,
-	Checkbox,
+	Button,
+	ButtonLink,
 	Collapsible,
 	ConfirmModal,
-	DropdownSelect,
+	IconButton,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	MarkdownEditor,
-	OverflowMenu,
-	type OverflowMenuOption,
-	StyledInput,
+	TeleportOverflowMenu,
+	Textarea,
 	useDebugLogger,
 } from '@modrinth/ui'
-import {
-	type ModerationJudgements,
-	type ModerationModpackItem,
-	type ProjectStatus,
-	renderHighlightedString,
-} from '@modrinth/utils'
+import type { ProjectStatus } from '@modrinth/utils'
+import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computedAsync, useDebounceFn } from '@vueuse/core'
+import { useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
+import { computed, nextTick, provide, ref, toRaw, watch, watchEffect } from 'vue'
 
+import LoaderPicker from '~/components/ui/create-project-version/components/LoaderPicker.vue'
+import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import {
-	clearChecklistProgressState,
-	clearGeneratedMessageState as clearPersistedGeneratedMessageState,
-	createEmptyGeneratedMessageState,
-	loadChecklistActionStates,
-	loadChecklistStage,
-	loadChecklistTextInputs,
-	loadGeneratedMessageState,
-	saveChecklistActionStates,
-	saveChecklistStage,
-	saveChecklistTextInputs,
-	saveGeneratedMessageState,
-} from '~/services/moderation-checklist-storage.ts'
-import { type LockAcquireResponse, useModerationQueue } from '~/services/moderation-queue.ts'
+	clearSessionChecklistState,
+	getSessionChecklistState,
+	patchSessionChecklistState,
+} from '~/services/moderation/checklist-session-storage.ts'
+import {
+	clearChecklistState,
+	loadChecklistState,
+	saveChecklistState,
+} from '~/services/moderation/checklist-storage.ts'
+import type { LockAcquireResponse } from '~/services/moderation/queue.ts'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
+import {
+	batchCheckQueueCandidates,
+	findNextEligibleQueueProject,
+	isEligibleQueueCandidate,
+	type QueueCandidateCheck,
+} from '~/services/moderation/queue-eligibility.ts'
 
-import KeybindsModal from './ChecklistKeybindsModal.vue'
-import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
+import { type LiveNode, STATE_KEY } from './checklist-context'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
+const keybinds = useModerationKeybinds()
+const settings = useModerationSettings()
 
-const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
 
 const props = defineProps<{
 	collapsed: boolean
 }>()
 
-const { projectV2, projectV3, invalidate } = injectProjectPageContext()
+const { projectV2, projectV3, versions, loadVersions, invalidate, thread } =
+	injectProjectPageContext()
+setMessageProject(projectV3, projectV2)
+const missingMdPaths = new Set<string>()
+setMissingMdHandler((path) => missingMdPaths.add(path))
+
+const nodeStates = ref<Record<string, Record<string, NodeState>>>({})
+const resolvedStages = ref(useStages(nodeStates))
+const client = injectModrinthClient()
 
 const moderationQueue = useModerationQueue()
 const queryClient = useQueryClient()
@@ -564,11 +535,10 @@ const alreadyReviewed = ref(false)
 
 // Prefetch queue for parallel lock checking and instant navigation
 interface PrefetchedProject {
-	projectId: string
+	project: string
 	slug: string // For canonical URL navigation
 	projectType: string // For canonical URL navigation
 	validatedAt: number
-	skippedIds: string[] // IDs that were locked when this was prefetched
 }
 
 const prefetchQueue = ref<PrefetchedProject[]>([])
@@ -672,7 +642,6 @@ function handleLockLost(result: LockAcquireResponse) {
 function handleLockAcquired() {
 	lockStatus.value = { locked: false, isOwnLock: true }
 	lockError.value = false
-	initializeAllStages()
 	clearLockCountdown()
 	startLockHeartbeat()
 	maintainPrefetchQueue() // Start prefetching immediately (not debounced)
@@ -681,7 +650,6 @@ function handleLockAcquired() {
 function handleLockUnavailable() {
 	lockError.value = true
 	lockStatus.value = { locked: false, isOwnLock: false }
-	initializeAllStages()
 	clearLockCountdown()
 	addNotification({
 		title: 'Lock unavailable',
@@ -691,7 +659,6 @@ function handleLockUnavailable() {
 }
 
 async function navigateToNextUnlockedProject(): Promise<boolean> {
-	// Remove stale entries first
 	const now = Date.now()
 	prefetchQueue.value = prefetchQueue.value.filter((p) => now - p.validatedAt < PREFETCH_STALE_MS)
 
@@ -701,46 +668,24 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 
 	// Quick re-check if close to expiry (last 5 seconds of TTL)
 	if (now - next.validatedAt > PREFETCH_STALE_MS - 5000) {
-		const recheckResults = await batchCheckQueueCandidates([next.projectId])
-		const recheck = recheckResults.get(next.projectId)
+		const recheckResults = await batchCheckQueueCandidates(client, moderationQueue, [next.project])
+		const recheck = recheckResults.get(next.project)
 		if (!isEligibleQueueCandidate(recheck)) {
 			prefetchQueue.value.shift()
 			return navigateToNextUnlockedProject()
 		}
 	}
 
-	// Remove from queue after validation
 	prefetchQueue.value.shift()
-
-	// Mark skipped projects as completed
-	await Promise.all(
-		next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-	)
-
-	notifySkippedQueueProjects(next.skippedIds.length)
 
 	maintainPrefetchQueue()
 
 	navigateToQueueProject(
 		{ slug: next.slug, projectType: next.projectType, locked: false, isProcessing: true },
-		next.projectId,
+		next.project,
 	)
 	return true
 }
-
-const variables = computed(() => {
-	return {
-		...flattenStaticVariables(),
-		...flattenProjectVariables(projectV2.value),
-		...flattenProjectV3Variables(projectV3.value),
-	}
-})
-
-const modpackPermissionsComplete = ref(false)
-const modpackJudgements = ref<ModerationJudgements>({})
-const isModpackPermissionsStage = computed(() => {
-	return currentStageObj.value.id === 'modpack-permissions'
-})
 
 async function onUploadHandler(file: File) {
 	const response = await useImageUpload(file, {
@@ -751,14 +696,33 @@ async function onUploadHandler(file: File) {
 }
 
 const useSimpleEditor = ref(false)
-const checklistPersistenceProjectSlug = projectV2.value.slug
-const persistedGeneratedMessage = import.meta.client
-	? await loadGeneratedMessageState(checklistPersistenceProjectSlug)
-	: createEmptyGeneratedMessageState()
-const message = ref(
-	typeof persistedGeneratedMessage.message === 'string' ? persistedGeneratedMessage.message : '',
+const checklistPersistenceProjectId = projectV2.value.id
+const persistedState = import.meta.client
+	? await loadChecklistState(checklistPersistenceProjectId)
+	: null
+nodeStates.value = persistedState?.state ?? {}
+const activatedStages = ref<Set<string>>(new Set(persistedState?.activatedStages ?? []))
+const visitedStages = ref<Set<string>>(
+	new Set(
+		import.meta.client
+			? (getSessionChecklistState(checklistPersistenceProjectId).visitedStages ?? [])
+			: [],
+	),
 )
-const generatedMessage = ref(persistedGeneratedMessage.generated === true)
+
+function markStageVisited(stageId: string | undefined) {
+	if (!stageId || visitedStages.value.has(stageId)) return
+	visitedStages.value.add(stageId)
+	patchSessionChecklistState(checklistPersistenceProjectId, {
+		visitedStages: [...visitedStages.value],
+	})
+}
+
+const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
+const message = ref<string | null>(persistedState?.message ?? null)
+const generatedActiveActions = ref<ActiveAction[] | null>(null)
+const resolvedMessageAvailability = ref<Map<object, boolean>>(new Map())
+const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
 const moderationDecision = ref<ProjectStatus | null>(null)
 const loadingModerationDecision = computed(() => moderationDecision.value !== null)
@@ -767,24 +731,16 @@ const approveSendStatus = computed<ProjectStatus>(() => {
 	return requested ?? 'approved'
 })
 const done = ref(false)
-
-function persistGeneratedMessageState() {
-	void saveGeneratedMessageState(checklistPersistenceProjectSlug, {
-		generated: generatedMessage.value,
-		message: message.value,
-	})
-}
+const messageText = computed({
+	get: () => message.value ?? '',
+	set: (v: string) => {
+		message.value = v
+	},
+})
 
 function clearGeneratedMessageState() {
-	generatedMessage.value = false
-	message.value = ''
-	void clearPersistedGeneratedMessageState(checklistPersistenceProjectSlug)
-}
-
-watch([generatedMessage, message], persistGeneratedMessageState, { flush: 'sync' })
-
-function handleModpackPermissionsComplete() {
-	modpackPermissionsComplete.value = true
+	message.value = null
+	generatedActiveActions.value = null
 }
 
 const emit = defineEmits<{
@@ -801,6 +757,8 @@ async function handleExit() {
 			console.warn('Failed to release moderation lock for project:', projectId)
 		}
 	}
+	await persistStateImmediately(false, true)
+	persistenceEnabled = false
 	emit('exit')
 }
 
@@ -845,25 +803,9 @@ async function confirmTakeOverOverride() {
 
 function reviewAnyway() {
 	alreadyReviewed.value = false
-	initializeAllStages()
-	// Start prefetching the next project in the background
+	reviewedAnyway.value = true
+	persistState()
 	maintainPrefetchQueue()
-}
-
-// Batch check locks, processing status, and fetch project metadata in parallel
-interface QueueCandidateCheck {
-	locked: boolean
-	expired?: boolean
-	isOwnLock?: boolean
-	slug?: string
-	projectType?: string
-	status?: string
-	isProcessing: boolean
-}
-
-function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
-	if (!result?.isProcessing) return false
-	return !result.locked || !!result.expired || !!result.isOwnLock
 }
 
 function notifySkippedQueueProjects(count: number) {
@@ -892,66 +834,6 @@ function navigateToQueueProject(result: QueueCandidateCheck, projectId: string) 
 	}
 }
 
-async function batchCheckQueueCandidates(
-	projectIds: string[],
-): Promise<Map<string, QueueCandidateCheck>> {
-	const results = new Map<string, QueueCandidateCheck>()
-
-	const checks = await Promise.allSettled(
-		projectIds.map(async (id) => {
-			const [lockResponse, projectData] = await Promise.all([
-				moderationQueue.checkLock(id),
-				useBaseFetch(`project/${id}`, { method: 'GET' }).catch(() => null),
-			])
-
-			const status = (projectData as { status?: string } | null)?.status
-
-			return {
-				id,
-				locked: lockResponse.locked,
-				expired: lockResponse.expired,
-				isOwnLock: lockResponse.is_own_lock,
-				slug: (projectData as { slug?: string } | null)?.slug,
-				projectType: (projectData as { project_type?: string } | null)?.project_type,
-				status,
-				isProcessing: projectData === null ? true : status === 'processing',
-			}
-		}),
-	)
-
-	checks.forEach((result, index) => {
-		if (result.status === 'fulfilled') {
-			results.set(result.value.id, result.value)
-		} else {
-			results.set(projectIds[index], { locked: false, isProcessing: true })
-		}
-	})
-
-	return results
-}
-
-async function findNextEligibleQueueProject(candidateIds: string[]) {
-	const skippedIds: string[] = []
-	let checkedCount = 0
-
-	while (checkedCount < candidateIds.length) {
-		const batch = candidateIds.slice(checkedCount, checkedCount + PREFETCH_BATCH_SIZE)
-		checkedCount += batch.length
-
-		const results = await batchCheckQueueCandidates(batch)
-
-		for (const id of batch) {
-			const result = results.get(id)
-			if (isEligibleQueueCandidate(result)) {
-				return { projectId: id, result: result!, skippedIds: [...skippedIds] }
-			}
-			skippedIds.push(id)
-		}
-	}
-
-	return null
-}
-
 // Maintain a queue of prefetched unlocked projects for instant navigation
 async function maintainPrefetchQueue() {
 	if (isPrefetching.value) return
@@ -962,22 +844,18 @@ async function maintainPrefetchQueue() {
 	isPrefetching.value = true
 
 	try {
-		// 1. Remove stale entries (validated > 30s ago)
 		const now = Date.now()
 		prefetchQueue.value = prefetchQueue.value.filter((p) => now - p.validatedAt < PREFETCH_STALE_MS)
 
-		// 2. Remove entries for current project
 		if (currentProjectId) {
-			prefetchQueue.value = prefetchQueue.value.filter((p) => p.projectId !== currentProjectId)
+			prefetchQueue.value = prefetchQueue.value.filter((p) => p.project !== currentProjectId)
 		}
 
-		// 3. If queue is full enough, exit early
 		if (prefetchQueue.value.length >= PREFETCH_TARGET_COUNT) {
 			return
 		}
 
-		// 4. Get remaining queue items (excluding current and already prefetched)
-		const prefetchedIds = new Set(prefetchQueue.value.map((p) => p.projectId))
+		const prefetchedIds = new Set(prefetchQueue.value.map((p) => p.project))
 		const queueItems = [...moderationQueue.currentQueue.items]
 		const currentIndex = currentProjectId ? queueItems.indexOf(currentProjectId) : -1
 		const remainingItems =
@@ -987,7 +865,6 @@ async function maintainPrefetchQueue() {
 
 		if (candidateIds.length === 0) return
 
-		const skippedIds: string[] = []
 		let checkedCount = 0
 
 		while (
@@ -997,22 +874,21 @@ async function maintainPrefetchQueue() {
 			const batch = candidateIds.slice(checkedCount, checkedCount + PREFETCH_BATCH_SIZE)
 			checkedCount += batch.length
 
-			const results = await batchCheckQueueCandidates(batch)
+			const results = await batchCheckQueueCandidates(client, moderationQueue, batch)
 
 			for (const id of batch) {
 				const result = results.get(id)
 				if (isEligibleQueueCandidate(result)) {
 					prefetchQueue.value.push({
-						projectId: id,
+						project: id,
 						slug: result?.slug ?? '',
 						projectType: result?.projectType ?? '',
 						validatedAt: Date.now(),
-						skippedIds: [...skippedIds],
 					})
 
 					if (prefetchQueue.value.length >= PREFETCH_TARGET_COUNT) break
 				} else {
-					skippedIds.push(id)
+					void moderationQueue.excludeProject(id)
 				}
 			}
 		}
@@ -1021,11 +897,25 @@ async function maintainPrefetchQueue() {
 	}
 }
 
-// Debounced prefetch to prevent spam from rapid stage changes
 const debouncedPrefetch = useDebounceFn(maintainPrefetchQueue, 300)
 
+async function goToNextEligibleProject(candidateIds: string[]): Promise<boolean> {
+	if (candidateIds.length === 0) return false
+
+	const next = await findNextEligibleQueueProject(client, moderationQueue, candidateIds)
+
+	if (!next) {
+		await Promise.all(candidateIds.map((id) => moderationQueue.excludeProject(id)))
+		return false
+	}
+
+	await Promise.all(next.excluded.map((id) => moderationQueue.excludeProject(id)))
+	notifySkippedQueueProjects(next.excluded.length)
+	navigateToQueueProject(next.result, next.project)
+	return true
+}
+
 async function skipToNextProject() {
-	// Skip the current project
 	const currentProjectId = projectV2.value?.id
 	if (!currentProjectId) {
 		console.warn('[skipToNextProject] No current project ID, aborting')
@@ -1034,12 +924,11 @@ async function skipToNextProject() {
 	debug('[skipToNextProject] Starting. Current project:', currentProjectId)
 	debug('[skipToNextProject] Queue before complete:', [...moderationQueue.currentQueue.items])
 
-	await moderationQueue.completeCurrentProject(currentProjectId, 'skipped')
+	await moderationQueue.deferProject(currentProjectId)
 
 	debug('[skipToNextProject] Queue after complete:', [...moderationQueue.currentQueue.items])
 	debug('[skipToNextProject] hasItems:', moderationQueue.hasItems)
 
-	// Use prefetched data if available
 	if (await navigateToNextUnlockedProject()) {
 		debug('[skipToNextProject] Used prefetch, returning')
 		return
@@ -1050,25 +939,12 @@ async function skipToNextProject() {
 	const remainingIds = moderationQueue.currentQueue.items.filter((id) => id !== currentProjectId)
 
 	if (remainingIds.length > 0) {
-		const next = await findNextEligibleQueueProject(remainingIds)
-
-		if (next) {
-			await Promise.all(
-				next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-			)
-			notifySkippedQueueProjects(next.skippedIds.length)
-			navigateToQueueProject(next.result, next.projectId)
-			return
-		}
-
-		await Promise.all(
-			remainingIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-		)
+		if (await goToNextEligibleProject(remainingIds)) return
 
 		debug('[skipToNextProject] No eligible projects in queue')
 		addNotification({
 			title: 'No projects available',
-			text: 'All remaining projects are already moderated or locked by others.',
+			text: 'All remaining projects are already moderated, deleted, or locked by others.',
 			type: 'warning',
 		})
 	}
@@ -1077,31 +953,37 @@ async function skipToNextProject() {
 	emit('exit')
 }
 
+const currentStageHasState = computed(() => {
+	const stageId = currentStageObj.value.id
+	if (!stageId) return false
+	const stageState = nodeStates.value[stageId]
+	return !!stageState && Object.keys(stageState).length > 0
+})
+
+const checklistHasState = computed(() =>
+	Object.values(nodeStates.value).some((s) => s && Object.keys(s).length > 0),
+)
+
 function resetProgress() {
+	if (!isPseudoStage.value && currentStageHasState.value) {
+		Reflect.deleteProperty(nodeStates.value, currentStageObj.value.id!)
+		activatedStages.value.delete(currentStageObj.value.id!)
+		clearGeneratedMessageState()
+		return
+	}
+
 	currentStage.value = findFirstValidStage()
-	actionStates.value = {}
-	textInputValues.value = {}
+	nodeStates.value = {}
+	activatedStages.value = new Set()
 
 	done.value = false
 	clearGeneratedMessageState()
 	loadingMessage.value = false
 	moderationDecision.value = null
-
-	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
-	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
-
-	sessionStorage.removeItem(`modpack-permissions-data-${projectV2.value.id}`)
-	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
-	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
-
-	modpackPermissionsComplete.value = false
-	modpackJudgements.value = {}
-
-	initializeAllStages()
 }
 
 function findFirstValidStage(): number {
-	for (let i = 0; i < checklist.length; i++) {
+	for (let i = 0; i < resolvedStages.value.length; i++) {
 		if (shouldShowStageIndex(i)) {
 			return i
 		}
@@ -1109,185 +991,341 @@ function findFirstValidStage(): number {
 	return 0
 }
 
-const currentStageObj = computed(() => checklist[currentStage.value])
-const persistedStage = import.meta.client
-	? await loadChecklistStage(checklistPersistenceProjectSlug)
-	: null
-const currentStage = ref(
-	persistedStage !== null && checklist[persistedStage] ? persistedStage : findFirstValidStage(),
+const currentStageObj = computed(() => resolvedStages.value[currentStage.value])
+const isOnFirstStage = computed(() => currentStage.value === findFirstValidStage())
+const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.value?.isOwnLock)
+const isPseudoStage = computed(
+	() => alreadyReviewed.value || done.value || generatedMessage.value || isLockedByOther.value,
+)
+const canOpenStageSelectorFromTitle = computed(
+	() => !alreadyReviewed.value && !done.value && !isLockedByOther.value,
 )
 
-const stageTextExpanded = computedAsync(async () => {
-	const stageIndex = currentStage.value
-	const stage = checklist[stageIndex]
-	if (stage.text) {
-		return renderHighlightedString(
-			expandVariables(
-				await stage.text(projectV2.value, projectV3.value),
-				projectV2.value,
-				projectV3.value,
-				variables.value,
-			),
-		)
-	}
-	return null
-}, null)
+const checklistTitleText = computed(() => {
+	if (alreadyReviewed.value || done.value) return 'Moderation'
+	if (generatedMessage.value) return 'Generated Message'
 
-const persistedActionStates = import.meta.client
-	? await loadChecklistActionStates(checklistPersistenceProjectSlug)
-	: {}
-
-const router = useRouter()
-
-const persistedTextInputs = import.meta.client
-	? await loadChecklistTextInputs(checklistPersistenceProjectSlug)
-	: {}
-
-const actionStates = ref<Record<string, ActionState>>(persistedActionStates)
-const textInputValues = ref<Record<string, string>>(persistedTextInputs)
-
-const persistState = () => {
-	void saveChecklistActionStates(checklistPersistenceProjectSlug, actionStates.value)
-	void saveChecklistTextInputs(checklistPersistenceProjectSlug, textInputValues.value)
-}
-
-watch(currentStage, (stage) => {
-	void saveChecklistStage(checklistPersistenceProjectSlug, stage)
+	return currentStageObj.value.label ?? kebabToTitleCase(currentStageObj.value.id)
 })
-watch(actionStates, persistState, { deep: true })
-watch(textInputValues, persistState, { deep: true })
-
-interface MessagePart {
-	weight: number
-	content: string
-	actionId: string
-	stageIndex: number
+function isStageLive(stage: StageNode): boolean {
+	return stage._shown === undefined || resolve(stage._shown)
 }
 
-function handleKeybinds(event: KeyboardEvent) {
-	const focusedActionIndex = ref<number | null>(null)
+function isStageEffectivelyShown(stage: StageNode): boolean {
+	if (isStageLive(stage)) return true
+	return stage._shownSticky === true && activatedStages.value.has(stage.id)
+}
 
-	handleKeybind(
-		event,
-		{
-			project: projectV2.value,
-			state: {
-				currentStage: currentStage.value,
-				totalStages: checklist.length,
-				currentStageId: currentStageObj.value.id,
-				currentStageTitle: currentStageObj.value.title,
+watchEffect(() => {
+	for (const stage of resolvedStages.value) {
+		if (stage._shownSticky && isStageLive(stage) && !activatedStages.value.has(stage.id)) {
+			activatedStages.value.add(stage.id)
+		}
+	}
+})
 
-				isCollapsed: props.collapsed,
-				isDone: done.value,
-				hasGeneratedMessage: generatedMessage.value,
-				isLoadingMessage: loadingMessage.value,
-				isModpackPermissionsStage: isModpackPermissionsStage.value,
+function isFixActionable(fixes: FixBuilder[], state: Record<string, NodeState>): boolean {
+	return fixes.some((f) => {
+		if (f._projectFn) {
+			const { proxy, changes } = createTrackedPatch(projectV3.value as any)
+			f._projectFn(proxy as any, state)
+			return Object.keys(changes()).length > 0
+		}
+		if (f._versionFn) {
+			const version = versions.value?.[0]
+			if (!version) return true
+			const { proxy, changes } = createTrackedPatch(version as any)
+			f._versionFn(proxy as any, state)
+			return Object.keys(changes()).length > 0
+		}
+		return false
+	})
+}
 
-				futureProjectCount: moderationQueue.queueLength,
-				visibleActionsCount: visibleActions.value.length,
+function computeStageLiveNode(stage: StageNode, stageState: Record<string, NodeState>): LiveNode {
+	if (!isStageEffectivelyShown(stage)) {
+		return {
+			isActive: true,
+			isVisible: false,
+			isFixActionable: false,
+			messageCount: 0,
+			fixCount: 0,
+			hasRequiredMissing: false,
+			activeActions: [],
+		}
+	}
 
-				focusedActionIndex: focusedActionIndex.value,
-				focusedActionType:
-					focusedActionIndex.value !== null
-						? (visibleActions.value[focusedActionIndex.value]?.type as any)
-						: null,
-			},
-			actions: {
-				tryGoNext: nextStage,
-				tryGoBack: previousStage,
-				tryGenerateMessage: generateMessage,
-				trySkipProject: skipCurrentProject,
+	const stageChildren = resolveChildren(stage, stageState)
+	const metaMap = computeNodeMeta(stageChildren, stageState, isFixActionable)
+	const attentionMap = computeAttentionMap(stageChildren, stageState, metaMap)
+	const actions = collectActiveActions(stageChildren, stageState, [stage.id])
 
-				tryToggleCollapse: () => emit('toggleCollapsed'),
-				tryResetProgress: resetProgress,
-				tryExitModeration: handleExit,
+	if (stage._segments.length > 0) {
+		actions.unshift({ node: stage, state: stageState, statePath: [stage.id], active: true })
+	}
 
-				tryApprove: () => sendMessage(approveSendStatus.value),
-				tryReject: () => sendMessage('rejected'),
-				tryWithhold: () => sendMessage('withheld'),
-				tryEditMessage: goBackToStages,
+	return {
+		isActive: true,
+		isVisible: metaMap.size > 0,
+		isFixActionable: false,
+		messageCount: actions.length,
+		fixCount: [...metaMap.values()].filter((m) => m.isFixActionable).length,
+		hasRequiredMissing: stageChildren.some(
+			(child) => typeof child === 'object' && child !== null && attentionMap.get(child) === true,
+		),
+		activeActions: actions,
+	}
+}
 
-				tryToggleAction: (actionIndex: number) => {
-					const action = visibleActions.value[actionIndex]
-					if (action) {
-						toggleAction(action)
-					}
-				},
-				trySelectDropdownOption: (actionIndex: number, optionIndex: number) => {
-					const action = visibleActions.value[actionIndex] as DropdownAction
-					if (action && action.type === 'dropdown') {
-						const visibleOptions = getVisibleDropdownOptions(action)
-						if (optionIndex < visibleOptions.length) {
-							selectDropdownOption(action, visibleOptions[optionIndex])
-						}
-					}
-				},
-				tryToggleChip: (actionIndex: number, chipIndex: number) => {
-					const action = visibleActions.value[actionIndex] as MultiSelectChipsAction
-					if (action && action.type === 'multi-select-chips') {
-						const visibleOptions = getVisibleMultiSelectOptions(action)
-						if (chipIndex < visibleOptions.length) {
-							toggleChip(action, chipIndex)
-						}
-					}
-				},
+const checklistLive = computed<Map<object, LiveNode>>(() => {
+	const map = new Map<object, LiveNode>()
 
-				tryFocusNextAction: () => {
-					if (visibleActions.value.length === 0) return
-					if (focusedActionIndex.value === null) {
-						focusedActionIndex.value = 0
-					} else {
-						focusedActionIndex.value = (focusedActionIndex.value + 1) % visibleActions.value.length
-					}
-				},
-				tryFocusPreviousAction: () => {
-					if (visibleActions.value.length === 0) return
-					if (focusedActionIndex.value === null) {
-						focusedActionIndex.value = visibleActions.value.length - 1
-					} else {
-						focusedActionIndex.value =
-							focusedActionIndex.value === 0
-								? visibleActions.value.length - 1
-								: focusedActionIndex.value - 1
-					}
-				},
-				tryActivateFocusedAction: () => {
-					if (focusedActionIndex.value === null) return
-					const action = visibleActions.value[focusedActionIndex.value]
-					if (!action) return
+	for (const stage of resolvedStages.value) {
+		const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
+		map.set(stage, computeStageLiveNode(stage, stageState))
+	}
 
-					if (
-						action.type === 'button' ||
-						action.type === 'conditional-button' ||
-						action.type === 'toggle'
-					) {
-						toggleAction(action)
-					}
-				},
-			},
+	return map
+})
+
+const restoredStage = persistedState
+	? resolvedStages.value.findIndex((s) => s.id === persistedState.stage)
+	: -1
+const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
+const initialAutoStage = currentStage.value
+const needsInitialStageSettle = !persistedState && thread.value === undefined
+const hasSettledInitialStage = ref(!needsInitialStageSettle)
+
+// Thread data may not be loaded when currentStage is first set, so stages that depend on it
+// (like re-review) may be invisible initially. Re-evaluate once thread loads.
+if (!persistedState) {
+	watch(
+		thread,
+		() => {
+			if (thread.value === undefined) return
+			if (currentStage.value === initialAutoStage) {
+				const firstValid = findFirstValidStage()
+				debug('settle', {
+					initialAutoStage,
+					currentStage: currentStage.value,
+					firstValid,
+					initialAutoStageId: resolvedStages.value[initialAutoStage]?.id,
+					firstValidId: resolvedStages.value[firstValid]?.id,
+				})
+				if (firstValid !== currentStage.value) {
+					currentStage.value = firstValid
+				} else if (needsInitialStageSettle) {
+					markStageVisited(currentStageObj.value.id)
+				}
+			} else {
+				debug('settle: currentStage already changed before settle', {
+					initialAutoStage,
+					currentStage: currentStage.value,
+				})
+			}
+			hasSettledInitialStage.value = true
 		},
-		keybinds,
+		{ once: true },
 	)
 }
 
-// Trigger debounced prefetch when user progresses through stages
+const router = useRouter()
+const route = useRoute()
+
+const projectUrlType = computed(() =>
+	getProjectTypeForUrlShorthand(
+		projectV2.value.project_type,
+		projectV2.value.loaders ?? [],
+		tags.value,
+	),
+)
+
+let lastSyncedStageTarget: string | null = null
+function syncStageUrl(stage: StageNode | undefined) {
+	const navigate = stage?._navigate
+	debug('syncStageUrl', { stageId: stage?.id, navigate, lastSyncedStageTarget })
+	if (navigate === undefined) return
+	const target = `/${projectUrlType.value}/${projectV2.value.slug}${navigate}`
+	if (target === lastSyncedStageTarget) return
+	lastSyncedStageTarget = target
+	setTimeout(() => router.replace(target), 0)
+}
+
+watch(
+	hasSettledInitialStage,
+	(settled) => {
+		if (settled) syncStageUrl(currentStageObj.value)
+	},
+	{ immediate: true },
+)
+
+const stageNavigateTarget = computed(() => {
+	const navigate = currentStageObj.value?._navigate
+	if (navigate === undefined || !projectV2.value) return null
+	const base = `/${projectUrlType.value}/${projectV2.value.slug}`
+	return navigate === '' ? base : `${base}${navigate}`
+})
+
+const stageNavigateLabel = computed(() => {
+	const navigate = currentStageObj.value?._navigate
+	if (navigate === '') return 'Project Page'
+	const segment = navigate?.split('/').filter(Boolean).pop()
+	if (!segment) return ''
+	return segment.charAt(0).toUpperCase() + segment.slice(1)
+})
+
+function navigateToStagePage() {
+	if (stageNavigateTarget.value) router.push(stageNavigateTarget.value)
+}
+
+let persistenceEnabled = true
+let persistenceTimer: ReturnType<typeof setTimeout> | null = null
+
+function cancelPendingPersistence() {
+	if (persistenceTimer === null) return
+	clearTimeout(persistenceTimer)
+	persistenceTimer = null
+}
+
+function savePersistedState(open: boolean, resetReviewAnyway = false) {
+	const rawState = toRaw(nodeStates.value)
+	const openVal = open || undefined
+	const reviewAnywayVal = resetReviewAnyway ? undefined : reviewedAnyway.value || undefined
+	const stageVal =
+		currentStage.value !== findFirstValidStage() ? currentStageObj.value.id : undefined
+	const messageVal = message.value ?? undefined
+	const stateVal = Object.keys(rawState).length > 0 ? rawState : undefined
+	const activatedStagesVal = activatedStages.value.size > 0 ? [...activatedStages.value] : undefined
+	if (
+		!openVal &&
+		!reviewAnywayVal &&
+		!stageVal &&
+		!messageVal &&
+		!stateVal &&
+		!activatedStagesVal
+	) {
+		return clearChecklistState(checklistPersistenceProjectId)
+	}
+	return saveChecklistState(checklistPersistenceProjectId, {
+		...(openVal && { open: openVal }),
+		...(reviewAnywayVal && { reviewAnyway: reviewAnywayVal }),
+		...(stageVal && { stage: stageVal }),
+		...(messageVal && { message: messageVal }),
+		...(stateVal && { state: stateVal }),
+		...(activatedStagesVal && { activatedStages: activatedStagesVal }),
+	})
+}
+
+function persistState() {
+	if (!persistenceEnabled || !import.meta.client) return
+	cancelPendingPersistence()
+	persistenceTimer = setTimeout(() => {
+		persistenceTimer = null
+		void savePersistedState(true)
+	}, 150)
+}
+
+async function persistStateImmediately(open: boolean, resetReviewAnyway = false) {
+	if (!import.meta.client) return
+	cancelPendingPersistence()
+	await savePersistedState(open, resetReviewAnyway)
+}
+
+watch(currentStage, persistState)
+watch(nodeStates, persistState, { deep: true })
+watch(activatedStages, persistState, { deep: true })
+watch(message, persistState)
+watch(currentStageObj, (stage) => markStageVisited(stage.id), {
+	immediate: !needsInitialStageSettle,
+})
+
+watch(
+	nodeStates,
+	async () => {
+		const active = collectAllActiveActions()
+		const newMap = new Map<object, boolean>()
+		await Promise.all(
+			active
+				.filter((a) => (a.node as any)._segments.some((s: any) => s.type !== 'collect'))
+				.map(async ({ node, state, statePath }) => {
+					try {
+						let hasContent = false
+						for (const seg of (node as any)._segments) {
+							if (seg.type === 'collect') continue
+							const text = await evalSegment(seg, state, statePath)
+							if (text?.trim()) {
+								hasContent = true
+								break
+							}
+						}
+						newMap.set(node, hasContent)
+					} catch {
+						newMap.set(node, false)
+					}
+				}),
+		)
+		resolvedMessageAvailability.value = newMap
+	},
+	{ deep: true, immediate: true },
+)
+
+function handleKeybinds(event: KeyboardEvent) {
+	keybinds.value.handle(event, {
+		project: projectV2.value,
+		scope: 'checklist',
+		state: {
+			currentStage: currentStage.value,
+			totalStages: resolvedStages.value.length,
+			currentStageId: currentStageObj.value.id,
+			currentStageTitle: currentStageObj.value.label,
+
+			isCollapsed: props.collapsed,
+			isDone: done.value,
+			hasGeneratedMessage: generatedMessage.value,
+			isLoadingMessage: loadingMessage.value,
+			isModpackPermissionsStage: false,
+
+			futureProjectCount: moderationQueue.queueLength,
+			visibleActionsCount: resolveChildren(
+				currentStageObj.value,
+				nodeStates.value[currentStageObj.value.id] ?? {},
+			).filter((c) => typeof c === 'object' && c !== null).length,
+		},
+		actions: {
+			tryGoNext: nextStage,
+			tryGoBack: previousStage,
+			tryGenerateMessage: generateMessage,
+			trySkipProject: skipCurrentProject,
+
+			tryToggleCollapse: () => emit('toggleCollapsed'),
+			tryResetProgress: resetProgress,
+			tryExitModeration: handleExit,
+
+			tryApprove: () => sendMessage(approveSendStatus.value),
+			tryReject: () => sendMessage('rejected'),
+			tryWithhold: () => sendMessage('withheld'),
+			tryEditMessage: previousStage,
+		},
+	})
+}
+
 watch(currentStage, () => {
 	// Only prefetch if we're past the first stage (user is actively moderating)
 	if (currentStage.value > 0) {
-		debouncedPrefetch() // Use debounced version to prevent spam
+		debouncedPrefetch()
 	}
 })
 
 onMounted(async () => {
+	void persistStateImmediately(true)
 	window.addEventListener('keydown', handleKeybinds)
 	window.addEventListener('beforeunload', handleBeforeUnload)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
-	notifications.setNotificationLocation('left')
-
-	if (projectV2.value.status !== 'processing') {
-		alreadyReviewed.value = true
-		return
+	if (settings.value.get(moderationSettings.General.ChecklistPosition) === 'right') {
+		notifications.setNotificationLocation('left')
 	}
+
+	if (done.value || alreadyReviewed.value) return
 
 	const result = await moderationQueue.acquireLock(projectV2.value.id)
 
@@ -1304,7 +1342,6 @@ onMounted(async () => {
 		}
 		lockError.value = false
 
-		// Start countdown timer
 		updateLockCountdown()
 		lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
 	} else {
@@ -1330,6 +1367,10 @@ function handleBeforeUnload() {
 }
 
 onUnmounted(() => {
+	cancelPendingPersistence()
+	if (persistenceEnabled) {
+		void savePersistedState(true)
+	}
 	window.removeEventListener('beforeunload', handleBeforeUnload)
 	window.removeEventListener('keydown', handleKeybinds)
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
@@ -1346,459 +1387,152 @@ onUnmounted(() => {
 		void moderationQueue.releaseLock(projectId)
 	}
 
-	// Clear prefetch state to prevent memory leaks
 	prefetchQueue.value = []
 	isPrefetching.value = false
 })
 
-function initializeAllStages() {
-	checklist.forEach((stage, stageIndex) => {
-		initializeStageActions(stage, stageIndex)
-	})
-}
-
-function initializeCurrentStage() {
-	initializeStageActions(currentStageObj.value, currentStage.value)
-}
-
 watch(
 	currentStage,
 	(newIndex, oldIndex) => {
-		const stage = checklist[newIndex]
-		// only navigate when the stage actually changes (not on initial mount/remount)
-		if (oldIndex !== undefined && newIndex !== oldIndex && stage?.navigate) {
-			router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${stage.navigate}`)
+		if (hasSettledInitialStage.value && oldIndex !== undefined && newIndex !== oldIndex) {
+			syncStageUrl(resolvedStages.value[newIndex])
 		}
-
-		initializeCurrentStage()
 	},
 	{ immediate: true },
 )
 
-function initializeStageActions(stage: Stage, stageIndex: number) {
-	stage.actions.forEach((action, index) => {
-		const actionId = getActionIdForStage(action, stageIndex, index)
-		if (!actionStates.value[actionId]) {
-			actionStates.value[actionId] = initializeActionState(action)
-		}
-	})
+loadVersions()
 
-	stage.actions.forEach((action) => {
-		if (action.enablesActions) {
-			action.enablesActions.forEach((enabledAction, index) => {
-				const actionId = getActionIdForStage(enabledAction, currentStage.value, index)
-				if (!actionStates.value[actionId]) {
-					actionStates.value[actionId] = initializeActionState(enabledAction)
-				}
-			})
-		}
-	})
+function countStageActions(stage: StageNode): number {
+	const actions = checklistLive.value.get(stage)?.activeActions ?? []
+	const resolved = resolvedMessageAvailability.value
+	return actions.filter((a) => {
+		if ((a.node as any)._segments.every((s: any) => s.type === 'collect')) return false
+		return resolved.get(a.node) ?? true
+	}).length
 }
 
-function getActionId(action: Action, index?: number): string {
-	// If index is not provided, find it in the current stage's actions
-	if (index === undefined) {
-		index = currentStageObj.value.actions.indexOf(action)
-	}
-	return getActionIdForStage(action, currentStage.value, index)
+function countStageFixes(stage: StageNode): number {
+	return checklistLive.value.get(stage)?.fixCount ?? 0
 }
 
-function getActionKey(action: Action): string {
-	// Find the actual index of this action in the current stage's actions array
-	const index = currentStageObj.value.actions.indexOf(action)
-	return `${currentStage.value}-${index}-${getActionId(action, index)}`
+function hasRequiredMissing(stage: StageNode): boolean {
+	return checklistLive.value.get(stage)?.hasRequiredMissing ?? false
 }
 
-const visibleActions = computed(() => {
-	const selectedActionIds = Object.entries(actionStates.value)
-		.filter(([_, state]) => state.selected)
-		.map(([id]) => id)
-
-	const allActions: Action[] = []
-	const actionSources = new Map<Action, { enabledBy?: Action; actionIndex?: number }>()
-
-	currentStageObj.value.actions.forEach((action, actionIndex) => {
-		if (shouldShowAction(action)) {
-			allActions.push(action)
-			actionSources.set(action, { actionIndex })
-
-			if (action.enablesActions) {
-				action.enablesActions.forEach((enabledAction) => {
-					if (shouldShowAction(enabledAction)) {
-						allActions.push(enabledAction)
-						actionSources.set(enabledAction, { enabledBy: action, actionIndex })
-					}
-				})
-			}
-		}
-	})
-
-	return allActions.filter((action) => {
-		const source = actionSources.get(action)
-
-		if (source?.enabledBy) {
-			const enablerId = getActionId(source.enabledBy, source.actionIndex)
-			if (!selectedActionIds.includes(enablerId)) {
-				return false
-			}
-		}
-
-		const disabledByOthers = currentStageObj.value.actions.some((otherAction, otherIndex) => {
-			const otherId = getActionId(otherAction, otherIndex)
-			return (
-				selectedActionIds.includes(otherId) &&
-				otherAction.disablesActions?.includes(
-					action.id || `action-${currentStage.value}-${source?.actionIndex}`,
-				)
-			)
-		})
-
-		return !disabledByOthers
-	})
-})
-
-const buttonActions = computed(() =>
-	visibleActions.value.filter(
-		(action) => action.type === 'button' || action.type === 'conditional-button',
-	),
-)
-
-const toggleActions = computed(() =>
-	visibleActions.value.filter((action) => action.type === 'toggle'),
-)
-
-const dropdownActions = computed(() =>
-	visibleActions.value.filter((action) => action.type === 'dropdown'),
-)
-
-const multiSelectActions = computed(() =>
-	visibleActions.value.filter((action) => action.type === 'multi-select-chips'),
-)
-
-function getDropdownValue(action: DropdownAction) {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const visibleOptions = getVisibleDropdownOptions(action)
-	const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0
-
-	const allOptions = action.options
-	const storedOption = allOptions[currentValue]
-
-	if (storedOption && visibleOptions.includes(storedOption)) {
-		return storedOption
-	}
-
-	return visibleOptions[0] || null
+function collectAllActiveActions(): ActiveAction[] {
+	return resolvedStages.value.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
 }
 
-function isActionSelected(action: Action): boolean {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	return actionStates.value[actionId]?.selected || false
-}
-
-function toggleAction(action: Action) {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state) {
-		state.selected = !state.selected
-		persistState()
-	}
-}
-
-function selectDropdownOption(action: DropdownAction, selected: any) {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state && selected !== undefined && selected !== null) {
-		const optionIndex = action.options.findIndex(
-			(opt) => opt === selected || (opt?.label && selected?.label && opt.label === selected.label),
-		)
-
-		if (optionIndex !== -1) {
-			state.value = optionIndex
-			state.selected = true
-			persistState()
-		}
-	}
-}
-
-function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined
-
-	const visibleOptions = getVisibleMultiSelectOptions(action)
-	const visibleOption = visibleOptions[optionIndex]
-	const originalIndex = action.options.findIndex((opt) => opt === visibleOption)
-
-	return selectedSet?.has(originalIndex) || false
-}
-
-function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state && state.value instanceof Set) {
-		const visibleOptions = getVisibleMultiSelectOptions(action)
-		const visibleOption = visibleOptions[optionIndex]
-		const originalIndex = action.options.findIndex((opt) => opt === visibleOption)
-
-		if (originalIndex !== -1) {
-			if (state.value.has(originalIndex)) {
-				state.value.delete(originalIndex)
-			} else {
-				state.value.add(originalIndex)
-			}
-			state.selected = state.value.size > 0
-			persistState()
-		}
-	}
-}
-
-const isAnyVisibleInputs = computed(() => {
-	return visibleActions.value.some((action) => {
-		const visibleInputs = getVisibleInputs(action, actionStates.value)
-		return visibleInputs.length > 0 && isActionSelected(action)
-	})
-})
-
-function getModpackFilesFromStorage(): {
-	interactive: ModerationModpackItem[]
-	permanentNo: ModerationModpackItem[]
-} {
-	try {
-		const sessionData = sessionStorage.getItem(`modpack-permissions-data-${projectV2.value.id}`)
-		const interactive = sessionData ? (JSON.parse(sessionData) as ModerationModpackItem[]) : []
-
-		const permanentNoData = sessionStorage.getItem(
-			`modpack-permissions-permanent-no-${projectV2.value.id}`,
-		)
-		const permanentNo = permanentNoData
-			? (JSON.parse(permanentNoData) as ModerationModpackItem[])
-			: []
-
-		return {
-			interactive: interactive || [],
-			permanentNo: permanentNo || [],
-		}
-	} catch (error) {
-		console.warn('Failed to parse session storage modpack data:', error)
-		return { interactive: [], permanentNo: [] }
-	}
+function byPriority(a: ActiveAction, b: ActiveAction): number {
+	return ((a.node as any)._priority as Priority).compareTo((b.node as any)._priority as Priority)
 }
 
 async function assembleFullMessage() {
-	const messageParts: MessagePart[] = []
+	const allEntries = collectAllActiveActions()
+	generatedActiveActions.value = allEntries
 
-	for (let stageIndex = 0; stageIndex < checklist.length; stageIndex++) {
-		const stage = checklist[stageIndex]
+	const consumed = new Set<object>()
 
-		await processStageActions(stage, stageIndex, messageParts)
+	const parts: { entry: ActiveAction; content: string }[] = []
+	for (const entry of allEntries) {
+		if (consumed.has(entry.node)) continue
+		const content = await evalActiveAction(entry, allEntries, consumed)
+		if (content.trim()) {
+			parts.push({ entry, content })
+		}
 	}
 
-	messageParts.sort((a, b) => a.weight - b.weight)
+	parts.sort((a, b) => byPriority(a.entry, b.entry))
 
-	const finalMessage = expandVariables(
-		messageParts
-			.map((part) => part.content)
-			.filter((content) => content.trim().length > 0)
+	return expandVariables(
+		parts
+			.map((p) => p.content.trim())
+			.filter((c) => c.length > 0)
 			.join('\n\n'),
 		projectV2.value,
 		projectV3.value,
 	)
-
-	return finalMessage
 }
 
-async function processStageActions(stage: Stage, stageIndex: number, messageParts: MessagePart[]) {
-	const selectedActionIds = Object.entries(actionStates.value)
-		.filter(([_, state]) => state.selected)
-		.map(([id]) => id)
+const tooltipHtmlMap = ref(new Map<object, string>())
 
-	for (let actionIndex = 0; actionIndex < stage.actions.length; actionIndex++) {
-		const action = stage.actions[actionIndex]
-		const actionId = getActionIdForStage(action, stageIndex, actionIndex)
-		const state = actionStates.value[actionId]
+watchEffect(async () => {
+	const stage = currentStageObj.value
+	const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
+	const stageChildren = resolveChildren(stage, stageState)
+	const actions = collectMessageNodes(stageChildren, stageState, [stage.id])
 
-		if (!state?.selected) continue
-
-		await processAction(action, actionId, state, selectedActionIds, stageIndex, messageParts)
-
-		if (action.enablesActions) {
-			for (let enabledIndex = 0; enabledIndex < action.enablesActions.length; enabledIndex++) {
-				const enabledAction = action.enablesActions[enabledIndex]
-				const enabledActionId = getActionIdForStage(
-					enabledAction,
-					stageIndex,
-					actionIndex,
-					enabledIndex,
+	const newMap = new Map<object, string>()
+	await Promise.all(
+		actions.map(async (entry) => {
+			try {
+				const raw = await evalActiveAction(entry, actions, new Set())
+				const expanded = expandVariables(raw, projectV2.value, projectV3.value).trim()
+				newMap.set(
+					entry.node,
+					expanded
+						? `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(expanded)}</div>`
+						: '',
 				)
-				const enabledState = actionStates.value[enabledActionId]
-
-				if (enabledState?.selected) {
-					await processAction(
-						enabledAction,
-						enabledActionId,
-						enabledState,
-						selectedActionIds,
-						stageIndex,
-						messageParts,
-					)
-				}
+			} catch {
+				newMap.set(entry.node, '')
 			}
-		}
+		}),
+	)
+	tooltipHtmlMap.value = newMap
+})
+
+const stageMeta = computed(() => {
+	const stage = currentStageObj.value
+	const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
+	const stageChildren = resolveChildren(stage, stageState)
+	const metaMap = computeNodeMeta(stageChildren, stageState, isFixActionable)
+	const attentionMap = computeAttentionMap(stageChildren, stageState, metaMap)
+	return { metaMap, attentionMap, tooltipHtml: tooltipHtmlMap.value }
+})
+
+const appComponentsByKey: Record<string, Component> = {
+	'loader-picker': LoaderPicker,
+	'game-version-picker': McVersionPicker,
+}
+
+const stageState = computed(
+	() => (nodeStates.value[currentStageObj.value.id] ?? {}) as Record<string, NodeState>,
+)
+const stageNodes = computed(() => resolveChildren(currentStageObj.value, stageState.value))
+
+const stageWriter: Writer = (id, value) => {
+	const stageId = currentStageObj.value.id
+	const existing = nodeStates.value[stageId]
+	const next: Record<string, NodeState> = existing ? { ...existing } : {}
+	if (value === undefined) Reflect.deleteProperty(next, id)
+	else next[id] = value
+	if (Object.keys(next).length === 0) {
+		if (existing !== undefined) Reflect.deleteProperty(nodeStates.value, stageId)
+	} else {
+		nodeStates.value[stageId] = next
 	}
 }
 
-async function processAction(
-	action: Action,
-	actionId: string,
-	state: ActionState,
-	selectedActionIds: string[],
-	stageIndex: number,
-	messageParts: MessagePart[],
-) {
-	const allValidActionIds: string[] = []
-	checklist.forEach((stage, stageIdx) => {
-		stage.actions.forEach((stageAction, actionIdx) => {
-			allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx))
-			if (stageAction.enablesActions) {
-				stageAction.enablesActions.forEach((enabledAction, enabledIdx) => {
-					allValidActionIds.push(
-						getActionIdForStage(enabledAction, stageIdx, actionIdx, enabledIdx),
-					)
-				})
-			}
-		})
-	})
+provide(CHECKLIST_META_KEY, stageMeta)
+provide(STATE_KEY, nodeStates)
 
-	if (action.type === 'button' || action.type === 'toggle') {
-		const buttonAction = action as ButtonAction | ToggleAction
-		const message = await getActionMessage(buttonAction, selectedActionIds, allValidActionIds)
-		if (message) {
-			messageParts.push({
-				weight: buttonAction.weight,
-				content: processMessage(message, action, stageIndex, textInputValues.value),
-				actionId,
-				stageIndex,
-			})
-		}
-	} else if (action.type === 'conditional-button') {
-		const conditionalAction = action as ConditionalButtonAction
-		const matchingVariant = findMatchingVariant(
-			conditionalAction.messageVariants,
-			selectedActionIds,
-			allValidActionIds,
-			stageIndex,
-		)
-
-		let message: string
-		let weight: number
-
-		if (matchingVariant) {
-			message = (await matchingVariant.message()) as string
-			weight = matchingVariant.weight
-		} else if (conditionalAction.fallbackMessage) {
-			message = (await conditionalAction.fallbackMessage()) as string
-			weight = conditionalAction.fallbackWeight ?? 0
-		} else {
-			return
-		}
-
-		messageParts.push({
-			weight,
-			content: processMessage(message, action, stageIndex, textInputValues.value),
-			actionId,
-			stageIndex,
-		})
-	} else if (action.type === 'dropdown') {
-		const dropdownAction = action as DropdownAction
-		const selectedIndex = state.value ?? 0
-		const selectedOption = dropdownAction.options[selectedIndex]
-
-		if (selectedOption && 'message' in selectedOption && 'weight' in selectedOption) {
-			const message = (await selectedOption.message()) as string
-			messageParts.push({
-				weight: selectedOption.weight,
-				content: processMessage(message, action, stageIndex, textInputValues.value),
-				actionId,
-				stageIndex,
-			})
-		}
-	} else if (action.type === 'multi-select-chips') {
-		const multiSelectAction = action as MultiSelectChipsAction
-		const selectedIndices = state.value as Set<number>
-
-		for (const index of selectedIndices) {
-			const option = multiSelectAction.options[index]
-			if (option && 'message' in option && 'weight' in option) {
-				const message = (await option.message()) as string
-				messageParts.push({
-					weight: option.weight,
-					content: processMessage(message, action, stageIndex, textInputValues.value),
-					actionId: `${actionId}-option-${index}`,
-					stageIndex,
-				})
-			}
-		}
-	}
-}
-
-function shouldShowStage(stage: Stage): boolean {
-	let hasVisibleActions = false
-
-	for (const a of stage.actions) {
-		if (shouldShowAction(a)) {
-			hasVisibleActions = true
-		}
-	}
-
-	if (!hasVisibleActions) {
-		return false
-	}
-
-	if (typeof stage.shouldShow === 'function') {
-		return stage.shouldShow(projectV2.value, projectV3.value)
-	}
-
-	return true
-}
-
-function shouldShowAction(action: Action): boolean {
-	if (typeof action.shouldShow === 'function') {
-		return action.shouldShow(projectV2.value, projectV3.value)
-	}
-
-	return true
-}
-
-function getVisibleDropdownOptions(action: DropdownAction) {
-	return action.options.filter((option) => {
-		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value, projectV3.value)
-		}
-		return true
-	})
-}
-
-function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
-	return action.options.filter((option) => {
-		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value, projectV3.value)
-		}
-		return true
-	})
+function shouldShowStage(stage: StageNode): boolean {
+	return checklistLive.value.get(stage)?.isVisible ?? false
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
-	return shouldShowStage(checklist[stageIndex])
+	return shouldShowStage(resolvedStages.value[stageIndex])
 }
 
 function previousStage() {
-	let targetStage = currentStage.value - 1
+	if (generatedMessage.value) {
+		goBackToStages()
+		return
+	}
 
+	let targetStage = currentStage.value - 1
 	while (targetStage >= 0) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
@@ -1809,35 +1543,34 @@ function previousStage() {
 }
 
 function nextStage() {
-	if (isModpackPermissionsStage.value && !modpackPermissionsComplete.value) {
-		addNotification({
-			title: 'Modpack permissions stage unfinished',
-			text: 'Please complete the modpack permissions stage before proceeding.',
-			type: 'error',
-		})
-
+	if (done.value) {
+		endChecklist(undefined)
 		return
 	}
 
-	let targetStage = currentStage.value + 1
+	if (alreadyReviewed.value || isLockedByOther.value) {
+		if (moderationQueue.isQueueMode && moderationQueue.queueLength > 1) skipToNextProject()
+		return
+	}
 
-	while (targetStage < checklist.length) {
+	if (generatedMessage.value) return
+
+	let targetStage = currentStage.value + 1
+	while (targetStage < resolvedStages.value.length) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
-			if (!isModpackPermissionsStage.value) {
-				modpackPermissionsComplete.value = false
-			}
-
 			return
 		}
 		targetStage++
 	}
+
+	generateMessage()
 }
 
 function goBackToStages() {
 	clearGeneratedMessageState()
 
-	let targetStage = checklist.length - 1
+	let targetStage = resolvedStages.value.length - 1
 	while (targetStage >= 0) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
@@ -1851,27 +1584,21 @@ async function generateMessage() {
 	if (loadingMessage.value) return
 
 	loadingMessage.value = true
+	markStageVisited(currentStageObj.value.id)
 
-	router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}/moderation`)
+	router.push(`/${projectUrlType.value}/${projectV2.value.slug}/moderation`)
 
 	try {
+		missingMdPaths.clear()
 		const baseMessage = await assembleFullMessage()
-		let fullMessage = baseMessage
-
-		if (projectV2.value.project_type === 'modpack') {
-			const modpackFilesData = getModpackFilesFromStorage()
-
-			if (modpackFilesData.interactive.length > 0 || modpackFilesData.permanentNo.length > 0) {
-				const modpackMessage = generateModpackMessage(modpackFilesData)
-				if (modpackMessage) {
-					fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage
-				}
-			}
+		if (missingMdPaths.size > 0) {
+			addNotification({
+				title: 'Missing message files',
+				text: [...missingMdPaths].join('\n'),
+				type: 'warning',
+			})
 		}
-
-		message.value = fullMessage
-
-		generatedMessage.value = true
+		message.value = baseMessage
 	} catch (error) {
 		console.error('Error generating message:', error)
 		addNotification({
@@ -1884,72 +1611,22 @@ async function generateMessage() {
 	}
 }
 
-function generateModpackMessage(allFiles: {
-	interactive: ModerationModpackItem[]
-	permanentNo: ModerationModpackItem[]
-}) {
-	const issues = []
+const hasNextProject = ref(false)
 
-	const attributeMods: string[] = []
-	const noMods: string[] = []
-	const permanentNoMods: string[] = []
-	const unidentifiedMods: string[] = []
-
-	allFiles.interactive.forEach((file) => {
-		if (file.status === 'unidentified') {
-			if (file.approved === 'no') {
-				unidentifiedMods.push(file.file_name)
-			}
-		} else if (file.status === 'with-attribution' && file.approved === 'no') {
-			attributeMods.push(file.file_name)
-		} else if (file.status === 'no' && file.approved === 'no') {
-			noMods.push(file.file_name)
-		} else if (file.status === 'permanent-no') {
-			permanentNoMods.push(file.file_name)
-		}
-	})
-
-	allFiles.permanentNo.forEach((file) => {
-		permanentNoMods.push(file.file_name)
-	})
-
-	if (
-		attributeMods.length > 0 ||
-		noMods.length > 0 ||
-		permanentNoMods.length > 0 ||
-		unidentifiedMods.length > 0
-	) {
-		issues.push('## Copyrighted content')
-
-		if (unidentifiedMods.length > 0) {
-			issues.push(
-				`${finalPermissionMessages.unidentified}\n${unidentifiedMods.map((mod) => `- ${mod}`).join('\n')}`,
-			)
-		}
-
-		if (attributeMods.length > 0) {
-			issues.push(
-				`${finalPermissionMessages['with-attribution']}\n${attributeMods.map((mod) => `- ${mod}`).join('\n')}`,
-			)
-		}
-
-		if (noMods.length > 0) {
-			issues.push(`${finalPermissionMessages.no}\n${noMods.map((mod) => `- ${mod}`).join('\n')}`)
-		}
-
-		if (permanentNoMods.length > 0) {
-			issues.push(
-				`${finalPermissionMessages['permanent-no']}\n${permanentNoMods.map((mod) => `- ${mod}`).join('\n')}`,
-			)
-		}
-	}
-
-	return issues.join('\n\n')
+const finishedId = localStorage.getItem('moderation-checklist-finished')
+if (finishedId === projectV2.value.id) {
+	localStorage.removeItem('moderation-checklist-finished')
+	hasNextProject.value = moderationQueue.queueLength > 0
+	done.value = true
+} else if (projectV2.value.status !== 'processing' && !reviewedAnyway.value) {
+	alreadyReviewed.value = true
 }
 
-const hasNextProject = ref(false)
 async function refreshModerationCaches(threadId?: string) {
-	const refreshes: Promise<unknown>[] = [invalidate(), refreshNuxtData('moderation-projects')]
+	const refreshes: Promise<unknown>[] = [
+		invalidate(),
+		queryClient.invalidateQueries({ queryKey: ['moderation-projects'] }),
+	]
 
 	if (threadId) {
 		refreshes.push(queryClient.invalidateQueries({ queryKey: ['thread', threadId] }))
@@ -1959,10 +1636,8 @@ async function refreshModerationCaches(threadId?: string) {
 }
 
 async function sendMessage(status: ProjectStatus) {
-	// Capture project data upfront to avoid null issues during async operations
 	const projectId = projectV2.value?.id
 	const threadId = projectV2.value?.thread_id
-	const projectType = projectV2.value?.project_type
 
 	if (!projectId) {
 		addNotification({
@@ -1973,13 +1648,14 @@ async function sendMessage(status: ProjectStatus) {
 		return
 	}
 
+	const active = [...(generatedActiveActions.value ?? collectAllActiveActions())].sort(byPriority)
+	const shouldApplyFixes = active.some((a) => (a.node as any)._applyFixes)
+
 	moderationDecision.value = status
 	try {
 		await useBaseFetch(`project/${projectId}`, {
 			method: 'PATCH',
-			body: {
-				status,
-			},
+			body: { status },
 		})
 
 		if (message.value && threadId) {
@@ -1994,28 +1670,69 @@ async function sendMessage(status: ProjectStatus) {
 			})
 		}
 
-		if (projectType === 'modpack' && Object.keys(modpackJudgements.value).length > 0) {
-			await useBaseFetch(`moderation/project`, {
-				internal: true,
-				method: 'POST',
-				body: modpackJudgements.value,
-			})
+		let projectFixChanges: Partial<typeof projectV3.value> = {}
+
+		if (shouldApplyFixes) {
+			const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
+				projectV3.value as any,
+			)
+			for (const { node, state } of active) {
+				if (!('_fixes' in (node as object))) continue
+				for (const f of (node as any)._fixes) {
+					f._projectFn?.(projectProxy, state)
+				}
+			}
+			projectFixChanges = projectChanges()
+			if (Object.keys(projectFixChanges).length > 0) {
+				await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
+			}
+
+			if (versions.value) {
+				const versionFixes = active.flatMap(({ node, state }) =>
+					'_fixes' in (node as object)
+						? (node as any)._fixes
+								.filter((f: FixBuilder) => f._versionFn)
+								.map((f: FixBuilder) => ({ fix: f, state }))
+						: [],
+				)
+				if (versionFixes.length > 0) {
+					await Promise.all(
+						versions.value.map(async (version) => {
+							const { proxy, changes } = createTrackedPatch(version as any)
+							for (const { fix, state } of versionFixes) {
+								fix._versionFn!(proxy, state)
+							}
+							const changed = changes()
+							if (Object.keys(changed).length > 0) {
+								await client.labrinth.versions_v3.modifyVersion(version.id, changed)
+							}
+						}),
+					)
+				}
+			}
 		}
 
-		await refreshModerationCaches(threadId)
+		const willHaveNext = await moderationQueue.completeProject(projectId)
+		// Set both states together - hasNextProject MUST be set before done
+		// to avoid the race condition where done=true renders with hasNextProject=false
+		hasNextProject.value = willHaveNext
+		done.value = true
+		clearGeneratedMessageState()
+		await nextTick()
 
-		const willHaveNext = await moderationQueue.completeCurrentProject(projectId, 'completed')
+		await refreshModerationCaches(threadId)
 
 		await Promise.race([
 			moderationQueue.releaseLock(projectId),
 			new Promise((r) => setTimeout(r, 2000)),
 		])
 
-		// Set both states together - hasNextProject MUST be set before done
-		// to avoid the race condition where done=true renders with hasNextProject=false
-		hasNextProject.value = willHaveNext
-		done.value = true
-		clearGeneratedMessageState()
+		if (projectFixChanges?.slug) {
+			const urlType = getProjectTypeForUrlShorthand(projectV2.value.project_type, [], tags.value)
+			localStorage.setItem('moderation-checklist-finished', projectId)
+			await navigateTo(`/${urlType}/${projectFixChanges.slug}/moderation`, { replace: true })
+			return
+		}
 	} catch (error) {
 		console.error('Error submitting moderation:', error)
 		addNotification({
@@ -2029,25 +1746,26 @@ async function sendMessage(status: ProjectStatus) {
 }
 
 async function endChecklist(status?: string) {
-	clearProjectLocalStorage()
+	await clearProjectLocalStorage()
 
 	if (!hasNextProject.value) {
+		const currentProjectId = projectV2.value?.id
+		const isRealQueue =
+			!!currentProjectId &&
+			(moderationQueue.currentQueue.completed.includes(currentProjectId) ||
+				moderationQueue.currentQueue.skipped.includes(currentProjectId))
+
 		await navigateTo({
 			name: 'moderation',
 			state: {
 				confetti: true,
+				queueSummary: isRealQueue,
 			},
 		})
 
 		await nextTick()
 
-		if (moderationQueue.currentQueue.total > 1) {
-			addNotification({
-				title: 'Moderation completed',
-				text: `You have completed the moderation queue.`,
-				type: 'success',
-			})
-		} else {
+		if (!isRealQueue) {
 			addNotification({
 				title: 'Moderation submitted',
 				text: `Project ${status ?? 'completed successfully'}.`,
@@ -2061,30 +1779,15 @@ async function endChecklist(status?: string) {
 				(id) => id !== currentProjectId,
 			)
 
-			let foundEligible = false
-			if (remainingIds.length > 0) {
-				const next = await findNextEligibleQueueProject(remainingIds)
-
-				if (next) {
-					await Promise.all(
-						next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-					)
-					notifySkippedQueueProjects(next.skippedIds.length)
-					navigateToQueueProject(next.result, next.projectId)
-					foundEligible = true
-				} else {
-					await Promise.all(
-						remainingIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
-					)
+			if (!(await goToNextEligibleProject(remainingIds))) {
+				if (remainingIds.length > 0) {
 					addNotification({
 						title: 'No projects available',
-						text: 'All remaining projects are already moderated or locked by others.',
+						text: 'All remaining projects are already moderated, deleted, or locked by others.',
 						type: 'warning',
 					})
 				}
-			}
 
-			if (!foundEligible) {
 				await navigateTo({
 					name: 'moderation',
 				})
@@ -2109,27 +1812,25 @@ async function skipCurrentProject() {
 		new Promise((r) => setTimeout(r, 2000)),
 	])
 
-	hasNextProject.value = await moderationQueue.completeCurrentProject(projectId, 'skipped')
+	hasNextProject.value = await moderationQueue.deferProject(projectId)
 
 	await endChecklist('skipped')
 }
 
-function clearProjectLocalStorage() {
-	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
-	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
+async function clearProjectLocalStorage() {
+	persistenceEnabled = false
+	cancelPendingPersistence()
 
-	sessionStorage.removeItem(`modpack-permissions-data-${projectV2.value.id}`)
-	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
-	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
-
-	void clearChecklistProgressState(checklistPersistenceProjectSlug)
-	actionStates.value = {}
-	textInputValues.value = {}
-	clearGeneratedMessageState()
+	nodeStates.value = {}
+	activatedStages.value = new Set()
+	visitedStages.value = new Set()
+	message.value = null
+	await clearChecklistState(checklistPersistenceProjectId)
+	clearSessionChecklistState(checklistPersistenceProjectId)
 }
 
 const isLastVisibleStage = computed(() => {
-	for (let i = currentStage.value + 1; i < checklist.length; i++) {
+	for (let i = currentStage.value + 1; i < resolvedStages.value.length; i++) {
 		if (shouldShowStageIndex(i)) {
 			return false
 		}
@@ -2146,43 +1847,68 @@ const hasValidPreviousStage = computed(() => {
 	return false
 })
 
-const stageOptions = computed<OverflowMenuOption[]>(() => {
-	const options = checklist
+interface StageOption {
+	id: string
+	label: string
+	action: () => void
+	text: string
+	icon?: Component
+	messages?: number
+	fixes?: number
+	requiredMissing?: boolean
+	visited?: boolean
+	tone?: 'green'
+}
+
+const stageOptions = computed<StageOption[]>(() => {
+	const options = resolvedStages.value
 		.map((stage, index) => {
 			if (!shouldShowStage(stage)) return null
 
+			const label = stage.label ?? kebabToTitleCase(stage.id)
 			return {
 				id: String(index),
-				action: () => (currentStage.value = index),
-				text: stage.id ? kebabToTitleCase(stage.id) : stage.title,
-				color: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
-				hoverFilled: true,
-				icon: stage.icon ? stage.icon : undefined,
-			} as OverflowMenuOption
+				label,
+				action: () => {
+					clearGeneratedMessageState()
+					currentStage.value = index
+				},
+				text: label,
+				icon: stage._icon ?? undefined,
+				messages: countStageActions(stage) || undefined,
+				fixes: countStageFixes(stage) || undefined,
+				requiredMissing: hasRequiredMissing(stage) || undefined,
+				visited:
+					((index !== currentStage.value || generatedMessage.value) &&
+						stage.id &&
+						visitedStages.value.has(stage.id)) ||
+					undefined,
+				tone: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
+			}
 		})
-		.filter((opt): opt is OverflowMenuOption => opt !== null)
+		.filter((opt): opt is StageOption => opt !== null)
 
 	options.push({
 		id: 'generate-message',
+		label: 'Generate Message',
 		action: () => generateMessage(),
 		text: 'Generate Message',
-		color: generatedMessage.value ? 'green' : undefined,
-		hoverFilled: true,
 		icon: CheckIcon,
-	} as OverflowMenuOption)
+		tone: generatedMessage.value ? 'green' : undefined,
+	})
 
 	return options
 })
-
-type StageOverflowSlotOption = OverflowMenuOption & { id: string; text: string; icon?: Component }
-
-const stageOptionsForSlots = computed(() =>
-	stageOptions.value.filter((opt): opt is StageOverflowSlotOption => 'id' in opt && 'text' in opt),
-)
 </script>
 
 <style scoped lang="scss">
 .moderation-checklist {
+	position: fixed;
+	bottom: 1rem;
+	overflow-y: auto;
+	z-index: 50;
+	transition: bottom 0.25s ease-in-out;
+
 	@media (prefers-reduced-motion) {
 		transition: none !important;
 	}
@@ -2218,5 +1944,51 @@ const stageOptionsForSlots = computed(() =>
 			transform: translateY(0);
 		}
 	}
+}
+
+// Tooltip styling for button action message previews.
+// Must use :global since floating-vue teleports tooltips outside the component DOM.
+:global(.v-popper--theme-tooltip .v-popper__inner) {
+	max-width: 400px;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	white-space: normal;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown) {
+	line-height: 1.45;
+	font-size: 0.9rem;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown p) {
+	margin: 0.35rem 0;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown ul),
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown ol) {
+	margin: 0.35rem 0;
+	padding-left: 1.15rem;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown pre) {
+	max-width: 100%;
+	overflow-x: auto;
+	margin: 0.4rem 0;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown code) {
+	background-color: rgba(255, 255, 255, 0.15);
+	padding: 0.1rem 0.3rem;
+	border-radius: 0.25rem;
+	font-family: monospace;
+	font-size: 0.85em;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown strong) {
+	font-weight: 700;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown em) {
+	font-style: italic;
 }
 </style>

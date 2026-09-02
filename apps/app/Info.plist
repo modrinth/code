@@ -19,6 +19,8 @@
 		<string>A Minecraft mod wants to access your camera.</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>A Minecraft mod wants to access your microphone.</string>
+		<key>NSLocalNetworkUsageDescription</key>
+		<string>Minecraft or a Minecraft mod wants to access the LAN.</string>
 		<key>NSAppTransportSecurity</key>
 		<dict>
 			<key>NSExceptionDomains</key>

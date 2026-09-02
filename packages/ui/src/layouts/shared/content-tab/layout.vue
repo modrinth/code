@@ -9,42 +9,53 @@ import {
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
-	FilterIcon,
 	FolderOpenIcon,
 	LinkIcon,
+	OrganizationIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
+	UserIcon,
 } from '@modrinth/assets'
-import { computed, ref, watch } from 'vue'
+import { useSessionStorage } from '@vueuse/core'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Avatar from '#ui/components/base/Avatar.vue'
+import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
-import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import FilterPills from '#ui/components/base/FilterPills.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentCardTable from './components/ContentCardTable.vue'
-import ContentModpackCard from './components/ContentModpackCard.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
+import ManagedContentCard from './components/managed-content-card/index.vue'
 import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.vue'
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
+import ConfirmDisableModal from './components/modals/ConfirmDisableModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
+import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
 import {
 	getClientWarningType,
-	isClientOnlyEnvironment,
 	useBulkOperation,
 	useChangingItems,
 	useContentFilters,
+	useContentMetadataFilters,
 	useContentSearch,
 	useContentSelection,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type { ContentCardTableItem, ContentItem } from './types'
+import type {
+	BulkOperationStatus,
+	ContentActionWarning,
+	ContentCardTableItem,
+	ContentItem,
+} from './types'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentPageLayout')
@@ -83,9 +94,13 @@ const messages = defineMessages({
 		id: 'content.page-layout.upload-files',
 		defaultMessage: 'Upload files',
 	},
-	sortAlphabetical: {
-		id: 'content.page-layout.sort.alphabetical',
-		defaultMessage: 'Alphabetical',
+	sortAlphabeticalAscending: {
+		id: 'content.page-layout.sort.alphabetical-ascending',
+		defaultMessage: 'Name (A-Z)',
+	},
+	sortAlphabeticalDescending: {
+		id: 'content.page-layout.sort.alphabetical-descending',
+		defaultMessage: 'Name (Z-A)',
 	},
 	sortDateAddedNewest: {
 		id: 'content.page-layout.sort.date-added-newest',
@@ -94,6 +109,14 @@ const messages = defineMessages({
 	sortDateAddedOldest: {
 		id: 'content.page-layout.sort.date-added-oldest',
 		defaultMessage: 'Oldest first',
+	},
+	filter: {
+		id: 'content.page-layout.filter.add',
+		defaultMessage: 'Filter',
+	},
+	authorCount: {
+		id: 'content.page-layout.filter.author-count',
+		defaultMessage: '{count, plural, one {# author} other {# authors}}',
 	},
 	updateAll: {
 		id: 'content.page-layout.update-all',
@@ -150,31 +173,50 @@ const messages = defineMessages({
 })
 
 const ctx = injectContentManager()
+const skipNonEssentialWarnings = computed(() => ctx.skipNonEssentialWarnings?.value ?? false)
 
 function getItemId(item: ContentItem) {
 	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
 }
 
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
-const sortMode = ref<SortMode>('alphabetical-asc')
+const sortMode = ctx.filterPersistKey
+	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, 'alphabetical-asc')
+	: ref<SortMode>('alphabetical-asc')
 
 const sortLabels: Record<SortMode, () => string> = {
-	'alphabetical-asc': () => formatMessage(messages.sortAlphabetical),
-	'alphabetical-desc': () => formatMessage(messages.sortAlphabetical),
+	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),
+	'alphabetical-desc': () => formatMessage(messages.sortAlphabeticalDescending),
 	'date-added-newest': () => formatMessage(messages.sortDateAddedNewest),
 	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
 }
 
-function cycleSortMode() {
-	const modes: SortMode[] = [
-		'alphabetical-asc',
-		'alphabetical-desc',
-		'date-added-newest',
-		'date-added-oldest',
-	]
-	const idx = modes.indexOf(sortMode.value)
-	sortMode.value = modes[(idx + 1) % modes.length]
-}
+const sortOptions = computed<ButtonMenuOption[]>(() => [
+	{
+		id: 'alphabetical-asc',
+		label: formatMessage(messages.sortAlphabeticalAscending),
+		icon: ArrowDownAZIcon,
+		action: () => (sortMode.value = 'alphabetical-asc'),
+	},
+	{
+		id: 'alphabetical-desc',
+		label: formatMessage(messages.sortAlphabeticalDescending),
+		icon: ArrowUpZAIcon,
+		action: () => (sortMode.value = 'alphabetical-desc'),
+	},
+	{
+		id: 'date-added-newest',
+		label: formatMessage(messages.sortDateAddedNewest),
+		icon: ClockArrowDownIcon,
+		action: () => (sortMode.value = 'date-added-newest'),
+	},
+	{
+		id: 'date-added-oldest',
+		label: formatMessage(messages.sortDateAddedOldest),
+		icon: ClockArrowUpIcon,
+		action: () => (sortMode.value = 'date-added-oldest'),
+	},
+])
 
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
@@ -222,12 +264,124 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 	ctx.items,
 	{
 		showTypeFilters: true,
-		showUpdateFilter: ctx.hasUpdateSupport,
-		showWarningsFilter: true,
+		showUpdateFilter: false,
+		showWarningsFilter: false,
+		showStatusFilters: false,
+		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
 		isPackLocked: ctx.isPackLocked,
 		persistKey: ctx.filterPersistKey,
 	},
 )
+
+const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
+	useContentMetadataFilters(ctx.items, ctx.filterPersistKey, {
+		showSharedContent: ctx.showSharedContentFilter,
+		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
+	})
+
+const metadataFilterAuthors = computed(() => {
+	const authors = new Map<string, NonNullable<ContentItem['owner']>>()
+	for (const item of ctx.items.value) {
+		if (!item.owner) continue
+		authors.set(`${item.owner.type}:${item.owner.id}`, item.owner)
+	}
+	return authors
+})
+
+function getMetadataFilterAuthor(value: string) {
+	return metadataFilterAuthors.value.get(value)
+}
+
+function getMetadataFilterPreviewAuthor(selectedValues: string[]) {
+	const [selectedValue] = selectedValues
+	return selectedValues.length === 1 && selectedValue
+		? getMetadataFilterAuthor(selectedValue)
+		: undefined
+}
+
+const metadataFilterPreviewAuthorLimit = 3
+const metadataFilterPreviewAuthorSize = 20
+const metadataFilterPreviewAuthorOffset = 14
+
+function getMetadataFilterPreviewAuthorValues(selectedValues: string[]) {
+	return selectedValues.slice(0, metadataFilterPreviewAuthorLimit)
+}
+
+function getMetadataFilterPreviewAuthorOverflow(selectedValues: string[]) {
+	return Math.max(0, selectedValues.length - metadataFilterPreviewAuthorLimit)
+}
+
+function getMetadataFilterPreviewAuthorStackWidth(selectedValues: string[]) {
+	const visibleCount = Math.min(selectedValues.length, metadataFilterPreviewAuthorLimit)
+	if (visibleCount === 0) return 0
+	return (
+		metadataFilterPreviewAuthorSize +
+		(visibleCount - 1 + (selectedValues.length > metadataFilterPreviewAuthorLimit ? 1 : 0)) *
+			metadataFilterPreviewAuthorOffset
+	)
+}
+
+function isMetadataFilterOrganization(value: string) {
+	return (
+		getMetadataFilterAuthor(value)?.type === 'organization' || value.startsWith('organization:')
+	)
+}
+
+const metadataFilterTriggerClass =
+	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
+const metadataFilterPreviewTriggerClass =
+	'!h-[34px] !rounded-xl !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
+
+const filterControlsRef = ref<HTMLElement | null>(null)
+const projectTypeFiltersRef = ref<HTMLElement | null>(null)
+const metadataFiltersRef = ref<HTMLElement | null>(null)
+const metadataFiltersWrapped = ref(false)
+let filterControlsResizeObserver: ResizeObserver | null = null
+
+function updateMetadataFiltersWrapped() {
+	metadataFiltersWrapped.value =
+		!!projectTypeFiltersRef.value &&
+		!!metadataFiltersRef.value &&
+		metadataFiltersRef.value.offsetTop > projectTypeFiltersRef.value.offsetTop
+}
+
+function observeFilterControls() {
+	filterControlsResizeObserver?.disconnect()
+	for (const element of [
+		filterControlsRef.value,
+		projectTypeFiltersRef.value,
+		metadataFiltersRef.value,
+	]) {
+		if (element) filterControlsResizeObserver?.observe(element)
+	}
+	updateMetadataFiltersWrapped()
+}
+
+onMounted(() => {
+	if (typeof ResizeObserver === 'undefined') return
+	filterControlsResizeObserver = new ResizeObserver(updateMetadataFiltersWrapped)
+	observeFilterControls()
+})
+
+watch([filterControlsRef, projectTypeFiltersRef, metadataFiltersRef], observeFilterControls, {
+	flush: 'post',
+})
+
+onBeforeUnmount(() => {
+	filterControlsResizeObserver?.disconnect()
+})
+
+function updateFilterChips(nextFilters: string[]) {
+	if (nextFilters.length === 0) {
+		selectedFilters.value = []
+		return
+	}
+
+	const changedFilter =
+		nextFilters.find((filter) => !selectedFilters.value.includes(filter)) ??
+		selectedFilters.value.find((filter) => !nextFilters.includes(filter))
+	if (changedFilter) toggleFilter(changedFilter)
+}
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
@@ -246,6 +400,8 @@ if (ctx.isBulkOperating) {
 const { isChanging, markChanging, unmarkChanging } = useChangingItems()
 
 const bulkWaiting = ref(false)
+const bulkStatusMessage = ref<string | null>(null)
+const bulkItemCount = ref(0)
 
 const refreshing = ref(false)
 async function handleRefresh() {
@@ -261,28 +417,32 @@ async function handleRefresh() {
 const filteredItems = computed(() => {
 	const sorted = sortedItems.value
 	const searched = search(sorted)
-	return applyFilters(searched)
+	return applyMetadataFilters(applyFilters(searched))
 })
 const tableItems = computed<ContentCardTableItem[]>(() => {
 	const items = filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
 		const id = getItemId(item)
+		const locked = base.locked ?? item.locked ?? false
+		const clientWarning = getClientWarningType(item, ctx.showEnvironmentWarnings)
 		return {
 			...base,
 			id,
+			locked,
 			disabled:
 				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
 			disabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
-			toggleDisabled: ctx.isBusy.value,
-			toggleDisabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
+			toggleDisabled: ctx.isBusy.value || base.toggleDisabled,
+			toggleDisabledTooltip: ctx.isBusy.value
+				? (ctx.busyMessage?.value ?? null)
+				: base.toggleDisabledTooltip,
 			installing: item.installing === true,
-			hasUpdate: item.has_update,
-			isClientOnly:
-				isClientOnlyEnvironment(item.environment) ||
-				!!item.pack_client_retained ||
-				!!item.pack_client_depends,
-			clientWarning: getClientWarningType(item),
-			hideSwitchVersion: !base.versionLink,
+			installProgress: item.installProgress,
+			hasUpdate: base.hasUpdate ?? item.has_update,
+			isClientOnly: clientWarning !== null,
+			clientWarning,
+			hideDelete: base.hideDelete,
+			hideSwitchVersion: base.hideSwitchVersion ?? !base.versionLink,
 			overflowOptions: ctx.getOverflowOptions?.(item),
 		}
 	})
@@ -300,7 +460,7 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 })
 
 const hasOutdatedProjects = computed(() => {
-	const outdated = ctx.items.value.filter((p) => p.has_update)
+	const outdated = ctx.items.value.filter((p) => p.has_update && !p.locked)
 	if (outdated.length > 0) {
 		debug('hasOutdatedProjects: raw items with has_update=true', {
 			count: outdated.length,
@@ -318,26 +478,154 @@ const hasOutdatedProjects = computed(() => {
 
 //  Deletion
 const pendingDeletionItems = ref<ContentItem[]>([])
+const pendingDeletionWarning = ref<ContentActionWarning | null>(null)
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
+const confirmDisableModal = ref<InstanceType<typeof ConfirmDisableModal>>()
+const contentDependencyWarningModal = ref<InstanceType<typeof ContentDependencyWarningModal>>()
+const pendingDisableItems = ref<ContentItem[]>([])
+const pendingDisableWarning = ref<ContentActionWarning | null>(null)
+const pendingDependencyWarningItems = ref<ContentCardTableItem[]>([])
+const pendingDependencyWarningDependents = ref<
+	Array<{
+		item: ContentCardTableItem
+		dependencies: ContentCardTableItem[]
+	}>
+>([])
+const pendingDependencyWarningDisableTargets = ref<ContentItem[]>([])
 
-function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (item) {
-		pendingDeletionItems.value = [item]
-		if (event?.shiftKey && !ctx.isBusy.value) {
-			confirmDelete()
-		} else {
-			confirmDeletionModal.value?.show()
-		}
+function mapToDisplayItem(item: ContentItem) {
+	return {
+		...ctx.mapToTableItem(item),
+		id: getItemId(item),
 	}
 }
 
-function showBulkDeleteModal(event?: MouseEvent) {
-	pendingDeletionItems.value = [...selectedItems.value]
-	if (event?.shiftKey && !ctx.isBusy.value) {
+function canDeleteItem(item: ContentItem) {
+	return ctx.canDeleteItem?.(item) ?? true
+}
+
+function canToggleItem(item: ContentItem) {
+	return ctx.canToggleItem?.(item) ?? true
+}
+
+const deletableSelectedItems = computed(() => selectedItems.value.filter(canDeleteItem))
+const toggleableSelectedItems = computed(() => selectedItems.value.filter(canToggleItem))
+
+async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
+	const deletableItems = items.filter(canDeleteItem)
+	if (deletableItems.length === 0) return
+	pendingDeletionItems.value = deletableItems
+	pendingDeletionWarning.value = ctx.getDeleteWarning?.(deletableItems) ?? null
+	pendingDependencyWarningItems.value = []
+	pendingDependencyWarningDependents.value = []
+	pendingDependencyWarningDisableTargets.value = []
+	const deletingIds = new Set(deletableItems.map(getItemId))
+
+	const warning = ctx.getDeleteDependencyWarning
+		? await Promise.resolve()
+				.then(() => ctx.getDeleteDependencyWarning!(deletableItems))
+				.catch(() => null)
+		: null
+	if (warning) {
+		const remainingDependents = warning.dependents.filter(
+			(dependent) => !deletingIds.has(getItemId(dependent.item)),
+		)
+
+		if (remainingDependents.length === 0) {
+			showDeletionConfirmation(event)
+			return
+		}
+
+		const relevantDependencyIds = new Set(
+			remainingDependents.flatMap((dependent) => dependent.dependencies.map(getItemId)),
+		)
+		const warningItems = deletableItems.filter((item) => relevantDependencyIds.has(getItemId(item)))
+		if (warningItems.length === 0) {
+			showDeletionConfirmation(event)
+			return
+		}
+
+		pendingDependencyWarningItems.value = warningItems.map(mapToDisplayItem)
+		pendingDependencyWarningDependents.value = remainingDependents.map((dependent) => ({
+			item: mapToDisplayItem(dependent.item),
+			dependencies: dependent.dependencies
+				.filter((dependency) => relevantDependencyIds.has(getItemId(dependency)))
+				.map(mapToDisplayItem),
+		}))
+		pendingDependencyWarningDisableTargets.value = remainingDependents.map(
+			(dependent) => dependent.item,
+		)
+		contentDependencyWarningModal.value?.show()
+		return
+	}
+
+	showDeletionConfirmation(event)
+}
+
+async function showDeletionConfirmation(event?: MouseEvent) {
+	if (
+		!pendingDeletionWarning.value &&
+		(event?.shiftKey || skipNonEssentialWarnings.value) &&
+		!ctx.isBusy.value
+	) {
 		confirmDelete()
 	} else {
+		await nextTick()
 		confirmDeletionModal.value?.show()
+	}
+}
+
+async function handleDeleteById(id: string, event?: MouseEvent) {
+	const item = ctx.items.value.find((i) => getItemId(i) === id)
+	if (item) {
+		await promptDeleteItems([item], event)
+	}
+}
+
+async function showBulkDeleteModal(event?: MouseEvent) {
+	await promptDeleteItems([...selectedItems.value], event)
+}
+
+async function confirmDependencyWarningDelete(disableDependentsAfterDeleting: boolean) {
+	if (disableDependentsAfterDeleting) {
+		pendingDependencyWarningDisableTargets.value =
+			pendingDependencyWarningDisableTargets.value.filter((item) => item.enabled)
+	} else {
+		pendingDependencyWarningDisableTargets.value = []
+	}
+
+	pendingDependencyWarningItems.value = []
+	pendingDependencyWarningDependents.value = []
+	if (pendingDeletionWarning.value) {
+		confirmDeletionModal.value?.show()
+		return
+	}
+
+	await confirmDelete()
+}
+
+async function disablePendingDependencyWarningDependents() {
+	const items = pendingDependencyWarningDisableTargets.value.filter((item) => item.enabled)
+	pendingDependencyWarningDisableTargets.value = []
+	if (items.length === 0) return
+
+	await promptDisableItems(items)
+}
+
+async function disableItemsWithoutWarning(items: ContentItem[]) {
+	if (ctx.bulkDisableItems) {
+		await ctx.bulkDisableItems(items)
+		return
+	}
+
+	for (const item of items) {
+		const id = getItemId(item)
+		markChanging(id)
+		try {
+			await ctx.toggleEnabled(item)
+		} finally {
+			unmarkChanging(id)
+		}
 	}
 }
 
@@ -345,18 +633,24 @@ async function confirmDelete() {
 	if (ctx.isBusy.value) return
 	const itemsToDelete = [...pendingDeletionItems.value]
 	pendingDeletionItems.value = []
+	pendingDeletionWarning.value = null
 	if (itemsToDelete.length === 0) return
 
 	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'delete'
+		bulkProgress.value = 0
+		bulkTotal.value = itemsToDelete.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkDeleteItems(itemsToDelete)
+			await disablePendingDependencyWarningDependents()
 		} finally {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 		return
@@ -369,6 +663,7 @@ async function confirmDelete() {
 		try {
 			await ctx.deleteItem(item)
 			removeFromSelection(id)
+			await disablePendingDependencyWarningDependents()
 		} finally {
 			unmarkChanging(id)
 		}
@@ -384,12 +679,79 @@ async function confirmDelete() {
 		},
 		{ onComplete: clearSelection },
 	)
+	await disablePendingDependencyWarningDependents()
+}
+
+async function promptDisableItems(items: ContentItem[]) {
+	const toggleableItems = items.filter(canToggleItem)
+	if (toggleableItems.length === 0) return
+	pendingDisableItems.value = toggleableItems
+	const warning = ctx.getDisableWarning?.(toggleableItems) ?? null
+	if (warning) {
+		pendingDisableWarning.value = warning
+		confirmDisableModal.value?.show()
+		return
+	}
+
+	await confirmDisable()
+}
+
+async function confirmDisable() {
+	if (ctx.isBusy.value) return
+	const itemsToDisable = [...pendingDisableItems.value]
+	pendingDisableItems.value = []
+	pendingDisableWarning.value = null
+	if (itemsToDisable.length === 0) return
+
+	if (ctx.bulkDisableItems && itemsToDisable.length > 1) {
+		isBulkOperating.value = true
+		bulkOperation.value = 'disable'
+		bulkProgress.value = 0
+		bulkTotal.value = itemsToDisable.length
+		bulkWaiting.value = true
+		try {
+			await disableItemsWithoutWarning(itemsToDisable)
+		} finally {
+			clearSelection()
+			isBulkOperating.value = false
+			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
+			bulkWaiting.value = false
+		}
+		return
+	}
+
+	if (itemsToDisable.length === 1) {
+		const item = itemsToDisable[0]
+		const id = getItemId(item)
+		markChanging(id)
+		try {
+			if (ctx.bulkDisableItems) {
+				await ctx.bulkDisableItems(itemsToDisable)
+			} else {
+				await ctx.toggleEnabled(item)
+			}
+		} finally {
+			unmarkChanging(id)
+		}
+		return
+	}
+
+	await runBulk('disable', itemsToDisable, (item) => disableItemsWithoutWarning([item]), {
+		onComplete: clearSelection,
+	})
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
 	if (ctx.isBusy.value) return
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (!item) return
+	if (!canToggleItem(item)) return
+	if (!_value) {
+		await promptDisableItems([item])
+		return
+	}
 	markChanging(id)
 	try {
 		await ctx.toggleEnabled(item)
@@ -400,11 +762,13 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 
 async function bulkEnable() {
 	if (ctx.isBusy.value) return
-	const items = selectedItems.value.filter((item) => !item.enabled)
+	const items = toggleableSelectedItems.value.filter((item) => !item.enabled)
 	if (items.length === 0) return
 	if (ctx.bulkEnableItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'enable'
+		bulkProgress.value = 0
+		bulkTotal.value = items.length
 		bulkWaiting.value = true
 		try {
 			await ctx.bulkEnableItems(items)
@@ -412,6 +776,8 @@ async function bulkEnable() {
 			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 			bulkWaiting.value = false
 		}
 		return
@@ -421,32 +787,20 @@ async function bulkEnable() {
 
 async function bulkDisable() {
 	if (ctx.isBusy.value) return
-	const items = selectedItems.value.filter((item) => item.enabled)
+	const items = toggleableSelectedItems.value.filter((item) => item.enabled)
 	if (items.length === 0) return
-	if (ctx.bulkDisableItems) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'disable'
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkDisableItems(items)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkWaiting.value = false
-		}
-		return
-	}
-	await runBulk('disable', items, (item) => ctx.toggleEnabled(item), { onComplete: clearSelection })
+	await promptDisableItems(items)
 }
 
 function handleUpdateById(id: string) {
+	const item = ctx.items.value.find((item) => getItemId(item) === id)
+	if (item?.locked) return
 	ctx.updateItem?.(id)
 }
 
 function handleSwitchVersionById(id: string) {
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (item) {
+	if (item && !item.locked) {
 		ctx.switchVersion?.(item)
 	}
 }
@@ -454,15 +808,19 @@ function handleSwitchVersionById(id: string) {
 // Bulk updating
 const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal>>()
 const pendingBulkUpdateItems = ref<ContentItem[]>([])
+const pendingBulkUpdateAll = ref(false)
 
-const hasBulkUpdateSupport = computed(() => !!(ctx.bulkUpdateItem || ctx.bulkUpdateItems))
+const hasBulkUpdateSupport = computed(
+	() => !!(ctx.bulkUpdateAll || ctx.bulkUpdateItem || ctx.bulkUpdateItems),
+)
 
 function promptUpdateAll(event?: MouseEvent) {
 	if (!hasBulkUpdateSupport.value) return
-	const items = ctx.items.value.filter((item) => item.has_update)
+	const items = ctx.items.value.filter((item) => item.has_update && !item.locked)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
-	if (event?.shiftKey && !ctx.isBusy.value) {
+	pendingBulkUpdateAll.value = true
+	if ((event?.shiftKey || skipNonEssentialWarnings.value) && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
 		confirmBulkUpdateModal.value?.show()
@@ -471,10 +829,11 @@ function promptUpdateAll(event?: MouseEvent) {
 
 function promptUpdateSelected(event?: MouseEvent) {
 	if (!hasBulkUpdateSupport.value) return
-	const items = selectedItems.value.filter((item) => item.has_update)
+	const items = selectedItems.value.filter((item) => item.has_update && !item.locked)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
-	if (event?.shiftKey && !ctx.isBusy.value) {
+	pendingBulkUpdateAll.value = false
+	if ((event?.shiftKey || skipNonEssentialWarnings.value) && !ctx.isBusy.value) {
 		confirmBulkUpdate()
 	} else {
 		confirmBulkUpdateModal.value?.show()
@@ -486,22 +845,61 @@ async function confirmBulkUpdate() {
 	const items = pendingBulkUpdateItems.value
 	if (items.length === 0 || !hasBulkUpdateSupport.value) return
 
-	if (ctx.bulkUpdateItems) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'update'
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkUpdateItems(items)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkWaiting.value = false
-		}
-	} else if (ctx.bulkUpdateItem) {
-		await runBulk('update', items, ctx.bulkUpdateItem, { onComplete: clearSelection })
+	const setBulkStatus = (status: BulkOperationStatus) => {
+		bulkStatusMessage.value = status.message ?? null
+		bulkProgress.value = status.progress ?? bulkProgress.value
+		bulkTotal.value = status.total ?? bulkTotal.value
+		bulkWaiting.value = status.waiting ?? false
 	}
-	pendingBulkUpdateItems.value = []
+
+	try {
+		if (pendingBulkUpdateAll.value && ctx.bulkUpdateAll) {
+			isBulkOperating.value = true
+			bulkOperation.value = 'update'
+			bulkProgress.value = 0
+			bulkTotal.value = items.length
+			bulkItemCount.value = items.length
+			bulkStatusMessage.value = null
+			bulkWaiting.value = true
+			try {
+				await ctx.bulkUpdateAll(setBulkStatus)
+			} finally {
+				clearSelection()
+				isBulkOperating.value = false
+				bulkOperation.value = null
+				bulkProgress.value = 0
+				bulkTotal.value = 0
+				bulkItemCount.value = 0
+				bulkStatusMessage.value = null
+				bulkWaiting.value = false
+			}
+		} else if (ctx.bulkUpdateItems) {
+			isBulkOperating.value = true
+			bulkOperation.value = 'update'
+			bulkProgress.value = 0
+			bulkTotal.value = items.length
+			bulkItemCount.value = items.length
+			bulkStatusMessage.value = null
+			bulkWaiting.value = true
+			try {
+				await ctx.bulkUpdateItems(items)
+			} finally {
+				clearSelection()
+				isBulkOperating.value = false
+				bulkOperation.value = null
+				bulkProgress.value = 0
+				bulkTotal.value = 0
+				bulkItemCount.value = 0
+				bulkStatusMessage.value = null
+				bulkWaiting.value = false
+			}
+		} else if (ctx.bulkUpdateItem) {
+			await runBulk('update', items, ctx.bulkUpdateItem, { onComplete: clearSelection })
+		}
+	} finally {
+		pendingBulkUpdateItems.value = []
+		pendingBulkUpdateAll.value = false
+	}
 }
 
 const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
@@ -517,50 +915,40 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="universal-card flex flex-col items-center gap-4 p-6">
 					<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
 					<p class="text-secondary">{{ ctx.error.value.message }}</p>
-					<ButtonStyled color="brand">
-						<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="handleRefresh">{{
+						formatMessage(commonMessages.retryButton)
+					}}</Button>
 				</div>
 			</div>
 
 			<template v-else>
-				<ContentModpackCard
-					v-if="ctx.modpack.value"
-					:project="ctx.modpack.value.project"
-					:project-link="ctx.modpack.value.projectLink"
-					:version="ctx.modpack.value.version"
-					:version-link="ctx.modpack.value.versionLink"
-					:owner="ctx.modpack.value.owner"
-					:categories="ctx.modpack.value.categories"
-					:has-update="ctx.modpack.value.hasUpdate"
-					:disabled="ctx.modpack.value.disabled"
-					:disabled-text="ctx.modpack.value.disabledText"
-					:show-content-hint="
-						!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
-					"
-					v-on="{
-						...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
-						...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
-						...(ctx.unlinkModpack ? { unlink: () => confirmUnlinkModal?.show() } : {}),
-						...(ctx.openSettings ? { settings: () => ctx.openSettings?.() } : {}),
-					}"
-					@dismiss-content-hint="ctx.dismissContentHint?.()"
+				<ManagedContentCard
+					v-if="ctx.managedContent.value"
+					:data="ctx.managedContent.value.card"
+					:disabled="ctx.managedContent.value.disabled"
+					:disabled-text="ctx.managedContent.value.disabledText"
+					:show-view-content="!!ctx.viewManagedContent"
+					:show-settings="!!ctx.openManagedContentSettings"
+					:show-primary-action="!!ctx.runManagedContentPrimaryAction"
+					@view-content="ctx.viewManagedContent?.()"
+					@settings="ctx.openManagedContentSettings?.()"
+					@primary-action="ctx.runManagedContentPrimaryAction?.($event)"
 				/>
 
 				<template v-if="ctx.items.value.length > 0">
-					<div class="flex flex-col gap-4">
-						<span v-if="ctx.modpack.value" class="text-xl font-semibold text-contrast">
+					<div class="flex flex-col gap-2">
+						<span v-if="ctx.managedContent.value" class="mb-2 text-xl font-semibold text-contrast">
 							{{ formatMessage(messages.additionalContent) }}
 						</span>
 
 						<div class="flex flex-wrap items-center gap-2">
-							<StyledInput
+							<Input
 								v-model="searchQuery"
 								:icon="SearchIcon"
 								type="text"
 								autocomplete="off"
 								:spellcheck="false"
-								input-class="!h-10"
+								size="medium"
 								wrapper-class="flex-1 min-w-0"
 								clearable
 								:placeholder="
@@ -576,132 +964,260 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							/>
 
 							<div class="flex gap-2">
-								<ButtonStyled color="brand">
-									<button
-										v-tooltip="
-											ctx.busyMessage?.value ??
-											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-										"
-										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10 flex items-center gap-2"
-										@click="ctx.browse"
-									>
-										<CompassIcon class="size-5" />
-										<span>{{ formatMessage(messages.browseContent) }}</span>
-									</button>
-								</ButtonStyled>
-								<ButtonStyled type="outlined">
-									<button
-										v-tooltip="
-											ctx.busyMessage?.value ??
-											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-										"
-										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-										class="!h-10"
-										@click="ctx.uploadFiles"
-									>
-										<FolderOpenIcon class="size-5" />
-										{{ formatMessage(messages.uploadFiles) }}
-									</button>
-								</ButtonStyled>
+								<Button
+									v-tooltip="
+										ctx.busyMessage?.value ??
+										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+									"
+									type="outlined"
+									size="lg"
+									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+									@click="ctx.uploadFiles"
+								>
+									<FolderOpenIcon class="size-5" />
+									{{ formatMessage(messages.uploadFiles) }}
+								</Button>
+								<Button
+									v-tooltip="
+										ctx.busyMessage?.value ??
+										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+									"
+									type="colored"
+									color="brand"
+									size="lg"
+									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+									@click="ctx.browse"
+								>
+									<CompassIcon class="size-5" />
+									<span>{{ formatMessage(messages.browseContent) }}</span>
+								</Button>
 							</div>
 						</div>
 
-						<div class="@container flex flex-wrap items-center justify-between gap-2">
-							<div class="flex flex-wrap items-center gap-1.5">
-								<FilterIcon class="size-5 text-secondary" />
-								<button
-									class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-									:class="
-										selectedFilters.length === 0
-											? 'border-green bg-brand-highlight text-brand'
-											: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-									"
-									:aria-pressed="selectedFilters.length === 0"
-									@click="selectedFilters = []"
+						<div class="@container flex items-start gap-2">
+							<div ref="filterControlsRef" class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+								<div ref="projectTypeFiltersRef" class="flex items-center gap-2">
+									<TeleportOverflowMenu
+										class="!h-[34px] !text-sm !font-medium"
+										:icon-only="false"
+										:label="formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })"
+										:options="sortOptions"
+									>
+										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" />
+										<ClockArrowDownIcon v-else-if="sortMode === 'date-added-newest'" />
+										<ClockArrowUpIcon v-else-if="sortMode === 'date-added-oldest'" />
+										<ArrowDownAZIcon v-else />
+										{{ sortLabels[sortMode]() }}
+										<DropdownIcon />
+									</TeleportOverflowMenu>
+									<div class="h-6 w-px shrink-0 bg-surface-5" />
+									<FilterPills
+										:model-value="selectedFilters"
+										:options="filterOptions"
+										@update:model-value="updateFilterChips"
+									>
+										<template #all>
+											{{ formatMessage(commonMessages.allProjectType) }}
+										</template>
+									</FilterPills>
+								</div>
+								<div
+									v-if="metadataFilterCategories.length > 0"
+									ref="metadataFiltersRef"
+									class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
 								>
-									{{ formatMessage(commonMessages.allProjectType) }}
-								</button>
-								<button
-									v-for="option in filterOptions"
-									:key="option.id"
-									class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-									:class="
-										selectedFilters.includes(option.id)
-											? 'border-green bg-brand-highlight text-brand'
-											: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-									"
-									:aria-pressed="selectedFilters.includes(option.id)"
-									@click="toggleFilter(option.id)"
-								>
-									{{ option.label }}
-								</button>
-								<div class="hidden @[900px]:block">
-									<ButtonStyled type="transparent">
-										<button
-											:aria-label="
-												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-											"
-											@click="cycleSortMode"
-										>
-											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-												v-else-if="sortMode === 'date-added-newest'"
-											/><ClockArrowUpIcon
-												v-else-if="sortMode === 'date-added-oldest'"
-											/><ArrowDownAZIcon v-else />
-											{{ sortLabels[sortMode]() }}
-										</button>
-									</ButtonStyled>
+									<div
+										class="mr-0.5 h-6 w-px shrink-0 bg-surface-5"
+										:class="{ invisible: metadataFiltersWrapped }"
+									/>
+									<DropdownFilterBar
+										v-model="selectedMetadataFilters"
+										:categories="metadataFilterCategories"
+										:show-label="false"
+										:add-label="formatMessage(messages.filter)"
+										:add-button-class="metadataFilterTriggerClass"
+										:preview-trigger-class="metadataFilterPreviewTriggerClass"
+										add-button-size="sm"
+										checkbox-position="right"
+										apply-immediately
+									>
+										<template #preview-content="{ category, selectedValues, label, summary }">
+											<div
+												v-if="category.key === 'author'"
+												class="flex min-w-0 flex-1 items-center gap-2"
+											>
+												<template v-if="selectedValues.length === 1">
+													<span
+														class="flex size-5 shrink-0 items-center justify-center overflow-hidden bg-surface-2 text-brand"
+														:class="
+															getMetadataFilterPreviewAuthor(selectedValues)?.type ===
+															'organization'
+																? 'rounded'
+																: 'rounded-full'
+														"
+													>
+														<Avatar
+															v-if="getMetadataFilterPreviewAuthor(selectedValues)?.avatar_url"
+															:src="getMetadataFilterPreviewAuthor(selectedValues)?.avatar_url"
+															size="100%"
+															:circle="
+																getMetadataFilterPreviewAuthor(selectedValues)?.type !==
+																'organization'
+															"
+															no-shadow
+															class="!border-0"
+														/>
+														<OrganizationIcon
+															v-else-if="
+																getMetadataFilterPreviewAuthor(selectedValues)?.type ===
+																'organization'
+															"
+															class="size-4"
+														/>
+														<UserIcon v-else class="size-4" />
+													</span>
+													<span class="min-w-0 truncate font-semibold text-contrast">
+														{{ getMetadataFilterPreviewAuthor(selectedValues)?.name ?? summary }}
+													</span>
+												</template>
+												<template v-else>
+													<span class="font-medium">{{ label }}:</span>
+													<div
+														class="relative h-5 shrink-0"
+														:style="{
+															width: `${getMetadataFilterPreviewAuthorStackWidth(selectedValues)}px`,
+														}"
+														aria-hidden="true"
+													>
+														<div
+															v-for="(value, index) in getMetadataFilterPreviewAuthorValues(
+																selectedValues,
+															)"
+															:key="value"
+															class="absolute top-0 flex size-5 items-center justify-center overflow-hidden border border-solid border-surface-3 bg-surface-4 text-brand"
+															:class="
+																isMetadataFilterOrganization(value) ? 'rounded' : 'rounded-full'
+															"
+															:style="{
+																left: `${index * metadataFilterPreviewAuthorOffset}px`,
+																zIndex:
+																	getMetadataFilterPreviewAuthorValues(selectedValues).length -
+																	index,
+															}"
+														>
+															<Avatar
+																v-if="getMetadataFilterAuthor(value)?.avatar_url"
+																:src="getMetadataFilterAuthor(value)?.avatar_url"
+																size="100%"
+																:circle="!isMetadataFilterOrganization(value)"
+																no-shadow
+																class="!border-0"
+															/>
+															<OrganizationIcon
+																v-else-if="isMetadataFilterOrganization(value)"
+																class="size-3.5"
+															/>
+															<UserIcon v-else class="size-3.5" />
+														</div>
+														<div
+															v-if="getMetadataFilterPreviewAuthorOverflow(selectedValues) > 0"
+															class="absolute top-0 flex size-5 items-center justify-center rounded-full border border-solid border-surface-3 bg-surface-4 text-[10px] font-bold text-contrast"
+															:style="{
+																left: `${getMetadataFilterPreviewAuthorValues(selectedValues).length * metadataFilterPreviewAuthorOffset}px`,
+															}"
+														>
+															+{{ getMetadataFilterPreviewAuthorOverflow(selectedValues) }}
+														</div>
+													</div>
+													<span class="min-w-0 truncate font-semibold text-contrast">
+														{{
+															formatMessage(messages.authorCount, { count: selectedValues.length })
+														}}
+													</span>
+												</template>
+											</div>
+											<span v-else class="min-w-0 flex-1 truncate">
+												<span class="font-medium">{{ label }}:</span>
+												<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
+											</span>
+										</template>
+										<template #option="{ category, option, selected }">
+											<div
+												v-if="category.key === 'author'"
+												class="flex min-w-0 flex-1 items-center gap-2"
+											>
+												<span
+													v-tooltip="option.label"
+													class="flex size-6 shrink-0 items-center justify-center overflow-hidden bg-surface-2 text-secondary"
+													:class="
+														getMetadataFilterAuthor(option.value)?.type === 'organization'
+															? 'rounded'
+															: 'rounded-full'
+													"
+												>
+													<img
+														v-if="getMetadataFilterAuthor(option.value)?.avatar_url"
+														:src="getMetadataFilterAuthor(option.value)?.avatar_url"
+														:alt="option.label"
+														class="size-full object-cover"
+													/>
+													<OrganizationIcon
+														v-else-if="
+															getMetadataFilterAuthor(option.value)?.type === 'organization'
+														"
+														class="size-5"
+													/>
+													<UserIcon v-else class="size-5" />
+												</span>
+												<span
+													v-tooltip="option.label"
+													class="min-w-0 truncate font-semibold leading-tight"
+													:class="selected ? 'text-contrast' : 'text-primary'"
+												>
+													{{ option.label }}
+												</span>
+											</div>
+											<span
+												v-else
+												class="min-w-0 truncate font-semibold leading-tight"
+												:class="selected ? 'text-contrast' : 'text-primary'"
+											>
+												{{ option.label }}
+											</span>
+										</template>
+									</DropdownFilterBar>
 								</div>
 							</div>
 
-							<div class="flex items-center gap-2">
-								<div class="@[900px]:hidden">
-									<ButtonStyled type="transparent">
-										<button
-											:aria-label="
-												formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-											"
-											@click="cycleSortMode"
-										>
-											<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
-												v-else-if="sortMode === 'date-added-newest'"
-											/><ClockArrowUpIcon
-												v-else-if="sortMode === 'date-added-oldest'"
-											/><ArrowDownAZIcon v-else />
-											{{ sortLabels[sortMode]() }}
-										</button>
-									</ButtonStyled>
-								</div>
-
-								<ButtonStyled
+							<div class="flex shrink-0 items-center gap-2">
+								<Button
 									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
+									v-tooltip="formatMessage(messages.updateAll)"
+									type="quiet"
 									color="green"
-									type="transparent"
-									color-fill="text"
-									hover-color-fill="background"
+									:disabled="isBulkOperating"
+									class="!text-sm !font-medium hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+									@click="promptUpdateAll"
 								>
-									<button
-										v-tooltip="formatMessage(messages.updateAll)"
-										:disabled="isBulkOperating"
-										@click="promptUpdateAll"
-									>
-										<DownloadIcon />
-										{{ formatMessage(messages.updateAll) }}
-									</button>
-								</ButtonStyled>
+									<DownloadIcon />
+									{{ formatMessage(messages.updateAll) }}
+								</Button>
 
-								<ButtonStyled type="transparent">
-									<button :disabled="refreshing" @click="handleRefresh">
-										<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-										{{ formatMessage(commonMessages.refreshButton) }}
-									</button>
-								</ButtonStyled>
+								<Button
+									type="quiet"
+									:disabled="refreshing"
+									class="!text-sm !font-medium"
+									@click="handleRefresh"
+								>
+									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
+									{{ formatMessage(commonMessages.refreshButton) }}
+								</Button>
 							</div>
 						</div>
 
 						<ContentCardTable
 							v-model:selected-ids="selectedIds"
+							class="mt-2"
 							:items="tableItems"
 							:show-selection="true"
 							@update:enabled="handleToggleEnabledById"
@@ -720,13 +1236,15 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					<template #heading>
 						{{
 							formatMessage(
-								ctx.modpack.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
+								ctx.managedContent.value
+									? messages.noExtraContentInstalled
+									: messages.noContentInstalled,
 							)
 						}}
 					</template>
 					<template #description>
 						{{
-							ctx.modpack.value
+							ctx.managedContent.value
 								? formatMessage(messages.emptyModpackHint)
 								: formatMessage(messages.emptyHint, {
 										contentType: formatContentTypeSentence(
@@ -739,34 +1257,33 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						}}
 					</template>
 					<template #actions>
-						<ButtonStyled type="outlined">
-							<button
-								v-tooltip="
-									ctx.busyMessage?.value ??
-									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-								"
-								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10"
-								@click="ctx.uploadFiles"
-							>
-								<FolderOpenIcon class="size-5" />
-								{{ formatMessage(messages.uploadFiles) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button
-								v-tooltip="
-									ctx.busyMessage?.value ??
-									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-								"
-								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-								class="!h-10 flex items-center gap-2"
-								@click="ctx.browse"
-							>
-								<CompassIcon class="size-5" />
-								<span>{{ formatMessage(messages.browseContent) }}</span>
-							</button>
-						</ButtonStyled>
+						<Button
+							v-tooltip="
+								ctx.busyMessage?.value ??
+								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+							"
+							type="outlined"
+							size="lg"
+							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+							@click="ctx.uploadFiles"
+						>
+							<FolderOpenIcon class="size-5" />
+							{{ formatMessage(messages.uploadFiles) }}
+						</Button>
+						<Button
+							v-tooltip="
+								ctx.busyMessage?.value ??
+								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+							"
+							type="colored"
+							color="brand"
+							size="lg"
+							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+							@click="ctx.browse"
+						>
+							<CompassIcon class="size-5" />
+							<span>{{ formatMessage(messages.browseContent) }}</span>
+						</Button>
 					</template>
 				</EmptyState>
 			</template>
@@ -782,90 +1299,92 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:bulk-progress="bulkProgress"
 			:bulk-total="bulkTotal"
 			:bulk-waiting="bulkWaiting"
+			:bulk-status-message="bulkStatusMessage"
+			:bulk-item-count="bulkItemCount"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
 			:get-item-id="getItemId"
+			:toggle-items="toggleableSelectedItems"
 			@clear="clearSelection"
 			@enable="bulkEnable"
 			@disable="bulkDisable"
 		>
 			<template #actions>
-				<ButtonStyled
-					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update)"
-					type="transparent"
+				<Button
+					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update && !m.locked)"
+					v-tooltip="formatMessage(commonMessages.updateButton)"
+					type="quiet"
 					color="green"
-					color-fill="text"
-					hover-color-fill="background"
+					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					@click="promptUpdateSelected"
 				>
-					<button
-						v-tooltip="formatMessage(commonMessages.updateButton)"
-						@click="promptUpdateSelected"
-					>
-						<DownloadIcon />
-						<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
-					</button>
-				</ButtonStyled>
+					<DownloadIcon />
+					<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
+				</Button>
 
-				<ButtonStyled v-if="ctx.shareItems" type="transparent">
-					<OverflowMenu
-						:options="[
-							{
-								id: 'share-names',
-								action: () => ctx.shareItems!(selectedItems, 'names'),
-							},
-							{
-								id: 'share-file-names',
-								action: () => ctx.shareItems!(selectedItems, 'file-names'),
-							},
-							{
-								id: 'share-urls',
-								action: () => ctx.shareItems!(selectedItems, 'urls'),
-							},
-							{
-								id: 'share-markdown',
-								action: () => ctx.shareItems!(selectedItems, 'markdown'),
-							},
-						]"
-					>
-						<ShareIcon />
-						<span class="bar-label">{{ formatMessage(messages.share) }}</span>
-						<DropdownIcon />
-						<template #share-names>
-							<TextCursorInputIcon />
-							{{ formatMessage(messages.shareProjectNames) }}
-						</template>
-						<template #share-file-names>
-							<FileIcon />
-							{{ formatMessage(messages.shareFileNames) }}
-						</template>
-						<template #share-urls>
-							<LinkIcon />
-							{{ formatMessage(messages.shareProjectLinks) }}
-						</template>
-						<template #share-markdown>
-							<CodeIcon />
-							{{ formatMessage(messages.shareMarkdownLinks) }}
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+				<TeleportOverflowMenu
+					v-if="ctx.shareItems"
+					type="quiet"
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					:options="[
+						{
+							id: 'share-names',
+							label: formatMessage(messages.shareProjectNames),
+							action: () => ctx.shareItems!(selectedItems, 'names'),
+						},
+						{
+							id: 'share-file-names',
+							label: formatMessage(messages.shareFileNames),
+							action: () => ctx.shareItems!(selectedItems, 'file-names'),
+						},
+						{
+							id: 'share-urls',
+							label: formatMessage(messages.shareProjectLinks),
+							action: () => ctx.shareItems!(selectedItems, 'urls'),
+						},
+						{
+							id: 'share-markdown',
+							label: formatMessage(messages.shareMarkdownLinks),
+							action: () => ctx.shareItems!(selectedItems, 'markdown'),
+						},
+					]"
+					class="!w-auto !px-2.5 !rounded-xl"
+				>
+					<ShareIcon />
+					<span class="bar-label">{{ formatMessage(messages.share) }}</span>
+					<DropdownIcon />
+					<template #share-names>
+						<TextCursorInputIcon />
+						{{ formatMessage(messages.shareProjectNames) }}
+					</template>
+					<template #share-file-names>
+						<FileIcon />
+						{{ formatMessage(messages.shareFileNames) }}
+					</template>
+					<template #share-urls>
+						<LinkIcon />
+						{{ formatMessage(messages.shareProjectLinks) }}
+					</template>
+					<template #share-markdown>
+						<CodeIcon />
+						{{ formatMessage(messages.shareMarkdownLinks) }}
+					</template>
+				</TeleportOverflowMenu>
 			</template>
 
 			<template #actions-end>
-				<div class="mx-1 h-6 w-px bg-surface-5" />
+				<div v-if="deletableSelectedItems.length > 0" class="mx-1 h-6 w-px bg-surface-5" />
 
-				<ButtonStyled
-					type="transparent"
+				<Button
+					v-if="deletableSelectedItems.length > 0"
+					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					type="quiet"
 					color="red"
-					color-fill="text"
-					hover-color-fill="background"
+					class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					@click="showBulkDeleteModal"
 				>
-					<button
-						v-tooltip="formatMessage(commonMessages.deleteLabel)"
-						@click="showBulkDeleteModal"
-					>
-						<TrashIcon />
-						<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
-					</button>
-				</ButtonStyled>
+					<TrashIcon />
+					<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+				</Button>
 			</template>
 		</ContentSelectionBar>
 
@@ -873,11 +1392,32 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			ref="confirmDeletionModal"
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
+			:warning="pendingDeletionWarning"
 			:variant="ctx.deletionContext ?? 'instance'"
 			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@delete="confirmDelete"
+		/>
+		<ConfirmDisableModal
+			ref="confirmDisableModal"
+			:count="pendingDisableItems.length"
+			:item-type="ctx.contentTypeLabel.value"
+			:warning="pendingDisableWarning"
+			:action-disabled="ctx.isBusy.value"
+			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			@disable="confirmDisable"
+		/>
+		<ContentDependencyWarningModal
+			ref="contentDependencyWarningModal"
+			:items="pendingDependencyWarningItems"
+			:dependents="pendingDependencyWarningDependents"
+			:item-type="ctx.contentTypeLabel.value"
+			:variant="ctx.deletionContext ?? 'instance'"
+			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
+			:action-disabled="ctx.isBusy.value"
+			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+			@delete="confirmDependencyWarningDelete"
 		/>
 		<ConfirmBulkUpdateModal
 			v-if="hasBulkUpdateSupport"
@@ -892,7 +1432,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			v-if="ctx.unlinkModpack"
 			ref="confirmUnlinkModal"
 			:server="ctx.deletionContext === 'server'"
-			:backup-tip="ctx.modpack.value?.project.title"
+			:backup-tip="ctx.managedContent.value?.card.manager.name"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@unlink="ctx.unlinkModpack!()"

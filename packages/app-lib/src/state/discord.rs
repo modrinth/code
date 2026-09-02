@@ -7,7 +7,6 @@ use discord_rich_presence::{
 use tokio::sync::RwLock;
 
 use crate::State;
-use crate::state::Profile;
 
 pub struct DiscordGuard {
     client: Arc<RwLock<DiscordIpcClient>>,
@@ -134,17 +133,13 @@ impl DiscordGuard {
             return self.clear_activity(true).await;
         }
 
-        let running_profiles = state.process_manager.get_all();
-        if let Some(existing_child) = running_profiles.first() {
-            let prof =
-                Profile::get(&existing_child.profile_path, &state.pool).await?;
-            if let Some(prof) = prof {
-                self.set_activity(
-                    &format!("Playing {}", prof.name),
-                    reconnect_if_fail,
-                )
-                .await?;
-            }
+        let running_instances = state.process_manager.get_all();
+        if let Some(existing_child) = running_instances.first() {
+            self.set_activity(
+                &format!("Playing {}", existing_child.instance_name),
+                reconnect_if_fail,
+            )
+            .await?;
         } else {
             self.set_activity("Idling...", reconnect_if_fail).await?;
         }

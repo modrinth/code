@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "소식"
   },
+  "badge.release": {
+    "defaultMessage": "릴리스"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "취소"
   },
@@ -104,6 +107,15 @@
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "선택된 프로젝트"
   },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "프로젝트 {count}개 설치"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "프로젝트 {count, plural, other {#}}개 선택됨"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "설치할 프로젝트로 {count, plural,  other {#}}개를 선택했습니다. 지금 설치하거나 설치하지 않고 돌아갈 수 있습니다."
+  },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "선택된 프로젝트가 아직 설치되지 않았습니다"
   },
@@ -118,6 +130,9 @@
   },
   "button.accept": {
     "defaultMessage": "수락"
+  },
+  "button.add-another": {
+    "defaultMessage": "내용 추가"
   },
   "button.add-server-to-instance": {
     "defaultMessage": "인스턴스에 서버 추가"
@@ -191,6 +206,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "스냅샷 숨기기"
   },
+  "button.i-understand": {
+    "defaultMessage": "이해했습니다"
+  },
   "button.install": {
     "defaultMessage": "설치"
   },
@@ -208,6 +226,9 @@
   },
   "button.open-folder": {
     "defaultMessage": "폴더 열기"
+  },
+  "button.open-in-browser": {
+    "defaultMessage": "브라우저에서 열기"
   },
   "button.open-in-folder": {
     "defaultMessage": "폴더 열기"
@@ -276,7 +297,10 @@
     "defaultMessage": "회원 가입"
   },
   "button.stop": {
-    "defaultMessage": "정지"
+    "defaultMessage": "끄기"
+  },
+  "button.switch-to-version": {
+    "defaultMessage": "이 버전으로 변경"
   },
   "button.switch-version": {
     "defaultMessage": "버전 변경"
@@ -305,6 +329,21 @@
   "changelog.product.web": {
     "defaultMessage": "플랫폼"
   },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "컬렉션이 비어 있습니다."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "프로젝트를 불러오는 중..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "검색 결과와 일치하는 프로젝트가 없습니다."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, other {# 프로젝트}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "프로젝트 검색"
+  },
   "collections.label.private": {
     "defaultMessage": "비공개"
   },
@@ -317,6 +356,12 @@
   "content.card.select-project": {
     "defaultMessage": "{project} 선택"
   },
+  "content.card.uploaded": {
+    "defaultMessage": "업로드됨"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "{count}개의 프로젝트를 최신 호환 버전으로 업데이트하시겠습니까? 콘텐츠는 하나씩 업데이트 하는 것을 권장합니다."
+  },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "업데이트 주의"
   },
@@ -325,6 +370,9 @@
   },
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "향후 이 확인 메시지를 건너뛰려면 Shift 키를 누른 상태에서 “모두 업데이트”를 클릭하세요."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "프로젝트 {count}개 업데이트"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "모드를 삭제하면 세계에 영구적인 영향을 미칠 수 있으며, 다시 로드할 때 콘텐츠가 누락되거나 예기치 않은 문제가 발생할 수 있습니다."
@@ -337,6 +385,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} 삭제"
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "{itemType} 비활성화"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {다운그레이드 진행 중} other {업데이트 진행 중}}에는 호환성 문제가 발생할 수 있습니다. 모드팩에 추가한 모드나 콘텐츠는 유지되지만, 새 버전과 호환되지 않을 수 있습니다."
@@ -362,8 +413,53 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "연결 해제"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "다른 콘텐츠를 사용하려면 이 콘텐츠가 필요합니다"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "영향을 받는 {count, plural, other {프로젝트}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "일부 선택한 프로젝트가 의존성으로 설치되어 있습니다. 이를 삭제하면 {context}이 손상되거나 의존하는 다른 콘텐츠가 올바르게 로드되지 않을 수 있습니다."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "인스턴스"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "서버"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "무시하고 삭제"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "무시하고 {count, number}개의 {itemType} 삭제"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "삭제 예정"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "삭제 후 의존하는 콘텐츠 비활성화"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "종속된 콘텐츠가 로드되지 않거나 스스로 비활성화될 수 있습니다"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "{context}에서 충돌이 발생하거나, 시작 실패 또는 예기치 않은 동작이 발생할 수 있습니다"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "종속성 경고"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project}이 의존성으로 설치되어 있습니다. 이를 삭제하면 {context}이 손상되거나 의존하는 다른 콘텐츠가 올바르게 로드되지 않을 수 있습니다."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "무슨 일이 벌어지나요?"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count}개 추가됨"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "변경된 설정 파일"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "추가됨 (종속성)"
@@ -371,14 +467,65 @@
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "비활성화"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "제거됨 (비활성화됨)"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "업데이트됨"
+  },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "설치하지 않음"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "추가됨"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "제거됨"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "업데이트됨"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {#개 파일} other {#개 파일}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "게임 버전"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "무시하고 설치"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "로더"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "연동된 모드팩"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "연동 해제된 모드팩"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "업데이트된 모드팩"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "콘텐츠 변경 사항 없음"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count}개 제거됨"
   },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} 제거됨 (비활성화됨)"
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "서버의 일부 콘텐츠를 분석할 수 없었으며, 이번 변경 사항의 영향을 받을 수 있습니다."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "이 업데이트에는 Modrinth에 게시되지 않은 파일이 포함되어 있습니다. 신뢰할 수 있는 출처의 파일만 설치하는 것을 강력히 권장합니다."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "출처를 알 수 없는 파일"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "알 수 없음"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count}개 업데이트됨"
@@ -425,14 +572,68 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "세계"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "여기서 모드팩의 콘텐츠를 확인할 수 있습니다!"
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "모드팩 콘텐츠"
   },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "모드팩 콘텐츠 이동됨"
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "서버"
   },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "다시 보지 않기"
+  "content.managed-card.settings": {
+    "defaultMessage": "설치 설정"
+  },
+  "content.managed-card.shared-content": {
+    "defaultMessage": "공유된 콘텐츠"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "콘텐츠 설치 중..."
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "버전 변경"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "{time} 동기화"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "업데이트 가능"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "{time} 업데이트"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "업데이트 중..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "콘텐츠 보기"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "저자"
+  },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "환경"
+  },
+  "content.metadata-filter.open-source": {
+    "defaultMessage": "오픈 소스"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "공유된 콘텐츠"
+  },
+  "content.metadata-filter.source.external": {
+    "defaultMessage": "외부"
+  },
+  "content.metadata-filter.state": {
+    "defaultMessage": "상태"
+  },
+  "content.metadata-filter.state.disabled": {
+    "defaultMessage": "꺼짐"
+  },
+  "content.metadata-filter.state.enabled": {
+    "defaultMessage": "켜짐"
+  },
+  "content.metadata-filter.update.available": {
+    "defaultMessage": "업데이트 가능"
+  },
+  "content.metadata-filter.warnings": {
+    "defaultMessage": "경고"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "추가 콘텐츠"
@@ -457,6 +658,9 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "콘텐츠 불러오기 실패"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "필터"
   },
   "content.page-layout.loading": {
     "defaultMessage": "콘텐츠 불러오는 중..."
@@ -485,8 +689,11 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "프로젝트 이름"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "알파벳순"
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "이름 (A-Z)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "이름 (Z-A)"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "최신순"
@@ -512,11 +719,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "{contentType} {progress}/{total}개 삭제 중..."
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "{contentType} {count, number}개를 삭제하는 중"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "{contentType} 삭제 중..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "{contentType} {progress}/{total}개 비활성화 중..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "{count, number}개의 {contentType} 비활성화 중"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "{contentType} 비활성화 중..."
@@ -524,11 +737,17 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "{contentType} {progress}/{total}개 활성화 중..."
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "{count, number}개의 {contentType} 활성화 중"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "{contentType} 활성화 중..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "{contentType} {progress}/{total}개 업데이트 중..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "{count, number}개의 {contentType} 업데이트 중"
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "{contentType} 업데이트 중..."
@@ -551,6 +770,9 @@
   "creation-flow.button.import": {
     "defaultMessage": "가져오기"
   },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "인스턴스 {count, plural, other {#}}개 가져오기"
+  },
   "creation-flow.button.setup-server": {
     "defaultMessage": "서버 설정"
   },
@@ -571,12 +793,6 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "게임 버전 검색..."
-  },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "아이콘 제거"
-  },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "아이콘 선택"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "최신"
@@ -752,9 +968,6 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "모드팩 검색"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "인스턴스란 특정 로더, 버전 및 모드가 적용된 Minecraft 환경을 의미합니다."
-  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "로더와 게임 버전을 선택하여 처음부터 시작합니다."
   },
@@ -766,12 +979,6 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "인스턴스 가져오기"
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Modrinth에서 모드팩을 찾아보거나 파일에서 직접 가져오세요."
-  },
-  "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "모드팩 설치"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "모드나 플러그인이 없는 기본 Minecraft입니다."
@@ -788,9 +995,6 @@
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "세계 방식 선택"
   },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "모드팩 선택"
-  },
   "creation-flow.title.create-instance": {
     "defaultMessage": "인스턴스 생성"
   },
@@ -805,6 +1009,273 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "서버 설정"
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, other {파일 추가}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "이 그룹으로 옮길 파일을 선택하세요."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "여기로 옮길 수 있는 파일이 다른 그룹에 없습니다."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "파일을 불러올 수 없습니다"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "검색과 일치하는 파일이 없습니다."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "파일 검색..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, other {파일 #개 선택됨}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "그룹에 파일 추가"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "파일 추가..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "파일을 추가하지 못했습니다"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "콘텐츠가 허용되지 않음"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "통과됨"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "증명 거부됨"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "완료됨"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "권한 없음"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "허용되지 않음"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "대기 중"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "정보 거부됨"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "기타"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "속성 추가"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "모든 권리 보유/라이선스 없음"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "라이선스 링크 연결"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "라이선스 이름, SPDX 식별자 권장"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "라이선스를 선택해 주세요."
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "링크는 유효한 URL이여야 합니다."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "예: MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(선택사항)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "라이선스"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "원본 링크"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "라이선스_링크"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "원본_링크"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Modrinth 링크로 보입니다. Modrinth에 게시된 콘텐츠인 경우 팩이 잘못 내보내졌을 수 있습니다. 다른 사이트에서 다운로드한 경우 Modrinth에서 다시 설치해보세요. 파일이 달라졌을 수 있습니다."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "노트"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "아무거나 작성해보세요..."
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "증명 스크린샷 {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "이미지 제거"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "증명 이미지"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "이미지를 드래그 앤 드롭하거나 클릭해서 선택하세요"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "제출된 이미지를 조작하거나 허위 사실을 기재한 경우, 프로젝트와 계정이 영구 삭제될 수 있습니다."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinth 직원이 제출한 증명을 검증할 수 있습니다"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "속성 저장"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "라이선스 선택..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "허가 사유"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "라이선스의 링크를 설정하세요. 라이선스가 없는 경우 '모든 권리 보유/라이선스 없음'을 선택하세요."
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "설명을 제공하거나 하나 이상의 증명 이미지를 업로드하세요."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "링크를 설정하세요."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "노트나 하나 이상의 증명 이미지를 업로드하세요."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "PNG, JPEG, GIF, WebP, 또는 BMP 이미지를 업로드해야 합니다."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "하나 이상의 증명 이미지를 업로드하세요."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "간단한 설명이나 증빙용 이미지를 제출해야 합니다."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "설명"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "저작자 표시 그룹 {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural,one {# 파일}other {# 파일}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "포함된 파일:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "{count, plural, one {#개 버전} other {#개 버전}}에 포함됨:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "{date}에 {user}님이 마지막으로 업데이트함"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "알 수 없음"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "라이선스:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "작업물 링크:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "사유"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "검토 내역을 저장하지 못했습니다"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "이 파일들은 현재 어떤 버전에서도 사용되지 않고 있습니다."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "참고 사항:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "없음"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "원본 프로젝트"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "증명 스크린샷 {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "증명 이미지:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "자동으로 출처가 표기됨"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "이 파일을 이전에 확인한 적이 있어 출처 표기를 미리 준비해 두었습니다. 잘못된 부분이 있다면 헬프 센터를 통해 Modrinth 고객 지원팀에 문의해 주세요"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "라이선스"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "이 작업물의 라이선스는 사용자의 모드팩에 이를 재배포하는 것을 허용합니다."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "이 라이선스와 관련된 증빙 자료를 업로드해 주세요."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "내 프로젝트"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "당신이 창조한 독창적인 작품."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "이 작업물을 만들었다는걸 증명할 파일을 업로드하세요."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "권한 없음"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "이 파일을 이전에 확인한 적이 있으며, 해당 파일의 라이선스는 일반적으로 재배포를 허용하지 않습니다."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "이 작업물을 사용할 권한이 없습니다."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "특별 허가"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "이 작업물을 모드팩에 재배포할 수 있는 특별 허가를 받았습니다."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "그룹 삭제"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "이 작업은 해당 출처 표시 그룹 및 내부의 모든 파일을 영구 삭제합니다. 이 작업은 되돌릴 수 없습니다."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "{title}를 삭제하시겠습니까?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "그룹을 삭제할 수 없습니다"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Shift 키를 누른 채 클릭하면 확인 절차를 생략합니다."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "그룹에서 제거"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "파일을 분할하지 못했습니다"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} 외 {count}개"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "관리자"
   },
   "external-project-license-status.no": {
     "defaultMessage": "아니오"
@@ -886,9 +1357,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "파일 저장됨"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "닫다"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "찾다"
@@ -1075,6 +1543,12 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "새 이름"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "항목 {count}개"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "상위 폴더"
   },
   "files.table-header.created": {
     "defaultMessage": "생성"
@@ -1277,6 +1751,9 @@
   "form.placeholder.state": {
     "defaultMessage": "주/도 입력"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, other {# 바이트}}"
+  },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
   },
@@ -1348,6 +1825,9 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "파일 업로드 실패"
+  },
+  "hosting.content.managed-content.modpack-header": {
+    "defaultMessage": "모드팩 콘텐츠"
   },
   "hosting.loader.failed-to-change-version": {
     "defaultMessage": "모드팩 버전 변경 실패"
@@ -1610,6 +2090,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "알 수 없는 게임 모드"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "호환되는 인스턴스 {count}개"
+  },
   "instances.content-install.existing-tab": {
     "defaultMessage": "존재하는 인스턴스"
   },
@@ -1646,29 +2129,23 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "호환가능한 인스턴스 없음"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "아이콘 제거"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "인스턴스 검색"
   },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "아이콘 선택"
-  },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "이 모드팩에는 추가 콘텐츠가 포함되어 있지 않습니다."
-  },
-  "instances.modpack-content-modal.empty-title": {
+  "instances.managed-content-modal.empty-title": {
     "defaultMessage": "콘텐츠를 찾을 수 없습니다"
   },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "모드팩 콘텐츠"
+  "instances.managed-content-modal.external-content": {
+    "defaultMessage": "외부"
   },
-  "instances.modpack-content-modal.loading": {
+  "instances.managed-content-modal.external-content-description": {
+    "defaultMessage": "이 파일은 Modrinth에 게시되지 않았습니다."
+  },
+  "instances.managed-content-modal.loading": {
     "defaultMessage": "콘텐츠 불러오는 중..."
   },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "검색 결과와 일치하는 프로젝트가 없습니다."
+  "instances.managed-content-modal.open-in-slicer": {
+    "defaultMessage": "Slicer에서 열기"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
@@ -1802,6 +2279,9 @@
   "label.details": {
     "defaultMessage": "세부 사항"
   },
+  "label.discover-content": {
+    "defaultMessage": "콘텐츠 둘러보기"
+  },
   "label.done": {
     "defaultMessage": "완료"
   },
@@ -1833,7 +2313,7 @@
     "defaultMessage": "게임 버전"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "이미 설치된 콘텐츠 숨기기"
+    "defaultMessage": "이미 설치한 콘텐츠 숨기기"
   },
   "label.hide-selected-content": {
     "defaultMessage": "선택된 콘텐츠 숨기기"
@@ -1880,6 +2360,9 @@
   "label.password": {
     "defaultMessage": "비밀번호"
   },
+  "label.permissions": {
+    "defaultMessage": "권한"
+  },
   "label.plan-custom": {
     "defaultMessage": "사용자 지정"
   },
@@ -1890,7 +2373,7 @@
     "defaultMessage": "중형"
   },
   "label.plan-small": {
-    "defaultMessage": "라이트"
+    "defaultMessage": "가벼운"
   },
   "label.plan-unknown": {
     "defaultMessage": "알 수 없음"
@@ -1936,6 +2419,9 @@
   },
   "label.server": {
     "defaultMessage": "서버"
+  },
+  "label.server-only": {
+    "defaultMessage": "서버 전용"
   },
   "label.servers": {
     "defaultMessage": "서버"
@@ -1986,7 +2472,7 @@
     "defaultMessage": "공개 설정"
   },
   "label.visit-your-profile": {
-    "defaultMessage": "내 프로필"
+    "defaultMessage": "내 프로필 보기"
   },
   "label.yes": {
     "defaultMessage": "예"
@@ -2408,8 +2894,152 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Modrinth 크리에이터입니다."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Modrinth 사용자입니다."
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} 님은 친구 요청을 보내거나, 공유 인스턴스 초대 및 Modrinth Hosting 서버 초대를 할 수 없게 됩니다."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "이 사용자를 차단하시겠습니까?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "이 사용자를 차단하는 중 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "사용자 차단 실패"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} 님을 차단했습니다."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "사용자 차단됨"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "{username} 차단"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "사용자 분석 보기"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "사용자 결제 관리"
+  },
+  "profile.button.block": {
+    "defaultMessage": "차단"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "컬렉션 만들기"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "프로젝트 만들기"
+  },
+  "profile.button.info": {
+    "defaultMessage": "사용자 상세 정보 보기"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "프로젝트 관리"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "제휴 자격 해제"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "제휴 자격 부여"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "차단 해제"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, one {프로젝트 #개} other {프로젝트 #개}}"
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "인증 제공자"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "이메일 인증됨"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "비밀번호 설정됨"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "TOTP 설정됨"
+  },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "불러오는 중..."
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "결제 수단"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "프로필 보기"
+  },
+  "profile.details.title": {
+    "defaultMessage": "사용자 상세 정보"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "이메일 미인증"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "이메일 인증됨"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "사용자 프로필을 불러올 수 없습니다."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "사용자를 찾을 수 없음"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "제휴 파트너"
+  },
   "profile.label.badges": {
     "defaultMessage": "배지"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "컬렉션"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, other {다운로드}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "가입일"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "이 사용자는 컬렉션이 없습니다!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "아직 컬렉션이 없습니다."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "이 사용자는 프로젝트가 없습니다!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "아직 프로젝트가 없습니다."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "조직"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, other {프로젝트}}"
+  },
+  "profile.official-account": {
+    "defaultMessage": "공식 Modrinth 계정"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Modrinth의 공식 사용자 계정입니다. <support-link></support-link> 또는 <email></email> 을 통해 문의해 주세요"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "이 사용자의 차단을 해제하는 동안 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "사용자 차단 해제 실패"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username}님의 차단이 해제되었습니다."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "사용자 차단 해제됨"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "{date}에 게시됨"
@@ -2426,23 +3056,59 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "클라이언트 또는 서버"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "전용 서버"
+  },
   "project-card.environment.server": {
     "defaultMessage": "서버"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "싱글플레이어"
   },
   "project-type.all": {
     "defaultMessage": "모두"
   },
+  "project-type.collection.plural": {
+    "defaultMessage": "컬렉션"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {데이터 팩}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "데이터 팩"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {데이터 팩}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {모드}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "모드"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {모드}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {모드팩}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "모드팩"
   },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {모드팩}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {플러그인}}"
+  },
   "project-type.plugin.category": {
     "defaultMessage": "플러그인"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {플러그인}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "프로젝트"
   },
   "project-type.project.category": {
     "defaultMessage": "프로젝트"
@@ -2450,8 +3116,14 @@
   "project-type.project.lowercase": {
     "defaultMessage": "{count, plural, one {프로젝트} other {프로젝트}}"
   },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {리소스 팩}}"
+  },
   "project-type.resourcepack.category": {
     "defaultMessage": "리소스 팩"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {리소스 팩}}"
   },
   "project-type.server.capital": {
     "defaultMessage": "{count, plural, one {서버} other {서버}}"
@@ -2462,8 +3134,14 @@
   "project-type.server.lowercase": {
     "defaultMessage": "{count, plural, one {서버} other {서버}}"
   },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {셰이더}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "셰이더"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {셰이더}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "지원되는 실행 환경"
@@ -2491,6 +3169,9 @@
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "플랫폼"
+  },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, other {플랫폼}}"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "호환성"
@@ -2544,19 +3225,19 @@
     "defaultMessage": "오류 신고"
   },
   "project.about.links.site": {
-    "defaultMessage": "웹사이트 방문하기"
+    "defaultMessage": "웹사이트 방문"
   },
   "project.about.links.source": {
     "defaultMessage": "소스 코드 보기"
   },
   "project.about.links.store": {
-    "defaultMessage": "스토어 페이지 방문하기"
+    "defaultMessage": "스토어 페이지 방문"
   },
   "project.about.links.title": {
     "defaultMessage": "링크"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "위키"
+    "defaultMessage": "위키 방문"
   },
   "project.about.server.address.tooltip": {
     "defaultMessage": "자바 서버 주소 복사"
@@ -2587,6 +3268,36 @@
   },
   "project.about.tags.title": {
     "defaultMessage": "태그"
+  },
+  "project.disclosure.advertising.title": {
+    "defaultMessage": "광고 포함"
+  },
+  "project.disclosure.ai-generated-content.title": {
+    "defaultMessage": "AI 생성 {types} 포함"
+  },
+  "project.disclosure.ai-generated-content.use.assets": {
+    "defaultMessage": "에셋"
+  },
+  "project.disclosure.ai-generated-content.use.code": {
+    "defaultMessage": "코드"
+  },
+  "project.disclosure.ai-generated-content.use.content": {
+    "defaultMessage": "콘텐츠"
+  },
+  "project.disclosure.ai-generated-content.use.functionality": {
+    "defaultMessage": "기능"
+  },
+  "project.disclosure.ai-generated-content.use.text": {
+    "defaultMessage": "텍스트"
+  },
+  "project.disclosure.derivative-work.show-fewer": {
+    "defaultMessage": "더 적게 표시"
+  },
+  "project.disclosure.derivative-work.show-more": {
+    "defaultMessage": "{count}개 더 보기"
+  },
+  "project.disclosure.paid-features.title": {
+    "defaultMessage": "유료 기능 포함"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {다운로드} other {다운로드}}"
@@ -2660,6 +3371,15 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {팔로워} other {팔로워}}"
   },
+  "project.license.error": {
+    "defaultMessage": "라이선스 텍스트를 가져올 수 없습니다."
+  },
+  "project.license.loading": {
+    "defaultMessage": "라이선스 텍스트를 가져오는 중..."
+  },
+  "project.license.title": {
+    "defaultMessage": "라이선스"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 온라인"
   },
@@ -2668,6 +3388,9 @@
   },
   "project.recent-plays": {
     "defaultMessage": "{count} {countPlural, plural, one {회 최근 플레이} other {회 최근 플레이}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "Modrinth에서 지난 2주동안 {count}회 플레이"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "이 프로젝트는 사용자 지정 모드팩을 사용합니다"
@@ -2939,6 +3662,30 @@
   "project.settings.description.title": {
     "defaultMessage": "설명"
   },
+  "project.settings.disclosures.ai.types-assets": {
+    "defaultMessage": "에셋"
+  },
+  "project.settings.disclosures.ai.types-code": {
+    "defaultMessage": "코드"
+  },
+  "project.settings.disclosures.ai.types-functionality": {
+    "defaultMessage": "기능"
+  },
+  "project.settings.disclosures.ai.types-text": {
+    "defaultMessage": "텍스트"
+  },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "defaultMessage": "항상 켜짐"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-in": {
+    "defaultMessage": "옵트인"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-out": {
+    "defaultMessage": "옵트아웃"
+  },
+  "project.settings.disclosures.title": {
+    "defaultMessage": "고지 사항"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
   },
@@ -3062,6 +3809,12 @@
   "project.settings.view.title": {
     "defaultMessage": "보기"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural,one {다운로드} other {다운로드}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural,one {팔로워} other {팔로워}}"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3070,6 +3823,21 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "{filter} 필터 전환"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "모드로더"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "보류됨"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "권한 누락으로 인해 보류된 버전"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "해결"
   },
   "project.visibility.archived": {
     "defaultMessage": "보관됨"
@@ -3113,6 +3881,9 @@
   "report.item-type.version": {
     "defaultMessage": "버전"
   },
+  "report.type.inappropriate": {
+    "defaultMessage": "부적절함"
+  },
   "s.bg": {
     "defaultMessage": "백그라운드 작업 실행 중"
   },
@@ -3145,6 +3916,30 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "더 많이 표시"
+  },
+  "search.filter.option.sub_options.collapse.tooltip": {
+    "defaultMessage": "추가 설정 숨기기"
+  },
+  "search.filter.option.sub_options.expand.tooltip": {
+    "defaultMessage": "추가 설정 표시"
+  },
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "광고"
+  },
+  "search.filter_type.advanced.disclosure.ai_content": {
+    "defaultMessage": "AI 생성 콘텐츠"
+  },
+  "search.filter_type.advanced.disclosure.ai_content.usage": {
+    "defaultMessage": "AI {usage}"
+  },
+  "search.filter_type.advanced.disclosure.archived": {
+    "defaultMessage": "보관됨"
+  },
+  "search.filter_type.advanced.disclosure.paid_features": {
+    "defaultMessage": "유료 기능"
+  },
+  "search.filter_type.advanced.disclosure.telemetry": {
+    "defaultMessage": "원격 측정"
   },
   "search.filter_type.environment": {
     "defaultMessage": "실행 환경"
@@ -3196,6 +3991,9 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "로더"
+  },
+  "search.photosensitivity-warning-modal.dont-show-again": {
+    "defaultMessage": "다시 보지 않기"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "모딩 됨"
@@ -3459,7 +4257,7 @@
     "defaultMessage": "편집자"
   },
   "servers.access-role.owner": {
-    "defaultMessage": "소유자"
+    "defaultMessage": "대표"
   },
   "servers.access-role.viewer": {
     "defaultMessage": "제한적"
@@ -3613,6 +4411,57 @@
   },
   "servers.audit-log.event.file-uploaded": {
     "defaultMessage": "파일 업로드: <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "Minecraft 버전을 <version></version>으로 변경"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Java 런타임을 <vendor></vendor>으로 변경함"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Java 버전을 <java-version></java-version>으로 변경함"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "로더를 <loader></loader> <version></version>로 변경함"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "로더를 <loader></loader>로 변경함"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "로더 버전을 <version></version>로 변경함"
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "로더 버전 초기화함"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "모드팩 변경함"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "모드팩을 <modpack></modpack> 로 변경함"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "모드팩 버전을 <version></version> 으로 변경함"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "모드팩 연결 해제함"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "모드팩 <modpack></modpack> 연결 해제함"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "모드팩 버전 <version></version> 연결 해제함"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "포트 할당 <port></port> 추가함"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "포트 할당 <port></port> 제거함"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "서버를 생성했습니다"
+  },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "서버를 종료했습니다"
   },
   "servers.audit-log.event.server-metadata-changed": {
     "defaultMessage": "서버 메타데이터 변경"
@@ -3779,6 +4628,15 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "백업으로부터 복원하는 중"
   },
+  "servers.backups.bulk-bar.aria-label": {
+    "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
+  },
+  "servers.backups.bulk-bar.deleting": {
+    "defaultMessage": "백업 {total, plural, other {#}}개 삭제 중..."
+  },
+  "servers.backups.bulk-bar.selected-count": {
+    "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "삭제하면 {count, plural, one {해당 백업은} other {해당 백업들은}} 복구할 수 없습니다. 되돌릴 수 없습니다."
   },
@@ -3790,6 +4648,9 @@
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "백업 {count, plural, one {삭제} other {#개 삭제}}"
+  },
+  "servers.backups.delete-modal.header": {
+    "defaultMessage": "백업 삭제"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "첫 백업 생성하기"
@@ -3851,9 +4712,6 @@
   "servers.busy.installing": {
     "defaultMessage": "서버 설치 중"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "콘텐츠 동기화 진행 중"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "친구 요청도 보내기"
   },
@@ -3908,56 +4766,26 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "설치 실패"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "플랫폼 설치 중 내부 오류가 발생했습니다. 다시 시도해 주세요."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "지정한 로더 또는 마인크래프트 버전을 설치할 수 없습니다. 유효하지 않거나 지원되지 않는 것일 수 있습니다."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "모드팩을 설치할 수 없습니다. 파일이 손상되었거나 호환되지 않을 수 있습니다."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "이 모드팩 버전은 다운로드 가능한 파일을 포함되어 있지 않습니다. 패키징이 잘못되었을 수 있습니다."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "설치 중 알 수 없는 오류가 발생했습니다."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "이 미인크래프트 또는 로더 버전은 아직 Modrinth Hosting에서 지원되지 않습니다."
+  "servers.installing-banner.installing-local-modpack": {
+    "defaultMessage": "{filename} 설치 중"
   },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "애드온 설치 중..."
+  "servers.installing-banner.installing-minecraft": {
+    "defaultMessage": "Minecraft {version} 설치 중"
   },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "모드팩 설치 중..."
+  "servers.installing-banner.installing-modpack": {
+    "defaultMessage": "모드팩 설치 중"
   },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "플랫폼 설치 중..."
+  "servers.installing-banner.installing-platform": {
+    "defaultMessage": "Minecraft {version}용 {loader} 설치 중"
   },
   "servers.installing-banner.preparing.header": {
-    "defaultMessage": "서버를 준비하고 있습니다"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java 추가 중..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "서버 구성 중..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "모드 다운로드 중..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "파일 준비 중..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "환경 설정 중..."
+    "defaultMessage": "서버 준비 중"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "서버가 이미 있으신가요?"
-  },
-  "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Modrinth 호스팅에 관하여 알아보기"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth 호스팅"
@@ -3968,23 +4796,14 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Modrinth 앱에서 모드를 설치하고, 친구를 초대해 함께 플레이하세요."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "서버 없음"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "즐겨찾는 모드들을 선택하시고 나머지는 저희에게 맡겨주세요."
   },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "원클릭 모드 설치"
   },
-  "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Modrinth 앱에서 친구들을 초대해 설정을 도울 수 있습니다."
-  },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "친구들과 플레이"
-  },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "로그인"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "싱글 플레이어 월드처럼 서버를 설정하세요."
@@ -4010,14 +4829,26 @@
   "servers.listing.new-label": {
     "defaultMessage": "새로운"
   },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "파일은 앞으로 <days-remaining>{daysRemaining}{daysRemaining, plural, one {일} other {일}}</days-remaining> 동안 더 보관됩니다. 파일이 삭제되기 전에 다운로드하려면 고객 지원팀에 문의해 주세요."
+  },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "취소 후 30일 동안 파일이 보존됩니다."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "사용자의 서버가 중재 조치로 인해 정지되었습니다."
+  },
+  "servers.listing.notice.pending-change": {
+    "defaultMessage": "사용자의 서버는 <date>{formattedDate}</date>에 {planSize} 요금제로 {verb, select, downgrade {다운그레이드} other {업그레이드}}될 예정입니다."
   },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "서버 설정이 완료될 때까지 잠시 기다려 주십시오. 최대 10분 정도 소요될 수 있습니다."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "구독이 취소되었습니다."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "사용자의 구독이 <date>{formattedDate}</date>에 취소되었습니다."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "결제 실패로 인해 구독이 취소되었습니다."
@@ -4036,6 +4867,12 @@
   },
   "servers.listing.notice.upgrading": {
     "defaultMessage": "서버 하드웨어 업그레이드 작업이 진행 중이며 곧 다시 온라인 상태가 될 예정입니다."
+  },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "{username}의 아바타"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "{username} 소유"
   },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "재구독"
@@ -4082,8 +4919,14 @@
   "servers.manage.new-server-button": {
     "defaultMessage": "새로운 서버"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "검색과 일치하는 서버가 없습니다."
+  },
   "servers.manage.no-servers-found": {
     "defaultMessage": "서버를 찾을 수 없습니다."
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "검색과 일치하는 공유된 서버가 없습니다."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "결제 정보가 아직 로딩 중입니다. 준비가 완료되는 대로 결제 페이지를 열겠습니다."
@@ -4127,6 +4970,12 @@
   "servers.manage.settings-hint.title": {
     "defaultMessage": "서버 설정이 이동되었습니다"
   },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "공유된 서버"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "내 서버"
+  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {일} other {일}} <hours-count>{hours}</hours-count> {hours, plural, one {시간} other {시간}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {분} other {분}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {초} other {초}} 남음..."
   },
@@ -4144,6 +4993,12 @@
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "서버의 하드웨어가 현재 업그레이드 중이며, 곧 다시 온라인 상태로 돌아올 예정입니다."
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username}의 아바타"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "{username} 소유"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "서버 아이콘"
@@ -4196,6 +5051,9 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "결제 수단"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "{interval, select, monthly {매 월} quarterly {3개월 마다} yearly {매 년} other {{interval}}} 청구"
+  },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "북미, 유럽, 동남아시아에서 이용 가능합니다."
   },
@@ -4203,7 +5061,7 @@
     "defaultMessage": "필요한 사양만을 갖춘 맞춤형 플랜을 선택하세요."
   },
   "servers.purchase.step.plan.custom.heading": {
-    "defaultMessage": "정확히 필요한 것이 있나요?"
+    "defaultMessage": "원하시는 구성을 정확히 알고 계신가요?"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "시작하기"
@@ -4221,7 +5079,7 @@
     "defaultMessage": "6–15명의 플레이어와 여러개의 모드에 적합합니다."
   },
   "servers.purchase.step.plan.most-popular": {
-    "defaultMessage": "가장 인기"
+    "defaultMessage": "가장 인기 있는"
   },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "플랜 선택"
@@ -4243,6 +5101,9 @@
   },
   "servers.purchase.step.review.title": {
     "defaultMessage": "검토"
+  },
+  "servers.region.australia": {
+    "defaultMessage": "호주"
   },
   "servers.region.central-europe": {
     "defaultMessage": "중부유럽"
@@ -4273,6 +5134,54 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "서유럽"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "{time} 추가됨"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "초대 취소"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "해당 사용자는 이 서버에 추가되지 않습니다"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "나중에 다시 초대를 보낼 수 있습니다"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "초대 취소"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "이 초대를 취소하면 {username}님이 이 서버에 참여하려면 새 초대를 받아야 합니다."
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "액세스 권한 회수"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "{time} 전 초대됨"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "대기 중인 초대"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "액세스 권한 회수"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "해당 사용자는 즉시 서버 패널에 대한 액세스 권한을 잃게 되며, 더 이상 콘텐츠를 편집할 수 없게 됩니다"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "별도로 설정을 변경하지 않는 한, 해당 사용자는 여전히 서버에 접속하여 플레이할 수 있습니다"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "알 수 없는 추가 일자"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username}의 아바타"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "사용자의 서버 액세스 권한을 회수하면, 권한을 다시 복구하기 위해 해당 사용자를 다시 초대해야 합니다."
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "무슨 일이 벌어지나요?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "설치 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
@@ -4355,9 +5264,6 @@
   "settings.display.theme.dark": {
     "defaultMessage": "어두운 테마"
   },
-  "settings.display.theme.description": {
-    "defaultMessage": "이 디바이스에서 선호하는 Modrinth의 색상 테마를 선택합니다."
-  },
   "settings.display.theme.light": {
     "defaultMessage": "밝은 테마"
   },
@@ -4382,6 +5288,9 @@
   "settings.feature-flags.title": {
     "defaultMessage": "기능 플래그"
   },
+  "settings.form.group.optional": {
+    "defaultMessage": "(선택)"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "기본 언어"
   },
@@ -4393,6 +5302,9 @@
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "언어 검색..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "검색어와 일치하는 언어가 {matches, plural, =0 {없습니다} other {#개 있습니다}}."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "검색어와 일치하는 언어가 없습니다."
@@ -4412,11 +5324,206 @@
   "settings.pats.title": {
     "defaultMessage": "개인 액세스 토큰"
   },
-  "settings.profile.title": {
-    "defaultMessage": "공개 프로필"
+  "settings.profile.bio.description": {
+    "defaultMessage": "자신을 알릴 수 있는 간단한 소개글입니다."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "자기소개"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "프로필"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "프로필 사진"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "프로필 정보는 Modrinth에서 <profile-link>누구나 볼 수 있게 공개</profile-link>되며, <docs-link>Modrinth API</docs-link>를 통해서도 확인할 수 있습니다."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "프로필 업데이트 실패"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "프로필을 업데이트하는 동안 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "공개 프로필을 맞춤 설정하려면 Modrinth 계정에 로그인하세요."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Modrinth 계정 필요"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "프로필을 식별하기 위한 대소문자 구분 없는 고유한 이름입니다."
   },
   "settings.sessions.title": {
     "defaultMessage": "세션"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "작업"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "사용자"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Modrinth에서 차단한 사용자 목록입니다. 해당 사용자는 다음 행위를 할 수 없습니다:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "차단한 사용자가 없습니다."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "차단된 사용자 목록을 불러올 수 없습니다."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "차단된 사용자 목록 불러오는 중…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "나에게 친구 요청 전송"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "Modrinth 호스팅 서버 관리 초대."
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "공유 인스턴스에 초대"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "차단된 사용자"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "차단 해제"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "사용자 차단 해제 실패"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "이 사용자의 차단을 해제하는 중 오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "{username} 차단 해제"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "{username} 님의 아바타"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Modrinth에서 본인에게 친구 요청을 보낼 수 있는 사람을 설정합니다."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "친구 요청"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "모든 사람"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "친구"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "친구의 친구"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "아무도 없음"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "Modrinth 계정이 있으면 본인과 소통 가능한 사람을 설정하고 차단된 사용자를 관리할 수 있습니다"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Modrinth 계정이 필요합니다"
+  },
+  "settings.social.title": {
+    "defaultMessage": "소셜"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "추가"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "추가됨"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "이 사용자는 이미 초대되었습니다."
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "선택"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username} 님의 아바타"
+  },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "커스텀..."
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "커스텀: {date}"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "초대 링크 수정."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "초대 링크 수정"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "1일 후"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "1시간 후"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "7일 후"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "6시간 후"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "3일 후"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "12시간 후"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "만료일"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "당신의 친구 - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "초대"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "초대 링크는 {duration} 후 만료됩니다."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "또는 초대 링크 사용"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "초대 링크가 클립보드에 복사되었습니다."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "링크 복사됨"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "링크 복사 실패"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "최대 사용 횟수"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "친구가 없습니다."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "일치하는 사용자를 찾을 수 없습니다."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "요청 전송됨"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username}님이 먼저 친구 요청을 수락해야 합니다"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "저장"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Modrinth 사용자 이름 입력"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "검색 중..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "초대 링크 업데이트 실패"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -4650,7 +5757,7 @@
     "defaultMessage": "플롯"
   },
   "tag.category.pokemon": {
-    "defaultMessage": "Pokémon"
+    "defaultMessage": "포켓몬"
   },
   "tag.category.potato": {
     "defaultMessage": "저사양"
@@ -4767,7 +5874,7 @@
     "defaultMessage": "Canvas"
   },
   "tag.loader.datapack": {
-    "defaultMessage": "데이터 팩"
+    "defaultMessage": "Data Pack"
   },
   "tag.loader.fabric": {
     "defaultMessage": "Fabric"
@@ -4794,13 +5901,13 @@
     "defaultMessage": "LiteLoader"
   },
   "tag.loader.minecraft": {
-    "defaultMessage": "리소스 팩"
+    "defaultMessage": "Resource Pack"
   },
   "tag.loader.modloader": {
     "defaultMessage": "Risugami's ModLoader"
   },
   "tag.loader.mrpack": {
-    "defaultMessage": "모드팩"
+    "defaultMessage": "Modpack"
   },
   "tag.loader.neoforge": {
     "defaultMessage": "NeoForge"
@@ -4840,6 +5947,15 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
+  },
+  "time-frame-picker.apply": {
+    "defaultMessage": "적용"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "취소"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "초기화"
   },
   "time-frame-picker.custom-range": {
     "defaultMessage": "사용자 지정 날짜 범위..."
@@ -4937,8 +6053,41 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "페이지를 떠나겠습니까?"
   },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "알림 {count}개"
+  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "모두 닫기"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "설치하지 않음"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "이 경고를 다시 표시하지 않음"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "설치 확인"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "무시하고 설치"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Discord 등의 플랫폼을 통해 모드 파일을 공유하는 과정에서 악성코드가 유포되는 경우가 많습니다."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " 은 Modrinth에 게시되지 않은 파일입니다. 신뢰할 수 있는 출처의 파일만 설치할 것을 강력히 권장합니다."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "알 수 없는 파일 경고"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " Modrinth에 게시되지 않은 파일이 포함되어 있습니다. 신뢰할 수 있는 출처의 파일만 설치하는 것을 강력히 권장합니다."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "알 수 없는 파일 경고"
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "인식되지 않는 파일"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "이 사용자는 2020년 11월에 종료된 Modrinth 알파 버전 시절부터 활동해 왔습니다."
@@ -4954,5 +6103,176 @@
   },
   "user.profile.badge.beta.name": {
     "defaultMessage": "베타 테스터"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "이 사용자가 올린 프로젝트들의 누적 다운로드 수가 {download_sum}회에 도달했습니다."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum}회 다운로드"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "이 사용자는 2023년 1월에 데이터 팩 프로젝트가 공식 출시되기 전, Modrinth에서 테스트를 도와주었습니다."
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "초기 데이터 팩 테스터"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "이 사용자는 2022년 5월에 모드팩 프로젝트가 공식 출시되기 전, Modrinth에서 테스트를 도와주었습니다."
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "초기 모드 팩 테스터"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "이 사용자는 2022년 8월에 플러그인 프로젝트가 공식 출시되기 전, Modrinth에서 테스트를 도와주었습니다."
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "초기 플러그인 팩 테스터"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "이 사용자는 2022년 8월에 리소스 팩 프로젝트가 공식 출시되기 전, Modrinth에서 테스트를 도와주었습니다."
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": "초기 리소스팩 팩 테스터"
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "이 사용자는 2026년 3월에 서버 프로젝트가 공식 출시되기 전, Modrinth에서 테스트를 도와주었습니다."
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "초기 호스팅 테스터"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "이 사용자는 2023년 1월에 셰이더 프로젝트가 공식 출시되기 전, Modrinth에서 테스트를 도와주었습니다."
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "초기 쉐이더 테스터"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "이 사용자는 2024년 11월에 Modrinth 호스팅 베타가 출시되기 전, Modrinth 호스팅의 비공개 알파 테스트에 참여했습니다."
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "초기 Modrinth 호스팅 테스터"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "이 사용자는 Modrinth에서 콘텐츠 중재자로 일하고 있습니다."
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "Modrinth의 콘텐츠 모더레이터는 프로젝트를 검토하고, 신고를 처리하며, Modrinth를 안전하게 유지하도록 돕습니다."
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "콘텐츠 중재자"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "이 사용자는 Modrinth와 플랫폼의 크리에이터들을 지원하기 위해 아낌없는 노력을 기울이고 있습니다."
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "멤버가 되는 방법에 대해 자세히 알아보려면 클릭하세요."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Modrinth+ 유저"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "이 사용자는 LGBTQ+ 커뮤니티를 위한 Modrinth의 프라이드 모금 행사에 최소 한 번 이상 참여했습니다."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "최신 프라이드 모금 행사 페이지를 방문하려면 클릭하세요."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "프라이드 모금 행사 후원자"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "이 사용자는 Modrinth에서 근무하고 있습니다."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth 팀"
+  },
+  "version.content.name": {
+    "defaultMessage": "이름"
+  },
+  "version.content.version": {
+    "defaultMessage": "버전"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "개발 jar"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "Javadoc jar"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "선택적 리소스 팩"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "기본"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "필수 리소스 팩"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "시그니처 파일"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "소스 jar"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "기타"
+  },
+  "version.section.changes": {
+    "defaultMessage": "변경 사항"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "호환성"
+  },
+  "version.section.content": {
+    "defaultMessage": "콘텐츠"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "콘텐츠 검색..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "호환되는 아무 버전"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "아무 버전"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "이용 불가능한 버전"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "이 버전은 삭제되었거나 관리자에 의해 검토 중일 수 있습니다."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "요청하신 버전이 삭제되었거나 중재자가 검토 중일 수 있습니다."
+  },
+  "version.section.files": {
+    "defaultMessage": "파일"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "포함된 콘텐츠"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "알려진 비호환 항목"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "변경 사항이 없습니다."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "모드 로더 없음"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "선택적 콘텐츠"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "필수 콘텐츠"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "추가 리소스"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "파일"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "크기"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "종류"
   }
 }

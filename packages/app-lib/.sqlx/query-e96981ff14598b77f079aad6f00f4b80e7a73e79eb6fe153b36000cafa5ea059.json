@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_content_sets (\n\t\t\tid,\n\t\t\tinstance_id,\n\t\t\tname,\n\t\t\tsource_kind,\n\t\t\tstatus,\n\t\t\tgame_version,\n\t\t\tprotocol_version,\n\t\t\tloader,\n\t\t\tloader_version,\n\t\t\tcreated,\n\t\t\tmodified\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 11
+    },
+    "nullable": []
+  },
+  "hash": "e96981ff14598b77f079aad6f00f4b80e7a73e79eb6fe153b36000cafa5ea059"
+}

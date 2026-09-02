@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM project_attribution_files paf\n        USING project_attribution_groups pag\n        WHERE pag.id = paf.group_id\n            AND NOT EXISTS (\n            SELECT 1\n            FROM override_file_sources ofs\n            INNER JOIN files f ON f.id = ofs.file_id\n            INNER JOIN versions v ON v.id = f.version_id\n            WHERE ofs.sha1 = paf.sha1\n                AND v.mod_id = pag.project_id\n        )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "d46c53877e97d54f38895f070bdc0a2417ba87ecac65edd03e8dc7a677f5efa9"
+}

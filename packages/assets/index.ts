@@ -11,6 +11,7 @@ import './omorphia.scss'
 import _FourOhFourNotFound from './branding/404.svg?component'
 // Branding
 import _BrowserWindowSuccessIllustration from './branding/illustrations/browser-window-success.svg?component'
+import _InviteBackgroundIllustration from './branding/illustrations/invite-bg.webp?url'
 import _ModrinthIcon from './branding/logo.svg?component'
 import _ModrinthPlusIcon from './branding/modrinth-plus.svg?component'
 import _AngryRinthbot from './branding/rinthbot/angry.webp'
@@ -64,6 +65,7 @@ import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
 import _YouTubeGaming from './external/youtubegaming.svg?component'
 import _YouTubeShortsIcon from './external/youtubeshorts.svg?component'
+import _LinuxIcon from './external/linux.svg?component'
 // Tag icon helpers - import maps from generated-icons
 import type { IconComponent } from './generated-icons'
 import { categoryIconMap, loaderIconMap } from './generated-icons'
@@ -83,6 +85,7 @@ import _NoTasksIllustration from './illustrations/no-tasks.svg?component'
 
 export const ModrinthIcon = _ModrinthIcon
 export const BrowserWindowSuccessIllustration = _BrowserWindowSuccessIllustration
+export const InviteBackgroundIllustration = _InviteBackgroundIllustration
 export const FourOhFourNotFound = _FourOhFourNotFound
 export const ModrinthPlusIcon = _ModrinthPlusIcon
 export const AngryRinthbot = _AngryRinthbot
@@ -135,6 +138,7 @@ export const USDCColorIcon = _USDCColorIcon
 export const VisaIcon = _VisaIcon
 export const IntercomBubbleIcon = _IntercomBubbleIcon
 export const MinecraftServerIcon = _MinecraftServerIcon
+export const LinuxIcon = _LinuxIcon
 
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'

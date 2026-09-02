@@ -1,12 +1,15 @@
+import type { Labrinth } from '@modrinth/api-client'
 import { useVIntl } from '@modrinth/ui'
 import { computed, type ComputedRef, ref, watch } from 'vue'
 
 import { useTheme } from '~/composables/nuxt-accessors'
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type {
+	AnalyticsBreakdownPreset,
 	AnalyticsDashboardContextValue,
 	AnalyticsDashboardProject,
 	AnalyticsDashboardStat,
+	AnalyticsSelectedFilters,
 } from '~/providers/analytics/analytics'
 
 import {
@@ -29,6 +32,7 @@ import {
 	type ChartDataset,
 	getChartDatasetTotal,
 	getShortHourlyAxisTickLimit,
+	getSliceBucketRange,
 	getSliceCount,
 	shouldCapitalizeBreakdownLabel,
 } from './analytics-chart-utils'
@@ -47,12 +51,16 @@ export function useAnalyticsChartDatasets(
 		| 'displayedPreviousTimeSlices'
 		| 'displayedSelectedGroupBy'
 		| 'displayedSelectedBreakdowns'
+		| 'displayedSelectedFilters'
 		| 'hiddenGraphDatasetIds'
 		| 'hasExplicitGraphDatasetSelection'
 		| 'isGraphDatasetSelectionActive'
 		| 'selectedGraphDatasetIds'
 		| 'defaultGraphDatasetIds'
 		| 'topGraphDatasetIds'
+		| 'projectNamesById'
+		| 'userNamesById'
+		| 'dependentProjectTypesById'
 		| 'getVersionDisplayName'
 		| 'getVersionProjectName'
 	>,
@@ -154,24 +162,44 @@ export function useAnalyticsChartDatasets(
 				)
 			: undefined
 	})
-	const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() =>
-		buildDatasetsByStat(
+	const chartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() => {
+		const datasets = buildDatasetsByStat(
 			context.displayedTimeSlices.value,
 			selectedProjects.value,
 			legendPalette.value,
 			context.displayedSelectedBreakdowns.value,
+			context.displayedSelectedFilters.value,
+			context.dependentProjectTypesById.value,
+			context.projectNamesById.value,
+			context.userNamesById.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
 			sliceCount.value,
-		),
-	)
+		)
+		const nextFetchRequest = context.displayedFetchRequest.value
+		if (
+			nextFetchRequest &&
+			context.displayedSelectedGroupBy.value === 'day' &&
+			isLastBucketCurrentDay(nextFetchRequest.time_range, sliceCount.value)
+		) {
+			datasets.revenue = datasets.revenue.map((dataset) => ({
+				...dataset,
+				lastDataPointUnavailable: true,
+			}))
+		}
+		return datasets
+	})
 	const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() =>
 		buildDatasetsByStat(
 			context.displayedPreviousTimeSlices.value,
 			selectedProjects.value,
 			legendPalette.value,
 			context.displayedSelectedBreakdowns.value,
+			context.displayedSelectedFilters.value,
+			context.dependentProjectTypesById.value,
+			context.projectNamesById.value,
+			context.userNamesById.value,
 			context.getVersionDisplayName,
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
@@ -357,12 +385,16 @@ export function useAnalyticsChartDatasets(
 }
 
 function buildDatasetsByStat(
-	timeSlices: Parameters<typeof buildChartDatasets>[0],
+	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	selectedProjects: AnalyticsDashboardProject[],
 	palette: string[],
-	selectedBreakdowns: Parameters<typeof buildChartDatasets>[4],
-	getVersionDisplayName: Parameters<typeof buildChartDatasets>[5],
-	getVersionProjectName: Parameters<typeof buildChartDatasets>[6],
+	selectedBreakdowns: readonly AnalyticsBreakdownPreset[],
+	selectedFilters: AnalyticsSelectedFilters,
+	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>,
+	projectNamesById: ReadonlyMap<string, string>,
+	userNamesById: ReadonlyMap<string, string>,
+	getVersionDisplayName: (versionId: string) => string,
+	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
 	sliceCount: number,
 ) {
@@ -374,6 +406,10 @@ function buildDatasetsByStat(
 			stat,
 			palette,
 			selectedBreakdowns,
+			selectedFilters,
+			dependentProjectTypesById,
+			projectNamesById,
+			userNamesById,
 			getVersionDisplayName,
 			getVersionProjectName,
 			formatMessage,
@@ -381,6 +417,16 @@ function buildDatasetsByStat(
 		)
 	}
 	return datasetsByStat
+}
+
+function isLastBucketCurrentDay(timeRange: Labrinth.Analytics.v3.TimeRange, sliceCount: number) {
+	const lastBucket = getSliceBucketRange(timeRange, sliceCount, sliceCount - 1)
+	const todayStart = new Date()
+	todayStart.setHours(0, 0, 0, 0)
+	const tomorrowStart = new Date(todayStart)
+	tomorrowStart.setDate(tomorrowStart.getDate() + 1)
+
+	return lastBucket.start < tomorrowStart && lastBucket.end > todayStart
 }
 
 function sortDatasetsByTotal(datasets: ChartDataset[]) {

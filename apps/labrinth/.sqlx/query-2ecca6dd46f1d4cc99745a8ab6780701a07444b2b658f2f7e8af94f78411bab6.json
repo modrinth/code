@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                insert into project_attribution_files (group_id, name, sha1, moderation_external_license_id)\n                values ($1, $2, $3, $4)\n                on conflict (group_id, sha1) do update\n                set moderation_external_license_id = excluded.moderation_external_license_id\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Bytea",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2ecca6dd46f1d4cc99745a8ab6780701a07444b2b658f2f7e8af94f78411bab6"
+}

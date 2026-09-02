@@ -1,171 +1,84 @@
 <template>
-	<div v-if="subtleLauncherRedirectUri">
-		<iframe
-			:src="subtleLauncherRedirectUri"
-			class="fixed left-0 top-0 z-[9999] m-0 h-full w-full border-0 p-0"
-		></iframe>
-	</div>
-	<div v-else>
-		<template v-if="flow && !subtleLauncherRedirectUri">
-			<label for="two-factor-code">
-				<span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
-				<span class="label__description">
-					{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
-				</span>
-			</label>
-			<StyledInput
-				id="two-factor-code"
-				v-model="twoFactorCode"
-				:maxlength="11"
-				inputmode="numeric"
-				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
-				autocomplete="one-time-code"
-				@keyup.enter="begin2FASignIn"
-			/>
-
-			<ButtonStyled color="brand">
-				<button class="continue-btn" @click="begin2FASignIn">
-					{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
-				</button>
-			</ButtonStyled>
-		</template>
-		<template v-else>
-			<h1>{{ formatMessage(messages.signInWithLabel) }}</h1>
-
-			<section class="third-party">
-				<ButtonStyled>
-					<a :href="getAuthUrl('discord', redirectTarget)">
-						<DiscordColorIcon />
-						<span>Discord</span>
-					</a>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a :href="getAuthUrl('github', redirectTarget)">
-						<GitHubColorIcon />
-						<span>GitHub</span>
-					</a>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a :href="getAuthUrl('microsoft', redirectTarget)">
-						<MicrosoftColorIcon />
-						<span>Microsoft</span>
-					</a>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a :href="getAuthUrl('google', redirectTarget)">
-						<GoogleColorIcon />
-						<span>Google</span>
-					</a>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a :href="getAuthUrl('steam', redirectTarget)">
-						<SteamColorIcon />
-						<span>Steam</span>
-					</a>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a :href="getAuthUrl('gitlab', redirectTarget)">
-						<GitLabColorIcon />
-						<span>GitLab</span>
-					</a>
-				</ButtonStyled>
-			</section>
-
-			<h1>{{ formatMessage(messages.usePasswordLabel) }}</h1>
-
-			<section class="auth-form">
-				<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
-				<StyledInput
-					id="email"
-					v-model="email"
-					:icon="MailIcon"
-					type="text"
-					inputmode="email"
-					autocomplete="username"
-					:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
-					wrapper-class="w-full"
-				/>
-
-				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-				<StyledInput
-					id="password"
-					v-model="password"
-					:icon="KeyIcon"
-					type="password"
-					autocomplete="current-password"
-					:placeholder="formatMessage(commonMessages.passwordLabel)"
-					wrapper-class="w-full"
-				/>
-
-				<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
-
-				<ButtonStyled color="brand">
-					<button
-						class="continue-btn centered-btn"
-						:disabled="globals?.captcha_enabled ? !token : false"
-						@click="beginPasswordSignIn()"
-					>
-						{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
-					</button>
-				</ButtonStyled>
-
-				<div class="auth-form__additional-options">
-					<IntlFormatted :message-id="messages.additionalOptionsLabel">
-						<template #forgot-password-link="{ children }">
-							<NuxtLink
-								class="text-link"
-								:to="{
-									path: '/auth/reset-password',
-									query: route.query,
-								}"
-							>
-								<component :is="() => children" />
-							</NuxtLink>
-						</template>
-						<template #create-account-link="{ children }">
-							<NuxtLink
-								class="text-link"
-								:to="{
-									path: '/auth/sign-up',
-									query: route.query,
-								}"
-							>
-								<component :is="() => children" />
-							</NuxtLink>
-						</template>
-					</IntlFormatted>
-				</div>
-			</section>
-		</template>
-	</div>
+	<SignInView
+		v-if="signInReady || subtleLauncherRedirectUri"
+		v-model:email="email"
+		v-model:password="password"
+		v-model:token="token"
+		v-model:two-factor-code="twoFactorCode"
+		:subtle-launcher-redirect-uri="subtleLauncherRedirectUri"
+		:flow="flow"
+		:redirect-target="redirectTarget"
+		:route-query="route.query"
+		:globals="globals"
+		:accounts="launcherAccountChoices"
+		:on-password-sign-in="beginPasswordSignIn"
+		:on-two-factor-sign-in="begin2FASignIn"
+		:on-passkey-sign-in="beginPasskeySignin"
+		:on-set-captcha-ref="setCaptchaRef"
+		@select="onSelectLauncherAccount"
+	/>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
-	DiscordColorIcon,
-	GitHubColorIcon,
-	GitLabColorIcon,
-	GoogleColorIcon,
-	KeyIcon,
-	MailIcon,
-	MicrosoftColorIcon,
-	RightArrowIcon,
-	SteamColorIcon,
-} from '@modrinth/assets'
-import {
-	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	IntlFormatted,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useStorage } from '@vueuse/core'
+import type { LocationQueryValue } from 'vue-router'
 
-import HCaptcha from '@/components/ui/HCaptcha.vue'
-import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
+import SignInView from '@/components/ui/auth/SignIn.vue'
+import {
+	hydrateStoredAccounts,
+	isStoredAccountAuthMethod,
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	rememberStoredAccount,
+	type StoredAccount,
+	type StoredAccountAuthMethod,
+	useStoredAccounts,
+} from '@/composables/accounts.ts'
+import {
+	ADD_ACCOUNT_QUERY_PARAM,
+	getLauncherRedirectUrl,
+	promotePendingSignInOAuthProvider,
+} from '@/composables/auth.ts'
+import { getPasskeyCredential } from '@/helpers/passkey.ts'
+
+type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft' | 'passkey'
+
+interface AuthGlobalsResponse {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
+
+interface ApiErrorShape {
+	data?: {
+		description?: string
+	}
+}
+
+const getQueryString = (
+	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string => {
+	const firstValue = Array.isArray(value) ? value[0] : value
+	return typeof firstValue === 'string' ? firstValue : ''
+}
+
+const getErrorMessage = (error: unknown): string => {
+	const apiError = error as ApiErrorShape
+	if (typeof apiError?.data?.description === 'string') {
+		return apiError.data.description
+	}
+	if (error instanceof Error) {
+		return error.message
+	}
+	return String(error)
+}
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -173,34 +86,9 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	additionalOptionsLabel: {
-		id: 'auth.sign-in.additional-options',
-		defaultMessage:
-			'<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>',
-	},
-	signInWithLabel: {
-		id: 'auth.sign-in.sign-in-with',
-		defaultMessage: 'Sign in with',
-	},
 	signInTitle: {
 		id: 'auth.sign-in.title',
 		defaultMessage: 'Sign In',
-	},
-	twoFactorCodeInputPlaceholder: {
-		id: 'auth.sign-in.2fa.placeholder',
-		defaultMessage: 'Enter code...',
-	},
-	twoFactorCodeLabel: {
-		id: 'auth.sign-in.2fa.label',
-		defaultMessage: 'Enter two-factor code',
-	},
-	twoFactorCodeLabelDescription: {
-		id: 'auth.sign-in.2fa.description',
-		defaultMessage: 'Please enter a two-factor code to proceed.',
-	},
-	usePasswordLabel: {
-		id: 'auth.sign-in.use-password',
-		defaultMessage: 'Or use a password',
 	},
 })
 
@@ -212,21 +100,144 @@ useHead({
 
 const auth = await useAuth()
 const route = useNativeRoute()
+const pendingSignInOAuthProvider = useStorage<AuthProvider | null>(
+	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
+const lastSignInOAuthProvider = useStorage<AuthProvider | null>(
+	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	null,
+	undefined,
+	{ initOnMounted: true },
+)
 
-const redirectTarget = route.query.redirect || ''
-const subtleLauncherRedirectUri = ref()
+if (route.query.state !== undefined) {
+	await navigateTo(
+		{
+			path: '/auth/create/oauth',
+			query: route.query,
+		},
+		{
+			replace: true,
+		},
+	)
+}
 
-if (route.query.code && !route.fullPath.includes('new_account=true')) {
+const redirectTarget = getQueryString(route.query.redirect)
+const subtleLauncherRedirectUri = ref<string>()
+
+if (route.query.code) {
 	await finishSignIn()
 }
 
-if (auth.value.user) {
+const isAddingAccount = route.query[ADD_ACCOUNT_QUERY_PARAM] !== undefined
+const isLauncherSignIn = route.query.launcher !== undefined
+const storedAccounts = useStoredAccounts()
+const signInReady = ref(!isLauncherSignIn)
+
+const choosableAccounts = computed((): StoredAccount[] => {
+	const user = auth.value.user
+	const token = auth.value.token
+	const accounts = storedAccounts.value.map((stored) => {
+		if (user && token && stored.id === user.id) {
+			return {
+				...stored,
+				username: user.username,
+				avatarUrl: user.avatar_url ?? stored.avatarUrl,
+				token,
+				role: user.role,
+			}
+		}
+
+		return stored
+	})
+
+	if (user && token && !accounts.some((account) => account.id === user.id)) {
+		accounts.push({
+			id: user.id,
+			username: user.username,
+			avatarUrl: user.avatar_url ?? null,
+			token,
+			role: user.role,
+		})
+	}
+
+	return accounts
+})
+
+const launcherAccountChoices = computed(() => {
+	if (!isLauncherSignIn) return []
+
+	const minimumAccounts = isAddingAccount ? 1 : 2
+	return choosableAccounts.value.length >= minimumAccounts ? choosableAccounts.value : []
+})
+
+if (auth.value.user && !isAddingAccount && !isLauncherSignIn) {
 	await finishSignIn()
 }
 
-const captcha = ref()
+onMounted(async () => {
+	if (!isLauncherSignIn) {
+		return
+	}
 
-const { data: globals } = useQuery({
+	hydrateStoredAccounts()
+
+	if (subtleLauncherRedirectUri.value) {
+		signInReady.value = true
+		return
+	}
+
+	if (
+		auth.value.user &&
+		!isAddingAccount &&
+		choosableAccounts.value.length === 1 &&
+		route.query.code === undefined
+	) {
+		await showLauncherOpeningPage(auth.value.token)
+		if (subtleLauncherRedirectUri.value) {
+			signInReady.value = true
+		}
+		return
+	}
+
+	signInReady.value = true
+})
+
+function getLauncherCallbackUrl(sessionToken: string) {
+	return `${getLauncherRedirectUrl(route)}/?code=${sessionToken}`
+}
+
+async function showLauncherOpeningPage(sessionToken: string) {
+	promotePendingSignInOAuthProvider()
+
+	const redirectUrl = getLauncherCallbackUrl(sessionToken)
+
+	if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
+		await navigateTo(redirectUrl, {
+			external: true,
+		})
+		return
+	}
+
+	subtleLauncherRedirectUri.value = redirectUrl
+}
+
+function onSelectLauncherAccount(account: { id: string }) {
+	const stored = choosableAccounts.value.find((choice) => choice.id === account.id)
+	if (stored) {
+		void showLauncherOpeningPage(stored.token)
+	}
+}
+
+const captcha = ref<{ reset?: () => void } | null>(null)
+const setCaptchaRef = (captchaRef: unknown) => {
+	captcha.value = (captchaRef as { reset?: () => void } | null) ?? null
+}
+
+const { data: globals } = useQuery<AuthGlobalsResponse>({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
@@ -242,9 +253,11 @@ const email = ref('')
 const password = ref('')
 const token = ref('')
 
-const flow = ref(route.query.flow)
+const flow = ref(getQueryString(route.query.flow))
 
 async function beginPasswordSignIn() {
+	pendingSignInOAuthProvider.value = null
+	lastSignInOAuthProvider.value = null
 	startLoading()
 	try {
 		const res = await client.labrinth.auth_v2.login({
@@ -256,79 +269,103 @@ async function beginPasswordSignIn() {
 		if (res.flow) {
 			flow.value = res.flow
 		} else {
-			await finishSignIn(res.session)
+			await finishSignIn(res.session, 'password')
 		}
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }
 
-const twoFactorCode = ref(null)
+const twoFactorCode = ref('')
 async function begin2FASignIn() {
 	startLoading()
 	try {
 		const res = await client.labrinth.auth_v2.login2FA({
 			flow: flow.value,
-			code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
+			code: twoFactorCode.value,
 		})
 
-		await finishSignIn(res.session)
+		await finishSignIn(res.session, 'password')
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset()
+		captcha.value?.reset?.()
 	}
 	stopLoading()
 }
 
-async function finishSignIn(token) {
+async function beginPasskeySignin() {
+	startLoading()
+	try {
+		const start = await client.labrinth.auth_v2.authenticatePasskeyStart()
+
+		const credential = await getPasskeyCredential(start.options.publicKey)
+
+		const result = await client.labrinth.auth_v2.authenticatePasskeyFinish({
+			flow: start.flow,
+			credential,
+		})
+
+		pendingSignInOAuthProvider.value = 'passkey'
+		await finishSignIn(result.session, 'passkey')
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: getErrorMessage(err),
+			type: 'error',
+		})
+	}
+	stopLoading()
+}
+
+async function finishSignIn(sessionToken?: string | null, authMethod?: StoredAccountAuthMethod) {
 	if (route.query.launcher) {
-		if (!token) {
-			token = auth.value.token
-		}
-
-		const redirectUrl = `${getLauncherRedirectUrl(route)}/?code=${token}`
-
-		if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
-			await navigateTo(redirectUrl, {
-				external: true,
-			})
-		} else {
-			// When redirecting to localhost, the auth token is very visible in the URL to the user.
-			// While we could make it harder to find with a POST request, such is security by obscurity:
-			// the user and other applications would still be able to sniff the token in the request body.
-			// So, to make the UX a little better by not changing the displayed URL, while keeping the
-			// token hidden from very casual observation and keeping the protocol as close to OAuth's
-			// standard flows as possible, let's execute the redirect within an iframe that visually
-			// covers the entire page.
-			subtleLauncherRedirectUri.value = redirectUrl
+		const token = sessionToken ?? auth.value.token
+		if (token) {
+			await showLauncherOpeningPage(token)
 		}
 
 		return
 	}
 
-	if (token) {
-		await useAuth(token)
+	if (sessionToken) {
+		await useAuth(sessionToken)
 		await useUser()
 		queryClient.clear()
 	}
 
+	const signedIn = await useAuth()
+	if (signedIn.value.user && signedIn.value.token) {
+		const nextAuthMethod =
+			authMethod ??
+			(isStoredAccountAuthMethod(pendingSignInOAuthProvider.value)
+				? pendingSignInOAuthProvider.value
+				: undefined)
+		rememberStoredAccount(
+			signedIn.value.user,
+			signedIn.value.token,
+			nextAuthMethod ? { authMethod: nextAuthMethod } : undefined,
+		)
+	}
+
+	promotePendingSignInOAuthProvider()
+
 	if (route.query.redirect) {
-		const redirect = decodeURIComponent(route.query.redirect)
+		const redirect = decodeURIComponent(getQueryString(route.query.redirect))
 		await navigateTo(redirect, {
 			replace: true,
 		})
-	} else {
-		await navigateTo('/dashboard')
+	} else if (signedIn.value.user) {
+		await navigateTo(`/user/${signedIn.value.user.username}`)
 	}
 }
 </script>

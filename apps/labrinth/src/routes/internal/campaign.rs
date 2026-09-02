@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, get, post, web};
 use base64::Engine;
 use chrono::{DateTime, Duration, Utc};
@@ -8,8 +9,9 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use std::collections::HashSet;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use uuid::Uuid;
+use xredis::RedisPool;
 
 use crate::{
     database::{
@@ -18,7 +20,6 @@ use crate::{
             DBCampaignDonationId, DBUser, DBUserId,
             generate_campaign_donation_id,
         },
-        redis::RedisPool,
     },
     env::ENV,
     models::payouts::TremendousForexResponse,
@@ -27,7 +28,7 @@ use crate::{
     util::{error::Context, http::HttpClient, tiltify::TiltifyClient},
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(tiltify_webhook).service(pride_26);
 }
 
@@ -60,15 +61,24 @@ struct TiltifyMeta {
     subscription_source_type: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct CampaignInfo {
     total_donations_usd: Decimal,
     target_usd: Decimal,
     num_donators: usize,
+    cached_at: DateTime<Utc>,
 }
 
-const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info";
-const CAMPAIGN_INFO_CACHE_TTL_SECONDS: i64 = 15 * 60;
+const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info:v4";
+const CAMPAIGN_INFO_CACHE_STALE_SECONDS: i64 = 15 * 60;
+const CAMPAIGN_INFO_CACHE_TTL_SECONDS: i64 = 24 * 60 * 60;
+
+impl CampaignInfo {
+    fn is_stale(&self) -> bool {
+        Utc::now().signed_duration_since(self.cached_at)
+            >= Duration::seconds(CAMPAIGN_INFO_CACHE_STALE_SECONDS)
+    }
+}
 
 #[derive(Debug, Deserialize)]
 struct TiltifyCampaignResponse {
@@ -134,7 +144,13 @@ impl CampaignDonation {
     }
 }
 
-#[utoipa::path]
+/// Receive a Tiltify webhook.
+#[utoipa::path(
+	context_path = "/campaign",
+	tag = "campaigns",
+	request_body(content = String, content_type = "text/plain"),
+	responses((status = NO_CONTENT))
+)]
 #[post("/webhook")]
 pub async fn tiltify_webhook(
     req: HttpRequest,
@@ -143,7 +159,8 @@ pub async fn tiltify_webhook(
     payouts_queue: web::Data<PayoutsQueue>,
     body: String,
 ) -> Result<(), ApiError> {
-    verify_tiltify_webhook_signature(&req, &body)?;
+    verify_tiltify_webhook_signature(&req, &body)
+        .wrap_api_err("executing `verify_tiltify_webhook_signature`")?;
 
     let raw_payload = serde_json::from_str::<serde_json::Value>(&body)
         .wrap_internal_err_with(|| eyre!("invalid Tiltify webhook JSON"))?;
@@ -166,7 +183,9 @@ pub async fn tiltify_webhook(
         .begin()
         .await
         .wrap_internal_err("beginning transaction")?;
-    let id = generate_campaign_donation_id(&mut transaction).await?;
+    let id = generate_campaign_donation_id(&mut transaction)
+        .await
+        .wrap_internal_err("generating campaign donation ID")?;
 
     let mut donation = CampaignDonation {
         id,
@@ -292,7 +311,12 @@ fn verify_tiltify_webhook_signature(
     Ok(())
 }
 
-#[utoipa::path]
+/// Get Pride campaign data.
+#[utoipa::path(
+	context_path = "/campaign",
+	tag = "campaigns",
+	responses((status = OK, body = CampaignInfo))
+)]
 #[get("/pride-26")]
 pub async fn pride_26(
     http: web::Data<HttpClient>,
@@ -304,67 +328,90 @@ pub async fn pride_26(
         .connect()
         .await
         .wrap_internal_err("connecting to redis")?;
+    let cache_key = redis
+        .key()
+        .entity(CAMPAIGN_INFO_CACHE_NAMESPACE, campaign_id);
 
-    if let Some(cached) = redis_connection
-        .get(CAMPAIGN_INFO_CACHE_NAMESPACE, campaign_id)
+    let cached = redis_connection
+        .get_deserialized::<CampaignInfo>(&cache_key)
         .await
-        .wrap_internal_err("getting cached campaign info")?
+        .wrap_internal_err("getting cached campaign info")?;
+
+    if let Some(cached) = &cached
+        && !cached.is_stale()
     {
-        let campaign_info = serde_json::from_str::<CampaignInfo>(&cached)
-            .wrap_internal_err("parsing cached campaign info")?;
-        return Ok(web::Json(campaign_info));
+        return Ok(web::Json(cached.clone()));
     }
 
-    let access_token = tiltify
-        .access_token()
-        .await
-        .wrap_internal_err("fetching Tiltify access token")?;
-    let url = format!(
-        "https://v5api.tiltify.com/api/public/team_campaigns/{campaign_id}",
-    );
-    let response = http
-        .get(url)
-        .bearer_auth(&access_token)
-        .send()
-        .await
-        .wrap_internal_err("fetching campaign from Tiltify")?
-        .error_for_status()
-        .wrap_internal_err("fetching campaign from Tiltify")?
-        .json::<TiltifyCampaignResponse>()
-        .await
-        .wrap_internal_err("parsing Tiltify response")?;
+    let result = async {
+        let access_token = tiltify
+            .access_token()
+            .await
+            .wrap_internal_err("fetching Tiltify access token")?;
+        let url = format!(
+            "https://v5api.tiltify.com/api/public/team_campaigns/{campaign_id}",
+        );
+        let response = http
+            .get(url)
+            .bearer_auth(&access_token)
+            .send()
+            .await
+            .wrap_internal_err("fetching campaign from Tiltify")?
+            .error_for_status()
+            .wrap_internal_err("fetching campaign from Tiltify")?
+            .json::<TiltifyCampaignResponse>()
+            .await
+            .wrap_internal_err("parsing Tiltify response")?;
 
-    let raised_currency = &response.data.total_amount_raised.currency;
-    if raised_currency != "USD" {
-        return Err(ApiError::Internal(eyre!(
-            "total amount raised is in {raised_currency}, must be USD"
-        )));
+        let raised_currency = &response.data.total_amount_raised.currency;
+        if raised_currency != "USD" {
+            return Err(ApiError::Internal(eyre!(
+                "total amount raised is in {raised_currency}, must be USD"
+            )));
+        }
+
+        let goal_currency = &response.data.goal.currency;
+        if goal_currency != "USD" {
+            return Err(ApiError::Internal(eyre!(
+                "goal amount is in {goal_currency}, must be USD"
+            )));
+        }
+
+        let campaign_info = CampaignInfo {
+            total_donations_usd: response.data.total_amount_raised.value,
+            target_usd: response.data.goal.value,
+            num_donators: num_donators(&http, &access_token, campaign_id)
+                .await
+                .wrap_api_err("executing `num_donators`")?,
+            cached_at: Utc::now(),
+        };
+
+        redis_connection
+            .set_serialized(
+                &cache_key,
+                &campaign_info,
+                Some(CAMPAIGN_INFO_CACHE_TTL_SECONDS),
+            )
+            .await
+            .wrap_internal_err("caching campaign info")?;
+
+        Ok(campaign_info)
     }
+    .await;
 
-    let goal_currency = &response.data.goal.currency;
-    if goal_currency != "USD" {
-        return Err(ApiError::Internal(eyre!(
-            "goal amount is in {goal_currency}, must be USD"
-        )));
+    match result {
+        Ok(campaign_info) => Ok(web::Json(campaign_info)),
+        Err(error) => {
+            if let Some(cached) = cached {
+                debug!(
+                    "Failed to refresh campaign info from Tiltify: {error:?}"
+                );
+                Ok(web::Json(cached))
+            } else {
+                Err(error)
+            }
+        }
     }
-
-    let campaign_info = CampaignInfo {
-        total_donations_usd: response.data.total_amount_raised.value,
-        target_usd: response.data.goal.value,
-        num_donators: num_donators(&http, &access_token, campaign_id).await?,
-    };
-
-    redis_connection
-        .set_serialized_to_json(
-            CAMPAIGN_INFO_CACHE_NAMESPACE,
-            campaign_id,
-            &campaign_info,
-            Some(CAMPAIGN_INFO_CACHE_TTL_SECONDS),
-        )
-        .await
-        .wrap_internal_err("caching campaign info")?;
-
-    Ok(web::Json(campaign_info))
 }
 
 async fn num_donators(

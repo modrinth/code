@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { MoreVerticalIcon, TrashIcon, UserIcon, XIcon } from '@modrinth/assets'
+import type { ButtonMenuOption } from '@modrinth/ui'
 import {
 	Accordion,
-	Avatar,
-	ButtonStyled,
+	ContextMenu,
 	defineMessages,
-	OverflowMenu,
+	IconButton,
+	TeleportOverflowMenu,
+	UserAvatar,
 	useVIntl,
 } from '@modrinth/ui'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { useTemplateRef } from 'vue'
+import { useRouter } from 'vue-router'
 
-import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type { FriendWithUserData } from '@/helpers/friends.ts'
 
 const { formatMessage } = useVIntl()
+const router = useRouter()
 
 const props = withDefaults(
 	defineProps<{
@@ -30,44 +32,42 @@ const props = withDefaults(
 	},
 )
 
-function createContextMenuOptions(friend: FriendWithUserData) {
-	if (friend.accepted) {
-		return [
-			{
-				name: 'view-profile',
-			},
-			{
-				name: 'remove-friend',
-				color: 'danger',
-			},
-		]
-	} else {
-		return [
-			{
-				name: 'view-profile',
-			},
-			{
-				name: 'cancel-request',
-			},
-		]
-	}
+const emit = defineEmits<{
+	onOpen: []
+	onClose: []
+}>()
+
+function createContextMenuOptions(friend: FriendWithUserData): ButtonMenuOption[] {
+	return [
+		{
+			id: 'view-profile',
+			label: formatMessage(messages.viewProfile),
+			icon: UserIcon,
+			action: () => openProfile(friend.username),
+		},
+		friend.accepted
+			? {
+					id: 'remove-friend',
+					label: formatMessage(messages.removeFriend),
+					icon: TrashIcon,
+					tone: 'red',
+					hoverFilledOnly: true,
+					action: () => void props.removeFriend(friend),
+				}
+			: {
+					id: 'cancel-request',
+					label: formatMessage(messages.cancelRequest),
+					icon: XIcon,
+					action: () => void props.removeFriend(friend),
+				},
+	]
 }
 
 function openProfile(username: string) {
-	openUrl('https://modrinth.com/user/' + username)
+	void router.push(`/user/${encodeURIComponent(username)}`)
 }
 
 const friendOptions = useTemplateRef('friendOptions')
-async function handleFriendOptions(args: { item: FriendWithUserData; option: string }) {
-	switch (args.option) {
-		case 'remove-friend':
-		case 'cancel-request':
-			await props.removeFriend(args.item)
-			break
-		case 'view-profile':
-			openProfile(args.item.username)
-	}
-}
 
 const messages = defineMessages({
 	removeFriend: {
@@ -90,18 +90,15 @@ const messages = defineMessages({
 		id: 'friends.friend.view-profile',
 		defaultMessage: 'View profile',
 	},
+	friendActionsLabel: {
+		id: 'friends.friend.actions.label',
+		defaultMessage: 'Friend actions',
+	},
 })
 </script>
 
 <template>
-	<ContextMenu ref="friendOptions" @option-clicked="handleFriendOptions">
-		<template #view-profile>
-			<UserIcon />
-			{{ formatMessage(messages.viewProfile) }}
-		</template>
-		<template #remove-friend> <TrashIcon /> {{ formatMessage(messages.removeFriend) }} </template>
-		<template #cancel-request> <XIcon /> {{ formatMessage(messages.cancelRequest) }} </template>
-	</ContextMenu>
+	<ContextMenu ref="friendOptions" :label="formatMessage(messages.friendActionsLabel)" />
 	<Accordion
 		:open-by-default="openByDefault"
 		:force-open="isSearching"
@@ -111,6 +108,8 @@ const messages = defineMessages({
 				? ''
 				: ' cursor-pointer hover:brightness-[--hover-brightness] active:scale-[0.98] transition-all')
 		"
+		@on-open="emit('onOpen')"
+		@on-close="emit('onClose')"
 	>
 		<template #title>
 			<h3 class="text-base text-primary font-medium m-0">
@@ -122,68 +121,63 @@ const messages = defineMessages({
 				<div
 					v-for="friend in friends"
 					:key="friend.username"
-					class="group grid items-center grid-cols-[auto_1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1"
+					class="group grid items-center grid-cols-[1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full mr-1 select-none"
 					@contextmenu.prevent.stop="
-						(event) => friendOptions?.showMenu(event, friend, createContextMenuOptions(friend))
+						(event) => friendOptions?.open(event, createContextMenuOptions(friend))
 					"
 				>
-					<div class="relative">
-						<Avatar
+					<RouterLink
+						:to="`/user/${encodeURIComponent(friend.username)}`"
+						class="grid min-w-0 grid-cols-[auto_1fr] items-center gap-2 text-inherit no-underline group no-click-animation"
+					>
+						<UserAvatar
 							:src="friend.avatar"
-							:class="{ grayscale: !friend.online && friend.accepted }"
-							class="w-12 h-12 rounded-full"
 							size="32px"
-							circle
+							:badge="friend.online"
+							:grayscale="!friend.online && friend.accepted"
 						/>
-						<span
-							v-if="friend.online"
-							aria-hidden="true"
-							class="bottom-[2px] right-[-2px] absolute w-3 h-3 bg-brand border-2 border-black border-solid rounded-full"
-						/>
-					</div>
-					<div class="flex flex-col">
-						<span
-							class="text-sm m-0"
-							:class="friend.online || !friend.accepted ? 'text-contrast' : 'text-primary'"
-						>
-							{{ friend.username }}
-						</span>
-						<span v-if="!friend.accepted" class="m-0 text-xs">
-							{{ formatMessage(messages.friendRequestSent) }}
-						</span>
-						<span v-else-if="friend.status" class="m-0 text-xs">{{ friend.status }}</span>
-					</div>
-					<ButtonStyled v-if="friend.accepted" circular type="transparent">
-						<OverflowMenu
-							class="opacity-0 group-hover:opacity-100 transition-opacity"
-							:options="[
-								{
-									id: 'view-profile',
-									action: () => openProfile(friend.username),
-								},
-								{
-									id: 'remove-friend',
-									action: () => removeFriend(friend),
-									color: 'red',
-								},
-							]"
-						>
-							<MoreVerticalIcon />
-							<template #view-profile>
-								<UserIcon />
-								{{ formatMessage(messages.viewProfile) }}
-							</template>
-							<template #remove-friend>
-								<TrashIcon />
-								{{ formatMessage(messages.removeFriend) }}
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-					<ButtonStyled v-else type="transparent" circular>
-						<button v-tooltip="formatMessage(messages.cancelRequest)" @click="removeFriend(friend)">
-							<XIcon />
-						</button>
-					</ButtonStyled>
+						<div class="flex flex-col">
+							<span
+								class="text-sm m-0 group-hover:underline"
+								:class="friend.online || !friend.accepted ? 'text-contrast' : 'text-primary'"
+							>
+								{{ friend.username }}
+							</span>
+							<span v-if="!friend.accepted" class="m-0 text-xs">
+								{{ formatMessage(messages.friendRequestSent) }}
+							</span>
+							<span v-else-if="friend.status" class="m-0 text-xs">{{ friend.status }}</span>
+						</div>
+					</RouterLink>
+					<TeleportOverflowMenu
+						v-if="friend.accepted"
+						type="quiet"
+						label="More options"
+						class="opacity-0 group-hover:opacity-100 transition-opacity"
+						:options="[
+							{
+								id: 'remove-friend',
+								label: formatMessage(messages.removeFriend),
+								action: () => removeFriend(friend),
+								tone: 'red',
+							},
+						]"
+					>
+						<MoreVerticalIcon />
+						<template #remove-friend>
+							<TrashIcon />
+							{{ formatMessage(messages.removeFriend) }}
+						</template>
+					</TeleportOverflowMenu>
+					<IconButton
+						v-else
+						v-tooltip="formatMessage(messages.cancelRequest)"
+						type="quiet"
+						:label="formatMessage(messages.cancelRequest)"
+						@click="removeFriend(friend)"
+					>
+						<XIcon />
+					</IconButton>
 				</div>
 			</div>
 		</template>

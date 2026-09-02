@@ -32,7 +32,7 @@
 						<span class="text-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-model="formData.businessName"
 					:placeholder="formatMessage(formFieldPlaceholders.businessNamePlaceholder)"
 					autocomplete="organization"
@@ -47,7 +47,7 @@
 						<span class="text-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-model="formData.email"
 					type="email"
 					:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
@@ -65,7 +65,7 @@
 								<span class="text-red">*</span>
 							</span>
 						</label>
-						<StyledInput
+						<Input
 							v-model="formData.firstName"
 							:placeholder="formatMessage(formFieldPlaceholders.firstNamePlaceholder)"
 							autocomplete="given-name"
@@ -79,7 +79,7 @@
 								<span class="text-red">*</span>
 							</span>
 						</label>
-						<StyledInput
+						<Input
 							v-model="formData.lastName"
 							:placeholder="formatMessage(formFieldPlaceholders.lastNamePlaceholder)"
 							autocomplete="family-name"
@@ -99,7 +99,7 @@
 						v-model="formData.dateOfBirth"
 						:max-date="maxDate"
 						autocomplete="bday"
-						placeholder="Select date of birth"
+						:placeholder="formatMessage(messages.dateOfBirthPlaceholder)"
 						wrapper-class="w-full"
 					/>
 				</div>
@@ -112,7 +112,7 @@
 						<span class="text-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-model="formData.physicalAddress.address1"
 					:placeholder="formatMessage(formFieldPlaceholders.addressPlaceholder)"
 					autocomplete="address-line1"
@@ -126,7 +126,7 @@
 						{{ formatMessage(formFieldLabels.addressLine2) }}
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-model="formData.physicalAddress.address2"
 					:placeholder="formatMessage(formFieldPlaceholders.address2Placeholder)"
 					autocomplete="address-line2"
@@ -142,7 +142,7 @@
 							<span class="text-red">*</span>
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						v-model="formData.physicalAddress.city"
 						:placeholder="formatMessage(formFieldPlaceholders.cityPlaceholder)"
 						autocomplete="address-level2"
@@ -162,9 +162,9 @@
 						:options="subdivisionOptions"
 						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
 						searchable
-						search-placeholder="Search subdivisions..."
+						:search-placeholder="formatMessage(messages.searchSubdivisionsPlaceholder)"
 					/>
-					<StyledInput
+					<Input
 						v-else
 						v-model="formData.physicalAddress.state"
 						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
@@ -182,7 +182,7 @@
 							<span class="text-red">*</span>
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						v-model="formData.physicalAddress.zip"
 						:placeholder="formatMessage(formFieldPlaceholders.postalCodePlaceholder)"
 						autocomplete="postal-code"
@@ -201,7 +201,7 @@
 						:options="countryOptions"
 						:placeholder="formatMessage(formFieldPlaceholders.countryPlaceholder)"
 						searchable
-						search-placeholder="Search countries..."
+						:search-placeholder="formatMessage(messages.searchCountriesPlaceholder)"
 					/>
 				</div>
 			</div>
@@ -217,7 +217,7 @@ import {
 	defineMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 // TODO: Switch to using Muralpay's improved endpoint when it's available.
@@ -360,6 +360,18 @@ const messages = defineMessages({
 	businessEntity: {
 		id: 'dashboard.creator-withdraw-modal.kyc.business-entity',
 		defaultMessage: 'Business entity',
+	},
+	dateOfBirthPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder',
+		defaultMessage: 'Select date of birth',
+	},
+	searchSubdivisionsPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder',
+		defaultMessage: 'Search subdivisions...',
+	},
+	searchCountriesPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.kyc.search-countries-placeholder',
+		defaultMessage: 'Search countries...',
 	},
 })
 </script>

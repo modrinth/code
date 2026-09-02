@@ -81,16 +81,12 @@
 					</div>
 				</Transition>
 				<div class="mt-4 flex justify-end gap-3">
-					<ButtonStyled @click="handleCancel">
-						<button><XIcon /> {{ formatMessage(messages.cancel) }}</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button :disabled="!canContinue || loading" @click="continueForm">
-							{{ formatMessage(messages.continue) }}
-							<RightArrowIcon v-if="!loading" />
-							<SpinnerIcon v-else class="animate-spin" />
-						</button>
-					</ButtonStyled>
+					<Button @click="handleCancel"><XIcon /> {{ formatMessage(messages.cancel) }}</Button>
+					<Button :disabled="!canContinue || loading" @click="continueForm">
+						{{ formatMessage(messages.continue) }}
+						<RightArrowIcon v-if="!loading" />
+						<SpinnerIcon v-else class="animate-spin" />
+					</Button>
 				</div>
 			</div>
 
@@ -136,16 +132,19 @@
 					</span>
 				</div>
 				<div class="flex w-full flex-row justify-stretch gap-2">
-					<ButtonStyled>
-						<button class="w-full text-contrast" @click="handleClose">{{ closeButtonText }}</button>
-					</ButtonStyled>
-					<ButtonStyled color="green">
-						<button class="w-full text-contrast" @click="downloadTaxForm">
-							<DownloadIcon />{{
-								formatMessage(messages.downloadButton, { formType: determinedFormType })
-							}}
-						</button>
-					</ButtonStyled>
+					<Button class="w-full text-contrast" @click="handleClose">
+						{{ props.closeButtonText ?? formatMessage(commonMessages.closeButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="green"
+						class="w-full text-contrast"
+						@click="downloadTaxForm"
+					>
+						<DownloadIcon />{{
+							formatMessage(messages.downloadButton, { formType: determinedFormType })
+						}}
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -163,7 +162,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
+	Button,
 	Chips,
 	commonMessages,
 	defineMessages,
@@ -182,7 +181,7 @@ const props = withDefaults(
 		emitSuccessOnClose?: boolean
 	}>(),
 	{
-		closeButtonText: 'Close',
+		closeButtonText: undefined,
 		emitSuccessOnClose: true,
 	},
 )
@@ -267,6 +266,14 @@ const messages = defineMessages({
 	downloadButton: {
 		id: 'dashboard.creator-tax-form-modal.confirmation.download-button',
 		defaultMessage: 'Download {formType}',
+	},
+	incompleteTitle: {
+		id: 'dashboard.creator-tax-form-modal.incomplete.title',
+		defaultMessage: 'Tax form incomplete',
+	},
+	incompleteText: {
+		id: 'dashboard.creator-tax-form-modal.incomplete.text',
+		defaultMessage: 'You have not completed the tax form. Please try again.',
 	},
 })
 
@@ -371,8 +378,8 @@ async function continueForm() {
 			}
 
 			addNotification({
-				title: 'Tax form incomplete',
-				text: 'You have not completed the tax form. Please try again.',
+				title: formatMessage(messages.incompleteTitle),
+				text: formatMessage(messages.incompleteText),
 				type: 'warning',
 			})
 		}

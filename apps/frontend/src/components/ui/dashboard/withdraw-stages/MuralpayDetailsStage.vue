@@ -56,7 +56,7 @@
 			</span>
 			<div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
 				<div class="flex flex-1 flex-col gap-2.5">
-					<StyledInput
+					<Input
 						v-model="formData.bankAccountOwnerFirstName"
 						:placeholder="formatMessage(formFieldPlaceholders.firstNamePlaceholder)"
 						autocomplete="given-name"
@@ -64,7 +64,7 @@
 					/>
 				</div>
 				<div class="flex flex-1 flex-col gap-2.5">
-					<StyledInput
+					<Input
 						v-model="formData.bankAccountOwnerLastName"
 						:placeholder="formatMessage(formFieldPlaceholders.lastNamePlaceholder)"
 						autocomplete="family-name"
@@ -91,7 +91,7 @@
 				class="h-10"
 			/>
 
-			<StyledInput
+			<Input
 				v-else
 				v-model="formData.bankName"
 				:placeholder="formatMessage(formFieldPlaceholders.bankNamePlaceholder)"
@@ -108,7 +108,7 @@
 				</span>
 			</label>
 
-			<StyledInput
+			<Input
 				v-if="['text', 'email', 'tel'].includes(field.type)"
 				v-model="formData[field.name]"
 				:type="field.type === 'tel' ? undefined : field.type === 'text' ? undefined : field.type"
@@ -158,7 +158,7 @@
 							<span v-if="dynamicDocumentNumberField.required" class="text-red">*</span>
 						</span>
 					</label>
-					<StyledInput
+					<Input
 						v-model="formData.documentNumber"
 						:placeholder="dynamicDocumentNumberField.placeholder"
 						autocomplete="off"
@@ -238,9 +238,9 @@ import {
 	getBlockchainIcon,
 	getCurrencyColor,
 	getCurrencyIcon,
+	Input,
 	IntlFormatted,
 	normalizeChildren,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'
@@ -248,13 +248,12 @@ import { computed, ref, watch } from 'vue'
 
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
-import { useGeneratedState } from '@/composables/generated'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
+import { muralBankDetails } from '~/generated/state.json'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()
-const generatedState = useGeneratedState()
 
 const selectedRail = computed(() => {
 	const railId = withdrawData.value.selection.method
@@ -285,7 +284,7 @@ const availableBankNames = computed(() => {
 	const rail = selectedRail.value
 	if (!rail || !rail.railCode) return []
 
-	const bankDetails = generatedState.value.muralBankDetails?.[rail.railCode]
+	const bankDetails = muralBankDetails?.[rail.railCode as keyof typeof muralBankDetails]
 	return bankDetails?.bankNames || []
 })
 

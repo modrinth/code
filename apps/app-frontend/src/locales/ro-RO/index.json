@@ -1,12 +1,129 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Se descarcă Java {version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "Se descarcă actualizarea"
+  },
+  "app.action-bar.downloads": {
+    "message": "Descărcări"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Copiat"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Copiază detaliile"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Ignoră"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Instanța nouă"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Reîncearcă"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Anulat"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Nu s-au putut salva fișierele"
+  },
+  "app.action-bar.offline": {
+    "message": "Offline"
+  },
+  "app.action-bar.update": {
+    "message": "Actualizează"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Vezi descărcările active"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Vezi instanțele"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Vezi jurnalele"
+  },
+  "app.ads-consent.accept": {
+    "message": "Acceptă tot"
+  },
+  "app.ads-consent.reject": {
+    "message": "Refuză tot"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Serverele de autentificare Minecraft pot fi indisponibile în acest moment. Verificați conexiunea la internet și încercați din nou mai târziu."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Nu se pot accesa serverele de autentificare"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Conținut necesar"
+  "app.browse.added": {
+    "message": "Adăugat"
+  },
+  "app.browse.already-added": {
+    "message": "Deja adăugat"
+  },
+  "app.browse.back-to-instance": {
+    "message": "Înapoi la instanță"
+  },
+  "app.browse.discover-project-type": {
+    "message": "Descoperă {projectType}"
+  },
+  "app.browse.discover-servers": {
+    "message": "Descoperă servere"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Ascunde serverele deja adăugate"
+  },
+  "app.browse.server.installing": {
+    "message": "Se instalează"
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportă"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Se finalizează"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Adăugat"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Creează"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Conectează-te"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Instanță"
+  },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Șterge lumea"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Șterge lumea"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Se șterge {name}"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.refreshing": {
+    "message": "Se reîmprospătează..."
+  },
+  "app.java-detection.cancel": {
+    "message": "Anulează"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Acțiuni"
   },
   "app.modal.install-to-play.header": {
     "message": "Instalați pentru a juca"
@@ -17,29 +134,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {#mod} other {# moduri}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Pachet de mod necesar"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Acest server necesită modificări pentru a juca. Faceți clic pe Instalare pentru a configura fișierele necesare din Modrinth, apoi lansați direct pe server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instanță comună"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instanță de server partajată"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Vizualizați conținutul"
   },
   "app.modal.update-to-play.header": {
     "message": "Actualizați pentru a juca"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Actualizare necesară"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Este necesară o actualizare pentru a juca {name}. Vă rugăm să actualizați la cea mai recentă versiune pentru a lansa jocul."
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modul dezvoltator activat."
@@ -49,9 +151,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Aspect"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Opțiuni implicite instanță"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalări Java"
@@ -82,9 +181,6 @@
   },
   "app.update-popup.download-complete": {
     "message": "Descărcare finalizată"
-  },
-  "app.update-popup.reload": {
-    "message": "Reîncărcați"
   },
   "app.update-popup.title": {
     "message": "Actualizare disponibilă"
@@ -248,26 +344,8 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selectează pictograma"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Grupuri din bibliotecă"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Creează grup nou"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupurile din bibliotecă îți permit să-ți organizezi instanțele în diferite secțiuni în biblioteca ta."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Introdu numele grupului"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nume"
-  },
-  "instance.settings.tabs.hooks": {
-    "message": "Cârlige de lansare"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Cârlige de lansare personalizate"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Cârligele permit utilizatorilor avansați să ruleze anumite comenzi de sistem înainte și după lansarea jocului."
@@ -307,9 +385,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versiune {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java și memorie"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variabile de mediu"
@@ -410,16 +485,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizează cu instanța"
   },
-  "search.filter.locked.server": {
-    "message": "Furnizat de server"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Numai modurile de pe partea clientului pot fi adăugate la instanța serverului"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Versiunea jocului este furnizată de server"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Încărcătorul este furnizat de server"
   }
 }

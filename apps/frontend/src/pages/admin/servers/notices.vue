@@ -24,7 +24,7 @@
 				<label for="notice-title" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Title </span>
 				</label>
-				<StyledInput
+				<Input
 					id="notice-title"
 					v-model="newNoticeTitle"
 					placeholder="E.g. Maintenance"
@@ -38,20 +38,14 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					v-if="newNoticeSurvey"
 					id="notice-message"
 					v-model="newNoticeMessage"
 					placeholder="E.g. rXGtq2"
 					autocomplete="off"
 				/>
-				<StyledInput
-					v-else
-					id="notice-message"
-					v-model="newNoticeMessage"
-					multiline
-					wrapper-class="h-32"
-				/>
+				<Textarea v-else id="notice-message" v-model="newNoticeMessage" wrapper-class="h-32" />
 			</div>
 			<div v-if="!newNoticeSurvey" class="flex items-center justify-between gap-2">
 				<label for="dismissable-toggle" class="flex flex-col gap-1">
@@ -65,7 +59,7 @@
 					<span class="text-lg font-semibold text-contrast"> Announcement date </span>
 					<span>Leave blank for notice to be available immediately.</span>
 				</label>
-				<StyledInput
+				<DateInput
 					id="scheduled-date"
 					v-model="newNoticeScheduledDate"
 					type="datetime-local"
@@ -77,7 +71,7 @@
 					<span class="text-lg font-semibold text-contrast"> Expiration date </span>
 					<span>The notice will automatically be deleted after this date.</span>
 				</label>
-				<StyledInput
+				<DateInput
 					id="expiration-date"
 					v-model="newNoticeExpiresDate"
 					type="datetime-local"
@@ -100,37 +94,35 @@
 				/>
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button v-if="editingNotice" :disabled="!!noticeSubmitError" @click="() => saveChanges()">
-						<SaveIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.saveChangesButton) }}
-					</button>
-					<button v-else :disabled="!!noticeSubmitError" @click="() => createNotice()">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createNotice) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="createNoticeModal?.hide">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button
+					v-if="editingNotice"
+					type="colored"
+					color="brand"
+					:disabled="!!noticeSubmitError"
+					@click="() => saveChanges()"
+				>
+					<SaveIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.saveChangesButton) }}
+				</Button>
+				<Button v-else :disabled="!!noticeSubmitError" @click="() => createNotice()">
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createNotice) }}
+				</Button>
+				<Button @click="createNoticeModal?.hide">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
 	<AssignNoticeModal ref="assignNoticeModal" @close="refreshNotices" />
-	<div class="page">
-		<div
-			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
-		>
-			<h1 class="m-0 text-2xl">Server notices</h1>
-			<ButtonStyled color="brand">
-				<button @click="openNewNoticeModal">
-					<PlusIcon />
-					{{ formatMessage(messages.createNotice) }}
-				</button>
-			</ButtonStyled>
+	<div>
+		<div class="mb-4 flex items-center justify-between gap-4">
+			<h2 class="m-0 text-2xl font-semibold">Server notices</h2>
+			<Button type="colored" color="brand" @click="openNewNoticeModal">
+				<PlusIcon />
+				{{ formatMessage(messages.createNotice) }}
+			</Button>
 		</div>
 		<div>
 			<div v-if="!notices || notices.length === 0">
@@ -201,16 +193,12 @@
 							</TagItem>
 						</div>
 						<div class="col-span-2 flex gap-2 md:col-span-1">
-							<ButtonStyled>
-								<button @click="() => startEditing(notice)">
-									<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="red">
-								<button @click="() => deleteNotice(notice)">
-									<TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}
-								</button>
-							</ButtonStyled>
+							<Button @click="() => startEditing(notice)">
+								<EditIcon /> {{ formatMessage(commonMessages.editButton) }}
+							</Button>
+							<Button type="colored" color="red" @click="() => deleteNotice(notice)">
+								<TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}
+							</Button>
 						</div>
 					</div>
 					<div class="col-span-full grid">
@@ -263,17 +251,19 @@
 import type { Archon } from '@modrinth/api-client'
 import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	Combobox,
 	commonMessages,
 	CopyCode,
+	DateInput,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
 	ServerNotice,
-	StyledInput,
 	TagItem,
+	Textarea,
 	Toggle,
 	useFormatDateTime,
 	useRelativeTime,
@@ -506,11 +496,3 @@ const messages = defineMessages({
 	},
 })
 </script>
-<style lang="scss" scoped>
-.page {
-	padding: 1rem;
-	margin-left: auto;
-	margin-right: auto;
-	max-width: 78.5rem;
-}
-</style>

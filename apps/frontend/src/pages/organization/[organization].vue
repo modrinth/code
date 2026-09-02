@@ -15,10 +15,10 @@
 						class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
 					>
 						<div class="flex items-center gap-4">
-							<Avatar size="sm" :src="organization.icon_url" />
+							<Avatar size="sm" :src="organization.icon_url" :raw-src="organization.raw_icon_url" />
 							<div class="flex flex-col justify-center gap-1">
 								<h2 class="m-0 text-base">
-									<nuxt-link :to="`/organization/${organization.slug}/settings`">
+									<nuxt-link :to="`/organization/${organization.slug}`">
 										{{ organization.name }}
 									</nuxt-link>
 								</h2>
@@ -62,220 +62,86 @@
 		</template>
 		<template v-else>
 			<div class="normal-page__header py-4">
-				<ContentPageHeader>
-					<template #icon>
-						<Avatar :src="organization.icon_url" :alt="organization.name" size="96px" />
-					</template>
-					<template #title>
-						{{ organization.name }}
-					</template>
-					<template #title-suffix>
-						<div class="ml-1 flex items-center gap-2 font-semibold">
-							<OrganizationIcon />
-							Organization
-						</div>
-					</template>
-					<template #summary>
-						{{ organization.description }}
-					</template>
-					<template #stats>
-						<div
-							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-						>
-							<UsersIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(acceptedMembers?.length || 0) }}
-							members
-						</div>
-						<div
-							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-						>
-							<BoxIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(projects?.length || 0) }}
-							projects
-						</div>
-						<div
-							v-tooltip="formatNumber(sumDownloads)"
-							class="flex items-center gap-2 font-semibold"
-						>
-							<DownloadIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(sumDownloads) }}
-							downloads
-						</div>
-					</template>
-					<template #actions>
-						<ButtonStyled v-if="auth.user && currentMember" size="large">
-							<NuxtLink :to="`/organization/${organization.slug}/settings`">
-								<SettingsIcon aria-hidden="true" />
-								Manage
-							</NuxtLink>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'manage-projects',
-										action: () =>
-											router.push('/organization/' + organization?.slug + '/settings/projects'),
-										hoverFilledOnly: true,
-										shown: !!(auth.user && currentMember),
-									},
-									{ divider: true, shown: !!(auth?.user && currentMember) },
-									{ id: 'copy-id', action: () => copyId() },
-									{ id: 'copy-permalink', action: () => copyPermalink() },
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #manage-projects>
-									<BoxIcon aria-hidden="true" />
-									Manage projects
-								</template>
-								<template #copy-id>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyIdButton) }}
-								</template>
-								<template #copy-permalink>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyPermalinkButton) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-				</ContentPageHeader>
+				<OrganizationPageHeader
+					:organization="organization"
+					:members-count="acceptedMembers?.length || 0"
+					:projects-count="projects?.length || 0"
+					:downloads="sumDownloads"
+					:can-manage="!!(auth.user && currentMember)"
+					@manage-projects="router.push(`/organization/${organization.slug}/settings/projects`)"
+					@copy-id="copyId"
+					@copy-permalink="copyPermalink"
+				/>
 			</div>
 			<div class="normal-page__sidebar">
 				<AdPlaceholder v-if="!auth.user" />
 
-				<div class="card flex-card">
-					<h2>Members</h2>
-					<div class="details-list">
-						<template v-for="member in acceptedMembers" :key="member?.user.id">
-							<nuxt-link
-								class="details-list__item details-list__item--type-large"
-								:to="`/user/${member?.user?.username}`"
-							>
-								<Avatar :src="member?.user.avatar_url" circle />
-								<div class="rows">
-									<span class="flex items-center gap-1">
-										{{ member?.user?.username }}
-										<CrownIcon
-											v-if="member?.is_owner"
-											v-tooltip="'Organization owner'"
-											class="text-brand-orange"
-										/>
-									</span>
-									<span class="details-list__item__text--style-secondary">
-										{{ member?.role ? member.role : 'Member' }}
-									</span>
-								</div>
-							</nuxt-link>
-						</template>
+				<SidebarCard title="Members">
+					<div class="flex flex-col gap-3 font-semibold">
+						<nuxt-link
+							v-for="member in acceptedMembers"
+							:key="`member-${member?.user?.id}`"
+							class="group flex w-fit items-center gap-2 leading-[1.2] text-primary"
+							:to="`/user/${member?.user?.username}`"
+						>
+							<Avatar
+								:src="member.user.avatar_url"
+								:alt="member.user.username"
+								size="32px"
+								circle
+							/>
+							<div class="flex flex-col">
+								<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
+									<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
+									<CrownIcon
+										v-if="member.is_owner"
+										v-tooltip="'Organization owner'"
+										class="text-brand-orange"
+									/>
+								</span>
+								<span class="text-sm font-normal text-secondary">
+									{{ member?.role ? member.role : 'Member' }}
+								</span>
+							</div>
+						</nuxt-link>
 					</div>
-				</div>
+				</SidebarCard>
 			</div>
 			<div class="normal-page__content">
 				<div v-if="isInvited" class="universal-card information invited">
 					<h2>Invitation to join {{ organization.name }}</h2>
 					<p>You have been invited to join {{ organization.name }}.</p>
 					<div class="input-group">
-						<ButtonStyled color="brand">
-							<button @click="onAcceptInvite">
-								<CheckIcon />
-								Accept
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red">
-							<button @click="onDeclineInvite">
-								<XIcon />
-								Decline
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" @click="onAcceptInvite">
+							<CheckIcon />
+							Accept
+						</Button>
+						<Button type="colored" color="red" @click="onDeclineInvite">
+							<XIcon />
+							Decline
+						</Button>
 					</div>
 				</div>
-				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
-					<NavTabs :links="navLinks" replace />
-				</div>
-				<ProjectCardList v-if="projects && projects.length > 0">
-					<template
-						v-for="project in (route.params.projectType !== undefined
-							? (projects ?? []).filter((x) =>
-									x.project_types.includes(
-										typeof route.params.projectType === 'string'
-											? route.params.projectType.slice(0, route.params.projectType.length - 1)
-											: route.params.projectType[0]?.slice(
-													0,
-													route.params.projectType[0].length - 1,
-												) || '',
-									),
-								)
-							: (projects ?? [])
-						)
-							.slice()
-							.sort((a, b) => b.downloads - a.downloads)"
-						:key="project.id"
-					>
-						<ProjectCard
-							v-if="isProjectServer(project)"
-							:link="`/server/${project.slug || project.id}`"
-							:title="project.name"
-							:icon-url="project.icon_url"
-							:summary="project.summary"
-							:tags="project.categories"
-							:server-online-players="
-								project.minecraft_java_server?.ping?.data?.players_online ?? 0
-							"
-							:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
-							:server-region="project.minecraft_server?.region"
-							:server-status-online="!!project.minecraft_java_server?.ping?.data"
-							:server-modpack-content="getServerModpackContent(project)"
-							:status="
-								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
-									? (project.status as ProjectStatus)
-									: undefined
-							"
-							:max-tags="2"
-							layout="list"
-							is-server-project
-							exclude-loaders
-						/>
-						<ProjectCard
-							v-else
-							:link="`/${project.project_types[0] ?? 'project'}/${project.slug || project.id}`"
-							:title="project.name"
-							:icon-url="project.icon_url"
-							:banner="project.gallery.find((element) => element.featured)?.url"
-							:summary="project.summary"
-							:date-updated="project.updated"
-							:downloads="project.downloads"
-							:followers="project.followers"
-							:tags="project.categories"
-							:environment="
-								project.client_side && project.server_side
-									? {
-											clientSide: project.client_side,
-											serverSide: project.server_side,
-										}
-									: undefined
-							"
-							:status="
-								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
-									? (project.status as ProjectStatus)
-									: undefined
-							"
-							:color="project.color"
-							layout="list"
-						/>
-					</template>
-				</ProjectCardList>
+				<NavTabs v-if="navLinks.length > 2" :links="navLinks" replace page-nav />
+				<ProjectList
+					v-if="projects && projects.length > 0"
+					:projects="displayedProjects"
+					:show-status="canSeeProjectStatus"
+				/>
 				<div v-else-if="true" class="error">
 					<UpToDate class="icon" />
 					<br />
 					<span class="preserve-lines text">
-						This organization doesn't have any projects yet.
 						<template v-if="isPermission(currentMember?.permissions, 1 << 4)">
-							Would you like to
-							<a class="link" @click="modal_creation?.show()">create one</a>?
+							<IntlFormatted :message-id="messages.noProjectsWithCreatePrompt">
+								<template #create-link="{ children }">
+									<a class="link" @click="modal_creation?.show()"
+										><component :is="() => normalizeChildren(children)"
+									/></a>
+								</template>
+							</IntlFormatted>
 						</template>
+						<template v-else>{{ formatMessage(messages.noProjects) }}</template>
 					</span>
 				</div>
 			</div>
@@ -289,11 +155,7 @@ import {
 	BoxIcon,
 	ChartIcon,
 	CheckIcon,
-	ClipboardCopyIcon,
 	CrownIcon,
-	DownloadIcon,
-	MoreVerticalIcon,
-	OrganizationIcon,
 	SettingsIcon,
 	SpinnerIcon,
 	UsersIcon,
@@ -301,46 +163,58 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
+	catalogProjectTypes,
 	commonMessages,
-	ContentPageHeader,
+	defineMessages,
+	filterProjectsByType,
 	injectModrinthClient,
+	IntlFormatted,
 	NavTabs,
-	OverflowMenu,
-	PROJECT_DEP_MARKER_QUERY,
-	ProjectCard,
-	ProjectCardList,
+	normalizeChildren,
+	parseProjectTypeRouteParam,
+	ProjectList,
+	SidebarCard,
 	useCompactNumber,
-	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
-import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import type { Organization, ProjectType } from '@modrinth/utils'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
+import OrganizationPageHeader from '~/components/ui/OrganizationPageHeader.vue'
+import { warmProjectCheckCaches } from '~/composables/queries/project'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
 	OrganizationContext,
 	provideOrganizationContext,
 } from '~/providers/organization-context.ts'
 import { isPermission } from '~/utils/permissions.ts'
+import { projectUserSorting } from '~/utils/projects.ts'
 
-type ProjectV3 = Labrinth.Projects.v3.Project & {
-	client_side: 'required' | 'optional' | 'unsupported'
-	server_side: 'required' | 'optional' | 'unsupported'
-}
+type ProjectV3 = Labrinth.Projects.v3.Project
 
 const vintl = useVIntl()
 const { formatMessage } = vintl
 
-const formatNumber = useFormatNumber()
+const messages = defineMessages({
+	noProjects: {
+		id: 'organization.projects.none',
+		defaultMessage: "This organization doesn't have any projects yet.",
+	},
+	noProjectsWithCreatePrompt: {
+		id: 'organization.projects.none-with-create-prompt',
+		defaultMessage:
+			"This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?",
+	},
+})
+
 const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
-const user = await useUser()
 const cosmetics = useCosmetics()
 const route = useNativeRoute()
 const router = useRouter()
@@ -358,8 +232,10 @@ if (route.path.includes('settings')) {
 
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
+useFavicon(() => (routeHasSettings.value ? 'settings' : 'default'))
 
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
 const {
 	data: organization,
@@ -394,45 +270,17 @@ const {
 	isFetching: projectsIsFetching,
 } = useQuery({
 	queryKey: computed(() => ['organization', orgId, 'projects']),
-	queryFn: async () => {
-		// @ts-expect-error
-		const rawProjects = (await client.labrinth.organizations_v3.getProjects(orgId)) as ProjectV3[]
-
-		return rawProjects.map((project) => {
-			let categories = project.categories.concat(project.loaders)
-			if (project.mrpack_loaders) {
-				categories = categories.concat(project.mrpack_loaders as string[])
-			}
-
-			const singleplayer = project.singleplayer && (project.singleplayer as string[])[0]
-			const clientAndServer =
-				project.client_and_server && (project.client_and_server as string[])[0]
-			const clientOnly = project.client_only && (project.client_only as string[])[0]
-			const serverOnly = project.server_only && (project.server_only as string[])[0]
-
-			let client_side: ProjectV3['client_side'] | undefined
-			let server_side: ProjectV3['server_side'] | undefined
-
-			// quick and dirty hack to show envs as legacy
-			if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-				client_side = 'required'
-				server_side = 'required'
-			} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-				client_side = 'required'
-				server_side = 'unsupported'
-			} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-				client_side = 'unsupported'
-				server_side = 'required'
-			} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-				client_side = 'optional'
-				server_side = 'optional'
-			}
-
-			return { ...project, categories, client_side, server_side }
-		})
-	},
+	queryFn: () => client.labrinth.organizations_v3.getProjects(orgId),
 	placeholderData: [],
 })
+
+watch(
+	projects,
+	(list) => {
+		warmProjectCheckCaches(queryClient, list)
+	},
+	{ immediate: true },
+)
 
 const refresh = async () => {
 	await Promise.all([refreshOrganization(), refreshProjects()])
@@ -464,43 +312,13 @@ const isInvited = computed(() => {
 	return currentMember.value?.accepted === false
 })
 
-const projectTypes = computed(() => {
-	const obj: Record<string, boolean> = {}
+const projectTypes = computed(() => catalogProjectTypes(projects.value ?? []))
 
-	for (const project of projects.value ?? []) {
-		obj[project.project_types[0] ?? 'project'] = true
-	}
-
-	delete obj.project
-
-	return Object.keys(obj)
-})
-function isProjectServer(project: ProjectV3): boolean {
-	return project.minecraft_server != null
-}
-
-function getServerModpackContent(project: ProjectV3) {
-	const content = project.minecraft_java_server?.content
-	if (content?.kind === 'modpack') {
-		const { project_name, project_icon, project_id } = content
-		if (!project_name) return undefined
-		return {
-			name: project_name,
-			icon: project_icon,
-			onclick:
-				project_id !== project.id
-					? () => {
-							navigateTo({
-								path: `/project/${project_id}`,
-								query: { ...PROJECT_DEP_MARKER_QUERY },
-							})
-						}
-					: undefined,
-			showCustomModpackTooltip: project_id === project.id,
-		}
-	}
-	return undefined
-}
+const displayedProjects = computed(() =>
+	filterProjectsByType(projects.value ?? [], parseProjectTypeRouteParam(route.params.projectType))
+		.slice()
+		.sort(projectUserSorting),
+)
 
 const sumDownloads = computed(() => {
 	let sum = 0
@@ -535,6 +353,22 @@ provideOrganizationContext(organizationContext)
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
 
+const authUserId = computed(() => auth.value?.user?.id as string | undefined)
+const viewerProjectsQuery = useQuery({
+	queryKey: computed(() => ['user', authUserId.value, 'projects']),
+	queryFn: () => client.labrinth.users_v3.getProjects(authUserId.value!),
+	enabled: computed(() => !!authUserId.value && !!organization.value && !currentMember.value),
+	staleTime: 30_000,
+})
+const viewerMemberProjectIds = computed(
+	() => new Set((viewerProjectsQuery.data.value ?? []).map((project) => project.id)),
+)
+
+function canSeeProjectStatus(project: ProjectV3) {
+	if (currentMember.value) return true
+	return viewerMemberProjectIds.value.has(project.id)
+}
+
 watch(
 	[routeHasSettings, acceptedMembers, currentMember],
 	() => {
@@ -562,7 +396,7 @@ watch(
 				description,
 				ogTitle: title,
 				ogDescription: org.description,
-				ogImage: org.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+				ogImage: org.icon_url ?? 'https://cdn.modrinth.com/placeholder-square.png',
 				ogUrl: canonicalUrl,
 			})
 			useHead({
@@ -583,15 +417,12 @@ const navLinks = computed(() => [
 		label: formatMessage(commonMessages.allProjectType),
 		href: `/organization/${organization.value?.slug}`,
 	},
-	...projectTypes.value
-		.map((x) => {
-			return {
-				label: formatMessage(getProjectTypeMessage(x as ProjectType, true)),
-				href: `/organization/${organization.value?.slug}/${x}s`,
-			}
-		})
-		.slice()
-		.sort((a, b) => a.label.localeCompare(b.label)),
+	...projectTypes.value.map((x) => {
+		return {
+			label: formatMessage(getProjectTypeMessage(x as ProjectType, true)),
+			href: `/organization/${organization.value?.slug}/${x}s`,
+		}
+	}),
 ])
 
 async function copyId() {
@@ -765,5 +596,9 @@ async function copyPermalink() {
 
 .popout-checkbox {
 	padding: var(--gap-sm) var(--gap-md);
+}
+
+.new-page {
+	column-gap: 1.5rem;
 }
 </style>

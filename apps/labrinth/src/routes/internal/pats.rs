@@ -1,10 +1,10 @@
 use crate::database;
 use crate::database::models::generate_pat_id;
+use crate::util::error::Context as _;
 
 use crate::auth::get_user_from_headers;
 use crate::routes::ApiError;
 
-use crate::database::redis::RedisPool;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post};
 use chrono::{DateTime, Utc};
@@ -12,30 +12,32 @@ use rand::Rng;
 use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::{PersonalAccessToken, Scopes};
 use crate::queue::session::AuthQueue;
-use crate::util::validate::validation_errors_to_string;
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_pats);
     cfg.service(create_pat);
     cfg.service(edit_pat);
     cfg.service(delete_pat);
 }
 
+/// List personal access tokens.  
 #[utoipa::path(
+	tag = "personal access tokens",
     get,
-    operation_id = "getPats",
-    responses(
-        (status = 200, description = "List of PATs"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "getPats",
+	responses(
+		(status = 200, description = "List of PATs", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = ["PAT_READ"]))
 )]
 #[get("/pat")]
@@ -52,7 +54,8 @@ pub async fn get_pats(
         &session_queue,
         Scopes::PAT_READ,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let pat_ids =
@@ -61,11 +64,13 @@ pub async fn get_pats(
             &**pool,
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("fetching personal access tokens from database")?;
     let pats = database::models::pat_item::DBPersonalAccessToken::get_many_ids(
         &pat_ids, &**pool, &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching personal access tokens from database")?;
 
     Ok(HttpResponse::Ok().json(
         pats.into_iter()
@@ -82,14 +87,16 @@ pub struct NewPersonalAccessToken {
     pub expires: DateTime<Utc>,
 }
 
+/// Create a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     post,
-    operation_id = "createPat",
-    responses(
-        (status = 200, description = "PAT created"),
-        (status = 400, description = "Invalid input"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "createPat",
+	responses(
+		(status = 200, description = "PAT created", body = serde_json::Value),
+		(status = 400, description = "Invalid input"),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = ["PAT_CREATE"]))
 )]
 #[post("/pat")]
@@ -100,19 +107,20 @@ pub async fn create_pat(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    info.0.validate().map_err(|err| {
-        ApiError::InvalidInput(validation_errors_to_string(err, None))
-    })?;
+    info.0
+        .validate()
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_request_err("validating request")?;
 
     if info.scopes.is_restricted() {
-        return Err(ApiError::InvalidInput(
-            "Invalid scopes requested!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "Invalid scopes requested!",
+        )));
     }
     if info.expires < Utc::now() {
-        return Err(ApiError::InvalidInput(
-            "Expire date must be in the future!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "Expire date must be in the future!",
+        )));
     }
 
     let user = get_user_from_headers(
@@ -122,12 +130,18 @@ pub async fn create_pat(
         &session_queue,
         Scopes::PAT_CREATE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
-    let id = generate_pat_id(&mut transaction).await?;
+    let id = generate_pat_id(&mut transaction)
+        .await
+        .wrap_internal_err("generating pat ID")?;
 
     let token = ChaCha20Rng::from_entropy()
         .sample_iter(&Alphanumeric)
@@ -148,7 +162,8 @@ pub async fn create_pat(
         last_used: None,
     }
     .insert(&mut transaction)
-    .await?;
+    .await
+    .wrap_internal_err("inserting database records for `create_pat`")?;
 
     NotificationBuilder {
         body: NotificationBody::PatCreated {
@@ -156,14 +171,19 @@ pub async fn create_pat(
         },
     }
     .insert(user.id.into(), &mut transaction, &redis)
-    .await?;
-    transaction.commit().await?;
+    .await
+    .wrap_internal_err("inserting database records for `create_pat`")?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     database::models::pat_item::DBPersonalAccessToken::clear_cache(
         vec![(None, None, Some(user.id.into()))],
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("clearing cached data from Redis")?;
 
     Ok(HttpResponse::Ok().json(PersonalAccessToken {
         id: id.into(),
@@ -185,10 +205,14 @@ pub struct ModifyPersonalAccessToken {
     pub expires: Option<DateTime<Utc>>,
 }
 
+/// Update a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     patch,
     operation_id = "editPat",
-    params(("id" = String, Path, description = "The PAT ID")),
+    params(
+        ("id" = String, Path, description = "The PAT ID")
+    ),
     responses(
         (status = 204, description = "PAT updated"),
         (status = 400, description = "Invalid input"),
@@ -205,9 +229,10 @@ pub async fn edit_pat(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    info.0.validate().map_err(|err| {
-        ApiError::InvalidInput(validation_errors_to_string(err, None))
-    })?;
+    info.0
+        .validate()
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_request_err("validating request")?;
 
     let user = get_user_from_headers(
         &req,
@@ -216,25 +241,30 @@ pub async fn edit_pat(
         &session_queue,
         Scopes::PAT_WRITE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
         &id, &**pool, &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching personal access token from database")?;
 
     if let Some(pat) = pat
         && pat.user_id == user.id.into()
     {
-        let mut transaction = pool.begin().await?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
 
         if let Some(scopes) = &info.scopes {
             if scopes.is_restricted() {
-                return Err(ApiError::InvalidInput(
-                    "Invalid scopes requested!".to_string(),
-                ));
+                return Err(ApiError::Request(eyre::eyre!(
+                    "Invalid scopes requested!",
+                )));
             }
 
             sqlx::query!(
@@ -247,7 +277,8 @@ pub async fn edit_pat(
                 pat.id.0
             )
             .execute(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("querying database for `edit_pat`")?;
         }
         if let Some(name) = &info.name {
             sqlx::query!(
@@ -260,13 +291,14 @@ pub async fn edit_pat(
                 pat.id.0
             )
             .execute(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("querying database for `edit_pat`")?;
         }
         if let Some(expires) = &info.expires {
             if expires < &Utc::now() {
-                return Err(ApiError::InvalidInput(
-                    "Expire date must be in the future!".to_string(),
-                ));
+                return Err(ApiError::Request(eyre::eyre!(
+                    "Expire date must be in the future!",
+                )));
             }
 
             sqlx::query!(
@@ -279,24 +311,33 @@ pub async fn edit_pat(
                 pat.id.0
             )
             .execute(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("querying database for `edit_pat`")?;
         }
 
-        transaction.commit().await?;
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
         database::models::pat_item::DBPersonalAccessToken::clear_cache(
             vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
     }
 
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Delete a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     delete,
     operation_id = "deletePat",
-    params(("id" = String, Path, description = "The PAT ID")),
+    params(
+        ("id" = String, Path, description = "The PAT ID")
+    ),
     responses(
         (status = 204, description = "PAT deleted"),
         (status = 401, description = "Unauthorized")
@@ -318,29 +359,39 @@ pub async fn delete_pat(
         &session_queue,
         Scopes::PAT_DELETE,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
         &id, &**pool, &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching personal access token from database")?;
 
     if let Some(pat) = pat
         && pat.user_id == user.id.into()
     {
-        let mut transaction = pool.begin().await?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
         database::models::pat_item::DBPersonalAccessToken::remove(
             pat.id,
             &mut transaction,
         )
-        .await?;
-        transaction.commit().await?;
+        .await
+        .wrap_internal_err("deleting personal access token from database")?;
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
         database::models::pat_item::DBPersonalAccessToken::clear_cache(
             vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
             &redis,
         )
-        .await?;
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
     }
 
     Ok(HttpResponse::NoContent().finish())

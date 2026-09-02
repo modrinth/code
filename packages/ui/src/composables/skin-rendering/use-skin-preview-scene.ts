@@ -20,7 +20,8 @@ import {
 	loadTexture as loadSkinTexture,
 } from '#ui/utils/webgl/skin-rendering.ts'
 
-import type { SkinPreviewTuple } from './types'
+import type { SkinPreviewBounds, SkinPreviewTuple } from './types'
+import { applyEarsMod, isEarsModFeature, removeEarsMod } from './use-ears-mod-features'
 
 const SKIN_LAYER_DEPTH_BIAS = -1
 
@@ -76,16 +77,25 @@ function disposeSceneMaterials(root: THREE.Object3D | null) {
 	materials.forEach((material) => material.dispose())
 }
 
-function getVisibleMeshBox(root: THREE.Object3D): THREE.Box3 | null {
+function getVisibleMeshBox(
+	root: THREE.Object3D,
+	includeMesh: (mesh: THREE.Mesh) => boolean = () => true,
+): THREE.Box3 | null {
 	root.updateWorldMatrix(true, true)
 
 	const result = new THREE.Box3()
 	const meshBox = new THREE.Box3()
+	const rootParentInverse = new THREE.Matrix4()
+	const meshToRootParent = new THREE.Matrix4()
 	let found = false
+
+	if (root.parent) {
+		rootParentInverse.copy(root.parent.matrixWorld).invert()
+	}
 
 	root.traverse((object) => {
 		const mesh = object as THREE.Mesh
-		if (!mesh.isMesh || !mesh.geometry || mesh.visible === false) return
+		if (!mesh.isMesh || !mesh.geometry || mesh.visible === false || !includeMesh(mesh)) return
 
 		const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
 		if (materials.length && materials.every((material) => material.visible === false)) return
@@ -96,7 +106,8 @@ function getVisibleMeshBox(root: THREE.Object3D): THREE.Box3 | null {
 
 		if (!mesh.geometry.boundingBox) return
 
-		meshBox.copy(mesh.geometry.boundingBox).applyMatrix4(mesh.matrixWorld)
+		meshToRootParent.multiplyMatrices(rootParentInverse, mesh.matrixWorld)
+		meshBox.copy(mesh.geometry.boundingBox).applyMatrix4(meshToRootParent)
 		result.union(meshBox)
 		found = true
 	})
@@ -104,18 +115,29 @@ function getVisibleMeshBox(root: THREE.Object3D): THREE.Box3 | null {
 	return found && !result.isEmpty() ? result.clone() : null
 }
 
+function isPlayerMesh(mesh: THREE.Mesh) {
+	if (isEarsModFeature(mesh)) return false
+
+	const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+	return materials.some((material) => material.name !== 'cape')
+}
+
 type MaybeReadonlyRef<T> = Ref<T> | ComputedRef<T>
 
 export function useSkinPreviewScene({
 	selectedModelSrc,
 	textureSrc,
+	earsTextureSrc,
 	capeSrc,
+	earsEnabled,
 	initializeAnimations,
 	cleanupAnimationState,
 }: {
 	selectedModelSrc: MaybeReadonlyRef<string>
 	textureSrc: MaybeReadonlyRef<string>
+	earsTextureSrc: MaybeReadonlyRef<string | undefined>
 	capeSrc: MaybeReadonlyRef<string | undefined>
+	earsEnabled: MaybeReadonlyRef<boolean>
 	initializeAnimations: (loadedScene: THREE.Object3D, clips: THREE.AnimationClip[]) => void
 	cleanupAnimationState: (root: THREE.Object3D | null) => void
 }) {
@@ -123,16 +145,24 @@ export function useSkinPreviewScene({
 	const lastCapeSrc = ref<string | undefined>(undefined)
 	const loadedModelSrc = ref<string | undefined>(undefined)
 	const loadedTextureSrc = ref<string | undefined>(undefined)
+	const loadedEarsTextureSrc = ref<string | undefined>(undefined)
 	const loadedCapeSrc = ref<string | undefined>(undefined)
 	const texture = shallowRef<THREE.Texture | null>(null)
+	const earsTexture = shallowRef<THREE.Texture | null>(null)
 	const capeTexture = shallowRef<THREE.Texture | null>(null)
 	const transparentTexture = createTransparentTexture()
 	const modelCenter = ref<SkinPreviewTuple>([0, 1, 0])
 	const modelSize = ref<SkinPreviewTuple>([1, 2, 1])
+	const visibleBounds = ref<SkinPreviewBounds>({
+		min: [-0.5, 0, -0.5],
+		max: [0.5, 2, 0.5],
+	})
 	const isModelLoaded = ref(false)
 	const isTextureLoaded = ref(false)
+	const hasEarsFeatures = ref(false)
 	let modelLoadVersion = 0
 	let textureLoadVersion = 0
+	let earsTextureLoadVersion = 0
 	let capeLoadVersion = 0
 	let isUnmounted = false
 
@@ -147,6 +177,18 @@ export function useSkinPreviewScene({
 		}
 
 		applyTexture(scene.value, texture.value)
+		const featureTextureSrc = earsTextureSrc.value
+		const featureTexture = featureTextureSrc ? earsTexture.value : texture.value
+		if (
+			!featureTexture ||
+			(featureTextureSrc && loadedEarsTextureSrc.value !== featureTextureSrc)
+		) {
+			removeEarsMod(scene.value)
+			hasEarsFeatures.value = false
+			return
+		}
+
+		hasEarsFeatures.value = applyEarsMod(scene.value, featureTexture, earsEnabled.value)
 	}
 
 	function applyCapeTextureToLoadedModel() {
@@ -173,6 +215,7 @@ export function useSkinPreviewScene({
 
 			const previousScene = scene.value
 			cleanupAnimationState(previousScene)
+			removeEarsMod(previousScene)
 			disposeSceneMaterials(previousScene)
 			scene.value = clonedScene
 			loadedModelSrc.value = src
@@ -230,25 +273,62 @@ export function useSkinPreviewScene({
 		capeTexture.value = loadedCapeTexture
 		loadedCapeSrc.value = src
 		applyCapeTextureToLoadedModel()
+		updateModelInfo()
+	}
+
+	async function loadAndApplyEarsTexture(src: string | undefined) {
+		const loadVersion = ++earsTextureLoadVersion
+		hasEarsFeatures.value = false
+
+		const loadedEarsTexture = src ? await loadAndApplyTexture(src) : null
+		if (isUnmounted || loadVersion !== earsTextureLoadVersion) return
+
+		earsTexture.value = loadedEarsTexture
+		loadedEarsTextureSrc.value = src
+		applyTextureToLoadedModel()
+		updateModelInfo()
 	}
 
 	function updateModelInfo() {
 		const box = scene.value ? getVisibleMeshBox(scene.value) : null
+		const playerBox = scene.value ? getVisibleMeshBox(scene.value, isPlayerMesh) : null
 
 		if (!box) {
 			modelCenter.value = [0, 1, 0]
 			modelSize.value = [1, 2, 1]
+			visibleBounds.value = {
+				min: [-0.5, 0, -0.5],
+				max: [0.5, 2, 0.5],
+			}
 			return
 		}
 
 		const center = new THREE.Vector3()
-		const size = new THREE.Vector3()
+		const playerCenter = new THREE.Vector3()
+		const rotationCenterBox = playerBox ?? box
 
 		box.getCenter(center)
-		box.getSize(size)
+		rotationCenterBox.getCenter(playerCenter)
 
-		modelCenter.value = [center.x, center.y, center.z]
-		modelSize.value = [Math.max(size.x, 0.001), Math.max(size.y, 0.001), Math.max(size.z, 0.001)]
+		const halfWidth = Math.max(
+			Math.abs(box.min.x - playerCenter.x),
+			Math.abs(box.max.x - playerCenter.x),
+		)
+		const halfDepth = Math.max(
+			Math.abs(box.min.z - playerCenter.z),
+			Math.abs(box.max.z - playerCenter.z),
+		)
+
+		modelCenter.value = [playerCenter.x, center.y, playerCenter.z]
+		modelSize.value = [
+			Math.max(halfWidth * 2, 0.001),
+			Math.max(box.max.y - box.min.y, 0.001),
+			Math.max(halfDepth * 2, 0.001),
+		]
+		visibleBounds.value = {
+			min: [box.min.x, box.min.y, box.min.z],
+			max: [box.max.x, box.max.y, box.max.z],
+		}
 	}
 
 	watch(
@@ -261,13 +341,28 @@ export function useSkinPreviewScene({
 			const loadVersion = ++textureLoadVersion
 
 			isTextureLoaded.value = false
+			hasEarsFeatures.value = false
 			const loadedTexture = await loadAndApplyTexture(newSrc)
 			if (isUnmounted || loadVersion !== textureLoadVersion) return
 
 			texture.value = loadedTexture
 			loadedTextureSrc.value = newSrc
 			applyTextureToLoadedModel()
+			updateModelInfo()
 			isTextureLoaded.value = true
+		},
+	)
+	watch(
+		() => earsTextureSrc.value,
+		async (newEarsTextureSrc) => {
+			await loadAndApplyEarsTexture(newEarsTextureSrc)
+		},
+	)
+	watch(
+		() => earsEnabled.value,
+		() => {
+			applyTextureToLoadedModel()
+			updateModelInfo()
 		},
 	)
 	watch(
@@ -284,6 +379,7 @@ export function useSkinPreviewScene({
 			loadedTextureSrc.value = textureSrc.value
 			isTextureLoaded.value = true
 
+			await loadAndApplyEarsTexture(earsTextureSrc.value)
 			await loadModel(selectedModelSrc.value)
 
 			if (capeSrc.value) {
@@ -298,19 +394,23 @@ export function useSkinPreviewScene({
 		isUnmounted = true
 		modelLoadVersion++
 		textureLoadVersion++
+		earsTextureLoadVersion++
 		capeLoadVersion++
 
 		cleanupAnimationState(scene.value)
+		removeEarsMod(scene.value)
 		disposeSceneMaterials(scene.value)
 		scene.value = null
 		transparentTexture.dispose()
 	})
 
 	return {
+		hasEarsFeatures,
 		isModelLoaded,
 		isTextureLoaded,
 		modelCenter,
 		modelSize,
 		scene,
+		visibleBounds,
 	}
 }

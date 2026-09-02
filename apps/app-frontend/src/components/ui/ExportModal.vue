@@ -1,28 +1,31 @@
 <script setup>
-import { WrenchIcon, XIcon } from '@modrinth/assets'
+import { FolderOpenIcon, XIcon } from '@modrinth/assets'
 import {
-	Accordion,
-	ButtonStyled,
-	Checkbox,
+	Button,
 	commonMessages,
 	defineMessages,
+	FileTreeSelect,
 	injectNotificationManager,
-	StyledInput,
+	injectPopupNotificationManager,
+	Input,
+	NewModal,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 import { save } from '@tauri-apps/plugin-dialog'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 
-import { PackageIcon, VersionIcon } from '@/assets/icons'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
+import { PackageIcon } from '@/assets/icons'
+import { export_instance_mrpack, get_pack_export_candidates } from '@/helpers/instance'
+import { highlightInFolder } from '@/helpers/utils'
 
 const { handleError } = injectNotificationManager()
+const popupNotificationManager = injectPopupNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	header: { id: 'app.export-modal.header', defaultMessage: 'Export modpack' },
-	modpackNameLabel: { id: 'app.export-modal.modpack-name-label', defaultMessage: 'Modpack Name' },
+	modpackNameLabel: { id: 'app.export-modal.modpack-name-label', defaultMessage: 'Modpack name' },
 	modpackNamePlaceholder: {
 		id: 'app.export-modal.modpack-name-placeholder',
 		defaultMessage: 'Modpack name',
@@ -39,14 +42,14 @@ const messages = defineMessages({
 		id: 'app.export-modal.description-placeholder',
 		defaultMessage: 'Enter modpack description...',
 	},
-	selectFilesLabel: {
-		id: 'app.export-modal.select-files-label',
-		defaultMessage: 'Configure which files are included in this export',
-	},
 	exportButton: { id: 'app.export-modal.export-button', defaultMessage: 'Export' },
-	includeFile: {
-		id: 'app.export-modal.include-file-accessibility-label',
-		defaultMessage: 'Include "{file}"?',
+	exportComplete: {
+		id: 'app.export-modal.export-complete',
+		defaultMessage: 'Export complete',
+	},
+	exportCompleteDescription: {
+		id: 'app.export-modal.export-complete-description',
+		defaultMessage: '{name} was exported successfully.',
 	},
 })
 
@@ -59,8 +62,9 @@ const props = defineProps({
 
 defineExpose({
 	show: () => {
+		resetExportState()
 		exportModal.value.show()
-		initFiles()
+		void initFiles().catch(handleError)
 	},
 })
 
@@ -68,68 +72,28 @@ const exportModal = ref(null)
 const nameInput = ref(props.instance.name)
 const exportDescription = ref('')
 const versionInput = ref('1.0.0')
-const files = ref([])
-const folders = ref([])
+const files = shallowRef([])
+const includedFilePaths = ref([])
+const excludedFilePaths = ref([])
+const fileTreeKey = ref(0)
+const filesLoadId = ref(0)
+const directoryEntries = new Map()
+const currentDirectory = ref('')
 
-const initFiles = async () => {
-	const newFolders = new Map()
-	const sep = '/'
-	files.value = []
-	await get_pack_export_candidates(props.instance.path).then((filePaths) =>
-		filePaths
-			.map((folder) => ({
-				path: folder,
-				name: folder.split(sep).pop(),
-				selected:
-					folder.startsWith('mods') ||
-					folder.startsWith('datapacks') ||
-					folder.startsWith('resourcepacks') ||
-					folder.startsWith('shaderpacks') ||
-					folder.startsWith('config'),
-				disabled:
-					folder === 'profile.json' ||
-					folder.startsWith('modrinth_logs') ||
-					folder.startsWith('.fabric'),
-			}))
-			.filter(
-				(pathData) =>
-					!pathData.path.includes('.DS_Store') &&
-					pathData.path !== 'mods/.connector' &&
-					!pathData.path.startsWith('mods/.connector/'),
-			)
-			.forEach((pathData) => {
-				const parent = pathData.path.split(sep).slice(0, -1).join(sep)
-				if (parent !== '') {
-					if (newFolders.has(parent)) {
-						newFolders.get(parent).push(pathData)
-					} else {
-						newFolders.set(parent, [pathData])
-					}
-				} else {
-					files.value.push(pathData)
-				}
-			}),
-	)
-	folders.value = [...newFolders.entries()].map(([name, value]) => [
-		{
-			name,
-			showingMore: false,
-		},
-		value,
-	])
+async function initFiles() {
+	const loadId = ++filesLoadId.value
+	const exportCandidates = await get_pack_export_candidates(props.instance.id)
+	if (loadId !== filesLoadId.value) return
+
+	files.value = exportCandidates
+	directoryEntries.set('', exportCandidates)
+	currentDirectory.value = ''
+	includedFilePaths.value = files.value
+		.filter((file) => !file.disabled && file.defaultSelected)
+		.map((file) => file.path)
 }
 
-await initFiles()
-
 const exportPack = async () => {
-	const filesToExport = files.value.filter((file) => file.selected).map((file) => file.path)
-	folders.value.forEach((args) => {
-		args[1].forEach((child) => {
-			if (child.selected) {
-				filesToExport.push(child.path)
-			}
-		})
-	})
 	const outputPath = await save({
 		defaultPath: `${nameInput.value} ${versionInput.value}.mrpack`,
 		filters: [
@@ -141,119 +105,148 @@ const exportPack = async () => {
 	})
 
 	if (outputPath) {
-		export_profile_mrpack(
-			props.instance.path,
-			outputPath,
-			filesToExport,
-			versionInput.value,
-			exportDescription.value,
-			nameInput.value,
-		).catch((err) => handleError(err))
 		exportModal.value.hide()
+
+		try {
+			await export_instance_mrpack(
+				props.instance.id,
+				outputPath,
+				includedFilePaths.value,
+				excludedFilePaths.value,
+				versionInput.value,
+				exportDescription.value,
+				nameInput.value,
+			)
+
+			const fileName = outputPath.split(/[\\/]/).pop() ?? outputPath
+			popupNotificationManager.addPopupNotification({
+				title: formatMessage(messages.exportComplete),
+				text: formatMessage(messages.exportCompleteDescription, { name: fileName }),
+				type: 'success',
+				buttons: [
+					{
+						label: formatMessage(commonMessages.openInFolderButton),
+						icon: FolderOpenIcon,
+						action: () => highlightInFolder(outputPath).catch(handleError),
+					},
+				],
+			})
+		} catch (error) {
+			handleError(error)
+		}
 	}
+}
+
+function resetExportState() {
+	nameInput.value = props.instance.name
+	exportDescription.value = ''
+	versionInput.value = '1.0.0'
+	files.value = []
+	includedFilePaths.value = []
+	excludedFilePaths.value = []
+	fileTreeKey.value += 1
+	directoryEntries.clear()
+	currentDirectory.value = ''
+}
+
+async function loadExportDirectory(path) {
+	const normalizedPath = normalizeExportPath(path)
+	currentDirectory.value = normalizedPath
+
+	const cachedEntries = directoryEntries.get(normalizedPath)
+	if (cachedEntries) {
+		files.value = cachedEntries
+		return
+	}
+
+	const loadId = filesLoadId.value
+	files.value = []
+
+	try {
+		const childItems = await get_pack_export_candidates(
+			props.instance.id,
+			normalizedPath || undefined,
+		)
+		if (loadId !== filesLoadId.value) return
+
+		directoryEntries.set(normalizedPath, childItems)
+		if (currentDirectory.value === normalizedPath) {
+			files.value = childItems
+		}
+	} catch {
+		if (currentDirectory.value === normalizedPath) files.value = []
+	}
+}
+
+function normalizeExportPath(path) {
+	return path.replaceAll('\\', '/').split('/').filter(Boolean).join('/')
 }
 </script>
 
 <template>
-	<ModalWrapper ref="exportModal" :header="formatMessage(messages.header)">
-		<div class="flex flex-col gap-4 w-[40rem]">
+	<NewModal
+		ref="exportModal"
+		:header="formatMessage(messages.header)"
+		scrollable
+		width="46rem"
+		max-width="calc(100vw - 2rem)"
+	>
+		<div class="flex flex-col gap-4">
 			<div class="grid grid-cols-2 gap-4">
-				<div class="labeled_input">
-					<p>{{ formatMessage(messages.modpackNameLabel) }}</p>
-					<StyledInput
+				<div class="labeled_input w-full">
+					<p class="text-contrast font-semibold">{{ formatMessage(messages.modpackNameLabel) }}</p>
+					<Input
 						v-model="nameInput"
-						:icon="PackageIcon"
 						type="text"
 						:placeholder="formatMessage(messages.modpackNamePlaceholder)"
 						clearable
+						wrapper-class="w-full"
 					/>
 				</div>
-				<div class="labeled_input">
-					<p>{{ formatMessage(messages.versionNumberLabel) }}</p>
-					<StyledInput
+				<div class="labeled_input w-full">
+					<p class="text-contrast font-semibold">
+						{{ formatMessage(messages.versionNumberLabel) }}
+					</p>
+					<Input
 						v-model="versionInput"
-						:icon="VersionIcon"
 						type="text"
 						:placeholder="formatMessage(messages.versionNumberPlaceholder)"
 						clearable
+						wrapper-class="w-full"
 					/>
 				</div>
 			</div>
-			<div class="flex flex-col gap-2">
-				<p class="m-0">{{ formatMessage(commonMessages.descriptionLabel) }}</p>
-				<StyledInput
+			<div class="flex flex-col gap-2 min-w-0">
+				<p class="m-0 text-contrast font-semibold">
+					{{ formatMessage(commonMessages.descriptionLabel) }}
+				</p>
+				<Textarea
 					v-model="exportDescription"
-					multiline
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
+					wrapper-class="w-full"
 				/>
 			</div>
-			<Accordion
-				class="w-full bg-surface-4 border border-solid border-surface-5 rounded-2xl overflow-clip"
-				button-class="p-4 w-full border-b border-solid border-b-surface-5 bg-surface-2 -mb-px hover:brightness-[--hover-brightness] group"
-			>
-				<template #title>
-					<span class="flex items-center gap-3 text-contrast group-active:scale-[0.98]">
-						<WrenchIcon aria-hidden="true" class="size-5 text-secondary" />
-						Configure which files are included in this export
-					</span>
-				</template>
-				<div class="flex flex-col [&>*:nth-child(even)]:bg-surface-3">
-					<div v-for="[path, children] in folders" :key="path.name" class="flex flex-col">
-						<Accordion
-							class="flex flex-col"
-							button-class="flex gap-3 pr-4 hover:bg-surface-5 group"
-						>
-							<template #title>
-								<Checkbox
-									:model-value="children.every((child) => child.selected)"
-									:indeterminate="
-										!children.every((child) => child.selected) &&
-										children.some((child) => child.selected)
-									"
-									:description="formatMessage(messages.includeFile, { file: path.name })"
-									class="pl-4 py-2"
-									:disabled="children.every((x) => x.disabled)"
-									@update:model-value="
-										(newValue) => children.forEach((child) => (child.selected = newValue))
-									"
-									@click.stop
-								/>
-								<span class="ml-2 group-active:scale-95">{{ path.name }}/</span>
-							</template>
-							<div v-for="child in children" :key="child.path">
-								<Checkbox
-									v-model="child.selected"
-									:label="child.name"
-									class="w-full px-8 py-2 hover:bg-surface-4 text-primary"
-									:disabled="child.disabled"
-								/>
-							</div>
-						</Accordion>
-					</div>
-					<Checkbox
-						v-for="file in files"
-						:key="file.path"
-						v-model="file.selected"
-						:label="file.name"
-						:disabled="file.disabled"
-						class="w-full px-4 py-2 hover:bg-surface-4 text-primary"
-					/>
-				</div>
-			</Accordion>
-			<div class="flex items-center justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="exportModal.hide">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button @click="exportPack">
-						<PackageIcon />
-						{{ formatMessage(messages.exportButton) }}
-					</button>
-				</ButtonStyled>
-			</div>
+			<FileTreeSelect
+				:key="fileTreeKey"
+				v-model="includedFilePaths"
+				v-model:excluded-paths="excludedFilePaths"
+				class="min-w-0"
+				:items="files"
+				lazy
+				@navigate="loadExportDirectory"
+			/>
 		</div>
-	</ModalWrapper>
+		<template #actions>
+			<div class="flex items-center justify-end gap-2">
+				<Button type="outlined" @click="exportModal.hide">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" @click="exportPack">
+					<PackageIcon />
+					{{ formatMessage(messages.exportButton) }}
+				</Button>
+			</div>
+		</template>
+	</NewModal>
 </template>

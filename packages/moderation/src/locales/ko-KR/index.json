@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Java 주소 추가"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "유효한 URL과 이름 혹은 SPDX 식별자로 사용자 지정 라이선스를 추가하세요."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "라이선스 세부 정보 추가"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "웹사이트, 스토어, Discord 초대 링크 등 Modrinth 외부로 연결되는 관련 링크를 추가하세요."
   },
@@ -28,6 +34,15 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "외부 링크 추가"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "있는 언어 설정을 전부 선택했습니다. 서버가 실제로 지원하는 언어만 선택해 주세요."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "올바른 언어 선택"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "사용 가능한 모든 {totalAvailableTags, plural, other {#개의 태그}}를 선택하셨습니다. 이는 사용자가 관련 프로젝트를 찾는 데 도움을 주기 위한 태그의 목적에 어긋납니다. 프로젝트와 관련된 태그만 선택해 주세요."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "올바른 태그를 선택해 주세요"
@@ -98,6 +113,9 @@
   "nags.link-shortener-usage.title": {
     "defaultMessage": "링크 단축기 사용 금지"
   },
+  "nags.long-headers.description": {
+    "defaultMessage": "설명의 {count, plural, other {#개의 헤더}}{count, plural, other {}}가 너무 깁니다. 헤더는 간결해야 하며, 완전한 문장이 아닌 단락 제목 역할을 해야 합니다."
+  },
   "nags.long-headers.title": {
     "defaultMessage": "헤더 단축"
   },
@@ -128,8 +146,17 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "피드백 검토"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "{count, plural, other {#개의 해상도 태그}} ({tags})를 선택했습니다. 리소스 팩에는 일반적으로 기본 해상도와 일치하는 해상도 태그 하나만 포함되어야 합니다."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "올바른 해상도 선택"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "자신의 모드팩에 외부 콘텐츠를 배포할 수 있는 권한을 증명할 수 있는 자료를 만드시 제공해 주세요."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "외부 권한 검토"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "서버가 지원하는 버전을 선택하거나, 모드팩을 고르거나, 직접 업로드하세요."
@@ -162,7 +189,7 @@
     "defaultMessage": "태그 선택"
   },
   "nags.server.title": {
-    "defaultMessage": "서버 설정으로 이동"
+    "defaultMessage": "서버 설정 방문"
   },
   "nags.settings.description.title": {
     "defaultMessage": "설명 설정 방문"
@@ -173,11 +200,17 @@
   "nags.settings.links.title": {
     "defaultMessage": "링크 설정 방문"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "권한 대시보드 방문"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "태그 설정 방문"
   },
   "nags.settings.title": {
     "defaultMessage": "일반 설정 방문"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "버전 설정 방문"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "요약은 프로젝트 이름과 동일할 수 없습니다. 정보가 충분하고 흥미를 끄는 요약을 작성하는 것이 중요합니다."
@@ -191,6 +224,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "요약 정리"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "작성한 요약이 {length, plural, other {#자}}입니다. 적절한 정보를 제공하는 요약을 작성하려면 최소 {minChars, plural, other {#자}} 이상을 권장합니다."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "요약 확장"
   },
@@ -200,17 +236,26 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "이름 정리"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "언어 {languageCount, plural, other {#}}개를 선택했습니다. 서버가 실제로 지원하는 언어만 선택해 주세요."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "올바른 언어 선택"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "{tagCount, plural, other {#}}개의 태그를 선택했습니다. 서버가 관련 검색 결과에 표시될 수 있도록 {maxTagCount}개 이하로 줄여주세요."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "올바른 태그를 선택해 주세요"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount, plural, other {#}}개의 태그를 선택했습니다. 프로젝트가 관련 검색 결과에 표시될 수 있도록 {maxTagCount}개 이하로 줄여주세요."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "올바른 태그를 선택해주세요"
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "{type}의 내용을 보여주기 위해서는 갤러리 이미지가 최소 한 장 이상 필요합니다."
-  },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "오디오나 현지화 팩을 제외한 리소스 팩입니다. 팩이 이에 해당한다면, 적절한 태그를 선택해 주세요"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "갤러리 이미지 업로드"
@@ -227,10 +272,8 @@
   "nags.verify-external-links.title": {
     "defaultMessage": "외부 링크 인증"
   },
-  "nags.versions.title": {
-    "defaultMessage": "버전 페이지 방문"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "링크 설정 방문"
   }
 }
+

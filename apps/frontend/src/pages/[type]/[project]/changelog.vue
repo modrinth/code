@@ -53,17 +53,18 @@
 										{{ formatDate(version.date_published) }}</span
 									>
 								</div>
-								<ButtonStyled v-if="getPrimaryFile(version)" color="brand" type="transparent">
-									<a
-										class="ml-auto"
-										:href="createDownloadUrl(version)"
-										:download="getPrimaryFile(version)?.filename"
-										:title="`Download ${version.name}`"
-									>
-										<DownloadIcon aria-hidden="true" />
-										Download
-									</a>
-								</ButtonStyled>
+								<ButtonLink
+									v-if="getPrimaryFile(version)"
+									type="quiet"
+									color="brand"
+									class="ml-auto"
+									:href="createDownloadUrl(version)"
+									:download="getPrimaryFile(version)?.filename"
+									:title="`Download ${version.name}`"
+								>
+									<DownloadIcon aria-hidden="true" />
+									Download
+								</ButtonLink>
 							</div>
 							<div
 								v-if="version.changelog && !version.duplicate"
@@ -90,7 +91,8 @@
 <script setup>
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	ButtonLink,
+	getEnvironmentFilterValue,
 	injectModrinthClient,
 	injectProjectPageContext,
 	Pagination,
@@ -140,6 +142,7 @@ const filteredVersions = computed(() => {
 	const selectedGameVersions = getArrayOrString(route.query.g) ?? []
 	const selectedLoaders = getArrayOrString(route.query.l) ?? []
 	const selectedVersionTypes = getArrayOrString(route.query.c) ?? []
+	const selectedEnvironments = getArrayOrString(route.query.e) ?? []
 
 	return versions.value.filter(
 		(projectVersion) =>
@@ -150,7 +153,9 @@ const filteredVersions = computed(() => {
 			(selectedLoaders.length === 0 ||
 				selectedLoaders.some((loader) => getVersionLoaders(projectVersion).includes(loader))) &&
 			(selectedVersionTypes.length === 0 ||
-				selectedVersionTypes.includes(projectVersion.version_type)),
+				selectedVersionTypes.includes(projectVersion.version_type)) &&
+			(selectedEnvironments.length === 0 ||
+				selectedEnvironments.includes(getEnvironmentFilterValue(projectVersion.environment) ?? '')),
 	)
 })
 
@@ -366,9 +371,5 @@ function getVersionLoaders(version) {
 			}
 		}
 	}
-}
-
-.brand-button {
-	color: var(--color-accent-contrast);
 }
 </style>

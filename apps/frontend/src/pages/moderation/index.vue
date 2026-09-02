@@ -1,116 +1,120 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<StyledInput
-				v-model="query"
-				:icon="SearchIcon"
-				type="text"
-				autocomplete="off"
-				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-				clearable
-				wrapper-class="flex-1"
-				input-class="h-[40px] w-full"
-				@input="goToPage(1)"
-			/>
+		<ModerationQueueToolbar
+			v-model="query"
+			:page="currentPage"
+			:total-pages="totalPages"
+			:loading="pending"
+			@search="goToPage(1)"
+			@switch-page="goToPage"
+		>
+			<template #actions>
+				<Combobox
+					v-model="currentFilterType"
+					class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
+					trigger-type="base"
+					trigger-size="lg"
+					:options="filterTypes"
+					:placeholder="formatMessage(commonMessages.filterByLabel)"
+					@select="goToPage(1)"
+				>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+							<ModerationFilterCount
+								:label="currentFilterType"
+								:count="totalProjects"
+								:loading="pending"
+							/>
+						</span>
+					</template>
+				</Combobox>
 
-			<div class="flex flex-col flex-wrap justify-end gap-2 sm:flex-row lg:flex-shrink-0">
-				<div class="flex flex-col gap-2 sm:flex-row">
-					<Combobox
-						v-model="currentFilterType"
-						class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-						:options="filterTypes"
-						:placeholder="formatMessage(commonMessages.filterByLabel)"
-						@select="goToPage(1)"
-					>
-						<template #selected>
-							<span class="flex flex-row gap-2 align-middle font-semibold">
-								<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
-								<span class="truncate text-contrast"
-									>{{ currentFilterType }} ({{ filteredProjects.length }})</span
-								>
-							</span>
-						</template>
-					</Combobox>
+				<Combobox
+					v-model="currentSortType"
+					class="!w-full flex-grow sm:!w-[240px] sm:flex-grow-0"
+					trigger-type="base"
+					trigger-size="lg"
+					:options="sortTypes"
+					:placeholder="formatMessage(commonMessages.sortByLabel)"
+					@select="goToPage(1)"
+				>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<SortAscIcon
+								v-if="currentSortType === 'Oldest' || currentSortType === 'Least external deps'"
+								class="size-5 flex-shrink-0 text-secondary"
+							/>
+							<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+							<span class="truncate text-contrast">{{ currentSortType }}</span>
+						</span>
+					</template>
+				</Combobox>
 
-					<Combobox
-						v-model="currentSortType"
-						class="!w-full flex-grow sm:!w-[240px] sm:flex-grow-0"
-						:options="sortTypes"
-						:placeholder="formatMessage(commonMessages.sortByLabel)"
-						@select="goToPage(1)"
-					>
-						<template #selected>
-							<span class="flex flex-row gap-2 align-middle font-semibold">
-								<SortAscIcon
-									v-if="currentSortType === 'Oldest' || currentSortType === 'Least external deps'"
-									class="size-5 flex-shrink-0 text-secondary"
-								/>
-								<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
-								<span class="truncate text-contrast">{{ currentSortType }}</span>
-							</span>
-						</template>
-					</Combobox>
+				<Combobox
+					v-model="itemsPerPage"
+					class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
+					trigger-type="base"
+					trigger-size="lg"
+					:options="itemsPerPageOptions"
+					placeholder="Items per page"
+					@select="goToPage(1)"
+				>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<span class="truncate text-contrast">{{ itemsPerPage }} items</span>
+						</span>
+					</template>
+				</Combobox>
 
-					<Combobox
-						v-model="itemsPerPage"
-						class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
-						:options="itemsPerPageOptions"
-						placeholder="Items per page"
-						@select="goToPage(1)"
-					>
-						<template #selected>
-							<span class="flex flex-row gap-2 align-middle font-semibold">
-								<span class="truncate text-contrast">{{ itemsPerPage }} items</span>
-							</span>
-						</template>
-					</Combobox>
-				</div>
-
-				<ButtonStyled color="orange">
-					<button
-						class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
-						:disabled="paginatedProjects?.length === 0"
-						@click="moderateAllInFilter()"
-					>
-						<ScaleIcon class="flex-shrink-0" />
-						<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
-						<span class="sm:hidden">Moderate</span>
-					</button>
-				</ButtonStyled>
-			</div>
-		</div>
-
-		<div v-if="totalPages > 1" class="flex items-center justify-between">
-			<div>
-				Showing {{ itemsPerPage * (currentPage - 1) + 1 }}–{{
-					itemsPerPage * (currentPage - 1) + Math.min(itemsPerPage, paginatedProjects.length)
-				}}
-				of {{ filteredProjects.length }}
-				{{
-					currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase()
-				}}
-			</div>
-			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
-			<ConfettiExplosion v-if="visible" />
-		</div>
-
-		<div class="flex flex-col gap-3">
-			<template v-if="pending">
-				<div
-					v-for="i in 3"
-					:key="`loading-skeleton-${i}`"
-					class="flex h-[98px] w-full animate-pulse rounded-2xl bg-surface-3"
-				></div>
+				<Button
+					type="colored"
+					color="orange"
+					size="lg"
+					class="w-full sm:w-auto"
+					:disabled="pending || paginatedProjects?.length === 0"
+					@click="moderateAllInFilter()"
+				>
+					<ScaleIcon />
+					<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
+					<span class="sm:hidden">Moderate</span>
+				</Button>
 			</template>
-			<EmptyState
-				v-else-if="paginatedProjects.length === 0"
-				:type="!!query ? 'no-search-result' : 'no-tasks'"
-				:heading="emptyStateHeading"
-				:description="emptyStateDescription"
-			/>
+			<template #meta>
+				<div v-if="totalProjects > 0">
+					Showing {{ formatNumber(pageStart) }}–{{ formatNumber(pageEnd) }} of
+					{{ formatNumber(totalProjects) }}
+					{{
+						currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase()
+					}}
+				</div>
+				<div class="flex items-center gap-2 text-sm font-semibold text-secondary">
+					<Toggle id="moderation-exclude-technical-review" v-model="excludeTechnicalReview" small />
+					<label class="cursor-pointer" for="moderation-exclude-technical-review">
+						{{ formatMessage(messages.excludeTechnicalReview) }}
+					</label>
+				</div>
+			</template>
+		</ModerationQueueToolbar>
+
+		<ConfettiExplosion v-if="visible" />
+		<QueueSummaryModal
+			ref="queueSummaryModal"
+			:completed-ids="moderationQueue.currentQueue.completed"
+			:skipped-ids="moderationQueue.currentQueue.skipped"
+			@review-skipped="reviewSkippedQueue"
+		/>
+
+		<ModerationQueueSkeleton v-if="pending" />
+		<EmptyState
+			v-else-if="paginatedProjects.length === 0"
+			:type="!!query ? 'no-search-result' : 'no-tasks'"
+			:heading="emptyStateHeading"
+			:description="emptyStateDescription"
+		/>
+		<div v-else class="flex flex-col gap-3">
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"
-				v-else
 				:key="item.project.id"
 				:queue-entry="item"
 				:show-external-dependencies="currentFilterType === MODPACK_FILTER_TYPE"
@@ -124,37 +128,46 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { ListFilterIcon, ScaleIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
+import { ListFilterIcon, ScaleIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
 	EmptyState,
+	injectModrinthClient,
 	injectNotificationManager,
 	Pagination,
-	StyledInput,
+	Toggle,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
-import Fuse from 'fuse.js'
+import { useQuery } from '@tanstack/vue-query'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
+import ModerationFilterCount from '~/components/ui/moderation/ModerationFilterCount.vue'
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
-import {
-	type ModerationProject,
-	type ProjectWithOwnership,
-	toModerationProjects,
-} from '~/helpers/moderation.ts'
-import { useModerationQueue } from '~/services/moderation-queue.ts'
+import ModerationQueueSkeleton from '~/components/ui/moderation/ModerationQueueSkeleton.vue'
+import ModerationQueueToolbar from '~/components/ui/moderation/ModerationQueueToolbar.vue'
+import QueueSummaryModal from '~/components/ui/moderation/QueueSummaryModal.vue'
+import { type ModerationProject, toModerationProjects } from '~/helpers/moderation.ts'
+import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
+import { useModerationQueue } from '~/services/moderation/queue.ts'
+import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility.ts'
 
 useHead({ title: 'Projects queue - Modrinth' })
 
 const { formatMessage } = useVIntl()
+const formatNumber = useFormatNumber()
 const { addNotification } = injectNotificationManager()
 const moderationQueue = useModerationQueue()
 const route = useRoute()
 const router = useRouter()
+const client = injectModrinthClient()
+
+const queueSummaryModal = ref()
 
 const visible = ref(false)
 if (import.meta.client && history && history.state && history.state.confetti) {
@@ -168,42 +181,27 @@ if (import.meta.client && history && history.state && history.state.confetti) {
 	}, 1000)
 }
 
+if (import.meta.client && history && history.state && history.state.queueSummary) {
+	setTimeout(async () => {
+		history.state.queueSummary = false
+		await nextTick()
+		queueSummaryModal.value?.show()
+	}, 1000)
+}
+
 const messages = defineMessages({
 	moderate: {
 		id: 'moderation.moderate',
 		defaultMessage: 'Moderate',
 	},
-})
-
-const { data: allProjects, pending } = await useLazyAsyncData('moderation-projects', async () => {
-	const startTime = performance.now()
-	let currentOffset = 0
-	const PROJECT_ENDPOINT_COUNT = 350
-	const allProjects: ModerationProject[] = []
-
-	let projects: ProjectWithOwnership[] = []
-	do {
-		projects = (await useBaseFetch(
-			`moderation/projects?count=${PROJECT_ENDPOINT_COUNT}&offset=${currentOffset}`,
-			{ internal: true },
-		)) as ProjectWithOwnership[]
-
-		if (projects.length === 0) break
-
-		allProjects.push(...toModerationProjects(projects))
-		currentOffset += projects.length
-	} while (projects.length === PROJECT_ENDPOINT_COUNT)
-
-	const duration = performance.now() - startTime
-
-	console.debug(
-		`Projects fetched and processed in ${duration.toFixed(2)}ms (${(duration / 1000).toFixed(2)}s)`,
-	)
-
-	return allProjects
+	excludeTechnicalReview: {
+		id: 'moderation.exclude-technical-review',
+		defaultMessage: 'Exclude TR',
+	},
 })
 
 const query = ref(route.query.q?.toString() || '')
+const excludeTechnicalReview = ref(false)
 
 watch(
 	query,
@@ -379,116 +377,106 @@ const itemsPerPage = computed({
 })
 
 const currentPage = ref(1)
-const totalPages = computed(() =>
-	Math.ceil((filteredProjects.value?.length || 0) / itemsPerPage.value),
+
+function toApiProjectType(label: string): string | undefined {
+	switch (label) {
+		case 'Modpacks':
+			return 'modpack'
+		case 'Mods':
+			return 'mod'
+		case 'Resource Packs':
+			return 'resourcepack'
+		case 'Data Packs':
+			return 'datapack'
+		case 'Plugins':
+			return 'plugin'
+		case 'Shaders':
+			return 'shader'
+		case 'Servers':
+			return 'minecraft_java_server'
+		case 'Fucked up':
+			return 'none'
+		default:
+			return undefined
+	}
+}
+
+function toApiSort(label: string): Labrinth.Moderation.Internal.ProjectsSort {
+	switch (label) {
+		case 'Newest':
+			return 'newest'
+		case 'Most external deps':
+			return 'most_external_deps'
+		case 'Least external deps':
+			return 'least_external_deps'
+		default:
+			return 'oldest'
+	}
+}
+
+const moderationProjectsRequest = computed<Labrinth.Moderation.Internal.ProjectsRequest>(() => ({
+	count: itemsPerPage.value,
+	offset: (currentPage.value - 1) * itemsPerPage.value,
+	exclude_technical_review: excludeTechnicalReview.value,
+	query: query.value || undefined,
+	project_type: toApiProjectType(currentFilterType.value),
+	sort: toApiSort(currentSortType.value),
+}))
+
+const moderationProjectsQueryKey = computed(
+	() => ['moderation-projects', moderationProjectsRequest.value] as const,
 )
 
-const fuse = computed(() => {
-	if (!allProjects.value || allProjects.value.length === 0) return null
-	return new Fuse(allProjects.value, {
-		keys: [
-			{
-				name: 'project.title',
-				weight: 3,
-			},
-			{
-				name: 'project.slug',
-				weight: 2,
-			},
-			{
-				name: 'project.description',
-				weight: 2,
-			},
-			{
-				name: 'project.project_type',
-				weight: 1,
-			},
-			'ownership.name',
-		],
-		includeScore: true,
-		threshold: 0.4,
-	})
+const {
+	data: moderationProjectsResponse,
+	isPending: moderationProjectsPending,
+	isPlaceholderData: moderationProjectsPlaceholder,
+} = useQuery({
+	queryKey: moderationProjectsQueryKey,
+	queryFn: ({ queryKey }) => client.labrinth.moderation_internal.getProjects(queryKey[1]),
+	placeholderData: (previousData) => previousData,
 })
 
-const searchResults = computed(() => {
-	if (!query.value || !fuse.value) return null
-	return fuse.value.search(query.value).map((result) => result.item)
-})
-
-const baseFiltered = computed(() => {
-	if (!allProjects.value) return []
-	return query.value && searchResults.value ? searchResults.value : [...allProjects.value]
-})
-
-const typeFiltered = computed(() => {
-	if (currentFilterType.value === 'All projects') {
-		return baseFiltered.value
-	} else if (currentFilterType.value === 'Fucked up') {
-		return baseFiltered.value.filter((queueItem) => queueItem.project.project_types.length === 0)
+const pending = computed(
+	() => moderationProjectsPending.value || moderationProjectsPlaceholder.value,
+)
+const totalProjects = computed(() => moderationProjectsResponse.value?.total ?? 0)
+const totalPages = computed(() => Math.ceil(totalProjects.value / itemsPerPage.value))
+const filteredProjects = computed(() =>
+	toModerationProjects(moderationProjectsResponse.value?.projects ?? []),
+)
+const paginatedProjects = computed(() => filteredProjects.value)
+const pageStart = computed(() =>
+	totalProjects.value === 0 ? 0 : (currentPage.value - 1) * itemsPerPage.value + 1,
+)
+const pageEnd = computed(() =>
+	Math.min(
+		(currentPage.value - 1) * itemsPerPage.value + paginatedProjects.value.length,
+		totalProjects.value,
+	),
+)
+const projectsById = computed(() => {
+	const projects = new Map<string, ModerationProject>()
+	for (const project of filteredProjects.value) {
+		projects.set(project.project.id, project)
 	}
 
-	const filterMap: Record<string, string> = {
-		Modpacks: 'modpack',
-		Mods: 'mod',
-		'Resource Packs': 'resourcepack',
-		'Data Packs': 'datapack',
-		Plugins: 'plugin',
-		Shaders: 'shader',
-		Servers: 'minecraft_java_server',
-	}
-	const projectType = filterMap[currentFilterType.value]
-	if (!projectType) return baseFiltered.value
-
-	return baseFiltered.value.filter(
-		(queueItem) =>
-			(queueItem.project.project_types.length > 0 &&
-				queueItem.project.project_types[0] === projectType) ||
-			(projectType === 'minecraft_java_server' &&
-				queueItem.project.project_types.includes('minecraft_java_server')),
-	)
+	return projects
 })
 
-const filteredProjects = computed(() => {
-	const filtered = [...typeFiltered.value]
-
-	if (currentSortType.value === 'Most external deps') {
-		filtered.sort((a, b) => {
-			const depsDiff = b.external_dependencies_count - a.external_dependencies_count
-			if (depsDiff !== 0) return depsDiff
-			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
-			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
-			return dateA - dateB
-		})
-	} else if (currentSortType.value === 'Least external deps') {
-		filtered.sort((a, b) => {
-			const depsDiff = a.external_dependencies_count - b.external_dependencies_count
-			if (depsDiff !== 0) return depsDiff
-			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
-			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
-			return dateA - dateB
-		})
-	} else if (currentSortType.value === 'Oldest') {
-		filtered.sort((a, b) => {
-			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
-			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
-			return dateA - dateB
-		})
-	} else {
-		filtered.sort((a, b) => {
-			const dateA = new Date(a.project.queued || a.project.published || 0).getTime()
-			const dateB = new Date(b.project.queued || b.project.published || 0).getTime()
-			return dateB - dateA
-		})
+watch(totalPages, (pages) => {
+	if (pages === 0 && currentPage.value !== 1) {
+		currentPage.value = 1
+		return
 	}
 
-	return filtered
+	if (pages > 0 && currentPage.value > pages) {
+		currentPage.value = pages
+	}
 })
 
-const paginatedProjects = computed(() => {
-	if (!filteredProjects.value) return []
-	const start = (currentPage.value - 1) * itemsPerPage.value
-	const end = start + itemsPerPage.value
-	return filteredProjects.value.slice(start, end)
+watch(excludeTechnicalReview, () => {
+	goToPage(1)
 })
 
 const emptyStateHeading = computed(() => {
@@ -515,67 +503,63 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-function notifySkippedProjects(skippedCount: number) {
-	if (skippedCount <= 0) return
-	addNotification({
-		title: 'Skipped projects',
-		text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
-		type: 'info',
-		autoCloseMs: 2000,
+async function findFirstEligibleProject(): Promise<string | null> {
+	const candidateIds = [...moderationQueue.currentQueue.items]
+	if (candidateIds.length === 0) return null
+
+	const next = await findNextEligibleQueueProject(client, moderationQueue, candidateIds)
+
+	if (!next) {
+		await Promise.all(candidateIds.map((id) => moderationQueue.excludeProject(id)))
+		return null
+	}
+
+	await Promise.all(next.excluded.map((id) => moderationQueue.excludeProject(id)))
+	return next.project
+}
+
+function getProjectRouteParam(projectId: string): string {
+	return projectsById.value.get(projectId)?.project.slug || projectId
+}
+
+function getProjectRouteType(projectId: string): string {
+	const projectType = projectsById.value.get(projectId)?.project.project_types[0]
+	if (!projectType) return 'project'
+	return getProjectTypeForUrlShorthand(projectType, [])
+}
+
+async function navigateToModerationProject(projectId: string) {
+	await navigateTo({
+		name: 'type-project',
+		params: {
+			type: getProjectRouteType(projectId),
+			project: getProjectRouteParam(projectId),
+		},
+		state: {
+			showChecklist: true,
+		},
 	})
 }
 
-async function findFirstEligibleProject(): Promise<ModerationProject | null> {
-	let skippedCount = 0
+async function getFilteredProjectIds(): Promise<string[]> {
+	const response = await client.labrinth.moderation_internal.getProjectIds({
+		exclude_technical_review: excludeTechnicalReview.value,
+		query: query.value || undefined,
+		project_type: toApiProjectType(currentFilterType.value),
+		sort: toApiSort(currentSortType.value),
+	})
 
-	while (moderationQueue.hasItems) {
-		const currentId = moderationQueue.getCurrentProjectId()
-		if (!currentId) return null
-
-		const project = filteredProjects.value.find((p) => p.project.id === currentId)
-		if (!project) {
-			await moderationQueue.completeCurrentProject(currentId, 'skipped')
-			skippedCount++
-			continue
-		}
-
-		if (project.project.status !== 'processing') {
-			await moderationQueue.completeCurrentProject(currentId, 'skipped')
-			skippedCount++
-			continue
-		}
-
-		try {
-			const lockStatus = await moderationQueue.checkLock(currentId)
-
-			if (!lockStatus.locked || lockStatus.expired || lockStatus.is_own_lock) {
-				notifySkippedProjects(skippedCount)
-				return project
-			}
-
-			await moderationQueue.completeCurrentProject(currentId, 'skipped')
-			skippedCount++
-		} catch {
-			return project
-		}
-	}
-
-	notifySkippedProjects(skippedCount)
-
-	return null
+	return response.ids
 }
 
 async function moderateAllInFilter() {
-	// Start from the current page - get projects from current page onwards
 	const startIndex = (currentPage.value - 1) * itemsPerPage.value
-	const projectsFromCurrentPage = filteredProjects.value.slice(startIndex)
-	const projectIds = projectsFromCurrentPage.map((queueItem) => queueItem.project.id)
+	const projectIds = (await getFilteredProjectIds()).slice(startIndex)
 	await moderationQueue.setQueue(projectIds)
 
-	// Find first unlocked project
-	const targetProject = await findFirstEligibleProject()
+	const targetProjectId = await findFirstEligibleProject()
 
-	if (!targetProject) {
+	if (!targetProjectId) {
 		addNotification({
 			title: 'No projects available',
 			text: 'All projects in queue are already moderated or locked by others.',
@@ -584,34 +568,18 @@ async function moderateAllInFilter() {
 		return
 	}
 
-	navigateTo({
-		name: 'type-project',
-		params: {
-			type: 'project',
-			project: targetProject.project.slug,
-		},
-		state: {
-			showChecklist: true,
-		},
-	})
+	await navigateToModerationProject(targetProjectId)
 }
 
 async function startFromProject(projectId: string) {
-	// Find the index of the clicked project in the filtered list
-	const projectIndex = filteredProjects.value.findIndex((p) => p.project.id === projectId)
-	if (projectIndex === -1) {
-		// Project not found in filtered list, just moderate it alone
-		await moderationQueue.setSingleProject(projectId)
-	} else {
-		// Start queue from this project onwards
-		const projectsFromHere = filteredProjects.value.slice(projectIndex)
-		const projectIds = projectsFromHere.map((queueItem) => queueItem.project.id)
-		await moderationQueue.setQueue(projectIds)
-	}
+	const allFilteredProjectIds = await getFilteredProjectIds()
+	const projectIndex = allFilteredProjectIds.indexOf(projectId)
+	const projectIds = projectIndex === -1 ? [projectId] : allFilteredProjectIds.slice(projectIndex)
+	await moderationQueue.setQueue(projectIds)
 
-	const targetProject = await findFirstEligibleProject()
+	const targetProjectId = await findFirstEligibleProject()
 
-	if (!targetProject) {
+	if (!targetProjectId) {
 		addNotification({
 			title: 'No projects available',
 			text: 'All projects in queue are already moderated or locked by others.',
@@ -620,15 +588,23 @@ async function startFromProject(projectId: string) {
 		return
 	}
 
-	navigateTo({
-		name: 'type-project',
-		params: {
-			type: 'project',
-			project: targetProject.project.slug,
-		},
-		state: {
-			showChecklist: true,
-		},
-	})
+	await navigateToModerationProject(targetProjectId)
+}
+
+async function reviewSkippedQueue() {
+	await moderationQueue.startSkippedReview()
+
+	const targetProjectId = await findFirstEligibleProject()
+
+	if (!targetProjectId) {
+		addNotification({
+			title: 'No projects available',
+			text: 'All previously skipped projects are already moderated or locked by others.',
+			type: 'warning',
+		})
+		return
+	}
+
+	await navigateToModerationProject(targetProjectId)
 }
 </script>

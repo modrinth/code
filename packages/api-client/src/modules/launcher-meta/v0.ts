@@ -20,10 +20,13 @@ export class LauncherMetaManifestV0Module extends AbstractModule {
 	 *
 	 * @param loader - Loader platform (fabric, forge, quilt, neo)
 	 */
-	public async getManifest(loader: string): Promise<LauncherMeta.Manifest.v0.Manifest> {
+	public async getManifest(
+		loader: string,
+		formatVersion = 0,
+	): Promise<LauncherMeta.Manifest.v0.Manifest> {
 		return this.client.request<LauncherMeta.Manifest.v0.Manifest>('/manifest.json', {
 			api: LAUNCHER_META_BASE_URL,
-			version: `${loader}/v0`,
+			version: `${loader}/v${formatVersion}`,
 			method: 'GET',
 			skipAuth: true,
 			headers: { 'Content-Type': '' },

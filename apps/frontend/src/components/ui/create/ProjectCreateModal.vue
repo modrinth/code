@@ -32,7 +32,7 @@
 						{{ formatMessage(messages.nameLabel) }}
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					id="name"
 					v-model="name"
 					:maxlength="64"
@@ -46,19 +46,18 @@
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.urlLabel) }}
 				</span>
-				<div class="text-input-wrapper !w-full">
-					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<StyledInput
-						id="slug"
-						v-model="slug"
-						:maxlength="64"
-						class="w-full"
-						type="text"
-						autocomplete="off"
-						:disabled="hasHitLimit"
-						@update:model-value="manualSlug = true"
-					/>
-				</div>
+				<Input
+					id="slug"
+					v-model="slug"
+					:maxlength="64"
+					class="w-full"
+					type="text"
+					autocomplete="off"
+					:disabled="hasHitLimit"
+					@update:model-value="manualSlug = true"
+				>
+					<template #prefix>https://modrinth.com/project/</template>
+				</Input>
 			</label>
 			<div class="flex flex-col gap-2.5">
 				<label for="owner">
@@ -73,6 +72,7 @@
 					:options="[userOption, ...ownerOptions]"
 					searchable
 					:disabled="hasHitLimit"
+					select-search-text-on-focus
 					show-icon-in-selected
 				/>
 				<span>{{ formatMessage(messages.ownerDescription) }}</span>
@@ -99,10 +99,9 @@
 						{{ formatMessage(messages.summaryLabel) }}
 					</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="additional-information"
 					v-model="description"
-					multiline
 					:maxlength="256"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
@@ -110,18 +109,20 @@
 				<span>{{ formatMessage(messages.summaryDescription) }}</span>
 			</div>
 			<div class="flex justify-end gap-2.5">
-				<ButtonStyled type="outlined">
-					<button @click="cancel">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button v-tooltip="missingFieldsTooltip" :disabled="disableCreate" @click="createProject">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createProject) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="cancel">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="missingFieldsTooltip"
+					type="colored"
+					color="brand"
+					:disabled="disableCreate"
+					@click="createProject"
+				>
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createProject) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -129,9 +130,9 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { PlusIcon, XIcon } from '@modrinth/assets'
+import { OrganizationIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Chips,
 	Combobox,
 	type ComboboxOption,
@@ -139,11 +140,15 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
+	Textarea,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
+
+import { generateUrlSlug } from '~/utils/slugs'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
@@ -159,14 +164,13 @@ interface ShowOptions {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+const debug = useDebugLogger('ProjectCreateModal')
 
 defineExpose({
 	show,
 })
 
-const auth = (await useAuth()) as Ref<{
-	user: { id: string; username: string; avatar_url: string } | null
-}>
+const auth = await useAuth()
 
 const messages = defineMessages({
 	title: {
@@ -245,6 +249,18 @@ const messages = defineMessages({
 		id: 'create.project.missing-fields-tooltip',
 		defaultMessage: 'Missing fields: {fields}',
 	},
+	unknownUser: {
+		id: 'create.project.unknown-user',
+		defaultMessage: 'Unknown user',
+	},
+	userAvatarAlt: {
+		id: 'create.project.user-avatar-alt',
+		defaultMessage: 'User Avatar',
+	},
+	organizationIconAlt: {
+		id: 'create.project.organization-icon-alt',
+		defaultMessage: '{name} Icon',
+	},
 })
 
 const props = defineProps<{
@@ -317,7 +333,7 @@ const cancel = () => {
 
 const userOption = computed(() => ({
 	value: 'self',
-	label: auth.value.user?.username || 'Unknown user',
+	label: auth.value.user?.username || formatMessage(messages.unknownUser),
 	icon: auth.value.user?.avatar_url
 		? markRaw(
 				defineAsyncComponent(() =>
@@ -325,7 +341,7 @@ const userOption = computed(() => ({
 						setup: () => () =>
 							h('img', {
 								src: auth.value.user?.avatar_url,
-								alt: 'User Avatar',
+								alt: formatMessage(messages.userAvatarAlt),
 								class: 'h-5 w-5 rounded-full',
 							}),
 					}),
@@ -356,13 +372,19 @@ async function fetchOrganizations() {
 								setup: () => () =>
 									h('img', {
 										src: org.icon_url,
-										alt: `${org.name} Icon`,
+										alt: formatMessage(messages.organizationIconAlt, { name: org.name }),
 										class: 'h-5 w-5 rounded',
 									}),
 							}),
 						),
 					)
-				: undefined,
+				: markRaw(
+						defineAsyncComponent(() =>
+							Promise.resolve({
+								setup: () => () => h(OrganizationIcon, { class: 'size-5' }),
+							}),
+						),
+					),
 		}))
 		if (props.organizationId) owner.value = props.organizationId
 	} catch (err) {
@@ -395,6 +417,7 @@ async function createProject() {
 		server_side: 'required',
 		license_id: 'LicenseRef-Unknown',
 		is_draft: true,
+		organization_id: owner.value !== 'self' ? owner.value : undefined,
 	}
 
 	formData.append('data', JSON.stringify(projectData))
@@ -432,7 +455,7 @@ async function createProject() {
 				},
 			})) as Labrinth.Projects.v3.Project
 			createdProjectId = result.id
-			console.log(createdProjectId)
+			debug(createdProjectId)
 		}
 
 		modal.value?.hide()
@@ -461,12 +484,7 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 
 function updatedName() {
 	if (!manualSlug.value) {
-		slug.value = name.value
-			.trim()
-			.toLowerCase()
-			.replaceAll(' ', '-')
-			.replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
-			.replaceAll(/--+/gm, '-')
+		slug.value = generateUrlSlug(name.value)
 	}
 }
 </script>

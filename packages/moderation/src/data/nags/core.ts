@@ -42,10 +42,11 @@ export const coreNags: Nag[] = [
 		link: {
 			path: 'settings/versions',
 			title: defineMessage({
-				id: 'nags.versions.title',
-				defaultMessage: 'Visit versions page',
+				id: 'nags.settings.versions.title',
+				defaultMessage: 'Visit versions settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-versions',
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-versions',
 		},
 	},
 	{
@@ -102,6 +103,23 @@ export const coreNags: Nag[] = [
 		description: (context: NagContext) => {
 			const { formatMessage } = useVIntl()
 
+			if (context.projectV3?.project_types.includes('resourcepack')) {
+				return formatMessage(
+					defineMessage({
+						id: 'nags.upload-gallery-image.description-resourcepack',
+						defaultMessage:
+							'At least one gallery image is required to showcase the content of your resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag.',
+					}),
+				)
+			} else if (context.projectV3?.project_types.includes('shader')) {
+				return formatMessage(
+					defineMessage({
+						id: 'nags.upload-gallery-image.description-shader',
+						defaultMessage:
+							'At least three gallery images are required to showcase the content of your shader in a variety of situations and conditions.',
+					}),
+				)
+			}
 			return formatMessage(
 				defineMessage({
 					id: 'nags.upload-gallery-image.description',
@@ -109,31 +127,26 @@ export const coreNags: Nag[] = [
 						'At least one gallery image is required to showcase the content of your {type}.',
 				}),
 				{
-					type:
-						context.project.project_type === 'resourcepack'
-							? formatMessage(
-									defineMessage({
-										id: 'nags.upload-gallery-image.resourcepack-type',
-										defaultMessage:
-											'resource pack, except for audio or localization packs. If this describes your pack, please select the appropriate tag',
-									}),
-								)
-							: formatProjectTypeSentence(formatMessage, context.project.project_type),
+					type: formatProjectTypeSentence(formatMessage, context.project.project_type),
 				},
 			)
 		},
 		status: 'required',
 		shouldShow: (context: NagContext) => {
 			return (
-				(context.project.project_type === 'resourcepack' ||
-					context.project.project_type === 'shader') &&
-				(!context.project.gallery || context.project.gallery?.length === 0) &&
-				!(
-					context.project.categories.includes('audio') ||
-					context.project.additional_categories.includes('audio') ||
-					context.project.categories.includes('locale') ||
-					context.project.additional_categories.includes('locale')
-				)
+				(context.projectV3?.project_types.includes('shader') &&
+					context.project.gallery &&
+					context.project.gallery?.length < 3) ||
+				(context.projectV3?.project_types.includes('resourcepack') &&
+					context.project.gallery &&
+					context.project.gallery?.length === 0 &&
+					!(
+						context.project.categories.includes('audio') ||
+						context.project.additional_categories.includes('audio') ||
+						context.project.categories.includes('locale') ||
+						context.project.additional_categories.includes('locale')
+					)) ||
+				false
 			)
 		},
 		link: {
@@ -192,7 +205,10 @@ export const coreNags: Nag[] = [
 		},
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			context.project.license.id === 'LicenseRef-Unknown' && !context.projectV3?.minecraft_server,
+			(context.project.license.id === 'LicenseRef-Unknown' ||
+				context.project.license.id === 'NOASSERTION' ||
+				context.project.license.id === 'LicenseRef-NOASSERTION') &&
+			!context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/license',
 			title: defineMessage({
@@ -200,6 +216,99 @@ export const coreNags: Nag[] = [
 				defaultMessage: 'Visit license settings',
 			}),
 			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-license',
+		},
+	},
+	{
+		id: 'add-custom-license-details',
+		title: defineMessage({
+			id: 'nags.add-license-details.title',
+			defaultMessage: 'Add license details',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			return formatMessage(
+				defineMessage({
+					id: 'nags.add-license-details.description',
+					defaultMessage: 'Add a valid URL and name or SPDX identifier for your custom license.',
+				}),
+				{
+					type: formatProjectTypeSentence(formatMessage, context.project.project_type),
+				},
+			)
+		},
+		status: 'required',
+		shouldShow: (context: NagContext) =>
+			!context.projectV3?.minecraft_server &&
+			(context.project.license.id === 'LicenseRef-' ||
+				(context.project.license.id.search('LicenseRef-') === 0 &&
+					(!context.project.license.url || context.project.license.url === '') &&
+					context.project.license.id !== 'LicenseRef-Unknown' &&
+					context.project.license.id !== 'LicenseRef-All-Rights-Reserved')),
+		link: {
+			path: 'settings/license',
+			title: defineMessage({
+				id: 'nags.settings.license.title',
+				defaultMessage: 'Visit license settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-license',
+		},
+	},
+	{
+		id: 'review-permissions',
+		title: defineMessage({
+			id: 'nags.review-permissions.title',
+			defaultMessage: 'Review external permissions',
+		}),
+		description: (_context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			return formatMessage(
+				defineMessage({
+					id: 'nags.review-permissions.description',
+					defaultMessage:
+						'Make sure you have provided proof of your permission to distribute any external content in your Modpack.',
+				}),
+			)
+		},
+		status: 'required',
+		shouldShow: (context: NagContext) =>
+			context.versions.some((version) => (version.files_missing_attribution?.length ?? 0) >= 1),
+		link: {
+			path: 'settings/permissions',
+			title: defineMessage({
+				id: 'nags.settings.permissions.title',
+				defaultMessage: 'Visit permissions dashboard',
+			}),
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-permissions',
+		},
+	},
+	{
+		id: 'check-disclosures',
+		title: defineMessage({
+			id: 'nags.check-disclosures.title',
+			defaultMessage: 'Check content disclosures',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			return formatMessage(
+				defineMessage({
+					id: 'nags.check-disclosures.description',
+					defaultMessage:
+						'Make sure users are aware of any important details by filling in content disclosures that apply to your {type}.',
+				}),
+				{ type: formatProjectTypeSentence(formatMessage, context.project.project_type) },
+			)
+		},
+		status: 'suggestion',
+		shouldShow: () => true,
+		link: {
+			path: 'settings/disclosures',
+			title: defineMessage({
+				id: 'nags.settings.disclosures.title',
+				defaultMessage: 'Visit disclosure settings',
+			}),
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-disclosures',
 		},
 	},
 ]

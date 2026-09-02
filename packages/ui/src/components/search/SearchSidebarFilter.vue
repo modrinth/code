@@ -7,10 +7,16 @@
 		title-wrapper-class="flex flex-col gap-2 justify-start items-start"
 		:open-by-default="openByDefault !== undefined ? openByDefault : true"
 	>
-		<template #title>
-			<slot name="header" :filter="filterType">
-				<h2>{{ filterType.formatted_name }}</h2>
-			</slot>
+		<template #button="{ open }">
+			<div class="flex items-center gap-1 w-full text-contrast">
+				<slot name="header" :filter="filterType">
+					<h2 class="text-base font-semibold text-red">{{ filterType.formatted_name }}</h2>
+				</slot>
+				<DropdownIcon
+					class="ml-auto size-5 transition-transform duration-300 shrink-0 text-primary group-hover:text-contrast"
+					:class="{ 'rotate-180': open }"
+				/>
+			</div>
 		</template>
 		<template
 			v-if="
@@ -24,14 +30,14 @@
 			<div class="flex gap-1 flex-wrap">
 				<div
 					v-for="option in selectedFilterOptions"
-					:key="`selected-filter-${filterType.id}-${option}`"
+					:key="`selected-filter-${filterType.id}-${option.id}`"
 					class="flex gap-1 text-xs bg-button-bg px-2 py-0.5 rounded-full font-bold text-secondary w-fit shrink-0 items-center"
 				>
 					{{ option.formatted_name ?? option.id }}
 				</div>
 				<div
 					v-for="option in selectedNegativeFilterOptions"
-					:key="`excluded-filter-${filterType.id}-${option}`"
+					:key="`excluded-filter-${filterType.id}-${option.id}`"
 					class="flex gap-1 text-xs bg-button-bg px-2 py-0.5 rounded-full font-bold text-secondary w-fit shrink-0 items-center"
 				>
 					<BanIcon class="text-brand-red" /> {{ option.formatted_name ?? option.id }}
@@ -39,7 +45,7 @@
 			</div>
 		</template>
 		<template v-if="locked" #default>
-			<div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider mx-2">
+			<div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider">
 				<p class="m-0 font-bold items-center">
 					<slot :name="`locked-${filterType.id}`">
 						{{ formatMessage(messages.lockedTitle, { type: filterType.formatted_name }) }}
@@ -48,100 +54,157 @@
 				<p class="m-0 text-secondary text-sm">
 					{{ formatMessage(messages.lockedDescription) }}
 				</p>
-				<ButtonStyled>
-					<button
-						class="w-fit"
-						@click="
-							() => {
-								overriddenProvidedFilterTypes.push(filterType.id)
-							}
-						"
-					>
-						<LockOpenIcon />
-						{{ formatMessage(messages.unlockFilterButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					class="w-fit"
+					@click="
+						() => {
+							overriddenProvidedFilterTypes.push(filterType.id)
+						}
+					"
+				>
+					<LockOpenIcon />
+					{{ formatMessage(messages.unlockFilterButton) }}
+				</Button>
 			</div>
 		</template>
 		<template v-else #default>
 			<slot name="prefix" />
-			<StyledInput
-				v-if="filterType.searchable"
-				:id="`search-${filterType.id}`"
-				v-model="query"
-				:icon="SearchIcon"
-				type="text"
-				:placeholder="formatMessage(messages.searchPlaceholder)"
-				autocomplete="off"
-				clearable
-				size="small"
-				input-class="!bg-button-bg"
-				wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
+			<SearchDependsOnFilter
+				v-if="filterType.display === 'depends-on-project'"
+				v-model:selected-filters="selectedFilters"
+				:project-type="projectType"
+				:inner-panel-class="innerPanelClass"
+				:selected-project-class="selectedProjectClass"
+				:result-count="resultCount"
+				:loading="loading"
+				:refreshing="refreshing"
 			/>
-
-			<ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">
-				<div :class="innerPanelClass ? innerPanelClass : ''" class="flex flex-col gap-1">
-					<template v-if="groupedOptions">
-						<SearchFilterGroup
-							v-for="[groupName, options] in groupedOptions"
-							:key="`${filterType.id}-group-${groupName}`"
-							:group-name="groupName"
-							:options="options"
-							:supports-negative-filter="filterType.supports_negative_filter"
-							:included="isIncluded"
-							:excluded="isExcluded"
-							@toggle="toggleFilter"
-							@toggle-exclude="toggleNegativeFilter"
-						/>
-					</template>
-					<template v-else>
-						<SearchFilterOption
-							v-for="option in visibleOptions"
-							:key="`${filterType.id}-${option}`"
-							:option="option"
-							:included="isIncluded(option)"
-							:excluded="isExcluded(option)"
-							:supports-negative-filter="filterType.supports_negative_filter"
-							:class="{
-								'mr-3': scrollable,
-							}"
-							@toggle="toggleFilter"
-							@toggle-exclude="toggleNegativeFilter"
-						>
-							<slot name="option" :filter="filterType" :option="option">
-								<span
-									v-if="option.icon"
-									class="inline-flex items-center justify-center shrink-0 h-4 w-4"
-									:style="iconStyle(option)"
-								>
-									<div
-										v-if="typeof option.icon === 'string'"
-										class="h-4 w-4"
-										v-html="option.icon"
-									/>
-									<component :is="option.icon" v-else class="h-4 w-4" />
-								</span>
-								<span class="truncate text-sm" :style="iconStyle(option)">
-									{{ option.formatted_name ?? option.id }}
-								</span>
-							</slot>
-						</SearchFilterOption>
-					</template>
-					<button
-						v-if="filterType.display === 'expandable'"
-						class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
-						@click="showMore = !showMore"
+			<template v-else>
+				<div
+					v-if="filterType.display === 'toggle'"
+					:class="innerPanelClass ? innerPanelClass : ''"
+					class="flex flex-col gap-3"
+				>
+					<label
+						v-for="option in filterType.options"
+						:key="`${filterType.id}-toggle-${option.id}`"
+						class="flex cursor-pointer items-center justify-between text-secondary gap-3 font-semibold"
 					>
-						<DropdownIcon
-							class="h-4 w-4 transition-transform"
-							:class="{ 'rotate-180': showMore }"
+						<span class="text-sm">{{ option.formatted_name ?? option.id }}</span>
+						<Toggle
+							:model-value="isExcluded(option)"
+							small
+							class="shrink-0"
+							@update:model-value="toggleNegativeFilter(option)"
 						/>
-						<span class="truncate text-sm">
-							{{ showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore) }}
-						</span>
-					</button>
+					</label>
 				</div>
-			</ScrollablePanel>
+				<template v-else>
+					<Input
+						v-if="filterType.searchable"
+						:id="`search-${filterType.id}`"
+						v-model="query"
+						:icon="SearchIcon"
+						type="text"
+						:placeholder="formatMessage(messages.searchPlaceholder)"
+						autocomplete="off"
+						clearable
+						size="small"
+						appearance="button"
+						wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
+					/>
+					<ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">
+						<div :class="innerPanelClass ? innerPanelClass : ''" class="flex flex-col gap-1">
+							<template v-if="groupedOptions">
+								<SearchFilterGroup
+									v-for="[groupName, options] in groupedOptions"
+									:key="`${filterType.id}-group-${groupName}`"
+									:group-name="groupName"
+									:options="options"
+									:supports="filterType.supports"
+									:included="isIncluded"
+									:excluded="isExcluded"
+									@toggle="toggleFilter"
+									@toggle-exclude="toggleNegativeFilter"
+								/>
+							</template>
+							<template v-else>
+								<template v-for="option in visibleOptions" :key="`${filterType.id}-${option.id}`">
+									<SearchFilterOption
+										:option="option"
+										:included="isIncluded(option)"
+										:excluded="isExcluded(option)"
+										:supports="filterType.supports"
+										:has-sub-options="!!option.sub_options?.length"
+										:expanded="isExpanded(option)"
+										:class="{
+											'mr-3': scrollable,
+										}"
+										@toggle="toggleFilter"
+										@toggle-exclude="toggleNegativeFilter"
+										@toggle-expand="toggleExpand(option)"
+									>
+										<slot name="option" :filter="filterType" :option="option">
+											<span
+												v-if="option.icon"
+												class="inline-flex items-center justify-center shrink-0 h-4 w-4"
+												:style="iconStyle(option)"
+											>
+												<div
+													v-if="typeof option.icon === 'string'"
+													class="h-4 w-4"
+													v-html="option.icon"
+												/>
+												<component :is="option.icon" v-else class="h-4 w-4" />
+											</span>
+											<span class="truncate text-sm" :style="iconStyle(option)">
+												{{ option.formatted_name ?? option.id }}
+											</span>
+										</slot>
+									</SearchFilterOption>
+									<div
+										v-if="option.sub_options?.length && isExpanded(option)"
+										class="ml-4 flex flex-col gap-1"
+										:class="{ 'mr-3': scrollable }"
+									>
+										<SearchFilterOption
+											v-for="subOption in option.sub_options"
+											:key="`${filterType.id}-${subOption.id}`"
+											:option="subOption"
+											:included="isIncluded(subOption)"
+											:excluded="isExcluded(subOption)"
+											:supports="filterType.supports"
+											@toggle="toggleFilter"
+											@toggle-exclude="toggleNegativeFilter"
+										>
+											<slot name="option" :filter="filterType" :option="subOption">
+												<span class="truncate text-sm">
+													{{ subOption.formatted_name ?? subOption.id }}
+												</span>
+											</slot>
+										</SearchFilterOption>
+									</div>
+								</template>
+							</template>
+							<button
+								v-if="filterType.display === 'expandable'"
+								class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
+								@click="showMore = !showMore"
+							>
+								<DropdownIcon
+									class="h-4 w-4 transition-transform"
+									:class="{ 'rotate-180': showMore }"
+								/>
+								<span class="truncate text-sm">
+									{{
+										showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore)
+									}}
+								</span>
+							</button>
+						</div>
+					</ScrollablePanel>
+				</template>
+			</template>
 			<div :class="innerPanelClass ? innerPanelClass : ''" class="empty:hidden">
 				<Checkbox
 					v-for="group in filterType.toggle_groups"
@@ -152,25 +215,23 @@
 					@update:model-value="toggleGroup(group.id)"
 				/>
 				<div v-if="hasProvidedFilter" class="mt-2 mx-1">
-					<ButtonStyled>
-						<button
-							class="w-fit"
-							@click="
-								() => {
-									overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
-										(id) => id !== filterType.id,
-									)
-									accordion?.close()
-									clearFilters()
-								}
-							"
-						>
-							<UpdatedIcon />
-							<slot name="sync-button">
-								{{ formatMessage(messages.syncFilterButton) }}
-							</slot>
-						</button>
-					</ButtonStyled>
+					<Button
+						class="w-fit"
+						@click="
+							() => {
+								overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
+									(id) => id !== filterType.id,
+								)
+								accordion?.close()
+								clearFilters()
+							}
+						"
+					>
+						<UpdatedIcon />
+						<slot name="sync-button">
+							{{ formatMessage(messages.syncFilterButton) }}
+						</slot>
+					</Button>
 				</div>
 			</div>
 		</template>
@@ -179,13 +240,21 @@
 
 <script setup lang="ts">
 import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+
+import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
+import {
+	type FilterOption,
+	type FilterType,
+	type FilterValue,
+	findParentFilterOption,
+	flattenFilterOptions,
+} from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
-import ButtonStyled from '../base/ButtonStyled.vue'
-import { Checkbox, ScrollablePanel, StyledInput } from '../index'
+import { Checkbox, Input, ScrollablePanel, Toggle } from '../index'
+import SearchDependsOnFilter from './SearchDependsOnFilter.vue'
 import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'
 
@@ -200,11 +269,16 @@ const overriddenProvidedFilterTypes = defineModel<string[]>('overriddenProvidedF
 
 const props = defineProps<{
 	filterType: FilterType
+	projectType: string
 	buttonClass?: string
 	contentClass?: string
 	innerPanelClass?: string
+	selectedProjectClass?: string
 	openByDefault?: boolean
 	providedFilters: FilterValue[]
+	resultCount?: number
+	loading?: boolean
+	refreshing?: boolean
 }>()
 
 defineOptions({
@@ -213,22 +287,31 @@ defineOptions({
 
 const query = ref('')
 const showMore = ref(false)
+const expandedOptionIds = ref<string[]>([])
 
 const accordion = ref<InstanceType<typeof Accordion> | null>()
 
+const allOptions = computed(() => flattenFilterOptions(props.filterType.options))
+
 const selectedFilterOptions = computed(() =>
-	props.filterType.options.filter((option) =>
+	allOptions.value.filter((option) =>
 		locked.value ? isProvided(option, false) : isIncluded(option),
 	),
 )
 const selectedNegativeFilterOptions = computed(() =>
-	props.filterType.options.filter((option) =>
+	allOptions.value.filter((option) =>
 		locked.value ? isProvided(option, true) : isExcluded(option),
 	),
 )
 const visibleOptions = computed(() =>
 	props.filterType.options
-		.filter((option) => isVisible(option) || isIncluded(option) || isExcluded(option))
+		.filter(
+			(option) =>
+				isVisible(option) ||
+				isIncluded(option) ||
+				isExcluded(option) ||
+				hasSelectedSubOption(option),
+		)
 		.slice()
 		.sort((a, b) => {
 			if (props.filterType.display === 'expandable') {
@@ -307,6 +390,24 @@ function isExcluded(filter: FilterOption) {
 	return selectedFilters.value.some((value) => value.option === filter.id && value.negative)
 }
 
+function hasSelectedSubOption(filter: FilterOption) {
+	return (
+		filter.sub_options?.some((subOption) => isIncluded(subOption) || isExcluded(subOption)) ?? false
+	)
+}
+
+function isExpanded(filter: FilterOption) {
+	return expandedOptionIds.value.includes(filter.id)
+}
+
+function toggleExpand(filter: FilterOption) {
+	if (isExpanded(filter)) {
+		expandedOptionIds.value = expandedOptionIds.value.filter((id) => id !== filter.id)
+	} else {
+		expandedOptionIds.value = [...expandedOptionIds.value, filter.id]
+	}
+}
+
 function isVisible(filter: FilterOption) {
 	const filterKey = filter.formatted_name?.toLowerCase() ?? filter.id.toLowerCase()
 	const matchesQuery = !query.value || filterKey.includes(query.value.toLowerCase())
@@ -339,7 +440,22 @@ function toggleNegativeFilter(filter: FilterOption) {
 }
 
 function setFilter(filter: FilterOption, state: FilterState) {
-	const newFilters = selectedFilters.value.filter((selected) => selected.option !== filter.id)
+	let newFilters = selectedFilters.value.filter((selected) => selected.option !== filter.id)
+
+	if (state !== 'ignore') {
+		const subOptionIds = new Set(filter.sub_options?.map((subOption) => subOption.id) ?? [])
+		if (subOptionIds.size > 0) {
+			newFilters = newFilters.filter((selected) => !subOptionIds.has(selected.option))
+		}
+
+		const parent = findParentFilterOption(props.filterType.options, filter.id)
+		if (parent) {
+			newFilters = newFilters.filter((selected) => selected.option !== parent.id)
+			if (!expandedOptionIds.value.includes(parent.id)) {
+				expandedOptionIds.value = [...expandedOptionIds.value, parent.id]
+			}
+		}
+	}
 
 	const baseValues = {
 		type: props.filterType.id,
@@ -366,6 +482,18 @@ function clearFilters() {
 		(filter) => filter.type !== props.filterType.id,
 	)
 }
+
+watch(
+	selectedFilters,
+	() => {
+		for (const option of props.filterType.options) {
+			if (hasSelectedSubOption(option) && !expandedOptionIds.value.includes(option.id)) {
+				expandedOptionIds.value = [...expandedOptionIds.value, option.id]
+			}
+		}
+	},
+	{ deep: true, immediate: true },
+)
 
 const messages = defineMessages({
 	searchPlaceholder: {

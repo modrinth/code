@@ -1,9 +1,9 @@
+use crate::util::error::ApiContext as _;
 use std::collections::HashMap;
 
 use super::ApiError;
 use crate::database::PgPool;
 use crate::database::models::loader_fields::LoaderFieldEnumValue;
-use crate::database::redis::RedisPool;
 use crate::models::v2::projects::LegacySideType;
 use crate::routes::v2_reroute::capitalize_first;
 use crate::routes::v3::tags::{LinkPlatformQueryData, LoaderFieldsEnumQuery};
@@ -11,10 +11,11 @@ use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/tag")
+        web::scope("/tag")
             .service(category_list)
             .service(loader_list)
             .service(game_version_list)
@@ -35,8 +36,10 @@ pub struct CategoryData {
     pub header: String,
 }
 
-/// Get the list of project categories.
+/// List project categories.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "categoryList",
     responses(
@@ -52,7 +55,9 @@ pub async fn category_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::tags::category_list(pool, redis).await?;
+    let response = v3::tags::category_list(pool, redis)
+        .await
+        .wrap_api_err("executing `tags::category_list`")?;
 
     // Convert to V2 format
     match v2_reroute::extract_ok_json::<Vec<v3::tags::CategoryData>>(response)
@@ -81,8 +86,10 @@ pub struct LoaderData {
     pub supported_project_types: Vec<String>,
 }
 
-/// Get the list of loaders.
+/// List loaders.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "loaderList",
     responses(
@@ -98,7 +105,9 @@ pub async fn loader_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::tags::loader_list(pool, redis).await?;
+    let response = v3::tags::loader_list(pool, redis)
+        .await
+        .wrap_api_err("executing `tags::loader_list`")?;
 
     // Convert to V2 format
     match v2_reroute::extract_ok_json::<Vec<v3::tags::LoaderData>>(response)
@@ -155,21 +164,15 @@ pub struct GameVersionQuery {
     major: Option<bool>,
 }
 
-/// Get the list of game versions.
+/// List game versions.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "versionList",
     params(
-        (
-            "type" = Option<String>,
-            Query,
-            description = "Optional game version type filter"
-        ),
-        (
-            "major" = Option<bool>,
-            Query,
-            description = "Whether to return only major versions"
-        )
+        ("type" = Option<String>, Query, description = "Optional game version type filter"),
+        ("major" = Option<bool>, Query, description = "Whether to return only major versions")
     ),
     responses(
         (
@@ -200,7 +203,8 @@ pub async fn game_version_list(
         }),
         redis,
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching game versions")?;
 
     // Convert to V2 format
     Ok(
@@ -212,18 +216,9 @@ pub async fn game_version_list(
                     .into_iter()
                     .map(|f| GameVersionQueryData {
                         version: f.value,
-                        version_type: f
-                            .metadata
-                            .get("type")
-                            .and_then(|m| m.as_str())
-                            .unwrap_or_default()
-                            .to_string(),
+                        version_type: f.ty.unwrap_or_default(),
                         date: f.created,
-                        major: f
-                            .metadata
-                            .get("major")
-                            .and_then(|m| m.as_bool())
-                            .unwrap_or_default(),
+                        major: f.major.unwrap_or_default(),
                     })
                     .collect::<Vec<_>>();
                 HttpResponse::Ok().json(fields)
@@ -239,8 +234,10 @@ pub struct License {
     pub name: String,
 }
 
-/// Get SPDX license identifiers and names.
+/// List SPDX license identifiers and names.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "licenseList",
     responses(
@@ -278,11 +275,15 @@ pub struct LicenseText {
     pub body: String,
 }
 
-/// Get full license text by SPDX ID.
+/// Get full license text by SPDX ID.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "licenseText",
-    params(("id" = String, Path, description = "The license ID to get the text for")),
+    params(
+        ("id" = String, Path, description = "The license ID to get the text for")
+    ),
     responses(
         (
             status = 200,
@@ -298,7 +299,8 @@ pub async fn license_text(
 ) -> Result<HttpResponse, ApiError> {
     let license = v3::tags::license_text(params)
         .await
-        .or_else(v2_reroute::flatten_404_error)?;
+        .or_else(v2_reroute::flatten_404_error)
+        .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert to V2 format
     Ok(
@@ -325,8 +327,10 @@ pub struct DonationPlatformQueryData {
     pub name: String,
 }
 
-/// Get available donation platforms.
+/// List donation platforms.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "donationPlatformList",
     responses(
@@ -342,7 +346,9 @@ pub async fn donation_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::tags::link_platform_list(pool, redis).await?;
+    let response = v3::tags::link_platform_list(pool, redis)
+        .await
+        .wrap_api_err("executing `tags::link_platform_list`")?;
 
     // Convert to V2 format
     Ok(
@@ -383,8 +389,10 @@ pub async fn donation_platform_list(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get valid report types.
+/// List valid report types.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "reportTypeList",
     responses(
@@ -406,8 +414,10 @@ pub async fn report_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get valid project types.
+/// List valid project types.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "projectTypeList",
     responses(
@@ -429,8 +439,10 @@ pub async fn project_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get valid side-type values.
+/// List valid side-type values.  
 #[utoipa::path(
+	context_path = "/tag",
+	tag = "tags",
     get,
     operation_id = "sideTypeList",
     responses(

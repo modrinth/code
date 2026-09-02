@@ -4,7 +4,7 @@
 			<label class="label" for="insert-link-label">
 				<span class="label__title">{{ formatMessage(messages.linkModalLabelFieldTitle) }}</span>
 			</label>
-			<StyledInput
+			<Input
 				id="insert-link-label"
 				v-model="linkText"
 				:icon="AlignLeftIcon"
@@ -18,7 +18,7 @@
 					{{ formatMessage(messages.urlLabel) }}<span class="required">*</span>
 				</span>
 			</label>
-			<StyledInput
+			<Input
 				id="insert-link-url"
 				v-model="linkUrl"
 				:icon="LinkIcon"
@@ -46,24 +46,22 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => linkModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="!!linkValidationErrorMessage || !linkUrl"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
-								linkModal?.hide()
-							}
-						"
-					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="() => linkModal?.hide()">
+					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
+							linkModal?.hide()
+						}
+					"
+				>
+					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -78,7 +76,7 @@
 					{{ formatMessage(messages.imageModalDescriptionFieldDescription) }}
 				</span>
 			</label>
-			<StyledInput
+			<Input
 				id="insert-image-alt"
 				v-model="linkText"
 				:icon="AlignLeftIcon"
@@ -115,7 +113,7 @@
 					<UploadIcon />
 				</FileInput>
 			</div>
-			<StyledInput
+			<Input
 				v-if="!props.onImageUpload || imageUploadOption === 'link'"
 				id="insert-link-url"
 				v-model="linkUrl"
@@ -144,24 +142,22 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => imageModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="!canInsertImage"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
-								imageModal?.hide()
-							}
-						"
-					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="() => imageModal?.hide()">
+					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!canInsertImage"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
+							imageModal?.hide()
+						}
+					"
+				>
+					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -175,7 +171,7 @@
 					{{ formatMessage(messages.videoModalUrlFieldDescription) }}
 				</span>
 			</label>
-			<StyledInput
+			<Input
 				id="insert-video-url"
 				v-model="linkUrl"
 				:icon="YouTubeIcon"
@@ -204,24 +200,22 @@
 				/>
 			</div>
 			<div class="flex gap-2 justify-end mt-4">
-				<ButtonStyled type="outlined">
-					<button @click="() => videoModal?.hide()">
-						<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="!!linkValidationErrorMessage || !linkUrl"
-						@click="
-							() => {
-								if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
-								videoModal?.hide()
-							}
-						"
-					>
-						<PlusIcon /> {{ formatMessage(messages.insertButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="() => videoModal?.hide()">
+					<XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!!linkValidationErrorMessage || !linkUrl"
+					@click="
+						() => {
+							if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
+							videoModal?.hide()
+						}
+					"
+				>
+					<PlusIcon /> {{ formatMessage(messages.insertButton) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -235,29 +229,30 @@
 					>
 						<div class="divider"></div>
 						<template v-for="button in buttonGroup.buttons" :key="button.label.id">
-							<ButtonStyled circular>
-								<button
-									v-tooltip="formatMessage(button.label)"
-									:aria-label="formatMessage(button.label)"
-									:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
-									:disabled="previewMode || disabled"
-									@click="() => button.action(editor)"
-								>
-									<component :is="button.icon" />
-								</button>
-							</ButtonStyled>
+							<IconButton
+								v-tooltip="formatMessage(button.label)"
+								:label="formatMessage(button.label)"
+								size="sm"
+								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
+								:disabled="previewMode || disabled"
+								@click="() => button.action(editor)"
+							>
+								<component :is="button.icon" />
+							</IconButton>
 						</template>
 					</template>
 				</div>
 				<div class="flex items-center gap-2">
-					<Toggle id="preview" v-model="previewMode" small />
-					<label class="label" for="preview">
+					<Toggle :id="previewId" v-model="previewMode" small />
+					<label class="label" :for="previewId">
 						{{ formatMessage(messages.editorPreviewToggleLabel) }}
 					</label>
 				</div>
 			</div>
 		</div>
-		<div ref="editorRef" :class="{ hide: previewMode }" />
+		<InputFrame :class="{ hide: previewMode }" :disabled="disabled" multiline>
+			<div ref="editorRef" class="min-w-0 w-full flex-1 self-stretch" />
+		</InputFrame>
 		<div v-if="!previewMode" class="info-blurb mt-2">
 			<div class="info-blurb">
 				<InfoIcon />
@@ -331,16 +326,18 @@ import {
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs'
-import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
+import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, useId, watch } from 'vue'
+
+import { Button, IconButton } from '#ui/components/base/buttons'
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages.ts'
 import NewModal from '../modal/NewModal.vue'
-import ButtonStyled from './ButtonStyled.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
+import Input from './inputs/Input.vue'
+import InputFrame from './inputs/InputFrame.vue'
 import IntlFormatted from './IntlFormatted.vue'
-import StyledInput from './StyledInput.vue'
 import Toggle from './Toggle.vue'
 
 const { formatMessage } = useVIntl()
@@ -573,10 +570,36 @@ let editor: EditorView | null = null
 let isDisabledCompartment: Compartment | null = null
 let editorThemeCompartment: Compartment | null = null
 
+const previewId = useId()
+
 const emit = defineEmits(['update:modelValue'])
 const resolvedPlaceholder = computed(
 	() => props.placeholder ?? formatMessage(messages.editorPlaceholder),
 )
+
+function createEditorTheme(disabled = props.disabled) {
+	return EditorView.theme({
+		'&': {
+			background: 'transparent',
+			width: '100%',
+		},
+		'&.cm-focused': {
+			outline: 'none',
+		},
+		'.cm-content': {
+			minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
+			padding: '0',
+			caretColor: 'var(--color-contrast)',
+			width: '100%',
+			pointerEvents: disabled ? 'none' : 'auto',
+		},
+		'.cm-scroller': {
+			height: '100%',
+			maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+			overflow: 'auto',
+		},
+	})
+}
 
 onMounted(() => {
 	const updateListener = EditorView.updateListener.of((update) => {
@@ -587,36 +610,7 @@ onMounted(() => {
 
 	editorThemeCompartment = new Compartment()
 
-	const theme = EditorView.theme({
-		// in defaults.scss there's references to .cm-content and such to inherit global styles
-		'&': {
-			borderRadius: 'var(--radius-md)',
-			background: 'var(--color-button-bg)',
-			border: '0.25rem solid transparent',
-			transition: 'border-color 0.1s ease-in-out',
-		},
-		'&.cm-focused': {
-			'box-shadow': 'inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow)',
-			color: 'var(--color-contrast)',
-			outline: 'none',
-		},
-		'.cm-focused': {
-			border: 'none',
-		},
-		'.cm-content': {
-			minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
-			marginBlockEnd: '0.5rem',
-			padding: '0.5rem',
-			caretColor: 'var(--color-contrast)',
-			width: '100%',
-		},
-		'.cm-scroller': {
-			borderRadius: 'var(--radius-md)',
-			height: '100%',
-			maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-			overflow: 'auto',
-		},
-	})
+	const theme = createEditorTheme()
 
 	isDisabledCompartment = new Compartment()
 
@@ -842,43 +836,7 @@ watch(
 
 			if (editorThemeCompartment) {
 				editor.dispatch({
-					effects: [
-						editorThemeCompartment.reconfigure(
-							EditorView.theme({
-								// in defaults.scss there's references to .cm-content and such to inherit global styles
-								'&': {
-									borderRadius: 'var(--radius-md)',
-									background: 'var(--color-button-bg)',
-									border: '0.25rem solid transparent',
-									transition: 'border-color 0.1s ease-in-out',
-								},
-								'&.cm-focused': {
-									'box-shadow': 'inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow)',
-									color: 'var(--color-contrast)',
-									outline: 'none',
-								},
-								'.cm-focused': {
-									border: 'none',
-								},
-								'.cm-content': {
-									minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
-									marginBlockEnd: '0.5rem',
-									padding: '0.5rem',
-									caretColor: 'var(--color-contrast)',
-									width: '100%',
-									opacity: newValue ? 0.6 : 1,
-									pointerEvents: newValue ? 'none' : 'all',
-									cursor: newValue ? 'not-allowed' : 'auto',
-								},
-								'.cm-scroller': {
-									borderRadius: 'var(--radius-md)',
-									height: '100%',
-									maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-									overflow: 'auto',
-								},
-							}),
-						),
-					],
+					effects: [editorThemeCompartment.reconfigure(createEditorTheme(newValue))],
 				})
 			}
 		}

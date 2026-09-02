@@ -10,12 +10,13 @@
 	"globalEnv": [
 		"MODRINTH_URL",
 		"MODRINTH_API_BASE_URL",
+		"SHARED_INSTANCES_API_BASE_URL",
 		"MODRINTH_ARCHON_BASE_URL",
 		"VITE_STRIPE_PUBLISHABLE_KEY"
 	],
 	"tasks": {
 		"build": {
-			"dependsOn": ["^build"],
+			"dependsOn": ["//#i18n:coverage", "^build"],
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
 			"outputs": [".nuxt/**", "dist/**", ".output/**", "$TURBO_ROOT$/target/**"],
 			"env": [
@@ -72,6 +73,25 @@
 			]
 		},
 		"lint:ancillary": {},
+		"//#i18n:coverage": {
+			"inputs": [
+				"package.json",
+				"scripts/run.mjs",
+				"scripts/coverage-i18n.ts",
+				"scripts/i18n-icu-contract.ts",
+				"apps/app-frontend/src/**/*.vue",
+				"apps/app-frontend/src/locales/**/*.json",
+				"apps/frontend/src/**/*.vue",
+				"apps/frontend/src/locales/**/*.json",
+				"packages/moderation/src/**/*.vue",
+				"packages/moderation/src/locales/**/*.json",
+				"packages/ui/src/**/*.vue",
+				"packages/ui/src/locales/**/*.json"
+			],
+			"outputs": [
+				"packages/ui/src/layouts/wrapped/settings/language-settings/language-settings-coverage.generated.ts"
+			]
+		},
 		"dev": {
 			"cache": false,
 			"persistent": true,
@@ -83,6 +103,7 @@
 			"env": [
 				"SQLX_OFFLINE",
 				"DATABASE_URL",
+				"REDIS_*",
 				"CARGO_*",
 				"RUST_*",
 				"RUSTFLAGS",

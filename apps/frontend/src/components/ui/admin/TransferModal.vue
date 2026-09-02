@@ -25,10 +25,9 @@
 					</span>
 					<span>Server IDs (one per line or comma-separated.)</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="server-ids"
 					v-model="serverIdsInput"
-					multiline
 					:rows="4"
 					input-class="bg-surface-3"
 					placeholder="123e4569-e89b-12d3-a456-426614174005&#10;123e9569-e89b-12d3-a456-413678919876"
@@ -48,7 +47,7 @@
 						<span>Add nodes to transfer (comma or space-separated).</span>
 					</label>
 					<div class="flex items-center gap-2">
-						<StyledInput
+						<Input
 							id="node-input"
 							v-model="nodeInput"
 							wrapper-class="w-64"
@@ -56,12 +55,15 @@
 							placeholder="us-vin200, us-vin201"
 							@keydown.enter.prevent="addNodes"
 						/>
-						<ButtonStyled color="blue" color-fill="text">
-							<button class="shrink-0" @click="addNodes">
-								<PlusIcon />
-								Add
-							</button>
-						</ButtonStyled>
+						<Button
+							type="quiet"
+							color="blue"
+							class="shrink-0 !text-blue [&>svg]:!text-blue"
+							@click="addNodes"
+						>
+							<PlusIcon />
+							Add
+						</Button>
 					</div>
 					<div v-if="selectedNodes.length" class="mt-1 flex flex-wrap gap-2">
 						<TagItem v-for="h in selectedNodes" :key="`node-${h}`" :action="() => removeNode(h)">
@@ -86,7 +88,7 @@
 						<span class="text-lg font-semibold text-contrast">Tag transferred nodes</span>
 						<span>Optional tag to add to the transferred nodes.</span>
 					</label>
-					<StyledInput
+					<Input
 						id="tag-nodes"
 						v-model="tagNodes"
 						wrapper-class="max-w-[12rem]"
@@ -114,7 +116,7 @@
 					<span>Optional preferred node tags for node selection.</span>
 				</label>
 				<div class="flex items-center gap-2">
-					<StyledInput
+					<Input
 						id="tag-input"
 						v-model="tagInput"
 						wrapper-class="w-40"
@@ -122,12 +124,15 @@
 						placeholder="ovh-gen4"
 						@keydown.enter.prevent="addTag"
 					/>
-					<ButtonStyled color="blue" color-fill="text">
-						<button class="shrink-0" @click="addTag">
-							<PlusIcon />
-							Add
-						</button>
-					</ButtonStyled>
+					<Button
+						type="quiet"
+						color="blue"
+						class="shrink-0 !text-blue [&>svg]:!text-blue"
+						@click="addTag"
+					>
+						<PlusIcon />
+						Add
+					</Button>
 				</div>
 				<div v-if="selectedTags.length" class="mt-1 flex flex-wrap gap-2">
 					<TagItem v-for="t in selectedTags" :key="`tag-${t}`" :action="() => removeTag(t)">
@@ -147,7 +152,7 @@
 					:format-label="(item) => scheduleOptionLabels[item]"
 					:capitalize="false"
 				/>
-				<StyledInput
+				<DateInput
 					v-if="scheduleOption === 'later'"
 					v-model="scheduledDate"
 					type="datetime-local"
@@ -164,10 +169,9 @@
 					</span>
 					<span>Provide a reason for this transfer batch.</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="reason"
 					v-model="reason"
-					multiline
 					:rows="2"
 					input-class="bg-surface-3"
 					placeholder="Node maintenance scheduled"
@@ -175,18 +179,19 @@
 			</div>
 
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="submitDisabled || submitting" @click="submit">
-						<SendIcon aria-hidden="true" />
-						{{ submitting ? 'Scheduling...' : 'Schedule transfer' }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="modal?.hide?.()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="submitDisabled || submitting"
+					@click="submit"
+				>
+					<SendIcon aria-hidden="true" />
+					{{ submitting ? 'Scheduling...' : 'Schedule transfer' }}
+				</Button>
+				<Button @click="modal?.hide?.()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -195,14 +200,16 @@
 <script setup lang="ts">
 import { PlusIcon, SendIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	Chips,
 	Combobox,
+	DateInput,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
 	TagItem,
+	Textarea,
 	Toggle,
 } from '@modrinth/ui'
 import dayjs from 'dayjs'

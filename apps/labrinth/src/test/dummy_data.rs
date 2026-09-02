@@ -21,7 +21,7 @@ use super::{
 
 use super::{database::USER_USER_ID, get_json_val_str};
 
-pub const DUMMY_DATA_UPDATE: i64 = 7;
+pub const DUMMY_DATA_UPDATE: i64 = 8;
 
 pub const DUMMY_CATEGORIES: &[&str] = &[
     "combat",
@@ -296,11 +296,12 @@ pub async fn add_dummy_data(api: &ApiV3, db: TemporaryDatabase) -> DummyData {
 
     let oauth_client_alpha = get_oauth_client_alpha(api).await;
 
-    sqlx::query("INSERT INTO dummy_data (update_id) VALUES ($1)")
-        .bind(DUMMY_DATA_UPDATE)
-        .execute(pool)
-        .await
-        .unwrap();
+    sqlx::raw_sql(&format!(
+        "INSERT INTO dummy_data (update_id) VALUES ({DUMMY_DATA_UPDATE})"
+    ))
+    .execute(pool)
+    .await
+    .unwrap();
 
     DummyData::new(
         alpha_project,

@@ -4,21 +4,22 @@ use std::hash::Hasher;
 use super::DatabaseError;
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-const GAMES_LIST_NAMESPACE: &str = "games";
-const LOADER_ID: &str = "loader_id";
-const LOADERS_LIST_NAMESPACE: &str = "loaders";
-const LOADER_FIELDS_NAMESPACE: &str = "loader_fields";
-const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all";
-const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums";
-pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str = "loader_field_enum_values";
+const GAMES_LIST_NAMESPACE: &str = "games:v4";
+const LOADER_ID: &str = "loader_id:v4";
+const LOADERS_LIST_NAMESPACE: &str = "loaders:v4";
+const LOADER_FIELDS_NAMESPACE: &str = "loader_fields:v4";
+const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all:v4";
+const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums:v4";
+pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str =
+    "loader_field_enum_values:v4";
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Game {
@@ -53,9 +54,9 @@ impl Game {
     {
         {
             let mut redis = redis.connect().await?;
-            let cached_games: Option<Vec<Game>> = redis
-                .get_deserialized_from_json(GAMES_LIST_NAMESPACE, "games")
-                .await?;
+            let key = redis.key().metadata(GAMES_LIST_NAMESPACE, "games");
+            let cached_games: Option<Vec<Game>> =
+                redis.get_deserialized(&key).await?;
             if let Some(cached_games) = cached_games {
                 return Ok(cached_games);
             }
@@ -78,18 +79,17 @@ impl Game {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(GAMES_LIST_NAMESPACE, "games");
 
-        redis
-            .set_serialized_to_json(
-                GAMES_LIST_NAMESPACE,
-                "games",
-                &result,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct LoaderMetadata {
+    pub platform: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -99,7 +99,7 @@ pub struct Loader {
     pub icon: String,
     pub supported_project_types: Vec<String>,
     pub supported_games: Vec<String>, // slugs
-    pub metadata: serde_json::Value,
+    pub metadata: LoaderMetadata,
 }
 
 impl Loader {
@@ -113,8 +113,8 @@ impl Loader {
     {
         {
             let mut redis = redis.connect().await?;
-            let cached_id: Option<i32> =
-                redis.get_deserialized_from_json(LOADER_ID, name).await?;
+            let key = redis.key().metadata(LOADER_ID, name);
+            let cached_id: Option<i32> = redis.get_deserialized(&key).await?;
             if let Some(cached_id) = cached_id {
                 return Ok(Some(LoaderId(cached_id)));
             }
@@ -133,9 +133,8 @@ impl Loader {
 
         if let Some(result) = result {
             let mut redis = redis.connect().await?;
-            redis
-                .set_serialized_to_json(LOADER_ID, name, &result.0, None)
-                .await?;
+            let key = redis.key().metadata(LOADER_ID, name);
+            redis.set_serialized(&key, &result.0, None).await?;
         }
 
         Ok(result)
@@ -150,9 +149,9 @@ impl Loader {
     {
         {
             let mut redis = redis.connect().await?;
-            let cached_loaders: Option<Vec<Loader>> = redis
-                .get_deserialized_from_json(LOADERS_LIST_NAMESPACE, "all")
-                .await?;
+            let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
+            let cached_loaders: Option<Vec<Loader>> =
+                redis.get_deserialized(&key).await?;
             if let Some(cached_loaders) = cached_loaders {
                 return Ok(cached_loaders);
             }
@@ -160,7 +159,8 @@ impl Loader {
 
         let result = sqlx::query!(
             "
-            SELECT l.id id, l.loader loader, l.icon icon, l.metadata metadata,
+            SELECT l.id id, l.loader loader, l.icon icon,
+            (l.metadata->>'platform')::boolean AS platform,
             ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
             ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
             FROM loaders l
@@ -185,21 +185,17 @@ impl Loader {
             supported_games: x
                 .games
                 .unwrap_or_default(),
-            metadata: x.metadata
+            metadata: LoaderMetadata {
+                platform: x.platform,
+            },
         })
         .try_collect::<Vec<_>>()
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
 
-        redis
-            .set_serialized_to_json(
-                LOADERS_LIST_NAMESPACE,
-                "all",
-                &result,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -289,8 +285,9 @@ pub struct LoaderFieldEnumValue {
     pub value: String,
     pub ordering: Option<i32>,
     pub created: DateTime<Utc>,
-    #[serde(flatten)]
-    pub metadata: serde_json::Value,
+    #[serde(rename = "type")]
+    pub ty: Option<String>,
+    pub major: Option<bool>,
 }
 
 impl std::hash::Hash for LoaderFieldEnumValue {
@@ -369,7 +366,8 @@ pub struct QueryLoaderFieldEnumValue {
     pub value: String,
     pub ordering: Option<i32>,
     pub created: DateTime<Utc>,
-    pub metadata: Option<serde_json::Value>,
+    pub ty: Option<String>,
+    pub major: Option<bool>,
 }
 
 impl LoaderField {
@@ -450,7 +448,7 @@ impl LoaderField {
                     })
                     .await?;
 
-                Ok(result)
+                Ok::<_, DatabaseError>(result)
             },
         ).await?;
 
@@ -469,11 +467,10 @@ impl LoaderField {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().metadata(LOADER_FIELDS_NAMESPACE_ALL, "");
 
             let cached_fields: Option<Vec<LoaderField>> =
-                redis.get(LOADER_FIELDS_NAMESPACE_ALL, "").await?.and_then(
-                    |x| serde_json::from_str::<Vec<LoaderField>>(&x).ok(),
-                );
+                redis.get_deserialized(&key).await?;
 
             if let Some(cached_fields) = cached_fields {
                 return Ok(cached_fields);
@@ -504,15 +501,9 @@ impl LoaderField {
             .collect();
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().metadata(LOADER_FIELDS_NAMESPACE_ALL, "");
 
-        redis
-            .set_serialized_to_json(
-                LOADER_FIELDS_NAMESPACE_ALL,
-                "",
-                &result,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -528,13 +519,11 @@ impl LoaderFieldEnum {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis
+                .key()
+                .metadata(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name);
 
-            let cached_enum = redis
-                .get_deserialized_from_json(
-                    LOADER_FIELD_ENUMS_ID_NAMESPACE,
-                    enum_name,
-                )
-                .await?;
+            let cached_enum = redis.get_deserialized(&key).await?;
             if let Some(cached_enum) = cached_enum {
                 return Ok(cached_enum);
             }
@@ -559,15 +548,11 @@ impl LoaderFieldEnum {
         });
 
         let mut redis = redis.connect().await?;
+        let key = redis
+            .key()
+            .metadata(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name);
 
-        redis
-            .set_serialized_to_json(
-                LOADER_FIELD_ENUMS_ID_NAMESPACE,
-                enum_name,
-                &result,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &result, None).await?;
 
         Ok(result)
     }
@@ -637,42 +622,50 @@ impl LoaderFieldEnumValue {
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
-        let val = redis.get_cached_keys_raw(
-            LOADER_FIELD_ENUM_VALUES_NAMESPACE,
-            &loader_field_enum_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
-            |loader_field_enum_ids| async move {
-                let values = sqlx::query!(
-                    "
-                    SELECT id, enum_id, value, ordering, metadata, created FROM loader_field_enum_values
+        let val = redis
+            .get_cached_keys_raw(
+                LOADER_FIELD_ENUM_VALUES_NAMESPACE,
+                &loader_field_enum_ids
+                    .iter()
+                    .map(|x| x.0)
+                    .collect::<Vec<_>>(),
+                |loader_field_enum_ids| async move {
+                    let values = sqlx::query!(
+                        r#"
+                    SELECT id, enum_id, value, ordering,
+                    metadata->>'type' AS "ty?",
+                    (metadata->>'major')::boolean AS "major?",
+                    created FROM loader_field_enum_values
                     WHERE enum_id = ANY($1)
                     ORDER BY enum_id, ordering, created DESC
-                    ",
-                    &loader_field_enum_ids
-                )
+                    "#,
+                        &loader_field_enum_ids
+                    )
                     .fetch(exec)
-                    .try_fold(DashMap::new(), |acc: DashMap<i32, Vec<LoaderFieldEnumValue>>, c| {
-                        let value = LoaderFieldEnumValue {
-                            id: LoaderFieldEnumValueId(c.id),
-                            enum_id: LoaderFieldEnumId(c.enum_id),
-                            value: c.value,
-                            ordering: c.ordering,
-                            created: c.created,
-                            metadata: c.metadata.unwrap_or_default(),
-                        };
+                    .try_fold(
+                        DashMap::new(),
+                        |acc: DashMap<i32, Vec<LoaderFieldEnumValue>>, c| {
+                            let value = LoaderFieldEnumValue {
+                                id: LoaderFieldEnumValueId(c.id),
+                                enum_id: LoaderFieldEnumId(c.enum_id),
+                                value: c.value,
+                                ordering: c.ordering,
+                                created: c.created,
+                                ty: c.ty,
+                                major: c.major,
+                            };
 
-                        acc.entry(c.enum_id)
-                            .or_default()
-                            .push(value);
+                            acc.entry(c.enum_id).or_default().push(value);
 
-                        async move {
-                            Ok(acc)
-                        }
-                    })
+                            async move { Ok(acc) }
+                        },
+                    )
                     .await?;
 
-                Ok(values)
-            },
-        ).await?;
+                    Ok::<_, DatabaseError>(values)
+                },
+            )
+            .await?;
 
         Ok(val
             .into_iter()
@@ -694,15 +687,16 @@ impl LoaderFieldEnumValue {
             .await?
             .into_iter()
             .filter(|x| {
-                let mut bool = true;
-                for (key, value) in &filter {
-                    if let Some(metadata_value) = x.metadata.get(key) {
-                        bool &= metadata_value == value;
-                    } else {
-                        bool = false;
+                filter.iter().all(|(key, value)| match key.as_str() {
+                    "type" => {
+                        x.ty.as_deref()
+                            .is_some_and(|type_| value.as_str() == Some(type_))
                     }
-                }
-                bool
+                    "major" => x
+                        .major
+                        .is_some_and(|major| value.as_bool() == Some(major)),
+                    _ => false,
+                })
             })
             .collect();
 
@@ -1195,10 +1189,8 @@ impl VersionFieldValue {
                                     value: lfev.value.clone(),
                                     ordering: lfev.ordering,
                                     created: lfev.created,
-                                    metadata: lfev
-                                        .metadata
-                                        .clone()
-                                        .unwrap_or_default(),
+                                    ty: lfev.ty.clone(),
+                                    major: lfev.major,
                                 }
                             }),
                         ))
@@ -1274,10 +1266,8 @@ impl VersionFieldValue {
                                 value: lfev.value.clone(),
                                 ordering: lfev.ordering,
                                 created: lfev.created,
-                                metadata: lfev
-                                    .metadata
-                                    .clone()
-                                    .unwrap_or_default(),
+                                ty: lfev.ty.clone(),
+                                major: lfev.major,
                             })
                         })
                         .collect::<Result<_, _>>()?,

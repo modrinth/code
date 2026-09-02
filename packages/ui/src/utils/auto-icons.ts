@@ -5,6 +5,7 @@ import {
 	CalendarIcon,
 	CardIcon,
 	CheckCircleIcon,
+	CircleAlertIcon,
 	CurrencyIcon,
 	DiscordIcon,
 	FileArchiveIcon,
@@ -72,6 +73,7 @@ export const SEVERITY_ICONS: Record<string, Component> = {
 	critical: XCircleIcon,
 	success: CheckCircleIcon,
 	moderation: ScaleIcon,
+	'circle-warning': CircleAlertIcon,
 }
 
 export const PROJECT_STATUS_ICONS: Record<ProjectStatus, Component> = {
@@ -85,6 +87,22 @@ export const PROJECT_STATUS_ICONS: Record<ProjectStatus, Component> = {
 	rejected: XIcon,
 	processing: UpdatedIcon,
 	unknown: UnknownIcon,
+}
+
+// this should probably be abstracted or something idk
+export type BadgeColor = 'red' | 'orange' | 'green' | 'blue' | 'purple' | 'gray'
+
+export const PROJECT_STATUS_COLORS: Record<ProjectStatus, BadgeColor> = {
+	approved: 'blue',
+	unlisted: 'purple',
+	withheld: 'red',
+	private: 'gray',
+	scheduled: 'orange',
+	draft: 'gray',
+	archived: 'gray',
+	rejected: 'red',
+	processing: 'orange',
+	unknown: 'gray',
 }
 
 export const DIRECTORY_ICONS: Record<string, Component> = {
@@ -120,6 +138,10 @@ export function getSeverityIcon(severity: string): Component {
 
 export function getProjectStatusIcon(status: ProjectStatus): Component {
 	return PROJECT_STATUS_ICONS[status] ?? UnknownIcon
+}
+
+export function getProjectStatusColor(status: ProjectStatus): BadgeColor {
+	return PROJECT_STATUS_COLORS[status] ?? `gray`
 }
 
 export function getDirectoryIcon(name: string): Component {

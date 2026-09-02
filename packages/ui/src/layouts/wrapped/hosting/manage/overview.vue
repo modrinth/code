@@ -1,13 +1,24 @@
 <template>
-	<div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
-		<div class="flex flex-col gap-4">
+	<div
+		class="relative flex select-none flex-col gap-6"
+		:class="containedConsole ? 'h-full min-h-0 overflow-hidden' : ''"
+		data-pyro-server-manager-root
+	>
+		<div
+			class="flex flex-col gap-4"
+			:class="containedConsole ? 'min-h-0 flex-1 overflow-hidden' : ''"
+		>
 			<ServerManageStats
+				class="shrink-0"
 				:data="!isWsAuthIncorrect ? stats : undefined"
 				:loading="isWsAuthIncorrect"
 			/>
 
-			<div class="flex min-h-[700px] flex-col gap-2">
-				<span class="text-2xl font-semibold text-contrast">Console</span>
+			<div
+				class="flex flex-col gap-2"
+				:class="containedConsole ? 'min-h-0 flex-1 overflow-hidden' : 'min-h-[700px]'"
+			>
+				<span class="shrink-0 text-2xl font-semibold text-contrast">Console</span>
 
 				<ConsolePageLayout />
 			</div>
@@ -48,9 +59,11 @@ import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers
 const props = withDefaults(
 	defineProps<{
 		showAdvancedDebugInfo?: boolean
+		containedConsole?: boolean
 	}>(),
 	{
 		showAdvancedDebugInfo: false,
+		containedConsole: false,
 	},
 )
 

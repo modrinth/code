@@ -12,9 +12,11 @@
 				:placeholder="formatMessage(analyticsMessages.selectProjects)"
 				:no-options-message="noProjectsMessage"
 				:searchable="projectOptions.length > 6"
+				fuzzy-search
 				:max-tag-rows="1"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
+				trigger-type="base"
 				checkbox-position="right"
 				show-selection-actions
 				@open="handleProjectSelectOpen"
@@ -31,7 +33,7 @@
 							decoding="async"
 						/>
 						<LayersIcon v-else class="size-5 shrink-0 text-primary" />
-						<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary">
+						<span class="min-w-0 flex-1 truncate px-0.5 font-semibold text-inherit">
 							{{ selectedProjectLabel }}
 						</span>
 						<ChevronLeftIcon
@@ -79,7 +81,7 @@
 							@keydown.enter.stop
 							@keydown.space.stop
 						>
-							<LayersIcon
+							<UserIcon
 								class="h-5 w-5 shrink-0 text-primary"
 								:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 							/>
@@ -144,6 +146,7 @@
 				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 				:display-value="selectedGroupByLabel"
 				:trigger-class="analyticsQueryChipTriggerClass"
+				trigger-type="base"
 			>
 				<template #prefix>
 					<ClockIcon class="size-5 shrink-0 text-primary" />
@@ -159,6 +162,7 @@
 				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
+				trigger-type="base"
 				checkbox-position="right"
 				:placeholder="formatMessage(analyticsMessages.none)"
 				show-selection-actions
@@ -169,7 +173,7 @@
 					<div class="flex min-h-7 min-w-0 max-w-full flex-1 items-center gap-1.5 pr-1">
 						<BlocksIcon class="size-5 shrink-0 text-primary" />
 						<span
-							class="min-w-0 flex-1 truncate px-0.5 font-semibold text-primary"
+							class="min-w-0 flex-1 truncate px-0.5 font-semibold text-inherit"
 							:title="mobileSelectedBreakdownLabel"
 						>
 							{{ mobileSelectedBreakdownLabel }}
@@ -190,6 +194,7 @@
 				show-preview-filter-icon
 				:show-clear-action="false"
 				:add-button-class="analyticsQueryAddFilterButtonClass"
+				add-button-size="lg"
 			/>
 		</div>
 
@@ -211,7 +216,9 @@
 						:placeholder="formatMessage(analyticsMessages.selectProjects)"
 						:no-options-message="noProjectsMessage"
 						:searchable="projectOptions.length > 6"
+						fuzzy-search
 						:max-tag-rows="1"
+						trigger-type="base"
 						checkbox-position="right"
 						show-selection-actions
 						@open="handleProjectSelectOpen"
@@ -241,7 +248,7 @@
 										class="size-5 shrink-0 text-primary"
 									/>
 									<BoxIcon v-else class="size-5 shrink-0 text-primary" />
-									<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-primary">
+									<span class="min-w-0 flex-1 truncate px-1.5 font-semibold text-inherit">
 										{{ selectedProjectLabel }}
 									</span>
 								</div>
@@ -290,7 +297,7 @@
 									@keydown.enter.stop
 									@keydown.space.stop
 								>
-									<LayersIcon
+									<UserIcon
 										class="h-5 w-5 shrink-0 text-primary"
 										:class="isUserProjectsOptionSelected ? 'text-contrast' : 'text-primary'"
 									/>
@@ -370,18 +377,19 @@
 							:options="groupByOptions"
 							:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 							:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+							trigger-type="base"
 						/>
 					</div>
 				</div>
-				<ButtonStyled v-if="!isTimeframeAndGroupByDefault" type="transparent">
-					<button
-						type="button"
-						:disabled="isTimeframeAndGroupByDefault"
-						@click="resetTimeframeAndGroupBy"
-					>
-						{{ formatMessage(analyticsMessages.resetButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-if="!isTimeframeAndGroupByDefault"
+					type="quiet"
+					native-type="button"
+					:disabled="isTimeframeAndGroupByDefault"
+					@click="resetTimeframeAndGroupBy"
+				>
+					{{ formatMessage(analyticsMessages.resetButton) }}
+				</Button>
 			</div>
 
 			<div class="flex flex-wrap items-start gap-2">
@@ -401,6 +409,7 @@
 									:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
 									:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
 									:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+									trigger-type="base"
 									checkbox-position="right"
 									:placeholder="formatMessage(analyticsMessages.none)"
 									show-selection-actions
@@ -410,7 +419,7 @@
 									<template #input-content="{ isOpen, openDirection }">
 										<div class="flex min-h-7 min-w-0 flex-1 items-center gap-1.5 pr-1">
 											<span
-												class="min-w-0 flex-1 truncate font-semibold text-primary"
+												class="min-w-0 flex-1 truncate font-semibold text-inherit"
 												:title="selectedBreakdownLabel"
 											>
 												{{ selectedBreakdownLabel }}
@@ -449,9 +458,10 @@ import {
 	ClockIcon,
 	FolderOpenIcon,
 	LayersIcon,
+	UserIcon,
 } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	MultiSelect,
@@ -499,9 +509,9 @@ import {
 import TimeFramePicker from './TimeframePicker.vue'
 
 const QUERY_BUILDER_DROPDOWN_MAX_HEIGHT = 500
-const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '12rem'
+const QUERY_BUILDER_DROPDOWN_MIN_WIDTH = '14rem'
 const analyticsQueryChipTriggerClass = 'h-10 '
-const analyticsQueryAddFilterButtonClass = '!h-10 max-w-full !w-max !px-3.5 flex !gap-2'
+const analyticsQueryAddFilterButtonClass = 'max-w-full !w-max !px-3.5 flex !gap-2'
 const projectOptionCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 type ProjectSelectionPreset = 'user' | 'all'
 
@@ -544,7 +554,7 @@ function getProjectOption(
 	return {
 		value: project.id,
 		label: project.name,
-		searchTerms: groupTitle ? [groupTitle] : undefined,
+		searchTerms: [project.id, groupTitle].filter((term): term is string => Boolean(term)),
 	}
 }
 
@@ -1008,14 +1018,33 @@ const breakdownOptions = computed<MultiSelectOption<Exclude<AnalyticsBreakdownPr
 				value: 'game_version',
 				label: formatAnalyticsBreakdownLabel('game_version', formatMessage),
 			},
+			{
+				value: 'dependent_project_download',
+				label: formatAnalyticsBreakdownLabel('dependent_project_download', formatMessage),
+			},
+			{
+				value: 'user_id',
+				label: formatAnalyticsBreakdownLabel('user_id', formatMessage),
+			},
 		)
 
-		return options.map((option) => ({
-			...option,
-			disabled: hasReachedBreakdownLimit && !selectedBreakdownSet.has(option.value),
-		}))
+		return options.map((option) => {
+			const isSelected = selectedBreakdownSet.has(option.value)
+			return {
+				...option,
+				disabled:
+					!isSelected && (hasReachedBreakdownLimit || !canSelectBreakdownOption(option.value)),
+			}
+		})
 	},
 )
+
+function canSelectBreakdownOption(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): boolean {
+	return getAnalyticsBreakdownPresetsForProjectSelection(
+		[...selectedBreakdownValue.value, breakdown],
+		selectedProjectIds.value,
+	).includes(breakdown)
+}
 
 function getBreakdownOptionLabel(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>): string {
 	return (
@@ -1133,6 +1162,17 @@ function withBreakdownFields(
 				break
 			case 'download_reason':
 				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('reason')
+				}
+				break
+			case 'user_id':
+				if (includesStat(breakdownStats, 'revenue') && includesStat(enabledStats, 'revenue')) {
+					revenue.push('user_id')
+				}
+				break
+			case 'dependent_project_download':
+				if (includesStat(breakdownStats, 'downloads') && includesStat(enabledStats, 'downloads')) {
+					downloads.push('dependent_project_id')
 					downloads.push('reason')
 				}
 				break
@@ -1264,6 +1304,12 @@ function buildMetricFilters(
 				filters.game_version,
 			),
 			loader: getFilterValuesForStat('loader_type', 'downloads', enabledStats, filters.loader_type),
+			dependent_project_id: getFilterValuesForStat(
+				'dependent_project_id',
+				'downloads',
+				enabledStats,
+				filters.dependent_project_id,
+			),
 		},
 		playtime: {
 			country: getFilterValuesForStat('country', 'playtime', enabledStats, filters.country),
@@ -1281,7 +1327,9 @@ function buildMetricFilters(
 			),
 			loader: getFilterValuesForStat('loader_type', 'playtime', enabledStats, filters.loader_type),
 		},
-		revenue: {},
+		revenue: {
+			user_id: getFilterValuesForStat('user_id', 'revenue', enabledStats, filters.user_id),
+		},
 	}
 }
 
@@ -1295,6 +1343,15 @@ const fetchRequest = computed<Labrinth.Analytics.v3.FetchRequest>(() => {
 
 	const bucketBy = withBreakdownFields(selectedBreakdowns.value, selectedFilters.value)
 	const filterBy = buildMetricFilters(selectedBreakdowns.value, selectedFilters.value)
+	if (
+		includesStat(
+			getEnabledAnalyticsStatsForState(selectedBreakdowns.value, selectedFilters.value),
+			'revenue',
+		) &&
+		!bucketBy.revenue.includes('user_id')
+	) {
+		bucketBy.revenue.push('user_id')
+	}
 	const filteredProjectIds = getProjectIdsMatchingStatusFilter(
 		selectedProjectIds.value,
 		projectStatusById.value,

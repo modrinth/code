@@ -71,6 +71,15 @@ const meta = {
 						progress: 0.35,
 						bytes_processed: 2_000_000,
 					},
+					{
+						id: 'fs-op-2',
+						op: 'zip',
+						src: 'world.zip',
+						state: 'failure-error',
+						progress: 0,
+						cancellable: false,
+						error: 'ZIP operation ended before completion',
+					},
 				])
 
 				const serverContext: ModrinthServerContext = {
@@ -88,7 +97,11 @@ const meta = {
 					isServerRunning: computed(() => true),
 					stats,
 					uptimeSeconds: ref(0),
-					isSyncingContent: ref(false),
+					installProgressItems: ref<Archon.Websocket.v0.InstallProgressItem[]>([]),
+					installation: computed(() => null),
+					beginInstallation: () => {},
+					cancelOptimisticInstallation: () => {},
+					dismissInstallation: () => {},
 					busyReasons: computed(() => [
 						{ reason: defineMessage({ id: 's.bg', defaultMessage: 'Background task running' }) },
 					]),

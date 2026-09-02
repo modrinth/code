@@ -3,7 +3,7 @@ use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::{emit_friend, emit_notification};
 use crate::state::tunnel::InternalTunnelSocket;
-use crate::state::{ProcessManager, Profile, TunnelSocket};
+use crate::state::{ProcessManager, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
@@ -26,6 +26,7 @@ use serde_json::Value;
 use std::net::SocketAddr;
 use std::ops::Deref;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio::net::tcp::OwnedReadHalf;
@@ -38,6 +39,8 @@ pub(super) type TunnelSockets = Arc<DashMap<Uuid, Arc<InternalTunnelSocket>>>;
 
 pub struct FriendsSocket {
     write: WriteSocket,
+    connection_lock: Mutex<()>,
+    connection_generation: Arc<AtomicU64>,
     user_statuses: Arc<DashMap<UserId, UserStatus>>,
     tunnel_sockets: TunnelSockets,
 }
@@ -60,6 +63,8 @@ impl FriendsSocket {
     pub fn new() -> Self {
         Self {
             write: Arc::new(RwLock::new(None)),
+            connection_lock: Mutex::new(()),
+            connection_generation: Arc::new(AtomicU64::new(0)),
             user_statuses: Arc::new(DashMap::new()),
             tunnel_sockets: Arc::new(DashMap::new()),
         }
@@ -72,6 +77,11 @@ impl FriendsSocket {
         semaphore: &FetchSemaphore,
         process_manager: &ProcessManager,
     ) -> crate::Result<()> {
+        let _connection_guard = self.connection_lock.lock().await;
+        if self.is_connected().await {
+            return Ok(());
+        }
+
         let credentials =
             ModrinthCredentials::get_and_refresh(exec, semaphore).await?;
 
@@ -94,6 +104,10 @@ impl FriendsSocket {
                 Ok((socket, _)) => {
                     tracing::info!("Connected to friends socket");
                     let (write, read) = socket.split();
+                    let connection_generation = self
+                        .connection_generation
+                        .fetch_add(1, Ordering::AcqRel)
+                        + 1;
 
                     {
                         let mut write_lock = self.write.write().await;
@@ -101,22 +115,27 @@ impl FriendsSocket {
                     }
 
                     if let Some(process) = process_manager.get_all().first() {
-                        let profile =
-                            Profile::get(&process.profile_path, exec).await?;
-
-                        if let Some(profile) = profile {
-                            let _ =
-                                self.update_status(Some(profile.name)).await;
-                        }
+                        let _ = self
+                            .update_status(Some(process.instance_name.clone()))
+                            .await;
                     }
 
                     let write_handle = self.write.clone();
+                    let connection_generation_handle =
+                        self.connection_generation.clone();
                     let statuses = self.user_statuses.clone();
                     let sockets = self.tunnel_sockets.clone();
 
                     tokio::spawn(async move {
                         let mut read_stream = read;
                         while let Some(msg_result) = read_stream.next().await {
+                            if connection_generation_handle
+                                .load(Ordering::Acquire)
+                                != connection_generation
+                            {
+                                break;
+                            }
+
                             match msg_result {
                                 Ok(msg) => {
                                     let server_message = match msg {
@@ -173,11 +192,11 @@ impl FriendsSocket {
                                         match server_message {
                                             ServerToClientMessage::StatusUpdate { status } => {
                                                 statuses.insert(status.user_id, status.clone());
-                                                let _ = emit_friend(FriendPayload::StatusUpdate { user_status: status }).await;
+                                                let _ = emit_friend(FriendPayload::StatusUpdate { user_status: status.into() }).await;
                                             },
                                             ServerToClientMessage::UserOffline { id } => {
                                                 statuses.remove(&id);
-                                                let _ = emit_friend(FriendPayload::UserOffline { id }).await;
+                                                let _ = emit_friend(FriendPayload::UserOffline { id: id.to_string() }).await;
                                             }
                                             ServerToClientMessage::FriendStatuses { statuses: new_statuses } => {
                                                 statuses.clear();
@@ -187,7 +206,7 @@ impl FriendsSocket {
                                                 let _ = emit_friend(FriendPayload::StatusSync).await;
                                             }
                                             ServerToClientMessage::FriendRequest { from } => {
-                                                let _ = emit_friend(FriendPayload::FriendRequest { from }).await;
+                                                let _ = emit_friend(FriendPayload::FriendRequest { from: from.to_string() }).await;
                                             }
                                             ServerToClientMessage::FriendRequestRejected { .. } => {}, // TODO
 
@@ -226,8 +245,17 @@ impl FriendsSocket {
                             }
                         }
 
-                        let mut w = write_handle.write().await;
-                        *w = None;
+                        if connection_generation_handle.load(Ordering::Acquire)
+                            == connection_generation
+                        {
+                            let mut write = write_handle.write().await;
+                            if connection_generation_handle
+                                .load(Ordering::Acquire)
+                                == connection_generation
+                            {
+                                *write = None;
+                            }
+                        }
                     });
                 }
                 Err(e) => {
@@ -244,6 +272,11 @@ impl FriendsSocket {
     }
 
     async fn handle_notification(notification: Value) -> crate::Result<()> {
+        tracing::info!(
+            notification = %notification,
+            "Received websocket notification payload"
+        );
+
         if notification
             .get("body")
             .and_then(|body| body.get("type"))
@@ -301,22 +334,33 @@ impl FriendsSocket {
 
     #[tracing::instrument(skip(self))]
     pub async fn disconnect(&self) -> crate::Result<()> {
+        let _connection_guard = self.connection_lock.lock().await;
+        self.connection_generation.fetch_add(1, Ordering::AcqRel);
+
         let mut write_lock = self.write.write().await;
-        if let Some(ref mut write_half) = *write_lock {
-            SinkExt::close(write_half).await?;
-            *write_lock = None;
+        let write_half = write_lock.take();
+        drop(write_lock);
+
+        self.user_statuses.clear();
+        self.tunnel_sockets.clear();
+
+        if let Some(mut write_half) = write_half {
+            SinkExt::close(&mut write_half).await?;
         }
+
         Ok(())
     }
 
     #[tracing::instrument(skip(self))]
     pub async fn update_status(
         &self,
-        profile_name: Option<String>,
+        instance_name: Option<String>,
     ) -> crate::Result<()> {
         Self::send_message(
             &self.write,
-            ClientToServerMessage::StatusUpdate { profile_name },
+            ClientToServerMessage::StatusUpdate {
+                profile_name: instance_name,
+            },
         )
         .await
     }
@@ -331,6 +375,7 @@ impl FriendsSocket {
             concat!(env!("MODRINTH_API_URL_V3"), "friends"),
             None,
             None,
+            Some("/v3/friends"),
             semaphore,
             exec,
         )
@@ -359,6 +404,7 @@ impl FriendsSocket {
             None,
             None,
             None,
+            Some("/v3/friend/:user_id"),
             semaphore,
             exec,
         )
@@ -392,6 +438,7 @@ impl FriendsSocket {
             None,
             None,
             None,
+            Some("/v3/friend/:user_id"),
             semaphore,
             exec,
         )

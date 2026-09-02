@@ -8,4 +8,11 @@ export const versionQueryOptions = {
 		queryFn: () => client.labrinth.versions_v3.getVersion(versionId),
 		staleTime: STALE_TIME,
 	}),
+
+	fromProject: (projectId: string, versionIdOrNumber: string, client: AbstractModrinthClient) => ({
+		queryKey: ['project', projectId, 'version', 'v3', versionIdOrNumber] as const,
+		queryFn: () =>
+			client.labrinth.versions_v3.getVersionFromIdOrNumber(projectId, versionIdOrNumber),
+		staleTime: STALE_TIME,
+	}),
 }

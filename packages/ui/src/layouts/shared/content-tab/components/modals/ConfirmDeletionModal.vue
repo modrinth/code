@@ -6,16 +6,13 @@
 				itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
 			})
 		"
-		:fade="props.variant === 'server' ? 'warning' : 'danger'"
+		fade="warning"
 		max-width="500px"
 		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition
-				:type="props.variant === 'server' ? 'warning' : 'critical'"
-				:header="formatMessage(messages.admonitionHeader)"
-			>
-				{{ formatMessage(messages.admonitionBody) }}
+			<Admonition type="warning" :header="admonitionHeader">
+				{{ admonitionBody }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
@@ -26,27 +23,20 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled :color="props.variant === 'server' ? 'orange' : 'red'">
-					<button
-						v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
-						:disabled="buttonsDisabled || props.actionDisabled"
-						@click="confirm"
-					>
-						<TrashIcon />
-						{{
-							formatMessage(messages.deleteButton, {
-								count: visibleCount,
-								itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
-							})
-						}}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="props.actionDisabled ? props.actionDisabledTooltip : undefined"
+					type="colored"
+					color="orange"
+					:disabled="buttonsDisabled || props.actionDisabled"
+					@click="confirm"
+				>
+					<TrashIcon />
+					{{ deleteButtonLabel }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -54,14 +44,15 @@
 
 <script setup lang="ts">
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
+import type { ContentActionWarning } from '../../types'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const { formatMessage } = useVIntl()
@@ -90,12 +81,14 @@ const props = withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
+		warning?: ContentActionWarning | null
 		variant?: 'instance' | 'server'
 		backupTip?: string
 		actionDisabled?: boolean
 		actionDisabledTooltip?: string
 	}>(),
 	{
+		warning: null,
 		variant: 'instance',
 		backupTip: undefined,
 		actionDisabled: false,
@@ -112,10 +105,35 @@ const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 const visibleCount = ref(props.count)
 const visibleItemType = ref(props.itemType)
+const visibleWarning = ref(props.warning)
 
-function show() {
+const formattedItemType = computed(() =>
+	formatContentTypeSentence(formatMessage, visibleItemType.value, visibleCount.value),
+)
+
+const admonitionHeader = computed(
+	() => visibleWarning.value?.admonitionHeader ?? formatMessage(messages.admonitionHeader),
+)
+
+const admonitionBody = computed(() => {
+	return visibleWarning.value?.admonitionBody ?? formatMessage(messages.admonitionBody)
+})
+
+const deleteButtonLabel = computed(() => {
+	return (
+		visibleWarning.value?.actionLabel ??
+		formatMessage(messages.deleteButton, {
+			count: visibleCount.value,
+			itemType: formattedItemType.value,
+		})
+	)
+})
+
+async function show() {
+	await nextTick()
 	visibleCount.value = props.count
 	visibleItemType.value = props.itemType
+	visibleWarning.value = props.warning
 	modal.value?.show()
 }
 

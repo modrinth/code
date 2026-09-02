@@ -26,7 +26,7 @@
 				v-if="isDisabled"
 				class="relative z-10 flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 			>
-				<Avatar src="https://cdn-raw.modrinth.com/medal_icon.webp" size="64px" class="opacity-50" />
+				<Avatar src="https://cdn.modrinth.com/medal_icon.webp" size="64px" class="opacity-50" />
 				<SpinnerIcon
 					v-if="isUpgrading"
 					class="size-8 animate-spin absolute text-contrast"
@@ -34,7 +34,7 @@
 				/>
 				<LockIcon v-else class="size-8 absolute" :class="{ 'opacity-50': isDisabled }" />
 			</div>
-			<Avatar v-else src="https://cdn-raw.modrinth.com/medal_icon.webp" size="64px" class="z-10" />
+			<Avatar v-else src="https://cdn.modrinth.com/medal_icon.webp" size="64px" class="z-10" />
 			<div class="z-10 ml-4 flex min-w-0 flex-col gap-1.5">
 				<div class="flex flex-row items-center gap-2.5">
 					<h2
@@ -120,11 +120,17 @@
 			</div>
 
 			<div class="z-10 ml-auto">
-				<ButtonStyled color="medal-promo" type="outlined" size="large">
-					<button class="my-auto" data-server-listing-button @click="handleUpgrade">
-						<RocketIcon /> {{ formatMessage(messages.upgradeButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					type="outlined"
+					color="medal_promotion"
+					size="xl"
+					class="my-auto"
+					data-server-listing-button
+					@click="handleUpgrade"
+				>
+					<RocketIcon aria-hidden="true" />
+					{{ formatMessage(messages.upgradeButton) }}
+				</Button>
 			</div>
 		</div>
 
@@ -168,10 +174,11 @@ import dayjsDuration from 'dayjs/plugin/duration'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { Button } from '#ui/components/base/buttons'
+
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectModrinthClient } from '../../../providers/api-client'
 import Avatar from '../../base/Avatar.vue'
-import ButtonStyled from '../../base/ButtonStyled.vue'
 import CopyCode from '../../base/CopyCode.vue'
 import IntlFormatted from '../../base/IntlFormatted.vue'
 import type { ServerListingOwner } from '../access/types'

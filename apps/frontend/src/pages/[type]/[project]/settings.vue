@@ -6,6 +6,7 @@ import {
 	GlobeIcon,
 	ImageIcon,
 	InfoIcon,
+	IssuesIcon,
 	LinkIcon,
 	ServerIcon,
 	SignatureIcon,
@@ -17,6 +18,7 @@ import {
 	commonMessages,
 	commonProjectSettingsMessages,
 	injectProjectPageContext,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
@@ -47,10 +49,8 @@ const navItems = computed(() => {
 		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type)) &&
 		isStaff(currentMember.value?.user)
 
-	const hasPermissionsPage = computed(
-		() =>
-			flags.value.modpackPermissionsPage &&
-			projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
+	const hasPermissionsPage = computed(() =>
+		projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
 	)
 
 	const items = [
@@ -73,6 +73,11 @@ const navItems = computed(() => {
 			icon: ServerIcon,
 		},
 		{
+			link: `/${base}/settings/disclosures`,
+			label: formatMessage(commonProjectSettingsMessages.disclosures),
+			icon: IssuesIcon,
+		},
+		{
 			link: `/${base}/settings/tags`,
 			label: formatMessage(commonProjectSettingsMessages.tags),
 			icon: TagsIcon,
@@ -82,15 +87,15 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.description),
 			icon: AlignLeftIcon,
 		},
-		hasPermissionsPage.value && {
-			link: `/${base}/settings/permissions`,
-			label: formatMessage(commonProjectSettingsMessages.permissions),
-			icon: SignatureIcon,
-		},
 		!isServerProject.value && {
 			link: `/${base}/settings/versions`,
 			label: formatMessage(commonProjectSettingsMessages.versions),
 			icon: VersionIcon,
+		},
+		hasPermissionsPage.value && {
+			link: `/${base}/settings/permissions`,
+			label: formatMessage(commonProjectSettingsMessages.permissions),
+			icon: SignatureIcon,
 		},
 		!isServerProject.value && {
 			link: `/${base}/settings/license`,
@@ -144,6 +149,16 @@ watch(route, () => {
 	const scrollY = scroll.y.value
 	setTimeout(() => window.scrollTo(0, scrollY), 10)
 })
+
+const moderatorSeeUserUi = computed<boolean>({
+	get() {
+		return flags.value.showModeratorProjectMemberUi
+	},
+	set(value: boolean) {
+		flags.value.showModeratorProjectMemberUi = value
+		saveFeatureFlags()
+	},
+})
 </script>
 
 <template>
@@ -164,9 +179,13 @@ watch(route, () => {
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"
 		/>
-		<div class="grid gap-4 lg:grid-cols-[1fr_3fr]">
+		<div class="grid gap-6 lg:grid-cols-[1fr_3fr]">
 			<div>
 				<NavStack :items="navItems" />
+				<div v-if="isStaff(currentMember?.user)" class="mt-4 flex items-center gap-2">
+					<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
+					<label for="moderator-see-user-ui-toggle"> Show member UI </label>
+				</div>
 			</div>
 			<div class="min-w-0">
 				<NuxtPage />

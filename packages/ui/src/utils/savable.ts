@@ -1,6 +1,6 @@
-import { isEqual } from 'es-toolkit'
+import { cloneDeep, isEqual } from 'es-toolkit'
 import type { ComputedRef, Ref } from 'vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 export function useSavable<T extends Record<string, unknown>>(
 	data: () => T,
@@ -15,7 +15,7 @@ export function useSavable<T extends Record<string, unknown>>(
 	save: () => Promise<void>
 } {
 	const savedValues = computed(data)
-	const currentValues = ref({ ...data() }) as Ref<T>
+	const currentValues = ref(cloneDeep(data())) as Ref<T>
 	const saving = ref(false)
 
 	const changes = computed<Partial<T>>(() => {
@@ -31,8 +31,18 @@ export function useSavable<T extends Record<string, unknown>>(
 
 	const hasChanges = computed(() => Object.keys(changes.value).length > 0)
 
+	watch(
+		savedValues,
+		(value, previousValue) => {
+			if (isEqual(currentValues.value, previousValue)) {
+				currentValues.value = cloneDeep(value)
+			}
+		},
+		{ deep: true },
+	)
+
 	const reset = () => {
-		currentValues.value = data()
+		currentValues.value = cloneDeep(data())
 	}
 
 	const saveInternal = async () => {
@@ -40,7 +50,7 @@ export function useSavable<T extends Record<string, unknown>>(
 		saving.value = true
 		try {
 			await save(changes.value)
-			currentValues.value = data()
+			currentValues.value = cloneDeep(data())
 		} finally {
 			saving.value = false
 		}

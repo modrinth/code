@@ -1,6 +1,36 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "מוריד את ‏ Java ‏{version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "מוריד עדכון"
+  },
   "app.action-bar.downloads": {
     "message": "הורדות"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "החבא יותר התקנים רצים"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "הועתק"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "העתקת הפרטים"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.action-bar.install.retry": {
+    "message": "נסה שוב"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "ביטול"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "לא נתן להוריד את הקבצים"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "הפוך למקרה ראשי"
   },
   "app.action-bar.offline": {
     "message": "לא מקוון"
@@ -8,8 +38,8 @@
   "app.action-bar.stop-instance": {
     "message": ""
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "מאפשר עיבוד מתקדם כגון אפקטים טשטוש העלולים לגרום לבעיות ביצועים ללא עיבוד מואץ לחומרה."
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "ספרייה"
   },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
@@ -29,9 +59,6 @@
   "app.browse.already-added": {
     "message": "כבר נוסף"
   },
-  "app.browse.discover-content": {
-    "message": "גלה תוכן"
-  },
   "app.browse.discover-servers": {
     "message": "גלה שרתים"
   },
@@ -43,9 +70,6 @@
   },
   "app.export-modal.header": {
     "message": "יצוא חבילת מודים"
-  },
-  "app.export-modal.modpack-name-label": {
-    "message": "שם חבילת המודים"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "שם חבילת המודים"
@@ -104,12 +128,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "עיון בשרתים"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' יימחק לצמיתות, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "האם אתה בטוח שברצונך למחוק לצמיתות את העולם הזה?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "עם מודים"
   },
@@ -128,23 +146,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "אין שרתים אן עולמות שנוספו"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' יוסר מהרשימה שלך, כולל מתוך המשחק, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) יוסר מהרשימה שלך, כולל מתוך המשחק, ולא תהיה דרך לשחזר אותו."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "אתה בטוח שאתה רוצה להסיר {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "חיפוש ב-{count} עולמות..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "השרת הזה"
-  },
-  "app.modal.install-to-play.content-required": {
-    "message": "תוכן נדרש"
   },
   "app.modal.install-to-play.header": {
     "message": "צריך להתקין כדי לשחק"
@@ -155,29 +158,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {מוד אחד} other {# מודים}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "חבילת מודים נדרשת"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "שרת זה דורש מודים כדי לשחק. לחץ על \"התקן\" כדי להגדיר את הקבצים הנדרשים מ-Modrinth, ולאחר מכן הפעל ישירות לשרת."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "התקנה משותפת"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "התקנת שרת משותפת"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "הצג תוכן"
   },
   "app.modal.update-to-play.header": {
     "message": "צריך לעדכן כדי לשחק"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "עדכון נדרש"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "עדכון נדרש כדי לשחק ב{name}. ניתן להתחיל את המשחק רק לאחר עדכון לגרסה החדשה."
   },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
@@ -187,9 +175,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "מראה"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "אפשרויות ברירת מחדל של התקנה"
   },
   "app.settings.tabs.java-installations": {
     "message": "התקנות ג'אווה"
@@ -221,9 +206,6 @@
   "app.update-popup.download-complete": {
     "message": "הורדה הושלמה"
   },
-  "app.update-popup.reload": {
-    "message": "רענן"
-  },
   "app.update-popup.title": {
     "message": "עדכון זמין"
   },
@@ -248,11 +230,11 @@
   "app.world.world-item.offline": {
     "message": "לא מקוון"
   },
-  "app.world.world-item.players-online": {
-    "message": "{count} מחוברים"
-  },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count, plural, one {בקשת חברות אחת} other {# בקשות חברות}}"
   },
   "friends.add-friend.submit": {
     "message": "שליחת בקשת חברות"
@@ -404,26 +386,8 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "בחירת סמל"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "קבוצות ספרייה"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "יצירת קבוצה חדשה"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "קבוצות ספרייה מאפשרות לך לארגן את ההתקנות שלך לחלקים שונים בספרייה שלך."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "שם קבוצה"
-  },
   "instance.settings.tabs.general.name": {
     "message": "שם"
-  },
-  "instance.settings.tabs.hooks": {
-    "message": "פעולות בעת הפעלה"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "פעולות בעת הפעלה מותאמות אישית"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "פעולות בעת הפעלה מאפשרות למשתמשים מתקדמים להריץ פקודות מערכת מסוימות לפני ואחרי שהמשחק מופעל."
@@ -463,9 +427,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} גרסה"
-  },
-  "instance.settings.tabs.java": {
-    "message": "ג'אווה וזיכרון"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "משתני סביבה"
@@ -566,16 +527,7 @@
   "search.filter.locked.instance.sync": {
     "message": "סנכרן עם התקנה"
   },
-  "search.filter.locked.server": {
-    "message": "מסופק על ידי השרת"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "ניתן להוסיף רק מודים בצד הלקוח לשרת"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "גרסת המשחק מסופקת על ידי השרת"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "הטוען מסופק על ידי השרת"
   }
 }

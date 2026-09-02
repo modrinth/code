@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_launch_overrides (\n\t\t\tinstance_id,\n\t\t\toverrides\n\t\t)\n\t\tVALUES (?, jsonb(?))\n\t\tON CONFLICT (instance_id) DO UPDATE SET\n\t\t\toverrides = excluded.overrides\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "f6bf3569c27401fb85c286f243902eb4831689391d34f1470db0e4c246525e49"
+}

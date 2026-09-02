@@ -6,24 +6,18 @@
 
 		<template #actions>
 			<div class="flex flex-wrap justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="resolve('cancel')">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button :disabled="installing" @click="resolve('discard')">
-						<TrashIcon />
-						{{ formatMessage(messages.discardButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="green">
-					<button :disabled="installing" @click="resolve('install')">
-						<PlusIcon />
-						{{ formatMessage(commonMessages.installButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="resolve('cancel')">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="red" :disabled="installing" @click="resolve('discard')">
+					<TrashIcon />
+					{{ formatMessage(messages.discardButton) }}
+				</Button>
+				<Button type="colored" color="green" :disabled="installing" @click="resolve('install')">
+					<PlusIcon />
+					{{ formatMessage(commonMessages.installButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -33,7 +27,7 @@
 import { PlusIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

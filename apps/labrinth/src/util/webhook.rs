@@ -1,11 +1,13 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::redis::RedisPool;
 use crate::models::ids::ProjectId;
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
 use serde::Serialize;
+use xredis::RedisPool;
 
 const PLUGIN_LOADERS: &[&str] = &[
     "bukkit",
@@ -51,7 +53,8 @@ async fn get_webhook_metadata(
         pool,
         redis,
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching webhook project")?;
 
     if let Some(mut project) = project {
         let mut owner = None;
@@ -62,7 +65,7 @@ async fn get_webhook_metadata(
                 pool,
                 redis,
             )
-            .await?;
+            .await.wrap_internal_err("fetching organization from database")?;
 
             if let Some(organization) = organization {
                 owner = Some(WebhookAuthor {
@@ -81,7 +84,7 @@ async fn get_webhook_metadata(
                 pool,
                 redis,
             )
-            .await?;
+            .await.wrap_internal_err("fetching team member from database")?;
 
             if let Some(member) = team.into_iter().find(|x| x.is_owner) {
                 let user = crate::database::models::user_item::DBUser::get_id(
@@ -89,7 +92,8 @@ async fn get_webhook_metadata(
                     pool,
                     redis,
                 )
-                .await?;
+                .await
+                .wrap_internal_err("fetching user from database")?;
 
                 if let Some(user) = user {
                     owner = Some(WebhookAuthor {
@@ -106,7 +110,11 @@ async fn get_webhook_metadata(
         };
 
         let all_game_versions =
-            MinecraftGameVersion::list(None, None, pool, redis).await?;
+            MinecraftGameVersion::list(None, None, pool, redis)
+                .await
+                .wrap_internal_err(
+                    "fetching minecraft game version from Redis",
+                )?;
 
         let versions = project
             .aggregate_version_fields
@@ -198,13 +206,22 @@ impl PayoutSourceAlertType {
                 threshold,
                 current_balance,
             } => format!(
-                "\u{1f6a8} *Payout Source Alert*\n\nPayout source '{source}' has an available balance under the ${threshold} threshold.\nBalance: ${current_balance}."
+"\u{1f6a8} *Payout Source Alert*
+
+Payout source '{source}' has an available balance under the ${threshold} threshold.
+Balance: ${current_balance}."
             ),
             PayoutSourceAlertType::CheckFailure {
                 source,
                 display_error,
             } => format!(
-                "\u{1f6a8} *Payout Source Alert*\n\nFAILED TO CHECK payout source '{source}' balance.\nError: {display_error}"
+"\u{1f6a8} *Payout Source Alert*
+
+Failed to check payout source '{source}' balance.
+Error:
+```
+{display_error}
+```"
             ),
         }
     }
@@ -240,9 +257,7 @@ pub async fn send_slack_payout_source_alert_webhook(
         }))
         .send()
         .await
-        .map_err(|_| {
-            ApiError::Slack("Error while sending projects webhook".to_string())
-        })?;
+        .map_err(|err| eyre::eyre!(err)).wrap_internal_err("error while sending projects webhook".to_string())?;
 
     Ok(())
 }
@@ -254,7 +269,9 @@ pub async fn send_slack_project_webhook(
     webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let metadata = get_webhook_metadata(project_id, pool, redis).await?;
+    let metadata = get_webhook_metadata(project_id, pool, redis)
+        .await
+        .wrap_api_err("fetching webhook metadata")?;
 
     if let Some(metadata) = metadata {
         let mut blocks = vec![];
@@ -336,7 +353,7 @@ pub async fn send_slack_project_webhook(
                 "elements": [
                     {
                         "type": "image",
-                        "image_url": "https://cdn-raw.modrinth.com/modrinth-new.png",
+                        "image_url": "https://cdn.modrinth.com/modrinth-new.png",
                         "alt_text": "Author"
                     },
                     {
@@ -356,11 +373,10 @@ pub async fn send_slack_project_webhook(
             }))
             .send()
             .await
-            .map_err(|_| {
-                ApiError::Slack(
-                    "Error while sending projects webhook".to_string(),
-                )
-            })?;
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_internal_err(
+                "error while sending projects webhook".to_string(),
+            )?;
     }
 
     Ok(())
@@ -425,7 +441,9 @@ pub async fn send_discord_webhook(
     webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let metadata = get_webhook_metadata(project_id, pool, redis).await?;
+    let metadata = get_webhook_metadata(project_id, pool, redis)
+        .await
+        .wrap_api_err("fetching webhook metadata")?;
 
     if let Some(project) = metadata {
         let mut fields = vec![];
@@ -474,7 +492,7 @@ pub async fn send_discord_webhook(
             footer: Some(DiscordEmbedFooter {
                 text: format!("{} on Modrinth", project.display_project_type),
                 icon_url: Some(
-                    "https://cdn-raw.modrinth.com/modrinth-new.png".to_string(),
+                    "https://cdn.modrinth.com/modrinth-new.png".to_string(),
                 ),
             }),
         };
@@ -494,11 +512,10 @@ pub async fn send_discord_webhook(
             })
             .send()
             .await
-            .map_err(|_| {
-                ApiError::Discord(
-                    "Error while sending projects webhook".to_string(),
-                )
-            })?;
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "error while sending projects webhook".to_string(),
+            )?;
     }
 
     Ok(())

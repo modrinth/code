@@ -2,7 +2,7 @@
 use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::state::LAUNCHER_STATE;
-use crate::state::{JavaVersion, Profile, Settings};
+use crate::state::{JavaVersion, Settings};
 use crate::util::fetch::IoSemaphore;
 use dashmap::DashSet;
 use std::path::{Path, PathBuf};
@@ -11,8 +11,9 @@ use tokio::fs;
 
 pub const CACHES_FOLDER_NAME: &str = "caches";
 pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
-pub const PROFILES_FOLDER_NAME: &str = "profiles";
+pub const INSTANCES_FOLDER_NAME: &str = "profiles";
 pub const METADATA_FOLDER_NAME: &str = "meta";
+pub const SYNCED_OPTIONS_FOLDER_NAME: &str = "synced-options";
 
 #[derive(Debug)]
 pub struct DirectoryInfo {
@@ -148,22 +149,29 @@ impl DirectoryInfo {
         self.config_dir.join("icons")
     }
 
-    /// Get the profiles directory for created profiles
+    /// Get the instances directory
     #[inline]
-    pub fn profiles_dir(&self) -> PathBuf {
-        self.config_dir.join(PROFILES_FOLDER_NAME)
+    pub fn instances_dir(&self) -> PathBuf {
+        self.config_dir.join(INSTANCES_FOLDER_NAME)
     }
 
-    /// Gets the logs dir for a given profile
     #[inline]
-    pub fn profile_logs_dir(&self, profile_path: &str) -> PathBuf {
-        self.profiles_dir().join(profile_path).join("logs")
+    pub fn synced_options_dir(&self) -> PathBuf {
+        self.config_dir.join(SYNCED_OPTIONS_FOLDER_NAME)
     }
 
-    /// Gets the crash reports dir for a given profile
+    /// Gets the logs dir for a given instance path
     #[inline]
-    pub fn crash_reports_dir(&self, profile_path: &str) -> PathBuf {
-        self.profiles_dir().join(profile_path).join("crash-reports")
+    pub fn instance_logs_dir(&self, instance_path: &str) -> PathBuf {
+        self.instances_dir().join(instance_path).join("logs")
+    }
+
+    /// Gets the crash reports dir for a given instance path
+    #[inline]
+    pub fn crash_reports_dir(&self, instance_path: &str) -> PathBuf {
+        self.instances_dir()
+            .join(instance_path)
+            .join("crash-reports")
     }
 
     #[inline]
@@ -251,8 +259,8 @@ impl DirectoryInfo {
             if prev_dir != move_dir {
                 let loader_bar_id = init_loading(
                     LoadingBarType::DirectoryMove {
-                        old: prev_dir.clone(),
-                        new: move_dir.clone(),
+                        old: prev_dir.to_string_lossy().into_owned(),
+                        new: move_dir.to_string_lossy().into_owned(),
                     },
                     100.0,
                     "Moving launcher directory",
@@ -265,8 +273,9 @@ impl DirectoryInfo {
 
                 const MOVE_DIRS: &[&str] = &[
                     CACHES_FOLDER_NAME,
-                    PROFILES_FOLDER_NAME,
+                    INSTANCES_FOLDER_NAME,
                     METADATA_FOLDER_NAME,
+                    SYNCED_OPTIONS_FOLDER_NAME,
                 ];
 
                 struct MovePath {
@@ -472,27 +481,37 @@ impl DirectoryInfo {
                     java_version.upsert(exec).await?
                 }
 
-                let profiles = Profile::get_all(exec).await?;
-
-                for mut profile in profiles {
-                    profile.icon_path = profile.icon_path.map(|x| {
-                        x.replace(
-                            prev_custom_dir,
-                            new_dir
-                                .trim_end_matches('/')
-                                .trim_end_matches('\\'),
-                        )
-                    });
-                    profile.java_path = profile.java_path.map(|x| {
-                        x.replace(
-                            prev_custom_dir,
-                            new_dir
-                                .trim_end_matches('/')
-                                .trim_end_matches('\\'),
-                        )
-                    });
-                    profile.upsert(exec).await?;
-                }
+                let new_dir = new_dir
+                    .trim_end_matches('/')
+                    .trim_end_matches('\\')
+                    .to_string();
+                let new_dir = new_dir.as_str();
+                sqlx::query!(
+                    "
+                    UPDATE instances
+                    SET icon_path = replace(icon_path, ?, ?)
+                    WHERE icon_path IS NOT NULL
+                    ",
+                    prev_custom_dir,
+                    new_dir,
+                )
+                .execute(exec)
+                .await?;
+                sqlx::query!(
+                    "
+                    UPDATE instance_launch_overrides
+                    SET overrides = jsonb(json_set(
+                        overrides,
+                        '$.java_path',
+                        replace(json_extract(overrides, '$.java_path'), ?, ?)
+                    ))
+                    WHERE json_type(overrides, '$.java_path') = 'text'
+                    ",
+                    prev_custom_dir,
+                    new_dir,
+                )
+                .execute(exec)
+                .await?;
             }
 
             settings.custom_dir = Some(new_dir);

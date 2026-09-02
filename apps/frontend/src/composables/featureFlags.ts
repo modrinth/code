@@ -19,8 +19,10 @@ const validateValues = <K extends PropertyKey>(flags: Record<K, FlagValue>) => f
 export const DEFAULT_FEATURE_FLAGS = validateValues({
 	// Developer flags
 	developerMode: false,
+	showThreadIds: false,
 	demoMode: false,
 	showVersionFilesInTable: false,
+	showVersionEnvironmentColumn: false,
 	showAdsWithPlus: false,
 	alwaysShowChecklistAsPopup: true,
 	testTaxForm: false,
@@ -37,7 +39,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showProjectPageCreateServersTooltip: true,
 	showProjectPageQuickServerButton: false,
 	newProjectGeneralSettings: false,
-	newProjectEnvironmentSettings: true,
 	serverRamAsBytesAlwaysOn: false,
 	archonSentryCapture: false,
 	hideRussiaCensorshipBanner: false,
@@ -48,14 +49,16 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	useV1ContentTabAPI: true,
 	labrinthApiCanary: false,
 	dismissedExternalProjectsInfo: false,
-	modpackPermissionsPage: false,
 	showAllBanners: false,
 	alwaysIgnoreErrorBanner: false,
 	showViewProdRouteBanner: false,
 	showModeratorProjectMemberUi: false,
-	showModeratorPrivateMessageHighlight: true,
 	archonApiStaging: false,
 	showHostingAccessInstanceAuditLog: false,
+	versionDevInfoCollapsed: true,
+	alwaysShowVersionDevInfo: false,
+	advancedFiltersCollapsed: true,
+	dismissedPhotosensitivityFilterWarning: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

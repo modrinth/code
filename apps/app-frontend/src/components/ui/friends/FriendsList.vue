@@ -1,70 +1,75 @@
 <script setup lang="ts">
-import { MailIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
+import { MailIcon, SearchIcon, SendIcon, UserIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
-	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { friend_listener } from '@/helpers/events'
-import {
-	add_friend,
-	friends,
-	type FriendWithUserData,
-	remove_friend,
-	transformFriends,
-} from '@/helpers/friends.ts'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { useFriends } from '@/composables/use-friends'
+import type { FriendWithUserData } from '@/helpers/friends.ts'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 
 const { formatMessage } = useVIntl()
 
 const { handleError } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
+const appSettings = useAppSettings()
 
 const props = defineProps<{
 	credentials: ModrinthCredentials | null
 	signIn: () => void
 }>()
 
+type FriendsSectionCollapsedFlag =
+	| 'friends_active_collapsed'
+	| 'friends_online_collapsed'
+	| 'friends_offline_collapsed'
+	| 'friends_pending_collapsed'
+
+function isFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag) {
+	return appSettings.getFeatureFlag(flag)
+}
+
+function setFriendsSectionCollapsed(flag: FriendsSectionCollapsedFlag, collapsed: boolean) {
+	appSettings.featureFlags[flag] = collapsed
+	getSettings()
+		.then((settings) => {
+			settings.feature_flags[flag] = collapsed
+			return setSettings(settings)
+		})
+		.catch(handleError)
+}
+
 const userCredentials = computed(() => props.credentials)
+const {
+	friends: userFriends,
+	loading,
+	requestFriend,
+	acceptFriend,
+	removeFriend: removeFriendRecord,
+} = useFriends({
+	currentUserId: () => userCredentials.value?.user_id,
+	getCredentials: () => userCredentials.value,
+	onError: handleError,
+})
 
 const search = ref('')
 const friendInvitesModal = ref()
-
 const username = ref('')
 const addFriendModal = ref()
-async function addFriendFromModal() {
-	addFriendModal.value.hide()
-	await add_friend(username.value).catch(handleError)
-	username.value = ''
-	await loadFriends()
-}
 
-async function addFriend(friend: FriendWithUserData) {
-	const id = friend.id === userCredentials.value?.user_id ? friend.friend_id : friend.id
-	if (id) {
-		await add_friend(id).catch(handleError)
-		await loadFriends()
-	}
-}
-
-async function removeFriend(friend: FriendWithUserData) {
-	const id = friend.id === userCredentials.value?.user_id ? friend.friend_id : friend.id
-	if (id) {
-		await remove_friend(id).catch(handleError)
-		await loadFriends()
-	}
-}
-
-const userFriends = ref<FriendWithUserData[]>([])
 const sortedFriends = computed<FriendWithUserData[]>(() =>
 	userFriends.value.slice().sort((a, b) => {
 		if (a.last_updated === null && b.last_updated === null) {
@@ -108,42 +113,29 @@ const incomingRequests = computed(() =>
 		.sort((a, b) => b.created.diff(a.created)),
 )
 
-const loading = ref(true)
-async function loadFriends(timeout = false) {
-	loading.value = timeout
+function addFriendFromModal() {
+	const target = username.value.trim()
+	if (!target) return
 
-	try {
-		const friendsList = await friends()
-		userFriends.value = await transformFriends(friendsList, userCredentials.value)
-		loading.value = false
-	} catch (e) {
-		console.error('Error loading friends', e)
-		if (timeout) {
-			setTimeout(() => loadFriends(), 15 * 1000)
-		}
-	}
+	addFriendModal.value.hide()
+	requestFriend({ id: target, username: target })
+	username.value = ''
 }
 
-watch(
-	userCredentials,
-	() => {
-		if (userCredentials.value === undefined) {
-			userFriends.value = []
-			loading.value = false
-		} else if (userCredentials.value === null) {
-			userFriends.value = []
-			loading.value = false
-		} else {
-			loadFriends(true)
-		}
-	},
-	{ immediate: true },
-)
+function showAddFriendModal() {
+	username.value = ''
+	addFriendModal.value?.show()
+}
 
-const unlisten = await friend_listener(() => loadFriends())
-onUnmounted(() => {
-	unlisten()
-})
+function addFriend(friend: FriendWithUserData) {
+	acceptFriend(friend)
+}
+
+function removeFriend(friend: FriendWithUserData) {
+	removeFriendRecord(friend)
+}
+
+defineExpose({ showAddFriendModal })
 
 const messages = defineMessages({
 	addFriend: {
@@ -236,26 +228,20 @@ const messages = defineMessages({
 					</div>
 					<div class="flex gap-2">
 						<template v-if="friend.id === userCredentials?.user_id">
-							<ButtonStyled color="brand">
-								<button @click="addFriend(friend)">
-									<UserPlusIcon />
-									Accept
-								</button>
-							</ButtonStyled>
-							<ButtonStyled>
-								<button @click="removeFriend(friend)">
-									<XIcon />
-									Ignore
-								</button>
-							</ButtonStyled>
+							<Button type="colored" color="brand" @click="addFriend(friend)">
+								<UserPlusIcon />
+								Accept
+							</Button>
+							<Button @click="removeFriend(friend)">
+								<XIcon />
+								Ignore
+							</Button>
 						</template>
 						<template v-else>
-							<ButtonStyled>
-								<button @click="removeFriend(friend)">
-									<XIcon />
-									Cancel
-								</button>
-							</ButtonStyled>
+							<Button @click="removeFriend(friend)">
+								<XIcon />
+								Cancel
+							</Button>
 						</template>
 					</div>
 				</div>
@@ -271,7 +257,7 @@ const messages = defineMessages({
 				{{ formatMessage(messages.usernameDescription) }}
 			</p>
 			<div class="flex items-center gap-2 mt-4">
-				<StyledInput
+				<Input
 					v-model="username"
 					:icon="UserIcon"
 					type="text"
@@ -279,56 +265,60 @@ const messages = defineMessages({
 					wrapper-class="flex-1"
 					@keyup.enter="addFriendFromModal"
 				/>
-				<ButtonStyled color="brand">
-					<button :disabled="username.length === 0" @click="addFriendFromModal">
-						<SendIcon />
-						{{ formatMessage(messages.sendFriendRequest) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="username.length === 0"
+					@click="addFriendFromModal"
+				>
+					<SendIcon />
+					{{ formatMessage(messages.sendFriendRequest) }}
+				</Button>
 			</div>
 		</div>
 	</ModalWrapper>
 	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 -ml-1">
 		<template v-if="sortedFriends.length > 0">
-			<ButtonStyled circular type="transparent">
-				<button
-					v-tooltip="formatMessage(messages.addFriend)"
-					:aria-label="formatMessage(messages.addFriend)"
-					@click="addFriendModal.show"
-				>
-					<UserPlusIcon />
-				</button>
-			</ButtonStyled>
-			<StyledInput
+			<IconButton
+				v-tooltip="formatMessage(messages.addFriend)"
+				type="quiet"
+				:label="formatMessage(messages.addFriend)"
+				@click="addFriendModal.show"
+			>
+				<UserPlusIcon />
+			</IconButton>
+			<Input
 				v-model="search"
+				:icon="SearchIcon"
 				type="text"
+				appearance="transparent"
 				:placeholder="formatMessage(messages.searchFriends)"
 				clearable
-				variant="outlined"
-				wrapper-class="flex-1"
+				input-class="!text-primary !placeholder:text-primary"
+				wrapper-class="flex-1 !border-button-bg [&>span:first-child]:!text-primary [&>span:first-child]:!opacity-100"
 				@keyup.esc="search = ''"
 			/>
 		</template>
 		<h3 v-else class="w-full text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
-		<ButtonStyled v-if="incomingRequests.length > 0" circular type="transparent">
-			<button
-				v-tooltip="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
-				class="relative"
-				:aria-label="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
-				@click="friendInvitesModal.show"
+		<IconButton
+			v-if="incomingRequests.length > 0"
+			v-tooltip="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
+			type="quiet"
+			:label="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
+			class="relative"
+			@click="friendInvitesModal.show"
+		>
+			<MailIcon />
+			<span
+				v-if="incomingRequests.length > 0"
+				aria-hidden="true"
+				class="absolute bg-brand text-brand-inverted text-[8px] top-0.5 px-1 right-0.5 min-w-3 h-3 rounded-full flex items-center justify-center font-bold"
 			>
-				<MailIcon />
-				<span
-					v-if="incomingRequests.length > 0"
-					aria-hidden="true"
-					class="absolute bg-brand text-brand-inverted text-[8px] top-0.5 px-1 right-0.5 min-w-3 h-3 rounded-full flex items-center justify-center font-bold"
-				>
-					{{ incomingRequests.length }}
-				</span>
-			</button>
-		</ButtonStyled>
+				{{ incomingRequests.length }}
+			</span>
+		</IconButton>
 	</div>
 	<div class="flex flex-col gap-3">
 		<h3 v-if="loading" class="text-base text-primary font-medium m-0">
@@ -369,33 +359,42 @@ const messages = defineMessages({
 			<FriendsSection
 				v-if="activeFriends.length > 0"
 				:is-searching="!!search"
-				open-by-default
+				:open-by-default="!isFriendsSectionCollapsed('friends_active_collapsed')"
 				:friends="activeFriends"
 				:heading="formatMessage(messages.active)"
 				:remove-friend="removeFriend"
+				@on-open="setFriendsSectionCollapsed('friends_active_collapsed', false)"
+				@on-close="setFriendsSectionCollapsed('friends_active_collapsed', true)"
 			/>
 			<FriendsSection
 				v-if="onlineFriends.length > 0"
 				:is-searching="!!search"
-				open-by-default
+				:open-by-default="!isFriendsSectionCollapsed('friends_online_collapsed')"
 				:friends="onlineFriends"
 				:heading="formatMessage(messages.online)"
 				:remove-friend="removeFriend"
+				@on-open="setFriendsSectionCollapsed('friends_online_collapsed', false)"
+				@on-close="setFriendsSectionCollapsed('friends_online_collapsed', true)"
 			/>
 			<FriendsSection
 				v-if="offlineFriends.length > 0"
 				:is-searching="!!search"
-				:open-by-default="activeFriends.length + onlineFriends.length < 3"
+				:open-by-default="!isFriendsSectionCollapsed('friends_offline_collapsed')"
 				:friends="offlineFriends"
 				:heading="formatMessage(messages.offline)"
 				:remove-friend="removeFriend"
+				@on-open="setFriendsSectionCollapsed('friends_offline_collapsed', false)"
+				@on-close="setFriendsSectionCollapsed('friends_offline_collapsed', true)"
 			/>
 			<FriendsSection
 				v-if="pendingFriends.length > 0"
 				:is-searching="!!search"
+				:open-by-default="!isFriendsSectionCollapsed('friends_pending_collapsed')"
 				:friends="pendingFriends"
 				:heading="formatMessage(messages.pending)"
 				:remove-friend="removeFriend"
+				@on-open="setFriendsSectionCollapsed('friends_pending_collapsed', false)"
+				@on-close="setFriendsSectionCollapsed('friends_pending_collapsed', true)"
 			/>
 			<p v-if="filteredFriends.length === 0 && search" class="text-sm text-secondary my-1 mx-4">
 				{{ formatMessage(messages.noFriendsMatch, { query: search }) }}

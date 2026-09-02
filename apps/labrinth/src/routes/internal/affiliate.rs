@@ -1,13 +1,11 @@
 use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use crate::env::ENV;
 use crate::{
     auth::get_user_from_headers,
-    database::{
-        models::{DBAffiliateCode, DBAffiliateCodeId, DBUser, DBUserId},
-        redis::RedisPool,
-    },
+    database::models::{DBAffiliateCode, DBAffiliateCodeId, DBUser, DBUserId},
     models::{
         analytics::AffiliateCodeClick, ids::AffiliateCodeId, pats::Scopes,
         users::Badges, v3::affiliate_code::AffiliateCode,
@@ -25,7 +23,7 @@ use url::Url;
 
 use crate::routes::ApiError;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ingest_click)
         .service(get_all)
         .service(create)
@@ -40,9 +38,14 @@ pub struct IngestClick {
     pub affiliate_code_id: AffiliateCodeId,
 }
 
-#[utoipa::path]
+/// Ingest an affiliate click.  
+#[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[post("/ingest-click")]
-async fn ingest_click(
+pub async fn ingest_click(
     req: HttpRequest,
     web::Json(ingest_click): web::Json<IngestClick>,
     pool: web::Data<PgPool>,
@@ -63,8 +66,8 @@ async fn ingest_click(
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = ingest_click.url;
-    let domain = url.host_str().ok_or_else(|| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+    let domain = url.host_str().wrap_request_err_with(|| {
+        "invalid page view URL specified!".to_string()
     })?;
     let url_origin = url.origin().ascii_serialization();
 
@@ -74,9 +77,9 @@ async fn ingest_click(
         .any(|origin| origin == "*" || url_origin == *origin);
 
     if !is_valid_url_origin {
-        return Err(ApiError::InvalidInput(
-            "invalid page view URL specified!".to_string(),
-        ));
+        return Err(ApiError::Request(eyre::eyre!(
+            "invalid page view URL specified!",
+        )));
     }
 
     let exists = sqlx::query!(
@@ -136,11 +139,14 @@ async fn ingest_click(
     Ok(())
 }
 
+/// List affiliate codes.  
 #[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
     responses((status = OK, body = inline(Vec<AffiliateCode>)))
 )]
 #[get("")]
-async fn get_all(
+pub async fn get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -153,7 +159,8 @@ async fn get_all(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     if user.role.is_admin() {
         let codes = DBAffiliateCode::get_all(&**pool)
@@ -175,9 +182,9 @@ async fn get_all(
             .collect::<Vec<_>>();
         Ok(web::Json(codes))
     } else {
-        Err(ApiError::CustomAuthentication(
-            "You do not have permission to view affiliate codes!".to_string(),
-        ))
+        Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to view affiliate codes!",
+        )))
     }
 }
 
@@ -187,11 +194,14 @@ pub struct CreateRequest {
     pub source_name: String,
 }
 
+/// Create an affiliate code.  
 #[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
     responses((status = OK, body = inline(AffiliateCode)))
 )]
 #[put("")]
-async fn create(
+pub async fn create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -205,16 +215,16 @@ async fn create(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let is_admin = creator.role.is_admin();
     let is_affiliate = creator.badges.contains(Badges::AFFILIATE);
 
     if !is_admin && !is_affiliate {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to create an affiliate code!"
-                .to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to create an affiliate code!",
+        )));
     }
 
     let creator_id = DBUserId::from(creator.id);
@@ -230,19 +240,25 @@ async fn create(
 
     if affiliate_id != creator_id {
         let Some(_affiliate_user) =
-            DBUser::get_id(affiliate_id, &**pool, &redis).await?
+            DBUser::get_id(affiliate_id, &**pool, &redis)
+                .await
+                .wrap_internal_err("fetching user from database")?
         else {
-            return Err(ApiError::CustomAuthentication(
-                "Affiliate user not found!".to_string(),
-            ));
+            return Err(ApiError::Auth(eyre::eyre!(
+                "Affiliate user not found!",
+            )));
         };
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let affiliate_code_id =
         crate::database::models::generate_affiliate_code_id(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("generating affiliate code ID")?;
 
     let code = DBAffiliateCode {
         id: affiliate_code_id,
@@ -263,11 +279,14 @@ async fn create(
     Ok(web::Json(AffiliateCode::from(code, is_admin)))
 }
 
+/// Get an affiliate code.  
 #[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
     responses((status = OK, body = inline(AffiliateCode)))
 )]
 #[get("/{id}")]
-async fn get(
+pub async fn get(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -281,13 +300,15 @@ async fn get(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
-    if let Some(model) =
-        DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
+    if let Some(model) = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
+        .await
+        .wrap_internal_err("fetching affiliate code from database")?
     {
         let is_admin = user.role.is_admin();
         let is_owner = model.affiliate == DBUserId::from(user.id);
@@ -295,16 +316,21 @@ async fn get(
         if is_admin || is_owner {
             Ok(web::Json(AffiliateCode::from(model, is_admin)))
         } else {
-            Err(ApiError::NotFound)
+            Err(ApiError::NotFound(eyre::eyre!("resource not found")))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
-#[utoipa::path]
+/// Delete an affiliate code.  
+#[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
-async fn delete(
+pub async fn delete(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -318,30 +344,33 @@ async fn delete(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
-    if let Some(model) =
-        DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
+    if let Some(model) = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
+        .await
+        .wrap_internal_err("fetching affiliate code from database")?
     {
         let is_admin = user.role.is_admin();
         let is_owner = model.affiliate == DBUserId::from(user.id);
 
         if is_admin || is_owner {
-            let result =
-                DBAffiliateCode::remove(affiliate_code_id, &**pool).await?;
+            let result = DBAffiliateCode::remove(affiliate_code_id, &**pool)
+                .await
+                .wrap_internal_err("deleting affiliate code from database")?;
             if result.is_some() {
                 Ok(())
             } else {
-                Err(ApiError::NotFound)
+                Err(ApiError::NotFound(eyre::eyre!("resource not found")))
             }
         } else {
-            Err(ApiError::NotFound)
+            Err(ApiError::NotFound(eyre::eyre!("resource not found")))
         }
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -350,9 +379,14 @@ pub struct PatchRequest {
     pub source_name: String,
 }
 
-#[utoipa::path]
+/// Update an affiliate code.  
+#[utoipa::path(
+	context_path = "/affiliate",
+	tag = "affiliates",
+	responses((status = NO_CONTENT))
+)]
 #[patch("/{id}")]
-async fn patch(
+pub async fn patch(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -367,26 +401,28 @@ async fn patch(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?;
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
     let existing_code = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
-        .await?
-        .ok_or(ApiError::NotFound)?;
+        .await
+        .wrap_internal_err("fetching affiliate code from database")?
+        .wrap_not_found_err("resource not found")?;
 
     let is_admin = user.role.is_admin();
     let is_owner = existing_code.affiliate == DBUserId::from(user.id);
 
     if !is_admin && !is_owner {
-        return Err(ApiError::NotFound);
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
     if !is_admin && !user.badges.contains(Badges::AFFILIATE) {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to update affiliate codes!".to_string(),
-        ));
+        return Err(ApiError::Auth(eyre::eyre!(
+            "You do not have permission to update affiliate codes!",
+        )));
     }
 
     DBAffiliateCode::update_source_name(

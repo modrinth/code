@@ -11,6 +11,7 @@
 				<SkinPreviewRenderer
 					:variant="variant"
 					:texture-src="previewSkin || ''"
+					:ears-texture-src="uploadedTextureUrl?.original ?? currentSkin?.texture"
 					:cape-src="selectedCapeTexture"
 					framing="modal"
 					:initial-rotation="Math.PI / 8"
@@ -18,14 +19,12 @@
 				/>
 			</div>
 
-			<div class="flex flex-col gap-4 w-full min-h-[20rem]">
+			<div class="flex flex-col gap-4 w-full min-h-[20rem] min-w-52">
 				<section v-if="mode === 'edit' && canEditTextureAndModel">
 					<h2 class="text-base font-semibold mb-2">{{ formatMessage(messages.textureSection) }}</h2>
-					<ButtonStyled>
-						<button class="!shadow-none" @click="openTextureFileBrowser">
-							<UploadIcon /> {{ formatMessage(messages.replaceTextureButton) }}
-						</button>
-					</ButtonStyled>
+					<Button @click="openTextureFileBrowser">
+						<UploadIcon /> {{ formatMessage(messages.replaceTextureButton) }}
+					</Button>
 					<input
 						ref="textureFileInput"
 						type="file"
@@ -39,7 +38,7 @@
 					<h2 class="text-base font-semibold mb-2">
 						{{ formatMessage(messages.armStyleSection) }}
 					</h2>
-					<RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']">
+					<RadioButtons v-model="variant" :items="['CLASSIC', 'SLIM']" class="!flex-row flex-wrap">
 						<template #default="{ item }">
 							{{
 								formatMessage(item === 'CLASSIC' ? messages.wideArmStyle : messages.slimArmStyle)
@@ -111,19 +110,21 @@
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button :disabled="isSaving" @click="hide">
-						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button v-tooltip="saveTooltip" :disabled="disableSave || isSaving" @click="save">
-						<SpinnerIcon v-if="isSaving" class="animate-spin" />
-						<CheckIcon v-else-if="mode === 'new'" />
-						<SaveIcon v-else />
-						{{ formatMessage(mode === 'new' ? messages.addSkinButton : messages.saveSkinButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" :disabled="isSaving" @click="hide">
+					<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="saveTooltip"
+					type="colored"
+					color="brand"
+					:disabled="disableSave || isSaving"
+					@click="save"
+				>
+					<SpinnerIcon v-if="isSaving" class="animate-spin" />
+					<CheckIcon v-else-if="mode === 'new'" />
+					<SaveIcon v-else />
+					{{ formatMessage(mode === 'new' ? messages.addSkinButton : messages.saveSkinButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -132,7 +133,7 @@
 <script setup lang="ts">
 import { CheckIcon, SaveIcon, SpinnerIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	CapeButton,
 	CapeLikeTextButton,
 	commonMessages,
@@ -217,6 +218,10 @@ const messages = defineMessages({
 		id: 'app.skins.modal.make-edit-first-tooltip',
 		defaultMessage: 'Make an edit to the skin first!',
 	},
+	demoSaveTooltip: {
+		id: 'app.skins.modal.demo-save-tooltip',
+		defaultMessage: 'Sign in to save skins.',
+	},
 	addSkinButton: {
 		id: 'app.skins.modal.add-skin-button',
 		defaultMessage: 'Add skin',
@@ -243,7 +248,7 @@ const previewSkin = ref<string>('')
 
 const variant = ref<SkinModel>('CLASSIC')
 const selectedCape = ref<Cape | undefined>(undefined)
-const props = defineProps<{ capes?: Cape[] }>()
+const props = defineProps<{ capes?: Cape[]; demo?: boolean }>()
 
 const selectedCapeTexture = computed(() => selectedCape.value?.texture)
 const canEditTextureAndModel = computed(() => currentSkin.value?.source !== 'default')
@@ -321,12 +326,14 @@ const hasEdits = computed(() => {
 
 const disableSave = computed(
 	() =>
+		props.demo ||
 		(mode.value === 'new' && !uploadedTextureUrl.value) ||
 		(mode.value === 'edit' && !hasEdits.value),
 )
 
 const saveTooltip = computed(() => {
 	if (isSaving.value) return formatMessage(messages.savingTooltip)
+	if (props.demo) return formatMessage(messages.demoSaveTooltip)
 	if (mode.value === 'new' && !uploadedTextureUrl.value) {
 		return formatMessage(messages.uploadSkinFirstTooltip)
 	}
@@ -425,6 +432,8 @@ async function onTextureFileInputChange(e: Event) {
 }
 
 async function save() {
+	if (props.demo) return
+
 	isSaving.value = true
 
 	try {

@@ -22,17 +22,16 @@
 						formatMessage(messages.resetServerTitle)
 					}}</span>
 					<div>
-						<ButtonStyled color="red">
-							<button
-								v-tooltip="resetServerDisabledTooltip"
-								class="!shadow-none"
-								:disabled="resetServerDisabled"
-								@click="showResetServerModal"
-							>
-								<RotateCounterClockwiseIcon class="size-5" />
-								{{ formatMessage(commonMessages.resetServerButton) }}
-							</button>
-						</ButtonStyled>
+						<Button
+							v-tooltip="resetServerDisabledTooltip"
+							type="colored"
+							color="red"
+							:disabled="resetServerDisabled"
+							@click="showResetServerModal"
+						>
+							<RotateCounterClockwiseIcon class="size-5" />
+							{{ formatMessage(commonMessages.resetServerButton) }}
+						</Button>
 					</div>
 					<span class="text-primary">
 						{{ formatMessage(messages.resetServerDescription) }}
@@ -59,27 +58,25 @@
 				{{ formatMessage(messages.supportOptionsTitle) }}
 			</span>
 			<div>
-				<ButtonStyled color="red">
-					<button
-						v-tooltip="supportResetToOnboardingTooltip"
-						class="!shadow-none"
-						:disabled="supportResetToOnboardingDisabled"
-						@click="showResetToOnboardingModal"
-					>
-						<RotateCounterClockwiseIcon class="size-5" />
-						{{ formatMessage(messages.resetToOnboardingButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-tooltip="supportResetToOnboardingTooltip"
+					type="colored"
+					color="red"
+					:disabled="supportResetToOnboardingDisabled"
+					@click="showResetToOnboardingModal"
+				>
+					<RotateCounterClockwiseIcon class="size-5" />
+					{{ formatMessage(messages.resetToOnboardingButton) }}
+				</Button>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
@@ -103,13 +100,24 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { injectFilePicker } from '#ui/providers/file-picker'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
-const { server, serverId, worldId, isSyncingContent, busyReasons } = injectModrinthServerContext()
+const {
+	beginInstallation,
+	busyReasons,
+	cancelOptimisticInstallation,
+	installation,
+	server,
+	serverId,
+	worldId,
+} = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
+const serverDetailQueryKey = ['servers', 'detail', serverId] as const
+const addonsQueryKey = ['content', 'list', 'v1', serverId] as const
 const tags = injectTags()
 const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
@@ -202,19 +210,7 @@ const emit = defineEmits<{
 	'reinstall-failed': []
 }>()
 
-const isInstalling = computed(() => {
-	const val =
-		server.value?.status === 'installing' || isSyncingContent.value || busyReasons.value.length > 0
-	debug(
-		'isInstalling:',
-		val,
-		'server.status:',
-		server.value?.status,
-		'isSyncingContent:',
-		isSyncingContent.value,
-	)
-	return val
-})
+const isInstalling = computed(() => busyReasons.value.length > 0)
 const setupActionDisabled = computed(() => !canSetup.value || isInstalling.value)
 const setupActionDisabledMessage = computed(() => {
 	if (!canSetup.value) return permissionDeniedMessage.value
@@ -236,18 +232,23 @@ function showResetServerModal() {
 async function invalidateServerState() {
 	debug('invalidateServerState: starting')
 	await Promise.all([
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+		queryClient.invalidateQueries({ queryKey: serverDetailQueryKey }),
+		queryClient.invalidateQueries({ queryKey: addonsQueryKey }),
 	])
 	debug('invalidateServerState: complete')
 }
 
 const addonsQuery = useQuery({
-	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
+	queryKey: addonsQueryKey,
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
+	staleTime: 30_000,
 })
+
+const requiresInstallation = computed(
+	() => installation.value?.status === 'failed' || addonsQuery.data.value?.error != null,
+)
 
 const modpack = computed(() => addonsQuery.data.value?.modpack ?? null)
 
@@ -284,6 +285,8 @@ function showResetToOnboardingModal() {
 }
 
 const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
+const loaderGameVersionPlaceholder = '${modrinth.gameVersion}'
+const minecraftServerDownloadsStartTime = Date.parse('2012-04-04T00:00:00Z')
 
 function toApiLoaderName(loader: string): string {
 	return loader === 'neoforge' ? 'neo' : loader
@@ -292,10 +295,14 @@ function toApiLoaderName(loader: string): string {
 const apiLoaderName = computed(() =>
 	modLoaders.includes(editingPlatform.value) ? toApiLoaderName(editingPlatform.value) : null,
 )
+const manifestFormatVersion = computed(() => (apiLoaderName.value === 'quilt' ? 1 : 0))
 
 const manifestQuery = useQuery({
-	queryKey: computed(() => ['loader-manifest', apiLoaderName.value] as const),
-	queryFn: () => client.launchermeta.manifest_v0.getManifest(apiLoaderName.value!),
+	queryKey: computed(
+		() => ['loader-manifest', apiLoaderName.value, manifestFormatVersion.value] as const,
+	),
+	queryFn: () =>
+		client.launchermeta.manifest_v0.getManifest(apiLoaderName.value!, manifestFormatVersion.value),
 	enabled: computed(() => !!apiLoaderName.value),
 	staleTime: 5 * 60 * 1000,
 })
@@ -376,13 +383,36 @@ function getLoaderVersionsForGameVersion(
 	}
 
 	const manifest = manifestQuery.data.value?.gameVersions
+	const versionGroups = manifestQuery.data.value?.versionGroups
 	if (!manifest) return []
 
-	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
+	const entry = manifest.find((x) => x.id === gameVersion)
+	if (!entry) return []
+	if (entry?.versionGroup) {
+		return versionGroups?.find((group) => group.id === entry.versionGroup)?.loaders ?? []
+	}
+
+	const placeholder = manifest.find((x) => x.id === loaderGameVersionPlaceholder)
 	if (placeholder) return placeholder.loaders
 
-	const entry = manifest.find((x) => x.id === gameVersion)
 	return entry?.loaders ?? []
+}
+
+function supportsMinecraftServer(version: Labrinth.Tags.v2.GameVersion): boolean {
+	return Date.parse(version.date) >= minecraftServerDownloadsStartTime
+}
+
+function getSupportedManifestGameVersions(): Set<string> | null {
+	const manifest = manifestQuery.data.value?.gameVersions
+	if (!manifest) return null
+
+	const hasPlaceholder = manifest.some((entry) => entry.id === loaderGameVersionPlaceholder)
+	return new Set(
+		manifest
+			.filter((entry) => entry.id !== loaderGameVersionPlaceholder)
+			.filter((entry) => hasPlaceholder || entry.loaders.length > 0 || !!entry.versionGroup)
+			.map((entry) => entry.id),
+	)
 }
 
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
@@ -390,8 +420,91 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 	return loader as Archon.Content.v1.Modloader
 }
 
+type InstallationCacheSnapshot = {
+	server: Archon.Servers.v0.Server | undefined
+	addons: Archon.Content.v1.Addons | undefined
+}
+
+async function applyOptimisticInstallation(
+	platform: string,
+	gameVersion: string,
+	loaderVersion: string | null,
+): Promise<InstallationCacheSnapshot> {
+	await Promise.all([
+		queryClient.cancelQueries({ queryKey: serverDetailQueryKey, exact: true }),
+		queryClient.cancelQueries({ queryKey: addonsQueryKey, exact: true }),
+	])
+
+	const snapshot = {
+		server: queryClient.getQueryData<Archon.Servers.v0.Server>(serverDetailQueryKey),
+		addons: queryClient.getQueryData<Archon.Content.v1.Addons>(addonsQueryKey),
+	}
+	const resolvedLoaderVersion = platform === 'vanilla' ? null : loaderVersion
+	beginInstallation({
+		type: 'platform',
+		platform: platform as Extract<
+			Archon.Websocket.v0.InstallProgressKey,
+			{ type: 'platform' }
+		>['platform'],
+		platform_version: resolvedLoaderVersion ?? '',
+		game_version: gameVersion,
+	})
+
+	queryClient.setQueryData<Archon.Servers.v0.Server>(serverDetailQueryKey, (current) =>
+		current
+			? {
+					...current,
+					status: 'installing',
+					loader: formatLoaderLabel(platform) as Archon.Servers.v0.Loader,
+					loader_version: resolvedLoaderVersion,
+					mc_version: gameVersion,
+				}
+			: current,
+	)
+	queryClient.setQueryData<Archon.Content.v1.Addons>(addonsQueryKey, (current) =>
+		current
+			? {
+					...current,
+					modloader: toApiLoader(platform),
+					modloader_version: resolvedLoaderVersion,
+					game_version: gameVersion,
+				}
+			: current,
+	)
+
+	return snapshot
+}
+
+function rollbackOptimisticInstallation(snapshot: InstallationCacheSnapshot) {
+	cancelOptimisticInstallation()
+	queryClient.setQueryData(serverDetailQueryKey, snapshot.server)
+	queryClient.setQueryData(addonsQueryKey, snapshot.addons)
+}
+
+async function uploadLocalModpackWithSoftOverride() {
+	const picked = await filePicker.pickModpackFile()
+	if (!picked?.file) return false
+
+	const handle = client.kyros.content_v1.uploadModpackFile(
+		worldId.value!,
+		picked.file,
+		{ known: {} },
+		{ softOverride: true },
+	)
+	await uploadProgressModal.value!.track(handle)
+	beginInstallation({
+		type: 'local_modpack',
+		filename: picked.file.name,
+	})
+	emit('reinstall')
+	return true
+}
+
 provideInstallationSettings({
 	closeSettings: serverSettings.closeModal,
+	afterSave: async () => {
+		serverSettings.closeModal?.()
+	},
 	onGameVersionHover: handleGameVersionHover,
 	loading: computed(() => !server.value || addonsQuery.isLoading.value),
 	installationInfo: computed(() => {
@@ -458,44 +571,37 @@ provideInstallationSettings({
 	currentPlatform: computed(() => server.value?.loader?.toLowerCase() ?? 'vanilla'),
 	currentGameVersion: computed(() => server.value?.mc_version ?? ''),
 	currentLoaderVersion: computed(() => server.value?.loader_version ?? ''),
+	requiresInstallation,
 	availablePlatforms: ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur'],
 
 	editingPlatformRef: editingPlatform,
 	editingGameVersionRef: editingGameVersion,
 
 	resolveGameVersions(loader, showSnapshots) {
+		const serverVersions = tags.gameVersions.value.filter(supportsMinecraftServer)
 		const versions = showSnapshots
-			? tags.gameVersions.value
-			: tags.gameVersions.value.filter((v) => v.version_type === 'release')
+			? serverVersions
+			: serverVersions.filter((v) => v.version_type === 'release')
 
 		if (loader && loader !== 'vanilla') {
 			if (loader === 'paper') {
 				const supported = paperSupportedVersionsQuery.data.value
-				if (supported) {
-					return versions
-						.filter((v) => supported.has(v.version))
-						.map((v) => ({ value: v.version, label: v.version }))
-				}
+				if (!supported) return []
+				return versions
+					.filter((v) => supported.has(v.version))
+					.map((v) => ({ value: v.version, label: v.version }))
 			} else if (loader === 'purpur') {
 				const supported = purpurSupportedVersionsQuery.data.value
-				if (supported) {
-					return versions
-						.filter((v) => supported.has(v.version))
-						.map((v) => ({ value: v.version, label: v.version }))
-				}
+				if (!supported) return []
+				return versions
+					.filter((v) => supported.has(v.version))
+					.map((v) => ({ value: v.version, label: v.version }))
 			} else {
-				const manifest = manifestQuery.data.value?.gameVersions
-				if (manifest) {
-					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
-					if (!hasPlaceholder) {
-						const supportedVersions = new Set(
-							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
-						)
-						return versions
-							.filter((v) => supportedVersions.has(v.version))
-							.map((v) => ({ value: v.version, label: v.version }))
-					}
-				}
+				const supportedVersions = getSupportedManifestGameVersions()
+				if (!supportedVersions) return []
+				return versions
+					.filter((v) => supportedVersions.has(v.version))
+					.map((v) => ({ value: v.version, label: v.version }))
 			}
 		}
 
@@ -508,31 +614,23 @@ provideInstallationSettings({
 	},
 
 	resolveHasSnapshots(loader) {
+		const serverVersions = tags.gameVersions.value.filter(supportsMinecraftServer)
 		if (loader === 'vanilla') {
-			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
+			return serverVersions.some((v) => v.version_type !== 'release')
 		}
 		if (loader === 'paper') {
 			const supported = paperSupportedVersionsQuery.data.value
 			if (!supported) return false
-			return tags.gameVersions.value.some(
-				(v) => v.version_type !== 'release' && supported.has(v.version),
-			)
+			return serverVersions.some((v) => v.version_type !== 'release' && supported.has(v.version))
 		}
 		if (loader === 'purpur') {
 			const supported = purpurSupportedVersionsQuery.data.value
 			if (!supported) return false
-			return tags.gameVersions.value.some(
-				(v) => v.version_type !== 'release' && supported.has(v.version),
-			)
+			return serverVersions.some((v) => v.version_type !== 'release' && supported.has(v.version))
 		}
-		const manifest = manifestQuery.data.value?.gameVersions
-		if (!manifest) return false
-		const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
-		if (hasPlaceholder) {
-			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
-		}
-		const supportedVersions = new Set(manifest.filter((x) => x.loaders.length > 0).map((x) => x.id))
-		const supported = tags.gameVersions.value.filter((v) => supportedVersions.has(v.version))
+		const supportedVersions = getSupportedManifestGameVersions()
+		if (!supportedVersions) return false
+		const supported = serverVersions.filter((v) => supportedVersions.has(v.version))
 		return supported.some((v) => v.version_type !== 'release')
 	},
 
@@ -544,6 +642,9 @@ provideInstallationSettings({
 		const gameVersionChanged = gameVersion !== (server.value?.mc_version ?? '')
 		const loaderVersionChanged =
 			loaderVersionId !== null && loaderVersionId !== (server.value?.loader_version ?? '')
+		const shouldInstallContent =
+			requiresInstallation.value || platformChanged || loaderVersionChanged
+		if (!shouldInstallContent && !gameVersionChanged) return
 
 		let resolvedLoaderVersion = loaderVersionId
 		if (!resolvedLoaderVersion && platform !== 'vanilla') {
@@ -551,32 +652,34 @@ provideInstallationSettings({
 			resolvedLoaderVersion = versions[0]?.id ?? null
 		}
 
+		const snapshot = await applyOptimisticInstallation(platform, gameVersion, resolvedLoaderVersion)
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
-			platformChanged || loaderVersionChanged
+			shouldInstallContent
 				? { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion }
 				: { mVersion: gameVersion },
 		)
 		try {
-			if (platformChanged || loaderVersionChanged) {
+			if (shouldInstallContent) {
 				const request: Archon.Content.v1.InstallWorldContent = {
 					content_variant: 'bare',
 					loader: toApiLoader(platform),
 					version: resolvedLoaderVersion ?? '',
-					game_version: gameVersion || undefined,
+					game_version: gameVersion,
 					soft_override: true,
 				}
-				debug('save: platform/loader version changed, calling installContent', request)
+				debug('save: calling installContent', request)
 				await client.archon.content_v1.installContent(serverId, worldId.value!, request)
 			} else if (gameVersionChanged) {
 				debug('save: game version only, calling applyGameVersionUpdate', gameVersion)
 				await client.archon.content_v1.applyGameVersionUpdate(serverId, worldId.value!, gameVersion)
 			}
-			debug('save: succeeded, invalidating')
-			invalidateServerState()
+			debug('save: succeeded')
+			serverSettings.closeModal?.()
 		} catch (err) {
 			debug('save: failed, emitting reinstall-failed', err)
+			rollbackOptimisticInstallation(snapshot)
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
@@ -589,10 +692,10 @@ provideInstallationSettings({
 	async repair() {
 		if (setupActionDisabled.value) return
 		debug('repair: called')
+		beginInstallation({ type: 'unknown' })
 		try {
 			await client.archon.content_v1.repair(serverId, worldId.value!)
-			debug('repair: API succeeded, invalidating')
-			await invalidateServerState()
+			debug('repair: API succeeded')
 			addNotification({
 				type: 'success',
 				title: formatMessage(messages.repairStartedTitle),
@@ -600,6 +703,7 @@ provideInstallationSettings({
 			})
 		} catch (err) {
 			debug('repair: failed', err)
+			cancelOptimisticInstallation()
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
@@ -612,18 +716,8 @@ provideInstallationSettings({
 		if (!modpack.value) return
 		if (modpack.value.spec.platform === 'local_file') {
 			debug('reinstallModpack: local file, opening file picker')
-			const picked = await filePicker.pickModpackFile()
-			if (!picked?.file) return
 			try {
-				const handle = client.kyros.content_v1.uploadModpackFile(
-					worldId.value!,
-					picked.file,
-					{ known: {} },
-					{ softOverride: true },
-				)
-				await uploadProgressModal.value!.track(handle)
-				emit('reinstall')
-				invalidateServerState()
+				await uploadLocalModpackWithSoftOverride()
 			} catch (err) {
 				emit('reinstall-failed')
 				addNotification({
@@ -641,6 +735,11 @@ provideInstallationSettings({
 			modpack.value.spec.version_id,
 		)
 		debug('reinstallModpack: emitting reinstall before API call')
+		beginInstallation({
+			type: 'modrinth_modpack',
+			project_id: modpack.value.spec.project_id,
+			version_id: modpack.value.spec.version_id,
+		})
 		emit('reinstall')
 		try {
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
@@ -652,14 +751,29 @@ provideInstallationSettings({
 				},
 				soft_override: true,
 			})
-			debug('reinstallModpack: installContent succeeded, invalidating')
-			invalidateServerState()
+			debug('reinstallModpack: installContent succeeded')
 		} catch (err) {
 			debug('reinstallModpack: failed, emitting reinstall-failed', err)
+			cancelOptimisticInstallation()
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
+			})
+		}
+	},
+
+	async swapModpack() {
+		if (setupActionDisabled.value) return
+		if (modpack.value?.spec.platform !== 'local_file') return
+		debug('swapModpack: local file, opening file picker')
+		try {
+			await uploadLocalModpackWithSoftOverride()
+		} catch (err) {
+			emit('reinstall-failed')
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToChangeVersion),
 			})
 		}
 	},
@@ -690,14 +804,7 @@ provideInstallationSettings({
 			})
 		} finally {
 			debug('unlinkModpack: invalidating queries')
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: ['servers', 'detail', serverId],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: ['content', 'list', 'v1', serverId],
-				}),
-			])
+			await invalidateServerState()
 			debug('unlinkModpack: invalidation complete')
 		}
 	},
@@ -741,6 +848,11 @@ provideInstallationSettings({
 		if (!modpackProjectId.value) return
 		debug('onModpackVersionConfirm: called, version:', version.id)
 		debug('onModpackVersionConfirm: emitting reinstall before API call')
+		beginInstallation({
+			type: 'modrinth_modpack',
+			project_id: modpackProjectId.value,
+			version_id: version.id,
+		})
 		emit('reinstall')
 		try {
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
@@ -752,10 +864,10 @@ provideInstallationSettings({
 				},
 				soft_override: true,
 			})
-			debug('onModpackVersionConfirm: installContent succeeded, invalidating')
-			invalidateServerState()
+			debug('onModpackVersionConfirm: installContent succeeded')
 		} catch (err) {
 			debug('onModpackVersionConfirm: failed, emitting reinstall-failed', err)
+			cancelOptimisticInstallation()
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
@@ -837,6 +949,7 @@ provideInstallationSettings({
 			const versions = getLoaderVersionsForGameVersion(platform, gameVersion)
 			resolvedLoaderVersion = versions[0]?.id ?? null
 		}
+		const snapshot = await applyOptimisticInstallation(platform, gameVersion, resolvedLoaderVersion)
 		emit('reinstall', { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion })
 		try {
 			const request: Archon.Content.v1.InstallWorldContent = {
@@ -848,10 +961,10 @@ provideInstallationSettings({
 			}
 			debug('saveWithoutAutoFix: calling installContent', request)
 			await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-			debug('saveWithoutAutoFix: succeeded, invalidating')
-			invalidateServerState()
+			debug('saveWithoutAutoFix: succeeded')
 		} catch (err) {
 			debug('saveWithoutAutoFix: failed', err)
+			rollbackOptimisticInstallation(snapshot)
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
@@ -902,10 +1015,28 @@ watch(
 )
 
 function onReinstall(event?: unknown) {
-	if (resetServerDisabled.value) return
+	if (resetServerDisabled.value && !installation.value) return
 	installationSettingsLayout.value?.cancelEditing()
 	modrinthServersConsole.clear()
 	queryClient.removeQueries({ queryKey: ['servers', 'ws-state', serverId] })
+	if (!installation.value) {
+		const args = event as
+			| { loader?: string; lVersion?: string; mVersion?: string | null }
+			| undefined
+		if (args?.loader && args.mVersion) {
+			beginInstallation({
+				type: 'platform',
+				platform: args.loader as Extract<
+					Archon.Websocket.v0.InstallProgressKey,
+					{ type: 'platform' }
+				>['platform'],
+				platform_version: args.lVersion ?? '',
+				game_version: args.mVersion,
+			})
+		} else {
+			beginInstallation({ type: 'unknown' })
+		}
+	}
 	emit('reinstall', event)
 	serverSettings.closeModal?.()
 }

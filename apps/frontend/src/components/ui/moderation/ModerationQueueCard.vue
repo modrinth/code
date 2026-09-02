@@ -2,12 +2,7 @@
 	<div class="shadow-card rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-4">
-				<NuxtLink
-					:to="`/project/${queueEntry.project.slug}`"
-					target="_blank"
-					tabindex="-1"
-					class="flex"
-				>
+				<NuxtLink :to="`/project/${projectRouteParam}`" target="_blank" tabindex="-1" class="flex">
 					<Avatar
 						:src="queueEntry.project.icon_url"
 						size="4rem"
@@ -17,7 +12,7 @@
 				<div class="flex flex-col gap-1.5">
 					<div class="flex items-center gap-2">
 						<NuxtLink
-							:to="`/project/${queueEntry.project.slug}`"
+							:to="`/project/${projectRouteParam}`"
 							target="_blank"
 							class="text-lg font-semibold text-contrast hover:underline"
 						>
@@ -107,21 +102,29 @@
 				</span>
 
 				<div class="flex items-center gap-2">
-					<ButtonStyled circular>
-						<button v-tooltip="'Copy ID'" @click="copyId">
-							<ClipboardCopyIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular>
-						<button v-tooltip="'Copy link'" @click="copyLink">
-							<LinkIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled circular color="orange">
-						<button v-tooltip="'Begin review'" @click="openProjectForReview">
-							<ScaleIcon />
-						</button>
-					</ButtonStyled>
+					<CopyCode v-tooltip="'Copy project ID'" :text="queueEntry.project.id" />
+					<CopyLinkButton
+						v-tooltip="'Copy project link'"
+						:url="`https://modrinth.com/project/${queueEntry.project.id}`"
+					/>
+					<ButtonLink
+						v-tooltip="'Open moderation thread'"
+						:href="`/project/${queueEntry.project.id}/moderation`"
+						target="_blank"
+						circular
+						icon-only
+					>
+						<ExternalIcon />
+					</ButtonLink>
+					<IconButton
+						v-tooltip="'Begin review'"
+						type="colored"
+						color="orange"
+						:label="'Begin review'"
+						@click="openProjectForReview"
+					>
+						<ScaleIcon />
+					</IconButton>
 				</div>
 			</div>
 		</div>
@@ -129,13 +132,15 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, FileIcon, LinkIcon, ScaleIcon } from '@modrinth/assets'
+import { ExternalIcon, FileIcon, ScaleIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Badge,
-	ButtonStyled,
+	ButtonLink,
+	CopyCode,
+	CopyLinkButton,
 	getProjectTypeIcon,
-	injectNotificationManager,
+	IconButton,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
@@ -145,7 +150,6 @@ import { computed } from 'vue'
 
 import type { ModerationProject } from '~/helpers/moderation'
 
-const { addNotification } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
 const formatDateTimeFull = useFormatDateTime({
 	weekday: 'short',
@@ -177,7 +181,7 @@ function getDaysQueued(date: Date): number {
 const queuedDate = computed(() => {
 	return dayjs(
 		props.queueEntry.project.queued ||
-			props.queueEntry.project.created ||
+			props.queueEntry.project.published ||
 			props.queueEntry.project.updated,
 	)
 })
@@ -186,10 +190,14 @@ const daysInQueue = computed(() => {
 	return getDaysQueued(queuedDate.value.toDate())
 })
 
+const projectRouteParam = computed(
+	() => props.queueEntry.project.slug || props.queueEntry.project.id,
+)
+
 const formattedDate = computed(() => {
 	const date =
 		props.queueEntry.project.queued ||
-		props.queueEntry.project.created ||
+		props.queueEntry.project.published ||
 		props.queueEntry.project.updated
 	if (!date) return 'Unknown'
 
@@ -199,28 +207,6 @@ const formattedDate = computed(() => {
 		return 'Unknown'
 	}
 })
-
-function copyLink() {
-	const base = window.location.origin
-	const projectUrl = `${base}/project/${props.queueEntry.project.slug}`
-	navigator.clipboard.writeText(projectUrl).then(() => {
-		addNotification({
-			type: 'success',
-			title: 'Project link copied',
-			text: 'The link to this project has been copied to your clipboard.',
-		})
-	})
-}
-
-function copyId() {
-	navigator.clipboard.writeText(props.queueEntry.project.id).then(() => {
-		addNotification({
-			type: 'success',
-			title: 'Project ID copied',
-			text: 'The ID of this project has been copied to your clipboard.',
-		})
-	})
-}
 
 function openProjectForReview() {
 	emit('startFromProject', props.queueEntry.project.id)

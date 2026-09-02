@@ -13,14 +13,17 @@ mod util;
 mod api;
 mod error;
 mod event;
+pub mod install;
 mod launcher;
 mod logger;
 mod state;
 
 pub use api::*;
 pub use error::*;
+#[cfg(feature = "export-ts")]
+pub use event::export_app_event_bindings;
 pub use event::{
-    EventState, LoadingBar, LoadingBarType, emit::emit_loading,
+    AppEvent, EventState, LoadingBar, LoadingBarType, emit::emit_loading,
     emit::init_loading,
 };
 pub use logger::start_logger;

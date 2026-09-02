@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::database::{MIGRATOR, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::search::{self, SearchBackend};
@@ -7,6 +6,7 @@ use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use url::Url;
+use xredis::RedisPool;
 
 use crate::test::{dummy_data, environment::TestEnvironment};
 
@@ -90,7 +90,8 @@ impl TemporaryDatabase {
         println!("Migrations complete");
 
         // Gets new Redis pool
-        let redis_pool = RedisPool::new(temp_database_name.clone());
+        let redis_pool =
+            crate::database::redis::from_env(temp_database_name.clone()).await;
 
         // Create search backend
         let search_backend = search::backend(Some(temp_database_name.clone()));
@@ -170,11 +171,11 @@ impl TemporaryDatabase {
                             "Dummy data updated, so template DB tables will be dropped and re-created"
                         );
                         // Drop all tables in the database so they can be re-created and later filled with updated dummy data
-                        sqlx::query("DROP SCHEMA public CASCADE;")
+                        sqlx::query!("DROP SCHEMA public CASCADE;")
                             .execute(&pool)
                             .await
                             .unwrap();
-                        sqlx::query("CREATE SCHEMA public;")
+                        sqlx::query!("CREATE SCHEMA public;")
                             .execute(&pool)
                             .await
                             .unwrap();
@@ -192,7 +193,10 @@ impl TemporaryDatabase {
                         pool: pool.clone(),
                         ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
-                        redis_pool: RedisPool::new(name.clone()),
+                        redis_pool: crate::database::redis::from_env(
+                            name.clone(),
+                        )
+                        .await,
                         search_backend: Arc::from(search::backend(Some(
                             name.clone(),
                         ))),
@@ -211,14 +215,14 @@ impl TemporaryDatabase {
                     &temp_database_name, TEMPLATE_DATABASE_NAME
                 );
 
-                sqlx::query(&create_db_query)
+                sqlx::raw_sql(&create_db_query)
                     .execute(&main_pool)
                     .await
                     .expect("Database creation failed");
 
                 // Release the advisory lock
-                sqlx::query("SELECT pg_advisory_unlock(1)")
-                    .execute(&main_pool)
+                sqlx::query_scalar!("SELECT pg_advisory_unlock(1)")
+                    .fetch_one(&main_pool)
                     .await
                     .unwrap();
 
@@ -248,7 +252,7 @@ impl TemporaryDatabase {
             "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = '{}' AND pid <> pg_backend_pid()",
             &self.database_name
         );
-        sqlx::query(&terminate_query)
+        sqlx::raw_sql(&terminate_query)
             .execute(&self.pool)
             .await
             .unwrap();
@@ -256,7 +260,7 @@ impl TemporaryDatabase {
         // Execute the deletion query asynchronously
         let drop_db_query =
             format!("DROP DATABASE IF EXISTS {}", &self.database_name);
-        sqlx::query(&drop_db_query)
+        sqlx::raw_sql(&drop_db_query)
             .execute(&self.pool)
             .await
             .expect("Database deletion failed");
@@ -265,7 +269,7 @@ impl TemporaryDatabase {
 
 async fn create_template_database(pool: &PgPool) {
     let create_db_query = format!("CREATE DATABASE {TEMPLATE_DATABASE_NAME}");
-    sqlx::query(&create_db_query)
+    sqlx::raw_sql(&create_db_query)
         .execute(pool)
         .await
         .expect("Database creation failed");

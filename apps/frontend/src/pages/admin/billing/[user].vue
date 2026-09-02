@@ -30,7 +30,7 @@
 						{{ selectedCharge.net }})
 					</span>
 				</label>
-				<StyledInput id="amount" v-model="refundAmount" type="number" autocomplete="off" />
+				<Input id="amount" v-model="refundAmount" type="number" autocomplete="off" />
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="unprovision" class="flex flex-col gap-1">
@@ -43,18 +43,14 @@
 				<Toggle id="unprovision" v-model="unprovision" />
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="refunding" @click="refundCharge">
-						<CheckIcon aria-hidden="true" />
-						Refund charge
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="refundModal.hide()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="refunding" @click="refundCharge">
+					<CheckIcon aria-hidden="true" />
+					Refund charge
+				</Button>
+				<Button @click="refundModal.hide()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -82,18 +78,14 @@
 				<Toggle id="cancel" v-model="cancel" />
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="modifying" @click="modifyCharge">
-						<CheckIcon aria-hidden="true" />
-						Modify charge
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="modifyModal.hide()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="modifying" @click="modifyCharge">
+					<CheckIcon aria-hidden="true" />
+					Modify charge
+				</Button>
+				<Button @click="modifyModal.hide()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -107,7 +99,7 @@
 					<span class="text-lg font-semibold text-contrast">Days to credit</span>
 					<span>Enter the number of days to add to the next due date.</span>
 				</label>
-				<StyledInput id="days" v-model="creditDays" type="number" :min="1" autocomplete="off" />
+				<Input id="days" v-model="creditDays" type="number" :min="1" autocomplete="off" />
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="sendEmail" class="flex flex-col gap-1">
@@ -117,37 +109,29 @@
 				<Toggle id="sendEmail" v-model="creditSendEmail" />
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button :disabled="crediting" @click="applyCredit">
-						<CheckIcon aria-hidden="true" />
-						Apply credit
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="creditModal.hide()">
-						<XIcon aria-hidden="true" />
-						Cancel
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" :disabled="crediting" @click="applyCredit">
+					<CheckIcon aria-hidden="true" />
+					Apply credit
+				</Button>
+				<Button @click="creditModal.hide()">
+					<XIcon aria-hidden="true" />
+					Cancel
+				</Button>
 			</div>
 		</div>
 	</NewModal>
-	<div class="page">
-		<div
-			class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
-		>
+	<div>
+		<div class="mb-4 flex items-center justify-between gap-4">
 			<div class="flex items-center gap-2">
 				<Avatar :src="user?.avatar_url" :alt="user?.username" size="32px" circle />
-				<h1 class="m-0 text-2xl font-extrabold">{{ user?.username }}'s subscriptions</h1>
+				<h2 class="m-0 text-2xl font-semibold">{{ user?.username }}'s subscriptions</h2>
 			</div>
 			<div class="flex items-center gap-2">
-				<ButtonStyled>
-					<nuxt-link :to="`/user/${user?.id}`">
-						<UserIcon aria-hidden="true" />
-						User profile
-						<ExternalIcon class="h-4 w-4" />
-					</nuxt-link>
-				</ButtonStyled>
+				<ButtonLink :to="`/user/${user?.id}`">
+					<UserIcon aria-hidden="true" />
+					User profile
+					<ExternalIcon class="h-4 w-4" />
+				</ButtonLink>
 			</div>
 		</div>
 		<div>
@@ -176,25 +160,20 @@
 					</div>
 					<div v-if="subscription.metadata?.id" class="flex flex-col items-end gap-2">
 						<CopyCode :text="subscription.metadata.id" />
-						<ButtonStyled
+						<ButtonLink
 							v-if="
 								subscription.metadata?.type === 'pyro' || subscription.metadata?.type === 'medal'
 							"
+							:href="`/hosting/manage/${subscription.metadata.id}`"
+							target="_blank"
+							class="w-fit"
 						>
-							<nuxt-link
-								:to="`/hosting/manage/${subscription.metadata.id}`"
-								target="_blank"
-								class="w-fit"
-							>
-								<ServerIcon /> Server panel <ExternalIcon class="h-4 w-4" />
-							</nuxt-link>
-						</ButtonStyled>
-						<ButtonStyled>
-							<button @click="showCreditModal(subscription)">
-								<CurrencyIcon />
-								Credit
-							</button>
-						</ButtonStyled>
+							<ServerIcon /> Server panel <ExternalIcon class="h-4 w-4" />
+						</ButtonLink>
+						<Button @click="showCreditModal(subscription)">
+							<CurrencyIcon />
+							Credit
+						</Button>
 					</div>
 				</div>
 				<div class="flex flex-col gap-2">
@@ -226,18 +205,17 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	CopyCode,
-	defineMessages,
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
 	Toggle,
 	useFormatDateTime,
 	useRelativeTime,
-	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
@@ -254,17 +232,7 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 })
 
-const vintl = useVIntl()
-
-const { formatMessage } = vintl
 const formatRelativeTime = useRelativeTime()
-
-const messages = defineMessages({
-	userNotFoundError: {
-		id: 'admin.billing.error.not-found',
-		defaultMessage: 'User not found',
-	},
-})
 
 const userId = useRouteId('user')
 
@@ -284,7 +252,7 @@ watch(userError, (error) => {
 		showError({
 			fatal: true,
 			statusCode: error.statusCode ?? error.status ?? 404,
-			message: formatMessage(messages.userNotFoundError),
+			message: 'User not found',
 		})
 	}
 })
@@ -428,11 +396,3 @@ async function modifyCharge() {
 	modifying.value = false
 }
 </script>
-<style scoped>
-.page {
-	padding: 1rem;
-	margin-left: auto;
-	margin-right: auto;
-	max-width: 56rem;
-}
-</style>

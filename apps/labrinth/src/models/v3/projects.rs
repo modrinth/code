@@ -8,10 +8,12 @@ use crate::models::exp;
 use crate::models::ids::{
     FileId, OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
+use crate::routes::{FileHash, HashAlgorithm};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use url::Url;
 use validator::Validate;
 
 /// A project returned from the API
@@ -77,6 +79,8 @@ pub struct Project {
     pub versions: Vec<VersionId>,
     /// The URL of the icon of the project
     pub icon_url: Option<String>,
+    /// The URL of the unoptimized icon of the project
+    pub raw_icon_url: Option<String>,
 
     /// A collection of links to the project's various pages.
     pub link_urls: HashMap<String, Link>,
@@ -191,6 +195,7 @@ impl From<ProjectQueryResult> for Project {
             loaders: m.loaders,
             versions: data.versions.into_iter().map(|v| v.into()).collect(),
             icon_url: m.icon_url,
+            raw_icon_url: m.raw_icon_url,
             link_urls: data
                 .urls
                 .into_iter()
@@ -565,11 +570,13 @@ impl ProjectStatus {
     pub fn can_be_requested(&self) -> bool {
         match self {
             ProjectStatus::Approved => true,
-            ProjectStatus::Archived => true,
             ProjectStatus::Unlisted => true,
             ProjectStatus::Private => true,
             ProjectStatus::Draft => true,
 
+            // `archived` is represented by a disclosure, not a status, so it
+            // can no longer be requested or set as a status.
+            ProjectStatus::Archived => false,
             ProjectStatus::Rejected => false,
             ProjectStatus::Processing => false,
             ProjectStatus::Unknown => false,
@@ -645,6 +652,98 @@ impl SideTypesMigrationReviewStatus {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+pub struct MissingAttributionFile {
+    pub id: FileId,
+    pub override_source: Option<OverrideSource>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum OverrideSource {
+    Flame {
+        id: u32,
+        title: String,
+        url: String,
+        icon_url: String,
+    },
+    Unknown,
+}
+
+#[derive(
+    Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
+)]
+pub struct FlameProject {
+    pub id: u32,
+    pub title: String,
+    pub url: String,
+    pub icon_url: String,
+}
+
+#[derive(
+    Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
+)]
+#[serde(untagged)]
+pub enum AttributionLicense {
+    Spdx(String),
+    Custom { name: String },
+}
+
+#[derive(
+    Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
+)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum AttributionResolutionKind {
+    License {
+        license: AttributionLicense,
+        link_to_work: Url,
+    },
+    GloballyAllowed {
+        link_to_work: Url,
+    },
+    MyProject {
+        license: AttributionLicense,
+    },
+    SpecialPermissions {
+        link_to_work: Url,
+    },
+    NoPermission {
+        link_to_work: Option<Url>,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum AttributionModerationStatusKind {
+    NotAllowed,
+    Approved,
+    BadProof,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+pub struct AttributionModerationStatus {
+    #[serde(flatten)]
+    pub kind: AttributionModerationStatusKind,
+    #[serde(default)]
+    pub reason: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub moderated_at: Option<DateTime<Utc>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub moderated_by: Option<UserId>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
+pub struct AttributionResolution {
+    #[serde(flatten)]
+    pub kind: AttributionResolutionKind,
+    #[serde(default)]
+    pub moderation_status: Option<AttributionModerationStatus>,
+    #[serde(default)]
+    pub updated_by_moderator: bool,
+    pub notes: String,
+    pub image_urls: Vec<Url>,
+}
+
 /// A specific version of a project
 #[derive(Debug, Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct Version {
@@ -681,6 +780,9 @@ pub struct Version {
 
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
+    /// Files in this version that contain override files not yet attributed.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub files_missing_attribution: Vec<MissingAttributionFile>,
     /// A list of projects that this version depends on.
     pub dependencies: Vec<Dependency>,
 
@@ -757,6 +859,7 @@ impl From<VersionQueryResult> for Version {
                     dependency_type: DependencyType::from_string(
                         d.dependency_type.as_str(),
                     ),
+                    attribution: d.attribution,
                 })
                 .collect(),
             loaders: data.loaders.into_iter().map(Loader).collect(),
@@ -768,6 +871,7 @@ impl From<VersionQueryResult> for Version {
                 .map(|vf| (vf.field_name, vf.value.serialize_internal()))
                 .collect(),
             components: data.components,
+            files_missing_attribution: Vec::new(),
         }
     }
 }
@@ -872,6 +976,7 @@ pub struct VersionFile {
     pub id: Option<FileId>,
     /// A map of hashes of the file.  The key is the hashing algorithm
     /// and the value is the string version of the hash.
+    #[schema(value_type = std::collections::HashMap<HashAlgorithm, FileHash>)]
     pub hashes: std::collections::HashMap<String, String>,
     /// A direct link to the file for downloading it.
     pub url: String,
@@ -899,6 +1004,18 @@ pub struct Dependency {
     pub file_name: Option<String>,
     /// The type of the dependency
     pub dependency_type: DependencyType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<DependencyAttribution>,
+}
+
+#[derive(
+    Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+)]
+pub struct DependencyAttribution {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flame_project: Option<FlameProject>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resolution: Option<AttributionResolutionKind>,
 }
 
 #[derive(

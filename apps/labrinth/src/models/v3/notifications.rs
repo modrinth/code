@@ -12,6 +12,7 @@ use crate::routes::ApiError;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
@@ -36,6 +37,7 @@ pub enum NotificationType {
     TeamInvite,
     OrganizationInvite,
     ServerInvite,
+    SharedInstanceInvite,
     StatusChange,
     ModeratorMessage,
     LegacyMarkdown,
@@ -71,6 +73,7 @@ impl NotificationType {
             NotificationType::TeamInvite => "team_invite",
             NotificationType::OrganizationInvite => "organization_invite",
             NotificationType::ServerInvite => "server_invite",
+            NotificationType::SharedInstanceInvite => "shared_instance_invite",
             NotificationType::StatusChange => "status_change",
             NotificationType::ModeratorMessage => "moderator_message",
             NotificationType::LegacyMarkdown => "legacy_markdown",
@@ -112,6 +115,7 @@ impl NotificationType {
             "team_invite" => NotificationType::TeamInvite,
             "organization_invite" => NotificationType::OrganizationInvite,
             "server_invite" => NotificationType::ServerInvite,
+            "shared_instance_invite" => NotificationType::SharedInstanceInvite,
             "status_change" => NotificationType::StatusChange,
             "moderator_message" => NotificationType::ModeratorMessage,
             "legacy_markdown" => NotificationType::LegacyMarkdown,
@@ -148,7 +152,8 @@ impl NotificationType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
+#[serde_binhum]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum NotificationBody {
     ProjectUpdate {
@@ -172,6 +177,12 @@ pub enum NotificationBody {
         server_name: String,
         invited_by: UserId,
         role: String,
+    },
+    SharedInstanceInvite {
+        shared_instance_id: String,
+        shared_instance_name: String,
+        shared_instance_icon: Option<String>,
+        invited_by: UserId,
     },
     StatusChange {
         project_id: ProjectId,
@@ -287,6 +298,9 @@ impl NotificationBody {
             }
             NotificationBody::ServerInvite { .. } => {
                 NotificationType::ServerInvite
+            }
+            NotificationBody::SharedInstanceInvite { .. } => {
+                NotificationType::SharedInstanceInvite
             }
             NotificationBody::StatusChange { .. } => {
                 NotificationType::StatusChange
@@ -451,6 +465,32 @@ impl From<DBNotification> for Notification {
                     "You have been invited to join a server!".to_string(),
                     format!(
                         "An invite has been sent for you to be {role} of {server_name}"
+                    ),
+                    "#".to_string(),
+                    vec![
+                        NotificationAction {
+                            name: "Accept".to_string(),
+                            action_route: (
+                                "POST".to_string(),
+                                String::new(),
+                            ),
+                        },
+                        NotificationAction {
+                            name: "Deny".to_string(),
+                            action_route: (
+                                "POST".to_string(),
+                                String::new(),
+                            ),
+                        },
+                    ],
+                ),
+                NotificationBody::SharedInstanceInvite {
+                    shared_instance_name,
+                    ..
+                } => (
+                    "You have been invited to a shared instance!".to_string(),
+                    format!(
+                        "An invite has been sent for you to join {shared_instance_name}"
                     ),
                     "#".to_string(),
                     vec![
@@ -670,7 +710,7 @@ impl From<DBNotification> for Notification {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct NotificationAction {
     pub name: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route
@@ -727,8 +767,8 @@ impl NotificationDeliveryStatus {
             NotificationDeliveryStatus::Delivered => Ok(()),
             NotificationDeliveryStatus::SkippedPreferences |
             NotificationDeliveryStatus::SkippedDefault |
-            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occurred while sending an email to your email address. Please try again later.".to_owned())),
-            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::InvalidInput("This email address doesn't exist! Please try another one.".to_owned())),
+            NotificationDeliveryStatus::Pending => Err(ApiError::Request(eyre::eyre!("An error occurred while sending an email to your email address. Please try again later.".to_owned()))),
+            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::Request(eyre::eyre!("This email address doesn't exist! Please try another one.".to_owned()))),
         }
     }
 

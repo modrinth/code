@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { SearchIcon } from '@modrinth/assets'
+import { RotateCounterClockwiseIcon, SearchIcon } from '@modrinth/assets'
 import { computed, ref, toValue } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Admonition from '#ui/components/base/Admonition.vue'
+import { Button, IconButton } from '#ui/components/base/buttons'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import Pagination from '#ui/components/base/Pagination.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
 import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
@@ -20,6 +21,7 @@ import type { SortType } from '#ui/utils/search'
 import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
 import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
+import type { CardAction } from './types'
 
 const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
@@ -65,14 +67,70 @@ const messages = defineMessages({
 		id: 'browse.no-results',
 		defaultMessage: 'No results found for your query!',
 	},
+	linkOverridingPreferences: {
+		id: 'browse.advanced-filters.link-overriding-preferences',
+		defaultMessage: "This link's filters differ from your saved advanced exclusions",
+	},
+	applySavedPreferences: {
+		id: 'browse.advanced-filters.apply-saved-preferences',
+		defaultMessage: 'Apply saved preferences',
+	},
 })
+
+function cardActionType(action: CardAction) {
+	if (action.type === 'transparent') return 'quiet'
+	if (action.type === 'outlined') return 'outlined'
+	return action.color && action.color !== 'standard' ? 'colored' : 'base'
+}
+
+function cardActionColor(action: CardAction) {
+	const type = cardActionType(action)
+	return type === 'colored' || type === 'quiet' ? action.color : undefined
+}
+
+function cardActionClass(action: CardAction) {
+	if (action.type !== 'outlined' || !action.color || action.color === 'standard') return undefined
+
+	return {
+		brand: '!text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]',
+		red: '!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]',
+		green: '!text-green [&>svg]:!text-green !shadow-[inset_0_0_0_1px_var(--color-green)]',
+	}[action.color]
+}
+
+function getLoaderFieldValues(
+	result: Labrinth.Search.v3.ResultSearchProject,
+	field: string,
+): string[] {
+	return (result.project_loader_fields?.[field] ?? []).filter(
+		(value): value is string => typeof value === 'string',
+	)
+}
+
+function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, displayOnly: boolean) {
+	const tags = new Set(displayOnly ? result.display_categories : result.categories)
+
+	for (const loader of result.loaders) {
+		if (loader !== 'mrpack') {
+			tags.add(loader)
+		}
+	}
+
+	if (result.loaders.includes('mrpack')) {
+		for (const loader of getLoaderFieldValues(result, 'mrpack_loaders')) {
+			tags.add(loader)
+		}
+	}
+
+	return Array.from(tags)
+}
 </script>
 
 <template>
 	<template v-if="ctx.installContext?.value && ctx.variant !== 'web'">
 		<div
 			ref="stickyInstallHeaderRef"
-			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 p-3 border-surface-5"
+			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-6 py-4 border-surface-5"
 			:class="[isInstallHeaderStuck ? 'border-t' : '']"
 		>
 			<BrowseInstallHeader />
@@ -80,9 +138,13 @@ const messages = defineMessages({
 	</template>
 	<SelectedProjectsFloatingBar v-if="ctx.installContext?.value && ctx.variant !== 'web'" />
 
-	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
+	<NavTabs
+		v-if="ctx.showProjectTypeTabs.value"
+		:links="ctx.selectableProjectTypes.value"
+		:replace="ctx.variant === 'app'"
+	/>
 
-	<StyledInput
+	<Input
 		v-model="ctx.query.value"
 		:icon="SearchIcon"
 		type="text"
@@ -94,14 +156,30 @@ const messages = defineMessages({
 		"
 		clearable
 		wrapper-class="w-full"
-		:input-class="ctx.variant === 'web' ? '!h-12' : 'h-12'"
+		size="large"
 		@clear="ctx.clearSearch()"
 	/>
+
+	<Admonition
+		v-if="ctx.linkOverridesAdvancedPrefs.value"
+		type="info"
+		:header="formatMessage(messages.linkOverridingPreferences)"
+		inline-actions
+		center-content
+	>
+		<template #actions>
+			<Button type="colored" color="blue" @click="ctx.applySavedAdvancedPrefs()">
+				<RotateCounterClockwiseIcon />
+				{{ formatMessage(messages.applySavedPreferences) }}
+			</Button>
+		</template>
+	</Admonition>
 
 	<div class="flex flex-wrap items-center gap-2">
 		<Combobox
 			:model-value="ctx.effectiveCurrentSortType.value"
 			:options="sortOptions"
+			trigger-type="base"
 			:class="
 				ctx.variant === 'web'
 					? '!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0'
@@ -119,6 +197,7 @@ const messages = defineMessages({
 		<Combobox
 			:model-value="ctx.maxResults.value"
 			:options="maxResultsOptions"
+			trigger-type="base"
 			:class="
 				ctx.variant === 'web'
 					? '!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0'
@@ -133,18 +212,18 @@ const messages = defineMessages({
 		</Combobox>
 
 		<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
-			<ButtonStyled>
-				<button @click="ctx.filtersMenuOpen.value = true">
-					{{ formatMessage(messages.filterResults) }}
-				</button>
-			</ButtonStyled>
+			<Button @click="ctx.filtersMenuOpen.value = true">
+				{{ formatMessage(messages.filterResults) }}
+			</Button>
 		</div>
 
-		<ButtonStyled v-if="ctx.cycleDisplayMode" circular>
-			<button @click="ctx.cycleDisplayMode!()">
-				<slot name="display-mode-icon" />
-			</button>
-		</ButtonStyled>
+		<IconButton
+			v-if="ctx.cycleDisplayMode"
+			label="Change display mode"
+			@click="ctx.cycleDisplayMode!()"
+		>
+			<slot name="display-mode-icon" />
+		</IconButton>
 
 		<Pagination
 			:page="ctx.currentPage.value"
@@ -158,19 +237,25 @@ const messages = defineMessages({
 		v-if="ctx.isServerType.value"
 		v-model:selected-filters="ctx.serverCurrentFilters.value"
 		:filters="ctx.serverFilterTypes.value"
+		:project-type="ctx.projectType.value"
 		:provided-filters="[]"
 		:overridden-provided-filter-types="[]"
 	/>
 	<SearchFilterControl
 		v-else
 		v-model:selected-filters="ctx.currentFilters.value"
-		:filters="ctx.filters.value.filter((f) => f.display !== 'none')"
+		:filters="
+			ctx.filters.value.filter(
+				(f) => f.display !== 'none' && !(ctx.hiddenFilterTypes?.value ?? []).includes(f.id),
+			)
+		"
+		:project-type="ctx.projectType.value"
 		:provided-filters="ctx.providedFilters?.value ?? []"
 		:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
 		:provided-message="lockedMessages?.providedBy"
 	/>
 
-	<div class="search">
+	<div class="search mt-1 [overflow-anchor:none]">
 		<section v-if="ctx.loading.value" class="offline">
 			<component :is="ctx.loadingComponent ?? LoadingIndicator" />
 		</section>
@@ -218,22 +303,35 @@ const messages = defineMessages({
 				>
 					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
-							<ButtonStyled
+							<template
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
 								:key="action.key"
-								:color="action.color"
-								:type="action.type"
-								:circular="action.circular"
 							>
-								<button
+								<IconButton
+									v-if="action.circular"
 									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
+									:label="action.label || action.tooltip || action.key"
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
 									<component :is="action.icon" :class="action.iconClass" />
-									<template v-if="!action.circular">{{ action.label }}</template>
-								</button>
-							</ButtonStyled>
+								</IconButton>
+								<Button
+									v-else
+									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
+									:disabled="action.disabled"
+									@click.stop="action.onClick"
+								>
+									<component :is="action.icon" :class="action.iconClass" />
+									{{ action.label }}
+								</Button>
+							</template>
 						</div>
 					</template>
 				</ProjectCard>
@@ -243,15 +341,13 @@ const messages = defineMessages({
 					v-for="result in ctx.projectHits.value"
 					:key="result.project_id"
 					:link="ctx.getProjectLink(result)"
-					:title="result.title"
-					:icon-url="result.icon_url"
+					:title="result.name"
+					:icon-url="result.icon_url ?? undefined"
 					:author="{
 						name: result.organization == null ? result.author : result.organization,
 						link:
 							result.organization_id == null
-								? ctx.variant === 'web'
-									? `/user/${result.author_id ?? result.author}`
-									: `https://modrinth.com/user/${result.author_id ?? result.author}`
+								? `/user/${encodeURIComponent(result.author_id ?? result.author)}`
 								: ctx.variant === 'web'
 									? `/organization/${result.organization_id}`
 									: `https://modrinth.com/organization/${result.organization_id}`,
@@ -262,9 +358,9 @@ const messages = defineMessages({
 						ctx.effectiveCurrentSortType.value.name === 'newest' ? 'published' : 'updated'
 					"
 					:downloads="result.downloads"
-					:summary="result.description"
-					:tags="result.display_categories"
-					:all-tags="result.categories"
+					:summary="result.summary"
+					:tags="getProjectCardTags(result, true)"
+					:all-tags="getProjectCardTags(result, false)"
 					:deprioritized-tags="ctx.deprioritizedTags.value"
 					:exclude-loaders="ctx.excludeLoaders.value"
 					:followers="result.follows"
@@ -272,10 +368,7 @@ const messages = defineMessages({
 					:color="result.color ?? undefined"
 					:environment="
 						['mod', 'modpack'].includes(ctx.projectType.value)
-							? {
-									clientSide: result.client_side as Labrinth.Projects.v2.Environment,
-									serverSide: result.server_side as Labrinth.Projects.v2.Environment,
-								}
+							? result.project_loader_fields?.environment?.[0]
 							: undefined
 					"
 					:layout="ctx.effectiveLayout.value"
@@ -285,22 +378,35 @@ const messages = defineMessages({
 				>
 					<template v-if="ctx.getCardActions?.(result, ctx.projectType.value)?.length" #actions>
 						<div class="flex gap-2">
-							<ButtonStyled
+							<template
 								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
 								:key="action.key"
-								:color="action.color"
-								:type="action.type"
-								:circular="action.circular"
 							>
-								<button
+								<IconButton
+									v-if="action.circular"
 									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
+									:label="action.label || action.tooltip || action.key"
 									:disabled="action.disabled"
 									@click.stop="action.onClick"
 								>
 									<component :is="action.icon" :class="action.iconClass" />
-									<template v-if="!action.circular">{{ action.label }}</template>
-								</button>
-							</ButtonStyled>
+								</IconButton>
+								<Button
+									v-else
+									v-tooltip="action.tooltip"
+									:type="cardActionType(action)"
+									:color="cardActionColor(action)"
+									:class="cardActionClass(action)"
+									:disabled="action.disabled"
+									@click.stop="action.onClick"
+								>
+									<component :is="action.icon" :class="action.iconClass" />
+									{{ action.label }}
+								</Button>
+							</template>
 						</div>
 					</template>
 				</ProjectCard>

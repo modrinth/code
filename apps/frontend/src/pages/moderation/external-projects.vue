@@ -2,13 +2,13 @@
 	<NewModal ref="editModal" header="Edit external project">
 		<form class="flex flex-col gap-2" @submit.prevent="saveExternalProjectEdit">
 			<label class="font-semibold text-contrast" for="edit-form-title">Title</label>
-			<StyledInput id="edit-form-title" v-model="editForm.title" type="text" />
+			<Input id="edit-form-title" v-model="editForm.title" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-link">Link</label>
-			<StyledInput id="edit-form-link" v-model="editForm.link" type="text" />
+			<Input id="edit-form-link" v-model="editForm.link" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-cf-id">
 				CurseForge project ID
 			</label>
-			<StyledInput id="edit-form-cf-id" v-model="editForm.flameProjectId" type="text" />
+			<Input id="edit-form-cf-id" v-model="editForm.flameProjectId" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-status">Allowed?</label>
 			<Combobox
 				id="edit-form-status"
@@ -17,66 +17,48 @@
 				class="!w-full"
 			/>
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-proof">Proof</label>
-			<StyledInput
-				id="edit-form-proof"
-				v-model="editForm.proof"
-				type="text"
-				multiline
-				resize="both"
-				class="w-[30rem]"
-			/>
+			<Textarea id="edit-form-proof" v-model="editForm.proof" resize="both" class="w-[30rem]" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-exceptions">
 				Exceptions / notes
 			</label>
-			<StyledInput
+			<Textarea
 				id="edit-form-exceptions"
 				v-model="editForm.exceptions"
-				type="text"
-				multiline
 				resize="both"
 				class="w-[30rem]"
 			/>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled>
-					<button @click="closeEditModal">Cancel</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button type="submit" :disabled="isSavingEdit">
-						{{ isSavingEdit ? 'Saving...' : 'Save' }}
-					</button>
-				</ButtonStyled>
+				<Button @click="closeEditModal">Cancel</Button>
+				<Button type="colored" color="brand" native-type="submit" :disabled="isSavingEdit">
+					{{ isSavingEdit ? 'Saving...' : 'Save' }}
+				</Button>
 			</div>
 		</form>
 	</NewModal>
 	<div>
-		<form class="flex gap-2" @submit.prevent="executeSearch">
-			<StyledInput
+		<form class="flex items-center gap-2" @submit.prevent="executeSearch">
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"
 				autocomplete="off"
 				placeholder="Search external projects..."
 				clearable
-				wrapper-class="flex-1 w-full"
+				size="medium"
+				wrapper-class="min-w-0 flex-1"
 			/>
-			<ButtonStyled color="brand">
-				<button type="submit">
-					<SearchIcon aria-hidden="true" />
-					Search by title
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button type="button" @click="executeFlameIdLookup">
-					<BinaryIcon aria-hidden="true" />
-					Lookup CurseForge ID
-				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button type="button" @click="executeSha1Lookup">
-					<HashIcon aria-hidden="true" />
-					Lookup SHA-1
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="brand" size="lg" native-type="submit">
+				<SearchIcon aria-hidden="true" />
+				Search by title
+			</Button>
+			<Button size="lg" native-type="button" @click="executeFlameIdLookup">
+				<BinaryIcon aria-hidden="true" />
+				Lookup CurseForge ID
+			</Button>
+			<Button size="lg" native-type="button" @click="executeSha1Lookup">
+				<HashIcon aria-hidden="true" />
+				Lookup SHA-1
+			</Button>
 		</form>
 		<div>
 			<template v-if="lastSearchKind !== 'none'">
@@ -106,12 +88,10 @@
 							:cf_id="project.flame_project_id"
 						>
 							<template #actions>
-								<ButtonStyled>
-									<button @click="openEditModal(project)">
-										<EditIcon />
-										Edit
-									</button>
-								</ButtonStyled>
+								<Button @click="openEditModal(project)">
+									<EditIcon />
+									Edit
+								</Button>
 							</template>
 						</ExternalProjectLookupCard>
 					</div>
@@ -130,8 +110,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { BinaryIcon, EditIcon, HashIcon, SearchIcon } from '@modrinth/assets'
+import { Button } from '@modrinth/ui'
 import {
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	EmptyState,
@@ -139,8 +119,9 @@ import {
 	externalProjectLicenseStatusMessages,
 	ExternalProjectLookupCard,
 	injectModrinthClient,
+	Input,
 	NewModal,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -185,7 +166,7 @@ function mapExternalProject(
 		exceptions: project.exceptions,
 		proof: project.proof,
 		flame_project_id: project.flame_project_id,
-		files: project.linked_files,
+		files: project.linked_files ?? [],
 	}
 }
 

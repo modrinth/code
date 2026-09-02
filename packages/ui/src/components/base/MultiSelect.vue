@@ -1,17 +1,21 @@
 <template>
 	<div ref="containerRef" class="relative inline-block" :class="fitContent ? 'w-auto' : 'w-full'">
-		<span
+		<component
+			:is="triggerComponent"
 			ref="triggerRef"
-			role="button"
-			tabindex="0"
-			class="relative flex items-center overflow-hidden rounded-xl bg-surface-4 px-4 py-1 text-left transition-all duration-200"
+			v-bind="triggerButtonProps"
+			:role="triggerType ? undefined : 'button'"
+			:tabindex="triggerType ? undefined : 0"
 			:class="[
+				triggerType
+					? 'overflow-hidden text-left'
+					: 'relative flex items-center overflow-hidden rounded-xl bg-surface-4 px-4 py-1 text-left transition-all duration-200',
 				fitContent ? 'w-auto max-w-full' : 'w-full',
 				triggerClass,
 				{
 					'z-[9999]': isOpen,
-					'cursor-not-allowed opacity-50': disabled,
-					'cursor-pointer hover:brightness-125 active:brightness-125': !disabled,
+					'cursor-not-allowed opacity-50': disabled && !triggerType,
+					'cursor-pointer hover:brightness-125 active:brightness-125': !disabled && !triggerType,
 				},
 			]"
 			:aria-expanded="isOpen"
@@ -39,7 +43,8 @@
 					<span
 						v-for="tag in visibleTags"
 						:key="String(tag.value)"
-						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2 py-1 text-sm font-medium text-primary transition-all hover:brightness-[115%]"
+						class="inline-flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2 py-1 text-sm font-medium transition-all hover:brightness-[115%]"
+						:class="triggerType ? 'text-inherit' : 'text-primary'"
 						@click.stop="removeTag(tag.value)"
 					>
 						{{ tag.label }}
@@ -100,15 +105,10 @@
 					/>
 				</div>
 			</template>
-		</span>
+		</component>
 
-		<Teleport to="#teleports">
-			<Transition
-				enter-active-class="transition-opacity duration-150"
-				leave-active-class="transition-opacity duration-150"
-				enter-from-class="opacity-0"
-				leave-to-class="opacity-0"
-			>
+		<Teleport v-if="isClient" to="#teleports">
+			<Transition name="floating-expand">
 				<div
 					v-if="isOpen"
 					ref="dropdownRef"
@@ -119,22 +119,22 @@
 					:style="dropdownStyle"
 					role="listbox"
 					aria-multiselectable="true"
+					@pointerdown.stop
 					@mousedown.stop
 					@keydown="handleDropdownKeydown"
 				>
 					<div class="empty:hidden">
 						<div
 							v-if="searchable"
-							class="px-0 py-1.5 border-0 border-solid border-b border-b-surface-5 flex"
+							class="px-0 border-0 border-solid border-b border-b-surface-5 flex"
 						>
-							<StyledInput
+							<Input
 								ref="searchInputRef"
 								v-model="searchQuery"
 								:icon="SearchIcon"
 								type="text"
 								:placeholder="searchPlaceholder"
-								wrapper-class="grow bg-surface-4 mx-0"
-								input-class="ps-9 mx-1.5"
+								wrapper-class="grow m-2"
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
 							/>
@@ -400,6 +400,7 @@ import 'overlayscrollbars/overlayscrollbars.css'
 import { CheckIcon, ChevronLeftIcon, MinusIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { Menu } from 'floating-vue'
+import Fuse from 'fuse.js'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
 import {
 	type Component,
@@ -414,7 +415,14 @@ import {
 } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
-import StyledInput from './StyledInput.vue'
+import ButtonFrame from './buttons/ButtonFrame.vue'
+import type {
+	ButtonElementHandle,
+	ButtonInteraction,
+	ButtonSize,
+	ButtonType,
+} from './buttons/types'
+import Input from './inputs/Input.vue'
 
 export interface MultiSelectOption<T> {
 	value: T
@@ -491,6 +499,10 @@ const props = withDefaults(
 		clearable?: boolean
 		maxHeight?: number
 		triggerClass?: string
+		/** Apply the shared button frame to compact, button-owned multiselect triggers. */
+		triggerType?: ButtonType
+		triggerSize?: ButtonSize
+		triggerInteraction?: ButtonInteraction
 		fitContent?: boolean
 		/** Width for the teleported dropdown; defaults to the trigger width */
 		dropdownWidth?: string | number
@@ -500,6 +512,7 @@ const props = withDefaults(
 		noOptionsMessage?: string
 		noResultsMessage?: string
 		disableSearchFilter?: boolean
+		fuzzySearch?: boolean
 		includeSelectAllOption?: boolean
 		selectAllLabel?: string
 		showSelectionActions?: boolean
@@ -515,10 +528,13 @@ const props = withDefaults(
 		showChevron: true,
 		clearable: true,
 		maxHeight: DEFAULT_MAX_HEIGHT,
+		triggerSize: 'md',
+		triggerInteraction: 'surface',
 		fitContent: false,
 		noOptionsMessage: 'No options available',
 		noResultsMessage: 'No results found',
 		includeSelectAllOption: false,
+		fuzzySearch: false,
 		selectAllLabel: 'Select all',
 		showSelectionActions: false,
 		selectionActionsClearLabel: 'Clear',
@@ -535,16 +551,34 @@ const emit = defineEmits<{
 }>()
 
 const slots = useSlots()
+const triggerComponent = computed(() => (props.triggerType ? ButtonFrame : 'span'))
+const triggerButtonProps = computed(() =>
+	props.triggerType
+		? {
+				as: 'button' as const,
+				nativeType: 'button' as const,
+				type: props.triggerType,
+				size: props.triggerSize,
+				interaction: props.triggerInteraction,
+				disabled: props.disabled,
+			}
+		: {},
+)
 const isOpen = ref(false)
 const searchQuery = ref('')
 const focusedIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
-const triggerRef = ref<HTMLElement>()
+const triggerRef = ref<HTMLElement | ButtonElementHandle>()
+const triggerElement = computed<HTMLElement | undefined>(() => {
+	const trigger = triggerRef.value
+	if (!trigger) return undefined
+	return 'element' in trigger ? (trigger.element ?? undefined) : trigger
+})
 const dropdownRef = ref<HTMLElement>()
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const selectionActionsRef = ref<HTMLElement>()
-const searchInputRef = ref<InstanceType<typeof StyledInput>>()
+const searchInputRef = ref<InstanceType<typeof Input>>()
 const rafId = ref<number | null>(null)
 const tagsContainerRef = ref<HTMLElement>()
 const optionsOverlayScrollbars = ref<OverlayScrollbarsInstance | null>(null)
@@ -605,12 +639,32 @@ const popperOverflowTags = shallowRef<MultiSelectOption<T>[]>([])
 
 const lastClickedValue = shallowRef<{ value: T } | null>(null)
 
+const fuzzySearchOptions = computed(() =>
+	selectableOptions.value.map((option) => ({
+		option,
+		label: option.label,
+		searchTerms: option.searchTerms ?? [],
+	})),
+)
+
+const fuzzyMatcher = computed(
+	() =>
+		new Fuse(fuzzySearchOptions.value, {
+			keys: ['label', 'searchTerms'],
+			threshold: 0.4,
+			ignoreLocation: true,
+		}),
+)
+
 const filteredOptions = computed(() => {
 	if (!searchQuery.value || !props.searchable || props.disableSearchFilter) {
 		return props.options
 	}
 
 	const query = searchQuery.value.toLowerCase()
+	const fuzzyMatches = props.fuzzySearch
+		? new Set(fuzzyMatcher.value.search(searchQuery.value).map(({ item }) => item.option))
+		: null
 	const items: MultiSelectItem<T>[] = []
 	let pendingSectionHeader: MultiSelectSectionHeader | null = null
 
@@ -620,9 +674,10 @@ const filteredOptions = computed(() => {
 			continue
 		}
 
-		const matches =
-			opt.label.toLowerCase().includes(query) ||
-			opt.searchTerms?.some((term) => term.toLowerCase().includes(query))
+		const matches = fuzzyMatches
+			? fuzzyMatches.has(opt)
+			: opt.label.toLowerCase().includes(query) ||
+				opt.searchTerms?.some((term) => term.toLowerCase().includes(query))
 
 		if (!matches) {
 			continue
@@ -920,11 +975,13 @@ function resolveCssSize(size: string | number | undefined): string | undefined {
 }
 
 async function updateDropdownPosition() {
-	if (!triggerRef.value || !dropdownRef.value) return
-
 	await nextTick()
 
-	const triggerRect = triggerRef.value.getBoundingClientRect()
+	const trigger = triggerElement.value
+	const dropdown = dropdownRef.value
+	if (!trigger || !dropdown) return
+
+	const triggerRect = trigger.getBoundingClientRect()
 	const width = resolveDropdownWidth(triggerRect.width)
 	const minWidth = resolveCssSize(props.dropdownMinWidth) ?? '0px'
 
@@ -936,7 +993,7 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
-	const dropdownRect = dropdownRef.value.getBoundingClientRect()
+	const dropdownRect = dropdown.getBoundingClientRect()
 	const viewport = getViewportRect()
 
 	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
@@ -1040,7 +1097,7 @@ function closeDropdown() {
 	emit('close')
 
 	nextTick(() => {
-		triggerRef.value?.focus()
+		triggerElement.value?.focus()
 	})
 }
 
@@ -1331,10 +1388,13 @@ onClickOutside(
 	() => {
 		closeDropdown()
 	},
-	{ ignore: [triggerRef, containerRef, '.v-popper__popper'] },
+	{ ignore: [triggerElement, containerRef, '.v-popper__popper'] },
 )
 
+const isClient = ref(false)
+
 onMounted(() => {
+	isClient.value = true
 	window.addEventListener('resize', handleWindowResize)
 	calculateVisibleTags()
 })
@@ -1415,9 +1475,9 @@ watch(
 }
 
 .multi-select-options-scrollbar :deep(.os-theme-modrinth) {
-	--os-size: 10px;
-	--os-padding-perpendicular: 2px;
-	--os-padding-axis: 2px;
+	--os-size: 8px;
+	--os-padding-perpendicular: 0px;
+	--os-padding-axis: 0px;
 	--os-track-bg: transparent;
 	--os-track-bg-hover: transparent;
 	--os-track-bg-active: transparent;

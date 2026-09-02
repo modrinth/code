@@ -39,7 +39,7 @@
 					>{{ formatMessage(formFieldLabels.email) }} <span class="text-red">*</span></span
 				>
 			</label>
-			<StyledInput
+			<Input
 				v-model="deliveryEmail"
 				type="email"
 				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
@@ -58,9 +58,17 @@
 				<Combobox
 					v-model="selectedGiftCardId"
 					:options="rewardOptions"
-					:placeholder="`Select ${categoryLabel.toLowerCase()}`"
+					:placeholder="
+						formatMessage(messages.selectCategoryPlaceholder, {
+							category: categoryLabel.toLowerCase(),
+						})
+					"
 					searchable
-					:search-placeholder="`Search ${categoryLabelPlural.toLowerCase()}...`"
+					:search-placeholder="
+						formatMessage(messages.searchCategoryPlaceholder, {
+							category: categoryLabelPlural.toLowerCase(),
+						})
+					"
 					class="h-10"
 				>
 					<template #selected>
@@ -90,47 +98,21 @@
 				</Combobox>
 			</div>
 			<span v-if="selectedMethodDetails" class="text-secondary">
-				{{ formatMoney(displayMinUsd)
-				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'"
-					>({{
-						formatAmountForDisplay(
-							displayMinLocal,
-							selectedMethodCurrencyCode,
-							selectedMethodExchangeRate,
-						)
-					}})</template
-				>
-				min<template v-if="displayMinUsd <= roundedMaxAmount"
-					>, {{ formatMoney(displayMaxUsd)
-					}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'"
-						>({{
-							formatAmountForDisplay(
-								displayMaxLocal,
-								selectedMethodCurrencyCode,
-								selectedMethodExchangeRate,
-							)
-						}})</template
-					>
-					max</template
-				>
-				withdrawal amount.
+				<template v-if="displayMinUsd <= roundedMaxAmount">{{
+					formatMessage(messages.withdrawalAmountMinMax, {
+						min: minAmountDisplay,
+						max: maxAmountDisplay,
+					})
+				}}</template>
+				<template v-else>{{
+					formatMessage(messages.withdrawalAmountMinOnly, { min: minAmountDisplay })
+				}}</template>
 			</span>
 			<span
 				v-if="selectedMethodDetails && effectiveMinAmount > roundedMaxAmount"
 				class="text-sm text-red"
 			>
-				You need at least
-				{{ formatMoney(displayMinUsd)
-				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'"
-					>({{
-						formatAmountForDisplay(
-							displayMinLocal,
-							selectedMethodCurrencyCode,
-							selectedMethodExchangeRate,
-						)
-					}})</template
-				>
-				to use this gift card.
+				{{ formatMessage(messages.needAtLeastGiftCard, { min: minAmountDisplay }) }}
 			</span>
 		</div>
 
@@ -149,7 +131,7 @@
 
 			<div v-if="showGiftCardSelector && useFixedDenominations" class="flex flex-col gap-2.5">
 				<template v-if="useDenominationSuggestions">
-					<StyledInput
+					<Input
 						v-model="denominationSearchInput"
 						type="number"
 						:icon="SearchIcon"
@@ -280,19 +262,13 @@
 					v-if="!useDenominationSuggestions && denominationOptions.length === 0"
 					class="text-error text-sm"
 				>
-					<template v-if="rawFixedDenominationMin !== null">
-						The minimum denomination is
-						{{
-							formatAmountForDisplay(
-								rawFixedDenominationMin,
-								selectedMethodCurrencyCode,
-								selectedMethodExchangeRate,
-							)
-						}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
-							({{ formatMoney(convertToUsd(rawFixedDenominationMin)) }})</template
-						>, which exceeds your balance of {{ formatMoney(roundedMaxAmount) }}.
-					</template>
-					<template v-else>No denominations available for your current balance</template>
+					<template v-if="rawFixedDenominationMin !== null">{{
+						formatMessage(messages.minimumDenominationExceedsBalance, {
+							min: minDenominationDisplay,
+							balance: formatMoney(roundedMaxAmount),
+						})
+					}}</template>
+					<template v-else>{{ formatMessage(messages.noDenominationsAvailable) }}</template>
 				</span>
 			</div>
 
@@ -345,10 +321,10 @@ import {
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	Input,
 	IntlFormatted,
 	normalizeChildren,
 	paymentMethodMessages,
-	StyledInput,
 	useDebugLogger,
 	useFormatMoney,
 	useVIntl,
@@ -358,8 +334,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
-import { useAuth } from '@/composables/auth.js'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { useAuth } from '~/composables/auth.ts'
 
 const debug = useDebugLogger('TremendousDetailsStage')
 const { withdrawData, maxWithdrawAmount, availableMethods, paymentOptions, calculateFees } =
@@ -540,7 +516,7 @@ const selectedRewardOption = computed(() => {
 })
 
 const selectedMethodDetails = computed(() => {
-	console.log(rewardOptions.value, selectedGiftCardId.value)
+	debug(rewardOptions.value, selectedGiftCardId.value)
 	if (!selectedGiftCardId.value) return null
 	const option = rewardOptions.value.find((opt) => opt.value === selectedGiftCardId.value)
 	debug('Selected method details:', option?.methodDetails)
@@ -683,11 +659,48 @@ const noSuggestionsMessage = computed(() => {
 				selectedMethodCurrencyCode.value,
 				selectedMethodExchangeRate.value,
 			)
-			return `No denominations near this amount. The highest available is ${maxInLocal}.`
+			return formatMessage(messages.noSuggestionsWithMax, { max: maxInLocal })
 		}
-		return 'No denominations near this amount'
+		return formatMessage(messages.noSuggestionsNoMax)
 	}
 	return null
+})
+
+const minAmountDisplay = computed(() => {
+	const base = formatMoney(displayMinUsd.value)
+	if (selectedMethodCurrencyCode.value && selectedMethodCurrencyCode.value !== 'USD') {
+		return `${base} (${formatAmountForDisplay(
+			displayMinLocal.value,
+			selectedMethodCurrencyCode.value,
+			selectedMethodExchangeRate.value,
+		)})`
+	}
+	return base
+})
+
+const maxAmountDisplay = computed(() => {
+	const base = formatMoney(displayMaxUsd.value)
+	if (selectedMethodCurrencyCode.value && selectedMethodCurrencyCode.value !== 'USD') {
+		return `${base} (${formatAmountForDisplay(
+			displayMaxLocal.value,
+			selectedMethodCurrencyCode.value,
+			selectedMethodExchangeRate.value,
+		)})`
+	}
+	return base
+})
+
+const minDenominationDisplay = computed(() => {
+	if (rawFixedDenominationMin.value === null) return ''
+	const local = formatAmountForDisplay(
+		rawFixedDenominationMin.value,
+		selectedMethodCurrencyCode.value,
+		selectedMethodExchangeRate.value,
+	)
+	if (selectedMethodCurrencyCode.value && selectedMethodCurrencyCode.value !== 'USD') {
+		return `${local} (${formatMoney(convertToUsd(rawFixedDenominationMin.value))})`
+	}
+	return local
 })
 
 const hasSelectedDenomination = computed(() => {
@@ -1123,6 +1136,42 @@ const messages = defineMessages({
 	selectDenominationRequired: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required',
 		defaultMessage: 'Please select a denomination to continue',
+	},
+	selectCategoryPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder',
+		defaultMessage: 'Select {category}',
+	},
+	searchCategoryPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder',
+		defaultMessage: 'Search {category}...',
+	},
+	withdrawalAmountMinMax: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max',
+		defaultMessage: '{min} min, {max} max withdrawal amount.',
+	},
+	withdrawalAmountMinOnly: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only',
+		defaultMessage: '{min} min withdrawal amount.',
+	},
+	needAtLeastGiftCard: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card',
+		defaultMessage: 'You need at least {min} to use this gift card.',
+	},
+	minimumDenominationExceedsBalance: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance',
+		defaultMessage: 'The minimum denomination is {min}, which exceeds your balance of {balance}.',
+	},
+	noDenominationsAvailable: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available',
+		defaultMessage: 'No denominations available for your current balance',
+	},
+	noSuggestionsWithMax: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max',
+		defaultMessage: 'No denominations near this amount. The highest available is {max}.',
+	},
+	noSuggestionsNoMax: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max',
+		defaultMessage: 'No denominations near this amount',
 	},
 })
 </script>

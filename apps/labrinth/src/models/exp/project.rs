@@ -2,12 +2,10 @@ use eyre::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use validator::Validate;
+use xredis::RedisPool;
 
 use crate::{
-    database::{
-        models::{DBProjectId, DBVersionId},
-        redis::RedisPool,
-    },
+    database::models::{DBProjectId, DBVersionId},
     models::{
         exp::{
             component::{
@@ -56,7 +54,7 @@ macro_rules! define_project_components {
         pub struct ProjectSerial {
             $(
                 #[validate(nested)]
-                #[serde(default, skip_serializing_if = "Option::is_none")]
+                #[serde(default)]
                 pub $field_name: Option<$ty>,
             )*
         }
@@ -116,7 +114,6 @@ macro_rules! define_project_components {
         #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
         pub struct ProjectQuery {
             $(
-                #[serde(skip_serializing_if = "Option::is_none")]
                 pub $field_name: Option<Query<$ty>>,
             )*
         }
@@ -257,14 +254,14 @@ pub async fn fetch_query_context(
     {
         HashMap::new()
     } else {
+        let ping_keys = minecraft_java_server_pings
+            .iter()
+            .map(|project_id| {
+                redis.key().entity(server_ping::REDIS_NAMESPACE, project_id)
+            })
+            .collect::<Vec<_>>();
         redis
-            .get_many_deserialized_from_json::<minecraft::JavaServerPing>(
-                server_ping::REDIS_NAMESPACE,
-                &minecraft_java_server_pings
-                    .iter()
-                    .map(ToString::to_string)
-                    .collect::<Vec<_>>(),
-            )
+            .get_many_deserialized::<minecraft::JavaServerPing>(&ping_keys)
             .await?
             .into_iter()
             .enumerate()
@@ -280,14 +277,14 @@ pub async fn fetch_query_context(
     let minecraft_server_analytics = if minecraft_server_analytics.is_empty() {
         HashMap::new()
     } else {
+        let analytics_keys = minecraft_server_analytics
+            .iter()
+            .map(|project_id| {
+                redis.key().entity(MINECRAFT_SERVER_ANALYTICS, project_id)
+            })
+            .collect::<Vec<_>>();
         redis
-            .get_many_deserialized_from_json::<MinecraftServerAnalytics>(
-                MINECRAFT_SERVER_ANALYTICS,
-                &minecraft_server_analytics
-                    .iter()
-                    .map(ToString::to_string)
-                    .collect::<Vec<_>>(),
-            )
+            .get_many_deserialized::<MinecraftServerAnalytics>(&analytics_keys)
             .await?
             .into_iter()
             .enumerate()

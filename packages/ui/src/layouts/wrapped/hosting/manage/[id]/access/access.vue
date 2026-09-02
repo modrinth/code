@@ -1,12 +1,12 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col gap-2 md:flex-row">
-			<StyledInput
+			<Input
 				v-model="memberSearch"
 				:icon="SearchIcon"
 				:placeholder="formatMessage(messages.searchUsersPlaceholder, { count: members.length })"
 				wrapper-class="min-w-0 flex-1"
-				input-class="!h-10"
+				size="medium"
 				clearable
 			/>
 			<div class="flex shrink-0 items-center gap-2 flex-wrap md:flex-nowrap">
@@ -14,23 +14,25 @@
 					v-model="roleFilter"
 					:options="roleFilterOptions"
 					:display-value="selectedRoleFilterLabel"
-					trigger-class="min-w-[225px] !h-10 !min-h-10 !py-0"
+					trigger-size="lg"
+					trigger-class="min-w-[225px]"
 				>
 					<template #prefix>
 						<FilterIcon class="size-5 text-secondary" aria-hidden="true" />
 					</template>
 				</Combobox>
-				<ButtonStyled color="brand">
-					<button
-						v-tooltip="manageUsersActionTooltip"
-						class="!h-10 w-full md:w-fit"
-						:disabled="!canManageUsers"
-						@click="grantAccessModal?.show($event)"
-					>
-						<UserPlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.inviteFriends) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					v-tooltip="manageUsersActionTooltip"
+					type="colored"
+					color="brand"
+					size="lg"
+					class="w-full md:w-fit"
+					:disabled="!canManageUsers"
+					@click="grantAccessModal?.show($event)"
+				>
+					<UserPlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.inviteFriends) }}
+				</Button>
 			</div>
 		</div>
 
@@ -113,10 +115,10 @@ import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import {
 	AccessTable,
 	apiPermissionsToAccessRole,

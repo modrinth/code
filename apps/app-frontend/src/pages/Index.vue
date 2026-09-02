@@ -1,127 +1,99 @@
 <script setup lang="ts">
-import { injectNotificationManager } from '@modrinth/ui'
-import type { SearchResult } from '@modrinth/utils'
+import { PlayIcon, PlusIcon } from '@modrinth/assets'
+import { ContextMenu, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
-import { computed, onUnmounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, inject, onActivated, ref } from 'vue'
 
-import RowDisplay from '@/components/RowDisplay.vue'
+import LibrarySection from '@/components/ui/library/index.vue'
+import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
-import { get_search_results } from '@/helpers/cache.js'
-import { profile_listener } from '@/helpers/events'
-import { list } from '@/helpers/profile.js'
-import type { GameInstance } from '@/helpers/types'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { instanceListQueryOptions } from '@/pages/instance/query-options'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
+import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
 
+defineOptions({
+	name: 'LibraryPage',
+})
+
+const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
-const route = useRoute()
-const breadcrumbs = useBreadcrumbs()
+const { hasCreatedInstance, isReady } = injectOnboardingChecklist()
+const showCreationModal = inject<() => void>('showCreationModal')
+const pageOptions = ref<InstanceType<typeof ContextMenu>>()
+const appSettings = useAppSettings()
 
-breadcrumbs.setRootContext({ name: 'Home', link: route.path })
+const messages = defineMessages({
+	home: {
+		id: 'app.navigation.home',
+		defaultMessage: 'Home',
+	},
+	newInstance: {
+		id: 'app.library.context-menu.create-instance',
+		defaultMessage: 'New instance',
+	},
+	libraryActionsLabel: {
+		id: 'app.library.actions.label',
+		defaultMessage: 'Library actions',
+	},
+})
 
-const instances = ref<GameInstance[]>([])
+const homeBreadcrumb = useRootBreadcrumb({
+	slot: 'root',
+	id: 'home',
+	label: formatMessage(messages.home),
+	to: '/',
+	visual: { type: 'icon', component: PlayIcon },
+})
+onActivated(homeBreadcrumb.reset)
 
-const featuredModpacks = ref<SearchResult[]>([])
-const featuredMods = ref<SearchResult[]>([])
-const installedModpacksFilter = ref('')
+const instancesQuery = useQuery(instanceListQueryOptions())
+const instances = computed(() => instancesQuery.data.value ?? [])
+if (hasCreatedInstance.value) {
+	await instancesQuery.suspense().catch(handleError)
+}
 
 const recentInstances = computed(() =>
 	instances.value
-		.filter((x) => x.last_played)
 		.slice()
-		.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played))),
+		.sort((a, b) => dayjs(b.last_played ?? b.created).diff(dayjs(a.last_played ?? a.created))),
 )
 
-const hasFeaturedProjects = computed(
-	() => (featuredModpacks.value?.length ?? 0) + (featuredMods.value?.length ?? 0) > 0,
-)
-
-const offline = ref<boolean>(!navigator.onLine)
-window.addEventListener('offline', () => {
-	offline.value = true
-})
-window.addEventListener('online', () => {
-	offline.value = false
-})
-
-async function fetchInstances() {
-	instances.value = await list().catch(handleError)
-
-	const filters = []
-	for (const instance of instances.value) {
-		if (instance.linked_data && instance.linked_data.project_id) {
-			filters.push(`NOT"project_id"="${instance.linked_data.project_id}"`)
-		}
+function openPageContextMenu(event: MouseEvent) {
+	if (
+		!(event.target instanceof HTMLElement) ||
+		!event.target.hasAttribute('data-library-page-background')
+	) {
+		return
 	}
-	installedModpacksFilter.value = filters.join(' AND ')
+
+	event.preventDefault()
+	event.stopPropagation()
+	pageOptions.value?.open(event, [
+		{
+			id: 'new_instance',
+			label: formatMessage(messages.newInstance),
+			icon: PlusIcon,
+			action: () => showCreationModal?.(),
+		},
+	])
 }
-
-async function fetchFeaturedModpacks() {
-	const response = await get_search_results(
-		`?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${installedModpacksFilter.value}`,
-	)
-
-	if (response) {
-		featuredModpacks.value = response.result.hits
-	} else {
-		featuredModpacks.value = []
-	}
-}
-
-async function fetchFeaturedMods() {
-	const response = await get_search_results('?facets=[["project_type:mod"]]&limit=10&index=follows')
-
-	if (response) {
-		featuredMods.value = response.result.hits
-	} else {
-		featuredModpacks.value = []
-	}
-}
-
-async function refreshFeaturedProjects() {
-	await Promise.all([fetchFeaturedModpacks(), fetchFeaturedMods()])
-}
-
-await fetchInstances()
-await refreshFeaturedProjects()
-
-const unlistenProfile = await profile_listener(
-	async (e: { event: string; profile_path_id: string }) => {
-		await fetchInstances()
-
-		if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
-			await refreshFeaturedProjects()
-		}
-	},
-)
-
-onUnmounted(() => {
-	unlistenProfile()
-})
 </script>
 
 <template>
-	<div class="p-6 flex flex-col gap-2">
-		<h1 v-if="recentInstances?.length > 0" class="m-0 text-2xl font-extrabold">Welcome back!</h1>
-		<h1 v-else class="m-0 text-2xl font-extrabold">Welcome to Modrinth App!</h1>
-		<RecentWorldsList :recent-instances="recentInstances" />
-		<RowDisplay
-			v-if="hasFeaturedProjects"
-			:instances="[
-				{
-					label: 'Discover a modpack',
-					route: '/browse/modpack',
-					instances: featuredModpacks,
-					downloaded: false,
-				},
-				{
-					label: 'Discover mods',
-					route: '/browse/mod',
-					instances: featuredMods,
-					downloaded: false,
-				},
-			]"
-			:can-paginate="true"
+	<WelcomeScreen v-if="isReady && !hasCreatedInstance" />
+	<div
+		v-else-if="isReady"
+		data-library-page-background
+		class="flex flex-col gap-3 p-6"
+		@contextmenu="openPageContextMenu"
+	>
+		<RecentWorldsList
+			v-if="recentInstances?.length > 0 && appSettings.getFeatureFlag('worlds_in_home')"
+			:recent-instances="recentInstances"
 		/>
+		<LibrarySection :instances="instances" />
+		<ContextMenu ref="pageOptions" :label="formatMessage(messages.libraryActionsLabel)" />
 	</div>
 </template>

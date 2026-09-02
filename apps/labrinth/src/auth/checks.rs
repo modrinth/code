@@ -1,14 +1,31 @@
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
-use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
+use crate::database::{PgPool, ReadOnlyPgPool};
+use crate::models::ids::FileId;
+use crate::models::projects::{
+    MissingAttributionFile, OverrideSource, Version,
+};
 use crate::models::users::User;
+use crate::queue::file_scan::get_files_missing_attribution;
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use futures::TryStreamExt;
 use itertools::Itertools;
+use xredis::RedisPool;
+
+pub fn require_verified_email(user: &User) -> Result<(), ApiError> {
+    if !user.email_verified.unwrap_or(false) {
+        return Err(ApiError::Auth(eyre::eyre!(
+            "Please verify your email before publishing!"
+        )));
+    }
+
+    Ok(())
+}
 
 pub trait ValidateAuthorized {
     fn validate_authorized(
@@ -76,7 +93,8 @@ pub async fn filter_visible_projects(
         pool,
         hide_unlisted,
     )
-    .await?;
+    .await
+    .wrap_api_err("filtering visible project ids")?;
     projects.retain(|x| filtered_project_ids.contains(&x.inner.id));
     Ok(projects.into_iter().map(|x| x.into()).collect())
 }
@@ -113,7 +131,8 @@ pub async fn filter_visible_project_ids(
     if !check_projects.is_empty() {
         return_projects.extend(
             filter_enlisted_projects_ids(check_projects, user_option, pool)
-                .await?,
+                .await
+                .wrap_api_err("filtering enlisted projects ids")?,
         );
     }
 
@@ -163,7 +182,8 @@ pub async fn filter_enlisted_projects_ids(
             }
         })
         .try_collect::<Vec<()>>()
-        .await?;
+        .await
+        .wrap_internal_err("fetching query results from database")?;
     }
     Ok(return_projects)
 }
@@ -194,6 +214,7 @@ pub async fn filter_visible_versions(
     mut versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
     pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<crate::models::projects::Version>, ApiError> {
     let filtered_version_ids = filter_visible_version_ids(
@@ -202,9 +223,43 @@ pub async fn filter_visible_versions(
         pool,
         redis,
     )
-    .await?;
+    .await
+    .wrap_api_err("filtering visible version ids")?;
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
-    Ok(versions.into_iter().map(|x| x.into()).collect())
+
+    let version_ids: Vec<_> = versions.iter().map(|v| v.inner.id).collect();
+    let missing = get_files_missing_attribution(&**ro_pool, &version_ids)
+        .await
+        .unwrap_or_default();
+
+    Ok(versions
+        .into_iter()
+        .map(|v| {
+            let files_missing = missing
+                .get(&v.inner.id)
+                .map(|entries| {
+                    entries
+                        .iter()
+                        .map(|(id, fp)| MissingAttributionFile {
+                            id: FileId(id.0 as u64),
+                            override_source: fp
+                                .as_ref()
+                                .map(|p| OverrideSource::Flame {
+                                    id: p.id,
+                                    title: p.title.clone(),
+                                    url: p.url.clone(),
+                                    icon_url: p.icon_url.clone(),
+                                })
+                                .or(Some(OverrideSource::Unknown)),
+                        })
+                        .collect::<Vec<_>>()
+                })
+                .unwrap_or_default();
+            let mut version = Version::from(v);
+            version.files_missing_attribution = files_missing;
+            version
+        })
+        .collect())
 }
 
 impl ValidateAuthorized for models::DBOAuthClient {
@@ -216,10 +271,9 @@ impl ValidateAuthorized for models::DBOAuthClient {
             return if user.role.is_mod() || user.id == self.created_by.into() {
                 Ok(())
             } else {
-                Err(ApiError::CustomAuthentication(
-                    "You don't have sufficient permissions to interact with this OAuth application"
-                        .to_string(),
-                ))
+                Err(ApiError::Auth(eyre::eyre!(
+                    "You don't have sufficient permissions to interact with this OAuth application",
+                )))
             };
         }
 
@@ -243,7 +297,8 @@ pub async fn filter_visible_version_ids(
     // Get visible projects- ones we are allowed to see public versions for.
     let visible_project_ids = filter_visible_project_ids(
         DBProject::get_many_ids(&project_ids, pool, redis)
-            .await?
+            .await
+            .wrap_api_err("fetching projects for visibility filtering")?
             .iter()
             .map(|x| &x.inner)
             .collect(),
@@ -251,20 +306,29 @@ pub async fn filter_visible_version_ids(
         pool,
         false,
     )
-    .await?;
+    .await
+    .wrap_api_err("filtering visible project IDs")?;
 
     // Then, get enlisted versions (Versions that are a part of a project we are a member of)
     let enlisted_version_ids =
         filter_enlisted_version_ids(versions.clone(), user_option, pool, redis)
-            .await?;
+            .await
+            .wrap_api_err("filtering enlisted version ids")?;
+
+    let version_ids: Vec<_> = versions.iter().map(|v| v.id).collect();
+    let withheld_versions = get_files_missing_attribution(pool, &version_ids)
+        .await
+        .unwrap_or_default();
 
     // Return versions that are not hidden, we are a mod of, or we are enlisted on the team of
     for version in versions {
+        let is_withheld = withheld_versions.contains_key(&version.id);
         // We can see the version if:
-        // - it's not hidden and we can see the project
+        // - it's not hidden and we can see the project and it's not withheld for attribution
         // - we are a mod
         // - we are enlisted on the team of the mod
         if (!version.status.is_hidden()
+            && !is_withheld
             && visible_project_ids.contains(&version.project_id))
             || user_option.as_ref().is_some_and(|x| x.role.is_mod())
             || enlisted_version_ids.contains(&version.id)
@@ -290,14 +354,16 @@ pub async fn filter_enlisted_version_ids(
     // Get enlisted projects- ones we are allowed to see hidden versions for.
     let authorized_project_ids = filter_enlisted_projects_ids(
         DBProject::get_many_ids(&project_ids, pool, redis)
-            .await?
+            .await
+            .wrap_api_err("fetching projects for membership filtering")?
             .iter()
             .map(|x| &x.inner)
             .collect(),
         user_option,
         pool,
     )
-    .await?;
+    .await
+    .wrap_api_err("filtering projects by membership")?;
 
     for version in versions {
         if user_option.as_ref().is_some_and(|x| x.role.is_mod())
@@ -372,7 +438,8 @@ pub async fn is_visible_organization(
 ) -> Result<bool, ApiError> {
     let members =
         DBTeamMember::get_from_team_full(organization.team_id, pool, redis)
-            .await?;
+            .await
+            .wrap_internal_err("fetching team members from database")?;
 
     // This is meant to match the same projects as the `Project::is_searchable` method, but we're not using
     // it here because that'd entail pulling in all projects for the organization
@@ -381,7 +448,7 @@ pub async fn is_visible_organization(
         organization.id as database::models::ids::DBOrganizationId
     )
     .fetch_optional(pool)
-    .await?
+    .await.wrap_internal_err("checking organization for searchable projects")?
     .flatten()
     .unwrap_or(false);
 

@@ -16,12 +16,17 @@
 			<div class="flex w-[30rem] flex-col gap-3">
 				<div class="flow-root">
 					<div class="group relative float-end ml-4">
-						<OverflowMenu
-							v-tooltip="formatMessage(messages.editIconButton)"
+						<TeleportOverflowMenu
+							:label="formatMessage(messages.editIconButton)"
+							:tooltip="formatMessage(messages.editIconButton)"
 							class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
 							:options="[
 								{
 									id: 'select',
+									label:
+										previewImage || collection.icon_url
+											? formatMessage(messages.replaceIcon)
+											: formatMessage(messages.selectIcon),
 									action: () => {
 										const input = iconInputRef?.$el?.querySelector('input')
 										input?.click()
@@ -29,7 +34,7 @@
 								},
 								{
 									id: 'remove',
-									color: 'danger',
+									label: formatMessage(messages.removeIconButton),
 									action: () => {
 										deletedIcon = true
 										previewImage = null
@@ -63,7 +68,7 @@
 								<XIcon />
 								{{ formatMessage(messages.removeIconButton) }}
 							</template>
-						</OverflowMenu>
+						</TeleportOverflowMenu>
 						<FileInput
 							id="collection-icon-input"
 							ref="iconInputRef"
@@ -71,7 +76,7 @@
 							:show-icon="false"
 							accept="image/png,image/jpeg,image/gif,image/webp"
 							class="hidden"
-							aria-label="Upload icon"
+							:aria-label="formatMessage(messages.uploadIconAriaLabel)"
 							@change="showPreviewImage"
 						/>
 					</div>
@@ -79,7 +84,7 @@
 						<label class="mb-2 block text-lg font-semibold text-contrast" for="collection-title">
 							{{ formatMessage(commonMessages.titleLabel) }}
 						</label>
-						<StyledInput
+						<Input
 							id="collection-title"
 							v-model="current.name"
 							:maxlength="255"
@@ -93,10 +98,9 @@
 					>
 						{{ formatMessage(commonMessages.descriptionLabel) }}
 					</label>
-					<StyledInput
+					<Textarea
 						id="collection-description"
 						v-model="current.description"
-						multiline
 						:maxlength="255"
 						wrapper-class="h-24"
 					/>
@@ -116,29 +120,25 @@
 					</RadioButtons>
 				</div>
 				<div class="flex justify-end gap-2">
-					<ButtonStyled>
-						<button class="w-24" @click="() => editModal?.hide()">
-							<XIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button class="w-36" :disabled="saving" @click="save()">
-							<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
-							<SaveIcon v-else aria-hidden="true" />
-							{{
-								saving
-									? formatMessage(commonMessages.savingButton)
-									: formatMessage(commonMessages.saveButton)
-							}}
-						</button>
-					</ButtonStyled>
+					<Button class="w-24" @click="() => editModal?.hide()">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button type="colored" color="brand" class="w-36" :disabled="saving" @click="save()">
+						<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
+						<SaveIcon v-else aria-hidden="true" />
+						{{
+							saving
+								? formatMessage(commonMessages.savingButton)
+								: formatMessage(commonMessages.saveButton)
+						}}
+					</Button>
 				</div>
 			</div>
 		</NewModal>
 		<NormalPage :sidebar="cosmetics.leftContentLayout ? 'left' : 'right'">
 			<template #header>
-				<div class="flex flex-col gap-6">
+				<div class="flex flex-col gap-4">
 					<ClientOnly>
 						<nuxt-link
 							v-if="returnLink"
@@ -150,7 +150,7 @@
 						</nuxt-link>
 					</ClientOnly>
 					<div class="grid grid-cols-[auto_1fr] gap-4 sm:grid-cols-[auto_1fr_auto]">
-						<Avatar :src="collection.icon_url" size="64px" />
+						<Avatar :src="collection.icon_url" :raw-src="collection.raw_icon_url" size="64px" />
 						<div class="flex flex-col gap-3">
 							<h1 class="heading-2xl">
 								{{ collection.name }}
@@ -201,20 +201,31 @@
 								</span>
 							</div>
 						</div>
-						<div class="col-span-2 flex gap-2 sm:col-span-1">
+						<div class="col-span-2 flex items-center gap-2 sm:col-span-1">
 							<template v-if="canEdit">
-								<ButtonStyled>
-									<button @click="openEditModal">
-										<EditIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.editButton) }}
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="red" color-fill="text">
-									<button @click="() => $refs.deleteModal.show()">
+								<Button size="xl" @click="openEditModal">
+									<EditIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.editButton) }}
+								</Button>
+								<TeleportOverflowMenu
+									type="quiet"
+									size="xl"
+									:label="formatMessage(commonMessages.moreOptionsButton)"
+									:options="[
+										{
+											id: 'delete',
+											label: formatMessage(commonMessages.deleteLabel),
+											tone: 'red',
+											action: () => deleteModal?.show(),
+										},
+									]"
+								>
+									<MoreVerticalIcon aria-hidden="true" />
+									<template #delete>
 										<TrashIcon aria-hidden="true" />
 										{{ formatMessage(commonMessages.deleteLabel) }}
-									</button>
-								</ButtonStyled>
+									</template>
+								</TeleportOverflowMenu>
 							</template>
 						</div>
 					</div>
@@ -226,7 +237,12 @@
 					v-if="collection.description"
 					:title="formatMessage(commonMessages.descriptionLabel)"
 				>
-					<p class="m-0 break-words">{{ collection.description }}</p>
+					<div
+						v-if="supportsMarkdown"
+						class="description-body"
+						v-html="renderString(collection.description)"
+					/>
+					<p v-else class="m-0 break-words">{{ collection.description }}</p>
 				</SidebarCard>
 				<SidebarCard
 					v-if="collection.id !== 'following'"
@@ -238,9 +254,7 @@
 					>
 						<Avatar :src="creator.avatar_url" :alt="creator.username" size="32px" circle />
 						<div class="flex flex-col">
-							<span
-								class="grid w-full grid-cols-[1fr_auto] flex-nowrap items-center gap-1 group-hover:underline"
-							>
+							<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
 								<span class="min-w-0 overflow-hidden truncate">{{ creator.username }}</span>
 							</span>
 						</div>
@@ -292,71 +306,44 @@
 						}
 					}),
 				]"
-				class="mb-4"
+				replace
+				page-nav
 			/>
 
-			<ProjectCardList
+			<ProjectList
 				v-if="projects && projects?.length > 0"
+				:projects="displayedProjects"
 				:layout="cosmetics.searchDisplayMode.collection"
 			>
-				<ProjectCard
-					v-for="project in (route.params.projectType !== undefined
-						? projects.filter(
-								(x) =>
-									x.project_type ===
-									route.params.projectType.substr(0, route.params.projectType.length - 1),
-							)
-						: projects
-					)
-						.slice()
-						.sort((a, b) => b.downloads - a.downloads)"
-					:key="project.id"
-					:link="`/${project.project_type}/${project.slug ?? project.id}`"
-					:title="project.title"
-					:icon-url="project.icon_url"
-					:banner="project.gallery.find((element) => element.featured)?.url"
-					:summary="project.description"
-					:date-updated="project.updated"
-					:downloads="project.downloads ?? 0"
-					:followers="project.followers ?? 0"
-					:tags="project.categories"
-					:environment="{
-						clientSide: project.client_side,
-						serverSide: project.server_side,
-					}"
-					:color="project.color"
-					:layout="
-						cosmetics.searchDisplayMode.collection === 'grid' ||
-						cosmetics.searchDisplayMode.collection === 'gallery'
-							? 'grid'
-							: 'list'
-					"
-				>
-					<template v-if="canEdit || collection.id === 'following'" #actions>
-						<ButtonStyled v-if="canEdit">
-							<button class="remove-btn" :disabled="removing" @click="() => removeProject(project)">
-								<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-								<XIcon v-else aria-hidden="true" />
-								{{ formatMessage(messages.removeProjectButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="collection.id === 'following'">
-							<button @click="unfollowProject(project)">
-								<HeartMinusIcon aria-hidden="true" />
-								{{ formatMessage(messages.unfollowProjectButton) }}
-							</button>
-						</ButtonStyled>
-					</template>
-				</ProjectCard>
-			</ProjectCardList>
+				<template v-if="canEdit || collection.id === 'following'" #actions="{ project }">
+					<Button
+						v-if="canEdit"
+						class="remove-btn"
+						:disabled="removing"
+						@click="() => removeProject(project)"
+					>
+						<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+						<XIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.removeProjectButton) }}
+					</Button>
+					<Button v-if="collection.id === 'following'" @click="unfollowProject(project)">
+						<HeartMinusIcon aria-hidden="true" />
+						{{ formatMessage(messages.unfollowProjectButton) }}
+					</Button>
+				</template>
+			</ProjectList>
 			<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noProjectsLabel)">
 				<template #actions>
-					<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
-						<nuxt-link class="mx-auto w-min" to="/discover/mods">
-							<CompassIcon class="size-5" />
-							Discover mods
-						</nuxt-link>
-					</ButtonStyled>
+					<ButtonLink
+						v-if="auth.user && auth.user.id === creator.id"
+						type="colored"
+						color="brand"
+						class="mx-auto w-min"
+						to="/discover/mods"
+					>
+						<CompassIcon class="size-5" />
+						{{ formatMessage(messages.discoverModsButton) }}
+					</ButtonLink>
 				</template>
 			</EmptyState>
 		</NormalPage>
@@ -373,6 +360,7 @@ import {
 	HeartMinusIcon,
 	LinkIcon,
 	LockIcon,
+	MoreVerticalIcon,
 	SaveIcon,
 	SpinnerIcon,
 	TrashIcon,
@@ -382,7 +370,9 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
+	ButtonLink,
+	catalogProjectTypes,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonProjectTypeSentenceMessages,
@@ -391,31 +381,38 @@ import {
 	defineMessages,
 	EmptyState,
 	FileInput,
+	filterProjectsByType,
 	HorizontalRule,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NavTabs,
 	NewModal,
 	normalizeChildren,
 	NormalPage,
-	OverflowMenu,
-	ProjectCard,
-	ProjectCardList,
+	parseProjectTypeRouteParam,
+	ProjectList,
 	RadioButtons,
 	SidebarCard,
-	StyledInput,
+	TeleportOverflowMenu,
+	Textarea,
 	useCompactNumber,
 	useFormatDateTime,
 	useRelativeTime,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { isAdmin } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import { isAdmin, renderString } from '@modrinth/utils'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
+import { onServerPrefetch } from 'vue'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+
+useSeoMeta({
+	robots: 'noindex',
+})
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
@@ -431,6 +428,22 @@ const route = useNativeRoute()
 const router = useRouter()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
+const queryClient = useQueryClient()
+async function fetchProjectsByIds(projectIds) {
+	const segmentSize = 800
+	const segments = []
+	for (let i = 0; i < projectIds.length; i += segmentSize) {
+		segments.push(projectIds.slice(i, i + segmentSize))
+	}
+	const results = await Promise.all(
+		segments.map((ids) => api.labrinth.projects_v3.getMultiple(ids)),
+	)
+	return results.flat()
+}
+
+async function fetchFollowedProjects(userId) {
+	return api.labrinth.users_v3.getFollowedProjects(userId)
+}
 
 const messages = defineMessages({
 	collectionDescription: {
@@ -488,6 +501,14 @@ const messages = defineMessages({
 	noProjectsLabel: {
 		id: 'collection.label.no-projects',
 		defaultMessage: 'No projects in collection yet',
+	},
+	discoverModsButton: {
+		id: 'collection.button.discover-mods',
+		defaultMessage: 'Discover mods',
+	},
+	uploadIconAriaLabel: {
+		id: 'collection.aria-label.upload-icon',
+		defaultMessage: 'Upload icon',
 	},
 	projectsCountLabel: {
 		id: 'collection.label.projects-count',
@@ -595,6 +616,28 @@ const creator = computed(() =>
 	isFollowingCollection.value ? auth.value.user : fetchedCreator.value,
 )
 
+const supportsMarkdown = computed(() => creator.value?.id === '2REoufqX')
+
+// Query for public projects
+const { data: creatorPublicProjectsSearch } = useQuery({
+	queryKey: computed(() => ['user', creator.value?.username, 'public-projects-search']),
+	queryFn: () =>
+		api.labrinth.projects_v3.search({
+			facets: [[`author:${creator.value.username}`]],
+			limit: 1,
+		}),
+	enabled: computed(
+		() =>
+			!isFollowingCollection.value &&
+			collection.value?.status === 'listed' &&
+			!!creator.value?.username,
+	),
+})
+
+const creatorHasPublicProjects = computed(
+	() => (creatorPublicProjectsSearch.value?.total_hits ?? 0) > 0,
+)
+
 // Query for followed projects
 const {
 	data: followedProjects,
@@ -602,13 +645,7 @@ const {
 	isFetching: followedProjectsIsFetching,
 } = useQuery({
 	queryKey: computed(() => ['user', auth.value.user?.id, 'follows']),
-	queryFn: async () => {
-		const projects = await api.labrinth.users_v2.getFollowedProjects(auth.value.user.id)
-		for (const project of projects) {
-			project.categories = project.categories.concat(project.loaders)
-		}
-		return projects
-	},
+	queryFn: async () => fetchFollowedProjects(auth.value.user.id),
 	enabled: computed(() => isFollowingCollection.value && !!auth.value.user?.id),
 	placeholderData: [],
 })
@@ -620,22 +657,7 @@ const {
 	isFetching: collectionProjectsIsFetching,
 } = useQuery({
 	queryKey: computed(() => ['projects', collection.value?.projects]),
-	queryFn: async () => {
-		const projectIds = collection.value.projects
-		const segmentSize = 800
-		const segments = []
-		for (let i = 0; i < projectIds.length; i += segmentSize) {
-			segments.push(projectIds.slice(i, i + segmentSize))
-		}
-		const results = await Promise.all(
-			segments.map((ids) => api.labrinth.projects_v2.getMultiple(ids)),
-		)
-		const projects = results.flat()
-		for (const project of projects) {
-			project.categories = project.categories.concat(project.loaders)
-		}
-		return projects
-	},
+	queryFn: () => fetchProjectsByIds(collection.value.projects),
 	enabled: computed(() => !isFollowingCollection.value && !!collection.value?.projects?.length),
 	placeholderData: [],
 })
@@ -647,15 +669,62 @@ const projects = computed(() =>
 
 // Loading state
 const isLoading = computed(() => {
+	if (!import.meta.client) return false
+
 	if (isFollowingCollection.value) {
 		return followedProjectsIsFetching.value
 	}
 	return collectionIsPending.value || creatorIsPending.value || collectionProjectsIsFetching.value
 })
 
+onServerPrefetch(async () => {
+	if (isFollowingCollection.value) {
+		const userId = auth.value.user?.id
+		if (!userId) return
+
+		await queryClient.ensureQueryData({
+			queryKey: ['user', userId, 'follows'],
+			queryFn: () => fetchFollowedProjects(userId),
+		})
+		return
+	}
+
+	if (!collectionId) return
+
+	const collectionData = await queryClient.ensureQueryData({
+		queryKey: ['collection', collectionId],
+		queryFn: () => api.labrinth.collections.get(collectionId),
+	})
+
+	if (collectionData?.user) {
+		const creatorData = await queryClient.ensureQueryData({
+			queryKey: ['user', collectionData.user],
+			queryFn: () => api.labrinth.users_v2.get(collectionData.user),
+		})
+
+		if (collectionData.status === 'listed' && creatorData?.username) {
+			await queryClient.ensureQueryData({
+				queryKey: ['user', creatorData.username, 'public-projects-search'],
+				queryFn: () =>
+					api.labrinth.projects_v3.search({
+						facets: [[`author:${creatorData.username}`]],
+						limit: 1,
+					}),
+			})
+		}
+	}
+
+	if (collectionData?.projects?.length) {
+		await queryClient.ensureQueryData({
+			queryKey: ['projects', collectionData.projects],
+			queryFn: () => fetchProjectsByIds(collectionData.projects),
+		})
+	}
+})
+
 watch(
-	[collection, creator],
-	([col, cre]) => {
+	[collection, creator, creatorHasPublicProjects],
+	([col, cre, hasPublicProjects]) => {
 		if (col && cre) {
 			const canonicalUrl = col ? `https://modrinth.com/collection/${col.id}` : undefined
 			useSeoMeta({
@@ -667,9 +736,9 @@ watch(
 				}),
 				ogTitle: formatMessage(messages.collectionTitle, { name: col.name }),
 				ogDescription: col.description,
-				ogImage: col.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+				ogImage: col.icon_url ?? 'https://cdn.modrinth.com/placeholder-square.png',
 				ogUrl: canonicalUrl,
-				robots: col.status === 'listed' ? 'all' : 'noindex',
+				robots: col.status === 'listed' && hasPublicProjects ? 'all' : 'noindex',
 			})
 			useHead({
 				link: [
@@ -692,13 +761,13 @@ const canEdit = computed(
 		collection.value.id !== 'following',
 )
 
-const projectTypes = computed(() => {
-	const projectSet = new Set(
-		projects.value?.map((project) => project?.project_type).filter((x) => x !== undefined) || [],
-	)
-	projectSet.delete('project')
-	return Array.from(projectSet)
-})
+const projectTypes = computed(() => catalogProjectTypes(projects.value ?? []))
+
+const displayedProjects = computed(() =>
+	filterProjectsByType(projects.value ?? [], parseProjectTypeRouteParam(route.params.projectType))
+		.slice()
+		.sort((a, b) => b.downloads - a.downloads),
+)
 
 function getProjectTypeSentenceMessage(type) {
 	return commonProjectTypeSentenceMessages[type] ?? commonProjectTypeSentenceMessages.project
@@ -716,6 +785,7 @@ const showUpdatedDate = computed(() => {
 })
 
 const editModal = ref(null)
+const deleteModal = ref(null)
 const iconInputRef = ref(null)
 const icon = ref(null)
 const deletedIcon = ref(false)
@@ -880,5 +950,20 @@ function openEditModal(event) {
 .animated-dropdown {
 	// Omorphia's dropdowns are harcoded in width, so we need to override that
 	width: 100% !important;
+}
+
+:deep(.description-body) {
+	p {
+		margin: 0;
+	}
+
+	a {
+		color: var(--color-brand);
+		font-weight: 600;
+	}
+
+	a:hover {
+		text-decoration: underline;
+	}
 }
 </style>

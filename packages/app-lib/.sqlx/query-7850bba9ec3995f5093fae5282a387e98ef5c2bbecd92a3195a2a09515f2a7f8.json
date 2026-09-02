@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instance_content_sets\n\t\tSET\n\t\t\tname = ?,\n\t\t\tsource_kind = ?,\n\t\t\tstatus = ?,\n\t\t\tgame_version = ?,\n\t\t\tprotocol_version = ?,\n\t\t\tloader = ?,\n\t\t\tloader_version = ?,\n\t\t\tmodified = ?\n\t\tWHERE id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 9
+    },
+    "nullable": []
+  },
+  "hash": "7850bba9ec3995f5093fae5282a387e98ef5c2bbecd92a3195a2a09515f2a7f8"
+}

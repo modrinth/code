@@ -1,0 +1,92 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT *\n\t\tFROM instance_content_entries\n\t\tWHERE content_set_id = ? AND file_id = ?\n\t\tORDER BY modified_at DESC\n\t\tLIMIT 1\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "instance_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "content_set_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_id",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "project_type",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "project_id",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "version_id",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "source_kind",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "server_requirement",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "client_requirement",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "enabled",
+        "ordinal": 10,
+        "type_info": "Integer"
+      },
+      {
+        "name": "added_at",
+        "ordinal": 11,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified_at",
+        "ordinal": 12,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "a1681a1932f01490c3282aa45a3dccdc7bb14128f797b2e3b64c43c86ee4cba8"
+}

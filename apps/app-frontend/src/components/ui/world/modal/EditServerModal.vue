@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SaveIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessage,
 	injectNotificationManager,
@@ -15,7 +15,7 @@ import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 import type { GameInstance } from '@/helpers/types'
 import {
 	type DisplayStatus,
-	edit_server_in_profile,
+	edit_server_in_instance,
 	type ServerPackStatus,
 	type ServerWorld,
 	set_world_display_status,
@@ -46,8 +46,8 @@ const newDisplayStatus = computed(() => (hideFromHome.value ? 'hidden' : 'normal
 async function saveServer() {
 	const serverName = name.value ? name.value : address.value
 	const resourcePackStatus = resourcePack.value
-	await edit_server_in_profile(
-		props.instance.path,
+	await edit_server_in_instance(
+		props.instance.id,
 		index.value,
 		serverName,
 		address.value,
@@ -56,7 +56,7 @@ async function saveServer() {
 
 	if (newDisplayStatus.value !== displayStatus.value) {
 		await set_world_display_status(
-			props.instance.path,
+			props.instance.id,
 			'server',
 			address.value,
 			newDisplayStatus.value,
@@ -105,18 +105,14 @@ const titleMessage = defineMessage({
 		<HideFromHomeOption v-model="hideFromHome" class="mt-3" />
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hide()">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!address" @click="saveServer">
-						<SaveIcon />
-						{{ formatMessage(commonMessages.saveChangesButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="!address" @click="saveServer">
+					<SaveIcon />
+					{{ formatMessage(commonMessages.saveChangesButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>

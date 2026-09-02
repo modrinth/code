@@ -1,3 +1,5 @@
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use std::collections::HashMap;
 
 use const_format::formatcp;
@@ -184,10 +186,22 @@ pub(crate) async fn fetch(
     let uses = |field| metrics.bucket_by.contains(&field);
     let use_columns = &[
         ("use_project_id", uses(F::ProjectId)),
-        ("use_version_id", uses(F::VersionId)),
-        ("use_loader", uses(F::Loader)),
-        ("use_game_version", uses(F::GameVersion)),
-        ("use_country", uses(F::Country)),
+        (
+            "use_version_id",
+            uses(F::VersionId) || !metrics.filter_by.version_id.is_empty(),
+        ),
+        (
+            "use_loader",
+            uses(F::Loader) || !metrics.filter_by.loader.is_empty(),
+        ),
+        (
+            "use_game_version",
+            uses(F::GameVersion) || !metrics.filter_by.game_version.is_empty(),
+        ),
+        (
+            "use_country",
+            uses(F::Country) || !metrics.filter_by.country.is_empty(),
+        ),
     ];
     let uses_column = |name| {
         use_columns
@@ -215,10 +229,16 @@ pub(crate) async fn fetch(
         query = filter_param.bind(query);
     }
 
-    let mut cursor = query.fetch::<PlaytimeRow>()?;
+    let mut cursor = query
+        .fetch::<PlaytimeRow>()
+        .wrap_internal_err("fetching project-playtime pagination cursor")?;
     let mut buckets = HashMap::<PlaytimeBucket, u64>::new();
 
-    while let Some(row) = cursor.next().await? {
+    while let Some(row) = cursor
+        .next()
+        .await
+        .wrap_internal_err("fetching project playtime")?
+    {
         let project_id =
             if uses_column("use_project_id") && row.project_id.0 == 0 {
                 parent_version_projects
@@ -265,6 +285,18 @@ pub(crate) async fn fetch(
         ) {
             continue;
         }
+        if !uses(F::VersionId) {
+            key.version_id = None;
+        }
+        if !uses(F::Loader) {
+            key.loader = None;
+        }
+        if !uses(F::GameVersion) {
+            key.game_version = None;
+        }
+        if !uses(F::Country) {
+            key.country = None;
+        }
         *output_buckets.entry(key).or_default() += seconds;
     }
 
@@ -284,7 +316,8 @@ pub(crate) async fn fetch(
                     seconds,
                 }),
             }),
-        )?;
+        )
+        .wrap_api_err("executing `ProjectMetrics::Playtime`")?;
     }
 
     Ok(())

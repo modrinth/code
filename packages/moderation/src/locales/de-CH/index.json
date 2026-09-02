@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Java Adresse Hinzufügen"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Gib eine gültige URL mit Namen oder eine SPDX-Kennung für deine benutzerdefinierte Lizenz ein."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Details zur Lizenz hinzufügen"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Füge relevante Links hinzu, welche außerhalb von Modrinth liegen, wie z. B. eine Webseite, einen Shop, oder eine Discord Einladung."
   },
@@ -29,11 +35,23 @@
   "nags.add-links.title": {
     "defaultMessage": "Externe Links hinzufügen"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "Du hast alle verfügbaren Sprachoptionen ausgewählt. Bitte gib nur die Sprachen an, die dein Server aktiv unterstützt."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Wähle passende Sprachen aus"
+  },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Du hast {totalAvailableTags, plural, one {# verfügbaren Tag} other {alle # verfügbaren Tags}} ausgewählt. Dies zerstört den Zweck von tags, welche Nutzern helfen sollen, relevante Projekte zu finden. Bitte wähle nur die Tags aus, die für dein projekt relevant sind."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wähle akkurate Tags aus"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Stelle sicher, dass Nutzer über alle wichtigen Details informiert sind, indem du die für dein {type} geltenden Angaben zum Inhalt ausfüllst."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Angaben zum Inhalt prüfen"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Deine Beschreibung ist {length, plural, one {# lesbares Zeichen} other {# lesbare Zeichen}} lang. Mindestens {minChars, plural, one {1 Zeichen ist} other {# Zeichen sind}} empfohlen, um eine klare und informative Beschreibung zu erstellen."
@@ -140,6 +158,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Richtige Auflösung auswählen"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Stelle sicher, dass du einen Nachweis über deine Berechtigung zur Verbreitung externer Inhalte in deinem Modpack hinterlegt hast."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Externe Berechtigungen überprüfen"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Wähle, welche Versionen dein Server unterstützt, wähle ein Modpack, oder lade dein eigenes hoch."
   },
@@ -176,17 +200,26 @@
   "nags.settings.description.title": {
     "defaultMessage": "Beschreibungseinstellungen ansehen"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Angabeneinstellungen öffnen"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Lizenzeinstellungen ansehen"
   },
   "nags.settings.links.title": {
     "defaultMessage": "Link-Einstellungen ansehen"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Berechtigungs-Dashboard besuchen"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Tag-Einstellungen ansehen"
   },
   "nags.settings.title": {
     "defaultMessage": "Allgemeine Einstellungen ansehen"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Versionseinstellungen ansehen"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Deine Zusammenfassung kann nicht identisch mit deinem Projektnamen sein. Es ist wichtig, eine informative und spannende Zusammenfassung zu erstellen."
@@ -212,6 +245,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Namen bereinigen"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Du hast {languageCount, plural, one {# Sprache} other {# Sprachen}} ausgewählt. Bitte gib nur die Sprachen an, die dein Server aktiv unterstützt."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Wähle passende Sprachen aus"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Server in relevanten Suchen erscheint."
   },
@@ -227,8 +266,11 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Es wird mindestens ein Galeriebild benötigt, um den Inhalt deines/deiner {type} zu präsentieren."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "Resource Pack, ausgenommen Audio- oder Lokalisierungs-Packs. Wenn dies auf dein Pack zutrifft, wähle bitte das entsprechende Tag aus"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Mindestens ein Galeriebild wird benötigt, um den Inhalt deines Ressourcenpakets zu präsentieren, außer bei Audio- oder Lokalisierungspaketen. Falls das auf dein Paket zutrifft, wähle bitte den entsprechenden Tag aus."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Mindestens drei Galeriebilder werden benötigt, um den Inhalt deines Shaders in einer Vielzahl von Situationen und Bedingungen darzustellen."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Lade ein Galeriebild hoch"
@@ -244,9 +286,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Externe Links überprüfen"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Versionen-Seite ansehen"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Link-Einstellungen ansehen"

@@ -2,11 +2,12 @@ use crate::database;
 use crate::database::PgPool;
 use crate::database::models::ids::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::redis::RedisPool;
+use crate::file_hosting::FileHost;
 use crate::models::notifications::NotificationBody;
 use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
+use crate::queue::file_scan::scan_all_pending_files;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_affiliate_payouts,
@@ -17,7 +18,8 @@ use crate::util::anrok;
 use actix_web::web;
 use clap::ValueEnum;
 use eyre::WrapErr;
-use tracing::info;
+use tracing::{info, instrument};
+use xredis::RedisPool;
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
 #[clap(rename_all = "kebab_case")]
@@ -29,6 +31,7 @@ pub enum BackgroundTask {
     SyncPayoutStatuses,
     IndexBilling,
     IndexSubscriptions,
+    IncrementalIndexSearch,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -37,18 +40,25 @@ pub enum BackgroundTask {
     /// Attempts to ping Minecraft Java servers as if we were a client, to
     /// collect info on if they're online, game version, description, etc.
     PingMinecraftJavaServers,
+    /// Finds files of versions which have not been scanned for attributions
+    /// yet, extracts them to find file overrides, and finds any overrides which
+    /// require attribution from the creator.
+    ScanPendingFiles,
     /// Queues Discord Creator Club role claim emails for newly eligible users.
     DiscordRoleEmailCampaign,
 }
 
 impl BackgroundTask {
     #[allow(clippy::too_many_arguments)]
+    #[instrument(skip_all, fields(background_task = ?self))]
     pub async fn run(
         self,
         pool: PgPool,
         ro_pool: PgPool,
         redis_pool: RedisPool,
         search_backend: web::Data<dyn SearchBackend>,
+        file_host: web::Data<dyn FileHost>,
+        kafka_client: web::Data<crate::util::kafka::KafkaClientState>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
@@ -88,12 +98,35 @@ impl BackgroundTask {
                 .await;
                 Ok(())
             }
+            IncrementalIndexSearch => {
+                crate::search::incremental::consume::run(
+                    ro_pool,
+                    redis_pool,
+                    search_backend,
+                    kafka_client,
+                )
+                .await
+            }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
                 cache_analytics(&pool, &redis_pool, &clickhouse).await
             }
             PingMinecraftJavaServers => {
-                ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
+                ping_minecraft_java_servers(
+                    pool,
+                    redis_pool,
+                    clickhouse,
+                    kafka_client,
+                )
+                .await
+            }
+            ScanPendingFiles => {
+                scan_all_pending_files(
+                    &pool,
+                    &redis_pool,
+                    file_host.into_inner(),
+                )
+                .await
             }
             DiscordRoleEmailCampaign => {
                 discord_role_email_campaign(pool, redis_pool).await
@@ -135,6 +168,9 @@ pub async fn update_bank_balances(pool: PgPool) -> eyre::Result<()> {
 
 pub async fn run_migrations() -> eyre::Result<()> {
     database::check_for_migrations().await?;
+    crate::clickhouse::run_migrations()
+        .await
+        .wrap_err("failed to run ClickHouse migrations")?;
     Ok(())
 }
 
@@ -144,7 +180,7 @@ pub async fn index_search(
     search_backend: web::Data<dyn SearchBackend>,
 ) -> eyre::Result<()> {
     info!("Indexing local database");
-    search_backend.index_projects(ro_pool, redis_pool).await
+    search_backend.rebuild_index(ro_pool, redis_pool).await
 }
 
 pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
@@ -322,17 +358,27 @@ pub async fn ping_minecraft_java_servers(
     pool: PgPool,
     redis_pool: RedisPool,
     clickhouse: clickhouse::Client,
+    kafka_client: web::Data<crate::util::kafka::KafkaClientState>,
 ) -> eyre::Result<()> {
     info!("Started pinging Minecraft Java servers");
 
+    let incremental_search_queue =
+        crate::search::incremental::IncrementalSearchQueue::new(kafka_client);
     let server_ping_queue = crate::queue::server_ping::ServerPingQueue::new(
-        pool, redis_pool, clickhouse,
+        pool,
+        redis_pool,
+        clickhouse,
+        incremental_search_queue.clone(),
     );
 
     server_ping_queue
         .ping_minecraft_java_servers()
         .await
         .wrap_err("failed to ping Minecraft Java servers")?;
+    incremental_search_queue
+        .drain()
+        .await
+        .wrap_err("failed to drain incremental search queue")?;
     info!("Successfully pinged Minecraft Java servers");
 
     info!("Done pinging Minecraft Java servers");
@@ -344,11 +390,11 @@ mod version_updater {
 
     use crate::database::PgPool;
     use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-    use crate::database::redis::RedisPool;
     use chrono::{DateTime, Utc};
     use serde::Deserialize;
     use thiserror::Error;
     use tracing::warn;
+    use xredis::RedisPool;
 
     #[derive(Deserialize)]
     struct InputFormat<'a> {

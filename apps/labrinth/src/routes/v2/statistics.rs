@@ -3,9 +3,10 @@ use crate::routes::{
     ApiError, v2_reroute,
     v3::{self, statistics::V3Stats},
 };
+use crate::util::error::ApiContext as _;
 use actix_web::{HttpResponse, get, web};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_stats);
 }
 
@@ -17,8 +18,9 @@ pub struct V2Stats {
     pub files: Option<i64>,
 }
 
-/// Get aggregate instance statistics.
+/// Get aggregate instance statistics.  
 #[utoipa::path(
+	tag = "statistics",
     get,
     operation_id = "statistics",
     responses(
@@ -35,7 +37,8 @@ pub async fn get_stats(
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::statistics::get_stats(pool)
         .await
-        .or_else(v2_reroute::flatten_404_error)?;
+        .or_else(v2_reroute::flatten_404_error)
+        .wrap_api_err("flattening v2 not-found response")?;
 
     match v2_reroute::extract_ok_json::<V3Stats>(response).await {
         Ok(stats) => {

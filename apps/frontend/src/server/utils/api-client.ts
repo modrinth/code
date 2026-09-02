@@ -5,17 +5,10 @@ import {
 	type NuxtClientConfig,
 	NuxtModrinthClient,
 } from '@modrinth/api-client'
-import type { H3Event } from 'h3'
+import { getRequestHeader, type H3Event } from 'h3'
 
-async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
-	try {
-		const mod = 'cloudflare:workers'
-		const { env } = await import(/* @vite-ignore */ mod)
-		return await env.RATE_LIMIT_IGNORE_KEY?.get()
-	} catch {
-		return undefined
-	}
-}
+import { readEnv } from '~/helpers/env'
+import { getFrontendUserAgent, VISITOR_USER_AGENT_HEADER } from '~/helpers/user-agent'
 
 export interface ServerModrinthClientOptions {
 	event?: H3Event
@@ -25,6 +18,12 @@ export interface ServerModrinthClientOptions {
 export function useServerModrinthClient(options?: ServerModrinthClientOptions): NuxtModrinthClient {
 	const config = useRuntimeConfig(options?.event)
 	const apiBaseUrl = (config.apiBaseUrl || config.public.apiBaseUrl).replace('/v2/', '/')
+	const sharedInstancesBaseUrl =
+		config.sharedInstancesBaseUrl || config.public.sharedInstancesBaseUrl
+
+	const visitorUserAgent = options?.event
+		? getRequestHeader(options.event, 'user-agent')
+		: undefined
 
 	const features = []
 
@@ -39,7 +38,10 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 
 	const clientConfig: NuxtClientConfig = {
 		labrinthBaseUrl: apiBaseUrl,
-		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
+		sharedInstancesBaseUrl,
+		userAgent: getFrontendUserAgent(config.public.hash),
+		headers: visitorUserAgent ? { [VISITOR_USER_AGENT_HEADER]: visitorUserAgent } : undefined,
+		rateLimitKey: config.rateLimitKey || (() => readEnv('RATE_LIMIT_IGNORE_KEY')),
 		features,
 	}
 

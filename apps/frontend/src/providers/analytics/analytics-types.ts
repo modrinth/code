@@ -10,9 +10,12 @@ export type AnalyticsQueryFilterCategory =
 	| 'monetization'
 	| 'user_agent'
 	| 'download_reason'
+	| 'user_id'
 	| 'version_id'
 	| 'game_version'
 	| 'loader_type'
+	| 'dependent_project_id'
+	| 'dependent_project_type'
 
 export type AnalyticsTimeframePreset =
 	| 'today'
@@ -37,9 +40,11 @@ export type AnalyticsBreakdownPreset =
 	| 'monetization'
 	| 'user_agent'
 	| 'download_reason'
+	| 'user_id'
 	| 'version_id'
 	| 'loader'
 	| 'game_version'
+	| 'dependent_project_download'
 
 export type AnalyticsSelectedBreakdowns = Exclude<AnalyticsBreakdownPreset, 'none'>[]
 export type AnalyticsDashboardStat = 'views' | 'downloads' | 'revenue' | 'playtime'
@@ -47,6 +52,7 @@ export type AnalyticsGraphViewMode = 'line' | 'area' | 'bar'
 export type AnalyticsTableSortColumn =
 	| 'date'
 	| 'project'
+	| 'dependent_on'
 	| 'breakdown'
 	| `breakdown_${Exclude<AnalyticsBreakdownPreset, 'none'>}`
 	| 'views'
@@ -121,6 +127,7 @@ export interface AnalyticsDashboardProject {
 	id: string
 	name: string
 	iconUrl?: string
+	organizationId?: string
 	downloads: number
 	status: ProjectStatusFilterValue
 	publishedAt?: string
@@ -151,8 +158,10 @@ export interface AnalyticsDashboardFilterOptions {
 	countries: string[]
 	downloadSources: string[]
 	downloadReasons: string[]
+	userIds: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
+	dependentProjectTypes: string[]
 	versionIds: string[]
 }
 
@@ -161,17 +170,22 @@ export interface NormalizedAnalyticsSelectedFilters {
 	monetization: ReadonlySet<string>
 	userAgent: ReadonlySet<string>
 	downloadReason: ReadonlySet<string>
+	userId: ReadonlySet<string>
 	versionId: ReadonlySet<string>
 	gameVersion: ReadonlySet<string>
 	loaderType: ReadonlySet<string>
+	dependentProjectId: ReadonlySet<string>
+	dependentProjectType: ReadonlySet<string>
 }
 
 export interface AnalyticsFacetsFilterOptionSummary {
 	countries: string[]
 	downloadSources: string[]
 	downloadReasons: string[]
+	userIds: string[]
 	gameVersions: string[]
 	loaderTypes: string[]
+	dependentProjectTypes: string[]
 	versionIds: string[]
 	projectDownloadsById: Map<string, number>
 	projectVersionDownloadsById: Map<string, number>
@@ -202,5 +216,7 @@ export type AnalyticsTimeSliceSplit = {
 
 export type AnalyticsFetchData = {
 	metrics: Labrinth.Analytics.v3.TimeSlice[]
+	projects: Record<string, Labrinth.Projects.v3.Project>
 	project_events: Labrinth.Analytics.v3.ProjectAnalyticsEvent[]
+	users: Record<string, Labrinth.Users.v3.User>
 }

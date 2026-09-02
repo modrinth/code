@@ -1,3 +1,4 @@
+use crate::util::error::ApiContext as _;
 use std::{
     collections::{HashMap, HashSet},
     sync::{
@@ -14,7 +15,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
 use crate::{
     database::{
         PgPool,
-        models::{DBProjectId, DBVersion, DBVersionId},
+        models::{DBProjectId, DBVersionId},
     },
     models::{
         ids::{ProjectId, VersionId},
@@ -326,15 +327,28 @@ async fn fetch_dependent_version_projects(
         return Ok(HashMap::new());
     }
 
-    let dependent_on_version_ids =
-        dependent_on_version_ids.into_iter().collect::<Vec<_>>();
-    let versions =
-        DBVersion::get_many(&dependent_on_version_ids, cx.pool, cx.redis)
-            .await?;
+    let dependent_on_version_ids = dependent_on_version_ids
+        .into_iter()
+        .map(|version_id| version_id.0)
+        .collect::<Vec<_>>();
+    let versions = sqlx::query!(
+        "
+        SELECT v.id, v.mod_id
+        FROM versions v
+        INNER JOIN mods m ON m.id = v.mod_id
+        WHERE
+            v.id = ANY($1)
+            AND jsonb_typeof(m.components -> 'minecraft_server') IS DISTINCT FROM 'object'
+        ",
+        &dependent_on_version_ids,
+    )
+    .fetch_all(cx.pool)
+    .await
+    .wrap_internal_err("failed to fetch dependent version projects")?;
 
     Ok(versions
         .into_iter()
-        .map(|version| (version.inner.id, version.inner.project_id))
+        .map(|version| (DBVersionId(version.id), DBProjectId(version.mod_id)))
         .collect())
 }
 
@@ -345,7 +359,9 @@ pub(crate) async fn fetch(
     use ProjectDownloadsField as F;
     let uses = |field| metrics.bucket_by.contains(&field);
     let dependent_on_version_filter =
-        fetch_dependent_on_version_filter(metrics, cx.pool).await?;
+        fetch_dependent_on_version_filter(metrics, cx.pool)
+            .await
+            .wrap_api_err("fetching dependent on version filter")?;
     if !metrics.filter_by.dependent_project_id.is_empty()
         && dependent_on_version_filter.is_empty()
     {
@@ -354,18 +370,39 @@ pub(crate) async fn fetch(
 
     let use_columns = &[
         ("use_project_id", uses(F::ProjectId)),
-        ("use_domain", uses(F::Domain)),
+        (
+            "use_domain",
+            uses(F::Domain) || !metrics.filter_by.domain.is_empty(),
+        ),
         (
             "use_user_agent",
             uses(F::UserAgent) || !metrics.filter_by.user_agent.is_empty(),
         ),
-        ("use_version_id", uses(F::VersionId)),
+        (
+            "use_version_id",
+            uses(F::VersionId) || !metrics.filter_by.version_id.is_empty(),
+        ),
         ("use_dependent_project_id", uses(F::DependentProjectId)),
-        ("use_monetized", uses(F::Monetized)),
-        ("use_country", uses(F::Country)),
-        ("use_reason", uses(F::Reason)),
-        ("use_game_version", uses(F::GameVersion)),
-        ("use_loader", uses(F::Loader)),
+        (
+            "use_monetized",
+            uses(F::Monetized) || !metrics.filter_by.monetized.is_empty(),
+        ),
+        (
+            "use_country",
+            uses(F::Country) || !metrics.filter_by.country.is_empty(),
+        ),
+        (
+            "use_reason",
+            uses(F::Reason) || !metrics.filter_by.reason.is_empty(),
+        ),
+        (
+            "use_game_version",
+            uses(F::GameVersion) || !metrics.filter_by.game_version.is_empty(),
+        ),
+        (
+            "use_loader",
+            uses(F::Loader) || !metrics.filter_by.loader.is_empty(),
+        ),
     ];
 
     let mut query = cx
@@ -399,15 +436,23 @@ pub(crate) async fn fetch(
             .iter()
             .any(|(column_name, used)| *column_name == name && *used)
     };
-    let mut cursor = query.fetch::<DownloadRow>()?;
+    let mut cursor = query
+        .fetch::<DownloadRow>()
+        .wrap_internal_err("fetching project-download pagination cursor")?;
     let mut rows = Vec::new();
 
-    while let Some(row) = cursor.next().await? {
+    while let Some(row) = cursor
+        .next()
+        .await
+        .wrap_internal_err("fetching project downloads")?
+    {
         rows.push(row);
     }
 
     let dependent_version_projects =
-        fetch_dependent_version_projects(&rows, cx).await?;
+        fetch_dependent_version_projects(&rows, cx)
+            .await
+            .wrap_api_err("fetching dependent version projects")?;
     let mut buckets = HashMap::<DownloadBucket, u64>::new();
 
     for row in rows {
@@ -419,12 +464,19 @@ pub(crate) async fn fetch(
         {
             continue;
         }
+        if uses(F::DependentProjectId)
+            && row.dependent_on_version_id.0 != 0
+            && !dependent_version_projects
+                .contains_key(&row.dependent_on_version_id)
+        {
+            continue;
+        }
 
         let key = DownloadBucket {
             bucket: row.bucket,
             project_id: row.project_id,
             domain: uses_column("use_domain").then(|| row.domain.clone()),
-            user_agent: uses(F::UserAgent)
+            user_agent: uses_column("use_user_agent")
                 .then_some(normalized_source)
                 .flatten(),
             version_id: uses_column("use_version_id").then_some(row.version_id),
@@ -476,6 +528,30 @@ pub(crate) async fn fetch(
         ) {
             continue;
         }
+        if !uses(F::Domain) {
+            key.domain = None;
+        }
+        if !uses(F::UserAgent) {
+            key.user_agent = None;
+        }
+        if !uses(F::VersionId) {
+            key.version_id = None;
+        }
+        if !uses(F::Monetized) {
+            key.monetized = None;
+        }
+        if !uses(F::Country) {
+            key.country = None;
+        }
+        if !uses(F::Reason) {
+            key.reason = None;
+        }
+        if !uses(F::GameVersion) {
+            key.game_version = None;
+        }
+        if !uses(F::Loader) {
+            key.loader = None;
+        }
         *output_buckets.entry(key).or_default() += downloads;
     }
 
@@ -502,7 +578,8 @@ pub(crate) async fn fetch(
                     downloads,
                 }),
             }),
-        )?;
+        )
+        .wrap_api_err("executing `ProjectMetrics::Downloads`")?;
     }
 
     Ok(())
@@ -581,6 +658,11 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
             (r"nothub/mrpack-install", P::Named("mrpack-install")),
             (r"^(packwiz-installer|packwiz/)", P::Named("Packwiz")),
             (r"^mrpack4server", P::Named("mrpack4server")),
+            (r"^DawnLauncher/", P::Named("Dawn")),
+            (r"^Complementary-Installer", P::Named("Complementary Installer")),
+            (r"^noriskclient-launcher-v3/", P::Named("NoRisk Client")),
+            (r"^Resourcify/", P::Named("Resourcify")),
+            (r"^OneClient", P::Named("OneClient")),
             (
                 r"^(Mozilla/|Chrome/|Chromium/|Firefox/|Safari/|AppleWebKit/|Edg/|OPR/)",
                 P::Website,

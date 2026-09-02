@@ -21,7 +21,7 @@
 				/>
 				<img
 					v-else
-					src="https://cdn-raw.modrinth.com/landing-new/landing.webp"
+					src="https://cdn.modrinth.com/landing-new/landing.webp"
 					alt=""
 					class="absolute w-full h-full inset-0 object-cover object-center placeholder-banner scale-[200%]"
 				/>
@@ -68,11 +68,7 @@
 								class="smart-clickable:allow-pointer-events"
 							/>
 						</template>
-						<ProjectCardEnvironment
-							v-if="environment"
-							:client-side="environment.clientSide"
-							:server-side="environment.serverSide"
-						/>
+						<ProjectCardEnvironment v-if="environment" :environment="environment" />
 						<ProjectCardTags
 							v-if="tags"
 							:tags="tags"
@@ -168,11 +164,7 @@
 								class="smart-clickable:allow-pointer-events"
 							/>
 						</template>
-						<ProjectCardEnvironment
-							v-if="environment"
-							:client-side="environment.clientSide"
-							:server-side="environment.serverSide"
-						/>
+						<ProjectCardEnvironment v-if="environment" :environment="environment" />
 						<ProjectCardTags
 							v-if="tags"
 							:tags="tags"
@@ -213,7 +205,7 @@ import ServerRegion from '../server/ServerRegion.vue'
 import ProjectCardAuthor from './ProjectCardAuthor.vue'
 import ProjectCardDate from './ProjectCardDate.vue'
 import ProjectCardEnvironment, {
-	type ProjectCardEnvironmentProps,
+	type ProjectCardEnvironmentValue,
 } from './ProjectCardEnvironment.vue'
 import ProjectCardStats from './ProjectCardStats.vue'
 import ProjectCardTags from './ProjectCardTags.vue'
@@ -257,7 +249,7 @@ const props = defineProps<{
 	isServerProject?: boolean
 	banner?: string
 	color?: string | number
-	environment?: ProjectCardEnvironmentProps
+	environment?: ProjectCardEnvironmentValue
 	status?: ProjectStatus
 	maxTags?: number
 }>()

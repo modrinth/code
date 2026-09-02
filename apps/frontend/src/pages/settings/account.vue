@@ -9,41 +9,45 @@
 			:has-to-type="true"
 			@proceed="deleteAccount"
 		/>
-		<Modal
+		<NewModal
 			ref="changeEmailModal"
+			width="500px"
 			:header="`${auth.user.email ? formatMessage(messages.changeEmailHeaderChange) : formatMessage(messages.changeEmailHeaderAdd)}`"
 		>
-			<div class="universal-modal">
-				<p>{{ formatMessage(messages.emailNotPublicNotice) }}</p>
-				<label for="email-input">
-					<span class="label__title">{{ formatMessage(messages.emailAddressLabel) }}</span>
-				</label>
-				<StyledInput
-					id="email-input"
-					v-model="email"
-					:maxlength="2048"
-					type="email"
-					:placeholder="formatMessage(messages.emailAddressPlaceholder)"
-					@keyup.enter="saveEmail()"
-				/>
-				<div class="input-group push-right">
-					<ButtonStyled>
-						<button @click="$refs.changeEmailModal.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="!email" @click="saveEmail()">
-							<SaveIcon />
-							{{ formatMessage(messages.saveEmailButton) }}
-						</button>
-					</ButtonStyled>
+			<div class="flex flex-col gap-6">
+				<Admonition type="info">
+					{{ formatMessage(messages.emailNotPublicNotice) }}
+				</Admonition>
+				<div class="flex flex-col gap-2.5">
+					<label for="email-input">
+						<span class="text-md font-semibold text-contrast">{{
+							formatMessage(messages.emailAddressLabel)
+						}}</span>
+					</label>
+					<Input
+						id="email-input"
+						v-model="email"
+						:maxlength="2048"
+						type="email"
+						:placeholder="formatMessage(messages.emailAddressPlaceholder)"
+						@keyup.enter="saveEmail()"
+					/>
+				</div>
+				<div class="flex justify-end gap-2.5">
+					<Button @click="$refs.changeEmailModal.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button type="colored" color="brand" :disabled="!email" @click="saveEmail()">
+						<SaveIcon />
+						{{ formatMessage(messages.saveEmailButton) }}
+					</Button>
 				</div>
 			</div>
-		</Modal>
-		<Modal
+		</NewModal>
+		<NewModal
 			ref="managePasswordModal"
+			width="600px"
 			:header="`${
 				removePasswordMode
 					? formatMessage(messages.passwordHeaderRemove)
@@ -52,104 +56,115 @@
 						: formatMessage(messages.passwordHeaderAdd)
 			}`"
 		>
-			<div class="universal-modal">
-				<ul
-					v-if="newPassword !== confirmNewPassword && confirmNewPassword.length > 0"
-					class="known-errors"
-				>
-					<li>{{ formatMessage(messages.passwordsDoNotMatchError) }}</li>
-				</ul>
-				<label v-if="removePasswordMode" for="old-password">
-					<span class="label__title">{{ formatMessage(messages.confirmPasswordLabel) }}</span>
-					<span class="label__description">{{
+			<div class="flex flex-col gap-6">
+				<div v-if="auth.user.has_password" class="flex flex-col gap-2.5">
+					<label v-if="removePasswordMode" for="old-password">
+						<span class="text-md font-semibold text-contrast">{{
+							formatMessage(messages.confirmPasswordLabel)
+						}}</span>
+					</label>
+					<label v-else for="old-password">
+						<span class="text-md font-semibold text-contrast">{{
+							formatMessage(messages.oldPasswordLabel)
+						}}</span>
+					</label>
+					<Input
+						id="old-password"
+						v-model="oldPassword"
+						:maxlength="2048"
+						type="password"
+						autocomplete="current-password"
+						:placeholder="
+							removePasswordMode
+								? formatMessage(messages.confirmPasswordPlaceholder)
+								: formatMessage(messages.oldPasswordPlaceholder)
+						"
+					/>
+					<span v-if="removePasswordMode" class="label__description">{{
 						formatMessage(messages.confirmPasswordDescription)
 					}}</span>
-				</label>
-				<label v-else-if="auth.user.has_password" for="old-password">
-					<span class="label__title">{{ formatMessage(messages.oldPasswordLabel) }}</span>
-				</label>
-				<StyledInput
-					v-if="auth.user.has_password"
-					id="old-password"
-					v-model="oldPassword"
-					:maxlength="2048"
-					type="password"
-					autocomplete="current-password"
-					:placeholder="
-						removePasswordMode
-							? formatMessage(messages.confirmPasswordPlaceholder)
-							: formatMessage(messages.oldPasswordPlaceholder)
-					"
-				/>
+				</div>
+
 				<template v-if="!removePasswordMode">
-					<label for="new-password"
-						><span class="label__title">{{ formatMessage(messages.newPasswordLabel) }}</span></label
-					>
-					<StyledInput
-						id="new-password"
-						v-model="newPassword"
-						:maxlength="2048"
-						type="password"
-						autocomplete="new-password"
-						:placeholder="formatMessage(messages.newPasswordPlaceholder)"
-					/>
-					<label for="confirm-new-password">
-						<span class="label__title">{{ formatMessage(messages.confirmNewPasswordLabel) }}</span>
-					</label>
-					<StyledInput
-						id="confirm-new-password"
-						v-model="confirmNewPassword"
-						:maxlength="2048"
-						type="password"
-						autocomplete="new-password"
-						:placeholder="formatMessage(messages.confirmNewPasswordPlaceholder)"
-					/>
+					<div class="flex flex-col gap-2.5">
+						<label for="new-password"
+							><span class="text-md font-semibold text-contrast">{{
+								formatMessage(messages.newPasswordLabel)
+							}}</span></label
+						>
+						<Input
+							id="new-password"
+							v-model="newPassword"
+							:maxlength="2048"
+							type="password"
+							autocomplete="new-password"
+							:placeholder="formatMessage(messages.newPasswordPlaceholder)"
+						/>
+					</div>
+
+					<div class="flex flex-col gap-2.5">
+						<label for="confirm-new-password">
+							<span class="text-md font-semibold text-contrast">{{
+								formatMessage(messages.confirmNewPasswordLabel)
+							}}</span>
+						</label>
+						<Input
+							id="confirm-new-password"
+							v-model="confirmNewPassword"
+							:maxlength="2048"
+							type="password"
+							autocomplete="new-password"
+							:placeholder="formatMessage(messages.confirmNewPasswordPlaceholder)"
+						/>
+						<div
+							v-if="newPassword !== confirmNewPassword && confirmNewPassword.length > 0"
+							class="known-errors"
+						>
+							{{ formatMessage(messages.passwordsDoNotMatchError) }}
+						</div>
+					</div>
 				</template>
-				<p></p>
-				<div class="input-group push-right">
-					<ButtonStyled>
-						<button @click="$refs.managePasswordModal.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
+				<div class="flex justify-end gap-2.5">
+					<Button @click="$refs.managePasswordModal.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
 					<template v-if="removePasswordMode">
-						<ButtonStyled color="red">
-							<button :disabled="!oldPassword" @click="savePassword">
-								<TrashIcon />
-								{{ formatMessage(messages.removePasswordButton) }}
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="red" :disabled="!oldPassword" @click="savePassword">
+							<TrashIcon />
+							{{ formatMessage(messages.removePasswordButton) }}
+						</Button>
 					</template>
 					<template v-else>
-						<ButtonStyled
+						<Button
 							v-if="auth.user.has_password && auth.user.auth_providers.length > 0"
+							type="colored"
 							color="red"
+							@click="removePasswordMode = true"
 						>
-							<button @click="removePasswordMode = true">
-								<TrashIcon />
-								{{ formatMessage(messages.removePasswordButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button
-								:disabled="
-									newPassword.length == 0 ||
-									(auth.user.has_password && oldPassword.length == 0) ||
-									newPassword !== confirmNewPassword
-								"
-								@click="savePassword"
-							>
-								<SaveIcon />
-								{{ formatMessage(messages.savePasswordButton) }}
-							</button>
-						</ButtonStyled>
+							<TrashIcon />
+							{{ formatMessage(messages.removePasswordButton) }}
+						</Button>
+						<Button
+							type="colored"
+							color="brand"
+							:disabled="
+								newPassword.length == 0 ||
+								(auth.user.has_password && oldPassword.length == 0) ||
+								newPassword !== confirmNewPassword
+							"
+							@click="savePassword"
+						>
+							<SaveIcon />
+							{{ formatMessage(messages.savePasswordButton) }}
+						</Button>
 					</template>
 				</div>
 			</div>
-		</Modal>
-		<Modal
+		</NewModal>
+		<NewModal
 			ref="manageTwoFactorModal"
+			width="500px"
 			:header="
 				formatMessage(
 					auth.user.has_totp && twoFactorStep === 0
@@ -158,43 +173,41 @@
 				)
 			"
 		>
-			<div class="universal-modal">
+			<div class="flex flex-col gap-6">
 				<template v-if="auth.user.has_totp && twoFactorStep === 0">
 					<label for="two-factor-code">
-						<span class="label__title">{{ formatMessage(messages.twoFactorEnterCodeLabel) }}</span>
+						<span class="text-md font-semibold text-contrast">{{
+							formatMessage(messages.twoFactorEnterCodeLabel)
+						}}</span>
 						<span class="label__description">{{
 							formatMessage(messages.twoFactorEnterCodeDescription)
 						}}</span>
 					</label>
-					<StyledInput
+					<Input
 						id="two-factor-code"
 						v-model="twoFactorCode"
 						:maxlength="11"
 						:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
 						@keyup.enter="removeTwoFactor()"
 					/>
-					<p v-if="twoFactorIncorrect" class="known-errors">
+					<p v-if="twoFactorIncorrect" class="known-errors m-0">
 						{{ formatMessage(messages.twoFactorIncorrectError) }}
 					</p>
-					<div class="input-group push-right">
-						<ButtonStyled>
-							<button @click="$refs.manageTwoFactorModal.hide()">
-								<XIcon />
-								{{ formatMessage(commonMessages.cancelButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red">
-							<button @click="removeTwoFactor">
-								<TrashIcon />
-								{{ formatMessage(messages.twoFactorRemoveButton) }}
-							</button>
-						</ButtonStyled>
+					<div class="flex justify-end gap-2.5">
+						<Button @click="$refs.manageTwoFactorModal.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</Button>
+						<Button type="colored" color="red" @click="removeTwoFactor">
+							<TrashIcon />
+							{{ formatMessage(messages.twoFactorRemoveButton) }}
+						</Button>
 					</div>
 				</template>
 				<template v-else>
 					<template v-if="twoFactorStep === 0">
-						<p>{{ formatMessage(messages.twoFactorSetupIntro) }}</p>
-						<p>
+						<p class="m-0">{{ formatMessage(messages.twoFactorSetupIntro) }}</p>
+						<p class="m-0">
 							<IntlFormatted :message-id="messages.twoFactorSetupScan">
 								<template #authy-link="{ children }">
 									<a href="https://authy.com/" target="_blank" rel="noreferrer">
@@ -221,21 +234,21 @@
 							:margin="2"
 							level="H"
 						/>
-						<p>
+						<p class="m-0">
 							{{ formatMessage(messages.twoFactorManualSecretPrefix) }}
 							<strong>{{ twoFactorSecret }}</strong>
 						</p>
 					</template>
 					<template v-if="twoFactorStep === 1">
 						<label for="verify-code">
-							<span class="label__title">{{
+							<span class="text-md font-semibold text-contrast">{{
 								formatMessage(messages.twoFactorVerifyCodeLabel)
 							}}</span>
 							<span class="label__description">{{
 								formatMessage(messages.twoFactorVerifyCodeDescription)
 							}}</span>
 						</label>
-						<StyledInput
+						<Input
 							id="verify-code"
 							v-model="twoFactorCode"
 							:maxlength="6"
@@ -243,86 +256,85 @@
 							:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
 							@keyup.enter="verifyTwoFactorCode()"
 						/>
-						<p v-if="twoFactorIncorrect" class="known-errors">
+						<p v-if="twoFactorIncorrect" class="known-errors m-0">
 							{{ formatMessage(messages.twoFactorIncorrectError) }}
 						</p>
 					</template>
 					<template v-if="twoFactorStep === 2">
-						<p>{{ formatMessage(messages.twoFactorBackupCodesIntro) }}</p>
-						<p>{{ formatMessage(messages.twoFactorBackupCodesSingleUse) }}</p>
+						<p class="m-0">{{ formatMessage(messages.twoFactorBackupCodesIntro) }}</p>
+						<p class="m-0">{{ formatMessage(messages.twoFactorBackupCodesSingleUse) }}</p>
 						<ul>
 							<li v-for="code in backupCodes" :key="code">{{ code }}</li>
 						</ul>
 					</template>
-					<div class="input-group push-right">
-						<ButtonStyled v-if="twoFactorStep === 1">
-							<button @click="twoFactorStep = 0">
-								<LeftArrowIcon />
-								{{ formatMessage(commonMessages.backButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="twoFactorStep !== 2">
-							<button @click="$refs.manageTwoFactorModal.hide()">
-								<XIcon />
-								{{ formatMessage(commonMessages.cancelButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="twoFactorStep <= 1" color="brand">
-							<button @click="twoFactorStep === 1 ? verifyTwoFactorCode() : (twoFactorStep = 1)">
-								<RightArrowIcon />
-								{{ formatMessage(commonMessages.continueButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="twoFactorStep === 2" color="brand">
-							<button @click="$refs.manageTwoFactorModal.hide()">
-								<CheckIcon />
-								{{ formatMessage(messages.completeSetupButton) }}
-							</button>
-						</ButtonStyled>
+					<div class="flex justify-end gap-2.5">
+						<Button v-if="twoFactorStep === 1" @click="twoFactorStep = 0">
+							<LeftArrowIcon />
+							{{ formatMessage(commonMessages.backButton) }}
+						</Button>
+						<Button v-if="twoFactorStep !== 2" @click="$refs.manageTwoFactorModal.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</Button>
+						<Button
+							v-if="twoFactorStep <= 1"
+							type="colored"
+							color="brand"
+							@click="twoFactorStep === 1 ? verifyTwoFactorCode() : (twoFactorStep = 1)"
+						>
+							<RightArrowIcon />
+							{{ formatMessage(commonMessages.continueButton) }}
+						</Button>
+						<Button
+							v-if="twoFactorStep === 2"
+							type="colored"
+							color="brand"
+							@click="$refs.manageTwoFactorModal.hide()"
+						>
+							<CheckIcon />
+							{{ formatMessage(messages.completeSetupButton) }}
+						</Button>
 					</div>
 				</template>
 			</div>
-		</Modal>
-		<Modal ref="manageProvidersModal" :header="formatMessage(messages.manageProvidersModalHeader)">
-			<div class="universal-modal">
-				<div class="table">
-					<div class="table-head table-row">
-						<div class="table-text table-cell">
-							{{ formatMessage(messages.providersTableProvider) }}
-						</div>
-						<div class="table-text table-cell">
-							{{ formatMessage(messages.providersTableActions) }}
-						</div>
-					</div>
-					<div v-for="provider in authProviders" :key="provider.id" class="table-row">
-						<div class="table-text table-cell">
-							<span><component :is="provider.icon" /> {{ provider.display }}</span>
-						</div>
-						<div class="table-text manage table-cell">
-							<ButtonStyled v-if="auth.user.auth_providers.includes(provider.id)">
-								<button @click="handleRemoveAuthProvider(provider.id)">
-									<TrashIcon /> {{ formatMessage(commonMessages.removeButton) }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else>
-								<a :href="`${getAuthUrl(provider.id, '/settings/account')}&token=${auth.token}`">
-									<ExternalIcon /> {{ formatMessage(messages.providerAddButton) }}
-								</a>
-							</ButtonStyled>
-						</div>
-					</div>
-				</div>
-				<p></p>
-				<div class="input-group push-right">
-					<ButtonStyled>
-						<button @click="$refs.manageProvidersModal.hide()">
-							<XIcon />
-							{{ formatMessage(commonMessages.closeButton) }}
-						</button>
-					</ButtonStyled>
+		</NewModal>
+		<NewModal
+			ref="manageProvidersModal"
+			width="500px"
+			:header="formatMessage(messages.manageProvidersModalHeader)"
+		>
+			<div class="flex flex-col gap-4">
+				<Table :columns="manageProvidersColumns" :data="authProviders" row-key="id">
+					<template #cell-provider="{ row }">
+						<span class="inline-flex items-center gap-1.5">
+							<component :is="row.icon" class="size-5" />
+							{{ row.display }}
+						</span>
+					</template>
+					<template #cell-actions="{ row }">
+						<Button
+							v-if="auth.user.auth_providers.includes(row.id)"
+							class="!w-full"
+							@click="handleRemoveAuthProvider(row.id)"
+						>
+							<TrashIcon /> {{ formatMessage(commonMessages.removeButton) }}
+						</Button>
+						<ButtonLink
+							v-else
+							:href="`${getAuthUrl(row.id, '/settings/account')}&token=${auth.token}`"
+						>
+							<ExternalIcon /> {{ formatMessage(messages.providerAddButton) }}
+						</ButtonLink>
+					</template>
+				</Table>
+				<div class="self-end">
+					<Button @click="$refs.manageProvidersModal.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.closeButton) }}
+					</Button>
 				</div>
 			</div>
-		</Modal>
+		</NewModal>
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(messages.accountSecurityTitle) }}</h2>
 
@@ -334,18 +346,16 @@
 					}}</span>
 				</label>
 				<div>
-					<ButtonStyled>
-						<button @click="$refs.changeEmailModal.show()">
-							<template v-if="auth.user.email">
-								<EditIcon />
-								{{ formatMessage(messages.changeEmailButton) }}
-							</template>
-							<template v-else>
-								<PlusIcon />
-								{{ formatMessage(messages.addEmailButton) }}
-							</template>
-						</button>
-					</ButtonStyled>
+					<Button @click="$refs.changeEmailModal.show()">
+						<template v-if="auth.user.email">
+							<EditIcon />
+							{{ formatMessage(messages.changeEmailButton) }}
+						</template>
+						<template v-else>
+							<PlusIcon />
+							{{ formatMessage(messages.addEmailButton) }}
+						</template>
+					</Button>
 				</div>
 			</div>
 			<div class="adjacent-input">
@@ -363,25 +373,23 @@
 					</span>
 				</label>
 				<div>
-					<ButtonStyled>
-						<button
-							@click="
-								() => {
-									oldPassword = ''
-									newPassword = ''
-									confirmNewPassword = ''
-									removePasswordMode = false
-									$refs.managePasswordModal.show()
-								}
-							"
-						>
-							<KeyIcon />
-							<template v-if="auth.user.has_password">{{
-								formatMessage(messages.changePasswordButton)
-							}}</template>
-							<template v-else> {{ formatMessage(messages.addPasswordButton) }} </template>
-						</button>
-					</ButtonStyled>
+					<Button
+						@click="
+							() => {
+								oldPassword = ''
+								newPassword = ''
+								confirmNewPassword = ''
+								removePasswordMode = false
+								$refs.managePasswordModal.show()
+							}
+						"
+					>
+						<KeyIcon />
+						<template v-if="auth.user.has_password">{{
+							formatMessage(messages.changePasswordButton)
+						}}</template>
+						<template v-else> {{ formatMessage(messages.addPasswordButton) }} </template>
+					</Button>
 				</div>
 			</div>
 			<div class="adjacent-input">
@@ -392,16 +400,14 @@
 					}}</span>
 				</label>
 				<div>
-					<ButtonStyled>
-						<button @click="showTwoFactorModal">
-							<template v-if="auth.user.has_totp">
-								<TrashIcon /> {{ formatMessage(messages.twoFactorRemoveButton) }}
-							</template>
-							<template v-else>
-								<PlusIcon /> {{ formatMessage(messages.twoFactorSetupButton) }}
-							</template>
-						</button>
-					</ButtonStyled>
+					<Button @click="showTwoFactorModal">
+						<template v-if="auth.user.has_totp">
+							<TrashIcon /> {{ formatMessage(messages.twoFactorRemoveButton) }}
+						</template>
+						<template v-else>
+							<PlusIcon /> {{ formatMessage(messages.twoFactorSetupButton) }}
+						</template>
+					</Button>
 				</div>
 			</div>
 			<div class="adjacent-input">
@@ -412,45 +418,38 @@
 					}}</span>
 				</label>
 				<div>
-					<ButtonStyled>
-						<button @click="$refs.manageProvidersModal.show()">
-							<SettingsIcon /> {{ formatMessage(messages.manageProvidersButton) }}
-						</button>
-					</ButtonStyled>
+					<Button @click="$refs.manageProvidersModal.show()">
+						<SettingsIcon /> {{ formatMessage(messages.manageProvidersButton) }}
+					</Button>
 				</div>
 			</div>
+			<PasskeySettings />
 		</section>
 
 		<section id="data-export" class="universal-card">
 			<h2>{{ formatMessage(messages.dataExportTitle) }}</h2>
 			<p>{{ formatMessage(messages.dataExportDescription) }}</p>
-			<ButtonStyled v-if="generated">
-				<a :href="generated" download="export.json">
-					<DownloadIcon />
-					{{ formatMessage(messages.downloadExportButton) }}
-				</a>
-			</ButtonStyled>
-			<ButtonStyled v-else>
-				<button :disabled="generatingExport" @click="exportData">
-					<template v-if="generatingExport">
-						<UpdatedIcon /> {{ formatMessage(messages.generatingExportButton) }}
-					</template>
-					<template v-else>
-						<UpdatedIcon /> {{ formatMessage(messages.generateExportButton) }}
-					</template>
-				</button>
-			</ButtonStyled>
+			<ButtonLink v-if="generated" :href="generated" download="export.json">
+				<DownloadIcon />
+				{{ formatMessage(messages.downloadExportButton) }}
+			</ButtonLink>
+			<Button v-else :disabled="generatingExport" @click="exportData">
+				<template v-if="generatingExport">
+					<UpdatedIcon /> {{ formatMessage(messages.generatingExportButton) }}
+				</template>
+				<template v-else>
+					<UpdatedIcon /> {{ formatMessage(messages.generateExportButton) }}
+				</template>
+			</Button>
 		</section>
 
 		<section id="delete-account" class="universal-card">
 			<h2>{{ formatMessage(messages.deleteAccountSectionTitle) }}</h2>
 			<p>{{ formatMessage(messages.deleteAccountSectionDescription) }}</p>
-			<ButtonStyled color="red">
-				<button type="button" @click="$refs.modal_confirm.show()">
-					<TrashIcon />
-					{{ formatMessage(messages.deleteAccountButton) }}
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="red" native-type="button" @click="$refs.modal_confirm.show()">
+				<TrashIcon />
+				{{ formatMessage(messages.deleteAccountButton) }}
+			</Button>
 		</section>
 	</div>
 </template>
@@ -471,13 +470,17 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Admonition,
+	Button,
+	ButtonLink,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
-	StyledInput,
+	NewModal,
+	Table,
 	useVIntl,
 } from '@modrinth/ui'
 import KeyIcon from 'assets/icons/auth/key.svg'
@@ -489,8 +492,10 @@ import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
 import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
 
-import Modal from '~/components/ui/Modal.vue'
-import { getAuthUrl, removeAuthProvider } from '~/composables/auth.js'
+import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
+import { forgetStoredAccount } from '~/composables/accounts.ts'
+import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
+import { useAuthCookie } from '~/composables/auth-cookie.ts'
 
 definePageMeta({
 	middleware: 'auth',
@@ -957,6 +962,18 @@ const authProviders = [
 		icon: GoogleIcon,
 	},
 ]
+const manageProvidersColumns = computed(() => [
+	{
+		key: 'provider',
+		label: formatMessage(messages.providersTableProvider),
+	},
+	{
+		key: 'actions',
+		label: formatMessage(messages.providersTableActions),
+		align: 'right',
+		width: '10rem',
+	},
+])
 
 async function deleteAccount() {
 	startLoading()
@@ -972,7 +989,8 @@ async function deleteAccount() {
 		})
 	}
 
-	useCookie('auth-token').value = null
+	forgetStoredAccount(auth.value.user.id)
+	useAuthCookie().value = null
 	window.location.href = '/'
 
 	stopLoading()
@@ -1009,21 +1027,5 @@ async function exportData() {
 canvas {
 	margin: 0 auto;
 	border-radius: var(--size-rounded-card);
-}
-
-.table-row {
-	grid-template-columns: 1fr 10rem;
-
-	span {
-		display: flex;
-		align-items: center;
-		margin: auto 0;
-
-		svg {
-			width: 1.25rem;
-			height: 1.25rem;
-			margin-right: 0.35rem;
-		}
-	}
 }
 </style>

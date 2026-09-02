@@ -1,20 +1,32 @@
 import type { ModrinthId } from '@modrinth/utils'
 
 export type GameInstance = {
+	id: string
 	path: string
 	install_stage: InstallStage
+	launcher_feature_version: string
 
 	name: string
 	icon_path?: string
+	icon_config?: InstanceIconConfig | null
 
 	game_version: string
+	protocol_version?: number
 	loader: InstanceLoader
 	loader_version?: string
 
-	groups: string[]
+	group_ids: string[]
+	synced_options: {
+		command_history: boolean
+		multiplayer_servers: boolean
+		creative_hotbars: boolean
+		screenshots: boolean
+	}
 
-	linked_data?: LinkedData
-	preferred_update_channel: ReleaseChannel
+	link?: InstanceLink | null
+	shared_instance?: SharedInstanceAttachment | null
+	quarantined: boolean
+	update_channel: ReleaseChannel
 
 	created: Date
 	modified: Date
@@ -31,6 +43,27 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+	visible_tabs: {
+		files: boolean
+		worlds: boolean
+		screenshots: boolean
+	}
+}
+
+export type IconBackground =
+	| {
+			type: 'color'
+			value: string
+	  }
+	| {
+			type: 'linear-top-down-gradient'
+			top_color: string
+			bottom_color: string
+	  }
+
+export type InstanceIconConfig = {
+	background: IconBackground
+	symbol: string
 }
 
 type InstallStage =
@@ -40,18 +73,91 @@ type InstallStage =
 	| 'pack_installing'
 	| 'not_installed'
 
-type LinkedData = {
-	project_id: ModrinthId
-	version_id: ModrinthId
-
-	locked: boolean
+type InstanceLinkIdentity = {
+	project_id?: ModrinthId | null
+	version_id?: ModrinthId | null
+	server_project_id?: ModrinthId | null
+	content_project_id?: ModrinthId | null
+	content_version_id?: ModrinthId | null
 }
+
+export type InstanceLink = InstanceLinkIdentity &
+	(
+		| {
+				type: 'modrinth_modpack'
+				project_id: ModrinthId
+				version_id: ModrinthId
+		  }
+		| {
+				type: 'server_project'
+				project_id: ModrinthId
+		  }
+		| {
+				type: 'server_project_modpack'
+				server_project_id: ModrinthId
+				content_project_id?: ModrinthId | null
+				content_version_id: ModrinthId
+				project_id?: ModrinthId
+				version_id?: ModrinthId
+		  }
+		| {
+				type: 'imported_modpack'
+				project_id?: ModrinthId | null
+				version_id?: ModrinthId | null
+				name?: string | null
+				version_number?: string | null
+				filename?: string | null
+		  }
+		| {
+				type: 'modrinth_hosting'
+				server_id: string
+				instance_ids: string[]
+				active_instance_id?: string | null
+		  }
+		| {
+				type: 'shared_instance'
+				modpack_project_id?: ModrinthId | null
+				modpack_version_id?: ModrinthId | null
+		  }
+	)
+
+export type SharedInstanceAttachment = {
+	id: string
+	role: 'owner' | 'member'
+	manager_id?: string | null
+	server_manager_name?: string | null
+	server_manager_icon_url?: string | null
+	linked_user_id?: string | null
+	status:
+		| 'unknown'
+		| 'up_to_date'
+		| 'update_available'
+		| 'applying'
+		| 'stale'
+		| 'not_ready'
+		| 'error'
+	applied_version?: number | null
+	latest_version?: number | null
+}
+
+export type Instance = GameInstance
 
 type ReleaseChannel = 'release' | 'beta' | 'alpha'
 
 export type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 
+export type ContentSourceKind =
+	| 'local'
+	| 'modrinth_modpack'
+	| 'server_project'
+	| 'modrinth_hosting'
+	| 'imported_modpack'
+	| 'shared_instance'
+
 type ContentFile = {
+	enabled: boolean
+	locked: boolean
+	source_kind?: ContentSourceKind | null
 	metadata?: {
 		project_id: string
 		version_id: string
@@ -87,11 +193,18 @@ type Hooks = {
 
 type Manifest = {
 	gameVersions: ManifestGameVersion[]
+	versionGroups?: ManifestVersionGroup[]
 }
 
 type ManifestGameVersion = {
 	id: string
 	stable: boolean
+	versionGroup?: string
+	loaders: ManifestLoaderVersion[]
+}
+
+type ManifestVersionGroup = {
+	id: string
 	loaders: ManifestLoaderVersion[]
 }
 
@@ -105,19 +218,19 @@ type AppSettings = {
 	max_concurrent_downloads: number
 	max_concurrent_writes: number
 
-	theme: 'dark' | 'light' | 'oled'
+	theme: 'dark' | 'light' | 'oled' | 'retro' | 'system'
 	default_page: 'Home' | 'Library'
 	collapsed_navigation: boolean
 	advanced_rendering: boolean
 	native_decorations: boolean
 	worlds_in_home: boolean
+	sync_theme_across_devices: boolean
+	sync_behavior_across_devices: boolean
 
 	telemetry: boolean
 	discord_rpc: boolean
 	developer_mode: boolean
 	personalized_ads: boolean
-
-	onboarded: boolean
 
 	extra_launch_args: string[]
 	custom_env_vars: [string, string][]

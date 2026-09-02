@@ -2,11 +2,12 @@
 import { TrashIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	ConfirmModal,
-	FileInput,
+	FileButton,
 	injectNotificationManager,
-	StyledInput,
+	Input,
+	Textarea,
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'
@@ -162,33 +163,32 @@ const onDeleteOrganization = useClientTry(async () => {
 					class="project__icon"
 				/>
 				<div class="flex flex-col gap-2">
-					<ButtonStyled>
-						<FileInput
-							id="project-icon"
-							:max-size="262144"
-							:show-icon="true"
-							accept="image/png,image/jpeg,image/gif,image/webp"
-							class="button-like"
-							prompt="Upload icon"
-							:disabled="!hasPermission"
-							@change="showPreviewImage"
-						>
-							<UploadIcon />
-						</FileInput>
-					</ButtonStyled>
-					<ButtonStyled v-if="!deletedIcon && (previewImage || organization.icon_url)">
-						<button :disabled="!hasPermission" @click="markIconForDeletion">
-							<TrashIcon />
-							Remove icon
-						</button>
-					</ButtonStyled>
+					<FileButton
+						id="project-icon"
+						:max-size="262144"
+						accept="image/png,image/jpeg,image/gif,image/webp"
+						class="button-like"
+						prompt="Upload icon"
+						:disabled="!hasPermission"
+						@change="showPreviewImage"
+					>
+						<UploadIcon />
+					</FileButton>
+					<Button
+						v-if="!deletedIcon && (previewImage || organization.icon_url)"
+						:disabled="!hasPermission"
+						@click="markIconForDeletion"
+					>
+						<TrashIcon />
+						Remove icon
+					</Button>
 				</div>
 			</div>
 
 			<label for="project-name">
 				<span class="label__title">Name</span>
 			</label>
-			<StyledInput
+			<Input
 				id="project-name"
 				v-model="current.name"
 				:maxlength="2048"
@@ -200,7 +200,7 @@ const onDeleteOrganization = useClientTry(async () => {
 			</label>
 			<div class="text-input-wrapper">
 				<div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
-				<StyledInput
+				<Input
 					id="project-slug"
 					v-model="current.slug"
 					:maxlength="64"
@@ -212,10 +212,9 @@ const onDeleteOrganization = useClientTry(async () => {
 			<label for="project-summary">
 				<span class="label__title">Summary</span>
 			</label>
-			<StyledInput
+			<Textarea
 				id="project-summary"
 				v-model="current.summary"
-				multiline
 				:maxlength="256"
 				:disabled="!hasPermission"
 				resize="vertical"
@@ -231,12 +230,10 @@ const onDeleteOrganization = useClientTry(async () => {
 				Deleting your organization will transfer all of its projects to the organization owner. This
 				action cannot be undone.
 			</p>
-			<ButtonStyled color="red">
-				<button @click="() => $refs.modal_deletion.show()">
-					<TrashIcon />
-					Delete organization
-				</button>
-			</ButtonStyled>
+			<Button type="colored" color="red" @click="() => $refs.modal_deletion.show()">
+				<TrashIcon />
+				Delete organization
+			</Button>
 		</div>
 		<UnsavedChangesPopup
 			:original="originalState"

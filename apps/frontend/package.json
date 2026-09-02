@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"build": "NODE_OPTIONS=\"--max-old-space-size=8192\" nuxi build",
+		"build": "NODE_OPTIONS=\"--max-old-space-size=8192 --max-semi-space-size=64\" nuxi build",
 		"dev": "nuxi dev",
 		"generate": "nuxi generate",
 		"preview": "nuxi preview",
@@ -35,9 +35,10 @@
 		"vite-svg-loader": "^5.1.0",
 		"vue-component-type-helpers": "^3.1.8",
 		"vue-tsc": "^2.0.24",
-		"wrangler": "^4.54.0"
+		"wrangler": "^4.115.0"
 	},
 	"dependencies": {
+		"@contentauth/c2pa-web": "^0.13.1",
 		"@formatjs/intl-localematcher": "^0.5.4",
 		"@ltd/j-toml": "^1.38.0",
 		"@modrinth/api-client": "workspace:*",
@@ -47,12 +48,13 @@
 		"@modrinth/ui": "workspace:*",
 		"@modrinth/utils": "workspace:*",
 		"@sentry/nuxt": "^10.33.0",
-		"@tanstack/vue-query": "5.90.7",
+		"@tanstack/vue-query": "5.101.4",
 		"@types/three": "^0.172.0",
 		"@vitejs/plugin-vue": "^6.0.3",
 		"@vue-email/components": "^0.0.21",
 		"@vue-email/render": "^0.0.9",
 		"@vueuse/core": "^11.1.0",
+		"@zip.js/zip.js": "^2.8.34",
 		"ace-builds": "^1.36.2",
 		"ansi-to-html": "^0.7.2",
 		"chart.js": "^4.5.1",

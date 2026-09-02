@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE versions v\n                SET downloads = v.downloads + x.amount\n                FROM unnest($1::BIGINT[], $2::int[]) AS x(id, amount)\n                WHERE v.id = x.id\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int4Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b7a3ebd72c8685c590298c154fb3da625f34589540efbb08201c0921f96d510b"
+}

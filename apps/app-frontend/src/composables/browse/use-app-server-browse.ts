@@ -1,39 +1,44 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, PlayIcon, PlusIcon, StopCircleIcon } from '@modrinth/assets'
-import type { CardAction } from '@modrinth/ui'
+import {
+	CheckIcon,
+	ClipboardCopyIcon,
+	GlobeIcon,
+	PlayIcon,
+	PlusIcon,
+	SpinnerIcon,
+	StopCircleIcon,
+} from '@modrinth/assets'
+import type { ButtonMenuOption, CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { ComputedRef, Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
-import { process_listener } from '@/helpers/events'
-import { get_by_profile_path } from '@/helpers/process'
-import { kill, list as listInstances } from '@/helpers/profile.js'
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
+import { useAppEvent } from '@/composables/use-app-event'
+import { kill, list as listInstances } from '@/helpers/instance'
+import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { add_server_to_profile, getServerLatency } from '@/helpers/worlds'
-import { getServerAddress } from '@/store/install.js'
+import { add_server_to_instance, getServerAddress } from '@/helpers/worlds'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 interface BrowseServerInstance {
+	id: string
 	name: string
 	path: string
 }
 
 interface ContextMenuHandle {
-	showMenu: (
-		event: MouseEvent,
-		result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
-		options: { name: string }[],
-	) => void
-}
-
-interface ContextMenuOptionClick {
-	option: 'open_link' | 'copy_link'
-	item: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject
+	open: (event: MouseEvent, options: ButtonMenuOption[]) => void
 }
 
 export interface UseAppServerBrowseOptions {
-	instance: Ref<BrowseServerInstance | null>
+	instance: Readonly<Ref<BrowseServerInstance | null>>
 	isFromWorlds: ComputedRef<boolean>
 	allInstalledIds: ComputedRef<Set<string>>
 	newlyInstalled: Ref<string[]>
@@ -65,15 +70,14 @@ const messages = defineMessages({
 
 export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	const { formatMessage } = useVIntl()
+	const queryClient = useQueryClient()
 	const debugLog = useDebugLogger('BrowseServer')
 	const serverPings = shallowRef<Record<string, number | undefined>>({})
-	const serverPingCache = new Map<string, number | undefined>()
-	const pendingServerPings = new Map<string, Promise<number | undefined>>()
 	const runningServerProjects = ref<Record<string, string>>({})
+	const preparingServerProjects = ref<string[]>([])
 	const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 	const contextMenuRef = ref<ContextMenuHandle | null>(null)
-	let serverPingCacheActive = true
-	let unlistenProcesses: (() => void) | null = null
+	let serverPingsActive = true
 
 	async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 		debugLog('checkServerRunningStates', { hitCount: hits.length })
@@ -83,13 +87,11 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		})
 		const newRunning: Record<string, string> = {}
 		for (const hit of hits) {
-			const inst = packs.find(
-				(pack: GameInstance) => pack.linked_data?.project_id === hit.project_id,
-			)
+			const inst = packs.find((pack: GameInstance) => pack.link?.project_id === hit.project_id)
 			if (inst) {
-				const processes = await get_by_profile_path(inst.path).catch(() => [])
+				const processes = await get_by_instance_id(inst.id).catch(() => [])
 				if (Array.isArray(processes) && processes.length > 0) {
-					newRunning[hit.project_id] = inst.path
+					newRunning[hit.project_id] = inst.id
 				}
 			}
 		}
@@ -99,17 +101,24 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 
 	async function handleStopServerProject(projectId: string) {
 		debugLog('handleStopServerProject', projectId)
-		const instancePath = runningServerProjects.value[projectId]
-		if (!instancePath) return
-		await kill(instancePath).catch(() => {})
+		const instanceId = runningServerProjects.value[projectId]
+		if (!instanceId) return
+		await kill(instanceId).catch(() => {})
 		const { [projectId]: _, ...rest } = runningServerProjects.value
 		runningServerProjects.value = rest
 	}
 
 	async function handlePlayServerProject(projectId: string) {
+		if (preparingServerProjects.value.includes(projectId)) return
+
 		debugLog('handlePlayServerProject', projectId)
-		await options.playServerProject(projectId)
-		checkServerRunningStates(lastServerHits.value)
+		preparingServerProjects.value.push(projectId)
+		try {
+			await options.playServerProject(projectId)
+			checkServerRunningStates(lastServerHits.value)
+		} finally {
+			preparingServerProjects.value = preparingServerProjects.value.filter((id) => id !== projectId)
+		}
 	}
 
 	async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
@@ -118,9 +127,10 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		if (!address) return
 
 		if (options.instance.value) {
+			const instanceId = options.instance.value.id
 			try {
-				await add_server_to_profile(
-					options.instance.value.path,
+				await add_server_to_instance(
+					instanceId,
 					project.name,
 					address,
 					'prompt',
@@ -128,6 +138,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 					project.minecraft_java_server?.content?.kind,
 				)
 				options.newlyInstalled.value.push(project.project_id)
+				await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instanceId) })
 			} catch (error) {
 				options.handleError(error)
 			}
@@ -145,37 +156,26 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		})
 		const nextPings = { ...serverPings.value }
 		for (const { hit, address } of pingsToFetch) {
-			if (serverPingCache.has(address)) {
-				nextPings[hit.project_id] = serverPingCache.get(address)
+			const cachedStatus = getFreshCachedServerStatus(queryClient, address)
+			if (cachedStatus) {
+				nextPings[hit.project_id] = cachedStatus.ping
 			}
 		}
 		serverPings.value = nextPings
 
 		await Promise.all(
 			pingsToFetch.map(async ({ hit, address }) => {
-				if (serverPingCache.has(address)) return
+				if (getFreshCachedServerStatus(queryClient, address)) return
 
-				let pending = pendingServerPings.get(address)
-				if (!pending) {
-					pending = getServerLatency(address)
-						.then((latency) => {
-							if (serverPingCacheActive) serverPingCache.set(address, latency)
-							return latency
-						})
-						.catch((error) => {
-							console.error(`Failed to ping server ${address}:`, error)
-							if (serverPingCacheActive) serverPingCache.set(address, undefined)
-							return undefined
-						})
-						.finally(() => {
-							pendingServerPings.delete(address)
-						})
-					pendingServerPings.set(address, pending)
+				try {
+					const status = await fetchCachedServerStatus(queryClient, address)
+					if (!serverPingsActive) return
+					serverPings.value = { ...serverPings.value, [hit.project_id]: status.ping }
+				} catch (error) {
+					console.error(`Failed to ping server ${address}:`, error)
+					if (!serverPingsActive) return
+					serverPings.value = { ...serverPings.value, [hit.project_id]: undefined }
 				}
-
-				const latency = await pending
-				if (!serverPingCacheActive) return
-				serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
 			}),
 		)
 	}
@@ -254,13 +254,16 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 			})
 		} else {
 			const isInstalling = options.installingServerProjects.value.includes(serverResult.project_id)
+			const isPreparing = preparingServerProjects.value.includes(serverResult.project_id)
+			const isBusy = isInstalling || isPreparing
 			actions.push({
 				key: 'play',
 				label: formatMessage(
 					isInstalling ? commonMessages.installingLabel : commonMessages.playButton,
 				),
-				icon: PlayIcon,
-				disabled: isInstalling,
+				icon: isBusy ? SpinnerIcon : PlayIcon,
+				iconClass: isBusy ? 'animate-spin' : undefined,
+				disabled: isBusy,
 				color: 'brand',
 				type: 'outlined',
 				onClick: () => handlePlayServerProject(serverResult.project_id),
@@ -270,30 +273,29 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		return actions
 	}
 
-	function handleRightClick(
-		event: MouseEvent,
-		result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
-	) {
-		contextMenuRef.value?.showMenu(event, result, [{ name: 'open_link' }, { name: 'copy_link' }])
+	function handleRightClick(event: MouseEvent, result: Labrinth.Search.v3.ResultSearchProject) {
+		const url = getProjectUrl(result)
+		contextMenuRef.value?.open(event, [
+			{
+				id: 'open_link',
+				label: formatMessage(commonMessages.openInModrinthButton),
+				icon: GlobeIcon,
+				action: () => void openUrl(url),
+			},
+			{
+				id: 'copy_link',
+				label: formatMessage(commonMessages.copyLinkButton),
+				icon: ClipboardCopyIcon,
+				action: () => void navigator.clipboard.writeText(url),
+			},
+		])
 	}
 
-	function handleOptionsClick(args: ContextMenuOptionClick) {
-		const url = getProjectUrl(args.item)
-		switch (args.option) {
-			case 'open_link':
-				openUrl(url)
-				break
-			case 'copy_link':
-				navigator.clipboard.writeText(url)
-				break
-		}
-	}
-
-	process_listener((event: { event: string; profile_path_id: string }) => {
+	useAppEvent('process', (event) => {
 		debugLog('process event', event)
 		if (event.event === 'finished') {
 			const projectId = Object.entries(runningServerProjects.value).find(
-				([, path]) => path === event.profile_path_id,
+				([, path]) => path === event.instance_id,
 			)?.[0]
 			if (projectId) {
 				const { [projectId]: _, ...rest } = runningServerProjects.value
@@ -301,16 +303,9 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 			}
 		}
 	})
-		.then((unlisten) => {
-			unlistenProcesses = unlisten
-		})
-		.catch(options.handleError)
 
 	onUnmounted(() => {
-		serverPingCacheActive = false
-		unlistenProcesses?.()
-		serverPingCache.clear()
-		pendingServerPings.clear()
+		serverPingsActive = false
 	})
 
 	return {
@@ -320,13 +315,10 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		getServerModpackContent,
 		getServerCardActions,
 		handleRightClick,
-		handleOptionsClick,
 	}
 }
 
-function getProjectUrl(
-	item: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
-) {
-	const projectType = 'project_types' in item ? item.project_types?.[0] : item.project_type
+function getProjectUrl(item: Labrinth.Search.v3.ResultSearchProject) {
+	const projectType = item.project_types?.[0]
 	return `https://modrinth.com/${projectType ?? 'project'}/${item.slug ?? item.project_id}`
 }

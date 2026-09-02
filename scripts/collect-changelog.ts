@@ -1,7 +1,10 @@
-import { execSync } from 'child_process'
+import { execFileSync, execSync } from 'child_process'
 import chalk from 'chalk'
 import * as fs from 'fs'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 type Product = 'web' | 'app' | 'hosting'
 
@@ -37,6 +40,11 @@ interface PRInfo {
 interface CommentInfo {
 	id: number
 	body: string
+}
+
+interface AppRelease {
+	tag: string
+	date: string
 }
 
 function parseArgs(argv: string[]): {
@@ -227,6 +235,19 @@ async function fetchMergedPRs(token: string, sinceDate: string): Promise<PRInfo[
 	return prs
 }
 
+function getLatestAppRelease(): AppRelease {
+	const tag = execFileSync(
+		'git',
+		['describe', '--tags', '--abbrev=0', '--match', 'v[0-9]*', 'origin/main'],
+		{ encoding: 'utf-8' },
+	).trim()
+	const date = execFileSync('git', ['log', '-1', '--format=%cI', tag], {
+		encoding: 'utf-8',
+	}).trim()
+
+	return { tag, date }
+}
+
 async function fetchBotComment(token: string, prNumber: number): Promise<CommentInfo | null> {
 	const res = await githubFetch(
 		`/repos/${REPO}/issues/${prNumber}/comments?per_page=100`,
@@ -311,11 +332,20 @@ async function main() {
 		const prodDate = execSync('git log -1 --format=%aI origin/prod', { encoding: 'utf-8' }).trim()
 		console.log(chalk.gray(`Last prod commit: ${prodDate}`))
 
-		prs = await fetchMergedPRs(token, prodDate)
-		console.log(chalk.gray(`Found ${prs.length} merged PR(s) since last prod deploy`))
+		let sinceDate = prodDate
+		if (args.version) {
+			const appRelease = getLatestAppRelease()
+			console.log(chalk.gray(`Last app release: ${appRelease.tag} (${appRelease.date})`))
+			if (new Date(appRelease.date) < new Date(sinceDate)) {
+				sinceDate = appRelease.date
+			}
+		}
+
+		prs = await fetchMergedPRs(token, sinceDate)
+		console.log(chalk.gray(`Found ${prs.length} merged PR(s) since ${sinceDate}`))
 
 		if (prs.length === 0) {
-			console.log(chalk.yellow('No merged PRs found since last prod deploy'))
+			console.log(chalk.yellow(`No merged PRs found since ${sinceDate}`))
 			return
 		}
 	}

@@ -1,3 +1,4 @@
+#![recursion_limit = "256"]
 #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
@@ -47,7 +48,7 @@ async fn main() -> theseus::Result<()> {
     for world in worlds {
         println!(
             "World: {:?}/{:?} played at {:?}: {:#?}",
-            world.profile,
+            world.instance_id,
             world.world.name,
             world.world.last_played,
             world.world.details

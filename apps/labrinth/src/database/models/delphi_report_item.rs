@@ -84,6 +84,8 @@ pub enum DelphiSeverity {
     High,
     #[serde(alias = "SEVERE")]
     Severe,
+    #[serde(alias = "MALWARE")]
+    Malware,
 }
 
 /// An issue found in a Delphi report. Every issue belongs to a report,
@@ -254,6 +256,10 @@ pub struct ReportIssueDetail {
     pub data: HashMap<String, serde_json::Value>,
     /// How important is this issue, as flagged by Delphi?
     pub severity: DelphiSeverity,
+    /// Project-local verdict for this detail, if one exists.
+    pub local_status: Option<DelphiStatus>,
+    /// Global verdict for this detail's key, if one exists.
+    pub global_status: Option<DelphiStatus>,
     /// Has this issue detail been marked as safe or unsafe?
     pub status: DelphiStatus,
 }

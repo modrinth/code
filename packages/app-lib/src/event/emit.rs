@@ -1,16 +1,18 @@
 use super::{FriendPayload, LoadingBarId};
-use crate::event::{
-    CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
-    ProfilePayloadType,
-};
 #[cfg(feature = "tauri")]
 use crate::event::{
-    LoadingPayload, ProcessPayload, ProfilePayload, WarningPayload,
+    AppEvent, InstanceGroupsChangedPayload, InstancePayload, LoadingPayload,
+    ProcessPayload, WarningPayload,
 };
+use crate::event::{
+    CommandPayload, EventError, InstanceBulkUpdateProgressPayload,
+    InstancePayloadType, LoadingBar, LoadingBarType, ProcessPayloadType,
+};
+use crate::state::OnboardingChecklist;
 use futures::prelude::*;
 use serde_json::Value;
 #[cfg(feature = "tauri")]
-use tauri::{Emitter, Manager};
+use tauri::Manager;
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
@@ -61,7 +63,7 @@ pub async fn init_loading_unsafe(
     total: f64,
     title: &str,
 ) -> crate::Result<LoadingBarId> {
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get();
     let key = LoadingBarId(Uuid::new_v4());
 
     event_state.loading_bars.insert(
@@ -71,7 +73,7 @@ pub async fn init_loading_unsafe(
             message: title.to_string(),
             total,
             current: 0.0,
-            last_sent: 0.0,
+            last_sent: -1.0,
             bar_type,
             #[cfg(feature = "cli")]
             cli_progress_bar: {
@@ -94,47 +96,6 @@ pub async fn init_loading_unsafe(
     Ok(key)
 }
 
-pub async fn init_or_edit_loading(
-    id: Option<LoadingBarId>,
-    bar_type: LoadingBarType,
-    total: f64,
-    title: &str,
-) -> crate::Result<LoadingBarId> {
-    if let Some(id) = id {
-        edit_loading(&id, bar_type, total, title).await?;
-
-        Ok(id)
-    } else {
-        init_loading(bar_type, total, title).await
-    }
-}
-
-// Edits a loading bar's type
-// This also resets the bar's current progress to 0
-pub async fn edit_loading(
-    id: &LoadingBarId,
-    bar_type: LoadingBarType,
-    total: f64,
-    title: &str,
-) -> crate::Result<()> {
-    let event_state = crate::EventState::get()?;
-
-    if let Some(mut bar) = event_state.loading_bars.get_mut(&id.0) {
-        bar.bar_type = bar_type;
-        bar.total = total;
-        bar.message = title.to_string();
-        bar.current = 0.0;
-        bar.last_sent = 0.0;
-        #[cfg(feature = "cli")]
-        {
-            bar.cli_progress_bar.reset(); // indicatif::ProgressBar::new(CLI_PROGRESS_BAR_TOTAL as u64);
-        }
-    };
-
-    emit_loading(id, 0.0, None)?;
-    Ok(())
-}
-
 // emit_loading emits a loading event to the frontend
 // key refers to the loading bar to update
 // increment refers to by what relative increment to the loading struct's total to update
@@ -146,7 +107,7 @@ pub fn emit_loading(
     increment_frac: f64,
     message: Option<&str>,
 ) -> crate::Result<()> {
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get();
 
     let Some(mut loading_bar) = event_state.loading_bars.get_mut(&key.0) else {
         return Err(EventError::NoLoadingBar(key.0).into());
@@ -172,25 +133,17 @@ pub fn emit_loading(
 
         //Emit event to tauri
         #[cfg(feature = "tauri")]
-        event_state
-            .app
-            .emit(
-                "loading",
-                LoadingPayload {
-                    fraction: if display_frac >= 1.0 {
-                        None // by convention, when its done, we submit None
-                    // any further updates will be ignored (also sending None)
-                    } else {
-                        Some(display_frac)
-                    },
-                    message: message
-                        .unwrap_or(&loading_bar.message)
-                        .to_string(),
-                    event: loading_bar.bar_type.clone(),
-                    loader_uuid: loading_bar.loading_bar_uuid,
-                },
-            )
-            .map_err(EventError::from)?;
+        event_state.send(AppEvent::Loading(LoadingPayload {
+            fraction: if display_frac >= 1.0 {
+                None // by convention, when its done, we submit None
+            // any further updates will be ignored (also sending None)
+            } else {
+                Some(display_frac)
+            },
+            message: message.unwrap_or(&loading_bar.message).to_string(),
+            event: loading_bar.bar_type.clone(),
+            loader_uuid: loading_bar.loading_bar_uuid.to_string(),
+        }))?;
 
         #[cfg(not(any(feature = "cli", feature = "tauri")))]
         let _ = message;
@@ -205,18 +158,24 @@ pub fn emit_loading(
 pub async fn emit_warning(message: &str) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
-        event_state
-            .app
-            .emit(
-                "warning",
-                WarningPayload {
-                    message: message.to_string(),
-                },
-            )
-            .map_err(EventError::from)?;
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::Warning(WarningPayload {
+            message: message.to_string(),
+        }))?;
     }
     tracing::warn!("{}", message);
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_instance_bulk_update_progress(
+    payload: InstanceBulkUpdateProgressPayload,
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::InstanceBulkUpdateProgress(payload))?;
+    }
     Ok(())
 }
 
@@ -227,11 +186,8 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
     tracing::debug!("Command: {}", serde_json::to_string(&command)?);
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
-        event_state
-            .app
-            .emit("command", command)
-            .map_err(EventError::from)?;
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::Command(command))?;
 
         if let Some(window) = event_state.app.get_window("main") {
             let _ = window.set_focus();
@@ -243,49 +199,65 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
 // emit_process(uuid, pid, event, message)
 #[allow(unused_variables)]
 pub async fn emit_process(
-    profile_path: &str,
+    instance_id: &str,
     uuid: Uuid,
     event: ProcessPayloadType,
     message: &str,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
-        event_state
-            .app
-            .emit(
-                "process",
-                ProcessPayload {
-                    profile_path_id: profile_path.to_string(),
-                    uuid,
-                    event,
-                    message: message.to_string(),
-                },
-            )
-            .map_err(EventError::from)?;
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::Process(ProcessPayload {
+            instance_id: instance_id.to_string(),
+            uuid: uuid.to_string(),
+            event,
+            message: message.to_string(),
+        }))?;
     }
     Ok(())
 }
 
-// emit_profile(path, event)
+// emit_instance(path, event)
 #[allow(unused_variables)]
-pub async fn emit_profile(
-    profile_path_id: &str,
-    event: ProfilePayloadType,
+pub async fn emit_instance(
+    instance_id: &str,
+    event: InstancePayloadType,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
-        event_state
-            .app
-            .emit(
-                "profile",
-                ProfilePayload {
-                    profile_path_id: profile_path_id.to_string(),
-                    event,
-                },
-            )
-            .map_err(EventError::from)?;
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::Instance(InstancePayload {
+            instance_id: instance_id.to_string(),
+            event,
+        }))?;
+    }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_instance_groups_changed(
+    instance_ids: &[String],
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::InstanceGroupsChanged(
+            InstanceGroupsChangedPayload {
+                instance_ids: instance_ids.to_vec(),
+            },
+        ))?;
+    }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_onboarding_checklist(
+    checklist: OnboardingChecklist,
+) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::OnboardingChecklist(checklist))?;
     }
     Ok(())
 }
@@ -294,11 +266,8 @@ pub async fn emit_profile(
 pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
-        event_state
-            .app
-            .emit("friend", payload)
-            .map_err(EventError::from)?;
+        let event_state = crate::EventState::get();
+        event_state.send(AppEvent::Friend(payload))?;
     }
 
     Ok(())
@@ -308,11 +277,9 @@ pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
 pub async fn emit_notification(payload: Value) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get()?;
+        let event_state = crate::EventState::get();
         event_state
-            .app
-            .emit("notification", payload)
-            .map_err(EventError::from)?;
+            .send(AppEvent::Notification(serde_json::to_string(&payload)?))?;
     }
 
     Ok(())

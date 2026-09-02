@@ -7,6 +7,7 @@ import svgLoader from 'vite-svg-loader'
 import { GenericModrinthClient, type Labrinth } from '../../packages/api-client/src/index.ts'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
+const STAGING_SHARED_INSTANCES_API_URL = 'https://staging-shared-instances.modrinth.com'
 const API_CLIENT_SOURCE = fileURLToPath(
 	new URL('../../packages/api-client/src/index.ts', import.meta.url),
 )
@@ -17,12 +18,6 @@ const preloadedFonts = [
 	'inter/Inter-SemiBold.woff2',
 	'inter/Inter-Bold.woff2',
 ]
-
-const favicons = {
-	'(prefers-color-scheme:no-preference)': '/favicon-light.ico',
-	'(prefers-color-scheme:light)': '/favicon-light.ico',
-	'(prefers-color-scheme:dark)': '/favicon.ico',
-}
 
 const PROD_MODRINTH_URL = 'https://modrinth.com'
 const STAGING_MODRINTH_URL = 'https://staging.modrinth.com'
@@ -43,17 +38,11 @@ export default defineNuxtConfig({
 				...preloadedFonts.map((font): object => {
 					return {
 						rel: 'preload',
-						href: `https://cdn-raw.modrinth.com/fonts/${font}?v=3.19`,
+						href: `https://cdn.modrinth.com/fonts/${font}?v=3.19`,
 						as: 'font',
 						type: 'font/woff2',
 						crossorigin: 'anonymous',
 					}
-				}),
-				...Object.entries(favicons).map(([media, href]): object => {
-					return { rel: 'icon', type: 'image/x-icon', href, media }
-				}),
-				...Object.entries(favicons).map(([media, href]): object => {
-					return { rel: 'apple-touch-icon', type: 'image/x-icon', href, media, sizes: '64x64' }
 				}),
 				{
 					rel: 'search',
@@ -121,23 +110,6 @@ export default defineNuxtConfig({
 		},
 	},
 	hooks: {
-		async 'nitro:config'(nitroConfig) {
-			const emailTemplates = Object.keys(
-				await import('./src/templates/emails/index.ts').then((m) => m.default),
-			)
-			const docTemplates = Object.keys(
-				await import('./src/templates/docs/index.ts').then((m) => m.default),
-			)
-
-			nitroConfig.prerender = nitroConfig.prerender || {}
-			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
-			for (const template of emailTemplates) {
-				nitroConfig.prerender.routes.push(`/_internal/templates/email/${template}`)
-			}
-			for (const template of docTemplates) {
-				nitroConfig.prerender.routes.push(`/_internal/templates/doc/${template}`)
-			}
-		},
 		async 'build:before'() {
 			// 30 minutes
 			const TTL = 30 * 60 * 1000
@@ -210,6 +182,7 @@ export default defineNuxtConfig({
 		// @ts-ignore
 		rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
 		pyroBaseUrl: process.env.PYRO_BASE_URL,
+		sharedInstancesBaseUrl: getSharedInstancesApiUrl(),
 		intercomIdentitySecret:
 			process.env.INTERCOM_IDENTITY_SECRET ??
 			// @ts-ignore
@@ -217,6 +190,7 @@ export default defineNuxtConfig({
 		public: {
 			apiBaseUrl: getApiUrl(),
 			pyroBaseUrl: process.env.PYRO_BASE_URL,
+			sharedInstancesBaseUrl: getSharedInstancesApiUrl(),
 			siteUrl: getDomain(),
 			intercomAppId:
 				process.env.INTERCOM_APP_ID ||
@@ -287,6 +261,7 @@ export default defineNuxtConfig({
 			external: ['cloudflare:workers'],
 		},
 		preset: 'cloudflare_module',
+		noExternals: getNoExternals(),
 		cloudflare: {
 			nodeCompat: true,
 		},
@@ -322,14 +297,12 @@ export default defineNuxtConfig({
 			redirect: '/_internal/templates/email/**',
 		},
 		'/_internal/templates/email/**': {
-			prerender: true,
 			headers: {
 				'Content-Type': 'text/html',
 				'Cache-Control': 'public, max-age=3600',
 			},
 		},
 		'/_internal/templates/doc/**': {
-			prerender: true,
 			headers: {
 				'Content-Type': 'text/html',
 				'Cache-Control': 'public, max-age=3600',
@@ -354,8 +327,26 @@ function getApiUrl() {
 	return process.env.BROWSER_BASE_URL ?? globalThis.BROWSER_BASE_URL ?? STAGING_API_URL
 }
 
+function getSharedInstancesApiUrl() {
+	return (
+		process.env.SHARED_INSTANCES_API_BASE_URL ??
+		// @ts-ignore
+		globalThis.SHARED_INSTANCES_API_BASE_URL ??
+		STAGING_SHARED_INSTANCES_API_URL
+	)
+}
+
 function isProduction() {
 	return process.env.NODE_ENV === 'production'
+}
+
+function getNoExternals() {
+	if (process.env.NITRO_NO_EXTERNALS !== undefined) {
+		return process.env.NITRO_NO_EXTERNALS === 'true'
+	}
+
+	// bundling every dependency breaks the dev server, so only do it for real builds
+	return isProduction()
 }
 
 function getFeatureFlagOverrides() {
@@ -364,11 +355,7 @@ function getFeatureFlagOverrides() {
 
 function getDomain() {
 	if (process.env.NODE_ENV === 'production') {
-		// @ts-ignore
-		if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
-			// @ts-ignore
-			return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL
-		} else if (process.env.HEROKU_APP_NAME) {
+		if (process.env.HEROKU_APP_NAME) {
 			return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
 		} else if (process.env.VERCEL_URL) {
 			return `https://${process.env.VERCEL_URL}`

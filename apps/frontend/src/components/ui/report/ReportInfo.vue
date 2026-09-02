@@ -63,6 +63,26 @@
 				</nuxt-link>
 			</template>
 		</div>
+		<div v-else-if="report.item_type === 'shared-instance'" class="item-info">
+			<Avatar
+				v-if="report.shared_instance"
+				:src="report.shared_instance.icon"
+				size="xs"
+				no-shadow
+				:raised="raised"
+				pad-transparent-corners
+			/>
+			<div v-else class="backed-svg" :class="{ raised: raised }">
+				<BoxesIcon />
+			</div>
+			<div class="stacked">
+				<span class="title">{{ report.shared_instance?.name ?? 'Shared instance' }}</span>
+				<span>
+					Version {{ report.shared_instance_version_id ?? 'unknown' }} ·
+					<CopyCode :text="report.item_id" />
+				</span>
+			</div>
+		</div>
 		<div v-else class="item-info">
 			<div class="backed-svg" :class="{ raised: raised }">
 				<UnknownIcon />
@@ -71,14 +91,20 @@
 		</div>
 		<div class="report-type">
 			<Badge v-if="report.closed" type="closed" />
-			<Badge :type="`Reported for ${report.report_type}`" color="orange" />
+			<Badge
+				:type="
+					formatMessage(messages.reportedFor, {
+						type: formatReportType(formatMessage, report.report_type),
+					})
+				"
+				color="orange"
+			/>
 		</div>
 		<div v-if="showMessage" class="markdown-body" v-html="renderHighlightedString(report.body)" />
 		<ThreadSummary
 			v-if="thread"
 			:thread="thread"
-			class="thread-summary"
-			:raised="raised"
+			class="thread-summary !bg-surface-2"
 			:link="`/${moderation ? 'moderation' : 'dashboard'}/report/${report.id}`"
 			:auth="auth"
 		/>
@@ -106,13 +132,23 @@
 </template>
 
 <script setup>
-import { ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
-import { Avatar, Badge, CopyCode, useFormatDateTime, useRelativeTime } from '@modrinth/ui'
+import { BoxesIcon, ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
+import {
+	Avatar,
+	Badge,
+	CopyCode,
+	defineMessages,
+	formatReportType,
+	useFormatDateTime,
+	useRelativeTime,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatProjectType, renderHighlightedString } from '@modrinth/utils'
 
 import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
+const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -147,6 +183,13 @@ defineProps({
 })
 
 const flags = useFeatureFlags()
+
+const messages = defineMessages({
+	reportedFor: {
+		id: 'report.reported-for',
+		defaultMessage: 'Reported for {type}',
+	},
+})
 </script>
 
 <style lang="scss" scoped>

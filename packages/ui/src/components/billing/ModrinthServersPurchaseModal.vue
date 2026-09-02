@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Archon, Labrinth } from '@modrinth/api-client'
+import { type Archon, type Labrinth, pingWebSocketUrl } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ChevronRightIcon,
@@ -10,14 +10,15 @@ import {
 } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import type Stripe from 'stripe'
-import { computed, nextTick, ref, toRef, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, toRef, useTemplateRef, watch } from 'vue'
 
+import { Button } from '#ui/components/base/buttons'
 import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
+import { useDebugLogger } from '../../composables/debug-logger'
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
-import { ButtonStyled } from '../index'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import NewModal from '../modal/NewModal.vue'
 import PlanSelector from './ServersPurchase0Plan.vue'
@@ -28,6 +29,7 @@ import ConfirmPurchase from './ServersPurchase3Review.vue'
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
+const debug = useDebugLogger('ModrinthServersPurchaseModal')
 
 export type RegionPing = {
 	region: string
@@ -43,7 +45,6 @@ const props = defineProps<{
 	paymentMethods: Stripe.PaymentMethod[]
 	customer: Stripe.Customer
 	currency: string
-	pings: RegionPing[]
 	regions: Archon.Servers.v1.Region[]
 	availableProducts: Labrinth.Billing.Internal.Product[]
 	planStage?: boolean
@@ -117,7 +118,13 @@ const steps: Step[] = props.planStage
 	: (['region', 'payment', 'review'] as Step[])
 
 const isUpgrade = computed(() => !!props.existingSubscription)
-const skipRegionStep = computed(() => isUpgrade.value && !customServer.value)
+const existingSubscriptionRegion = computed(() =>
+	props.existingSubscription?.metadata?.type === 'pyro'
+		? props.existingSubscription.metadata.region
+		: undefined,
+)
+const hideRegionSelection = computed(() => isUpgrade.value && !!existingSubscriptionRegion.value)
+const skipRegionStep = computed(() => !customServer.value && hideRegionSelection.value)
 const visibleSteps = computed(() => steps.filter((s) => !(s === 'region' && skipRegionStep.value)))
 
 const titles: Record<Step, MessageDescriptor> = {
@@ -144,11 +151,80 @@ const currentRegion = computed(() => {
 	return props.regions.find((region) => region.shortcode === selectedRegion.value)
 })
 
+const regionPings = ref<RegionPing[]>([])
+
 const currentPing = computed(() => {
-	return props.pings.find((ping) => ping.region === currentRegion.value?.shortcode)?.ping
+	return regionPings.value.find((ping) => ping.region === currentRegion.value?.shortcode)?.ping
 })
 
 const currentStep = ref<Step>()
+
+const PING_COUNT = 5
+const PING_INTERVAL = 200
+const MAX_PING_TIME = 1000
+
+const initialIndex: Record<string, number> = {
+	'eu-lim': 31,
+}
+
+let regionPingAbortController: AbortController | null = null
+
+function setRegionPing(region: Archon.Servers.v1.Region, ping: number) {
+	regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
+	regionPings.value.push({
+		region: region.shortcode,
+		ping,
+	})
+}
+
+function stopRegionPings() {
+	regionPingAbortController?.abort()
+	regionPingAbortController = null
+	regionPings.value = []
+}
+
+function startRegionPings() {
+	regionPingAbortController?.abort()
+	regionPings.value = []
+
+	const controller = new AbortController()
+	regionPingAbortController = controller
+
+	for (const region of props.regions) {
+		void runRegionPing(region, initialIndex[region.shortcode] ?? 1, controller.signal)
+	}
+}
+
+function ensureRegionPings() {
+	if (regionPingAbortController && !regionPingAbortController.signal.aborted) return
+	startRegionPings()
+}
+
+async function runRegionPing(region: Archon.Servers.v1.Region, index: number, signal: AbortSignal) {
+	if (signal.aborted) return
+
+	const ping = await pingWebSocketUrl(`wss://${region.shortcode}${index}.${region.zone}/pingtest`, {
+		count: PING_COUNT,
+		intervalMs: PING_INTERVAL,
+		settleDelayMs: MAX_PING_TIME,
+		timeoutMs: PING_COUNT * PING_INTERVAL + MAX_PING_TIME + 1000,
+		signal,
+	})
+
+	if (signal.aborted) return
+
+	if (ping > 0) {
+		setRegionPing(region, ping)
+	} else {
+		setRegionPing(region, -1)
+	}
+}
+
+function startRegionPingsIfNeeded() {
+	if (currentStep.value === 'region') {
+		ensureRegionPings()
+	}
+}
 
 const currentStepIndex = computed(() =>
 	currentStep.value ? visibleSteps.value.indexOf(currentStep.value) : -1,
@@ -172,7 +248,7 @@ const nextStep = computed(() => {
 const canProceed = computed(() => {
 	switch (currentStep.value) {
 		case 'plan':
-			console.log('Plan step:', {
+			debug('Plan step:', {
 				customServer: customServer.value,
 				selectedPlan: selectedPlan.value,
 				existingPlan: props.existingPlan,
@@ -268,6 +344,7 @@ async function setStep(step: Step | undefined, skipValidation = false) {
 
 	if (await beforeProceed(step)) {
 		currentStep.value = step
+		startRegionPingsIfNeeded()
 		await nextTick()
 
 		await afterProceed(step)
@@ -285,10 +362,10 @@ watch(
 )
 
 watch(
-	() => props.existingSubscription,
-	(sub) => {
-		if (sub?.metadata?.type === 'pyro' && sub.metadata.region) {
-			selectedRegion.value = sub.metadata.region
+	existingSubscriptionRegion,
+	(region) => {
+		if (region) {
+			selectedRegion.value = region
 		}
 	},
 	{ immediate: true },
@@ -325,6 +402,7 @@ function begin(
 	currentStep.value = skipPlanStep
 		? (visibleSteps.value[1] ?? visibleSteps.value[0])
 		: visibleSteps.value[0]
+	startRegionPingsIfNeeded()
 	skipPaymentMethods.value = true
 	projectId.value = project
 	modal.value?.show()
@@ -337,6 +415,13 @@ defineExpose({
 const emit = defineEmits<{
 	(e: 'hide' | 'purchase-success'): void
 }>()
+
+function handleHide() {
+	stopRegionPings()
+	emit('hide')
+}
+
+onBeforeUnmount(stopRegionPings)
 
 function handleChooseCustom() {
 	customServer.value = true
@@ -365,7 +450,7 @@ function goToBreadcrumbStep(id: string) {
 }
 </script>
 <template>
-	<NewModal ref="modal" @hide="$emit('hide')">
+	<NewModal ref="modal" @hide="handleHide">
 		<template #title>
 			<div class="flex items-center gap-1 font-bold text-secondary">
 				<template v-for="(step, index) in visibleSteps" :key="step">
@@ -408,9 +493,9 @@ function goToBreadcrumbStep(id: string) {
 				v-model:region="selectedRegion"
 				v-model:plan="selectedPlan"
 				:regions="regions"
-				:pings="pings"
+				:pings="regionPings"
 				:custom="customServer"
-				:hide-region-selection="isUpgrade"
+				:hide-region-selection="hideRegionSelection"
 				:available-products="availableProducts"
 				:currency="currency"
 				:interval="selectedInterval"
@@ -472,51 +557,50 @@ function goToBreadcrumbStep(id: string) {
 			</div>
 		</div>
 		<div class="flex gap-2 justify-between mt-4">
-			<ButtonStyled>
-				<button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
-					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
-				</button>
-				<button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-if="currentStep !== 'plan'" color="brand">
-				<button
-					v-tooltip="
-						currentStep === 'review' && !acceptedEula && !noPaymentRequired
-							? 'You must accept the Minecraft EULA to proceed.'
-							: undefined
-					"
-					:disabled="!canProceed"
-					@click="
-						noPaymentRequired && currentStep === 'review'
-							? (async () => {
-									if (props.onFinalizeNoPaymentChange) {
-										try {
-											await props.onFinalizeNoPaymentChange()
-										} catch (e) {
-											return
-										}
+			<Button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
+				<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
+			</Button>
+			<Button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
+				<XIcon />
+				{{ formatMessage(commonMessages.cancelButton) }}
+			</Button>
+			<Button
+				v-if="currentStep !== 'plan'"
+				v-tooltip="
+					currentStep === 'review' && !acceptedEula && !noPaymentRequired
+						? 'You must accept the Minecraft EULA to proceed.'
+						: undefined
+				"
+				type="colored"
+				color="brand"
+				:disabled="!canProceed"
+				@click="
+					noPaymentRequired && currentStep === 'review'
+						? (async () => {
+								if (props.onFinalizeNoPaymentChange) {
+									try {
+										await props.onFinalizeNoPaymentChange()
+									} catch (e) {
+										return
 									}
-									modal?.hide()
-								})()
-							: setStep(nextStep)
-					"
-				>
-					<template v-if="currentStep === 'review'">
-						<template v-if="noPaymentRequired"><CheckCircleIcon /> Confirm Change</template>
-						<template v-else>
-							<SpinnerIcon v-if="completingPurchase" class="animate-spin" />
-							<CheckCircleIcon v-else />
-							Subscribe
-						</template>
-					</template>
+								}
+								modal?.hide()
+							})()
+						: setStep(nextStep)
+				"
+			>
+				<template v-if="currentStep === 'review'">
+					<template v-if="noPaymentRequired"><CheckCircleIcon /> Confirm Change</template>
 					<template v-else>
-						{{ formatMessage(commonMessages.nextButton) }} <RightArrowIcon />
+						<SpinnerIcon v-if="completingPurchase" class="animate-spin" />
+						<CheckCircleIcon v-else />
+						Subscribe
 					</template>
-				</button>
-			</ButtonStyled>
+				</template>
+				<template v-else>
+					{{ formatMessage(commonMessages.nextButton) }} <RightArrowIcon />
+				</template>
+			</Button>
 		</div>
 	</NewModal>
 </template>

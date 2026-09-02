@@ -21,7 +21,6 @@
 			:server-name="`${auth?.user?.username}'s server`"
 			:out-of-stock-url="outOfStockUrl"
 			:fetch-capacity-statuses="fetchCapacityStatuses"
-			:pings="regionPings"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
@@ -34,7 +33,7 @@
 			<div class="z-[5] flex w-full flex-col gap-8">
 				<div class="flex flex-col gap-4">
 					<div
-						class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+						class="relative h-fit w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 					>
 						{{ formatMessage(commonMessages.betaRelease) }}
 					</div>
@@ -51,21 +50,23 @@
 					<div
 						class="flex w-full flex-col items-center gap-5 text-center align-middle sm:w-fit sm:flex-row"
 					>
-						<ButtonStyled color="brand" size="large">
-							<nuxt-link class="w-fit" to="#plan">
-								<GameIcon aria-hidden="true" />
-								{{
-									hasServers
-										? formatMessage(messages.startANewServer)
-										: formatMessage(messages.startYourServer)
-								}}
-							</nuxt-link>
-						</ButtonStyled>
-						<ButtonStyled v-if="hasServers" type="outlined" size="large">
-							<nuxt-link class="w-fit" to="/hosting/manage">
-								<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.manageYourServers) }}
-							</nuxt-link>
-						</ButtonStyled>
+						<ButtonLink type="colored" color="brand" size="xl" class="w-fit" to="#plan">
+							<GameIcon aria-hidden="true" />
+							{{
+								hasServers
+									? formatMessage(messages.startANewServer)
+									: formatMessage(messages.startYourServer)
+							}}
+						</ButtonLink>
+						<ButtonLink
+							v-if="hasServers"
+							type="outlined"
+							size="xl"
+							class="w-fit"
+							to="/hosting/manage"
+						>
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.manageYourServers) }}
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
@@ -77,7 +78,7 @@
 					src="https://cdn.modrinth.com/servers/panel-right-dark.webp"
 					alt=""
 					aria-hidden="true"
-					class="pointer-events-none h-full w-fit select-none"
+					class="pointer-events-none h-full w-auto select-none"
 				/>
 			</div>
 
@@ -109,7 +110,7 @@
 			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
 			<div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
 				<div
-					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+					class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
 					{{ formatMessage(messages.whyModrinthHosting) }}
 				</div>
@@ -153,7 +154,7 @@
 					</div>
 
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<LoaderIcon loader="fabric" class="size-8 text-brand" />
+						<TagIcon tag="fabric" enforce-type="loader" class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.yourFavoriteMods) }}</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
 							{{ formatMessage(messages.yourFavoriteModsDescription) }}
@@ -237,7 +238,7 @@
 			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
 			<div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
 				<div
-					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+					class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
 					{{ formatMessage(messages.includedWithYourServer) }}
 				</div>
@@ -604,12 +605,10 @@
 					</div>
 
 					<div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
-						<ButtonStyled color="standard" size="large">
-							<button class="w-full md:w-fit" @click="selectProduct('custom')">
-								{{ formatMessage(messages.getStartedButton) }}
-								<RightArrowIcon class="shrink-0" />
-							</button>
-						</ButtonStyled>
+						<Button size="xl" class="w-full md:w-fit" @click="selectProduct('custom')">
+							{{ formatMessage(messages.getStartedButton) }}
+							<RightArrowIcon class="shrink-0" />
+						</Button>
 						<p v-if="lowestPrice" class="m-0 text-sm">
 							{{
 								formatMessage(messages.startingAtPrice, {
@@ -635,14 +634,17 @@ import {
 	VersionIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
-	LoaderIcon,
 	ModrinthServersPurchaseModal,
+	OptionGroup,
+	TagIcon,
+	useDebugLogger,
 	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'
@@ -650,7 +652,6 @@ import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import OptionGroup from '~/components/ui/OptionGroup.vue'
 import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
 import { products } from '~/generated/state.json'
@@ -658,6 +659,7 @@ import { products } from '~/generated/state.json'
 const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
+const debug = useDebugLogger('Hosting')
 
 const { setAffiliateCode, getAffiliateCode } = useAffiliates()
 
@@ -681,6 +683,31 @@ const formatPrice = useFormatPrice()
 const flags = useFeatureFlags()
 
 const messages = defineMessages({
+	errorFetchingPaymentDataTitle: {
+		id: 'hosting-marketing.notification.error-fetching-payment-data-title',
+		defaultMessage: 'Error fetching payment data',
+	},
+	unexpectedErrorText: {
+		id: 'hosting-marketing.notification.unexpected-error-text',
+		defaultMessage: 'An unexpected error occurred',
+	},
+	serverCapacityFullTitle: {
+		id: 'hosting-marketing.notification.server-capacity-full-title',
+		defaultMessage: 'Server Capacity Full',
+	},
+	serverCapacityFullText: {
+		id: 'hosting-marketing.notification.server-capacity-full-text',
+		defaultMessage: 'We are currently at capacity. Please try again later.',
+	},
+	invalidProductTitle: {
+		id: 'hosting-marketing.notification.invalid-product-title',
+		defaultMessage: 'Invalid product',
+	},
+	invalidProductText: {
+		id: 'hosting-marketing.notification.invalid-product-text',
+		defaultMessage:
+			'The selected product was found but lacks necessary data. Please contact support.',
+	},
 	hostWithModrinth: {
 		id: 'hosting-marketing.hero.host-with-modrinth',
 		defaultMessage: 'Host your next server with Modrinth Hosting',
@@ -1107,7 +1134,7 @@ const startTyping = () => {
 
 const handleError = (err) => {
 	addNotification({
-		title: 'An error occurred',
+		title: formatMessage(commonMessages.errorNotificationTitle),
 		type: 'error',
 		text: err.message ?? (err.data ? err.data.description : err),
 	})
@@ -1125,9 +1152,9 @@ async function fetchPaymentData() {
 	} catch (error) {
 		console.error('Error fetching payment data:', error)
 		addNotification({
-			title: 'Error fetching payment data',
+			title: formatMessage(messages.errorFetchingPaymentDataTitle),
 			type: 'error',
-			text: error.message || 'An unexpected error occurred',
+			text: error.message || formatMessage(messages.unexpectedErrorText),
 		})
 	}
 }
@@ -1174,13 +1201,13 @@ const selectProduct = async (product) => {
 	}
 
 	await refreshCapacity()
-	console.log(capacityStatuses.value)
+	debug(capacityStatuses.value)
 
 	if ((product === 'custom' && isCustomAtCapacity.value) || isAtCapacity.value) {
 		addNotification({
-			title: 'Server Capacity Full',
+			title: formatMessage(messages.serverCapacityFullTitle),
 			type: 'error',
-			text: 'We are currently at capacity. Please try again later.',
+			text: formatMessage(messages.serverCapacityFullText),
 		})
 		return
 	}
@@ -1193,9 +1220,9 @@ const selectProduct = async (product) => {
 		(product !== 'custom' && !selectedPlan.metadata)
 	) {
 		addNotification({
-			title: 'Invalid product',
+			title: formatMessage(messages.invalidProductTitle),
 			type: 'error',
-			text: 'The selected product was found but lacks necessary data. Please contact support.',
+			text: formatMessage(messages.invalidProductText),
 		})
 		return
 	}
@@ -1233,81 +1260,16 @@ const planQuery = async () => {
 }
 
 const regions = ref([])
-const regionPings = ref([])
-
-function pingRegions() {
+function fetchRegions() {
 	client.archon.servers_v1.getRegions().then((res) => {
 		regions.value = res
-		regions.value.forEach((region) => {
-			runPingTest(region)
-		})
 	})
-}
-
-const PING_COUNT = 20
-const PING_INTERVAL = 200
-const MAX_PING_TIME = 1000
-
-const initialIndex = {
-	'eu-lim': 31,
-}
-
-function runPingTest(region, index = initialIndex[region.shortcode] ?? 1) {
-	if (index > (initialIndex[region.shortcode] ?? 1) + 10) {
-		regionPings.value.push({
-			region: region.shortcode,
-			ping: -1,
-		})
-		return
-	}
-
-	const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
-	try {
-		const socket = new WebSocket(wsUrl)
-		const pings = []
-
-		socket.onopen = () => {
-			for (let i = 0; i < PING_COUNT; i++) {
-				setTimeout(() => {
-					socket.send(performance.now())
-				}, i * PING_INTERVAL)
-			}
-			setTimeout(
-				() => {
-					socket.close()
-
-					const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
-					if (median) {
-						regionPings.value.push({
-							region: region.shortcode,
-							ping: median,
-						})
-					}
-				},
-				PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
-			)
-		}
-
-		socket.onmessage = (event) => {
-			pings.push(performance.now() - event.data)
-		}
-
-		socket.onerror = (event) => {
-			console.error(
-				`Failed to connect pingtest WebSocket with ${wsUrl}, trying index ${index + 1}:`,
-				event,
-			)
-			runPingTest(region, index + 1)
-		}
-	} catch (error) {
-		console.error(`Failed to connect pingtest WebSocket with ${wsUrl}:`, error)
-	}
 }
 
 onMounted(() => {
 	startTyping()
 	planQuery()
-	pingRegions()
+	fetchRegions()
 })
 
 watch(customer, (newCustomer) => {

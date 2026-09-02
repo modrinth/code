@@ -1,36 +1,54 @@
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpResponse, get};
-use eyre::{Context, eyre};
+use eyre::eyre;
 use prometheus::{IntGauge, Registry};
 use std::time::Duration;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(heap).service(flame_graph);
 }
 
-#[utoipa::path]
+/// Get a heap profile.  
+#[utoipa::path(
+	tag = "debug",
+	responses((
+		status = OK,
+		body = Vec<u8>,
+		content_type = "application/octet-stream"
+	))
+)]
 #[get("/pprof/heap", guard = "admin_key_guard")]
 pub async fn heap() -> Result<HttpResponse, ApiError> {
     let mut prof_ctl = jemalloc_pprof::PROF_CTL.as_ref().unwrap().lock().await;
-    require_profiling_activated(&prof_ctl)?;
+    require_profiling_activated(&prof_ctl)
+        .wrap_api_err("executing `require_profiling_activated`")?;
     let pprof = prof_ctl
         .dump_pprof()
-        .map_err(|err| ApiError::InvalidInput(err.to_string()))?;
+        .map_err(|err| eyre::Report::msg(err.to_string()))
+        .wrap_request_err("processing request")?;
 
     Ok(HttpResponse::Ok()
         .content_type("application/octet-stream")
         .body(pprof))
 }
 
-#[utoipa::path]
+/// Get a heap flame graph.  
+#[utoipa::path(
+	tag = "debug",
+	responses((status = OK, body = String, content_type = "image/svg+xml"))
+)]
 #[get("/pprof/heap/flamegraph", guard = "admin_key_guard")]
 pub async fn flame_graph() -> Result<HttpResponse, ApiError> {
     let mut prof_ctl = jemalloc_pprof::PROF_CTL.as_ref().unwrap().lock().await;
-    require_profiling_activated(&prof_ctl)?;
+    require_profiling_activated(&prof_ctl)
+        .wrap_api_err("executing `require_profiling_activated`")?;
     let svg = prof_ctl
         .dump_flamegraph()
-        .map_err(|err| ApiError::InvalidInput(err.to_string()))?;
+        .map_err(|err| eyre::Report::msg(err.to_string()))
+        .wrap_request_err("processing request")?;
 
     Ok(HttpResponse::Ok().content_type("image/svg+xml").body(svg))
 }
@@ -41,8 +59,8 @@ fn require_profiling_activated(
     if prof_ctl.activated() {
         Ok(())
     } else {
-        Err(ApiError::InvalidInput(
-            "Profiling is not activated".to_string(),
+        Err(ApiError::Request(
+            eyre::eyre!("Profiling is not activated",),
         ))
     }
 }

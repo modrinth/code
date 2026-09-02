@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        select\n            fa.file_id as \"file_id: DBFileId\",\n            f.url,\n            v.mod_id as \"project_id: DBProjectId\"\n        from file_scans fa\n        inner join files f on f.id = fa.file_id\n        inner join attribution_enforced_versions aev on aev.id = f.version_id\n        inner join versions v on v.id = f.version_id\n        where fa.attributions_scanned_at is null\n        order by fa.file_id\n        limit $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "file_id: DBFileId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "502a0fcf14a874beb2709d5518fb7f4dd3ec2d110bd6e75caa1fbe3014d8e412"
+}

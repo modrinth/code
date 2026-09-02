@@ -1,4 +1,7 @@
-use std::{collections::HashSet, fmt::Display, sync::Arc};
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
+use std::{collections::HashSet, fmt::Display};
+use xredis::RedisPool;
 
 use super::ApiError;
 use crate::database::{PgPool, PgTransaction};
@@ -7,14 +10,11 @@ use crate::models::ids::OAuthClientId;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
-    database::{
-        models::{
-            DBOAuthClientId, DBUser, DatabaseError, generate_oauth_client_id,
-            generate_oauth_redirect_id,
-            oauth_client_authorization_item::DBOAuthClientAuthorization,
-            oauth_client_item::{DBOAuthClient, DBOAuthRedirectUri},
-        },
-        redis::RedisPool,
+    database::models::{
+        DBOAuthClientId, DBUser, DatabaseError, generate_oauth_client_id,
+        generate_oauth_redirect_id,
+        oauth_client_authorization_item::DBOAuthClientAuthorization,
+        oauth_client_item::{DBOAuthClient, DBOAuthRedirectUri},
     },
     models::{
         self,
@@ -29,10 +29,7 @@ use crate::{
     file_hosting::FileHost, models::oauth_clients::DeleteOAuthClientQueryParam,
     util::routes::read_limited_from_payload,
 };
-use actix_web::{
-    HttpRequest, HttpResponse, delete, get, patch, post,
-    web::{self, scope},
-};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use itertools::Itertools;
@@ -41,9 +38,9 @@ use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        scope("oauth")
+        web::scope("/oauth")
             .configure(crate::auth::oauth::config)
             .service(revoke_oauth_authorization)
             .service(oauth_client_create)
@@ -57,6 +54,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients", responses((status = OK))
+)]
+#[get("/user/{id}/oauth_apps")]
 pub async fn get_user_clients(
     req: HttpRequest,
     info: web::Path<String>,
@@ -71,23 +73,27 @@ pub async fn get_user_clients(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
-    let target_user = DBUser::get(&info.into_inner(), &**pool, &redis).await?;
+    let target_user = DBUser::get(&info.into_inner(), &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?;
 
     if let Some(target_user) = target_user {
         if target_user.id != current_user.id.into()
             && !current_user.role.is_admin()
         {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to see the OAuth clients of this user!".to_string(),
-            ));
+            return Err(ApiError::Auth(eyre::eyre!(
+                "You do not have permission to see the OAuth clients of this user!",
+            )));
         }
 
         let clients =
             DBOAuthClient::get_all_user_clients(target_user.id, &**pool)
-                .await?;
+                .await
+                .wrap_internal_err("fetching OAuth clients from database")?;
 
         let response = clients
             .into_iter()
@@ -96,24 +102,40 @@ pub async fn get_user_clients(
 
         Ok(HttpResponse::Ok().json(response))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
-#[get("app/{id}")]
+/// Get an OAuth client.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = OK, body = models::oauth_clients::OAuthClient)),
+)]
+#[get("/app/{id}")]
 pub async fn get_client(
     id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let clients = get_clients_inner(&[id.into_inner()], pool).await?;
+    let clients = get_clients_inner(&[id.into_inner()], pool)
+        .await
+        .wrap_api_err("fetching OAuth client")?;
     if let Some(client) = clients.into_iter().next() {
         Ok(HttpResponse::Ok().json(client))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
-#[get("apps")]
+/// List OAuth clients.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("ids" = Vec<String>, Query)),
+	responses((status = OK, body = Vec<models::oauth_clients::OAuthClient>)),
+)]
+#[get("/apps")]
 pub async fn get_clients(
     info: web::Query<GetOAuthClientsRequest>,
     pool: web::Data<PgPool>,
@@ -122,14 +144,17 @@ pub async fn get_clients(
         .ids
         .iter()
         .map(|id| parse_base62(id).map(OAuthClientId))
-        .collect::<Result<_, _>>()?;
+        .collect::<Result<_, _>>()
+        .wrap_request_err("parsing OAuth client IDs")?;
 
-    let clients = get_clients_inner(&ids, pool).await?;
+    let clients = get_clients_inner(&ids, pool)
+        .await
+        .wrap_api_err("fetching clients inner")?;
 
     Ok(HttpResponse::Ok().json(clients))
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct NewOAuthApp {
     #[validate(
         custom(function = "crate::util::validate::validate_name"),
@@ -154,7 +179,13 @@ pub struct NewOAuthApp {
     pub description: Option<String>,
 }
 
-#[post("app")]
+/// Create an OAuth client.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	responses((status = OK, body = OAuthClientCreationResult)),
+)]
+#[post("/app")]
 pub async fn oauth_client_create(
     req: HttpRequest,
     new_oauth_app: web::Json<NewOAuthApp>,
@@ -215,7 +246,14 @@ pub async fn oauth_client_create(
     }))
 }
 
-#[delete("app/{id}")]
+/// Delete an OAuth client.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
+)]
+#[delete("/app/{id}")]
 pub async fn oauth_client_delete(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
@@ -230,22 +268,28 @@ pub async fn oauth_client_delete(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
-    let client =
-        DBOAuthClient::get(client_id.into_inner().into(), &**pool).await?;
+    let client = DBOAuthClient::get(client_id.into_inner().into(), &**pool)
+        .await
+        .wrap_internal_err("fetching OAuth client from database")?;
     if let Some(client) = client {
-        client.validate_authorized(Some(&current_user))?;
-        DBOAuthClient::remove(client.id, &**pool).await?;
+        client
+            .validate_authorized(Some(&current_user))
+            .wrap_api_err("validating authorized")?;
+        DBOAuthClient::remove(client.id, &**pool)
+            .await
+            .wrap_internal_err("validating oauth client")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct OAuthClientEdit {
     #[validate(
         custom(function = "crate::util::validate::validate_name"),
@@ -271,7 +315,14 @@ pub struct OAuthClientEdit {
     pub description: Option<Option<String>>,
 }
 
-#[patch("app/{id}")]
+/// Update an OAuth client.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
+)]
+#[patch("/app/{id}")]
 pub async fn oauth_client_edit(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
@@ -287,17 +338,23 @@ pub async fn oauth_client_edit(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
-    client_updates.validate().map_err(|e| {
-        ApiError::Validation(validation_errors_to_string(e, None))
-    })?;
+    client_updates
+        .validate()
+        .map_err(|err| eyre::eyre!(err))
+        .wrap_request_err("validating request")?;
 
     if let Some(existing_client) =
-        DBOAuthClient::get(client_id.into_inner().into(), &**pool).await?
+        DBOAuthClient::get(client_id.into_inner().into(), &**pool)
+            .await
+            .wrap_internal_err("fetching OAuth client from database")?
     {
-        existing_client.validate_authorized(Some(&current_user))?;
+        existing_client
+            .validate_authorized(Some(&current_user))
+            .wrap_api_err("authorizing OAuth client update")?;
 
         let mut updated_client = existing_client.clone();
         let OAuthClientEdit {
@@ -323,21 +380,31 @@ pub async fn oauth_client_edit(
             updated_client.description = description;
         }
 
-        let mut transaction = pool.begin().await?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_internal_err("starting database transaction")?;
         updated_client
             .update_editable_fields(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err(
+                "updating database records for `oauth_client_edit`",
+            )?;
 
         if let Some(redirects) = redirect_uris {
             edit_redirects(redirects, &existing_client, &mut transaction)
-                .await?;
+                .await
+                .wrap_internal_err("updating redirects in database")?;
         }
 
-        transaction.commit().await?;
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
 
         Ok(HttpResponse::Ok().body(""))
     } else {
-        Err(ApiError::NotFound)
+        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
 }
 
@@ -346,7 +413,18 @@ pub struct Extension {
     pub ext: String,
 }
 
-#[patch("app/{id}/icon")]
+/// Update an OAuth client icon.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(
+		("id" = OAuthClientId, Path),
+		("ext" = String, Query)
+	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
+	responses((status = NO_CONTENT))
+)]
+#[patch("/app/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn oauth_client_icon_edit(
     web::Query(ext): web::Query<Extension>,
@@ -354,7 +432,7 @@ pub async fn oauth_client_icon_edit(
     client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -365,33 +443,37 @@ pub async fn oauth_client_icon_edit(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let client = DBOAuthClient::get((*client_id).into(), &**pool)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified client does not exist!".to_string(),
-            )
+        .await
+        .wrap_internal_err("fetching OAuth client from database")?
+        .wrap_request_err_with(|| {
+            "the specified client does not exist!".to_string()
         })?;
 
-    client.validate_authorized(Some(&user))?;
+    client
+        .validate_authorized(Some(&user))
+        .wrap_api_err("validating authorized")?;
 
     delete_old_images(
         client.icon_url.clone(),
         client.raw_icon_url.clone(),
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
-    .await?;
+    .await
+    .wrap_api_err("deleting old images")?;
 
     let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",
     )
-    .await?;
+    .await
+    .wrap_api_err("executing `read_limited_from_payload`")?;
     let upload_result = upload_image_optimized(
         &format!("data/{client_id}"),
         FileHostPublicity::Public,
@@ -399,11 +481,15 @@ pub async fn oauth_client_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
-    .await?;
+    .await
+    .wrap_api_err("uploading image")?;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let mut editable_client = client.clone();
     editable_client.icon_url = Some(upload_result.url);
@@ -411,20 +497,33 @@ pub async fn oauth_client_icon_edit(
 
     editable_client
         .update_editable_fields(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err(
+            "updating database records for `oauth_client_icon_edit`",
+        )?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[delete("app/{id}/icon")]
+/// Delete an OAuth client icon.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
+)]
+#[delete("/app/{id}/icon")]
 pub async fn oauth_client_icon_delete(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -434,27 +533,33 @@ pub async fn oauth_client_icon_delete(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let client = DBOAuthClient::get((*client_id).into(), &**pool)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified client does not exist!".to_string(),
-            )
+        .await
+        .wrap_internal_err("fetching OAuth client from database")?
+        .wrap_request_err_with(|| {
+            "the specified client does not exist!".to_string()
         })?;
-    client.validate_authorized(Some(&user))?;
+    client
+        .validate_authorized(Some(&user))
+        .wrap_api_err("validating authorized")?;
 
     delete_old_images(
         client.icon_url.clone(),
         client.raw_icon_url.clone(),
         FileHostPublicity::Public,
-        &***file_host,
+        &**file_host,
     )
-    .await?;
+    .await
+    .wrap_api_err("deleting old images")?;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     let mut editable_client = client.clone();
     editable_client.icon_url = None;
@@ -462,13 +567,25 @@ pub async fn oauth_client_icon_delete(
 
     editable_client
         .update_editable_fields(&mut transaction)
-        .await?;
-    transaction.commit().await?;
+        .await
+        .wrap_internal_err(
+            "updating database records for `oauth_client_icon_delete`",
+        )?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[get("authorizations")]
+/// List OAuth authorizations.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	responses((status = OK, body = Vec<models::oauth_clients::OAuthClientAuthorization>)),
+)]
+#[get("/authorizations")]
 pub async fn get_user_oauth_authorizations(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -482,14 +599,16 @@ pub async fn get_user_oauth_authorizations(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     let authorizations = DBOAuthClientAuthorization::get_all_for_user(
         current_user.id.into(),
         &**pool,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching OAuth client authorizations from database")?;
 
     let mapped: Vec<models::oauth_clients::OAuthClientAuthorization> =
         authorizations.into_iter().map(|a| a.into()).collect_vec();
@@ -497,7 +616,14 @@ pub async fn get_user_oauth_authorizations(
     Ok(HttpResponse::Ok().json(mapped))
 }
 
-#[delete("authorizations")]
+/// Revoke OAuth authorization.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("client_id" = OAuthClientId, Query)),
+	responses((status = NO_CONTENT))
+)]
+#[delete("/authorizations")]
 pub async fn revoke_oauth_authorization(
     req: HttpRequest,
     info: web::Query<DeleteOAuthClientQueryParam>,
@@ -512,7 +638,8 @@ pub async fn revoke_oauth_authorization(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
+    .await
+    .wrap_auth_err("authenticating API request")?
     .1;
 
     DBOAuthClientAuthorization::remove(
@@ -520,7 +647,8 @@ pub async fn revoke_oauth_authorization(
         current_user.id.into(),
         &**pool,
     )
-    .await?;
+    .await
+    .wrap_internal_err("deleting oauth client authorization from database")?;
 
     Ok(HttpResponse::Ok().body(""))
 }
@@ -588,7 +716,9 @@ pub async fn get_clients_inner(
     pool: web::Data<PgPool>,
 ) -> Result<Vec<models::oauth_clients::OAuthClient>, ApiError> {
     let ids: Vec<DBOAuthClientId> = ids.iter().map(|i| (*i).into()).collect();
-    let clients = DBOAuthClient::get_many(&ids, &**pool).await?;
+    let clients = DBOAuthClient::get_many(&ids, &**pool)
+        .await
+        .wrap_internal_err("fetching OAuth clients from database")?;
 
     Ok(clients.into_iter().map(|c| c.into()).collect_vec())
 }

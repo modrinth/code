@@ -15,7 +15,11 @@
 			}"
 			@click="toggleItem(item)"
 		>
-			<CheckIcon v-if="selected === item && !hideCheckmarkIcon" />
+			<CheckIcon
+				v-if="selected === item && !hideCheckmarkIcon"
+				class="!text-brand"
+				aria-hidden="true"
+			/>
 			<span>{{ formatLabel(item) }}</span>
 		</Button>
 	</div>
@@ -24,7 +28,7 @@
 <script setup lang="ts" generic="T">
 import { CheckIcon } from '@modrinth/assets'
 
-import Button from './Button.vue'
+import Button from './buttons/Button.vue'
 
 const props = withDefaults(
 	defineProps<{

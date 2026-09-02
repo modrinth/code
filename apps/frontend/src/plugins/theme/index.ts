@@ -1,9 +1,11 @@
-import { ref } from 'vue'
+import type { Labrinth } from '@modrinth/api-client'
+import { prepareThemeColorTransition } from '@modrinth/ui'
+import { ref, watch, watchEffect } from 'vue'
 
 import { useNativeTheme } from './native-theme.ts'
 import { usePreferredThemes } from './preferred-theme.ts'
 import { useThemeSettings } from './theme-settings.ts'
-import { isDarkTheme } from './themes.ts'
+import { isDarkTheme, type Theme } from './themes.ts'
 
 export * from './themes.ts'
 
@@ -33,12 +35,32 @@ export default defineNuxtPlugin({
 		}
 
 		const $settings = useThemeSettings(() => getPreferredNativeTheme())
+		const $preview = ref<Theme | 'system' | null>(null)
+		const $active = computed(() => {
+			if ($preview.value === null) return $settings.active
+			return $preview.value === 'system' ? getPreferredNativeTheme() : $preview.value
+		})
 
-		useHead({ htmlAttrs: { class: () => [`${$settings.active}-mode`] } })
+		useHead({ htmlAttrs: { class: () => [`${$active.value}-mode`] } })
 
 		function syncTheme() {
 			$settings.active =
 				$settings.preferred === 'system' ? getPreferredNativeTheme() : $settings.preferred
+		}
+
+		function applyAccountAppearance(appearance: Labrinth.Users.v3.AppearancePreferences) {
+			if (isDarkTheme(appearance.theme)) {
+				$preferredThemes.dark = appearance.theme
+			} else {
+				$preferredThemes.light = appearance.theme
+			}
+
+			$settings.preferred = appearance.auto ? 'system' : appearance.theme
+
+			const systemThemeIsUnknown =
+				import.meta.server && $settings.preferred === 'system' && $nativeTheme.value === 'unknown'
+
+			if (!systemThemeIsUnknown) syncTheme()
 		}
 
 		if (
@@ -52,12 +74,27 @@ export default defineNuxtPlugin({
 
 		if (import.meta.client) {
 			const $clientReady = ref(false)
+			let themeColorTransitionsEnabled = false
 
 			nuxtApp.hook('app:suspense:resolve', () => {
 				$clientReady.value = true
 			})
 
-			watchEffect(() => $clientReady.value && syncTheme())
+			watchEffect(() => {
+				if (!$clientReady.value) return
+				syncTheme()
+				themeColorTransitionsEnabled = true
+			})
+
+			watch(
+				$active,
+				(theme, previousTheme) => {
+					if (themeColorTransitionsEnabled && previousTheme && theme !== previousTheme) {
+						prepareThemeColorTransition()
+					}
+				},
+				{ flush: 'sync' },
+			)
 		}
 
 		function cycle() {
@@ -74,6 +111,8 @@ export default defineNuxtPlugin({
 			provide: {
 				theme: reactive({
 					...toRefs($settings),
+					active: $active,
+					preview: $preview,
 					/**
 					 * Preferred themes for each mode.
 					 */
@@ -84,6 +123,7 @@ export default defineNuxtPlugin({
 					 */
 					native: $nativeTheme,
 					cycle,
+					applyAccountAppearance,
 				}),
 			},
 		}

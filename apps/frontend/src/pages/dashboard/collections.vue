@@ -4,7 +4,7 @@
 		<h2 class="text-2xl">{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
 		<div class="mb-3 flex flex-col gap-3">
 			<label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
-			<StyledInput
+			<Input
 				id="search-input"
 				v-model="filterQuery"
 				:icon="SearchIcon"
@@ -30,12 +30,15 @@
 					<span class="font-semibold text-secondary">{{ selected }}</span>
 				</DropdownSelect>
 
-				<ButtonStyled color="brand">
-					<button class="ml-auto" @click="(event) => $refs.modal_creation.show(event)">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createNewButton) }}
-					</button>
-				</ButtonStyled>
+				<Button
+					type="colored"
+					color="brand"
+					class="ml-auto"
+					@click="(event) => $refs.modal_creation.show(event)"
+				>
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createNewButton) }}
+				</Button>
 			</div>
 		</div>
 		<div class="collections-grid">
@@ -144,12 +147,12 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
 	injectModrinthClient,
-	StyledInput,
+	Input,
 	useCompactNumber,
 	useVIntl,
 } from '@modrinth/ui'

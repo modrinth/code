@@ -1,8 +1,12 @@
 <template>
 	<div
 		data-pyro-server-list-root
-		class="relative mx-auto mb-6 flex w-full flex-col p-6"
-		:class="serverList.length ? 'min-h-screen' : 'min-h-[calc(100vh-4.5rem)]'"
+		class="relative mx-auto flex w-full flex-col p-6"
+		:class="
+			serverList.length && !showEmptyState
+				? 'min-h-screen mb-6'
+				: 'min-h-[calc(100vh-14.5rem)] h-full py-0'
+		"
 	>
 		<ServersGuestPlanModal
 			ref="guestPlanModal"
@@ -23,7 +27,6 @@
 			:customer="customer"
 			:payment-methods="paymentMethods"
 			:currency="selectedCurrency"
-			:pings="regionPings"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
@@ -76,14 +79,17 @@
 						</li>
 					</ul>
 				</div>
-				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com">{{
-						formatMessage(messages.contactSupportButton)
-					}}</AutoLink>
-				</ButtonStyled>
-				<ButtonStyled size="large" @click="() => router.go(0)">
-					<button class="mt-3 !w-full">{{ formatMessage(messages.reloadButton) }}</button>
-				</ButtonStyled>
+				<ButtonLink
+					type="colored"
+					color="brand"
+					size="xl"
+					class="mt-6 !w-full"
+					to="https://support.modrinth.com"
+					>{{ formatMessage(messages.contactSupportButton) }}</ButtonLink
+				>
+				<Button size="xl" class="mt-3 !w-full" @click="() => router.go(0)">{{
+					formatMessage(messages.reloadButton)
+				}}</Button>
 			</div>
 		</div>
 
@@ -96,7 +102,7 @@
 					{{ formatMessage(messages.serversTitle) }}
 				</h1>
 				<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
-					<StyledInput
+					<Input
 						id="search"
 						v-model="searchInput"
 						:icon="SearchIcon"
@@ -107,12 +113,10 @@
 						:placeholder="formatMessage(messages.searchPlaceholder, { count: filteredData.length })"
 						wrapper-class="w-full md:w-72"
 					/>
-					<ButtonStyled type="standard" color="brand">
-						<button @click="openPurchaseModal">
-							<PlusIcon />
-							{{ formatMessage(messages.newServerButton) }}
-						</button>
-					</ButtonStyled>
+					<Button type="colored" color="brand" @click="openPurchaseModal">
+						<PlusIcon />
+						{{ formatMessage(messages.newServerButton) }}
+					</Button>
 				</div>
 			</div>
 
@@ -134,7 +138,7 @@
 				<div
 					v-else-if="showEmptyState"
 					key="empty"
-					class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
+					class="flex h-full flex-col items-center justify-center gap-8 grow"
 				>
 					<ServerListEmpty
 						:logged-in="loggedIn"
@@ -232,19 +236,17 @@
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import {
-	AutoLink,
-	ButtonStyled,
 	CopyCode,
 	defineMessages,
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
 	ServerListEmpty,
 	ServersGuestPlanModal,
-	StyledInput,
 	useServerBackupDownload,
 	useVIntl,
 } from '@modrinth/ui'
@@ -256,6 +258,7 @@ import type Stripe from 'stripe'
 import { type ComponentPublicInstance, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { Button, ButtonLink } from '#ui/components/base/buttons'
 import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
 import type { ServerListingOwner } from '#ui/components/servers/access'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
@@ -333,6 +336,10 @@ const messages = defineMessages({
 		id: 'servers.manage.handle-error.title',
 		defaultMessage: 'An error occurred',
 	},
+	unknownError: {
+		id: 'servers.manage.error.unknown',
+		defaultMessage: 'Unknown error',
+	},
 	purchaseUnavailableTitle: {
 		id: 'servers.manage.purchase-unavailable.title',
 		defaultMessage: 'Purchase unavailable',
@@ -407,12 +414,6 @@ const medalUpgradeModal = ref<UpgradeModalRef | null>(null)
 const resubscribeModal = ref<InstanceType<typeof ResubscribeModal> | null>(null)
 const affiliateCode = ref<string | null>(null)
 const selectedCurrency = ref<string>('USD')
-const regionPings = ref<
-	{
-		region: string
-		ping: number
-	}[]
->([])
 
 const pyroProducts = computed(() => {
 	return [...props.products]
@@ -453,27 +454,6 @@ const { data: regions, isLoading: regionsLoading } = useQuery({
 	enabled: loggedIn,
 })
 
-const PING_COUNT = 20
-const PING_INTERVAL = 200
-const MAX_PING_TIME = 1000
-
-const initialIndex = {
-	'eu-lim': 31,
-}
-
-watch(
-	regions,
-	(newRegions) => {
-		regionPings.value = []
-		if (newRegions) {
-			newRegions.forEach((region) => {
-				runPingTest(region)
-			})
-		}
-	},
-	{ immediate: true },
-)
-
 async function fetchPaymentData() {
 	await Promise.all([refetchCustomer(), refetchPaymentMethods()])
 }
@@ -484,82 +464,6 @@ async function fetchStock(
 ): Promise<number> {
 	const result = await client.archon.servers_v0.checkStock(region.shortcode, request)
 	return result.available
-}
-
-function runPingTest(
-	region: Archon.Servers.v1.Region,
-	index = initialIndex[region.shortcode] ?? 1,
-) {
-	if (index > (initialIndex[region.shortcode] ?? 1) + 10) {
-		regionPings.value.push({
-			region: region.shortcode,
-			ping: -1,
-		})
-		return
-	}
-
-	const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
-	try {
-		const socket = new WebSocket(wsUrl)
-		const pings: number[] = []
-		let finalized = false
-
-		const finalize = (ping: number) => {
-			if (finalized) return
-			finalized = true
-			clearTimeout(connectTimeout)
-			regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
-			regionPings.value.push({
-				region: region.shortcode,
-				ping,
-			})
-			socket.close()
-		}
-
-		const retryNext = () => {
-			if (finalized) return
-			finalized = true
-			clearTimeout(connectTimeout)
-			socket.close()
-			runPingTest(region, index + 1)
-		}
-
-		// Prevent hangs where the socket never opens or errors.
-		const connectTimeout = setTimeout(() => {
-			retryNext()
-		}, 3000)
-
-		socket.onopen = () => {
-			clearTimeout(connectTimeout)
-
-			for (let i = 0; i < PING_COUNT; i++) {
-				setTimeout(() => {
-					socket.send(String(performance.now()))
-				}, i * PING_INTERVAL)
-			}
-			setTimeout(
-				() => {
-					const median =
-						pings.length > 0
-							? Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
-							: -1
-					finalize(median)
-				},
-				PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
-			)
-		}
-
-		socket.onmessage = (event) => {
-			const start = Number(event.data)
-			pings.push(performance.now() - start)
-		}
-
-		socket.onerror = () => {
-			retryNext()
-		}
-	} catch {
-		runPingTest(region, index + 1)
-	}
 }
 
 const {
@@ -781,7 +685,9 @@ function handleError(err: unknown) {
 }
 
 function formatFetchError(error: unknown) {
-	return error instanceof Error && error.message ? error.message : 'Unknown error'
+	return error instanceof Error && error.message
+		? error.message
+		: formatMessage(messages.unknownError)
 }
 
 function handleSignIn() {

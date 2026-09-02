@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT *\n\t\tFROM instance_content_update_checks\n\t\tWHERE content_entry_id = ?\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "content_entry_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "update_channel",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "update_version_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "checked_at",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "70f0b9c833e36fecb9c13496149cad79c4cab21a58fbd0614cce668f96b391ef"
+}

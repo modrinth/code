@@ -1,13 +1,13 @@
 <template>
 	<div class="search-filter-option group flex gap-1 items-center">
 		<button
-			:class="`flex border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-2 [@media(hover:hover)]:py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98] ${included ? 'bg-brand-highlight text-contrast hover:brightness-125' : excluded ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg focus-visible:bg-button-bg [&>svg.check-icon]:hover:text-brand [&>svg.check-icon]:focus-visible:text-brand'}`"
-			@click="() => emit('toggle', option)"
+			:class="`flex border-none cursor-pointer flex-1 min-w-0 items-center gap-2 truncate rounded-xl px-2 py-2 [@media(hover:hover)]:py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98] ${included ? 'bg-brand-highlight text-contrast hover:brightness-125' : excluded ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg focus-visible:bg-button-bg [&>svg.check-icon]:hover:text-brand [&>svg.check-icon]:focus-visible:text-brand [&>svg.ban-icon]:hover:text-red [&>svg.ban-icon]:focus-visible:text-red'}`"
+			@click="() => emit(primaryAction === 'exclude' ? 'toggleExclude' : 'toggle', option)"
 		>
 			<slot> </slot>
 			<BanIcon
-				v-if="excluded"
-				:class="`filter-action-icon ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${excluded ? '' : '[@media(hover:hover)]:opacity-0'}`"
+				v-if="excluded || primaryAction === 'exclude'"
+				:class="`filter-action-icon ban-icon ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${excluded ? '' : '[@media(hover:hover)]:opacity-0'}`"
 				aria-hidden="true"
 			/>
 			<CheckIcon
@@ -17,37 +17,71 @@
 			/>
 		</button>
 		<div
-			v-if="supportsNegativeFilter && !excluded"
+			v-if="showExcludeButton"
 			class="w-px h-[1.75rem] bg-button-bg [@media(hover:hover)]:contents"
 			:class="{ 'opacity-0': included }"
 		></div>
 		<button
-			v-if="supportsNegativeFilter && !excluded"
+			v-if="showExcludeButton"
 			v-tooltip="formatMessage(messages.excludeTooltip)"
 			class="flex border-none cursor-pointer items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary [@media(hover:hover)]:opacity-0 transition-all hover:bg-button-bg hover:text-red focus-visible:bg-button-bg focus-visible:text-red active:scale-[0.96]"
 			@click="() => emit('toggleExclude', option)"
 		>
 			<BanIcon class="filter-action-icon h-4 w-4" aria-hidden="true" />
 		</button>
+		<button
+			v-if="hasSubOptions"
+			v-tooltip="
+				expanded
+					? formatMessage(messages.collapseSubOptionsTooltip)
+					: formatMessage(messages.expandSubOptionsTooltip)
+			"
+			class="flex border-none cursor-pointer items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary transition-all hover:bg-button-bg hover:text-contrast focus-visible:bg-button-bg focus-visible:text-contrast active:scale-[0.96]"
+			:aria-expanded="expanded"
+			:aria-label="
+				expanded
+					? formatMessage(messages.collapseSubOptionsTooltip)
+					: formatMessage(messages.expandSubOptionsTooltip)
+			"
+			@click.stop="emit('toggleExpand')"
+		>
+			<DropdownIcon
+				class="h-4 w-4 transition-transform duration-200"
+				:class="{ 'rotate-180': expanded }"
+				aria-hidden="true"
+			/>
+		</button>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { BanIcon, CheckIcon } from '@modrinth/assets'
+import { BanIcon, CheckIcon, DropdownIcon } from '@modrinth/assets'
+import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
-import type { FilterOption } from '../../utils/search'
+import type { FilterMode, FilterOption } from '../../utils/search'
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		option: FilterOption
 		included: boolean
 		excluded: boolean
-		supportsNegativeFilter?: boolean
+		supports?: FilterMode[]
+		hasSubOptions?: boolean
+		expanded?: boolean
 	}>(),
 	{
-		supportsNegativeFilter: false,
+		supports: () => ['include'],
+		hasSubOptions: false,
+		expanded: false,
 	},
+)
+
+const supportsInclude = computed(() => props.supports.includes('include'))
+const supportsExclude = computed(() => props.supports.includes('exclude'))
+const primaryAction = computed<FilterMode>(() => (supportsInclude.value ? 'include' : 'exclude'))
+const showExcludeButton = computed(
+	() => supportsInclude.value && supportsExclude.value && !props.excluded,
 )
 
 const { formatMessage } = useVIntl()
@@ -55,12 +89,21 @@ const { formatMessage } = useVIntl()
 const emit = defineEmits<{
 	toggle: [option: FilterOption]
 	toggleExclude: [option: FilterOption]
+	toggleExpand: []
 }>()
 
 const messages = defineMessages({
 	excludeTooltip: {
 		id: 'search.filter.option.exclusion.add.tooltip',
 		defaultMessage: 'Exclude',
+	},
+	expandSubOptionsTooltip: {
+		id: 'search.filter.option.sub_options.expand.tooltip',
+		defaultMessage: 'Show more options',
+	},
+	collapseSubOptionsTooltip: {
+		id: 'search.filter.option.sub_options.collapse.tooltip',
+		defaultMessage: 'Hide more options',
 	},
 })
 </script>

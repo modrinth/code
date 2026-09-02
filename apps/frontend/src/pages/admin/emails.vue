@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
+import { Button, IconButton, Input, NewModal } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import emails from '~/templates/emails'
@@ -113,19 +113,31 @@ function openPopupPreview(id: string, offset = 0) {
 	)
 }
 
-const counts = computed(() => ({
-	total: allTemplates.length,
-	shown: filtered.value.length,
-}))
-
 onMounted(() => {
 	document.getElementById('email-search')?.focus()
 })
 </script>
 
 <template>
-	<div class="normal-page no-sidebar">
-		<h1 class="mb-4 text-3xl font-extrabold text-heading">Email templates</h1>
+	<div>
+		<div class="mb-4 flex items-center justify-between gap-4">
+			<h2 class="m-0 text-2xl font-semibold">Email templates</h2>
+			<div class="flex items-center gap-2">
+				<Input
+					id="email-search"
+					v-model="query"
+					:icon="SearchIcon"
+					type="text"
+					autocomplete="off"
+					placeholder="Search templates..."
+					clearable
+				/>
+				<Button type="colored" color="brand" :disabled="filtered.length === 0" @click="openAll">
+					<LibraryIcon class="h-4 w-4" aria-hidden="true" />
+					Open all ({{ filtered.length }})
+				</Button>
+			</div>
+		</div>
 		<NewModal
 			ref="previewModal"
 			header="Preview email"
@@ -143,7 +155,7 @@ onMounted(() => {
 					{{ previewError }}
 				</div>
 
-				<div v-if="previewLoading" class="my-4 text-sm text-secondary">Loading preview…</div>
+				<div v-if="previewLoading" class="my-4 text-sm text-secondary">Loading preview...</div>
 				<div v-else>
 					<div v-if="previewVariables.length" class="mt-2 grid gap-3 md:grid-cols-2">
 						<label
@@ -153,7 +165,7 @@ onMounted(() => {
 							class="flex flex-col"
 						>
 							<span class="label__title">{{ variable }}</span>
-							<StyledInput
+							<Input
 								:id="`preview-${variable}`"
 								v-model="variableValues[variable]"
 								type="text"
@@ -182,40 +194,15 @@ onMounted(() => {
 					</div>
 
 					<div class="input-group mt-4">
-						<ButtonStyled type="transparent">
-							<button @click="closePreview">Close</button>
-						</ButtonStyled>
+						<Button type="quiet" @click="closePreview">Close</Button>
 					</div>
 				</div>
 			</div>
 		</NewModal>
-		<div class="normal-page__content">
-			<div class="flex flex-wrap items-center gap-3">
-				<StyledInput
-					id="email-search"
-					v-model="query"
-					type="search"
-					:icon="SearchIcon"
-					placeholder="Search templates..."
-					wrapper-class="w-72"
-				/>
-
-				<ButtonStyled color="brand">
-					<button :disabled="filtered.length === 0" @click="openAll">
-						<LibraryIcon class="h-4 w-4" aria-hidden="true" />
-						Open all ({{ counts.shown }})
-					</button>
-				</ButtonStyled>
-
-				<span class="text-sm text-secondary">
-					Showing <span class="font-medium text-contrast">{{ counts.shown }}</span> of
-					<span class="font-medium text-contrast">{{ counts.total }}</span>
-				</span>
-			</div>
-
+		<div>
 			<div
 				v-if="filtered.length === 0"
-				class="mt-4 border-0 border-b border-solid border-surface-4 pb-4"
+				class="border-0 border-b border-solid border-surface-4 pb-4"
 			>
 				No templates match your search.
 			</div>
@@ -236,18 +223,14 @@ onMounted(() => {
 					</div>
 
 					<div class="mt-auto flex gap-2">
-						<ButtonStyled color="brand">
-							<button @click="openPreview(id, $event)">
-								<PlayIcon aria-hidden="true" />
-								Preview
-							</button>
-						</ButtonStyled>
+						<Button type="colored" color="brand" @click="openPreview(id, $event)">
+							<PlayIcon aria-hidden="true" />
+							Preview
+						</Button>
 
-						<ButtonStyled circular type="outlined">
-							<button title="Copy preview URL" @click="copy(id)">
-								<CopyIcon aria-hidden="true" />
-							</button>
-						</ButtonStyled>
+						<IconButton type="outlined" label="Copy" title="Copy preview URL" @click="copy(id)">
+							<CopyIcon aria-hidden="true" />
+						</IconButton>
 					</div>
 				</li>
 			</ul>

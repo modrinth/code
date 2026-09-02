@@ -90,6 +90,14 @@ export function isEditableFile(ext: string): boolean {
 }
 
 /**
+ * Check if a file can be opened in the file editor
+ */
+export function canOpenInFileEditor(filename: string): boolean {
+	const ext = getFileExtension(filename)
+	return !filename.includes('.') || isEditableFile(ext) || isImageFile(ext)
+}
+
+/**
  * Get Ace editor language mode for a file extension
  */
 export function getEditorLanguage(ext: string): string {

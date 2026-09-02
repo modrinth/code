@@ -31,6 +31,7 @@ export interface BrowseManagerContext {
 	effectiveSortTypes: ComputedRef<readonly SortType[]>
 	effectiveCurrentSortType: Ref<SortType>
 	loading: Ref<boolean>
+	refreshing: Ref<boolean>
 	projectHits: ShallowRef<BrowseSearchResponse['projectHits']>
 	serverHits: ShallowRef<BrowseSearchResponse['serverHits']>
 	totalHits: Ref<number>
@@ -45,8 +46,10 @@ export interface BrowseManagerContext {
 	setPage: (page: number) => Promise<void>
 	clearSearch: () => void
 	onFilterChange: () => void
+	linkOverridesAdvancedPrefs: Ref<boolean>
+	applySavedAdvancedPrefs: () => void
 
-	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => string | RouteLocationRaw
+	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => string | RouteLocationRaw
 	getServerProjectLink: (
 		result: Labrinth.Search.v3.ResultSearchProject,
 	) => string | RouteLocationRaw
@@ -57,7 +60,7 @@ export interface BrowseManagerContext {
 	variant: 'app' | 'web'
 
 	getCardActions?: (
-		result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+		result: Labrinth.Search.v3.ResultSearchProject,
 		projectType: string,
 	) => CardAction[]
 
@@ -69,6 +72,12 @@ export interface BrowseManagerContext {
 	hideSelected?: Ref<boolean>
 	showHideSelected?: ComputedRef<boolean>
 	hideSelectedLabel?: ComputedRef<string>
+	serverOnly?: Ref<boolean>
+	showServerOnly?: ComputedRef<boolean>
+	serverOnlyLabel?: ComputedRef<string>
+	hiddenFilterTypes?: ComputedRef<string[]>
+	advancedFiltersCollapsed?: Ref<boolean>
+	dismissedPhotosensitivityFilterWarning?: Ref<boolean>
 	onInstalled?: (projectId: string) => void
 
 	displayMode?: Ref<'list' | 'grid' | 'gallery'> | ComputedRef<'list' | 'grid' | 'gallery'>
@@ -80,13 +89,10 @@ export interface BrowseManagerContext {
 		result: Labrinth.Search.v3.ResultSearchProject,
 	) => ServerModpackContent | undefined
 
-	onProjectHover?: (result: Labrinth.Search.v2.ResultSearchProject) => void
+	onProjectHover?: (result: Labrinth.Search.v3.ResultSearchProject) => void
 	onServerProjectHover?: (result: Labrinth.Search.v3.ResultSearchProject) => void
 	onProjectHoverEnd?: () => void
-	onContextMenu?: (
-		event: MouseEvent,
-		result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
-	) => void
+	onContextMenu?: (event: MouseEvent, result: Labrinth.Search.v3.ResultSearchProject) => void
 	offline?: Ref<boolean>
 
 	filtersMenuOpen?: Ref<boolean>

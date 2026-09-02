@@ -9,7 +9,7 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<StyledInput
+				<Input
 					id="name"
 					v-model="name"
 					:maxlength="64"
@@ -28,7 +28,7 @@
 				</label>
 				<div class="text-input-wrapper">
 					<div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
-					<StyledInput
+					<Input
 						id="slug"
 						v-model="slug"
 						:maxlength="64"
@@ -46,10 +46,9 @@
 					</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="additional-information"
 					v-model="description"
-					multiline
 					:maxlength="256"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
@@ -59,18 +58,14 @@
 				{{ formatMessage(messages.ownershipInfo) }}
 			</p>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="hide">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="hasHitLimit" @click="createOrganization">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createOrganization) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="hide">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="hasHitLimit" @click="createOrganization">
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createOrganization) }}
+				</Button>
 			</div>
 		</div>
 	</NewModal>
@@ -79,15 +74,18 @@
 <script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
+
+import { generateUrlSlug } from '~/utils/slugs'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
@@ -148,7 +146,7 @@ async function createOrganization(): Promise<void> {
 		const value = {
 			name: name.value.trim(),
 			description: description.value.trim(),
-			slug: slug.value.trim().replace(/ +/g, ''),
+			slug: slug.value.trim(),
 		}
 
 		const result: any = await useBaseFetch('organization', {
@@ -183,12 +181,7 @@ function hide(): void {
 
 function updateSlug(): void {
 	if (!manualSlug.value) {
-		slug.value = name.value
-			.trim()
-			.toLowerCase()
-			.replaceAll(' ', '-')
-			.replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
-			.replaceAll(/--+/gm, '-')
+		slug.value = generateUrlSlug(name.value)
 	}
 }
 

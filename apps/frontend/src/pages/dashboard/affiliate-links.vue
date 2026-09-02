@@ -18,7 +18,7 @@
 				{{ formatMessage(messages.yourAffiliateLinks) }}
 			</h1>
 			<div class="flex items-center gap-2">
-				<StyledInput
+				<Input
 					v-model="filterQuery"
 					:icon="SearchIcon"
 					type="text"
@@ -26,12 +26,10 @@
 					:placeholder="formatMessage(messages.searchAffiliateLinks)"
 					clearable
 				/>
-				<ButtonStyled color="brand">
-					<button @click="createModal?.show">
-						<PlusIcon />
-						{{ formatMessage(messages.createButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" @click="createModal?.show">
+					<PlusIcon />
+					{{ formatMessage(messages.createButton) }}
+				</Button>
 			</div>
 		</div>
 		<Admonition v-if="error" type="critical">
@@ -63,12 +61,12 @@ import {
 	Admonition,
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
-	ButtonStyled,
+	Button,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'

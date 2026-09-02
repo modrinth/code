@@ -9,7 +9,8 @@ import {
 import { Menu } from 'floating-vue'
 import { computed } from 'vue'
 
-import { ButtonStyled, CopyCode } from '#ui/components'
+import { CopyCode } from '#ui/components'
+import { IconButton } from '#ui/components/base/buttons'
 
 import ExternalProjectLicenseStateTag from './ExternalProjectLicenseStateTag.vue'
 import type { ExternalLicenseStatus } from './types.ts'
@@ -42,7 +43,9 @@ async function copyProjectLink() {
 </script>
 
 <template>
-	<div class="bg-surface-3 p-4 rounded-2xl flex flex-col gap-3">
+	<div
+		class="bg-surface-3 p-4 rounded-2xl flex flex-col gap-3 border border-solid border-surface-4"
+	>
 		<div class="flex gap-4 justify-between">
 			<div class="flex flex-col gap-2">
 				<span class="text-contrast font-semibold">{{ title }}</span>
@@ -58,11 +61,16 @@ async function copyProjectLink() {
 						</template>
 						<template v-else> <LinkIcon class="size-5 shrink-0" /> Project link </template>
 					</a>
-					<ButtonStyled circular type="transparent" size="small">
-						<button v-tooltip="'Copy link'" @click="copyProjectLink">
-							<ClipboardCopyIcon />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-tooltip="'Copy link'"
+						class="!size-6"
+						type="quiet"
+						size="xs"
+						:label="'Copy link'"
+						@click="copyProjectLink"
+					>
+						<ClipboardCopyIcon />
+					</IconButton>
 				</div>
 			</div>
 			<slot name="actions" />
@@ -82,7 +90,9 @@ async function copyProjectLink() {
 			<div class="font-medium">Notes:</div>
 			<div>{{ notes ?? 'N/A' }}</div>
 		</div>
-		<div class="bg-surface-2 p-4 rounded-2xl flex flex-col gap-3">
+		<div
+			class="bg-surface-2 p-4 rounded-2xl flex flex-col gap-3 border border-solid border-surface-4"
+		>
 			<span class="text-contrast font-semibold">Files</span>
 			<span v-if="!(files?.length > 0)" class="text-secondary">
 				No files available for external project.

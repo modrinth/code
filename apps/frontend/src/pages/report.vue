@@ -23,21 +23,17 @@
 					})
 				}}
 				<div class="flex gap-2">
-					<ButtonStyled v-if="itemLink">
-						<nuxt-link :to="itemLink">
-							<LeftArrowIcon />
-							{{
-								formatMessage(messages.backToItem, {
-									item: formatReportItemType(formatMessage, reportItem),
-								})
-							}}
-						</nuxt-link>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<nuxt-link :to="`/dashboard/report/${existingReport.id}`">
-							{{ formatMessage(messages.goToReport) }} <RightArrowIcon />
-						</nuxt-link>
-					</ButtonStyled>
+					<ButtonLink v-if="itemLink" :to="itemLink">
+						<LeftArrowIcon />
+						{{
+							formatMessage(messages.backToItem, {
+								item: formatReportItemType(formatMessage, reportItem),
+							})
+						}}
+					</ButtonLink>
+					<ButtonLink type="colored" color="brand" :to="`/dashboard/report/${existingReport.id}`">
+						{{ formatMessage(messages.goToReport) }} <RightArrowIcon />
+					</ButtonLink>
 				</div>
 			</div>
 			<template v-else>
@@ -110,25 +106,15 @@
 				<div class="card-shadow flex flex-col gap-4 rounded-xl bg-bg-raised p-6">
 					<template v-if="!prefilled || !currentItemValid">
 						<div class="flex flex-col gap-2">
-							<span class="text-lg font-bold text-contrast">
+							<span class="text-lg font-semibold text-contrast">
 								{{ formatMessage(messages.whatContentType) }}
 							</span>
-							<RadioButtons
-								v-slot="{ item }"
-								v-model="reportItem"
-								:items="reportItems"
-								@update:model-value="
-									() => {
-										prefilled = false
-										fetchItem()
-									}
-								"
-							>
+							<RadioButtons v-slot="{ item }" v-model="reportItem" :items="reportItems">
 								{{ capitalizeString(item) }}
 							</RadioButtons>
 						</div>
 						<div class="flex flex-col gap-2" :class="{ hidden: !reportItem }">
-							<span class="text-lg font-bold text-contrast">
+							<span class="text-lg font-semibold text-contrast">
 								{{
 									formatMessage(messages.whatContentId, {
 										item: formatReportItemType(formatMessage, reportItem),
@@ -136,20 +122,13 @@
 								}}
 							</span>
 							<div class="flex gap-4">
-								<StyledInput
+								<Input
 									id="report-item-id"
 									v-model="reportItemID"
 									placeholder="ex: Dc7EYhxG"
 									autocomplete="off"
 									:disabled="reportItem === ''"
 									wrapper-class="w-40"
-									@blur="
-										() => {
-											prefilled = false
-											reportItemID = reportItemID.trim()
-											fetchItem()
-										}
-									"
 								/>
 								<div v-if="checkingId || checkedId" class="flex items-center gap-1">
 									<template v-if="checkingId">
@@ -164,11 +143,11 @@
 										<AutoLink
 											:to="itemLink"
 											target="_blank"
-											class="flex items-center gap-1 font-bold text-contrast hover:underline"
+											class="flex items-center gap-1 font-semibold text-contrast hover:underline"
 										>
 											<Avatar
-												v-if="typeof itemIcon === 'string'"
-												:src="itemIcon"
+												v-if="typeof itemIcon === 'string' || !itemIcon"
+												:src="itemIcon ?? null"
 												:alt="itemName"
 												size="24px"
 												:circle="reportItem === 'user'"
@@ -196,15 +175,18 @@
 								item: formatReportItemType(formatMessage, reportItem),
 							})
 						}}
-						<ButtonStyled color="brand">
-							<nuxt-link :to="`/dashboard/report/${existingReport.id}`" class="w-fit">
-								{{ formatMessage(messages.goToReport) }} <RightArrowIcon />
-							</nuxt-link>
-						</ButtonStyled>
+						<ButtonLink
+							type="colored"
+							color="brand"
+							:to="`/dashboard/report/${existingReport.id}`"
+							class="w-fit"
+						>
+							{{ formatMessage(messages.goToReport) }} <RightArrowIcon />
+						</ButtonLink>
 					</template>
 					<template v-else>
 						<div class="flex flex-col gap-2" :class="{ hidden: !reportItemID }">
-							<span class="text-lg font-bold text-contrast">
+							<span class="text-lg font-semibold text-contrast">
 								{{
 									formatMessage(messages.whatReportReason, {
 										item: formatReportItemType(formatMessage, reportItem),
@@ -212,7 +194,7 @@
 								}}
 							</span>
 							<RadioButtons v-slot="{ item }" v-model="reportType" :items="reportTypes">
-								{{ item === 'copyright' ? 'Reuploaded work' : capitalizeString(item) }}
+								{{ formatReportType(formatMessage, item) }}
 							</RadioButtons>
 						</div>
 						<div
@@ -237,7 +219,7 @@
 							</div>
 						</div>
 						<div :class="{ hidden: !reportType }">
-							<span class="text-lg font-bold text-contrast">
+							<span class="text-lg font-semibold text-contrast">
 								{{ formatMessage(messages.reportBodyTitle) }}
 							</span>
 							<p class="m-0 leading-tight text-secondary">
@@ -248,20 +230,21 @@
 							<MarkdownEditor
 								v-model="reportBody"
 								placeholder=""
+								:disabled="disableReporting"
 								:on-image-upload="onImageUpload"
 							/>
 						</div>
 						<div :class="{ hidden: !reportType }">
-							<ButtonStyled color="brand">
-								<button
-									id="submit-button"
-									:disabled="submitLoading || !canSubmit"
-									@click="submitReport"
-								>
-									<SendIcon aria-hidden="true" />
-									{{ formatMessage(messages.submitReport) }}
-								</button>
-							</ButtonStyled>
+							<Button
+								id="submit-button"
+								type="colored"
+								color="brand"
+								:disabled="submitLoading || !canSubmit || disableReporting"
+								@click="submitReport"
+							>
+								<SendIcon aria-hidden="true" />
+								{{ formatMessage(messages.submitReport) }}
+							</Button>
 						</div>
 					</template>
 				</div>
@@ -284,38 +267,40 @@ import {
 	VersionIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import { defineMessage } from '@modrinth/ui'
+import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	AutoLink,
 	Avatar,
-	ButtonStyled,
+	commonMessages,
+	defineMessage,
 	defineMessages,
 	formatReportItemType,
+	formatReportType,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	MarkdownEditor,
 	type MessageDescriptor,
 	RadialHeader,
 	RadioButtons,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'
+import { useDebounceFn } from '@vueuse/core'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
+
+definePageMeta({
+	middleware: 'auth',
+})
 
 const { addNotification } = injectNotificationManager()
 
 const tags = useGeneratedState()
 const route = useNativeRoute()
-const router = useRouter()
 
 const auth = await useAuth()
 const { formatMessage } = useVIntl()
-
-if (!auth.value.user) {
-	router.push('/auth/sign-in?redirect=' + encodeURIComponent(route.fullPath))
-}
 
 const accessQuery = (id: string): string => {
 	return route.query?.[id]?.toString() || ''
@@ -366,54 +351,87 @@ async function fetchExistingReports() {
 	)
 }
 
-async function fetchItem() {
-	if (reportItem.value && reportItemID.value) {
-		checkingId.value = true
-		itemIcon.value = undefined
-		itemName.value = undefined
-		itemLink.value = undefined
-		itemId.value = undefined
-		itemIssueTracker.value = undefined
-		try {
-			if (reportItem.value === 'project') {
-				const project = (await useBaseFetch(`project/${reportItemID.value}`)) as Project
-				currentProject.value = project
+const fetchItemDebounced = useDebounceFn(fetchItem, 500)
 
-				itemIcon.value = project.icon_url
-				itemName.value = project.title
-				itemLink.value = `/project/${project.id}`
-				itemId.value = project.id
-				itemIssueTracker.value = project.issues_url
-			} else if (reportItem.value === 'version') {
-				const version = (await useBaseFetch(`version/${reportItemID.value}`)) as Version
-				currentVersion.value = version
-
-				itemIcon.value = VersionIcon
-				itemName.value = version.version_number
-				itemLink.value = `project/${version.project_id}/version/${version.id}`
-				itemId.value = version.id
-			} else if (reportItem.value === 'user') {
-				const user = (await useBaseFetch(`user/${reportItemID.value}`)) as User
-				currentUser.value = user
-
-				itemIcon.value = user.avatar_url
-				itemName.value = user.username
-				itemLink.value = `/user/${user.username}`
-				itemId.value = user.id
-			}
-		} catch {
-			// Ignored
-		}
-		checkedId.value = true
-		checkingId.value = false
+watch([reportItem, reportItemID], ([type, id], [prevType]) => {
+	prefilled.value = false
+	if (!id.trim() || type !== prevType) {
+		fetchItem()
+	} else {
+		fetchItemDebounced()
 	}
+})
+
+async function fetchItem() {
+	const type = reportItem.value
+	const id = reportItemID.value.trim()
+
+	currentProject.value = null
+	currentVersion.value = null
+	currentUser.value = null
+	itemIcon.value = undefined
+	itemName.value = undefined
+	itemLink.value = undefined
+	itemId.value = undefined
+	itemIssueTracker.value = undefined
+
+	if (!type || !id) {
+		checkedId.value = false
+		checkingId.value = false
+		return
+	}
+
+	checkingId.value = true
+	try {
+		if (type === 'project') {
+			const project = (await useBaseFetch(`project/${id}`)) as Project
+			currentProject.value = project
+			itemIcon.value = project.icon_url
+			itemName.value = project.title
+			itemLink.value = `/project/${project.id}`
+			itemId.value = project.id
+			itemIssueTracker.value = project.issues_url
+		} else if (type === 'version') {
+			const version = (await useBaseFetch(`version/${id}`)) as Version
+			currentVersion.value = version
+			itemIcon.value = VersionIcon
+			itemName.value = version.version_number
+			itemLink.value = `project/${version.project_id}/version/${version.id}`
+			itemId.value = version.id
+		} else if (type === 'user') {
+			const user = (await useBaseFetch(`user/${id}`)) as User
+			currentUser.value = user
+			itemIcon.value = user.avatar_url
+			itemName.value = user.username
+			itemLink.value = `/user/${user.username}`
+			itemId.value = user.id
+		}
+	} catch {
+		// do nothing
+	}
+	checkedId.value = true
+	checkingId.value = false
 }
 
 const reportItems = ['project', 'version', 'user']
-const reportTypes = computed(() => tags.value.reportTypes)
+const dummyProjectReportTypes = ['missing-disclosure', 'ai-images', 'fully-ai-generated'] as const
+const reportTypes = computed(() => {
+	const types = [...tags.value.reportTypes]
+	if (reportItem.value === 'project') {
+		const otherIndex = types.indexOf('other')
+		if (otherIndex === -1) {
+			types.push(...dummyProjectReportTypes)
+		} else {
+			types.splice(otherIndex, 0, ...dummyProjectReportTypes)
+		}
+	}
+	return types
+})
+const disableReporting = computed(() => dummyProjectReportTypes.includes(reportType.value))
 
 const canSubmit = computed(() => {
 	return (
+		!disableReporting.value &&
 		reportItem.value !== '' &&
 		reportItemID.value !== '' &&
 		reportType.value !== '' &&
@@ -480,7 +498,7 @@ const submitReport = async () => {
 
 		if (error instanceof Error) {
 			addNotification({
-				title: 'An error occurred',
+				title: formatMessage(commonMessages.errorNotificationTitle),
 				text: error.message,
 				type: 'error',
 			})
@@ -505,7 +523,7 @@ const submitReport = async () => {
 
 		if (error instanceof Error) {
 			addNotification({
-				title: 'An error occurred',
+				title: formatMessage(commonMessages.errorNotificationTitle),
 				text: error.message,
 				type: 'error',
 			})
@@ -519,33 +537,6 @@ const onImageUpload = async (file: File) => {
 	const item = await useImageUpload(file, { context: 'report' })
 	uploadedImageIDs.value.push(item.id)
 	return item.url
-}
-
-const warnings: Record<string, MessageDescriptor[]> = {
-	copyright: [
-		defineMessage({
-			id: 'report.note.copyright.1',
-			defaultMessage:
-				'Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content.',
-		}),
-		defineMessage({
-			id: 'report.note.copyright.2',
-			defaultMessage:
-				'If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <copyright-policy-link>Copyright Policy</copyright-policy-link>.',
-		}),
-	],
-	malicious: [
-		defineMessage({
-			id: 'report.note.malicious.1',
-			defaultMessage:
-				'Reports for malicious or deceptive content must include substantial evidence of the behavior, such as code samples.',
-		}),
-		defineMessage({
-			id: 'report.note.malicious.2',
-			defaultMessage:
-				'Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted.',
-		}),
-	],
 }
 
 const messages = defineMessages({
@@ -641,7 +632,60 @@ const messages = defineMessages({
 		id: 'report.submit',
 		defaultMessage: 'Submit report',
 	},
+	checkBackLater: {
+		id: 'report.note.check-back-later',
+		defaultMessage:
+			'Check back later once the grace period has ended. Reports of this type are not being accepted at this time.',
+	},
 })
+
+const warnings: Record<string, MessageDescriptor[]> = {
+	copyright: [
+		defineMessage({
+			id: 'report.note.copyright.1',
+			defaultMessage:
+				'Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content.',
+		}),
+		defineMessage({
+			id: 'report.note.copyright.2',
+			defaultMessage:
+				'If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <copyright-policy-link>Copyright Policy</copyright-policy-link>.',
+		}),
+	],
+	malicious: [
+		defineMessage({
+			id: 'report.note.malicious.1',
+			defaultMessage:
+				'Reports for malicious or deceptive content must include substantial evidence of the behavior, such as code samples.',
+		}),
+		defineMessage({
+			id: 'report.note.malicious.2',
+			defaultMessage:
+				'Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted.',
+		}),
+	],
+	'missing-disclosure': [
+		defineMessage({
+			id: 'report.note.missing-disclosure.1',
+			defaultMessage: `Content disclosures are a new feature we've just added. We're giving creators a grace period to get their disclosures up-to-date before we begin accepting reports for missing or incorrect disclosures.`,
+		}),
+		messages.checkBackLater,
+	],
+	'ai-images': [
+		defineMessage({
+			id: 'report.note.ai-images.1',
+			defaultMessage: `We've just updated our rules to prohibit AI-generated images in icons, galleries, and descriptions. We're giving creators a grace period to remove AI images from their projects before we begin accepting reports for them.`,
+		}),
+		messages.checkBackLater,
+	],
+	'fully-ai-generated': [
+		defineMessage({
+			id: 'report.note.fully-ai-generated.1',
+			defaultMessage: `We've just updated our rules to prohibit fully AI-generated projects. We're giving creators a grace period to update or take down fully AI-generated projects before we begin accepting reports for them.`,
+		}),
+		messages.checkBackLater,
+	],
+}
 </script>
 
 <style scoped lang="scss">

@@ -14,46 +14,49 @@
 			@dismiss="ctx.onDismissCrash?.()"
 		/>
 
-		<div class="flex items-center gap-2">
-			<StyledInput
-				v-model="searchQuery"
-				:icon="SearchIcon"
-				placeholder="Search logs"
-				wrapper-class="flex-1"
-				input-class="!h-10"
-				clearable
-			/>
-			<div v-if="ctx.logSources?.value && ctx.activeLogSourceIndex" class="w-[220px]">
-				<Combobox
-					:model-value="ctx.activeLogSourceIndex.value"
-					:options="logSourceOptions"
-					@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
+		<div class="flex flex-col gap-2">
+			<div class="flex items-center gap-2">
+				<Input
+					v-model="searchQuery"
+					:icon="SearchIcon"
+					placeholder="Search logs"
+					wrapper-class="flex-1"
+					size="medium"
+					clearable
+				/>
+				<div v-if="ctx.logSources?.value && ctx.activeLogSourceIndex" class="w-[220px]">
+					<Combobox
+						:model-value="ctx.activeLogSourceIndex.value"
+						:options="logSourceOptions"
+						trigger-size="lg"
+						@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
+					/>
+				</div>
+			</div>
+
+			<div class="flex items-center justify-between">
+				<ConsoleFilterPills
+					v-model="activeFilters"
+					:present-levels="presentLevels"
+					@toggle="handleFilterToggle"
+				/>
+				<ConsoleActionButtons
+					:show-clear="isLiveSource"
+					:has-logs="hasLogs"
+					:share-disabled="resolvedShareDisabled"
+					:sharing="isSharing"
+					:fullscreen="isFullscreen"
+					:clear-disabled="resolvedClearDisabled"
+					:clear-disabled-tooltip="resolvedClearDisabledTooltip"
+					:show-delete="showDelete"
+					:delete-disabled="resolvedDeleteDisabled"
+					:delete-disabled-tooltip="ctx.deleteDisabledTooltip"
+					@clear="handleClear"
+					@share="handleShare"
+					@toggle-fullscreen="toggleFullscreen"
+					@delete="handleDelete"
 				/>
 			</div>
-		</div>
-
-		<div class="flex items-center justify-between">
-			<ConsoleFilterPills
-				v-model="activeFilters"
-				:present-levels="presentLevels"
-				@toggle="handleFilterToggle"
-			/>
-			<ConsoleActionButtons
-				:show-clear="isLiveSource"
-				:has-logs="hasLogs"
-				:share-disabled="resolvedShareDisabled"
-				:sharing="isSharing"
-				:fullscreen="isFullscreen"
-				:clear-disabled="resolvedClearDisabled"
-				:clear-disabled-tooltip="resolvedClearDisabledTooltip"
-				:show-delete="showDelete"
-				:delete-disabled="resolvedDeleteDisabled"
-				:delete-disabled-tooltip="ctx.deleteDisabledTooltip"
-				@clear="handleClear"
-				@share="handleShare"
-				@toggle-fullscreen="toggleFullscreen"
-				@delete="handleDelete"
-			/>
 		</div>
 
 		<BaseTerminal
@@ -79,18 +82,14 @@
 		</div>
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="deleteModal?.hide()">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button :disabled="isDeleting" @click="confirmDelete">
-						<TrashIcon />
-						Delete
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="deleteModal?.hide()">
+					<XIcon />
+					Cancel
+				</Button>
+				<Button type="colored" color="red" :disabled="isDeleting" @click="confirmDelete">
+					<TrashIcon />
+					Delete
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -103,11 +102,11 @@ import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button } from '#ui/components/base/buttons'
 import type { CollapsibleAdmonitionItem } from '#ui/components/base/CollapsibleAdmonition.vue'
 import CollapsibleAdmonition from '#ui/components/base/CollapsibleAdmonition.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
 import { injectModrinthClient } from '#ui/providers'

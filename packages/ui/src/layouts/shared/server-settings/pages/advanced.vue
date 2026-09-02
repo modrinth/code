@@ -1,13 +1,33 @@
 <template>
 	<div class="relative h-full w-full">
+		<ConfirmModal
+			ref="rollSftpModal"
+			:title="formatMessage(messages.rollCredentialsModalTitle)"
+			:description="formatMessage(messages.rollCredentialsModalDescription)"
+			:proceed-label="formatMessage(messages.rollCredentials)"
+			:proceed-icon="RefreshCwIcon"
+			:markdown="false"
+			@proceed="confirmRollSftp"
+		/>
+
 		<div class="flex h-full w-full flex-col gap-4">
 			<div class="flex flex-col gap-6">
 				<!-- SFTP section -->
 				<div class="flex flex-col gap-2">
-					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">
+					<div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
 						<span class="text-lg font-semibold text-contrast">SFTP</span>
-						<ButtonStyled>
-							<a
+						<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+							<Button
+								v-tooltip="sftpRollTooltip"
+								class="!w-full sm:!w-auto"
+								:disabled="!canWriteFiles || isRollingSftp"
+								:loading="isRollingSftp"
+								@click="showRollSftpModal"
+							>
+								<RefreshCwIcon class="h-5 w-5" />
+								{{ formatMessage(messages.rollCredentials) }}
+							</Button>
+							<ButtonLink
 								v-tooltip="sftpActionTooltip"
 								class="!w-full sm:!w-auto"
 								:class="{ 'opacity-60': !canWriteFiles }"
@@ -18,83 +38,72 @@
 							>
 								<ExternalIcon class="h-5 w-5" />
 								Launch SFTP
-							</a>
-						</ButtonStyled>
+							</ButtonLink>
+						</div>
 					</div>
 
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
 						<span class="text-lg font-semibold text-contrast">Server Address</span>
-						<div
+						<Button
 							v-tooltip="sftpCopyTooltip('Copy SFTP server address')"
-							class="copy-field hover:bg-button-bg-hover"
-							:class="{ 'opacity-60': !canWriteFiles }"
+							native-type="button"
+							size="lg"
+							class="w-full !justify-between text-left"
+							:disabled="!canWriteFiles"
 							@click="copyToClipboard('Server address', server?.sftp_host)"
 						>
-							<span class="cursor-pointer font-semibold text-primary">
+							<span class="min-w-0 truncate text-base font-semibold text-primary">
 								{{ server?.sftp_host }}
 							</span>
-							<div class="grid h-10 w-10 place-content-center">
-								<CopyIcon class="h-5 w-5" />
-							</div>
-						</div>
+							<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+						</Button>
 						<div class="flex flex-col gap-2 sm:mt-0 sm:flex-row">
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Username</span>
-								<div
+								<Button
 									v-tooltip="sftpCopyTooltip('Copy SFTP username')"
-									class="copy-field hover:bg-button-bg-hover"
-									:class="{ 'opacity-60': !canWriteFiles }"
+									native-type="button"
+									size="lg"
+									class="w-full !justify-between text-left"
+									:disabled="!canWriteFiles"
 									@click="copyToClipboard('Username', server?.sftp_username)"
 								>
-									<div class="truncate font-semibold">
+									<span class="min-w-0 truncate text-base font-semibold text-primary">
 										{{ server?.sftp_username }}
-									</div>
-									<div class="grid h-10 w-9 place-content-center">
-										<CopyIcon class="h-5 w-5" />
-									</div>
-								</div>
+									</span>
+									<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+								</Button>
 							</div>
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Password</span>
-								<div
-									class="copy-field-has-button [&:hover:not(:has(button:hover))]:bg-button-bg-hover"
-									:class="{ 'opacity-60': !canWriteFiles }"
-									@click="copyToClipboard('Password', server?.sftp_password)"
-								>
-									<div class="flex items-center gap-1.5 h-full w-full">
-										<div
-											v-tooltip="sftpCopyTooltip('Copy SFTP Password')"
-											class="h-full flex justify-between grow items-center"
-										>
-											<div class="truncate font-semibold">
-												{{
-													showPassword
-														? server?.sftp_password
-														: '*'.repeat(server?.sftp_password?.length ?? 0)
-												}}
-											</div>
-											<CopyIcon class="h-5 w-5" />
-										</div>
-
-										<ButtonStyled type="transparent" circular>
-											<button
-												v-tooltip="
-													canWriteFiles
-														? showPassword
-															? 'Hide password'
-															: 'Show password'
-														: permissionDeniedMessage
-												"
-												class="hover:bg-button-bg-hover grid h-10 w-10 place-content-center rounded-lg"
-												:disabled="!canWriteFiles"
-												@click.stop="togglePasswordVisibility"
-											>
-												<!-- look into doing stop propagation here -->
-												<EyeIcon v-if="showPassword" class="h-5 w-5" />
-												<EyeOffIcon v-else class="h-5 w-5" />
-											</button>
-										</ButtonStyled>
-									</div>
+								<div class="flex items-center gap-1.5">
+									<Button
+										v-tooltip="sftpCopyTooltip('Copy SFTP password')"
+										native-type="button"
+										size="lg"
+										class="min-w-0 grow !justify-between text-left"
+										:disabled="!canWriteFiles"
+										@click="copyToClipboard('Password', server?.sftp_password)"
+									>
+										<span class="min-w-0 truncate text-base font-semibold text-primary">
+											{{
+												showPassword
+													? server?.sftp_password
+													: '*'.repeat(server?.sftp_password?.length ?? 0)
+											}}
+										</span>
+										<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+									</Button>
+									<IconButton
+										v-tooltip="passwordVisibilityTooltip"
+										:label="passwordVisibilityTooltip"
+										size="lg"
+										:disabled="!canWriteFiles"
+										@click="togglePasswordVisibility"
+									>
+										<EyeIcon v-if="showPassword" />
+										<EyeOffIcon v-else />
+									</IconButton>
 								</div>
 							</div>
 						</div>
@@ -107,28 +116,27 @@
 						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
 							<span class="text-lg font-semibold text-contrast">Startup command</span>
 						</label>
-						<ButtonStyled v-if="startupCommand !== defaultStartupCommand" type="transparent">
-							<button
-								v-tooltip="advancedActionTooltip"
-								:disabled="
-									isStartupLoading ||
-									startupCommand === defaultStartupCommand ||
-									!canUseAdvancedSettings
-								"
-								class="relative !w-full sm:!w-auto"
-								@click="resetToDefault"
-							>
-								<UpdatedIcon class="h-5 w-5" />
-								Default
-							</button>
-						</ButtonStyled>
+						<Button
+							v-if="startupCommand !== defaultStartupCommand"
+							v-tooltip="advancedActionTooltip"
+							type="quiet"
+							:disabled="
+								isStartupLoading ||
+								startupCommand === defaultStartupCommand ||
+								!canUseAdvancedSettings
+							"
+							class="relative !w-full sm:!w-auto"
+							@click="resetToDefault"
+						>
+							<UpdatedIcon class="h-5 w-5" />
+							Default
+						</Button>
 					</div>
 					<div class="relative">
-						<StyledInput
+						<Textarea
 							id="startup-command-field"
 							v-model="startupCommand"
 							v-tooltip="advancedActionTooltip"
-							multiline
 							resize="vertical"
 							input-class="font-mono field-sizing-content"
 							:disabled="isStartupLoading || !canUseAdvancedSettings"
@@ -157,6 +165,7 @@
 							:options="displayedJavaVersions"
 							:display-value="javaVersionLabel ?? 'Java Version'"
 							:disabled="isStartupLoading || !canUseAdvancedSettings"
+							trigger-type="base"
 						>
 							<template #dropdown-footer>
 								<button
@@ -194,6 +203,7 @@
 							:options="JRE_VENDORS"
 							:display-value="jreVendorLabel ?? 'Runtime'"
 							:disabled="isStartupLoading || !canUseAdvancedSettings"
+							trigger-type="base"
 						/>
 						<div
 							v-if="isStartupLoading"
@@ -219,18 +229,21 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import {
-	CopyIcon,
+	ClipboardCopyIcon,
 	ExternalIcon,
 	EyeIcon,
 	EyeOffIcon,
+	RefreshCwIcon,
 	SpinnerIcon,
 	UpdatedIcon,
 } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { ButtonStyled, Combobox, StyledInput } from '#ui/components'
+import { Combobox, ConfirmModal, Textarea } from '#ui/components'
+import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
 	injectModrinthClient,
@@ -242,10 +255,42 @@ const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const { formatMessage } = useVIntl()
 const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useServerPermissions()
 
-// SFTP state
+const messages = defineMessages({
+	rollCredentials: {
+		id: 'servers.settings.advanced.sftp.roll-credentials',
+		defaultMessage: 'Rotate credentials',
+	},
+	rollCredentialsModalTitle: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-modal-title',
+		defaultMessage: 'Rotate credentials',
+	},
+	rollCredentialsModalDescription: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-modal-description',
+		defaultMessage: 'The previous username and password will stop working.',
+	},
+	rollCredentialsSuccessTitle: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-success-title',
+		defaultMessage: 'SFTP credentials rotated',
+	},
+	rollCredentialsSuccessText: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-success-text',
+		defaultMessage: 'Your SFTP username and password have been regenerated.',
+	},
+	rollCredentialsErrorTitle: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-error-title',
+		defaultMessage: 'Failed to rotate SFTP credentials',
+	},
+	rollCredentialsErrorText: {
+		id: 'servers.settings.advanced.sftp.roll-credentials-error-text',
+		defaultMessage: 'Please try again later.',
+	},
+})
+
 const showPassword = ref(false)
+const rollSftpModal = ref<InstanceType<typeof ConfirmModal>>()
 const sftpUrl = computed(() => `sftp://${server.value?.sftp_username}@${server.value?.sftp_host}`)
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
@@ -255,12 +300,62 @@ const sftpActionTooltip = computed(() =>
 		? 'This button only works with compatible SFTP clients (e.g. WinSCP)'
 		: permissionDeniedMessage.value,
 )
+const sftpRollTooltip = computed(() =>
+	canWriteFiles.value ? undefined : permissionDeniedMessage.value,
+)
 const sftpCopyTooltip = (label: string) =>
 	canWriteFiles.value ? label : permissionDeniedMessage.value
+const passwordVisibilityTooltip = computed(() =>
+	canWriteFiles.value
+		? showPassword.value
+			? 'Hide password'
+			: 'Show password'
+		: permissionDeniedMessage.value,
+)
 
 function handleSftpLaunchClick(event: MouseEvent) {
 	if (canWriteFiles.value) return
 	event.preventDefault()
+}
+
+function applySftpCredentials(credentials: Archon.Servers.v1.SftpCredentials) {
+	queryClient.setQueryData<Archon.Servers.v0.Server>(['servers', 'detail', serverId], (current) =>
+		current ? { ...current, ...credentials } : current,
+	)
+	queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
+		['servers', 'v1', 'detail', serverId],
+		(current) => (current ? { ...current, ...credentials } : current),
+	)
+}
+
+const { mutate: rollSftpMutation, isPending: isRollingSftp } = useMutation({
+	mutationFn: () => client.archon.servers_v1.rollSftp(serverId),
+	onSuccess: (credentials) => {
+		applySftpCredentials(credentials)
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.rollCredentialsSuccessTitle),
+			text: formatMessage(messages.rollCredentialsSuccessText),
+		})
+	},
+	onError: (error) => {
+		console.error(error)
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.rollCredentialsErrorTitle),
+			text: formatMessage(messages.rollCredentialsErrorText),
+		})
+	},
+})
+
+function showRollSftpModal() {
+	if (!canWriteFiles.value || isRollingSftp.value) return
+	rollSftpModal.value?.show()
+}
+
+function confirmRollSftp() {
+	if (!canWriteFiles.value) return
+	rollSftpMutation()
 }
 
 const copyToClipboard = (name: string, textToCopy?: string) => {
@@ -272,6 +367,11 @@ const copyToClipboard = (name: string, textToCopy?: string) => {
 	})
 }
 
+function togglePasswordVisibility() {
+	if (!canWriteFiles.value) return
+	showPassword.value = !showPassword.value
+}
+
 // Startup state
 const startupQueryKey = computed(() => ['servers', 'startup', 'v1', serverId, worldId.value])
 
@@ -280,11 +380,6 @@ const { data: startupData, isLoading: isStartupLoading } = useQuery({
 	queryFn: () => client.archon.options_v1.getStartup(serverId, worldId.value!),
 	enabled: computed(() => worldId.value !== null),
 })
-
-function togglePasswordVisibility() {
-	if (!canWriteFiles.value) return
-	showPassword.value = !showPassword.value
-}
 
 const JAVA_VERSIONS = [
 	{ value: 8, label: 'Java 8' },
@@ -427,15 +522,3 @@ function resetToDefault() {
 	startupCommand.value = defaultStartupCommand.value
 }
 </script>
-
-<style scoped>
-.copy-field {
-	@apply flex h-10 cursor-pointer items-center justify-between gap-2 rounded-lg bg-button-bg px-3 pr-1.5 transition-all;
-	@apply hover:brightness-125 active:scale-95;
-}
-
-.copy-field-has-button {
-	@apply flex h-10 cursor-pointer items-center justify-between gap-2 rounded-lg bg-button-bg px-3 pr-1.5 transition-all;
-	@apply [&:hover:not(:has(button:hover))]:brightness-125 [&:active:not(:has(button:active))]:scale-95;
-}
-</style>

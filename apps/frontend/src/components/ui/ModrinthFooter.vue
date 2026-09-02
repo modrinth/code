@@ -2,14 +2,15 @@
 import {
 	BlueskyIcon,
 	DiscordIcon,
-	GithubIcon,
 	MastodonIcon,
+	RedditIcon,
 	ToggleRightIcon,
 	TwitterIcon,
+	YouTubeIcon,
 } from '@modrinth/assets'
+import { Button, ButtonLink } from '@modrinth/ui'
 import {
 	AutoLink,
-	ButtonStyled,
 	defineMessage,
 	defineMessages,
 	injectNotificationManager,
@@ -39,6 +40,30 @@ const messages = defineMessages({
 		id: 'layout.footer.legal-disclaimer',
 		defaultMessage:
 			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
+	},
+	basedOnLabel: {
+		id: 'layout.footer.based-on-label',
+		defaultMessage: 'Based on',
+	},
+	unknownCommit: {
+		id: 'layout.footer.unknown-commit',
+		defaultMessage: 'unknown',
+	},
+	developerModeActivatedTitle: {
+		id: 'layout.footer.developer-mode-activated.title',
+		defaultMessage: 'Developer mode activated',
+	},
+	developerModeActivatedText: {
+		id: 'layout.footer.developer-mode-activated.text',
+		defaultMessage: 'Developer mode has been enabled',
+	},
+	developerModeDeactivatedTitle: {
+		id: 'layout.footer.developer-mode-deactivated.title',
+		defaultMessage: 'Developer mode deactivated',
+	},
+	developerModeDeactivatedText: {
+		id: 'layout.footer.developer-mode-deactivated.text',
+		defaultMessage: 'Developer mode has been disabled',
 	},
 })
 
@@ -70,9 +95,14 @@ const socialLinks: {
 		icon: TwitterIcon,
 	},
 	{
-		label: defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
-		href: 'https://github.com/modrinth',
-		icon: GithubIcon,
+		label: defineMessage({ id: 'layout.footer.social.youtube', defaultMessage: 'YouTube' }),
+		href: 'https://www.youtube.com/@modrinth',
+		icon: YouTubeIcon,
+	},
+	{
+		label: defineMessage({ id: 'layout.footer.social.reddit', defaultMessage: 'Reddit' }),
+		href: 'https://www.reddit.com/r/Modrinth',
+		icon: RedditIcon,
 	},
 ]
 
@@ -215,14 +245,14 @@ function developerModeIncrement() {
 		saveFeatureFlags()
 		if (flags.value.developerMode) {
 			addNotification({
-				title: 'Developer mode activated',
-				text: 'Developer mode has been enabled',
+				title: formatMessage(messages.developerModeActivatedTitle),
+				text: formatMessage(messages.developerModeActivatedText),
 				type: 'success',
 			})
 		} else {
 			addNotification({
-				title: 'Developer mode deactivated',
-				text: 'Developer mode has been disabled',
+				title: formatMessage(messages.developerModeDeactivatedTitle),
+				text: formatMessage(messages.developerModeDeactivatedText),
 				type: 'success',
 			})
 		}
@@ -242,36 +272,41 @@ function developerModeIncrement() {
 					:aria-label="formatMessage(messages.modrinthInformation)"
 				>
 					<div class="flex items-center gap-2">
-						<TextLogo
-							aria-hidden="true"
-							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+						<Button
+							type="quiet"
+							interaction="none"
+							aria-label="Modrinth"
+							class="!h-auto !p-0"
 							@click="developerModeIncrement()"
-						/>
-						<ButtonStyled v-if="flags.developerMode" circular type="transparent" color="brand">
-							<nuxt-link
-								v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
-								to="/settings/flags"
-							>
-								<ToggleRightIcon />
-							</nuxt-link>
-						</ButtonStyled>
+						>
+							<span class="inline-flex">
+								<TextLogo aria-hidden="true" class="text-logo h-6 w-auto text-contrast lg:h-8" />
+							</span>
+						</Button>
+						<ButtonLink
+							v-if="flags.developerMode"
+							v-tooltip="formatMessage(commonSettingsMessages.featureFlags)"
+							type="quiet"
+							color="brand"
+							to="/settings/flags"
+							class="!w-9 !rounded-full !px-0"
+						>
+							<ToggleRightIcon />
+						</ButtonLink>
 					</div>
 					<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
-						<ButtonStyled
+						<ButtonLink
 							v-for="(social, index) in socialLinks"
 							:key="`footer-social-${index}`"
-							circular
-							type="transparent"
+							v-tooltip="formatMessage(social.label)"
+							type="quiet"
+							:href="social.href"
+							target="_blank"
+							:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
+							class="!w-9 !rounded-full !px-0"
 						>
-							<a
-								v-tooltip="formatMessage(social.label)"
-								:href="social.href"
-								target="_blank"
-								:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-							>
-								<component :is="social.icon" class="h-5 w-5" />
-							</a>
-						</ButtonStyled>
+							<component :is="social.icon" class="h-5 w-5" />
+						</ButtonLink>
 					</div>
 					<div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
 						<p class="m-0">
@@ -320,7 +355,7 @@ function developerModeIncrement() {
 				</div>
 			</div>
 			<p v-if="flags.developerMode" class="m-0 text-sm text-secondary">
-				Based on
+				{{ formatMessage(messages.basedOnLabel) }}
 				<a
 					v-if="config.public.owner && config.public.branch"
 					class="hover:underline"
@@ -330,7 +365,9 @@ function developerModeIncrement() {
 					{{ config.public.owner }}/{{ config.public.branch }}
 				</a>
 				@
-				<span v-if="config.public.hash === 'unknown'">unknown</span>
+				<span v-if="config.public.hash === 'unknown'">{{
+					formatMessage(messages.unknownCommit)
+				}}</span>
 				<AutoLink
 					v-else
 					class="text-link"

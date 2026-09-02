@@ -5,77 +5,76 @@
 			:game-versions="gameVersions"
 			:versions="versions"
 			:project="project"
-			:version-link="(version) => `/project/${project.id}/version/${version.id}`"
+			:show-environment-column="appSettings.featureFlags.show_version_environment_column"
+			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
 			<template #actions="{ version }">
-				<ButtonStyled circular type="transparent">
-					<button
-						v-tooltip="`Install`"
-						:class="{
-							'group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted':
-								!installed || version.id !== installedVersion,
-						}"
-						:disabled="installing || (installed && version.id === installedVersion)"
-						@click.stop="() => install(version.id)"
-					>
-						<DownloadIcon v-if="!installed" />
-						<SwapIcon v-else-if="installed && version.id !== installedVersion" />
-						<CheckIcon v-else />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						v-if="false"
-						class="group-hover:!bg-button-bg"
-						:options="[
-							{
-								id: 'install-elsewhere',
-								action: () => {},
-								shown: false && !!instance,
-								color: 'primary',
-								hoverFilled: true,
-							},
-							{
-								id: 'open-in-browser',
-								link: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
-							},
-						]"
-						aria-label="More options"
-					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #install-elsewhere>
-							<DownloadIcon aria-hidden="true" />
-							Add to another instance
-						</template>
-						<template #open-in-browser> <ExternalIcon /> Open in browser </template>
-					</OverflowMenu>
-					<a
-						v-else
-						v-tooltip="`Open in browser`"
-						class="group-hover:!bg-button-bg"
-						:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
-						target="_blank"
-					>
-						<ExternalIcon />
-					</a>
-				</ButtonStyled>
+				<IconButton
+					v-tooltip="
+						!installed
+							? formatMessage(commonMessages.installButton)
+							: version.id !== installedVersion
+								? formatMessage(commonMessages.switchToVersionButton)
+								: formatMessage(messages.alreadyInstalled)
+					"
+					type="quiet"
+					:color="installed && version.id === installedVersion ? undefined : 'green'"
+					:label="
+						!installed
+							? formatMessage(commonMessages.installButton)
+							: version.id !== installedVersion
+								? formatMessage(commonMessages.switchToVersionButton)
+								: formatMessage(messages.alreadyInstalled)
+					"
+					:disabled="installing || (installed && version.id === installedVersion)"
+					@click.stop="() => install(version.id)"
+				>
+					<DownloadIcon v-if="!installed" />
+					<SwapIcon v-else-if="installed && version.id !== installedVersion" />
+					<CheckIcon v-else />
+				</IconButton>
+				<ButtonLink
+					v-tooltip="formatMessage(commonMessages.openInBrowserButton)"
+					type="quiet"
+					:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
+					target="_blank"
+					:aria-label="formatMessage(commonMessages.openInBrowserButton)"
+					class="!w-9 !px-0 !rounded-full"
+				>
+					<ExternalIcon />
+				</ButtonLink>
 			</template>
 		</ProjectPageVersions>
 	</div>
 </template>
 
 <script setup>
-import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, ExternalIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	ButtonLink,
+	commonMessages,
+	defineMessages,
+	IconButton,
 	injectNotificationManager,
-	OverflowMenu,
 	ProjectPageVersions,
+	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
+
+const { formatMessage } = useVIntl()
+const appSettings = useAppSettings()
+
+const messages = defineMessages({
+	alreadyInstalled: {
+		id: 'app.project.versions.already-installed',
+		defaultMessage: 'Already installed',
+	},
+})
 
 defineProps({
 	project: {
@@ -109,6 +108,20 @@ defineProps({
 })
 
 const { handleError } = injectNotificationManager()
+const route = useRoute()
+
+function buildProjectHref(path) {
+	const params = new URLSearchParams()
+	for (const [key, val] of Object.entries(route.query)) {
+		if (Array.isArray(val)) {
+			for (const v of val) params.append(key, v)
+		} else if (val) {
+			params.append(key, String(val))
+		}
+	}
+	const qs = params.toString()
+	return qs ? `${path}?${qs}` : path
+}
 
 const [loaders, gameVersions] = await Promise.all([
 	get_loaders().catch(handleError).then(ref),

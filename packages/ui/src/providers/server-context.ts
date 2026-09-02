@@ -2,6 +2,10 @@ import type { Archon, UploadState } from '@modrinth/api-client'
 import type { ComputedRef, Ref } from 'vue'
 
 import type { MessageDescriptor } from '#ui/composables/i18n'
+import type {
+	ServerInstallationKey,
+	ServerInstallationState,
+} from '#ui/composables/server-installation-tracker'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 
 import { createContext } from '.'
@@ -49,9 +53,11 @@ export interface ModrinthServerContext {
 	readonly isServerRunning: ComputedRef<boolean>
 	readonly stats: Ref<ServerStats>
 	readonly uptimeSeconds: Ref<number>
-
-	// Content sync state
-	readonly isSyncingContent: Ref<boolean>
+	readonly installProgressItems: Ref<Archon.Websocket.v0.InstallProgressItem[]>
+	readonly installation: ComputedRef<ServerInstallationState | null>
+	beginInstallation: (key: ServerInstallationKey) => void
+	cancelOptimisticInstallation: () => void
+	dismissInstallation: (id: string) => void
 
 	// Busy state — when non-empty, all write operations should be disabled
 	readonly busyReasons: ComputedRef<BusyReason[]>
@@ -69,6 +75,7 @@ export interface ModrinthServerContext {
 	// File operations (extract, move, etc.)
 	readonly activeOperations: ComputedRef<FileOperation[]>
 	dismissOperation: (opId: string, action: 'dismiss' | 'cancel') => Promise<void>
+	upsertLocalFileOperation?: (operation: FileOperation) => void
 }
 
 export const [injectModrinthServerContext, provideModrinthServerContext] =

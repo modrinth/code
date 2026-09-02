@@ -154,11 +154,13 @@ export class LabrinthStateModule extends AbstractModule {
 			homePageSearch,
 			homePageNotifs,
 			products,
-			muralBankDetails: muralBankDetails?.bankDetails,
+			// Always emit a value: `undefined` is dropped by JSON.stringify, and consumers
+			// import these keys by name from the generated state.
+			muralBankDetails: muralBankDetails?.bankDetails ?? {},
 			tremendousIdMap,
 			countries: iso3166Data.countries,
 			subdivisions: iso3166Data.subdivisions,
-			taxComplianceThresholds: globals?.tax_compliance_thresholds,
+			taxComplianceThresholds: globals?.tax_compliance_thresholds ?? {},
 			errors,
 		}
 	}

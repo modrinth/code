@@ -2,7 +2,6 @@ use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::VersionField;
-use crate::database::redis::RedisPool;
 use crate::models::pack::PackFormat;
 use crate::models::projects::{FileType, Loader};
 use crate::validate::datapack::DataPackValidator;
@@ -24,6 +23,7 @@ use std::io::{self, Cursor};
 use std::mem;
 use std::sync::LazyLock;
 use thiserror::Error;
+use xredis::RedisPool;
 use zip::ZipArchive;
 use zip::result::ZipError;
 
@@ -326,9 +326,10 @@ fn game_version_supported(
     }
 }
 
-pub fn filter_out_packs(
-    archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
-) -> Result<ValidationResult, ValidationError> {
+#[must_use]
+pub fn validate_pack_formats(
+    archive: &mut ZipArchive<Cursor<Bytes>>,
+) -> ValidationResult {
     if (archive.by_name("modlist.html").is_ok()
         && archive.by_name("manifest.json").is_ok())
         || archive
@@ -338,10 +339,10 @@ pub fn filter_out_packs(
             .file_names()
             .any(|x| x.starts_with("override/mods/") && x.ends_with(".jar"))
     {
-        return Ok(ValidationResult::Warning(
-            "Invalid modpack file. You must upload a valid .MRPACK file.",
-        ));
+        return ValidationResult::Warning(
+            "Invalid modpack file. Modpacks must be uploaded in the .mrpack format, not as a ZIP file.",
+        );
     }
 
-    Ok(ValidationResult::Pass)
+    ValidationResult::Pass
 }

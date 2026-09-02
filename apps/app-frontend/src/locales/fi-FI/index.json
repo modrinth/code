@@ -2,11 +2,41 @@
   "app.action-bar.downloading-java": {
     "message": "Ladataan Java-versiota {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Ladataan päivitystä"
+  },
   "app.action-bar.downloads": {
     "message": "Lataukset"
   },
   "app.action-bar.hide-more-running-instances": {
     "message": "Piilota enemmän käynnissä olevia instansseja"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Hylkää"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Avaa instanssi"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Yritä uudelleen"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Peruutettu"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Ei voitu ladata tiedostoja"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Ladattu tiedosto on vioittunut"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Ei voitu tallentaa tiedostoja"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Tuntematon instanssi"
+  },
+  "app.action-bar.installs": {
+    "message": "Asennukset"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Aseta ensisijaiseksi instanssiksi"
@@ -20,11 +50,17 @@
   "app.action-bar.primary-instance": {
     "message": "Ensisijainen instanssi"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Lataa uudelleen päivittääksesi"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Näytä enemmän käynnissä olevia instansseja"
   },
   "app.action-bar.stop-instance": {
     "message": "Pysäytä instanssi"
+  },
+  "app.action-bar.update": {
+    "message": "Päivitä"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Näytä aktiiviset lataukset"
@@ -35,65 +71,20 @@
   "app.action-bar.view-logs": {
     "message": "Katso lokeja"
   },
-  "app.appearance-settings.advanced-rendering.description": {
-    "message": "Mahdollistaa edistyneen renderöinnin, kuten sumennus efektit, jotka voivat aiheuttaa suorituskykyongelmia ilman laitteistokiihdytettyä renderöintiä."
-  },
-  "app.appearance-settings.advanced-rendering.title": {
-    "message": "Edistynyt renderointi"
-  },
-  "app.appearance-settings.color-theme.description": {
-    "message": "Valitse haluamasi väriteema Modrinth Appille."
-  },
-  "app.appearance-settings.color-theme.title": {
-    "message": "Väriteema"
-  },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Muuta sivua mille laukaisin avautuu."
-  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Koti"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Kirjasto"
   },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Oletus laskeutumissivu"
-  },
-  "app.appearance-settings.hide-nametag.description": {
-    "message": "Kytkee pois päältä nimikyltin pelaajasi päällä skinit sivulla."
-  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Piilota nimikyltti"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Sisällyttää viimeaikaiset maailmat \"Hyppää takaisin sisään\" osiossa Koti sivulla."
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Näyttää peliaika"
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Hyppää takaisin sisään maailmoihin"
-  },
-  "app.appearance-settings.minimize-launcher.description": {
-    "message": "Pienennä laukaisin kun Minecraft prosessi käynnistyy."
-  },
-  "app.appearance-settings.minimize-launcher.title": {
-    "message": "Piilota käynnistysohjelma"
-  },
-  "app.appearance-settings.native-decorations.description": {
-    "message": "Käytä järjestelmän ikkuna kehystä (Vaatii sovelluksen uudelleen käynnistämisen)."
-  },
-  "app.appearance-settings.native-decorations.title": {
-    "message": "Natiivit koristukset"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Valitse vaihtoehto"
-  },
-  "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Laittaa päälle mahdollisuuden kytkeä sivupalkkia."
-  },
-  "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Kytke sivupalkki"
-  },
-  "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Jos yrität asentaa Modrinth-pakettitiedoston (.mrpack), jota ei ole isännöity Modrinthissä, varmistamme, että ymmärrät riskit ennen asennusta."
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Ohita ei olennaiset varoitukset"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Varoita minua ennen tuntemattomien modipakettien asentamista"
@@ -125,29 +116,17 @@
   "app.browse.back-to-instance": {
     "message": "Takaisin instanssiin"
   },
-  "app.browse.discover-content": {
-    "message": "Löydä sisältöä"
-  },
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"
-  },
-  "app.browse.hide-added-servers": {
-    "message": "Piilota lisätyt palvelimet"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modipaketit"
   },
-  "app.browse.server-instance-content-warning": {
-    "message": "Sisällön lisääminen voi rikkoa yhteensopivuuden palvelimelle liittyessä. Kaikki lisätty sisältö katoaa myös kun päivität palvelin instanssin sisällön."
-  },
   "app.browse.server.installing": {
     "message": "Asennetaan"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Asennetaan modipakettia..."
+  "app.content-install.no-compatible-versions": {
+    "message": "Yhtään versiota ei ole saatavilla yhteensopivuudella {compatibilityLabel}. Valitse asennettava versio siitä huolimatta. Riippuvuuksia ei asenneta automaattisesti."
   },
   "app.export-modal.description-placeholder": {
     "message": "Lisää modipaketin kuvaus..."
@@ -158,23 +137,65 @@
   "app.export-modal.header": {
     "message": "Vie modipaketti"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Sisällytä \"{file}\"?"
-  },
-  "app.export-modal.modpack-name-label": {
-    "message": "Modipaketin nimi"
-  },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modipaketin nimi"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Muuta mitkä tiedostot sisältyvät tähän vientiin"
   },
   "app.export-modal.version-number-label": {
     "message": "Versio numero"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Ladataan sisältöä"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Ladataan Minecraftia"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Ladataan paketti tiedostoja"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Puretaan ohituksia"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Viimeistellään"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Valmistellaan Javaa"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Ladataan Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Puretaan Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Haetaan Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Valmistellaan Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Tarkistetaan Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Luetaan paketin manifestia"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Ratkaistaan lataajaa"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Ratkaistaan Minecraftia"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Ratkaistaan sisältöä"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Palautetaan muutoksia"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Suoritetaan lataajan käsittelijöitä"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Kaikki sinun instanssisi data poistetaan pysyvästi, sisältäen maailmasi, konfiguraatiosi ja asennetun sisällön."
@@ -200,6 +221,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instanssi"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Ladataan {current, number}/{total, number} projekteja..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Viimeistellään päivitystä..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Selvitetään versioita..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekti"
   },
@@ -218,17 +248,26 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Onnistuneesti ladattu"
   },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Kaikki laitteeseen jo asennetut kopiot säilyvät laitteessa"
+  },
   "app.instance.worlds.add-server": {
     "message": "Lisää palvelin"
   },
   "app.instance.worlds.browse-servers": {
     "message": "Selaa palvelimia"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' tullaan **poistamaan pysyvästi**, eikä tule olemaan mitään tapaa palauttaa sitä."
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Poista maailma"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Oletko varma että haluat pysyvästi poistaa tämän maailman?"
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Poista maailma"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Tämä maailma poistetaan pysyvästi tästä instanssista. Tätä toimintoa ei voi kumota."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Poistetaan {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Modattu"
@@ -248,26 +287,26 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Ei palvelimia tai maailmoja lisättynä"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' tullaan poistamaan sinun listaltasi, mukaan lukien pelin sisällä, eikä tule olemaan mitään tapaa palauttaa sitä."
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Poista palvelin"
   },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) tullaan poistamaan sinun listaltasi, mukaan lukien pelin sisällä, eikä tule olemaan mitään tapaa palauttaa sitä."
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Poista palvelin"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Oletko varma että haluat poistaa {name}?"
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Tämä palvelin poistetaan palvelinluettelostasi ja pelin sisäisestä palvelinluettelosta. Voit lisätä sen myöhemmin uudelleen, jos tiedät osoitteen."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Poistetaan {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hae {count} maailmasta..."
   },
-  "app.instance.worlds.this-server": {
-    "message": "tämän palvelimen"
-  },
-  "app.modal.install-to-play.content-required": {
-    "message": "Sisältö vaaditaan"
-  },
   "app.modal.install-to-play.header": {
     "message": "Asenna pelataksesi"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Asenna silti"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Asenna"
@@ -275,17 +314,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# modia}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Vaadittu modipaketti"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Tämä palvelin vaatii modeja toimiakseen. Klikkaa Asenna ladataksesi vaaditut tiedostot Modrinthista, ja käynnistä peli suoraan palvelimelle."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Jaettu instanssi"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Jaettu palvelininstanssi"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Tarkastele sisältöä"
@@ -293,20 +323,17 @@
   "app.modal.update-to-play.header": {
     "message": "Päivitä pelataksesi"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Päivitys vaaditaan"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Pävitys vaaditaan pelataksesi {name}. Päivitä viimeisimpään versioon pelataksesi."
-  },
   "app.project.install-button.already-installed": {
     "message": "Tämä projekti on jo asennettu"
   },
   "app.project.install-context.back-to-browse": {
     "message": "Takaisin sisällön löytöön"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Asenna sisältöä instanssiin"
+  "app.project.version.installing": {
+    "message": "Asennetaan"
+  },
+  "app.project.versions.already-installed": {
+    "message": "On jo asennettu"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Kehittäjätila käytössä."
@@ -316,9 +343,6 @@
   },
   "app.settings.tabs.appearance": {
     "message": "Ulkonäkö"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Oletusinstanssin asetukset"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java asennukset"
@@ -331,6 +355,147 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resurssien hallinta"
+  },
+  "app.skins.add-button": {
+    "message": "Lisää ulkoasu"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Raahaa ja pudota"
+  },
+  "app.skins.apply-button": {
+    "message": "Käytä"
+  },
+  "app.skins.delete-button": {
+    "message": "Poista ulkoasu"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "Tämä poistaa valitun skinin pysyvästi. Tätä toimintoa ei voi kumota."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Haluatko varmasti poistaa ulkoasun?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Tiedoston lukeminen epäonnistui."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Virhe prosessoidessa tiedostoa"
+  },
+  "app.skins.edit-button": {
+    "message": "Muokkaa ulkoasua"
+  },
+  "app.skins.modal.add-skin-button": {
+    "message": "Lisää ulkoasu"
+  },
+  "app.skins.modal.add-title": {
+    "message": "Lisätään ulkoasua"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Käsien tyyli"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Ohut"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Paksu"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "Viitta"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "Viitta"
+  },
+  "app.skins.modal.edit-title": {
+    "message": "Muokataan ulkoasua"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Tee muokkaus ulkoasuun ensin!"
+  },
+  "app.skins.modal.no-cape-tooltip": {
+    "message": "Ei viittaa"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "Ei mitään"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Korvaa tekstuuri"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "Tallenna ulkoasu"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "Tallennetaan..."
+  },
+  "app.skins.modal.texture-section": {
+    "message": "Tekstuuri"
+  },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Lataa ulkoasu ensin!"
+  },
+  "app.skins.preview.edit-button": {
+    "message": "Muokkaa ulkoasua"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Esikatsellaan"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Vaihdat ulkoasua liian usein. Mojangin palvelimet ovat estäneet uudet pyynnöt väliaikaisesti. Yritä hetken kuluttua uudelleen."
+  },
+  "app.skins.rate-limit.title": {
+    "message": "Hidasta vähän!"
+  },
+  "app.skins.reorder-error.text": {
+    "message": "Ulkoasujen järjestystä ei voitu tallentaa."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Skinien järjestyksen muuttaminen epäonnistui"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
+  "app.skins.section.default-skins": {
+    "message": "Oletus ulkoasut"
+  },
+  "app.skins.section.minecon-earth-2017": {
+    "message": "MINECON Earth 2017"
+  },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Pride"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Sait nämä skinit lahjoittamalla Modrinthin Pride-keräykseen Pride-kuukauden aikana."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Sekasorron ratsut"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Tallennetut ulkoasut"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Pienten vallankumous"
+  },
+  "app.skins.title": {
+    "message": "Skinivalinta"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Poista käytöstä"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Ota käyttöön"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App versio {version} on ladattu. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
@@ -351,7 +516,7 @@
     "message": "Lataus valmis"
   },
   "app.update-popup.reload": {
-    "message": "Lataa uudelleen"
+    "message": "Lataa uudelleen päivittääksesi"
   },
   "app.update-popup.title": {
     "message": "Päivitys saatavilla"
@@ -376,9 +541,6 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline-tilassa"
-  },
-  "app.world.world-item.players-online": {
-    "message": "{count} paikalla"
   },
   "friends.action.add-friend": {
     "message": "Lisää ystävä"
@@ -442,6 +604,9 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Kirjaudu Modrinth-tilille</link> lisätäksesi ystäviä ja nähdäksesi mitä he pelaavat!"
+  },
+  "instance.action.create-shortcut": {
+    "message": "Luo pikakuvake"
   },
   "instance.add-server.add-and-play": {
     "message": "Lisää ja pelaa"
@@ -536,26 +701,32 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Valitse kuvake"
   },
-  "instance.settings.tabs.general.library-groups": {
-    "message": "Kirjaston ryhmät"
-  },
-  "instance.settings.tabs.general.library-groups.create": {
-    "message": "Luo uusi ryhmä"
-  },
-  "instance.settings.tabs.general.library-groups.description": {
-    "message": "Kirjaston ryhmät sallivat sinun järjestää instanssisi eri osioihin kirjastossasi."
-  },
-  "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Syötä ryhmän nimi"
-  },
   "instance.settings.tabs.general.name": {
     "message": "Nimi"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Aloitustoiminnot"
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Päivitys kanava"
   },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Mukautetut aloitustoiminnot"
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release-, beta- ja alpha-versiot näytetään saatavilla olevina päivityksinä."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release- ja beta-versiot näytetään saatavilla olevina päivityksinä."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Julkaisu"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Vain release-versiot näytetään saatavilla olevina päivityksinä."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Valitse päivitys kanava"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Koukut antavat edistyneiden käyttäjien suorittaa tiettyjä järjestelmä komentoja pelin käynnistystä ennen ja sen jälkeen."
@@ -595,9 +766,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} versio"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java ja muisti"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Mukautetut ympäristö muuttujat"
@@ -674,6 +842,9 @@
   "instance.worlds.copy_address": {
     "message": "Kopioi osoite"
   },
+  "instance.worlds.create_shortcut": {
+    "message": "Luo pikakuvake"
+  },
   "instance.worlds.dont_show_on_home": {
     "message": "Älä näytä koti näkymässä"
   },
@@ -737,37 +908,7 @@
   "search.filter.locked.instance.sync": {
     "message": "Synkronoi instanssin kanssa"
   },
-  "search.filter.locked.server": {
-    "message": "Palvelimen tarjoama"
-  },
   "search.filter.locked.server-environment.title": {
     "message": "Voit lisätä vain paikallisia modeja palvelin instanssiin"
-  },
-  "search.filter.locked.server-game-version.title": {
-    "message": "Peliversio on palvelimen tarjoama"
-  },
-  "search.filter.locked.server-loader.title": {
-    "message": "Modialusta on palvelimen tarjoama"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Tiedosto tarkistetaan vain jos se on ladattu Modrinthiin, riippumatta tiedoston muodosta (mukaanlukien .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Älä näytä tätä varoitusta uudestaan"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Vahvista asennus"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Asenna jokatapauksessa"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Haittaohjelmia levitetään usein modipaketti tiedostojen kautta jakamalla niitä alustoilla kuten Discordissa."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Emme löytäneet tätä tiedostoa Modrinthista. Suosittelemme vahvasti että asennat tiedostoja vain lähteistä joihin luotat."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Tuntematon tiedosto varoitus"
   }
 }

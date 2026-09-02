@@ -2,24 +2,25 @@
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	SpinnerIcon,
 	TrashExclamationIcon,
 	TrashIcon,
 	TriangleAlertIcon,
+	UploadIcon,
 } from '@modrinth/assets'
 import { useMagicKeys } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
+import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
-import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
+import ProgressSpinner from '#ui/components/base/ProgressSpinner.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -30,6 +31,7 @@ import type {
 	ContentCardProject,
 	ContentCardVersion,
 	ContentOwner,
+	ContentSource,
 } from '../types'
 
 const { formatMessage } = useVIntl()
@@ -39,6 +41,14 @@ const messages = defineMessages({
 		id: 'content.card.select-project',
 		defaultMessage: 'Select {project}',
 	},
+	uploaded: {
+		id: 'content.card.uploaded',
+		defaultMessage: 'Uploaded',
+	},
+	frozen: {
+		id: 'content.card.frozen',
+		defaultMessage: 'This project is locked to its current version until unfrozen.',
+	},
 })
 
 interface Props {
@@ -47,20 +57,26 @@ interface Props {
 	version?: ContentCardVersion
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
+	source?: ContentSource
+	external?: boolean
 	enabled?: boolean
+	locked?: boolean
 	installing?: boolean
+	installProgress?: number | null
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
 	hideSwitchVersion?: boolean
-	overflowOptions?: OverflowMenuOption[]
+	overflowOptions?: ButtonMenuOption[]
 	disabled?: boolean
 	disabledTooltip?: string | null
 	toggleDisabled?: boolean
 	toggleDisabledTooltip?: string | null
+	hideToggle?: boolean
 	showCheckbox?: boolean
 	hideDelete?: boolean
 	hideActions?: boolean
+	inline?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -68,8 +84,12 @@ const props = withDefaults(defineProps<Props>(), {
 	version: undefined,
 	versionLink: undefined,
 	owner: undefined,
+	source: undefined,
+	external: false,
 	enabled: undefined,
+	locked: false,
 	installing: false,
+	installProgress: undefined,
 	hasUpdate: false,
 	isClientOnly: false,
 	clientWarning: null,
@@ -79,15 +99,18 @@ const props = withDefaults(defineProps<Props>(), {
 	disabledTooltip: undefined,
 	toggleDisabled: false,
 	toggleDisabledTooltip: undefined,
+	hideToggle: false,
 	showCheckbox: false,
 	hideDelete: false,
 	hideActions: false,
+	inline: false,
 })
 
 const selected = defineModel<boolean>('selected')
 
 const emit = defineEmits<{
 	'update:enabled': [value: boolean]
+	select: [value: boolean, event?: MouseEvent]
 	delete: [event: MouseEvent]
 	update: []
 	switchVersion: []
@@ -119,13 +142,20 @@ const clientWarningMessage = computed(() => {
 
 const { shift: shiftHeld } = useMagicKeys()
 const deleteHovered = ref(false)
+const installTooltip = computed(() => {
+	if (!props.installing) return undefined
+	if (props.installProgress == null) return formatMessage(commonMessages.installingLabel)
+	return `${formatMessage(commonMessages.installingLabel)} (${Math.round(props.installProgress)}%)`
+})
 </script>
 
 <template>
 	<div
 		role="row"
-		class="flex h-[74px] items-center justify-between gap-4 px-3"
+		class="flex items-center justify-between"
 		:class="{
+			'h-[74px] gap-4 px-3': !inline,
+			'gap-3': inline,
 			'opacity-50 grayscale': disabled && !installing,
 			'opacity-50': installing,
 		}"
@@ -140,18 +170,16 @@ const deleteHovered = ref(false)
 				v-if="showCheckbox"
 				:model-value="selected ?? false"
 				:aria-label="formatMessage(messages.selectProject, { project: project.title })"
+				:disabled="isDisabled"
 				class="shrink-0"
-				@update:model-value="selected = $event"
+				@update:model-value="(value, event) => emit('select', value, event)"
 			/>
 
 			<div
 				class="flex min-w-0 items-center gap-3 transition-[filter,opacity] duration-200"
 				:class="enabled === false && !disabled ? 'grayscale opacity-50' : ''"
 			>
-				<div
-					v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined"
-					class="relative shrink-0"
-				>
+				<div v-tooltip="installTooltip" class="relative flex shrink-0 items-center">
 					<Avatar
 						:src="project.icon_url"
 						:alt="project.title"
@@ -163,7 +191,13 @@ const deleteHovered = ref(false)
 						v-if="installing"
 						class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20"
 					>
-						<SpinnerIcon class="size-5 animate-spin text-white" />
+						<ProgressSpinner
+							v-if="installProgress != null && installProgress > 0"
+							:progress="installProgress"
+							:max="100"
+							class="size-5 text-white"
+						/>
+						<SpinnerIcon v-else class="size-5 animate-spin text-white" />
 					</div>
 				</div>
 				<div class="flex min-w-0 flex-col gap-0.5">
@@ -180,30 +214,44 @@ const deleteHovered = ref(false)
 						>
 							{{ project.title }}
 						</AutoLink>
-						<Tooltip
+						<slot name="title-badges" />
+						<span
 							v-if="isClientOnly"
-							theme="dismissable-prompt"
-							class="inline-flex shrink-0"
-							:triggers="['hover', 'focus']"
-							no-auto-focus
+							v-tooltip="formatMessage(clientWarningMessage)"
+							class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
+							tabindex="0"
 						>
-							<span
-								class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
-								tabindex="0"
-							>
-								<TriangleAlertIcon class="pointer-events-none size-4 text-orange" />
-							</span>
-							<template #popper>
-								<div class="max-w-[18rem] text-sm">
-									{{ formatMessage(clientWarningMessage) }}
-								</div>
-							</template>
-						</Tooltip>
+							<TriangleAlertIcon class="pointer-events-none size-4 text-orange" />
+						</span>
 					</div>
 
 					<div class="flex min-w-0 items-center gap-1">
+						<template v-if="source">
+							<AutoLink
+								:target="
+									typeof source.link === 'string' && source.link.startsWith('http')
+										? '_blank'
+										: undefined
+								"
+								:to="source.link"
+								class="flex min-w-0 items-center gap-1 !decoration-secondary"
+								:class="{ 'hover:underline': source.link }"
+							>
+								<Avatar
+									:src="source.project.icon_url"
+									:alt="source.project.title"
+									:tint-by="source.project.id"
+									size="1.25rem"
+									no-shadow
+									class="shrink-0 rounded-md"
+								/>
+								<span class="truncate text-sm leading-5 text-secondary">
+									{{ source.project.title }}
+								</span>
+							</AutoLink>
+						</template>
 						<AutoLink
-							v-if="owner"
+							v-else-if="owner"
 							:target="
 								typeof owner.link === 'string' && owner.link.startsWith('http')
 									? '_blank'
@@ -223,7 +271,11 @@ const deleteHovered = ref(false)
 							/>
 							<span class="text-sm leading-5 text-secondary">{{ owner.name }}</span>
 						</AutoLink>
-						<template v-if="version">
+						<span v-else-if="external" class="flex items-center gap-1 text-secondary">
+							<UploadIcon class="size-4 shrink-0" />
+							<span class="text-sm leading-5">{{ formatMessage(messages.uploaded) }}</span>
+						</span>
+						<template v-if="version && !external">
 							<BulletDivider class="shrink-0 @[800px]:hidden" />
 							<AutoLink
 								:target="
@@ -257,7 +309,7 @@ const deleteHovered = ref(false)
 						typeof versionLink === 'string' && versionLink.startsWith('http') ? '_blank' : undefined
 					"
 					:to="versionLink"
-					class="inline-flex min-w-0 font-medium leading-6 text-contrast !decoration-contrast"
+					class="inline-flex min-w-0 font-semibold leading-6 text-contrast !decoration-contrast"
 					:class="{ 'hover:underline': versionLink, 'cursor-pointer': versionLink }"
 				>
 					<span ref="versionNumberRef" class="truncate">{{
@@ -289,50 +341,64 @@ const deleteHovered = ref(false)
 
 			<!-- Fixed width container to reserve space for update/switch version button -->
 			<div
-				v-if="hasUpdateListener || hasSwitchVersionListener"
+				v-if="
+					locked ||
+					(hasUpdateListener && hasUpdate) ||
+					(hasSwitchVersionListener && version && !hideSwitchVersion)
+				"
 				class="flex w-8 items-center justify-center"
 			>
-				<ButtonStyled
-					v-if="hasUpdate"
-					circular
-					type="transparent"
+				<IconButton
+					v-if="locked"
+					v-tooltip="formatMessage(messages.frozen)"
+					type="quiet"
+					:label="formatMessage(messages.frozen)"
+					disabled
+				>
+					<LockIcon class="size-5" />
+				</IconButton>
+				<IconButton
+					v-else-if="hasUpdate"
+					v-tooltip="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(commonMessages.updateAvailableLabel)
+					"
+					type="quiet"
 					color="green"
-					color-fill="text"
-					hover-color-fill="background"
+					:label="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(commonMessages.updateAvailableLabel)
+					"
+					:disabled="isDisabled"
+					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					@click="emit('update')"
 				>
-					<button
-						v-tooltip="
-							isDisabled && disabledTooltip
-								? disabledTooltip
-								: formatMessage(commonMessages.updateAvailableLabel)
-						"
-						:disabled="isDisabled"
-						@click="emit('update')"
-					>
-						<DownloadIcon class="size-5" />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled
+					<DownloadIcon class="size-5" />
+				</IconButton>
+				<IconButton
 					v-else-if="hasSwitchVersionListener && version && !hideSwitchVersion"
-					circular
-					type="transparent"
+					v-tooltip="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(commonMessages.switchVersionButton)
+					"
+					type="quiet"
+					:label="
+						isDisabled && disabledTooltip
+							? disabledTooltip
+							: formatMessage(commonMessages.switchVersionButton)
+					"
+					:disabled="isDisabled"
+					@click="emit('switchVersion')"
 				>
-					<button
-						v-tooltip="
-							isDisabled && disabledTooltip
-								? disabledTooltip
-								: formatMessage(commonMessages.switchVersionButton)
-						"
-						:disabled="isDisabled"
-						@click="emit('switchVersion')"
-					>
-						<ArrowLeftRightIcon class="size-5" />
-					</button>
-				</ButtonStyled>
+					<ArrowLeftRightIcon class="size-5" />
+				</IconButton>
 			</div>
 
 			<Toggle
-				v-if="enabled !== undefined"
+				v-if="enabled !== undefined && !hideToggle"
 				v-tooltip="
 					isToggleDisabled && (toggleDisabledTooltip || disabledTooltip)
 						? (toggleDisabledTooltip ?? disabledTooltip)
@@ -345,46 +411,55 @@ const deleteHovered = ref(false)
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
-			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
-				<button
-					v-tooltip="
-						isDisabled && disabledTooltip
-							? disabledTooltip
-							: formatMessage(
-									shiftHeld && deleteHovered
-										? commonMessages.deleteImmediatelyLabel
-										: commonMessages.deleteLabel,
-								)
-					"
-					:disabled="isDisabled"
-					@click="emit('delete', $event)"
-					@mouseenter="deleteHovered = true"
-					@mouseleave="deleteHovered = false"
-				>
-					<span class="relative size-5">
-						<TrashIcon
-							class="absolute inset-0 size-5 text-secondary transition-opacity duration-200"
-							:class="shiftHeld && deleteHovered ? 'opacity-0' : 'opacity-100'"
-						/>
-						<TrashExclamationIcon
-							class="absolute inset-0 size-5 text-red transition-opacity duration-200"
-							:class="shiftHeld && deleteHovered ? 'opacity-100' : 'opacity-0'"
-						/>
-					</span>
-				</button>
-			</ButtonStyled>
+			<IconButton
+				v-if="hasDeleteListener && !props.hideDelete"
+				v-tooltip="
+					isDisabled && disabledTooltip
+						? disabledTooltip
+						: formatMessage(
+								shiftHeld && deleteHovered
+									? commonMessages.deleteImmediatelyLabel
+									: commonMessages.deleteLabel,
+							)
+				"
+				type="quiet"
+				:label="
+					isDisabled && disabledTooltip
+						? disabledTooltip
+						: formatMessage(
+								shiftHeld && deleteHovered
+									? commonMessages.deleteImmediatelyLabel
+									: commonMessages.deleteLabel,
+							)
+				"
+				:disabled="isDisabled"
+				@click="emit('delete', $event)"
+				@mouseenter="deleteHovered = true"
+				@mouseleave="deleteHovered = false"
+			>
+				<span class="relative size-5">
+					<TrashIcon
+						class="absolute inset-0 size-5 text-secondary transition-opacity duration-200"
+						:class="shiftHeld && deleteHovered ? 'opacity-0' : 'opacity-100'"
+					/>
+					<TrashExclamationIcon
+						class="absolute inset-0 size-5 text-red transition-opacity duration-200"
+						:class="shiftHeld && deleteHovered ? 'opacity-100' : 'opacity-0'"
+					/>
+				</span>
+			</IconButton>
 
 			<slot name="additionalButtonsRight" />
 
-			<ButtonStyled circular type="transparent">
-				<TeleportOverflowMenu
-					v-if="overflowOptions?.length"
-					:options="overflowOptions"
-					:disabled="isDisabled"
-				>
-					<MoreVerticalIcon class="size-5" />
-				</TeleportOverflowMenu>
-			</ButtonStyled>
+			<TeleportOverflowMenu
+				v-if="overflowOptions?.length"
+				type="quiet"
+				label="More options"
+				:options="overflowOptions"
+				:disabled="isDisabled"
+			>
+				<MoreVerticalIcon class="size-5" />
+			</TeleportOverflowMenu>
 		</div>
 	</div>
 </template>

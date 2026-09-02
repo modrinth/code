@@ -1,6 +1,5 @@
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::payouts::{
@@ -9,6 +8,7 @@ use crate::models::payouts::{
 };
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
@@ -31,6 +31,7 @@ use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 use tracing::{error, info, warn};
+use xredis::RedisPool;
 
 mod affiliate;
 pub mod flow;
@@ -207,19 +208,17 @@ impl PayoutsQueue {
             .form(&form)
             .send()
             .await
-            .map_err(|_| {
-                ApiError::Payments(
-                    "Error while authenticating with PayPal".to_string(),
-                )
-            })?
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "error while authenticating with PayPal".to_string(),
+            )?
             .json()
             .await
-            .map_err(|_| {
-                ApiError::Payments(
-                    "Error while authenticating with PayPal (deser error)"
-                        .to_string(),
-                )
-            })?;
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "error while authenticating with PayPal (deser error)"
+                    .to_string(),
+            )?;
 
         let new_creds = PayPalCredentials {
             access_token: credential.access_token,
@@ -244,21 +243,23 @@ impl PayoutsQueue {
         let credentials = if let Some(credentials) = read.as_ref() {
             if credentials.expires < Utc::now() {
                 drop(read);
-                self.refresh_token().await.map_err(|_| {
-                    ApiError::Payments(
-                        "Error while authenticating with PayPal".to_string(),
-                    )
-                })?
+                self.refresh_token()
+                    .await
+                    .map_err(|err| eyre::eyre!(err))
+                    .wrap_failed_dependency_err(
+                        "error while authenticating with PayPal".to_string(),
+                    )?
             } else {
                 credentials.clone()
             }
         } else {
             drop(read);
-            self.refresh_token().await.map_err(|_| {
-                ApiError::Payments(
-                    "Error while authenticating with PayPal".to_string(),
-                )
-            })?
+            self.refresh_token()
+                .await
+                .map_err(|err| eyre::eyre!(err))
+                .wrap_failed_dependency_err(
+                    "error while authenticating with PayPal".to_string(),
+                )?
         };
 
         let client = reqwest::Client::new();
@@ -287,17 +288,23 @@ impl PayoutsQueue {
                 .body(body);
         }
 
-        let resp = request.send().await.map_err(|_| {
-            ApiError::Payments("could not communicate with PayPal".to_string())
-        })?;
+        let resp = request
+            .send()
+            .await
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
+                "could not communicate with PayPal".to_string(),
+            )?;
 
         let status = resp.status();
 
-        let value = resp.json::<Value>().await.map_err(|_| {
-            ApiError::Payments(
+        let value = resp
+            .json::<Value>()
+            .await
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
                 "could not retrieve PayPal response body".to_string(),
-            )
-        })?;
+            )?;
 
         if !status.is_success() {
             #[derive(Deserialize)]
@@ -318,27 +325,28 @@ impl PayoutsQueue {
                 if error.name == "INSUFFICIENT_FUNDS" {
                     error.message = "We're currently transferring funds to our PayPal account. Please try again in a couple days.".to_string();
                 }
-                return Err(ApiError::Payments(format!(
+                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
                     "error name: {}, message: {}",
                     error.name, error.message
-                )));
+                ))));
             }
 
             if let Ok(error) =
                 serde_json::from_value::<PayPalIdentityError>(value)
             {
-                return Err(ApiError::Payments(format!(
+                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
                     "error name: {}, message: {}",
                     error.error, error.error_description
-                )));
+                ))));
             }
 
-            return Err(ApiError::Payments(
-                "could not retrieve PayPal error body".to_string(),
-            ));
+            return Err(ApiError::FailedDependency(eyre::eyre!(
+                "could not retrieve PayPal error body",
+            )));
         }
 
-        Ok(serde_json::from_value(value)?)
+        serde_json::from_value(value)
+            .wrap_request_err("deserializing JSON data")
     }
 
     pub async fn make_tremendous_request<T: Serialize, X: DeserializeOwned>(
@@ -359,19 +367,23 @@ impl PayoutsQueue {
             request = request.json(&body);
         }
 
-        let resp = request.send().await.map_err(|_| {
-            ApiError::Payments(
+        let resp = request
+            .send()
+            .await
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
                 "could not communicate with Tremendous".to_string(),
-            )
-        })?;
+            )?;
 
         let status = resp.status();
 
-        let value = resp.json::<Value>().await.map_err(|_| {
-            ApiError::Payments(
+        let value = resp
+            .json::<Value>()
+            .await
+            .map_err(|err| eyre::eyre!(err))
+            .wrap_failed_dependency_err(
                 "could not retrieve Tremendous response body".to_string(),
-            )
-        })?;
+            )?;
 
         if !status.is_success()
             && let Some(obj) = value.as_object()
@@ -385,25 +397,25 @@ impl PayoutsQueue {
 
                 let err =
                     serde_json::from_value::<TremendousError>(array.clone())
-                        .map_err(|_| {
-                            ApiError::Payments(
-                                "could not retrieve Tremendous error json body"
-                                    .to_string(),
-                            )
-                        })?;
+                        .map_err(|err| eyre::eyre!(err))
+                        .wrap_failed_dependency_err(
+                            "could not retrieve Tremendous error json body"
+                                .to_string(),
+                        )?;
 
-                return Err(ApiError::Payments(format!(
+                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
                     "Tremendous error: {} ({:?})",
                     err.message, err.payload
-                )));
+                ))));
             }
 
-            return Err(ApiError::Payments(
-                "could not retrieve Tremendous error body".to_string(),
-            ));
+            return Err(ApiError::FailedDependency(eyre::eyre!(
+                "could not retrieve Tremendous error body",
+            )));
         }
 
-        Ok(serde_json::from_value(value)?)
+        serde_json::from_value(value)
+            .wrap_request_err("deserializing JSON data")
     }
 
     pub async fn get_payout_methods(
@@ -469,20 +481,23 @@ impl PayoutsQueue {
         let options = if let Some(options) = read.as_ref() {
             if options.expires < Utc::now() {
                 drop(read);
-                refresh_payout_methods(self).await?
+                refresh_payout_methods(self)
+                    .await
+                    .wrap_api_err("executing `refresh_payout_methods`")?
             } else {
                 options.clone()
             }
         } else {
             drop(read);
-            refresh_payout_methods(self).await?
+            refresh_payout_methods(self)
+                .await
+                .wrap_api_err("executing `refresh_payout_methods`")?
         };
 
         Ok(options.options)
     }
 
-    pub async fn get_brex_balance() -> Result<Option<AccountBalance>, ApiError>
-    {
+    pub async fn get_brex_balance() -> eyre::Result<AccountBalance> {
         #[derive(Deserialize)]
         struct BrexBalance {
             pub amount: i64,
@@ -505,11 +520,13 @@ impl PayoutsQueue {
             .get(format!("{}accounts/cash", ENV.BREX_API_URL))
             .bearer_auth(&ENV.BREX_API_KEY)
             .send()
-            .await?
+            .await
+            .wrap_request_err("sending `accounts/cash` request")?
             .json::<BrexResponse>()
-            .await?;
+            .await
+            .wrap_request_err("reading `accounts/cash` request")?;
 
-        Ok(Some(AccountBalance {
+        Ok(AccountBalance {
             available: Decimal::from(
                 res.items
                     .iter()
@@ -524,11 +541,10 @@ impl PayoutsQueue {
                     })
                     .sum::<i64>(),
             ) / Decimal::from(100),
-        }))
+        })
     }
 
-    pub async fn get_paypal_balance() -> Result<Option<AccountBalance>, ApiError>
-    {
+    pub async fn get_paypal_balance() -> eyre::Result<AccountBalance> {
         let api_username = &ENV.PAYPAL_NVP_USERNAME;
         let api_password = &ENV.PAYPAL_NVP_PASSWORD;
         let api_signature = &ENV.PAYPAL_NVP_SIGNATURE;
@@ -544,36 +560,39 @@ impl PayoutsQueue {
         let endpoint = "https://api-3t.paypal.com/nvp";
 
         let client = reqwest::Client::new();
-        let response = client.post(endpoint).form(&params).send().await?;
+        let response = client
+            .post(endpoint)
+            .form(&params)
+            .send()
+            .await
+            .wrap_err("requesting `nvp` endpoint")?;
 
-        let text = response.text().await?;
+        let text = response
+            .text()
+            .await
+            .wrap_err("reading response text from `nvp`")?;
         let body = urlencoding::decode(&text).unwrap_or_default();
 
         let mut key_value_map = HashMap::new();
 
         for pair in body.split('&') {
-            let mut iter = pair.splitn(2, '=');
-            if let (Some(key), Some(value)) = (iter.next(), iter.next()) {
+            if let Some((key, value)) = pair.split_once('=') {
                 key_value_map.insert(key.to_string(), value.to_string());
             }
         }
 
-        if let Some(amount) = key_value_map
-            .get("L_AMT0")
-            .and_then(|x| Decimal::from_str_exact(x).ok())
-        {
-            Ok(Some(AccountBalance {
-                available: amount,
-                pending: Decimal::ZERO,
-            }))
-        } else {
-            Ok(None)
-        }
+        let amount =
+            key_value_map.get("L_AMT0").wrap_err("missing `L_AMT0`")?;
+        let amount = Decimal::from_str_exact(amount)
+            .wrap_err("cannot parse `L_AMT0` as decimal")?;
+
+        Ok(AccountBalance {
+            available: amount,
+            pending: Decimal::ZERO,
+        })
     }
 
-    pub async fn get_tremendous_balance(
-        &self,
-    ) -> Result<Option<AccountBalance>, ApiError> {
+    pub async fn get_tremendous_balance(&self) -> eyre::Result<AccountBalance> {
         #[derive(Deserialize)]
         struct FundingSourceMeta {
             available_cents: Option<u64>,
@@ -597,18 +616,23 @@ impl PayoutsQueue {
                 "funding_sources",
                 None,
             )
-            .await?;
+            .await
+            .wrap_err("fetching funding sources")?;
 
-        Ok(val
+        let funding_source = val
             .funding_sources
             .into_iter()
             .find(|x| x.method == "balance")
-            .map(|x| AccountBalance {
-                available: Decimal::from(x.meta.available_cents.unwrap_or(0))
-                    / Decimal::from(100),
-                pending: Decimal::from(x.meta.pending_cents.unwrap_or(0))
-                    / Decimal::from(100),
-            }))
+            .wrap_err("no balance funding source")?;
+
+        Ok(AccountBalance {
+            available: Decimal::from(
+                funding_source.meta.available_cents.unwrap_or(0),
+            ) / Decimal::from(100),
+            pending: Decimal::from(
+                funding_source.meta.pending_cents.unwrap_or(0),
+            ) / Decimal::from(100),
+        })
     }
 }
 
@@ -700,6 +724,7 @@ async fn get_tremendous_payout_methods(
 
     for product in response.products {
         const BLACKLISTED_IDS: &[&str] = &[
+            // typos:off
             // physical visa
             "A2J05SWPI2QG",
             // crypto
@@ -732,6 +757,7 @@ async fn get_tremendous_payout_methods(
             "NL4JQ2G7UPRZ",
             "OEFTMSBA5ELH",
             "A3CQK6UHNV27",
+            // typos:on
         ];
         const SUPPORTED_METHODS: &[&str] = &[
             "merchant_cards",
@@ -868,12 +894,18 @@ pub async fn make_aditude_request(
             "interval": interval
         }))
         .send()
-        .await?
-        .error_for_status()?;
+        .await
+        .wrap_internal_err("deserializing HTTP response")?
+        .error_for_status()
+        .wrap_internal_err("deserializing HTTP response")?;
 
-    let text = request.text().await?;
+    let text = request
+        .text()
+        .await
+        .wrap_internal_err("reading HTTP response body")?;
 
-    let json: Vec<AditudePoints> = serde_json::from_str(&text)?;
+    let json: Vec<AditudePoints> = serde_json::from_str(&text)
+        .wrap_request_err("deserializing JSON data")?;
 
     Ok(json)
 }
@@ -892,7 +924,8 @@ pub async fn process_payout(
         crate::models::payouts::PayoutStatus::InTransit.as_str(),
     )
     .execute(pool)
-    .await?;
+    .await
+    .wrap_internal_err("writing analytics data to ClickHouse")?;
 
     let start: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
         (Utc::now() - Duration::days(1))
@@ -907,7 +940,8 @@ pub async fn process_payout(
         start,
     )
     .fetch_one(pool)
-    .await?;
+    .await
+    .wrap_internal_err("querying database for `process_payout`")?;
 
     if results.exists.unwrap_or(false) {
         return Ok(());
@@ -958,9 +992,12 @@ pub async fn process_payout(
             .bind(end.timestamp())
             .fetch_one::<u64>(),
     )
-        .await?;
+        .await.wrap_internal_err("querying database for `process_payout`")?;
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     struct PayoutMultipliers {
         sum: u64,
@@ -1021,7 +1058,7 @@ pub async fn process_payout(
             .insert(r.user_id, r.payouts_split);
         async move { Ok(acc) }
     })
-    .await?;
+    .await.wrap_internal_err("inserting project org members into database")?;
 
     let project_team_members = sqlx::query!(
         "
@@ -1047,7 +1084,7 @@ pub async fn process_payout(
             async move { Ok(acc) }
         },
     )
-    .await?;
+    .await.wrap_internal_err("inserting project team members into database")?;
 
     for project_id in project_ids {
         let team_members: HashMap<i64, Decimal> = project_team_members
@@ -1090,7 +1127,8 @@ pub async fn process_payout(
         "Yesterday",
         "1d",
     )
-    .await?;
+    .await
+    .wrap_api_err("executing `make_aditude_request`")?;
 
     let aditude_amount: Decimal = aditude_res
         .iter()
@@ -1185,9 +1223,12 @@ pub async fn process_payout(
         &insert_availables[..]
     )
     .execute(&mut transaction)
-    .await?;
+    .await.wrap_internal_err("inserting database records for `process_payout`")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(())
 }
@@ -1222,14 +1263,18 @@ pub async fn index_payouts_notifications(
 ) -> Result<(), ApiError> {
     info!("Updating payout notifications");
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
 
     payouts_values_notifications::synchronize_future_payout_values(
         &mut transaction,
         200,
     )
-    .await?;
-    let items = payouts_values_notifications::PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit(&mut transaction, 200).await?;
+    .await
+    .wrap_internal_err("executing `payouts_values_notifications::synchronize_future_payout_values`")?;
+    let items = payouts_values_notifications::PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit(&mut transaction, 200).await.wrap_internal_err("executing `PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit`")?;
 
     let payout_ref_ids = items.iter().map(|x| x.id).collect::<Vec<_>>();
     let dates_available =
@@ -1242,14 +1287,23 @@ pub async fn index_payouts_notifications(
         &mut transaction,
         redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err(
+        "inserting database records for `index_payouts_notifications`",
+    )?;
     payouts_values_notifications::PayoutsValuesNotification::set_notified_many(
         &payout_ref_ids,
         &mut transaction,
     )
-    .await?;
+    .await
+    .wrap_internal_err(
+        "updating database records for `index_payouts_notifications`",
+    )?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     Ok(())
 }
@@ -1257,7 +1311,7 @@ pub async fn index_payouts_notifications(
 pub async fn insert_bank_balances_and_webhook(
     payouts: &PayoutsQueue,
     pool: &PgPool,
-) -> Result<(), ApiError> {
+) -> eyre::Result<()> {
     let mut transaction = pool.begin().await?;
 
     let paypal_result = PayoutsQueue::get_paypal_balance().await;
@@ -1273,30 +1327,30 @@ pub async fn insert_bank_balances_and_webhook(
     let now = Utc::now();
     let today = now.date_naive().and_time(NaiveTime::MIN).and_utc();
 
-    let mut add_balance = |account_type: &str, balance: &AccountBalance| {
-        insert_account_types.push(account_type.to_string());
-        insert_amounts.push(balance.available);
-        insert_pending.push(false);
-        insert_recorded.push(today);
+    let mut add_balance =
+        |account_type: &str,
+         balance: Result<&AccountBalance, &eyre::Report>| match balance
+        {
+            Ok(balance) => {
+                insert_account_types.push(account_type.to_string());
+                insert_amounts.push(balance.available);
+                insert_pending.push(false);
+                insert_recorded.push(today);
 
-        insert_account_types.push(account_type.to_string());
-        insert_amounts.push(balance.pending);
-        insert_pending.push(true);
-        insert_recorded.push(today);
-    };
+                insert_account_types.push(account_type.to_string());
+                insert_amounts.push(balance.pending);
+                insert_pending.push(true);
+                insert_recorded.push(today);
+            }
+            Err(err) => {
+                warn!("Failed to check balance for '{account_type}': {err:?}");
+            }
+        };
 
-    if let Ok(Some(ref paypal)) = paypal_result {
-        add_balance("paypal", paypal);
-    }
-    if let Ok(Some(ref brex)) = brex_result {
-        add_balance("brex", brex);
-    }
-    if let Ok(Some(ref tremendous)) = tremendous_result {
-        add_balance("tremendous", tremendous);
-    }
-    if let Ok(Some(ref mural)) = mural_result {
-        add_balance("mural", mural);
-    }
+    add_balance("paypal", paypal_result.as_ref());
+    add_balance("brex", brex_result.as_ref());
+    add_balance("tremendous", tremendous_result.as_ref());
+    add_balance("mural", mural_result.as_ref());
 
     let inserted = sqlx::query_scalar!(
         r#"
@@ -1320,25 +1374,29 @@ pub async fn insert_bank_balances_and_webhook(
             ENV.PAYPAL_BALANCE_ALERT_THRESHOLD,
             paypal_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking PayPal balance")?;
         check_balance_with_webhook(
             "brex",
             ENV.BREX_BALANCE_ALERT_THRESHOLD,
             brex_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Brex balance")?;
         check_balance_with_webhook(
             "tremendous",
             ENV.TREMENDOUS_BALANCE_ALERT_THRESHOLD,
             tremendous_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Tremendous balance")?;
         check_balance_with_webhook(
             "mural",
             ENV.MURAL_BALANCE_ALERT_THRESHOLD,
             mural_result,
         )
-        .await?;
+        .await
+        .wrap_err("checking Mural balance")?;
     }
 
     transaction.commit().await?;
@@ -1349,13 +1407,13 @@ pub async fn insert_bank_balances_and_webhook(
 async fn check_balance_with_webhook(
     source: &str,
     threshold: u64,
-    result: Result<Option<AccountBalance>, ApiError>,
-) -> Result<Option<AccountBalance>, ApiError> {
+    result: eyre::Result<AccountBalance>,
+) -> eyre::Result<()> {
     let maybe_threshold = if threshold > 0 { Some(threshold) } else { None };
     let payout_alert_webhook = &ENV.PAYOUT_ALERT_SLACK_WEBHOOK;
 
     match &result {
-        Ok(Some(account_balance)) => {
+        Ok(account_balance) => {
             if let Some(threshold) = maybe_threshold
                 && let Some(available) =
                     account_balance.available.trunc().to_u64()
@@ -1372,26 +1430,28 @@ async fn check_balance_with_webhook(
                 .await?;
             }
         }
-
         Err(error) => {
-            error!(%error, "Failure getting balance for payout source '{source}'");
+            // use compact single-line error repr here
+            error!(
+                error = format!("{error:#?}"),
+                "Failure getting balance for payout source '{source}'"
+            );
 
             if maybe_threshold.is_some() {
+                // use expanded multi-line error repr here
                 send_slack_payout_source_alert_webhook(
                     PayoutSourceAlertType::CheckFailure {
                         source: source.to_owned(),
-                        display_error: error.to_string(),
+                        display_error: format!("{error:?}"),
                     },
                     payout_alert_webhook,
                 )
                 .await?;
             }
         }
-
-        _ => {}
     }
 
-    Ok(result.ok().flatten())
+    Ok(())
 }
 
 #[cfg(test)]

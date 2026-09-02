@@ -7,24 +7,20 @@
 		<form class="space-y-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
 			<label class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">{{ formatMessage(messages.newNameLabel) }}</span>
-				<StyledInput ref="renameInput" v-model="itemName" wrapper-class="w-full" />
+				<Input ref="renameInput" v-model="itemName" wrapper-class="w-full" />
 				<div v-if="submitted && error" class="text-sm text-red">{{ error }}</div>
 			</label>
 		</form>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
-				<ButtonStyled type="outlined">
-					<button @click="hide">
-						<XIcon class="h-5 w-5" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button :disabled="!!error && submitted" @click="handleSubmit">
-						<EditIcon class="h-5 w-5" />
-						{{ formatMessage(commonMessages.renameButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" @click="hide">
+					<XIcon class="h-5 w-5" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="!!error && submitted" @click="handleSubmit">
+					<EditIcon class="h-5 w-5" />
+					{{ formatMessage(commonMessages.renameButton) }}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -34,8 +30,8 @@
 import { EditIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import { Button } from '#ui/components/base/buttons'
+import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'

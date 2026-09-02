@@ -1,80 +1,76 @@
 <template>
-	<div class="normal-page no-sidebar">
-		<h1>File lookup</h1>
-		<div class="normal-page__content">
-			<div class="card flex flex-col gap-3">
-				<div
-					class="border-highlight-gray hover:bg-button-hover relative flex h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-button-bg p-8 transition-colors"
-					@click="triggerFileInput"
-					@drop.prevent="handleDrop"
-					@dragover.prevent
-					@dragenter.prevent
-				>
-					<p
-						class="mx-auto mb-0 flex items-center gap-2 text-center text-lg font-bold text-primary"
-					>
-						<UploadIcon /> Select file to lookup
-					</p>
-					<p class="mx-auto mt-0 text-center text-sm text-secondary">
-						Drag and drop or click here to browse
-					</p>
-					<input ref="fileInput" type="file" class="hidden" @change="handleFileSelect" />
+	<div>
+		<h2 class="m-0 mb-4 text-2xl font-semibold">File lookup</h2>
+		<div class="card flex flex-col gap-3">
+			<div
+				class="border-highlight-gray hover:bg-button-hover relative flex h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-button-bg p-8 transition-colors"
+				@click="triggerFileInput"
+				@drop.prevent="handleDrop"
+				@dragover.prevent
+				@dragenter.prevent
+			>
+				<p class="mx-auto mb-0 flex items-center gap-2 text-center text-lg font-bold text-primary">
+					<UploadIcon /> Select file to lookup
+				</p>
+				<p class="mx-auto mt-0 text-center text-sm text-secondary">
+					Drag and drop or click here to browse
+				</p>
+				<input ref="fileInput" type="file" class="hidden" @change="handleFileSelect" />
+			</div>
+
+			<template v-if="selectedFile">
+				<div class="flex items-center gap-2 text-sm text-secondary">
+					<FileIcon class="h-4 w-4" />
+					<span>{{ selectedFile.name }} ({{ formatBytes(selectedFile.size) }})</span>
 				</div>
 
-				<template v-if="selectedFile">
-					<div class="flex items-center gap-2 text-sm text-secondary">
-						<FileIcon class="h-4 w-4" />
-						<span>{{ selectedFile.name }} ({{ formatBytes(selectedFile.size) }})</span>
-					</div>
+				<div v-if="loadingHash" class="flex items-center gap-2 text-sm text-secondary">
+					<SpinnerIcon class="h-4 w-4 animate-spin" />
+					Calculating hashes...
+				</div>
+				<div v-if="loadingLookup" class="flex items-center gap-2 text-sm text-secondary">
+					<SpinnerIcon class="h-4 w-4 animate-spin" />
+					Looking up file on Modrinth...
+				</div>
 
-					<div v-if="loadingHash" class="flex items-center gap-2 text-sm text-secondary">
-						<SpinnerIcon class="h-4 w-4 animate-spin" />
-						Calculating hashes...
+				<template v-if="fileHashes">
+					<h3 class="mb-0 text-lg font-extrabold text-contrast">File hashes:</h3>
+					<div class="flex flex-col gap-2">
+						<span class="text-xs text-secondary">SHA512:</span>
+						<CopyCode :text="fileHashes.sha512" />
+						<span class="mt-1 text-xs text-secondary">SHA256:</span>
+						<CopyCode :text="fileHashes.sha256" />
+						<span class="mt-1 text-xs text-secondary">SHA1:</span>
+						<CopyCode :text="fileHashes.sha1" />
 					</div>
-					<div v-if="loadingLookup" class="flex items-center gap-2 text-sm text-secondary">
-						<SpinnerIcon class="h-4 w-4 animate-spin" />
-						Looking up file on Modrinth...
-					</div>
-
-					<template v-if="fileHashes">
-						<h3 class="mb-0 text-lg font-extrabold text-contrast">File hashes:</h3>
-						<div class="flex flex-col gap-2">
-							<span class="text-xs text-secondary">SHA512:</span>
-							<CopyCode :text="fileHashes.sha512" />
-							<span class="mt-1 text-xs text-secondary">SHA256:</span>
-							<CopyCode :text="fileHashes.sha256" />
-							<span class="mt-1 text-xs text-secondary">SHA1:</span>
-							<CopyCode :text="fileHashes.sha1" />
-						</div>
-					</template>
 				</template>
+			</template>
 
-				<template v-if="lookupResult">
-					<h3 class="mb-0 text-lg font-extrabold text-contrast">Modrinth project:</h3>
-					<nuxt-link
-						class="flex w-fit items-center gap-2 text-lg font-semibold text-contrast hover:underline"
-						target="_blank"
-						:to="`/project/${lookupResult.projectId}`"
-					>
-						<Avatar :src="lookupResult.iconUrl" alt="" size="48px" />
-						{{ lookupResult.name }}
-					</nuxt-link>
-					<CopyCode :text="lookupResult.projectId" />
-					<h3 class="mb-0 text-lg font-extrabold text-contrast">Modrinth version:</h3>
-					<nuxt-link
-						class="text-blue hover:underline"
-						:to="`/project/${lookupResult.projectId}/version/${lookupResult.versionId}`"
-						target="_blank"
-					>
-						Version {{ lookupResult.versionNumber }}
-					</nuxt-link>
-					<CopyCode :text="lookupResult.versionId" />
-				</template>
+			<template v-if="lookupResult">
+				<h3 class="mb-0 text-lg font-extrabold text-contrast">Modrinth project:</h3>
+				<nuxt-link
+					class="flex w-fit items-center gap-2 text-lg font-semibold text-contrast hover:underline"
+					target="_blank"
+					:to="`/project/${lookupResult.projectId}`"
+				>
+					<Avatar :src="lookupResult.iconUrl" alt="" size="48px" />
+					{{ lookupResult.name }}
+				</nuxt-link>
+				<CopyCode :text="lookupResult.projectId" />
+				<h3 class="mb-0 text-lg font-extrabold text-contrast">Modrinth version:</h3>
+				<nuxt-link
+					class="text-blue hover:underline"
+					:to="`/project/${lookupResult.projectId}/version/${lookupResult.versionId}`"
+					target="_blank"
+				>
+					Version {{ lookupResult.versionNumber }}
+				</nuxt-link>
+				<CopyCode :text="lookupResult.versionId" />
+			</template>
 
-				<Admonition v-if="lookupError" type="critical" header="Lookup failed">
-					{{ lookupError }}
-				</Admonition>
-			</div>
+			<Admonition v-if="lookupError" type="critical" header="Lookup failed">
+				{{ lookupError }}
+			</Admonition>
 		</div>
 	</div>
 </template>

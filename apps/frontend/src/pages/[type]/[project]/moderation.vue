@@ -72,11 +72,9 @@
 					<h2 id="messages" class="m-0 text-xl font-semibold text-contrast">
 						{{ formatMessage(messages.threadSectionTitle) }}
 					</h2>
-					<div v-if="currentMember?.staffOnly" class="flex items-center gap-2">
+					<div v-if="staff" class="flex items-center gap-2">
 						<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
-						<label for="moderator-see-user-ui-toggle">
-							{{ formatMessage(messages.moderatorSeeUserUiToggle) }}
-						</label>
+						<label for="moderator-see-user-ui-toggle"> Show member UI </label>
 					</div>
 				</div>
 				<template v-if="userFacingUiVisible">
@@ -111,8 +109,8 @@
 				</template>
 			</div>
 			<ConversationThread
-				v-if="thread"
-				:thread="thread"
+				v-if="prefixedThread"
+				:thread="prefixedThread"
 				:project="project"
 				:set-status="setStatus"
 				:current-member="currentMember ?? undefined"
@@ -151,16 +149,19 @@ import {
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref, watch } from 'vue'
+import { isStaff } from '@modrinth/utils'
+import { useQueryClient } from '@tanstack/vue-query'
+import dayjs from 'dayjs'
+import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
 
+defineEmits(['on-download', 'delete-version'])
+
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 
-type ProjectPageMember = Labrinth.Projects.v3.TeamMember & { staffOnly?: boolean }
 type ModerationAdmonitionSection =
 	| {
 			type: 'paragraph'
@@ -180,10 +181,6 @@ const messages = defineMessages({
 	threadSectionTitle: {
 		id: 'project.moderation.thread.title',
 		defaultMessage: 'Moderation messages',
-	},
-	moderatorSeeUserUiToggle: {
-		id: 'project.moderation.thread.moderator-see-user-ui-toggle',
-		defaultMessage: 'Show member UI',
 	},
 	threadPrivateDescription: {
 		id: 'project.moderation.thread.private-description',
@@ -215,15 +212,36 @@ const messages = defineMessages({
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
-	currentMember: currentMemberRaw,
+	currentMember,
 	invalidate,
 	allMembers,
+	thread,
 } = injectProjectPageContext()
-const currentMember = currentMemberRaw as Ref<ProjectPageMember | null>
+
+const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
+
+const prefixedThread = computed(() => {
+	const projectDate = project.value?.queued ?? project.value?.approved ?? project.value?.published
+	if (thread.value && projectDate && dayjs(projectDate).isBefore(dayjs(THREADS_RELEASE_DATE))) {
+		const newThread = JSON.parse(JSON.stringify(thread.value))
+		newThread.messages.unshift({
+			id: '69',
+			author_id: null,
+			body: {
+				type: 'legacy_project_message',
+			},
+			created: THREADS_RELEASE_DATE,
+			hide_identity: false,
+		})
+		return newThread
+	}
+	return thread.value
+})
 
 const canAccess = computed(() => !!currentMember.value)
+const staff = computed(() => isStaff(currentMember.value?.user))
 const userFacingUiVisible = computed(
-	() => !!currentMember.value && (!currentMember.value.staffOnly || moderatorSeeUserUi.value),
+	() => !!currentMember.value && (!staff.value || moderatorSeeUserUi.value),
 )
 
 const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
@@ -336,10 +354,11 @@ const moderationAdmonition = computed<{
 							defaultMessage:
 								"You can still modify your project, it won't affect your position in the queue.",
 						}),
+						// temp moved 24-48 hr below to keep old translation for future
 						defineMessage({
-							id: 'project.moderation.admonition.under-review.body.4',
+							id: 'project.moderation.admonition.under-review.body.4.alt-week',
 							defaultMessage:
-								'We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
+								'We aim to review submissions within a week, but some projects may face delays. This does not reflect an issue with your submission.',
 						}),
 					],
 				},
@@ -406,6 +425,13 @@ const moderationAdmonition = computed<{
 	return null
 })
 
+// unused 24-48hr message still defined here for later
+defineMessage({
+	id: 'project.moderation.admonition.under-review.body.4',
+	defaultMessage:
+		'We aim to review submissions in 24–48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
+})
+
 const moderatorSeeUserUi = computed<boolean>({
 	get() {
 		return flags.value.showModeratorProjectMemberUi
@@ -438,12 +464,7 @@ watch(
 const auth = await useAuth()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-
-const { data: thread, isPending: pending } = useQuery({
-	queryKey: computed(() => ['thread', project.value?.thread_id]),
-	queryFn: () => client.labrinth.threads_v3.getThread(project.value.thread_id),
-	enabled: computed(() => !!project.value?.thread_id),
-})
+const pending = computed(() => thread.value === undefined)
 
 function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) {
 	const threadId = newThread?.id ?? project.value?.thread_id

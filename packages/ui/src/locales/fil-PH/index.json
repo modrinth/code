@@ -137,9 +137,6 @@
   "button.refresh": {
     "defaultMessage": "I-refresh"
   },
-  "button.remove": {
-    "defaultMessage": "Tanggalin"
-  },
   "button.remove-image": {
     "defaultMessage": "Tanggalin ang imahe"
   },
@@ -224,6 +221,9 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "I-unlink"
   },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "server"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dinagdag (dependency)"
   },
@@ -266,9 +266,6 @@
   "content.page-layout.share.project-links": {
     "defaultMessage": "Mga link ng proyekto"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "Alpabetiko"
-  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Pinakabago ang mauuna"
   },
@@ -280,6 +277,24 @@
   },
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Nakabukas na ang lahat ng piniling kontento"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Tapusin"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "I-angkat"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "Bago"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.other": {
+    "defaultMessage": "Iba pa"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Matatag"
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Loader"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Pangalan"
@@ -311,14 +326,17 @@
   "creation-flow.modal.import-instance.launcher-path.add": {
     "defaultMessage": "Magdagdag ng launcher path"
   },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Iba pa"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Wala"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Hindi"
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Oo"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Isara"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Hahanapin"
@@ -641,24 +659,6 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Walang mahanap na magkatugmang instansiya"
   },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "Hindi naglalaman ng karagdagang kontento ang modpack na ito."
-  },
-  "instances.modpack-content-modal.empty-title": {
-    "defaultMessage": "Walang mahanap na kontento"
-  },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Kontentong modpack"
-  },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Inihahanda ang kontento..."
-  },
-  "instances.modpack-content-modal.no-results": {
-    "defaultMessage": "Walang proyektong tumugma sa iyong paghanap."
-  },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Maghanap sa {count, number} {count, plural, one {proyekto} other {na proyekto}}"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Kasalukuyan"
   },
@@ -970,6 +970,9 @@
   },
   "markdown-editor.image-modal.upload-mode.link": {
     "defaultMessage": "Link"
+  },
+  "markdown-editor.link-modal.label-field.title": {
+    "defaultMessage": "Label"
   },
   "markdown-editor.toolbar.bold": {
     "defaultMessage": "Bold"
@@ -1988,6 +1991,12 @@
   "servers.access-page.role-filter.all": {
     "defaultMessage": "Lahat"
   },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "May-ari"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "May-ari"
+  },
   "servers.access-table.column.role": {
     "defaultMessage": "Tungkulin"
   },
@@ -2038,9 +2047,6 @@
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Mayroon ka nang server?"
-  },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Mag-sign-in"
   },
   "servers.listing.copied-label": {
     "defaultMessage": "Kopyado"
@@ -2115,7 +2121,7 @@
     "defaultMessage": "Paraan ng pagbabayad"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "Pumili ng pinasadyang plan sa specs na kailangan mo."
+    "defaultMessage": "Pumili ng pasadya na plan na may specs na kailangan mo."
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Magsimula"
@@ -2204,9 +2210,6 @@
   "settings.display.theme.dark": {
     "defaultMessage": "madilim"
   },
-  "settings.display.theme.description": {
-    "defaultMessage": "Pumili ng iyong gugustohing paksang kulay para sa Modrinth ng nitong device."
-  },
   "settings.display.theme.light": {
     "defaultMessage": "Liwanag"
   },
@@ -2260,9 +2263,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Mga personal na access token"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Pampublikong profile"
   },
   "settings.sessions.title": {
     "defaultMessage": "Mga sesyon"
@@ -2722,6 +2722,18 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Koponan ng Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Pangalan"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Iba pa"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Talaksan"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Uri"
   }
 }
 

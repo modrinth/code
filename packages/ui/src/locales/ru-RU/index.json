@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Посмотреть аналитику"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "Использовать системное оформление заголовка и кнопок окна. Требуется перезапуск."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "Системная рамка окна"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Не удалось загрузить настройки сервера"
   },
@@ -49,6 +55,9 @@
   },
   "badge.new": {
     "defaultMessage": "Новое"
+  },
+  "badge.release": {
+    "defaultMessage": "Релиз"
   },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Отмена"
@@ -86,6 +95,15 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Возобновление подписки на сервер"
   },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Вернуть мои настройки"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "Фильтры ссылки не содержат ваши настройки исключений"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Особые исключения остаются между сеансами. Чужая ссылка с фильтрами перезапишет их."
+  },
   "browse.filter-results": {
     "defaultMessage": "Фильтры..."
   },
@@ -95,8 +113,20 @@
   "browse.offline": {
     "defaultMessage": "Вы не в сети. Подключитесь к интернету, чтобы искать на Modrinth."
   },
+  "browse.search.placeholder": {
+    "defaultMessage": "Искать {projectType}..."
+  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Выбранные проекты"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Установить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# проект выбран} few {# проекта выбрано} other {# проектов выбрано}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "{count, plural, one {Выбран # проект} few {Выбрано # проекта} other {Выбрано # проектов}} для установки. Установите {count, plural, =1 {его} other {их}} сейчас или вернитесь без изменений."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Выбранные проекты ещё не установлены"
@@ -112,6 +142,9 @@
   },
   "button.accept": {
     "defaultMessage": "Принять"
+  },
+  "button.add-another": {
+    "defaultMessage": "Добавить ещё"
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Добавить сервер в сборку"
@@ -185,6 +218,9 @@
   "button.hide-snapshots": {
     "defaultMessage": "Скрыть снапшоты"
   },
+  "button.i-understand": {
+    "defaultMessage": "Всё понятно"
+  },
   "button.install": {
     "defaultMessage": "Установить"
   },
@@ -202,6 +238,9 @@
   },
   "button.open-folder": {
     "defaultMessage": "Открыть папку"
+  },
+  "button.open-in-browser": {
+    "defaultMessage": "Открыть в браузере"
   },
   "button.open-in-folder": {
     "defaultMessage": "Открыть в папке"
@@ -272,6 +311,9 @@
   "button.stop": {
     "defaultMessage": "Остановить"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Сменить на версию"
+  },
   "button.switch-version": {
     "defaultMessage": "Сменить версию"
   },
@@ -299,17 +341,44 @@
   "changelog.product.web": {
     "defaultMessage": "Платформа"
   },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Коллекция пуста."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Загрузка проектов..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Не найдены проекты, соответствующие запросу."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Поиск проектов"
+  },
   "collections.label.private": {
     "defaultMessage": "Приватная"
   },
   "content-type.content.lowercase": {
     "defaultMessage": "контент"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural,  one {# элемент}  few {# элемента} many {# элементов} other {#элементов}}"
+  },
+  "content.card.frozen": {
+    "defaultMessage": "Этот проект заблокирован на его текущей версии до разморозки."
+  },
   "content.card.select-project": {
     "defaultMessage": "Выбрать {project}"
   },
+  "content.card.uploaded": {
+    "defaultMessage": "Загружено"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Вы точно хотите обновить {count, plural, one {# проект} few {# проекта} other {# проектов}} до {count, plural, =1 {последней совместимой версии} other {последних совместимых версий}}? Рекомендуется обновлять контент по очереди."
+  },
   "content.confirm-bulk-update.admonition-header": {
-    "defaultMessage": "Предупреждение об обновлении"
+    "defaultMessage": "Предупреждение об обновлении"
   },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Обновление проектов"
@@ -317,20 +386,26 @@
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Удерживайте Shift при нажатии на «Обновить всё», чтобы больше не показывать это окно."
   },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Обновить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Удаление мода может необратимо повлиять на ваш мир, что приведет к потере контента или непредвиденным ошибкам при следующей загрузке."
+    "defaultMessage": "Удаление модов может повлиять на миры и привести к необратимой пропаже контента или ошибкам при следующей загрузке."
   },
   "content.confirm-deletion.admonition-header": {
-    "defaultMessage": "Предупреждение об удалении"
+    "defaultMessage": "Предупреждение об удалении"
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Удалить {itemType}"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Отключить {itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "{action, select, downgrade {Понижение версии} other {Обновление}} может привести к проблемам с совместимостью. Моды или другой контент, который вы установили в сборку, сохранятся, но могут быть несовместимы с новой версией."
+    "defaultMessage": "{action, select, downgrade {Откат} other {Обновление}} может нарушить совместимость. Добавленные вами моды и контент останутся, но могут перестать работать в новой версии."
   },
   "content.confirm-modpack-update.admonition-header": {
-    "defaultMessage": "Предупреждение: {action, select, downgrade {откат} other {обновление}} версии"
+    "defaultMessage": "Предупреждение об {action, select, downgrade {откате} other {обновлении}}"
   },
   "content.confirm-modpack-update.confirm-button": {
     "defaultMessage": "{action, select, downgrade {Откатить} other {Обновить}} сборку"
@@ -339,7 +414,7 @@
     "defaultMessage": "{action, select, downgrade {Откат} other {Обновление}} сборки"
   },
   "content.confirm-unlink.admonition-body": {
-    "defaultMessage": "Моды и контент будут объединены с тем, что вы добавили в сборку. После этого сборка перестанет получать обновления."
+    "defaultMessage": "Моды и контент объединятся с вашими добавлениями, но сборка перестанет получать обновления."
   },
   "content.confirm-unlink.admonition-header": {
     "defaultMessage": "Отвязка сборки"
@@ -350,17 +425,104 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Отвязать"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Этот контент необходим для другого контента"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, =1 {Зависимый проект} other {Зависимые проекты}}"
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "сборка"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "сервер"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Всё равно удалить"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Всё равно удалить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Удаление"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Отключить зависимый контент после удаления"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Зависимый контент может не загрузиться или отключиться"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Предупреждение о зависимостях"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Что произойдёт?"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Изменены файлы настроек"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Добавлен (зависимость)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Отключён"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Удалён (отключён)"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Обновлён"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Отмена"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Добавлен"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Удалён"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Обновлён"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# файл} few {# файла} other {# файлов}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Версия игры"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Всё равно установить"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Загрузчик"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Привязана сборка"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Отвязана сборка"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Обновлена сборка"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Нет изменений контента"
+  },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Файлы не c Modrinth не проверяются."
+  },
   "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Некоторые файлы на вашем сервере распознать не удалось. Это может повлиять на их работу."
+    "defaultMessage": "Часть файлов на сервере не удалось распознать, изменения могут повлиять на их работу."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Обновление содержит файлы не с Modrinth. Устанавливайте только проверенные файлы."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Предупреждение о неизвестных файлах"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Неизвестно"
   },
   "content.filter.disabled": {
     "defaultMessage": "Отключённые"
@@ -401,14 +563,89 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "мир"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Теперь он находится здесь!"
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "Контент сборки"
   },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Контент сборки перемещён"
+  "content.managed-card.provided-by": {
+    "defaultMessage": "Источник:"
   },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Больше не показывать"
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "сервер"
+  },
+  "content.managed-card.settings": {
+    "defaultMessage": "Настройки установки"
+  },
+  "content.managed-card.shared-content": {
+    "defaultMessage": "Совместный контент"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "Установка контента..."
+  },
+  "content.managed-card.summary.loading": {
+    "defaultMessage": "Загрузка сводки управляемого контента"
+  },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "Нет контента"
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "Сменить версию"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "Синхронизировано {time}"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "Доступно обновление"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "Обновлено {time}"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "Обновление..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "Посмотреть контент"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "Автор"
+  },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "Среда"
+  },
+  "content.metadata-filter.open-source": {
+    "defaultMessage": "Открытый код"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "Совместный контент"
+  },
+  "content.metadata-filter.source.external": {
+    "defaultMessage": "Сторонние"
+  },
+  "content.metadata-filter.state": {
+    "defaultMessage": "Состояние"
+  },
+  "content.metadata-filter.state.disabled": {
+    "defaultMessage": "Отключённые"
+  },
+  "content.metadata-filter.state.enabled": {
+    "defaultMessage": "Включённые"
+  },
+  "content.metadata-filter.update.available": {
+    "defaultMessage": "Необновлённые"
+  },
+  "content.metadata-filter.warning.client-depends": {
+    "defaultMessage": "Клиент зависит от файла"
+  },
+  "content.metadata-filter.warning.client-only": {
+    "defaultMessage": "Контент только для клиента"
+  },
+  "content.metadata-filter.warning.client-retained": {
+    "defaultMessage": "Файл для клиента сохранен"
+  },
+  "content.metadata-filter.warning.none": {
+    "defaultMessage": "Без предупреждений"
+  },
+  "content.metadata-filter.warnings": {
+    "defaultMessage": "Предупреждения"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Дополнительный контент"
@@ -418,6 +655,9 @@
   },
   "content.page-layout.busy-description": {
     "defaultMessage": "Пожалуйста, дождитесь завершения операции перед редактированием."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Найдите проекты или добавьте файлы"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Добавьте дополнительный контент поверх этой сборки"
@@ -430,6 +670,12 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Не удалось загрузить контент"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "Фильтр"
+  },
+  "content.page-layout.filter.author-count": {
+    "defaultMessage": "{count, plural, one {# автор} few {# автора} other {# авторов}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Загрузка контента..."
@@ -455,8 +701,11 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Названия проектов"
   },
-  "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "По алфавиту"
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "Название (А–Я)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "Название (Я–А)"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Сначала новые"
@@ -479,6 +728,18 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Все выбранные проекты уже включены"
   },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "Удаление проектов..."
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "Отключение проектов..."
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Включение проектов..."
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Обновление проектов..."
+  },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "Выбрано: {count, number}"
   },
@@ -493,6 +754,9 @@
   },
   "creation-flow.button.import": {
     "defaultMessage": "Импортировать"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Импортировать {count, plural, one {# сборку} few {# сборки} other {# сборок}}"
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Установить сервер"
@@ -515,11 +779,14 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Поиск версии игры..."
   },
-  "creation-flow.modal.custom-setup.icon.remove": {
-    "defaultMessage": "Удалить иконку"
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "Настроить"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "Рандомизировать"
   },
   "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Выбрать иконку"
+    "defaultMessage": "Файл"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Последняя"
@@ -588,7 +855,7 @@
     "defaultMessage": "Выживание"
   },
   "creation-flow.modal.final-config.generate-structures.description": {
-    "defaultMessage": "Определяет, будут ли деревни, крепости и другие структуры генерироваться в новых чанках."
+    "defaultMessage": "Определяет, будут ли деревни, крепости и другие строения генерироваться в новых чанках."
   },
   "creation-flow.modal.final-config.generate-structures.label": {
     "defaultMessage": "Генерация строений"
@@ -695,14 +962,26 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Поиск сборки"
   },
-  "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Сборка — это установка Minecraft с определённым загрузчиком модов, версией и модами."
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "Уже знаете, во что сыграть?"
+  },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Создание сборки"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Установить сборку"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "Ничего не найдено"
+  },
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "Поиск модов, сборок, и многого другого..."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Начать с нуля, выбрав загрузчик и версию игры."
   },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
-    "defaultMessage": "Пользовательская настройка"
+    "defaultMessage": "Собственная настройка"
   },
   "creation-flow.modal.setup-type.option.import-instance.description": {
     "defaultMessage": "Импортировать сборку из Prism, CurseForge, или похожего лаунчера."
@@ -711,16 +990,22 @@
     "defaultMessage": "Импортировать сборку"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Найти сборку на Modrinth или импортировать из файла."
+    "defaultMessage": "Выберите проект и мы будем использовать его последнюю версию."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Установить сборку"
+    "defaultMessage": "Начните с мода или сборки"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.description": {
+    "defaultMessage": "Установить сборку из файла .mrpack на вашем устройстве."
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "Загрузить сборку"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Классический Minecraft без модов или плагинов."
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
-    "defaultMessage": "Чистый Minecraft"
+    "defaultMessage": "Ванильный Minecraft"
   },
   "creation-flow.modal.setup-type.title.installation": {
     "defaultMessage": "Выберите тип установки"
@@ -730,9 +1015,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Выберите тип мира"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Выбрать сборку модов"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Создание сборки"
@@ -748,6 +1030,276 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Установка сервера"
+  },
+  "empty-state.upload-versions.description": {
+    "defaultMessage": "Возвращайтесь, как только вы загрузите свои версии."
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, =1 {Добавить файл} other {Добавить файлы}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Выберите файлы для переноса в эту группу."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "В других группах нет файлов, которые можно было бы перенести сюда."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Не удалось загрузить файлы"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "Не найдены файлы, соответствующие запросу."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Поиск файлов..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, one {# файл выбран} few {# файла выбрано} other {# файлов выбрано}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "Добавление файлов в группу"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Добавить файлы..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Не удалось добавить файлы"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "Контент запрещён"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Одобрено"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Доказательства отклонены"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Готово"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "Нет разрешения"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "Запрещено"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "В ожидании"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Информация отклонена"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Другое"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "Добавить атрибуцию"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "Все права защищены/Без лицензии"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "Ссылка на лицензию"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "Название лицензии, желательно идентификатор SPDX"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "Выберите лицензию."
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "Ссылка должна быть корректным URL."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "Например: MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(необязательно)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Лицензия"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "Ссылка на работу"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "ссылка-на-лицензию"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "ссылка-на-работу"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Похоже, это ссылка на Modrinth. Если этот контент доступен на Modrinth, вероятно, ваш набор был экспортирован неправильно. Если вы скачали его с другого сайта, попробуйте скачать версию с Modrinth; иногда эти файлы различаются."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Примечания"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Напишите что‑нибудь..."
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "Скриншот доказательства {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "Удалить изображение"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "Доказательства"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "Перетащите изображение или нажмите, чтобы выбрать"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Если будет выявлена ложь или подделка загруженных изображений, то ваш проект и аккаунт могут быть заблокированы."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Модераторы могут проверить предоставленные доказательства"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Сохранить атрибуцию"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Выберите лицензию..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "Тип разрешения"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Укажите ссылку на лицензию. Если у вас её нет, лучше указать «Все права защищены/Без лицензии»"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Предоставьте объяснение или загрузите хотя бы одно доказательство."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Введите ссылку."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Предоставьте примечание или хотя бы одно доказательство."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Загрузите изображение в формате PNG, JPEG, GIF, WebP, или BMP."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Загрузите хотя бы одно доказательство."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Предоставьте краткое объяснение или изображение."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Обоснование"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Группа атрибуции {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, one {# файл} few {# файла} other {# файлов}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Включённые файлы:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "Есть в {count, plural, one {# версии} other {# версиях}}:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "Последнее изменение {date} от {user}"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Неизвестно"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Лицензия:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Ссылка на работу:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Причина"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Не удалось сохранить проверку модерации"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "Ни одна версия не использует эти файлы."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Примечания:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Нет"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Оригинальный проект"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Скриншот доказательства {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Доказательства:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Атрибутировано автоматически"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Мы уже видели этот файл и подготовили для вас ссылку на источник. Если что-то не так, пожалуйста, обратитесь в службу поддержки Modrinth через справочный центр"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Лицензия"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "Лицензия данной работы допускает её распространение в вашей сборке."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Загрузите подтверждающую документацию, относящиеся к данной лицензии."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Свой проект"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Оригинальная работа, созданная вами."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Загрузите файлы для подтверждения авторства."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "Нет разрешения"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "Мы уже видели этот файл, и его лицензия не допускает распространение."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "У вас нет разрешения на использование этой работы."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Особое разрешение"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "Вы получили особое разрешение на распространение этой работы в вашей сборке."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Удалить группу"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Эта группа атрибуции и все находящиеся в ней файлы будут удалены навсегда. Это действие необратимо."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Удалить {title}?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Не удалось удалить группу"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Удерживайте Shift при нажатии, чтобы пропустить подтверждение."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "Удалить из группы"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "Не удалось разделить файл"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} и ещё {count}"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Модератор"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Нет"
@@ -795,7 +1347,7 @@
     "defaultMessage": "Удаление файла"
   },
   "files.delete-modal.warning.file": {
-    "defaultMessage": "Этот файл будет удален навсегда. Отменить это действие нельзя."
+    "defaultMessage": "Этот файл будет удалён навсегда. Это действие необратимо."
   },
   "files.delete-modal.warning.folder": {
     "defaultMessage": "Эта папка и всё её содержимое будут удалены навсегда. Отменить это действие нельзя."
@@ -817,9 +1369,6 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Файл сохранён"
-  },
-  "files.editor.find-close": {
-    "defaultMessage": "Закрыть"
   },
   "files.editor.find-in-file": {
     "defaultMessage": "Найти"
@@ -915,13 +1464,13 @@
     "defaultMessage": "Возможно, папка не существует."
   },
   "files.layout.error-title": {
-    "defaultMessage": "Не удалось загрузить файлы"
+    "defaultMessage": "Не удалось загрузить файлы"
   },
   "files.layout.extraction-started-title": {
     "defaultMessage": "Извлечение началось"
   },
   "files.layout.unsaved-changes": {
-    "defaultMessage": "Имеются несохранённые изменения."
+    "defaultMessage": "Есть несохранённые изменения."
   },
   "files.move-modal.current-location": {
     "defaultMessage": "Текущий путь"
@@ -1000,6 +1549,12 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Новое имя"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# элемент} few {# элемента} other {# элементов}}"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "Родительская папка"
   },
   "files.table-header.created": {
     "defaultMessage": "Создан"
@@ -1095,13 +1650,13 @@
     "defaultMessage": "Установка не удалась"
   },
   "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Скопируйте URL страницы выбранной версии и вставьте его ниже."
+    "defaultMessage": "Скопируйте ссылку на страницу версии и вставьте его ниже."
   },
   "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Скопируйте URL"
+    "defaultMessage": "Скопируйте ссылку"
   },
   "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Найдите необходимую вам сборку модов на CurseForge."
+    "defaultMessage": "Найдите необходимую вам сборку на CurseForge."
   },
   "files.zip-url-modal.step-find-title": {
     "defaultMessage": "Найдите сборку"
@@ -1120,6 +1675,30 @@
   },
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "Загрузка .zip контента из URL"
+  },
+  "filter-bar.add": {
+    "defaultMessage": "Добавить"
+  },
+  "filter-bar.clear": {
+    "defaultMessage": "Очистить"
+  },
+  "filter-bar.clear-named-filter": {
+    "defaultMessage": "Очистить фильтр: {name}"
+  },
+  "filter-bar.filtered-by": {
+    "defaultMessage": "Фильтры:"
+  },
+  "filter-bar.no-options": {
+    "defaultMessage": "Нет доступных вариантов."
+  },
+  "filter-bar.no-search-results": {
+    "defaultMessage": "Вариантов не найдено."
+  },
+  "filter-bar.search-placeholder": {
+    "defaultMessage": "Поиск..."
+  },
+  "filter-bar.select-all": {
+    "defaultMessage": "Выбрать всё"
   },
   "form.label.address-line": {
     "defaultMessage": "Строка адреса"
@@ -1199,6 +1778,9 @@
   "form.placeholder.state": {
     "defaultMessage": "Введите край/область"
   },
+  "format.bytes.0": {
+    "defaultMessage": "{count, plural, one {# байт} few {# байта} many {# байт} other {# байта}}"
+  },
   "format.bytes.1": {
     "defaultMessage": "{count, number} КиБ"
   },
@@ -1251,7 +1833,7 @@
     "defaultMessage": "Не удалось установить контент"
   },
   "hosting.content.failed-to-load-modpack-content": {
-    "defaultMessage": "Не удалось загрузить содержимое сборки"
+    "defaultMessage": "Не удалось загрузить контент сборки"
   },
   "hosting.content.failed-to-load-versions": {
     "defaultMessage": "Не удалось загрузить версии"
@@ -1270,6 +1852,9 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Не удалось добавить файл"
+  },
+  "hosting.content.managed-content.modpack-header": {
+    "defaultMessage": "Контент сборки"
   },
   "hosting.loader.failed-to-change-version": {
     "defaultMessage": "Не удалось изменить версию сборки"
@@ -1380,61 +1965,61 @@
     "defaultMessage": "Подтвердить"
   },
   "installation-settings.confirm-version-change-description": {
-    "defaultMessage": "Смена версии на {gameVersion} затронет следующий контент на вашем сервере."
+    "defaultMessage": "Переход на {gameVersion} затронет следующий контент на сервере."
   },
   "installation-settings.confirm-version-change-header": {
-    "defaultMessage": "Просмотреть изменения контента"
+    "defaultMessage": "Обзор изменений контента"
   },
   "installation-settings.edit-installation.title": {
     "defaultMessage": "Настройка установки"
   },
   "installation-settings.edit.warning-instance": {
-    "defaultMessage": "Мы не рекомендуем изменять настройки сборки после установки контента. Если вы всё же хотите их изменить, будьте осторожны, так как это может вызвать проблемы."
+    "defaultMessage": "Не рекомендуется изменять установку после добавления контента. Это может привести к ошибкам."
   },
   "installation-settings.edit.warning-server": {
-    "defaultMessage": "Не рекомендуется менять настройки инсталляции после установки контента. Если вы всё же хотите изменить их, перезагрузите сервер."
+    "defaultMessage": "Не рекомендуется изменять установку после добавления контента. Лучше сразу переустановить сервер."
   },
   "installation-settings.incompatible-content.auto-fix-button": {
-    "defaultMessage": "Авто-исправление"
+    "defaultMessage": "Исправить"
   },
   "installation-settings.incompatible-content.change-loader-button": {
     "defaultMessage": "Сменить загрузчик"
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
-    "defaultMessage": "Отключить конфликты"
+    "defaultMessage": "Отключить"
   },
   "installation-settings.incompatible-content.game-version-warning-body": {
-    "defaultMessage": "При изменении версии игры вы можете либо отключить несовместимый контент, либо попытаться устранить несовместимости."
+    "defaultMessage": "При смене версии игры можно отключить несовместимый контент или попытаться исправить несовместимости автоматически."
   },
   "installation-settings.incompatible-content.game-version-warning-title": {
-    "defaultMessage": "Предупреждение о несовместимости"
+    "defaultMessage": "Предупреждение о несовместимости"
   },
   "installation-settings.incompatible-content.header": {
-    "defaultMessage": "Установлены несовместимые проекты"
+    "defaultMessage": "Нарушение совместимости"
   },
   "installation-settings.incompatible-content.loader-change-body": {
-    "defaultMessage": "При смене загрузчика модов, все установленные проекты будут отключены. Вместо этого рекомендуется сбросить сервер."
+    "defaultMessage": "Смена загрузчика отключит установленный контент. Лучше сразу переустановить сервер."
   },
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Смена загрузчика небезопасна"
   },
   "installation-settings.linked-instance.title": {
-    "defaultMessage": "Связанный {projectType}"
+    "defaultMessage": "Отвязка {projectType}"
   },
   "installation-settings.linked.modpack": {
-    "defaultMessage": "сборка"
+    "defaultMessage": "сборки"
   },
   "installation-settings.linked.server-project": {
-    "defaultMessage": "серверный проект"
+    "defaultMessage": "серверного проекта"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "Версия {loader}"
   },
   "installation-settings.platform-lock-tooltip": {
-    "defaultMessage": "Необходимо сбросить сервер для изменения загрузчика."
+    "defaultMessage": "Для смены загрузчика необходимо переустановить сервер."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Переустановка сборки сбросит контент, который использует {type}, до исходного состояния, удалив все добавленные вами моды и файлы."
+    "defaultMessage": "Переустановка сбросит {type} к исходному состоянию, удалив все добавленные вами моды и контент."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Переустановка сборки"
@@ -1464,31 +2049,31 @@
     "defaultMessage": "Поиск версии игры..."
   },
   "installation-settings.type.instance": {
-    "defaultMessage": "сборка"
+    "defaultMessage": "сборку"
   },
   "installation-settings.type.instance-possessive": {
-    "defaultMessage": "сборки"
+    "defaultMessage": "сборку"
   },
   "installation-settings.type.server": {
     "defaultMessage": "сервер"
   },
   "installation-settings.type.server-possessive": {
-    "defaultMessage": "серверы"
+    "defaultMessage": "сервер"
   },
   "installation-settings.unlink": {
     "defaultMessage": "Отвязать"
   },
   "installation-settings.unlink.description": {
-    "defaultMessage": "Отвязка навсегда отключит этот {type} от проекта {projectType}, что позволит вам изменить загрузчик и версию Minecraft, но вы больше не сможете получать обновления."
+    "defaultMessage": "Отвязка навсегда отключит {type} от исходного проекта. Это откроет доступ к смене версии игры и загрузчика, но получение обновлений прекратится."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Проверка..."
   },
   "instance.confirm-reinstall.admonition-body": {
-    "defaultMessage": "Переустановка сбросит весь установленный или изменённый контент к начальному состоянию, удалив моды и контент, добавленные поверх исходной установки."
+    "defaultMessage": "Переустановка сбросит установленное содержимое к исходному состоянию, удалив добавленные вами моды и контент."
   },
   "instance.confirm-reinstall.admonition-header": {
-    "defaultMessage": "Предупреждение переустановки"
+    "defaultMessage": "Предупреждение о переустановке"
   },
   "instance.confirm-reinstall.header": {
     "defaultMessage": "Переустановка сборки"
@@ -1529,6 +2114,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Неизвестный режим игры"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count, plural, one {# совместимая сборка} few {# совместимые сборки} other {# совместимых сборок}}"
+  },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Существующая сборка"
   },
@@ -1537,6 +2125,9 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Установка проекта"
+  },
+  "instances.content-install.hide-unavailable": {
+    "defaultMessage": "Скрыть недоступные"
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "В этой сборке используется другой загрузчик или версия игры, не поддерживаемая данным проектом."
@@ -1565,31 +2156,40 @@
   "instances.content-install.no-instances": {
     "defaultMessage": "Совместимые сборки не найдены"
   },
-  "instances.content-install.remove-icon": {
-    "defaultMessage": "Удалить иконку"
-  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Поиск сборки"
   },
-  "instances.content-install.select-icon": {
-    "defaultMessage": "Выбрать иконку"
+  "instances.content-install.show-unavailable": {
+    "defaultMessage": "Показать недоступные"
   },
-  "instances.modpack-content-modal.empty-description": {
-    "defaultMessage": "В сборке нет дополнительного контента."
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "Скачать файл"
   },
-  "instances.modpack-content-modal.empty-title": {
+  "instances.managed-content-modal.empty-description": {
+    "defaultMessage": "Этот источник не содержит управляемый контент."
+  },
+  "instances.managed-content-modal.empty-title": {
     "defaultMessage": "Сборка пуста"
   },
-  "instances.modpack-content-modal.header": {
-    "defaultMessage": "Содержимое сборки"
+  "instances.managed-content-modal.external-content": {
+    "defaultMessage": "Сторонний"
   },
-  "instances.modpack-content-modal.loading": {
-    "defaultMessage": "Загрузка содержимого..."
+  "instances.managed-content-modal.external-content-description": {
+    "defaultMessage": "Этот файл не с Modrinth."
   },
-  "instances.modpack-content-modal.no-results": {
+  "instances.managed-content-modal.header": {
+    "defaultMessage": "Управляемый контент"
+  },
+  "instances.managed-content-modal.loading": {
+    "defaultMessage": "Загрузка контента..."
+  },
+  "instances.managed-content-modal.no-results": {
     "defaultMessage": "Не найдены проекты, соответствующие запросу."
   },
-  "instances.modpack-content-modal.search-placeholder": {
+  "instances.managed-content-modal.open-in-slicer": {
+    "defaultMessage": "Открыть в Slicer"
+  },
+  "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
   },
   "instances.updater-modal.badge.current": {
@@ -1724,6 +2324,9 @@
   "label.details": {
     "defaultMessage": "Сведения"
   },
+  "label.discover-content": {
+    "defaultMessage": "Найти проекты"
+  },
   "label.done": {
     "defaultMessage": "Готово"
   },
@@ -1738,6 +2341,9 @@
   },
   "label.error": {
     "defaultMessage": "Ошибка"
+  },
+  "label.explanation": {
+    "defaultMessage": "Пояснение"
   },
   "label.extract-failed": {
     "defaultMessage": "Распаковка не удалась"
@@ -1802,6 +2408,9 @@
   "label.password": {
     "defaultMessage": "Пароль"
   },
+  "label.permissions": {
+    "defaultMessage": "Разрешения"
+  },
   "label.plan-custom": {
     "defaultMessage": "Свой"
   },
@@ -1858,6 +2467,9 @@
   },
   "label.server": {
     "defaultMessage": "Сервер"
+  },
+  "label.server-only": {
+    "defaultMessage": "Только для сервера"
   },
   "label.servers": {
     "defaultMessage": "Серверы"
@@ -2180,6 +2792,39 @@
   "notification.error.title": {
     "defaultMessage": "Произошла ошибка"
   },
+  "notifications.actor.unknown": {
+    "defaultMessage": "Кто-то"
+  },
+  "notifications.close": {
+    "defaultMessage": "Закрыть"
+  },
+  "notifications.dismiss": {
+    "defaultMessage": "Закрыть уведомление"
+  },
+  "notifications.friend-request.body": {
+    "defaultMessage": "Получен запрос дружбы от <actor>{actor}</actor>."
+  },
+  "notifications.instance-invite.body": {
+    "defaultMessage": "<actor>{actor}</actor> пригласил вас в сборку <entity>{entity}</entity>."
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "Играть"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "Сборка"
+  },
+  "notifications.instance-ready.status": {
+    "defaultMessage": "Установлено и готово."
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "Принять"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "Отклонить"
+  },
+  "notifications.server-invite.body": {
+    "defaultMessage": "<actor>{actor}</actor> пригласил вас для управления сервера <entity>{entity}</entity>."
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Принят"
   },
@@ -2327,8 +2972,161 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Автор на Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Пользователь Modrinth."
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} не сможет отправлять вам запросы дружбы, приглашать вас в сборки или приглашать вас управлять сервером Modrinth Hosting."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Точно заблокировать пользователя?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Произошла ошибка при блокировке пользователя. Попробуйте снова."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Не удалось заблокировать"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} заблокирован."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Пользователь заблокирован"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "Заблокировать {username}"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Посмотреть аналитику"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "Управление платежами"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Заблокировать"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "Создать коллекцию"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "Создать проект"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Посмотреть подробности"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "Управление проектами"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "Убрать из партнёров"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "Сделать партнёром"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Разблокировать"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Разрешите всплывающие окна для Modrinth и повторите попытку."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Не удалось получить профиль GitHub. Повторите попытку."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Не удалось открыть профиль GitHub"
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "Сервисы входа"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "Почта подтверждена"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "Есть пароль"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "Есть TOTP"
+  },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Загрузка..."
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "Способы оплаты"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Посмотреть профиль"
+  },
+  "profile.details.title": {
+    "defaultMessage": "О пользователе"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "Почта не подтверждена"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "Почта подтверждена"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Не удалось загрузить профиль."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "Пользователь не найден"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "Партнёр"
+  },
   "profile.label.badges": {
     "defaultMessage": "Значки"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "Коллекция"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "Регистрация:"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "У этого пользователя нет коллекций!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "Коллекций пока нет."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "У этого пользователя нет проектов!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "Проектов пока нет."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "Организации"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
+  },
+  "profile.official-account": {
+    "defaultMessage": "Официальный аккаунт Modrinth"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Официальный аккаунт Modrinth. Связь с поддержкой: <support-link></support-link> или по почте <email></email>"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "Произошла ошибка при разблокировке пользователя. Попробуйте снова."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "Не удалось разблокировать"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "{username} разблокирован."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "Пользователь разблокирован"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Опубликован {date}"
@@ -2345,35 +3143,92 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Клиент или сервер"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Выделенный сервер"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Сервер"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Одиночная игра"
   },
   "project-type.all": {
     "defaultMessage": "Всё"
   },
+  "project-type.collection.plural": {
+    "defaultMessage": "Коллекции"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {набор данных} few {набора данных} other {наборов данных}}"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Наборы данных"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {набор данных} few {набора данных} other {наборов данных}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {мод} few {мода} other {модов}}"
   },
   "project-type.mod.category": {
     "defaultMessage": "Моды"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {мод} few {мода} other {модов}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {сборка} few {сборки} other {сборок}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Сборки"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {сборка} few {сборки} other {сборок}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {плагин} few {плагина} other {плагинов}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Плагины"
   },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {плагин} few {плагина} other {плагинов}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
+  },
   "project-type.project.category": {
     "defaultMessage": "Проекты"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {набор ресурсов} few {набора ресурсов} other {наборов ресурсов}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Наборы ресурсов"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {набор ресурсов} few {набора ресурсов} other {наборов ресурсов}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {сервер} few {сервера} other {серверов}}"
+  },
   "project-type.server.category": {
     "defaultMessage": "Серверы"
   },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {сервер} few {сервера} other {серверов}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдера} other {шейдеров}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "Шейдеры"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдера} other {шейдеров}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Поддерживаемые среды"
@@ -2401,6 +3256,9 @@
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "Платформы"
+  },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, =1 {Платформа} other {Платформы}}"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "Совместимость"
@@ -2498,6 +3356,48 @@
   "project.about.tags.title": {
     "defaultMessage": "Теги"
   },
+  "project.disclosure.advertising.title": {
+    "defaultMessage": "Есть реклама"
+  },
+  "project.disclosure.ai-generated-content.title": {
+    "defaultMessage": "Есть {types} от ИИ"
+  },
+  "project.disclosure.ai-generated-content.use.assets": {
+    "defaultMessage": "ресурсы"
+  },
+  "project.disclosure.ai-generated-content.use.code": {
+    "defaultMessage": "код"
+  },
+  "project.disclosure.ai-generated-content.use.content": {
+    "defaultMessage": "контент"
+  },
+  "project.disclosure.ai-generated-content.use.functionality": {
+    "defaultMessage": "функциональность"
+  },
+  "project.disclosure.ai-generated-content.use.text": {
+    "defaultMessage": "текст"
+  },
+  "project.disclosure.derivative-work.show-fewer": {
+    "defaultMessage": "Показать меньше"
+  },
+  "project.disclosure.derivative-work.title": {
+    "defaultMessage": "Производная работа от:"
+  },
+  "project.disclosure.paid-features.title": {
+    "defaultMessage": "Есть платный контент"
+  },
+  "project.disclosure.photosensitivity.title": {
+    "defaultMessage": "Предупреждение о вспышках"
+  },
+  "project.disclosure.system-interactions.title": {
+    "defaultMessage": "Взаимодействие с системой"
+  },
+  "project.disclosure.telemetry.title": {
+    "defaultMessage": "{consent, select,opt_in {Телеметрия с согласия} opt_out {Отключаемая телеметрия} always_active {Неотключаемая телеметрия} other {Есть телеметрия}}"
+  },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Обязателен и для клиента, и для сервера."
   },
@@ -2564,8 +3464,29 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Неизвестная среда"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "Не удалось получить текст лицензии."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Загрузка текста лицензии..."
+  },
+  "project.license.title": {
+    "defaultMessage": "Лицензия"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} в игре"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {игрок} few {игрока} other {игроков}} сейчас на сервере"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, one {недавний запуск} few {недавних запуска} other {недавних запусков}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {запуск} few {запуска} other {запусков}} через Modrinth за последние 2 недели"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Используется собственная сборка"
@@ -2802,7 +3723,7 @@
     "defaultMessage": "Европа"
   },
   "project.server.region.middle_east": {
-    "defaultMessage": "Средний Восток"
+    "defaultMessage": "Ближний Восток"
   },
   "project.server.region.russia": {
     "defaultMessage": "Россия"
@@ -2837,6 +3758,30 @@
   "project.settings.description.title": {
     "defaultMessage": "Описание"
   },
+  "project.settings.disclosures.ai.types-assets": {
+    "defaultMessage": "Ресурсы"
+  },
+  "project.settings.disclosures.ai.types-code": {
+    "defaultMessage": "Код"
+  },
+  "project.settings.disclosures.ai.types-functionality": {
+    "defaultMessage": "Функциональность"
+  },
+  "project.settings.disclosures.ai.types-text": {
+    "defaultMessage": "Текст"
+  },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "defaultMessage": "Неотключаемая"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-in": {
+    "defaultMessage": "С согласия"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-out": {
+    "defaultMessage": "Отключаемая"
+  },
+  "project.settings.disclosures.title": {
+    "defaultMessage": "Маркировка"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Содержит функциональность как для клиента, так и для сервера, пусть даже частично."
   },
@@ -2865,19 +3810,19 @@
     "defaultMessage": "Только для клиента"
   },
   "project.settings.environment.notice.missing-env.description": {
-    "defaultMessage": "В проекте отсутствуют метаданные среды. Выберите подходящий вариант ниже."
+    "defaultMessage": "В проекте отсутствуют метаданные среды. Выберите один из вариантов ниже."
   },
   "project.settings.environment.notice.missing-env.title": {
     "defaultMessage": "Укажите среду проекта"
   },
   "project.settings.environment.notice.multiple-environments.description": {
-    "defaultMessage": "В разных версиях проекта указаны разные среды — глобальное изменение сред невозможно."
+    "defaultMessage": "В разных версиях проекта указаны разные среды, поэтому глобальное изменение сред невозможно."
   },
   "project.settings.environment.notice.multiple-environments.title": {
     "defaultMessage": "У проекта несколько сред"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Мы переработали систему сред на Modrinth, и теперь доступны новые варианты. Убедитесь, что выбран подходящий вариант, и подтвердите его!"
+    "defaultMessage": "На Modrinth изменилась система сред и появились новые варианты. Убедитесь в верности выбранного варианта и подтвердите его."
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Подтвердите выбранный вариант"
@@ -2952,13 +3897,25 @@
     "defaultMessage": "Добавление"
   },
   "project.settings.versions.permissions": {
-    "defaultMessage": "Атрибуции"
+    "defaultMessage": "Авторство"
   },
   "project.settings.versions.title": {
     "defaultMessage": "Версии"
   },
   "project.settings.view.title": {
     "defaultMessage": "Просмотр"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
+  },
+  "project.status.archived.body": {
+    "defaultMessage": "{title} больше не будет получать обновления, если только автор не решит разархивировать проект."
+  },
+  "project.status.archived.header": {
+    "defaultMessage": "{title} помещён в архив"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "А"
@@ -2968,6 +3925,21 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "Р"
+  },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Переключить фильтр: {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "На удержании"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "Версия недоступна из-за отсутствия разрешений"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Решить"
   },
   "project.visibility.archived": {
     "defaultMessage": "Архивирован"
@@ -3011,8 +3983,83 @@
   "report.item-type.version": {
     "defaultMessage": "версия"
   },
+  "report.type.ai-images": {
+    "defaultMessage": "ИИ‑изображения в иконке, галерее или описании"
+  },
+  "report.type.copyright": {
+    "defaultMessage": "Перезалив"
+  },
+  "report.type.fully-ai-generated": {
+    "defaultMessage": "Полностью созданный ИИ проект"
+  },
+  "report.type.inappropriate": {
+    "defaultMessage": "Неприемлемый контент"
+  },
+  "report.type.malicious": {
+    "defaultMessage": "Вредоносный контент"
+  },
+  "report.type.missing-disclosure": {
+    "defaultMessage": "Неверная маркировка контента"
+  },
+  "report.type.name-squatting": {
+    "defaultMessage": "Присвоение названия"
+  },
+  "report.type.spam": {
+    "defaultMessage": "Спам"
+  },
   "s.bg": {
     "defaultMessage": "Выполняется фоновая задача"
+  },
+  "search.filter.dependency_type.any": {
+    "defaultMessage": "Любая зависимость"
+  },
+  "search.filter.dependency_type.embedded": {
+    "defaultMessage": "Встроен"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "Необязателен"
+  },
+  "search.filter.dependency_type.optional_or_embedded": {
+    "defaultMessage": "Необязателен или встроен"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "Необходим"
+  },
+  "search.filter.dependency_type.required_or_embedded": {
+    "defaultMessage": "Необходим или встроен"
+  },
+  "search.filter.dependency_type.required_or_optional": {
+    "defaultMessage": "Необходим или необязателен"
+  },
+  "search.filter.dependent_project": {
+    "defaultMessage": "Зависимость: {project}"
+  },
+  "search.filter.dependent_project.clear": {
+    "defaultMessage": "Очистить фильтр зависимостей"
+  },
+  "search.filter.dependent_project.search_placeholder": {
+    "defaultMessage": "Поиск проекта..."
+  },
+  "search.filter.excluded_projects": {
+    "defaultMessage": "Исключать: {projects}"
+  },
+  "search.filter.included_content.exclude": {
+    "defaultMessage": "Исключить"
+  },
+  "search.filter.included_content.excluded": {
+    "defaultMessage": "Исключено"
+  },
+  "search.filter.included_content.remove_project": {
+    "defaultMessage": "Удалить {project}"
+  },
+  "search.filter.included_content.remove_project.tooltip": {
+    "defaultMessage": "Удалить проект"
+  },
+  "search.filter.included_content.search_placeholder": {
+    "defaultMessage": "Поиск контента..."
+  },
+  "search.filter.included_projects": {
+    "defaultMessage": "Включать: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Фильтр заблокирован"
@@ -3022,6 +4069,9 @@
   },
   "search.filter.locked.default.sync": {
     "defaultMessage": "Синхронизировать"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "Фильтр заблокирован"
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Разблокировать"
@@ -3041,6 +4091,45 @@
   "search.filter.option.show_more": {
     "defaultMessage": "Показать больше"
   },
+  "search.filter.option.sub_options.collapse.tooltip": {
+    "defaultMessage": "Скрыть другие варианты"
+  },
+  "search.filter.option.sub_options.expand.tooltip": {
+    "defaultMessage": "Показать другие варианты"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Особые исключения"
+  },
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "Реклама"
+  },
+  "search.filter_type.advanced.disclosure.ai_content": {
+    "defaultMessage": "ИИ‑контент"
+  },
+  "search.filter_type.advanced.disclosure.ai_content.usage": {
+    "defaultMessage": "{usage} от ИИ"
+  },
+  "search.filter_type.advanced.disclosure.archived": {
+    "defaultMessage": "Архивированные"
+  },
+  "search.filter_type.advanced.disclosure.derivative_work": {
+    "defaultMessage": "Производная работа"
+  },
+  "search.filter_type.advanced.disclosure.epilepsy_triggers": {
+    "defaultMessage": "Вспышки света"
+  },
+  "search.filter_type.advanced.disclosure.paid_features": {
+    "defaultMessage": "Платный контент"
+  },
+  "search.filter_type.advanced.disclosure.system_interactions": {
+    "defaultMessage": "Взаимодействие с системой"
+  },
+  "search.filter_type.advanced.disclosure.telemetry": {
+    "defaultMessage": "Телеметрия"
+  },
+  "search.filter_type.compatible_dependency_project_ids": {
+    "defaultMessage": "Зависимости"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Среда"
   },
@@ -3055,6 +4144,9 @@
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "Показывать все версии"
+  },
+  "search.filter_type.included_content": {
+    "defaultMessage": "Включает в себя"
   },
   "search.filter_type.license": {
     "defaultMessage": "Лицензия"
@@ -3091,6 +4183,21 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Загрузчик"
+  },
+  "search.photosensitivity-warning-modal.body.1": {
+    "defaultMessage": "Мы не гарантируем точность маркировки на Modrinth."
+  },
+  "search.photosensitivity-warning-modal.body.2": {
+    "defaultMessage": "Предупреждения о вспышках указывают сами авторы — мы не проводим дополнительные проверки."
+  },
+  "search.photosensitivity-warning-modal.body.3": {
+    "defaultMessage": "Используйте контент с Modrinth на свой страх и риск. Берегите себя! 💚"
+  },
+  "search.photosensitivity-warning-modal.dont-show-again": {
+    "defaultMessage": "Больше не показывать"
+  },
+  "search.photosensitivity-warning-modal.title": {
+    "defaultMessage": "Безопасность не гарантируется"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Модовые"
@@ -3282,7 +4389,7 @@
     "defaultMessage": "Добавить пользователя"
   },
   "servers.access-page.notification.friend-request-failed.title": {
-    "defaultMessage": "Запрос в друзья не может быть отправлен"
+    "defaultMessage": "Не удалось отправить запрос дружбы"
   },
   "servers.access-page.notification.invite-cancelled.text": {
     "defaultMessage": "Отозвано приглашение {target}."
@@ -3347,6 +4454,9 @@
   "servers.access-page.role.viewer-description": {
     "defaultMessage": "Запуск, остановка и просмотр сервера без возможности вносить изменения."
   },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "Поиск по {count, plural, one {# пользователю} other {# пользователям}}..."
+  },
   "servers.access-role.editor": {
     "defaultMessage": "Редактор"
   },
@@ -3384,7 +4494,7 @@
     "defaultMessage": "По заданным фильтрам пользователи не найдены."
   },
   "servers.access-table.member-actions-label": {
-    "defaultMessage": "Действия для {username}"
+    "defaultMessage": "Действия с {username}"
   },
   "servers.access-table.pending": {
     "defaultMessage": "В ожидании"
@@ -3486,7 +4596,7 @@
     "defaultMessage": "Очищена консоль"
   },
   "servers.audit-log.event.console-command-executed": {
-    "defaultMessage": "Запущена консольная команда <command></command>"
+    "defaultMessage": "Выполнена консольная команда <command></command>"
   },
   "servers.audit-log.event.entity-list.hidden-count": {
     "defaultMessage": "+{count, number}"
@@ -3565,6 +4675,9 @@
   },
   "servers.audit-log.event.server-plan-changed": {
     "defaultMessage": "Изменён план на <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, number} CPU"
   },
   "servers.audit-log.event.server-plan.new-plan": {
     "defaultMessage": "новый план"
@@ -3720,7 +4833,7 @@
     "defaultMessage": "Восстановление из резервной копии"
   },
   "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Выбрана 1 резервная копия} other {Выбрано # резервныx копий}}"
+    "defaultMessage": "Действия с выбранными резервными копиями"
   },
   "servers.backups.bulk-bar.deleting": {
     "defaultMessage": "Удаление {total, plural, one {# резервной копии} other {# резервных копий}}..."
@@ -3729,13 +4842,13 @@
     "defaultMessage": "{count, plural,one {# резервная копия выбрана} other {резервная копия выбрана}}"
   },
   "servers.backups.delete-modal.admonition-body": {
-    "defaultMessage": "После удаления {count, plural, one {эта резервная копия не может быть восстановлена} other {эти резервные копии не могут быть восстановлены}}. Удаление необратимо."
+    "defaultMessage": "После удаления {count, plural, =1 {эта резервная копия не может быть восстановлена} other {эти резервные копии не могут быть восстановлены}}. Удаление необратимо."
   },
   "servers.backups.delete-modal.admonition-header": {
-    "defaultMessage": "Предупреждение об удалении"
+    "defaultMessage": "Предупреждение об удалении"
   },
   "servers.backups.delete-modal.backups-label": {
-    "defaultMessage": "{count, plural, one {Резервная копия} other {Резервные копии ({count})}}"
+    "defaultMessage": "{count, plural, =1 {Резервная копия} other {Резервные копии ({count})}}"
   },
   "servers.backups.delete-modal.confirm": {
     "defaultMessage": "Удалить {count, plural,one {резервную копию} other {# резервных копий}}"
@@ -3803,11 +4916,8 @@
   "servers.busy.installing": {
     "defaultMessage": "Сервер устанавливается"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Синхронизация контента в процессе"
-  },
   "servers.grant-access-modal.add-as-friend": {
-    "defaultMessage": "Также отправить запрос в друзья"
+    "defaultMessage": "Также отправить запрос дружбы"
   },
   "servers.grant-access-modal.already-member-tooltip": {
     "defaultMessage": "Этот пользователь уже приглашён"
@@ -3849,7 +4959,7 @@
     "defaultMessage": "Имя пользователя Modrinth"
   },
   "servers.grant-access-modal.target.no-suggestions": {
-    "defaultMessage": "Пользователи не найдены."
+    "defaultMessage": "Пользователи не найдены."
   },
   "servers.grant-access-modal.target.placeholder": {
     "defaultMessage": "Введите имя пользователя Modrinth"
@@ -3857,59 +4967,62 @@
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Поиск..."
   },
+  "servers.installing-banner.description.applying": {
+    "defaultMessage": "Применение изменений..."
+  },
+  "servers.installing-banner.description.controls": {
+    "defaultMessage": "Настройка сервера разблокируется после завершения установки."
+  },
+  "servers.installing-banner.description.duration": {
+    "defaultMessage": "Установка может занять несколько минут..."
+  },
+  "servers.installing-banner.description.preparing": {
+    "defaultMessage": "Подготовка сервера..."
+  },
+  "servers.installing-banner.description.still-working": {
+    "defaultMessage": "Работаем-ваша установка в процессе..."
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Установка не удалась"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Во время установки платформы произошла внутренняя ошибка. Попробуйте ещё раз."
+  "servers.installing-banner.error.header.local-modpack": {
+    "defaultMessage": "Не удалось загрузить {filename}"
   },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Не удалось установить указанную версию загрузчика или Minecraft. Возможно, она недействительна или не поддерживается."
+  "servers.installing-banner.error.header.minecraft": {
+    "defaultMessage": "Не удалось установить Minecraft {version}"
   },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Не удалось установить сборку модов. Возможно, она повреждена или несовместима."
+  "servers.installing-banner.error.header.modpack": {
+    "defaultMessage": "Не удалось установить сборку"
   },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Эта версия сборки не содержит загрузочного файла. Возможно, она была собрана неправильно."
+  "servers.installing-banner.error.header.platform": {
+    "defaultMessage": "Не удалось установить {loader} {loaderVersion} для Minecraft {gameVersion}"
+  },
+  "servers.installing-banner.error.header.platform-without-version": {
+    "defaultMessage": "Не удалось установить {loader} для Minecraft {gameVersion}"
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Во время установки произошла непредвиденная ошибка."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Эта версия Minecraft или загрузчика пока не поддерживается Modrinth Hosting."
+  "servers.installing-banner.installing-local-modpack": {
+    "defaultMessage": "Установка {filename}"
   },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Установка дополнений..."
+  "servers.installing-banner.installing-minecraft": {
+    "defaultMessage": "Установка Minecraft {version}"
   },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Установка сборки..."
+  "servers.installing-banner.installing-modpack": {
+    "defaultMessage": "Установка сборки"
   },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Установка платформы..."
+  "servers.installing-banner.installing-platform": {
+    "defaultMessage": "Установка {loader} для Minecraft {version}"
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Подготовка сервера"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Добавление Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Настройка сервера..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Скачивание модов..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Упорядочивание файлов..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Настройка среды..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже есть сервер?"
   },
   "servers.list-empty.learn-more-link": {
-    "defaultMessage": "Подробнее о Modrinth Hosting"
+    "defaultMessage": "Подробнее"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -3920,9 +5033,6 @@
   "servers.list-empty.no-servers-description": {
     "defaultMessage": "Играйте в сборки вместе с друзьями через Modrinth App."
   },
-  "servers.list-empty.no-servers-title": {
-    "defaultMessage": "Серверов ещё нет"
-  },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "Выбирайте любимые моды, а мы сделаем всё остальное."
   },
@@ -3930,13 +5040,13 @@
     "defaultMessage": "Установка модов в один клик"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Зовите друзей и настраивайте им игру через Modrinth App."
+    "defaultMessage": "Пригласите ваших друзей поиграть на вашем сервере в один клик в Modrinth App."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Совместная игра"
   },
   "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Войти"
+    "defaultMessage": "Войти в Modrinth"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Настраивайте сервер подобно одиночному миру."
@@ -3961,6 +5071,9 @@
   },
   "servers.listing.new-label": {
     "defaultMessage": "Новый"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "Ваши файлы будут храниться еще <days-remaining>{daysRemaining} {daysRemaining, plural, one {день} few {дня} other {дней}}</days-remaining>. Обратитесь в службу поддержки, чтобы скачать файлы до их удаления."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Ваши файлы будут храниться в течение 30 дней после отмены."
@@ -4046,6 +5159,9 @@
   "servers.manage.error.title": {
     "defaultMessage": "Серверы не загрузились"
   },
+  "servers.manage.error.unknown": {
+    "defaultMessage": "Неизвестная ошибка"
+  },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Произошла ошибка"
   },
@@ -4053,13 +5169,13 @@
     "defaultMessage": "Новый сервер"
   },
   "servers.manage.no-owned-servers-found": {
-    "defaultMessage": "Не найдено серверов, соответствующих запросу."
+    "defaultMessage": "Не найдены личные серверы, соответствующие запросу."
   },
   "servers.manage.no-servers-found": {
     "defaultMessage": "Серверы не найдены."
   },
   "servers.manage.no-shared-servers-found": {
-    "defaultMessage": "Не найдено доступных серверов, соответствующих запросу."
+    "defaultMessage": "Не найдены совместные серверы, соответствующие запросу."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Платёжная информация загружается. Оформление заказа откроется автоматически после загрузки."
@@ -4088,6 +5204,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Готово"
   },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Поиск по {count, plural, one {# серверу} other {# серверам}}..."
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -4101,10 +5220,13 @@
     "defaultMessage": "Настройки сервера перемещены"
   },
   "servers.manage.shared-servers-title": {
-    "defaultMessage": "Общие серверы"
+    "defaultMessage": "Совместные серверы"
   },
   "servers.manage.your-servers-title": {
-    "defaultMessage": "Ваши серверы"
+    "defaultMessage": "Личные серверы"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {день} few {дня} other {дней}} <hours-count>{hours}</hours-count> {hours, plural, one {час} few {часа} other {часов}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {минута} few {минуты} other {минут}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {секунда} few {секунды} other {секунд}} осталось..."
   },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Новый сервер"
@@ -4170,7 +5292,7 @@
     "defaultMessage": "Успешная покупка"
   },
   "servers.purchase.step.payment.description": {
-    "defaultMessage": "Средства пока не будут списаны."
+    "defaultMessage": "Средства пока не будут списаны."
   },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "Выберите способ оплаты"
@@ -4179,7 +5301,7 @@
     "defaultMessage": "Способ оплаты"
   },
   "servers.purchase.step.plan.billed": {
-    "defaultMessage": "оплата {interval, select, monthly {ежемесячно} quarterly {ежеквартально} yearly {ежегодно} other {{interval}}}"
+    "defaultMessage": "{interval, select, monthly {за месяц} quarterly {за 3 месяца} yearly {за год} other {billed {interval}}}"
   },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Доступно в Северной Америке, Европе и Юго‑Восточной Азии."
@@ -4254,7 +5376,7 @@
     "defaultMessage": "Где вы хотите разместить свой сервер?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Нет нужного региона? <link>Сообщите, где бы вы хотели видеть Modrinth Hosting!</link>"
+    "defaultMessage": "Нет нужного региона? <link>Сообщите, где запустить Modrinth Hosting дальше!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Юго-Восточная Азия"
@@ -4388,11 +5510,71 @@
   "settings.billing.title": {
     "defaultMessage": "Платежи и подписки"
   },
+  "settings.display.project-list-layouts.datapack": {
+    "defaultMessage": "Страница наборов данных"
+  },
+  "settings.display.project-list-layouts.description": {
+    "defaultMessage": "Выберите вид для каждой страницы с проектами."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "defaultMessage": "Страница модов"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "defaultMessage": "Сетка"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "defaultMessage": "Список"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "defaultMessage": "Страница сборок"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "defaultMessage": "Страница плагинов"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "defaultMessage": "Страница наборов ресурсов"
+  },
+  "settings.display.project-list-layouts.server": {
+    "defaultMessage": "Страница серверов"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "defaultMessage": "Страница шейдеров"
+  },
+  "settings.display.project-list-layouts.title": {
+    "defaultMessage": "Вид проектов"
+  },
+  "settings.display.project-list-layouts.user": {
+    "defaultMessage": "Страницы пользователей"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "defaultMessage": "Использовать эффекты вроде размытия. Без аппаратного ускорения возможна потеря производительности."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "defaultMessage": "Расширенные эффекты"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "defaultMessage": "Открывать ссылки за пределы Modrinth в новой вкладке. Ссылки внутри домена и в Markdown открываются всегда в той же вкладке; реклама и страницы редактирования — всегда в новой."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "defaultMessage": "Внешние ссылки в новой вкладке"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.description": {
+    "defaultMessage": "Показывать панель сведений слева от содержимого страницы."
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "defaultMessage": "Панель сведений слева"
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "defaultMessage": "Показывать панель фильтров справа от результатов поиска."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "defaultMessage": "Панель фильтров справа"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "Тёмная"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Выберите тему для Modrinth на этом устройстве."
+    "defaultMessage": "Выберите тему для Modrinth."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Светлая"
@@ -4409,6 +5591,15 @@
   "settings.display.theme.retro": {
     "defaultMessage": "Ретро"
   },
+  "settings.display.theme.sync-across-devices": {
+    "defaultMessage": "Синхронизация темы между устройствами"
+  },
+  "settings.display.theme.sync-across-devices.description": {
+    "defaultMessage": "Применять текущую тему везде, где вы вошли. Отключите, чтобы настроить это устройство отдельно."
+  },
+  "settings.display.theme.sync-across-devices.sign-in-tooltip": {
+    "defaultMessage": "Войдите в Modrinth для синхронизации темы"
+  },
   "settings.display.theme.system": {
     "defaultMessage": "Системная"
   },
@@ -4418,17 +5609,32 @@
   "settings.feature-flags.title": {
     "defaultMessage": "Флаги функций"
   },
+  "settings.form.group.optional": {
+    "defaultMessage": "(необязательно)"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "Стандартные языки"
   },
   "settings.language.categories.search-result": {
     "defaultMessage": "Результаты поиска"
   },
+  "settings.language.coverage.app-tooltip": {
+    "defaultMessage": "Около {percentage}% Modrinth App переведено на этот язык."
+  },
+  "settings.language.coverage.label": {
+    "defaultMessage": "Поддерживается {percentage}%"
+  },
+  "settings.language.coverage.website-tooltip": {
+    "defaultMessage": "Около {percentage}% сайта переведено на этот язык."
+  },
   "settings.language.description": {
     "defaultMessage": "Выберите язык {platform}. Переводы выполнены сообществом <crowdin-link>на Crowdin</crowdin-link>."
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Поиск языка..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Не найдены языки, соответствующие} one {Найден # язык, соответствующий} few {Найдено # языка, соответствующих} other {Найдено # языков, соответствующих}} запросу."
   },
   "settings.language.languages.search.no-results": {
     "defaultMessage": "Не найдены языки, соответствующие запросу."
@@ -4448,11 +5654,254 @@
   "settings.pats.title": {
     "defaultMessage": "Личные токены доступа"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Публичный профиль"
+  "settings.preferences.update-failed.description": {
+    "defaultMessage": "Не удалось сохранить настройки в аккаунте Modrinth. Повторите попытку."
+  },
+  "settings.preferences.update-failed.title": {
+    "defaultMessage": "Настройки не синхронизированы"
+  },
+  "settings.profile.bio.description": {
+    "defaultMessage": "Возможность кратко рассказать всем о себе."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "О себе"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "Профиль"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "Изображение профиля"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "Информация в вашем профиле <profile-link>доступна публично на Modrinth</profile-link> и через <docs-link>API Modrinth</docs-link>."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "Не удалось обновить профиль"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "Произошла ошибка при обновлении профиля. Попробуйте снова."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "Войдите в Modrinth, чтобы настраивать публичный профиль."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Требуется аккаунт Modrinth"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "Уникальное имя для идентификации профиля."
   },
   "settings.sessions.title": {
     "defaultMessage": "Сеансы"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Действия"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Пользователь"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Эти пользователи заблокированы вами на Modrinth. Им нельзя:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "Вы ещё никого не заблокировали."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "Не удалось загрузить заблокированных пользователей."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "Загрузка заблокированных пользователей..."
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "отправлять вам запросы дружбы"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "приглашать вас управлять сервером Modrinth Hosting"
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "приглашать вас в совместные сборки"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "Заблокированные пользователи"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "Убрать"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "Пользователь не разблокирован"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "Произошла ошибка при разблокировке пользователя. Повторите попытку."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "Разблокировать {username}"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Настройте, кто может отправлять вам запросы дружбы на Modrinth."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "Запросы дружбы"
+  },
+  "settings.social.hosting-access.description": {
+    "defaultMessage": "Настройте, кто может давать вам доступ к серверу Modrinth Hosting."
+  },
+  "settings.social.hosting-access.title": {
+    "defaultMessage": "Приглашения управлять сервером"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "Все"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "Друзья"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "Друзья друзей"
+  },
+  "settings.social.interaction-source.loading": {
+    "defaultMessage": "Загрузка настроек..."
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "Никто"
+  },
+  "settings.social.interaction-source.saving": {
+    "defaultMessage": "Сохранение настроек..."
+  },
+  "settings.social.interaction-source.unavailable": {
+    "defaultMessage": "Настройки недоступны."
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "Настройте, кто может приглашать вас в совместные сборки."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Приглашения в совместные сборки"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "Войдите в Modrinth, чтобы настраивать доступ к общению и список заблокированных пользователей."
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Требуется аккаунт Modrinth"
+  },
+  "settings.social.title": {
+    "defaultMessage": "Общение"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Добавить"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Добавлен"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Этот пользователь уже приглашён."
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Применить"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Отмена"
+  },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Другое..."
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Другое: {date}"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Настроить ссылку."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Настройка ссылки"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "1 день"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "1 час"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "7 дней"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "6 часов"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "3 дня"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "12 часов"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Срок действия"
+  },
+  "sharing.invite-players-modal.heading": {
+    "defaultMessage": "Пригласите игроков"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Пригласить"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Ссылка действует {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Или отправьте ссылку-приглашение"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "Ссылка-приглашение скопирована в буфер обмена."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Ссылка скопирована"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Не удалось скопировать ссылку"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Лимит использований"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Друзья не найдены."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Пользователи не найдены."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Запрос отправлен"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} необходимо сначала принять запрос дружбы"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Сохранить"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Введите имя пользователя Modrinth"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Поиск..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Не удалось обновить ссылку"
+  },
+  "sharing.invite-players-toast.accept": {
+    "defaultMessage": "Принять"
+  },
+  "sharing.invite-players-toast.decline": {
+    "defaultMessage": "Отклонить"
+  },
+  "sharing.invite-players-toast.invited-you-to": {
+    "defaultMessage": "приглашает на сервер"
+  },
+  "sharing.invite-players-toast.server-suffix": {
+    "defaultMessage": "."
+  },
+  "skins.select": {
+    "defaultMessage": "Выберите скин"
+  },
+  "skins.select-named": {
+    "defaultMessage": "Выбрать {name}"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -4713,7 +6162,7 @@
     "defaultMessage": "Реализм"
   },
   "tag.category.recording-smp": {
-    "defaultMessage": "Выживание со съёмкой"
+    "defaultMessage": "Выживание на запись"
   },
   "tag.category.reflections": {
     "defaultMessage": "Отражения"
@@ -4901,6 +6350,9 @@
   "time-frame-picker.increase-amount": {
     "defaultMessage": "Увеличить период"
   },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "{unit, select,\n  hours {{amount, plural, =1 {Последний час} one {Последний # час} few {Последние # часа} other {Последние # часов}}}\n  days {{amount, plural, =1 {Последний день} one {Последний # день} few {Последние # дня} other {Последние # дней}}}\n  weeks {{amount, plural, =1 {Последняя неделя} one {Последняя # неделя} few {Последние # недели} other {Последние # недель}}}\n  months {{amount, plural, =1 {Последний месяц} one {Последний # месяц} few {Последние # месяца} other {Последние # месяцев}}}\n  other {Последнее время}\n}"
+  },
   "time-frame-picker.last-timeframe-prefix": {
     "defaultMessage": "Последние"
   },
@@ -4962,13 +6414,13 @@
     "defaultMessage": "недель"
   },
   "ui.component.unsaved-changes-popup.body": {
-    "defaultMessage": "Имеются несохранённые изменения."
+    "defaultMessage": "Есть несохранённые изменения."
   },
   "ui.confirm-leave-modal.body": {
     "defaultMessage": "Если уйти со страницы, несохранённые изменения будут потеряны."
   },
   "ui.confirm-leave-modal.header": {
-    "defaultMessage": "Имеются несохранённые изменения"
+    "defaultMessage": "Есть несохранённые изменения"
   },
   "ui.confirm-leave-modal.leave": {
     "defaultMessage": "Уйти со страницы"
@@ -4979,8 +6431,53 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Уйти со страницы?"
   },
+  "ui.pagination.go-to-page": {
+    "defaultMessage": "Перейти"
+  },
+  "ui.pagination.next-page": {
+    "defaultMessage": "Следующая страница"
+  },
+  "ui.pagination.previous-page": {
+    "defaultMessage": "Прошлая страница"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, one {# уведомление} few {# уведомления} other {# уведомлений}}"
+  },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Закрыть всё"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Не устанавливать"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Больше не предупреждать"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Подтверждение установки"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Всё равно установить"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Вредоносное ПО часто распространяется через моды на таких платформах, как Discord."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " не с Modrinth. Устанавливайте только проверенные файлы."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Предупреждение о неизвестном файле"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " содержит файлы не с Modrinth. Устанавливайте только проверенные файлы."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Предупреждение о неизвестных файлах"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Файлы не c Modrinth не проверяются."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Нераспознанные файлы"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Этот пользователь присоединился к Modrinth до завершения альфа‑тестирования в ноябре 2020 года."
@@ -5077,5 +6574,95 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Команда Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Название"
+  },
+  "version.content.version": {
+    "defaultMessage": "Версия"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "JAR для разработки"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "JAR с Javadoc"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "Необязательный набор ресурсов"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Основной"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "Необходимый набор ресурсов"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "Файл подписи"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "JAR с исходным кодом"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Другое"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Изменения"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "Совместимость"
+  },
+  "version.section.content": {
+    "defaultMessage": "Контент"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "Поиск контента..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "Любая совместимая версия"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "Любая версия"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "Недоступная версия"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "Эта версия либо удалена, либо на рассмотрении."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "Обязательная версия либо удалена, либо на рассмотрении."
+  },
+  "version.section.files": {
+    "defaultMessage": "Файлы"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Включённый контент"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "Известные несовместимости"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "Описание изменений отсутствует."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "Без загрузчика"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "Необязательные зависимости"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Необходимый контент"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Дополнительные ресурсы"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Файл"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Размер"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Тип"
   }
 }

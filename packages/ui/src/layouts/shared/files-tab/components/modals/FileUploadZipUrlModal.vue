@@ -35,7 +35,7 @@
 				<div v-else class="text-sm text-secondary">
 					{{ formatMessage(messages.zipDescription) }}
 				</div>
-				<StyledInput
+				<Input
 					v-model="url"
 					v-tooltip="props.disabled ? props.disabledTooltip : undefined"
 					:icon="LinkIcon"
@@ -63,32 +63,30 @@
 
 		<template #actions>
 			<div class="flex w-full items-center justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button type="button" @click="hide">
-						<XIcon />
-						{{
-							submitted
-								? formatMessage(commonMessages.closeButton)
-								: formatMessage(commonMessages.cancelButton)
-						}}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						v-tooltip="submitTooltip"
-						:disabled="submitDisabled"
-						type="submit"
-						@click="handleSubmit"
-					>
-						<SpinnerIcon v-if="submitted" class="animate-spin" />
-						<DownloadIcon v-else />
-						{{
-							submitted
-								? formatMessage(commonMessages.installingLabel)
-								: formatMessage(messages.installButton)
-						}}
-					</button>
-				</ButtonStyled>
+				<Button type="outlined" native-type="button" @click="hide">
+					<XIcon />
+					{{
+						submitted
+							? formatMessage(commonMessages.closeButton)
+							: formatMessage(commonMessages.cancelButton)
+					}}
+				</Button>
+				<Button
+					v-tooltip="submitTooltip"
+					type="colored"
+					color="brand"
+					:disabled="submitDisabled"
+					native-type="submit"
+					@click="handleSubmit"
+				>
+					<SpinnerIcon v-if="submitted" class="animate-spin" />
+					<DownloadIcon v-else />
+					{{
+						submitted
+							? formatMessage(commonMessages.installingLabel)
+							: formatMessage(messages.installButton)
+					}}
+				</Button>
 			</div>
 		</template>
 	</NewModal>
@@ -105,8 +103,8 @@ import {
 } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import { Button } from '#ui/components/base/buttons'
+import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers/api-client'

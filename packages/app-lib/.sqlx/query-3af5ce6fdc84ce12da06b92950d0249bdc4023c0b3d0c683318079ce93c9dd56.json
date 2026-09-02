@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instances\n\t\tSET\n\t\t\tsubmitted_time_played = CASE\n\t\t\t\tWHEN submitted_time_played < 0 THEN ?\n\t\t\t\tWHEN submitted_time_played > ? THEN ?\n\t\t\t\tELSE submitted_time_played + ?\n\t\t\tEND,\n\t\t\trecent_time_played = 0,\n\t\t\tmodified = ?\n\t\tWHERE id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "3af5ce6fdc84ce12da06b92950d0249bdc4023c0b3d0c683318079ce93c9dd56"
+}

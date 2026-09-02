@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<AiImageWarningModal ref="aiImageWarningModal" />
 		<Modal
 			v-if="currentMember"
 			ref="modal_edit_item"
@@ -10,24 +11,18 @@
 					<div class="file-header">
 						<ImageIcon aria-hidden="true" />
 						<strong>{{ editFile ? editFile.name : 'Current image' }}</strong>
-						<ButtonStyled v-if="editIndex === -1" type="outlined">
-							<FileInput
-								class="button-like"
-								prompt="Replace"
-								:accept="acceptFileTypes"
-								:max-size="5242880"
-								should-always-reset
-								aria-label="Replace image"
-								@change="
-									(x) => {
-										editFile = x[0]
-										showPreviewImage()
-									}
-								"
-							>
-								<TransferIcon aria-hidden="true" />
-							</FileInput>
-						</ButtonStyled>
+						<FileButton
+							v-if="editIndex === -1"
+							type="outlined"
+							class="button-like"
+							prompt="Replace"
+							:accept="acceptFileTypes"
+							:max-size="5242880"
+							aria-label="Replace image"
+							@change="replaceEditFile"
+						>
+							<TransferIcon aria-hidden="true" />
+						</FileButton>
 					</div>
 					<img
 						:src="
@@ -43,7 +38,7 @@
 				<label for="gallery-image-title">
 					<span class="label__title">Title</span>
 				</label>
-				<StyledInput
+				<Input
 					id="gallery-image-title"
 					v-model="editTitle"
 					:maxlength="64"
@@ -52,17 +47,16 @@
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="gallery-image-desc"
 					v-model="editDescription"
-					multiline
 					:maxlength="255"
 					placeholder="Enter description..."
 				/>
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>
-				<StyledInput
+				<Input
 					id="gallery-image-ordering"
 					v-model="editOrder"
 					type="number"
@@ -74,37 +68,44 @@
 						You can feature one image on your project to be used as a banner image.
 					</span>
 				</label>
-				<ButtonStyled v-if="!editFeatured">
-					<button id="gallery-image-featured" class="w-fit" @click="editFeatured = true">
-						<StarIcon aria-hidden="true" />
-						Set as banner
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else>
-					<button id="gallery-image-featured" class="w-fit" @click="editFeatured = false">
-						<StarIcon fill="currentColor" aria-hidden="true" />
-						Unset as banner
-					</button>
-				</ButtonStyled>
-				<div class="button-group">
-					<ButtonStyled type="outlined">
-						<button @click="modal_edit_item.hide()">
-							<XIcon aria-hidden="true" />
-							Cancel
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="editIndex === -1" color="brand">
-						<button :disabled="shouldPreventActions" @click="createGalleryItem">
-							<PlusIcon aria-hidden="true" />
-							Add gallery image
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="brand">
-						<button :disabled="shouldPreventActions" @click="editGalleryItem">
-							<SaveIcon aria-hidden="true" />
-							Save changes
-						</button>
-					</ButtonStyled>
+				<Button
+					v-if="!editFeatured"
+					id="gallery-image-featured"
+					class="w-fit"
+					@click="editFeatured = true"
+				>
+					<StarIcon aria-hidden="true" />
+					Set as banner
+				</Button>
+				<Button v-else id="gallery-image-featured" class="w-fit" @click="editFeatured = false">
+					<StarIcon fill="currentColor" aria-hidden="true" />
+					Unset as banner
+				</Button>
+				<div class="mt-3 flex flex-wrap justify-end gap-2">
+					<Button type="outlined" @click="modal_edit_item.hide()">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</Button>
+					<Button
+						v-if="editIndex === -1"
+						type="colored"
+						color="brand"
+						:disabled="shouldPreventActions"
+						@click="createGalleryItem"
+					>
+						<PlusIcon aria-hidden="true" />
+						Add gallery image
+					</Button>
+					<Button
+						v-else
+						type="colored"
+						color="brand"
+						:disabled="shouldPreventActions"
+						@click="editGalleryItem"
+					>
+						<SaveIcon aria-hidden="true" />
+						Save changes
+					</Button>
 				</div>
 			</div>
 		</Modal>
@@ -146,59 +147,59 @@
 					</div>
 					<div class="controls">
 						<div class="flex gap-2">
-							<ButtonStyled circular>
-								<button class="close" @click="expandedGalleryItem = null">
-									<XIcon aria-hidden="true" />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled circular>
-								<a
-									class="open"
-									target="_blank"
-									:href="
-										expandedGalleryItem.raw_url
-											? expandedGalleryItem.raw_url
-											: 'https://cdn.modrinth.com/placeholder-banner.svg'
-									"
-								>
-									<ExternalIcon aria-hidden="true" />
-								</a>
-							</ButtonStyled>
-							<ButtonStyled circular>
-								<button @click="zoomedIn = !zoomedIn">
-									<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-									<ContractIcon v-else aria-hidden="true" />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="filteredGallery.length > 1" circular>
-								<button class="previous" @click="previousImage()">
-									<LeftArrowIcon aria-hidden="true" />
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-if="filteredGallery.length > 1" circular>
-								<button class="next" @click="nextImage()">
-									<RightArrowIcon aria-hidden="true" />
-								</button>
-							</ButtonStyled>
+							<IconButton label="Close" class="close" @click="expandedGalleryItem = null">
+								<XIcon aria-hidden="true" />
+							</IconButton>
+							<ButtonLink
+								class="open !w-9 !rounded-full !px-0"
+								target="_blank"
+								:href="
+									expandedGalleryItem.raw_url
+										? expandedGalleryItem.raw_url
+										: 'https://cdn.modrinth.com/placeholder-banner.svg'
+								"
+							>
+								<ExternalIcon aria-hidden="true" />
+							</ButtonLink>
+							<IconButton label="Toggle zoom" @click="zoomedIn = !zoomedIn">
+								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+								<ContractIcon v-else aria-hidden="true" />
+							</IconButton>
+							<IconButton
+								v-if="filteredGallery.length > 1"
+								label="Previous image"
+								class="previous"
+								@click="previousImage()"
+							>
+								<LeftArrowIcon aria-hidden="true" />
+							</IconButton>
+							<IconButton
+								v-if="filteredGallery.length > 1"
+								label="Next image"
+								class="next"
+								@click="nextImage()"
+							>
+								<RightArrowIcon aria-hidden="true" />
+							</IconButton>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div v-if="currentMember" class="card header-buttons">
-			<ButtonStyled color="brand">
-				<FileInput
-					:max-size="5242880"
-					:accept="acceptFileTypes"
-					prompt="Upload an image"
-					aria-label="Upload an image"
-					class="button-like"
-					:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
-					@change="handleFiles"
-				>
-					<UploadIcon aria-hidden="true" />
-				</FileInput>
-			</ButtonStyled>
+			<FileButton
+				type="colored"
+				color="brand"
+				:max-size="5242880"
+				:accept="acceptFileTypes"
+				prompt="Upload an image"
+				aria-label="Upload an image"
+				class="button-like"
+				:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+				@change="handleFiles"
+			>
+				<UploadIcon aria-hidden="true" />
+			</FileButton>
 			<span class="indicator">
 				<InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
 			</span>
@@ -214,6 +215,7 @@
 					<img
 						:src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
 						:alt="item.title ? item.title : 'gallery-image'"
+						@contextmenu="onFullImageContextMenu($event, item.raw_url)"
 					/>
 				</a>
 				<div class="gallery-body">
@@ -232,37 +234,33 @@
 						{{ formatDate(item.created) }}
 					</div>
 					<div v-if="currentMember" class="gallery-buttons input-group">
-						<ButtonStyled>
-							<button
-								@click="
-									() => {
-										resetEdit()
-										editIndex = index
-										editTitle = item.title
-										editDescription = item.description
-										editFeatured = item.featured
-										editOrder = item.ordering
-										modal_edit_item.show()
-									}
-								"
-							>
-								<EditIcon aria-hidden="true" />
-								Edit
-							</button>
-						</ButtonStyled>
-						<ButtonStyled>
-							<button
-								@click="
-									() => {
-										deleteIndex = index
-										modal_confirm.show()
-									}
-								"
-							>
-								<TrashIcon aria-hidden="true" />
-								Remove
-							</button>
-						</ButtonStyled>
+						<Button
+							@click="
+								() => {
+									resetEdit()
+									editIndex = index
+									editTitle = item.title
+									editDescription = item.description
+									editFeatured = item.featured
+									editOrder = item.ordering
+									modal_edit_item.show()
+								}
+							"
+						>
+							<EditIcon aria-hidden="true" />
+							Edit
+						</Button>
+						<Button
+							@click="
+								() => {
+									deleteIndex = index
+									modal_confirm.show()
+								}
+							"
+						>
+							<TrashIcon aria-hidden="true" />
+							Remove
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -290,16 +288,23 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
+	Button,
+	ButtonLink,
+	commonProjectSettingsMessages,
 	ConfirmModal,
 	DropArea,
-	FileInput,
+	FileButton,
+	IconButton,
 	injectProjectPageContext,
+	Input,
 	NewModal as Modal,
-	StyledInput,
+	Textarea,
 	useFormatDateTime,
+	useFullImageContextMenu,
 } from '@modrinth/ui'
 
+import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
 
 const formatDate = useFormatDateTime({
@@ -307,6 +312,7 @@ const formatDate = useFormatDateTime({
 	month: 'long',
 	day: 'numeric',
 })
+const onFullImageContextMenu = useFullImageContextMenu()
 
 const {
 	projectV2: project,
@@ -316,16 +322,9 @@ const {
 	deleteGalleryItem: deleteGalleryItemMutation,
 } = injectProjectPageContext()
 
-const title = `${project.value.title} - Gallery`
-const description = `View ${project.value.gallery?.length ?? 0} images of ${project.value.title} on Modrinth.`
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.gallery)
 
-useSeoMeta({
-	title,
-	description,
-	ogTitle: title,
-	ogDescription: description,
-})
-
+const aiImageWarningModal = ref(null)
 const modal_edit_item = ref(null)
 const modal_confirm = ref(null)
 
@@ -383,12 +382,33 @@ const resetEdit = () => {
 	previewImage.value = null
 }
 
-const handleFiles = (files) => {
+const handleFiles = async (files) => {
+	const file = files[0]
+	if (!file) {
+		return
+	}
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
 	resetEdit()
-	editFile.value = files[0]
+	editFile.value = file
 
 	showPreviewImage()
 	modal_edit_item.value.show()
+}
+
+const replaceEditFile = async (files) => {
+	const file = files[0]
+	if (!file) {
+		return
+	}
+	if (await fileDeclaresAi(file)) {
+		aiImageWarningModal.value?.show()
+		return
+	}
+	editFile.value = file
+	showPreviewImage()
 }
 
 const showPreviewImage = () => {

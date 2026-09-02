@@ -9,7 +9,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::database::redis::RedisPool;
+use xredis::RedisPool;
 
 use super::{
     DatabaseError, LoaderFieldEnumValueId,
@@ -117,17 +117,8 @@ impl MinecraftGameVersion {
             id: loader_field_enum_value.id,
             version: loader_field_enum_value.value,
             created: loader_field_enum_value.created,
-            type_: loader_field_enum_value
-                .metadata
-                .get("type")
-                .and_then(|x| x.as_str())
-                .map(|x| x.to_string())
-                .unwrap_or_default(),
-            major: loader_field_enum_value
-                .metadata
-                .get("major")
-                .and_then(|x| x.as_bool())
-                .unwrap_or_default(),
+            type_: loader_field_enum_value.ty.unwrap_or_default(),
+            major: loader_field_enum_value.major.unwrap_or_default(),
         }
     }
 }
@@ -220,11 +211,11 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
         .await?;
 
         let mut conn = redis.connect().await?;
-        conn.delete(
+        let key = conn.key().entity(
             crate::database::models::loader_fields::LOADER_FIELD_ENUM_VALUES_NAMESPACE,
             game_versions_enum.id.0,
-        )
-        .await?;
+        );
+        conn.delete(&key).await?;
 
         Ok(LoaderFieldEnumValueId(result.id))
     }

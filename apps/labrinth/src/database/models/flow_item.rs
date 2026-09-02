@@ -1,26 +1,32 @@
 use super::ids::*;
-use crate::auth::AuthProvider;
 use crate::auth::oauth::uris::OAuthRedirectUris;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
+use crate::{auth::AuthProvider, routes::internal::flows::TempUser};
 use chrono::Duration;
 use rand::Rng;
 use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
-use serde::{Deserialize, Serialize};
+use serde_binhum::serde_binhum;
+use url::Url;
+use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
+use xredis::RedisPool;
 
-const FLOWS_NAMESPACE: &str = "flows";
+const FLOWS_NAMESPACE: &str = "flows:v4";
 
-#[derive(Deserialize, Serialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
+#[serde_binhum]
 pub enum DBFlow {
     OAuth {
         user_id: Option<DBUserId>,
-        url: String,
+        url: Url,
         provider: AuthProvider,
         existing_user_id: Option<DBUserId>,
+    },
+    OAuthPending {
+        url: Url,
+        provider: AuthProvider,
+        user: TempUser,
     },
     Login2FA {
         user_id: DBUserId,
@@ -52,31 +58,70 @@ pub enum DBFlow {
         scopes: Scopes,
         original_redirect_uri: Option<String>, // Needed for https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
     },
+    RegisterPasskey {
+        user_id: DBUserId,
+        #[serde_binhum(binary(with = "json_string"))]
+        state: PasskeyRegistration,
+    },
+    AuthenticatePasskey {
+        #[serde_binhum(binary(with = "json_string"))]
+        state: DiscoverableAuthentication,
+    },
+}
+
+mod json_string {
+    use serde::de::DeserializeOwned;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn serialize<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        T: Serialize,
+        S: Serializer,
+    {
+        let value =
+            serde_json::to_string(value).map_err(serde::ser::Error::custom)?;
+        value.serialize(serializer)
+    }
+
+    pub fn deserialize<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+    where
+        T: DeserializeOwned,
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        serde_json::from_str(&value).map_err(serde::de::Error::custom)
+    }
 }
 
 impl DBFlow {
+    pub async fn insert_with_state(
+        &self,
+        expires: Duration,
+        redis: &RedisPool,
+        state: &str,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.connect().await?;
+        let key = redis.key().entity(FLOWS_NAMESPACE, state);
+
+        redis
+            .set_serialized(&key, &self, Some(expires.num_seconds()))
+            .await?;
+        Ok(())
+    }
+
     pub async fn insert(
         &self,
         expires: Duration,
         redis: &RedisPool,
     ) -> Result<String, DatabaseError> {
-        let mut redis = redis.connect().await?;
-
-        let flow = ChaCha20Rng::from_entropy()
+        let state = ChaCha20Rng::from_entropy()
             .sample_iter(&Alphanumeric)
             .take(32)
             .map(char::from)
             .collect::<String>();
 
-        redis
-            .set_serialized_to_json(
-                FLOWS_NAMESPACE,
-                &flow,
-                &self,
-                Some(expires.num_seconds()),
-            )
-            .await?;
-        Ok(flow)
+        self.insert_with_state(expires, redis, &state).await?;
+        Ok(state)
     }
 
     pub async fn get(
@@ -84,8 +129,9 @@ impl DBFlow {
         redis: &RedisPool,
     ) -> Result<Option<DBFlow>, DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
-        redis.get_deserialized_from_json(FLOWS_NAMESPACE, id).await
+        redis.get_deserialized(&key).await.map_err(Into::into)
     }
 
     /// Gets the flow and removes it from the cache, but only removes if the flow was present and the predicate returned true
@@ -109,8 +155,9 @@ impl DBFlow {
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
-        redis.delete(FLOWS_NAMESPACE, id).await?;
+        redis.delete(&key).await?;
         Ok(Some(()))
     }
 }

@@ -1,9 +1,8 @@
 use crate::auth::AuthenticationError;
 use crate::auth::validate::get_user_record_from_bearer_token;
-use crate::database::PgPool;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::models::notification_item::DBNotification;
-use crate::database::redis::RedisPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::notifications::{Notification, NotificationBody};
 use crate::models::pats::Scopes;
 use crate::models::users::User;
@@ -16,6 +15,7 @@ use crate::sync::friends::{FRIENDS_CHANNEL_NAME, RedisFriendsMessage};
 use crate::sync::status::{
     get_user_status, push_back_user_expiry, replace_user_status,
 };
+use crate::util::error::Context as _;
 use actix_web::web::{Data, Payload};
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use actix_ws::Message;
@@ -28,14 +28,14 @@ use chrono::Utc;
 use either::Either;
 use futures_util::future::select;
 use futures_util::{StreamExt, TryStreamExt};
-use redis::AsyncCommands;
 use serde::Deserialize;
 use std::pin::pin;
 use std::sync::atomic::Ordering;
 use tokio::sync::oneshot::error::TryRecvError;
 use tokio::time::{Duration, sleep};
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ws_init);
 }
 
@@ -45,10 +45,16 @@ struct LauncherHeartbeatInit {
 }
 
 // TODO: Move launcher-specific tunnel traffic to a proper launcher websocket endpoint.
-#[get("launcher_socket")]
+/// Start launcher socket.  
+#[utoipa::path(
+	tag = "statuses",
+	responses((status = 101))
+)]
+#[get("/launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,
     pool: Data<PgPool>,
+    ro_pool: Data<ReadOnlyPgPool>,
     web::Query(auth): web::Query<LauncherHeartbeatInit>,
     body: Payload,
     db: Data<ActiveSockets>,
@@ -63,15 +69,14 @@ pub async fn ws_init(
         &session_queue,
         false,
     )
-    .await?
-    .ok_or_else(|| {
-        ApiError::Authentication(AuthenticationError::InvalidCredentials)
-    })?;
+    .await
+    .wrap_auth_err("authenticating API request")?
+    .wrap_auth_err_with(|| AuthenticationError::InvalidCredentials)?;
 
     if !scopes.contains(Scopes::SESSION_ACCESS) {
-        return Err(ApiError::Authentication(
+        return Err(ApiError::Auth(eyre::eyre!(
             AuthenticationError::InvalidCredentials,
-        ));
+        )));
     }
 
     let user = User::from_full(db_user);
@@ -89,7 +94,9 @@ pub async fn ws_init(
     };
 
     let friends =
-        DBFriend::get_user_friends(user.id.into(), Some(true), &**pool).await?;
+        DBFriend::get_user_friends(user.id.into(), Some(true), &***ro_pool)
+            .await
+            .wrap_internal_err("fetching friends from database")?;
 
     let friend_statuses = if !friends.is_empty() {
         let db = db.clone();
@@ -123,31 +130,40 @@ pub async fn ws_init(
     };
 
     let _ = session
-        .text(serde_json::to_string(
-            &ServerToClientMessage::FriendStatuses {
+        .text(
+            serde_json::to_string(&ServerToClientMessage::FriendStatuses {
                 statuses: friend_statuses,
-            },
-        )?)
+            })
+            .wrap_request_err("serializing friend statuses")?,
+        )
         .await;
 
-    let unread_server_invites = DBNotification::get_many_user_exposed_on_site(
-        user_id.into(),
-        &**pool,
-        &redis,
-    )
-    .await?
-    .into_iter()
-    .filter(|notification| {
-        !notification.read
-            && matches!(
-                &notification.body,
-                NotificationBody::ServerInvite { .. }
-            )
-    })
-    .map(Notification::from);
+    let unread_launcher_invites =
+        DBNotification::get_many_user_exposed_on_site(
+            user_id.into(),
+            &***ro_pool,
+            &redis,
+        )
+        .await
+        .wrap_internal_err("fetching notifications from database")?
+        .into_iter()
+        .filter(|notification| {
+            !notification.read
+                && matches!(
+                    &notification.body,
+                    NotificationBody::ServerInvite { .. }
+                        | NotificationBody::SharedInstanceInvite { .. }
+                )
+        })
+        .map(Notification::from);
 
-    for notification in unread_server_invites {
-        let _ = session.text(serde_json::to_string(&notification)?).await;
+    for notification in unread_launcher_invites {
+        let _ = session
+            .text(
+                serde_json::to_string(&notification)
+                    .wrap_request_err("serializing launcher notification")?,
+            )
+            .await;
     }
 
     let db = db.clone();
@@ -162,12 +178,15 @@ pub async fn ws_init(
     #[cfg(debug_assertions)]
     tracing::info!("Connection {socket_id} opened by {}", user.id);
 
-    replace_user_status(None, Some(&status), &redis).await?;
+    replace_user_status(None, Some(&status), &redis)
+        .await
+        .wrap_internal_err("reading HTTP response body")?;
     broadcast_friends_message(
         &redis,
         RedisFriendsMessage::StatusUpdate { status },
     )
-    .await?;
+    .await
+    .wrap_internal_err("reading HTTP response body")?;
 
     let (shutdown_sender, mut shutdown_receiver) =
         tokio::sync::oneshot::channel::<()>();
@@ -318,7 +337,7 @@ pub async fn ws_init(
                             let _ = broadcast_to_local_friends(
                                 user.id,
                                 ServerToClientMessage::FriendSocketStoppedListening { user: user.id },
-                                &pool,
+                                &ro_pool,
                                 &db,
                             )
                             .await;
@@ -376,7 +395,7 @@ pub async fn ws_init(
         }
 
         let _ = shutdown_sender.send(());
-        let _ = close_socket(socket_id, &pool, &db, &redis).await;
+        let _ = close_socket(socket_id, &ro_pool, &db, &redis).await;
     });
 
     Ok(res)
@@ -386,26 +405,24 @@ pub async fn broadcast_friends_message(
     redis: &RedisPool,
     message: RedisFriendsMessage,
 ) -> Result<(), crate::database::models::DatabaseError> {
-    let _: () = redis
-        .pool
-        .get()
-        .await?
+    redis
         .publish(FRIENDS_CHANNEL_NAME, message)
-        .await?;
-    Ok(())
+        .await
+        .map_err(Into::into)
 }
 
 pub async fn broadcast_to_local_friends(
     user_id: UserId,
     message: ServerToClientMessage,
-    pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     sockets: &ActiveSockets,
 ) -> Result<(), crate::database::models::DatabaseError> {
     broadcast_to_known_local_friends(
         user_id,
         message,
         sockets,
-        DBFriend::get_user_friends(user_id.into(), Some(true), pool).await?,
+        DBFriend::get_user_friends(user_id.into(), Some(true), &**ro_pool)
+            .await?,
     )
     .await
 }
@@ -493,7 +510,7 @@ pub async fn send_notification_to_user(
 
 pub async fn close_socket(
     id: SocketId,
-    pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     db: &ActiveSockets,
     redis: &RedisPool,
 ) -> Result<(), crate::database::models::DatabaseError> {
@@ -526,7 +543,7 @@ pub async fn close_socket(
                         ServerToClientMessage::SocketClosed {
                             socket: owned_socket,
                         },
-                        pool,
+                        ro_pool,
                         db,
                     )
                     .await;

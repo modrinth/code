@@ -1,6 +1,9 @@
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
+use std::cmp::Reverse;
 use std::collections::HashMap;
 
-use crate::database::PgPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
@@ -9,18 +12,18 @@ use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::queue::session::AuthQueue;
+use xredis::RedisPool;
 
 use super::ApiError;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(forge_updates);
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct NeoForge {
     #[serde(default = "default_neoforge")]
     pub neoforge: String,
@@ -30,12 +33,22 @@ fn default_neoforge() -> String {
     "none".into()
 }
 
-#[get("{id}/forge_updates.json")]
+#[utoipa::path(
+	context_path = "/updates",
+	tag = "updates",
+	params(
+		("id" = String, Path),
+		("neoforge" = Option<String>, Query)
+	),
+	responses((status = OK))
+)]
+#[get("/{id}/forge_updates.json")]
 pub async fn forge_updates(
     req: HttpRequest,
     web::Query(neo): web::Query<NeoForge>,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -44,8 +57,9 @@ pub async fn forge_updates(
     let (id,) = info.into_inner();
 
     let project = database::models::DBProject::get(&id, &**pool, &redis)
-        .await?
-        .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
+        .await
+        .wrap_api_err("fetching project from database")?
+        .wrap_request_err_with(|| ERROR.to_string())?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -58,16 +72,20 @@ pub async fn forge_updates(
     .map(|x| x.1)
     .ok();
 
-    if !is_visible_project(&project.inner, &user_option, &pool, false).await? {
-        return Err(ApiError::InvalidInput(ERROR.to_string()));
+    if !is_visible_project(&project.inner, &user_option, &pool, false)
+        .await
+        .wrap_api_err("checking project visibility")?
+    {
+        return Err(ApiError::Request(eyre::eyre!("{ERROR}")));
     }
 
     let versions = database::models::DBVersion::get_many(
         &project.versions,
-        &**pool,
+        &***ro_pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("fetching versions from database")?;
 
     let loaders = match &*neo.neoforge {
         "only" => |x: &String| *x == "neoforge",
@@ -82,11 +100,13 @@ pub async fn forge_updates(
             .collect(),
         &user_option,
         &pool,
+        &ro_pool,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_api_err("fetching compatible update versions")?;
 
-    versions.sort_by_key(|b| std::cmp::Reverse(b.date_published));
+    versions.sort_by_key(|b| Reverse(b.date_published));
 
     #[derive(Serialize)]
     struct ForgeUpdates {

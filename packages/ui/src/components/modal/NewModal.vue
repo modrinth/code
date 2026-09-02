@@ -1,11 +1,12 @@
 <template>
 	<Teleport to="body">
-		<div v-if="open" class="modal-root">
+		<div v-if="open" class="modal-root" data-modal-root :data-modal-id="modalId">
 			<div
 				:class="{ shown: visible }"
 				class="tauri-overlay"
 				data-tauri-drag-region
-				@click="() => (closeOnClickOutside && closable ? hide() : {})"
+				@pointerdown="onTauriOverlayPointerDown"
+				@click="onTauriOverlayClick"
 			/>
 			<div
 				:class="[
@@ -31,7 +32,7 @@
 					<div
 						v-if="!hideHeader"
 						data-tauri-drag-region
-						class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
+						class="grid grid-cols-[1fr_auto] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
 					>
 						<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 							<slot name="title">
@@ -40,32 +41,30 @@
 								</span>
 							</slot>
 						</div>
-						<ButtonStyled v-if="closable" circular>
-							<button
+						<div class="flex items-center gap-2">
+							<slot name="header-actions" />
+							<IconButton
+								v-if="closable"
 								v-tooltip="closeLabel"
-								:aria-label="closeLabel"
+								:label="closeLabel"
 								:disabled="disableClose"
 								@click="hide"
 							>
 								<XIcon aria-hidden="true" />
-							</button>
-						</ButtonStyled>
+							</IconButton>
+						</div>
 					</div>
 
-					<ButtonStyled
+					<IconButton
 						v-if="props.mergeHeader && closable"
+						v-tooltip="closeLabel"
+						:label="closeLabel"
 						class="absolute top-4 right-4 z-10"
-						circular
+						:disabled="disableClose"
+						@click="hide"
 					>
-						<button
-							v-tooltip="closeLabel"
-							:aria-label="closeLabel"
-							:disabled="disableClose"
-							@click="hide"
-						>
-							<XIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+						<XIcon aria-hidden="true" />
+					</IconButton>
 
 					<div v-if="scrollable" class="relative flex-1 min-h-0 flex flex-col">
 						<Transition
@@ -86,11 +85,11 @@
 							ref="scrollContainer"
 							data-modal-content
 							:class="[
-								'flex-1 min-h-0',
-								props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
+								'flex-1 min-h-0 overflow-y-auto',
+								props.noPadding ? '' : 'p-6 !pb-1 sm:pb-6',
 								{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 							]"
-							:style="props.noPadding ? {} : { maxHeight: maxContentHeight }"
+							:style="{ maxHeight: maxContentHeight }"
 							@scroll="checkScrollState"
 						>
 							<slot> You just lost the game.</slot>
@@ -123,7 +122,11 @@
 						<slot> You just lost the game.</slot>
 					</div>
 
-					<div v-if="$slots.actions" class="p-4 pt-0">
+					<div
+						v-if="$slots.actions"
+						:class="{ 'pt-4 border-0 border-t border-solid border-surface-5': actionsDivider }"
+						class="p-4"
+					>
 						<slot name="actions" />
 					</div>
 				</div>
@@ -136,12 +139,13 @@
 import { XIcon } from '@modrinth/assets'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
+import { IconButton } from '#ui/components/base/buttons'
+
 import { useVIntl } from '../../composables/i18n'
 import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import { injectModalBehavior } from '../../providers'
 import { commonMessages } from '../../utils/common-messages'
-import ButtonStyled from '../base/ButtonStyled.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -166,7 +170,9 @@ const props = withDefaults(
 		header?: string
 		hideHeader?: boolean
 		onHide?: () => void
+		onAfterHide?: () => void
 		onShow?: () => void
+		beforeHide?: () => boolean
 		mergeHeader?: boolean
 		scrollable?: boolean
 		maxContentHeight?: string
@@ -178,6 +184,7 @@ const props = withDefaults(
 		width?: string
 		/** Disables all close actions (close button, ESC key, click outside). */
 		disableClose?: boolean
+		actionsDivider?: boolean
 	}>(),
 	{
 		type: true,
@@ -191,7 +198,9 @@ const props = withDefaults(
 		header: undefined,
 		hideHeader: false,
 		onHide: () => {},
+		onAfterHide: () => {},
 		onShow: () => {},
+		beforeHide: undefined,
 		mergeHeader: false,
 		// TODO: migrate all modals to use scrollable and remove this prop
 		scrollable: false,
@@ -200,10 +209,35 @@ const props = withDefaults(
 		maxWidth: undefined,
 		width: undefined,
 		disableClose: false,
+		actionsDivider: false,
 	},
 )
 
 const effectiveNoblur = computed(() => props.noblur ?? modalBehavior?.noblur.value ?? false)
+
+const TAURI_DRAG_THRESHOLD_PX = 4
+let tauriPointerScreen: { x: number; y: number } | null = null
+
+function onTauriOverlayPointerDown(event: PointerEvent) {
+	if (event.button !== 0) {
+		return
+	}
+	tauriPointerScreen = { x: event.screenX, y: event.screenY }
+}
+
+function onTauriOverlayClick(event: MouseEvent) {
+	const start = tauriPointerScreen
+	tauriPointerScreen = null
+	if (
+		start &&
+		Math.hypot(event.screenX - start.x, event.screenY - start.y) >= TAURI_DRAG_THRESHOLD_PX
+	) {
+		return
+	}
+	if (props.closeOnClickOutside && props.closable && !props.disableClose) {
+		hide()
+	}
+}
 
 const computedFade = computed(() => {
 	if (props.fade) return props.fade
@@ -220,6 +254,7 @@ const visible = ref(false)
 const stackDepth = ref(0)
 const modalBodyRef = ref<HTMLElement | null>(null)
 let previousFocusEl: Element | null = null
+let hideTimeout: ReturnType<typeof setTimeout> | null = null
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
@@ -232,10 +267,20 @@ function getFocusableElements(): HTMLElement[] {
 	return Array.from(modalBodyRef.value.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
 }
 
+function renderedModalDepth(): number {
+	return Array.from(document.querySelectorAll<HTMLElement>('[data-modal-root]')).filter(
+		(root) => root.dataset.modalId !== modalId,
+	).length
+}
+
 function show(event?: MouseEvent) {
+	if (hideTimeout) {
+		clearTimeout(hideTimeout)
+		hideTimeout = null
+	}
 	props.onShow?.()
 	const wasEmpty = modalStackSize() === 0
-	stackDepth.value = modalStackSize()
+	stackDepth.value = Math.max(modalStackSize(), renderedModalDepth())
 	open.value = true
 	previousFocusEl = document.activeElement
 	pushModal()
@@ -263,11 +308,15 @@ function show(event?: MouseEvent) {
 	}, 50)
 }
 
-function hide() {
+function hide(): boolean {
 	if (props.disableClose) {
-		return
+		return false
+	}
+	if (props.beforeHide?.() === false) {
+		return false
 	}
 	props.onHide?.()
+	resetMousePosition()
 	visible.value = false
 	popModal()
 	if (modalStackSize() === 0) {
@@ -280,15 +329,30 @@ function hide() {
 		previousFocusEl.focus()
 	}
 	previousFocusEl = null
-	setTimeout(() => {
+	hideTimeout = setTimeout(() => {
 		open.value = false
+		hideTimeout = null
+		nextTick(() => props.onAfterHide?.())
 	}, 300)
+	return true
+}
+
+async function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
+	await nextTick()
+	if (!scrollContainer.value) return
+
+	scrollContainer.value.scrollTo({
+		top: scrollContainer.value.scrollHeight,
+		behavior,
+	})
+	requestAnimationFrame(checkScrollState)
 }
 
 defineExpose({
 	show,
 	hide,
 	checkScrollState,
+	scrollToBottom,
 })
 
 const mouseX = ref(0)
@@ -309,7 +373,16 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseY.value = event.clientY
 }
 
+function resetMousePosition() {
+	mouseX.value = Math.round(window.innerWidth / 2)
+	mouseY.value = Math.round(window.innerHeight / 2)
+}
+
 onUnmounted(() => {
+	if (hideTimeout) {
+		clearTimeout(hideTimeout)
+		hideTimeout = null
+	}
 	if (open.value) {
 		popModal()
 		window.removeEventListener('keydown', handleWindowKeyDown)
@@ -325,8 +398,6 @@ function handleWindowKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
 		if (!isTopmostModal()) return
 		hide()
-		mouseX.value = Math.round(window.innerWidth / 2)
-		mouseY.value = Math.round(window.innerHeight / 2)
 	}
 }
 

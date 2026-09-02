@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center gap-2">
 			<div class="relative flex-1">
-				<StyledInput
+				<Input
 					ref="amountInput"
 					:model-value="modelValue"
 					type="number"
@@ -12,7 +12,7 @@
 					:disabled="isDisabled"
 					:placeholder="formatMessage(formFieldPlaceholders.amountPlaceholder)"
 					wrapper-class="w-full"
-					@update:model-value="handleStyledInput"
+					@update:model-value="handleInput"
 				/>
 			</div>
 			<Combobox
@@ -26,11 +26,9 @@
 					<span class="font-semibold leading-tight">{{ item.label }}</span>
 				</template>
 			</Combobox>
-			<ButtonStyled>
-				<button class="px-4 py-2" :disabled="isDisabled" @click="setMaxAmount">
-					{{ formatMessage(commonMessages.maxButton) }}
-				</button>
-			</ButtonStyled>
+			<Button class="px-4 py-2" :disabled="isDisabled" @click="setMaxAmount">
+				{{ formatMessage(commonMessages.maxButton) }}
+			</Button>
 		</div>
 		<div>
 			<span class="my-1 mt-0 text-secondary">{{ formatMoney(safeMaxAmount) }} available.</span>
@@ -50,11 +48,11 @@
 
 <script setup lang="ts">
 import {
-	ButtonStyled,
+	Button,
 	Combobox,
 	commonMessages,
 	formFieldPlaceholders,
-	StyledInput,
+	Input,
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
@@ -83,7 +81,7 @@ const emit = defineEmits<{
 
 const { formatMessage } = useVIntl()
 const formatMoney = useFormatMoney()
-const amountInput = ref<InstanceType<typeof StyledInput> | null>(null)
+const amountInput = ref<InstanceType<typeof Input> | null>(null)
 
 const safeMaxAmount = computed(() => {
 	return Math.max(0, props.maxAmount)
@@ -108,7 +106,7 @@ function setMaxAmount() {
 	emit('update:modelValue', maxValue)
 }
 
-function handleStyledInput(val: string | number) {
+function handleInput(val: string | number) {
 	const value = String(val)
 
 	if (value && value.includes('.')) {

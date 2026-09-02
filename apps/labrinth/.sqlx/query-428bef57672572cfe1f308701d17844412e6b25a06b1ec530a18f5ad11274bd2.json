@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            insert into project_attribution_files (group_id, name, sha1)\n            select $1, unnest($2::text[]), unnest($3::bytea[])\n            on conflict (group_id, sha1) do nothing\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "TextArray",
+        "ByteaArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "428bef57672572cfe1f308701d17844412e6b25a06b1ec530a18f5ad11274bd2"
+}

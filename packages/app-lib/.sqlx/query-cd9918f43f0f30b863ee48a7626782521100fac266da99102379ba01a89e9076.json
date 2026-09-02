@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO screenshot_group_memberships (screenshot_id, group_id) VALUES (?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "cd9918f43f0f30b863ee48a7626782521100fac266da99102379ba01a89e9076"
+}

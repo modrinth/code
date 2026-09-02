@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
 use crate::models::projects::Project;
@@ -9,16 +8,18 @@ use crate::models::v2::projects::LegacyProject;
 use crate::models::v2::user::LegacyUser;
 use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
+use crate::util::error::ApiContext as _;
+use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 use validator::Validate;
+use xredis::RedisPool;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(user_auth_get);
     cfg.service(users_get);
     cfg.service(
-        utoipa_actix_web::scope("/user")
+        web::scope("/user")
             .service(user_get)
             .service(projects_list)
             .service(user_delete)
@@ -30,12 +31,14 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     );
 }
 
-/// Get the current user from the authorization header.
+/// Get the current user.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getUserFromAuth",
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyUser),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -52,7 +55,8 @@ pub async fn user_auth_get(
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::user_auth_get(req, pool, redis, session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)?;
+        .or_else(v2_reroute::flatten_404_error)
+        .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<User>(response).await {
@@ -69,12 +73,15 @@ pub struct UserIds {
     pub ids: String,
 }
 
-/// Get multiple users by ID.
+/// Get multiple users by ID.  
 #[utoipa::path(
+	tag = "users",
     get,
     operation_id = "getUsers",
-    params(("ids" = String, Query, description = "The JSON array of user IDs")),
-    responses((status = 200, description = "Expected response to a valid request"))
+    params(
+        ("ids" = String, Query, description = "The JSON array of user IDs")
+    ),
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyUser>))
 )]
 #[get("/users")]
 pub async fn users_get(
@@ -92,7 +99,8 @@ pub async fn users_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<User>>(response).await {
@@ -105,13 +113,17 @@ pub async fn users_get(
     }
 }
 
-/// Get a user by ID or username.
+/// Get a user by ID or username.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyUser),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -128,7 +140,8 @@ pub async fn user_get(
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::user_get(req, info, pool, redis, session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)?;
+        .or_else(v2_reroute::flatten_404_error)
+        .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<User>(response).await {
@@ -140,13 +153,17 @@ pub async fn user_get(
     }
 }
 
-/// Get a user's projects.
+/// Get a user's projects.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getUserProjects",
-    params(("user_id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("user_id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -169,13 +186,18 @@ pub async fn projects_list(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
+                LegacyProject::from_many(project, &pool, &redis)
+                    .await
+                    .wrap_internal_err(
+                        "executing `LegacyProject::from_many`",
+                    )?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -184,14 +206,14 @@ pub async fn projects_list(
 
 #[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_USERNAME))]
+    #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub username: Option<String>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(length(min = 1, max = 64), regex(path = *crate::util::validate::RE_USERNAME))]
+    #[validate(length(min = 1, max = 64), regex(path = *crate::util::validate::RE_URL_SAFE))]
     pub name: Option<Option<String>>,
     #[serde(
         default,
@@ -205,11 +227,15 @@ pub struct EditUser {
     pub allow_friend_requests: Option<bool>,
 }
 
-/// Modify a user.
+/// Update a user.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     patch,
     operation_id = "modifyUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     request_body = EditUser,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -259,17 +285,15 @@ pub struct Extension {
     pub ext: String,
 }
 
-/// Change a user's avatar.
+/// Change a user's avatar.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     patch,
     operation_id = "changeUserIcon",
     params(
         ("id" = String, Path, description = "The ID or username of the user"),
-        (
-            "ext" = String,
-            Query,
-            description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)"
-        )
+        ("ext" = String, Query, description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)")
     ),
     request_body(
         content(
@@ -299,7 +323,7 @@ pub async fn user_icon_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -318,11 +342,15 @@ pub async fn user_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Remove a user's avatar.
+/// Remove a user's avatar.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     delete,
     operation_id = "deleteUserIcon",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
@@ -339,7 +367,7 @@ pub async fn user_icon_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert to V2
@@ -355,11 +383,15 @@ pub async fn user_icon_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a user by ID or username.
+/// Delete a user by ID or username.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     delete,
     operation_id = "deleteUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -388,13 +420,17 @@ pub async fn user_delete(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get projects followed by a user.
+/// Get projects followed by a user.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getFollowedProjects",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -422,26 +458,35 @@ pub async fn user_follows(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
+    .or_else(v2_reroute::flatten_404_error)
+    .wrap_api_err("flattening v2 not-found response")?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
+                LegacyProject::from_many(project, &pool, &redis)
+                    .await
+                    .wrap_internal_err(
+                        "executing `LegacyProject::from_many`",
+                    )?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
     }
 }
 
-/// Get notifications for a user.
+/// Get notifications for a user.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getUserNotifications",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyNotification>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -464,7 +509,8 @@ pub async fn user_notifications(
     let response =
         v3::users::user_notifications(req, info, pool, redis, session_queue)
             .await
-            .or_else(v2_reroute::flatten_404_error)?;
+            .or_else(v2_reroute::flatten_404_error)
+            .wrap_api_err("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Notification>>(response).await {
         Ok(notifications) => {

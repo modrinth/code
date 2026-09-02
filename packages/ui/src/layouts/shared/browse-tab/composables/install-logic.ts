@@ -31,6 +31,11 @@ export interface BrowseInstallTarget {
 	loader?: string | null
 }
 
+export interface BrowseResolvedInstallContent {
+	projectId: string
+	versionId: string
+}
+
 /**
  * Minimal project shape needed by shared install resolution.
  */
@@ -53,12 +58,10 @@ export interface BrowseInstallPlan<TProject extends BrowseInstallProject = Brows
 	project: TProject
 	projectId: string
 	versionId: string
-	versionName?: string
-	versionNumber?: string
-	fileName?: string
 	contentType: BrowseInstallContentType
 	preferences: BrowseInstallPreferences
 	source: BrowseInstallPlanSource
+	resolvedContent?: BrowseResolvedInstallContent[]
 }
 
 /**
@@ -335,6 +338,15 @@ export interface FlushStoredServerAddonInstallQueueOptions<TProject extends Brow
 	onQueueChange?: (plans: Map<string, BrowseInstallPlan<TProject>>) => void
 }
 
+export interface ResolveServerAddonInstallPlansOptions<TProject extends BrowseInstallProject> {
+	plans: readonly BrowseInstallPlan<TProject>[]
+	existingProjectIds: Iterable<string>
+	resolvePlan: (
+		plan: BrowseInstallPlan<TProject>,
+		existingProjectIds: string[],
+	) => Promise<BrowseResolvedInstallContent[]>
+}
+
 /**
  * Result of a queue flush. Failed plans are also written back to the queue.
  */
@@ -384,7 +396,24 @@ export function getLoaderFilterTypes(contentType: string) {
 	if (contentType === 'plugin') return ['plugin_loader', 'plugin_platform']
 	if (contentType === 'modpack') return ['modpack_loader']
 	if (contentType === 'shader') return ['shader_loader']
+	if (contentType === 'datapack') return ['datapack_loader']
 	return []
+}
+
+const SERVER_RUNTIME_INSTALL_FILTER_TYPES = new Set([
+	'game_version',
+	'mod_loader',
+	'plugin_loader',
+	'plugin_platform',
+	'datapack_loader',
+])
+
+export function stripServerRuntimeInstallFilters(filters: readonly FilterValue[]) {
+	return filters.filter((filter) => !SERVER_RUNTIME_INSTALL_FILTER_TYPES.has(filter.type))
+}
+
+export function stripServerRuntimeInstallOverrides(filterTypes: readonly string[]) {
+	return filterTypes.filter((type) => !SERVER_RUNTIME_INSTALL_FILTER_TYPES.has(type))
 }
 
 /**
@@ -454,7 +483,12 @@ export function getTargetInstallPreferences(
 
 	return normalizeInstallPreferences({
 		gameVersions: gameVersion && shouldUseTargetRuntime ? [gameVersion] : undefined,
-		loaders: loader && shouldUseTargetRuntime ? [loader] : undefined,
+		loaders:
+			contentType === 'datapack'
+				? ['datapack']
+				: loader && shouldUseTargetRuntime
+					? [loader]
+					: undefined,
 	})
 }
 
@@ -515,10 +549,9 @@ export function mergeInstallPreferences(
 export function getLatestMatchingInstallVersion(
 	versions: readonly Labrinth.Versions.v2.Version[],
 	preferences: BrowseInstallPreferences,
-	contentType: string,
 ) {
 	return [...versions]
-		.filter((version) => versionMatchesPreferences(version, preferences, contentType))
+		.filter((version) => versionMatchesPreferences(version, preferences))
 		.sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime())[0]
 }
 
@@ -543,22 +576,13 @@ export async function resolveInstallPlan<TProject extends BrowseInstallProject>(
 	let lastError: Error | null = null
 
 	for (const candidate of candidates) {
-		const version = getLatestMatchingInstallVersion(
-			versions,
-			candidate.preferences,
-			options.contentType,
-		)
+		const version = getLatestMatchingInstallVersion(versions, candidate.preferences)
 
 		if (version) {
-			const fileName =
-				version.files.find((file) => file.primary)?.filename ?? version.files[0]?.filename
 			return {
 				project: options.project,
 				projectId,
 				versionId: version.id,
-				versionName: version.name,
-				versionNumber: version.version_number,
-				fileName,
 				contentType: options.contentType,
 				preferences: candidate.preferences,
 				source: candidate.source,
@@ -627,6 +651,62 @@ export function getStoredServerAddonInstallQueue<
 	}
 
 	return addonPlans
+}
+
+export function getServerAddonInstallPlanProjectIds<TProject extends BrowseInstallProject>(
+	plans: Iterable<BrowseInstallPlan<TProject>>,
+) {
+	const projectIds = new Set<string>()
+	for (const plan of plans) {
+		projectIds.add(plan.projectId)
+		for (const item of plan.resolvedContent ?? []) {
+			projectIds.add(item.projectId)
+		}
+	}
+	return projectIds
+}
+
+export async function resolveServerAddonInstallPlans<TProject extends BrowseInstallProject>({
+	plans,
+	existingProjectIds,
+	resolvePlan,
+}: ResolveServerAddonInstallPlansOptions<TProject>) {
+	const installedProjectIds = new Set(existingProjectIds)
+	const resolutionExistingProjectIds = Array.from(installedProjectIds)
+	const resolvedPlans = await Promise.all(
+		plans.map(
+			async (plan) =>
+				plan.resolvedContent ?? (await resolvePlan(plan, resolutionExistingProjectIds)),
+		),
+	)
+	const explicitProjectIds = new Set(plans.map((plan) => plan.projectId))
+	const addons = new Map<string, { project_id: string; version_id: string }>()
+
+	for (const plan of plans) {
+		if (installedProjectIds.has(plan.projectId)) continue
+		addons.set(plan.projectId, {
+			project_id: plan.projectId,
+			version_id: plan.versionId,
+		})
+	}
+
+	for (const content of resolvedPlans) {
+		for (const item of content) {
+			if (
+				installedProjectIds.has(item.projectId) ||
+				explicitProjectIds.has(item.projectId) ||
+				addons.has(item.projectId)
+			) {
+				continue
+			}
+			addons.set(item.projectId, {
+				project_id: item.projectId,
+				version_id: item.versionId,
+			})
+		}
+	}
+
+	return Array.from(addons.values())
 }
 
 export async function flushStoredServerAddonInstallQueue<TProject extends BrowseInstallProject>({
@@ -747,13 +827,11 @@ function hasPreferences(preferences: BrowseInstallPreferences) {
 function versionMatchesPreferences(
 	version: Labrinth.Versions.v2.Version,
 	preferences: BrowseInstallPreferences,
-	contentType: string,
 ) {
 	const gameVersionMatches =
 		!preferences.gameVersions?.length ||
 		version.game_versions.some((gameVersion) => preferences.gameVersions?.includes(gameVersion))
 	if (!gameVersionMatches) return false
-	if (contentType === 'datapack') return true
 	if (!preferences.loaders?.length) return true
 
 	const compatibleLoaders = getCompatibleLoaderAliasSet(preferences.loaders)
@@ -854,7 +932,22 @@ function isStoredBrowseInstallPlan(
 		typeof record.versionId === 'string' &&
 		isStoredBrowseInstallContentType(record.contentType) &&
 		isStoredBrowseInstallPreferences(record.preferences) &&
-		(record.source === 'filtered' || record.source === 'target')
+		(record.source === 'filtered' || record.source === 'target') &&
+		isOptionalStoredResolvedContent(record.resolvedContent)
+	)
+}
+
+function isOptionalStoredResolvedContent(value: unknown) {
+	return (
+		value === undefined ||
+		(Array.isArray(value) &&
+			value.every(
+				(item) =>
+					!!item &&
+					typeof item === 'object' &&
+					typeof (item as Record<string, unknown>).projectId === 'string' &&
+					typeof (item as Record<string, unknown>).versionId === 'string',
+			))
 	)
 }
 

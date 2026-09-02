@@ -42,22 +42,22 @@
 		</div>
 
 		<div class="w-full">
-			<ButtonStyled v-if="uploading" size="large">
-				<button class="ml-auto" disabled>
-					<SpinnerIcon class="animate-spin" />
-					{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled v-else color="brand" size="large">
-				<button
-					v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
-					class="ml-auto"
-					:disabled="!canSetup"
-					@click="openModal"
-				>
-					{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
-				</button>
-			</ButtonStyled>
+			<Button v-if="uploading" size="xl" class="ml-auto" disabled>
+				<SpinnerIcon class="animate-spin" />
+				{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
+			</Button>
+			<Button
+				v-else
+				v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
+				type="colored"
+				color="brand"
+				size="xl"
+				class="ml-auto"
+				:disabled="!canSetup"
+				@click="openModal"
+			>
+				{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
+			</Button>
 		</div>
 
 		<CreationFlowModal
@@ -65,7 +65,7 @@
 			type="server-onboarding"
 			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 			:show-snapshot-toggle="true"
-			:search-modpacks="searchModpacks"
+			:search-projects="searchModpacks"
 			:get-project-versions="getProjectVersions"
 			:finish-disabled="!canSetup"
 			:finish-disabled-tooltip="!canSetup ? permissionDeniedMessage : undefined"
@@ -80,7 +80,6 @@
 import type { Archon } from '@modrinth/api-client'
 import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -93,6 +92,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import type { CreationFlowContextValue } from '#ui/components'
 import { CreationFlowModal } from '#ui/components'
+import { Button } from '#ui/components/base/buttons'
 import { injectModrinthServerContext } from '#ui/providers'
 
 const client = injectModrinthClient()

@@ -25,7 +25,7 @@ pub async fn search_users_returns_compact_prefix_matches_with_exact_first() {
     with_test_environment(
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
-            sqlx::query(
+            sqlx::query!(
                 "
                 INSERT INTO users (id, username, email, role)
                 VALUES
@@ -65,21 +65,21 @@ pub async fn search_users_escapes_wildcards_and_limits_results() {
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
             for i in 0..30 {
-                sqlx::query(
+                sqlx::query!(
                     "
                     INSERT INTO users (id, username, email, role)
                     VALUES ($1, $2, $3, 'developer')
                     ",
+                    2000 + i,
+                    format!("prefix{i:02}"),
+                    format!("prefix{i:02}@modrinth.com"),
                 )
-                .bind(2000 + i)
-                .bind(format!("prefix{i:02}"))
-                .bind(format!("prefix{i:02}@modrinth.com"))
                 .execute(&*test_env.db.pool)
                 .await
                 .unwrap();
             }
 
-            sqlx::query(
+            sqlx::query!(
                 "
                 INSERT INTO users (id, username, email, role)
                 VALUES (2100, 'prefix_under_score', 'prefix_under_score@modrinth.com', 'developer')

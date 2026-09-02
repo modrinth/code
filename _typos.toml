@@ -6,10 +6,16 @@ extend-exclude = [
   "packages/utils/",
   "packages/ui/",
   "packages/blog/",
-  # contains licenses like `CC-BY-ND-4.0`
-  "packages/moderation/src/data/stages/license.ts",
-  # contains payment card IDs like `IY1VMST1MOXS` which are flagged
-  "apps/labrinth/src/queue/payouts/mod.rs",
+]
+
+[default]
+extend-ignore-re = [
+  # Ignore lines that end with `// typos:ignore`
+  "(?Rm)^.*(#|//)\\s*typos:ignore$",
+  # Ignore the line after `// typos:ignore`:
+  "(#|//)\\s*typos:ignore\\n.*",
+  # Ignore blocks between `// typos:off` and `// typos:on`
+  "(?s)(#|//)\\s*typos:off.*?\\n\\s*(#|//)\\s*typos:on",
 ]
 
 [default.extend-words]
@@ -21,3 +27,7 @@ gam = "gam"
 consts = "consts"
 # short for "Copy"
 Cpy = "Cpy"
+
+[default.extend-identifiers]
+# Constant from the `zip` crate
+ZIP64_BYTES_THR = "ZIP64_BYTES_THR"

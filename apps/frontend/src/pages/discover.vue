@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import { getMarginTarget } from '@modrinth/moderation'
 import { commonProjectTypeCategoryMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 
 const flags = useFeatureFlags()
-const cosmetics = useCosmetics()
 const route = useRoute()
+const modSettings = useModerationSettings()
 
 const allowTabChanging = computed(() => !route.query.sid)
+const marginTarget = computed(() => getMarginTarget(modSettings.value))
 
 const selectableProjectTypes = [
 	{
@@ -48,15 +50,16 @@ const selectableProjectTypes = [
 ]
 </script>
 <template>
-	<div class="new-page sidebar" :class="{ 'alt-layout': !cosmetics.rightSearchLayout }">
-		<section class="normal-page__header mb-4 flex flex-col gap-4">
-			<NavTabs
-				v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
-				:links="selectableProjectTypes"
-				replace
-				class="hidden md:flex"
-			/>
-		</section>
+	<div
+		class="box-border flex w-full max-w-[1280px] flex-col gap-4 px-6 pb-6"
+		:class="`m${marginTarget}-auto`"
+	>
+		<NavTabs
+			v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
+			:links="selectableProjectTypes"
+			replace
+			class="hidden md:flex"
+		/>
 		<NuxtPage />
 	</div>
 </template>

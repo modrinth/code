@@ -1,213 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type {
-	Action,
-	AdditionalTextInput,
-	ButtonAction,
-	ConditionalMessage,
-	ToggleAction,
-} from './types/actions'
-
-export interface ActionState {
-	selected: boolean
-	value?: Set<number> | number | string | unknown
-}
-
-export interface MessagePart {
-	weight: number
-	content: string
-	actionId: string
-	stageIndex: number
-}
-
-export type SerializedActionState = {
-	isSet?: boolean
-} & ActionState
-
-export function getActionIdForStage(
-	action: Action,
-	stageIndex: number,
-	actionIndex?: number,
-	enabledIndex?: number,
-): string {
-	if (action.id) {
-		return `stage-${stageIndex}-${action.id}`
-	}
-	const suffix = enabledIndex !== undefined ? `-enabled-${enabledIndex}` : ''
-	return `stage-${stageIndex}-action-${actionIndex}${suffix}`
-}
-
-export function getActionId(action: Action, currentStage: number, index?: number): string {
-	return getActionIdForStage(action, currentStage, index)
-}
-
-export function getActionKey(
-	action: Action,
-	currentStage: number,
-	visibleActions: Action[],
-): string {
-	const index = visibleActions.indexOf(action)
-	return `${currentStage}-${index}-${getActionId(action, currentStage)}`
-}
-
-export function serializeActionStates(states: Record<string, ActionState>): string {
-	const serializable: Record<string, SerializedActionState> = {}
-	for (const [key, state] of Object.entries(states)) {
-		serializable[key] = {
-			selected: state.selected,
-			value: state.value instanceof Set ? Array.from(state.value) : state.value,
-			isSet: state.value instanceof Set,
-		}
-	}
-	return JSON.stringify(serializable)
-}
-
-export function deserializeActionStates(data: string): Record<string, ActionState> {
-	try {
-		const parsed = JSON.parse(data)
-		const states: Record<string, ActionState> = {}
-		for (const [key, state] of Object.entries(parsed as Record<string, SerializedActionState>)) {
-			states[key] = {
-				selected: state.selected,
-				value: state.isSet ? new Set(state.value as unknown[]) : state.value,
-			}
-		}
-		return states
-	} catch {
-		return {}
-	}
-}
-
-export function initializeActionState(action: Action): ActionState {
-	if (action.type === 'toggle') {
-		return {
-			selected: action.defaultChecked || false,
-		}
-	} else if (action.type === 'dropdown') {
-		return {
-			selected: true,
-			value: action.defaultOption || 0,
-		}
-	} else if (action.type === 'multi-select-chips') {
-		return {
-			selected: false,
-			value: new Set<number>(),
-		}
-	} else {
-		return {
-			selected: false,
-		}
-	}
-}
-
-export function processMessage(
-	message: string,
-	action: Action,
-	stageIndex: number,
-	textInputValues: Record<string, string>,
-): string {
-	let processedMessage = message
-
-	if (action.relevantExtraInput) {
-		action.relevantExtraInput.forEach((input, index) => {
-			if (input.variable) {
-				const inputKey = `stage-${stageIndex}-${action.id || `action-${index}`}-${index}`
-				const value = textInputValues[inputKey] || ''
-
-				const regex = new RegExp(`%${input.variable}%`, 'g')
-				processedMessage = processedMessage.replace(regex, value)
-			}
-		})
-	}
-
-	return processedMessage
-}
-
-export function findMatchingVariant(
-	variants: ConditionalMessage[],
-	selectedActionIds: string[],
-	allValidActionIds?: string[],
-	currentStageIndex?: number,
-): ConditionalMessage | null {
-	for (const variant of variants) {
-		const conditions = variant.conditions
-
-		const meetsRequired =
-			!conditions.requiredActions ||
-			conditions.requiredActions.every((id) => {
-				let fullId = id
-				if (currentStageIndex !== undefined && !id.startsWith('stage-')) {
-					fullId = `stage-${currentStageIndex}-${id}`
-				}
-
-				if (allValidActionIds && !allValidActionIds.includes(fullId)) {
-					return false
-				}
-				return selectedActionIds.includes(fullId)
-			})
-
-		const meetsExcluded =
-			!conditions.excludedActions ||
-			!conditions.excludedActions.some((id) => {
-				let fullId = id
-				if (currentStageIndex !== undefined && !id.startsWith('stage-')) {
-					fullId = `stage-${currentStageIndex}-${id}`
-				}
-				return selectedActionIds.includes(fullId)
-			})
-
-		if (meetsRequired && meetsExcluded) {
-			return variant
-		}
-	}
-
-	return null
-}
-
-export async function getActionMessage(
-	action: ButtonAction | ToggleAction,
-	selectedActionIds: string[],
-	allValidActionIds?: string[],
-): Promise<string> {
-	if (action.conditionalMessages && action.conditionalMessages.length > 0) {
-		const matchingConditional = findMatchingVariant(
-			action.conditionalMessages,
-			selectedActionIds,
-			allValidActionIds,
-		)
-		if (matchingConditional) {
-			return (await matchingConditional.message()) as string
-		}
-	}
-
-	return (await action.message()) as string
-}
-
-export function getVisibleInputs(
-	action: Action,
-	actionStates: Record<string, ActionState>,
-): AdditionalTextInput[] {
-	if (!action.relevantExtraInput) return []
-
-	const selectedActionIds = Object.entries(actionStates)
-		.filter(([, state]) => state.selected)
-		.map(([id]) => id)
-
-	return action.relevantExtraInput.filter((input) => {
-		if (!input.showWhen) return true
-
-		const meetsRequired =
-			!input.showWhen.requiredActions ||
-			input.showWhen.requiredActions.every((id) => selectedActionIds.includes(id))
-
-		const meetsExcluded =
-			!input.showWhen.excludedActions ||
-			!input.showWhen.excludedActions.some((id) => selectedActionIds.includes(id))
-
-		return meetsRequired && meetsExcluded
-	})
-}
-
 export function expandVariables(
 	template: string,
 	project: Labrinth.Projects.v2.Project,
@@ -224,6 +16,67 @@ export function expandVariables(
 		const variable = `%${key}%`
 		return result.replace(new RegExp(variable, 'g'), value)
 	}, template)
+}
+
+export const licensesNotRequiringSource: string[] = [
+	// typos:off
+	'LicenseRef-All-Rights-Reserved',
+	'Apache-2.0',
+	'BSD-2-Clause',
+	'BSD-3-Clause',
+	'CC0-1.0',
+	'CC-BY-4.0',
+	'CC-BY-SA-4.0',
+	'CC-BY-NC-4.0',
+	'CC-BY-NC-SA-4.0',
+	'CC-BY-ND-4.0',
+	'CC-BY-NC-ND-4.0',
+	'ISC',
+	'MIT',
+	'Zlib',
+	// typos:on
+]
+
+export const licensesRequiringSource: string[] = [
+	'GPL-2.0',
+	'GPL-2.0+',
+	'GPL-2.0-only',
+	'GPL-2.0-or-later',
+	'GPL-3.0',
+	'GPL-3.0+',
+	'GPL-3.0-only',
+	'GPL-3.0-or-later',
+	'LGPL-2.1',
+	'LGPL-2.1+',
+	'LGPL-2.1-only',
+	'LGPL-2.1-or-later',
+	'LGPL-3.0',
+	'LGPL-3.0+',
+	'LGPL-3.0-only',
+	'LGPL-3.0-or-later',
+	'AGPL-3.0',
+	'AGPL-3.0+',
+	'AGPL-3.0-only',
+	'AGPL-3.0-or-later',
+	'MPL-2.0',
+]
+
+export function licenseDoesNotRequireSource(licenseId: string): boolean {
+	return licensesNotRequiringSource.includes(licenseId)
+}
+export function licenseMayRequireSource(licenseId: string): boolean {
+	return !licensesNotRequiringSource.includes(licenseId)
+}
+export function licenseRequiresSource(licenseId: string): boolean {
+	return licensesRequiringSource.includes(licenseId)
+}
+
+export function notSourceAsDistributed(projectTypes): boolean {
+	return projectTypes.includes('mod') || projectTypes.includes('plugin')
+}
+
+export function promptSourceRequired(licenseId: string, projectTypes): boolean {
+	return licenseRequiresSource(licenseId) && notSourceAsDistributed(projectTypes)
 }
 
 export function kebabToTitleCase(input: string): string {
@@ -256,25 +109,93 @@ export function formatProjectTypes(type: string, lower: boolean = false) {
 	return value
 }
 
+export function requiresEnvironmentInfo(projectTypes): boolean {
+	return projectTypes.includes('mod') || projectTypes.includes('modpack')
+}
+
 export function flattenStaticVariables(): Record<string, string> {
 	const vars: Record<string, string> = {}
 
 	vars[`RULES`] = `[Modrinth's Content Rules](https://modrinth.com/legal/rules)`
+	vars[`R1`] =
+		`Per section 1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-content)`
+	const rule1subs = 12
+	for (let n = 1; n <= rule1subs; n++) {
+		vars[`R1.${n}`] =
+			`Per section 1.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-content)`
+	}
+	vars[`R2`] =
+		`Per section 2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#clear-and-honest-function)`
+	vars[`R2.1`] =
+		`Per section 2.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#general-expectations)`
+	const rule2sub1subs = 3
+	for (let n = 1; n <= rule2sub1subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R2.1${l}`] =
+			`Per section 2.1${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#general-expectations)`
+	}
+	vars[`R2.2`] =
+		`Per section 2.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#accessibility)`
+	vars[`R3`] =
+		`Per section 3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	const rule3subs = 3
+	for (let n = 1; n <= rule3subs; n++) {
+		vars[`R3.${n}`] =
+			`Per section 3.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	}
+	const rule3sub3subs = 6
+	for (let n = 1; n <= rule3sub3subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R3.3${l}`] =
+			`Per section 3.3${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#cheats-and-hacks)`
+	}
+	vars[`R4`] =
+		`Per section 4 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#copyright-and-legality-of-content)`
+	vars[`R5`] =
+		`Per section 5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
+	const rule5subs = 9
+	for (let n = 1; n <= rule5subs; n++) {
+		vars[`R5.${n}`] =
+			`Per section 5.${n} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous)`
+	}
+	vars[`R6`] =
+		`Per section 6 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#generative-ai)`
+	vars[`R6.1`] =
+		`Per section 6.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#disclosure-of-ai-generated-content)`
+	const rule6sub1subs = 2
+	for (let n = 1; n <= rule6sub1subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R6.1${l}`] =
+			`Per section 6.1${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#disclosure-of-ai-generated-content)`
+	}
+	vars[`R6.2`] =
+		`Per section 6.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-usage-of-ai)`
+	const rule6sub2subs = 4
+	for (let n = 1; n <= rule6sub2subs; n++) {
+		const l = String.fromCharCode(96 + n)
+		vars[`R6.2${l}`] =
+			`Per section 6.2${l} of [Modrinth's Content Rules](https://modrinth.com/legal/rules#prohibited-usage-of-ai)`
+	}
 	vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
 	vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
 	vars[`SUPPORT`] =
 		`please visit the [Modrinth Help Center](https://support.modrinth.com/) and click the blue bubble to contact support.`
 	vars[`MODPACK_PERMISSIONS_GUIDE`] =
-		`our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions)`
+		`our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527)`
 	vars[`MODPACKS_ON_MODRINTH`] =
-		`[Modpacks on Modrinth](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth)`
+		`[Modpacks on Modrinth](https://support.modrinth.com/en/articles/8802250)`
 	vars[`ADVANCED_MARKDOWN`] =
-		`[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
+		`[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962)`
+	vars[`DISCLOSURES_FAQ_FLINK`] =
+		`[Content Disclosures FAQ](https://support.modrinth.com/en/articles/16567675)`
+	vars[`AI_USAGE_FLINK`] = `[AI Usage](https://support.modrinth.com/en/articles/16551575)`
 	vars[`LICENSING_GUIDE`] =
 		`our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
 	vars[`NEW_ENVIRONMENTS_LINK`] = `https://modrinth.com/news/article/new-environments`
 	vars[`LEARN_MORE_ABOUT_SERVERS_FLINK`] =
 		`[learn more about server projects from our news feed](https://modrinth.com/news/article/introducing-server-projects/)`
+	vars[`SHARED_INSTANCES_FLINK`] =
+		`[Shared Instances](https://modrinth.com/news/article/shared-instances/)`
 
 	return vars
 }
@@ -350,6 +271,7 @@ export function flattenProjectVariables(
 	vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
 	vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
 	vars[`PROJECT_SETTINGS_FLINK`] = `[Settings](https://modrinth.com/project/${project.id}/settings)`
+	vars[`PROJECT_ICON_FLINK`] = `[Icon](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_TITLE_FLINK`] = `[Name](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
@@ -382,6 +304,17 @@ export function flattenProjectVariables(
 	vars[`PROJECT_LANGUAGE_SETTINGS`] = `https://modrinth.com/project/${project.id}/settings/server`
 	vars[`PROJECT_LANGUAGE_SETTINGS_FLINK`] =
 		`[Language Settings](https://modrinth.com/project/${project.id}/settings/server)`
+	vars[`PROJECT_PERMISSIONS_LINK`] =
+		`https://modrinth.com/project/${project.id}/settings/permissions`
+	vars[`PROJECT_PERMISSIONS_FLINK`] =
+		`[Permissions settings](https://modrinth.com/project/${project.id}/settings/permissions)`
+	vars[`PROJECT_MONETIZATION_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
+	vars[`PROJECT_MONETIZATION_SETTINGS_FLINK`] =
+		`[Monetization settings](https://modrinth.com/project/${project.id}/settings)`
+	vars[`PROJECT_CONTENT_DISCLOSURES_LINK`] =
+		`https://modrinth.com/project/${project.id}/settings/disclosures`
+	vars[`PROJECT_CONTENT_DISCLOSURES_FLINK`] =
+		`[Content Disclosures](https://modrinth.com/project/${project.id}/settings/disclosures)`
 
 	return vars
 }

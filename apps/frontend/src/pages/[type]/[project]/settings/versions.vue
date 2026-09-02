@@ -8,41 +8,43 @@
 		<ConfirmModal
 			v-if="currentMember"
 			ref="deleteVersionModal"
-			title="Are you sure you want to delete this version?"
-			description="This will remove this version forever (like really forever)."
+			:title="formatMessage(messages.deleteVersionConfirmTitle)"
+			:description="formatMessage(messages.deleteVersionConfirmDescription)"
 			:has-to-type="false"
-			proceed-label="Delete"
+			:proceed-label="formatMessage(messages.deleteButton)"
 			@proceed="deleteVersion()"
 		/>
-
 		<Admonition
-			v-if="flags.modpackPermissionsPage && withheldVersions.length > 0"
-			type="warning"
+			v-if="withheldVersions.length > 0"
+			type="circle-warning"
 			class="mb-4"
 			:header="
 				formatMessage(messages.withheldVersionsWarningTitle, {
 					count: withheldVersions.length,
-					version_name: withheldVersions.length === 1 ? withheldVersions[0] : undefined,
+					version_name:
+						withheldVersions.length === 1 ? withheldVersions[0].version_number : undefined,
 				})
 			"
 			:body="
 				formatMessage(messages.withheldVersionsWarningDescription, {
 					count: withheldVersions.length,
-					version_name: withheldVersions.length === 1 ? withheldVersions[0] : undefined,
+					version_name:
+						withheldVersions.length === 1 ? withheldVersions[0].version_number : undefined,
 				})
 			"
 		>
 			<template #actions>
 				<div class="flex">
-					<ButtonStyled color="orange">
-						<nuxt-link
-							:to="`/${project.project_type}/${
-								project.slug ? project.slug : project.id
-							}/settings/permissions`"
-						>
-							{{ formatMessage(messages.withheldVersionsWarningResolve) }} <RightArrowIcon />
-						</nuxt-link>
-					</ButtonStyled>
+					<ButtonLink
+						type="colored"
+						color="orange"
+						:to="`/${project.project_type}/${
+							project.slug ? project.slug : project.id
+						}/settings/permissions`"
+					>
+						{{ formatMessage(commonProjectSettingsMessages.withheldVersionsWarningResolve) }}
+						<RightArrowIcon />
+					</ButtonLink>
 				</div>
 			</template>
 		</Admonition>
@@ -51,6 +53,7 @@
 			:project="project"
 			:versions="versionsWithDisplayUrl"
 			:show-files="flags.showVersionFilesInTable"
+			:show-environment-column="flags.showVersionEnvironmentColumn"
 			:current-member="!!currentMember"
 			:loaders="tags.loaders"
 			:game-versions="tags.gameVersions"
@@ -64,180 +67,189 @@
 			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 		>
 			<template #actions="{ version }">
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						v-tooltip="'Edit version'"
-						class="hover:!bg-button-bg [&>svg]:!text-green"
-						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
-						:options="[
-							{
-								id: 'edit-metadata',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+				<TeleportOverflowMenu
+					type="quiet"
+					:label="formatMessage(messages.editVersionTooltip)"
+					:tooltip="formatMessage(messages.editVersionTooltip)"
+					class="hover:!bg-button-bg [&>svg]:!text-green"
+					:options="[
+						{
+							id: 'edit-metadata',
+							label: formatMessage(messages.editMetadataOption),
+							action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+						},
+						{
+							id: 'edit-details',
+							label: formatMessage(messages.editDetailsOption),
+							action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+						},
+						{
+							id: 'edit-files',
+							label: formatMessage(messages.editFilesOption),
+							action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
+						},
+					]"
+				>
+					<EditIcon aria-hidden="true" />
+					<template #edit-files>
+						<FileIcon aria-hidden="true" />
+						{{ formatMessage(messages.editFilesOption) }}
+					</template>
+					<template #edit-details>
+						<InfoIcon aria-hidden="true" />
+						{{ formatMessage(messages.editDetailsOption) }}
+					</template>
+					<template #edit-metadata>
+						<BoxIcon aria-hidden="true" />
+						{{ formatMessage(messages.editMetadataOption) }}
+					</template>
+				</TeleportOverflowMenu>
+				<TeleportOverflowMenu
+					type="quiet"
+					:label="formatMessage(commonMessages.moreOptionsButton)"
+					:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+					class="hover:!bg-button-bg"
+					:options="[
+						{
+							id: 'download',
+							label: formatMessage(commonMessages.downloadButton),
+							type: 'link',
+							tone: 'brand',
+							hoverFilled: true,
+							href: createDownloadUrl(version),
+							download: getPrimaryFile(version)?.filename,
+							shown: !!getPrimaryFile(version),
+						},
+						{
+							id: 'new-tab',
+							label: formatMessage(messages.openInNewTabOption),
+							type: 'link',
+							href: `/${project.project_type}/${
+								project.slug ? project.slug : project.id
+							}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
+							target: '_blank',
+						},
+						{
+							id: 'copy-link',
+							label: formatMessage(messages.copyLinkOption),
+							action: () =>
+								copyToClipboard(
+									`https://modrinth.com/${project.project_type}/${
+										project.slug ? project.slug : project.id
+									}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
+								),
+						},
+						{
+							id: 'share',
+							label: formatMessage(messages.shareOption),
+							action: () => {},
+							shown: false,
+						},
+						{
+							id: 'report',
+							label: formatMessage(commonMessages.reportButton),
+							tone: 'red',
+							hoverFilled: true,
+							action: () =>
+								auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
+							shown: !currentMember,
+						},
+						{ type: 'divider', shown: !!currentMember || flags.developerMode },
+						{
+							id: 'copy-id',
+							label: formatMessage(messages.copyIdOption),
+							action: () => {
+								copyToClipboard(version.id)
 							},
-							{
-								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+							shown: !!currentMember || flags.developerMode,
+						},
+						{
+							id: 'copy-maven',
+							label: formatMessage(messages.copyMavenCoordinatesOption),
+							action: () => {
+								copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
 							},
-							{
-								id: 'edit-files',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
+							shown: flags.developerMode,
+						},
+						{ type: 'divider', shown: !!currentMember },
+						{
+							id: 'edit-details',
+							label: formatMessage(messages.editDetailsOption),
+							action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
+							shown: !!currentMember,
+						},
+						{
+							id: 'edit-metadata',
+							label: formatMessage(messages.editMetadataOption),
+							action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
+							shown: !!currentMember,
+						},
+						{
+							id: 'edit-files',
+							label: formatMessage(messages.editFilesOption),
+							action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
+							shown: !!currentMember,
+						},
+						{
+							id: 'delete',
+							label: formatMessage(commonMessages.deleteLabel),
+							tone: 'red',
+							hoverFilled: true,
+							action: () => {
+								selectedVersion = version.id
+								deleteVersionModal?.show()
 							},
-						]"
-						aria-label="Edit version"
-					>
-						<EditIcon aria-hidden="true" />
-						<template #edit-files>
-							<FileIcon aria-hidden="true" />
-							Edit files
-						</template>
-						<template #edit-details>
-							<InfoIcon aria-hidden="true" />
-							Edit details
-						</template>
-						<template #edit-metadata>
-							<BoxIcon aria-hidden="true" />
-							Edit metadata
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						v-tooltip="'More options'"
-						class="hover:!bg-button-bg"
-						:dropdown-id="`${baseDropdownId}-${version.id}`"
-						:options="[
-							{
-								id: 'download',
-								color: 'primary',
-								hoverFilled: true,
-								link: createDownloadUrl(version),
-								download: getPrimaryFile(version)?.filename,
-								action: () => {
-									emit('onDownload')
-								},
-								shown: !!getPrimaryFile(version),
-							},
-							{
-								id: 'new-tab',
-								action: () => {},
-								link: `/${project.project_type}/${
-									project.slug ? project.slug : project.id
-								}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
-								external: true,
-							},
-							{
-								id: 'copy-link',
-								action: () =>
-									copyToClipboard(
-										`https://modrinth.com/${project.project_type}/${
-											project.slug ? project.slug : project.id
-										}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`,
-									),
-							},
-							{
-								id: 'share',
-								action: () => {},
-								shown: false,
-							},
-							{
-								id: 'report',
-								color: 'red',
-								hoverFilled: true,
-								action: () =>
-									auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
-								shown: !currentMember,
-							},
-							{ divider: true, shown: !!currentMember || flags.developerMode },
-							{
-								id: 'copy-id',
-								action: () => {
-									copyToClipboard(version.id)
-								},
-								shown: !!currentMember || flags.developerMode,
-							},
-							{
-								id: 'copy-maven',
-								action: () => {
-									copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
-								},
-								shown: flags.developerMode,
-							},
-							{ divider: true, shown: !!currentMember },
-							{
-								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-								shown: !!currentMember,
-							},
-							{
-								id: 'edit-metadata',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
-								shown: !!currentMember,
-							},
-							{
-								id: 'edit-files',
-								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
-								shown: !!currentMember,
-							},
-							{
-								id: 'delete',
-								color: 'red',
-								hoverFilled: true,
-								action: () => {
-									selectedVersion = version.id
-									deleteVersionModal?.show()
-								},
-								shown: !!currentMember,
-							},
-						]"
-						aria-label="More options"
-					>
-						<MoreVerticalIcon aria-hidden="true" />
-						<template #download>
-							<DownloadIcon aria-hidden="true" />
-							Download
-						</template>
-						<template #new-tab>
-							<ExternalIcon aria-hidden="true" />
-							Open in new tab
-						</template>
-						<template #copy-link>
-							<LinkIcon aria-hidden="true" />
-							Copy link
-						</template>
-						<template #share>
-							<ShareIcon aria-hidden="true" />
-							Share
-						</template>
-						<template #report>
-							<ReportIcon aria-hidden="true" />
-							Report
-						</template>
-						<template #edit-files>
-							<FileIcon aria-hidden="true" />
-							Edit files
-						</template>
-						<template #edit-details>
-							<InfoIcon aria-hidden="true" />
-							Edit details
-						</template>
-						<template #edit-metadata>
-							<BoxIcon aria-hidden="true" />
-							Edit metadata
-						</template>
-						<template #delete>
-							<TrashIcon aria-hidden="true" />
-							Delete
-						</template>
-						<template #copy-id>
-							<ClipboardCopyIcon aria-hidden="true" />
-							Copy ID
-						</template>
-						<template #copy-maven>
-							<ClipboardCopyIcon aria-hidden="true" />
-							Copy Maven coordinates
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+							shown: !!currentMember,
+						},
+					]"
+					@select="$event.id === 'download' && emit('onDownload')"
+				>
+					<MoreVerticalIcon aria-hidden="true" />
+					<template #download>
+						<DownloadIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.downloadButton) }}
+					</template>
+					<template #new-tab>
+						<ExternalIcon aria-hidden="true" />
+						{{ formatMessage(messages.openInNewTabOption) }}
+					</template>
+					<template #copy-link>
+						<LinkIcon aria-hidden="true" />
+						{{ formatMessage(messages.copyLinkOption) }}
+					</template>
+					<template #share>
+						<ShareIcon aria-hidden="true" />
+						{{ formatMessage(messages.shareOption) }}
+					</template>
+					<template #report>
+						<ReportIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.reportButton) }}
+					</template>
+					<template #edit-files>
+						<FileIcon aria-hidden="true" />
+						{{ formatMessage(messages.editFilesOption) }}
+					</template>
+					<template #edit-details>
+						<InfoIcon aria-hidden="true" />
+						{{ formatMessage(messages.editDetailsOption) }}
+					</template>
+					<template #edit-metadata>
+						<BoxIcon aria-hidden="true" />
+						{{ formatMessage(messages.editMetadataOption) }}
+					</template>
+					<template #delete>
+						<TrashIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.deleteLabel) }}
+					</template>
+					<template #copy-id>
+						<ClipboardCopyIcon aria-hidden="true" />
+						{{ formatMessage(messages.copyIdOption) }}
+					</template>
+					<template #copy-maven>
+						<ClipboardCopyIcon aria-hidden="true" />
+						{{ formatMessage(messages.copyMavenCoordinatesOption) }}
+					</template>
+				</TeleportOverflowMenu>
 			</template>
 		</ProjectPageVersions>
 
@@ -301,11 +313,13 @@
 					<div class="text-2xl font-semibold text-contrast">No versions created</div>
 					<div>Create your first project version.</div>
 					<br />
-					<ButtonStyled color="green">
-						<button @click="() => createProjectVersionModal?.openCreateVersionModal()">
-							<PlusIcon /> Create version
-						</button>
-					</ButtonStyled>
+					<Button
+						type="colored"
+						color="green"
+						@click="() => createProjectVersionModal?.openCreateVersionModal()"
+					>
+						<PlusIcon /> Create version
+					</Button>
 				</div>
 			</div>
 		</template>
@@ -332,20 +346,23 @@ import {
 } from '@modrinth/assets'
 import {
 	Admonition,
-	ButtonStyled,
+	Button,
+	ButtonLink,
+	commonMessages,
+	commonProjectSettingsMessages,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	OverflowMenu,
 	ProjectPageVersions,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
@@ -363,6 +380,8 @@ const {
 	loadVersions,
 	cdnDownloadReason,
 } = injectProjectPageContext()
+
+useProjectSettingsHeadTitle(commonProjectSettingsMessages.versions)
 
 // Load versions on mount (client-side)
 onMounted(() => {
@@ -440,13 +459,13 @@ async function deleteVersion() {
 		await client.labrinth.versions_v3.deleteVersion(id)
 
 		addNotification({
-			title: 'Version deleted',
-			text: 'The version has been successfully deleted.',
+			title: formatMessage(messages.versionDeletedTitle),
+			text: formatMessage(messages.versionDeletedText),
 			type: 'success',
 		})
 	} catch (err: any) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -458,7 +477,9 @@ async function deleteVersion() {
 	stopLoading()
 }
 
-const withheldVersions = computed(() => ['4.0.0'])
+const withheldVersions = computed(() =>
+	versions.value.filter((x) => x.files_missing_attribution?.length > 0),
+)
 
 const messages = defineMessages({
 	withheldVersionsWarningTitle: {
@@ -471,9 +492,61 @@ const messages = defineMessages({
 		defaultMessage:
 			'{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}.',
 	},
-	withheldVersionsWarningResolve: {
-		id: 'project.versions.withheld-versions-warning.resolve-button',
-		defaultMessage: 'Resolve',
+	deleteVersionConfirmTitle: {
+		id: 'project.versions.delete-confirm.title',
+		defaultMessage: 'Are you sure you want to delete this version?',
+	},
+	deleteVersionConfirmDescription: {
+		id: 'project.versions.delete-confirm.description',
+		defaultMessage: 'This will remove this version forever (like really forever).',
+	},
+	deleteButton: {
+		id: 'project.versions.delete-button',
+		defaultMessage: 'Delete',
+	},
+	editVersionTooltip: {
+		id: 'project.versions.edit-version-tooltip',
+		defaultMessage: 'Edit version',
+	},
+	editFilesOption: {
+		id: 'project.versions.edit-files-option',
+		defaultMessage: 'Edit files',
+	},
+	editDetailsOption: {
+		id: 'project.versions.edit-details-option',
+		defaultMessage: 'Edit details',
+	},
+	editMetadataOption: {
+		id: 'project.versions.edit-metadata-option',
+		defaultMessage: 'Edit metadata',
+	},
+	openInNewTabOption: {
+		id: 'project.versions.open-in-new-tab-option',
+		defaultMessage: 'Open in new tab',
+	},
+	copyLinkOption: {
+		id: 'project.versions.copy-link-option',
+		defaultMessage: 'Copy link',
+	},
+	shareOption: {
+		id: 'project.versions.share-option',
+		defaultMessage: 'Share',
+	},
+	copyIdOption: {
+		id: 'project.versions.copy-id-option',
+		defaultMessage: 'Copy ID',
+	},
+	copyMavenCoordinatesOption: {
+		id: 'project.versions.copy-maven-coordinates-option',
+		defaultMessage: 'Copy Maven coordinates',
+	},
+	versionDeletedTitle: {
+		id: 'project.versions.version-deleted-title',
+		defaultMessage: 'Version deleted',
+	},
+	versionDeletedText: {
+		id: 'project.versions.version-deleted-text',
+		defaultMessage: 'The version has been successfully deleted.',
 	},
 })
 </script>

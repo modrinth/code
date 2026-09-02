@@ -1,0 +1,81 @@
+<script setup lang="ts">
+import { SearchIcon } from '@modrinth/assets'
+import { Button, Input, Toggle } from '@modrinth/ui'
+import Fuse from 'fuse.js'
+import { computed, ref, watch } from 'vue'
+
+import {
+	DEFAULT_FEATURE_FLAGS,
+	type FeatureFlag,
+	useAppSettings,
+} from '@/composables/use-app-settings.ts'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+
+const appSettings = useAppSettings()
+
+const settings = ref(await getSettings())
+const searchQuery = ref('')
+const allFlags = computed(() => Object.keys(DEFAULT_FEATURE_FLAGS) as FeatureFlag[])
+
+const fuse = computed(
+	() =>
+		new Fuse(allFlags.value, {
+			threshold: 0.4,
+		}),
+)
+
+const filteredFlags = computed(() => {
+	if (!searchQuery.value.trim()) {
+		return allFlags.value
+	}
+	return fuse.value.search(searchQuery.value).map((result) => result.item)
+})
+
+function setFeatureFlag(key: FeatureFlag, value: boolean) {
+	appSettings.featureFlags[key] = value
+	settings.value.feature_flags[key] = value
+}
+
+watch(
+	settings,
+	async () => {
+		await setSettings(settings.value)
+	},
+	{ deep: true },
+)
+</script>
+<template>
+	<div class="flex flex-col gap-2.5">
+		<Input
+			v-model="searchQuery"
+			type="search"
+			:icon="SearchIcon"
+			placeholder="Search flags..."
+			wrapper-class="w-full"
+		/>
+		<div v-for="option in filteredFlags" :key="option" class="flex items-center justify-between">
+			<div>
+				<h2 class="m-0 text-lg font-semibold text-contrast capitalize">
+					{{ option.replaceAll('_', ' ') }}
+				</h2>
+			</div>
+			<div class="flex items-center gap-2">
+				<Button
+					type="quiet"
+					:disabled="appSettings.getFeatureFlag(option) === DEFAULT_FEATURE_FLAGS[option]"
+					@click="setFeatureFlag(option, DEFAULT_FEATURE_FLAGS[option])"
+				>
+					Reset to default
+				</Button>
+				<Toggle
+					id="advanced-rendering"
+					:model-value="appSettings.getFeatureFlag(option)"
+					@update:model-value="() => setFeatureFlag(option, !appSettings.getFeatureFlag(option))"
+				/>
+			</div>
+		</div>
+		<p v-if="filteredFlags.length === 0" class="text-center text-secondary">
+			No flags found matching "{{ searchQuery }}"
+		</p>
+	</div>
+</template>

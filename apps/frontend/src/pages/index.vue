@@ -25,33 +25,37 @@
 			<h2>
 				{{ formatMessage(messages.discoverHeading) }}
 			</h2>
-			<div class="button-group">
-				<ButtonStyled color="brand" size="large">
-					<nuxt-link to="/discover/mods">
-						<CompassIcon aria-hidden="true" />
-						{{ formatMessage(messages.discoverMods) }}
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled size="large" type="outlined">
-					<nuxt-link v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
-						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.signUpButton) }}
-					</nuxt-link>
-					<nuxt-link v-else to="/dashboard/projects">
-						<DashboardIcon aria-hidden="true" />
-						{{ formatMessage(messages.goToDashboard) }}
-					</nuxt-link>
-				</ButtonStyled>
+			<div class="mx-auto mb-20 flex w-fit flex-wrap justify-center gap-5">
+				<ButtonLink type="colored" color="brand" size="xl" to="/discover/mods">
+					<CompassIcon aria-hidden="true" />
+					{{ formatMessage(messages.discoverMods) }}
+				</ButtonLink>
+				<ButtonLink
+					v-if="!auth.user"
+					type="outlined"
+					size="xl"
+					to="/auth/sign-up"
+					rel="noopener nofollow"
+				>
+					<LogInIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.signUpButton) }}
+				</ButtonLink>
+				<ButtonLink v-else type="outlined" size="xl" to="/dashboard/projects">
+					<DashboardIcon aria-hidden="true" />
+					{{ formatMessage(messages.goToDashboard) }}
+				</ButtonLink>
 			</div>
 		</div>
 		<div class="users-section-outer">
 			<div v-if="rows" class="projects-showcase">
 				<div v-for="(row, index) in rows" :key="index" class="row">
 					<div v-for="n in 2" :key="n" class="row__content" :class="{ offset: index % 2 }">
-						<nuxt-link
+						<ButtonLink
 							v-for="project in row"
 							:key="project.id"
-							class="project button-animation"
+							type="quiet"
+							interaction="none"
+							class="project !h-auto !shrink !items-stretch !justify-start !whitespace-normal !p-4 !font-normal !leading-normal"
 							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}`"
 						>
 							<Avatar :src="project.icon_url" :alt="project.title" size="sm" loading="lazy" />
@@ -63,7 +67,7 @@
 									{{ project.description }}
 								</span>
 							</div>
-						</nuxt-link>
+						</ButtonLink>
 					</div>
 				</div>
 			</div>
@@ -94,7 +98,7 @@
 								<label class="hidden" for="search">{{
 									formatMessage(commonMessages.searchLabel)
 								}}</label>
-								<StyledInput
+								<Input
 									id="search"
 									v-model="searchQuery"
 									:icon="SearchIcon"
@@ -444,13 +448,14 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
+	Input,
 	IntlFormatted,
 	ProjectCard,
-	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -464,6 +469,7 @@ import { homePageNotifs, homePageProjects, homePageSearch } from '~/generated/st
 const formatRelativeTime = useRelativeTime()
 
 const { formatMessage } = useVIntl()
+const { labrinth } = injectModrinthClient()
 
 const searchQuery = ref('leave')
 const sortType = ref('relevance')
@@ -473,8 +479,8 @@ const PROJECT_COUNT = 100000
 
 const auth = await useAuth()
 
-const newProjects = homePageProjects?.slice(0, 40)
-const val = Math.ceil(newProjects?.length / 3)
+const newProjects = homePageProjects?.slice(0, 40) ?? []
+const val = Math.ceil(newProjects.length / 3)
 const rows = ref(
 	newProjects.length > 0
 		? [
@@ -489,11 +495,25 @@ const notifications = ref(homePageNotifs?.hits ?? [])
 const searchProjects = ref(homePageSearch?.hits ?? [])
 
 async function updateSearchProjects() {
-	const res = await useBaseFetch(
-		`search?limit=3&query=${searchQuery.value}&index=${sortType.value}`,
-	)
+	searchProjects.value = await getSearchProjects()
+}
 
-	searchProjects.value = res?.hits ?? []
+async function getSearchProjects() {
+	try {
+		const res = await labrinth.projects_v2.search({
+			limit: 3,
+			query: searchQuery.value,
+			index: sortType.value,
+		})
+
+		return res?.hits ?? []
+	} catch {
+		return []
+	}
+}
+
+if (searchProjects.value.length === 0) {
+	searchProjects.value = await getSearchProjects()
 }
 
 const messages = defineMessages({
@@ -719,13 +739,6 @@ const creatorFeatureMessages = defineMessages({
 		line-break: loose;
 		color: var(--landing-color-subheading);
 		max-width: 50rem;
-	}
-
-	.button-group {
-		width: fit-content;
-		gap: 1.25rem;
-		margin: 0 auto 5rem;
-		justify-content: center;
 	}
 }
 

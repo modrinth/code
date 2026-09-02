@@ -1,0 +1,80 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT cs.*\n\t\tFROM instances i\n\t\tINNER JOIN instance_content_sets cs\n\t\t\tON cs.id = i.applied_content_set_id\n\t\tWHERE i.id = ?\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "instance_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "name",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "source_kind",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "status",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "game_version",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "protocol_version",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "loader",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "loader_version",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "created",
+        "ordinal": 9,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified",
+        "ordinal": 10,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "322be8068c58f2d22a3f3513f4fc1eb59ef1f4ea6f15de754a22cfbc3e316bce"
+}

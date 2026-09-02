@@ -1,4 +1,3 @@
-use crate::database::PgTransaction;
 use crate::database::models::{
     DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
@@ -131,7 +130,7 @@ impl DBUserSubscription {
 
     pub async fn upsert(
         &self,
-        transaction: &mut PgTransaction<'_>,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
@@ -156,7 +155,7 @@ impl DBUserSubscription {
             self.status.as_str(),
             serde_json::to_value(&self.metadata)?,
         )
-        .execute(&mut *transaction)
+        .execute(exec)
         .await?;
 
         Ok(())

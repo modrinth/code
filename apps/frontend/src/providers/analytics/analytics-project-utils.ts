@@ -15,7 +15,7 @@ const PLUGIN_PROJECT_TYPE = 'plugin'
 
 export const UNKNOWN_ORGANIZATION_NAME = 'Organization'
 
-function getProjectTypes(project: ProjectTypeMetadata): string[] {
+export function getProjectTypes(project: ProjectTypeMetadata): string[] {
 	const projectTypes = new Set<string>()
 	const projectType = project.project_type?.trim()
 	if (projectType) {
@@ -69,6 +69,7 @@ export function toAnalyticsDashboardProject(
 		id: project.id,
 		name: project.name ?? project.title ?? project.id,
 		iconUrl: project.icon_url ?? undefined,
+		organizationId: getProjectOrganizationId(project),
 		downloads: project.downloads ?? 0,
 		status: getProjectStatusFilterValue(project.status),
 		publishedAt: project.published ?? undefined,

@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Añade una dirección Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Añade una URL válida y un nombre o identificador SPDX para su licencia personalizada."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Agregar detalles de la licencia"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Añade cualquier enlace relevante, como un sitio web, tienda o una invitación de Discord."
   },
@@ -29,11 +35,23 @@
   "nags.add-links.title": {
     "defaultMessage": "Añadir enlaces externos"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "Has elegido todos los idiomas. Por favor elige solo a los que tu servidor de soporte activamente."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Selecciona los idiomas correspondientes"
+  },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Has seleccionado {totalAvailableTags, plural, one {la única etiqueta disponible} other {todas las # etiquetas disponibles}}. Esto anula el propósito de las etiquetas, que están pensadas para ayudar a los usuarios a encontrar proyectos relevantes. Por favor, selecciona solo las etiquetas que sean relevantes para tu proyecto."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecciona etiquetas precisas"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Asegúrate de que los usuarios estén al tanto de cualquier detalle importante rellenando las divulgaciones de contenido que se aplican a tu {type}."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Comprobar divulgaciones de contenido"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Tu descripción tiene {length, plural, one {# carácter legible} other {# caracteres legibles}}. Se recomienda un mínimo de {minChars, plural, one {# carácter} other {# caracteres}} para crear una descripción clara e informativa."
@@ -72,7 +90,7 @@
     "defaultMessage": "Proporcionar el código fuente"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado"
+    "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado."
   },
   "nags.identical-links.title": {
     "defaultMessage": "Limpiar links idénticos"
@@ -140,6 +158,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecciona la resolución correcta"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Asegúrate de haber proporcionado prueba de que cuentas con permiso para distribuir cualquier contenido externo en tu modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Revisar los permisos externos"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Selecciona qué versiones admite tu servidor, elige un Modpack o carga el tuyo propio."
   },
@@ -176,17 +200,26 @@
   "nags.settings.description.title": {
     "defaultMessage": "Visitar la configuración de la descripción"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Visita la configuración de divulgación"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Visitar la configuración de la licencia"
   },
   "nags.settings.links.title": {
     "defaultMessage": "Visitar la configuración de enlaces"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visitar el panel de proyectos"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Visitar la configuración de etiquetas"
   },
   "nags.settings.title": {
     "defaultMessage": "Visitar la configuración general"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Visita los ajustes de versiones"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Tu resumen no puede ser igual al Nombre de tu proyecto. Es importante crear un Resumen informativo y atractivo."
@@ -207,10 +240,16 @@
     "defaultMessage": "Expandir el resumen"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el cargador se muestra automáticamente junto a tu proyecto."
+    "defaultMessage": "Mantener limpio el nombre de tu proyecto lo hace más memorable y fácil de encontrar. La información sobre la versión y el loader se muestra automáticamente junto a tu proyecto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpiar el nombre"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Has seleccionado {languageCount, plural, one {# language} other {# languages}}. Por favor elige solo a los que tu servidor de soporte activamente."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Selecciona los idiomas correspondientes"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Has seleccionado {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Por favor, redúcelas a {maxTagCount} o menos para que tu servidor aparezca en los resultados de búsqueda relevantes."
@@ -227,8 +266,11 @@
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu {type}."
   },
-  "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "pack de recursos, excepto para audio o packs de localización. Si esto describe tu pack, por favor, seleccionar la etiqueta apropiada"
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Se requiere al menos una imagen en la galería para mostrar el contenido de tu paquete de recursos, excepto para los paquetes de audio o localización. Si este es el caso de tu paquete, selecciona la etiqueta correspondiente."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Se requieren al menos tres imágenes en la galería para mostrar el contenido de su shader en diversas situaciones y condiciones."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"
@@ -244,9 +286,6 @@
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Verificar enlaces externos"
-  },
-  "nags.versions.title": {
-    "defaultMessage": "Visita la página de versiones"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visitar la configuración de enlaces"

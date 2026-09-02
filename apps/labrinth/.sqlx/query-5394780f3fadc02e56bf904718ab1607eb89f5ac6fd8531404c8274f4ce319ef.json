@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            insert into project_attribution_files (group_id, name, sha1)\n            values ($1, $2, $3)\n            on conflict (group_id, sha1) do nothing\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Bytea"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5394780f3fadc02e56bf904718ab1607eb89f5ac6fd8531404c8274f4ce319ef"
+}
