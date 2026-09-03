@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM delphi_tech_review_queue\n        WHERE project_id = $1\n        RETURNING project_id AS \"project_id: DBProjectId\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "285c66152a506e79c3c8996b4f44b8f63dcf79a2d02dcfeac9655d89bdb2750e"
+}

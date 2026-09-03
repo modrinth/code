@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronRightIcon } from '@modrinth/assets'
 import { injectNotificationManager, Toggle } from '@modrinth/ui'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
+
+import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from './helpers'
 import TechRevClassItem from './TechRevClassItem.vue'
@@ -30,6 +31,7 @@ const emit = defineEmits<{
 }>()
 
 const { addNotification } = injectNotificationManager()
+
 const {
 	updatingDetails,
 	updatingGlobalDetailKeys,
@@ -49,6 +51,7 @@ const hideGloballyPassed = ref(true)
 const isBatchUpdating = ref(false)
 const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
+
 const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 2
 
 const globallyPassedCount = computed(() => {
@@ -333,7 +336,7 @@ async function updateGlobalDetailStatus(
 function splitJarSegments(jar: string | null, currentFileName: string | null): string[] {
 	if (!jar) return []
 	const segments = jar
-		.split(/[/#]/)
+		.split('#')
 		.map((s) => decodeURIComponent(s.trim()))
 		.filter((s) => s.length > 0)
 	if (segments.length > 0 && currentFileName && segments[0] === currentFileName) {
@@ -427,7 +430,7 @@ async function focusDetail(detailId: string) {
 	await nextTick()
 
 	const classItem = groupedByClass.value.find((group) =>
-		group.flags.some((flag) => flag.detail.id === detailId),
+		group.flags.some((flag) => String(flag.detail.id) === detailId),
 	)
 
 	if (classItem) {
@@ -502,24 +505,12 @@ watch(
 	<div v-for="jarGroup in groupedByJar" :key="jarGroup.key" class="flex flex-col gap-1 px-4 pb-4">
 		<div v-if="jarGroup.segments.length > 0" class="my-2">
 			<div class="flex flex-wrap items-center justify-between gap-3">
-				<div class="flex flex-wrap items-center gap-1">
-					<template v-for="(segment, index) in jarGroup.segments" :key="`${jarGroup.key}-${index}`">
-						<span
-							class="font-mono text-sm"
-							:class="
-								index === jarGroup.segments.length - 1
-									? 'font-semibold text-contrast'
-									: 'text-secondary'
-							"
-						>
-							{{ segment }}
-						</span>
-						<ChevronRightIcon
-							v-if="index < jarGroup.segments.length - 1"
-							class="size-4 text-secondary"
-						/>
-					</template>
-				</div>
+				<IssueDetailPath
+					:segments="jarGroup.segments"
+					:decode="false"
+					class="font-mono text-sm"
+					emphasize-last
+				/>
 
 				<TechRevVerdictButtons
 					v-if="getJarRemainingUnmarkedCount(jarGroup) > 0"
