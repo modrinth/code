@@ -155,9 +155,6 @@
   "nags.server.title": {
     "defaultMessage": "Bisitahin ang server settings"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Bisitahin ang mga setting sa paglalarawan"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Bisitahin ang mga setting sa lisensiya"
   },

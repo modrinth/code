@@ -173,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "서버 설정 방문"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "설명 설정 방문"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "라이선스 설정 방문"
   },

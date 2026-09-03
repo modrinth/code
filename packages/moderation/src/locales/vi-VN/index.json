@@ -173,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "Truy cập cài đặt máy chủ"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Truy cập cài đặt mô tả"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Truy cập cài đặt giấy phép"
   },

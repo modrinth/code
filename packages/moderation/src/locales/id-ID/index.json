@@ -173,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "Kunjungi pengaturan server"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Kunjungi pengaturan keterangan"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Kunjungi pengaturan lisensi"
   },

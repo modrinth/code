@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "前往伺服器設定"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "前往描述設定"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "前往揭露資訊設定"
   },

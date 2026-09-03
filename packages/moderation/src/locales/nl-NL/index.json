@@ -173,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "Toon server instellingen"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Bekijk beschrijving instellingen"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Bekijk licentie instellingen"
   },

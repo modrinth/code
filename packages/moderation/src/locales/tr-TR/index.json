@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Sunucu ayarlara göz at"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Açıklama ayarlarına göz at"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "İçerik açıklamalarını ziyaret et"
   },

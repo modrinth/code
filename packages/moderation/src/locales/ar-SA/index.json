@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "زيارة إعدادات الخادم"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "زيارة إعدادات الوصف"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "انتقل إلى إعدادات الإفصاحات"
   },

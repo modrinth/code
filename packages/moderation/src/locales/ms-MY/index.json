@@ -155,9 +155,6 @@
   "nags.server.title": {
     "defaultMessage": "Kunjungi tetapan pelayan"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Kunjungi tetapan keterangan"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Kunjungi tetapan lesen"
   },

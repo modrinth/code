@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Přejděte do nastavení serveru"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Přejděte do nastavení popisu"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Přejděte do nastavení zveřejnění"
   },

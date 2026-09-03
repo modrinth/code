@@ -158,9 +158,6 @@
   "nags.server.title": {
     "defaultMessage": "בקר בהגדרות השרת"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "בקר בהגדרות התיאור"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "בקר בהגדרות הרישיון"
   },

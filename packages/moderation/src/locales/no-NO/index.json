@@ -167,9 +167,6 @@
   "nags.server.title": {
     "defaultMessage": "Gå til serverinnstillinger"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Gå til lisensinnstillinger"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Gå til lenkeinnstillinger"
   },

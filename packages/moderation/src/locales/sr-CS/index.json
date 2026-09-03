@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Posjeti podešavanja servera"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Posjeti podešavanja opisa"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Posetite podešavanja sadržaja"
   },

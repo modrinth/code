@@ -170,9 +170,6 @@
   "nags.server.title": {
     "defaultMessage": "Impostazioni del server"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Impostazioni della descrizione"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Impostazioni delle informative"
   },

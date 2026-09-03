@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Servereinstellungen ansehen"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Beschreibungseinstellungen ansehen"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Angabeneinstellungen öffnen"
   },

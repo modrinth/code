@@ -176,9 +176,6 @@
   "nags.server.title": {
     "defaultMessage": "サーバー設定を表示する"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "説明の設定を表示"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "開示設定を開く"
   },

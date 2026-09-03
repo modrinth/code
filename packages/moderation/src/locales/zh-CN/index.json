@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "访问服务器设置"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "访问描述设置"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "访问权限设置"
   },

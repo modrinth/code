@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Besök serverinställningar"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Besök beskrivningsinställningar"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Besök informationsinställningar"
   },

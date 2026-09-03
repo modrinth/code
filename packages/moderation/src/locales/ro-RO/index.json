@@ -146,9 +146,6 @@
   "nags.server.title": {
     "defaultMessage": "Accesați setările serverului"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Vizitează setările descrierii"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Vizitează setările licenței"
   },

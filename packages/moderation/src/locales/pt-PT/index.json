@@ -164,9 +164,6 @@
   "nags.server.title": {
     "defaultMessage": "Visitar as definições do servidor"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Vê as definições da descrição"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Vê as definições de licença"
   },

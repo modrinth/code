@@ -173,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "Odwiedź ustawienia serwera"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Odwiedź ustawienia opisu"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Odwiedź ustawienia licencji"
   },

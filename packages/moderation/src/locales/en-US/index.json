@@ -155,63 +155,6 @@
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Modify the summary"
   },
-  "nags.link.description.invalid-url": {
-    "defaultMessage": "The description has an invalid link: “{fullUrl}”."
-  },
-  "nags.link.discord.channel": {
-    "defaultMessage": "This is a link to a Discord channel, not a server invite."
-  },
-  "nags.link.discord.invite.expires": {
-    "defaultMessage": "This Discord invite is set to expire"
-  },
-  "nags.link.discord.invite.invalid": {
-    "defaultMessage": "This Discord invite is invalid or has expired."
-  },
-  "nags.link.discord.invite.not-guild": {
-    "defaultMessage": "This Discord invite does not lead to a server."
-  },
-  "nags.link.discord.user": {
-    "defaultMessage": "This is a link to a Discord user, not a server invite."
-  },
-  "nags.link.expected-type": {
-    "defaultMessage": "This isn't a valid {label} link."
-  },
-  "nags.link.git.archived": {
-    "defaultMessage": "This repository is archived, which disables issues."
-  },
-  "nags.link.git.empty": {
-    "defaultMessage": "This repository appears to be empty."
-  },
-  "nags.link.git.issues-disabled": {
-    "defaultMessage": "Issues are disabled on this repository."
-  },
-  "nags.link.git.not-found": {
-    "defaultMessage": "This repository could not be found (it may be private or deleted)."
-  },
-  "nags.link.git.wiki-disabled": {
-    "defaultMessage": "The wiki is disabled on this repository."
-  },
-  "nags.link.invalid-url": {
-    "defaultMessage": "This URL is invalid"
-  },
-  "nags.link.license.url-mismatch": {
-    "defaultMessage": "This link points to the {detected} license, but your project is set to {selected}."
-  },
-  "nags.link.license.url-redundant": {
-    "defaultMessage": "You don't need to link to a generic license page for a supported license — consider linking to your repository's own license file instead, or leaving this blank."
-  },
-  "nags.link.never-valid": {
-    "defaultMessage": "{label} links aren't allowed here."
-  },
-  "nags.link.unverifiable-redirect": {
-    "defaultMessage": "This doesn't look like a {platform} link."
-  },
-  "nags.link.wrong-field": {
-    "defaultMessage": "{label} links aren't valid for this field."
-  },
-  "nags.link.youtube.unrecognized": {
-    "defaultMessage": "This doesn't look like a YouTube donation link."
-  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# header} other {# headers}} in your description {count, plural, one {is} other {are}} too long. Headers should be concise and act as section titles, not full sentences."
   },
@@ -355,9 +298,6 @@
   },
   "nags.server.title": {
     "defaultMessage": "Visit server settings"
-  },
-  "nags.settings.description.title": {
-    "defaultMessage": "Visit description settings"
   },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Visit disclosure settings"

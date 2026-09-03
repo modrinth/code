@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Ir a ajustes del servidor"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Visitar la configuración de la descripción"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Visita la configuración de divulgación"
   },

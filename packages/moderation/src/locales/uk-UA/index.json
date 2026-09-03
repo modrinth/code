@@ -179,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Відвідайте налаштування сервера"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Відвідайте налаштування опису"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Перейти до налаштувань маркування"
   },
