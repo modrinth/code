@@ -161,6 +161,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import ConfettiExplosion from 'vue-confetti-explosion'
+import type { LocationQueryValue } from 'vue-router'
 
 import ModerateByIdsModal from '~/components/ui/moderation/ModerateByIdsModal.vue'
 import ModerationFilterCount from '~/components/ui/moderation/ModerationFilterCount.vue'
@@ -183,7 +184,6 @@ const moderationQueue = useModerationQueue()
 const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
-const tags = useGeneratedState()
 
 const queueSummaryModal = ref()
 const moderateByIdsModal = ref<InstanceType<typeof ModerateByIdsModal>>()
