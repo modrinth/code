@@ -15,13 +15,11 @@
 						<TriangleAlertIcon class="size-4 shrink-0 text-orange" />
 						<span class="text-secondary">{{ getFormattedMessage(messages.warning) }}</span>
 					</div>
-					<template v-if="!isProcessing">
-						|
-						<div class="flex items-center gap-1">
-							<LightBulbIcon class="size-4 shrink-0 text-purple" />
-							<span class="text-secondary">{{ getFormattedMessage(messages.suggestion) }}</span>
-						</div>
-					</template>
+					|
+					<div class="flex items-center gap-1">
+						<LightBulbIcon class="size-4 shrink-0 text-purple" />
+						<span class="text-secondary">{{ getFormattedMessage(messages.suggestion) }}</span>
+					</div>
 				</div>
 			</div>
 			<div class="input-group">
@@ -137,7 +135,13 @@ import {
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nagDestinations, normalizeProjectNagKind, toProjectNag } from '@modrinth/moderation'
 import { Accordion, Button, IconButton } from '@modrinth/ui'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import {
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	type MessageDescriptor,
+	useVIntl,
+} from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -211,9 +215,14 @@ const messages = defineMessages({
 		id: 'project-moderation-nags.suggestion',
 		defaultMessage: 'Suggestion',
 	},
+	projectSubmittedForReview: {
+		id: 'project-moderation-nags.project-submitted-for-review',
+		defaultMessage: 'Your project has been submitted for review!',
+	},
 })
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 
 const props = withDefaults(defineProps<Props>(), {
 	versions: () => [],
@@ -376,7 +385,16 @@ async function submitForReview() {
 	if (!canSubmitForReview.value) return
 	const validation = await props.refreshValidation?.()
 	if (!validation || validation.nags.some((nag) => nag.severity === 'required')) return
+	if (!props.collapsed) emit('toggleCollapsed')
 	emit('setProcessing', true)
+	await navigateTo(
+		`/${props.project.project_type}/${props.project.slug ?? props.project.id}/${nagDestinations.moderation.path}`,
+	)
+	addNotification({
+		type: 'success',
+		title: formatMessage(commonMessages.successLabel),
+		text: formatMessage(messages.projectSubmittedForReview),
+	})
 }
 
 const applicableNags = computed<Nag[]>(() => {
@@ -400,11 +418,7 @@ function isNagComplete(nag: Nag): boolean {
 }
 
 const visibleNags = computed<Nag[]>(() => {
-	const finalNags = applicableNags.value.filter(
-		(nag) =>
-			!isNagComplete(nag) &&
-			(!isProcessing.value || nag.status === 'required' || nag.status === 'warning'),
-	)
+	const finalNags = applicableNags.value.filter((nag) => !isNagComplete(nag))
 
 	if (props.project.status === 'draft') {
 		finalNags.push({
@@ -440,6 +454,49 @@ const visibleNags = computed<Nag[]>(() => {
 })
 
 watch(visibleNags, () => nextTick(updateNagScrollShadows))
+
+watch(
+	isProcessing,
+	(processing) => {
+		if (processing && !props.collapsed) emit('toggleCollapsed')
+	},
+)
+
+let validationProjectId = props.project.id
+let previousActionableNagKeys: Set<string> | null = null
+
+watch(
+	[
+		() => props.project.id,
+		() => props.validationLoading,
+		() => props.validationAvailable,
+		() => props.validationNags,
+	],
+	([projectId, validationLoading, validationAvailable, validationNags]) => {
+		if (projectId !== validationProjectId) {
+			validationProjectId = projectId
+			previousActionableNagKeys = null
+		}
+
+		if (validationLoading || !validationAvailable) return
+
+		const actionableNagKeys = new Set(
+			validationNags
+				.filter((nag) => nag.severity === 'required' || nag.severity === 'warning')
+				.map((nag) => `${nag.severity}:${nag.kind}`),
+		)
+		const previousNagKeys = previousActionableNagKeys
+		const hasNewActionableNag =
+			previousNagKeys !== null && [...actionableNagKeys].some((key) => !previousNagKeys.has(key))
+
+		previousActionableNagKeys = actionableNagKeys
+
+		if (isProcessing.value && props.collapsed && hasNewActionableNag) {
+			emit('toggleCollapsed')
+		}
+	},
+	{ deep: true, immediate: true },
+)
 
 function shouldShowLink(nag: Nag): boolean {
 	return nag.link?.shouldShow(nagContext.value) ?? false

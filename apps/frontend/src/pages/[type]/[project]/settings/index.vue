@@ -380,6 +380,7 @@ const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
 	title: name,
 	username: ownerUsername,
 	currentProjectId: () => project.value.id,
+	enabled: showSlugSuggestions,
 })
 const icon = ref(null)
 const previewImage = ref(null)

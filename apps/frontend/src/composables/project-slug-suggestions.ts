@@ -12,6 +12,7 @@ interface ProjectSlugSuggestionOptions {
 	title: MaybeRefOrGetter<string>
 	username?: MaybeRefOrGetter<string | null | undefined>
 	currentProjectId?: MaybeRefOrGetter<string | null | undefined>
+	enabled?: MaybeRefOrGetter<boolean>
 }
 
 export function generateUrlSlug(value: string) {
@@ -71,6 +72,7 @@ export function useProjectSlugSuggestions({
 	title,
 	username,
 	currentProjectId,
+	enabled = true,
 }: ProjectSlugSuggestionOptions) {
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
@@ -80,31 +82,38 @@ export function useProjectSlugSuggestions({
 	let requestId = 0
 
 	async function isAvailable(slug: string, projectId?: string | null) {
-		try {
-			const result = await queryClient.fetchQuery({
-				queryKey: ['project', 'check', slug],
-				queryFn: () => client.labrinth.projects_v2.check(slug),
-				staleTime: STALE_TIME,
-				retry: false,
-			})
-			return result.id === projectId
-		} catch (error) {
-			return error instanceof ModrinthApiError && error.statusCode === 404
-		}
+		return queryClient.fetchQuery({
+			queryKey: ['project', 'slug-available', slug, projectId ?? null],
+			queryFn: async () => {
+				try {
+					const result = await client.labrinth.projects_v2.check(slug)
+					return result.id === projectId
+				} catch (error) {
+					if (error instanceof ModrinthApiError && error.statusCode === 404) return true
+					throw error
+				}
+			},
+			staleTime: STALE_TIME,
+			retry: false,
+		})
 	}
 
 	watch(
-		() => [toValue(title), toValue(username), toValue(currentProjectId)] as const,
-		([newTitle, newUsername, projectId]) => {
+		() =>
+			[toValue(title), toValue(username), toValue(currentProjectId), toValue(enabled)] as const,
+		([newTitle, newUsername, projectId, isEnabled]) => {
 			if (import.meta.server) return
 
 			clearTimeout(debounceTimer)
 			const currentRequestId = ++requestId
-			const candidates = generateProjectSlugSuggestions(newTitle, newUsername)
 			suggestions.value = []
+			checking.value = false
+
+			if (!isEnabled) return
+
+			const candidates = generateProjectSlugSuggestions(newTitle, newUsername)
 
 			if (candidates.length === 0) {
-				checking.value = false
 				return
 			}
 

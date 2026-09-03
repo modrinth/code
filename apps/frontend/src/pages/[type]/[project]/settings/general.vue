@@ -69,6 +69,7 @@ const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
 	title: () => current.value.title,
 	username: ownerUsername,
 	currentProjectId: () => project.value.id,
+	enabled: showSlugSuggestions,
 })
 
 async function save() {

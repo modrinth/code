@@ -1498,8 +1498,8 @@ const patchProjectV3Mutation = useMutation({
 		})
 	},
 
-	onSettled: async () => {
-		await invalidateProject()
+	onSettled: () => {
+		void invalidateProject()
 	},
 })
 
@@ -2278,7 +2278,7 @@ async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/project/${project.value.id}`)
 }
 
-const collapsedChecklist = ref(false)
+const collapsedChecklist = useLocalStorage(`project-checklist-collapsed-${project.value.id}`, false)
 
 const showModerationChecklist = ref(false)
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
