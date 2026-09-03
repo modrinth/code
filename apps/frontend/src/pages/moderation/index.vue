@@ -4,6 +4,7 @@
 			v-model="query"
 			:page="currentPage"
 			:total-pages="totalPages"
+			:loading="pending"
 			@search="goToPage(1)"
 			@switch-page="goToPage"
 		>

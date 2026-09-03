@@ -75,6 +75,7 @@ export interface ModrinthServerContext {
 	// File operations (extract, move, etc.)
 	readonly activeOperations: ComputedRef<FileOperation[]>
 	dismissOperation: (opId: string, action: 'dismiss' | 'cancel') => Promise<void>
+	upsertLocalFileOperation?: (operation: FileOperation) => void
 }
 
 export const [injectModrinthServerContext, provideModrinthServerContext] =

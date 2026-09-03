@@ -34,6 +34,7 @@ import {
 	type ImageViewerEditorSavePayload,
 	injectNotificationManager,
 	ReadyTransition,
+	useDebugLogger,
 	useFormatDateTime,
 	useReadyState,
 	useScrollViewport,
@@ -109,6 +110,7 @@ type ScreenshotDropData = {
 }
 
 type ScreenshotGroupLayout = {
+	id: string
 	group: ScreenshotGroupData
 	top: number
 	height: number
@@ -117,7 +119,7 @@ type ScreenshotGroupLayout = {
 	gridTop: number
 }
 
-type VisibleScreenshotGroupLayout = ScreenshotGroupLayout & {
+type VirtualizedScreenshotGroupLayout = ScreenshotGroupLayout & {
 	renderedScreenshots: InstanceScreenshot[]
 	virtualGridTop: number
 }
@@ -126,7 +128,7 @@ const SCREENSHOT_GRID_GAP = 12
 const SCREENSHOT_GROUP_SPACING = 12
 const SCREENSHOT_GROUP_HEADER_HEIGHT = 40
 const SCREENSHOT_GROUP_CONTENT_SPACING = 10
-const SCREENSHOT_GROUP_OVERSCAN = 900
+const SCREENSHOT_GROUP_OVERSCAN = 2000
 const SCREENSHOT_GRID_MIN_HEIGHT = 45
 const FALLBACK_SCREENSHOT_CARD_WIDTH = 320
 
@@ -173,8 +175,6 @@ const selectedKeys = ref(new Set<string>())
 const copiedScreenshotIds = ref(new Set<string>())
 const copiedResetTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 const screenshotsPage = ref<HTMLElement>()
-const regrouping = ref(false)
-const screenshotsScrolling = ref(false)
 const screenshotToDelete = ref<InstanceScreenshot | null>(null)
 const deleteFromPreview = ref(false)
 const activeDrag = ref<ActiveScreenshotDrag | null>(null)
@@ -197,7 +197,8 @@ const route = useRoute()
 const router = useRouter()
 const { formatMessage } = useVIntl()
 const { addNotification, handleError } = injectNotificationManager()
-let screenshotsScrollIdleTimeout: ReturnType<typeof setTimeout> | undefined
+const debugLayout = useDebugLogger('Screenshots:Layout')
+let screenshotsScrollLogFrame: number | undefined
 const {
 	listContainer: screenshotListContainer,
 	containerOffset: screenshotListOffset,
@@ -206,12 +207,18 @@ const {
 	viewportHeight: screenshotViewportHeight,
 } = useScrollViewport({
 	onScroll: () => {
-		screenshotsScrolling.value = true
-		if (screenshotsScrollIdleTimeout) clearTimeout(screenshotsScrollIdleTimeout)
-		screenshotsScrollIdleTimeout = setTimeout(() => {
-			screenshotsScrolling.value = false
-			screenshotsScrollIdleTimeout = undefined
-		}, 120)
+		if (screenshotsScrollLogFrame === undefined) {
+			screenshotsScrollLogFrame = requestAnimationFrame(() => {
+				screenshotsScrollLogFrame = undefined
+				debugLayout('scroll', {
+					groupBy: groupBy.value,
+					relativeScrollTop: screenshotListScrollTop.value,
+					listOffset: screenshotListOffset.value,
+					viewportHeight: screenshotViewportHeight.value,
+					listWidth: screenshotListWidth.value,
+				})
+			})
+		}
 	},
 })
 const { width: screenshotListWidth } = useElementSize(screenshotListContainer)
@@ -429,10 +436,10 @@ const groupedScreenshots = computed((): ScreenshotGroupData[] => {
 			screenshotGroups.set(screenshot.instance_id, group)
 		}
 
-		const syncedInstances = (instancesQuery.data.value ?? [])
-			.filter((instance) => instance.synced_options.screenshots)
-			.sort((a, b) => a.name.localeCompare(b.name))
-		const groups = syncedInstances.flatMap((instance) => {
+		const instances = [...(instancesQuery.data.value ?? [])].sort((a, b) =>
+			a.name.localeCompare(b.name),
+		)
+		const groups = instances.flatMap((instance) => {
 			const instanceScreenshots = screenshotGroups.get(instance.id)
 			return instanceScreenshots
 				? [
@@ -546,19 +553,14 @@ const screenshotGroupLayouts = computed<ScreenshotGroupLayout[]>(() => {
 			(isOpen ? SCREENSHOT_GROUP_CONTENT_SPACING + gridHeight : 0) +
 			SCREENSHOT_GROUP_SPACING
 
-		layouts.push({ group, top, height, isOpen, gridHeight, gridTop })
+		layouts.push({ id: group.id, group, top, height, isOpen, gridHeight, gridTop })
 		top += height
 	}
 
 	return layouts
 })
 
-const screenshotListHeight = computed(() => {
-	const lastGroup = screenshotGroupLayouts.value[screenshotGroupLayouts.value.length - 1]
-	return lastGroup ? lastGroup.top + lastGroup.height : 0
-})
-
-const visibleScreenshotGroups = computed<VisibleScreenshotGroupLayout[]>(() => {
+const virtualizedScreenshotGroups = computed<VirtualizedScreenshotGroupLayout[]>(() => {
 	const hasViewport = Boolean(screenshotListContainer.value && screenshotScrollContainer.value)
 	const viewportStart = hasViewport
 		? Math.max(0, screenshotListScrollTop.value - SCREENSHOT_GROUP_OVERSCAN)
@@ -567,36 +569,90 @@ const visibleScreenshotGroups = computed<VisibleScreenshotGroupLayout[]>(() => {
 		? screenshotListScrollTop.value + screenshotViewportHeight.value + SCREENSHOT_GROUP_OVERSCAN
 		: SCREENSHOT_GROUP_OVERSCAN
 
-	return screenshotGroupLayouts.value
-		.filter((layout) => layout.top + layout.height >= viewportStart && layout.top <= viewportEnd)
-		.map((layout) => {
-			if (!layout.isOpen || layout.group.screenshots.length === 0) {
-				return { ...layout, renderedScreenshots: [], virtualGridTop: 0 }
-			}
+	return screenshotGroupLayouts.value.map((layout) => {
+		const isInRenderRange = layout.top + layout.height >= viewportStart && layout.top <= viewportEnd
+		if (!layout.isOpen || layout.group.screenshots.length === 0) {
+			return { ...layout, renderedScreenshots: [], virtualGridTop: 0 }
+		}
+		if (!isInRenderRange) {
+			return { ...layout, renderedScreenshots: [], virtualGridTop: 0 }
+		}
 
-			const rowCount = Math.ceil(layout.group.screenshots.length / screenshotColumnCount.value)
-			const firstRow = Math.min(
-				rowCount,
-				Math.max(0, Math.floor((viewportStart - layout.gridTop) / screenshotRowHeight.value)),
-			)
-			const lastRow = Math.min(
-				rowCount,
-				Math.max(
-					firstRow,
-					Math.ceil(
-						(viewportEnd - layout.gridTop + SCREENSHOT_GRID_GAP) / screenshotRowHeight.value,
-					),
-				),
-			)
-			const firstScreenshot = firstRow * screenshotColumnCount.value
-			const lastScreenshot = lastRow * screenshotColumnCount.value
+		const rowCount = Math.ceil(layout.group.screenshots.length / screenshotColumnCount.value)
+		const firstRow = Math.min(
+			rowCount,
+			Math.max(0, Math.floor((viewportStart - layout.gridTop) / screenshotRowHeight.value)),
+		)
+		const lastRow = Math.min(
+			rowCount,
+			Math.max(
+				firstRow,
+				Math.ceil((viewportEnd - layout.gridTop + SCREENSHOT_GRID_GAP) / screenshotRowHeight.value),
+			),
+		)
+		const firstScreenshot = firstRow * screenshotColumnCount.value
+		const lastScreenshot = lastRow * screenshotColumnCount.value
 
-			return {
-				...layout,
-				renderedScreenshots: layout.group.screenshots.slice(firstScreenshot, lastScreenshot),
-				virtualGridTop: firstRow * screenshotRowHeight.value,
-			}
+		return {
+			...layout,
+			renderedScreenshots: layout.group.screenshots.slice(firstScreenshot, lastScreenshot),
+			virtualGridTop: firstRow * screenshotRowHeight.value,
+		}
+	})
+})
+
+watch(
+	[groupBy, screenshotListWidth, windowWidth, screenshotColumnCount, screenshotCardHeight],
+	([currentGroupBy, listWidth, currentWindowWidth, columns, cardHeight], previous) => {
+		debugLayout('responsive geometry changed', {
+			groupBy: currentGroupBy,
+			listWidth,
+			windowWidth: currentWindowWidth,
+			columns,
+			cardHeight,
+			previous,
 		})
+	},
+	{ immediate: true },
+)
+
+watch(
+	screenshotGroupLayouts,
+	(layouts) => {
+		debugLayout('group layouts changed', {
+			groupBy: groupBy.value,
+			groupCount: layouts.length,
+			totalHeight: layouts.at(-1) ? layouts.at(-1)!.top + layouts.at(-1)!.height : 0,
+			layouts: layouts.map((layout) => ({
+				id: layout.id,
+				top: layout.top,
+				height: layout.height,
+				gridTop: layout.gridTop,
+				gridHeight: layout.gridHeight,
+				isOpen: layout.isOpen,
+				screenshotCount: layout.group.screenshots.length,
+			})),
+		})
+	},
+	{ immediate: true },
+)
+
+watch(virtualizedScreenshotGroups, (groups) => {
+	debugLayout('render window changed', {
+		groupBy: groupBy.value,
+		relativeScrollTop: screenshotListScrollTop.value,
+		viewportHeight: screenshotViewportHeight.value,
+		renderedGroups: groups
+			.filter((group) => group.renderedScreenshots.length > 0)
+			.map((group) => ({
+				id: group.id,
+				top: group.top,
+				virtualGridTop: group.virtualGridTop,
+				renderedCount: group.renderedScreenshots.length,
+				firstScreenshotId: group.renderedScreenshots.at(0)?.id,
+				lastScreenshotId: group.renderedScreenshots.at(-1)?.id,
+			})),
+	})
 })
 
 const previewItems = computed(() =>
@@ -685,10 +741,8 @@ watch(groupBy, async (currentGroupBy, previousGroupBy) => {
 	if (currentGroupBy === previousGroupBy) return
 
 	const previousPositions = getScreenshotCardPositions()
-	regrouping.value = true
 	await nextTick()
 	animateScreenshotCardsFrom(previousPositions)
-	regrouping.value = false
 })
 
 let handledFocus: string | undefined
@@ -1335,7 +1389,7 @@ watch(activeDropGroupId, (groupId) => {
 onBeforeUnmount(() => {
 	clearGroupHoverOpenTimeout()
 	if (revealTimeout) clearTimeout(revealTimeout)
-	if (screenshotsScrollIdleTimeout) clearTimeout(screenshotsScrollIdleTimeout)
+	if (screenshotsScrollLogFrame !== undefined) cancelAnimationFrame(screenshotsScrollLogFrame)
 	for (const timeout of copiedResetTimeouts.values()) clearTimeout(timeout)
 	copiedResetTimeouts.clear()
 })
@@ -1479,20 +1533,21 @@ onBeforeUnmount(() => {
 			>
 				<div
 					ref="screenshotListContainer"
-					class="relative w-full"
-					:style="{ height: `${screenshotListHeight}px`, overflowAnchor: 'none' }"
+					class="w-full"
+					:style="{
+						overflowAnchor: 'none',
+						visibility: screenshotListWidth > 0 ? 'visible' : 'hidden',
+					}"
 				>
 					<div
 						v-for="{
+							id,
 							group,
-							top,
 							gridHeight,
 							renderedScreenshots,
 							virtualGridTop,
-						} in visibleScreenshotGroups"
-						:key="group.id"
-						class="absolute inset-x-0 transition-transform duration-300 ease-in-out will-change-transform motion-reduce:transition-none"
-						:style="{ transform: `translateY(${top}px)` }"
+						} in virtualizedScreenshotGroups"
+						:key="id"
 					>
 						<ScreenshotGroupSection
 							:id="group.id"
@@ -1514,7 +1569,6 @@ onBeforeUnmount(() => {
 							:show-instance-name="isGlobal && groupBy !== 'instance'"
 							:highlighted-screenshot-id="highlightedScreenshotId"
 							:copied-screenshot-ids="copiedScreenshotIds"
-							:animate-entry="!regrouping && !screenshotsScrolling"
 							:force-open="search.length > 0"
 							:hide-header="groupBy === 'none'"
 							:editable-title="Boolean(group.customGroupId)"

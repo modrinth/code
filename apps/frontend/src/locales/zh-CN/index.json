@@ -3443,12 +3443,6 @@
   "project-type.shader.singular": {
     "message": "光影包"
   },
-  "project.actions.back-to-all-projects": {
-    "message": "回到全部项目列表"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "回到项目页"
-  },
   "project.actions.check-modpack-archives": {
     "message": "检查整合包解压"
   },

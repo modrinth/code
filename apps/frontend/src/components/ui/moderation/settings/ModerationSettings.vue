@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { moderationSettings, type SettingDefinition } from '@modrinth/moderation'
-import { Combobox, Toggle } from '@modrinth/ui'
+import { Button, Combobox, Input, Toggle } from '@modrinth/ui'
+
+const localhostHostname = 'localhost:3000'
 
 const flattenedSettings = Object.entries(moderationSettings).reduce(
 	(acc, [group, settings]) => {
@@ -35,27 +37,28 @@ const displayedSettings = ref<{ [name: string]: SettingDefinition[] }>(flattened
 </script>
 
 <template>
-	<div v-for="[name, page] of Object.entries(displayedSettings)" :key="name" class="universal-card">
+	<div v-for="[name, page] in Object.entries(displayedSettings)" :key="name" class="universal-card">
 		<h2 class="text-2xl">{{ name }}</h2>
-		<div class="flex flex-col gap-2">
+		<div class="flex flex-col gap-3">
 			<div
 				v-for="setting in page"
 				:key="setting.id"
 				class="flex flex-row flex-wrap items-center justify-between gap-2"
 			>
 				<label class="flex-1">
-					<span class="block font-semibold text-contrast">{{ setting.title }}</span>
+					<span class="mb-1 block font-semibold text-contrast">{{ setting.title }}</span>
 					<span class="block text-secondary">{{ setting.description }}</span>
-					<span class="block text-secondary">
+					<span class="mt-1 block text-secondary">
 						Default:
 						<span
-							class="font-semibold"
+							class="font-medium"
 							:class="{
 								'text-red': setting.type === 'toggle' && !setting.default,
 								'text-green': setting.type === 'toggle' && setting.default,
+								'italic opacity-50': setting.default === null,
 							}"
-							>{{ setting.default }}</span
-						>
+							>{{ setting.default ?? '(none)' }}
+						</span>
 					</span>
 				</label>
 
@@ -72,15 +75,23 @@ const displayedSettings = ref<{ [name: string]: SettingDefinition[] }>(flattened
 					class="!w-1/4"
 					@update:model-value="(value) => configuredSettings.set(setting, value)"
 				/>
-				<input
-					v-if="setting.type === 'string'"
-					type="text"
-					:value="configuredSettings.get(setting)"
-					class="input !w-1/4"
-					@input="
-						(event) => configuredSettings.set(setting, (event.target as HTMLInputElement).value)
-					"
-				/>
+				<div v-if="setting.type === 'string'" class="flex !w-1/4 flex-col items-start gap-2">
+					<Input
+						type="text"
+						:model-value="configuredSettings.get(setting) ?? ''"
+						@update:model-value="(value) => configuredSettings.set(setting, String(value ?? ''))"
+					/>
+					<Button
+						v-if="setting.id === 'alternative-hostname'"
+						type="outlined"
+						size="sm"
+						class="shrink-0"
+						:disabled="configuredSettings.get(setting) === localhostHostname"
+						@click="configuredSettings.set(setting, localhostHostname)"
+					>
+						Set to {{ localhostHostname }}
+					</Button>
+				</div>
 			</div>
 		</div>
 	</div>
