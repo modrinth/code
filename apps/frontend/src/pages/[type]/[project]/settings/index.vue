@@ -558,6 +558,8 @@ async function handleSave() {
 	if (!canSave.value) return
 	saving.value = true
 	try {
+		summary.value = summary.value.trim()
+
 		const hasPatchChanges = Object.keys(basePatchData.value).length > 0
 
 		if (hasPatchChanges) {
