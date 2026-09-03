@@ -26,7 +26,6 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     MonetizationStatus, Project, ProjectStatus, SideTypesMigrationReviewStatus,
-    Version,
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
@@ -42,7 +41,6 @@ use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
-use crate::validate::project::has_required_nags_with_context;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use chrono::Utc;
 use eyre::eyre;
@@ -1361,53 +1359,13 @@ pub async fn project_edit_internal(
     .wrap_api_err("deleting unused images")?;
 
     if validate_for_review {
-        let mut projects = db_models::DBProject::get_many_uncached(
-            &[ProjectId::from(id)],
+        let reloaded_project = validate::ensure_project_is_valid_for_review(
+            id,
+            &pool,
             &mut transaction,
             &redis,
         )
-        .await
-        .wrap_internal_err("reloading project for submission validation")?;
-        let reloaded_project =
-            projects.pop().wrap_not_found_err("resource not found")?;
-        let versions = db_models::DBVersion::get_many_uncached(
-            &reloaded_project.versions,
-            &mut transaction,
-            &redis,
-        )
-        .await
-        .wrap_internal_err(
-            "reloading project versions for submission validation",
-        )?
-        .into_iter()
-        .map(Version::from)
-        .collect::<Vec<_>>();
-        let available_categories =
-            db_models::categories::Category::list(&**pool, &redis)
-                .await
-                .wrap_internal_err("fetching project categories")?;
-        let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
-            reloaded_project.inner.id,
-            false,
-            &mut transaction,
-        )
-        .await
-        .wrap_internal_err("fetching project disclosures")?
-        .into_iter()
-        .map(|disclosure| disclosure.disclosure)
-        .collect::<Vec<_>>();
-        let project = Project::from(reloaded_project.clone());
-
-        if has_required_nags_with_context(
-            &project,
-            &versions,
-            &available_categories,
-            &disclosures,
-        ) {
-            return Err(ApiError::Request(eyre!(
-                "project must have no required validation nags before or while under review"
-            )));
-        }
+        .await?;
 
         if submit_for_review {
             submit_project_for_review(
@@ -2740,8 +2698,8 @@ pub async fn add_gallery_item_internal(
     }
 
     let gallery_item = vec![db_models::project_item::DBGalleryItem {
-        image_url: upload_result.url,
-        raw_image_url: upload_result.raw_url,
+        image_url: upload_result.url.clone(),
+        raw_image_url: upload_result.raw_url.clone(),
         featured: item.featured,
         name: item.name,
         description: item.description,
@@ -2755,6 +2713,31 @@ pub async fn add_gallery_item_internal(
     )
     .await
     .wrap_internal_err("inserting galleries into database")?;
+
+    let validation_error = match project_item.inner.status {
+        ProjectStatus::Processing => {
+            validate::ensure_project_is_valid_for_review(
+                project_item.inner.id,
+                &pool,
+                &mut transaction,
+                &redis,
+            )
+            .await
+            .err()
+        }
+        _ => None,
+    };
+    if let Some(error) = validation_error {
+        delete_old_images(
+            Some(upload_result.url),
+            Some(upload_result.raw_url),
+            FileHostPublicity::Public,
+            &**file_host,
+        )
+        .await
+        .wrap_api_err("deleting rejected gallery image upload")?;
+        return Err(error);
+    }
 
     transaction
         .commit()
@@ -2994,6 +2977,16 @@ pub async fn edit_gallery_item_internal(
         )?;
     }
 
+    if project_item.inner.status == ProjectStatus::Processing {
+        validate::ensure_project_is_valid_for_review(
+            project_item.inner.id,
+            &pool,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
+    }
+
     transaction
         .commit()
         .await
@@ -3127,15 +3120,6 @@ pub async fn delete_gallery_item_internal(
         }
     }
 
-    delete_old_images(
-        Some(item.image_url),
-        Some(item.raw_image_url),
-        FileHostPublicity::Public,
-        &**file_host,
-    )
-    .await
-    .wrap_api_err("deleting old images")?;
-
     let mut transaction = pool
         .begin()
         .await
@@ -3154,10 +3138,29 @@ pub async fn delete_gallery_item_internal(
         "querying database for `delete_gallery_item_internal`",
     )?;
 
+    if project_item.inner.status == ProjectStatus::Processing {
+        validate::ensure_project_is_valid_for_review(
+            project_item.inner.id,
+            &pool,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
+    }
+
     transaction
         .commit()
         .await
         .wrap_internal_err("committing database transaction")?;
+
+    delete_old_images(
+        Some(item.image_url),
+        Some(item.raw_image_url),
+        FileHostPublicity::Public,
+        &**file_host,
+    )
+    .await
+    .wrap_api_err("deleting old images")?;
 
     clear_project_cache_and_queue_search(
         &redis,

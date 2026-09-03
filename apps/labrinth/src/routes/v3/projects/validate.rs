@@ -4,7 +4,12 @@ use serde::Serialize;
 use xredis::RedisPool;
 
 use crate::auth::get_user_from_headers;
-use crate::database::{PgPool, ReadOnlyPgPool, models as db_models};
+use crate::database::models::DBProjectId;
+use crate::database::models::project_item::ProjectQueryResult;
+use crate::database::{
+	PgPool, PgTransaction, ReadOnlyPgPool, models as db_models,
+};
+use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::models::projects::{Project, Version};
 use crate::models::teams::ProjectPermissions;
@@ -12,12 +17,68 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use crate::validate::project::{
-	ProjectNag, validate_with_context as validate_project,
+	ProjectNag, has_required_nags_with_context,
+	validate_with_context as validate_project,
 };
 
 #[derive(Serialize, utoipa::ToSchema)]
 pub struct ProjectValidationResponse {
 	pub nags: Vec<ProjectNag>,
+}
+
+pub(crate) async fn ensure_project_is_valid_for_review(
+	project_id: DBProjectId,
+	pool: &PgPool,
+	transaction: &mut PgTransaction<'_>,
+	redis: &RedisPool,
+) -> Result<ProjectQueryResult, ApiError> {
+	let mut projects = db_models::DBProject::get_many_uncached(
+		&[ProjectId::from(project_id)],
+		&mut *transaction,
+		redis,
+	)
+	.await
+	.wrap_internal_err("reloading project for review validation")?;
+	let reloaded_project =
+		projects.pop().wrap_not_found_err("resource not found")?;
+	let versions = db_models::DBVersion::get_many_uncached(
+		&reloaded_project.versions,
+		&mut *transaction,
+		redis,
+	)
+	.await
+	.wrap_internal_err("reloading project versions for review validation")?
+	.into_iter()
+	.map(Version::from)
+	.collect::<Vec<_>>();
+	let available_categories =
+		db_models::categories::Category::list(&**pool, redis)
+			.await
+			.wrap_internal_err("fetching project categories")?;
+	let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
+		reloaded_project.inner.id,
+		false,
+		&mut *transaction,
+	)
+	.await
+	.wrap_internal_err("fetching project disclosures")?
+	.into_iter()
+	.map(|disclosure| disclosure.disclosure)
+	.collect::<Vec<_>>();
+	let project = Project::from(reloaded_project.clone());
+
+	if has_required_nags_with_context(
+		&project,
+		&versions,
+		&available_categories,
+		&disclosures,
+	) {
+		return Err(ApiError::Request(eyre!(
+			"project must have no required validation nags before or while under review"
+		)));
+	}
+
+	Ok(reloaded_project)
 }
 
 /// Validate that a project is ready to be submitted for review.

@@ -6,7 +6,9 @@ use common::dummy_data::DUMMY_CATEGORIES;
 
 use crate::common::api_common::models::CommonProject;
 use crate::common::api_common::request_data::ProjectCreationRequestData;
-use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion};
+use crate::common::api_common::{
+    Api, ApiProject, ApiTeams, ApiVersion, AppendsOptionalPat,
+};
 use crate::common::dummy_data::{
     DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
     TestFile,
@@ -583,6 +585,230 @@ async fn test_edit_invalid_project_in_review_rolls_back() {
                 .await;
             assert_eq!(project_after.status, ProjectStatus::Processing);
             assert_eq!(project_after.description, project_before.description);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_add_invalid_gallery_item_in_review_rolls_back() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({ "status": "processing" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let project_before =
+                api.get_project(project_slug, USER_USER_PAT).await;
+            let project_before: serde_json::Value =
+                test::read_body_json(project_before).await;
+
+            let response = api
+                .add_gallery_item(
+                    project_slug,
+                    DummyImage::SmallIcon.get_icon_data(),
+                    false,
+                    None,
+                    Some("%EF%BC%A1".to_string()),
+                    None,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let project_after =
+                api.get_project(project_slug, USER_USER_PAT).await;
+            let project_after: serde_json::Value =
+                test::read_body_json(project_after).await;
+            assert_eq!(project_after["gallery"], project_before["gallery"]);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_edit_invalid_gallery_item_in_review_rolls_back() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            let response = api
+                .add_gallery_item(
+                    project_slug,
+                    DummyImage::SmallIcon.get_icon_data(),
+                    true,
+                    None,
+                    Some("valid-gallery-description".to_string()),
+                    None,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({ "status": "processing" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let project_before =
+                api.get_project(project_slug, USER_USER_PAT).await;
+            let project_before: serde_json::Value =
+                test::read_body_json(project_before).await;
+            let gallery_url =
+                project_before["gallery"][0]["url"].as_str().unwrap();
+
+            let response = api
+                .edit_gallery_item(
+                    project_slug,
+                    gallery_url,
+                    vec![("name".to_string(), "Ａ".to_string())]
+                        .into_iter()
+                        .collect(),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let project_after =
+                api.get_project(project_slug, USER_USER_PAT).await;
+            let project_after: serde_json::Value =
+                test::read_body_json(project_after).await;
+            assert_eq!(project_after["gallery"], project_before["gallery"]);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_delete_gallery_item_from_invalid_project_in_review_rolls_back() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            let response = api
+                .add_gallery_item(
+                    project_slug,
+                    DummyImage::SmallIcon.get_icon_data(),
+                    true,
+                    None,
+                    Some("valid-gallery-description".to_string()),
+                    None,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({
+                        "description": "",
+                        "status": "draft",
+                    }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({ "status": "processing" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let project_before =
+                api.get_project(project_slug, USER_USER_PAT).await;
+            let project_before: serde_json::Value =
+                test::read_body_json(project_before).await;
+            let gallery_url =
+                project_before["gallery"][0]["url"].as_str().unwrap();
+
+            let response = api
+                .remove_gallery_item(project_slug, gallery_url, USER_USER_PAT)
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let project_after =
+                api.get_project(project_slug, USER_USER_PAT).await;
+            let project_after: serde_json::Value =
+                test::read_body_json(project_after).await;
+            assert_eq!(project_after["gallery"], project_before["gallery"]);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_edit_invalid_disclosures_in_review_rolls_back() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+            let disclosures_uri =
+                format!("/v3/project/{project_slug}/disclosures");
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({ "status": "processing" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let request = test::TestRequest::get()
+                .uri(&disclosures_uri)
+                .append_pat(USER_USER_PAT)
+                .to_request();
+            let response = api.call(request).await;
+            assert_status!(&response, StatusCode::OK);
+            let disclosures_before: serde_json::Value =
+                test::read_body_json(response).await;
+
+            let request = test::TestRequest::patch()
+                .uri(&disclosures_uri)
+                .append_pat(USER_USER_PAT)
+                .set_json(json!({
+                    "set": [{
+                        "type": "advertisements",
+                        "note": "<strong>sponsored</strong>",
+                    }],
+                    "remove": [],
+                }))
+                .to_request();
+            let response = api.call(request).await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let request = test::TestRequest::get()
+                .uri(&disclosures_uri)
+                .append_pat(USER_USER_PAT)
+                .to_request();
+            let response = api.call(request).await;
+            assert_status!(&response, StatusCode::OK);
+            let disclosures_after: serde_json::Value =
+                test::read_body_json(response).await;
+            assert_eq!(disclosures_after, disclosures_before);
         },
     )
     .await;

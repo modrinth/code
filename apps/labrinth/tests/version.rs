@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::common::api_common::ApiVersion;
+use crate::common::api_common::{ApiProject, ApiVersion};
 use crate::common::database::*;
 use crate::common::dummy_data::{
     DummyProjectAlpha, DummyProjectBeta, TestFile,
@@ -88,6 +88,35 @@ async fn test_get_version() {
         let resp = api.get_version(beta_version_id, ENEMY_USER_PAT).await;
         assert_status!(&resp, StatusCode::NOT_FOUND);
     })
+    .await;
+}
+
+#[actix_rt::test]
+async fn deleting_version_in_review_that_fails_validation_rolls_back() {
+    with_test_environment(
+        None,
+        |test_env: common::environment::TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project = &test_env.dummy.project_alpha;
+
+            let response = api
+                .edit_project(
+                    &project.project_slug,
+                    json!({ "status": "processing" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let response =
+                api.remove_version(&project.version_id, USER_USER_PAT).await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let response =
+                api.get_version(&project.version_id, USER_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+        },
+    )
     .await;
 }
 
