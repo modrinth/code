@@ -110,25 +110,43 @@ pub(super) fn validate(
         ));
     }
 
-    if named_link_is_uncommon(project, "source", SOURCE_DOMAINS)
-        || named_link_is_uncommon(project, "issues", ISSUES_DOMAINS)
-        || named_link_is_uncommon(project, "discord", DISCORD_DOMAINS)
-    {
-        nags.push(super::ProjectNag::new(
-            ProjectNagKind::VerifyExternalLinks,
-            ProjectNagSeverity::Warning,
-        ));
+    let uncommon_link_fields = [
+        ("source", SOURCE_DOMAINS),
+        ("issues", ISSUES_DOMAINS),
+        ("discord", DISCORD_DOMAINS),
+    ]
+    .into_iter()
+    .filter_map(|(key, domains)| {
+        named_link_is_uncommon(project, key, domains).then_some(key)
+    })
+    .collect::<Vec<_>>();
+    if !uncommon_link_fields.is_empty() {
+        nags.push(
+            super::ProjectNag::new(
+                ProjectNagKind::VerifyExternalLinks,
+                ProjectNagSeverity::Warning,
+            )
+            .with_details(
+                serde_json::json!({ "fields": uncommon_link_fields }),
+            ),
+        );
     }
 
-    if ["source", "issues", "wiki", "site", "store"]
-        .into_iter()
-        .filter_map(|key| named_link(project, key))
-        .any(is_discord_link)
-    {
-        nags.push(super::ProjectNag::new(
-            ProjectNagKind::MisusedDiscordLink,
-            ProjectNagSeverity::Required,
-        ));
+    let misused_discord_link_fields =
+        ["source", "issues", "wiki", "site", "store"]
+            .into_iter()
+            .filter(|key| named_link(project, key).is_some_and(is_discord_link))
+            .collect::<Vec<_>>();
+    if !misused_discord_link_fields.is_empty() {
+        nags.push(
+            super::ProjectNag::new(
+                ProjectNagKind::MisusedDiscordLink,
+                ProjectNagSeverity::Required,
+            )
+            .with_details(serde_json::json!({
+                "fields": misused_discord_link_fields,
+            })),
+        );
     }
 
     if let Some(url) = find_blocked_external_link(project) {
