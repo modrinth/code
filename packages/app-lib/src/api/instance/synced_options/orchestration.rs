@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use super::super::synced_servers;
+use super::super::{synced_packs, synced_servers};
 use super::command_history::{
     command_history_path, ensure_command_history,
     merge_command_history_from_instance, normalize_command_history,
@@ -55,6 +55,10 @@ pub struct GlobalSyncedOptions {
     pub multiplayer_servers: bool,
     pub creative_hotbars: bool,
     pub screenshots: bool,
+    #[serde(default)]
+    pub resource_packs: bool,
+    #[serde(default)]
+    pub data_packs: bool,
 }
 
 impl GlobalSyncedOptions {
@@ -65,6 +69,8 @@ impl GlobalSyncedOptions {
             SyncedOption::MultiplayerServers => self.multiplayer_servers,
             SyncedOption::CreativeHotbars => self.creative_hotbars,
             SyncedOption::Screenshots => self.screenshots,
+            SyncedOption::ResourcePacks => self.resource_packs,
+            SyncedOption::DataPacks => self.data_packs,
         }
     }
 
@@ -77,6 +83,8 @@ impl GlobalSyncedOptions {
             }
             SyncedOption::CreativeHotbars => self.creative_hotbars = enabled,
             SyncedOption::Screenshots => self.screenshots = enabled,
+            SyncedOption::ResourcePacks => self.resource_packs = enabled,
+            SyncedOption::DataPacks => self.data_packs = enabled,
         }
     }
 }
@@ -240,7 +248,10 @@ async fn version_capability(
 ) -> CapabilityStatus {
     if matches!(
         option,
-        SyncedOption::GameOptions | SyncedOption::Screenshots
+        SyncedOption::GameOptions
+            | SyncedOption::Screenshots
+            | SyncedOption::ResourcePacks
+            | SyncedOption::DataPacks
     ) {
         return CapabilityStatus::Supported;
     }
@@ -255,7 +266,9 @@ async fn version_capability(
 		);
     };
     let cutoff_id = match option {
-        SyncedOption::GameOptions => unreachable!(),
+        SyncedOption::GameOptions
+        | SyncedOption::ResourcePacks
+        | SyncedOption::DataPacks => unreachable!(),
         // Mojang's manifest does not include Beta 1.8 Pre-release as a
         // separate entry, so b1.8 is the first resolvable version at that
         // boundary.
@@ -289,7 +302,7 @@ async fn version_capability(
 
     CapabilityStatus::Unsupported(
 		match option {
-			SyncedOption::GameOptions => unreachable!(),
+			SyncedOption::GameOptions | SyncedOption::ResourcePacks | SyncedOption::DataPacks => unreachable!(),
 			SyncedOption::MultiplayerServers => {
 				"Multiplayer server syncing requires Minecraft Beta 1.8 Pre-release or newer."
 			}
@@ -315,12 +328,15 @@ pub async fn set_global_option(
     let was_enabled = get_global_options_with_state(&state).await?.get(option);
 
     let initializing_game_options_from_base = enabled
-        && !was_enabled
         && option == SyncedOption::GameOptions
         && base_instance_id.is_some();
     if enabled
-        && !was_enabled
         && option != SyncedOption::Screenshots
+        && (!was_enabled
+            || !matches!(
+                option,
+                SyncedOption::ResourcePacks | SyncedOption::DataPacks
+            ))
         && let Some(base_instance_id) = base_instance_id
     {
         if option == SyncedOption::GameOptions {
@@ -372,6 +388,15 @@ pub async fn set_global_option(
         Err(error) => return Err(error),
     };
     for metadata in instances {
+        if !enabled
+            && matches!(
+                option,
+                SyncedOption::ResourcePacks | SyncedOption::DataPacks
+            )
+        {
+            detach_option(&metadata, option, &state).await?;
+            continue;
+        }
         let running = option != SyncedOption::GameOptions
             && instance_is_running(&metadata, &state).await?;
         if sync_files_are_protected(&metadata) || running {
@@ -541,7 +566,10 @@ pub async fn set_instance_option(
         }
         if !matches!(
             option,
-            SyncedOption::GameOptions | SyncedOption::Screenshots
+            SyncedOption::GameOptions
+                | SyncedOption::Screenshots
+                | SyncedOption::ResourcePacks
+                | SyncedOption::DataPacks
         ) && !can_reconcile
         {
             return Err(ErrorKind::InputError(
@@ -583,7 +611,9 @@ pub async fn set_instance_option(
                 }
                 SyncedOption::GameOptions
                 | SyncedOption::CreativeHotbars
-                | SyncedOption::Screenshots => {
+                | SyncedOption::Screenshots
+                | SyncedOption::ResourcePacks
+                | SyncedOption::DataPacks => {
                     unreachable!()
                 }
             },
@@ -629,6 +659,13 @@ pub async fn set_instance_option(
             }
             return Err(error);
         }
+    } else if !enabled
+        && matches!(
+            option,
+            SyncedOption::ResourcePacks | SyncedOption::DataPacks
+        )
+    {
+        detach_option(&metadata, option, &state).await?;
     }
 
     crate::state::get_instance(instance_id, &state.pool)
@@ -658,7 +695,10 @@ pub async fn get_instance_option_join_preview(
     }
     if !matches!(
         option,
-        SyncedOption::GameOptions | SyncedOption::Screenshots
+        SyncedOption::GameOptions
+            | SyncedOption::Screenshots
+            | SyncedOption::ResourcePacks
+            | SyncedOption::DataPacks
     ) && (sync_files_are_protected(&metadata)
         || instance_is_running(&metadata, &state).await?)
     {
@@ -694,7 +734,9 @@ async fn instance_option_join_action(
                 SyncedOptionJoinAction::Attach
             }
         }
-        SyncedOption::Screenshots => SyncedOptionJoinAction::Attach,
+        SyncedOption::Screenshots
+        | SyncedOption::ResourcePacks
+        | SyncedOption::DataPacks => SyncedOptionJoinAction::Attach,
     })
 }
 
@@ -739,6 +781,14 @@ pub(crate) async fn monitor_persisted_processes() -> crate::Result<()> {
                             .await;
                     }
                     Ok(false) => {
+                        if let Err(error) =
+                            synced_packs::reconcile_after_change(&instance_id)
+                                .await
+                        {
+                            tracing::warn!(
+                                "Failed to reconcile synced packs after closing {instance_id}: {error}"
+                            );
+                        }
                         break;
                     }
                     Err(error) => {
@@ -872,6 +922,9 @@ async fn reconcile_option(
         SyncedOption::MultiplayerServers => {
             synced_servers::reconcile_servers(metadata, state).await
         }
+        SyncedOption::ResourcePacks | SyncedOption::DataPacks => {
+            synced_packs::reconcile(metadata, option, state).await
+        }
         SyncedOption::Screenshots => Ok(()),
     }
 }
@@ -967,7 +1020,9 @@ async fn backup_instance_option_file(
         SyncedOption::CommandHistory => directory.join(COMMAND_HISTORY_FILE),
         SyncedOption::CreativeHotbars => directory.join(HOTBAR_FILE),
         SyncedOption::MultiplayerServers => directory.join("servers.dat"),
-        SyncedOption::Screenshots => return Ok(()),
+        SyncedOption::Screenshots
+        | SyncedOption::ResourcePacks
+        | SyncedOption::DataPacks => return Ok(()),
     };
     if !path.exists() {
         return Ok(());
@@ -1060,6 +1115,9 @@ pub(super) async fn seed_from_instance(
         SyncedOption::MultiplayerServers => {
             synced_servers::seed_servers(metadata, state).await?;
         }
+        SyncedOption::ResourcePacks | SyncedOption::DataPacks => {
+            synced_packs::seed_from_instance(metadata, option, state).await?;
+        }
         SyncedOption::Screenshots => {}
     }
     Ok(())
@@ -1081,6 +1139,9 @@ async fn ensure_option(
         SyncedOption::CreativeHotbars => ensure_hotbar(metadata, state).await,
         SyncedOption::MultiplayerServers => {
             synced_servers::ensure_servers(metadata, state).await
+        }
+        SyncedOption::ResourcePacks | SyncedOption::DataPacks => {
+            synced_packs::reconcile(metadata, option, state).await
         }
         SyncedOption::Screenshots => Ok(()),
     }
@@ -1116,6 +1177,9 @@ async fn detach_option(
         SyncedOption::MultiplayerServers => {
             synced_servers::detach_servers(metadata, state).await
         }
+        SyncedOption::ResourcePacks | SyncedOption::DataPacks => {
+            synced_packs::detach(metadata, option, state).await
+        }
         SyncedOption::Screenshots => Ok(()),
     }
 }
@@ -1133,7 +1197,9 @@ async fn canonical_exists(
         SyncedOption::MultiplayerServers => {
             synced_servers::canonical_exists(state).await?
         }
-        SyncedOption::Screenshots => true,
+        SyncedOption::Screenshots
+        | SyncedOption::ResourcePacks
+        | SyncedOption::DataPacks => true,
     })
 }
 
@@ -1178,6 +1244,8 @@ fn option_from_str(value: &str) -> Option<SyncedOption> {
         "multiplayer_servers" => Some(SyncedOption::MultiplayerServers),
         "creative_hotbars" => Some(SyncedOption::CreativeHotbars),
         "screenshots" => Some(SyncedOption::Screenshots),
+        "resource_packs" => Some(SyncedOption::ResourcePacks),
+        "data_packs" => Some(SyncedOption::DataPacks),
         _ => None,
     }
 }

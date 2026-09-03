@@ -125,9 +125,6 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Langkau"
-  },
   "app.install.phase.preparing_java.downloading": {
     "message": "Sedang memuat turun Java {version}"
   },

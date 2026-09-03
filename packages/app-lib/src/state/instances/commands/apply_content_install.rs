@@ -203,25 +203,29 @@ pub(crate) async fn install_resolved_content_plan(
     instance_id: &str,
     plan: &ResolveContentPlan,
     state: &State,
-) -> crate::Result<()> {
-    add_resolved_content(
-        instance_id,
-        &plan.primary,
-        DownloadReason::Standalone,
-        state,
-    )
-    .await?;
-    for dependency in &plan.dependencies {
+) -> crate::Result<Vec<String>> {
+    let mut paths = vec![
         add_resolved_content(
             instance_id,
-            dependency,
-            DownloadReason::Dependency,
+            &plan.primary,
+            DownloadReason::Standalone,
             state,
         )
-        .await?;
+        .await?,
+    ];
+    for dependency in &plan.dependencies {
+        paths.push(
+            add_resolved_content(
+                instance_id,
+                dependency,
+                DownloadReason::Dependency,
+                state,
+            )
+            .await?,
+        );
     }
 
-    Ok(())
+    Ok(paths)
 }
 
 pub(crate) async fn switch_project_version_with_dependencies(

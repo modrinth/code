@@ -284,6 +284,21 @@
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
+  "app.content.desync-pack": {
+    "message": "Desync"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Turn on data pack syncing in app settings first."
+  },
+  "app.content.sync-pack": {
+    "message": "Sync"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Turn off the pack syncing override in this instance’s settings first."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Turn on resource pack syncing in app settings first."
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Open backups folder"
   },
@@ -403,48 +418,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Modrinth App update required"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Failed to apply random icons to instances."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Randomized icon for {num, plural, one {# instance} other {# instances}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "New this update"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Close"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Create custom icons for your instances right in the Modrinth App. Mix and match backgrounds with symbols from Minecraft and popular mods!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# instance doesn’t} other {# instances don’t}} have icons yet. Want us to give {count, plural, one {it} other {them}} random ones to get started?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Random icons"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Skip"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Custom icon editor"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Close"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Personalize your instances!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Dismiss"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "New icon editor"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "View update"
   },
   "app.install.phase.downloading_content": {
     "message": "Downloading content"
@@ -2798,11 +2771,17 @@
   "app.settings.synced-options.choose-sync-source.game-settings-description": {
     "message": "Choose which instance to copy game settings from."
   },
+  "app.settings.synced-options.choose-sync-source.load-error": {
+    "message": "Could not load sync sources. Please try again."
+  },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
     "message": "Pick the instance whose multiplayer servers become the shared copy."
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "No instances found"
+  },
+  "app.settings.synced-options.choose-sync-source.retry": {
+    "message": "Try again"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "Search instance"
@@ -2827,6 +2806,15 @@
   },
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "Use the same saved creative hotbars across your instances."
+  },
+  "app.settings.synced-options.data-packs": {
+    "message": "Sync data packs"
+  },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "Use the same datapacks across your instances"
+  },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "You haven't synced any data packs yet"
   },
   "app.settings.synced-options.edit.no-instances": {
     "message": "Add an instance before editing synced data."
@@ -2955,7 +2943,7 @@
     "message": "No synced servers match your search or filters."
   },
   "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
-    "message": "No servers synced yet"
+    "message": "You haven't synced any servers yet"
   },
   "app.settings.synced-options.multiplayer-servers.players-online": {
     "message": "{count, number} online"
@@ -2965,6 +2953,18 @@
   },
   "app.settings.synced-options.multiplayer-servers.status": {
     "message": "Status"
+  },
+  "app.settings.synced-options.packs.disabled": {
+    "message": "Enable syncing before editing shared packs."
+  },
+  "app.settings.synced-options.resource-packs": {
+    "message": "Sync resource packs"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "Use the same resource packs across your instances"
+  },
+  "app.settings.synced-options.resource-packs.none-synced-yet": {
+    "message": "You haven't synced any resource packs yet"
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
@@ -3169,6 +3169,84 @@
   },
   "app.survey.title": {
     "message": "Hey there Modrinth user!"
+  },
+  "app.sync-instances-update.badge": {
+    "message": "New this update"
+  },
+  "app.sync-instances-update.choose-source.all": {
+    "message": "Choose the instance to use as the sync source for all six settings."
+  },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "Choose which instance to copy data packs from."
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "Choose which instance to copy resource packs from."
+  },
+  "app.sync-instances-update.creative-hotbars": {
+    "message": "Sync creative hotbars"
+  },
+  "app.sync-instances-update.description": {
+    "message": "You can now sync options like game settings, servers, resource packs, and more across your instances, so everything stays the same every time you play!"
+  },
+  "app.sync-instances-update.load-error": {
+    "message": "Could not load your sync settings. Please try again."
+  },
+  "app.sync-instances-update.manage-later": {
+    "message": "You can enable syncing now and manage it later in your app settings."
+  },
+  "app.sync-instances-update.retry": {
+    "message": "Try again"
+  },
+  "app.sync-instances-update.skip": {
+    "message": "Skip"
+  },
+  "app.sync-instances-update.sync-all": {
+    "message": "Sync all"
+  },
+  "app.sync-instances-update.title": {
+    "message": "Sync your instances"
+  },
+  "app.synced-content.delete.description": {
+    "message": "Deleting this content will delete it across all your instances"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "Selected content that is not synced will only be deleted from this instance."
+  },
+  "app.synced-content.desync.description": {
+    "message": "This instance will keep its own copy. Do you want to keep this content synced in other instances, or remove it from them?"
+  },
+  "app.synced-content.desync.keep": {
+    "message": "Keep"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "Remove"
+  },
+  "app.synced-content.desync.title": {
+    "message": "Desync content"
+  },
+  "app.synced-content.warning.disable": {
+    "message": "Disabling this content will also disable it in the other instances where it is synced. To change it only here, desync it first."
+  },
+  "app.synced-content.warning.enable": {
+    "message": "Enabling this content will also enable it in the other instances where it is synced. To change it only here, desync it first."
+  },
+  "app.synced-content.warning.modal-title": {
+    "message": "Sync warning"
+  },
+  "app.synced-content.warning.title": {
+    "message": "This content is synced"
+  },
+  "app.synced-packs.data-packs.title": {
+    "message": "Synced data packs"
+  },
+  "app.synced-packs.empty": {
+    "message": "Add packs from an instance’s content page to start syncing."
+  },
+  "app.synced-packs.load-failed": {
+    "message": "Packs could not be loaded. Try refreshing."
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "Synced resource packs"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
@@ -3727,6 +3805,30 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revoke invite"
+  },
+  "instance.settings.synced-options.data-packs": {
+    "message": "Unsync data packs"
+  },
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "Keep this instance's data packs separate from synced packs."
+  },
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "Data pack syncing is turned off in app settings."
+  },
+  "instance.settings.synced-options.edit-packs": {
+    "message": "Edit synced packs"
+  },
+  "instance.settings.synced-options.packs-override": {
+    "message": "Turn off this override to edit synced packs. Independent packs can be managed in the content tab."
+  },
+  "instance.settings.synced-options.resource-packs": {
+    "message": "Unsync resource packs"
+  },
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "Keep this instance's resource packs separate from synced packs."
+  },
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "Resource pack syncing is turned off in app settings."
   },
   "instance.settings.tabs.behavior.description": {
     "message": "Choose which tabs appear on this instance."

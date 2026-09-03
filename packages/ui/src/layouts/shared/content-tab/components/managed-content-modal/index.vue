@@ -38,6 +38,8 @@ const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
 
 interface Props {
+	description?: string
+	emptyDescription?: string
 	header?: string
 	sourceName?: string
 	sourceIconUrl?: string
@@ -46,11 +48,15 @@ interface Props {
 	actionDisabledTooltip?: string | null
 	getOverflowOptions?: (item: ContentItem) => ButtonMenuOption[]
 	switchVersion?: (item: ContentItem) => void
+	showVersion?: boolean
 	showEnvironmentWarnings?: boolean
+	filterMode?: 'content' | 'status'
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	header: undefined,
+	description: undefined,
+	emptyDescription: undefined,
 	sourceName: undefined,
 	sourceIconUrl: undefined,
 	enableToggle: false,
@@ -58,7 +64,9 @@ const props = withDefaults(defineProps<Props>(), {
 	actionDisabledTooltip: undefined,
 	getOverflowOptions: undefined,
 	switchVersion: undefined,
+	showVersion: true,
 	showEnvironmentWarnings: false,
+	filterMode: 'content',
 })
 
 const emit = defineEmits<{
@@ -109,6 +117,18 @@ const messages = defineMessages({
 		id: 'instances.managed-content-modal.download-file',
 		defaultMessage: 'Download File',
 	},
+	warnings: {
+		id: 'instances.managed-content-modal.warnings',
+		defaultMessage: 'Warnings',
+	},
+	enabled: {
+		id: 'instances.managed-content-modal.enabled',
+		defaultMessage: 'Enabled',
+	},
+	disabled: {
+		id: 'instances.managed-content-modal.disabled',
+		defaultMessage: 'Disabled',
+	},
 })
 
 export interface ManagedContentModalState {
@@ -127,6 +147,10 @@ const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
 const selectedIds = ref<string[]>([])
+
+function updateFilters(filters: string[]) {
+	selectedFilters.value = props.filterMode === 'status' ? filters.slice(-1) : filters
+}
 
 const selectedItems = computed(() =>
 	items.value.filter((item) => selectedIds.value.includes(item.id)),
@@ -161,6 +185,13 @@ const fuse = new Fuse<ContentItem>([], {
 watchSyncEffect(() => fuse.setCollection(items.value))
 
 const filterOptions = computed(() => {
+	if (props.filterMode === 'status') {
+		return [
+			{ id: 'enabled', label: formatMessage(messages.enabled) },
+			{ id: 'disabled', label: formatMessage(messages.disabled) },
+		]
+	}
+
 	const frequency = items.value.reduce(
 		(map, item) => {
 			const normalized = normalizeProjectType(item.project_type)
@@ -184,11 +215,11 @@ const filterOptions = computed(() => {
 	if (
 		items.value.some((item) => getClientWarningType(item, props.showEnvironmentWarnings) !== null)
 	) {
-		options.push({ id: 'warnings', label: 'Warnings' })
+		options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
 	}
 
 	if (props.enableToggle && items.value.some((item) => item.enabled === false)) {
-		options.push({ id: 'disabled', label: 'Disabled' })
+		options.push({ id: 'disabled', label: formatMessage(messages.disabled) })
 	}
 
 	return options
@@ -203,22 +234,23 @@ const stats = computed(() => {
 	return counts
 })
 
-const attributeFilterIds = new Set(['disabled', 'warnings'])
+const attributeFilterIds = new Set(['enabled', 'disabled', 'warnings'])
 
-const typeFilteredCount = computed(() => {
-	if (selectedFilters.value.length === 0) return items.value.length
+function matchesSelectedFilters(item: ContentItem) {
 	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
+	const hasEnabledFilter = props.enableToggle && selectedFilters.value.includes('enabled')
 	const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
 	const hasWarningsFilter = selectedFilters.value.includes('warnings')
-	return items.value.filter((item) => {
-		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
-			return false
-		if (hasDisabledFilter && item.enabled) return false
-		if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
-			return false
-		return true
-	}).length
-})
+	if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
+		return false
+	if (hasEnabledFilter !== hasDisabledFilter && Boolean(item.enabled) !== hasEnabledFilter)
+		return false
+	if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
+		return false
+	return true
+}
+
+const typeFilteredCount = computed(() => items.value.filter(matchesSelectedFilters).length)
 
 const filteredItems = computed(() => {
 	const query = searchQuery.value.trim()
@@ -231,17 +263,7 @@ const filteredItems = computed(() => {
 	}
 
 	if (selectedFilters.value.length > 0) {
-		const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
-		const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
-		const hasWarningsFilter = selectedFilters.value.includes('warnings')
-		result = result.filter((item) => {
-			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
-				return false
-			if (hasDisabledFilter && item.enabled) return false
-			if (hasWarningsFilter && getClientWarningType(item, props.showEnvironmentWarnings) === null)
-				return false
-			return true
-		})
+		result = result.filter(matchesSelectedFilters)
 	}
 
 	return sortContentItems(result, !query)
@@ -262,11 +284,13 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			icon_url: item.embedded_metadata?.icon_url ?? null,
 		},
 		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
-		version: item.version ?? {
-			id: item.id,
-			version_number: contentVersionLabel(item),
-			file_name: item.file_name,
-		},
+		version: props.showVersion
+			? (item.version ?? {
+					id: item.id,
+					version_number: contentVersionLabel(item),
+					file_name: item.file_name,
+				})
+			: undefined,
 		owner: item.owner
 			? {
 					...item.owner,
@@ -283,6 +307,8 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		synced: !!item.synced_pack,
+		syncUpdatePending: item.synced_pack?.update_pending,
 		locked: item.locked,
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
@@ -293,7 +319,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			props.actionDisabled || disabledIds.value.has(item.file_name) || item.installing === true,
 		disabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
 		overflowOptions: [
-			...(props.switchVersion && !item.locked
+			...(props.switchVersion && !item.locked && item.project?.id && item.version?.id
 				? [
 						{
 							id: 'switch-version',
@@ -491,8 +517,12 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				{{ props.header ?? formatMessage(messages.header) }}
 			</span>
 		</template>
-		<div class="flex flex-col h-[min(600px,calc(95vh-10rem))]">
-			<div class="flex flex-col gap-4 px-6 py-4 border-b border-solid border-0 border-surface-4">
+		<div class="flex max-h-[min(600px,calc(95vh-10rem))] flex-col">
+			<div
+				class="flex shrink-0 flex-col gap-4 px-6 py-4 border-b border-solid border-0 border-surface-4"
+			>
+				<p v-if="description" class="m-0 text-secondary">{{ description }}</p>
+				<slot name="toolbar" />
 				<Input
 					v-model="searchQuery"
 					:icon="SearchIcon"
@@ -502,8 +532,9 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 
 				<FilterPills
 					v-if="filterOptions.length > 0"
-					v-model="selectedFilters"
+					:model-value="selectedFilters"
 					:options="filterOptions"
+					@update:model-value="updateFilters"
 				>
 					<template #all>
 						{{ formatMessage(commonMessages.allProjectType) }}
@@ -511,10 +542,10 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				</FilterPills>
 			</div>
 
-			<div class="flex-1 flex flex-col min-h-0 overflow-hidden">
+			<div class="flex min-h-0 flex-col overflow-hidden">
 				<div
 					v-if="loading"
-					class="flex flex-col items-center justify-center flex-1 gap-2 text-secondary"
+					class="flex flex-col items-center justify-center gap-2 p-8 text-secondary"
 				>
 					<SpinnerIcon class="size-8 animate-spin" />
 					<span class="text-sm">{{ formatMessage(messages.loading) }}</span>
@@ -527,7 +558,9 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					<span class="text-xl font-semibold text-contrast">
 						{{ formatMessage(messages.emptyTitle) }}
 					</span>
-					<span class="text-secondary">{{ formatMessage(messages.emptyDescription) }}</span>
+					<span class="text-secondary">{{
+						emptyDescription ?? formatMessage(messages.emptyDescription)
+					}}</span>
 				</div>
 
 				<div
@@ -537,14 +570,14 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					<span class="text-secondary">{{ formatMessage(messages.noResults) }}</span>
 				</div>
 
-				<div v-else class="@container flex-1 min-h-0 flex flex-col">
+				<div v-else class="@container flex min-h-0 flex-col">
 					<div
 						class="flex h-12 shrink-0 items-center justify-between gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 px-3"
 					>
 						<div
 							class="flex min-w-0 items-center gap-4"
 							:class="
-								showTableActions
+								showTableActions && showVersion
 									? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 									: 'flex-1'
 							"
@@ -562,6 +595,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							}}</span>
 						</div>
 						<div
+							v-if="showVersion"
 							class="hidden @[800px]:flex"
 							:class="showTableActions ? 'flex-1 min-w-0' : 'flex-1'"
 						>
@@ -575,12 +609,13 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							}}</span>
 						</div>
 					</div>
-					<div ref="scrollContainer" class="flex-1 min-h-0 overflow-y-auto">
+					<div ref="scrollContainer" class="min-h-0 overflow-y-auto">
 						<ContentCardTable
 							v-model:selected-ids="selectedIds"
 							:items="tableItems"
 							:show-selection="props.enableToggle"
-							:show-item-actions="hasExternalSlicerUrls"
+							:show-item-actions="showTableActions"
+							:show-version="showVersion"
 							hide-delete
 							hide-header
 							flat

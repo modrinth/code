@@ -1077,6 +1077,15 @@ pub async fn launch_minecraft(
     command.envs(env_args.iter().cloned());
 
     if let Err(error) =
+        crate::api::instance::reconcile_synced_packs(&instance.id).await
+    {
+        tracing::warn!(
+            "Failed to reconcile synced packs before launching {}: {error}",
+            instance.id
+        );
+    }
+
+    if let Err(error) =
         crate::api::instance::sync_game_options_before_launch(&instance.id)
             .await
     {

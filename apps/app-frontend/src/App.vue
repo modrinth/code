@@ -91,8 +91,6 @@ import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyIn
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
-import NewIconEditorNotification from '@/components/ui/new-icon-editor-notification/index.vue'
-import { shouldShowNewIconEditorNotification } from '@/components/ui/new-icon-editor-notification/show-notification'
 import OnboardingChecklist from '@/components/ui/onboarding-checklist/index.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
@@ -100,6 +98,7 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import SurveyPopup from '@/components/ui/SurveyPopup.vue'
+import SyncInstancesUpdateModal from '@/components/ui/sync-instances-update-modal/index.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { useAppEvent } from '@/composables/use-app-event'
@@ -712,14 +711,6 @@ function handleAdsConsentRequired(required) {
 async function setupApp() {
 	await onboardingChecklist.initialize()
 
-	if (shouldShowNewIconEditorNotification(showChecklist.value)) {
-		addPopupNotification({
-			contentType: 'custom',
-			component: NewIconEditorNotification,
-			autoCloseMs: null,
-		})
-	}
-
 	const {
 		native_decorations,
 		theme,
@@ -768,6 +759,10 @@ async function setupApp() {
 	appSettings.showSkinSelectorInSidebar = show_skin_selector_in_sidebar
 	appSettings.devMode = developer_mode
 	stateInitialized.value = true
+	await nextTick()
+	if (!showChecklist.value) {
+		syncInstancesUpdateModal.value?.showOnce()
+	}
 
 	await getCurrentWindow().onResized(async () => {
 		isMaximized.value = await getCurrentWindow().isMaximized()
@@ -1053,6 +1048,7 @@ const updateToPlayModal = ref()
 
 const modrinthLoginModal = ref()
 const appSettingsModal = ref()
+const syncInstancesUpdateModal = ref()
 provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
 provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
 
@@ -2104,6 +2100,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<Suspense>
 			<AppSettingsModal ref="appSettingsModal" />
 		</Suspense>
+		<SyncInstancesUpdateModal ref="syncInstancesUpdateModal" />
 		<Suspense>
 			<ModrinthAccountRequiredModal ref="modrinthLoginModal" :request-auth="requestModrinthAuth" />
 		</Suspense>
