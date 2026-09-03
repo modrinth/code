@@ -2,13 +2,19 @@
 import {
 	CheckIcon,
 	ChevronDownIcon,
+	ClipboardCopyIcon,
 	CopyIcon,
 	ExternalIcon,
 	LoaderCircleIcon,
 } from '@modrinth/assets'
-import { ButtonLink, IconButton } from '@modrinth/ui'
+import {
+	ButtonLink,
+	IconButton,
+	injectModrinthClient,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import { capitalizeString, highlightCodeLines } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 
 import { getSeverityBadgeColor, truncateMiddle } from './helpers'
 import TechRevFlagBadges from './TechRevFlagBadges.vue'
@@ -30,9 +36,13 @@ const emit = defineEmits<{
 	verdict: [event: TraceVerdictEvent]
 }>()
 
+const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 const { isPreReviewed, getMarkedFlagsCount } = injectTechReviewDecisions()
 
 const showCopyFeedback = ref(false)
+const copyingCelDetails = reactive<Set<string>>(new Set())
+const copiedCelDetails = reactive<Set<string>>(new Set())
 
 const truncatedPath = computed(() => truncateMiddle(props.classItem.filePath))
 const pathTooltip = computed(() =>
@@ -78,6 +88,29 @@ async function copyToClipboard() {
 		}, 2000)
 	} catch (error) {
 		console.error('Failed to copy code:', error)
+	}
+}
+
+async function copyDetailCelInput(detailId: string) {
+	if (copyingCelDetails.has(detailId)) return
+
+	copyingCelDetails.add(detailId)
+	try {
+		const input = await client.labrinth.tech_review_internal.getDetailRuleInput(detailId)
+		await navigator.clipboard.writeText(JSON.stringify(input, null, 2))
+		copiedCelDetails.add(detailId)
+		setTimeout(() => {
+			copiedCelDetails.delete(detailId)
+		}, 2000)
+	} catch (error) {
+		console.error('Failed to copy CEL input:', error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to copy CEL input',
+			text: 'An error occurred while loading the trace rule input.',
+		})
+	} finally {
+		copyingCelDetails.delete(detailId)
 	}
 }
 
@@ -168,7 +201,7 @@ function createSlicerLink(url: string, group: ClassGroup | undefined) {
 				:key="`${flag.issueId}-${flag.detail.id}`"
 				class="flex flex-col gap-2 rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 pl-4"
 				:class="{
-					'!border-brand bg-brand-highlight': focusedDetailId === flag.detail.id,
+					'!border-brand bg-brand-highlight': focusedDetailId === String(flag.detail.id),
 				}"
 			>
 				<div class="grid grid-cols-[1fr_auto] items-center">
@@ -190,6 +223,21 @@ function createSlicerLink(url: string, group: ClassGroup | undefined) {
 					</div>
 
 					<div class="me-2 flex items-center justify-end gap-2">
+						<IconButton
+							v-tooltip="copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'"
+							type="quiet"
+							:label="copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'"
+							:disabled="copyingCelDetails.has(flag.detail.id)"
+							@click="copyDetailCelInput(flag.detail.id)"
+						>
+							<LoaderCircleIcon
+								v-if="copyingCelDetails.has(flag.detail.id)"
+								class="animate-spin"
+								aria-hidden="true"
+							/>
+							<CheckIcon v-else-if="copiedCelDetails.has(flag.detail.id)" aria-hidden="true" />
+							<ClipboardCopyIcon v-else aria-hidden="true" />
+						</IconButton>
 						<TechRevVerdictButtons
 							variant="trace"
 							:detail="flag.detail"

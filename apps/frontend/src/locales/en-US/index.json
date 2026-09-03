@@ -3020,6 +3020,9 @@
   "moderation.moderate": {
     "message": "Moderate"
   },
+  "moderation.page.delphi-rules": {
+    "message": "Delphi rules"
+  },
   "moderation.page.external-projects": {
     "message": "External projects"
   },

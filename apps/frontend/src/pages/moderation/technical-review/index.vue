@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { BlendIcon, ListFilterIcon, SortAscIcon, SortDescIcon, SpinnerIcon } from '@modrinth/assets'
 import {
+	BlendIcon,
+	ListFilterIcon,
+	SettingsIcon,
+	SortAscIcon,
+	SortDescIcon,
+	SpinnerIcon,
+} from '@modrinth/assets'
+import {
+	ButtonLink,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
@@ -613,6 +621,11 @@ onUnmounted(() => {
 			@switch-page="goToPage"
 		>
 			<template #actions>
+				<ButtonLink to="/moderation/technical-review/rules">
+					<SettingsIcon class="size-5" />
+					Rules
+				</ButtonLink>
+
 				<Combobox
 					v-model="currentResponseFilter"
 					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"

@@ -39,6 +39,11 @@ export type ModrinthErrorResponse = {
 	description: string
 
 	/**
+	 * Structured details about the error
+	 */
+	details?: unknown
+
+	/**
 	 * Optional context about where the error occurred
 	 */
 	context?: string
