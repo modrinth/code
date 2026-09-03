@@ -1133,23 +1133,6 @@ watch(
 						settings.hide_nametag_skins_page = behavior.hide_nametag
 						settingsChanged = true
 					}
-					const showAllScreenshots = behavior.show_all_screenshots
-					if (typeof showAllScreenshots === 'boolean') {
-						const globalSyncedOptions =
-							globalSyncedOptionsQuery.data.value ??
-							(await queryClient.fetchQuery({
-								queryKey: ['global-synced-options'],
-								queryFn: get_global_synced_options,
-							}))
-						if (globalSyncedOptions.screenshots !== showAllScreenshots) {
-							const updatedGlobalSyncedOptions = await set_global_synced_option(
-								'screenshots',
-								showAllScreenshots,
-							)
-							queryClient.setQueryData(['global-synced-options'], updatedGlobalSyncedOptions)
-							await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
-						}
-					}
 
 					for (const [flag, value] of Object.entries(behaviorFeatureFlags)) {
 						if (settings.feature_flags[flag] !== value) {
@@ -1206,6 +1189,24 @@ watch(
 						settings.show_skin_selector_in_sidebar = showSkinSelector
 						settingsChanged = true
 					}
+					const showAllScreenshots = behavior.show_all_screenshots
+					if (typeof showAllScreenshots === 'boolean') {
+						const globalSyncedOptions =
+							globalSyncedOptionsQuery.data.value ??
+							(await queryClient.fetchQuery({
+								queryKey: ['global-synced-options'],
+								queryFn: get_global_synced_options,
+							}))
+						if (globalSyncedOptions.screenshots !== showAllScreenshots) {
+							const updatedGlobalSyncedOptions = await set_global_synced_option(
+								'screenshots',
+								showAllScreenshots,
+							)
+							queryClient.setQueryData(['global-synced-options'], updatedGlobalSyncedOptions)
+							await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
+						}
+					}
+
 					for (const [flag, value] of Object.entries(featureFlags)) {
 						if (settings.feature_flags[flag] !== value) {
 							settings.feature_flags[flag] = value

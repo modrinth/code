@@ -7,7 +7,6 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
 import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import {
@@ -15,13 +14,7 @@ import {
 	type FeatureFlag,
 	useAppSettings,
 } from '@/composables/use-app-settings.ts'
-import {
-	get_global_synced_options,
-	type GlobalSyncedOptions,
-	set_global_synced_option,
-} from '@/helpers/instance.ts'
 import { type AppSettings, get, set } from '@/helpers/settings.ts'
-import { screenshotKeys } from '@/pages/instance/query-options.ts'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
 const appSettings = useAppSettings()
@@ -29,7 +22,6 @@ const { formatMessage } = useVIntl()
 const auth = injectAuth()
 const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
-const queryClient = useQueryClient()
 
 const compactInstanceCardsFlag: FeatureFlag = 'compact_instance_cards'
 const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
@@ -57,14 +49,6 @@ const messages = defineMessages({
 	contentTitle: {
 		id: 'app.behavior-settings.content.title',
 		defaultMessage: 'Home and content',
-	},
-	showAllScreenshotsTitle: {
-		id: 'app.behavior-settings.show-all-screenshots.title',
-		defaultMessage: 'Show all screenshots together',
-	},
-	showAllScreenshotsDescription: {
-		id: 'app.behavior-settings.show-all-screenshots.description',
-		defaultMessage: 'View screenshots from all your instances on the Screenshots page.',
 	},
 	confirmationsTitle: {
 		id: 'app.behavior-settings.confirmations.title',
@@ -142,7 +126,6 @@ type BehaviorSettingsState = {
 	syncBehaviorAcrossDevices: boolean
 	minimizeApp: boolean
 	hideRightSidebar: boolean
-	showAllScreenshots: boolean
 	compactInstanceCards: boolean
 	showPlayTime: boolean
 	hideNametag: boolean
@@ -150,22 +133,13 @@ type BehaviorSettingsState = {
 	skipNonEssentialWarnings: boolean
 }
 
-const [initialSettings, initialGlobalSyncedOptions] = await Promise.all([
-	get(),
-	get_global_synced_options(),
-])
-const persistedSettings = ref(initialSettings)
-const persistedGlobalSyncedOptions = ref(initialGlobalSyncedOptions)
+const persistedSettings = ref(await get())
 
-function getBehaviorSettingsState(
-	settings: AppSettings,
-	globalSyncedOptions: GlobalSyncedOptions,
-): BehaviorSettingsState {
+function getBehaviorSettingsState(settings: AppSettings): BehaviorSettingsState {
 	return {
 		syncBehaviorAcrossDevices: settings.sync_behavior_across_devices,
 		minimizeApp: settings.hide_on_process_start,
 		hideRightSidebar: settings.toggle_sidebar,
-		showAllScreenshots: globalSyncedOptions.screenshots,
 		compactInstanceCards:
 			settings.feature_flags[compactInstanceCardsFlag] ??
 			DEFAULT_FEATURE_FLAGS[compactInstanceCardsFlag],
@@ -183,7 +157,7 @@ function getBehaviorSettingsState(
 }
 
 const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
-	() => getBehaviorSettingsState(persistedSettings.value, persistedGlobalSyncedOptions.value),
+	() => getBehaviorSettingsState(persistedSettings.value),
 	async () => {
 		const value = current.value
 
@@ -195,7 +169,6 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 					compact_instance_cards: value.compactInstanceCards,
 					show_play_time: value.showPlayTime,
 					hide_nametag: value.hideNametag,
-					show_all_screenshots: value.showAllScreenshots,
 					warn_on_unknown_modpacks: value.warnOnUnknownModpacks,
 					skip_non_essential_warnings: value.skipNonEssentialWarnings,
 				},
@@ -217,20 +190,8 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 			},
 		}
 
-		const screenshotsChanged =
-			value.showAllScreenshots !== persistedGlobalSyncedOptions.value.screenshots
-		const [, updatedGlobalSyncedOptions] = await Promise.all([
-			set(nextSettings),
-			screenshotsChanged
-				? set_global_synced_option('screenshots', value.showAllScreenshots)
-				: Promise.resolve(persistedGlobalSyncedOptions.value),
-		])
+		await set(nextSettings)
 		persistedSettings.value = nextSettings
-		persistedGlobalSyncedOptions.value = updatedGlobalSyncedOptions
-		queryClient.setQueryData(['global-synced-options'], updatedGlobalSyncedOptions)
-		if (screenshotsChanged) {
-			await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
-		}
 		appSettings.setBehaviorSyncAcrossDevices(value.syncBehaviorAcrossDevices)
 		appSettings.toggleSidebar = value.hideRightSidebar
 		appSettings.hideNametagSkinsPage = value.hideNametag
@@ -326,18 +287,6 @@ onBeforeUnmount(() => {
 			{{ formatMessage(messages.contentTitle) }}
 		</h2>
 		<div class="mt-4 flex flex-col gap-6">
-			<div class="flex items-center justify-between gap-4">
-				<div>
-					<h3 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.showAllScreenshotsTitle) }}
-					</h3>
-					<p class="m-0 mt-1">
-						{{ formatMessage(messages.showAllScreenshotsDescription) }}
-					</p>
-				</div>
-				<Toggle id="show-all-screenshots" v-model="current.showAllScreenshots" />
-			</div>
-
 			<div class="flex items-center justify-between gap-4">
 				<div>
 					<h3 class="m-0 text-lg font-semibold text-contrast">

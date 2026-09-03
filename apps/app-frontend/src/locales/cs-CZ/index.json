@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Skrýt jmenovku"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Zobrazit nedávno hrané světy nebo instance v \"Nedávno hrané\" sekci na domovské obrazovce."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Hrát světy nebo instance"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizovat Modrinth aplikaci při spuštění Minecraftu."
   },

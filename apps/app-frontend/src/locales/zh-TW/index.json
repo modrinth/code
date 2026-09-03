@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "隱藏名牌"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "在首頁的「繼續遊玩」區塊中顯示最近遊玩的世界或實例。"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "繼續遊玩世界或實例"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "當 Minecraft 啟動時將 Modrinth App 最小化。"
   },

@@ -158,9 +158,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Hoppa in i världar eller instanser"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimera Modrinth App när Minecraft startar."
   },

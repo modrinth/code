@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar etiqueta de nombre"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Muestra los mundos recientes en la sección \"Jugar\" en la página de inicio."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Jugar en mundos o instancias"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiza la app de Modrinth al iniciar Minecraft."
   },

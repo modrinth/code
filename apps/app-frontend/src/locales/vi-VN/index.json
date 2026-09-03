@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ẩn thẻ tên"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Hiển thị các thế giới hoặc phiên chơi gần đây trong mục \"Jump in\" trên trang chủ."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Bước vào các thế giới hoặc các khu vực riêng biệt"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Thu nhỏ ứng dụng Modrinth khi Minecraft khởi động."
   },

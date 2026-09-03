@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Namensschild ausblenden"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Zeige kürzlich gespielte Welten oder Instanzen im Abschnitt „Loslegen“ auf der Startseite an."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Mit Welten oder Instanzen loslegen"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiere die Modrinth App, wenn Minecraft startet."
   },

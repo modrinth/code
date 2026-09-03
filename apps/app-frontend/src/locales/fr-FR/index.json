@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Cacher le pseudo"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Affiche les mondes récemment joués dans la section \"Lancement rapide\" de la page principale."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Lancement rapide dans les mondes ou les instances"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiser Modrinth App quand Minecraft se lance."
   },
