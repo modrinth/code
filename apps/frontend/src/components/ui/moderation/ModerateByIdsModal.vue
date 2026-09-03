@@ -13,11 +13,13 @@ const input = ref('')
 const error = ref('')
 
 function parseProjectIds(value: string): string[] {
+	const normalizedValue = value.trim().replace(/^\[([\s\S]*)\]$/, '$1')
+
 	return [
 		...new Set(
-			value
+			normalizedValue
 				.split(/[,\r\n]+/)
-				.map((id) => id.replace(/\s+/g, ''))
+				.map((id) => id.trim().replace(/^(['"])(.*)\1$/, '$2').replace(/\s+/g, ''))
 				.filter(Boolean),
 		),
 	]
@@ -63,13 +65,14 @@ defineExpose({ show, hide })
 					:rows="10"
 					:error="!!error"
 					resize="vertical"
-					placeholder="Enter project IDs separated by commas or new lines"
+					placeholder="Enter IDs separated by commas or new lines, or paste an array"
 					wrapper-class="min-h-48"
 					@input="error = ''"
 				/>
 				<span v-if="error" class="text-sm font-semibold text-red">{{ error }}</span>
 				<span v-else class="text-sm text-secondary">
-					Separate IDs with commas or new lines. Whitespace and duplicate IDs are removed.
+					Accepts comma- or newline-separated IDs, including quoted IDs and array syntax.
+					Whitespace and duplicates are removed.
 				</span>
 			</div>
 
