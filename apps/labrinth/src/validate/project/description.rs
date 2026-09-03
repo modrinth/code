@@ -1,13 +1,12 @@
 use serde_json::json;
 
 use super::text::{
-    ProfanityKind, contains_spam, description_ends_with_header,
+    ProfanityKind, contains_description_spam, description_ends_with_header,
     extract_description_blocks, extract_description_text,
     find_banned_description_link, has_adjacent_same_level_headers,
     has_image_without_alt_text, has_sufficient_english_blocks,
     js_string_length, long_header_count, non_standard_text_ratio,
     normalize_project_field_text, profanity_matches, project_requires_english,
-    text_without_links,
 };
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
@@ -22,7 +21,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     let description = project.description.as_str();
     let normalized_description = normalize_project_field_text(description);
     let text = extract_description_text(description);
-    let spam_text = text_without_links(&text);
+    let has_spam = has_description_spam(description);
     let normalized_text = extract_description_text(&normalized_description);
     let blocks = extract_description_blocks(description);
     let profanity = profanity_matches(description);
@@ -62,7 +61,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     }
     if project_requires_english(project)
         && js_string_length(&text) >= MIN_DESCRIPTION_CHARS
-        && !contains_spam(&spam_text)
+        && !has_spam
         && !has_sufficient_english_blocks(&blocks)
     {
         nags.push(ProjectNag::new(
@@ -90,7 +89,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             );
         }
     }
-    if contains_spam(&spam_text) {
+    if has_spam {
         nags.push(ProjectNag::new(
             ProjectNagKind::ProjectDescriptionSpam,
             ProjectNagSeverity::Required,
@@ -135,4 +134,27 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     }
 
     nags
+}
+
+fn has_description_spam(markdown: &str) -> bool {
+    contains_description_spam(markdown)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::has_description_spam;
+
+    #[test]
+    fn description_spam_ignores_formatting() {
+        assert!(!has_description_spam("======== ━━━━━━━━ !!!!!!!!"));
+        assert!(has_description_spam(&"a".repeat(64)));
+    }
+
+    #[test]
+    fn description_spam_allows_isolated_repetition() {
+        assert!(!has_description_spam(&format!(
+            "aaaaaaaa {}",
+            "text ".repeat(140)
+        )));
+    }
 }

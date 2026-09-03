@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::LazyLock;
 
 use linkify::{LinkFinder, LinkKind};
@@ -14,6 +14,10 @@ use crate::models::projects::Project;
 
 static WORD: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"[\p{L}\p{M}\p{N}]+").unwrap());
+static SPAM_TOKEN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"[\p{L}\p{M}\p{N}]+(?:['_\u{2019}.:+/-][\p{L}\p{M}\p{N}]+)*"#)
+        .unwrap()
+});
 static SUMMARY_LINK_FINDER: LazyLock<LinkFinder> = LazyLock::new(|| {
     let mut finder = LinkFinder::new();
     finder.kinds(&[LinkKind::Url]).url_must_have_scheme(false);
@@ -24,6 +28,9 @@ static MARKDOWN_LINK: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"!?\[([^\]]*)\]\([^)]+\)").unwrap());
 static HTML_TAG: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?is)<!--.*?-->|</?[a-z][^>]*>").unwrap());
+static HTML_ENTITY: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"&(?:#[0-9]+|#[xX][0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);").unwrap()
+});
 static HTML_OPEN_TAG: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?is)<([a-z][\w:-]*)\b[^>]*>").unwrap());
 static HTML_CLOSE_TAG: LazyLock<Regex> =
@@ -33,7 +40,7 @@ static CODE_BLOCK: LazyLock<Regex> =
 static DESCRIPTION_BLOCK_BREAK: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\n\s*\n+").unwrap());
 static INLINE_CODE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"`[^`]*`").unwrap());
+    LazyLock::new(|| Regex::new(r"`([^`]*)`").unwrap());
 static MARKDOWN_IMAGE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"!\[([^\]]*)\]\([^)]+\)").unwrap());
 static HTML_IMAGE: LazyLock<Regex> =
@@ -578,6 +585,219 @@ pub(super) fn contains_spam(text: &str) -> bool {
     false
 }
 
+pub(super) fn contains_description_spam(markdown: &str) -> bool {
+    const MIN_CHARACTER_RUN: usize = 16;
+    const MIN_CHARACTER_EXCESS: usize = 20;
+    const MIN_CHARACTER_EXCESS_PERCENT: usize = 10;
+    const EXTREME_CHARACTER_RUN: usize = 64;
+    const MIN_REPEATED_WORDS: usize = 6;
+    const MIN_REPEATED_PHRASE_WORDS: usize = 12;
+    const MIN_DUPLICATE_BLOCK_PERCENT: usize = 20;
+
+    let blocks = extract_description_spam_blocks(markdown);
+    let mut block_counts = BTreeMap::<Vec<String>, usize>::new();
+    let mut visible_characters = 0;
+    let mut repeated_character_excess = 0;
+    let mut longest_character_run = 0;
+    let mut total_words = 0;
+
+    for block in blocks {
+        let words = spam_words(&block);
+        if words.is_empty() {
+            continue;
+        }
+        total_words += words.len();
+
+        update_character_repetition(
+            &words,
+            &mut visible_characters,
+            &mut repeated_character_excess,
+            &mut longest_character_run,
+        );
+
+        if has_repeated_words(&words, MIN_REPEATED_WORDS)
+            || has_repeated_phrase(&words, MIN_REPEATED_PHRASE_WORDS)
+        {
+            return true;
+        }
+
+        if is_duplicate_spam_block_candidate(&block) {
+            *block_counts.entry(words).or_default() += 1;
+        }
+    }
+
+    let duplicate_block_words = block_counts
+        .iter()
+        .filter(|(words, count)| {
+            **count >= 3 && words.len() * **count >= MIN_REPEATED_PHRASE_WORDS
+        })
+        .map(|(words, count)| words.len() * (count - 1))
+        .sum::<usize>();
+    if duplicate_block_words > 0
+        && duplicate_block_words * 100
+            >= total_words * MIN_DUPLICATE_BLOCK_PERCENT
+    {
+        return true;
+    }
+
+    longest_character_run >= EXTREME_CHARACTER_RUN
+        || (longest_character_run >= MIN_CHARACTER_RUN
+            && repeated_character_excess >= MIN_CHARACTER_EXCESS
+            && repeated_character_excess * 100
+                >= visible_characters * MIN_CHARACTER_EXCESS_PERCENT)
+}
+
+fn extract_description_spam_blocks(markdown: &str) -> Vec<String> {
+    let without_code = CODE_BLOCK.replace_all(markdown, "\n\n");
+    let with_inline_code = INLINE_CODE.replace_all(&without_code, "$1");
+    let without_images = MARKDOWN_IMAGE.replace_all(&with_inline_code, " ");
+    let with_link_labels = MARKDOWN_LINK.replace_all(&without_images, "$1");
+    let without_html_images = HTML_IMAGE.replace_all(&with_link_labels, " ");
+    let without_html = HTML_TAG.replace_all(&without_html_images, " ");
+    let without_entities = HTML_ENTITY.replace_all(&without_html, " ");
+    let without_links = text_without_explicit_links(&without_entities);
+
+    let mut blocks = Vec::new();
+    let mut paragraph = String::new();
+    for line in without_links.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            push_spam_block(&mut blocks, &mut paragraph);
+            continue;
+        }
+
+        if is_standalone_spam_block(line) {
+            push_spam_block(&mut blocks, &mut paragraph);
+            blocks.push(line.to_owned());
+        } else {
+            if !paragraph.is_empty() {
+                paragraph.push(' ');
+            }
+            paragraph.push_str(line);
+        }
+    }
+    push_spam_block(&mut blocks, &mut paragraph);
+
+    blocks
+}
+
+fn text_without_explicit_links(text: &str) -> String {
+    let mut without_links = String::with_capacity(text.len());
+    let mut previous_end = 0;
+
+    for link in DESCRIPTION_LINK_FINDER.links(text).filter(|link| {
+        let link = link.as_str();
+        link.contains("://") || link.starts_with("www.")
+    }) {
+        without_links.push_str(&text[previous_end..link.start()]);
+        without_links.push(' ');
+        previous_end = link.end();
+    }
+    without_links.push_str(&text[previous_end..]);
+    without_links
+}
+
+fn push_spam_block(blocks: &mut Vec<String>, paragraph: &mut String) {
+    if !paragraph.is_empty() {
+        blocks.push(std::mem::take(paragraph));
+    }
+}
+
+fn is_standalone_spam_block(line: &str) -> bool {
+    let line = line.trim_start_matches('>');
+    let trimmed = line.trim_start();
+    let is_heading = trimmed.starts_with('#');
+    let is_list_item = ["- ", "* ", "+ ", "•"]
+        .iter()
+        .any(|prefix| trimmed.starts_with(prefix))
+        || trimmed.split_once(". ").is_some_and(|(prefix, _)| {
+            prefix.chars().all(|char| char.is_ascii_digit())
+        });
+    let is_table_row = trimmed.contains('|');
+
+    is_heading || is_list_item || is_table_row
+}
+
+fn is_duplicate_spam_block_candidate(block: &str) -> bool {
+    let trimmed = block.trim_start_matches('>').trim_start();
+    !trimmed.starts_with('#') && !trimmed.contains('|')
+}
+
+fn spam_words(text: &str) -> Vec<String> {
+    SPAM_TOKEN
+        .find_iter(text)
+        .map(|word| word.as_str().nfc().flat_map(char::to_lowercase).collect())
+        .collect()
+}
+
+fn update_character_repetition(
+    words: &[String],
+    visible_characters: &mut usize,
+    repeated_character_excess: &mut usize,
+    longest_character_run: &mut usize,
+) {
+    for word in words {
+        *visible_characters += word.chars().count();
+        let mut previous = None;
+        let mut run: usize = 0;
+        for character in word.chars() {
+            if previous == Some(character) {
+                run += 1;
+            } else {
+                *repeated_character_excess += run.saturating_sub(3);
+                *longest_character_run = (*longest_character_run).max(run);
+                previous = Some(character);
+                run = 1;
+            }
+        }
+        *repeated_character_excess += run.saturating_sub(3);
+        *longest_character_run = (*longest_character_run).max(run);
+    }
+}
+
+fn has_repeated_words(words: &[String], minimum_repetitions: usize) -> bool {
+    let mut repetitions = 1;
+    for pair in words.windows(2) {
+        repetitions = if pair[0] == pair[1] {
+            repetitions + 1
+        } else {
+            1
+        };
+        if repetitions >= minimum_repetitions {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn has_repeated_phrase(
+    words: &[String],
+    minimum_repeated_words: usize,
+) -> bool {
+    let max_phrase_words = 8.min(words.len() / 3);
+    for phrase_words in (2..=max_phrase_words).rev() {
+        for start in 0..=words.len() - phrase_words * 3 {
+            let phrase = &words[start..start + phrase_words];
+            let mut repetitions = 1;
+            while start + phrase_words * (repetitions + 1) <= words.len()
+                && phrase
+                    == &words[start + phrase_words * repetitions
+                        ..start + phrase_words * (repetitions + 1)]
+            {
+                repetitions += 1;
+            }
+            if repetitions >= 3
+                && phrase_words * repetitions >= minimum_repeated_words
+            {
+                return true;
+            }
+        }
+    }
+
+    false
+}
+
 pub(super) fn find_link_or_ip(text: &str) -> Option<String> {
     SUMMARY_LINK_FINDER.links(text).find_map(|link| {
         let raw = link.as_str();
@@ -662,23 +882,6 @@ pub(super) fn extract_description_text(markdown: &str) -> String {
         .collect::<Vec<_>>()
         .join("\n")
         .replace(['*', '_', '~', '`', '>', '-', '|'], " ")
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
-pub(super) fn text_without_links(text: &str) -> String {
-    let mut without_links = String::with_capacity(text.len());
-    let mut previous_end = 0;
-
-    for link in DESCRIPTION_LINK_FINDER.links(&text) {
-        without_links.push_str(&text[previous_end..link.start()]);
-        without_links.push(' ');
-        previous_end = link.end();
-    }
-    without_links.push_str(&text[previous_end..]);
-
-    without_links
         .split_whitespace()
         .collect::<Vec<_>>()
         .join(" ")
