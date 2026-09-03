@@ -7,6 +7,7 @@ use super::text::{
     has_image_without_alt_text, has_sufficient_english_blocks,
     js_string_length, long_header_count, non_standard_text_ratio,
     normalize_project_field_text, profanity_matches, project_requires_english,
+    text_without_links,
 };
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
@@ -21,6 +22,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     let description = project.description.as_str();
     let normalized_description = normalize_project_field_text(description);
     let text = extract_description_text(description);
+    let spam_text = text_without_links(&text);
     let normalized_text = extract_description_text(&normalized_description);
     let blocks = extract_description_blocks(description);
     let profanity = profanity_matches(description);
@@ -60,7 +62,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     }
     if project_requires_english(project)
         && js_string_length(&text) >= MIN_DESCRIPTION_CHARS
-        && !contains_spam(&text)
+        && !contains_spam(&spam_text)
         && !has_sufficient_english_blocks(&blocks)
     {
         nags.push(ProjectNag::new(
@@ -88,7 +90,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             );
         }
     }
-    if contains_spam(&text) {
+    if contains_spam(&spam_text) {
         nags.push(ProjectNag::new(
             ProjectNagKind::ProjectDescriptionSpam,
             ProjectNagSeverity::Required,
