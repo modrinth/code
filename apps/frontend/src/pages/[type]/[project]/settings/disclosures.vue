@@ -294,6 +294,8 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 		</p>
 		<ValidationMessage
 			:check="[...disclosureValidation, ...disclosureTextValidation]"
+			:project-field="JSON.stringify(savedSnapshot)"
+			:current-field="JSON.stringify(currentSnapshot)"
 			class="mb-4"
 		/>
 		<EmptyState

@@ -20,7 +20,12 @@
 						:placeholder="formatMessage(messages.selectRegionPlaceholder)"
 						:disabled="!hasPermission"
 					/>
-					<ValidationMessage :check="regionValidation" class="mt-2" />
+					<ValidationMessage
+						:check="regionValidation"
+						:project-field="projectV3?.minecraft_server?.region ?? ''"
+						:current-field="region"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Language -->
@@ -43,7 +48,14 @@
 						:placeholder="formatMessage(messages.selectLanguagesPlaceholder)"
 						:disabled="!hasPermission"
 					/>
-					<ValidationMessage :check="languageValidation" class="mt-2" />
+					<ValidationMessage
+						:check="languageValidation"
+						:project-field="
+							JSON.stringify([...(projectV3?.minecraft_server?.languages ?? [])].sort())
+						"
+						:current-field="JSON.stringify([...languages].sort())"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Java Address -->
@@ -129,7 +141,12 @@
 							/></template>
 						</IntlFormatted>
 					</div>
-					<ValidationMessage :check="javaAddressValidation" class="mt-2" />
+					<ValidationMessage
+						:check="javaAddressValidation"
+						:project-field="projectV3?.minecraft_java_server?.address ?? ''"
+						:current-field="javaAddress.trim()"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Bedrock Address -->

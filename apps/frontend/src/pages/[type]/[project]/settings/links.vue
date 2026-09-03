@@ -4,7 +4,12 @@
 		<!-- Server Project Links -->
 		<section v-if="isServerProject" class="universal-card">
 			<h2>External links</h2>
-			<ValidationMessage :check="externalLinksValidation" class="mb-4" />
+			<ValidationMessage
+				:check="externalLinksValidation"
+				:project-field="JSON.stringify(saved)"
+				:current-field="JSON.stringify(current)"
+				class="mb-4"
+			/>
 			<div class="adjacent-input">
 				<label id="server-website" title="Your server's website.">
 					<span class="label__title">Website</span>
@@ -18,7 +23,11 @@
 					maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<ValidationMessage :check="siteCheck" />
+				<ValidationMessage
+					:check="siteCheck"
+					:project-field="saved.site"
+					:current-field="current.site"
+				/>
 			</div>
 			<div class="adjacent-input">
 				<label id="server-store" title="Your server's store page.">
@@ -33,7 +42,11 @@
 					maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<ValidationMessage :check="storeCheck" />
+				<ValidationMessage
+					:check="storeCheck"
+					:project-field="saved.store"
+					:current-field="current.store"
+				/>
 			</div>
 			<div class="adjacent-input">
 				<label
@@ -53,7 +66,11 @@
 					maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<ValidationMessage :check="wikiCheck" />
+				<ValidationMessage
+					:check="wikiCheck"
+					:project-field="saved.wiki"
+					:current-field="current.wiki"
+				/>
 			</div>
 			<div class="adjacent-input">
 				<label id="server-discord" title="An invitation link to your Discord server.">
@@ -68,14 +85,23 @@
 					maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<ValidationMessage :check="discordInviteCheck" />
+				<ValidationMessage
+					:check="discordInviteCheck"
+					:project-field="saved.discord"
+					:current-field="current.discord"
+				/>
 			</div>
 		</section>
 
 		<!-- Standard Project Links -->
 		<section v-if="!isServerProject" class="universal-card">
 			<h2>External links</h2>
-			<ValidationMessage :check="externalLinksValidation" class="mb-4" />
+			<ValidationMessage
+				:check="externalLinksValidation"
+				:project-field="JSON.stringify(saved)"
+				:current-field="JSON.stringify(current)"
+				class="mb-4"
+			/>
 			<div class="adjacent-input">
 				<label
 					id="project-issue-tracker"
@@ -94,7 +120,11 @@
 					:maxlength="2048"
 					:disabled="!hasPermission"
 				/>
-				<ValidationMessage :check="issuesCheck" />
+				<ValidationMessage
+					:check="issuesCheck"
+					:project-field="saved.issues"
+					:current-field="current.issues"
+				/>
 			</div>
 			<div class="adjacent-input">
 				<label
@@ -114,7 +144,11 @@
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
-				<ValidationMessage :check="sourceCheck" />
+				<ValidationMessage
+					:check="sourceCheck"
+					:project-field="saved.source"
+					:current-field="current.source"
+				/>
 			</div>
 			<div class="adjacent-input">
 				<label
@@ -134,7 +168,11 @@
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
-				<ValidationMessage :check="wikiCheck" />
+				<ValidationMessage
+					:check="wikiCheck"
+					:project-field="saved.wiki"
+					:current-field="current.wiki"
+				/>
 			</div>
 			<div class="adjacent-input">
 				<label id="project-discord-invite" title="An invitation link to your Discord server.">
@@ -149,7 +187,11 @@
 					placeholder="Enter a valid URL"
 					:disabled="!hasPermission"
 				/>
-				<ValidationMessage :check="discordInviteCheck" />
+				<ValidationMessage
+					:check="discordInviteCheck"
+					:project-field="saved.discord"
+					:current-field="current.discord"
+				/>
 			</div>
 			<span class="label">
 				<span class="label__title">Donation links</span>

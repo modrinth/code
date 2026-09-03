@@ -28,8 +28,8 @@
 <script setup lang="ts">
 import { LightBulbIcon, TriangleAlertIcon, XCircleIcon } from '@modrinth/assets'
 import type { FieldValidationMessage } from '@modrinth/moderation'
-import { useVIntl } from '@modrinth/ui'
-import { computed, onScopeDispose, shallowRef, watch } from 'vue'
+import { injectProjectPageContext, useVIntl } from '@modrinth/ui'
+import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
 
 type ValidationCheck = Omit<FieldValidationMessage, 'code'> & { code?: string }
 
@@ -39,6 +39,8 @@ const props = withDefaults(
 	defineProps<{
 		check?: ValidationCheckInput
 		debounce?: number
+		projectField?: unknown
+		currentField?: unknown
 	}>(),
 	{
 		check: null,
@@ -47,31 +49,65 @@ const props = withDefaults(
 )
 
 const { formatMessage } = useVIntl()
+const { projectValidationLoading } = injectProjectPageContext()
 const displayedCheck = shallowRef<ValidationCheckInput>(props.check)
+const validationIsStale = ref(props.projectField !== props.currentField)
 let debounceTimer: ReturnType<typeof setTimeout> | undefined
+let validationRefreshCompleted = false
+
+function updateDisplayedCheck(check: ValidationCheckInput) {
+	clearTimeout(debounceTimer)
+	const update = () => {
+		displayedCheck.value = check
+		if (
+			validationRefreshCompleted &&
+			!projectValidationLoading.value &&
+			props.projectField === props.currentField
+		) {
+			validationIsStale.value = false
+			validationRefreshCompleted = false
+		}
+	}
+
+	if (props.debounce <= 0) {
+		update()
+		return
+	}
+
+	debounceTimer = setTimeout(update, props.debounce)
+}
 
 watch(
-	() => props.check,
-	(check) => {
-		clearTimeout(debounceTimer)
-		if (props.debounce <= 0) {
-			displayedCheck.value = check
-			return
+	() => [props.projectField, props.currentField] as const,
+	([projectField, currentField], [previousProjectField]) => {
+		if (projectField !== currentField) {
+			validationIsStale.value = true
+			validationRefreshCompleted = false
+		} else if (projectField === previousProjectField) {
+			validationIsStale.value = false
+			validationRefreshCompleted = false
 		}
-
-		debounceTimer = setTimeout(() => {
-			displayedCheck.value = check
-		}, props.debounce)
 	},
 )
 
+watch(projectValidationLoading, (loading, wasLoading) => {
+	if (!loading && wasLoading) {
+		validationRefreshCompleted = true
+		updateDisplayedCheck(props.check)
+	}
+})
+
+watch(() => props.check, updateDisplayedCheck)
+
 onScopeDispose(() => clearTimeout(debounceTimer))
 
-const validations = computed(() =>
-	Array.isArray(displayedCheck.value)
+const validations = computed(() => {
+	if (validationIsStale.value || projectValidationLoading.value) return []
+
+	return Array.isArray(displayedCheck.value)
 		? displayedCheck.value
 		: displayedCheck.value
 			? [displayedCheck.value]
-			: [],
-)
+			: []
+})
 </script>

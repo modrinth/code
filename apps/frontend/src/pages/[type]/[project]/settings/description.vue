@@ -20,7 +20,12 @@
 				:disabled="!hasPermission"
 				:on-image-upload="onUploadHandler"
 			/>
-			<ValidationMessage :check="descriptionValidation" class="mt-2" />
+			<ValidationMessage
+				:check="descriptionValidation"
+				:project-field="saved.description"
+				:current-field="current.description"
+				class="mt-2"
+			/>
 		</div>
 		<UnsavedChangesPopup
 			:original="saved"

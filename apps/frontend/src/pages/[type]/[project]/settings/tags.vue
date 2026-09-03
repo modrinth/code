@@ -409,7 +409,11 @@ const toggleFeatured = (tag: string) => {
 					</Checkbox>
 				</div>
 			</div>
-			<ValidationMessage :check="tagValidation" />
+			<ValidationMessage
+				:check="tagValidation"
+				:project-field="JSON.stringify(saved)"
+				:current-field="JSON.stringify(current)"
+			/>
 		</div>
 		<UnsavedChangesPopup
 			:original="saved"

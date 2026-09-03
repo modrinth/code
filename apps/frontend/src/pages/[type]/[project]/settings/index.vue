@@ -29,7 +29,12 @@
 						wrapper-class="w-full max-w-72"
 						:disabled="!hasPermission"
 					/>
-					<ValidationMessage :check="nameValidation" class="mt-2" />
+					<ValidationMessage
+						:check="nameValidation"
+						:project-field="project.name"
+						:current-field="name"
+						class="mt-2"
+					/>
 				</div>
 
 				<div @focusin="onSlugSuggestionFocusIn" @focusout="onSlugSuggestionFocusOut">
@@ -69,7 +74,12 @@
 						:disabled="!hasPermission"
 						resize="vertical"
 					/>
-					<ValidationMessage :check="summaryValidation" class="mt-2" />
+					<ValidationMessage
+						:check="summaryValidation"
+						:project-field="project.summary"
+						:current-field="summary"
+						class="mt-2"
+					/>
 				</div>
 
 				<div>
@@ -109,7 +119,12 @@
 							</Button>
 						</div>
 					</div>
-					<ValidationMessage :check="iconValidation" class="mt-2" />
+					<ValidationMessage
+						:check="iconValidation"
+						:project-field="false"
+						:current-field="Boolean(icon || deletedIcon)"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Server Project Settings -->

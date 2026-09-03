@@ -36,7 +36,12 @@
 						:disabled="!hasPermission"
 						trigger-type="base"
 					/>
-					<ValidationMessage :check="licenseSelectionValidation" class="mt-2" />
+					<ValidationMessage
+						:check="licenseSelectionValidation"
+						:project-field="project.license.id"
+						:current-field="licenseId"
+						class="mt-2"
+					/>
 				</div>
 			</div>
 
@@ -85,8 +90,16 @@
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
-					<ValidationMessage :check="customLicenseValidation" />
-					<ValidationMessage :check="effectiveLicenseCheck" />
+					<ValidationMessage
+						:check="customLicenseValidation"
+						:project-field="project.license.id"
+						:current-field="licenseId"
+					/>
+					<ValidationMessage
+						:check="effectiveLicenseCheck"
+						:project-field="project.license.url ?? ''"
+						:current-field="current.licenseUrl"
+					/>
 				</div>
 			</div>
 

@@ -179,7 +179,12 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 		<div class="base-card block">
 			<div class="group relative float-end ml-4">
 				<IconSelect v-model="current.icon" />
-				<ValidationMessage :check="iconValidation" class="mt-2" />
+				<ValidationMessage
+					:check="iconValidation"
+					:project-field="saved.icon"
+					:current-field="current.icon"
+					class="mt-2"
+				/>
 			</div>
 			<div>
 				<SettingsLabel
@@ -197,7 +202,12 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 						wrapper-class="flex-grow"
 					/>
 				</div>
-				<ValidationMessage :check="titleValidation" class="mt-2" />
+				<ValidationMessage
+					:check="titleValidation"
+					:project-field="saved.title"
+					:current-field="current.title"
+					class="mt-2"
+				/>
 			</div>
 			<div class="mt-4">
 				<SettingsLabel
@@ -213,7 +223,12 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 					:maxlength="120"
 					wrapper-class="w-full"
 				/>
-				<ValidationMessage :check="taglineValidation" class="mt-2" />
+				<ValidationMessage
+					:check="taglineValidation"
+					:project-field="saved.tagline"
+					:current-field="current.tagline"
+					class="mt-2"
+				/>
 			</div>
 			<div class="mt-4" @focusin="onSlugSuggestionFocusIn" @focusout="onSlugSuggestionFocusOut">
 				<SettingsLabel id="project-url" :title="messages.urlTitle" />

@@ -44,7 +44,11 @@
 					:maxlength="64"
 					placeholder="Enter title..."
 				/>
-				<ValidationMessage :check="galleryTitleValidation" />
+				<ValidationMessage
+					:check="galleryTitleValidation"
+					:project-field="filteredGallery[editIndex]?.title ?? ''"
+					:current-field="editTitle"
+				/>
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
@@ -54,7 +58,11 @@
 					:maxlength="255"
 					placeholder="Enter description..."
 				/>
-				<ValidationMessage :check="galleryDescriptionValidation" />
+				<ValidationMessage
+					:check="galleryDescriptionValidation"
+					:project-field="filteredGallery[editIndex]?.description ?? ''"
+					:current-field="editDescription"
+				/>
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>

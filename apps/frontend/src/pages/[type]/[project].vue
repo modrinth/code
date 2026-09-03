@@ -842,6 +842,14 @@ const messages = defineMessages({
 		id: 'project.notification.updated.message',
 		defaultMessage: 'Your project has been updated.',
 	},
+	projectReviewSaveFailed: {
+		id: 'project.notification.review-save-failed.title',
+		defaultMessage: 'Failed to save project in review',
+	},
+	projectReviewSaveFailedDescription: {
+		id: 'project.notification.review-save-failed.description',
+		defaultMessage: 'You cannot save edits to your project which result in failing validation.',
+	},
 	reviewEnvironmentSettings: {
 		id: 'project.environment.migration.review-button',
 		defaultMessage: 'Review environment settings',
@@ -1377,6 +1385,30 @@ function mergeV3ProjectPatch(old, data) {
 	return merged
 }
 
+const PROJECT_REVIEW_VALIDATION_ERROR =
+	'project must have no required validation nags before or while under review'
+
+function addProjectMutationErrorNotification(error) {
+	const description =
+		error?.v1Error?.description ??
+		error?.responseData?.description ??
+		error?.data?.description ??
+		error?.message
+	const isProjectReviewValidationError = description === PROJECT_REVIEW_VALIDATION_ERROR
+
+	addNotification({
+		title: formatMessage(
+			isProjectReviewValidationError
+				? messages.projectReviewSaveFailed
+				: commonMessages.errorNotificationTitle,
+		),
+		text: isProjectReviewValidationError
+			? formatMessage(messages.projectReviewSaveFailedDescription)
+			: description,
+		type: 'error',
+	})
+}
+
 // Mutation for patching project data
 const patchProjectMutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
@@ -1412,11 +1444,7 @@ const patchProjectMutation = useMutation({
 		if (context?.previousV3) {
 			queryClient.setQueryData(['project', 'v3', context.projectId], context.previousV3)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1447,11 +1475,7 @@ const patchStatusMutation = useMutation({
 		if (context?.previousProject) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1491,11 +1515,7 @@ const patchProjectV3Mutation = useMutation({
 		if (context?.previousV2) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousV2)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: () => {
@@ -1519,11 +1539,7 @@ const patchIconMutation = useMutation({
 	},
 
 	onError: (err) => {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1572,11 +1588,7 @@ const createGalleryItemMutation = useMutation({
 		if (context?.previousProject) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1625,11 +1637,7 @@ const editGalleryItemMutation = useMutation({
 		if (context?.previousProject) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1662,11 +1670,7 @@ const deleteGalleryItemMutation = useMutation({
 		if (context?.previousProject) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
