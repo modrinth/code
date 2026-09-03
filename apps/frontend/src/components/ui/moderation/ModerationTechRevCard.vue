@@ -173,7 +173,7 @@ function findFileForDetail(
 ): { file: FlattenedFileReport; hidden: boolean } | null {
 	for (const report of props.item.reports) {
 		for (const issue of report.issues) {
-			const detail = issue.details.find((detail) => detail.id === detailId)
+			const detail = issue.details.find((detail) => String(detail.id) === detailId)
 			if (detail) {
 				return { file: report, hidden: detail.severity === 'hidden' }
 			}

@@ -430,7 +430,7 @@ async function focusDetail(detailId: string) {
 	await nextTick()
 
 	const classItem = groupedByClass.value.find((group) =>
-		group.flags.some((flag) => flag.detail.id === detailId),
+		group.flags.some((flag) => String(flag.detail.id) === detailId),
 	)
 
 	if (classItem) {

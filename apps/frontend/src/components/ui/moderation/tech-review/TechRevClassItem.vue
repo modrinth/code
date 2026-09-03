@@ -201,7 +201,7 @@ function createSlicerLink(url: string, group: ClassGroup | undefined) {
 				:key="`${flag.issueId}-${flag.detail.id}`"
 				class="flex flex-col gap-2 rounded-lg border border-solid border-surface-5 bg-surface-3 py-2 pl-4"
 				:class="{
-					'!border-brand bg-brand-highlight': focusedDetailId === flag.detail.id,
+					'!border-brand bg-brand-highlight': focusedDetailId === String(flag.detail.id),
 				}"
 			>
 				<div class="grid grid-cols-[1fr_auto] items-center">
