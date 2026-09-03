@@ -83,7 +83,7 @@ function show() {
 }
 
 function hide() {
-	modal.value?.hide()
+	return modal.value?.hide()
 }
 
 defineExpose({ show, hide })
@@ -111,6 +111,7 @@ defineExpose({ show, hide })
 				type="search"
 				autocomplete="off"
 				:placeholder="formatMessage(messages.search)"
+				:aria-label="formatMessage(messages.search)"
 				class="shrink-0"
 			/>
 
@@ -159,7 +160,7 @@ defineExpose({ show, hide })
 		<template #actions>
 			<div class="flex justify-end gap-2 p-2">
 				<Button type="outlined" :disabled="pending" @click="hide">
-					<XIcon />
+					<XIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
 				<Button
@@ -169,8 +170,7 @@ defineExpose({ show, hide })
 					:loading="pending"
 					@click="canConfirm && emit('confirm')"
 				>
-					<SpinnerIcon v-if="pending" class="animate-spin" />
-					<RefreshCwIcon v-else />
+					<RefreshCwIcon :class="{ 'animate-spin': pending }" aria-hidden="true" />
 					{{ formatMessage(messages.sync) }}
 				</Button>
 			</div>

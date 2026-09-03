@@ -63,6 +63,9 @@ pub struct GlobalSyncedOptions {
 
 impl GlobalSyncedOptions {
     pub fn get(self, option: SyncedOption) -> bool {
+		if !option.is_available() {
+			return false;
+		}
         match option {
             SyncedOption::GameOptions => self.game_options,
             SyncedOption::CommandHistory => self.command_history,
@@ -75,6 +78,7 @@ impl GlobalSyncedOptions {
     }
 
     fn set(&mut self, option: SyncedOption, enabled: bool) {
+		let enabled = enabled && option.is_available();
         match option {
             SyncedOption::GameOptions => self.game_options = enabled,
             SyncedOption::CommandHistory => self.command_history = enabled,
@@ -209,6 +213,11 @@ async fn capability_status(
     global_enabled: bool,
     state: &State,
 ) -> CapabilityStatus {
+	if !option.is_available() {
+		return CapabilityStatus::Unsupported(
+			"Data pack syncing is currently disabled.".to_string(),
+		);
+	}
     if !global_enabled {
         return CapabilityStatus::Unsupported(
             "This option is disabled in the app's synced options settings."
@@ -323,6 +332,12 @@ pub async fn set_global_option(
     enabled: bool,
     base_instance_id: Option<&str>,
 ) -> crate::Result<GlobalSyncedOptions> {
+	if !option.is_available() {
+		return Err(ErrorKind::InputError(
+			"Data pack syncing is currently disabled.".to_string(),
+		)
+		.into());
+	}
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     let was_enabled = get_global_options_with_state(&state).await?.get(option);
@@ -542,6 +557,12 @@ pub async fn set_instance_option(
     enabled: bool,
     resolution: Option<SyncedOptionJoinResolution>,
 ) -> crate::Result<InstanceMetadata> {
+	if !option.is_available() {
+		return Err(ErrorKind::InputError(
+			"Data pack syncing is currently disabled.".to_string(),
+		)
+		.into());
+	}
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)

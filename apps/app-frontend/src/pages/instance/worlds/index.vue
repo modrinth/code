@@ -65,12 +65,7 @@
 						{{ option.label }}
 					</button>
 				</div>
-				<Button
-					type="quiet"
-					:disabled="refreshingAll"
-					class="!text-sm !font-medium"
-					@click="refreshAllWorlds"
-				>
+				<Button type="quiet" :disabled="refreshingAll" size="sm" @click="refreshAllWorlds">
 					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
 					{{
 						formatMessage(refreshingAll ? messages.refreshingButton : commonMessages.refreshButton)

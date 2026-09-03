@@ -80,7 +80,8 @@ function finish(choice: Choice) {
 }
 
 function show() {
-	resolveChoice?.(null)
+	settle(null)
+	if (!modal.value) return Promise.resolve(null)
 	return new Promise<Choice>((resolve) => {
 		resolveChoice = resolve
 		modal.value?.show()
@@ -111,7 +112,7 @@ async function confirmDesync(item: ContentItem) {
 		: null
 }
 
-onBeforeUnmount(() => resolveChoice?.(null))
+onBeforeUnmount(() => settle(null))
 defineExpose({ confirmChange, confirmDelete, confirmDesync })
 </script>
 
@@ -134,7 +135,7 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 				<div
 					v-for="item in items"
 					:key="item.id"
-					class="rounded-xl border border-solid border-surface-5 p-4 !bg-surface-2"
+					class="rounded-xl border border-solid border-surface-4 bg-surface-2 p-4"
 				>
 					<ContentCardItem
 						:project="
@@ -171,16 +172,19 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 		</div>
 		<template #actions>
 			<div class="flex flex-wrap justify-end gap-2">
-				<Button type="outlined" class="!border !border-surface-5" @click="finish(null)"
-					><XIcon />{{ formatMessage(commonMessages.cancelButton) }}</Button
-				>
+				<Button type="outlined" @click="finish(null)">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
 				<template v-if="mode === 'desync'">
-					<Button @click="finish('keep_in_other_instances')"
-						><LinkIcon />{{ formatMessage(messages.keep) }}</Button
-					>
-					<Button type="colored" color="orange" @click="finish('remove_from_other_instances')"
-						><TrashIcon />{{ formatMessage(messages.remove) }}</Button
-					>
+					<Button @click="finish('keep_in_other_instances')">
+						<LinkIcon aria-hidden="true" />
+						{{ formatMessage(messages.keep) }}
+					</Button>
+					<Button type="colored" color="orange" @click="finish('remove_from_other_instances')">
+						<TrashIcon aria-hidden="true" />
+						{{ formatMessage(messages.remove) }}
+					</Button>
 				</template>
 				<Button
 					v-else
@@ -188,8 +192,8 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 					:color="mode === 'delete' ? 'red' : 'orange'"
 					@click="finish(mode === 'delete' ? 'all' : 'confirm')"
 				>
-					<TrashIcon v-if="mode === 'delete'" />
-					<RightArrowIcon v-else />
+					<TrashIcon v-if="mode === 'delete'" aria-hidden="true" />
+					<RightArrowIcon v-else aria-hidden="true" />
 					{{
 						formatMessage(
 							mode === 'delete' ? commonMessages.deleteLabel : commonMessages.continueButton,

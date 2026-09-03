@@ -183,10 +183,7 @@ type MemorySettings = {
 	maximum: number
 }
 
-type WindowSize = {
-	width: number
-	height: number
-}
+type WindowSize = [number, number]
 
 type Hooks = {
 	pre_launch?: string

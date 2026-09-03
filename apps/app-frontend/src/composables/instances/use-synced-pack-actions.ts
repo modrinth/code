@@ -10,9 +10,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { type Ref, watch } from 'vue'
 
 import type SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
-import { get_global_synced_options } from '@/helpers/instance'
+import { globalSyncedOptionsQueryOptions } from '@/helpers/synced-options'
 import {
 	desync_pack,
+	isSyncedPackTypeAvailable,
 	remove_synced_pack,
 	sync_pack,
 	type SyncedPackAction,
@@ -30,10 +31,7 @@ export function useSyncedPackActions(
 	const { formatMessage } = useVIntl()
 	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
-	const globalOptions = useQuery({
-		queryKey: ['global-synced-options'],
-		queryFn: get_global_synced_options,
-	})
+	const globalOptions = useQuery(globalSyncedOptionsQueryOptions())
 	const deleteEverywhere = new Set<string>()
 	watch(
 		[
@@ -81,15 +79,17 @@ export function useSyncedPackActions(
 	}
 
 	async function desync(item: ContentItem) {
-		if (!item.synced_pack) return
+		const packId = item.synced_pack?.id
+		if (!packId || mutation.isPending.value) return
+		const instanceId = instance.value.id
 		const mode = await modal.value?.confirmDesync(item)
 		if (!mode) return
-		mutation.mutate(() => desync_pack(instance.value.id, item.synced_pack!.id, mode))
+		mutation.mutate(() => desync_pack(instanceId, packId, mode))
 	}
 
 	function overflowOptions(item: ContentItem): ButtonMenuOption[] {
 		if (
-			!['resourcepack', 'datapack'].includes(item.project_type) ||
+			!isSyncedPackTypeAvailable(item.project_type) ||
 			!canMutate(item) ||
 			(item.source_kind && item.source_kind !== 'local')
 		)

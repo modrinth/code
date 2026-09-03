@@ -16,7 +16,10 @@ import { useRouter } from 'vue-router'
 import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
-import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
+import {
+	QUICK_INSTANCE_LIMIT_MAX,
+	useQuickInstanceLimit,
+} from '@/composables/use-quick-instance-limit.ts'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
@@ -55,7 +58,9 @@ const allInstances = computed(() =>
 const dragging = ref(false)
 const quickInstances = useQuickInstanceLimit()
 
-const maxVisible = computed(() => Math.min(maxAuto.value, allInstances.value.length))
+const maxVisible = computed(() =>
+	Math.min(maxAuto.value, allInstances.value.length, QUICK_INSTANCE_LIMIT_MAX),
+)
 const visibleCount = computed(() =>
 	Math.min(quickInstances.limit.value ?? maxVisible.value, maxVisible.value),
 )

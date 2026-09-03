@@ -13,22 +13,25 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, ref } from 'vue'
 
-import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
+import GameSettingsModal from '@/components/ui/settings/instances/game-settings-modal/index.vue'
 import SyncedPacksModal from '@/components/ui/settings/instances/SyncedPacksModal.vue'
-import { list_game_options_sync_sources } from '@/helpers/game-options'
 import {
-	get_initialized_synced_options,
 	get_synced_option_join_preview,
 	get_synced_options_overview,
-	list as listInstances,
+	isSyncedOptionAvailable,
 	set_synced_option,
 	type SyncedOption,
 	type SyncedOptionJoinResolution,
 } from '@/helpers/instance'
+import {
+	gameOptionsSyncSourcesQueryOptions,
+	initializedSyncedOptionsQueryOptions,
+	syncedOptionsKeys,
+} from '@/helpers/synced-options'
 import type { GameInstance } from '@/helpers/types'
 import { appSettingsModalOpenSyncedOptionsKey } from '@/providers/app-settings-modal'
 
-import { instanceKeys } from '../../query-options'
+import { instanceKeys, instanceListQueryOptions } from '../../query-options'
 import HooksSettings from './hooks-settings.vue'
 import { injectInstanceSettings } from './instance-settings-context'
 import JavaSettings from './java-settings.vue'
@@ -211,24 +214,17 @@ const rows: Array<{
 	},
 ]
 
+const availableRows = rows.filter((row) => isSyncedOptionAvailable(row.option))
+
 const overviewQuery = useQuery(
 	computed(() => ({
 		queryKey: ['instance-synced-options', instance.value.id],
 		queryFn: () => get_synced_options_overview(instance.value.id),
 	})),
 )
-const initializedOptionsQuery = useQuery({
-	queryKey: ['initialized-synced-options'],
-	queryFn: get_initialized_synced_options,
-})
-const instancesQuery = useQuery({
-	queryKey: instanceKeys.list(),
-	queryFn: listInstances,
-})
-const gameOptionSourcesQuery = useQuery({
-	queryKey: ['game-options-sync-sources'],
-	queryFn: list_game_options_sync_sources,
-})
+const initializedOptionsQuery = useQuery(initializedSyncedOptionsQueryOptions())
+const instancesQuery = useQuery(instanceListQueryOptions())
+const gameOptionSourcesQuery = useQuery(gameOptionsSyncSourcesQueryOptions())
 
 const capabilities = computed(
 	() =>
@@ -328,8 +324,8 @@ async function handleGameSettingsSaved(): Promise<void> {
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
 		queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
-		queryClient.invalidateQueries({ queryKey: ['initialized-synced-options'] }),
-		queryClient.invalidateQueries({ queryKey: ['game-options-sync-sources'] }),
+		queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.initialized }),
+		queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.gameSources }),
 	])
 }
 
@@ -400,7 +396,7 @@ const mutation = useMutation({
 	},
 	onSettled: async (_data, _error, variables) => {
 		if (variables.option === 'game_options') {
-			await queryClient.invalidateQueries({ queryKey: ['game-options-sync-sources'] })
+			await queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.gameSources })
 		}
 		if (variables.option === 'multiplayer_servers') {
 			await queryClient.invalidateQueries({
@@ -420,6 +416,7 @@ const mutation = useMutation({
 })
 
 async function setExcluded(option: InstanceSyncedOption, nextExcluded: boolean) {
+	if (!isSyncedOptionAvailable(option)) return
 	const enabled = !nextExcluded
 	if (!enabled || option !== 'creative_hotbars') {
 		mutation.mutate({ option, enabled })
@@ -528,7 +525,11 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<div v-for="row in rows" :key="row.option" class="flex items-center justify-between gap-6">
+			<div
+				v-for="row in availableRows"
+				:key="row.option"
+				class="flex items-center justify-between gap-6"
+			>
 				<div class="flex min-w-0 flex-col gap-1">
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages[row.title]) }}
@@ -584,6 +585,7 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 					<span v-tooltip="disabledReason(row.option)" class="flex">
 						<Toggle
 							:id="`exclude-${row.option}`"
+							:aria-label="formatMessage(messages[row.title])"
 							:model-value="excluded(row.option)"
 							:disabled="
 								previewingOption !== null ||

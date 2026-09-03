@@ -297,6 +297,10 @@ export type SyncedOption =
 	| 'creative_hotbars'
 	| 'screenshots'
 
+export function isSyncedOptionAvailable(option: SyncedOption): boolean {
+	return option !== 'data_packs'
+}
+
 export type GlobalSyncedOptions = Record<SyncedOption, boolean>
 
 export type SyncedOptionJoinAction = 'seed_shared' | 'attach' | 'merge' | 'requires_resolution'
@@ -353,8 +357,6 @@ export async function set_global_synced_option(
 		baseInstanceId,
 	})
 }
-
-export * from './game-options'
 
 export async function get_command_history(): Promise<string> {
 	return await invoke('plugin:instance|instance_get_command_history')

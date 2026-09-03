@@ -144,6 +144,9 @@ const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
 const isToggleDisabled = computed(() => isDisabled.value || props.toggleDisabled)
+const syncStatusLabel = computed(() =>
+	formatMessage(props.syncUpdatePending ? messages.syncUpdatePending : messages.synced),
+)
 
 const clientWarningMessage = computed(() => {
 	switch (props.clientWarning) {
@@ -235,18 +238,16 @@ const installTooltip = computed(() => {
 						<slot name="title-badges" />
 						<span
 							v-if="synced"
-							v-tooltip="
-								formatMessage(syncUpdatePending ? messages.syncUpdatePending : messages.synced)
-							"
-							:aria-label="
-								formatMessage(syncUpdatePending ? messages.syncUpdatePending : messages.synced)
-							"
+							v-tooltip="syncStatusLabel"
+							:aria-label="syncStatusLabel"
+							role="img"
 							class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
 							tabindex="0"
 						>
 							<LinkIcon
 								class="size-4"
 								:class="syncUpdatePending ? 'text-orange' : 'text-secondary'"
+								aria-hidden="true"
 							/>
 						</span>
 						<span

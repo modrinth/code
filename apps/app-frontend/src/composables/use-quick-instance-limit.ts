@@ -1,16 +1,20 @@
-import { ref } from 'vue'
+import { readonly, ref } from 'vue'
 
 const STORAGE_KEY = 'modrinth-quick-instance-count'
 
 export const QUICK_INSTANCE_LIMIT_MAX = 20
 
-const storedLimit = Number.parseInt(localStorage.getItem(STORAGE_KEY) ?? '', 10)
-const quickInstanceLimit = ref<number | null>(
-	Number.isFinite(storedLimit) ? Math.max(0, storedLimit) : null,
-)
+function normalizeLimit(limit: number | null): number | null {
+	if (limit === null || !Number.isFinite(limit)) return null
+	const rounded = Math.max(0, Math.round(limit))
+	return rounded >= QUICK_INSTANCE_LIMIT_MAX ? null : rounded
+}
+
+const storedLimit = localStorage.getItem(STORAGE_KEY)
+const quickInstanceLimit = ref(normalizeLimit(storedLimit === null ? null : Number(storedLimit)))
 
 function setQuickInstanceLimit(limit: number | null): void {
-	const normalizedLimit = limit === null ? null : Math.max(0, Math.round(limit))
+	const normalizedLimit = normalizeLimit(limit)
 	quickInstanceLimit.value = normalizedLimit
 
 	if (normalizedLimit === null) {
@@ -22,7 +26,7 @@ function setQuickInstanceLimit(limit: number | null): void {
 
 export function useQuickInstanceLimit() {
 	return {
-		limit: quickInstanceLimit,
+		limit: readonly(quickInstanceLimit),
 		setLimit: setQuickInstanceLimit,
 	}
 }

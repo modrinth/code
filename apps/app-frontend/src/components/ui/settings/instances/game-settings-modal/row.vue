@@ -14,20 +14,21 @@ import { computed, ref } from 'vue'
 
 import type { EditableGameSetting, GameOptionCanonicalValue } from '@/helpers/game-options'
 
-import GameSettingBooleanControl from './game-setting-boolean-control.vue'
+import GameSettingBooleanControl from './boolean-control.vue'
 import {
 	canonicalBooleanValue,
 	canonicalValueFromInput,
 	canonicalValueText,
-} from './game-setting-editors'
+	settingCanBeEnabled,
+} from './editors'
+import GameKeybindInput from './keybind-input.vue'
 import {
 	formatGameSettingChoice,
 	formatGameSettingDescription,
 	formatGameSettingLabel,
 	formatGameSettingValidation,
 	presentationMessages,
-} from './game-setting-messages'
-import GameKeybindInput from './GameKeybindInput.vue'
+} from './messages'
 
 const props = withDefaults(
 	defineProps<{
@@ -52,10 +53,6 @@ const { formatMessage } = useVIntl()
 const settingLabelRef = ref<HTMLElement | null>(null)
 
 const messages = defineMessages({
-	valueLabel: {
-		id: 'app.settings.synced-options.game-settings.value-label',
-		defaultMessage: 'Value',
-	},
 	on: {
 		id: 'app.settings.synced-options.game-settings.value-on',
 		defaultMessage: 'On',
@@ -101,11 +98,11 @@ const enumOptions = computed<ComboboxOption<string>[]>(() =>
 		label: formatGameSettingChoice(formatMessage, props.setting.option_id, choice.value),
 	})),
 )
+const isNumber = computed(
+	() => props.setting.editor.type === 'integer' || props.setting.editor.type === 'decimal',
+)
 const isSlider = computed(
-	() =>
-		(props.setting.editor.type === 'integer' || props.setting.editor.type === 'decimal') &&
-		props.setting.editor.min != null &&
-		props.setting.editor.max != null,
+	() => isNumber.value && props.setting.editor.min != null && props.setting.editor.max != null,
 )
 const booleanValue = computed(() => canonicalBooleanValue(props.setting))
 const numberScale = computed(() => (props.setting.editor.unit === 'percent' ? 100 : 1))
@@ -129,6 +126,9 @@ const sliderValue = computed(() => {
 	const value = Number(valueText.value)
 	return Number.isFinite(value) ? value : null
 })
+const inputValue = computed(() =>
+	isNumber.value ? (sliderValue.value ?? undefined) : valueText.value,
+)
 const editorDisabled = computed(
 	() =>
 		props.disabled ||
@@ -139,11 +139,7 @@ const syncToggleDisabled = computed(
 	() =>
 		props.disabled ||
 		props.setting.controlled ||
-		(!props.setting.sync_enabled &&
-			(!!props.setting.validation_error ||
-				['mixed', 'unset', 'invalid'].includes(props.setting.value_state) ||
-				(props.setting.compatibility.total_participating > 0 &&
-					props.setting.compatibility.will_receive === 0))),
+		(!props.setting.sync_enabled && !settingCanBeEnabled(props.setting)),
 )
 const placeholder = computed(() => {
 	if (props.setting.value_state === 'mixed') return formatMessage(messages.mixed)
@@ -242,15 +238,13 @@ function updateValue(value: string | number | boolean | undefined) {
 				:placeholder="placeholder"
 				:aria-label="settingLabel"
 				:disabled="editorDisabled"
-				value-input-class="!bg-transparent"
-				class="[&_input]:!text-secondary"
 				@update:model-value="updateValue"
 			/>
 
 			<GameSettingBooleanControl
 				v-else-if="setting.editor.type === 'bool'"
 				:model-value="booleanValue"
-				:label="formatMessage(messages.valueLabel)"
+				:label="settingLabel"
 				:on-label="formatMessage(messages.on)"
 				:off-label="formatMessage(messages.off)"
 				:placeholder="placeholder"
@@ -264,8 +258,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:options="enumOptions"
 				:placeholder="placeholder"
 				:disabled="editorDisabled"
-				:aria-label="formatMessage(messages.valueLabel)"
-				trigger-class="!bg-transparent !text-secondary"
+				:aria-label="settingLabel"
 				class="min-w-0"
 				@update:model-value="updateValue"
 			/>
@@ -282,18 +275,15 @@ function updateValue(value: string | number | boolean | undefined) {
 
 			<Input
 				v-else
-				:model-value="valueText"
-				:type="
-					setting.editor.type === 'integer' || setting.editor.type === 'decimal' ? 'number' : 'text'
-				"
+				:model-value="inputValue"
+				:type="isNumber ? 'number' : 'text'"
 				:min="inputMin"
 				:max="inputMax"
 				:step="inputStep"
 				:placeholder="placeholder"
 				:disabled="editorDisabled"
-				:aria-label="formatMessage(messages.valueLabel)"
-				wrapper-class="w-full !bg-transparent"
-				input-class="!text-secondary"
+				:aria-label="settingLabel"
+				wrapper-class="w-full"
 				@update:model-value="updateValue"
 			/>
 		</div>
@@ -304,18 +294,15 @@ function updateValue(value: string | number | boolean | undefined) {
 			class="flex justify-center"
 		>
 			<IconButton
+				:type="setting.sync_enabled ? 'outlined' : 'base'"
+				:color="setting.sync_enabled ? 'blue' : undefined"
 				:label="syncActionLabel"
 				:disabled="syncToggleDisabled"
 				:aria-pressed="setting.sync_enabled"
-				:class="
-					setting.sync_enabled
-						? '!bg-highlight-blue !text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)] [&>svg]:!text-blue'
-						: ''
-				"
 				@click="emit('update:sync-enabled', !setting.sync_enabled)"
 			>
-				<LinkIcon v-if="setting.sync_enabled" />
-				<UnlinkIcon v-else />
+				<LinkIcon v-if="setting.sync_enabled" aria-hidden="true" />
+				<UnlinkIcon v-else aria-hidden="true" />
 			</IconButton>
 		</span>
 	</div>
