@@ -160,10 +160,10 @@ import { computed, defineAsyncComponent, h } from 'vue'
 
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import {
+	generateUrlSlug,
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
 } from '~/composables/project-slug-suggestions'
-import { generateUrlSlug } from '~/utils/slugs'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 

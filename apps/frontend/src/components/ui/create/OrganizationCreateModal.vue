@@ -85,7 +85,7 @@ import {
 } from '@modrinth/ui'
 import { ref } from 'vue'
 
-import { generateUrlSlug } from '~/utils/slugs'
+import { generateUrlSlug } from '~/composables/project-slug-suggestions'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
