@@ -13,14 +13,10 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { isAdmin } from '@modrinth/utils'
 
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
-import {
-	useProjectSummaryValidation,
-	useProjectTitleValidation,
-} from '~/composables/project-field-validation'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
@@ -28,7 +24,7 @@ import {
 
 const { formatMessage } = useVIntl()
 
-const { allMembers, currentMember, projectV2: project, patchProject } = injectProjectPageContext()
+const { allMembers, projectV2: project, patchProject } = injectProjectPageContext()
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
@@ -57,15 +53,10 @@ const {
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
-const titleValidation = useProjectTitleValidation(() => current.value.title)
-const taglineValidation = useProjectSummaryValidation(
-	() => current.value.tagline,
-	() => current.value.title,
-)
-const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
-const canSave = computed(
-	() => isAdminUser.value || (!titleValidation.value && !taglineValidation.value),
-)
+const titleValidation = useProjectNagMessages('name')
+const taglineValidation = useProjectNagMessages('summary')
+const iconValidation = useProjectNagMessages('icon')
+const canSave = computed(() => true)
 const {
 	onFocusIn: onSlugSuggestionFocusIn,
 	onFocusOut: onSlugSuggestionFocusOut,
@@ -187,6 +178,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 		<div class="base-card block">
 			<div class="group relative float-end ml-4">
 				<IconSelect v-model="current.icon" />
+				<ValidationMessage :check="iconValidation" class="mt-2" />
 			</div>
 			<div>
 				<SettingsLabel

@@ -4,6 +4,7 @@
 		<!-- Server Project Links -->
 		<section v-if="isServerProject" class="universal-card">
 			<h2>External links</h2>
+			<ValidationMessage :check="externalLinksValidation" class="mb-4" />
 			<div class="adjacent-input">
 				<label id="server-website" title="Your server's website.">
 					<span class="label__title">Website</span>
@@ -74,6 +75,7 @@
 		<!-- Standard Project Links -->
 		<section v-if="!isServerProject" class="universal-card">
 			<h2>External links</h2>
+			<ValidationMessage :check="externalLinksValidation" class="mb-4" />
 			<div class="adjacent-input">
 				<label
 					id="project-issue-tracker"
@@ -195,7 +197,6 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { type LinkCheckContext, type LinkCheckResult, validateLink } from '@modrinth/moderation'
 import {
 	Combobox,
 	commonProjectSettingsMessages,
@@ -212,6 +213,7 @@ import {
 import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
 type EditableLinkField = 'discord' | 'issues' | 'site' | 'source' | 'store' | 'wiki'
 type EditableLinks = Partial<Record<EditableLinkField, string>>
@@ -283,47 +285,27 @@ function reset() {
 	resetDonations()
 }
 
-function fieldContext(
-	field: string,
-	getUrl: () => string | undefined,
-	extra: Record<string, unknown> = {},
-) {
-	return computed(() => ({ field, url: getUrl(), ...extra }))
+const externalLinksValidation = useProjectNagMessages('external-links')
+
+function useLinkFieldMessages(field: EditableLinkField, includeSourceRequirement = false) {
+	const verification = useProjectNagMessages('source-issues-discord-links', field)
+	const discordMisuse = useProjectNagMessages('non-discord-link-fields', field)
+	const sourceRequirement = useProjectNagMessages('source-availability', field)
+	return computed(() => [
+		...verification.value,
+		...(field === 'discord' ? [] : discordMisuse.value),
+		...(includeSourceRequirement ? sourceRequirement.value : []),
+	])
 }
 
-const discordContext = fieldContext('discord', () => current.value.discord, {
-	platformName: 'Discord',
-})
-const issuesContext = fieldContext('issues', () => current.value.issues)
-const sourceContext = fieldContext('source', () => current.value.source)
-const wikiContext = fieldContext('wiki', () => current.value.wiki)
-const siteContext = fieldContext('site', () => current.value.site)
-const storeContext = fieldContext('store', () => current.value.store)
+const discordInviteCheck = useLinkFieldMessages('discord')
+const issuesCheck = useLinkFieldMessages('issues')
+const sourceCheck = useLinkFieldMessages('source', true)
+const wikiCheck = useLinkFieldMessages('wiki')
+const siteCheck = useLinkFieldMessages('site')
+const storeCheck = useLinkFieldMessages('store')
 
-const discordInviteValidation = useLinkValidation(discordContext)
-const issuesValidation = useLinkValidation(issuesContext)
-const sourceValidation = useLinkValidation(sourceContext)
-const wikiValidation = useLinkValidation(wikiContext)
-const siteValidation = useLinkValidation(siteContext)
-const storeValidation = useLinkValidation(storeContext)
-
-const discordInviteCheck = discordInviteValidation.result
-const issuesCheck = issuesValidation.result
-const sourceCheck = sourceValidation.result
-const wikiCheck = wikiValidation.result
-const siteCheck = siteValidation.result
-const storeCheck = storeValidation.result
-
-function donationContext(row: DonationRow): LinkCheckContext {
-	return {
-		field: row.id ?? '',
-		url: row.url,
-		isDonation: true,
-		platformName: tags.value.donationPlatforms.find((platform) => platform.short === row.id)?.name,
-	}
-}
-
-function donationCheckState(row: DonationRow, index: number): LinkCheckResult | undefined {
+function donationCheckState(row: DonationRow, index: number) {
 	if (row.url && !row.id) {
 		return {
 			severity: 'error',
@@ -352,50 +334,8 @@ function donationCheckState(row: DonationRow, index: number): LinkCheckResult | 
 		}
 	}
 
-	return donationCheckResults.get(index)
+	return undefined
 }
-
-const donationCheckTimers = reactive(new Map<number, ReturnType<typeof setTimeout>>())
-const donationCheckResults = reactive(new Map<number, LinkCheckResult>())
-const donationChecksPending = reactive(new Set<number>())
-let donationValidationId = 0
-
-onScopeDispose(() => {
-	for (const timeout of donationCheckTimers.values()) clearTimeout(timeout)
-	donationValidationId++
-})
-
-watch(
-	donationLinks,
-	(rows) => {
-		for (const timeout of donationCheckTimers.values()) clearTimeout(timeout)
-		donationCheckTimers.clear()
-		donationCheckResults.clear()
-		donationChecksPending.clear()
-		const currentValidationId = ++donationValidationId
-
-		rows.forEach((row, index) => {
-			if (!row.id || !row.url) return
-			donationChecksPending.add(index)
-			donationCheckTimers.set(
-				index,
-				setTimeout(async () => {
-					donationCheckTimers.delete(index)
-					try {
-						const result = await validateLink(donationContext(row))
-						if (currentValidationId !== donationValidationId) return
-						if (result) donationCheckResults.set(index, result)
-					} finally {
-						if (currentValidationId === donationValidationId) {
-							donationChecksPending.delete(index)
-						}
-					}
-				}, 500),
-			)
-		})
-	},
-	{ deep: true, immediate: true },
-)
 
 const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 
@@ -485,25 +425,12 @@ const patchData = computed<Record<string, string | null>>(() => {
 
 const canSave = computed(() => {
 	if (!hasPermission.value || Object.keys(patchData.value).length === 0) return false
-	if (isAdminUser.value) return true
-
-	const checks = isServerProject.value
-		? [siteCheck, storeCheck, wikiCheck, discordInviteCheck]
-		: [issuesCheck, sourceCheck, wikiCheck, discordInviteCheck]
-	const validations = isServerProject.value
-		? [siteValidation, storeValidation, wikiValidation, discordInviteValidation]
-		: [issuesValidation, sourceValidation, wikiValidation, discordInviteValidation]
-
-	const fieldsInvalid = checks.some((check) => check.value?.severity === 'error')
-	const fieldsPending = validations.some((validation) => validation.pending.value)
 
 	const donationsInvalid =
 		!isServerProject.value &&
 		donationLinks.value.some((row, index) => donationCheckState(row, index)?.severity === 'error')
-	const donationsPending =
-		!isServerProject.value && (donationCheckTimers.size > 0 || donationChecksPending.size > 0)
 
-	return !fieldsInvalid && !fieldsPending && !donationsInvalid && !donationsPending
+	return !donationsInvalid
 })
 
 const saving = ref(false)

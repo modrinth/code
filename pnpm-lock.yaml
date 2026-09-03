@@ -557,30 +557,9 @@ importers:
       '@modrinth/api-client':
         specifier: workspace:*
         version: link:../api-client
-      '@modrinth/assets':
-        specifier: workspace:*
-        version: link:../assets
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../utils
-      '@tanstack/vue-query':
-        specifier: 5.101.4
-        version: 5.101.4(vue@3.5.27(typescript@5.9.3))
-      franc-min:
-        specifier: ^6.2.0
-        version: 6.2.0
-      linkify-it:
-        specifier: ^5.0.0
-        version: 5.0.0
-      node-html-parser:
-        specifier: ^9.0.1
-        version: 9.0.1
-      obscenity:
-        specifier: ^0.4.6
-        version: 0.4.6
-      tlds:
-        specifier: ^1.261.0
-        version: 1.261.0
       vue:
         specifier: ^3.5.13
         version: 3.5.27(typescript@5.9.3)
@@ -594,9 +573,6 @@ importers:
       '@modrinth/ui':
         specifier: workspace:*
         version: link:../ui
-      '@types/linkify-it':
-        specifier: ^5.0.0
-        version: 5.0.0
       typescript:
         specifier: ^5.4.5
         version: 5.9.3

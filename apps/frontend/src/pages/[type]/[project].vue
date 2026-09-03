@@ -155,6 +155,10 @@
 							:collapsed="collapsedChecklist"
 							:route-name="route.name"
 							:tags="tags"
+							:validation-nags="projectValidation?.nags ?? []"
+							:validation-loading="projectValidationLoading"
+							:validation-available="projectValidation !== null"
+							:refresh-validation="refreshProjectValidation"
 							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 							@set-processing="setProcessing"
 						/>
@@ -1736,6 +1740,24 @@ const currentMember = computed(() => {
 	return val
 })
 
+const {
+	data: projectValidationResponse,
+	isFetching: projectValidationLoading,
+	refetch: refetchProjectValidation,
+} = useQuery({
+	queryKey: computed(() => ['project', projectId.value, 'validation', 'v3']),
+	queryFn: () => client.labrinth.projects_v3.validate(projectId.value),
+	staleTime: 0,
+	enabled: computed(() => !!projectId.value && !!currentMember.value?.accepted),
+})
+
+const projectValidation = computed(() => projectValidationResponse.value ?? null)
+
+async function refreshProjectValidation() {
+	const result = await refetchProjectValidation()
+	return result.data ?? null
+}
+
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
 
 const hasEditDetailsPermission = computed(() => {
@@ -2439,6 +2461,8 @@ provideProjectPageContext({
 	currentMember,
 	allMembers,
 	organization,
+	projectValidation,
+	projectValidationLoading,
 	// Lazy version loading
 	versions,
 	versionsLoading,
@@ -2452,6 +2476,7 @@ provideProjectPageContext({
 
 	// Invalidate all project queries (auto-refetches active ones)
 	invalidate: invalidateProject,
+	refreshProjectValidation,
 
 	// Lazy loading
 	loadVersions,

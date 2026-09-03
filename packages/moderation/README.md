@@ -21,8 +21,9 @@ The package is organized as follows:
 │   │   ├── description.ts  # Description stage definition
 │   │   └── ...             # One file per stage
 │   └── nags/               # Publishing checklist (nag system) files
-│       ├── core.ts         # Core nags (required fields, basic validation)
-│       └── ...
+│       ├── index.ts        # Backend-kind registry and presentation adapters
+│       ├── name.ts         # Name nag copy
+│       └── ...             # One copy file per settings area
 └── types/                  # Type definitions
     ├── actions.ts          # Action-related types (moderation)
     ├── messages.ts         # Message-related types (moderation)
@@ -160,7 +161,7 @@ relevantExtraInput: [
 
 ## Publishing Checklist (Nag System)
 
-The nag system provides automated feedback to project authors during the submission process, helping them improve their projects before they reach moderation. It analyzes project data and provides suggestions, warnings, and requirements.
+The nag system presents automated feedback returned by Labrinth's project validation endpoint. Labrinth decides which nags apply and their severity; this package owns localized copy and navigation metadata.
 
 ### Nags
 
@@ -169,45 +170,19 @@ A nag represents a specific issue or suggestion for improvement. Each nag has:
 - A unique `id` for identification
 - A `title` and `description` displayed to the user
 - A `status` indicating severity: `'required'`, `'warning'`, or `'suggestion'`
-- A `shouldShow` function that determines when the nag should be displayed
 - An optional `link` to help users address the issue
 
 ### Internationalization
 
 Use vintl's `defineMessage` syntax.
 
-If you want to use context in the messages, you can do so like this:
-
-```typescript
-description: (context: NagContext) => {
-  const { formatMessage } = useVIntl()
-
-  return formatMessage(defineMessage(...), {
-    length: context.project.body?.length || 0,
-    minChars: MIN_DESCRIPTION_CHARS,
-  })
-}
-```
-
-### Nag Context
-
-The `NagContext` type provides access to:
-
-- `project`: Current project data
-- `versions`: Project versions
-- `tags`: Frontend "tags" (generated state)
-- `currentRoute`: Current page route
-- and other data...
-
 ### Adding New Nags
 
 To add a new nag:
 
-1. Add the nag definition to the appropriate category file (or make a new category file and add it to `data/nags.ts`)
-2. Add corresponding i18n messages to the `.i18n.ts` file
-3. Implement the `shouldShow` logic based on project state
-4. Add appropriate links to help users resolve the issue
-5. Run `pnpm run fix` to fix lint issues & generate the root locale index.json file.
+1. Add the nag copy to the appropriate area file in `data/nags/` and register its backend kind in `data/nags/index.ts`.
+2. Assign the settings destination for the affected field.
+3. Run `pnpm run fix` to fix lint issues and generate the root locale index.json file.
 
 Example:
 
@@ -217,16 +192,7 @@ Example:
   id: 'new-nag',
   title: messages.newNagTitle,
   description: messages.newNagDescription,
-  status: 'warning',
-  shouldShow: (context: NagContext) => {
-    // Your validation logic here
-    return someCondition
-  },
-  link: {
-    path: 'settings/description',
-    title: messages.editDescriptionTitle,
-    shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-description',
-  },
+	destination: 'description',
 }
 ```
 

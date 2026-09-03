@@ -96,6 +96,8 @@ export interface Nag {
 	 * It can accept a context to provide dynamic descriptions.
 	 */
 	description: MessageDescriptor | ((context: ProjectValidationContext) => string)
+	/** Values used when formatting a message descriptor description. */
+	values?: Record<string, string | number | boolean>
 	/**
 	 * The status of the nag, which can be 'required', 'warning', or 'suggestion'.
 	 */

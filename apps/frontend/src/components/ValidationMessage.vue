@@ -3,10 +3,10 @@
 		<div
 			v-for="(validation, index) in validations"
 			:key="validation.code ?? validation.message?.id ?? index"
-			class="flex w-full items-center gap-1.5"
+			class="flex w-full items-start gap-1.5"
 			:class="{
 				'text-red': validation.severity === 'error',
-				'text-orange': validation.severity === 'warn' || validation.severity === 'warning',
+				'text-orange': validation.severity === 'warning',
 				'text-purple': validation.severity === 'suggestion',
 			}"
 		>
@@ -18,7 +18,7 @@
 							? LightBulbIcon
 							: TriangleAlertIcon
 				"
-				class="my-auto"
+				class="mt-0.5"
 			/>
 			{{ validation.message ? formatMessage(validation.message, validation.values) : undefined }}
 		</div>
@@ -27,15 +27,11 @@
 
 <script setup lang="ts">
 import { LightBulbIcon, TriangleAlertIcon, XCircleIcon } from '@modrinth/assets'
-import { type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import type { FieldValidationMessage } from '@modrinth/moderation'
+import { useVIntl } from '@modrinth/ui'
 import { computed, onScopeDispose, shallowRef, watch } from 'vue'
 
-interface ValidationCheck {
-	code?: string
-	severity: 'valid' | 'warn' | 'warning' | 'suggestion' | 'error'
-	message?: MessageDescriptor
-	values?: Record<string, unknown>
-}
+type ValidationCheck = Omit<FieldValidationMessage, 'code'> & { code?: string }
 
 type ValidationCheckInput = ValidationCheck | ValidationCheck[] | null
 
@@ -72,11 +68,10 @@ watch(
 onScopeDispose(() => clearTimeout(debounceTimer))
 
 const validations = computed(() =>
-	(Array.isArray(displayedCheck.value)
+	Array.isArray(displayedCheck.value)
 		? displayedCheck.value
 		: displayedCheck.value
 			? [displayedCheck.value]
-			: []
-	).filter((validation) => validation.severity !== 'valid'),
+			: [],
 )
 </script>

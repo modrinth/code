@@ -27,11 +27,6 @@
 			:modified="current"
 			:saving="saving"
 			:can-save="canSave"
-			:save-disabled-reason="
-				hasPermission && hasValidationIssues
-					? projectTextValidationMessages.resolveIssuesToSave
-					: undefined
-			"
 			@reset="reset"
 			@save="save"
 		/>
@@ -54,10 +49,7 @@ import { computed, useTemplateRef } from 'vue'
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
-import {
-	projectTextValidationMessages,
-	useProjectDescriptionValidation,
-} from '~/composables/project-field-validation'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
@@ -89,16 +81,8 @@ const hasPermission = computed(
 			(currentMember.value.permissions & TeamMemberPermission.EDIT_BODY) ===
 				TeamMemberPermission.EDIT_BODY),
 )
-const { pending: descriptionLinksPending, validation: descriptionValidation } =
-	useProjectDescriptionValidation(() => current.value.description)
-const hasValidationIssues = computed(() =>
-	descriptionValidation.value.some((validation) => validation.severity === 'error'),
-)
-const canSave = computed(
-	() =>
-		hasPermission.value &&
-		(isAdminUser.value || (!hasValidationIssues.value && !descriptionLinksPending.value)),
-)
+const descriptionValidation = useProjectNagMessages('description')
+const canSave = computed(() => hasPermission.value)
 
 async function save() {
 	if (!canSave.value) return

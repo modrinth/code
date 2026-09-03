@@ -135,7 +135,7 @@ import {
 	TriangleAlertIcon,
 } from '@modrinth/assets'
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
-import { getNags, nagDestinations, validateProject } from '@modrinth/moderation'
+import { nagDestinations, normalizeProjectNagKind, toProjectNag } from '@modrinth/moderation'
 import { Accordion, Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import type { Component } from 'vue'
@@ -153,6 +153,10 @@ interface Props {
 	projectV3: Labrinth.Projects.v3.Project
 	versions?: Labrinth.Versions.v3.Version[]
 	nags?: Nag[]
+	validationNags?: Labrinth.Projects.v3.ProjectNag[]
+	validationLoading?: boolean
+	validationAvailable?: boolean
+	refreshValidation?: () => Promise<Labrinth.Projects.v3.ProjectValidationResponse | null>
 	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
 	disableHorizontalScroll?: boolean
@@ -217,6 +221,9 @@ const props = withDefaults(defineProps<Props>(), {
 	collapsed: false,
 	disableHorizontalScroll: false,
 	routeName: '',
+	validationNags: () => [],
+	validationLoading: false,
+	validationAvailable: true,
 })
 
 const emit = defineEmits<{
@@ -358,21 +365,33 @@ const nagContext = computed<NagContext>(() => ({
 }))
 
 const canSubmitForReview = computed(() => {
-	return validateProject(nagContext.value).valid
+	return (
+		!props.validationLoading &&
+		props.validationAvailable &&
+		!props.validationNags.some((nag) => nag.severity === 'required')
+	)
 })
 
 async function submitForReview() {
-	if (canSubmitForReview.value) {
-		emit('setProcessing', true)
-	}
+	if (!canSubmitForReview.value) return
+	const validation = await props.refreshValidation?.()
+	if (!validation || validation.nags.some((nag) => nag.severity === 'required')) return
+	emit('setProcessing', true)
 }
 
 const applicableNags = computed<Nag[]>(() => {
 	if (props.nags) return props.nags
 
-	return getNags(nagContext.value).filter((nag) => {
-		return nag.shouldShow(nagContext.value)
-	})
+	const nagsByKind = new Map<
+		Labrinth.Projects.v3.NormalizedProjectNagKind,
+		Labrinth.Projects.v3.ProjectNag
+	>()
+	for (const nag of props.validationNags) {
+		const kind = normalizeProjectNagKind(nag.kind)
+		if (kind && !nagsByKind.has(kind)) nagsByKind.set(kind, nag)
+	}
+
+	return [...nagsByKind.values()].map((nag) => toProjectNag(nag, props.project.project_type))
 })
 
 function isNagComplete(nag: Nag): boolean {
@@ -458,7 +477,7 @@ function getNagDescription(nag: Nag): string {
 	if (typeof nag.description === 'function') {
 		return nag.description(nagContext.value)
 	}
-	return formatMessage(nag.description)
+	return formatMessage(nag.description, nag.values)
 }
 
 function getNagDescriptionSegments(nag: Nag): { text: string; isUrl: boolean }[] {

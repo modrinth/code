@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-	Admonition,
 	Checkbox,
 	commonMessages,
 	ConfirmLeaveModal,
@@ -22,6 +21,9 @@ import {
 import { capitalizeString, isAdmin, sortedCategories } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
+
 interface Category {
 	name: string
 	header: string
@@ -37,8 +39,6 @@ interface CategoryGroup {
 }
 
 const MAX_FEATURED_TAGS = 3
-
-const RESOLUTION_TAGS = ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+']
 
 const SHARED_CATEGORY_PROJECT_TYPES: Record<string, string> = {
 	plugin: 'mod',
@@ -313,46 +313,7 @@ const isFeaturedLimitReached = computed(
 const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const canSave = computed(() => isAdminUser.value || current.value.featuredTags.length > 0)
 
-const tooManyTagsWarning = computed(() => {
-	const tagCount = current.value.selectedTags.length
-	if (isServerProject.value) {
-		if (tagCount > 18) {
-			return formatMessage(messages.tooManyTagsServerHardWarning, { count: tagCount })
-		} else if (tagCount > 12) {
-			return formatMessage(messages.tooManyTagsServerSoftWarning, { count: tagCount })
-		}
-	} else if (tagCount > 8) {
-		return formatMessage(messages.tooManyTagsProjectWarning, { count: tagCount })
-	}
-	return null
-})
-
-const multipleResolutionTagsWarning = computed(() => {
-	if (!projectTypes.value.includes('resourcepack')) return null
-
-	const resolutionTags = current.value.selectedTags.filter((tag) => RESOLUTION_TAGS.includes(tag))
-	if (resolutionTags.length < 2) return null
-
-	return formatMessage(messages.multipleResolutionTagsWarning, {
-		count: resolutionTags.length,
-		tags: resolutionTags
-			.join(', ')
-			.replace('8x-', '8x or lower')
-			.replace('512x+', '512x or higher'),
-	})
-})
-
-const allTagsSelectedWarning = computed(() => {
-	if (
-		availableTags.value.length < 1 ||
-		availableTags.value.length < 1 ||
-		current.value.selectedTags.length !== availableTags.value.length
-	) {
-		return null
-	}
-
-	return formatMessage(messages.allTagsSelectedWarning, { count: availableTags.value.length })
-})
+const tagValidation = useProjectNagMessages('tags')
 
 function toggleTagRaw(selection: string[], tag: string) {
 	if (selection.includes(tag)) {
@@ -385,14 +346,6 @@ const toggleFeatured = (tag: string) => {
 			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
 		/>
 		<div v-else class="flex flex-col gap-4">
-			<Admonition v-if="allTagsSelectedWarning" type="critical" :body="allTagsSelectedWarning" />
-			<Admonition v-else-if="tooManyTagsWarning" type="warning" :body="tooManyTagsWarning" />
-			<Admonition
-				v-if="multipleResolutionTagsWarning"
-				type="warning"
-				:body="multipleResolutionTagsWarning"
-			/>
-
 			<div
 				v-for="group in categoryGroups"
 				:key="group.id"
@@ -456,6 +409,7 @@ const toggleFeatured = (tag: string) => {
 					</Checkbox>
 				</div>
 			</div>
+			<ValidationMessage :check="tagValidation" />
 		</div>
 		<UnsavedChangesPopup
 			:original="saved"

@@ -41,7 +41,6 @@
 					:disabled="hasHitLimit"
 					@update:model-value="updatedName()"
 				/>
-				<ValidationMessage :check="nameValidation" />
 			</div>
 			<div
 				class="flex flex-col gap-2.5"
@@ -117,7 +116,6 @@
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
 				/>
-				<ValidationMessage :check="summaryValidation" />
 				<span>{{ formatMessage(messages.summaryDescription) }}</span>
 			</div>
 			<div class="flex justify-end gap-2.5">
@@ -161,11 +159,6 @@ import {
 import { computed, defineAsyncComponent, h } from 'vue'
 
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
-import ValidationMessage from '~/components/ValidationMessage.vue'
-import {
-	useProjectSummaryValidation,
-	useProjectTitleValidation,
-} from '~/composables/project-field-validation'
 import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
@@ -336,16 +329,8 @@ const visibilities = ref<VisibilityOption[]>([
 ])
 const visibility = ref<VisibilityOption>(visibilities.value[0])
 
-const nameValidation = useProjectTitleValidation(name)
-const summaryValidation = useProjectSummaryValidation(description, name)
-
 const disableCreate = computed(() => {
 	if (hasHitLimit.value) return true
-	if (
-		nameValidation.value.some((validation) => validation.severity === 'error') ||
-		summaryValidation.value.some((validation) => validation.severity === 'error')
-	)
-		return true
 	if (!name.value.trim() || !slug.value.trim()) return true
 	if (!manualSlug.value && checkingSlugSuggestions.value) return true
 	if (!manualSlug.value && !slugSuggestions.value.includes(slug.value)) return true

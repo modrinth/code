@@ -239,7 +239,6 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { validateProjectGalleryDescription, validateProjectGalleryName } from '@modrinth/moderation'
 import {
 	Button,
 	ConfirmModal,
@@ -253,10 +252,10 @@ import {
 	useFormatDateTime,
 	useFullImageContextMenu,
 } from '@modrinth/ui'
-import { isAdmin } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
 
@@ -309,18 +308,6 @@ const previewImage = ref<string | null>(null)
 
 // UI state
 const shouldPreventActions = ref(false)
-const galleryTitleValidation = computed(() => validateProjectGalleryName(editTitle.value))
-const galleryDescriptionValidation = computed(() =>
-	validateProjectGalleryDescription(editDescription.value),
-)
-const galleryFieldsInvalid = computed(
-	() =>
-		galleryTitleValidation.value.some((validation) => validation.severity === 'error') ||
-		galleryDescriptionValidation.value.some((validation) => validation.severity === 'error'),
-)
-const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
-const canSaveGalleryFields = computed(() => isAdminUser.value || !galleryFieldsInvalid.value)
-
 // Constant for accepted file types
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
@@ -328,6 +315,21 @@ const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.g
 const filteredGallery = computed(
 	() => project.value.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
 )
+const selectedGalleryIndex = computed(() => {
+	const selectedItem = filteredGallery.value[editIndex.value]
+	return selectedItem ? (project.value.gallery ?? []).indexOf(selectedItem) : -1
+})
+const galleryTitleValidation = useProjectNagMessages(
+	'gallery-text',
+	'name',
+	() => selectedGalleryIndex.value,
+)
+const galleryDescriptionValidation = useProjectNagMessages(
+	'gallery-text',
+	'description',
+	() => selectedGalleryIndex.value,
+)
+const canSaveGalleryFields = computed(() => true)
 
 const galleryViewerItems = computed(() =>
 	filteredGallery.value.map((image) => ({

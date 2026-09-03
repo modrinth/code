@@ -1,11 +1,11 @@
 import { defineMessages } from '@modrinth/ui/i18n'
 
-import type { NagDestinationId, NagLink } from '../types/nags.ts'
+import type { NagDestinationId, NagLink } from '../../types/nags.ts'
 
 const messages = defineMessages({
 	description: {
-		id: 'nags.settings.description.title',
-		defaultMessage: 'Visit description settings',
+		id: 'nags.edit-description.title',
+		defaultMessage: 'Edit description',
 	},
 	disclosures: {
 		id: 'nags.settings.disclosures.title',

@@ -1,24 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	type Nag,
-	projectDescriptionValidationRules,
-	projectDisclosureTextValidationRules,
-	projectDisclosureValidationRules,
-	projectGalleryTextValidationRules,
-	projectGalleryValidationRules,
-	projectIconValidationRules,
-	projectLicenseValidationRules,
-	projectLinksValidationRules,
-	projectModerationValidationRules,
-	projectNameValidationRules,
-	projectPermissionsValidationRules,
-	projectServerSettingsValidationRules,
-	projectSummaryValidationRules,
-	projectTagsValidationRules,
-	projectVersionValidationRules,
-	toNags,
-	type ValidationRuleDefinition,
-} from '@modrinth/moderation'
+import { type Nag, nagDefinitions, toProjectNag } from '@modrinth/moderation'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
@@ -127,39 +108,41 @@ const previewValues = {
 	value: 'example',
 }
 
-function createPreviewNags(rules: Readonly<Record<string, ValidationRuleDefinition>>): Nag[] {
-	return Object.entries(rules).flatMap(([code, rule]) =>
-		toNags([
-			{
-				code,
-				message: rule.presentation.message,
-				rule,
-				values: previewValues,
-			},
-		]),
-	)
-}
+const suggestionKinds = new Set<Labrinth.Projects.v3.NormalizedProjectNagKind>([
+	'add-icon',
+	'feature-gallery-image',
+	'add-links',
+	'add-links-server',
+	'select-language',
+	'select-tags',
+	'check-disclosures',
+])
 
-const validationRuleSets = [
-	projectNameValidationRules,
-	projectSummaryValidationRules,
-	projectIconValidationRules,
-	projectGalleryTextValidationRules,
-	projectGalleryValidationRules,
-	projectDescriptionValidationRules,
-	projectLicenseValidationRules,
-	projectLinksValidationRules,
-	projectPermissionsValidationRules,
-	projectServerSettingsValidationRules,
-	projectTagsValidationRules,
-	projectVersionValidationRules,
-	projectDisclosureTextValidationRules,
-	projectDisclosureValidationRules,
-	projectModerationValidationRules,
-]
+const warningKinds = new Set<Labrinth.Projects.v3.NormalizedProjectNagKind>([
+	'missing-alt-text',
+	'verify-external-links',
+	'too-many-languages',
+	'too-many-tags',
+	'multiple-resolution-tags',
+	'moderator-feedback',
+])
+
+const previewNags = Object.keys(nagDefinitions).map((kind) => {
+	const normalizedKind = kind as Labrinth.Projects.v3.NormalizedProjectNagKind
+	const projectNagKind = kind.replaceAll('-', '_') as Labrinth.Projects.v3.ProjectNagKind
+	const severity: Labrinth.Projects.v3.ProjectNagSeverity = suggestionKinds.has(normalizedKind)
+		? 'suggestion'
+		: warningKinds.has(normalizedKind)
+			? 'warning'
+			: 'required'
+	return toProjectNag(
+		{ kind: projectNagKind, severity, details: previewValues },
+		previewValues.projectType,
+	)
+})
 
 const everyNag: Nag[] = [
-	...validationRuleSets.flatMap(createPreviewNags),
+	...previewNags,
 	{
 		id: 'resubmit-for-review-preview',
 		title: 'Resubmit for review',

@@ -20,6 +20,7 @@
 						:placeholder="formatMessage(messages.selectRegionPlaceholder)"
 						:disabled="!hasPermission"
 					/>
+					<ValidationMessage :check="regionValidation" class="mt-2" />
 				</div>
 
 				<!-- Language -->
@@ -42,6 +43,7 @@
 						:placeholder="formatMessage(messages.selectLanguagesPlaceholder)"
 						:disabled="!hasPermission"
 					/>
+					<ValidationMessage :check="languageValidation" class="mt-2" />
 				</div>
 
 				<!-- Java Address -->
@@ -127,6 +129,7 @@
 							/></template>
 						</IntlFormatted>
 					</div>
+					<ValidationMessage :check="javaAddressValidation" class="mt-2" />
 				</div>
 
 				<!-- Bedrock Address -->
@@ -151,7 +154,10 @@
 					</div>
 				</div>
 
-				<CompatibilityCard />
+				<div>
+					<CompatibilityCard />
+					<ValidationMessage :check="compatibilityValidation" class="mt-2" />
+				</div>
 			</div>
 		</section>
 
@@ -189,6 +195,8 @@ import {
 import { isAdmin } from '@modrinth/utils'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
 const PING_TIMEOUT_MS = 5000
 
@@ -272,6 +280,11 @@ const messages = defineMessages({
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
+
+const regionValidation = useProjectNagMessages('server-region')
+const languageValidation = useProjectNagMessages('server-languages')
+const javaAddressValidation = useProjectNagMessages('java-address')
+const compatibilityValidation = useProjectNagMessages('server-compatibility')
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.server)
 

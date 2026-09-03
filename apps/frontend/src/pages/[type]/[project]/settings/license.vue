@@ -36,6 +36,7 @@
 						:disabled="!hasPermission"
 						trigger-type="base"
 					/>
+					<ValidationMessage :check="licenseSelectionValidation" class="mt-2" />
 				</div>
 			</div>
 
@@ -84,6 +85,7 @@
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
+					<ValidationMessage :check="customLicenseValidation" />
 					<ValidationMessage :check="effectiveLicenseCheck" />
 				</div>
 			</div>
@@ -165,6 +167,7 @@ import { builtinLicenses, formatProjectType, isAdmin, TeamMemberPermission } fro
 import { computed } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
@@ -231,14 +234,9 @@ const {
 	},
 )
 
-const licenseContext = computed(() => ({
-	field: 'license',
-	url: current.value.licenseUrl,
-	expectedLicense: current.value.license.short,
-	isCustom: current.value.license.friendly === 'Custom',
-}))
-const licenseValidation = useLinkValidation(licenseContext)
-const effectiveLicenseCheck = licenseValidation.result
+const licenseSelectionValidation = useProjectNagMessages('license')
+const customLicenseValidation = useProjectNagMessages('custom-license')
+const effectiveLicenseCheck = useProjectNagMessages('license-url')
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
@@ -257,17 +255,7 @@ const hasPermission = computed(
 		Boolean((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
 )
 
-const canSave = computed(
-	() =>
-		hasPermission.value &&
-		(isAdminUser.value ||
-			(!(
-				current.value.license.friendly === 'Custom' &&
-				(current.value.license.short === '' || current.value.licenseUrl === '')
-			) &&
-				effectiveLicenseCheck.value?.severity !== 'error' &&
-				!licenseValidation.pending.value)),
-)
+const canSave = computed(() => hasPermission.value)
 
 async function save() {
 	if (!canSave.value) return

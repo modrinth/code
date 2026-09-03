@@ -109,6 +109,7 @@
 							</Button>
 						</div>
 					</div>
+					<ValidationMessage :check="iconValidation" class="mt-2" />
 				</div>
 
 				<!-- Server Project Settings -->
@@ -295,11 +296,6 @@
 			:modified="modified"
 			:saving="saving"
 			:can-save="canSave"
-			:save-disabled-reason="
-				hasPermission && hasBlockingValidationIssues
-					? projectTextValidationMessages.resolveIssuesToSave
-					: undefined
-			"
 			@reset="resetChanges"
 			@save="handleSave"
 		/>
@@ -339,11 +335,7 @@ import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'
-import {
-	projectTextValidationMessages,
-	useProjectSummaryValidation,
-	useProjectTitleValidation,
-} from '~/composables/project-field-validation'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
@@ -436,15 +428,10 @@ const hasPermission = computed(() => {
 	)
 })
 
-const nameValidation = useProjectTitleValidation(name)
-const summaryValidation = useProjectSummaryValidation(summary, name)
-const hasValidationIssues = computed(
-	() =>
-		nameValidation.value.some((validation) => validation.severity === 'error') ||
-		summaryValidation.value.some((validation) => validation.severity === 'error'),
-)
-const hasBlockingValidationIssues = computed(() => hasValidationIssues.value && !isStaff.value)
-const canSave = computed(() => hasPermission.value && !hasBlockingValidationIssues.value)
+const nameValidation = useProjectNagMessages('name')
+const summaryValidation = useProjectNagMessages('summary')
+const iconValidation = useProjectNagMessages('icon')
+const canSave = computed(() => hasPermission.value)
 
 const monetizationToggleDisabled = computed(() => !hasPermission.value || isForceDemonetized.value)
 

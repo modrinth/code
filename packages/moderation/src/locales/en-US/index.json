@@ -36,7 +36,7 @@
     "defaultMessage": "Add external links"
   },
   "nags.adjacent-headers.description": {
-    "defaultMessage": "Headers of the same level should be placed next to each other."
+    "defaultMessage": "Headers of the same level should not be placed next to each other."
   },
   "nags.adjacent-headers.title": {
     "defaultMessage": "Remove adjacent headers"
@@ -48,7 +48,7 @@
     "defaultMessage": "Select accurate languages"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. Tags should be used to help users find relevant projects. Please only select relevant select."
+    "defaultMessage": "You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. Tags should be used to help users find relevant projects. Please only select relevant tags."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Select accurate tags"
@@ -306,7 +306,7 @@
     "defaultMessage": "Your project's summary must not contain offensive terms. Detected: “{value}”."
   },
   "nags.project-summary-spam.description": {
-    "defaultMessage": "Repeated characters, words, or phrases should be used to pad your project's summary."
+    "defaultMessage": "Repeated characters, words, or phrases should not be used to pad your project's summary."
   },
   "nags.project-summary-spam.title": {
     "defaultMessage": "Remove summary spam"
