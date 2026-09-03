@@ -344,48 +344,6 @@
   "app.hosting.update-required.title": {
     "message": "Mise à jour de Modrinth App requise"
   },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Impossible d'appliquer des icônes aléatoires aux instances."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Appliqué une icône aléatoire pour {num, plural,one {# instance} other {# instances}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nouveautés"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Fermer"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Créez des icônes personnalisées pour vos instances directement dans l'application Modrinth. Mélangez et associez des arrière-plans avec des symboles de Minecraft et des mods populaires !"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {Une instance n'a} other {# instances n'ont}} pas encore d'icône. Vous voulez qu'on {count, plural, one {lui} other {leur}} attribue {count, plural, one {une icône aléatoire} other {des icônes aléatoires}} pour commencer ?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Icônes aléatoires"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Ignorer"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Éditeur d'icônes personnalisées"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Fermer"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Personnalisez vos instances !"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Ignorer"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nouvel éditeur d'icônes"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Voir la mise à jour"
-  },
   "app.install.phase.downloading_content": {
     "message": "Téléchargement du contenu"
   },

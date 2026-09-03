@@ -16,7 +16,6 @@ import {
 	Avatar,
 	Button,
 	type ButtonMenuOption,
-	CheckCircleButton,
 	commonMessages,
 	defineMessages,
 	FilterPills,
@@ -36,13 +35,11 @@ import type { Component } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 
 import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
+import SyncedPacksModal from '@/components/ui/settings/instances/SyncedPacksModal.vue'
+import SyncSourceModal from '@/components/ui/settings/instances/SyncSourceModal.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
-import { list_game_options_sync_sources } from '@/helpers/game-options'
 import {
 	get_command_history,
-	get_global_synced_options,
-	get_initialized_synced_options,
-	getInstanceIconUrl,
 	type GlobalSyncedOptions,
 	list as listInstances,
 	list_synced_servers,
@@ -55,6 +52,13 @@ import {
 	update_synced_server,
 } from '@/helpers/instance'
 import { get, parseEnvVars, serializeEnvVars, set } from '@/helpers/settings.ts'
+import {
+	gameOptionsSyncSourcesQueryOptions,
+	globalSyncedOptionsQueryOptions,
+	initializedSyncedOptionsQueryOptions,
+	syncedOptionsKeys,
+} from '@/helpers/synced-options'
+import { syncedPackKeys, syncedPackQueryOptions } from '@/helpers/synced-packs'
 import { copyToClipboard } from '@/helpers/utils'
 import {
 	refreshServerData,
@@ -68,7 +72,26 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 
+const syncedPacksModal = ref<InstanceType<typeof SyncedPacksModal>>()
+
 const messages = defineMessages({
+	resourcePacks: {
+		id: 'app.settings.synced-options.resource-packs',
+		defaultMessage: 'Sync resource packs',
+	},
+	resourcePacksDescription: {
+		id: 'app.settings.synced-options.resource-packs.description',
+		defaultMessage: 'Use the same resource packs across your instances',
+	},
+	dataPacks: { id: 'app.settings.synced-options.data-packs', defaultMessage: 'Sync data packs' },
+	dataPacksDescription: {
+		id: 'app.settings.synced-options.data-packs.description',
+		defaultMessage: 'Use the same datapacks across your instances',
+	},
+	packsDisabled: {
+		id: 'app.settings.synced-options.packs.disabled',
+		defaultMessage: 'Enable syncing before editing shared packs.',
+	},
 	// syncedDescription: {
 	// 	id: 'app.settings.synced-options.description',
 	// 	defaultMessage:
@@ -84,8 +107,7 @@ const messages = defineMessages({
 	},
 	gameSettingsDescription: {
 		id: 'app.settings.synced-options.game-settings.description',
-		defaultMessage:
-			'Use the same graphics, keybinds, and other game settings across your instances.',
+		defaultMessage: 'Use the same game options across your instances',
 	},
 	gameSettingsButton: {
 		id: 'app.settings.synced-options.game-settings.button',
@@ -123,10 +145,6 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.creative-hotbars.description',
 		defaultMessage: 'Use the same saved creative hotbars across your instances.',
 	},
-	chooseSyncSourceTitle: {
-		id: 'app.settings.synced-options.choose-sync-source.title',
-		defaultMessage: 'Choose a sync source',
-	},
 	multiplayerServersSyncSourceDescription: {
 		id: 'app.settings.synced-options.choose-sync-source.multiplayer-servers-description',
 		defaultMessage: 'Pick the instance whose multiplayer servers become the shared copy.',
@@ -142,18 +160,6 @@ const messages = defineMessages({
 	gameSettingsSyncSourceDescription: {
 		id: 'app.settings.synced-options.choose-sync-source.game-settings-description',
 		defaultMessage: 'Choose which instance to copy game settings from.',
-	},
-	searchInstance: {
-		id: 'app.settings.synced-options.choose-sync-source.search-placeholder',
-		defaultMessage: 'Search instance',
-	},
-	noInstancesFound: {
-		id: 'app.settings.synced-options.choose-sync-source.no-instances-found',
-		defaultMessage: 'No instances found',
-	},
-	syncButton: {
-		id: 'app.settings.synced-options.choose-sync-source.sync',
-		defaultMessage: 'Sync',
 	},
 	commandHistoryEditorTitle: {
 		id: 'app.settings.synced-options.command-history.editor-title',
@@ -218,7 +224,15 @@ const messages = defineMessages({
 	},
 	noServersSyncedYet: {
 		id: 'app.settings.synced-options.multiplayer-servers.none-synced-yet',
-		defaultMessage: 'No servers synced yet',
+		defaultMessage: "You haven't synced any servers yet",
+	},
+	noResourcePacksSyncedYet: {
+		id: 'app.settings.synced-options.resource-packs.none-synced-yet',
+		defaultMessage: "You haven't synced any resource packs yet",
+	},
+	noDataPacksSyncedYet: {
+		id: 'app.settings.synced-options.data-packs.none-synced-yet',
+		defaultMessage: "You haven't synced any data packs yet",
 	},
 	noInstancesToEdit: {
 		id: 'app.settings.synced-options.edit.no-instances',
@@ -375,7 +389,7 @@ const globalRows: Array<{
 	option: SyncedOption
 	title: keyof typeof messages
 	description?: keyof typeof messages
-	editable?: 'game-settings' | 'servers' | 'commands'
+	editable?: 'game-settings' | 'servers' | 'commands' | 'resourcepack' | 'datapack'
 }> = [
 	{
 		option: 'game_options',
@@ -390,6 +404,18 @@ const globalRows: Array<{
 		editable: 'servers',
 	},
 	{
+		option: 'resource_packs',
+		title: 'resourcePacks',
+		description: 'resourcePacksDescription',
+		editable: 'resourcepack',
+	},
+	{
+		option: 'data_packs',
+		title: 'dataPacks',
+		description: 'dataPacksDescription',
+		editable: 'datapack',
+	},
+	{
 		option: 'command_history',
 		title: 'commandHistory',
 		description: 'commandHistoryDescription',
@@ -402,11 +428,13 @@ const globalRows: Array<{
 	},
 ]
 
-const globalSyncedOptionsQueryKey = ['global-synced-options'] as const
-const initializedSyncedOptionsQueryKey = ['initialized-synced-options'] as const
-const gameOptionsSyncSourcesQueryKey = ['game-options-sync-sources'] as const
-const globalSyncedOptionsMutationKey = ['global-synced-options', 'set'] as const
+const globalSyncedOptionsQueryKey = syncedOptionsKeys.global
+const initializedSyncedOptionsQueryKey = syncedOptionsKeys.initialized
+const gameOptionsSyncSourcesQueryKey = syncedOptionsKeys.gameSources
+const globalSyncedOptionsMutationKey = syncedOptionsKeys.set
 const defaultGlobalOptions: GlobalSyncedOptions = {
+	resource_packs: false,
+	data_packs: false,
 	game_options: false,
 	command_history: false,
 	multiplayer_servers: false,
@@ -414,18 +442,11 @@ const defaultGlobalOptions: GlobalSyncedOptions = {
 	screenshots: false,
 }
 
-const globalOptionsQuery = useQuery({
-	queryKey: globalSyncedOptionsQueryKey,
-	queryFn: get_global_synced_options,
-})
-const initializedOptionsQuery = useQuery({
-	queryKey: initializedSyncedOptionsQueryKey,
-	queryFn: get_initialized_synced_options,
-})
-const gameOptionSourcesQuery = useQuery({
-	queryKey: gameOptionsSyncSourcesQueryKey,
-	queryFn: list_game_options_sync_sources,
-})
+const globalOptionsQuery = useQuery(globalSyncedOptionsQueryOptions())
+const initializedOptionsQuery = useQuery(initializedSyncedOptionsQueryOptions())
+const gameOptionSourcesQuery = useQuery(gameOptionsSyncSourcesQueryOptions())
+const resourcePacksQuery = useQuery(syncedPackQueryOptions('resourcepack'))
+const dataPacksQuery = useQuery(syncedPackQueryOptions('datapack'))
 const globalOptions = computed(() => globalOptionsQuery.data.value ?? defaultGlobalOptions)
 const initializedOptions = computed(
 	() => initializedOptionsQuery.data.value ?? defaultGlobalOptions,
@@ -448,8 +469,7 @@ const hasGameOptionsToEdit = computed(
 )
 const baseOption = ref<SyncedOption | null>(null)
 const baseInstanceId = ref(instances.value[0]?.id ?? '')
-const baseInstanceSearch = ref('')
-const baseModal = ref<InstanceType<typeof NewModal> | null>(null)
+const baseModal = ref<InstanceType<typeof SyncSourceModal> | null>(null)
 const gameSettingsModal = ref<InstanceType<typeof GameSettingsModal> | null>(null)
 const commandHistoryModal = ref<InstanceType<typeof NewModal> | null>(null)
 const serverEditorModal = ref<InstanceType<typeof NewModal> | null>(null)
@@ -580,25 +600,21 @@ const baseInstanceDescription = computed(() => {
 	}
 })
 
-const filteredBaseInstances = computed(() => {
-	const search = baseInstanceSearch.value.trim().toLowerCase()
-	const candidates: BaseSourceCandidate[] =
-		baseOption.value === 'game_options'
-			? gameOptionSources.value.map((source) => ({
-					id: source.source_id,
-					name: source.name,
-					icon_path: source.icon_path,
-					eligible: source.eligible,
-				}))
-			: instances.value.map((instance) => ({
-					id: instance.id,
-					name: instance.name,
-					icon_path: instance.icon_path,
-					eligible: true,
-				}))
-	if (!search) return candidates
-	return candidates.filter((instance) => instance.name.toLowerCase().includes(search))
-})
+const baseInstances = computed<BaseSourceCandidate[]>(() =>
+	baseOption.value === 'game_options'
+		? gameOptionSources.value.map((source) => ({
+				id: source.source_id,
+				name: source.name,
+				icon_path: source.icon_path,
+				eligible: source.eligible,
+			}))
+		: instances.value.map((instance) => ({
+				id: instance.id,
+				name: instance.name,
+				icon_path: instance.icon_path,
+				eligible: true,
+			})),
+)
 
 async function invalidateSyncedOptions() {
 	await Promise.all([
@@ -606,11 +622,29 @@ async function invalidateSyncedOptions() {
 		queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
 		queryClient.invalidateQueries({ queryKey: globalSyncedOptionsQueryKey }),
 		queryClient.invalidateQueries({ queryKey: initializedSyncedOptionsQueryKey }),
+		queryClient.invalidateQueries({ queryKey: syncedPackKeys.all }),
 	])
+}
+
+function emptySyncedContentMessage(row: (typeof globalRows)[number]) {
+	if (
+		row.editable === 'servers' &&
+		(instances.value.length === 0 || syncedServers.value.length === 0)
+	) {
+		return messages.noServersSyncedYet
+	}
+	if (row.editable === 'resourcepack' && !resourcePacksQuery.data.value?.length) {
+		return messages.noResourcePacksSyncedYet
+	}
+	if (row.editable === 'datapack' && !dataPacksQuery.data.value?.length) {
+		return messages.noDataPacksSyncedYet
+	}
 }
 
 function canEditGlobalOption(row: (typeof globalRows)[number]): boolean {
 	if (!row.editable || !globalOptions.value[row.option]) return false
+	if (emptySyncedContentMessage(row)) return false
+	if (row.editable === 'resourcepack' || row.editable === 'datapack') return true
 	if (row.editable === 'game-settings') return hasGameOptionsToEdit.value
 	return (
 		instances.value.length > 0 &&
@@ -620,6 +654,13 @@ function canEditGlobalOption(row: (typeof globalRows)[number]): boolean {
 }
 
 function editGlobalOptionTooltip(row: (typeof globalRows)[number]): string {
+	const emptyMessage = emptySyncedContentMessage(row)
+	if (emptyMessage) return formatMessage(emptyMessage)
+	if (row.editable === 'resourcepack' || row.editable === 'datapack') {
+		return formatMessage(
+			globalOptions.value[row.option] ? commonMessages.editButton : messages.packsDisabled,
+		)
+	}
 	if (row.editable === 'game-settings') {
 		if (!hasGameOptionsToEdit.value) return formatMessage(messages.noGameOptionsToEdit)
 		if (!globalOptions.value[row.option]) {
@@ -632,9 +673,6 @@ function editGlobalOptionTooltip(row: (typeof globalRows)[number]): string {
 	}
 	if (!initializedOptions.value[row.option]) {
 		return formatMessage(messages.noSyncedDataToEdit)
-	}
-	if (row.editable === 'servers' && syncedServers.value.length === 0) {
-		return formatMessage(messages.noServersSyncedYet)
 	}
 	return formatMessage(commonMessages.editButton)
 }
@@ -695,16 +733,11 @@ function applyGlobalOption(option: SyncedOption, enabled: boolean, baseInstanceI
 async function chooseBaseInstance(option: SyncedOption) {
 	const generation = ++baseSourceGeneration
 	baseOption.value = option
-	baseInstanceSearch.value = ''
 	baseSourcesLoading.value = option === 'game_options'
 
 	if (option === 'game_options') {
 		try {
-			const sources = await queryClient.fetchQuery({
-				queryKey: gameOptionsSyncSourcesQueryKey,
-				queryFn: list_game_options_sync_sources,
-				staleTime: 0,
-			})
+			const sources = await queryClient.fetchQuery(gameOptionsSyncSourcesQueryOptions())
 			if (generation !== baseSourceGeneration || baseOption.value !== option) return
 			const eligibleSources = sources.filter((source) => source.eligible)
 			baseInstanceId.value = eligibleSources[0]?.source_id ?? ''
@@ -744,7 +777,12 @@ async function chooseBaseInstance(option: SyncedOption) {
 }
 
 function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
-	if (enabled && option !== 'screenshots') {
+	if (
+		enabled &&
+		option !== 'screenshots' &&
+		option !== 'resource_packs' &&
+		option !== 'data_packs'
+	) {
 		void chooseBaseInstance(option)
 		return
 	}
@@ -763,6 +801,16 @@ async function confirmBaseInstance() {
 		baseModal.value?.hide()
 	} catch {
 		return
+	}
+}
+
+function editGlobalOption(row: (typeof globalRows)[number]) {
+	if (row.editable === 'resourcepack' || row.editable === 'datapack') {
+		void syncedPacksModal.value?.show(row.editable)
+	} else if (row.editable === 'commands') {
+		void openCommandHistoryEditor()
+	} else {
+		void openServerEditor()
 	}
 }
 
@@ -946,93 +994,19 @@ watch(
 </script>
 
 <template>
+	<SyncedPacksModal ref="syncedPacksModal" />
 	<div>
 		<GameSettingsModal ref="gameSettingsModal" @saved="handleGameSettingsSaved" />
 
-		<NewModal
+		<SyncSourceModal
 			ref="baseModal"
-			:header="formatMessage(messages.chooseSyncSourceTitle)"
-			no-padding
-			actions-divider
-			max-width="560px"
-			width="560px"
-			:disable-close="globalOptionMutation.isPending.value"
-		>
-			<p class="m-0 border-0 border-b border-solid border-surface-5 p-6 text-primary">
-				{{ baseInstanceDescription }}
-			</p>
-
-			<div class="flex h-[400px] flex-col gap-3 overflow-y-auto bg-surface-2 px-6 py-4">
-				<Input
-					v-model="baseInstanceSearch"
-					:icon="SearchIcon"
-					type="search"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.searchInstance)"
-					class="shrink-0"
-				/>
-
-				<div v-if="baseSourcesLoading" class="flex flex-1 items-center justify-center">
-					<RefreshCwIcon class="size-5 animate-spin text-secondary" />
-				</div>
-				<div
-					v-else-if="filteredBaseInstances.length === 0"
-					class="flex flex-1 items-center justify-center text-secondary"
-				>
-					{{ formatMessage(messages.noInstancesFound) }}
-				</div>
-				<div
-					v-else
-					role="radiogroup"
-					:aria-label="formatMessage(messages.chooseSyncSourceTitle)"
-					class="flex flex-col gap-1"
-				>
-					<CheckCircleButton
-						v-for="instance in filteredBaseInstances"
-						:key="instance.id"
-						:checked="baseInstanceId === instance.id"
-						:disabled="!instance.eligible"
-						class="min-h-10"
-						@click="instance.eligible && (baseInstanceId = instance.id)"
-					>
-						<span class="size-5 shrink-0 overflow-hidden rounded-[6px]">
-							<Avatar
-								:src="getInstanceIconUrl(instance.icon_path)"
-								:alt="instance.name"
-								:tint-by="instance.id"
-								size="1.25rem"
-								no-shadow
-							/>
-						</span>
-						<span class="min-w-0 flex-1 truncate">{{ instance.name }}</span>
-					</CheckCircleButton>
-				</div>
-			</div>
-			<template #actions>
-				<div class="flex justify-end gap-2 p-2">
-					<Button
-						type="outlined"
-						:disabled="globalOptionMutation.isPending.value"
-						@click="baseModal?.hide()"
-					>
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						:disabled="
-							!baseInstanceId || baseSourcesLoading || globalOptionMutation.isPending.value
-						"
-						:loading="globalOptionMutation.isPending.value"
-						@click="confirmBaseInstance"
-					>
-						<RefreshCwIcon v-if="!globalOptionMutation.isPending.value" />
-						{{ formatMessage(messages.syncButton) }}
-					</Button>
-				</div>
-			</template>
-		</NewModal>
+			v-model="baseInstanceId"
+			:description="baseInstanceDescription"
+			:sources="baseInstances"
+			:loading="baseSourcesLoading"
+			:pending="globalOptionMutation.isPending.value"
+			@confirm="confirmBaseInstance"
+		/>
 
 		<NewModal
 			ref="commandHistoryModal"
@@ -1292,9 +1266,7 @@ watch(
 										globalOptionMutation.isPending.value
 									"
 									:label="formatMessage(commonMessages.editButton)"
-									@click="
-										row.editable === 'commands' ? openCommandHistoryEditor() : openServerEditor()
-									"
+									@click="editGlobalOption(row)"
 								>
 									<EditIcon />
 								</IconButton>

@@ -14,6 +14,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, ref } from 'vue'
 
 import GameSettingsModal from '@/components/ui/settings/instances/game-settings/GameSettingsModal.vue'
+import SyncedPacksModal from '@/components/ui/settings/instances/SyncedPacksModal.vue'
 import { list_game_options_sync_sources } from '@/helpers/game-options'
 import {
 	get_initialized_synced_options,
@@ -39,7 +40,42 @@ const { handleError } = injectNotificationManager()
 const queryClient = useQueryClient()
 const openAppSettingsSyncedOptions = inject(appSettingsModalOpenSyncedOptionsKey, () => {})
 
+const syncedPacksModal = ref<InstanceType<typeof SyncedPacksModal>>()
+
 const messages = defineMessages({
+	resourcePacks: {
+		id: 'instance.settings.synced-options.resource-packs',
+		defaultMessage: 'Unsync resource packs',
+	},
+	resourcePacksDescription: {
+		id: 'instance.settings.synced-options.resource-packs.description',
+		defaultMessage: "Keep this instance's resource packs separate from synced packs.",
+	},
+	resourcePacksDisabled: {
+		id: 'instance.settings.synced-options.resource-packs.disabled',
+		defaultMessage: 'Resource pack syncing is turned off in app settings.',
+	},
+	dataPacks: {
+		id: 'instance.settings.synced-options.data-packs',
+		defaultMessage: 'Unsync data packs',
+	},
+	dataPacksDescription: {
+		id: 'instance.settings.synced-options.data-packs.description',
+		defaultMessage: "Keep this instance's data packs separate from synced packs.",
+	},
+	dataPacksDisabled: {
+		id: 'instance.settings.synced-options.data-packs.disabled',
+		defaultMessage: 'Data pack syncing is turned off in app settings.',
+	},
+	editPacks: {
+		id: 'instance.settings.synced-options.edit-packs',
+		defaultMessage: 'Edit synced packs',
+	},
+	packsOverride: {
+		id: 'instance.settings.synced-options.packs-override',
+		defaultMessage:
+			'Turn off this override to edit synced packs. Independent packs can be managed in the content tab.',
+	},
 	sharedSettingsDescription: {
 		id: 'instance.settings.tabs.synced-options.shared-settings.description',
 		defaultMessage: 'Enable an override to keep a synced setting separate for this instance.',
@@ -130,6 +166,8 @@ const messages = defineMessages({
 type InstanceSyncedOption = Exclude<SyncedOption, 'screenshots'>
 
 const globalDisabledMessages: Record<InstanceSyncedOption, keyof typeof messages> = {
+	resource_packs: 'resourcePacksDisabled',
+	data_packs: 'dataPacksDisabled',
 	game_options: 'gameSettingsDisabled',
 	multiplayer_servers: 'multiplayerServersDisabled',
 	command_history: 'commandHistoryDisabled',
@@ -150,6 +188,16 @@ const rows: Array<{
 		option: 'multiplayer_servers',
 		title: 'multiplayerServers',
 		description: 'multiplayerServersDescription',
+	},
+	{
+		option: 'resource_packs',
+		title: 'resourcePacks',
+		description: 'resourcePacksDescription',
+	},
+	{
+		option: 'data_packs',
+		title: 'dataPacks',
+		description: 'dataPacksDescription',
 	},
 	{
 		option: 'command_history',
@@ -411,6 +459,7 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 
 <template>
 	<div class="flex flex-col gap-6">
+		<SyncedPacksModal ref="syncedPacksModal" />
 		<GameSettingsModal
 			ref="gameSettingsModal"
 			:instance-id="gameSettingsInstanceId"
@@ -501,6 +550,33 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 							"
 							:label="formatMessage(messages.editGameSettings)"
 							@click="openGameSettings"
+						>
+							<EditIcon />
+						</IconButton>
+					</span>
+					<span
+						v-if="row.option === 'resource_packs' || row.option === 'data_packs'"
+						v-tooltip="
+							disabledReason(row.option) ??
+							formatMessage(enabled(row.option) ? messages.editPacks : messages.packsOverride)
+						"
+						class="flex"
+					>
+						<IconButton
+							type="outlined"
+							circular
+							:label="formatMessage(messages.editPacks)"
+							:disabled="
+								mutation.isPending.value ||
+								overviewQuery.isPending.value ||
+								!!disabledReason(row.option) ||
+								!enabled(row.option)
+							"
+							@click="
+								syncedPacksModal?.show(
+									row.option === 'resource_packs' ? 'resourcepack' : 'datapack',
+								)
+							"
 						>
 							<EditIcon />
 						</IconButton>

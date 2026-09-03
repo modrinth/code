@@ -332,48 +332,6 @@
   "app.hosting.update-required.title": {
     "message": "يلزم تحديث تطبيق Modrinth"
   },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "تعذّر تطبيق أيقونات عشوائية على النسخ."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "تم تعيين أيقونة عشوائية لـ {num, plural, one {نسخة واحدة} two {نسختين} few {# نسخ} many {# نسخة} other {# نسخة}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "جديد في هذا التحديث"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "إغلاق"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "أنشئ أيقونات مخصصة لنسخك مباشرةً في Modrinth App. امزج بين الخلفيات والرموز من Minecraft والمودات الشائعة!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# نسخة لا تحتوي} two {# نسختان لا تحتويان} few {# نسخ لا تحتوي} many {# نسخة لا تحتوي} other {# نسخة لا تحتوي}} على أيقونات بعد. هل تريد منا تعيين أيقونات عشوائية لـ{count, plural, one {نسخة واحدة} two {نسختين} few {# نسخ} many {# نسخة} other {# نسخة}} للبدء؟"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "أيقونات عشوائية"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "تخطي"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "محرر الأيقونات المخصصة"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "إغلاق"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "خصّص نسخك!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "تجاهل"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "محرر الأيقونات الجديد"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "عرض التحديث"
-  },
   "app.install.phase.downloading_content": {
     "message": "جارٍ تنزيل المحتوى"
   },

@@ -15,6 +15,7 @@ mod screenshot_groups;
 mod screenshots;
 mod shared;
 mod synced_options;
+mod synced_packs;
 pub(crate) mod synced_servers;
 
 pub use self::content::{
@@ -137,4 +138,11 @@ pub use self::synced_options::{
 pub use self::synced_servers::{
     DesyncServerMode, ServerSource, SyncedServer, desync_server,
     list_synced_servers, remove_synced_server, update_synced_server,
+};
+
+pub(crate) use self::synced_packs::reconcile_after_change as reconcile_synced_packs;
+pub use self::synced_packs::{
+    PackSyncPreview, PackSyncTarget, desync_pack, get_pack_sync_preview,
+    list_synced_packs, remove_synced_pack, set_synced_pack_enabled, sync_pack,
+    upload_synced_pack,
 };

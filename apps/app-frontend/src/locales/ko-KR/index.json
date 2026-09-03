@@ -338,36 +338,6 @@
   "app.hosting.update-required.title": {
     "message": "Modrinth App 업데이트 필요"
   },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "인스턴스에 무작위 아이콘을 표시하는 데 실패했습니다."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "인스턴스 {num, plural, other {#}}개의 아이콘을 무작위로 섞었습니다."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "이번 업데이트"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "닫기"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Modrinth App에서 자신의 인스턴스에 사용자 지정 아이콘을 만들어 보세요. 배경을 Minecraft 및 인기 모드의 문양과 자유롭게 조합할 수 있습니다!"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "무작위 아이콘"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "건너뛰기"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "닫기"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "닫기"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "업데이트 보기"
-  },
   "app.install.phase.downloading_content": {
     "message": "콘텐츠 다운로드 중"
   },

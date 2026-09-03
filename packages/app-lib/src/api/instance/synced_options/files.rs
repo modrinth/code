@@ -96,6 +96,8 @@ pub(in crate::api::instance) fn instance_option_enabled(
             metadata.synced_options.creative_hotbars
         }
         SyncedOption::Screenshots => metadata.synced_options.screenshots,
+        SyncedOption::ResourcePacks => metadata.synced_options.resource_packs,
+        SyncedOption::DataPacks => metadata.synced_options.data_packs,
     }
 }
 

@@ -33,6 +33,10 @@ pub struct InstanceSyncedOptions {
     pub multiplayer_servers: bool,
     pub creative_hotbars: bool,
     pub screenshots: bool,
+    #[serde(default)]
+    pub resource_packs: bool,
+    #[serde(default)]
+    pub data_packs: bool,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -43,6 +47,8 @@ pub enum SyncedOption {
     MultiplayerServers,
     CreativeHotbars,
     Screenshots,
+    ResourcePacks,
+    DataPacks,
 }
 
 impl SyncedOption {
@@ -53,15 +59,19 @@ impl SyncedOption {
             Self::MultiplayerServers => "multiplayer_servers",
             Self::CreativeHotbars => "creative_hotbars",
             Self::Screenshots => "screenshots",
+            Self::ResourcePacks => "resource_packs",
+            Self::DataPacks => "data_packs",
         }
     }
 
-    pub const ALL: [Self; 5] = [
+    pub const ALL: [Self; 7] = [
         Self::GameOptions,
         Self::CommandHistory,
         Self::MultiplayerServers,
         Self::CreativeHotbars,
         Self::Screenshots,
+        Self::ResourcePacks,
+        Self::DataPacks,
     ];
 }
 

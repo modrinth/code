@@ -2,6 +2,7 @@
 	<ReadyTransition :pending="loading">
 		<ContentPageLayout>
 			<template #modals>
+				<SyncedContentModal ref="syncedContentModal" />
 				<UnknownFileWarningModal
 					ref="unknownFileWarningModal"
 					mode="mod"
@@ -124,8 +125,10 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
+import SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
+import { useSyncedPackActions } from '@/composables/instances/use-synced-pack-actions'
 import { useAppEvent } from '@/composables/use-app-event'
 import { type FeatureFlag, useAppSettings } from '@/composables/use-app-settings.ts'
 import { trackEvent } from '@/helpers/analytics'
@@ -146,6 +149,7 @@ import {
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get as getSettings, set as setSettings } from '@/helpers/settings'
+import { set_synced_pack_enabled, syncedPackKeys } from '@/helpers/synced-packs'
 import type { CacheBehaviour } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { type AppEventPayload, injectAppEvents } from '@/providers/app-events'
@@ -801,6 +805,13 @@ async function toggleDisableMod(
 	const originalFilePath = mod.file_path
 
 	try {
+		if (mod.synced_pack) {
+			await set_synced_pack_enabled(mod.synced_pack.id, desiredEnabled ?? !mod.enabled)
+			await refreshContentState('must_revalidate')
+			await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })
+			if (reconcileSharedState) await reconcileSharedInstancePublishState()
+			return
+		}
 		const newPath = await toggle_disable_project(instance.value.id, mod.file_path, desiredEnabled)
 		const newFileName = fileNameFromPath(newPath)
 		const enabled = !newPath.endsWith('.disabled')
@@ -846,8 +857,15 @@ async function removeMod(mod: ContentItem) {
 
 	try {
 		const removedPath = mod.file_path
-		await remove_project(instance.value.id, removedPath)
-		projects.value = projects.value.filter((x) => removedPath !== x.file_path)
+		if (!(await packActions.deleteSyncedItem(mod))) {
+			await remove_project(instance.value.id, removedPath)
+		}
+		if (mod.synced_pack) {
+			await refreshContentState('must_revalidate')
+			await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })
+		} else {
+			projects.value = projects.value.filter((x) => removedPath !== x.file_path)
+		}
 
 		trackEvent('InstanceProjectRemove', {
 			loader: instance.value.loader,
@@ -1473,8 +1491,13 @@ async function handleShareItems(
 	await shareModal.value?.show(text)
 }
 
+const syncedContentModal = ref<InstanceType<typeof SyncedContentModal>>()
+const packActions = useSyncedPackActions(instance, syncedContentModal, canMutateContent, () =>
+	refreshContentState('must_revalidate'),
+)
+
 function getOverflowOptions(item: ContentItem): ButtonMenuOption[] {
-	const options: ButtonMenuOption[] = []
+	const options: ButtonMenuOption[] = packActions.overflowOptions(item)
 
 	options.push({
 		id: 'show-file',
@@ -1582,7 +1605,7 @@ provideContentManager({
 	error: ref(null),
 	managedContent,
 	isPackLocked,
-	isBusy: isInstanceBusy,
+	isBusy: computed(() => isInstanceBusy.value || packActions.isPending.value),
 	disableAddContent: isQuarantined,
 	disableAddContentTooltip: formatMessage(messages.lockedContent),
 	isBulkOperating,
@@ -1612,6 +1635,8 @@ provideContentManager({
 	canToggleItem: canToggleContent,
 	getDeleteWarning: managedContentPolicy.deleteWarning,
 	getDisableWarning: managedContentPolicy.disableWarning,
+	confirmAction: packActions.confirmAction,
+	confirmDeleteItems: packActions.confirmDeleteItems,
 	getDeleteDependencyWarning,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
@@ -1664,6 +1689,8 @@ provideContentManager({
 			: undefined,
 		external: item.external ?? !item.project,
 		enabled: canMutateContent(item) ? item.enabled : undefined,
+		synced: !!item.synced_pack,
+		syncUpdatePending: item.synced_pack?.update_pending,
 		locked: item.locked,
 		installing: item.installing,
 		hideDelete: !canDeleteContent(item),

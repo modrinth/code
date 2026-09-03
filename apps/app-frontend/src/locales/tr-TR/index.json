@@ -344,48 +344,6 @@
   "app.hosting.update-required.title": {
     "message": "Modrinth App güncellemesi gerekli"
   },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Kurulumlara rastgele ikonlar uygulanamadı."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "{num, plural, one {# kurulum} other {# kurulumlar}} için rastgele ikon."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Bu güncellemede yeni"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Kapat"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Modrinth App'de kurulumlarınız için özel ikonlar oluşturun. Arka planları Minecraft ve popüler modlardan sembollerle karıştırıp eşleştirin!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# kurulumun} other {# kurulumun}} henüz ikonu yok. Başlangıç için {count, plural, one {ona} other {onlara}} rastgele simgeler vermemizi ister misiniz?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Rastgele ikon"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Atla"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Özel ikon düzenleyici"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Kapat"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Kurulumunuzu özelleştirin!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Reddet"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Yeni ikon düzenleyici"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Güncellemeyi görüntüle"
-  },
   "app.install.phase.downloading_content": {
     "message": "İçerik indiriliyor"
   },

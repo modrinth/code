@@ -332,42 +332,6 @@
   "app.hosting.update-required.title": {
     "message": "Frissítés szükséges a Modrinth Apphoz"
   },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Nem sikerült véletlenszerű ikonokat rendelni a játékprofilokhoz."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Véletlenszerű ikon alkalmazva {num} játékprofilnak."
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Bezárás"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {Egy játékprofilnak} other {# játékprofilnak}} még nincs ikonja. Szeretnéd, ha adnánk neki{count, plural, one { egy} other {k néhány}} véletlenszerű példát a kezdéshez?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Véletlenszerű ikonok"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Átugrás"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Saját ikon szerkesztő"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Bezárás"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Szabd személyre a példányodat!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Elvet"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Új ikon szerkesztő"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Frissítés megtekintése"
-  },
   "app.install.phase.downloading_content": {
     "message": "A tartalom letöltése..."
   },

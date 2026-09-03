@@ -344,48 +344,6 @@
   "app.hosting.update-required.title": {
     "message": "需要更新 Modrinth App"
   },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "无法为实例应用随机图标。"
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "已为 {num, plural, one {# 个实例} other {# 个实例}} 随机分配图标。"
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "本次更新的新功能"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "关闭"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "直接在 Modrinth App 中为你的实例创建自定义图标。自由搭配背景与来自《我的世界》及热门 Mod 的图案！"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "还有 {count, plural, one {# 个实例} other {# 个实例}} 未设置图标。要先随机分配图标来试试看吗？"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "随机一个图标"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "跳过"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "自定义图标编辑器"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "关闭"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "个性化你的实例！"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "忽略"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "新的图标编辑器"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "查看更新"
-  },
   "app.install.phase.downloading_content": {
     "message": "正在下载内容"
   },

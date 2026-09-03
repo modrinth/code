@@ -305,27 +305,6 @@
   "app.home.jump-back-in.view-instance": {
     "message": "Pokaż instancję"
   },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Zamknij"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Losowe ikony"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Pomiń"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Zamknij"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Odrzuć"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nowy edytor ikon"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Pokaż aktualizację"
-  },
   "app.install.phase.downloading_content": {
     "message": "Pobieranie zawartości"
   },

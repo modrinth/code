@@ -208,6 +208,11 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 "Failed to sync instance content after filesystem change: {error}"
                                             );
 										}
+                                        if sync_content
+											&& let Err(error) = crate::api::instance::reconcile_synced_packs(&emit_instance_id).await
+										{
+											tracing::error!("Failed to reconcile synced packs after filesystem change: {error}");
+										}
                                         if reconcile_screenshots
                                             && let Err(error) =
                                                 crate::api::instance::reconcile_screenshots(
