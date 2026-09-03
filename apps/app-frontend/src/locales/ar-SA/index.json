@@ -161,12 +161,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "إخفاء عرض الاسم"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "عرض العوالم أو النسخ التي لعبتها مؤخرًا في قسم \"ابدأ اللعب\" بالصفحة الرئيسية."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "الدخول إلى العوالم أو النسخ"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "تصغير تطبيق مودرينث عند بدء تشغيل ماين كرافت."
   },

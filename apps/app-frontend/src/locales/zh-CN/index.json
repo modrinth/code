@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "隐藏名牌"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "在主页的“快速开始”区域显示最近运行过的世界或实例。"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "快速进入世界或实例"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "当 Minecraft 进程启动时，将 Modrinth App 最小化。"
   },

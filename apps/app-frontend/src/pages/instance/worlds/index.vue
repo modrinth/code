@@ -68,7 +68,7 @@
 				<Button
 					type="quiet"
 					:disabled="refreshingAll"
-					class="hover:!bg-transparent focus-visible:!bg-transparent"
+					class="!text-sm !font-medium"
 					@click="refreshAllWorlds"
 				>
 					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />

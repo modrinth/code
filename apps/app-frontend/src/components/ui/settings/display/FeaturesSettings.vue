@@ -8,6 +8,7 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import {
@@ -19,7 +20,13 @@ import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
+import {
+	get_global_synced_options,
+	type GlobalSyncedOptions,
+	set_global_synced_option,
+} from '@/helpers/instance.ts'
 import { type AppSettings, get, set } from '@/helpers/settings.ts'
+import { screenshotKeys } from '@/pages/instance/query-options.ts'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
 const appSettings = useAppSettings()
@@ -28,6 +35,7 @@ const auth = injectAuth()
 const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
 const quickInstances = useQuickInstanceLimit()
+const queryClient = useQueryClient()
 
 const showJumpInFlag: FeatureFlag = 'worlds_in_home'
 
@@ -47,35 +55,32 @@ const messages = defineMessages({
 	},
 	instancePagesTitle: {
 		id: 'app.features-settings.instance-pages.title',
-		defaultMessage: 'Instance pages',
+		defaultMessage: 'Instances',
 	},
 	showWorldsTabTitle: {
 		id: 'app.features-settings.show-worlds-tab.title',
 		defaultMessage: 'Show Worlds tab in instances',
 	},
-	showWorldsTabDescription: {
-		id: 'app.features-settings.show-worlds-tab.description',
-		defaultMessage: 'Browse and launch worlds from each instance.',
-	},
 	showFilesTabTitle: {
 		id: 'app.features-settings.show-files-tab.title',
 		defaultMessage: 'Show Files tab in instances',
-	},
-	showFilesTabDescription: {
-		id: 'app.features-settings.show-files-tab.description',
-		defaultMessage: 'Browse the files in each instance from its navigation.',
 	},
 	showScreenshotsTabTitle: {
 		id: 'app.features-settings.show-screenshots-tab.title',
 		defaultMessage: 'Show Screenshots tab in instances',
 	},
-	showScreenshotsTabDescription: {
-		id: 'app.features-settings.show-screenshots-tab.description',
-		defaultMessage: 'Browse screenshots from the instance where they were taken.',
-	},
 	sidebarTitle: {
 		id: 'app.features-settings.sidebar.title',
 		defaultMessage: 'Sidebar',
+	},
+	showAllScreenshotsTitle: {
+		id: 'app.features-settings.show-all-screenshots.title',
+		defaultMessage: 'Show all screenshots in sidebar',
+	},
+	showAllScreenshotsDescription: {
+		id: 'app.features-settings.show-all-screenshots.description',
+		defaultMessage:
+			'Show a button in the left sidebar to view screenshots from all your instances.',
 	},
 	showSkinSelectorTitle: {
 		id: 'app.features-settings.show-skin-selector.title',
@@ -83,7 +88,7 @@ const messages = defineMessages({
 	},
 	showSkinSelectorDescription: {
 		id: 'app.features-settings.show-skin-selector.description',
-		defaultMessage: 'Add a shortcut to the skin selector to the left sidebar.',
+		defaultMessage: 'Show a button in the left sidebar to open the skin selector.',
 	},
 	quickInstancesTitle: {
 		id: 'app.features-settings.quick-instances.title',
@@ -113,19 +118,29 @@ type FeaturesSettingsState = {
 	showFilesTab: boolean
 	showWorldsTab: boolean
 	showScreenshotsTab: boolean
+	showAllScreenshots: boolean
 	showSkinSelector: boolean
 	quickInstanceCount: number
 	showJumpIn: boolean
 }
 
-const persistedSettings = ref(await get())
+const [initialSettings, initialGlobalSyncedOptions] = await Promise.all([
+	get(),
+	get_global_synced_options(),
+])
+const persistedSettings = ref(initialSettings)
+const persistedGlobalSyncedOptions = ref(initialGlobalSyncedOptions)
 
-function getFeaturesSettingsState(settings: AppSettings): FeaturesSettingsState {
+function getFeaturesSettingsState(
+	settings: AppSettings,
+	globalSyncedOptions: GlobalSyncedOptions,
+): FeaturesSettingsState {
 	return {
 		syncFeaturesAcrossDevices: settings.sync_features_across_devices,
 		showFilesTab: settings.show_files_tab_in_instances,
 		showWorldsTab: settings.show_worlds_tab_in_instances,
 		showScreenshotsTab: settings.show_screenshots_tab_in_instances,
+		showAllScreenshots: globalSyncedOptions.screenshots,
 		showSkinSelector: settings.show_skin_selector_in_sidebar,
 		quickInstanceCount: Math.min(
 			quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX,
@@ -136,7 +151,7 @@ function getFeaturesSettingsState(settings: AppSettings): FeaturesSettingsState 
 }
 
 const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
-	() => getFeaturesSettingsState(persistedSettings.value),
+	() => getFeaturesSettingsState(persistedSettings.value, persistedGlobalSyncedOptions.value),
 	async (changedValues) => {
 		const value = current.value
 
@@ -147,6 +162,7 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 					show_files_tab_in_instances: value.showFilesTab,
 					show_worlds_tab_in_instances: value.showWorldsTab,
 					show_screenshots_tab_in_instances: value.showScreenshotsTab,
+					show_all_screenshots: value.showAllScreenshots,
 					show_skin_selector_in_sidebar: value.showSkinSelector,
 					quick_instance_count: value.quickInstanceCount,
 				},
@@ -166,8 +182,20 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 			},
 		}
 
-		await set(nextSettings)
+		const screenshotsChanged =
+			value.showAllScreenshots !== persistedGlobalSyncedOptions.value.screenshots
+		const [, updatedGlobalSyncedOptions] = await Promise.all([
+			set(nextSettings),
+			screenshotsChanged
+				? set_global_synced_option('screenshots', value.showAllScreenshots)
+				: Promise.resolve(persistedGlobalSyncedOptions.value),
+		])
 		persistedSettings.value = nextSettings
+		persistedGlobalSyncedOptions.value = updatedGlobalSyncedOptions
+		queryClient.setQueryData(['global-synced-options'], updatedGlobalSyncedOptions)
+		if (screenshotsChanged) {
+			await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
+		}
 		appSettings.setFeaturesSyncAcrossDevices(value.syncFeaturesAcrossDevices)
 		appSettings.showFilesTabInInstances = value.showFilesTab
 		appSettings.showWorldsTabInInstances = value.showWorldsTab
@@ -245,7 +273,6 @@ onBeforeUnmount(() => {
 					<h3 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.showWorldsTabTitle) }}
 					</h3>
-					<p class="m-0 mt-1">{{ formatMessage(messages.showWorldsTabDescription) }}</p>
 				</div>
 				<Toggle id="show-worlds-tab-in-instances" v-model="current.showWorldsTab" />
 			</div>
@@ -255,7 +282,6 @@ onBeforeUnmount(() => {
 					<h3 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.showFilesTabTitle) }}
 					</h3>
-					<p class="m-0 mt-1">{{ formatMessage(messages.showFilesTabDescription) }}</p>
 				</div>
 				<Toggle id="show-files-tab-in-instances" v-model="current.showFilesTab" />
 			</div>
@@ -265,9 +291,6 @@ onBeforeUnmount(() => {
 					<h3 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.showScreenshotsTabTitle) }}
 					</h3>
-					<p class="m-0 mt-1">
-						{{ formatMessage(messages.showScreenshotsTabDescription) }}
-					</p>
 				</div>
 				<Toggle id="show-screenshots-tab-in-instances" v-model="current.showScreenshotsTab" />
 			</div>
@@ -279,6 +302,18 @@ onBeforeUnmount(() => {
 			{{ formatMessage(messages.sidebarTitle) }}
 		</h2>
 		<div class="mt-4 flex flex-col gap-6">
+			<div class="flex items-center justify-between gap-4">
+				<div>
+					<h3 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.showAllScreenshotsTitle) }}
+					</h3>
+					<p class="m-0 mt-1">
+						{{ formatMessage(messages.showAllScreenshotsDescription) }}
+					</p>
+				</div>
+				<Toggle id="show-all-screenshots" v-model="current.showAllScreenshots" />
+			</div>
+
 			<div class="flex items-center justify-between gap-4">
 				<div>
 					<h3 class="m-0 text-lg font-semibold text-contrast">

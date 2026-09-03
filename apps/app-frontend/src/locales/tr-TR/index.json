@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "İsim etiketini gizle"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Ana sayfadaki \"Hemen Katıl\" bölümünde yakın zamanda oynanan dünyaları veya kurulumları göster."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Dünyalara veya kurulumlara atlayın"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minecraft başladığında Modrinth uygulamasını küçült."
   },

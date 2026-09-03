@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Без имени над скином"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Показывать недавние миры или сборки в секции «Недавнее» на главной странице."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Недавние миры или сборки"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Сворачивать Modrinth App при запуске Minecraft."
   },

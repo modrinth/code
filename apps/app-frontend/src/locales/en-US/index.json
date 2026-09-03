@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Hide nametag"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Show recently played worlds or instances in the \"Jump in\" section on the Home page."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Jump into worlds or instances"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimize Modrinth App when Minecraft starts."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Home and content"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "View screenshots from all your instances on the Screenshots page."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Show all screenshots together"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Startup and navigation"
@@ -327,7 +315,7 @@
     "message": "1.0.0"
   },
   "app.features-settings.instance-pages.title": {
-    "message": "Instance pages"
+    "message": "Instances"
   },
   "app.features-settings.play-page.title": {
     "message": "Play page"
@@ -338,8 +326,11 @@
   "app.features-settings.quick-instances.title": {
     "message": "Quick instances in sidebar"
   },
-  "app.features-settings.show-files-tab.description": {
-    "message": "Browse the files in each instance from its navigation."
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Show a button in the left sidebar to view screenshots from all your instances."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Show all screenshots in sidebar"
   },
   "app.features-settings.show-files-tab.title": {
     "message": "Show Files tab in instances"
@@ -350,26 +341,29 @@
   "app.features-settings.show-jump-in.title": {
     "message": "Show Jump in section"
   },
-  "app.features-settings.show-screenshots-tab.description": {
-    "message": "Browse screenshots from the instance where they were taken."
-  },
   "app.features-settings.show-screenshots-tab.title": {
     "message": "Show Screenshots tab in instances"
   },
   "app.features-settings.show-skin-selector.description": {
-    "message": "Add a shortcut to the skin selector to the left sidebar."
+    "message": "Show a button in the left sidebar to open the skin selector."
   },
   "app.features-settings.show-skin-selector.title": {
     "message": "Show skin selector in sidebar"
-  },
-  "app.features-settings.show-worlds-tab.description": {
-    "message": "Browse and launch worlds from each instance."
   },
   "app.features-settings.show-worlds-tab.title": {
     "message": "Show Worlds tab in instances"
   },
   "app.features-settings.sidebar.title": {
     "message": "Sidebar"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Use these feature settings everywhere you're signed in. Turn this off to keep separate settings on this device."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Sign into a Modrinth account to sync settings."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Sync features across devices"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instance actions"

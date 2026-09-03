@@ -33,7 +33,7 @@
 			<ShareIcon v-else />
 			Share
 		</Button>
-		<Button type="quiet" @click="emit('toggle-fullscreen')">
+		<Button type="quiet" class="!text-sm !font-medium" @click="emit('toggle-fullscreen')">
 			<ContractIcon v-if="fullscreen" />
 			<ExpandIcon v-else />
 			{{ fullscreen ? 'Collapse' : 'Expand' }}

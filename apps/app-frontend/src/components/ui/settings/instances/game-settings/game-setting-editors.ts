@@ -72,11 +72,10 @@ export function canonicalValueText(setting: EditableGameSetting): string {
 		case 'bool':
 			return value.value ? 'true' : 'false'
 		case 'integer':
-			return String(value.value)
 		case 'decimal':
 			return setting.editor.unit === 'percent'
-				? (Number(value.value) * 100).toFixed(0)
-				: value.value
+				? String(Number((Number(value.value) * 100).toFixed(8)))
+				: String(value.value)
 		case 'string_list':
 			return value.value.join(', ')
 		default:

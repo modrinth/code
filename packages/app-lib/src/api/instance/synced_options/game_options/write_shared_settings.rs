@@ -143,7 +143,7 @@ async fn apply_shared_settings_to_document(
             continue;
         };
 
-        document.set(&key, &raw_value, definition.is_none() || migrated)?;
+        document.set(&key, &raw_value, true)?;
         count += 1;
         used_migration |= migrated
             || definition.is_some_and(|definition| {

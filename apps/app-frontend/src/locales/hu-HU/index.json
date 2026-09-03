@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Névcímke eltüntetése"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "A legutóbb játszott világok és játékprofilok megjelenítése a kezdőlap „Folytasd itt” részében."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "„Folytasd itt” a világokat és a játékprofilokat is"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "A Modrinth App bezáródik a Minecraft indításakor"
   },

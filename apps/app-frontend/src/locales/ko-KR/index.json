@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "이름표 숨기기"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "홈 화면 중 \"바로 입장\" 부분에 최근에 플레이한 세계나 인스턴스를 표시합니다."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "세계나 인스턴스로 바로 입장"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "마인크래프트가 시작되면 Modrinth 앱을 최소화 합니다."
   },

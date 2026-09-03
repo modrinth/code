@@ -101,11 +101,11 @@ const enumOptions = computed<ComboboxOption<string>[]>(() =>
 		label: formatGameSettingChoice(formatMessage, props.setting.option_id, choice.value),
 	})),
 )
-const isVolumeSlider = computed(
+const isSlider = computed(
 	() =>
-		props.setting.category_id === 'music_and_sound' &&
-		props.setting.editor.unit === 'percent' &&
-		props.setting.editor.type === 'decimal',
+		(props.setting.editor.type === 'integer' || props.setting.editor.type === 'decimal') &&
+		props.setting.editor.min != null &&
+		props.setting.editor.max != null,
 )
 const booleanValue = computed(() => canonicalBooleanValue(props.setting))
 const numberScale = computed(() => (props.setting.editor.unit === 'percent' ? 100 : 1))
@@ -125,8 +125,9 @@ const inputStep = computed(() =>
 		: props.setting.editor.step * numberScale.value,
 )
 const sliderValue = computed(() => {
+	if (valueText.value === '') return null
 	const value = Number(valueText.value)
-	return Number.isFinite(value) ? value : (inputMin.value ?? 0)
+	return Number.isFinite(value) ? value : null
 })
 const editorDisabled = computed(
 	() =>
@@ -194,7 +195,7 @@ function updateValue(value: string | number | boolean | undefined) {
 	<div
 		class="grid min-h-[54px] min-w-0 items-center gap-2"
 		:class="
-			isVolumeSlider
+			isSlider
 				? showSyncToggle
 					? 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)_2.25rem]'
 					: 'grid-cols-[minmax(10rem,0.65fr)_minmax(0,1.35fr)]'
@@ -230,13 +231,16 @@ function updateValue(value: string | number | boolean | undefined) {
 
 		<div class="flex min-w-0 items-center justify-end">
 			<Slider
-				v-if="isVolumeSlider"
+				v-if="isSlider"
 				:model-value="sliderValue"
 				:min="inputMin ?? 0"
 				:max="inputMax ?? 100"
 				:step="inputStep ?? 1"
-				:snap-points="[0, 50, 100]"
+				:snap-points="setting.category_id === 'music_and_sound' ? [0, 50, 100] : []"
 				:snap-range="5"
+				:unit="setting.editor.unit === 'percent' ? '%' : undefined"
+				:placeholder="placeholder"
+				:aria-label="settingLabel"
 				:disabled="editorDisabled"
 				value-input-class="!bg-transparent"
 				class="[&_input]:!text-secondary"

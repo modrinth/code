@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Nascondi nome"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Elenca i mondi o le istanze recenti nella sezione \"Avvio rapido\" della pagina Home."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Avvio rapido di mondi o istanze"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimizza l'app all'avvio di Minecraft."
   },
