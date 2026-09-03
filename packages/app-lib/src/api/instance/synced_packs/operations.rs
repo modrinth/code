@@ -99,6 +99,26 @@ pub(super) async fn pack_from_item(
         vec![metadata.applied_content_set.game_version.clone()]
     };
     let sha1 = cache_bytes(bytes, state).await?;
+    let selected = if item.project_type == ProjectType::ResourcePack {
+        match super::selection::selected_in_instance(
+            metadata,
+            &item.file_path,
+            state,
+        )
+        .await
+        {
+            Ok(selected) => selected,
+            Err(error) => {
+                tracing::warn!(
+                    "Could not read resource-pack selection from {}: {error}",
+                    metadata.instance.id
+                );
+                None
+            }
+        }
+    } else {
+        None
+    };
     item.file_name = item.file_name.trim_end_matches(".disabled").to_string();
     item.file_path.clear();
     item.synced_pack = None;
@@ -109,6 +129,7 @@ pub(super) async fn pack_from_item(
         item,
         sha1,
         game_versions,
+        selected,
     })
 }
 
@@ -300,6 +321,14 @@ pub(in crate::api::instance) async fn seed_from_instance(
                 },
             );
     }
+    if let Err(error) =
+        super::selection::capture_source_order(metadata, &mut library, state)
+            .await
+    {
+        tracing::warn!(
+            "Could not read the source resource-pack order for {instance_id}: {error}"
+        );
+    }
     write_library(&library, state).await
 }
 
@@ -353,9 +382,23 @@ async fn sync_pack_inner(
         .into());
     }
     let mut library = read_library(&state).await?;
-    let (id, mut pack) = existing_pack(&library, &candidate)
-        .map(|(id, pack)| (id.clone(), pack.clone()))
-        .unwrap_or_else(|| (Uuid::new_v4().to_string(), candidate));
+    if let Err(error) =
+        super::selection::capture(&metadata, &mut library, &state).await
+    {
+        tracing::warn!(
+            "Could not capture resource-pack selection before syncing {project_path}: {error}"
+        );
+    }
+    let (id, mut pack) =
+        if let Some((id, existing)) = existing_pack(&library, &candidate) {
+            let mut existing = existing.clone();
+            if existing.selected.is_none() {
+                existing.selected = candidate.selected;
+            }
+            (id.clone(), existing)
+        } else {
+            (Uuid::new_v4().to_string(), candidate)
+        };
     if automatic
         && library
             .instances
@@ -368,6 +411,17 @@ async fn sync_pack_inner(
     if !participating(&metadata, &pack, global) {
         return Err(crate::ErrorKind::InputError("Enable pack syncing in app settings and turn off this instance's override first.".to_string()).into());
     }
+    let previous = library
+        .instances
+        .get(instance_id)
+        .and_then(|placements| placements.get(&id));
+    let resource_pack_selection_path = previous.and_then(|placement| {
+        placement.resource_pack_selection_path.clone().or_else(|| {
+            (!placement.path.is_empty()).then(|| placement.path.clone())
+        })
+    });
+    let resource_pack_selection_pending = previous
+        .is_some_and(|placement| placement.resource_pack_selection_pending);
     pack.item.id = id.clone();
     library.packs.insert(id.clone(), pack);
     library
@@ -380,10 +434,20 @@ async fn sync_pack_inner(
                 path: item.file_path,
                 sha1: item.id,
                 enabled: item.enabled,
-                content_set_id: metadata.applied_content_set.id,
+                content_set_id: metadata.applied_content_set.id.clone(),
+                resource_pack_selection_path,
+                resource_pack_selection_pending,
                 ..Default::default()
             },
         );
+    if let Err(error) =
+        super::selection::capture_source_order(&metadata, &mut library, &state)
+            .await
+    {
+        tracing::warn!(
+            "Could not read the source resource-pack order for {instance_id}: {error}"
+        );
+    }
     apply_all(&mut library, &state).await?;
     emit_instance(instance_id, InstancePayloadType::Synced).await?;
     Ok(())
@@ -472,6 +536,8 @@ pub async fn upload_synced_pack(
         SyncedPack {
             sha1,
             game_versions,
+            selected: (project_type == ProjectType::ResourcePack)
+                .then_some(false),
             item: ContentItem {
                 id,
                 file_name,
@@ -506,7 +572,7 @@ pub async fn set_synced_pack_enabled(
     let pack = library.packs.get_mut(pack_id).ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown synced pack.".to_string())
     })?;
-	pack_option(pack.item.project_type)?;
+    pack_option(pack.item.project_type)?;
     pack.item.enabled = enabled;
     apply_all(&mut library, &state).await
 }
@@ -515,11 +581,11 @@ pub async fn remove_synced_pack(pack_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     let mut library = read_library(&state).await?;
-	let pack = library.packs.get(pack_id).ok_or_else(|| {
-		crate::ErrorKind::InputError("Unknown synced pack.".to_string())
-	})?;
-	pack_option(pack.item.project_type)?;
-	library.packs.remove(pack_id);
+    let pack = library.packs.get(pack_id).ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown synced pack.".to_string())
+    })?;
+    pack_option(pack.item.project_type)?;
+    library.packs.remove(pack_id);
     apply_all(&mut library, &state).await
 }
 
@@ -542,10 +608,10 @@ pub async fn desync_pack(
 		).into());
     }
     let mut library = read_library(&state).await?;
-	let pack = library.packs.get(pack_id).ok_or_else(|| {
-		crate::ErrorKind::InputError("Unknown synced pack.".to_string())
-	})?;
-	pack_option(pack.item.project_type)?;
+    let pack = library.packs.get(pack_id).ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown synced pack.".to_string())
+    })?;
+    pack_option(pack.item.project_type)?;
     let placement = library
         .instances
         .get_mut(instance_id)

@@ -1,5 +1,7 @@
 mod operations;
 mod reconciliation;
+mod selection;
+mod selection_compatibility;
 mod storage;
 
 pub use operations::{
@@ -9,7 +11,8 @@ pub use operations::{
 pub(super) use operations::{seed_from_instance, sync_new_pack};
 pub(crate) use reconciliation::reconcile_after_change;
 pub(super) use reconciliation::{
-    decorate_content, detach, reconcile, reconcile_after_content_change,
+    capture_resource_pack_selection_change, decorate_content, detach,
+    prepare_instance_update, reconcile, reconcile_after_content_change,
 };
 
 use crate::state::{
@@ -22,6 +25,12 @@ use std::collections::BTreeMap;
 struct PackLibrary {
     packs: BTreeMap<String, SyncedPack>,
     instances: BTreeMap<String, BTreeMap<String, PackPlacement>>,
+    #[serde(default)]
+    resource_pack_order: Vec<String>,
+    #[serde(default)]
+    resource_pack_observations: BTreeMap<String, Vec<String>>,
+    #[serde(default)]
+    resource_pack_incompatible_observations: BTreeMap<String, Vec<String>>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -29,6 +38,8 @@ struct SyncedPack {
     item: ContentItem,
     sha1: String,
     game_versions: Vec<String>,
+    #[serde(default)]
+    selected: Option<bool>,
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
@@ -42,6 +53,11 @@ struct PackPlacement {
     content_set_id: String,
     #[serde(default)]
     error: Option<String>,
+    #[serde(default)]
+    resource_pack_selection_pending: bool,
+    /// The pack path used by the last reconciled resourcePacks selection.
+    #[serde(default)]
+    resource_pack_selection_path: Option<String>,
 }
 
 #[derive(Clone, Serialize)]
@@ -60,23 +76,23 @@ pub struct PackSyncPreview {
 }
 
 fn pack_option(project_type: ProjectType) -> crate::Result<SyncedOption> {
-	let option = match project_type {
-		ProjectType::ResourcePack => SyncedOption::ResourcePacks,
-		ProjectType::DataPack => SyncedOption::DataPacks,
-		_ => {
-			return Err(crate::ErrorKind::InputError(
-				"Only resource packs and data packs can be synced.".to_string(),
-			)
-			.into());
-		}
-	};
-	if !option.is_available() {
-		return Err(crate::ErrorKind::InputError(
-			"Data pack syncing is currently disabled.".to_string(),
-		)
-		.into());
-	}
-	Ok(option)
+    let option = match project_type {
+        ProjectType::ResourcePack => SyncedOption::ResourcePacks,
+        ProjectType::DataPack => SyncedOption::DataPacks,
+        _ => {
+            return Err(crate::ErrorKind::InputError(
+                "Only resource packs and data packs can be synced.".to_string(),
+            )
+            .into());
+        }
+    };
+    if !option.is_available() {
+        return Err(crate::ErrorKind::InputError(
+            "Data pack syncing is currently disabled.".to_string(),
+        )
+        .into());
+    }
+    Ok(option)
 }
 
 fn version_compatible(
