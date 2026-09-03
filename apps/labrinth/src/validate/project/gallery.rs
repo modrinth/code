@@ -3,10 +3,13 @@ use serde_json::json;
 use super::text::{ProfanityKind, has_non_standard_text, profanity_matches};
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
+const MAX_GALLERY_DESCRIPTION_PROFANITY_COUNT: usize = 2;
+
 fn validate_text(
     text: Option<&str>,
     gallery_index: usize,
     field: &'static str,
+    max_profanity_count: usize,
 ) -> Vec<ProjectNag> {
     let text = text.unwrap_or_default();
     let mut nags = Vec::new();
@@ -30,7 +33,8 @@ fn validate_text(
     }
     if let Some(matched) = profanity
         .iter()
-        .find(|matched| matched.kind == ProfanityKind::Profanity)
+        .filter(|matched| matched.kind == ProfanityKind::Profanity)
+        .nth(max_profanity_count)
     {
         nags.push(
             ProjectNag::new(
@@ -102,11 +106,12 @@ pub(super) fn validate(
     }
 
     for (index, item) in project.gallery.iter().enumerate() {
-        nags.extend(validate_text(item.name.as_deref(), index, "name"));
+        nags.extend(validate_text(item.name.as_deref(), index, "name", 0));
         nags.extend(validate_text(
             item.description.as_deref(),
             index,
             "description",
+            MAX_GALLERY_DESCRIPTION_PROFANITY_COUNT,
         ));
     }
 
