@@ -10,7 +10,7 @@ use labrinth::models::projects::{Project, Version};
 use labrinth::validate::project::{
 	ProjectNagKind, ProjectNagSeverity, validate,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde::de::{
 	DeserializeOwned, DeserializeSeed, IgnoredAny, MapAccess, SeqAccess,
 	Visitor,
@@ -52,6 +52,10 @@ struct Args {
 	/// Show this many descriptions flagged for profanity
 	#[arg(long, value_name = "COUNT", default_value_t = 0, requires = "file")]
 	show_description_profanity: usize,
+
+	/// Print project IDs grouped by every triggered nag kind
+	#[arg(long, requires = "file")]
+	nag_project_ids: bool,
 
 	/// Scan every profanity-bearing field into a reusable JSON report
 	#[arg(
@@ -163,6 +167,9 @@ async fn main() -> Result<()> {
 	}
 
 	if let Some(path) = args.file.as_deref() {
+		if args.nag_project_ids {
+			return print_json(&find_nag_project_ids(path)?);
+		}
 		let summary = summarize_file(path, args.show_description_profanity)?;
 		print_description_profanity_samples(
 			&summary.description_profanity_samples,
@@ -176,6 +183,38 @@ async fn main() -> Result<()> {
 		.as_deref()
 		.ok_or_else(|| eyre!("a project ID or `--file` is required"))?;
 	check_api_project(project_id, args.token.as_deref()).await
+}
+
+#[derive(Deserialize)]
+struct ProjectDataset {
+	projects: Vec<Project>,
+}
+
+fn find_nag_project_ids(
+	path: &Path,
+) -> Result<BTreeMap<ProjectNagKind, Vec<String>>> {
+	let file = File::open(path)
+		.wrap_err_with(|| format!("opening `{}`", path.display()))?;
+	let dataset: ProjectDataset = serde_json::from_reader(BufReader::new(file))
+		.wrap_err_with(|| format!("reading `{}`", path.display()))?;
+	let mut project_ids = ProjectNagKind::iter()
+		.map(|kind| (kind, Vec::new()))
+		.collect::<BTreeMap<_, _>>();
+
+	for project in dataset.projects {
+		let kinds = validate(&project, &[])
+			.into_iter()
+			.map(|nag| nag.kind)
+			.collect::<std::collections::BTreeSet<_>>();
+		for kind in kinds {
+			project_ids
+				.entry(kind)
+				.or_default()
+				.push(project.id.to_string());
+		}
+	}
+
+	Ok(project_ids)
 }
 
 async fn check_api_project(
