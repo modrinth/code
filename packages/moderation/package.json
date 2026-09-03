@@ -2,17 +2,16 @@
 	"name": "@modrinth/moderation",
 	"version": "0.0.0",
 	"private": true,
-	"type": "module",
 	"main": "./src/index.ts",
 	"scripts": {
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
-		"test": "node --test src/data/nags/tests.ts",
 		"intl:extract": "formatjs extract \"**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore \"node_modules/**/*\" --out-file src/locales/en-US/index.json --preserve-whitespace",
 		"intl:prune-local": "pnpm -w scripts i18n-icu-contract prune-local --scope packages/moderation"
 	},
 	"dependencies": {
 		"@modrinth/api-client": "workspace:*",
+		"@modrinth/assets": "workspace:*",
 		"@modrinth/utils": "workspace:*",
 		"vue": "^3.5.13"
 	},

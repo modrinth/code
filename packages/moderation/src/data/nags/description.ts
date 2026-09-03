@@ -1,4 +1,4 @@
-import { defineMessages } from '@modrinth/ui/i18n'
+import { defineMessages } from '@modrinth/ui'
 
 import type { NagDefinitions } from './types.ts'
 

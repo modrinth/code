@@ -19,7 +19,12 @@ function parseProjectIds(value: string): string[] {
 		...new Set(
 			normalizedValue
 				.split(/[,\r\n]+/)
-				.map((id) => id.trim().replace(/^(['"])(.*)\1$/, '$2').replace(/\s+/g, ''))
+				.map((id) =>
+					id
+						.trim()
+						.replace(/^(['"])(.*)\1$/, '$2')
+						.replace(/\s+/g, ''),
+				)
 				.filter(Boolean),
 		),
 	]
@@ -71,8 +76,8 @@ defineExpose({ show, hide })
 				/>
 				<span v-if="error" class="text-sm font-semibold text-red">{{ error }}</span>
 				<span v-else class="text-sm text-secondary">
-					Accepts comma- or newline-separated IDs, including quoted IDs and array syntax.
-					Whitespace and duplicates are removed.
+					Accepts comma- or newline-separated IDs, including quoted IDs and array syntax. Whitespace
+					and duplicates are removed.
 				</span>
 			</div>
 

@@ -1,10 +1,6 @@
-import { capitalizeString } from '@modrinth/utils/utils.ts'
+import { capitalizeString } from '@modrinth/utils'
 
-import {
-	defineMessages,
-	type MessageDescriptor,
-	type VIntlFormatters,
-} from '../composables/i18n.ts'
+import { defineMessages, type MessageDescriptor, type VIntlFormatters } from '../composables/i18n'
 
 export const loaderMessages = defineMessages({
 	babric: {

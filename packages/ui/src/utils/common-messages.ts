@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { capitalizeString } from '@modrinth/utils/utils.ts'
+import { capitalizeString } from '@modrinth/utils'
 
-import { defineMessage, defineMessages, type MessageDescriptor } from '../composables/i18n.ts'
+import { defineMessage, defineMessages, type MessageDescriptor } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
 	acceptButton: {
