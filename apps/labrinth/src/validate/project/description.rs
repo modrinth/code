@@ -59,11 +59,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             ProjectNagSeverity::Required,
         ));
     }
-    if project_requires_english(project)
-        && js_string_length(&text) >= MIN_DESCRIPTION_CHARS
-        && !has_spam
-        && !has_sufficient_english_blocks(&blocks)
-    {
+    if !has_spam && is_non_english_text(project, &text, &blocks) {
         nags.push(ProjectNag::new(
             ProjectNagKind::ProjectDescriptionNonEnglish,
             ProjectNagSeverity::Required,
@@ -134,6 +130,22 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     }
 
     nags
+}
+
+pub(super) fn is_non_english(project: &Project) -> bool {
+    let text = extract_description_text(&project.description);
+    let blocks = extract_description_blocks(&project.description);
+    is_non_english_text(project, &text, &blocks)
+}
+
+fn is_non_english_text(
+    project: &Project,
+    text: &str,
+    blocks: &[String],
+) -> bool {
+    project_requires_english(project)
+        && js_string_length(text) >= MIN_DESCRIPTION_CHARS
+        && !has_sufficient_english_blocks(blocks)
 }
 
 fn has_description_spam(markdown: &str) -> bool {

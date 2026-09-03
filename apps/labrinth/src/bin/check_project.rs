@@ -8,13 +8,14 @@ use clap::Parser;
 use eyre::{Result, WrapErr, eyre};
 use labrinth::models::projects::{Project, Version};
 use labrinth::validate::project::{
-	ProjectNagKind, ProjectNagSeverity, validate,
+	ProjectNagKind, ProjectNagSeverity, is_project_description_non_english,
+	is_project_summary_non_english, validate,
 };
-use serde::{Deserialize, Serialize};
 use serde::de::{
 	DeserializeOwned, DeserializeSeed, IgnoredAny, MapAccess, SeqAccess,
 	Visitor,
 };
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use url::Url;
 
@@ -53,9 +54,13 @@ struct Args {
 	#[arg(long, value_name = "COUNT", default_value_t = 0, requires = "file")]
 	show_description_profanity: usize,
 
-	/// Print project IDs grouped by every triggered nag kind
+	/// Print project IDs triggering the summary language nag
 	#[arg(long, requires = "file")]
 	nag_project_ids: bool,
+
+	/// Print project IDs triggering the description language nag
+	#[arg(long, requires = "file", conflicts_with = "nag_project_ids")]
+	description_language_project_ids: bool,
 
 	/// Scan every profanity-bearing field into a reusable JSON report
 	#[arg(
@@ -168,7 +173,18 @@ async fn main() -> Result<()> {
 
 	if let Some(path) = args.file.as_deref() {
 		if args.nag_project_ids {
-			return print_json(&find_nag_project_ids(path)?);
+			return print_json(&find_language_project_ids(
+				path,
+				ProjectNagKind::ProjectSummaryNonEnglish,
+				is_project_summary_non_english,
+			)?);
+		}
+		if args.description_language_project_ids {
+			return print_json(&find_language_project_ids(
+				path,
+				ProjectNagKind::ProjectDescriptionNonEnglish,
+				is_project_description_non_english,
+			)?);
 		}
 		let summary = summarize_file(path, args.show_description_profanity)?;
 		print_description_profanity_samples(
@@ -190,23 +206,19 @@ struct ProjectDataset {
 	projects: Vec<Project>,
 }
 
-fn find_nag_project_ids(
+fn find_language_project_ids(
 	path: &Path,
+	kind: ProjectNagKind,
+	is_non_english: fn(&Project) -> bool,
 ) -> Result<BTreeMap<ProjectNagKind, Vec<String>>> {
 	let file = File::open(path)
 		.wrap_err_with(|| format!("opening `{}`", path.display()))?;
 	let dataset: ProjectDataset = serde_json::from_reader(BufReader::new(file))
 		.wrap_err_with(|| format!("reading `{}`", path.display()))?;
-	let mut project_ids = ProjectNagKind::iter()
-		.map(|kind| (kind, Vec::new()))
-		.collect::<BTreeMap<_, _>>();
+	let mut project_ids = BTreeMap::from([(kind, Vec::new())]);
 
 	for project in dataset.projects {
-		let kinds = validate(&project, &[])
-			.into_iter()
-			.map(|nag| nag.kind)
-			.collect::<std::collections::BTreeSet<_>>();
-		for kind in kinds {
+		if is_non_english(&project) {
 			project_ids
 				.entry(kind)
 				.or_default()

@@ -164,6 +164,14 @@ pub fn validate(project: &Project, versions: &[Version]) -> Vec<ProjectNag> {
     validate_inner(project, versions, None, None)
 }
 
+pub fn is_project_summary_non_english(project: &Project) -> bool {
+    summary::is_non_english(project)
+}
+
+pub fn is_project_description_non_english(project: &Project) -> bool {
+    description::is_non_english(project)
+}
+
 pub fn validate_with_context(
     project: &Project,
     versions: &[Version],

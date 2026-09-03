@@ -18,6 +18,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     let normalized_summary = normalize_project_field_text(summary);
     let summary_link = find_link_or_ip(summary);
     let contains_link = summary_link.is_some();
+    let has_spam = contains_spam(&normalized_summary);
     let profanity = profanity_matches(summary);
 
     if let Some(matched) = profanity
@@ -50,12 +51,12 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             ProjectNagSeverity::Required,
         ));
     }
-    if project_requires_english(project)
-        && js_string_length(&normalized_summary) >= MIN_SUMMARY_CHARS
-        && !contains_link
-        && !contains_spam(&normalized_summary)
-        && !is_likely_english_summary(&normalized_summary)
-    {
+    if requires_language_nag(
+        project,
+        &normalized_summary,
+        contains_link,
+        has_spam,
+    ) {
         nags.push(ProjectNag::new(
             ProjectNagKind::ProjectSummaryNonEnglish,
             ProjectNagSeverity::Required,
@@ -88,7 +89,7 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             })),
         );
     }
-    if contains_spam(&normalized_summary) {
+    if has_spam {
         nags.push(ProjectNag::new(
             ProjectNagKind::ProjectSummarySpam,
             ProjectNagSeverity::Required,
@@ -111,6 +112,28 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     }
 
     nags
+}
+
+pub(super) fn is_non_english(project: &Project) -> bool {
+    let normalized_summary = normalize_project_field_text(&project.summary);
+    is_non_english_text(project, &normalized_summary)
+}
+
+fn is_non_english_text(project: &Project, normalized_summary: &str) -> bool {
+    project_requires_english(project)
+        && js_string_length(normalized_summary) >= MIN_SUMMARY_CHARS
+        && !is_likely_english_summary(normalized_summary)
+}
+
+fn requires_language_nag(
+    project: &Project,
+    normalized_summary: &str,
+    contains_link: bool,
+    has_spam: bool,
+) -> bool {
+    is_non_english_text(project, normalized_summary)
+        && !contains_link
+        && !has_spam
 }
 
 fn summary_name_similarity(summary: &str, name: &str) -> f64 {

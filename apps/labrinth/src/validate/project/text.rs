@@ -14,6 +14,8 @@ use crate::models::projects::Project;
 
 static WORD: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"[\p{L}\p{M}\p{N}]+").unwrap());
+static NON_LATIN_LETTER: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"[\p{Alphabetic}&&[^\p{Latin}]]").unwrap());
 static SPAM_TOKEN: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"[\p{L}\p{M}\p{N}]+(?:['_\u{2019}.:+/-][\p{L}\p{M}\p{N}]+)*"#)
         .unwrap()
@@ -1102,13 +1104,18 @@ pub(super) fn project_requires_english(project: &Project) -> bool {
 }
 
 pub(super) fn is_likely_english_summary(text: &str) -> bool {
-    if !has_enough_language_content(text) {
+    let detection_text = normalize_language_text(text);
+    if has_dominant_non_latin_script(&detection_text) {
+        return false;
+    }
+
+    if !has_enough_language_content(&detection_text) {
         return true;
     }
 
     LANGUAGE_DETECTOR
-        .detect(text)
-        .is_none_or(|info| info.lang() == Lang::Eng || info.confidence() < 0.5)
+        .detect(&detection_text)
+        .is_none_or(|info| info.lang() == Lang::Eng || !info.is_reliable())
 }
 
 pub(super) fn has_sufficient_english_blocks(blocks: &[String]) -> bool {
@@ -1116,14 +1123,29 @@ pub(super) fn has_sufficient_english_blocks(blocks: &[String]) -> bool {
     let mut non_english_chunks = 0;
 
     for block in blocks {
-        for chunk in language_chunks(block) {
+        let detection_text = normalize_language_text(block);
+        if has_dominant_non_latin_script(&detection_text) {
+            non_english_chunks += 1;
+
+            let latin_text = NON_LATIN_LETTER.replace_all(&detection_text, " ");
+            if has_enough_language_content(&latin_text)
+                && LANGUAGE_DETECTOR
+                    .detect(&latin_text)
+                    .is_some_and(|info| info.lang() == Lang::Eng)
+            {
+                english_chunks += 1;
+            }
+            continue;
+        }
+
+        for chunk in language_chunks(&detection_text) {
             let Some(info) = LANGUAGE_DETECTOR.detect(&chunk) else {
                 continue;
             };
 
             if info.lang() == Lang::Eng {
                 english_chunks += 1;
-            } else if info.confidence() >= 0.8 {
+            } else if info.is_reliable() {
                 non_english_chunks += 1;
             }
         }
@@ -1131,6 +1153,22 @@ pub(super) fn has_sufficient_english_blocks(blocks: &[String]) -> bool {
 
     let classified_chunks = english_chunks + non_english_chunks;
     classified_chunks == 0 || english_chunks * 10 >= classified_chunks * 3
+}
+
+fn normalize_language_text(text: &str) -> String {
+    text.nfkc().collect()
+}
+
+fn has_dominant_non_latin_script(text: &str) -> bool {
+    const MIN_NON_LATIN_LETTERS: usize = 5;
+
+    let non_latin_letters = NON_LATIN_LETTER.find_iter(text).count();
+    let alphabetic_letters = text
+        .chars()
+        .filter(|character| character.is_alphabetic())
+        .count();
+    non_latin_letters >= MIN_NON_LATIN_LETTERS
+        && non_latin_letters * 2 >= alphabetic_letters
 }
 
 fn language_chunks(block: &str) -> Vec<String> {
