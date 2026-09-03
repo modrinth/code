@@ -3,7 +3,7 @@ use serde_json::json;
 use super::text::{ProfanityKind, has_non_standard_text, profanity_matches};
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
-const MAX_GALLERY_DESCRIPTION_PROFANITY_COUNT: usize = 2;
+const MAX_GALLERY_DESCRIPTION_PROFANITY_COUNT: usize = 0;
 
 fn validate_text(
     text: Option<&str>,

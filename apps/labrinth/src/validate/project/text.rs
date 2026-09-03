@@ -3,7 +3,6 @@ use std::sync::LazyLock;
 
 use linkify::{LinkFinder, LinkKind};
 use regex::Regex;
-use rustrict::{Censor, Type};
 use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::UnicodeSegmentation;
 use url::Url;
@@ -122,6 +121,25 @@ const SLUR_TERMS: &[&str] = &[
     "wetback",
 ];
 
+const PROFANITY_TERMS: &[&str] = &[
+    "asshole",
+    "bastard",
+    "bitch",
+    "bullshit",
+    "cum",
+    "cunt",
+    "douchebag",
+    "fck",
+    "fuck",
+    "incest",
+    "motherfucker",
+    "pussy",
+    "shit",
+    "slut",
+    "twat",
+    "whore",
+];
+
 pub(super) fn normalize_project_field_text(text: &str) -> String {
     text.trim().nfc().collect()
 }
@@ -132,16 +150,8 @@ pub(super) fn js_string_length(text: &str) -> usize {
 
 pub(super) fn profanity_matches(text: &str) -> Vec<ProfanityMatch> {
     let (prepared, raw_ranges) = prepare_profanity_text(text);
-    let mut spans = censored_spans(&prepared, profanity_types());
-    for span in censored_spans(&prepared, slur_types()) {
-        if spans.contains(&span) {
-            continue;
-        }
-        if raw_text_for_span(text, &raw_ranges, span).is_some_and(is_slur) {
-            spans.push(span);
-        }
-    }
-    spans.extend(frontend_slur_spans(&prepared));
+    let mut spans = term_spans(&prepared, PROFANITY_TERMS, false);
+    spans.extend(term_spans(&prepared, SLUR_TERMS, true));
     spans.sort_unstable_by(|left, right| {
         left.0.cmp(&right.0).then_with(|| right.1.cmp(&left.1))
     });
@@ -158,37 +168,11 @@ pub(super) fn profanity_matches(text: &str) -> Vec<ProfanityMatch> {
     matches
 }
 
-fn censored_spans(text: &str, threshold: Type) -> Vec<(usize, usize)> {
-    const CENSORED: char = '\0';
-
-    let mut censor = Censor::from_str(text);
-    censor
-        .with_ignore_self_censoring(true)
-        .with_censor_threshold(threshold)
-        .with_censor_first_character_threshold(threshold)
-        .with_censor_replacement(CENSORED);
-
-    let mut spans = Vec::new();
-    let mut start = None;
-    let mut character_count = 0;
-    for (index, character) in censor.censor().chars().enumerate() {
-        character_count = index + 1;
-        match (start, character == CENSORED) {
-            (None, true) => start = Some(index),
-            (Some(match_start), false) => {
-                spans.push((match_start, index));
-                start = None;
-            }
-            _ => {}
-        }
-    }
-    if let Some(start) = start {
-        spans.push((start, character_count));
-    }
-    spans
-}
-
-fn frontend_slur_spans(text: &str) -> Vec<(usize, usize)> {
+fn term_spans(
+    text: &str,
+    terms: &[&str],
+    match_repeated_letters: bool,
+) -> Vec<(usize, usize)> {
     let characters = text.chars().collect::<Vec<_>>();
     let mut spans = Vec::new();
 
@@ -197,11 +181,15 @@ fn frontend_slur_spans(text: &str) -> Vec<(usize, usize)> {
             continue;
         }
 
-        let end = SLUR_TERMS
+        let end = terms
             .iter()
             .flat_map(|term| {
                 [
-                    match_repeated_term(&characters, start, term),
+                    if match_repeated_letters {
+                        match_repeated_term(&characters, start, term)
+                    } else {
+                        match_exact_term(&characters, start, term)
+                    },
                     match_separated_term(&characters, start, term),
                 ]
             })
@@ -213,6 +201,22 @@ fn frontend_slur_spans(text: &str) -> Vec<(usize, usize)> {
     }
 
     spans
+}
+
+fn match_exact_term(
+    characters: &[char],
+    start: usize,
+    term: &str,
+) -> Option<usize> {
+    let mut input_index = start;
+    for expected in term.chars() {
+        if characters.get(input_index) != Some(&expected) {
+            return None;
+        }
+        input_index += 1;
+    }
+
+    is_whole_word_end(characters, input_index).then_some(input_index)
 }
 
 fn match_repeated_term(
@@ -329,7 +333,6 @@ fn push_profanity_match(
     if normalize_project_field_text(raw_text).to_lowercase() == "кооп" {
         return;
     }
-
     matches.push(ProfanityMatch {
         kind: if is_slur(raw_text) {
             ProfanityKind::Slur
@@ -424,14 +427,6 @@ fn is_invisible_separator(character: char) -> bool {
             (0xe0100, 0xe01ef),
         ],
     )
-}
-
-fn profanity_types() -> Type {
-    Type::PROFANE & Type::MODERATE_OR_HIGHER
-}
-
-fn slur_types() -> Type {
-    Type::OFFENSIVE & Type::MILD_OR_HIGHER
 }
 
 pub(super) fn has_non_standard_text(text: &str) -> bool {
