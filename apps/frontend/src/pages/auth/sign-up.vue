@@ -38,8 +38,8 @@ import SignUpView from '@/components/ui/auth/SignUp.vue'
 import {
 	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-	promotePendingSignInOAuthProvider,
-} from '@/composables/auth.ts'
+} from '@/composables/accounts.ts'
+import { promotePendingSignInOAuthProvider } from '@/composables/auth.ts'
 
 interface AuthGlobalsResponse {
 	captcha_enabled?: boolean
@@ -120,7 +120,7 @@ const showOtherOptions = ref(false)
 const isCreateAccountStep = ref(false)
 
 if (auth.value.user) {
-	await navigateTo('/dashboard')
+	await navigateTo(`/user/${auth.value.user.username}`)
 }
 
 const captcha = ref<{ reset?: () => void } | null>(null)
@@ -275,7 +275,7 @@ async function createAccount(accountConsent: boolean) {
 		if (route.query.redirect) {
 			await navigateTo(getQueryString(route.query.redirect))
 		} else {
-			await navigateTo('/dashboard')
+			await navigateTo(`/user/${username.value}`)
 		}
 	} catch (err) {
 		addNotification({

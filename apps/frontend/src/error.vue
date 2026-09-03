@@ -2,6 +2,7 @@
 	<NuxtLayout>
 		<LoadingBar />
 		<NotificationPanel />
+		<AccountSwitchOverlay :show="isSwitchingAccount" />
 		<div class="main">
 			<div v-if="is404" class="error-graphic">
 				<Logo404 />
@@ -32,15 +33,29 @@
 							{{ formatMessage(unauthorizedMessages.signedInAsLabel) }}
 						</p>
 						<div
-							class="flex items-center gap-2 rounded-2xl border border-solid border-surface-5 bg-surface-4 p-4"
+							class="flex items-center gap-2 rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4"
 						>
 							<Avatar :src="auth.user.avatar_url" size="32px" circle />
 							<span class="font-medium text-contrast">{{ auth.user.username }}</span>
+							<UserRoleIcon :role="auth.user.role" />
 
-							<Button type="quiet" color="red" native-type="button" class="ml-auto" @click="logout">
+							<Button
+								type="quiet"
+								color="red"
+								native-type="button"
+								class="ml-auto"
+								@click="signOut"
+							>
+								<LogOutIcon />
 								{{ formatMessage(commonMessages.signOutButton) }}
 							</Button>
 						</div>
+						<template v-if="otherAccounts.length">
+							<p class="m-0">
+								{{ formatMessage(unauthorizedMessages.switchAccountLabel) }}
+							</p>
+							<AccountChoiceList :accounts="otherAccounts" @select="onSelectStoredAccount" />
+						</template>
 					</template>
 					<template v-else>
 						<ButtonLink type="colored" color="brand" class="button-like w-fit" :to="signInRoute">
@@ -85,8 +100,10 @@
 </template>
 
 <script setup>
-import { AnnoyedRinthbot, LogInIcon, SadRinthbot } from '@modrinth/assets'
+import { AnnoyedRinthbot, LogInIcon, LogOutIcon, SadRinthbot } from '@modrinth/assets'
 import {
+	AccountChoiceList,
+	AccountSwitchOverlay,
 	Avatar,
 	Button,
 	ButtonLink,
@@ -97,18 +114,27 @@ import {
 	LoadingBar,
 	normalizeChildren,
 	NotificationPanel,
+	UserRoleIcon,
 	useVIntl,
 } from '@modrinth/ui'
 
 import Logo404 from '~/assets/images/404.svg'
+import {
+	hydrateStoredAccounts,
+	switchToSignedOut,
+	switchToStoredAccount,
+	useIsSwitchingAccount,
+	useStoredAccounts,
+} from '~/composables/accounts.ts'
 import { getSignInRouteObj } from '~/composables/auth.js'
-import { logout } from '~/composables/user.js'
 import { setupProviders } from '~/providers/setup.ts'
 
 const auth = await useAuth()
-setupProviders(auth)
+const { notificationManager } = setupProviders(auth)
 
 const { formatMessage } = useVIntl()
+const { addNotification } = notificationManager
+const isSwitchingAccount = useIsSwitchingAccount()
 
 const props = defineProps({
 	error: {
@@ -130,7 +156,39 @@ const unauthorizedMessages = defineMessages({
 		id: 'error.generic.401.signed-in-as',
 		defaultMessage: "You're currently signed in as:",
 	},
+	switchAccountLabel: {
+		id: 'error.generic.401.switch-account',
+		defaultMessage: 'Or switch to another account:',
+	},
+	accountSwitchFailed: {
+		id: 'error.generic.401.switch-account-failed',
+		defaultMessage: "Couldn't switch accounts. Please try again.",
+	},
 })
+
+const storedAccounts = useStoredAccounts()
+
+const otherAccounts = computed(() =>
+	storedAccounts.value.filter((account) => account.id !== auth.value.user?.id),
+)
+
+async function signOut() {
+	await switchToSignedOut()
+}
+
+async function onSelectStoredAccount(account) {
+	const result = await switchToStoredAccount(account)
+	if (result === 'error') {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: formatMessage(unauthorizedMessages.accountSwitchFailed),
+			type: 'error',
+		})
+	}
+}
+
+// error page replaces the app root, so hydrate here too
+onMounted(hydrateStoredAccounts)
 
 const signInRoute = computed(() => getSignInRouteObj(route))
 

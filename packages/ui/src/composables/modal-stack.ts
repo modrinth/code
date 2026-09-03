@@ -1,8 +1,23 @@
 import { computed, type Ref, ref } from 'vue'
 
 const isClient = typeof window !== 'undefined'
-const stack: symbol[] = []
-const stackSizeRef = ref(0)
+
+type ModalStackState = {
+	stack: symbol[]
+	stackSizeRef: Ref<number>
+}
+
+const MODAL_STACK_STATE_KEY = '__modrinth_ui_modal_stack_state__' as const
+const globalScope = globalThis as typeof globalThis & {
+	[MODAL_STACK_STATE_KEY]?: ModalStackState
+}
+const modalStackState: ModalStackState = globalScope[MODAL_STACK_STATE_KEY] ?? {
+	stack: [],
+	stackSizeRef: ref(0),
+}
+globalScope[MODAL_STACK_STATE_KEY] = modalStackState
+
+const { stack, stackSizeRef } = modalStackState
 
 export function useModalStack() {
 	const id = Symbol()

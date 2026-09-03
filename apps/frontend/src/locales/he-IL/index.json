@@ -5,8 +5,14 @@
   "action.continue": {
     "message": "המשך"
   },
-  "admin.billing.error.not-found": {
-    "message": "משתמש לא קיים"
+  "ads-consent.accept": {
+    "message": "אשר הכול"
+  },
+  "ads-consent.manage": {
+    "message": "ניהול העדפות"
+  },
+  "ads-consent.reject": {
+    "message": "דחיית כל השינויים"
   },
   "analytics.action.add": {
     "message": "לְהוֹסִיף"
@@ -14,8 +20,38 @@
   "analytics.action.cancel": {
     "message": "ביטול"
   },
+  "analytics.action.reset": {
+    "message": "איפוס"
+  },
+  "analytics.breakdown.country": {
+    "message": "מדינה"
+  },
+  "analytics.breakdown.download-reason": {
+    "message": "סיבת ההורדה"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "גרסת משחק"
+  },
+  "analytics.breakdown.members": {
+    "message": "חבר"
+  },
+  "analytics.breakdown.monetization": {
+    "message": "ייצור הכנסות"
+  },
   "analytics.breakdown.project": {
     "message": "פּרוֹיֶקט"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "מצב הפרוייקט"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "גרסת פרויקט"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "להציג הכול"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "לרואת טופ 8"
   },
   "analytics.chart.axis.playtime-hours": {
     "message": "{hours} שעות"
@@ -1408,9 +1444,6 @@
   },
   "layout.action.file-lookup": {
     "message": "חיפוש קבצים"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "חיפוש על ידי אימייל"
   },
   "layout.action.manage-affiliates": {
     "message": "נהל את קישורי השותפים"

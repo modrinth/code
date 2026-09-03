@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { PlayIcon, PlusIcon } from '@modrinth/assets'
-import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { ContextMenu, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, inject, onActivated, ref } from 'vue'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import LibrarySection from '@/components/ui/library/index.vue'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
-import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { toError } from '@/helpers/errors'
-import { list } from '@/helpers/instance'
-import type { GameInstance } from '@/helpers/types'
+import { instanceListQueryOptions } from '@/pages/instance/query-options'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
 
@@ -20,8 +17,8 @@ defineOptions({
 	name: 'LibraryPage',
 })
 
-const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const { handleError } = injectNotificationManager()
 const { hasCreatedInstance, isReady } = injectOnboardingChecklist()
 const showCreationModal = inject<() => void>('showCreationModal')
 const pageOptions = ref<InstanceType<typeof ContextMenu>>()
@@ -36,6 +33,10 @@ const messages = defineMessages({
 		id: 'app.library.context-menu.create-instance',
 		defaultMessage: 'New instance',
 	},
+	libraryActionsLabel: {
+		id: 'app.library.actions.label',
+		defaultMessage: 'Library actions',
+	},
 })
 
 const homeBreadcrumb = useRootBreadcrumb({
@@ -47,35 +48,17 @@ const homeBreadcrumb = useRootBreadcrumb({
 })
 onActivated(homeBreadcrumb.reset)
 
-const instances = ref<GameInstance[]>([])
-let latestInstanceFetch = 0
+const instancesQuery = useQuery(instanceListQueryOptions())
+const instances = computed(() => instancesQuery.data.value ?? [])
+if (hasCreatedInstance.value) {
+	await instancesQuery.suspense().catch(handleError)
+}
 
 const recentInstances = computed(() =>
 	instances.value
 		.slice()
 		.sort((a, b) => dayjs(b.last_played ?? b.created).diff(dayjs(a.last_played ?? a.created))),
 )
-
-async function fetchInstances() {
-	const fetchId = ++latestInstanceFetch
-	try {
-		const nextInstances = await list()
-		if (fetchId === latestInstanceFetch) {
-			instances.value = nextInstances
-		}
-	} catch (error: unknown) {
-		if (fetchId === latestInstanceFetch) {
-			handleError(toError(error))
-		}
-	}
-}
-
-if (hasCreatedInstance.value) {
-	await fetchInstances()
-}
-
-useAppEvent('instance', fetchInstances)
-useAppEvent('instance_groups_changed', fetchInstances)
 
 function openPageContextMenu(event: MouseEvent) {
 	if (
@@ -87,13 +70,14 @@ function openPageContextMenu(event: MouseEvent) {
 
 	event.preventDefault()
 	event.stopPropagation()
-	pageOptions.value?.showMenu(event, {}, [{ name: 'new_instance' }])
-}
-
-function handlePageOption({ option }: { option: string }) {
-	if (option === 'new_instance') {
-		showCreationModal?.()
-	}
+	pageOptions.value?.open(event, [
+		{
+			id: 'new_instance',
+			label: formatMessage(messages.newInstance),
+			icon: PlusIcon,
+			action: () => showCreationModal?.(),
+		},
+	])
 }
 </script>
 
@@ -110,8 +94,6 @@ function handlePageOption({ option }: { option: string }) {
 			:recent-instances="recentInstances"
 		/>
 		<LibrarySection :instances="instances" />
-		<ContextMenu ref="pageOptions" @option-clicked="handlePageOption">
-			<template #new_instance> <PlusIcon /> {{ formatMessage(messages.newInstance) }} </template>
-		</ContextMenu>
+		<ContextMenu ref="pageOptions" :label="formatMessage(messages.libraryActionsLabel)" />
 	</div>
 </template>

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\t\tINSERT INTO processes\n\t\t\t\t\t(pid, start_time, name, executable, instance_id,\n\t\t\t\t\t post_exit_command)\n\t\t\t\tVALUES (?, ?, ?, ?, ?, ?)\n\t\t\t\tON CONFLICT(pid) DO UPDATE SET\n\t\t\t\t\tstart_time = excluded.start_time,\n\t\t\t\t\tname = excluded.name,\n\t\t\t\t\texecutable = excluded.executable,\n\t\t\t\t\tinstance_id = excluded.instance_id,\n\t\t\t\t\tpost_exit_command = excluded.post_exit_command\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "8aa89bfd90dba93d7ae2274f0b1e591e1a305966ffaa84fbc2e15cccc98854aa"
+}

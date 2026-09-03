@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Tải xuống"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Ẩn các lượt tải xuống đang hoạt động"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Đóng các phiên bản đang chạy"
   },
@@ -19,6 +22,9 @@
   },
   "app.action-bar.install.dismiss": {
     "message": "Bỏ qua"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Xem phiên bản"
   },
   "app.action-bar.install.retry": {
     "message": "Thử lại"
@@ -46,6 +52,9 @@
   },
   "app.action-bar.install.summary.download-failed": {
     "message": "Không hoàn tất tải xuống"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Không tìm thấy phiên bản"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Đường dẫn tệp tin không hợp lệ"
@@ -83,6 +92,9 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Instance không rõ"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Đang cập nhật nội dung được chia sẻ"
+  },
   "app.action-bar.installs": {
     "message": "Cài đặt"
   },
@@ -100,6 +112,9 @@
   },
   "app.action-bar.reload-to-update": {
     "message": "Tải lại để cập nhật"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Hiển thị các lượt tải xuống đang hoạt động"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Hiện thêm các phiên bản đang chạy"
@@ -134,6 +149,12 @@
   "app.ads-consent.title": {
     "message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Hiển thị thư viện phiên bản theo bố cục hàng nhỏ gọn."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Chế độ nhỏ gọn"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Trang chủ"
   },
@@ -141,28 +162,43 @@
     "message": "Thư viện"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Tắt hiển thị thẻ tên phía trên người chơi ở trang skin."
+    "message": "Ẩn tên người dùng của bạn phía trên phần xem trước nhân vật tại trang chọn giao diện skin."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ẩn thẻ tên"
   },
+  "app.appearance-settings.jump-back-into-worlds.description": {
+    "message": "Hiển thị các thế giới hoặc phiên chơi gần đây trong mục \"Jump in\" trên trang chủ."
+  },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Tiếp tục chơi"
+    "message": "Bước vào các thế giới hoặc các khu vực riêng biệt"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Thu nhỏ launcher khi game Minecraft bắt đầu chạy."
+    "message": "Thu nhỏ ứng dụng Modrinth khi Minecraft khởi động."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Thu nhỏ launcher"
+    "message": "Thu nhỏ ứng dụng"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Hiển thị thời gian bạn đã dành để chơi bằng một cấu hình."
+    "message": "Hiển thị thời gian bạn đã chơi mỗi phiên."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Hiện thời gian chơi"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Bỏ qua bước xác nhận đối với các thao tác ít rủi ro như cài đặt lại, xóa nội dung thông thường, cập nhật hàng loạt, hủy liên kết và sửa chữa. Các cảnh báo cho những thao tác nguy hiểm sẽ luôn được hiển thị."
+  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Bỏ qua các cảnh báo không quan trọng"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Ẩn thanh bên phải theo mặc định và thêm nút để hiển thị hoặc ẩn nó."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Ẩn thanh bên"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Hiển thị cảnh báo an toàn trước khi cài đặt một gói Modrinth (.mrpack) không được lưu trữ trên Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Cảnh báo tôi trước khi cài đặt các modpacks không rõ nguồn gốc"
@@ -172,6 +208,21 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Không thể kết nối đến máy chủ xác thực"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Các xác nhận"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Khởi động và điều hướng"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Sử dụng các cài đặt hành vi này ở mọi nơi bạn đăng nhập. Hãy tắt tùy chọn này nếu muốn duy trì các cài đặt riêng cho thiết bị này."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Đăng nhập vào tài khoản Modrinth để đồng bộ hóa cài đặt."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Đồng bộ hóa hành vi trên các thiết bị"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Thêm máy chủ vào phiên bản"
@@ -194,6 +245,9 @@
   "app.browse.back-to-instance": {
     "message": "Quay lại phiên bản"
   },
+  "app.browse.discover-project-type": {
+    "message": "Khám phá {projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "Khám phá máy chủ"
   },
@@ -204,7 +258,7 @@
     "message": "Modpack"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Thêm nội dung có thể gây lỗi tương thích khi tham gia máy chủ. Bất kỳ nội dung nào được thêm vào cũng sẽ bị mất khi bạn cập nhật nội dung của phiên bản máy chủ."
+    "message": "Việc thêm nội dung có thể khiến bạn không thể tham gia máy chủ này. Mọi nội dung bạn thêm vào sẽ bị xóa khi nội dung do máy chủ quản lý được cập nhật."
   },
   "app.browse.server.installing": {
     "message": "Đang cài đặt"
@@ -217,6 +271,9 @@
   },
   "app.export-modal.export-button": {
     "message": "Xuất"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} đã được xuất thành công."
   },
   "app.export-modal.header": {
     "message": "Xuất modpack"
@@ -232,6 +289,42 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "Phiên bản này đã bị khóa"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Chưa từng chơi"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "Tham gia ngay"
+  },
+  "app.hosting.update-required.description": {
+    "message": "Bạn cần cập nhật để sử dụng Modrinth Hosting thông qua ứng dụng Modrinth"
+  },
+  "app.hosting.update-required.download": {
+    "message": "Tải xuống để cập nhật"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Yêu cầu cập nhật ứng dụng Modrinth"
+  },
+  "app.icon-editor.apply-icons-modal.apply-error": {
+    "message": "Không thể áp dụng các biểu tượng ngẫu nhiên cho các thực thể."
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "Điểm mới trong bản cập nhật này"
+  },
+  "app.icon-editor.apply-icons-modal.description": {
+    "message": "Tạo biểu tượng tùy chỉnh cho các instance của bạn ngay trong ứng dụng Modrinth. Hãy kết hợp các hình nền với những biểu tượng từ Minecraft và các bản mod phổ biến!"
+  },
+  "app.icon-editor.apply-icons-modal.title": {
+    "message": "Trình chỉnh sửa biểu tượng tùy chỉnh"
+  },
+  "app.icon-editor.notification.description": {
+    "message": "Tùy chỉnh các instance của bạn!"
+  },
+  "app.icon-editor.notification.title": {
+    "message": "Trình chỉnh sửa biểu tượng mới"
   },
   "app.install.phase.downloading_content": {
     "message": "Đang tải nội dung"
@@ -266,17 +359,35 @@
   "app.install.phase.preparing_java.resolving": {
     "message": "Đang chuẩn bị Java {version}"
   },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Xem lại các thay đổi"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "Đang xem xét..."
+  },
+  "app.instance.card.loading": {
+    "message": "Đang tải phiên bản..."
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Tất cả dữ liệu trong gói hồ sơ này sẽ bị xoá, bao gồm thế giới của bạn, cấu hình, và tất cả nội dung đã được tải xuống."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Hành động này sẽ không thể huỷ bỏ"
   },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "Tất cả dữ liệu của {count} phiên bản này sẽ bị xóa vĩnh viễn, bao gồm thế giới, cấu hình và toàn bộ nội dung đã cài đặt."
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "Xóa {count} mục"
+  },
   "app.instance.confirm-delete.delete-button": {
     "message": "Xoá hồ sơ"
   },
   "app.instance.confirm-delete.header": {
     "message": "Xoá hồ sơ"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "Nội dung được chia sẻ"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "Gói modpack này đã được cài đặt trong hồ sơ <bold>{instanceName}</bold> rồi. Bạn có chắc chắn muốn sao chép nó không?"
@@ -290,8 +401,23 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Hồ sơ"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Đang tải xuống {current, number}/{total, number} dự án..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Đang hoàn tất cập nhật..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Đang xác định các phiên bản..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "Dự án"
+  },
+  "app.instance.mods.freeze-content": {
+    "message": "Phiên bản cố định"
+  },
+  "app.instance.mods.locked-content": {
+    "message": "Không thể thay đổi nội dung trong các instance bị khóa."
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" đã được thêm"
@@ -307,6 +433,33 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Tải lên thành công"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "Hủy đóng băng phiên bản"
+  },
+  "app.instance.share.empty.description": {
+    "message": "Bạn có thể chia sẻ phiên bản này với bạn bè của mình!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Không có bạn để mời"
+  },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Phiên bản này đã đạt đến giới hạn {limit} người dùng."
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "Bạn cần đăng nhập với tư cách là"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "để truy cập trang này."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "tài khoản được liên kết"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Sai tài khoản"
+  },
+  "app.instance.share.members.empty": {
+    "message": "Chưa có người dùng nào tham gia"
   },
   "app.instance.worlds.add-server": {
     "message": "Thêm máy chủ"
@@ -554,9 +707,6 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
-  "app.skins.sign-in.button": {
-    "message": "Đăng nhập"
-  },
   "app.skins.title": {
     "message": "Đổi skin"
   },
@@ -788,12 +938,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Chọn kênh cập nhật"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Khởi chạy Hooks"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hooks khởi chạy tuỳ biến"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooks cho phép người dùng nâng cao chạy câu lệnh hệ thống trước và sau khi chạy game."
   },
@@ -832,9 +976,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Phiên bản {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java và bộ nhớ"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Tùy chọn biến môi trường"

@@ -47,6 +47,12 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Оставьте ключевые теги"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Предупредите о важных особенностях проекта, заполнив маркировку контента."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Проверьте маркировку"
+  },
   "nags.description-too-short.description": {
     "defaultMessage": "Описание содержит {length, plural, one {# читаемый символ} few {# читаемых символа} other {# читаемых символов}}. Для ясного и информативного описания рекомендуется не менее {minChars, plural, one {# символа} other {# символов}}."
   },
@@ -156,7 +162,7 @@
     "defaultMessage": "Предоставьте подтверждение на включение стороннего контента в свою сборку."
   },
   "nags.review-permissions.title": {
-    "defaultMessage": "Укажите атрибуции"
+    "defaultMessage": "Укажите авторство"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Настройте поддерживаемые версии, выберите сборку или добавьте собственную."
@@ -194,6 +200,9 @@
   "nags.settings.description.title": {
     "defaultMessage": "Настроить описание"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Настроить маркировку"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Настроить лицензию"
   },
@@ -201,13 +210,16 @@
     "defaultMessage": "Настроить ссылки"
   },
   "nags.settings.permissions.title": {
-    "defaultMessage": "Перейти к атрибуциям"
+    "defaultMessage": "Настроить авторство"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Настроить теги"
   },
   "nags.settings.title": {
     "defaultMessage": "Перейти в настройки"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Настроить версии"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Сводка не может совпадать с названием проекта. Сделайте её понятной и интересной."

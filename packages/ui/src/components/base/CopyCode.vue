@@ -1,17 +1,17 @@
 <template>
 	<button
-		class="!m-0 inline-flex w-fit select-text items-center gap-2 rounded-[10px] bg-[var(--color-button-bg)] px-2 py-1 font-mono text-sm text-primary transition-[opacity,filter,transform,outline] duration-200 ease-in-out hover:brightness-[1.25] active:scale-95 active:brightness-[0.8] motion-reduce:transition-none [&>svg]:h-[1em] [&>svg]:w-[1em]"
+		class="rounded-lg border border-solid border-surface-5 bg-surface-2 text-xs !m-0 inline-flex w-fit select-text items-center gap-2 px-2 py-1 font-mono text-primary transition-[opacity,filter,transform,outline] duration-200 ease-in-out hover:brightness-[1.25] active:scale-95 motion-reduce:transition-none [&>svg]:h-[1em] [&>svg]:w-[1em]"
 		:title="formatMessage(copiedMessage)"
 		@click="copyText"
 	>
 		<span>{{ displayText ?? text }}</span>
 		<CheckIcon v-if="copied" />
-		<ClipboardCopyIcon v-else />
+		<CopyIcon v-else />
 	</button>
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, ClipboardCopyIcon } from '@modrinth/assets'
+import { CheckIcon, CopyIcon } from '@modrinth/assets'
 import { onBeforeUnmount, ref } from 'vue'
 
 import { defineMessage, useVIntl } from '../../composables/i18n'

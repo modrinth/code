@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "ダウンロード"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "進行中のダウンロードを非表示"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "実行中のインスタンスの一部を非表示"
   },
@@ -110,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "再読み込みしてアップデート"
   },
+  "app.action-bar.show-downloads": {
+    "message": "進行中のダウンロードを表示"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "実行中のインスタンスをさらに表示"
   },
@@ -132,7 +138,7 @@
     "message": "すべて受け入れる"
   },
   "app.ads-consent.body": {
-    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬も広告収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。"
+    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。"
   },
   "app.ads-consent.manage": {
     "message": "設定の管理"
@@ -154,12 +160,6 @@
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "ネームタグを非表示にする"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "ホーム画面の「Jump back in」セクションに、最近プレイしたワールドを表示します。"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "最近のワールドを表示"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minecraftを起動したときにランチャーを最小化します。"
@@ -239,11 +239,23 @@
   "app.browse.hide-installed-modpacks": {
     "message": "インストール済みを非表示"
   },
+  "app.browse.project-type.data-packs": {
+    "message": "データパック"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modパック"
   },
-  "app.browse.server-instance-content-warning": {
-    "message": "コンテンツを追加すると、サーバーに参加する際に互換性が失われる可能性があります。また、追加されたコンテンツはインスタンスのコンテンツをアップデートした際に失われます。"
+  "app.browse.project-type.mods": {
+    "message": "モッド"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "リソースパック"
+  },
+  "app.browse.project-type.servers": {
+    "message": "サーバー"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "シェーダー"
   },
   "app.browse.server.installing": {
     "message": "インストール中"
@@ -271,6 +283,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "閉じる"
   },
   "app.install.phase.downloading_content": {
     "message": "コンテンツをダウンロード中"
@@ -326,6 +341,12 @@
   "app.install.phase.running_loader_processors": {
     "message": "ローダーのプロセッサーを実行中"
   },
+  "app.instance.add-server.add": {
+    "message": "追加"
+  },
+  "app.instance.add-server.cancel": {
+    "message": "キャンセル"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "追加済"
   },
@@ -356,11 +377,17 @@
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "審査中…"
   },
+  "app.instance.card.repair": {
+    "message": "修復"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "インスタンス内のすべてのデータは、ワールド、設定、インストール済みのコンテンツを含め、完全に削除されます。"
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "この操作は取り消せません"
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "{count}個のインスタンスを削除"
   },
   "app.instance.confirm-delete.delete-button": {
     "message": "インスタンスを削除"
@@ -620,6 +647,9 @@
   "app.java-selector.test-installation": {
     "message": "Javaのインストールをテスト"
   },
+  "app.library.group.move-up": {
+    "message": "グループを上に移動"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "追加のコンテンツ"
   },
@@ -681,7 +711,7 @@
     "message": "サポートに関するお問い合わせは、<support-link>サポートチーム</support-link>までご連絡ください。バグの報告は、<github-link>GitHubのIssue</github-link>を作成してください。"
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "ファイル形式（.mrpackを含む）に関わらず、Modrinthに公開されているファイルのみが審査の対象となります。"
+    "message": "追加するファイルはModrinthの認証を受けていません"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共有インスタンス"
@@ -745,9 +775,6 @@
   },
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Modrinthアカウントにサインイン"
-  },
-  "app.nav.signed-in-as": {
-    "message": "<user>{username}</user>としてサインイン中"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+にアップグレード"
@@ -885,7 +912,7 @@
     "message": "MacOS"
   },
   "app.settings.privacy.ads-consent.intro": {
-    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬も広告収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。この機能は下のボタンから個別に拒否や許可または変更することができます。"
+    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。この機能は下のボタンから個別に拒否や許可または変更することができます。"
   },
   "app.settings.privacy.discord-rich-presence.description": {
     "message": "Discordの現在のプレイ中に Modrinth App を表示します。これはModによってインスタンスに追加されるRich Presenceには影響しません。適用にはアプリの再起動が必要です。"
@@ -961,9 +988,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "動作"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "デフォルトのゲーム設定"
   },
   "app.settings.tabs.java-installations": {
     "message": "Javaのインストール設定"
@@ -1117,9 +1141,6 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "タイニー・テイクオーバー"
-  },
-  "app.skins.sign-in.button": {
-    "message": "サイン審"
   },
   "app.skins.title": {
     "message": "スキンセレクター"
@@ -1353,10 +1374,10 @@
     "message": "インスタンスの設定"
   },
   "instance.action.starting": {
-    "message": "起動中…"
+    "message": "プレイ"
   },
   "instance.action.stopping": {
-    "message": "停止中…"
+    "message": "停止"
   },
   "instance.add-server.add-and-play": {
     "message": "追加してプレイ"
@@ -1399,6 +1420,138 @@
   },
   "instance.files.save-as": {
     "message": "名前をつけて保存…"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "リュック"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "ビーコン"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "本棚"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "ケーキ"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "焚き火"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "チェスト"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "歯車"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "コマンドブロック"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "鍋"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "ソファー"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "作業台"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "レンチ"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "クリーパー"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "エンチャントテーブル"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "エンダーチェスト"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "エンダードラゴン"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "エンジン"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "かまど"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "地球儀"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "草ブロック"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "ランタン"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "ムーブルーム"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "宝玉"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "酸素分配機"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "パンケーキ"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "ツルハシ"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "モンスターボール"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "レッドストーンブロック"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "スカルクセンサー"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "スケルトン"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "フライパン"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "スライムブロック"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "宇宙ヘルメット"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "粘着ピストン"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "剣"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "小さなポテト"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "タイヤ"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "ゾンビ"
   },
   "instance.locked.delete-button": {
     "message": "インスタンスを削除"
@@ -1526,12 +1679,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "アップデートチャンネルを選択"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "起動フック"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "カスタム起動フック"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "フックを使用して、ゲームの起動前後にシステムコマンドを実行するようにできます。"
   },
@@ -1594,9 +1741,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "このインスタンスがロックされている間は、インストール設定を利用できません。"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Javaとメモリ"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "カスタム環境変数"

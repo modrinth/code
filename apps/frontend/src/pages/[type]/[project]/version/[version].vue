@@ -89,12 +89,11 @@
 			@download="emit('onDownload')"
 		/>
 		<div class="flex flex-col">
-			<nuxt-link
-				class="mb-4 flex w-fit items-center gap-2 rounded-lg px-2 py-0.5 pl-0 text-link"
+			<BackToParentLink
 				:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
 			>
-				<ChevronLeftIcon class="shrink-0" /> {{ formatMessage(messages.allVersions) }}
-			</nuxt-link>
+				{{ formatMessage(messages.allVersions) }}
+			</BackToParentLink>
 			<template v-if="version">
 				<Admonition
 					v-if="version.files_missing_attribution?.length"
@@ -151,14 +150,12 @@
 								modSettings.get(moderationSettings.General.SlicerButtonInVersions)
 							"
 							v-tooltip="`Open in Slicer`"
-							type="quiet"
 							target="_blank"
 							:href="`https://slicer.run/?url=${encodeURIComponent(primaryFile?.url)}`"
-							class="!bg-button-bg"
 							aria-label="Open in Slicer"
 						>
 							<ExternalIcon aria-hidden="true" />
-							Open
+							Slicer
 						</ButtonLink>
 						<ButtonLink
 							v-for="file in promotedFiles.filter(
@@ -521,6 +518,7 @@ import {
 import { moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
+	BackToParentLink,
 	Button,
 	ButtonLink,
 	Collapsible,

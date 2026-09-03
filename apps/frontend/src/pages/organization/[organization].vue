@@ -15,7 +15,7 @@
 						class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
 					>
 						<div class="flex items-center gap-4">
-							<Avatar size="sm" :src="organization.icon_url" />
+							<Avatar size="sm" :src="organization.icon_url" :raw-src="organization.raw_icon_url" />
 							<div class="flex flex-col justify-center gap-1">
 								<h2 class="m-0 text-base">
 									<nuxt-link :to="`/organization/${organization.slug}`">
@@ -126,7 +126,7 @@
 				<ProjectList
 					v-if="projects && projects.length > 0"
 					:projects="displayedProjects"
-					:show-status="showProjectStatus"
+					:show-status="canSeeProjectStatus"
 				/>
 				<div v-else-if="true" class="error">
 					<UpToDate class="icon" />
@@ -215,7 +215,6 @@ const messages = defineMessages({
 const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
-const user = await useUser()
 const cosmetics = useCosmetics()
 const route = useNativeRoute()
 const router = useRouter()
@@ -233,6 +232,7 @@ if (route.path.includes('settings')) {
 
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
+useFavicon(() => (routeHasSettings.value ? 'settings' : 'default'))
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -320,10 +320,6 @@ const displayedProjects = computed(() =>
 		.sort(projectUserSorting),
 )
 
-const showProjectStatus = computed(
-	() => !!(auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))),
-)
-
 const sumDownloads = computed(() => {
 	let sum = 0
 
@@ -357,6 +353,22 @@ provideOrganizationContext(organizationContext)
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
 
+const authUserId = computed(() => auth.value?.user?.id as string | undefined)
+const viewerProjectsQuery = useQuery({
+	queryKey: computed(() => ['user', authUserId.value, 'projects']),
+	queryFn: () => client.labrinth.users_v3.getProjects(authUserId.value!),
+	enabled: computed(() => !!authUserId.value && !!organization.value && !currentMember.value),
+	staleTime: 30_000,
+})
+const viewerMemberProjectIds = computed(
+	() => new Set((viewerProjectsQuery.data.value ?? []).map((project) => project.id)),
+)
+
+function canSeeProjectStatus(project: ProjectV3) {
+	if (currentMember.value) return true
+	return viewerMemberProjectIds.value.has(project.id)
+}
+
 watch(
 	[routeHasSettings, acceptedMembers, currentMember],
 	() => {
@@ -384,7 +396,7 @@ watch(
 				description,
 				ogTitle: title,
 				ogDescription: org.description,
-				ogImage: org.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png',
+				ogImage: org.icon_url ?? 'https://cdn.modrinth.com/placeholder-square.png',
 				ogUrl: canonicalUrl,
 			})
 			useHead({

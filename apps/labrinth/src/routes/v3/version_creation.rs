@@ -923,7 +923,7 @@ pub async fn upload_file(
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
 
-    if other_file_names.contains(&format!("{file_name}.{file_extension}")) {
+    if other_file_names.iter().any(|name| name == file_name) {
         return Err(CreateError::InvalidInput(
             "Duplicate files are not allowed to be uploaded to Modrinth!"
                 .to_string(),

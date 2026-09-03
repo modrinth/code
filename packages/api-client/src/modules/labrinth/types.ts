@@ -869,6 +869,7 @@ export namespace Labrinth {
 				id: string
 				name: string
 				icon_url: string | null
+				raw_icon_url: string | null
 				max_scopes: number
 				redirect_uris: OAuthRedirectUri[]
 				created_by: string
@@ -1002,6 +1003,7 @@ export namespace Labrinth {
 				loaders: string[]
 				versions: string[]
 				icon_url?: string
+				raw_icon_url?: string
 				issues_url?: string
 				source_url?: string
 				wiki_url?: string
@@ -1145,6 +1147,7 @@ export namespace Labrinth {
 				mrpack_loaders: string[]
 				versions: string[]
 				icon_url?: string
+				raw_icon_url?: string
 				link_urls: Record<string, Link>
 				gallery: GalleryItem[]
 				color?: number
@@ -1264,6 +1267,7 @@ export namespace Labrinth {
 				team_id: string
 				description: string
 				icon_url: string | null
+				raw_icon_url: string | null
 				color: number | null
 				members: TeamMember[]
 			}
@@ -1387,6 +1391,7 @@ export namespace Labrinth {
 				team_id: string
 				description: string
 				icon_url: string | null
+				raw_icon_url: string | null
 				color: number | null
 				members: Projects.v3.TeamMember[]
 				moderation_notes?: Users.Common.ModerationNote | null
@@ -1727,6 +1732,7 @@ export namespace Labrinth {
 				compact_instance_cards: boolean
 				show_play_time: boolean
 				hide_nametag: boolean
+				show_all_screenshots: boolean
 				warn_on_unknown_modpacks: boolean
 				skip_non_essential_warnings: boolean
 			}
@@ -2297,6 +2303,7 @@ export namespace Labrinth {
 			name: string
 			description: string | null
 			icon_url: string | null
+			raw_icon_url: string | null
 			color: number | null
 			status: CollectionStatus
 			created: string
@@ -2407,6 +2414,126 @@ export namespace Labrinth {
 
 	export namespace TechReview {
 		export namespace Internal {
+			export type DelphiRule = {
+				id: number
+				name: string
+				rule: string
+				priority: number
+				on_issue_types: string[]
+				revision: number
+				current_revision?: number
+				created_at: string
+				updated_at: string
+				created_by: number | null
+				updated_by: number | null
+				affected_details_count: number
+				affected_details: DelphiRuleAffectedDetail[]
+			}
+
+			export type DelphiRuleAffectedDetail = {
+				detail_id: string
+				issue_id: string
+				project_id: string | null
+				project_name: string | null
+				project_icon_url: string | null
+				version_id: string | null
+				version_name: string | null
+				version_number: string | null
+				issue_type: string
+				key: string
+				jar: string | null
+				file_path: string
+				original_severity: DelphiSeverity
+				severity: DelphiSeverity
+			}
+
+			export type GetRuleAffectedDetailsRequest = {
+				limit?: number
+				page?: number
+			}
+
+			export type GetRuleAffectedDetailsResponse = {
+				total: number
+				details: DelphiRuleAffectedDetail[]
+			}
+
+			export type WriteDelphiRule = {
+				name: string
+				rule: string
+				priority: number
+				on_issue_types: string[]
+			}
+
+			export type DelphiIssueTypeSchemaResponse = Record<string, unknown>
+
+			export type TestDelphiRuleRequest = {
+				rule: string
+				inputs: RuleInput[]
+			}
+
+			export type DelphiRuleEffect = {
+				severity: DelphiSeverity
+			}
+
+			export type DelphiRuleSchema = Record<string, unknown>
+
+			export type DelphiRuleSchemaResponse = {
+				input: DelphiRuleSchema
+				output: DelphiRuleSchema
+				components: Record<string, DelphiRuleSchema>
+			}
+
+			export type RuleInput = {
+				schema_version: number
+				trace: RuleTrace
+				file_traces: RuleTrace[]
+				scan: {
+					delphi_version: number
+				}
+				artifact: {
+					size: number | null
+					hashes: Record<string, string>
+				}
+				project: {
+					id: string | null
+					types: string[]
+				}
+				version: {
+					id: string | null
+					loaders: string[]
+				}
+				file: {
+					id: string | null
+				}
+			}
+
+			export type RuleTrace = {
+				key: string
+				issue_type: string
+				severity: DelphiSeverity
+				jar: string | null
+				file_path: string
+				data: Record<string, unknown>
+			}
+
+			export type TestDelphiRuleResponse = {
+				effects: Array<DelphiRuleEffect | null>
+			}
+
+			export type DelphiRuleScanPhase = 'scanning' | 'publishing' | 'complete'
+
+			export type DelphiRuleScanEvent = {
+				phase: DelphiRuleScanPhase
+				revision: number
+				scanned: number
+				total: number
+				effects: number
+			}
+
+			export type DelphiRuleScanErrorEvent = {
+				message: string
+			}
+
 			export type SearchProjectsRequest = {
 				limit?: number
 				page?: number
@@ -2516,6 +2643,7 @@ export namespace Labrinth {
 
 			export type VersionReport = {
 				version_id: string
+				version_number?: string
 				files: FileReport[]
 			}
 
@@ -2529,6 +2657,10 @@ export namespace Labrinth {
 				file_size: number
 				download_url: string
 				issues: FileIssue[]
+			}
+
+			export type GetIssueRequest = {
+				include_hidden?: boolean
 			}
 
 			export type FileIssue = {
@@ -2652,7 +2784,7 @@ export namespace Labrinth {
 
 			export type FlagReason = 'delphi'
 
-			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
+			export type DelphiSeverity = 'hidden' | 'low' | 'medium' | 'high' | 'severe' | 'malware'
 
 			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
 

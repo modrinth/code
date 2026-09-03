@@ -14,11 +14,11 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectPageContext } from '#ui/providers/page-context'
@@ -44,7 +44,7 @@ interface Props {
 	enableToggle?: boolean
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string | null
-	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
+	getOverflowOptions?: (item: ContentItem) => ButtonMenuOption[]
 	switchVersion?: (item: ContentItem) => void
 	showEnvironmentWarnings?: boolean
 }
@@ -493,7 +493,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 		</template>
 		<div class="flex flex-col h-[min(600px,calc(95vh-10rem))]">
 			<div class="flex flex-col gap-4 px-6 py-4 border-b border-solid border-0 border-surface-4">
-				<StyledInput
+				<Input
 					v-model="searchQuery"
 					:icon="SearchIcon"
 					:placeholder="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"

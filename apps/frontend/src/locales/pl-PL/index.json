@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Kontynuuj"
   },
-  "admin.billing.error.not-found": {
-    "message": "Nie znaleziono użytkownika"
-  },
   "ads-consent.accept": {
     "message": "Zaakceptuj wszystko"
   },
@@ -1024,9 +1021,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Zatwierdź z odpowiedzią "
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Zamknij wątek"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Zamknij z odpowiedzią"
@@ -2645,9 +2639,6 @@
   "layout.action.file-lookup": {
     "message": "Wyszukiwarka plików"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Szukaj po e-mailu"
-  },
   "layout.action.manage-affiliates": {
     "message": "Zarządzaj linkami afiliacyjnymi"
   },
@@ -2843,8 +2834,14 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
   },
   "layout.footer.unknown-commit": {
     "message": "nieznany"
@@ -2968,6 +2965,12 @@
   },
   "modpack-scan-modal.delete-all-groups-confirmation.description": {
     "message": "Trwale usunie to wszystkie grupy atrybucji i wszystkie zawarte w nich pliki. Tej akcji nie można cofnąć."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Nie udało się wyczyścić wszystkich grup: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Wszystkie grupy zostały wyczyszczone pomyślnie."
   },
   "modpack-scan-modal.failed": {
     "message": "Błąd"
@@ -3299,8 +3302,17 @@
   "organization.project-transfer.name-column": {
     "message": "Nazwa"
   },
+  "organization.project-transfer.no-projects-available": {
+    "message": "Brak dostępnych projektów do przeniesienia."
+  },
   "organization.project-transfer.project-icon-alt": {
     "message": "Ikona {name}"
+  },
+  "organization.project-transfer.title": {
+    "message": "Przenieś projekt"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "Zainstaluj {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
   },
   "organization.project-transfer.type-column": {
     "message": "Rodzaj"
@@ -3422,6 +3434,9 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.checking-modpack-archives": {
+    "message": "Sprawdzanie..."
+  },
   "project.actions.create-server": {
     "message": "Utwórz serwer"
   },
@@ -3433,6 +3448,9 @@
   },
   "project.actions.edit-project": {
     "message": "Edytuj projekt"
+  },
+  "project.actions.project-page": {
+    "message": "Strona projektu"
   },
   "project.actions.rescan-modpack": {
     "message": "Ponownie skanuj paczkę modów"
@@ -3710,6 +3728,78 @@
   "project.notification.updated.title": {
     "message": "Projekt zaktualizowany"
   },
+  "project.settings.danger-zone": {
+    "message": "Strefa ryzyka"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Usuń projekt"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Trwale usuń projekt"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "Czy na pewno chcesz usunąć ten projekt?"
+  },
+  "project.settings.delete-project.title": {
+    "message": "Usuń projekt"
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "np. automatycznie dodaje serwer SMP Modrinth do listy serwerów."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Zawiera reklamy"
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "np. chińskie i arabskie tłumaczenia zostały wygenerowane przez sztuczną inteligencję."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "Zawiera treści wygenerowane przez sztuczną inteligencję"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "W jaki sposób użyto sztucznej inteligencji?"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Przykładowy projekt"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Wyjaśnij, jak Twój projekt jest oparty na oryginalnej pracy"
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "Ostatnio zaktualizowano dnia {date} przez {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "Moderator"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Zawiera płatne funkcje"
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Opisz zewnętrzne interakcje z systemem"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "np. dodaje do pulpitu plik o nazwie wake_up.txt"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "Zewnętrzne interakcje z systemem"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "Jaki jest model zgody na telemetrię?"
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "Jakie dane są zbierane?"
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "Musisz to włączyć, jeśli Twój projekt wysyła dane użytkowania z powrotem do siebie lub do osoby trzeciej."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Zawiera telemetrię"
+  },
+  "project.settings.editing-project": {
+    "message": "Edytowanie projektu: {projectType}"
+  },
   "project.settings.general.name.description": {
     "message": "Unikaj przedrostków, przyrostków, wtrąceń lub dodatkowych opisów — używaj tylko rzeczywistej nazwy projektu."
   },
@@ -3755,6 +3845,9 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.monetization.title": {
+    "message": "Monetyzacja"
+  },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Prosimy o dostarczenie dowodu, że posiadasz pozwolenie na rozpowszechnianie wszystkich poniższych plików. Po dostarczeniu dowodu wszelkie wstrzymane wersje zostaną automatycznie opublikowane."
   },
@@ -3784,6 +3877,15 @@
   },
   "project.settings.permissions.delete-all-groups-confirmation.description": {
     "message": "Trwale usunie to {count, plural, one {# grupę atrybucji} few {wszystkie # grupy atrybucji} other {wszystkie # grup atrybucji}} i wszystkie zawarte w nich pliki. Tej akcji nie można cofnąć."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Usunąć wszystkie grupy przypisów?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Nie można usunąć wszystkich grup przypisów"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "Wszystkie grupy przypisów zostały usunięte."
   },
   "project.settings.permissions.empty-state.description": {
     "message": "Żadne z wersji Twojego projektu nie zawierają zewnętrznej zawartości, więc nie musisz martwić się o uzyskanie zezwoleń."
@@ -3836,6 +3938,9 @@
   "project.settings.server.bedrock-address-label": {
     "message": "Adres Bedrock"
   },
+  "project.settings.server.cannot-save-text": {
+    "message": "Serwer Java musi być osiągalny przed zapisywaniem. Upewnij się, że ping się uda."
+  },
   "project.settings.server.cannot-save-title": {
     "message": "Nie udało się zapisać"
   },
@@ -3872,17 +3977,53 @@
   "project.settings.server.server-online": {
     "message": "Serwer jest online!"
   },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "Wybrałeś wszystkie dostępne {count} tagi . Proszę wybrać tylko tagi, które naprawdę odnoszą się do projektu."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "Wybierz wszystkie kategorie, które odzwierciedlają motywy lub funkcje Twojego {type}."
+  },
   "project.settings.tags.featured-tags": {
     "message": "Wyróżnione tagi"
+  },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Musisz mieć co najmniej jeden polecany tag."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Wybierz najważniejsze tagi. Są one wyświetlane przed resztą tagów."
   },
   "project.settings.tags.features-description": {
     "message": "Wszystkie funkcjonalności, których używa {type}"
   },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} kategorie} other {Kategorie}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} funkcje} other {Funkcje}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {{types} wydajność wpływa na} other {Efekty}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} rozdzielczości} other {Rozdzielczości}}"
+  },
   "project.settings.tags.resolutions-description": {
     "message": "Rozdzielczość tekstur, którą ma {type}."
   },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Wybierz co najmniej jedną kategorię, aby móc korzystać z kategorii."
+  },
   "project.settings.tags.title": {
     "message": "Tagi"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "Wybrałeś {count} tagów. Rozważ zmniejszenie ich do 8 lub mniej, aby Twój serwer był konkretny i łatwiejszy do odkrycia."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "Wybrałeś {count} tagów. Rozważ zmniejszenie ich do 18 lub mniej, aby Twój serwer był konkretny i łatwiejszy do odkrycia."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "Wybrałeś {count} tagów. Rozważ zmniejszenie ich do 12 lub mniej, aby Twój serwer był konkretny i łatwiejszy do odkrycia."
   },
   "project.versions.copy-id-option": {
     "message": "Kopiuj ID"

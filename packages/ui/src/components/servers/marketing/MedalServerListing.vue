@@ -26,7 +26,7 @@
 				v-if="isDisabled"
 				class="relative z-10 flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 			>
-				<Avatar src="https://cdn-raw.modrinth.com/medal_icon.webp" size="64px" class="opacity-50" />
+				<Avatar src="https://cdn.modrinth.com/medal_icon.webp" size="64px" class="opacity-50" />
 				<SpinnerIcon
 					v-if="isUpgrading"
 					class="size-8 animate-spin absolute text-contrast"
@@ -34,7 +34,7 @@
 				/>
 				<LockIcon v-else class="size-8 absolute" :class="{ 'opacity-50': isDisabled }" />
 			</div>
-			<Avatar v-else src="https://cdn-raw.modrinth.com/medal_icon.webp" size="64px" class="z-10" />
+			<Avatar v-else src="https://cdn.modrinth.com/medal_icon.webp" size="64px" class="z-10" />
 			<div class="z-10 ml-4 flex min-w-0 flex-col gap-1.5">
 				<div class="flex flex-row items-center gap-2.5">
 					<h2

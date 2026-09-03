@@ -18,7 +18,7 @@
 				{{ formatMessage(messages.yourAffiliateLinks) }}
 			</h1>
 			<div class="flex items-center gap-2">
-				<StyledInput
+				<Input
 					v-model="filterQuery"
 					:icon="SearchIcon"
 					type="text"
@@ -66,7 +66,7 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	StyledInput,
+	Input,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'

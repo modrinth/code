@@ -5,8 +5,20 @@
   "action.continue": {
     "message": "Continuar"
   },
-  "admin.billing.error.not-found": {
-    "message": "Utilizador não encontrado"
+  "ads-consent.accept": {
+    "message": "Aceitar todos"
+  },
+  "ads-consent.body": {
+    "message": "Os anúncios tornam o Modrinth possível e financiam os criadores de projetos. Os nossos parceiros podem armazenar ou aceder a cookies no site para personalizar a publicidade e analisar o seu desempenho."
+  },
+  "ads-consent.manage": {
+    "message": "Gerir preferências"
+  },
+  "ads-consent.reject": {
+    "message": "Rejeitar tudo"
+  },
+  "ads-consent.title": {
+    "message": "A tua privacidade e como os anúncios suportam o Modrinth"
   },
   "analytics.action.add": {
     "message": "Adicionar"
@@ -96,7 +108,7 @@
     "message": "Controlos do gráfico de estatísticas"
   },
   "analytics.chart.controls.display": {
-    "message": "Visualização"
+    "message": "Exibição"
   },
   "analytics.chart.controls.modrinth-events": {
     "message": "Eventos do Modrinth"
@@ -176,6 +188,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Ocultar {name} no gráfico"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Sem dados"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Dica do gráfico fixada"
   },
@@ -236,6 +251,9 @@
   "analytics.empty.select-project": {
     "message": "Seleciona pelo menos um projeto para veres os dados"
   },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Projetos dependentes falharam ao carregar"
+  },
   "analytics.filter.game-version-type": {
     "message": "Tipo de versão do jogo"
   },
@@ -276,10 +294,10 @@
     "message": "Visualização ao longo do tempo"
   },
   "analytics.group-by.1h": {
-    "message": "1 h"
+    "message": "1h"
   },
   "analytics.group-by.6h": {
-    "message": "6 h"
+    "message": "6h"
   },
   "analytics.group-by.date": {
     "message": "Data"
@@ -426,7 +444,7 @@
     "message": "${value}"
   },
   "analytics.stat.unavailable": {
-    "message": "N/D"
+    "message": "N/A"
   },
   "analytics.stat.unavailable-tooltip": {
     "message": "Estatística indisponível para a consulta atual"
@@ -517,6 +535,9 @@
   },
   "analytics.value.unknown": {
     "message": "Desconhecido"
+  },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "Não há metadados para determinar a que projeto dependente corresponde este download."
   },
   "analytics.value.unmonetized": {
     "message": "Não monetizado"
@@ -764,6 +785,39 @@
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Seleciona a tua data de nascimento"
   },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Por favor, insere a tua data de nascimento para continuar."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Data de nascimento requerida"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Não cumpres os requisitos de idade para criar uma conta no Modrinth."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Código-fonte relevante"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Não armazenamos a tua data de nascimento. Aprnas a usamos durante o registo para validar a conformidade com a COPPA."
+  },
+  "auth.create-account.page-title": {
+    "message": "Criar conta"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Verificação de segurança"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Mantém-me atualizado por e-mail sobre as coisas bacanas em que o Modrinth está a trabalhar"
+  },
+  "auth.create-account.title": {
+    "message": "Criar uma conta"
+  },
+  "auth.create-account.username.label": {
+    "message": "Nome de utilizador"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Insere o nome de utilizador"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Enviar e-mail de recuperação"
   },
@@ -797,14 +851,53 @@
   "auth.reset-password.title.long": {
     "message": "Redefine a tua palavra-passe"
   },
+  "auth.sign-in.2fa.description": {
+    "message": "Insere o código de 6 dígitos da tua app de autenticação ou um dos teus códigos de recuperação."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Autenticação de dois fatores"
+  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Inserir código..."
+  },
+  "auth.sign-in.continue-with-email": {
+    "message": "Continuar com e-mail"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Continuar com palavra-passe"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Registar"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Esqueci-me da palavra-passe"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Última sessão"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Não tens uma conta?"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Iniciar sessão no Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sessão"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Requisito de idade"
+  },
+  "auth.sign-up.continue-with-email": {
+    "message": "Continuar com e-mail"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ao criares uma conta, concordas com os <terms-link>Termos</terms-link> e com a <privacy-policy-link>Política de Privacidade </privacy-policy-link> do Modrinth."
+  },
+  "auth.sign-up.show-fewer-options": {
+    "message": "Mostrar menos opções"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Mostrar outras opções"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Já tens uma conta?"
@@ -812,8 +905,14 @@
   "auth.sign-up.title": {
     "message": "Criar conta"
   },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Criar uma conta"
+  },
   "auth.verify-email.action.account-settings": {
     "message": "Definições de conta"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Descobrir mods"
   },
   "auth.verify-email.already-verified.description": {
     "message": "O teu e-mail já foi verificado!"
@@ -833,6 +932,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "Falha na verificação do e-mail"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "Foi enviado um e-mail para {email} com um link para verificar a tua conta."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "E-mail enviado"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Ocorreu um erro"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "O teu endereço de e-mail foi verificado com sucesso!"
   },
@@ -841,6 +949,12 @@
   },
   "auth.verify-email.title": {
     "message": "Verificar E-mail"
+  },
+  "collection.aria-label.upload-icon": {
+    "message": "Carregar ícone"
+  },
+  "collection.button.discover-mods": {
+    "message": "Descobrir mods"
   },
   "collection.button.edit-icon": {
     "message": "Editar ícone"
@@ -902,8 +1016,119 @@
   "collection.title": {
     "message": "{name} - Coleção"
   },
+  "conversation-thread.action.add-private-note": {
+    "message": "Adicionar nota privada"
+  },
+  "conversation-thread.action.approve": {
+    "message": "Aprovar"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Aprovar com comentário"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Fechar com comentário"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Rejeitar"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Rejeitar com comentário"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Reabrir tópico"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Responder"
+  },
+  "conversation-thread.action.reply-to-thread": {
+    "message": "Responder ao tópico"
+  },
+  "conversation-thread.action.resubmit-for-review": {
+    "message": "Reenviar para revisão"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Reenviar para revisão com comentário"
+  },
+  "conversation-thread.action.send": {
+    "message": "Enviar"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Enviar para revisão"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Enviar para revisão com comentário"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Definir como rascunho"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Definir como rascunho com comentário"
+  },
+  "conversation-thread.action.withhold": {
+    "message": "Reter"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Reter com comentário"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Este tópico está fechado e não aceita novas mensagens."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Erro ao fechar relatório"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Erro ao reabrir relatório"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Erro ao enviar mensagem"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Os ficheiros suplementares destinam-se a recursos de apoio, como código-fonte, e não a versões alternativas ou variantes"
+  },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Detalhes"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Ficheiros"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadados"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "O ficheiro principal é o ficheiro predefinido que um utilizador transfere quando instala o projeto."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Ficheiro principal"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "Opcionalmente, podes adicionar ficheiros adicionais, como código-fonte, documentação ou pacotes de recursos necessários."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Ficheiros adicionais"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Carregar ficheiro adicional"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Carregar ficheiro"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Carregar ficheiros principal e adicionais"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Arrasta e solta os ficheiros ou clica para procurar"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Ficheiros"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Editar"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Ficheiros"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Ficheiros carregados"
   },
   "create.collection.collection-info": {
     "message": "A tua nova coleção vai ser criada como uma coleção pública {count, plural,=0 {sem projetos}one {com # projeto}other {com # projetos}}."
@@ -1082,6 +1307,9 @@
   "dashboard.collections.long-title": {
     "message": "As tuas coleções"
   },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Nome (A-Z)"
+  },
   "dashboard.collections.sort.recently-created": {
     "message": "Criado recentemente"
   },
@@ -1114,6 +1342,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Formulário de imposto"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "Não completaste a declaração fiscal. Por favor, tenta novamente."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Declaração fiscal incompleta"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth usa o provedor externo Track1099 para recolher e armazenar os teus formulários de imposto com segurança. <security-link>Sabe mais aqui.</security-link>"
@@ -1154,6 +1388,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Entidade empresarial"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Selecionar data de nascimento"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Uma entidade empresarial refere-se a uma organização registada tais como uma corporação, parceria, ou LLC."
   },
@@ -1162,6 +1399,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Indivíduo privado"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Procurar países..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Procurar subdivisões..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Seleciona o teu país"
@@ -1236,7 +1479,7 @@
     "message": "Rede"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "Estás próximo de atingir o limite de levantamento. Podes levantar <b>{amountRemaining}</b> agora, mas é necessário um formulário de imposto para levantar mais."
+    "message": "Estás próximo de atingir o limite de levantamento. Podes levantar <b>{amountRemaining}</b> agora, mas é necessária uma declaração fiscal para levantar mais."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Conta"
@@ -1275,16 +1518,16 @@
     "message": "Método"
   },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
-    "message": "Formulário de imposto"
+    "message": "Declaração fiscal"
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body": {
-    "message": "Para levantar a totalidade do saldo disponível de <b>{available}</b>, preencha o formulário abaixo. Este é necessário para reporte fiscal e apenas precisa de ser feito uma vez."
+    "message": "Para levantar a totalidade do saldo disponível de <b>{available}</b>, preenche o formulário abaixo. Este é necessário para relatório fiscal e apenas precisa de ser feito uma vez."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Deve preencher um formulário W-9 ou W-8 para os registos fiscais da Modrinth, para garantirmos a conformidade com a regulamentação fiscal"
+    "message": "Deves preencher um formulário W-9 ou W-8 para os registos fiscais do Modrinth, para garantirmos a conformidade com a lei tributária."
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
-    "message": "Formulário fiscal obrigatório"
+    "message": "Declaração fiscal necessária"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
     "message": "Denominações disponíveis"
@@ -1297,6 +1540,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Introduza o valor"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "O valor mínimo é {min}, que excede o teu saldo de {balance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "Precisas de pelo menos {min} para usar este cartão presente."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Método de pagamento"
@@ -1340,14 +1589,71 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Já utilizou o seu limite de levantamento de <b>{withdrawLimit}</b>. Deve preencher um formulário fiscal para levantar mais."
   },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Transferências"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Criador"
+  },
+  "dashboard.head-title": {
+    "message": "Painel de Controlo"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "Não tens notificações por ler."
+  },
   "dashboard.notifications.link.see-all": {
     "message": "Ver tudo"
   },
   "dashboard.notifications.link.view-history": {
     "message": "Ver histórico de notificações"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Ver mais {extraNotifs} {extraNotifs, plural,one {notificação} other {notificações}}"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Criar organização"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Cria uma organização!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Falha ao procurar organizações"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural,one {membro} other {membros}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizações"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Marcar tudo como lido"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Ver histórico"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Não tens notificações por ler."
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Histórico"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Histórico de notificações"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "A carregar notificações..."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Projetos de servidor não suportam edição em massa"
+  },
+  "dashboard.projects.empty": {
+    "message": "Ainda não tens nenhum projeto. Clica no botão verde acima para começar."
+  },
   "dashboard.projects.head-title": {
     "message": "Projetos"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "e mais {count}..."
   },
   "dashboard.projects.links.button.clear-link": {
     "message": "Limpar link"
@@ -1355,14 +1661,29 @@
   "dashboard.projects.links.button.edit": {
     "message": "Editar links"
   },
+  "dashboard.projects.links.changes-applied": {
+    "message": "As alterações serão aplicadas a <strong>{count}</strong> {count, plural,one {projeto} other {projetos}}."
+  },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Convite do Discord"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "Um local para utilizadores reportarem erros, problemas e preocupações sobre o teu projeto."
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "A página/repositório que contém o código-fonte do teu projeto"
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Código-fonte"
   },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "A página que contém informação, documentação, e ajuda para o projeto"
+  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Página da Wiki"
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Ícone para {title}"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -1407,7 +1728,7 @@
     "message": "Levantado"
   },
   "dashboard.revenue.tos": {
-    "message": "Ao enviar projetos para a Modrinth e levantar dinheiro da sua conta, concorda com os nossos Termos do <terms-link>Programa de Recompensas</terms-link>. Saiba mais sobre o <info-link>Programa de Recompensas</info-link>."
+    "message": "Ao carregares projetos para o Modrinth e levantares dinheiro da tua conta, concordas com os nossos <terms-link>Termos do Programa de Recompensas</terms-link>. Sabe mais sobre o <info-link>Programa de Recompensas</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Transferir como CSV"
@@ -1430,6 +1751,9 @@
   "dashboard.revenue.transactions.see-all": {
     "message": "Ver todas"
   },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Todos os anos"
+  },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Os seus levantamentos estão temporariamente bloqueados porque o seu TIN ou SSN não corresponde aos registos do IRS. Por favor, contacte o apoio ao cliente para reiniciar e submeter novamente o seu formulário fiscal."
   },
@@ -1444,6 +1768,9 @@
   },
   "dashboard.sidebar.label.creators": {
     "message": "Criadores"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Painel de controlo"
   },
   "dashboard.sidebar.label.notifications": {
     "message": "Notificações"
@@ -1543,6 +1870,12 @@
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Por favor, preencha o formulário fiscal"
+  },
+  "discover.install.back-to-server": {
+    "message": "Voltar ao servidor"
+  },
+  "discover.install.cancel-reset": {
+    "message": "Cancelar reinício"
   },
   "error.collection.404.list_item.1": {
     "message": "Podes ter inserido incorretamente o URL da coleção."
@@ -1752,7 +2085,7 @@
     "message": "Gestor de ficheiros fácil de usar"
   },
   "hosting-marketing.included.file-manager.description": {
-    "message": "Procura, gere, edita, e envia ficheiros diretamente para o teu servidor facilmente."
+    "message": "Procura, gere, edita, e carrega ficheiros diretamente para o teu servidor facilmente."
   },
   "hosting-marketing.included.heading": {
     "message": "Vem com todos os recursos de que precisas."
@@ -1788,7 +2121,10 @@
     "message": "Saber mais"
   },
   "hosting-marketing.medal.text-secondary": {
-    "message": "Oferta de tempo limitado. Cartão de crédito não necessário. Disponível para servidores EUA."
+    "message": "Oferta por tempo limitado. Não requer cartão de crédito. Disponível para servidores nos EUA."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Produto inválido"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "Escolhe um plano personalizado apenas com as especificações de que precisas."
@@ -1866,7 +2202,7 @@
     "message": "Visibilidade"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Integra o Minotaur nas tuas ferramentas de build para que os carregamentos sejam automáticos logo ao lançares uma nova versão"
+    "message": "Integra o Minotaur nas tuas ferramentas de compilação para carregares uma nova versão do teu projeto automaticamente"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Ecossistema diverso"
@@ -1981,9 +2317,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Pesquisa de ficheiros"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Pesquisa por e-mail"
   },
   "layout.action.manage-affiliates": {
     "message": "Gerir links de afiliado"
@@ -2298,7 +2631,7 @@
     "message": "Cartão de residência / Documento de residente"
   },
   "muralpay.document-type.ruc": {
-    "message": "RUC"
+    "message": "NIF"
   },
   "muralpay.document-type.tax-id": {
     "message": "Número de identificação fiscal"
@@ -2495,6 +2828,15 @@
   "muralpay.warning.wallet-address": {
     "message": "Confirme o endereço da carteira. Fundos enviados para um endereço errado não podem ser recuperados."
   },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Nome"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Tipo"
+  },
   "project-member-header.error-decline": {
     "message": "Falha a rejeitar o convite de equipa"
   },
@@ -2690,6 +3032,9 @@
   "project.gallery.title": {
     "message": "Galeria"
   },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>Agradecemos a sua paciência enquanto os nossos moderadores trabalham duro para manter o Modrinth seguro, e esperamos ajudá-lo a compartilhar o seu conteúdo! 💚</emphasis>"
+  },
   "project.moderation.title": {
     "message": "Moderação"
   },
@@ -2707,6 +3052,9 @@
   },
   "project.notification.updated.title": {
     "message": "Projeto atualizado"
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Ficheiros carregados para este projeto que são usados ativamente em Modpacks hospedados no Modrinth podem continuar a existir."
   },
   "project.settings.general.name.description": {
     "message": "Evita prefixos, sufixos, parênteses ou descrições adicionais—usa apenas o nome real do projeto."
@@ -2752,6 +3100,18 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.tags.title": {
+    "message": "Marcadores"
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "Selecionaste {count} marcadores. Considera reduzir para 12 ou menos para manter o foco do servidor e torná-lo mais fácil de descobrir."
+  },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "Carrega versões antes de adicionar marcadores"
+  },
+  "project.versions.share-option": {
+    "message": "Partilhar"
   },
   "project.versions.title": {
     "message": "Versões"
@@ -3131,6 +3491,9 @@
   "servers.plan.small.description": {
     "message": "Perfeito para 1 a 5 amigos com alguns mods leves."
   },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ mês{interval, select, monthly {} other {, cobrado {interval, select, quarterly {trimestralmente} yearly {anualmente} other {{interval}}}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Completar configuração"
   },
@@ -3253,6 +3616,9 @@
   },
   "settings.account.security.email.title": {
     "message": "E-mail"
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Nome"
   },
   "settings.account.security.password.action.add": {
     "message": "Adicionar palavra-passe"
@@ -3701,6 +4067,12 @@
   "settings.sidebar.label.display": {
     "message": "Visual"
   },
+  "shared-instance.invite.accept": {
+    "message": "Aceitar convite"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Um utilizador Modrinth"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "As notícias mais recentes do Modrinth"
   },
@@ -3715,6 +4087,12 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Subscrever a newsletter do Modrinth"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Pacote de recursos necessário"
+  },
+  "version.edit.button": {
+    "message": "Editar"
   },
   "version.environment.none.description": {
     "message": "O ambiente para esta versão não foi especificado."

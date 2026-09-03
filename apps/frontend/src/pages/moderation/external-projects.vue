@@ -2,13 +2,13 @@
 	<NewModal ref="editModal" header="Edit external project">
 		<form class="flex flex-col gap-2" @submit.prevent="saveExternalProjectEdit">
 			<label class="font-semibold text-contrast" for="edit-form-title">Title</label>
-			<StyledInput id="edit-form-title" v-model="editForm.title" type="text" />
+			<Input id="edit-form-title" v-model="editForm.title" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-link">Link</label>
-			<StyledInput id="edit-form-link" v-model="editForm.link" type="text" />
+			<Input id="edit-form-link" v-model="editForm.link" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-cf-id">
 				CurseForge project ID
 			</label>
-			<StyledInput id="edit-form-cf-id" v-model="editForm.flameProjectId" type="text" />
+			<Input id="edit-form-cf-id" v-model="editForm.flameProjectId" type="text" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-status">Allowed?</label>
 			<Combobox
 				id="edit-form-status"
@@ -17,22 +17,13 @@
 				class="!w-full"
 			/>
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-proof">Proof</label>
-			<StyledInput
-				id="edit-form-proof"
-				v-model="editForm.proof"
-				type="text"
-				multiline
-				resize="both"
-				class="w-[30rem]"
-			/>
+			<Textarea id="edit-form-proof" v-model="editForm.proof" resize="both" class="w-[30rem]" />
 			<label class="mt-2 font-semibold text-contrast" for="edit-form-exceptions">
 				Exceptions / notes
 			</label>
-			<StyledInput
+			<Textarea
 				id="edit-form-exceptions"
 				v-model="editForm.exceptions"
-				type="text"
-				multiline
 				resize="both"
 				class="w-[30rem]"
 			/>
@@ -45,25 +36,26 @@
 		</form>
 	</NewModal>
 	<div>
-		<form class="flex gap-2" @submit.prevent="executeSearch">
-			<StyledInput
+		<form class="flex items-center gap-2" @submit.prevent="executeSearch">
+			<Input
 				v-model="query"
 				:icon="SearchIcon"
 				type="text"
 				autocomplete="off"
 				placeholder="Search external projects..."
 				clearable
-				wrapper-class="flex-1 w-full"
+				size="medium"
+				wrapper-class="min-w-0 flex-1"
 			/>
-			<Button type="colored" color="brand" native-type="submit">
+			<Button type="colored" color="brand" size="lg" native-type="submit">
 				<SearchIcon aria-hidden="true" />
 				Search by title
 			</Button>
-			<Button native-type="button" @click="executeFlameIdLookup">
+			<Button size="lg" native-type="button" @click="executeFlameIdLookup">
 				<BinaryIcon aria-hidden="true" />
 				Lookup CurseForge ID
 			</Button>
-			<Button native-type="button" @click="executeSha1Lookup">
+			<Button size="lg" native-type="button" @click="executeSha1Lookup">
 				<HashIcon aria-hidden="true" />
 				Lookup SHA-1
 			</Button>
@@ -127,8 +119,9 @@ import {
 	externalProjectLicenseStatusMessages,
 	ExternalProjectLookupCard,
 	injectModrinthClient,
+	Input,
 	NewModal,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 

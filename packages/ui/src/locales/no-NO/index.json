@@ -413,6 +413,15 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Prosjektnavn"
   },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Nyeste først"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Eldste først"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sorter etter {mode}"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "Oppdater alle"
   },
@@ -437,9 +446,6 @@
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Søk etter spillversjon..."
   },
-  "creation-flow.modal.custom-setup.icon.select": {
-    "defaultMessage": "Velg ikon"
-  },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Nyeste"
   },
@@ -457,6 +463,12 @@
   },
   "creation-flow.modal.import-instance.search.placeholder": {
     "defaultMessage": "Søk etter instansnavn"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Ingen resultater funnet"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Søk etter modpakke"
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# fil} other {# filer}} valgt"
@@ -2210,9 +2222,6 @@
   "servers.list-empty.new-server-button": {
     "defaultMessage": "Ny server"
   },
-  "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Logg inn"
-  },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Ditt abonnement ble kansellert."
   },
@@ -2326,9 +2335,6 @@
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Mørk"
-  },
-  "settings.display.theme.description": {
-    "defaultMessage": "Velg ditt foretrukne fargetema for Modrinth på denne enheten."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Lys"
@@ -2739,3 +2745,4 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
+

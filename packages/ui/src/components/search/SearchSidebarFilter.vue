@@ -79,109 +79,131 @@
 				:loading="loading"
 				:refreshing="refreshing"
 			/>
-			<template v-if="filterType.display !== 'depends-on-project'">
-				<StyledInput
-					v-if="filterType.searchable"
-					:id="`search-${filterType.id}`"
-					v-model="query"
-					:icon="SearchIcon"
-					type="text"
-					:placeholder="formatMessage(messages.searchPlaceholder)"
-					autocomplete="off"
-					clearable
-					input-class="!bg-button-bg"
-					wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
-				/>
-				<ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">
-					<div :class="innerPanelClass ? innerPanelClass : ''" class="flex flex-col gap-1">
-						<template v-if="groupedOptions">
-							<SearchFilterGroup
-								v-for="[groupName, options] in groupedOptions"
-								:key="`${filterType.id}-group-${groupName}`"
-								:group-name="groupName"
-								:options="options"
-								:supports="filterType.supports"
-								:included="isIncluded"
-								:excluded="isExcluded"
-								@toggle="toggleFilter"
-								@toggle-exclude="toggleNegativeFilter"
-							/>
-						</template>
-						<template v-else>
-							<template v-for="option in visibleOptions" :key="`${filterType.id}-${option.id}`">
-								<SearchFilterOption
-									:option="option"
-									:included="isIncluded(option)"
-									:excluded="isExcluded(option)"
+			<template v-else>
+				<div
+					v-if="filterType.display === 'toggle'"
+					:class="innerPanelClass ? innerPanelClass : ''"
+					class="flex flex-col gap-3"
+				>
+					<label
+						v-for="option in filterType.options"
+						:key="`${filterType.id}-toggle-${option.id}`"
+						class="flex cursor-pointer items-center justify-between text-secondary gap-3 font-semibold"
+					>
+						<span class="text-sm">{{ option.formatted_name ?? option.id }}</span>
+						<Toggle
+							:model-value="isExcluded(option)"
+							small
+							class="shrink-0"
+							@update:model-value="toggleNegativeFilter(option)"
+						/>
+					</label>
+				</div>
+				<template v-else>
+					<Input
+						v-if="filterType.searchable"
+						:id="`search-${filterType.id}`"
+						v-model="query"
+						:icon="SearchIcon"
+						type="text"
+						:placeholder="formatMessage(messages.searchPlaceholder)"
+						autocomplete="off"
+						clearable
+						size="small"
+						appearance="button"
+						wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
+					/>
+					<ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">
+						<div :class="innerPanelClass ? innerPanelClass : ''" class="flex flex-col gap-1">
+							<template v-if="groupedOptions">
+								<SearchFilterGroup
+									v-for="[groupName, options] in groupedOptions"
+									:key="`${filterType.id}-group-${groupName}`"
+									:group-name="groupName"
+									:options="options"
 									:supports="filterType.supports"
-									:has-sub-options="!!option.sub_options?.length"
-									:expanded="isExpanded(option)"
-									:class="{
-										'mr-3': scrollable,
-									}"
+									:included="isIncluded"
+									:excluded="isExcluded"
 									@toggle="toggleFilter"
 									@toggle-exclude="toggleNegativeFilter"
-									@toggle-expand="toggleExpand(option)"
-								>
-									<slot name="option" :filter="filterType" :option="option">
-										<span
-											v-if="option.icon"
-											class="inline-flex items-center justify-center shrink-0 h-4 w-4"
-											:style="iconStyle(option)"
-										>
-											<div
-												v-if="typeof option.icon === 'string'"
-												class="h-4 w-4"
-												v-html="option.icon"
-											/>
-											<component :is="option.icon" v-else class="h-4 w-4" />
-										</span>
-										<span class="truncate text-sm" :style="iconStyle(option)">
-											{{ option.formatted_name ?? option.id }}
-										</span>
-									</slot>
-								</SearchFilterOption>
-								<div
-									v-if="option.sub_options?.length && isExpanded(option)"
-									class="ml-4 flex flex-col gap-1"
-									:class="{ 'mr-3': scrollable }"
-								>
+								/>
+							</template>
+							<template v-else>
+								<template v-for="option in visibleOptions" :key="`${filterType.id}-${option.id}`">
 									<SearchFilterOption
-										v-for="subOption in option.sub_options"
-										:key="`${filterType.id}-${subOption.id}`"
-										:option="subOption"
-										:included="isIncluded(subOption)"
-										:excluded="isExcluded(subOption)"
+										:option="option"
+										:included="isIncluded(option)"
+										:excluded="isExcluded(option)"
 										:supports="filterType.supports"
+										:has-sub-options="!!option.sub_options?.length"
+										:expanded="isExpanded(option)"
+										:class="{
+											'mr-3': scrollable,
+										}"
 										@toggle="toggleFilter"
 										@toggle-exclude="toggleNegativeFilter"
+										@toggle-expand="toggleExpand(option)"
 									>
-										<slot name="option" :filter="filterType" :option="subOption">
-											<span class="truncate text-sm">
-												{{ subOption.formatted_name ?? subOption.id }}
+										<slot name="option" :filter="filterType" :option="option">
+											<span
+												v-if="option.icon"
+												class="inline-flex items-center justify-center shrink-0 h-4 w-4"
+												:style="iconStyle(option)"
+											>
+												<div
+													v-if="typeof option.icon === 'string'"
+													class="h-4 w-4"
+													v-html="option.icon"
+												/>
+												<component :is="option.icon" v-else class="h-4 w-4" />
+											</span>
+											<span class="truncate text-sm" :style="iconStyle(option)">
+												{{ option.formatted_name ?? option.id }}
 											</span>
 										</slot>
 									</SearchFilterOption>
-								</div>
+									<div
+										v-if="option.sub_options?.length && isExpanded(option)"
+										class="ml-4 flex flex-col gap-1"
+										:class="{ 'mr-3': scrollable }"
+									>
+										<SearchFilterOption
+											v-for="subOption in option.sub_options"
+											:key="`${filterType.id}-${subOption.id}`"
+											:option="subOption"
+											:included="isIncluded(subOption)"
+											:excluded="isExcluded(subOption)"
+											:supports="filterType.supports"
+											@toggle="toggleFilter"
+											@toggle-exclude="toggleNegativeFilter"
+										>
+											<slot name="option" :filter="filterType" :option="subOption">
+												<span class="truncate text-sm">
+													{{ subOption.formatted_name ?? subOption.id }}
+												</span>
+											</slot>
+										</SearchFilterOption>
+									</div>
+								</template>
 							</template>
-						</template>
-						<button
-							v-if="filterType.display === 'expandable'"
-							class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
-							@click="showMore = !showMore"
-						>
-							<DropdownIcon
-								class="h-4 w-4 transition-transform"
-								:class="{ 'rotate-180': showMore }"
-							/>
-							<span class="truncate text-sm">
-								{{
-									showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore)
-								}}
-							</span>
-						</button>
-					</div>
-				</ScrollablePanel>
+							<button
+								v-if="filterType.display === 'expandable'"
+								class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
+								@click="showMore = !showMore"
+							>
+								<DropdownIcon
+									class="h-4 w-4 transition-transform"
+									:class="{ 'rotate-180': showMore }"
+								/>
+								<span class="truncate text-sm">
+									{{
+										showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore)
+									}}
+								</span>
+							</button>
+						</div>
+					</ScrollablePanel>
+				</template>
 			</template>
 			<div :class="innerPanelClass ? innerPanelClass : ''" class="empty:hidden">
 				<Checkbox
@@ -231,7 +253,7 @@ import {
 	flattenFilterOptions,
 } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
-import { Checkbox, ScrollablePanel, StyledInput } from '../index'
+import { Checkbox, Input, ScrollablePanel, Toggle } from '../index'
 import SearchDependsOnFilter from './SearchDependsOnFilter.vue'
 import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'

@@ -24,7 +24,7 @@
 							formatMessage(messages.emailAddressLabel)
 						}}</span>
 					</label>
-					<StyledInput
+					<Input
 						id="email-input"
 						v-model="email"
 						:maxlength="2048"
@@ -68,7 +68,7 @@
 							formatMessage(messages.oldPasswordLabel)
 						}}</span>
 					</label>
-					<StyledInput
+					<Input
 						id="old-password"
 						v-model="oldPassword"
 						:maxlength="2048"
@@ -92,7 +92,7 @@
 								formatMessage(messages.newPasswordLabel)
 							}}</span></label
 						>
-						<StyledInput
+						<Input
 							id="new-password"
 							v-model="newPassword"
 							:maxlength="2048"
@@ -108,7 +108,7 @@
 								formatMessage(messages.confirmNewPasswordLabel)
 							}}</span>
 						</label>
-						<StyledInput
+						<Input
 							id="confirm-new-password"
 							v-model="confirmNewPassword"
 							:maxlength="2048"
@@ -183,7 +183,7 @@
 							formatMessage(messages.twoFactorEnterCodeDescription)
 						}}</span>
 					</label>
-					<StyledInput
+					<Input
 						id="two-factor-code"
 						v-model="twoFactorCode"
 						:maxlength="11"
@@ -248,7 +248,7 @@
 								formatMessage(messages.twoFactorVerifyCodeDescription)
 							}}</span>
 						</label>
-						<StyledInput
+						<Input
 							id="verify-code"
 							v-model="twoFactorCode"
 							:maxlength="6"
@@ -477,9 +477,9 @@ import {
 	ConfirmModal,
 	defineMessages,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
 	NewModal,
-	StyledInput,
 	Table,
 	useVIntl,
 } from '@modrinth/ui'
@@ -493,7 +493,9 @@ import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
 
 import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
+import { forgetStoredAccount } from '~/composables/accounts.ts'
 import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
+import { useAuthCookie } from '~/composables/auth-cookie.ts'
 
 definePageMeta({
 	middleware: 'auth',
@@ -987,7 +989,8 @@ async function deleteAccount() {
 		})
 	}
 
-	useCookie('auth-token').value = null
+	forgetStoredAccount(auth.value.user.id)
+	useAuthCookie().value = null
 	window.location.href = '/'
 
 	stopLoading()

@@ -292,4 +292,5 @@ id_type!(StatusId as i32);
 id_type!(DelphiReportId as i64);
 id_type!(DelphiReportIssueId as i64);
 id_type!(DelphiReportIssueDetailsId as i64);
+id_type!(DelphiRuleId as i64);
 id_type!(SharedInstanceId as i64);

@@ -2,7 +2,10 @@ import { useRenderLoop } from '@tresjs/core'
 import * as THREE from 'three'
 import { computed, type ComputedRef, type Ref, ref, watch } from 'vue'
 
+import { useDebugLogger } from '../debug-logger'
 import type { SkinPreviewAnimationConfig } from './types'
+
+const debug = useDebugLogger('SkinPreviewAnimation')
 
 type AnimationFinishedListener = (
 	event: THREE.AnimationMixerEventMap['finished'] & {
@@ -103,7 +106,7 @@ export function useSkinPreviewAnimation(
 		const action = actions.value[name]
 
 		if (currentAnimation.value === name && action.isRunning() && name !== baseAnimation.value) {
-			console.log(`Animation "${name}" is already running, ignoring request`)
+			debug(`Animation "${name}" is already running, ignoring request`)
 			return false
 		}
 
@@ -196,7 +199,7 @@ export function useSkinPreviewAnimation(
 		const action = actions.value[name]
 
 		if (currentAnimation.value === name && action.isRunning()) {
-			console.log(`Animation "${name}" is already running, ignoring request`)
+			debug(`Animation "${name}" is already running, ignoring request`)
 			return
 		}
 

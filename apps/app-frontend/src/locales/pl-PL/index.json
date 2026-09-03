@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Pobrania"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Ukryj aktywne pobrania"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Ukryj aktywne instancje"
   },
@@ -110,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "Załaduj ponownie, aby zaktualizować"
   },
+  "app.action-bar.show-downloads": {
+    "message": "Pokaż aktywne pobrania"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Pokaż więcej włączonych instancji"
   },
@@ -155,12 +161,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ukryj nazwę"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Pokaż ostatnie światy w sekcji \"Wskocz z powrotem do światów\" na stronie głównej."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Wskocz z powrotem do światów"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizuje Modrinth App po uruchomieniu Minecraft."
   },
@@ -168,7 +168,7 @@
     "message": "Minimalizuj aplikację"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Pokazuje czas gry spędzony w danej instancji."
+    "message": "Pokaż, jak długo grałeś w każdą grę."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Pokaż czas gry"
@@ -184,6 +184,9 @@
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Ukryj prawy pasek boczny"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Pokaż ostrzeżenie o bezpieczeństwie przed zainstalowaniem Pakietu Modrinth (.mrpack), które nie jest hostowane na Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Ostrzegaj mnie przed instalowaniem nieznanych paczek modów"
@@ -236,11 +239,26 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Ukryj już zainstalowane"
   },
+  "app.browse.project-type.data-packs": {
+    "message": "Paczki danych"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Paczki modów"
   },
+  "app.browse.project-type.mods": {
+    "message": "Modyfikacje"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Paczki zasobów"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Serwery"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shadery"
+  },
   "app.browse.server-instance-content-warning": {
-    "message": "Dodawanie zawartości może zepsuć kompatybilność podczas dołączania na serwer. Jakakolwiek dodana zawartość zostanie stracona, gdy zaktualizujesz zawartość instancji serwera."
+    "message": "Dodawanie treści może uniemożliwić Ci dołączenie do tego serwera. Każda dodana zawartość zostanie usunięta po aktualizacji zarządzanej zawartości serwera."
   },
   "app.browse.server.installing": {
     "message": "Instalowanie"
@@ -268,6 +286,45 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "Ta instancja została zablokowana"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "Instancja jest już otwarta"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Więcej opcji"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Nigdy nie grano"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Nowa instancja"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "Pokaż instancję"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "Zamknij"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "Losowe ikony"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "Pomiń"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "Zamknij"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "Odrzuć"
+  },
+  "app.icon-editor.notification.title": {
+    "message": "Nowy edytor ikon"
+  },
+  "app.icon-editor.notification.view-update": {
+    "message": "Pokaż aktualizację"
   },
   "app.install.phase.downloading_content": {
     "message": "Pobieranie zawartości"
@@ -323,6 +380,42 @@
   "app.install.phase.running_loader_processors": {
     "message": "Uruchamianie procesorów loadera"
   },
+  "app.instance.action.add-content": {
+    "message": "Dodaj zawartość"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Kopiuj ścieżkę"
+  },
+  "app.instance.action.edit": {
+    "message": "Edytuj"
+  },
+  "app.instance.action.open-folder": {
+    "message": "Otwórz folder"
+  },
+  "app.instance.action.play": {
+    "message": "Graj"
+  },
+  "app.instance.add-server.add": {
+    "message": "Dodaj"
+  },
+  "app.instance.add-server.added": {
+    "message": "Dodano"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Dodawanie..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Anuluj"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "Ten serwer może nie być kompatybilny ze wszystkimi instancjami."
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "Szukaj instancji"
+  },
+  "app.instance.add-server.title": {
+    "message": "Dodaj serwer do instancji"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Dodano"
   },
@@ -353,6 +446,27 @@
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Trwa przegląd..."
   },
+  "app.instance.card.icon-alt": {
+    "message": "Ikona instancji"
+  },
+  "app.instance.card.installing": {
+    "message": "Instalowanie..."
+  },
+  "app.instance.card.loading": {
+    "message": "Instancja ładuje się..."
+  },
+  "app.instance.card.never-played": {
+    "message": "Nigdy nie grano"
+  },
+  "app.instance.card.play": {
+    "message": "Graj"
+  },
+  "app.instance.card.played": {
+    "message": "Grano {relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "Napraw"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
   },
@@ -364,6 +478,12 @@
   },
   "app.instance.confirm-delete.header": {
     "message": "Usuń instancję"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Zawartość paczki modów"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "Udostępniona zawartość"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "Ta paczka modów jest już zainstalowana w instancji <bold>{instanceName}</bold>. Czy na pewno chcesz utworzyć duplikat?"
@@ -404,6 +524,9 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Przesyłanie zakończone sukcesem"
   },
+  "app.instance.navigation.back-to-instance": {
+    "message": "Powrót do instancji"
+  },
   "app.instance.share.empty.description": {
     "message": "Możesz udostępnić tę instalację znajomym!"
   },
@@ -443,6 +566,12 @@
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Nie będzie w stanie otrzymywać aktualizacji dla tej udostępnionej instancji"
   },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Każda zainstalowana kopia pozostanie na swoim urządzeniu"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "Możesz zaprosić je ponownie później"
+  },
   "app.instance.share.remove-user-modal.effect-last-user": {
     "message": "To jest ostatni użytkownik, udostępnianie zostanie wyłączone dla tej instancji"
   },
@@ -460,6 +589,15 @@
   },
   "app.instance.share.sign-in.button": {
     "message": "Zaloguj się"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Nie można połączyć"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "Musisz odłączyć paczkę modów, aby udostępnić swoją rozgrywkę"
+  },
+  "app.instance.share.unlink.header": {
+    "message": "Udostępnianie wymaga odłączenia"
   },
   "app.instance.shared-instance-already-installed.body": {
     "message": "Ta przesłana instalacja jest zainstalowana jako <bold>{instanceName} </bold>. Czy na pewno chcesz zainstalować jej kopię?"
@@ -490,6 +628,18 @@
   },
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "Korzystasz z niewłaściwego konta Modrith"
+  },
+  "app.instance.tab.content": {
+    "message": "Zawartość"
+  },
+  "app.instance.tab.files": {
+    "message": "Pliki"
+  },
+  "app.instance.tab.share": {
+    "message": "Udostępnianie"
+  },
+  "app.instance.tab.worlds": {
+    "message": "Światy"
   },
   "app.instance.worlds.add-server": {
     "message": "Dodaj serwer"
@@ -590,6 +740,225 @@
   "app.java-selector.test-installation": {
     "message": "Testuj instalację Java"
   },
+  "app.library.context-menu.create-instance": {
+    "message": "Nowa instancja"
+  },
+  "app.library.filter.add": {
+    "message": "Dodaj filtr"
+  },
+  "app.library.filter.clear": {
+    "message": "Wyczyść filtry"
+  },
+  "app.library.filter.game-version": {
+    "message": "Wersja gry"
+  },
+  "app.library.filter.instance-type": {
+    "message": "Typ instancji"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "Paczka modów"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "Serwer"
+  },
+  "app.library.filter.label": {
+    "message": "Filtruj według"
+  },
+  "app.library.filter.loader": {
+    "message": "Loader"
+  },
+  "app.library.group-by.game-version": {
+    "message": "Wersja gry"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "Typ instancji"
+  },
+  "app.library.group-by.label": {
+    "message": "Grupuj według"
+  },
+  "app.library.group-by.loader": {
+    "message": "Loader"
+  },
+  "app.library.group-by.none": {
+    "message": "Bez grupowania"
+  },
+  "app.library.group.collapse": {
+    "message": "Zwiń grupę"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "Dodaj do grupy"
+  },
+  "app.library.group.create": {
+    "message": "Utwórz grupę"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Anuluj"
+  },
+  "app.library.group.delete": {
+    "message": "Usuń grupę"
+  },
+  "app.library.group.expand": {
+    "message": "Rozwiń grupę"
+  },
+  "app.library.group.favorites": {
+    "message": "Ulubione"
+  },
+  "app.library.group.instance.add": {
+    "message": "Dodaj"
+  },
+  "app.library.group.instance.added": {
+    "message": "Dodano"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Dodaj"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Dodano"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "Nie znaleziono żadnych instancji"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "Szukaj instancji"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "Dodaj instancje do \"{groupName}\""
+  },
+  "app.library.group.move-down": {
+    "message": "Przesuń grupę do dołu"
+  },
+  "app.library.group.move-up": {
+    "message": "Przesuń grupę do góry"
+  },
+  "app.library.group.name": {
+    "message": "Nazwa grupy"
+  },
+  "app.library.group.name-empty": {
+    "message": "Nazwa grupy nie może być pusta."
+  },
+  "app.library.group.name-placeholder": {
+    "message": "Wpisz nazwę grupy"
+  },
+  "app.library.group.new": {
+    "message": "Nowa grupa"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "Nie znaleziono żadnych instancji"
+  },
+  "app.library.group.search-instance": {
+    "message": "Szukaj instancji"
+  },
+  "app.library.group.ungrouped": {
+    "message": "Bez grupy"
+  },
+  "app.library.group.unknown": {
+    "message": "Nieznana grupa"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "Dodaj zawartość"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "Dodaj do ulubionych"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "Kopiuj ścieżkę"
+  },
+  "app.library.instance.action.delete": {
+    "message": "Usuń"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "Duplikuj instancję"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "Otwórz folder"
+  },
+  "app.library.instance.action.play": {
+    "message": "Graj"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "Usuń z ulubionych"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "Usuń z grupy"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "Pokaż instancję"
+  },
+  "app.library.instance.deselect": {
+    "message": "Odznacz instancję"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "Odznacz {name}"
+  },
+  "app.library.instance.installing": {
+    "message": "Instalowanie..."
+  },
+  "app.library.instance.loading": {
+    "message": "Instancja ładuje się..."
+  },
+  "app.library.instance.new": {
+    "message": "Nowa instancja"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "Otwórz {name}"
+  },
+  "app.library.instance.play": {
+    "message": "Graj"
+  },
+  "app.library.instance.repair": {
+    "message": "Napraw"
+  },
+  "app.library.instance.select": {
+    "message": "Wybierz instancję"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "Wybierz {name}"
+  },
+  "app.library.search.placeholder": {
+    "message": "Szukaj"
+  },
+  "app.library.selection.aria-label": {
+    "message": "Wybrane instancje"
+  },
+  "app.library.selection.deleting": {
+    "message": "Usuwanie wybranych instancji"
+  },
+  "app.library.selection.new-group": {
+    "message": "Nowa grupa"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "Usuń z grupy"
+  },
+  "app.library.selection.selected-count": {
+    "message": "Wybrano {count}"
+  },
+  "app.library.sort.date-created": {
+    "message": "Data utworzenia"
+  },
+  "app.library.sort.date-modified": {
+    "message": "Data modyfikacji"
+  },
+  "app.library.sort.game-version": {
+    "message": "Wersja gry"
+  },
+  "app.library.sort.hours-played": {
+    "message": "Czas gry w godzinach"
+  },
+  "app.library.sort.label": {
+    "message": "Sortuj według"
+  },
+  "app.library.sort.last-played": {
+    "message": "Ostatnio grane"
+  },
+  "app.library.sort.loader": {
+    "message": "Loader"
+  },
+  "app.library.sort.name": {
+    "message": "Nazwa"
+  },
+  "app.library.title": {
+    "message": "Biblioteka"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Dodatkowy kontekst"
   },
@@ -651,7 +1020,7 @@
     "message": "W przypadku pytań technicznych prosimy o kontakt z <support-link>Zespołem Obsługi Klienta</support-link>. Aby, zgłosić błąd wejdź na <github-link>GitHub issue</github-link>."
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "Plik jest sprawdzony tylko, jeżeli został opublikowany na Modrinth, niezależnie od jego formatu (w tym pliki .mrpack)."
+    "message": "Pliki nieopublikowane w Modrinth nie są sprawdzane."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Przesłana Instalacja"
@@ -713,17 +1082,23 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Zaloguj się na konto Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Zalogowano jako <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Ulepsz do Modrinth+"
+  },
+  "app.navigation.home": {
+    "message": "Strona główna"
   },
   "app.news.title": {
     "message": "Aktualności"
   },
   "app.news.view-all": {
     "message": "Zobacz wszystkie aktualności"
+  },
+  "app.notification.warning": {
+    "message": "Ostrzeżenie"
+  },
+  "app.project.coming-soon": {
+    "message": "Już wkrótce"
   },
   "app.project.install-button.already-installed": {
     "message": "Ten projekt jest już zainstalowany"
@@ -737,6 +1112,18 @@
   "app.project.install-context.back-to-instance": {
     "message": "Powrót do instancji"
   },
+  "app.project.more-options": {
+    "message": "Więcej opcji"
+  },
+  "app.project.tab.description": {
+    "message": "Opis"
+  },
+  "app.project.tab.gallery": {
+    "message": "Galeria"
+  },
+  "app.project.tab.versions": {
+    "message": "Wersje"
+  },
   "app.project.version.all-versions": {
     "message": "Wszystkie wersje"
   },
@@ -749,11 +1136,20 @@
   "app.project.versions.already-installed": {
     "message": "Już zainstalowano"
   },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Przeciągnij, by zmienić rozmiar"
+  },
   "app.restarting": {
     "message": "Uruchamianie ponowne..."
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "Zmienne środowiskowe ustawione podczas uruchamiania instancji."
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Zmienne środowiskowe..."
   },
   "app.settings.default-instance-options.environment-variables.title": {
     "message": "Zmienne środowiskowe"
@@ -769,6 +1165,9 @@
   },
   "app.settings.default-instance-options.height.title": {
     "message": "Wysokość"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "Argumenty przekazane do Java podczas uruchamiania instancji."
   },
   "app.settings.default-instance-options.java-arguments.placeholder": {
     "message": "Wprowadź argumenty Java..."
@@ -809,6 +1208,12 @@
   "app.settings.default-instance-options.width.title": {
     "message": "Szerokość"
   },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Wprowadź komendę wrappera..."
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Przełącz tryb programisty"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
   },
@@ -833,8 +1238,35 @@
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetria"
   },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Wyczyścić pamięć podręczną aplikacji?"
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Wyczyść pamięć podręczną"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "Pamięć podręczna aplikacji"
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Otwórz folder kopii zapasowych"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Kopie zapasowe bazy danych aplikacji"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Przeglądaj lokalizację aplikacji"
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Wybierz nową lokalizację aplikacji"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "Katalog aplikacji"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Ilość plików, które aplikacja może pobierać na raz. Zmniejsz tę wartość, jeśli pobieranie jest niestabilne. Wymaga ponownego uruchomienia aplikacji."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Maksymalna liczba równoczesnych pobrań"
   },
   "app.settings.resource-management.maximum-concurrent-writes.description": {
     "message": "Ilość plików, które aplikacja może zapisywać na dysku na raz. Zmniejsz tę wartość, jeśli często występują błędy wejścia/wyjścia. Wymaga ponownego uruchomienia aplikacji."
@@ -847,9 +1279,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "Zachowanie"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Domyślne opcje gry"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalacje Java"
@@ -1005,7 +1434,7 @@
     "message": "Tiny Takeover"
   },
   "app.skins.sign-in.button": {
-    "message": "Zaloguj się"
+    "message": "Zaloguj się do Microsoft"
   },
   "app.skins.title": {
     "message": "Wybór skórki"
@@ -1015,6 +1444,9 @@
   },
   "app.skins.toggle-ears-features-on": {
     "message": "Włącz"
+  },
+  "app.survey.footer": {
+    "message": "Ta opinia przejdzie bezpośrednio do zespołu Modrinth i pomoże w opracowaniu przyszłych aktualizacji!"
   },
   "app.survey.no-thanks": {
     "message": "Nie, dziękuję"
@@ -1055,8 +1487,26 @@
   "app.update.complete-toast.title": {
     "message": "Wersja {version} została pomyślnie zainstalowana!"
   },
+  "app.update.download-error.missing-version": {
+    "message": "Nie udało się pobrać aktualizacji: brak dostępnej wersji"
+  },
   "app.user.project.install-to-instance": {
     "message": "Zainstaluj do instancji"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "Utwórz instancję"
+  },
+  "app.welcome-screen.description": {
+    "message": "Czas na grę!"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "Importuj z launchera"
+  },
+  "app.welcome-screen.import-prompt": {
+    "message": "Uciekasz z innego launchera?"
+  },
+  "app.welcome-screen.title": {
+    "message": "Witaj na Modrinth"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -1172,6 +1622,9 @@
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Usuń tę udostępnioną instancję z Modrinth i przestań wysyłać aktualizacje do użytkowników, którym jest udostępniona. Nie wpłynie to na twoją lokalną instancję."
   },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "message": "Anulowanie publikacji..."
+  },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Spowoduje to usunięcie przesyłanej instalacji z serwerów Modrith. Użytkownicy korzystający z niej na Modrinth App przestaną otrzymywać aktualizacje, ale twoja lokalna instalacja zostanie na tym urządzeniu."
   },
@@ -1250,8 +1703,188 @@
   "instance.files.save-as": {
     "message": "Zapisz jako..."
   },
+  "instance.icon-editor.background": {
+    "message": "Tło"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "Niebieskie"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "Ciemnoszare"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "Ciemnozielone"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Szare"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "Zielone"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "Indygo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "Lawendowe"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "Jasnoszare"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Jasnozielone"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "Pomarańczowe"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Różowe"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "Fioletowe"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Czerwone"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "Różane"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "Żółte"
+  },
+  "instance.icon-editor.description": {
+    "message": "Wybierz elementy, by utworzyć własną ikonę."
+  },
+  "instance.icon-editor.recents": {
+    "message": "Ostatnio używane"
+  },
+  "instance.icon-editor.save": {
+    "message": "Zapisz ikonę"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "Losuj"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "Plecak"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Magiczna latarnia"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Niebieski rekin"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Biblioteczka"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Brązowy miś"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Ciasto"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "Ognisko"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "Skrzynia"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Koło zębate"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Blok poleceń"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Garnek"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "Kanapa"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Stół rzemieślniczy"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Klucz"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "Stół do zaklinania"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "Skrzynia Endu"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "Smok Endu"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "Piec"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Globus"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "Blok trawy"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "Latarnia"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Kula"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "Naleśniki"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "Kilof"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "Blok redstone"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "Sculkowy czujnik"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "Szkielet"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "Patelnia"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "Blok szlamu"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Lepki tłok"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "Miecz"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Ziemniaczek"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "message": "Edytor ikon"
+  },
+  "instance.last-played": {
+    "message": "Ostatnio grane"
+  },
   "instance.locked.delete-button": {
     "message": "Usuń instancję"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "Ta instancja została zablokowana"
   },
   "instance.playtime.never-played": {
     "message": "Nigdy nie grano"
@@ -1271,8 +1904,23 @@
   "instance.settings.sharing.active-invites.actions": {
     "message": "Akcje"
   },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Link zaproszenia"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "Każdy, kto ma jeden z tych linków, może dołaczyć, dopóki jest aktywny"
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "Brak aktywnych zaproszeń."
+  },
   "instance.settings.sharing.active-invites.expires": {
     "message": "Wygasa"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Cofnij zaproszenie"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Cofnij zaproszenie {code}"
   },
   "instance.settings.sharing.active-invites.title": {
     "message": "Aktywne zaproszenia"
@@ -1280,8 +1928,17 @@
   "instance.settings.sharing.active-invites.uses": {
     "message": "Użyć"
   },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "Link zaproszenia <monospace>{code}</monospace> przestanie natychmiastowo działać. Osoby, które już dołączyły, będą mieć do niego dostęp."
+  },
   "instance.settings.sharing.revoke-invite.admonition-header": {
     "message": "Tej akcji nie można cofnąć"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Cofnij zaproszenie"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Cofnij zaproszenie"
   },
   "instance.settings.tabs.general": {
     "message": "Ogólne"
@@ -1313,6 +1970,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "Edytuj ikonę"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "Utwórz ikonę"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "Edytuj ikonę"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Usuń ikonę"
   },
@@ -1321,6 +1984,9 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Wybierz ikonę"
+  },
+  "instance.settings.tabs.general.icon": {
+    "message": "Ikona"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nazwa"
@@ -1349,12 +2015,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Wybierz kanał aktualizacji"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Haczyki startowe"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Własne haczyki przy uruchomieniu"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooki pozwalają zaawansowanym użytkownikom uruchamiać określone systemowe komendy przed i po uruchomieniu gry."
   },
@@ -1379,6 +2039,12 @@
   "instance.settings.tabs.hooks.title": {
     "message": "Hooki uruchamiania gry"
   },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: Nazwa folderu instancji"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: Nazwa instancji"
+  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
@@ -1393,9 +2059,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Wersja {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java i pamięć"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Zmienne środowiskowe"
@@ -1469,6 +2132,9 @@
   "instance.shared-instance.error.title": {
     "message": "Coś poszło nie tak"
   },
+  "instance.shared-instance.network-error.title": {
+    "message": "Błąd sieci"
+  },
   "instance.shared-instance.owner-tooltip": {
     "message": "Zawartość tej instancji jest udostępniana dla innych użytkowników."
   },
@@ -1541,8 +2207,14 @@
   "instance.worlds.incompatible_server": {
     "message": "Serwer jest nie kompatybilny"
   },
+  "instance.worlds.instance-locked": {
+    "message": "Ta instancja została zablokowana"
+  },
   "instance.worlds.linked_server": {
     "message": "Zarządzane przez serwer"
+  },
+  "instance.worlds.more-options": {
+    "message": "Więcej opcji"
   },
   "instance.worlds.no_contact": {
     "message": "Nie można nawiązać połączenia z serwerem"
@@ -1601,11 +2273,17 @@
   "minecraft-required.sign-in": {
     "message": "Zaloguj się do Microsoft"
   },
+  "modal.modrinth-account-required.browser-description": {
+    "message": "Nowa karta otwarta do zalogowania. Ukończ logowanie, a następnie wróć do aplikacji."
+  },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Kontynuuj w przeglądarce"
   },
   "modal.modrinth-account-required.create-account-button": {
     "message": "Utwórz konto"
+  },
+  "modal.modrinth-account-required.description": {
+    "message": "Musisz zalogować się na swoje konto Modrinth, zanim będziesz mógł korzystać z tej funkcji."
   },
   "modal.modrinth-account-required.header": {
     "message": "Konto wymagane"
@@ -1627,6 +2305,15 @@
   },
   "modal.modrinth-account-required.waiting-for-browser": {
     "message": "Oczekiwanie na twoje potwierdzenie..."
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "Zaloguj się do Minecraft"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "Zaloguj się na Modrinth"
+  },
+  "onboarding-checklist.title": {
+    "message": "Pierwsze kroki"
   },
   "search.filter.locked.instance": {
     "message": "Podane przez instancję"

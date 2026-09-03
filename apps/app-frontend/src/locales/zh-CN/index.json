@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "下载"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "隐藏当前下载项目列表"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "隐藏更多运行中的实例"
   },
@@ -110,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "重启以完成更新"
   },
+  "app.action-bar.show-downloads": {
+    "message": "查看当前的下载项目列表"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "显示更多运行中的实例"
   },
@@ -143,6 +149,12 @@
   "app.ads-consent.title": {
     "message": "您的隐私以及广告如何支持 Modrinth"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "用紧凑行式布局显示库实例。"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "紧凑模式"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "首页"
   },
@@ -156,10 +168,10 @@
     "message": "隐藏名牌"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "在主页的“快速回到”部分包含最近的世界。"
+    "message": "在主页的“快速开始”区域显示最近运行过的世界或实例。"
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "快速回到世界"
+    "message": "快速进入世界或实例"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "当 Minecraft 进程启动时，将 Modrinth App 最小化。"
@@ -206,6 +218,15 @@
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "启动与导航"
   },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "在你登录的所有设备上使用这些行为设置。关闭它后可以在设备上单独设置。"
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "登录 Modrinth 账户以同步设置。"
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "跨设备同步行为"
+  },
   "app.browse.add-servers-to-instance": {
     "message": "添加服务器到实例"
   },
@@ -239,11 +260,26 @@
   "app.browse.hide-installed-modpacks": {
     "message": "隐藏已安装内容"
   },
+  "app.browse.project-type.data-packs": {
+    "message": "数据包"
+  },
   "app.browse.project-type.modpacks": {
     "message": "整合包"
   },
+  "app.browse.project-type.mods": {
+    "message": "模组"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "资源包"
+  },
+  "app.browse.project-type.servers": {
+    "message": "服务器"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "光影包"
+  },
   "app.browse.server-instance-content-warning": {
-    "message": "加入服务器时，添加内容可能会破坏兼容性。当更新服务器实例内容时，任何添加的内容也将丢失。"
+    "message": "添加内容可能会阻止你加入此服务器，当管理服务器内容更新时，您添加的所有内容都会被删除"
   },
   "app.browse.server.installing": {
     "message": "安装中"
@@ -256,6 +292,12 @@
   },
   "app.export-modal.export-button": {
     "message": "导出"
+  },
+  "app.export-modal.export-complete": {
+    "message": "导出成功"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} 已成功导出"
   },
   "app.export-modal.header": {
     "message": "导出整合包"
@@ -271,6 +313,84 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "此实例已被锁定"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "实例已开始运行"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "更多选项"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "从未游玩过"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "新实例"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "拖拽以调整大小"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "快速开始"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "查看实例"
+  },
+  "app.hosting.update-required.description": {
+    "message": "你需要更新你的Modrint App才能使用Modrinth在线服务"
+  },
+  "app.hosting.update-required.download": {
+    "message": "更新升级"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "兴奋的Modrinth Bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "需要更新 Modrinth App"
+  },
+  "app.icon-editor.apply-icons-modal.apply-error": {
+    "message": "无法为实例应用随机图标。"
+  },
+  "app.icon-editor.apply-icons-modal.apply-success": {
+    "message": "已为 {num, plural, one {# 个实例} other {# 个实例}} 随机分配图标。"
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "本次更新的新功能"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "关闭"
+  },
+  "app.icon-editor.apply-icons-modal.description": {
+    "message": "直接在 Modrinth App 中为你的实例创建自定义图标。自由搭配背景与来自《我的世界》及热门 Mod 的图案！"
+  },
+  "app.icon-editor.apply-icons-modal.instances-without-icons": {
+    "message": "还有 {count, plural, one {# 个实例} other {# 个实例}} 未设置图标。要先随机分配图标来试试看吗？"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "随机一个图标"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "跳过"
+  },
+  "app.icon-editor.apply-icons-modal.title": {
+    "message": "自定义图标编辑器"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "关闭"
+  },
+  "app.icon-editor.notification.description": {
+    "message": "个性化你的实例！"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "忽略"
+  },
+  "app.icon-editor.notification.title": {
+    "message": "新的图标编辑器"
+  },
+  "app.icon-editor.notification.view-update": {
+    "message": "查看更新"
   },
   "app.install.phase.downloading_content": {
     "message": "正在下载内容"
@@ -326,6 +446,45 @@
   "app.install.phase.running_loader_processors": {
     "message": "正在运行加载器处理程序"
   },
+  "app.instance.action.add-content": {
+    "message": "添加内容"
+  },
+  "app.instance.action.copy-path": {
+    "message": "复制路径"
+  },
+  "app.instance.action.edit": {
+    "message": "编辑"
+  },
+  "app.instance.action.open-folder": {
+    "message": "打开文件夹"
+  },
+  "app.instance.action.play": {
+    "message": "游玩"
+  },
+  "app.instance.action.stop": {
+    "message": "停止"
+  },
+  "app.instance.add-server.add": {
+    "message": "添加"
+  },
+  "app.instance.add-server.added": {
+    "message": "已添加"
+  },
+  "app.instance.add-server.adding": {
+    "message": "添加中……"
+  },
+  "app.instance.add-server.cancel": {
+    "message": "取消"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "此服务器可能不兼容所有实例。"
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "搜索实例"
+  },
+  "app.instance.add-server.title": {
+    "message": "向实例添加服务器"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "新增内容"
   },
@@ -356,17 +515,59 @@
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "正在审查……"
   },
+  "app.instance.card.icon-alt": {
+    "message": "实例图标"
+  },
+  "app.instance.card.installing": {
+    "message": "安装中……"
+  },
+  "app.instance.card.loading": {
+    "message": "正在加载实例……"
+  },
+  "app.instance.card.never-played": {
+    "message": "未曾游玩"
+  },
+  "app.instance.card.play": {
+    "message": "开始游戏"
+  },
+  "app.instance.card.played": {
+    "message": "上次游玩于{relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "修复"
+  },
+  "app.instance.card.stop": {
+    "message": "停止"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "你实例的所有数据将被永久删除，包括你的世界、配置和所有已安装的内容。"
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "此操作无法撤销"
   },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "这{count}个实例中的世界、配置与其他已安装的内容将被永久删除。（真的很久）"
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "确认删除{count}个实例"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "删除{count}个实例"
+  },
   "app.instance.confirm-delete.delete-button": {
     "message": "删除实例"
   },
   "app.instance.confirm-delete.header": {
     "message": "删除实例"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "实例 ({count})"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "整合包内容"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "共享内容"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "该整合包已经被安装到实例<bold>{instanceName}</bold>中了。你确定要重复安装吗？"
@@ -392,6 +593,9 @@
   "app.instance.mods.content-type-project": {
     "message": "项目"
   },
+  "app.instance.mods.freeze-content": {
+    "message": "固定版本"
+  },
   "app.instance.mods.locked-content": {
     "message": "已锁定实例中的内容无法修改。"
   },
@@ -409,6 +613,12 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "上传成功"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "取消固定版本"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "返回实例"
   },
   "app.instance.share.empty.description": {
     "message": "你可以将此实例分享给你的好友！"
@@ -521,6 +731,27 @@
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "你当前使用的 Modrinth 账户不正确"
   },
+  "app.instance.shortcut.created": {
+    "message": "已创建快捷方式"
+  },
+  "app.instance.shortcut.creation-error": {
+    "message": "未能创建快捷方式"
+  },
+  "app.instance.tab.content": {
+    "message": "内容"
+  },
+  "app.instance.tab.files": {
+    "message": "文件"
+  },
+  "app.instance.tab.logs": {
+    "message": "日志"
+  },
+  "app.instance.tab.share": {
+    "message": "分享"
+  },
+  "app.instance.tab.worlds": {
+    "message": "世界"
+  },
   "app.instance.worlds.add-server": {
     "message": "添加服务器"
   },
@@ -620,6 +851,258 @@
   "app.java-selector.test-installation": {
     "message": "测试"
   },
+  "app.library.context-menu.create-instance": {
+    "message": "新建实例"
+  },
+  "app.library.filter.add": {
+    "message": "添加筛选"
+  },
+  "app.library.filter.clear": {
+    "message": "清空筛选"
+  },
+  "app.library.filter.game-version": {
+    "message": "游戏版本"
+  },
+  "app.library.filter.instance-type": {
+    "message": "实例类型"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "自定义"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "整合包"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "服务器"
+  },
+  "app.library.filter.label": {
+    "message": "筛选条件"
+  },
+  "app.library.filter.loader": {
+    "message": "模组加载器"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "自定义组"
+  },
+  "app.library.group-by.game-version": {
+    "message": "游戏版本"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "实例类型"
+  },
+  "app.library.group-by.label": {
+    "message": "分组方式"
+  },
+  "app.library.group-by.loader": {
+    "message": "加载器"
+  },
+  "app.library.group-by.none": {
+    "message": "不分类"
+  },
+  "app.library.group.collapse": {
+    "message": "折叠分组"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "添加实例至分组"
+  },
+  "app.library.group.create": {
+    "message": "创建分组"
+  },
+  "app.library.group.create.cancel": {
+    "message": "取消"
+  },
+  "app.library.group.delete": {
+    "message": "删除分组"
+  },
+  "app.library.group.delete-description": {
+    "message": "此分组内的实例将被取消分组。"
+  },
+  "app.library.group.edit-name": {
+    "message": "编辑分组名称"
+  },
+  "app.library.group.empty": {
+    "message": "拖拽以添加实例。"
+  },
+  "app.library.group.expand": {
+    "message": "展开分组"
+  },
+  "app.library.group.favorites": {
+    "message": "收藏夹"
+  },
+  "app.library.group.instance.add": {
+    "message": "添加"
+  },
+  "app.library.group.instance.added": {
+    "message": "已添加"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "添加"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "已添加"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "未找到您搜索的实例"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "搜索实例"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "将实例添加到 \"{groupName}\" 分组"
+  },
+  "app.library.group.move-down": {
+    "message": "下移分组"
+  },
+  "app.library.group.move-up": {
+    "message": "上移分组"
+  },
+  "app.library.group.name": {
+    "message": "分组名称"
+  },
+  "app.library.group.name-empty": {
+    "message": "分组名称不能为空。"
+  },
+  "app.library.group.name-placeholder": {
+    "message": "输入分组名称"
+  },
+  "app.library.group.name-reserved": {
+    "message": "“None”为系统保留名称，不能用作分组名称。"
+  },
+  "app.library.group.name-too-long": {
+    "message": "分组名称不能超过 {maxLength} 个字符。"
+  },
+  "app.library.group.new": {
+    "message": "新建分组"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "未找到实例"
+  },
+  "app.library.group.rename-failed": {
+    "message": "无法重命名分组"
+  },
+  "app.library.group.search-instance": {
+    "message": "搜索实例"
+  },
+  "app.library.group.ungrouped": {
+    "message": "未分组的"
+  },
+  "app.library.group.unknown": {
+    "message": "未知分组"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "添加内容"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "添加到收藏夹"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "复制路径"
+  },
+  "app.library.instance.action.delete": {
+    "message": "删除"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "复制实例"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "打开文件夹"
+  },
+  "app.library.instance.action.play": {
+    "message": "游玩"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "取消收藏"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "移出分组"
+  },
+  "app.library.instance.action.stop": {
+    "message": "停止游戏"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "查看实例"
+  },
+  "app.library.instance.deselect": {
+    "message": "取消选择实例"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "取消选择 {name}"
+  },
+  "app.library.instance.installing": {
+    "message": "安装中……"
+  },
+  "app.library.instance.loading": {
+    "message": "实例加载中……"
+  },
+  "app.library.instance.new": {
+    "message": "新建实例"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "打开 {name}"
+  },
+  "app.library.instance.play": {
+    "message": "游玩"
+  },
+  "app.library.instance.repair": {
+    "message": "修复"
+  },
+  "app.library.instance.select": {
+    "message": "选择实例"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "选择 {name}"
+  },
+  "app.library.instance.stop": {
+    "message": "停止"
+  },
+  "app.library.search.no-results.title": {
+    "message": "没有与搜索匹配的实例。"
+  },
+  "app.library.search.placeholder": {
+    "message": "搜索"
+  },
+  "app.library.selection.aria-label": {
+    "message": "选中的实例"
+  },
+  "app.library.selection.deleting": {
+    "message": "删除选中的实例"
+  },
+  "app.library.selection.new-group": {
+    "message": "新建分组"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "移出分组"
+  },
+  "app.library.selection.selected-count": {
+    "message": "已选 {count} 项"
+  },
+  "app.library.sort.date-created": {
+    "message": "创建日期"
+  },
+  "app.library.sort.date-modified": {
+    "message": "修改日期"
+  },
+  "app.library.sort.game-version": {
+    "message": "游戏版本"
+  },
+  "app.library.sort.hours-played": {
+    "message": "累计游玩时长"
+  },
+  "app.library.sort.label": {
+    "message": "排序方式"
+  },
+  "app.library.sort.last-played": {
+    "message": "最后游玩时间"
+  },
+  "app.library.sort.loader": {
+    "message": "加载器"
+  },
+  "app.library.sort.name": {
+    "message": "实例名称"
+  },
+  "app.library.title": {
+    "message": "实例库"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "补充说明"
   },
@@ -653,6 +1136,9 @@
   "app.modal.install-to-play.invite-warning-with-creator": {
     "message": "此邀请由 <creator>{username}</creator> 创建，而非 Modrinth。只接受您信任的人发出的邀请。"
   },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "整合包内容"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} 个模组"
   },
@@ -681,7 +1167,7 @@
     "message": "为了寻求支持，请咨询我们的<support-link>支持团队</support-link>为了发漏洞请进开启我们的一个<github-link>github-漏洞报告</github-link>。"
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
+    "message": "未发布到 Modrinth 的文件未经过审核。"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共享实例"
@@ -746,17 +1232,32 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "登录Modrinth账户"
   },
-  "app.nav.signed-in-as": {
-    "message": "以<user>{username}</user>身份登录"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "升级至Modrinth+"
+  },
+  "app.navigation.go-back": {
+    "message": "返回"
+  },
+  "app.navigation.go-forward": {
+    "message": "前进"
+  },
+  "app.navigation.home": {
+    "message": "主页"
+  },
+  "app.navigation.next-image": {
+    "message": "下一张图片"
   },
   "app.news.title": {
     "message": "新闻"
   },
   "app.news.view-all": {
     "message": "查看所有新闻"
+  },
+  "app.notification.warning": {
+    "message": "警告"
+  },
+  "app.project.coming-soon": {
+    "message": "即将到来"
   },
   "app.project.install-button.already-installed": {
     "message": "此项目已安装"
@@ -769,6 +1270,21 @@
   },
   "app.project.install-context.back-to-instance": {
     "message": "返回实例"
+  },
+  "app.project.load-error": {
+    "message": "无法加载此项目数据。"
+  },
+  "app.project.more-options": {
+    "message": "更多选项"
+  },
+  "app.project.tab.description": {
+    "message": "项目介绍"
+  },
+  "app.project.tab.gallery": {
+    "message": "画廊"
+  },
+  "app.project.tab.versions": {
+    "message": "版本"
   },
   "app.project.version.all-versions": {
     "message": "所有版本"
@@ -962,9 +1478,6 @@
   "app.settings.tabs.behavior": {
     "message": "行为"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "默认游戏选项"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java 管理"
   },
@@ -998,6 +1511,15 @@
   "app.skins.delete-modal.title": {
     "message": "你确定要删除这个皮肤吗？"
   },
+  "app.skins.demo.apply-tooltip": {
+    "message": "请先登录以使用皮肤。"
+  },
+  "app.skins.demo.description": {
+    "message": "登录 Minecraft 账号以保存并应用皮肤！"
+  },
+  "app.skins.demo.title": {
+    "message": "正在使用演示账号编辑"
+  },
   "app.skins.dropped-file-error.text": {
     "message": "无法读取拖放的文件。"
   },
@@ -1030,6 +1552,9 @@
   },
   "app.skins.modal.cape-section": {
     "message": "披风"
+  },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "登录后才能保存皮肤。"
   },
   "app.skins.modal.edit-title": {
     "message": "编辑皮肤中"
@@ -1119,7 +1644,7 @@
     "message": "小鬼当家"
   },
   "app.skins.sign-in.button": {
-    "message": "登录"
+    "message": "登录 Minecraft"
   },
   "app.skins.title": {
     "message": "皮肤选择器"
@@ -1175,8 +1700,29 @@
   "app.update.complete-toast.title": {
     "message": "版本 {version} 已成功安装！"
   },
+  "app.update.download-error.missing-version": {
+    "message": "下载更新失败：无可用版本"
+  },
   "app.user.project.install-to-instance": {
     "message": "在实例上安装"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "创建一个实例"
+  },
+  "app.welcome-screen.description": {
+    "message": "准备好开始游戏了吗？"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "从其他启动器导入实例"
+  },
+  "app.welcome-screen.import-prompt": {
+    "message": "想从其他启动器迁移实例？"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "按 <shortcut>N</shortcut> 键快速创建实例"
+  },
+  "app.welcome-screen.title": {
+    "message": "欢迎使用 Modrinth"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -1192,6 +1738,9 @@
   },
   "app.world.world-item.offline": {
     "message": "离线"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} 人在线"
   },
   "content.shared-instance.change-version-body": {
     "message": "更改版本只会修改你的本地副本。未来的共享实例更新可能会再次将其恢复或更改。"
@@ -1400,6 +1949,222 @@
   "instance.files.save-as": {
     "message": "保存为……"
   },
+  "instance.icon-editor.background": {
+    "message": "背景"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "蓝"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "深灰"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "深绿"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "灰"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "绿"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "靛青"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "浅紫"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "浅灰"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "青绿"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "橙"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "粉"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "紫"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "红"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "玫瑰红"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "黄"
+  },
+  "instance.icon-editor.description": {
+    "message": "挑选并混合各种元素来创建个性化的图标。"
+  },
+  "instance.icon-editor.recents": {
+    "message": "历史记录"
+  },
+  "instance.icon-editor.save": {
+    "message": "保存图标"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "随机"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "图案"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "背包"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "信标"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "蓝鲨"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "书架"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "棕熊"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "蛋糕"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "营火"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "箱子"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "齿轮"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "命令方块"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "厨锅"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "沙发"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "工作台"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "扳手"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "苦力怕"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "附魔台"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "末影箱"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "末影龙"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "便携式引擎"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "熔炉"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "坐标系"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "地球仪"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "草方块"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "灯笼"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "哞花"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "整合包先生"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "起源之球"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "氧气分配器"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "煎饼"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "镐"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "精灵球"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "红石块"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "幽匿感测体"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "骷髅"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "平底锅"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "粘液快"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "航天头盔"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "粘性活塞"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "剑"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "终端"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "小土豆"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "车轮"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Modrinth 扳手"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "僵尸"
+  },
+  "instance.icon-editor.title": {
+    "message": "图标编辑器"
+  },
+  "instance.last-played": {
+    "message": "上次游玩"
+  },
   "instance.locked.delete-button": {
     "message": "删除实例"
   },
@@ -1490,6 +2255,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "编辑图标"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "创建一个图标"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "编辑图标"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "移除图标"
   },
@@ -1498,6 +2269,9 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "选择图标"
+  },
+  "instance.settings.tabs.general.icon": {
+    "message": "图标"
   },
   "instance.settings.tabs.general.name": {
     "message": "名称"
@@ -1525,12 +2299,6 @@
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "选择更新渠道"
-  },
-  "instance.settings.tabs.hooks": {
-    "message": "启动钩子"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "自定义启动钩子"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "钩子供高级用户使用，可设置游戏启动前后运行的特定系统命令。"
@@ -1594,9 +2362,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "当实例被锁定时，安装设置不可用。"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java 及内存"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "自定义环境变量"
@@ -1748,8 +2513,14 @@
   "instance.worlds.incompatible_server": {
     "message": "服务器不兼容"
   },
+  "instance.worlds.instance-locked": {
+    "message": "此实例已被锁定"
+  },
   "instance.worlds.linked_server": {
     "message": "由服务器项目管理"
+  },
+  "instance.worlds.more-options": {
+    "message": "更多选项"
   },
   "instance.worlds.no_contact": {
     "message": "无法连接服务器"
@@ -1762,6 +2533,12 @@
   },
   "instance.worlds.play_instance": {
     "message": "游玩实例"
+  },
+  "instance.worlds.shortcut-created": {
+    "message": "已创建快捷方式"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "未能创建快捷方式"
   },
   "instance.worlds.view_instance": {
     "message": "查看实例"
@@ -1791,7 +2568,7 @@
     "message": "你需要先登录拥有 Minecraft 的 Microsoft 账户，然后才能启动游戏。"
   },
   "minecraft-required.description-header": {
-    "message": "请登录 Microsoft 账户"
+    "message": "登录 Microsoft 账户"
   },
   "minecraft-required.dont-have-account": {
     "message": "没有账户？"
@@ -1840,6 +2617,18 @@
   },
   "modal.modrinth-account-required.waiting-for-browser": {
     "message": "等待浏览器确认……"
+  },
+  "onboarding-checklist.create-instance": {
+    "message": "创建第一个实例"
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "登录 Minecraft 账号"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "登录 Modrinth 账号"
+  },
+  "onboarding-checklist.title": {
+    "message": "新手引导"
   },
   "search.filter.locked.instance": {
     "message": "由该实例提供"

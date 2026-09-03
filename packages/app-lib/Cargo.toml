@@ -9,10 +9,7 @@ ariadne = { workspace = true }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
 async-trait = { workspace = true }
-async-tungstenite = { workspace = true, features = [
-  "tokio-runtime",
-  "tokio-rustls-webpki-roots"
-] }
+async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
 async-walkdir = { workspace = true }
 async_zip = { workspace = true, features = [
   "bzip2",
@@ -113,11 +110,7 @@ toml = { workspace = true }
 tracing = { workspace = true }
 tracing-error = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
-ts-rs = { workspace = true, features = [
-  "chrono-impl",
-  "no-serde-warnings",
-  "uuid-impl"
-], optional = true }
+ts-rs = { workspace = true, features = ["chrono-impl", "no-serde-warnings", "uuid-impl"], optional = true }
 url = { workspace = true, features = ["serde"] }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }

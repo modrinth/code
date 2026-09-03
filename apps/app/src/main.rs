@@ -12,7 +12,6 @@ use tauri_plugin_fs::FsExt;
 use theseus::prelude::*;
 
 mod api;
-mod error;
 
 #[cfg(target_os = "macos")]
 mod macos;
@@ -143,6 +142,13 @@ fn main() {
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
     let mut builder = tauri::Builder::default();
+
+    #[cfg(target_os = "macos")]
+    {
+        builder = builder
+            .menu(|app| macos::menu::create(app))
+            .on_menu_event(macos::menu::handle_event);
+    }
 
     #[cfg(feature = "updater")]
     {

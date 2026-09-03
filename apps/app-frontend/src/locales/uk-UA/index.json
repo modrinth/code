@@ -8,8 +8,11 @@
   "app.action-bar.downloads": {
     "message": "Завантаження"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Приховати активні завантаження"
+  },
   "app.action-bar.hide-more-running-instances": {
-    "message": "Приховати більше запущених профілів"
+    "message": "Приховати інші примірники"
   },
   "app.action-bar.install.copied-details": {
     "message": "Скопійовано"
@@ -51,7 +54,7 @@
     "message": "Не вдалося завантажити"
   },
   "app.action-bar.install.summary.instance-not-found": {
-    "message": "Екземпляр не знайдено"
+    "message": "Примірника не знайдено"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Недійсний шлях до файлу"
@@ -69,7 +72,7 @@
     "message": "Помилка встановлення завантажувача"
   },
   "app.action-bar.install.summary.local-data-error": {
-    "message": "Не вдалося оновити локальні дані"
+    "message": "Не вдалось оновити локальні дані"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
     "message": "Не вдалося встановити Minecraft"
@@ -87,7 +90,7 @@
     "message": "Щось пішло не так"
   },
   "app.action-bar.install.unknown-instance": {
-    "message": "Невідомий профіль"
+    "message": "Невідомий примірник"
   },
   "app.action-bar.install.updating-shared-content": {
     "message": "Оновлюємо спільний вміст"
@@ -96,25 +99,28 @@
     "message": "Установки"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Зробити основним профілем"
+    "message": "Зробити основним примірником"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Немає запущених профілів"
+    "message": "Немає запущених примірників"
   },
   "app.action-bar.offline": {
     "message": "Поза мережею"
   },
   "app.action-bar.primary-instance": {
-    "message": "Основний профіль"
+    "message": "Основний примірник"
   },
   "app.action-bar.reload-to-update": {
-    "message": "Перезавантажте, щоб оновити"
+    "message": "Перезапустити для оновлення"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Показати активні завантаження"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "Показати більше запущених профілів"
+    "message": "Показати інші примірники"
   },
   "app.action-bar.stop-instance": {
-    "message": "Зупинити профіль"
+    "message": "Зупинити примірник"
   },
   "app.action-bar.update": {
     "message": "Оновити"
@@ -123,7 +129,7 @@
     "message": "Переглянути поточні завантаження"
   },
   "app.action-bar.view-instance": {
-    "message": "Переглянути профіль"
+    "message": "Переглянути примірник"
   },
   "app.action-bar.view-logs": {
     "message": "Переглянути журнали"
@@ -132,7 +138,7 @@
     "message": "Прийняти всі"
   },
   "app.ads-consent.body": {
-    "message": "Реклама підтримує існування Modrinth та фінансує виплати творцям. Наші партнери можуть зберігати та отримувати доступ до cookie в застосунку, аби персоналізувати рекламу та збирати метрики."
+    "message": "Реклама підтримує існування Modrinth і фінансує виплати творцям. Наші партнери можуть зберігати й отримувати доступ до cookie в застосунку, щоб персоналізувати рекламу та збирати метрики."
   },
   "app.ads-consent.manage": {
     "message": "Налаштувати"
@@ -141,7 +147,10 @@
     "message": "Відхилити всі"
   },
   "app.ads-consent.title": {
-    "message": "Ваша приватність та як реклама підтримує Modrinth"
+    "message": "Ваша приватність і як реклама підтримує Modrinth"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Компактний режим"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Головна"
@@ -150,16 +159,10 @@
     "message": "Бібліотека"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Приховати ваш нікнейм над попереднім переглядом гравця на сторінці вибору skin."
+    "message": "Приховати ім'я користувача над попереднім переглядом у меню «Вибір скіна»."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Приховати ім'я"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Показувати нещодавно зіграні світи в розділі «Повернутися до гри» на головній сторінці."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Повернутися до світів"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Згортати Modrinth App під час запуску Minecraft."
@@ -177,10 +180,10 @@
     "message": "Пропускати підтвердження для дій із низьким ризиком, як-от дублювання інсталяцій, звичайне видалення вмісту, масові оновлення, відв'язування та відновлення. Попередження про небезпечні показуються завжди."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
-    "message": "Пропустити несуттєві попередження"
+    "message": "Пропускати несуттєві попередження"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Приховувати праву бічну панель за замовчуванням і додати кнопку для її показання або приховування."
+    "message": "Приховати праву бічну панель і додати кнопку для її перемикання."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Приховати праву бічну панель"
@@ -189,7 +192,7 @@
     "message": "Показувати попередження про безпеку перед встановленням Modrinth Pack (.mrpack), який не розміщено на Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Попереджати мене перед установленням невідомих збірок"
+    "message": "Попереджати перед установленням невідомих збірок"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Сервери автентифікації Minecraft можуть зараз не працювати. Перевірте з’єднання з інтернетом та спробуйте пізніше."
@@ -201,19 +204,19 @@
     "message": "Підтвердження"
   },
   "app.behavior-settings.content.title": {
-    "message": "Головна та контент"
+    "message": "Головна й уміст"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Запуск і навігація"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Додавання сервера до профілю"
+    "message": "Додавання сервера до примірника"
   },
   "app.browse.add-to-an-instance": {
-    "message": "Додати до профілю"
+    "message": "Додати до примірника"
   },
   "app.browse.add-to-instance": {
-    "message": "Додати до профілю"
+    "message": "Додати до примірника"
   },
   "app.browse.add-to-instance-name": {
     "message": "Додати до «{instanceName}»"
@@ -225,13 +228,13 @@
     "message": "Уже додано"
   },
   "app.browse.back-to-instance": {
-    "message": "Назад до профілю"
+    "message": "Назад до примірника"
   },
   "app.browse.discover-project-type": {
-    "message": "Огляд {projectType}"
+    "message": "Огляд — {projectType}"
   },
   "app.browse.discover-servers": {
-    "message": "Дослідити сервери"
+    "message": "Огляд — сервери"
   },
   "app.browse.hide-added-servers": {
     "message": "Приховати вже додані сервери"
@@ -239,11 +242,26 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Приховати вже встановлені"
   },
+  "app.browse.project-type.data-packs": {
+    "message": "Пакети даних"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Збірки"
   },
+  "app.browse.project-type.mods": {
+    "message": "Моди"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Пакети ресурсів"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Сервери"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Шейдери"
+  },
   "app.browse.server-instance-content-warning": {
-    "message": "Додавання вмісту може порушити сумісність із сервером. Будь-який доданий уміст буде втрачено під час оновлення вмісту профілю сервера."
+    "message": "Додавання вмісту може завадити вам приєднатися до цього сервера. Будь-який доданий вміст буде видалено під час оновлення керованого вмісту сервера."
   },
   "app.browse.server.installing": {
     "message": "Установлення"
@@ -256,6 +274,12 @@
   },
   "app.export-modal.export-button": {
     "message": "Експортувати"
+  },
+  "app.export-modal.export-complete": {
+    "message": "Експорт завершено"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} успішно експортовано."
   },
   "app.export-modal.header": {
     "message": "Експортувати збірку"
@@ -271,6 +295,60 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "Примірник уже запущено"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Більше налаштувань"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Не запускалась"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Новий примірник"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "Перейти"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "Переглянути примірник"
+  },
+  "app.hosting.update-required.description": {
+    "message": "Вам потрібно оновитися, щоб використовувати Modrinth Hosting через застосунок Modrinth"
+  },
+  "app.hosting.update-required.download": {
+    "message": "Завантажити для оновлення"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Схвильований бот Modrinth"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Потрібне оновлення Modrinth App"
+  },
+  "app.icon-editor.apply-icons-modal.badge": {
+    "message": "Нове оновлення"
+  },
+  "app.icon-editor.apply-icons-modal.close": {
+    "message": "Закрити"
+  },
+  "app.icon-editor.apply-icons-modal.random-icons": {
+    "message": "Випадкові іконки"
+  },
+  "app.icon-editor.apply-icons-modal.skip": {
+    "message": "Пропустити"
+  },
+  "app.icon-editor.notification.close": {
+    "message": "Закрити"
+  },
+  "app.icon-editor.notification.description": {
+    "message": "Персоналізуйте свої примірники!"
+  },
+  "app.icon-editor.notification.dismiss": {
+    "message": "Відхилити"
+  },
+  "app.icon-editor.notification.view-update": {
+    "message": "Переглянути оновлення"
   },
   "app.install.phase.downloading_content": {
     "message": "Завантаження вмісту"
@@ -326,11 +404,41 @@
   "app.install.phase.running_loader_processors": {
     "message": "Запуск процесорів завантажувача"
   },
+  "app.instance.action.add-content": {
+    "message": "Додати вміст"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Скопіювати шлях"
+  },
+  "app.instance.action.open-folder": {
+    "message": "Відкрити теку"
+  },
+  "app.instance.action.play": {
+    "message": "Грати"
+  },
+  "app.instance.action.stop": {
+    "message": "Зупинити"
+  },
+  "app.instance.add-server.add": {
+    "message": "Додати"
+  },
+  "app.instance.add-server.added": {
+    "message": "Додано"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Додаємо…"
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Скасувати"
+  },
+  "app.instance.add-server.title": {
+    "message": "Додати сервер до примірника"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Додано"
   },
   "app.instance.admonitions.shared-instance.changes-body": {
-    "message": "Ваш локальний профіль містить зміни, з якими ви не поділилися."
+    "message": "Локальний примірник містить зміни, якими ви ще не поділилися з іншими користувачами."
   },
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Ви ще не поділилися своїми змінами"
@@ -348,7 +456,7 @@
     "message": "Публікація оновлення"
   },
   "app.instance.admonitions.shared-instance.review-description": {
-    "message": "Переглянути зміни вмісту, які застосуються для всіх, хто використовує цей профіль."
+    "message": "Переглянути зміни вмісту, які застосуються для всіх, хто використовує цей примірник."
   },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Огляд змін"
@@ -356,20 +464,41 @@
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Оглядаємо…"
   },
+  "app.instance.card.never-played": {
+    "message": "Ніколи не запускалась"
+  },
+  "app.instance.card.play": {
+    "message": "Грати"
+  },
+  "app.instance.card.played": {
+    "message": "Зіграно: {relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "Полагодити"
+  },
+  "app.instance.card.stop": {
+    "message": "Зупинити"
+  },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Усі дані вашого профілю будуть видалені назавжди, включно з вашими світами, налаштуваннями та всім установленим умістом."
+    "message": "Усі дані вашого примірника будуть видалені назавжди, включно з вашими світами, налаштуваннями та всім установленим умістом."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Ця дія є незворотною"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Видалити профіль"
+    "message": "Видалити примірник"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Видалити профіль"
+    "message": "Видалити примірник"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Уміст збірки"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "Спільний уміст"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Ця збірка вже встановлена в профілі <bold>«{instanceName}»</bold>. Дійсно бажаєте її клонувати?"
+    "message": "Ця збірка вже встановлена в примірнику <bold>«{instanceName}»</bold>. Справді бажаєте її дублювати?"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "Створити"
@@ -378,7 +507,7 @@
     "message": "Збірку вже встановлено"
   },
   "app.instance.modpack-already-installed.instance": {
-    "message": "Профіль"
+    "message": "Примірник"
   },
   "app.instance.mods.bulk-update.downloading-projects": {
     "message": "Завантаження проєктів: {current, number}/{total, number}…"
@@ -392,8 +521,11 @@
   "app.instance.mods.content-type-project": {
     "message": "проєкт"
   },
+  "app.instance.mods.freeze-content": {
+    "message": "Заморозити версію"
+  },
   "app.instance.mods.locked-content": {
-    "message": "Уміст у заблокованих профілях не можна змінювати."
+    "message": "Уміст у заблокованих примірниках не можна змінювати."
   },
   "app.instance.mods.project-was-added": {
     "message": "«{name}» додано"
@@ -410,8 +542,11 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Успішно вивантажено"
   },
+  "app.instance.mods.unfreeze-content": {
+    "message": "Розморозити версію"
+  },
   "app.instance.share.empty.description": {
-    "message": "Ви можете поділитися цим профілем із друзями!"
+    "message": "Ви можете поділитися цим примірником із друзями!"
   },
   "app.instance.share.empty.heading": {
     "message": "Немає запрошених друзів"
@@ -450,7 +585,7 @@
     "message": "Жоден користувач не відповідає вашим фільтрам."
   },
   "app.instance.share.remove-user-modal.effect-access": {
-    "message": "Він більше не зможе отримувати оновлення для цього спільного профілю"
+    "message": "Він більше не зможе отримувати оновлення для цього спільного примірника"
   },
   "app.instance.share.remove-user-modal.effect-installed-copy": {
     "message": "Будь-які копії, які він уже встановив, залишаться на його пристрої"
@@ -459,7 +594,7 @@
     "message": "Ви зможете потім запросити його знову"
   },
   "app.instance.share.remove-user-modal.effect-last-user": {
-    "message": "Це останній користувач, тому спільний доступ буде вимкнено для цього профілю"
+    "message": "Це останній користувач, тому спільний доступ буде вимкнено для цього примірника"
   },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "Що тоді?"
@@ -474,28 +609,28 @@
     "message": "Аватар {username}"
   },
   "app.instance.share.remove-user-modal.warning-body": {
-    "message": "Якщо ви відкличете доступ {username} до цього спільного профілю, він зможе отримувати оновлення, лише якщо ви знову його запросите."
+    "message": "Якщо ви відкличете доступ {username} до цього спільного примірника, він зможе отримувати оновлення, лише якщо ви знову його запросите."
   },
   "app.instance.share.sign-in.button": {
     "message": "Увійти"
   },
   "app.instance.share.unable-to-connect.description": {
-    "message": "Сервіс спільних збірок наразі недоступний, будь ласка, спробуйте пізніше"
+    "message": "Сервіс спільних збірок наразі недоступний, спробуйте знову пізніше"
   },
   "app.instance.share.unable-to-connect.heading": {
     "message": "Не вдалося під'єднатися"
   },
   "app.instance.share.unlink.body": {
-    "message": "Ви повинні від'єднати цю збірку, аби поділитися своїм профілем"
+    "message": "Ви повинні від'єднати цю збірку, щоб поділитися своїм примірником"
   },
   "app.instance.share.unlink.header": {
     "message": "Спільний доступ вимагає відв'язування"
   },
   "app.instance.shared-instance-already-installed.body": {
-    "message": "Цей спільний профіль уже встановлено як <bold>{instanceName}</bold>. Дійсно встановити ще одну копію?"
+    "message": "Цей спільний примірник уже встановлено як <bold>«{instanceName}»</bold>. Справді бажаєте встановити ще одну копію?"
   },
   "app.instance.shared-instance-already-installed.header": {
-    "message": "Спільний профіль уже встановлено"
+    "message": "Спільний примірник уже встановлено"
   },
   "app.instance.shared-instance-already-installed.install-anyway": {
     "message": "Усе одно встановити"
@@ -521,6 +656,21 @@
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "Ви використовуєте не той обліковий запис Modrinth"
   },
+  "app.instance.tab.content": {
+    "message": "Уміст"
+  },
+  "app.instance.tab.files": {
+    "message": "Файли"
+  },
+  "app.instance.tab.logs": {
+    "message": "Журнали"
+  },
+  "app.instance.tab.share": {
+    "message": "Поділитись"
+  },
+  "app.instance.tab.worlds": {
+    "message": "Світи"
+  },
   "app.instance.worlds.add-server": {
     "message": "Додати сервер"
   },
@@ -537,7 +687,7 @@
     "message": "Цей світ буде видалено назавжди з цього екземпляра. Це не можна скасувати."
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
-    "message": "Видалення {name}"
+    "message": "Видалення «{name}»"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Модифіковано"
@@ -570,7 +720,7 @@
     "message": "Цей сервер буде видалено з вашого списку серверів. Ви зможете повернути його, якщо знаєте адресу."
   },
   "app.instance.worlds.remove-server-modal.warning-header": {
-    "message": "Видалення {name}"
+    "message": "Видалення «{name}»"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Пошук {count} світів…"
@@ -597,7 +747,7 @@
     "message": "Обрано"
   },
   "app.java-detection.title": {
-    "message": "Виберіть версію Java"
+    "message": "Вибір інсталяції Java"
   },
   "app.java-selector.already-installed": {
     "message": "Уже встановлено"
@@ -620,6 +770,129 @@
   "app.java-selector.test-installation": {
     "message": "Протестувати інсталяцію Java"
   },
+  "app.library.context-menu.create-instance": {
+    "message": "Новий примірник"
+  },
+  "app.library.filter.add": {
+    "message": "Додати фільтр"
+  },
+  "app.library.filter.clear": {
+    "message": "Очистити фільтри"
+  },
+  "app.library.filter.game-version": {
+    "message": "Версія гри"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "Збірка"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "Сервер"
+  },
+  "app.library.filter.label": {
+    "message": "Упорядковувати за"
+  },
+  "app.library.filter.loader": {
+    "message": "Завантажувач"
+  },
+  "app.library.group-by.game-version": {
+    "message": "Версія гри"
+  },
+  "app.library.group-by.loader": {
+    "message": "Завантажувач"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Скасувати"
+  },
+  "app.library.group.favorites": {
+    "message": "Обране"
+  },
+  "app.library.group.instance.add": {
+    "message": "Додати"
+  },
+  "app.library.group.instance.added": {
+    "message": "Додано"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Додати"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Додано"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "Примірника не знайдено"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "Пошук примірників"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "Додати вміст"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "Додати до обраного"
+  },
+  "app.library.instance.action.delete": {
+    "message": "Видалити"
+  },
+  "app.library.instance.action.play": {
+    "message": "Грати"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "Видалити з обраного"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Зупинити"
+  },
+  "app.library.instance.new": {
+    "message": "Новий примірник"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "Відкрити {name}"
+  },
+  "app.library.instance.play": {
+    "message": "Грати"
+  },
+  "app.library.instance.repair": {
+    "message": "Полагодити"
+  },
+  "app.library.instance.select": {
+    "message": "Вибрати примірник"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "Вибрати {name}"
+  },
+  "app.library.instance.stop": {
+    "message": "Зупинити"
+  },
+  "app.library.search.placeholder": {
+    "message": "Пошук"
+  },
+  "app.library.sort.date-created": {
+    "message": "Час створення"
+  },
+  "app.library.sort.date-modified": {
+    "message": "Час зміни"
+  },
+  "app.library.sort.game-version": {
+    "message": "Версія гри"
+  },
+  "app.library.sort.hours-played": {
+    "message": "Годин зіграно"
+  },
+  "app.library.sort.label": {
+    "message": "Упорядкування"
+  },
+  "app.library.sort.last-played": {
+    "message": "Востаннє зіграно"
+  },
+  "app.library.sort.loader": {
+    "message": "Завантажувач"
+  },
+  "app.library.sort.name": {
+    "message": "Назва"
+  },
+  "app.library.title": {
+    "message": "Бібліотека"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Додатковий контекст"
   },
@@ -630,10 +903,10 @@
     "message": "Заблокувати користувача"
   },
   "app.modal.install-to-play.content-you-are-reporting": {
-    "message": "Профіль, на який скаржитеся"
+    "message": "Примірник, на який скаржитеся"
   },
   "app.modal.install-to-play.delete-instance": {
-    "message": "Видалити профіль"
+    "message": "Видалити примірник"
   },
   "app.modal.install-to-play.external-files-dont-install": {
     "message": "Не встановлювати"
@@ -653,11 +926,14 @@
   "app.modal.install-to-play.invite-warning-with-creator": {
     "message": "Це запрошення створив користувач <creator>{username}</creator>, не Modrinth. Приймайте запрошення лише від людей, яким довіряєте."
   },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "Уміст збірки"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
   "app.modal.install-to-play.report-description": {
-    "message": "Використайте цю форму, аби поскаржитися на профілі, які можуть порушувати наші <rules-link>правила</rules-link> чи <terms-link>умови використання</terms-link>."
+    "message": "Використайте цю форму, щоб поскаржитися на примірники, які можуть порушувати наші <rules-link>Правила</rules-link> чи <terms-link>Умови використання</terms-link>."
   },
   "app.modal.install-to-play.report-image-invalid-type": {
     "message": "Тип файлу зображення не підтримується"
@@ -666,13 +942,13 @@
     "message": "Файл перевищує обмеження розміру в 1 МіБ"
   },
   "app.modal.install-to-play.report-legal-claims": {
-    "message": "Для повідомлень щодо DMCA або інших юридичних претензій ознайомтеся з <copyright-link>Copyright Policy</copyright-link>."
+    "message": "Для повідомлень щодо DMCA або інших юридичних претензій ознайомтеся з <copyright-link>«Політикою щодо авторських прав»</copyright-link>."
   },
   "app.modal.install-to-play.report-reason": {
-    "message": "Яке правило порушує цей профіль?"
+    "message": "Яке правило порушує цей примірник?"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
-    "message": "Скарга на спільний профіль"
+    "message": "Скарга на спільний примірник"
   },
   "app.modal.install-to-play.report-submitted": {
     "message": "Скаргу відправлено"
@@ -681,16 +957,16 @@
     "message": "Для отримання допомоги зв'яжіться з нашою <support-link>командою підтримки</support-link>. Для створення звіту про помилки відкрийте <github-link>issue в GitHub</github-link>."
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "Файл перевірятиметься, лише якщо його завантажено на Modrinth, незалежно від його формату (включно з .mrpack)."
+    "message": "Файли, які не опубліковані на Modrinth, не перевіряються."
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "Профіль"
+    "message": "Спільний примірник"
   },
   "app.modal.install-to-play.shared-instance-content": {
     "message": "Уміст спільного профілю"
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
-    "message": "Цей спільний профіль містить файли, які не викладені на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
+    "message": "Цей спільний примірник містить файли, які не викладені на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ця збірка сервера містить файли, які не викладені на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
@@ -714,7 +990,7 @@
     "message": "Видалено"
   },
   "app.modal.update-to-play.server-modpack-unknown-files-description": {
-    "message": "Це оновлення збірки сервера містить файли, які не є опубліковані на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+    "message": "Це оновлення збірки сервера містить файли, які не викладені на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "app.modal.update-to-play.shared-instance-added-label": {
     "message": "Додано"
@@ -723,16 +999,16 @@
     "message": "Видалено"
   },
   "app.modal.update-to-play.shared-instance-unknown-files-description": {
-    "message": "Це оновлення спільного профілю містить файли, які не є опубліковані на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+    "message": "Це оновлення спільного примірника містить файли, які не викладені на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "app.modal.update-to-play.update-required": {
     "message": "Необхідне оновлення"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "Для гри в {name} потрібне оновлення. Будь ласка, оновіть до найновішої версії, щоб запустити гру."
+    "message": "Щоб запустити гру, вам необхідно встановити оновлення «{name}»."
   },
   "app.nav.create-new-instance": {
-    "message": "Створити новий профіль"
+    "message": "Створити новий примірник"
   },
   "app.nav.home": {
     "message": "Головна"
@@ -741,22 +1017,31 @@
     "message": "Обліковий запис Modrinth"
   },
   "app.nav.modrinth-hosting": {
-    "message": "Хостинг Modrinth"
+    "message": "Modrinth Hosting"
   },
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Увійти в обліковий запис Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Вхід виконано як <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Оновити до Modrinth+"
+  },
+  "app.navigation.home": {
+    "message": "Головна"
+  },
+  "app.navigation.next-image": {
+    "message": "Наступне зображення"
   },
   "app.news.title": {
     "message": "Новини"
   },
   "app.news.view-all": {
     "message": "Переглянути всі новини"
+  },
+  "app.notification.warning": {
+    "message": "Попередження"
+  },
+  "app.project.coming-soon": {
+    "message": "Незабаром"
   },
   "app.project.install-button.already-installed": {
     "message": "Проєкт уже встановлено"
@@ -770,11 +1055,17 @@
   "app.project.install-context.back-to-instance": {
     "message": "Повернутися до збірки"
   },
+  "app.project.tab.description": {
+    "message": "Опис"
+  },
+  "app.project.tab.versions": {
+    "message": "Версії"
+  },
   "app.project.version.all-versions": {
     "message": "Усі версії"
   },
   "app.project.version.download-in-browser": {
-    "message": "Завантажити в переглядачу"
+    "message": "Завантажити в переглядачі"
   },
   "app.project.version.installing": {
     "message": "Установлення"
@@ -795,7 +1086,7 @@
     "message": "Modrinth App {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
-    "message": "Змінні середовища встановлюються, коли профіль запускається."
+    "message": "Змінні середовища встановлюються, коли примірник запускається."
   },
   "app.settings.default-instance-options.environment-variables.placeholder": {
     "message": "Уведіть змінні середовища…"
@@ -819,7 +1110,7 @@
     "message": "Висота"
   },
   "app.settings.default-instance-options.java-arguments.description": {
-    "message": "Аргументи передаються Java, коли запускається профіль."
+    "message": "Аргументи передаються Java, коли запускається примірник."
   },
   "app.settings.default-instance-options.java-arguments.placeholder": {
     "message": "Уведіть аргументи Java…"
@@ -828,7 +1119,7 @@
     "message": "Аргументи Java"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
-    "message": "Максимальна кількість памʼяті для кожного профілю."
+    "message": "Максимальна кількість памʼяті для кожного примірника."
   },
   "app.settings.default-instance-options.memory-allocation.title": {
     "message": "Виділення памʼяті"
@@ -843,7 +1134,7 @@
     "message": "Команда після виходу"
   },
   "app.settings.default-instance-options.pre-launch-hook.description": {
-    "message": "Запускається перед відкриттям профілю."
+    "message": "Запускається перед відкриттям примірника."
   },
   "app.settings.default-instance-options.pre-launch-hook.placeholder": {
     "message": "Введіть команду перед запуском..."
@@ -885,7 +1176,7 @@
     "message": "macOS"
   },
   "app.settings.privacy.ads-consent.intro": {
-    "message": "Реклама підтримує існування Modrinth та фінансує виплати творцям. Наші партнери можуть зберігати та отримувати доступ до cookie в застосунку, аби персоналізувати рекламу та збирати метрики. Ви можете відмовитися від них або керувати налаштуваннями нижче."
+    "message": "Реклама підтримує існування Modrinth і фінансує виплати творцям. Наші партнери можуть зберігати й отримувати доступ до cookie в застосунку, щоб персоналізувати рекламу та збирати метрики. Ви можете відмовитися від них або керувати налаштуваннями нижче."
   },
   "app.settings.privacy.discord-rich-presence.description": {
     "message": "Показувати Modrinth App як вашу поточну активність у Discord. Це не впливає на Rich Presence, доданий до збірок модами. Потребує перезапуску застосунку."
@@ -962,9 +1253,6 @@
   "app.settings.tabs.behavior": {
     "message": "Поведінка"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Стандартні параметри гри"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Інсталяції Java"
   },
@@ -978,7 +1266,7 @@
     "message": "Керування ресурсами"
   },
   "app.sidebar.playing-as": {
-    "message": "Грає як"
+    "message": "Ігровий профіль"
   },
   "app.skins.add-button": {
     "message": "Додати скін"
@@ -996,7 +1284,7 @@
     "message": "Це видалить вибраний скін назавжди. Ця дія не може бути скасована."
   },
   "app.skins.delete-modal.title": {
-    "message": "Ви дійсно бажаєте видалити цей скін?"
+    "message": "Справді бажаєте видалити цей скін?"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Неможливо відкрити вибраний файл."
@@ -1011,7 +1299,7 @@
     "message": "Редагувати скін"
   },
   "app.skins.modal.add-skin-button": {
-    "message": "Додати вигляд"
+    "message": "Додати скін"
   },
   "app.skins.modal.add-title": {
     "message": "Додавання скіна"
@@ -1056,25 +1344,25 @@
     "message": "Текстура"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "Спершу завантажте вигляд!"
+    "message": "Спершу завантажте скін!"
   },
   "app.skins.preview.edit-button": {
-    "message": "Змінити вигляд"
+    "message": "Змінити скін"
   },
   "app.skins.previewing-badge": {
     "message": "Попередній перегляд"
   },
   "app.skins.rate-limit.text": {
-    "message": "Ви змінюєте свій вигляд зачасто. Сервери Mojang тимчасово заблокували дальші запити. Заждіть, перш ніж спробувати знову."
+    "message": "Ви змінюєте скін занадто часто. Сервери Mojang тимчасово заблокували подальші запити. Зачекайте трохи, перш ніж спробувати знову."
   },
   "app.skins.rate-limit.title": {
     "message": "Повільніше!"
   },
   "app.skins.reorder-error.text": {
-    "message": "Ваше замовлення скінів не вдалося зберегти."
+    "message": "Не вдалося зберегти ваш порядок скінів."
   },
   "app.skins.reorder-error.title": {
-    "message": "Не вдалося змінити порядок виглядів"
+    "message": "Не вдалося змінити порядок"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
@@ -1086,7 +1374,7 @@
     "message": "Chase the Skies"
   },
   "app.skins.section.default-skins": {
-    "message": "Усталені вигляди"
+    "message": "Усталені скіни"
   },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
@@ -1104,7 +1392,7 @@
     "message": "Mounts of Mayhem"
   },
   "app.skins.section.saved-skins": {
-    "message": "Збережені вигляди"
+    "message": "Збережені скіни"
   },
   "app.skins.section.striding-hero": {
     "message": "Striding Hero"
@@ -1118,11 +1406,8 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
-  "app.skins.sign-in.button": {
-    "message": "Увійдіть"
-  },
   "app.skins.title": {
-    "message": "Вибір скіну"
+    "message": "Вибір скіна"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "Вимкнути"
@@ -1155,7 +1440,7 @@
     "message": "Modrinth App v{version} вже доступно! Оскільки ви використовуєте лімітне підключення, ми не завантажили його автоматично."
   },
   "app.update-popup.changelog": {
-    "message": "Журнал змін"
+    "message": "Список змін"
   },
   "app.update-popup.download": {
     "message": "Завантажити ({size})"
@@ -1170,13 +1455,22 @@
     "message": "Доступне оновлення"
   },
   "app.update.complete-toast.text": {
-    "message": "Натисніть тут, щоб переглянути журнал змін."
+    "message": "Натисніть тут, щоб переглянути список змін."
   },
   "app.update.complete-toast.title": {
     "message": "Версію {version} успішно встановлено!"
   },
   "app.user.project.install-to-instance": {
-    "message": "Установити в профіль"
+    "message": "Установити в примірник"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "Створити примірник"
+  },
+  "app.welcome-screen.description": {
+    "message": "Готові до гри?"
+  },
+  "app.welcome-screen.title": {
+    "message": "Вітаємо в Modrinth"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -1191,7 +1485,7 @@
     "message": "Ще не зіграно"
   },
   "app.world.world-item.offline": {
-    "message": "Не в мережі"
+    "message": "Поза мережею"
   },
   "content.shared-instance.change-version-body": {
     "message": "Зміна версії впливає лише на вашу локальну копію. Майбутні оновлення спільної збірки можуть відновити або знову змінити її."
@@ -1239,7 +1533,7 @@
     "message": "Додавання друга"
   },
   "friends.add-friend.username.description": {
-    "message": "Може відрізнятися від його або її імені користувача Minecraft!"
+    "message": "Може не збігатися з іменем користувача Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Уведіть ім’я користувача…"
@@ -1260,7 +1554,7 @@
     "message": "Запит у друзі надіслано"
   },
   "friends.friend.view-profile": {
-    "message": "Переглянути профіль"
+    "message": "Переглянути примірник"
   },
   "friends.heading": {
     "message": "Друзі"
@@ -1338,7 +1632,7 @@
     "message": "Експортувати збірку"
   },
   "instance.action.launch-instance": {
-    "message": "Запустити профіль"
+    "message": "Запустити примірник"
   },
   "instance.action.more-actions": {
     "message": "Інші дії"
@@ -1350,7 +1644,7 @@
     "message": "Виправити"
   },
   "instance.action.settings": {
-    "message": "Налаштування профілю"
+    "message": "Налаштування примірника"
   },
   "instance.action.starting": {
     "message": "Запускаємо…"
@@ -1359,10 +1653,10 @@
     "message": "Зупиняємо…"
   },
   "instance.add-server.add-and-play": {
-    "message": "Додати та грати"
+    "message": "Додати й грати"
   },
   "instance.add-server.add-server": {
-    "message": "Додати сервер"
+    "message": "Додати"
   },
   "instance.add-server.resource-pack.disabled": {
     "message": "Вимкнено"
@@ -1374,7 +1668,7 @@
     "message": "Запитувати"
   },
   "instance.add-server.title": {
-    "message": "Додати сервер"
+    "message": "Додавання сервера"
   },
   "instance.edit-server.title": {
     "message": "Редагувати сервер"
@@ -1400,6 +1694,186 @@
   "instance.files.save-as": {
     "message": "Зберегти як..."
   },
+  "instance.icon-editor.background": {
+    "message": "Тло"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "Синій"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "Темно-сірий"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "Темно-зелений"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Сірий"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "Зелений"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "Світло-сірий"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Світло-зелений"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "Жовтогарячий"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Рожевий"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Червоний"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "Трояндовий"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "Жовтий"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "Наплічник"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Маяк"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Блакитна акула"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Книжкова полиця"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Бурий ведмідь"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Торт"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "Багаття"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "Скриня"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Шестірня"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Командний блок"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Баняк"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "Диван"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Верстак"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Гайковий ключ"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "Крипер"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "Стіл зачарування"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "Скриня Енду"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "Дракон Енду"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "Двигун"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "Піч"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Глобус"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "Трав’яний блок"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "Ліхтар"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Пан Пакет"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Гало"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "Кисневий розповсюджувач"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "Млинці"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "Кайло"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "Покебол"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "Блок редстовну"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "Скалковий сенсор"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "Скелет"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "Сковорода"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "Блок слизу"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "Скафандовий шолом"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Липкий поршень"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "Меч"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "Термінал"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Бараболик"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Колесо"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "Динаміт"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Гайковий ключ Modrinth"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "Зомбі"
+  },
+  "instance.last-played": {
+    "message": "Востаннє зіграно:"
+  },
   "instance.locked.delete-button": {
     "message": "Видалити збірку"
   },
@@ -1407,7 +1881,7 @@
     "message": "Цю збірку заблоковано"
   },
   "instance.playtime.never-played": {
-    "message": "Не запускався"
+    "message": "Не запускалась"
   },
   "instance.server-modal.address": {
     "message": "Адреса"
@@ -1425,7 +1899,7 @@
     "message": "Дії"
   },
   "instance.settings.sharing.active-invites.code": {
-    "message": "Посилання для запрошення"
+    "message": "Посилання"
   },
   "instance.settings.sharing.active-invites.description": {
     "message": "Будь-хто з цим посиланням-запрошенням може приєднатися, поки воно залишається активним."
@@ -1446,7 +1920,7 @@
     "message": "Активні запрошення"
   },
   "instance.settings.sharing.active-invites.uses": {
-    "message": "Кількість використань"
+    "message": "Використання"
   },
   "instance.settings.sharing.revoke-invite.admonition-body": {
     "message": "Посилання для запрошення <monospace>{code}</monospace> негайно припинить діяти. Люди, які вже приєдналися, збережуть доступ."
@@ -1464,13 +1938,13 @@
     "message": "Загальні"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Видалити профіль"
+    "message": "Видалити примірник"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Видалити профіль"
+    "message": "Видалити примірник"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Назавжди видаляє профіль з вашого пристрою, включно з вашими світами, налаштуваннями та всім установленим умістом. Будьте обережні, після видалення, відновити профіль буде неможливо."
+    "message": "Назавжди видаляє примірник із вашого пристрою, включно з вашими світами, налаштуваннями та всім установленим умістом. Будьте обережні: після видалення відновити примірник буде неможливо."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Видалення…"
@@ -1482,10 +1956,10 @@
     "message": "Неможливо клонувати під час установлення."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Клонувати профіль"
+    "message": "Клонувати примірник"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Створює копію профілю, включно зі світами, налаштуваннями, модами тощо."
+    "message": "Створює копію примірника, включно зі світами, налаштуваннями, модами тощо."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Редагувати значок"
@@ -1521,19 +1995,13 @@
     "message": "Випуск"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Тільки випуски версії будуть показуватися як доступні оновлення."
+    "message": "Тільки випускні версії показуватимуться як доступні оновлення."
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Оберіть випуск оновлення"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Гуки запуску"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Користувацькі гуки запуску"
-  },
   "instance.settings.tabs.hooks.description": {
-    "message": "Гуки дозволяють досвідченим користувачам використовувати певні системні команди до та після запуску гри."
+    "message": "Дають змогу досвідченим користувачам застосовувати певні системні команди до та після запуску гри."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Після виходу"
@@ -1548,22 +2016,22 @@
     "message": "Перед запуском"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Запускається перед відкриттям профілю."
+    "message": "Запускається перед відкриттям примірника."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Уведіть команду, що виконуватиметься перед запуском…"
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Гуки запуску гри"
+    "message": "Параметри запуску гри"
   },
   "instance.settings.tabs.hooks.variables.description": {
-    "message": "Гуки виконуються в робочій директорії профілю з наступними змінними:"
+    "message": "Параметри працюють в каталозі примірника з наступними змінними:"
   },
   "instance.settings.tabs.hooks.variables.inst-dir.description": {
-    "message": "$INST_DIR: повний шлях до теки профілю"
+    "message": "$INST_DIR: повний шлях до теки примірника"
   },
   "instance.settings.tabs.hooks.variables.inst-id.description": {
-    "message": "$INST_ID: назва теки профілю"
+    "message": "$INST_ID: назва теки примірника"
   },
   "instance.settings.tabs.hooks.variables.inst-java-args.description": {
     "message": "$INST_JAVA_ARGS: надані для гри аргументи JVM"
@@ -1575,7 +2043,7 @@
     "message": "$INST_MC_DIR: те саме, що $INST_DIR"
   },
   "instance.settings.tabs.hooks.variables.inst-name.description": {
-    "message": "$INST_NAME: назва профілю"
+    "message": "$INST_NAME: назва примірника"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Обгортач"
@@ -1594,9 +2062,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Налаштування інсталяції недоступні, поки ця збірка заблокована."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java та пам’ять"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Власні змінні середовища"
@@ -1620,7 +2085,7 @@
     "message": "Змінні середовища"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Гуки"
+    "message": "Параметри"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Аргументи Java"
@@ -1701,28 +2166,28 @@
     "message": "Видалено"
   },
   "instance.shared-instance.tooltip": {
-    "message": "Уміст цього профілю керується іншим користувачем."
+    "message": "Уміст цього примірника керується іншим користувачем."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
-    "message": "Ваш доступ до цього спільного профілю відкликано. Профіль досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
+    "message": "Ваш доступ до цього спільного примірника відкликано. Примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
   },
   "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Основний профіль видалено. Цей профіль досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
+    "message": "Основний примірник видалено. Цей примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Цю спільну збірку було заблоковано командою модерації контенту. Вона більше не отримуватиме оновлень від основної збірки та не може бути запущена."
   },
   "instance.shared-instance.unavailable.locked-title": {
-    "message": "Профіль заблоковано"
+    "message": "Примірник заблоковано"
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "менеджер збірки"
   },
   "instance.shared-instance.unavailable.text": {
-    "message": "Ваш локальний профіль досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
+    "message": "Ваш локальний примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
   },
   "instance.shared-instance.unavailable.title": {
-    "message": "Спільний профіль уже не доступний"
+    "message": "Спільний примірник уже не доступний"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Сервер Minecraft"
@@ -1740,7 +2205,7 @@
     "message": "Не показувати на головній"
   },
   "instance.worlds.game_already_open": {
-    "message": "Профіль вже запущений"
+    "message": "Примірник уже запущено"
   },
   "instance.worlds.hardcore": {
     "message": "Режим гардкору"
@@ -1761,10 +2226,10 @@
     "message": "Запускатися у світи напряму можливо лише починаючи з версії Minecraft 1.20"
   },
   "instance.worlds.play_instance": {
-    "message": "Грати у профіль"
+    "message": "Запустити примірник"
   },
   "instance.worlds.view_instance": {
-    "message": "Переглянути профіль"
+    "message": "Переглянути примірник"
   },
   "instance.worlds.world_in_use": {
     "message": "Світ наразі використовується"
@@ -1812,7 +2277,7 @@
     "message": "Відкрилася нова вкладка, де ви зможете ввійти. Увійдіть, тоді поверніться до застосунку."
   },
   "modal.modrinth-account-required.continue-in-browser-heading": {
-    "message": "Продовжити у браузері"
+    "message": "Продовжити у переглядачі"
   },
   "modal.modrinth-account-required.create-account-button": {
     "message": "Створити обліковий запис"
@@ -1824,7 +2289,7 @@
     "message": "Необхідний обліковий запис"
   },
   "modal.modrinth-account-required.open-browser-again-button": {
-    "message": "Знову відкрити браузер"
+    "message": "Знову відкрити переглядач"
   },
   "modal.modrinth-account-required.sign-in-button": {
     "message": "Увійти в Modrinth"
@@ -1839,22 +2304,22 @@
     "message": "Не можете ввійти? <support>Отримати допомогу</support>"
   },
   "modal.modrinth-account-required.waiting-for-browser": {
-    "message": "Очікуємо на підтвердження від переглядача…"
+    "message": "Ждемо підтвердження від переглядача…"
   },
   "search.filter.locked.instance": {
-    "message": "Надано профілем"
+    "message": "Надано примірником"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "Версія гри надана профілем"
+    "message": "Версія гри надана примірником"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Завантажувач наданий профілем"
+    "message": "Завантажувач наданий примірником"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Синхронізувати з профілем"
+    "message": "Синхронізувати з примірником"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "До профілю сервера можна додавати лише клієнтські моди"
+    "message": "До примірника сервера можна додавати лише клієнтські моди"
   },
   "settings.sidebar.label.account": {
     "message": "Обліковий запис"

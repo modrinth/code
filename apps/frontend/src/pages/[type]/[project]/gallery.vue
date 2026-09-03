@@ -38,7 +38,7 @@
 				<label for="gallery-image-title">
 					<span class="label__title">Title</span>
 				</label>
-				<StyledInput
+				<Input
 					id="gallery-image-title"
 					v-model="editTitle"
 					:maxlength="64"
@@ -47,17 +47,16 @@
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
-				<StyledInput
+				<Textarea
 					id="gallery-image-desc"
 					v-model="editDescription"
-					multiline
 					:maxlength="255"
 					placeholder="Enter description..."
 				/>
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
 				</label>
-				<StyledInput
+				<Input
 					id="gallery-image-ordering"
 					v-model="editOrder"
 					type="number"
@@ -119,74 +118,18 @@
 			proceed-label="Delete"
 			@proceed="deleteGalleryImage"
 		/>
-		<div
-			v-if="expandedGalleryItem != null"
-			class="expanded-image-modal"
-			@click="expandedGalleryItem = null"
-		>
-			<div class="content">
-				<img
-					class="image"
-					:class="{ 'zoomed-in': zoomedIn }"
-					:src="
-						expandedGalleryItem.raw_url
-							? expandedGalleryItem.raw_url
-							: 'https://cdn.modrinth.com/placeholder-banner.svg'
-					"
-					:alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
-					@click.stop
-				/>
-
-				<div class="floating" @click.stop>
-					<div class="text">
-						<h2 v-if="expandedGalleryItem.title">
-							{{ expandedGalleryItem.title }}
-						</h2>
-						<p v-if="expandedGalleryItem.description">
-							{{ expandedGalleryItem.description }}
-						</p>
-					</div>
-					<div class="controls">
-						<div class="flex gap-2">
-							<IconButton label="Close" class="close" @click="expandedGalleryItem = null">
-								<XIcon aria-hidden="true" />
-							</IconButton>
-							<ButtonLink
-								class="open !w-9 !rounded-full !px-0"
-								target="_blank"
-								:href="
-									expandedGalleryItem?.raw_url
-										? expandedGalleryItem?.raw_url
-										: 'https://cdn.modrinth.com/placeholder-banner.svg'
-								"
-							>
-								<ExternalIcon aria-hidden="true" />
-							</ButtonLink>
-							<IconButton label="Toggle zoom" @click="zoomedIn = !zoomedIn">
-								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-								<ContractIcon v-else aria-hidden="true" />
-							</IconButton>
-							<IconButton
-								v-if="filteredGallery.length > 1"
-								label="Previous image"
-								class="previous"
-								@click="previousImage()"
-							>
-								<LeftArrowIcon aria-hidden="true" />
-							</IconButton>
-							<IconButton
-								v-if="filteredGallery.length > 1"
-								label="Next image"
-								class="next"
-								@click="nextImage()"
-							>
-								<RightArrowIcon aria-hidden="true" />
-							</IconButton>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		<ImageViewerEditor ref="galleryViewer" :items="galleryViewerItems" editor="disabled">
+			<template #actions="{ item }">
+				<Button
+					type="quiet"
+					class="!w-9 !rounded-full !p-0"
+					aria-label="Open image in new tab"
+					@click="openImageInNewTab(item.src)"
+				>
+					<ExternalIcon aria-hidden="true" />
+				</Button>
+			</template>
+		</ImageViewerEditor>
 
 		<div v-if="currentMember && filteredGallery.length" class="card header-buttons">
 			<FileButton
@@ -213,10 +156,11 @@
 		</div>
 		<div v-if="filteredGallery.length" class="items">
 			<div v-for="(item, index) in filteredGallery" :key="index" class="card gallery-item">
-				<a class="gallery-thumbnail" @click="expandImage(item as GalleryItem, index)">
+				<a class="gallery-thumbnail" @click="expandImage(index)">
 					<img
 						:src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
 						:alt="item.title ? item.title : 'gallery-image'"
+						@contextmenu="onFullImageContextMenu($event, item.raw_url)"
 					/>
 				</a>
 				<div class="gallery-body">
@@ -281,15 +225,11 @@
 <script setup lang="ts">
 import {
 	CalendarIcon,
-	ContractIcon,
 	EditIcon,
-	ExpandIcon,
 	ExternalIcon,
 	ImageIcon,
 	InfoIcon,
-	LeftArrowIcon,
 	PlusIcon,
-	RightArrowIcon,
 	SaveIcon,
 	StarIcon,
 	TransferIcon,
@@ -299,17 +239,17 @@ import {
 } from '@modrinth/assets'
 import {
 	Button,
-	ButtonLink,
 	ConfirmModal,
 	DropArea,
 	FileButton,
-	IconButton,
+	ImageViewerEditor,
 	injectProjectPageContext,
+	Input,
 	NewModal as Modal,
-	StyledInput,
+	Textarea,
 	useFormatDateTime,
+	useFullImageContextMenu,
 } from '@modrinth/ui'
-import { useEventListener } from '@vueuse/core'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import { fileDeclaresAi } from '~/helpers/c2pa'
@@ -320,6 +260,7 @@ const formatDate = useFormatDateTime({
 	month: 'long',
 	day: 'numeric',
 })
+const onFullImageContextMenu = useFullImageContextMenu()
 
 // Single DI injection
 const {
@@ -334,6 +275,7 @@ const {
 const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
 const modalEditItem = useTemplateRef('modal_edit_item')
 const modalConfirm = useTemplateRef('modal_confirm')
+const galleryViewer = useTemplateRef('galleryViewer')
 
 // SEO
 const title = computed(() => `${project.value.title} - Gallery`)
@@ -347,23 +289,6 @@ useSeoMeta({
 	ogTitle: title,
 	ogDescription: description,
 })
-
-// Gallery item type matching actual v2 API response (LegacyGalleryItem in labrinth)
-// raw_url is optional in TS types but present in API response
-interface GalleryItem {
-	url: string
-	raw_url?: string
-	featured: boolean
-	title?: string
-	description?: string
-	created: string
-	ordering: number
-}
-
-// Expanded image modal state
-const expandedGalleryItem = ref<GalleryItem | null>(null)
-const expandedGalleryIndex = ref(0)
-const zoomedIn = ref(false)
 
 // Delete state
 const deleteIndex = ref(-1)
@@ -388,43 +313,22 @@ const filteredGallery = computed(
 	() => project.value.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
 )
 
-// Keyboard navigation for expanded image modal
-useEventListener(document, 'keydown', (e) => {
-	if (expandedGalleryItem.value) {
-		e.preventDefault()
-		if (e.key === 'Escape') {
-			expandedGalleryItem.value = null
-		} else if (e.key === 'ArrowLeft') {
-			e.stopPropagation()
-			previousImage()
-		} else if (e.key === 'ArrowRight') {
-			e.stopPropagation()
-			nextImage()
-		}
-	}
-})
+const galleryViewerItems = computed(() =>
+	filteredGallery.value.map((image) => ({
+		id: image.url,
+		src: image.raw_url ?? 'https://cdn.modrinth.com/placeholder-banner.svg',
+		alt: image.title || 'Gallery image',
+		title: image.title,
+		description: image.description,
+	})),
+)
 
-// Navigation functions
-function nextImage() {
-	expandedGalleryIndex.value++
-	if (expandedGalleryIndex.value >= filteredGallery.value.length) {
-		expandedGalleryIndex.value = 0
-	}
-	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value] as GalleryItem
+function expandImage(index: number) {
+	galleryViewer.value?.show(index)
 }
 
-function previousImage() {
-	expandedGalleryIndex.value--
-	if (expandedGalleryIndex.value < 0) {
-		expandedGalleryIndex.value = filteredGallery.value.length - 1
-	}
-	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value] as GalleryItem
-}
-
-function expandImage(item: GalleryItem, index: number) {
-	expandedGalleryItem.value = item
-	expandedGalleryIndex.value = index
-	zoomedIn.value = false
+function openImageInNewTab(url: string) {
+	window.open(url, '_blank', 'noopener,noreferrer')
 }
 
 // Edit state management
@@ -540,100 +444,6 @@ async function deleteGalleryImage() {
 		gap: 0.5ch;
 		align-items: center;
 		color: var(--color-text-inactive);
-	}
-}
-
-.expanded-image-modal {
-	position: fixed;
-	z-index: 20;
-	overflow: auto;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: #000000;
-	background-color: rgba(0, 0, 0, 0.7);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	.content {
-		position: relative;
-		width: calc(100vw - 2 * var(--spacing-card-lg));
-		height: calc(100vh - 2 * var(--spacing-card-lg));
-
-		.image {
-			position: absolute;
-			left: 50%;
-			top: 50%;
-			transform: translate(-50%, -50%);
-			max-width: calc(100vw - 2 * var(--spacing-card-lg));
-			max-height: calc(100vh - 2 * var(--spacing-card-lg));
-			border-radius: var(--size-rounded-card);
-
-			&.zoomed-in {
-				object-fit: cover;
-				width: auto;
-				height: calc(100vh - 2 * var(--spacing-card-lg));
-				max-width: calc(100vw - 2 * var(--spacing-card-lg));
-			}
-		}
-		.floating {
-			position: absolute;
-			left: 50%;
-			transform: translateX(-50%);
-			bottom: var(--spacing-card-md);
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			gap: var(--spacing-card-sm);
-			transition: opacity 0.25s ease-in-out;
-			opacity: 1;
-			padding: 2rem 2rem 0 2rem;
-
-			&:not(&:hover) {
-				opacity: 0.4;
-				.text {
-					transform: translateY(2.5rem) scale(0.8);
-					opacity: 0;
-				}
-				.controls {
-					transform: translateY(0.25rem) scale(0.9);
-				}
-			}
-
-			.text {
-				display: flex;
-				flex-direction: column;
-				max-width: 40rem;
-				transition:
-					opacity 0.25s ease-in-out,
-					transform 0.25s ease-in-out;
-				text-shadow: 1px 1px 10px #000000d4;
-				margin-bottom: 0.25rem;
-				gap: 0.5rem;
-
-				h2 {
-					color: var(--dark-color-text-dark);
-					font-size: 1.25rem;
-					text-align: center;
-					margin: 0;
-				}
-
-				p {
-					color: var(--dark-color-text);
-					margin: 0;
-				}
-			}
-			.controls {
-				background-color: var(--color-raised-bg);
-				padding: var(--spacing-card-md);
-				border-radius: var(--size-rounded-card);
-				transition:
-					opacity 0.25s ease-in-out,
-					transform 0.25s ease-in-out;
-			}
-		}
 	}
 }
 

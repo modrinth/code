@@ -67,7 +67,7 @@
 			style="height: 400px; overflow-y: auto"
 		>
 			<div class="flex items-start gap-3 px-6">
-				<StyledInput
+				<Input
 					v-model="searchFilter"
 					:icon="SearchIcon"
 					:placeholder="formatMessage(messages.searchPlaceholder)"
@@ -109,7 +109,12 @@
 						class="flex min-w-0 cursor-pointer items-center gap-2.5 overflow-hidden border-0 bg-transparent p-0 text-left"
 						@click="emit('navigate', inst)"
 					>
-						<Avatar :src="inst.iconUrl ?? undefined" size="2rem" rounded="md" />
+						<Avatar
+							:src="inst.iconUrl ?? undefined"
+							size="2rem"
+							rounded="md"
+							pad-transparent-corners
+						/>
 						<span class="truncate font-semibold text-contrast hover:underline">{{
 							inst.name
 						}}</span>
@@ -145,7 +150,12 @@
 		<div v-else class="flex flex-col gap-6 p-6">
 			<div class="flex items-center gap-2.5">
 				<div class="group relative size-[7.75rem] shrink-0">
-					<Avatar :src="iconPreviewUrl ?? undefined" size="100%" no-shadow />
+					<Avatar
+						:src="iconPreviewUrl ?? undefined"
+						size="100%"
+						no-shadow
+						pad-transparent-corners
+					/>
 					<div
 						v-if="iconPreviewUrl"
 						class="pointer-events-none absolute right-1.5 top-1.5 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
@@ -187,10 +197,7 @@
 				<span class="font-semibold text-contrast">
 					{{ formatMessage(messages.nameLabel) }}
 				</span>
-				<StyledInput
-					v-model="instanceName"
-					:placeholder="formatMessage(messages.namePlaceholder)"
-				/>
+				<Input v-model="instanceName" :placeholder="formatMessage(messages.namePlaceholder)" />
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -290,8 +297,8 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import { Button, IconButton } from '#ui/components/base/buttons'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectFilePicker } from '#ui/providers'

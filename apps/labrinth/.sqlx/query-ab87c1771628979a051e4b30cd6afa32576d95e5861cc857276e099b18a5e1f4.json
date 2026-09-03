@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE delphi_rule_revisions SET revision = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ab87c1771628979a051e4b30cd6afa32576d95e5861cc857276e099b18a5e1f4"
+}

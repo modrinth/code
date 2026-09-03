@@ -14,7 +14,7 @@
 		<div v-else-if="app && createdBy && authorizationData" class="flex flex-col gap-6">
 			<div class="mt-4 flex items-center justify-center">
 				<div class="flex w-full flex-row items-center justify-evenly">
-					<Avatar size="md" :src="app.icon_url" />
+					<Avatar size="md" :src="app.icon_url" :raw-src="app.raw_icon_url" />
 					<!-- <img class="profile-pic" :src="app.icon_url" alt="User profile picture" /> -->
 					<div class="flex select-none items-center justify-center text-[2rem] text-primary">→</div>
 					<Avatar size="md" circle :src="auth.user?.avatar_url" />

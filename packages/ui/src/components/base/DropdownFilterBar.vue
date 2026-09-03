@@ -150,7 +150,7 @@
 		}}</Button>
 	</div>
 
-	<Teleport to="#teleports">
+	<Teleport v-if="isClient" to="#teleports">
 		<Transition name="floating-expand" :css="!isMobileAddMenuLayout">
 			<div
 				v-if="isAddMenuOpen && !isMobileActiveSubmenu"
@@ -158,6 +158,7 @@
 				class="fixed z-[9999] flex flex-col overflow-x-hidden overflow-y-auto rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
 				:style="addMenuStyle"
 				role="menu"
+				@pointerdown.stop
 				@mousedown.stop
 				@keydown="handleAddMenuKeydown"
 				@mousemove="(event) => handleMenuMouseMove(event, 'menu')"
@@ -192,7 +193,7 @@
 		</Transition>
 	</Teleport>
 
-	<Teleport to="#teleports">
+	<Teleport v-if="isClient" to="#teleports">
 		<Transition name="floating-expand" :css="!isMobileAddMenuLayout">
 			<div
 				v-if="isAddMenuOpen && activeCategory && (isMobileAddMenuLayout || hasSubmenuPosition)"
@@ -222,7 +223,7 @@
 					v-if="activeCategory.searchable"
 					class="flex justify-between border-0 border-b border-solid border-b-surface-5 py-1.5 w-full"
 				>
-					<StyledInput
+					<Input
 						v-model="categorySearchQuery"
 						:icon="SearchIcon"
 						type="text"
@@ -425,14 +426,14 @@ import {
 import { onClickOutside } from '@vueuse/core'
 import { OverlayScrollbars, type PartialOptions } from 'overlayscrollbars'
 import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { Button, type ButtonElementHandle, type ButtonSize } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useVirtualScroll } from '../../composables/virtual-scroll'
+import Input from './inputs/Input.vue'
 import MultiSelect, { type MultiSelectItem } from './MultiSelect.vue'
-import StyledInput from './StyledInput.vue'
 
 export type DropdownFilterBarOption = {
 	value: string
@@ -607,6 +608,7 @@ const emit = defineEmits<{
 }>()
 
 const isAddMenuOpen = ref(false)
+const isClient = ref(false)
 const activeCategoryKey = ref<string | null>(null)
 const pendingCategoryKey = ref<string | null>(null)
 const draftSelectedFilters = ref<DropdownFilterBarValue>(cloneSelectedFilters(props.modelValue))
@@ -1979,6 +1981,10 @@ watch(
 	},
 	{ deep: true },
 )
+
+onMounted(() => {
+	isClient.value = true
+})
 
 onBeforeUnmount(() => {
 	clearPendingCategoryTimeout()

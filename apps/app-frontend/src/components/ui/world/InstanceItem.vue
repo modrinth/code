@@ -12,7 +12,9 @@ import {
 	Avatar,
 	BulletDivider,
 	Button,
+	type ButtonMenuOption,
 	commonMessages,
+	ContextMenu,
 	defineMessages,
 	injectNotificationManager,
 	SmartClickable,
@@ -24,7 +26,7 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import type { Dayjs } from 'dayjs'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAppEvent } from '@/composables/use-app-event'
@@ -79,6 +81,10 @@ const messages = defineMessages({
 	viewInstance: {
 		id: 'app.home.jump-back-in.view-instance',
 		defaultMessage: 'View instance',
+	},
+	instanceActions: {
+		id: 'app.home.jump-back-in.actions.label',
+		defaultMessage: 'Instance actions',
 	},
 })
 
@@ -144,115 +150,149 @@ const checkProcess = async () => {
 onMounted(() => {
 	checkProcess()
 })
+
+const cardOptions = useTemplateRef('cardOptions')
+const showStop = computed(() => playing.value && !loading.value)
+const playDisabled = computed(() => props.instance.quarantined || playing.value || loading.value)
+
+const overflowOptions = computed((): ButtonMenuOption[] => [
+	{
+		id: 'open-instance',
+		label: formatMessage(messages.viewInstance),
+		icon: EyeIcon,
+		shown: !!props.instance.id,
+		action: () => router.push(encodeURI(`/instance/${props.instance.id}`)),
+	},
+	{
+		id: 'open-folder',
+		label: formatMessage(commonMessages.openFolderButton),
+		icon: FolderOpenIcon,
+		action: () => showInstanceInFolder(props.instance.id),
+	},
+])
+
+const contextMenuOptions = computed((): ButtonMenuOption[] => [
+	showStop.value
+		? {
+				id: 'stop',
+				label: formatMessage(commonMessages.stopButton),
+				icon: StopCircleIcon,
+				tone: 'red',
+				action: (event) => stop(event),
+			}
+		: {
+				id: 'play',
+				label: formatMessage(commonMessages.playButton),
+				icon: PlayIcon,
+				tone: 'brand',
+				disabled: playDisabled.value,
+				tooltip: props.instance.quarantined
+					? formatMessage(messages.lockedTooltip)
+					: playing.value
+						? formatMessage(messages.alreadyOpenTooltip)
+						: undefined,
+				action: (event) => play(event),
+			},
+	{ type: 'divider' },
+	...overflowOptions.value,
+])
+
+function openContextMenu(event: MouseEvent) {
+	cardOptions.value?.open(event, contextMenuOptions.value)
+}
 </script>
 <template>
-	<SmartClickable class="[--active-scale:0.99]">
-		<template #clickable>
-			<router-link
-				class="no-click-animation"
-				:to="`/instance/${encodeURIComponent(instance.id)}`"
-			/>
-		</template>
-		<div
-			class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 border border-surface-4 rounded-[20px] smart-clickable:highlight-on-hover transition-[filter] ease-out [--hover-brightness:1.1] min-h-20 p-3"
-			:class="newlyAdded ? 'border-dashed bg-surface-2' : 'bg-bg-raised border-solid'"
-		>
-			<Avatar
-				:src="getInstanceIconUrl(instanceIcon)"
-				:tint-by="instance.id"
-				no-shadow
-				class="!rounded-[14px]"
-				size="48px"
-			/>
-			<div class="flex flex-col col-span-2 justify-center gap-1 h-full">
-				<div class="flex items-center gap-1.5">
-					<div class="text-contrast truncate text-base font-semibold">
-						{{ instance.name }}
+	<div @contextmenu.prevent.stop="openContextMenu">
+		<SmartClickable class="[--active-scale:0.99]">
+			<template #clickable>
+				<router-link
+					class="no-click-animation"
+					:to="`/instance/${encodeURIComponent(instance.id)}`"
+				/>
+			</template>
+			<div
+				class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 border border-surface-4 rounded-[20px] smart-clickable:highlight-on-hover transition-[filter] ease-out [--hover-brightness:1.1] min-h-20 p-3"
+				:class="newlyAdded ? 'border-dashed bg-surface-2' : 'bg-bg-raised border-solid'"
+			>
+				<Avatar
+					:src="getInstanceIconUrl(instanceIcon)"
+					:tint-by="instance.id"
+					no-shadow
+					class="!rounded-[14px]"
+					size="48px"
+					pad-transparent-corners
+				/>
+				<div class="flex flex-col col-span-2 justify-center gap-1 h-full">
+					<div class="flex items-center gap-1.5">
+						<div class="text-contrast truncate text-base font-semibold">
+							{{ instance.name }}
+						</div>
+						<TagItem
+							v-if="newlyAdded"
+							class="!border-green !bg-bg-green !px-2 !font-medium !text-green"
+						>
+							<SparklesIcon aria-hidden="true" />
+							{{ formatMessage(messages.newInstance) }}
+						</TagItem>
 					</div>
-					<TagItem
-						v-if="newlyAdded"
-						class="!border-green !bg-bg-green !px-2 !font-medium !text-green"
-					>
-						<SparklesIcon aria-hidden="true" />
-						{{ formatMessage(messages.newInstance) }}
-					</TagItem>
+					<div class="flex items-center gap-1.5 text-sm text-secondary">
+						<span class="flex items-center gap-1 truncate text-secondary">
+							{{ loader }}
+							{{ instance.game_version }}
+						</span>
+						<BulletDivider class="shrink-0" />
+						<div
+							v-tooltip="!newlyAdded ? formatDateTime(last_played.toDate()) : null"
+							class="w-fit shrink-0"
+							:class="{
+								'cursor-help smart-clickable:allow-pointer-events': !newlyAdded,
+							}"
+						>
+							<template v-if="newlyAdded">
+								{{ formatMessage(messages.neverPlayed) }}
+							</template>
+							<template v-else-if="last_played">
+								{{ formatRelativeTime(last_played.toISOString?.()) }}
+							</template>
+							<template v-else>{{ formatMessage(messages.neverPlayed) }}</template>
+						</div>
+					</div>
 				</div>
-				<div class="flex items-center gap-1.5 text-sm text-secondary">
-					<span class="flex items-center gap-1 truncate text-secondary">
-						{{ loader }}
-						{{ instance.game_version }}
-					</span>
-					<BulletDivider class="shrink-0" />
-					<div
-						v-tooltip="!newlyAdded ? formatDateTime(last_played.toDate()) : null"
-						class="w-fit shrink-0"
-						:class="{
-							'cursor-help smart-clickable:allow-pointer-events': !newlyAdded,
-						}"
+				<div data-no-card-click class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
+					<Button v-if="showStop" type="colored" color="red" @click="stop">
+						<StopCircleIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.stopButton) }}
+					</Button>
+					<Button
+						v-else
+						v-tooltip="
+							instance.quarantined
+								? formatMessage(messages.lockedTooltip)
+								: playing
+									? formatMessage(messages.alreadyOpenTooltip)
+									: null
+						"
+						:disabled="playDisabled"
+						type="colored"
+						color="green"
+						@click="play"
 					>
-						<template v-if="newlyAdded">
-							{{ formatMessage(messages.neverPlayed) }}
-						</template>
-						<template v-else-if="last_played">
-							{{ formatRelativeTime(last_played.toISOString?.()) }}
-						</template>
-						<template v-else>{{ formatMessage(messages.neverPlayed) }}</template>
-					</div>
+						<SpinnerIcon v-if="loading" class="animate-spin" />
+						<PlayIcon v-else aria-hidden="true" />
+						{{ formatMessage(commonMessages.playButton) }}
+					</Button>
+					<TeleportOverflowMenu
+						type="quiet"
+						:label="formatMessage(messages.moreOptions)"
+						:options="overflowOptions"
+					>
+						<MoreVerticalIcon aria-hidden="true" />
+					</TeleportOverflowMenu>
 				</div>
 			</div>
-			<div data-no-card-click class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
-				<Button v-if="playing && !loading" type="colored" color="red" @click="stop">
-					<StopCircleIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.stopButton) }}
-				</Button>
-				<Button
-					v-else
-					v-tooltip="
-						instance.quarantined
-							? formatMessage(messages.lockedTooltip)
-							: playing
-								? formatMessage(messages.alreadyOpenTooltip)
-								: null
-					"
-					:disabled="instance.quarantined || playing || loading"
-					type="colored"
-					color="green"
-					@click="play"
-				>
-					<SpinnerIcon v-if="loading" class="animate-spin" />
-					<PlayIcon v-else aria-hidden="true" />
-					{{ formatMessage(commonMessages.playButton) }}
-				</Button>
-				<TeleportOverflowMenu
-					type="quiet"
-					:label="formatMessage(messages.moreOptions)"
-					:options="[
-						{
-							id: 'open-instance',
-							label: formatMessage(messages.viewInstance),
-							shown: !!instance.id,
-							action: () => router.push(encodeURI(`/instance/${instance.id}`)),
-						},
-						{
-							id: 'open-folder',
-							label: formatMessage(commonMessages.openFolderButton),
-							action: () => showInstanceInFolder(instance.id),
-						},
-					]"
-				>
-					<MoreVerticalIcon aria-hidden="true" />
-					<template #open-instance>
-						<EyeIcon aria-hidden="true" />
-						{{ formatMessage(messages.viewInstance) }}
-					</template>
-					<template #open-folder>
-						<FolderOpenIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.openFolderButton) }}
-					</template>
-				</TeleportOverflowMenu>
-			</div>
-		</div>
-	</SmartClickable>
+		</SmartClickable>
+		<ContextMenu ref="cardOptions" :label="formatMessage(messages.instanceActions)" />
+	</div>
 </template>
 <style scoped>
 .clickable-card:has([data-no-card-click]:hover) {

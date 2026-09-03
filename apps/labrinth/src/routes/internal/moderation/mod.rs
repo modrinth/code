@@ -306,6 +306,7 @@ pub async fn get_projects_internal(
                             FROM delphi_issue_details_with_statuses didws
                             WHERE didws.project_id = m.id
                                 AND didws.status = 'pending'
+                                AND didws.severity != 'hidden'
                         )
                     )
             ),
@@ -555,6 +556,7 @@ pub async fn get_projects_internal(
                             FROM delphi_issue_details_with_statuses didws
                             WHERE didws.project_id = m.id
                                 AND didws.status = 'pending'
+                                AND didws.severity != 'hidden'
                         )
                     )
             ),
@@ -786,6 +788,7 @@ pub async fn get_project_ids(
                             FROM delphi_issue_details_with_statuses didws
                             WHERE didws.project_id = m.id
                                 AND didws.status = 'pending'
+                                AND didws.severity != 'hidden'
                         )
                     )
             ),
@@ -914,6 +917,7 @@ pub async fn get_project_ids(
                         FROM delphi_issue_details_with_statuses didws
                         WHERE didws.project_id = mods.id
                             AND didws.status = 'pending'
+                            AND didws.severity != 'hidden'
                     )
                 )
             ORDER BY

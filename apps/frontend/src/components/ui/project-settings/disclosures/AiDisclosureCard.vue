@@ -8,7 +8,7 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	SettingsFormGroup,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -110,10 +110,9 @@ function setUse(use: AiUsage, enabled: boolean) {
 				title-for="ai-disclosure-note"
 				optional
 			>
-				<StyledInput
+				<Textarea
 					id="ai-disclosure-note"
 					v-model="model.note"
-					multiline
 					:rows="3"
 					class="max-w-[40rem]"
 					:disabled="disabled"

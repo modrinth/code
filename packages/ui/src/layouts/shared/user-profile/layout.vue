@@ -189,6 +189,7 @@
 					@open-billing="openPath(`/admin/billing/${user.id}`)"
 					@toggle-affiliate="toggleAffiliate"
 					@open-info="openUserDetails"
+					@open-shared-instances="openPath(`/admin/shared-instances/${user.id}`)"
 					@open-analytics="
 						openPath(`/dashboard/analytics?user=${encodeURIComponent(user.username)}`)
 					"
@@ -229,7 +230,7 @@
 					:projects="filteredProjects"
 					:layout="displayMode"
 					:link-mode="projectLinkMode"
-					show-status
+					:show-status="canSeeProjectStatus"
 				>
 					<template v-if="$slots['project-actions']" #actions="{ project }">
 						<slot name="project-actions" :project="project" />
@@ -295,7 +296,7 @@
 										})
 									}}
 								</div>
-								<div class="flex items-center gap-1">
+								<div v-if="canSeeCollectionStatus" class="flex items-center gap-1">
 									<template v-if="collection.status === 'listed'">
 										<GlobeIcon />
 										{{ formatMessage(commonMessages.publicLabel) }}
@@ -702,6 +703,19 @@ const blockedUsersQuery = useQuery({
 	enabled: computed(() => Boolean(auth.user.value)),
 	staleTime: 30_000,
 })
+const viewerProjectsQuery = useQuery({
+	queryKey: computed(() => ['user', auth.user.value?.id, 'projects']),
+	queryFn: () => userProfile.getProjects(auth.user.value!.id),
+	enabled: computed(
+		() =>
+			Boolean(auth.user.value?.id) &&
+			Boolean(userQuery.data.value?.id) &&
+			auth.user.value?.id !== userQuery.data.value?.id &&
+			auth.user.value?.role !== 'admin' &&
+			auth.user.value?.role !== 'moderator',
+	),
+	staleTime: 30_000,
+})
 
 const user = computed(() => userQuery.data.value)
 const projects = computed(() => projectsQuery.data.value ?? [])
@@ -796,6 +810,16 @@ const isAdminViewing = computed(() => auth.user.value?.role === 'admin')
 const isStaffViewing = computed(
 	() => auth.user.value?.role === 'admin' || auth.user.value?.role === 'moderator',
 )
+const viewerMemberProjectIds = computed(
+	() => new Set((viewerProjectsQuery.data.value ?? []).map((project) => project.id)),
+)
+
+function canSeeProjectStatus(project: Labrinth.Projects.v3.Project) {
+	if (isSelf.value || isStaffViewing.value) return true
+	return viewerMemberProjectIds.value.has(project.id)
+}
+
+const canSeeCollectionStatus = computed(() => isSelf.value || isStaffViewing.value)
 const isAffiliate = computed(() => Boolean((user.value?.badges ?? 0) & UserBadge.AFFILIATE))
 const hasMidas = computed(
 	() => Boolean((user.value?.badges ?? 0) & UserBadge.MIDAS) || hasActivePride26Midas(user.value),

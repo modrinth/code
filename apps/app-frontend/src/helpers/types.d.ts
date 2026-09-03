@@ -16,6 +16,12 @@ export type GameInstance = {
 	loader_version?: string
 
 	group_ids: string[]
+	synced_options: {
+		command_history: boolean
+		multiplayer_servers: boolean
+		creative_hotbars: boolean
+		screenshots: boolean
+	}
 
 	link?: InstanceLink | null
 	shared_instance?: SharedInstanceAttachment | null
@@ -37,6 +43,11 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+	visible_tabs: {
+		files: boolean
+		worlds: boolean
+		screenshots: boolean
+	}
 }
 
 export type IconBackground =

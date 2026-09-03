@@ -1,32 +1,23 @@
 <template>
-	<div class="overflow-hidden rounded-2xl">
-		<div class="bg-bg-raised p-4">
+	<div
+		class="relative overflow-hidden rounded-2xl border border-solid border-surface-4 transition-[transform,opacity] duration-[400ms] ease-in"
+		:class="{ 'pointer-events-none translate-x-[120%] opacity-0': isSwipingAway }"
+	>
+		<div class="border-0 border-b border-solid border-surface-4 bg-bg-raised p-4">
 			<div
 				class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
 			>
-				<span class="text-md flex flex-col gap-2 sm:flex-row sm:items-center">
-					<span class="flex items-center gap-2">
+				<span class="text-md flex flex-col flex-wrap gap-1 sm:flex-row sm:items-center">
+					<span class="flex items-center gap-1">
 						<span class="text-secondary">Reported for</span>
 						<span class="font-semibold text-contrast">
 							{{ formattedReportType }}
 						</span>
 					</span>
-					<span class="flex items-center gap-2">
-						<span class="hidden text-secondary sm:inline">By</span>
+					<span class="flex items-center gap-1">
+						<span class="hidden text-secondary sm:inline">by</span>
 						<span class="text-secondary sm:hidden">Reporter:</span>
-						<nuxt-link
-							:to="`/user/${report.reporter_user.username}`"
-							target="_blank"
-							class="inline-flex flex-row items-center gap-1 transition-colors duration-100 ease-in-out hover:text-brand"
-						>
-							<Avatar
-								:src="report.reporter_user.avatar_url"
-								circle
-								size="1.75rem"
-								class="flex-shrink-0"
-							/>
-							<span class="truncate">{{ report.reporter_user.username }}</span>
-						</nuxt-link>
+						<ModerationOwnerLink :owner="reporter" />
 					</span>
 				</span>
 
@@ -38,14 +29,17 @@
 						{{ formatRelativeTime(report.created) }}
 					</span>
 					<div class="flex items-center gap-2">
-						<IconButton v-tooltip="'Copy ID'" :label="'Copy ID'" @click="copyId">
-							<ClipboardCopyIcon />
-						</IconButton>
+						<CopyCode v-tooltip="'Copy report ID'" :text="report.id" />
+						<CopyLinkButton
+							copy-label="Copy report link"
+							:url="`https://modrinth.com/moderation/reports/${props.report.id}`"
+						/>
 						<ButtonLink
 							v-tooltip="'Open in new tab'"
 							:href="`/moderation/reports/${props.report.id}`"
 							target="_blank"
-							class="!w-9 !rounded-full !px-0"
+							circular
+							icon-only
 						>
 							<ExternalIcon />
 						</ButtonLink>
@@ -55,130 +49,88 @@
 
 			<div class="my-4 h-px bg-surface-5" />
 
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-4">
-					<Avatar
-						:src="reportItemAvatarUrl"
-						:circle="report.item_type === 'user'"
-						size="4rem"
-						:class="[
-							'flex-shrink-0 border border-surface-5 bg-surface-4 !shadow-none',
-							report.item_type !== 'user' && 'rounded-2xl',
-						]"
-					/>
-
-					<div v-if="report.item_type === 'user'" class="flex flex-col gap-1.5">
-						<NuxtLink
-							:to="`/user/${report.user?.username}`"
-							target="_blank"
-							class="text-base font-semibold text-contrast hover:underline"
-						>
-							{{ report.user?.username || 'Unknown User' }}
-						</NuxtLink>
-
-						<span
-							v-if="report.user?.created"
-							v-tooltip="formatDateTime(report.user.created)"
-							class="cursor-help text-sm text-secondary"
-						>
-							Joined {{ formatRelativeTime(report.user.created) }}
+			<ModerationItemHeader
+				:avatar-url="reportItemAvatarUrl"
+				:title="reportItemTitle"
+				:title-to="reportItemTitleTo"
+				:owner="itemOwner"
+				:circle="report.item_type === 'user'"
+				:pad-transparent-corners="report.item_type === 'shared-instance'"
+			>
+				<template #badges>
+					<div
+						v-if="report.project?.project_type"
+						class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+					>
+						<component
+							:is="getProjectTypeIcon(report.project.project_type as any)"
+							aria-hidden="true"
+							class="h-4 w-4"
+						/>
+						<span class="text-sm font-medium text-secondary">
+							{{ formatProjectType(report.project.project_type, true) }}
 						</span>
 					</div>
 
-					<div v-else class="flex flex-col gap-1.5">
-						<div class="flex flex-wrap items-center gap-2">
-							<NuxtLink
-								v-if="report.item_type !== 'shared-instance'"
-								:to="reportItemUrl"
-								target="_blank"
-								class="text-base font-semibold text-contrast hover:underline"
-							>
-								{{ reportItemTitle }}
-							</NuxtLink>
-							<span v-else class="text-base font-semibold text-contrast">
-								{{ reportItemTitle }}
-							</span>
-
-							<div
-								v-if="report.project?.project_type"
-								class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
-							>
-								<component
-									:is="getProjectTypeIcon(report.project.project_type as any)"
-									aria-hidden="true"
-									class="h-4 w-4"
-								/>
-								<span class="text-sm font-medium text-secondary">
-									{{ formatProjectType(report.project.project_type, true) }}
-								</span>
-							</div>
-
-							<span
-								v-if="report.item_type === 'version' && report.version"
-								class="text-sm text-secondary"
-							>
-								{{ report.version.files.find((f) => f.primary)?.filename || 'Unknown Version' }}
-							</span>
-							<span
-								v-if="
-									report.item_type === 'shared-instance' &&
-									report.shared_instance_version_id !== undefined
-								"
-								class="text-sm text-secondary"
-							>
-								Version {{ report.shared_instance_version_id }}
-							</span>
-							<CopyCode v-if="report.item_type === 'shared-instance'" :text="report.item_id" />
-							<span
-								v-if="report.item_type === 'shared-instance' && sharedInstanceQuarantined"
-								class="bg-orange-highlight inline-flex items-center gap-1 rounded-full border border-solid border-orange px-2.5 py-1 text-sm font-semibold text-orange"
-							>
-								<LockIcon class="size-4" />
-								Quarantined
-							</span>
-						</div>
-
-						<div v-if="report.target" class="flex items-center gap-1">
-							<Avatar
-								:src="report.target.avatar_url"
-								size="1.5rem"
-								circle
-								class="border border-surface-5 bg-surface-4 !shadow-none"
-							/>
-							<NuxtLink
-								:to="`/${report.target.type}/${report.target.slug}`"
-								target="_blank"
-								class="text-sm font-medium text-secondary hover:underline"
-							>
-								{{ report.target.name }}
-							</NuxtLink>
-						</div>
-						<div
-							v-else-if="report.item_type === 'shared-instance' && sharedInstanceDetails"
-							class="flex items-center gap-1"
-						>
-							<Avatar
-								:src="sharedInstanceDetails.owner.avatar_url"
-								size="1.5rem"
-								circle
-								class="border border-surface-5 bg-surface-4 !shadow-none"
-							/>
-							<NuxtLink
-								:to="`/user/${sharedInstanceDetails.owner.username}`"
-								target="_blank"
-								class="text-sm font-medium text-secondary hover:underline"
-							>
-								{{ sharedInstanceDetails.owner.username }}
-							</NuxtLink>
-						</div>
+					<div
+						v-if="report.project?.status"
+						class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+					>
+						<Badge :type="report.project?.status" class="text-sm" />
 					</div>
-				</div>
-			</div>
+
+					<span
+						v-if="report.item_type === 'version' && report.version"
+						class="text-sm text-secondary"
+					>
+						{{ report.version.files.find((f) => f.primary)?.filename || 'Unknown Version' }}
+					</span>
+					<span
+						v-if="
+							report.item_type === 'shared-instance' &&
+							report.shared_instance_version_id !== undefined
+						"
+						class="text-sm text-secondary"
+					>
+						Version {{ report.shared_instance_version_id }}
+					</span>
+					<CopyCode v-if="report.item_type === 'shared-instance'" :text="report.item_id" />
+					<span
+						v-if="report.item_type === 'shared-instance' && sharedInstanceQuarantined"
+						class="bg-orange-highlight inline-flex items-center gap-1 rounded-full border border-solid border-orange px-2.5 py-1 text-sm font-semibold text-orange"
+					>
+						<LockIcon class="size-4" />
+						Quarantined
+					</span>
+				</template>
+				<template #subtitle>
+					<span
+						v-if="report.item_type === 'user' && report.user?.created"
+						v-tooltip="formatDateTime(report.user.created)"
+						class="cursor-help text-sm text-secondary"
+					>
+						Joined {{ formatRelativeTime(report.user.created) }}
+					</span>
+					<Button
+						v-else-if="report.item_type === 'shared-instance' && !itemOwner"
+						type="outlined"
+						size="sm"
+						class="w-fit"
+						:loading="sharedInstanceLoading"
+						@click="loadSharedInstanceDetails"
+					>
+						<LoaderCircleIcon v-if="sharedInstanceLoading" class="animate-spin" />
+						<ReceiptTextIcon v-else />
+						Load shared instance details
+					</Button>
+				</template>
+			</ModerationItemHeader>
 		</div>
 		<CollapsibleRegion
 			v-model:collapsed="isThreadCollapsed"
 			:expand-text="expandText"
 			collapse-text="Collapse thread"
+			:disabled="disableCollapsing"
 		>
 			<div class="bg-surface-2 pt-2">
 				<ThreadView
@@ -230,7 +182,7 @@
 							@click="reopenReport()"
 						>
 							<CheckCircleIcon class="size-4" />
-							Reopen Thread
+							Reopen report
 						</Button>
 					</template>
 					<template #additionalActions="{ hasReply }">
@@ -260,24 +212,37 @@
 				</ThreadView>
 			</div>
 		</CollapsibleRegion>
+		<div
+			v-if="pendingDismiss"
+			:key="dismissAnimationId"
+			class="pointer-events-none absolute inset-x-0 bottom-0 h-1.5 overflow-hidden bg-highlight-red"
+			aria-hidden="true"
+		>
+			<div
+				class="report-dismiss-progress h-full w-full bg-red"
+				:style="{ animationDuration: `${DISMISS_DELAY_MS}ms` }"
+			/>
+		</div>
 	</div>
 </template>
 <script setup lang="ts">
 import type { Labrinth, SharedInstances } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
-	ClipboardCopyIcon,
 	ExternalIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	ReceiptTextIcon,
 } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
-import { Button, ButtonLink, IconButton } from '@modrinth/ui'
 import {
-	Avatar,
+	Badge,
+	Button,
+	ButtonLink,
 	CollapsibleRegion,
 	type ContentItem,
 	CopyCode,
+	CopyLinkButton,
 	formatReportType,
 	getProjectTypeIcon,
 	injectModrinthClient,
@@ -287,11 +252,14 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { computed, ref, watch } from 'vue'
+import { useQueryClient } from '@tanstack/vue-query'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
 import { isStaff } from '~/helpers/users.js'
 
 import ThreadView from '../thread/ThreadView.vue'
+import ModerationItemHeader from './ModerationItemHeader.vue'
+import ModerationOwnerLink, { type ModerationOwner } from './ModerationOwnerLink.vue'
 import SharedInstanceReportContext, {
 	type SharedInstanceOwnerInstance,
 	type SharedInstanceReportDetails,
@@ -301,21 +269,31 @@ import SharedInstanceReportContext, {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const auth = await useAuth()
+const queryClient = useQueryClient()
+const auth = useAuthState()
 
 type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 	project_id?: string
 	version_id?: string
 }
 
+const DISMISS_DELAY_MS = 3000
+const SWIPE_DURATION_MS = 400
+
 const props = defineProps<{
 	report: ExtendedReport
 	collapsed: boolean
+	disableCollapsing?: boolean
+	dismissAfterClose?: boolean
 	sharedInstanceDetailsLoader?: () => Promise<SharedInstanceReportDetails>
 	sharedInstanceVersionContentLoader?: (
 		instanceId: string,
 		version: number,
 	) => Promise<ContentItem[]>
+}>()
+
+const emit = defineEmits<{
+	dismiss: []
 }>()
 
 const reportThread = ref<{
@@ -338,17 +316,38 @@ watch(
 	{ immediate: true },
 )
 
-const didCloseReport = ref(false)
-const reportClosed = computed(() => {
-	return didCloseReport.value || props.report.closed
-})
+const closedOverride = ref<boolean | null>(null)
+const pendingDismiss = ref(false)
+const isSwipingAway = ref(false)
+const dismissAnimationId = ref(0)
+const thread = ref(props.report.thread)
+let dismissTimeout: ReturnType<typeof setTimeout> | null = null
+let swipeTimeout: ReturnType<typeof setTimeout> | null = null
+
+const reportClosed = computed(() => closedOverride.value ?? props.report.closed)
+
+watch(
+	() => props.report.thread,
+	(value) => {
+		thread.value = value
+	},
+)
+
+watch(
+	() => props.report.closed,
+	(closed) => {
+		if (closedOverride.value === closed) {
+			closedOverride.value = null
+		}
+	},
+)
 const sharedInstanceQuarantined = computed(
 	() =>
 		sharedInstanceDetails.value?.quarantine ?? props.report.shared_instance?.quarantine ?? false,
 )
 
 const threadWithReportBody = computed(() => {
-	if (!props.report.thread) return null
+	if (!thread.value) return null
 
 	const reportBodyMessage = {
 		id: `report-body-${props.report.id}`,
@@ -365,16 +364,15 @@ const threadWithReportBody = computed(() => {
 	}
 
 	return {
-		...props.report.thread,
-		messages: [reportBodyMessage, ...props.report.thread.messages],
-		members: [props.report.reporter_user, ...props.report.thread.members],
+		...thread.value,
+		messages: [reportBodyMessage, ...thread.value.messages],
+		members: [props.report.reporter_user, ...thread.value.members],
 	}
 })
 
 const remainingMessageCount = computed(() => {
-	if (!props.report.thread?.messages) return 0
-	// Thread messages count (report body is injected separately)
-	return props.report.thread.messages.length
+	if (!thread.value?.messages) return 0
+	return thread.value.messages.length
 })
 
 const expandText = computed(() => {
@@ -382,6 +380,13 @@ const expandText = computed(() => {
 	if (remainingMessageCount.value === 1) return 'Show 1 more message'
 	return `Show ${remainingMessageCount.value} more messages`
 })
+
+const reporter = computed<ModerationOwner>(() => ({
+	kind: 'user',
+	id: props.report.reporter_user.id,
+	name: props.report.reporter_user.username,
+	icon_url: props.report.reporter_user.avatar_url,
+}))
 
 async function closeReport(reply = false) {
 	if (reply && reportThread.value) {
@@ -395,8 +400,10 @@ async function closeReport(reply = false) {
 				closed: true,
 			},
 		})
-		await refreshReportCaches()
-		didCloseReport.value = true
+		await refreshThread()
+		closedOverride.value = true
+		startDismissCountdown()
+		void refreshReportQuery()
 	} catch (err: any) {
 		addNotification({
 			title: 'Error closing report',
@@ -407,6 +414,8 @@ async function closeReport(reply = false) {
 }
 
 async function reopenReport() {
+	cancelDismissCountdown()
+
 	try {
 		await useBaseFetch(`report/${props.report.id}`, {
 			method: 'PATCH',
@@ -414,16 +423,58 @@ async function reopenReport() {
 				closed: false,
 			},
 		})
-		await refreshReportCaches()
-		didCloseReport.value = false
+		await refreshThread()
+		closedOverride.value = false
+		void refreshReportQuery()
 	} catch (err: any) {
 		addNotification({
 			title: 'Error reopening report',
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
+		if (reportClosed.value) {
+			startDismissCountdown()
+		}
 	}
 }
+
+function cancelDismissCountdown() {
+	pendingDismiss.value = false
+	if (dismissTimeout !== null) {
+		clearTimeout(dismissTimeout)
+		dismissTimeout = null
+	}
+}
+
+function startDismissCountdown() {
+	if (!props.dismissAfterClose || isSwipingAway.value) return
+
+	cancelDismissCountdown()
+	dismissAnimationId.value += 1
+	pendingDismiss.value = true
+	dismissTimeout = setTimeout(() => {
+		dismissTimeout = null
+		swipeAway()
+	}, DISMISS_DELAY_MS)
+}
+
+function swipeAway() {
+	if (isSwipingAway.value) return
+
+	isSwipingAway.value = true
+	swipeTimeout = setTimeout(() => {
+		swipeTimeout = null
+		emit('dismiss')
+	}, SWIPE_DURATION_MS)
+}
+
+onUnmounted(() => {
+	cancelDismissCountdown()
+	if (swipeTimeout !== null) {
+		clearTimeout(swipeTimeout)
+		swipeTimeout = null
+	}
+})
 
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
@@ -431,22 +482,23 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 })
 
-async function refreshReportCaches() {
-	await Promise.allSettled([refreshThread(), refreshNuxtData('new-moderation-reports')])
-}
-
 async function refreshThread() {
-	const threadId = props.report.thread?.id ?? props.report.thread_id
+	const threadId = thread.value?.id ?? props.report.thread?.id ?? props.report.thread_id
 	if (!threadId) return
 
-	const thread = await useBaseFetch(`thread/${threadId}`)
-	updateThread(thread)
+	const nextThread = await useBaseFetch(`thread/${threadId}`)
+	updateThread(nextThread)
 }
 
 function updateThread(newThread: any) {
+	thread.value = newThread
 	if (props.report.thread) {
 		Object.assign(props.report.thread, newThread)
 	}
+}
+
+function refreshReportQuery() {
+	return queryClient.invalidateQueries({ queryKey: ['report', props.report.id] })
 }
 
 async function getSharedInstanceVersion(
@@ -794,19 +846,39 @@ const reportItemUrl = computed(() => {
 	}
 })
 
+const reportItemTitleTo = computed(() =>
+	props.report.item_type === 'shared-instance' ? undefined : reportItemUrl.value,
+)
+
+const itemOwner = computed((): ModerationOwner | null => {
+	if (props.report.item_type === 'user') return null
+
+	if (props.report.item_type === 'shared-instance') {
+		const owner = sharedInstanceDetails.value?.owner
+		if (!owner) return null
+
+		return {
+			kind: 'user',
+			id: owner.id,
+			name: owner.username,
+			icon_url: owner.avatar_url ?? null,
+		}
+	}
+
+	const target = props.report.target
+	if (!target) return null
+
+	return {
+		kind: target.type,
+		id: target.id,
+		name: target.name,
+		icon_url: target.avatar_url ?? null,
+	}
+})
+
 const formattedReportType = computed(() =>
 	formatReportType(formatMessage, props.report.report_type),
 )
-
-function copyId() {
-	navigator.clipboard.writeText(props.report.id).then(() => {
-		addNotification({
-			type: 'success',
-			title: 'Report ID copied',
-			text: 'The ID of this report has been copied to your clipboard.',
-		})
-	})
-}
 
 async function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
 	if (sharedInstanceBanPending.value) return
@@ -844,3 +916,21 @@ async function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
 	}
 }
 </script>
+
+<style scoped>
+.report-dismiss-progress {
+	transform-origin: left center;
+	animation-name: report-dismiss-fill;
+	animation-timing-function: linear;
+	animation-fill-mode: forwards;
+}
+
+@keyframes report-dismiss-fill {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
+	}
+}
+</style>
