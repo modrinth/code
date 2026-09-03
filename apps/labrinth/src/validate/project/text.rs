@@ -617,6 +617,7 @@ pub(super) fn contains_description_spam(markdown: &str) -> bool {
 
         if has_repeated_words(&words, MIN_REPEATED_WORDS)
             || has_repeated_phrase(&words, MIN_REPEATED_PHRASE_WORDS)
+            || has_repeated_ngram_density(&words)
         {
             return true;
         }
@@ -796,6 +797,42 @@ fn has_repeated_phrase(
     }
 
     false
+}
+
+fn has_repeated_ngram_density(words: &[String]) -> bool {
+    const NGRAM_WORDS: usize = 4;
+    const MIN_WORDS: usize = 30;
+    const MIN_DUPLICATE_NGRAM_PERCENT: usize = 50;
+    const MIN_COVERED_WORD_PERCENT: usize = 70;
+
+    if words.len() < MIN_WORDS {
+        return false;
+    }
+
+    let mut ngram_counts = BTreeMap::<&[String], usize>::new();
+    for ngram in words.windows(NGRAM_WORDS) {
+        *ngram_counts.entry(ngram).or_default() += 1;
+    }
+
+    let total_ngrams = words.len() - NGRAM_WORDS + 1;
+    let duplicate_ngrams = ngram_counts
+        .values()
+        .map(|count| count.saturating_sub(1))
+        .sum::<usize>();
+    if duplicate_ngrams * 100
+        < total_ngrams * MIN_DUPLICATE_NGRAM_PERCENT
+    {
+        return false;
+    }
+
+    let mut covered_words = vec![false; words.len()];
+    for (start, ngram) in words.windows(NGRAM_WORDS).enumerate() {
+        if ngram_counts.get(ngram).is_some_and(|count| *count > 1) {
+            covered_words[start..start + NGRAM_WORDS].fill(true);
+        }
+    }
+    covered_words.iter().filter(|covered| **covered).count() * 100
+        >= words.len() * MIN_COVERED_WORD_PERCENT
 }
 
 pub(super) fn find_link_or_ip(text: &str) -> Option<String> {
