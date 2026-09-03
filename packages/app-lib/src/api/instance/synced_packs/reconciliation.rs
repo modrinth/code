@@ -103,6 +103,12 @@ pub(super) async fn capture(
                 }
                 shared_changed = true;
             }
+            if pack.item.project_type == ProjectType::ResourcePack
+                && placement.resource_pack_selection_path.is_none()
+            {
+                placement.resource_pack_selection_path =
+                    Some(placement.path.clone());
+            }
             placement.path = item.file_path.clone();
             placement.sha1 = item.id.clone();
             placement.enabled = item.enabled;
@@ -115,6 +121,13 @@ pub(super) async fn capture(
             .entry(metadata.instance.id.clone())
             .or_default()
             .insert(id, placement);
+    }
+    match super::selection::capture(metadata, library, state).await {
+        Ok(changed) => shared_changed |= changed.unwrap_or(false),
+        Err(error) => tracing::warn!(
+            "Could not capture resource-pack selection for {}: {error}",
+            metadata.instance.id
+        ),
     }
     Ok(shared_changed)
 }
@@ -186,6 +199,15 @@ async fn apply_pack(
         .get(instance_id)
         .and_then(|items| items.get(id))
         .cloned();
+    let resource_pack_selection_path =
+        previous.as_ref().and_then(|placement| {
+            placement.resource_pack_selection_path.clone().or_else(|| {
+                (!placement.path.is_empty()).then(|| placement.path.clone())
+            })
+        });
+    let resource_pack_selection_pending = previous
+        .as_ref()
+        .is_some_and(|placement| placement.resource_pack_selection_pending);
     if previous
         .as_ref()
         .is_some_and(|placement| placement.excluded)
@@ -252,6 +274,8 @@ async fn apply_pack(
                         enabled: pack.item.enabled,
                         pending: !compatible,
                         content_set_id: metadata.applied_content_set.id.clone(),
+                        resource_pack_selection_path,
+                        resource_pack_selection_pending,
                         ..Default::default()
                     },
                 );
@@ -302,6 +326,8 @@ async fn apply_pack(
                 PackPlacement {
                     enabled: pack.item.enabled,
                     content_set_id: metadata.applied_content_set.id.clone(),
+                    resource_pack_selection_path,
+                    resource_pack_selection_pending,
                     ..Default::default()
                 },
             );
@@ -440,6 +466,8 @@ async fn apply_pack(
                 sha1,
                 enabled: pack.item.enabled,
                 content_set_id: metadata.applied_content_set.id.clone(),
+                resource_pack_selection_path,
+                resource_pack_selection_pending,
                 ..Default::default()
             },
         );
@@ -460,6 +488,11 @@ pub(super) async fn apply_instance(
         return Ok(());
     }
     let global = get_global_options().await?;
+    let previous_placements = library
+        .instances
+        .get(&metadata.instance.id)
+        .cloned()
+        .unwrap_or_default();
     let packs = library.packs.clone();
     for (id, pack) in &packs {
         if !participating(metadata, pack, global) {
@@ -514,6 +547,15 @@ pub(super) async fn apply_instance(
             placements.remove(&id);
         }
     }
+    if let Err(error) =
+        super::selection::apply(metadata, library, &previous_placements, state)
+            .await
+    {
+        tracing::warn!(
+            "Could not apply resource-pack selection for {}: {error}",
+            metadata.instance.id
+        );
+    }
     Ok(())
 }
 
@@ -525,6 +567,30 @@ pub(super) async fn apply_all(
     library.instances.retain(|id, _| {
         instances.iter().any(|metadata| &metadata.instance.id == id)
     });
+    library.resource_pack_observations.retain(|id, _| {
+        instances.iter().any(|metadata| &metadata.instance.id == id)
+    });
+    library
+        .resource_pack_incompatible_observations
+        .retain(|id, _| {
+            instances.iter().any(|metadata| &metadata.instance.id == id)
+        });
+    library
+        .resource_pack_order
+        .retain(|id| library.packs.contains_key(id));
+    for metadata in &instances {
+        if sync_files_are_protected(metadata) {
+            continue;
+        }
+        if let Err(error) =
+            super::selection::capture(metadata, library, state).await
+        {
+            tracing::warn!(
+                "Could not capture resource-pack selection for {} before syncing: {error}",
+                metadata.instance.id
+            );
+        }
+    }
     write_library(library, state).await?;
     for metadata in instances {
         if let Err(error) = apply_instance(&metadata, library, state).await {
@@ -583,6 +649,72 @@ pub(in crate::api::instance) async fn reconcile_after_content_change(
     }
 }
 
+pub(in crate::api::instance) async fn capture_resource_pack_selection_change(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<()> {
+    let mut library = read_library(state).await?;
+    match super::selection::capture(metadata, &mut library, state).await? {
+        Some(true) => apply_all(&mut library, state).await?,
+        Some(false) => write_library(&library, state).await?,
+        None => {}
+    }
+    Ok(())
+}
+
+pub(in crate::api::instance) async fn prepare_instance_update(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<()> {
+    let mut library = read_library(state).await?;
+    match super::selection::capture(metadata, &mut library, state).await {
+        Ok(Some(true)) => apply_all(&mut library, state).await?,
+        Ok(_) => {}
+        Err(error) => tracing::warn!(
+            "Could not capture resource-pack selection before updating {}: {error}",
+            metadata.instance.id
+        ),
+    }
+    let global = get_global_options().await?;
+    let pending_ids = library
+        .instances
+        .get(&metadata.instance.id)
+        .into_iter()
+        .flat_map(|placements| placements.iter())
+        .filter_map(|(id, placement)| {
+            let pack = library.packs.get(id)?;
+            (pack.item.project_type == ProjectType::ResourcePack
+                && pack.selected.is_some()
+                && participating(metadata, pack, global)
+                && !placement.excluded
+                && !placement.suspended)
+                .then(|| id.clone())
+        })
+        .collect::<Vec<_>>();
+    let mut changed = library
+        .resource_pack_observations
+        .remove(&metadata.instance.id)
+        .is_some();
+    changed |= library
+        .resource_pack_incompatible_observations
+        .remove(&metadata.instance.id)
+        .is_some();
+    if let Some(placements) = library.instances.get_mut(&metadata.instance.id) {
+        for id in pending_ids {
+            if let Some(placement) = placements.get_mut(&id)
+                && !placement.resource_pack_selection_pending
+            {
+                placement.resource_pack_selection_pending = true;
+                changed = true;
+            }
+        }
+    }
+    if changed {
+        write_library(&library, state).await?;
+    }
+    Ok(())
+}
+
 pub(in crate::api::instance) async fn detach(
     metadata: &InstanceMetadata,
     option: SyncedOption,
@@ -600,6 +732,16 @@ pub(in crate::api::instance) async fn detach(
                 changed = true;
             }
         }
+    }
+    if option == SyncedOption::ResourcePacks {
+        changed |= library
+            .resource_pack_observations
+            .remove(&metadata.instance.id)
+            .is_some();
+        changed |= library
+            .resource_pack_incompatible_observations
+            .remove(&metadata.instance.id)
+            .is_some();
     }
     if changed {
         write_library(&library, state).await?;

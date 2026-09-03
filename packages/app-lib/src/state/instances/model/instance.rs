@@ -52,9 +52,9 @@ pub enum SyncedOption {
 }
 
 impl SyncedOption {
-	pub const fn is_available(self) -> bool {
-		!matches!(self, Self::DataPacks)
-	}
+    pub const fn is_available(self) -> bool {
+        !matches!(self, Self::DataPacks)
+    }
 
     pub fn as_str(self) -> &'static str {
         match self {
