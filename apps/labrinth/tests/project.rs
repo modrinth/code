@@ -548,6 +548,47 @@ async fn test_submit_invalid_project_for_review() {
 }
 
 #[actix_rt::test]
+async fn test_edit_invalid_project_in_review_rolls_back() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({ "status": "processing" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let project_before = api
+                .get_project_deserialized(project_slug, USER_USER_PAT)
+                .await;
+            assert_eq!(project_before.status, ProjectStatus::Processing);
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({ "description": "" }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let project_after = api
+                .get_project_deserialized(project_slug, USER_USER_PAT)
+                .await;
+            assert_eq!(project_after.status, ProjectStatus::Processing);
+            assert_eq!(project_after.description, project_before.description);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
 pub async fn test_patch_v3() {
     // Hits V3-specific patchable fields
     with_test_environment(

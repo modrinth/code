@@ -1,6 +1,7 @@
 [package]
 name = "labrinth"
 version = "2.7.0"
+default-run = "labrinth"
 edition.workspace = true
 license = "AGPL-3.0-only"
 

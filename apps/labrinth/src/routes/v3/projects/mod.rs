@@ -501,6 +501,8 @@ pub async fn project_edit_internal(
     let submit_for_review = new_project.status
         == Some(ProjectStatus::Processing)
         && !user.role.is_mod();
+    let validate_for_review = submit_for_review
+        || project_item.inner.status == ProjectStatus::Processing;
     if submit_for_review {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::Auth(eyre!(
@@ -1358,7 +1360,7 @@ pub async fn project_edit_internal(
     .await
     .wrap_api_err("deleting unused images")?;
 
-    if submit_for_review {
+    if validate_for_review {
         let mut projects = db_models::DBProject::get_many_uncached(
             &[ProjectId::from(id)],
             &mut transaction,
@@ -1403,19 +1405,21 @@ pub async fn project_edit_internal(
             &disclosures,
         ) {
             return Err(ApiError::Request(eyre!(
-                "project must have no required validation nags before being submitted for review"
+                "project must have no required validation nags before or while under review"
             )));
         }
 
-        submit_project_for_review(
-            &reloaded_project,
-            &user,
-            team_member.as_ref().is_none_or(|member| !member.accepted),
-            sync_archival_disclosure,
-            &mut transaction,
-            &redis,
-        )
-        .await?;
+        if submit_for_review {
+            submit_project_for_review(
+                &reloaded_project,
+                &user,
+                team_member.as_ref().is_none_or(|member| !member.accepted),
+                sync_archival_disclosure,
+                &mut transaction,
+                &redis,
+            )
+            .await?;
+        }
     }
 
     transaction
