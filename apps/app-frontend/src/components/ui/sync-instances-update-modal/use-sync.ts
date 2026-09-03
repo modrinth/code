@@ -2,7 +2,7 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { set_global_synced_option } from '@/helpers/instance'
+import { isSyncedOptionAvailable, set_global_synced_option } from '@/helpers/instance'
 import {
 	gameOptionsSyncSourcesQueryOptions,
 	globalSyncedOptionsQueryOptions,
@@ -11,14 +11,14 @@ import {
 import { syncedPackKeys } from '@/helpers/synced-packs'
 import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 
-export const syncUpdateOptions = [
+export const syncUpdateOptions = ([
 	'game_options',
 	'multiplayer_servers',
 	'command_history',
 	'creative_hotbars',
 	'resource_packs',
 	'data_packs',
-] as const
+] as const).filter(isSyncedOptionAvailable)
 
 export type SyncUpdateOption = (typeof syncUpdateOptions)[number]
 
@@ -86,7 +86,7 @@ export function useSyncInstancesUpdate() {
 			enabled: boolean
 			baseInstanceId?: string
 		}) => {
-			for (const option of options) {
+			for (const option of options.filter(isSyncedOptionAvailable)) {
 				const updated = await set_global_synced_option(option, enabled, baseInstanceId)
 				queryClient.setQueryData(syncedOptionsKeys.global, updated)
 			}
@@ -107,7 +107,7 @@ export function useSyncInstancesUpdate() {
 
 	function chooseSource(options: readonly SyncUpdateOption[]) {
 		sourceInstanceId.value = ''
-		sourceOptions.value = [...options]
+		sourceOptions.value = options.filter(isSyncedOptionAvailable)
 	}
 
 	function retrySources() {

@@ -500,8 +500,8 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 <template>
 	<NewModal
 		ref="modal"
-		:max-width="'min(928px, calc(95vw - 10rem))'"
-		:width="'min(928px, calc(95vw - 10rem))'"
+		max-width="min(928px, calc(95vw - 10rem))"
+		width="min(928px, calc(95vw - 10rem))"
 		:on-hide="handleHide"
 		no-padding
 	>
@@ -526,7 +526,10 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				<Input
 					v-model="searchQuery"
 					:icon="SearchIcon"
+					type="search"
 					:placeholder="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"
+					:aria-label="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"
+					:clear-label="formatMessage(commonMessages.clearButton)"
 					clearable
 				/>
 

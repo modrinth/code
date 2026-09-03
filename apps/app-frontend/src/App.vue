@@ -105,10 +105,7 @@ import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useError } from '@/composables/use-error.js'
 import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-refresh'
-import {
-	QUICK_INSTANCE_LIMIT_MAX,
-	useQuickInstanceLimit,
-} from '@/composables/use-quick-instance-limit.ts'
+import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
 import { getAccountAppearance, rememberAccountAppearance } from '@/helpers/account-appearance.ts'
@@ -127,7 +124,6 @@ import { install_create_modpack_instance, install_get_modpack_preview } from '@/
 import {
 	can_current_user_use_shared_instances,
 	get as getInstance,
-	get_global_synced_options,
 	run,
 	set_global_synced_option,
 } from '@/helpers/instance'
@@ -140,8 +136,9 @@ import {
 	setActive,
 } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
-import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+import { appSettingsKeys, get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
+import { globalSyncedOptionsQueryOptions, syncedOptionsKeys } from '@/helpers/synced-options'
 import { hasActivePride26Midas, hasMidasBadge } from '@/helpers/user-campaigns.ts'
 import { get_user_preferences } from '@/helpers/user-preferences.ts'
 import { parse_modrinth_user_link } from '@/helpers/users'
@@ -456,8 +453,7 @@ const isDevEnvironment = ref(false)
 
 const stateInitialized = ref(false)
 const globalSyncedOptionsQuery = useQuery({
-	queryKey: ['global-synced-options'],
-	queryFn: get_global_synced_options,
+	...globalSyncedOptionsQueryOptions(),
 	enabled: computed(() => stateInitialized.value),
 })
 
@@ -1142,63 +1138,36 @@ watch(
 					const featureFlags = {
 						worlds_in_home: behavior.show_jump_in,
 					}
-					const showFilesTab =
-						behavior.show_files_tab_in_instances ?? settings.show_files_tab_in_instances
-					const showWorldsTab =
-						behavior.show_worlds_tab_in_instances ?? settings.show_worlds_tab_in_instances
-					const showScreenshotsTab =
-						behavior.show_screenshots_tab_in_instances ?? settings.show_screenshots_tab_in_instances
-					const showSkinSelector =
-						behavior.show_skin_selector_in_sidebar ?? settings.show_skin_selector_in_sidebar
-					const quickInstanceCount = Math.min(
-						Math.max(
-							typeof behavior.quick_instance_count === 'number'
-								? behavior.quick_instance_count
-								: (quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX),
-							0,
-						),
-						QUICK_INSTANCE_LIMIT_MAX,
-					)
-
-					appSettings.showFilesTabInInstances = showFilesTab
-					appSettings.showWorldsTabInInstances = showWorldsTab
-					appSettings.showScreenshotsTabInInstances = showScreenshotsTab
-					appSettings.showSkinSelectorInSidebar = showSkinSelector
+					const featureSettings = {
+						show_files_tab_in_instances: 'showFilesTabInInstances',
+						show_worlds_tab_in_instances: 'showWorldsTabInInstances',
+						show_screenshots_tab_in_instances: 'showScreenshotsTabInInstances',
+						show_skin_selector_in_sidebar: 'showSkinSelectorInSidebar',
+					}
+					for (const [key, stateKey] of Object.entries(featureSettings)) {
+						const value = behavior[key] ?? settings[key]
+						appSettings[stateKey] = value
+						if (settings[key] !== value) {
+							settings[key] = value
+							settingsChanged = true
+						}
+					}
 					Object.assign(appSettings.featureFlags, featureFlags)
-					quickInstances.setLimit(
-						quickInstanceCount >= QUICK_INSTANCE_LIMIT_MAX ? null : quickInstanceCount,
-					)
+					if (typeof behavior.quick_instance_count === 'number') {
+						quickInstances.setLimit(behavior.quick_instance_count)
+					}
 
-					if (settings.show_files_tab_in_instances !== showFilesTab) {
-						settings.show_files_tab_in_instances = showFilesTab
-						settingsChanged = true
-					}
-					if (settings.show_worlds_tab_in_instances !== showWorldsTab) {
-						settings.show_worlds_tab_in_instances = showWorldsTab
-						settingsChanged = true
-					}
-					if (settings.show_screenshots_tab_in_instances !== showScreenshotsTab) {
-						settings.show_screenshots_tab_in_instances = showScreenshotsTab
-						settingsChanged = true
-					}
-					if (settings.show_skin_selector_in_sidebar !== showSkinSelector) {
-						settings.show_skin_selector_in_sidebar = showSkinSelector
-						settingsChanged = true
-					}
 					const showAllScreenshots = behavior.show_all_screenshots
 					if (typeof showAllScreenshots === 'boolean') {
 						const globalSyncedOptions =
 							globalSyncedOptionsQuery.data.value ??
-							(await queryClient.fetchQuery({
-								queryKey: ['global-synced-options'],
-								queryFn: get_global_synced_options,
-							}))
+							(await queryClient.fetchQuery(globalSyncedOptionsQueryOptions()))
 						if (globalSyncedOptions.screenshots !== showAllScreenshots) {
 							const updatedGlobalSyncedOptions = await set_global_synced_option(
 								'screenshots',
 								showAllScreenshots,
 							)
-							queryClient.setQueryData(['global-synced-options'], updatedGlobalSyncedOptions)
+							queryClient.setQueryData(syncedOptionsKeys.global, updatedGlobalSyncedOptions)
 							await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
 						}
 					}
@@ -1213,6 +1182,7 @@ watch(
 
 				if (settingsChanged) {
 					await setSettings(settings)
+					queryClient.setQueryData(appSettingsKeys.all, settings)
 				}
 			})
 			.catch(handleError)

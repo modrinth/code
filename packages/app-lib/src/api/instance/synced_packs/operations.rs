@@ -506,6 +506,7 @@ pub async fn set_synced_pack_enabled(
     let pack = library.packs.get_mut(pack_id).ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown synced pack.".to_string())
     })?;
+	pack_option(pack.item.project_type)?;
     pack.item.enabled = enabled;
     apply_all(&mut library, &state).await
 }
@@ -514,12 +515,11 @@ pub async fn remove_synced_pack(pack_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     let mut library = read_library(&state).await?;
-    if library.packs.remove(pack_id).is_none() {
-        return Err(crate::ErrorKind::InputError(
-            "Unknown synced pack.".to_string(),
-        )
-        .into());
-    }
+	let pack = library.packs.get(pack_id).ok_or_else(|| {
+		crate::ErrorKind::InputError("Unknown synced pack.".to_string())
+	})?;
+	pack_option(pack.item.project_type)?;
+	library.packs.remove(pack_id);
     apply_all(&mut library, &state).await
 }
 
@@ -542,6 +542,10 @@ pub async fn desync_pack(
 		).into());
     }
     let mut library = read_library(&state).await?;
+	let pack = library.packs.get(pack_id).ok_or_else(|| {
+		crate::ErrorKind::InputError("Unknown synced pack.".to_string())
+	})?;
+	pack_option(pack.item.project_type)?;
     let placement = library
         .instances
         .get_mut(instance_id)

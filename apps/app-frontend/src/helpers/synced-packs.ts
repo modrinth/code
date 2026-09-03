@@ -1,11 +1,19 @@
 import type { ContentItem } from '@modrinth/ui'
+import { queryOptions } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 
-import { adaptContentItems } from './instance'
+import { adaptContentItems, isSyncedOptionAvailable } from './instance'
 import type { DesyncServerMode } from './worlds'
 
 export type SyncedPackType = 'resourcepack' | 'datapack'
 export type SyncedPackAction = 'enable' | 'disable'
+
+export function isSyncedPackTypeAvailable(projectType: ContentItem['project_type']): boolean {
+	return (
+		['resourcepack', 'datapack'].includes(projectType) &&
+		isSyncedOptionAvailable(projectType === 'resourcepack' ? 'resource_packs' : 'data_packs')
+	)
+}
 
 export interface PackSyncPreview {
 	pack: ContentItem
@@ -23,10 +31,13 @@ export const syncedPackKeys = {
 	list: (type: SyncedPackType) => ['synced-packs', 'list', type] as const,
 }
 
-export const syncedPackQueryOptions = (type: SyncedPackType) => ({
-	queryKey: syncedPackKeys.list(type),
-	queryFn: () => list_synced_packs(type),
-})
+export function syncedPackQueryOptions(type: SyncedPackType) {
+	return queryOptions({
+		queryKey: syncedPackKeys.list(type),
+		queryFn: () => list_synced_packs(type),
+		enabled: isSyncedPackTypeAvailable(type),
+	})
+}
 
 export async function list_synced_packs(projectType: SyncedPackType): Promise<ContentItem[]> {
 	const items = await invoke<ContentItem[]>('plugin:instance|instance_list_synced_packs', {

@@ -1808,38 +1808,11 @@
   "app.settings.game-options.choice.while-afk": {
     "message": "While AFK"
   },
-  "app.settings.game-options.compatibility.all": {
-    "message": "Syncs to {count, plural, one {# instance} other {# instances}}"
-  },
-  "app.settings.game-options.compatibility.all-disabled": {
-    "message": "Sync is off"
-  },
-  "app.settings.game-options.compatibility.no-participants": {
-    "message": "Add an instance to start syncing"
-  },
   "app.settings.game-options.compatibility.none": {
     "message": "Some of your instances cannot use this setting"
   },
   "app.settings.game-options.compatibility.reason.launcher-controlled": {
     "message": "This setting is managed by Modrinth’s launch settings."
-  },
-  "app.settings.game-options.compatibility.some": {
-    "message": "Some of your instances cannot use this setting"
-  },
-  "app.settings.game-options.compatibility.some-disabled": {
-    "message": "Some of your instances cannot use this setting"
-  },
-  "app.settings.game-options.compatibility.tooltip.all": {
-    "message": "All of your instances can use this setting."
-  },
-  "app.settings.game-options.compatibility.tooltip.no-participants": {
-    "message": "Add an instance to start syncing this setting."
-  },
-  "app.settings.game-options.compatibility.tooltip.recipients": {
-    "message": "Some of your instances cannot use this setting"
-  },
-  "app.settings.game-options.compatibility.tooltip.waiting": {
-    "message": "{count, plural, one {Launch this instance once before syncing this setting.} other {Launch these instances once before syncing this setting.}}"
   },
   "app.settings.game-options.custom-value.placeholder": {
     "message": "Enter a value"
@@ -1996,6 +1969,9 @@
   },
   "app.settings.game-options.keybind.mouse.right": {
     "message": "Right Mouse"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: listening for a key or mouse button. Press Escape to clear this binding."
   },
   "app.settings.game-options.keybind.scancode": {
     "message": "Scancode {code}"
@@ -2651,24 +2627,6 @@
   "app.settings.game-options.setting.weather-volume.label": {
     "message": "Weather"
   },
-  "app.settings.game-options.source.disabled.installing-or-updating": {
-    "message": "Installing or updating"
-  },
-  "app.settings.game-options.source.disabled.missing-options-file": {
-    "message": "No options.txt file"
-  },
-  "app.settings.game-options.source.disabled.no-syncable-settings": {
-    "message": "No syncable settings found"
-  },
-  "app.settings.game-options.source.disabled.unreadable-options-file": {
-    "message": "options.txt could not be read"
-  },
-  "app.settings.game-options.source.disabled.unsupported-version": {
-    "message": "Unsupported Minecraft version"
-  },
-  "app.settings.game-options.source.settings-summary": {
-    "message": "{recognized, plural, one {# recognized setting} other {# recognized settings}}, {custom, plural, one {# custom setting} other {# custom settings}}"
-  },
   "app.settings.game-options.validation.changed-since-opened": {
     "message": "This setting changed elsewhere. Check it and try again."
   },
@@ -2838,7 +2796,7 @@
     "message": "Settings added by mods will appear here after Modrinth finds them in one of your instances."
   },
   "app.settings.synced-options.game-settings.description": {
-    "message": "Synced options are applied to every instance and override the values included with a modpack."
+    "message": "Use the same game options across your instances"
   },
   "app.settings.synced-options.game-settings.disable-all": {
     "message": "Unsync all"
@@ -2873,6 +2831,9 @@
   "app.settings.synced-options.game-settings.search": {
     "message": "Search settings..."
   },
+  "app.settings.synced-options.game-settings.sync-description": {
+    "message": "Synced options are applied to every instance and override the values included with a modpack."
+  },
   "app.settings.synced-options.game-settings.sync-setting": {
     "message": "Sync {setting} across instances"
   },
@@ -2890,9 +2851,6 @@
   },
   "app.settings.synced-options.game-settings.unsync-setting": {
     "message": "Stop syncing {setting} across instances"
-  },
-  "app.settings.synced-options.game-settings.value-label": {
-    "message": "Value"
   },
   "app.settings.synced-options.game-settings.value-mixed": {
     "message": "Different across instances"

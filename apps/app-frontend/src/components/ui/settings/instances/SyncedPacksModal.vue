@@ -16,6 +16,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import {
+	isSyncedPackTypeAvailable,
 	remove_synced_pack,
 	set_synced_pack_enabled,
 	syncedPackKeys,
@@ -54,7 +55,7 @@ const title = computed(() =>
 const packsQuery = useQuery(
 	computed(() => ({
 		...syncedPackQueryOptions(projectType.value),
-		enabled: isOpen.value,
+		enabled: isOpen.value && isSyncedPackTypeAvailable(projectType.value),
 	})),
 )
 const mutation = useMutation({
@@ -81,11 +82,12 @@ useAppEvent('instance', (event) => {
 })
 
 async function show(type: SyncedPackType) {
+	if (!isSyncedPackTypeAvailable(type)) return
 	projectType.value = type
 	isOpen.value = true
 	await nextTick()
-	if (packsQuery.data.value) manager.value?.show(packsQuery.data.value)
-	else manager.value?.showLoading()
+	if (packsQuery.isPending.value) manager.value?.showLoading()
+	else manager.value?.show(packsQuery.data.value ?? [])
 }
 
 async function togglePacks(items: ContentItem[], enabled: boolean) {
@@ -98,6 +100,7 @@ async function togglePacks(items: ContentItem[], enabled: boolean) {
 }
 
 async function deletePack(item: ContentItem) {
+	if (mutation.isPending.value) return
 	if ((await confirmation.value?.confirmDelete([item])) !== 'all') return
 	mutation.mutate(() => remove_synced_pack(item.id))
 }

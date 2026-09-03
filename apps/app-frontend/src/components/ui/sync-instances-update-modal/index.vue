@@ -14,11 +14,7 @@ import { computed, nextTick, useTemplateRef } from 'vue'
 
 import SyncSourceModal from '@/components/ui/settings/instances/SyncSourceModal.vue'
 
-import {
-	type SyncUpdateOption,
-	syncUpdateOptions,
-	useSyncInstancesUpdate,
-} from './use-sync-instances-update'
+import { type SyncUpdateOption, syncUpdateOptions, useSyncInstancesUpdate } from './use-sync'
 
 const hasSeenUpdate = useLocalStorage('sync-instances-update-modal-shown', false)
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -90,7 +86,7 @@ const messages = defineMessages({
 	},
 	allSourcesDescription: {
 		id: 'app.sync-instances-update.choose-source.all',
-		defaultMessage: 'Choose the instance to use as the sync source for all six settings.',
+		defaultMessage: 'Choose the instance to use as the sync source for all selected settings.',
 	},
 	game_options_source: {
 		id: 'app.settings.synced-options.choose-sync-source.game-settings-description',
@@ -310,7 +306,6 @@ defineExpose({ show, showOnce, hide })
 							:id="`update-sync-${option}`"
 							:model-value="globalOptionsQuery.data.value?.[option] ?? false"
 							:disabled="controlsDisabled"
-							class="!h-[26px] !w-[50px] !p-0.5 [&>span]:!m-0 [&>span]:!size-5"
 							@update:model-value="(enabled) => toggleOption(option, enabled)"
 						/>
 					</div>

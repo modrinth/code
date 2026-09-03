@@ -60,14 +60,23 @@ pub struct PackSyncPreview {
 }
 
 fn pack_option(project_type: ProjectType) -> crate::Result<SyncedOption> {
-    match project_type {
-        ProjectType::ResourcePack => Ok(SyncedOption::ResourcePacks),
-        ProjectType::DataPack => Ok(SyncedOption::DataPacks),
-        _ => Err(crate::ErrorKind::InputError(
-            "Only resource packs and data packs can be synced.".to_string(),
-        )
-        .into()),
-    }
+	let option = match project_type {
+		ProjectType::ResourcePack => SyncedOption::ResourcePacks,
+		ProjectType::DataPack => SyncedOption::DataPacks,
+		_ => {
+			return Err(crate::ErrorKind::InputError(
+				"Only resource packs and data packs can be synced.".to_string(),
+			)
+			.into());
+		}
+	};
+	if !option.is_available() {
+		return Err(crate::ErrorKind::InputError(
+			"Data pack syncing is currently disabled.".to_string(),
+		)
+		.into());
+	}
+	Ok(option)
 }
 
 fn version_compatible(

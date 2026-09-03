@@ -2,8 +2,6 @@ import { defineMessages, type MessageDescriptor, type VIntlFormatters } from '@m
 
 import type {
 	EditableGameSetting,
-	GameOptionsSourceCandidate,
-	GameOptionsSourceDisabledReason,
 	GameOptionValidationError,
 	GameSettingCategory,
 } from '@/helpers/game-options'
@@ -1006,75 +1004,13 @@ export const presentationMessages = defineMessages({
 		id: 'app.settings.game-options.validation.changed-since-opened',
 		defaultMessage: 'This setting changed elsewhere. Check it and try again.',
 	},
-	compatibilityNoParticipants: {
-		id: 'app.settings.game-options.compatibility.no-participants',
-		defaultMessage: 'Add an instance to start syncing',
-	},
 	compatibilityNone: {
 		id: 'app.settings.game-options.compatibility.none',
 		defaultMessage: 'Some of your instances cannot use this setting',
 	},
-	compatibilityAll: {
-		id: 'app.settings.game-options.compatibility.all',
-		defaultMessage: 'Syncs to {count, plural, one {# instance} other {# instances}}',
-	},
-	compatibilityAllDisabled: {
-		id: 'app.settings.game-options.compatibility.all-disabled',
-		defaultMessage: 'Sync is off',
-	},
-	compatibilitySome: {
-		id: 'app.settings.game-options.compatibility.some',
-		defaultMessage: 'Some of your instances cannot use this setting',
-	},
-	compatibilitySomeDisabled: {
-		id: 'app.settings.game-options.compatibility.some-disabled',
-		defaultMessage: 'Some of your instances cannot use this setting',
-	},
-	compatibilityTooltipNoParticipants: {
-		id: 'app.settings.game-options.compatibility.tooltip.no-participants',
-		defaultMessage: 'Add an instance to start syncing this setting.',
-	},
-	compatibilityTooltipAll: {
-		id: 'app.settings.game-options.compatibility.tooltip.all',
-		defaultMessage: 'All of your instances can use this setting.',
-	},
-	compatibilityTooltipLimited: {
-		id: 'app.settings.game-options.compatibility.tooltip.recipients',
-		defaultMessage: 'Some of your instances cannot use this setting',
-	},
-	compatibilityTooltipWaiting: {
-		id: 'app.settings.game-options.compatibility.tooltip.waiting',
-		defaultMessage:
-			'{count, plural, one {Launch this instance once before syncing this setting.} other {Launch these instances once before syncing this setting.}}',
-	},
 	bucketLauncherControlled: {
 		id: 'app.settings.game-options.compatibility.reason.launcher-controlled',
 		defaultMessage: 'This setting is managed by Modrinth’s launch settings.',
-	},
-	sourceInstallingOrUpdating: {
-		id: 'app.settings.game-options.source.disabled.installing-or-updating',
-		defaultMessage: 'Installing or updating',
-	},
-	sourceUnsupportedVersion: {
-		id: 'app.settings.game-options.source.disabled.unsupported-version',
-		defaultMessage: 'Unsupported Minecraft version',
-	},
-	sourceMissingOptionsFile: {
-		id: 'app.settings.game-options.source.disabled.missing-options-file',
-		defaultMessage: 'No options.txt file',
-	},
-	sourceNoSyncableSettings: {
-		id: 'app.settings.game-options.source.disabled.no-syncable-settings',
-		defaultMessage: 'No syncable settings found',
-	},
-	sourceUnreadableOptionsFile: {
-		id: 'app.settings.game-options.source.disabled.unreadable-options-file',
-		defaultMessage: 'options.txt could not be read',
-	},
-	sourceSettingsSummary: {
-		id: 'app.settings.game-options.source.settings-summary',
-		defaultMessage:
-			'{recognized, plural, one {# recognized setting} other {# recognized settings}}, {custom, plural, one {# custom setting} other {# custom settings}}',
 	},
 })
 
@@ -1453,14 +1389,6 @@ const validationMessages: Record<GameOptionValidationError, MessageDescriptor> =
 	changed_since_opened: presentationMessages.validationChangedSinceOpened,
 }
 
-const sourceDisabledMessages: Record<GameOptionsSourceDisabledReason, MessageDescriptor> = {
-	installing_or_updating: presentationMessages.sourceInstallingOrUpdating,
-	unsupported_version: presentationMessages.sourceUnsupportedVersion,
-	missing_options_file: presentationMessages.sourceMissingOptionsFile,
-	no_syncable_settings: presentationMessages.sourceNoSyncableSettings,
-	unreadable_options_file: presentationMessages.sourceUnreadableOptionsFile,
-}
-
 export function formatGameSettingLabel(
 	formatMessage: FormatMessage,
 	setting: EditableGameSetting,
@@ -1488,13 +1416,6 @@ export function gameSettingCategoryMessage(category: GameSettingCategory): Messa
 	)
 }
 
-export function formatGameSettingCategory(
-	formatMessage: FormatMessage,
-	category: GameSettingCategory,
-): string {
-	return formatMessage(gameSettingCategoryMessage(category))
-}
-
 export function formatGameSettingChoice(
 	formatMessage: FormatMessage,
 	optionId: string,
@@ -1509,75 +1430,4 @@ export function formatGameSettingValidation(
 	error: GameOptionValidationError | null | undefined,
 ): string | null {
 	return error ? formatMessage(validationMessages[error]) : null
-}
-
-export function formatCompatibilitySubtitle(
-	formatMessage: FormatMessage,
-	setting: EditableGameSetting,
-): string {
-	const { total_participating: total, will_receive: recipients } = setting.compatibility
-	if (total === 0) return formatMessage(presentationMessages.compatibilityNoParticipants)
-	if (recipients === 0) return formatMessage(presentationMessages.compatibilityNone)
-	if (recipients === total) {
-		return formatMessage(
-			setting.sync_enabled
-				? presentationMessages.compatibilityAll
-				: presentationMessages.compatibilityAllDisabled,
-			{ count: total },
-		)
-	}
-	return formatMessage(
-		setting.sync_enabled
-			? presentationMessages.compatibilitySome
-			: presentationMessages.compatibilitySomeDisabled,
-		{ recipients, total },
-	)
-}
-
-export function formatCompatibilityTooltip(
-	formatMessage: FormatMessage,
-	setting: EditableGameSetting,
-): string {
-	const summary = setting.compatibility
-	if (summary.total_participating === 0) {
-		return formatMessage(presentationMessages.compatibilityTooltipNoParticipants)
-	}
-	if (summary.left_local > 0) {
-		return formatMessage(presentationMessages.compatibilityTooltipLimited)
-	}
-	const waiting = summary.buckets
-		.filter(
-			(bucket) => bucket.status === 'waiting_for_file' || bucket.status === 'waiting_for_base',
-		)
-		.reduce((count, bucket) => count + bucket.instance_count, 0)
-	if (waiting > 0) {
-		return formatMessage(presentationMessages.compatibilityTooltipWaiting, { count: waiting })
-	}
-	return formatMessage(presentationMessages.compatibilityTooltipAll)
-}
-
-export function shouldShowCompatibilityIndicator(setting: EditableGameSetting): boolean {
-	return (
-		setting.compatibility.left_local > 0 ||
-		setting.compatibility.buckets.some(
-			(bucket) => bucket.status === 'waiting_for_file' || bucket.status === 'waiting_for_base',
-		)
-	)
-}
-
-export function formatSourceDisabledReason(
-	formatMessage: FormatMessage,
-	reason: GameOptionsSourceDisabledReason | null | undefined,
-): string | null {
-	return reason ? formatMessage(sourceDisabledMessages[reason]) : null
-}
-
-export function formatSourceSettingsSummary(
-	formatMessage: FormatMessage,
-	source: Pick<GameOptionsSourceCandidate, 'recognized_setting_count' | 'custom_setting_count'>,
-): string {
-	return formatMessage(presentationMessages.sourceSettingsSummary, {
-		recognized: source.recognized_setting_count,
-		custom: source.custom_setting_count,
-	})
 }

@@ -54,13 +54,11 @@
 		</span>
 
 		<Input
-			:model-value="currentValue === null ? '' : String(currentValue)"
+			:model-value="currentValue ?? undefined"
 			type="number"
 			size="medium"
-			:class="valueInputClass"
 			wrapper-class="slider-value shrink-0"
-			input-class="!font-semibold"
-			:style="{ width: currentValue === null ? '100%' : '5rem' }"
+			:style="{ width: valueInputWidth }"
 			:disabled="disabled"
 			:placeholder="placeholder"
 			:aria-label="ariaLabel"
@@ -89,7 +87,6 @@ interface Props {
 	snapRange?: number
 	disabled?: boolean
 	unit?: string
-	valueInputClass?: string
 	placeholder?: string
 	ariaLabel?: string
 }
@@ -104,11 +101,15 @@ const props = withDefaults(defineProps<Props>(), {
 	snapRange: 100,
 	disabled: false,
 	unit: '',
-	valueInputClass: '',
 })
 
 const currentValue = ref(props.modelValue === null ? null : clampValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
+const valueInputWidth = computed(() =>
+	currentValue.value === null
+		? '100%'
+		: `calc(${Math.max(String(currentValue.value).length, 1)}ch + 2.125rem)`,
+)
 const visibleSnapPoints = computed(() =>
 	props.snapPoints.filter((snapPoint) => snapPoint >= props.min && snapPoint <= props.max),
 )
@@ -136,7 +137,7 @@ function formatValue(value: number) {
 }
 
 function inputValueValid(inputValue: number) {
-	if (Number.isNaN(inputValue)) return
+	if (!Number.isFinite(inputValue)) return
 
 	let newValue = inputValue
 	if (props.forceStep && props.step > 0) {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TriangleAlertIcon } from '@modrinth/assets'
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, onBeforeUnmount, ref, useId } from 'vue'
+import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 import {
 	activateKeybindRecording,
@@ -9,7 +9,7 @@ import {
 	formatMinecraftKeybind,
 	minecraftKeyTokenFromKeyboardEvent,
 	minecraftMouseTokenFromButton,
-} from './game-keybinds'
+} from './keybinds'
 
 const props = withDefaults(
 	defineProps<{
@@ -32,6 +32,7 @@ const emit = defineEmits<{
 
 const { formatMessage, locale } = useVIntl()
 const statusId = useId()
+const conflictId = useId()
 const recording = ref(false)
 const statusMessage = ref('')
 const controlElement = ref<HTMLElement | null>(null)
@@ -57,6 +58,11 @@ const messages = defineMessages({
 	listeningStatus: {
 		id: 'app.settings.game-options.keybind.listening-status',
 		defaultMessage: 'Listening for a key or mouse button. Press Escape to clear this binding.',
+	},
+	recordingLabel: {
+		id: 'app.settings.game-options.keybind.recording-label',
+		defaultMessage:
+			'{setting}: listening for a key or mouse button. Press Escape to clear this binding.',
 	},
 	unsupportedStatus: {
 		id: 'app.settings.game-options.keybind.unsupported-status',
@@ -95,16 +101,12 @@ const conflictMessage = computed(() =>
 		? formatMessage(messages.conflict, { settings: conflictSettings.value })
 		: '',
 )
-const accessibleLabel = computed(() => {
-	if (recording.value) {
-		return `${props.settingLabel}. ${formatMessage(messages.listeningStatus)}`
-	}
-	const change = formatMessage(messages.change, {
+const accessibleLabel = computed(() =>
+	formatMessage(recording.value ? messages.recordingLabel : messages.change, {
 		setting: props.settingLabel,
 		binding: bindingLabel.value,
-	})
-	return conflictMessage.value ? `${change} ${conflictMessage.value}` : change
-})
+	}),
+)
 
 function startRecording() {
 	if (props.disabled || recording.value) return
@@ -113,12 +115,14 @@ function startRecording() {
 	statusMessage.value = formatMessage(messages.listeningStatus)
 	window.addEventListener('keydown', handleKeydown, true)
 	window.addEventListener('pointerdown', handlePointerDown, true)
+	window.addEventListener('blur', cancelRecording)
 }
 
 function stopRecording() {
 	recording.value = false
 	window.removeEventListener('keydown', handleKeydown, true)
 	window.removeEventListener('pointerdown', handlePointerDown, true)
+	window.removeEventListener('blur', cancelRecording)
 	deactivateKeybindRecording(cancelRecording)
 }
 
@@ -187,6 +191,12 @@ function handlePointerDown(event: PointerEvent) {
 	assign(token)
 }
 
+watch(
+	() => props.disabled,
+	(disabled) => {
+		if (disabled) cancelRecording()
+	},
+)
 onBeforeUnmount(cancelRecording)
 </script>
 
@@ -199,46 +209,27 @@ onBeforeUnmount(cancelRecording)
 			class="flex min-w-0 flex-1"
 		>
 			<Button
-				type="base"
+				:type="recording || conflicts.length ? 'outlined' : 'quiet'"
+				:color="recording ? 'brand' : conflicts.length ? 'orange' : undefined"
 				size="lg"
 				:disabled="disabled"
 				:aria-label="accessibleLabel"
-				:aria-describedby="recording ? statusId : undefined"
-				class="keybind-button !w-full overflow-hidden"
-				:class="{
-					'!bg-brand-highlight !text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]': recording,
-					'keybind-button--conflict': !recording && conflicts.length,
-					'!bg-transparent !text-secondary': !recording && !conflicts.length,
-				}"
+				:aria-describedby="recording ? statusId : conflicts.length ? conflictId : undefined"
+				class="w-full overflow-hidden"
 				@click="handleClick"
 				@contextmenu.prevent.stop
 				@auxclick.prevent.stop
 			>
-				<span class="flex min-w-0 flex-row items-center justify-center gap-2">
-					<TriangleAlertIcon
-						v-if="!recording && conflicts.length"
-						class="keybind-conflict-icon order-first size-4 shrink-0"
-						aria-hidden="true"
-					/>
-					<span class="order-last min-w-0 truncate">{{ visibleLabel }}</span>
-				</span>
+				<TriangleAlertIcon v-if="!recording && conflicts.length" aria-hidden="true" />
+				<span class="min-w-0 truncate">{{ visibleLabel }}</span>
 			</Button>
 		</span>
 
 		<span :id="statusId" class="visually-hidden" role="status" aria-live="polite">
 			{{ statusMessage }}
 		</span>
+		<span v-if="conflicts.length" :id="conflictId" class="visually-hidden">
+			{{ conflictMessage }}
+		</span>
 	</div>
 </template>
-
-<style scoped>
-.keybind-button.keybind-button--conflict {
-	background-color: var(--color-orange-highlight) !important;
-	color: var(--color-orange) !important;
-	box-shadow: inset 0 0 0 1px var(--color-orange) !important;
-}
-
-.keybind-button.keybind-button--conflict .keybind-conflict-icon {
-	color: var(--color-orange) !important;
-}
-</style>
