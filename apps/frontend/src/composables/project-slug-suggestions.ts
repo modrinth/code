@@ -99,8 +99,7 @@ export function useProjectSlugSuggestions({
 	}
 
 	watch(
-		() =>
-			[toValue(title), toValue(username), toValue(currentProjectId), toValue(enabled)] as const,
+		() => [toValue(title), toValue(username), toValue(currentProjectId), toValue(enabled)] as const,
 		([newTitle, newUsername, projectId, isEnabled]) => {
 			if (import.meta.server) return
 

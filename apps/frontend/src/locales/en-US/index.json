@@ -3422,6 +3422,9 @@
   "project-member-header.success-join": {
     "message": "You have joined the project team"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Your project has been submitted for review!"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Publishing checklist"
   },

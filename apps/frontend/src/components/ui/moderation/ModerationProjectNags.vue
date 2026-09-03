@@ -455,12 +455,9 @@ const visibleNags = computed<Nag[]>(() => {
 
 watch(visibleNags, () => nextTick(updateNagScrollShadows))
 
-watch(
-	isProcessing,
-	(processing) => {
-		if (processing && !props.collapsed) emit('toggleCollapsed')
-	},
-)
+watch(isProcessing, (processing) => {
+	if (processing && !props.collapsed) emit('toggleCollapsed')
+})
 
 let validationProjectId = props.project.id
 let previousActionableNagKeys: Set<string> | null = null
