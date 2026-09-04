@@ -382,14 +382,8 @@
 													getProductPrice(getPyroProduct(subscription), subscription.interval)
 														? formatMessage(messages.pricePerInterval, {
 																price: formatPrice(
-																	getProductPrice(
-																		getPyroProduct(subscription),
-																		subscription.interval,
-																	).prices.intervals[subscription.interval],
-																	getProductPrice(
-																		getPyroProduct(subscription),
-																		subscription.interval,
-																	).currency_code,
+																	getPyroSubscriptionTotal(subscription),
+																	getPyroSubscriptionCurrency(subscription),
 																),
 																interval: getIntervalNounLabel(subscription.interval),
 															})
@@ -398,15 +392,7 @@
 											</span>
 										</h3>
 										<div
-											v-if="
-												getPyroCharge(subscription) &&
-												getPyroCharge(subscription).status === 'open' &&
-												((getPyroCharge(subscription).price_id &&
-													getPyroCharge(subscription).price_id !== subscription.price_id) ||
-													(getPyroCharge(subscription).subscription_interval &&
-														getPyroCharge(subscription).subscription_interval !==
-															subscription.interval))
-											"
+											v-if="hasPendingPyroChange(subscription)"
 											class="-mt-1 flex items-baseline gap-2 text-sm text-secondary"
 										>
 											<span class="opacity-70">{{ formatMessage(messages.nextLabel) }}</span>
@@ -414,8 +400,8 @@
 												{{
 													formatMessage(messages.pricePerInterval, {
 														price: formatPrice(
-															getPyroCharge(subscription).amount,
-															getPyroCharge(subscription).currency_code,
+															getPyroNextChargeTotal(subscription),
+															getPyroSubscriptionCurrency(subscription),
 														),
 														interval: getIntervalNounLabel(
 															getPyroCharge(subscription).subscription_interval ||
@@ -425,6 +411,19 @@
 												}}
 											</span>
 										</div>
+										<span
+											v-if="subscription.next_charge_tax_amount != null"
+											class="text-sm text-secondary"
+										>
+											{{
+												formatMessage(messages.includesTax, {
+													amount: formatPrice(
+														subscription.next_charge_tax_amount,
+														getPyroSubscriptionCurrency(subscription),
+													),
+												})
+											}}
+										</span>
 										<div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
 											<span class="text-sm text-secondary">
 												{{
@@ -848,6 +847,10 @@ const messages = defineMessages({
 		id: 'settings.billing.price.per-interval',
 		defaultMessage: '{price} / {interval}',
 	},
+	includesTax: {
+		id: 'settings.billing.price.includes-tax',
+		defaultMessage: 'Includes {amount} tax',
+	},
 	nextLabel: {
 		id: 'settings.billing.next',
 		defaultMessage: 'Next:',
@@ -1229,6 +1232,39 @@ function getPyroCharge(subscription) {
 	return charges.value.find(
 		(charge) => charge.subscription_id === subscription.id && charge.status !== 'succeeded',
 	)
+}
+
+function hasPendingPyroChange(subscription) {
+	const charge = getPyroCharge(subscription)
+	return (
+		charge?.status === 'open' &&
+		((charge.price_id && charge.price_id !== subscription.price_id) ||
+			(charge.subscription_interval && charge.subscription_interval !== subscription.interval))
+	)
+}
+
+function getPyroSubscriptionTotal(subscription) {
+	const productPrice = getProductPrice(getPyroProduct(subscription), subscription.interval)
+	const subtotal = productPrice?.prices?.intervals?.[subscription.interval]
+	if (subtotal == null) return subtotal
+
+	return (
+		subtotal + (hasPendingPyroChange(subscription) ? 0 : (subscription.next_charge_tax_amount ?? 0))
+	)
+}
+
+function getPyroSubscriptionCurrency(subscription) {
+	return (
+		getPyroCharge(subscription)?.currency_code ??
+		getProductPrice(getPyroProduct(subscription), subscription.interval)?.currency_code
+	)
+}
+
+function getPyroNextChargeTotal(subscription) {
+	const charge = getPyroCharge(subscription)
+	if (!charge) return 0
+
+	return charge.amount + (subscription.next_charge_tax_amount ?? 0)
 }
 
 function getCancellationDate(subscription) {
