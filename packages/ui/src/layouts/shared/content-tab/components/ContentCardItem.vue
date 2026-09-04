@@ -237,18 +237,14 @@ const installTooltip = computed(() => {
 						</AutoLink>
 						<slot name="title-badges" />
 						<span
-							v-if="synced"
+							v-if="synced && hideActions"
 							v-tooltip="syncStatusLabel"
 							:aria-label="syncStatusLabel"
 							role="img"
 							class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
 							tabindex="0"
 						>
-							<LinkIcon
-								class="size-4"
-								:class="syncUpdatePending ? 'text-orange' : 'text-secondary'"
-								aria-hidden="true"
-							/>
+							<LinkIcon class="size-4 text-blue" aria-hidden="true" />
 						</span>
 						<span
 							v-if="isClientOnly"
@@ -374,6 +370,16 @@ const installTooltip = computed(() => {
 			class="flex min-w-[160px] shrink-0 items-center justify-end gap-2 transition-colors duration-200"
 		>
 			<slot name="additionalButtonsLeft" />
+			<span
+				v-if="synced"
+				v-tooltip="syncStatusLabel"
+				:aria-label="syncStatusLabel"
+				role="img"
+				tabindex="0"
+				class="inline-flex size-9 shrink-0 cursor-help items-center justify-center rounded-xl text-blue focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
+			>
+				<LinkIcon class="size-5" aria-hidden="true" />
+			</span>
 
 			<!-- Fixed width container to reserve space for update/switch version button -->
 			<div

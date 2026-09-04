@@ -804,7 +804,8 @@ async function toggleDisableMod(
 	const originalFilePath = mod.file_path
 
 	try {
-		if (mod.synced_pack) {
+		const packSyncOption = mod.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs'
+		if (mod.synced_pack && instance.value.synced_options[packSyncOption]) {
 			await set_synced_pack_enabled(mod.synced_pack.id, desiredEnabled ?? !mod.enabled)
 			await refreshContentState('must_revalidate')
 			await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })

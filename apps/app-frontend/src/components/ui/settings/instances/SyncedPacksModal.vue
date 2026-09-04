@@ -93,7 +93,8 @@ async function show(type: SyncedPackType) {
 async function togglePacks(items: ContentItem[], enabled: boolean) {
 	const changing = items.filter((item) => item.enabled !== enabled)
 	if (changing.length === 0 || mutation.isPending.value) return
-	if (!(await confirmation.value?.confirmChange(enabled ? 'enable' : 'disable', changing))) return
+	if ((await confirmation.value?.confirmChange(enabled ? 'enable' : 'disable', changing)) !== 'all')
+		return
 	mutation.mutate(async () => {
 		for (const item of changing) await set_synced_pack_enabled(item.id, enabled)
 	})

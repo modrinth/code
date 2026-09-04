@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LinkIcon, RightArrowIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import { LinkIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
@@ -15,26 +15,47 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 import type { SyncedPackAction } from '@/helpers/synced-packs'
 import type { DesyncServerMode } from '@/helpers/worlds'
 
-type Choice = 'confirm' | 'all' | DesyncServerMode | null
+type Choice = 'here' | 'all' | DesyncServerMode | null
 const { formatMessage } = useVIntl()
 const modal = ref<InstanceType<typeof NewModal>>()
 const mode = ref<'change' | 'delete' | 'desync'>('change')
 const action = ref<SyncedPackAction>('disable')
 const items = ref<ContentItem[]>([])
+const allowInstanceOverride = ref(false)
 let resolveChoice: ((choice: Choice) => void) | undefined
 
 const messages = defineMessages({
 	warningTitle: { id: 'app.synced-content.warning.modal-title', defaultMessage: 'Sync warning' },
 	title: { id: 'app.synced-content.warning.title', defaultMessage: 'This content is synced' },
+	enableTitle: { id: 'app.synced-content.change.enable-title', defaultMessage: 'Enable content?' },
+	disableTitle: { id: 'app.synced-content.change.disable-title', defaultMessage: 'Disable content?' },
 	enable: {
-		id: 'app.synced-content.warning.enable',
+		id: 'app.synced-content.change.enable-description',
 		defaultMessage:
-			'Enabling this content will also enable it in the other instances where it is synced. To change it only here, desync it first.',
+			'Enable it across all synced instances, or only in this instance. Enabling it only here will turn on overrides for this instance.',
 	},
 	disable: {
-		id: 'app.synced-content.warning.disable',
+		id: 'app.synced-content.change.disable-description',
 		defaultMessage:
-			'Disabling this content will also disable it in the other instances where it is synced. To change it only here, desync it first.',
+			'Disable it across all synced instances, or only in this instance. Disabling it only here will turn on overrides for this instance.',
+	},
+	enableEverywhereDescription: {
+		id: 'app.synced-content.change.enable-everywhere-description',
+		defaultMessage: 'Enable this content across all synced instances.',
+	},
+	disableEverywhereDescription: {
+		id: 'app.synced-content.change.disable-everywhere-description',
+		defaultMessage: 'Disable this content across all synced instances.',
+	},
+	enableHere: { id: 'app.synced-content.change.enable-here', defaultMessage: 'Enable here' },
+	disableHere: { id: 'app.synced-content.change.disable-here', defaultMessage: 'Disable here' },
+	enableEverywhere: {
+		id: 'app.synced-content.change.enable-everywhere',
+		defaultMessage: 'Enable everywhere',
+	},
+	disableEverywhere: {
+		id: 'app.synced-content.change.disable-everywhere',
+		defaultMessage: 'Disable everywhere',
 	},
 	desyncTitle: { id: 'app.synced-content.desync.title', defaultMessage: 'Desync content' },
 	desyncDescription: {
@@ -57,7 +78,7 @@ const messages = defineMessages({
 const title = computed(
 	() =>
 		({
-			change: messages.warningTitle,
+			change: action.value === 'enable' ? messages.enableTitle : messages.disableTitle,
 			delete: messages.warningTitle,
 			desync: messages.desyncTitle,
 		})[mode.value],
@@ -65,6 +86,11 @@ const title = computed(
 const description = computed(() => {
 	if (mode.value === 'desync') return messages.desyncDescription
 	if (mode.value === 'delete') return messages.deleteDescription
+	if (!allowInstanceOverride.value) {
+		return action.value === 'enable'
+			? messages.enableEverywhereDescription
+			: messages.disableEverywhereDescription
+	}
 	return action.value === 'enable' ? messages.enable : messages.disable
 })
 
@@ -88,12 +114,18 @@ function show() {
 	})
 }
 
-async function confirmChange(value: SyncedPackAction, content: ContentItem[]) {
+async function confirmChange(
+	value: SyncedPackAction,
+	content: ContentItem[],
+	canOverride = false,
+) {
+	allowInstanceOverride.value = canOverride
 	mode.value = 'change'
 	action.value = value
 	items.value = content.filter((item) => item.synced_pack)
-	if (items.value.length === 0) return true
-	return (await show()) === 'confirm'
+	if (items.value.length === 0) return 'all'
+	const choice = await show()
+	return choice === 'all' || (canOverride && choice === 'here') ? choice : null
 }
 
 async function confirmDelete(content: ContentItem[]) {
@@ -186,19 +218,30 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 						{{ formatMessage(messages.remove) }}
 					</Button>
 				</template>
-				<Button
-					v-else
-					type="colored"
-					:color="mode === 'delete' ? 'red' : 'orange'"
-					@click="finish(mode === 'delete' ? 'all' : 'confirm')"
-				>
-					<TrashIcon v-if="mode === 'delete'" aria-hidden="true" />
-					<RightArrowIcon v-else aria-hidden="true" />
-					{{
-						formatMessage(
-							mode === 'delete' ? commonMessages.deleteLabel : commonMessages.continueButton,
-						)
-					}}
+				<template v-else-if="mode === 'change'">
+					<Button
+						v-if="allowInstanceOverride"
+						type="colored"
+						color="orange"
+						@click="finish('here')"
+					>
+						{{ formatMessage(action === 'enable' ? messages.enableHere : messages.disableHere) }}
+					</Button>
+					<Button
+						:type="allowInstanceOverride ? 'outlined' : 'colored'"
+						color="orange"
+						@click="finish('all')"
+					>
+						{{
+							formatMessage(
+								action === 'enable' ? messages.enableEverywhere : messages.disableEverywhere,
+							)
+						}}
+					</Button>
+				</template>
+				<Button v-else type="colored" color="red" @click="finish('all')">
+					<TrashIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.deleteLabel) }}
 				</Button>
 			</div>
 		</template>

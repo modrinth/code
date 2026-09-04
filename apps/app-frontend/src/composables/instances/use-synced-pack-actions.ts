@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { type Ref, watch } from 'vue'
 
 import type SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
+import { set_synced_option } from '@/helpers/instance'
 import { globalSyncedOptionsQueryOptions } from '@/helpers/synced-options'
 import {
 	desync_pack,
@@ -116,7 +117,34 @@ export function useSyncedPackActions(
 
 	async function confirmAction(action: SyncedPackAction, items: ContentItem[]) {
 		if (!items.some((item) => item.synced_pack)) return true
-		return (await modal.value?.confirmChange(action, items)) ?? false
+		const choice = await modal.value?.confirmChange(action, items, true)
+		if (!choice) return false
+		if (choice === 'here') {
+			const instanceId = instance.value.id
+			const options = new Set<'resource_packs' | 'data_packs'>(
+				items
+					.filter((item) => item.synced_pack)
+					.map((item) =>
+						item.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs',
+					),
+			)
+			try {
+				for (const option of options) {
+					const updated = await set_synced_option(instanceId, option, false)
+					queryClient.setQueryData(instanceKeys.detail(instanceId), updated)
+				}
+			} catch (error) {
+				handleError(error)
+				return false
+			} finally {
+				await Promise.all([
+					queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
+					queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
+				])
+				await refresh()
+			}
+		}
+		return true
 	}
 
 	async function confirmDeleteItems(items: ContentItem[]) {

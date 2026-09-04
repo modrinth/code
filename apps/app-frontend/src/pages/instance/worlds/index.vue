@@ -16,7 +16,6 @@
 	<ConfirmRemoveWorldModal
 		ref="removeWorldModal"
 		:world="worldToRemove"
-		:other-synced-instance-count="otherSyncedInstanceCount"
 		@confirm="proceedRemoveWorld"
 	/>
 	<DesyncServerModal ref="desyncServerModal" @confirm="confirmDesyncServer" />
@@ -157,6 +156,7 @@ import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
+import { set_synced_option } from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
 import {
@@ -187,11 +187,7 @@ import {
 import { injectServerInstall } from '@/providers/server-install'
 
 import { injectInstancePage } from '../instance-context'
-import {
-	instanceKeys,
-	instanceListQueryOptions,
-	instanceWorldsQueryOptions,
-} from '../query-options'
+import { instanceKeys, instanceWorldsQueryOptions } from '../query-options'
 
 const messages = defineMessages({
 	searchWorldsPlaceholder: {
@@ -272,15 +268,6 @@ function updateFilters(filters: string[]) {
 }
 
 const queryClient = useQueryClient()
-
-const instanceListQuery = useQuery(instanceListQueryOptions())
-const otherSyncedInstanceCount = computed(
-	() =>
-		instanceListQuery.data.value?.filter(
-			(candidate) =>
-				candidate.id !== instance.value.id && candidate.synced_options.multiplayer_servers,
-		).length ?? 0,
-)
 
 const refreshingAll = ref(false)
 const hadNoWorlds = ref(true)
@@ -495,14 +482,22 @@ async function editServer(server: ServerWorld) {
 	}
 }
 
-async function removeServer(server: ServerWorld) {
-	await remove_server_from_instance(instance.value.id, server.index).catch(handleError)
-	worlds.value = worlds.value.filter((w) => w.type !== 'server' || w.index !== server.index)
-	let serverIdx = 0
-	for (const w of worlds.value) {
-		if (w.type === 'server') {
-			w.index = serverIdx++
+async function removeServer(server: ServerWorld, scope: 'here' | 'all') {
+	const instanceId = instance.value.id
+	try {
+		if (scope === 'here' && server.source === 'user_synced') {
+			const updated = await set_synced_option(instanceId, 'multiplayer_servers', false)
+			queryClient.setQueryData(instanceKeys.detail(instanceId), updated)
 		}
+		await remove_server_from_instance(instanceId, server.index)
+	} catch (error) {
+		handleError(error)
+	} finally {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
+			queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
+		])
+		await refreshAllWorlds()
 	}
 }
 
@@ -710,9 +705,9 @@ function promptToRemoveWorld(world: World): boolean {
 	return !!removeWorldModal.value
 }
 
-async function proceedRemoveWorld(world: World) {
+async function proceedRemoveWorld(world: World, scope: 'here' | 'all') {
 	if (world.type === 'server') {
-		await removeServer(world)
+		await removeServer(world, scope)
 	} else {
 		await deleteWorld(world)
 	}

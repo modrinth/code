@@ -228,6 +228,7 @@ function updateValue(value: string | number | boolean | undefined) {
 		<div class="flex min-w-0 items-center justify-end">
 			<Slider
 				v-if="isSlider"
+				size="standard"
 				:model-value="sliderValue"
 				:min="inputMin ?? 0"
 				:max="inputMax ?? 100"
