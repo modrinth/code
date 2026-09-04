@@ -2,12 +2,16 @@ use super::ApiError;
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::PgPool;
-use crate::database::models::DBModerationLock;
 use crate::database::models::moderation_external_item;
+use crate::database::models::{
+    DBModerationLock, DBOrganization, DBOrganizationId, DBProject, DBProjectId,
+};
 use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
+use crate::routes::v3::organizations::OrganizationIds;
+use crate::routes::v3::users::UserIds;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::{
@@ -18,6 +22,7 @@ use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
+use futures_util::future::try_join_all;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use xredis::RedisPool;
@@ -37,6 +42,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
+        .service(get_user_project_by_status)
+        .service(get_users_project_by_status)
+        .service(get_organization_project_by_status)
+        .service(get_organizations_project_by_status)
         .service(web::scope("/tech-review").configure(tech_review::config))
         .service(
             web::scope("/external-license").configure(external_license::config),
@@ -215,7 +224,7 @@ pub struct DeleteAllLocksResponse {
     pub deleted_count: u64,
 }
 
-/// List projects in the moderation queue.  
+/// List projects in the moderation queue.
 #[utoipa::path(
 	context_path = "/moderation",
 	tag = "moderation",
@@ -1067,7 +1076,7 @@ fn row_to_ownership(
     })
 }
 
-/// Get project moderation metadata.  
+/// Get project moderation metadata.
 #[utoipa::path(
 	context_path = "/moderation",
 	tag = "moderation",
@@ -1230,7 +1239,7 @@ pub enum Judgement {
     },
 }
 
-/// Update project moderation judgements.  
+/// Update project moderation judgements.
 #[utoipa::path(
 	context_path = "/moderation",
 	tag = "moderation",
@@ -1332,7 +1341,7 @@ pub async fn set_project_meta(
     Ok(())
 }
 
-/// Acquire a moderation lock.  
+/// Acquire a moderation lock.
 /// Returns success if acquired, or info about who holds the lock if blocked.
 #[utoipa::path(
 	context_path = "/moderation",
@@ -1397,7 +1406,7 @@ pub async fn acquire_lock(
     }
 }
 
-/// Override a moderation lock.  
+/// Override a moderation lock.
 #[utoipa::path(
 	context_path = "/moderation",
 	tag = "moderation",
@@ -1448,7 +1457,7 @@ pub async fn override_lock(
     }))
 }
 
-/// Get moderation lock status.  
+/// Get moderation lock status.
 #[utoipa::path(
 	context_path = "/moderation",
 	tag = "moderation",
@@ -1515,7 +1524,7 @@ pub async fn get_lock_status(
     }
 }
 
-/// Release a moderation lock.  
+/// Release a moderation lock.
 #[utoipa::path(
 	context_path = "/moderation",
 	tag = "moderation",
@@ -1561,7 +1570,7 @@ pub async fn release_lock(
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
 
-/// Release a moderation lock by beacon.  
+/// Release a moderation lock by beacon.
 ///
 /// For use with `navigator.sendBeacon`, which cannot set `Authorization` or send `DELETE`.
 /// The body must be `text/plain` containing the same token value as the `Authorization` header
@@ -1637,7 +1646,7 @@ pub async fn release_lock_beacon(
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
 
-/// Delete all moderation locks.  
+/// Delete all moderation locks.
 #[utoipa::path(
 	context_path = "/moderation",
 	tag = "moderation",
@@ -1675,4 +1684,284 @@ pub async fn delete_all_locks(
         .wrap_internal_err("deleting moderation locks from database")?;
 
     Ok(web::Json(DeleteAllLocksResponse { deleted_count }))
+}
+
+/// Get project id's for a given user with them grouped by their `ProjectStatus`.
+///
+/// Only statuses with at least one project are present in the map.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = HashMap<ProjectStatus, Vec<ProjectId>>))
+)]
+#[get("/user/{user_id}/all-projects-by-status")]
+pub async fn get_user_project_by_status(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<HashMap<ProjectStatus, Vec<ProjectId>>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let target_user =
+        database::models::DBUser::get(&info.into_inner().0, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching user from database")?
+            .wrap_not_found_err("resource not found")?;
+
+    let counts =
+        user_projects_by_status(target_user.id, &**pool, &redis).await?;
+
+    Ok(web::Json(counts))
+}
+
+/// Get project id's for a list of user's with them grouped by their `ProjectStatus`.
+///
+/// Users that don't exist are silently omitted from the response; users
+/// that exist but have no projects are included with an empty map.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("ids" = String, Query)),
+    responses((status = OK, body = HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>))
+)]
+#[get("/users/all-projects-by-status")]
+pub async fn get_users_project_by_status(
+    req: HttpRequest,
+    ids: web::Query<UserIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<
+    web::Json<HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>>,
+    ApiError,
+> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing JSON data")?;
+
+    if user_ids.is_empty() {
+        return Ok(web::Json(HashMap::new()));
+    }
+
+    let target_users =
+        database::models::DBUser::get_many(&user_ids, &**pool, &redis)
+            .await
+            .wrap_internal_err("fetching users from database")?;
+
+    let pool_ref = &**pool;
+    let redis_ref = &*redis;
+
+    let grouped_projects_by_user =
+        try_join_all(target_users.into_iter().map(|target_user| async move {
+            let counts =
+                user_projects_by_status(target_user.id, pool_ref, redis_ref)
+                    .await?;
+
+            Ok::<_, ApiError>((UserId::from(target_user.id), counts))
+        }))
+        .await?
+        .into_iter()
+        .collect::<HashMap<_, _>>();
+
+    Ok(web::Json(grouped_projects_by_user))
+}
+
+/// Get project id's for a given organization with them grouped by their `ProjectStatus`.
+///
+/// Only statuses with at least one project are present in the map.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = HashMap<ProjectStatus, Vec<ProjectId>>))
+)]
+#[get("/organization/{organization_id}/all-projects-by-status")]
+pub async fn get_organization_project_by_status(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<HashMap<ProjectStatus, Vec<ProjectId>>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let target_org = database::models::DBOrganization::get(
+        &info.into_inner().0,
+        &**pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching organization from database")?
+    .wrap_not_found_err("resource not found")?;
+
+    let grouped_projects =
+        organization_projects_by_status(target_org.id, &**pool, &redis).await?;
+
+    Ok(web::Json(grouped_projects))
+}
+
+/// Get project id's for a list of organization's with them grouped by their `ProjectStatus`.
+///
+/// Organizations that don't exist are silently omitted from the
+/// response; organizations that exist but have no projects are included
+/// with an empty map.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("ids" = String, Query)),
+    responses((status = OK, body = HashMap<OrganizationId, HashMap<ProjectStatus, Vec<ProjectId>>>))
+)]
+#[get("/organizations/all-projects-by-status")]
+pub async fn get_organizations_project_by_status(
+    req: HttpRequest,
+    ids: web::Query<OrganizationIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<
+    web::Json<HashMap<OrganizationId, HashMap<ProjectStatus, Vec<ProjectId>>>>,
+    ApiError,
+> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let organization_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing JSON data")?;
+
+    if organization_ids.is_empty() {
+        return Ok(web::Json(HashMap::new()));
+    }
+
+    let target_orgs = database::models::DBOrganization::get_many(
+        &organization_ids,
+        &**pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching organizations from database")?;
+
+    let pool_ref = &**pool;
+    let redis_ref = &*redis;
+
+    let grouped_projects_by_org =
+        try_join_all(target_orgs.into_iter().map(|target_org| async move {
+            let counts = organization_projects_by_status(
+                target_org.id,
+                pool_ref,
+                redis_ref,
+            )
+            .await?;
+
+            Ok::<_, ApiError>((OrganizationId::from(target_org.id), counts))
+        }))
+        .await?
+        .into_iter()
+        .collect::<HashMap<_, _>>();
+
+    Ok(web::Json(grouped_projects_by_org))
+}
+
+/// Groups the given User projects by their `ProjectStatus`.
+async fn user_projects_by_status<'a, E>(
+    user_id: database::models::DBUserId,
+    pool: E,
+    redis: &RedisPool,
+) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
+where
+    E: database::Executor<'a, Database = sqlx::Postgres>
+        + database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
+{
+    let project_ids =
+        database::models::DBUser::get_projects(user_id, pool, redis)
+            .await
+            .wrap_internal_err("fetching user's projects from database")?;
+
+    group_projects_by_status(&project_ids, pool, redis).await
+}
+
+/// Groups the given Organization projects by their `ProjectStatus`.
+async fn organization_projects_by_status<'a, E>(
+    organization_id: DBOrganizationId,
+    pool: E,
+    redis: &RedisPool,
+) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
+where
+    E: database::Executor<'a, Database = sqlx::Postgres>
+        + database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
+{
+    let project_ids = DBOrganization::get_projects(organization_id, pool)
+        .await
+        .wrap_internal_err("fetching project IDs from database")?;
+
+    group_projects_by_status(&project_ids, pool, redis).await
+}
+
+/// Groups the given input Projects by their `ProjectStatus`.
+async fn group_projects_by_status<'a, E>(
+    project_ids: &[DBProjectId],
+    pool: E,
+    redis: &RedisPool,
+) -> Result<HashMap<ProjectStatus, Vec<ProjectId>>, ApiError>
+where
+    E: database::Executor<'a, Database = sqlx::Postgres>
+        + database::Acquire<'a, Database = sqlx::Postgres>
+        + Copy,
+{
+    if project_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    let projects = DBProject::get_many_ids(project_ids, pool, redis)
+        .await
+        .wrap_internal_err("fetching projects from database")?;
+
+    let mut grouped_projects: HashMap<ProjectStatus, Vec<ProjectId>> =
+        HashMap::new();
+    for project in &projects {
+        grouped_projects
+            .entry(project.inner.status)
+            .or_default()
+            .push(project.inner.id.into());
+    }
+
+    Ok(grouped_projects)
 }
