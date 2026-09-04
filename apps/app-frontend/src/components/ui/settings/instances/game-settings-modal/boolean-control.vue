@@ -20,12 +20,12 @@ const emit = defineEmits<{
 		v-tooltip="modelValue === undefined ? placeholder : undefined"
 		role="group"
 		:aria-label="label"
-		class="inline-flex h-8 items-center gap-0.5 rounded-xl border border-solid border-surface-5 p-px shadow-[0_1px_3px_rgba(0,0,0,0.15)]"
+		class="inline-flex h-9 items-center gap-0.5 rounded-xl border border-solid border-surface-5 p-px shadow-[0_1px_3px_rgba(0,0,0,0.15)]"
 		:class="{ 'opacity-50': disabled }"
 	>
 		<Button
 			type="quiet"
-			size="xs"
+			size="sm"
 			:interaction="modelValue === true ? 'none' : 'surface'"
 			class="boolean-control-on !rounded-[10px] !px-3 !font-medium disabled:!opacity-100"
 			:class="modelValue === true ? '!text-green' : '!text-contrast'"
@@ -37,7 +37,7 @@ const emit = defineEmits<{
 		</Button>
 		<Button
 			type="quiet"
-			size="xs"
+			size="sm"
 			:interaction="modelValue === false ? 'none' : 'surface'"
 			class="boolean-control-off !rounded-[10px] !px-3 !font-medium !text-contrast disabled:!opacity-100"
 			:aria-pressed="modelValue === false"

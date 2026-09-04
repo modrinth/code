@@ -9,8 +9,8 @@
 
 		<div
 			v-if="currentValue !== null"
-			class="relative mx-2 h-10 min-w-0 flex-1"
-			:class="disabled ? 'opacity-50' : ''"
+			class="relative mx-2 min-w-0 flex-1"
+			:class="[heightClass, disabled ? 'opacity-50' : '']"
 		>
 			<div
 				class="pointer-events-none absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-surface-5"
@@ -38,7 +38,7 @@
 				:min="min"
 				:max="max"
 				:step="step"
-				class="slider absolute top-0 h-10 min-h-0 appearance-none overflow-visible border-0 bg-transparent p-0 shadow-none outline-none"
+				class="slider absolute top-0 h-full min-h-0 appearance-none overflow-visible border-0 bg-transparent p-0 shadow-none outline-none"
 				:class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
 				:disabled="disabled"
 				:aria-label="ariaLabel"
@@ -56,7 +56,7 @@
 		<Input
 			:model-value="currentValue ?? undefined"
 			type="number"
-			size="medium"
+			:size="size"
 			wrapper-class="slider-value shrink-0"
 			:class="currentValue === null ? 'w-full' : 'w-[65px]'"
 			:input-class="currentValue === null ? undefined : 'text-center'"
@@ -75,10 +75,12 @@
 import { computed, ref, watch } from 'vue'
 
 import Input from './inputs/Input.vue'
+import type { InputSize } from './inputs/types'
 
 const emit = defineEmits<{ 'update:modelValue': [number] }>()
 
 interface Props {
+	size?: InputSize
 	modelValue?: number | null
 	min: number
 	max: number
@@ -93,6 +95,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+	size: 'medium',
 	modelValue: 0,
 	min: 0,
 	max: 100,
@@ -104,6 +107,15 @@ const props = withDefaults(defineProps<Props>(), {
 	unit: '',
 })
 
+const heightClass = computed(
+	() =>
+		({
+			small: 'h-8',
+			standard: 'h-9',
+			medium: 'h-10',
+			large: 'h-12',
+		})[props.size],
+)
 const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>

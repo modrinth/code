@@ -211,7 +211,7 @@ onBeforeUnmount(cancelRecording)
 			<Button
 				:type="recording || conflicts.length ? 'outlined' : 'quiet'"
 				:color="recording ? 'brand' : conflicts.length ? 'orange' : undefined"
-				size="lg"
+				size="md"
 				:disabled="disabled"
 				:aria-label="accessibleLabel"
 				:aria-describedby="recording ? statusId : conflicts.length ? conflictId : undefined"

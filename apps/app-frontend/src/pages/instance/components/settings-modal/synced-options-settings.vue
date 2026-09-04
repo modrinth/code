@@ -110,7 +110,7 @@ const messages = defineMessages({
 	},
 	gameSettingsDescription: {
 		id: 'instance.settings.tabs.synced-options.game-settings.description',
-		defaultMessage: "Keep this instance's options.txt separate from the synced copy",
+		defaultMessage: "Keep this instance's options.txt separate from the synced copy.",
 	},
 	editGameSettings: {
 		id: 'app.settings.synced-options.game-settings.button',
