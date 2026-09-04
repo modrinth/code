@@ -490,6 +490,8 @@ pub struct Project {
     pub versions: Vec<String>,
 
     pub icon_url: Option<String>,
+    #[serde(default)]
+    pub raw_icon_url: Option<String>,
 
     pub issues_url: Option<String>,
     pub source_url: Option<String>,
