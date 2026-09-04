@@ -75,18 +75,18 @@
 			</template>
 			<template #cell-actions="{ row }">
 				<div class="flex items-center justify-end">
-					<ButtonStyled circular type="transparent">
-						<button
-							v-tooltip="row.pending ? 'Revoke invite' : 'More actions'"
-							:aria-label="`${row.pending ? 'Revoke invite' : 'More actions'} for ${row.username}`"
-							class="text-secondary hover:!filter-none"
-							:class="row.pending ? 'hover:text-red' : ''"
-							@click="row.pending ? emit('remove', row) : emit('open-actions', row)"
-						>
-							<XIcon v-if="row.pending" aria-hidden="true" />
-							<MoreHorizontalIcon v-else aria-hidden="true" />
-						</button>
-					</ButtonStyled>
+					<IconButton
+						v-tooltip="row.pending ? 'Revoke invite' : 'More actions'"
+						type="quiet"
+						interaction="none"
+						:label="`${row.pending ? 'Revoke invite' : 'More actions'} for ${row.username}`"
+						class="!text-secondary"
+						:class="row.pending ? 'hover:!text-red' : ''"
+						@click="row.pending ? emit('remove', row) : emit('open-actions', row)"
+					>
+						<XIcon v-if="row.pending" aria-hidden="true" />
+						<MoreHorizontalIcon v-else aria-hidden="true" />
+					</IconButton>
 				</div>
 			</template>
 		</Table>
@@ -105,7 +105,7 @@ import {
 import { computed, ref } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { IconButton } from '#ui/components/base/buttons'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import Table, { type SortDirection, type TableColumn } from '#ui/components/base/Table.vue'
