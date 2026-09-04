@@ -204,7 +204,7 @@ export function flattenStaticVariables(): Record<string, string> {
 		`https://support.modrinth.com/en/articles/16567675#h_37c3b31394`
 	vars[`DISCLOSURES_FAQ_TELEMETRY_LINK`] =
 		`https://support.modrinth.com/en/articles/16567675#h_490dcf364b`
-	vars[`DISCLOSURES_FAQ_TELEMTRY_CONSENT_LINK`] =
+	vars[`DISCLOSURES_FAQ_TELEMETRY_CONSENT_LINK`] =
 		`https://support.modrinth.com/en/articles/16567675#h_d209c4c04c`
 	vars[`DISCLOSURES_FAQ_DERIVATIVE_LINK`] =
 		`https://support.modrinth.com/en/articles/16567675#h_6422cc821e`
