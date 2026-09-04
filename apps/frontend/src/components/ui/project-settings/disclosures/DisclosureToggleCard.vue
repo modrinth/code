@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CircleSlashIcon, LockIcon, LockOpenIcon } from '@modrinth/assets'
+import { CircleSlashIcon, LockIcon, LockOpenIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	Button,
 	ButtonGroup,
@@ -8,6 +8,7 @@ import {
 	normalizeChildren,
 	SettingsInlineWarning,
 	SettingsToggleCard,
+	useVIntl,
 } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed } from 'vue'
@@ -17,11 +18,14 @@ import type { DisclosureCardMetaProps, DisclosureLockStatus } from './types'
 
 defineOptions({ inheritAttrs: false })
 
+const { formatMessage } = useVIntl()
+
 const props = defineProps<
 	DisclosureCardMetaProps & {
 		title: string
 		icon?: Component
 		description?: string
+		infoLink?: string
 	}
 >()
 
@@ -54,6 +58,10 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.lock-status.disabled.warning',
 		defaultMessage:
 			'This disclosure has been locked by the moderators. Please <contact-support-link>contact support</contact-support-link> if you believe this is in error.',
+	},
+	infoTooltip: {
+		id: 'project.settings.disclosures.info-tooltip',
+		defaultMessage: 'Click to learn more about when to use this disclosure.',
 	},
 })
 
@@ -91,6 +99,18 @@ function setLockStatus(status: DisclosureLockStatus) {
 		:description="description"
 	>
 		<slot />
+		<template #title-suffix>
+			<a
+				v-if="infoLink"
+				v-tooltip="formatMessage(messages.infoTooltip)"
+				class="smart-clickable:allow-pointer-events flex text-secondary hover:brightness-[--hover-brightness]"
+				:href="infoLink"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				<UnknownIcon class="size-5" />
+			</a>
+		</template>
 		<template v-if="$slots.expanded" #expanded>
 			<slot name="expanded" />
 		</template>

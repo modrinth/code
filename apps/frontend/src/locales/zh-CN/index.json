@@ -3812,9 +3812,6 @@
   "project.settings.disclosures.advertising.title": {
     "message": "包含广告推广内容"
   },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "请参考第6节的 <rules>Modrinth Content Rules</rules> 获取更多信息。"
-  },
   "project.settings.disclosures.ai.description": {
     "message": "如果此项目包含大量AI生成的代码，您必须启用此功能，任何资产基本上是AI生成的、该项目的功能依赖于使用AI或您的项目页面中的任何元素的部分为AI所生成的，请描述或发布依赖于生成的AI所生成的部分。"
   },

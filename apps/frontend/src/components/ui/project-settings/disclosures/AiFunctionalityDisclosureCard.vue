@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EyeIcon } from '@modrinth/assets'
+import { BrainCircuitIcon } from '@modrinth/assets'
 import { commonMessages, defineMessages, SettingsFormGroup, Textarea, useVIntl } from '@modrinth/ui'
 
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
@@ -17,18 +17,17 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	title: {
-		id: 'project.settings.disclosures.photosensitivity.title',
-		defaultMessage: 'Photosensitivity warning',
+		id: 'project.settings.disclosures.ai-functionality.title',
+		defaultMessage: 'Contains generative AI functionality',
 	},
 	description: {
-		id: 'project.settings.disclosures.photosensitivity.description',
+		id: 'project.settings.disclosures.ai-functionality.description',
 		defaultMessage:
-			'Enable this if your project contains anything that you think may be dangerous to certain people who are sensitive to flashing lights or patterns.',
+			'Must be enabled if the project has functionality that makes use of generative AI, such as an in-game chatbot or dynamically generated textures.',
 	},
 	notePlaceholder: {
-		id: 'project.settings.disclosures.photosensitivity.note-placeholder',
-		defaultMessage:
-			'e.g. It adds a flashlight item that has a strobe mode. It can be disabled in Accessibility settings in-game.',
+		id: 'project.settings.disclosures.ai-functionality.note-placeholder',
+		defaultMessage: 'e.g. The NPCs uses generative AI for dialogue options.',
 	},
 })
 </script>
@@ -37,19 +36,20 @@ const messages = defineMessages({
 	<DisclosureToggleCard
 		v-bind="props"
 		v-model="model.enabled"
-		:icon="EyeIcon"
+		:icon="BrainCircuitIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
-		info-link="https://support.modrinth.com/en/articles/16567675#h_22ffae0bb1"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_4482fb3bf7"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
 			<SettingsFormGroup
 				:title="formatMessage(commonMessages.explanationLabel)"
-				title-for="photosensitivity-disclosure-note"
+				title-for="ai-functionality-disclosure-note"
+				optional
 			>
 				<Textarea
-					id="photosensitivity-disclosure-note"
+					id="ai-functionality-disclosure-note"
 					v-model="model.note"
 					:rows="3"
 					class="max-w-[40rem]"

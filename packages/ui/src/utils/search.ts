@@ -1,14 +1,15 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArchiveIcon,
+	BrainCircuitIcon,
 	CircleDollarSignIcon,
-	CircuitBoardIcon,
 	ClientIcon,
 	EyeIcon,
 	getCategoryIcon,
 	getLoaderIcon,
 	GitForkIcon,
 	MegaphoneIcon,
+	MonitorCogIcon,
 	RadioTowerIcon,
 	ServerIcon,
 	SparklesIcon,
@@ -224,9 +225,10 @@ export type DisclosureTypeFilter = Labrinth.Projects.v3.ProjectDisclosureType
 
 const DISCLOSURE_TYPE_ICONS: Record<DisclosureTypeFilter, Component> = {
 	ai_content: SparklesIcon,
+	ai_functionality: BrainCircuitIcon,
 	advertisements: MegaphoneIcon,
 	epilepsy_triggers: EyeIcon,
-	system_interactions: CircuitBoardIcon,
+	system_interactions: MonitorCogIcon,
 	telemetry: RadioTowerIcon,
 	derivative_work: GitForkIcon,
 	paid_features: CircleDollarSignIcon,
@@ -252,6 +254,13 @@ export function formatDisclosureTypeLabel(
 				defineMessage({
 					id: 'search.filter_type.advanced.disclosure.ai_content',
 					defaultMessage: 'AI-generated content',
+				}),
+			)
+		case 'ai_functionality':
+			return formatMessage(
+				defineMessage({
+					id: 'search.filter_type.advanced.disclosure.ai_functionality',
+					defaultMessage: 'Generative AI functionality',
 				}),
 			)
 		case 'advertisements':
@@ -354,8 +363,10 @@ export function createDisclosureFilterOptions(
 	formatMessage: FormatMessage,
 	projectTypes: readonly ProjectType[],
 ): FilterOption[] {
-	return PROJECT_DISCLOSURE_TYPES.filter((disclosureType) =>
-		isDisclosureCompatibleWithProjectTypes(disclosureType, projectTypes),
+	return PROJECT_DISCLOSURE_TYPES.filter(
+		(disclosureType) =>
+			disclosureType !== 'derivative_work' &&
+			isDisclosureCompatibleWithProjectTypes(disclosureType, projectTypes),
 	).map((disclosureType) => ({
 		id: disclosureType,
 		formatted_name: formatDisclosureTypeLabel(formatMessage, disclosureType),

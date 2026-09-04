@@ -3458,9 +3458,6 @@
   "project.disclosure.ai-generated-content.use.content": {
     "defaultMessage": "e Inhalte"
   },
-  "project.disclosure.ai-generated-content.use.functionality": {
-    "defaultMessage": "e Funktionen"
-  },
   "project.disclosure.ai-generated-content.use.text": {
     "defaultMessage": "en Text"
   },
@@ -3853,9 +3850,6 @@
   },
   "project.settings.disclosures.ai.types-code": {
     "defaultMessage": "Code"
-  },
-  "project.settings.disclosures.ai.types-functionality": {
-    "defaultMessage": "Funktionen"
   },
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "Text"

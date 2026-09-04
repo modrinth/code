@@ -32,7 +32,7 @@ const messages = defineMessages({
 	description: {
 		id: 'project.settings.disclosures.paid-features.description',
 		defaultMessage:
-			'You must enable this if your project contains features that can be obtained by spending real-world money.',
+			'Must be enabled if this project contains features that can be unlocked by spending real-world money.',
 	},
 	featuresDescription: {
 		id: 'project.settings.disclosures.paid-features.features-description',
@@ -70,6 +70,7 @@ function removeFeature(index: number) {
 		:icon="CircleDollarSignIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_37c3b31394"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>

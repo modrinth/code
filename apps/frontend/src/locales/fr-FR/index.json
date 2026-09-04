@@ -3767,17 +3767,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Cette option doit être activée si votre projet contient des publicités, des partenariats ou des promotions pour d'autres contenus."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Si la promotion n'a aucune valeur monétaire directe <emphasis>et</emphasis> qu'elle concerne quelque chose que le grand public considérerait comme <italic>pertinent</italic> et <italic>discret</italic> (tel qu'un lien vers votre profil Modrinth dans un coin de la page des paramètres de votre propre mod), nous ne considérerions pas cela comme de la publicité."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "Par exemple : Ajoute automatiquement le serveur multijoueur Modrinth à votre liste de serveurs."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Contient des publicités"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Pour plus d'informations, veuillez vous reporter à la section 6 des <rules>Règles relatives au contenu de Modrinth</rules>."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Cette option doit être activée si ce projet contient une quantité importante de code généré par IA, si des\néléments sont en grande partie générés par IA, si des fonctionnalités du projet reposent sur l'utilisation d'une\nIA générative, ou si un élément quelconque de la page de votre projet, tel que la description ou la publication,\nrepose sur une IA générative."

@@ -3770,17 +3770,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Projeniz reklam, sponsorluk veya diğer çalışmaların tanıtımını içeriyorsa bunu etkinleştirmeniz gerekir."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Tanıtımın doğrudan parasal bir değeri yoksa <emphasis>ve</emphasis> ortalama bir kişinin <italic>ilgili</italic> ve <italic>rahatsız etmeyen</italic> olarak değerlendireceği bir şeyse (örneğin kendi modunuzun ayarlar sayfasının köşesinde Modrinth profilinize bir bağlantı), bunu bir reklam olarak değerlendirmeyiz."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "örn. Modrinth SMP sunucusunu sunucu listenize otomatik olarak ekler."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Reklam içerir"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Daha fazla bilgi için lütfen <rules>Modrinth İçerik Kuralları</rules>’nın 6. bölümüne bakın."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "örn. AI tarafından oluşturulmuş Çince ve Arapça çeviriler."

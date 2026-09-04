@@ -3377,9 +3377,6 @@
   "project.settings.disclosures.advertising.title": {
     "message": "Innehåller reklam"
   },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Vänligen läs avsnitt 6 i <rules>Modrinths innehållsregler</rules> för mer information."
-  },
   "project.settings.disclosures.ai.description": {
     "message": "Du måste aktivera detta om projektet innehåller en betydande mängd AI-genererad kod, om det finns tillgångar som till stor del är AI-genererade, om projektets funktionalitet bygger på användning av generativ AI, eller om någon del av projektets sida som beskrivningen eller publiceringen bygger på generativ AI."
   },

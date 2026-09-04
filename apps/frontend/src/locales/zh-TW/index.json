@@ -3812,9 +3812,6 @@
   "project.settings.disclosures.advertising.title": {
     "message": "包含廣告宣傳"
   },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "請參閱 Modrinth 的《<rules>內容規範</rules>》第 6 節以取得更多資訊。"
-  },
   "project.settings.disclosures.ai.description": {
     "message": "如果這個專案包含大量由 AI 生成的程式碼、任何主要由 AI 生成的資源、專案的功能仰賴生成式 AI，或是專案頁面的任何元素（例如描述或發布）仰賴生成式 AI，則必須啟用這個選項。"
   },

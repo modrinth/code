@@ -86,7 +86,7 @@ jobs:
       GIT_HASH: ${{ github.sha }}
       SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '20G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
-      RUST_MIN_STACK: '16777216'
+      RUST_MIN_STACK: '268435456'
     steps:
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

@@ -3797,17 +3797,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Включите, если проект содержит рекламу, спонсорство или продвижение других работ."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Если у продвижения нет прямой денежной ценности <emphasis>и</emphasis> оно представляет собой то, что обычный человек счёл бы <italic>уместным</italic> и <italic>ненавязчивым</italic> (например, ссылку на ваш профиль Modrinth в уголке страницы настроек вашего же мода), мы не будем считать это рекламой."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "Например: Adds the Modrinth SMP server to your server list automatically."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Есть реклама"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Пожалуйста, ознакомьтесь с разделом 6 <rules>Правил контента Modrinth</rules> для получения дополнительной информации."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Вы должны включить это если в вашем проекте имеется малейшее содержание кода сгенерированного с помощью ИИ, ассетов созданных ИИ или в проекте хоть где-то используется искусственный интеллект. Или даже где-то в вашем описании, а также текстовом поле был использован генеративный искусственный интеллект."

@@ -3398,9 +3398,6 @@
   "project.disclosure.ai-generated-content.use.content": {
     "defaultMessage": "zawartość wygenerowaną"
   },
-  "project.disclosure.ai-generated-content.use.functionality": {
-    "defaultMessage": "funkcjonalność wygenerowaną"
-  },
   "project.disclosure.ai-generated-content.use.text": {
     "defaultMessage": "tekst wygenerowany"
   },
@@ -3781,9 +3778,6 @@
   },
   "project.settings.disclosures.ai.types-code": {
     "defaultMessage": "Kod"
-  },
-  "project.settings.disclosures.ai.types-functionality": {
-    "defaultMessage": "Funkcjonalność"
   },
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "Tekst"

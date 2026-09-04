@@ -3458,9 +3458,6 @@
   "project.disclosure.ai-generated-content.use.content": {
     "defaultMessage": "内容"
   },
-  "project.disclosure.ai-generated-content.use.functionality": {
-    "defaultMessage": "功能"
-  },
   "project.disclosure.ai-generated-content.use.text": {
     "defaultMessage": "文本"
   },
@@ -3853,9 +3850,6 @@
   },
   "project.settings.disclosures.ai.types-code": {
     "defaultMessage": "代码"
-  },
-  "project.settings.disclosures.ai.types-functionality": {
-    "defaultMessage": "功能"
   },
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "文本（如翻译）"
