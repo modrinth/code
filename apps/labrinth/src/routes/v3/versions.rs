@@ -20,7 +20,7 @@ use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Dependency, FileType, VersionStatus, VersionType,
+    Dependency, FileType, ProjectStatus, VersionStatus, VersionType,
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
@@ -47,7 +47,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 }
 
 // Given a project ID/slug and a version slug
-/// Get a project version.  
+/// Get a project version.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "versions",
@@ -969,7 +969,7 @@ pub struct VersionListFilters {
     pub include_changelog: bool,
 }
 
-/// List project versions.  
+/// List project versions.
 #[utoipa::path(
 	context_path = "/project",
 	tag = "versions",
@@ -1243,6 +1243,15 @@ pub async fn version_delete(
         .wrap_request_err_with(|| {
             "the specified version does not exist!".to_string()
         })?;
+    let project = database::models::DBProject::get_id(
+        version.inner.project_id,
+        &**pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("fetching project from database")?
+    .wrap_not_found_err("resource not found")?;
+    let validate_for_review = project.inner.status == ProjectStatus::Processing;
 
     if !user.role.is_admin() {
         let team_member =
@@ -1326,6 +1335,16 @@ pub async fn version_delete(
     .wrap_api_err(
         "executing `tech_review_sync::sync_project_tech_review_state`",
     )?;
+
+    if validate_for_review {
+        super::projects::validate::ensure_project_is_valid_for_review(
+            version.inner.project_id,
+            &pool,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
+    }
 
     transaction
         .commit()

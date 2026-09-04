@@ -94,6 +94,8 @@ async fn app() -> std::io::Result<()> {
         .install_default()
         .unwrap();
 
+    dioxus_devtools::connect_subsecond();
+
     if args.run_background_task.is_none() {
         info!("Starting labrinth on {}", &ENV.BIND_ADDR);
 

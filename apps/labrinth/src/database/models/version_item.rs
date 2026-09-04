@@ -595,8 +595,32 @@ impl DBVersion {
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
-        let mut val = redis.get_cached_keys(
+        Self::get_many_inner(version_ids, exec, redis, true).await
+    }
+
+    pub async fn get_many_uncached<'a, E>(
+        version_ids: &[DBVersionId],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<VersionQueryResult>, DatabaseError>
+    where
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
+    {
+        Self::get_many_inner(version_ids, exec, redis, false).await
+    }
+
+    async fn get_many_inner<'a, E>(
+        version_ids: &[DBVersionId],
+        exec: E,
+        redis: &RedisPool,
+        use_cache: bool,
+    ) -> Result<Vec<VersionQueryResult>, DatabaseError>
+    where
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
+    {
+        let mut val = redis.get_keys_with_cache(
             VERSIONS_NAMESPACE,
+            use_cache,
             &version_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
             |version_ids| async move {
                 let mut exec = exec.acquire().await?;

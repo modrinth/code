@@ -6,7 +6,9 @@ use std::collections::HashMap;
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
+use crate::database::models::project_item::{
+    DBGalleryItem, DBModCategory, ProjectQueryResult,
+};
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
     DBModerationLock, DBProjectId, DBTeamMember, ids as db_ids, image_item,
@@ -27,7 +29,7 @@ use crate::models::projects::{
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
-use crate::models::users::DELETED_USER;
+use crate::models::users::{DELETED_USER, User};
 use crate::models::{self, exp};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -49,6 +51,8 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use xredis::RedisPool;
+
+pub mod validate;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_search)
@@ -74,7 +78,8 @@ pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(super::teams::team_members_get_project)
         .service(super::versions::version_list)
         .service(super::versions::version_project_get)
-        .service(dependency_list);
+        .service(dependency_list)
+        .service(validate::validate);
 }
 
 pub async fn clear_project_cache_and_queue_search(
@@ -457,10 +462,12 @@ pub async fn project_edit_internal(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    new_project
-        .validate()
-        .map_err(|err| eyre::eyre!(err))
-        .wrap_request_err("validating request")?;
+    new_project.validate().map_err(|err| {
+        let message =
+            crate::util::validate::validation_errors_to_string(err, None)
+                .replacen("Field ", "field ", 1);
+        ApiError::Request(eyre!(message))
+    })?;
 
     let Some(mut project_item) =
         db_models::DBProject::get(&info.into_inner().0, &**pool, &redis)
@@ -490,6 +497,29 @@ pub async fn project_edit_internal(
             "You do not have permission to edit this project!",
         )));
     };
+
+    let submit_for_review = new_project.status
+        == Some(ProjectStatus::Processing)
+        && !user.role.is_mod();
+    let leave_review = matches!(
+        new_project.status,
+        Some(ProjectStatus::Draft | ProjectStatus::Rejected)
+    );
+    let validate_for_review = submit_for_review
+        || (project_item.inner.status == ProjectStatus::Processing
+            && !leave_review);
+    if submit_for_review {
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::Auth(eyre!(
+                "you do not have permission to submit this project for review"
+            )));
+        }
+        if project_item.inner.status.is_approved() {
+            return Err(ApiError::Auth(eyre!(
+                "you do not have permission to submit this project for review"
+            )));
+        }
+    }
 
     let mut transaction = pool
         .begin()
@@ -538,7 +568,9 @@ pub async fn project_edit_internal(
         .wrap_internal_err("querying database for `project_edit_internal`")?;
     }
 
-    if let Some(status) = &new_project.status {
+    if let Some(status) = &new_project.status
+        && !submit_for_review
+    {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have the permissions to edit the status of this project!",
@@ -611,12 +643,6 @@ pub async fn project_edit_internal(
             }
 
             if status == &ProjectStatus::Processing {
-                if project_item.versions.is_empty() {
-                    return Err(ApiError::Request(eyre::eyre!(String::from(
-                        "Project submitted for review with no initial versions",
-                    ))));
-                }
-
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -701,7 +727,7 @@ pub async fn project_edit_internal(
                 .ok();
             }
 
-            if team_member.is_none_or(|x| !x.accepted) {
+            if team_member.as_ref().is_none_or(|x| !x.accepted) {
                 let notified_members = sqlx::query!(
                     "
                     SELECT tm.user_id id
@@ -1339,6 +1365,28 @@ pub async fn project_edit_internal(
     .await
     .wrap_api_err("deleting unused images")?;
 
+    if validate_for_review {
+        let reloaded_project = validate::ensure_project_is_valid_for_review(
+            id,
+            &pool,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
+
+        if submit_for_review {
+            submit_project_for_review(
+                &reloaded_project,
+                &user,
+                team_member.as_ref().is_none_or(|member| !member.accepted),
+                sync_archival_disclosure,
+                &mut transaction,
+                &redis,
+            )
+            .await?;
+        }
+    }
+
     transaction
         .commit()
         .await
@@ -1383,6 +1431,127 @@ pub async fn project_edit_internal(
     }
 
     Ok(HttpResponse::NoContent().body(""))
+}
+
+async fn submit_project_for_review(
+    project: &ProjectQueryResult,
+    user: &User,
+    notify_team_members: bool,
+    sync_archival_disclosure: bool,
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    let archival_disclosure =
+        db_models::DBProjectDisclosure::get_many_for_project(
+            project.inner.id,
+            false,
+            &mut *transaction,
+        )
+        .await
+        .wrap_internal_err("failed to fetch project disclosures")?
+        .into_iter()
+        .find(|disclosure| {
+            matches!(disclosure.disclosure, ProjectDisclosure::Archived { .. })
+        });
+
+    sqlx::query!(
+        "
+                    UPDATE mods
+                    SET moderation_message = NULL, moderation_message_body = NULL, queued = NOW()
+                    WHERE (id = $1)
+                    ",
+        project.inner.id as db_ids::DBProjectId,
+    )
+    .execute(&mut *transaction)
+    .await
+    .wrap_internal_err("querying database for `project_edit_internal`")?;
+
+    if notify_team_members {
+        let notified_members = sqlx::query!(
+            "
+                    SELECT tm.user_id id
+                    FROM team_members tm
+                    WHERE tm.team_id = $1 AND tm.accepted
+                    ",
+            project.inner.team_id as db_ids::DBTeamId
+        )
+        .fetch(&mut *transaction)
+        .map_ok(|row| db_models::DBUserId(row.id))
+        .try_collect::<Vec<_>>()
+        .await
+        .wrap_internal_err("fetching notified members from database")?;
+
+        NotificationBuilder {
+            body: NotificationBody::StatusChange {
+                project_id: project.inner.id.into(),
+                old_status: project.inner.status,
+                new_status: ProjectStatus::Processing,
+            },
+        }
+        .insert_many(notified_members.clone(), &mut *transaction, redis)
+        .await
+        .wrap_internal_err(
+            "inserting database records for `project_edit_internal`",
+        )?;
+
+        NotificationBuilder {
+            body: NotificationBody::ProjectStatusNeutral {
+                project_id: project.inner.id.into(),
+                old_status: project.inner.status,
+                new_status: ProjectStatus::Processing,
+            },
+        }
+        .insert_many(notified_members, &mut *transaction, redis)
+        .await
+        .wrap_internal_err(
+            "inserting database records for `project_edit_internal`",
+        )?;
+    }
+
+    ThreadMessageBuilder {
+        author_id: Some(user.id.into()),
+        body: MessageBody::StatusChange {
+            new_status: ProjectStatus::Processing,
+            old_status: project.inner.status,
+        },
+        thread_id: project.thread_id,
+        hide_identity: false,
+    }
+    .insert(&mut *transaction)
+    .await
+    .wrap_internal_err(
+        "inserting database records for `project_edit_internal`",
+    )?;
+
+    sqlx::query!(
+        "
+                UPDATE mods
+                SET status = $1
+                WHERE (id = $2)
+                ",
+        ProjectStatus::Processing.as_str(),
+        project.inner.id as db_ids::DBProjectId,
+    )
+    .execute(&mut *transaction)
+    .await
+    .wrap_internal_err("querying database for `project_edit_internal`")?;
+
+    if sync_archival_disclosure
+        && archival_disclosure
+            .is_some_and(|disclosure| disclosure.lock_status.allows_removal())
+    {
+        db_models::DBProjectDisclosure::remove(
+            project.inner.id,
+            ProjectDisclosureType::Archived,
+            user.id.into(),
+            false,
+            &mut *transaction,
+        )
+        .await
+        .wrap_internal_err("failed to remove archival disclosure")?;
+    }
+
+    Ok(())
 }
 
 pub async fn edit_project_categories(
@@ -2536,8 +2705,8 @@ pub async fn add_gallery_item_internal(
     }
 
     let gallery_item = vec![db_models::project_item::DBGalleryItem {
-        image_url: upload_result.url,
-        raw_image_url: upload_result.raw_url,
+        image_url: upload_result.url.clone(),
+        raw_image_url: upload_result.raw_url.clone(),
         featured: item.featured,
         name: item.name,
         description: item.description,
@@ -2551,6 +2720,31 @@ pub async fn add_gallery_item_internal(
     )
     .await
     .wrap_internal_err("inserting galleries into database")?;
+
+    let validation_error = match project_item.inner.status {
+        ProjectStatus::Processing => {
+            validate::ensure_project_is_valid_for_review(
+                project_item.inner.id,
+                &pool,
+                &mut transaction,
+                &redis,
+            )
+            .await
+            .err()
+        }
+        _ => None,
+    };
+    if let Some(error) = validation_error {
+        delete_old_images(
+            Some(upload_result.url),
+            Some(upload_result.raw_url),
+            FileHostPublicity::Public,
+            &**file_host,
+        )
+        .await
+        .wrap_api_err("deleting rejected gallery image upload")?;
+        return Err(error);
+    }
 
     transaction
         .commit()
@@ -2790,6 +2984,16 @@ pub async fn edit_gallery_item_internal(
         )?;
     }
 
+    if project_item.inner.status == ProjectStatus::Processing {
+        validate::ensure_project_is_valid_for_review(
+            project_item.inner.id,
+            &pool,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
+    }
+
     transaction
         .commit()
         .await
@@ -2923,15 +3127,6 @@ pub async fn delete_gallery_item_internal(
         }
     }
 
-    delete_old_images(
-        Some(item.image_url),
-        Some(item.raw_image_url),
-        FileHostPublicity::Public,
-        &**file_host,
-    )
-    .await
-    .wrap_api_err("deleting old images")?;
-
     let mut transaction = pool
         .begin()
         .await
@@ -2950,10 +3145,29 @@ pub async fn delete_gallery_item_internal(
         "querying database for `delete_gallery_item_internal`",
     )?;
 
+    if project_item.inner.status == ProjectStatus::Processing {
+        validate::ensure_project_is_valid_for_review(
+            project_item.inner.id,
+            &pool,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
+    }
+
     transaction
         .commit()
         .await
         .wrap_internal_err("committing database transaction")?;
+
+    delete_old_images(
+        Some(item.image_url),
+        Some(item.raw_image_url),
+        FileHostPublicity::Public,
+        &**file_host,
+    )
+    .await
+    .wrap_api_err("deleting old images")?;
 
     clear_project_cache_and_queue_search(
         &redis,
