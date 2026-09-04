@@ -92,7 +92,7 @@ import {
 	EditIcon,
 	FolderOpenIcon,
 	GlobeIcon,
-	ImagesIcon,
+	ImageIcon,
 	PlayIcon,
 	PlusIcon,
 	StopCircleIcon,
@@ -494,7 +494,7 @@ const tabs = computed(() => {
 		instanceTabs.push({
 			label: formatMessage(messages.screenshotsTab),
 			href: `${basePath.value}/screenshots`,
-			icon: ImagesIcon,
+			icon: ImageIcon,
 		})
 	}
 

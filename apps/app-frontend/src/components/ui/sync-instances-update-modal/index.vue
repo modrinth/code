@@ -148,9 +148,13 @@ function hide() {
 	modal.value?.hide()
 }
 
+function skip() {
+	hasSeenUpdate.value = true
+}
+
 function handleHide() {
 	isOpen.value = false
-	hasSeenUpdate.value = true
+	skip()
 }
 
 async function openSourcePicker(options: readonly SyncUpdateOption[], retry = false) {
@@ -208,7 +212,7 @@ async function confirmSource() {
 	}
 }
 
-defineExpose({ show, showOnce, hide })
+defineExpose({ show, showOnce, hide, skip })
 </script>
 
 <template>

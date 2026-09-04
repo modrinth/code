@@ -14,7 +14,7 @@ import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	CompassIcon,
-	ImagesIcon,
+	ImageIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
@@ -706,6 +706,7 @@ function handleAdsConsentRequired(required) {
 
 async function setupApp() {
 	await onboardingChecklist.initialize()
+	const skipSyncUpdate = showChecklist.value
 
 	const {
 		native_decorations,
@@ -756,7 +757,9 @@ async function setupApp() {
 	appSettings.devMode = developer_mode
 	stateInitialized.value = true
 	await nextTick()
-	if (!showChecklist.value) {
+	if (skipSyncUpdate) {
+		syncInstancesUpdateModal.value?.skip()
+	} else {
 		syncInstancesUpdateModal.value?.showOnce()
 	}
 
@@ -2130,7 +2133,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(messages.screenshots)"
 				to="/screenshots"
 			>
-				<ImagesIcon />
+				<ImageIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(messages.modrinthHosting)"
