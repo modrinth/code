@@ -1,21 +1,21 @@
 [files]
 extend-exclude = [
-  "**/src/locales/",
-  "apps/frontend/",
-  "patches/",
-  "packages/utils/",
-  "packages/ui/",
-  "packages/blog/",
+	"**/src/locales/",
+	"apps/frontend/",
+	"patches/",
+	"packages/utils/",
+	"packages/ui/",
+	"packages/blog/",
 ]
 
 [default]
 extend-ignore-re = [
-  # Ignore lines that end with `// typos:ignore`
-  "(?Rm)^.*(#|//)\\s*typos:ignore$",
-  # Ignore the line after `// typos:ignore`:
-  "(#|//)\\s*typos:ignore\\n.*",
-  # Ignore blocks between `// typos:off` and `// typos:on`
-  "(?s)(#|//)\\s*typos:off.*?\\n\\s*(#|//)\\s*typos:on",
+	# Ignore lines that end with `// typos:ignore`
+	"(?Rm)^.*(#|//)\\s*typos:ignore$",
+	# Ignore the line after `// typos:ignore`:
+	"(#|//)\\s*typos:ignore\\n.*",
+	# Ignore blocks between `// typos:off` and `// typos:on`
+	"(?s)(#|//)\\s*typos:off.*?\\n\\s*(#|//)\\s*typos:on",
 ]
 
 [default.extend-words]
