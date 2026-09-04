@@ -10,12 +10,7 @@ repository = "https://github.com/jdrouet/sqlx-tracing"
 license = "MIT"
 # authors = ["Jérémie Drouet <jeremie.drouet@gmail.com>"] # deprecated field, Tombi warns
 keywords = ["database", "observability", "opentelemetry", "sqlx", "tracing"]
-categories = [
-  "asynchronous",
-  "database",
-  "development-tools::debugging",
-  "development-tools::profiling"
-]
+categories = ["asynchronous", "database", "development-tools::debugging", "development-tools::profiling"]
 
 [dependencies]
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
