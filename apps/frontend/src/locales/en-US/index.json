@@ -5255,6 +5255,9 @@
   "settings.billing.plan.title": {
     "message": "{size} Plan"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "Includes {amount} tax"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
