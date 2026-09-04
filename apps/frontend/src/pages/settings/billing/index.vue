@@ -291,7 +291,7 @@
 								v-bind="subscription.serverInfo"
 								:pending-change="getPendingChange(subscription)"
 								:cancellation-date="getCancellationDate(subscription)"
-								:on-download-backup="getBackupDownloadForServer(subscription.serverInfo)"
+								:on-download-world="getWorldDownload(subscription.serverInfo, serverFullList)"
 							/>
 							<div v-else class="w-fit">
 								<p>
@@ -508,11 +508,7 @@
 											{{ formatMessage(messages.upgrade) }}
 										</Button>
 										<Button
-											v-else-if="
-												getPyroCharge(subscription) &&
-												(getPyroCharge(subscription).status === 'cancelled' ||
-													getPyroCharge(subscription).status === 'failed')
-											"
+											v-else-if="canResubscribe(subscription)"
 											type="colored"
 											color="green"
 											size="xl"
@@ -703,8 +699,10 @@ import {
 	CopyCode,
 	defineMessages,
 	getPaymentMethodIcon,
+	hasAvailableWorldDownload,
 	injectModrinthClient,
 	injectNotificationManager,
+	isWithinServerResubscribeWindow,
 	paymentMethodMessages,
 	PurchaseModal,
 	ResubscribeModal,
@@ -713,7 +711,7 @@ import {
 	useDebugLogger,
 	useFormatDateTime,
 	useFormatPrice,
-	useServerBackupDownload,
+	useServerWorldDownload,
 	useVIntl,
 } from '@modrinth/ui'
 import { calculateSavings, getCurrency } from '@modrinth/utils'
@@ -727,7 +725,7 @@ import { products } from '~/generated/state.json'
 
 const { addNotification, handleError } = injectNotificationManager()
 const client = injectModrinthClient()
-const { getLatestBackupDownload } = useServerBackupDownload()
+const { getWorldDownload } = useServerWorldDownload()
 const debug = useDebugLogger('Billing')
 definePageMeta({
 	middleware: 'auth',
@@ -1102,17 +1100,11 @@ const pyroSubscriptions = computed(() => {
 			}
 		})
 		.filter((subscription) => {
-			// files expire 30 days after cancellation
-			const cancellationDate = getCancellationDate(subscription)
-			if (
-				!cancellationDate ||
-				subscription.serverInfo?.status !== 'suspended' ||
-				subscription.serverInfo?.suspension_reason !== 'cancelled'
+			if (subscription.serverInfo?.status !== 'suspended') return true
+			return (
+				canResubscribe(subscription) ||
+				hasAvailableWorldDownload(subscription.serverInfo.server_id, serverFullList.value)
 			)
-				return true
-			const cancellation = new Date(cancellationDate)
-			const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
-			return new Date() <= thirtyDaysLater
 		})
 })
 
@@ -1274,6 +1266,13 @@ function getCancellationDate(subscription) {
 	return null
 }
 
+function canResubscribe(subscription) {
+	const charge = getPyroCharge(subscription)
+	if (!charge) return false
+	if (charge.status === 'failed') return true
+	return charge.status === 'cancelled' && isWithinServerResubscribeWindow(charge.due)
+}
+
 const getProductSize = (product) => {
 	if (!product || !product.metadata) return formatMessage(commonMessages.planUnknownLabel)
 	const ramSize = product.metadata.ram
@@ -1386,10 +1385,6 @@ function openPyroResubscribeModal(subscription) {
 
 function handlePyroResubscribeConfirm({ subscriptionId, wasSuspended }) {
 	return resubscribePyro(subscriptionId, wasSuspended)
-}
-
-function getBackupDownloadForServer(serverInfo) {
-	return getLatestBackupDownload(serverInfo.server_id, serverFullList.value)
 }
 
 const refresh = async () => {

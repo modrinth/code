@@ -5315,8 +5315,8 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Copy ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Download latest backup"
+  "servers.listing.download-world-tooltip": {
+    "defaultMessage": "Download world files"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Manage billing"

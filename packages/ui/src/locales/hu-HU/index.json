@@ -4175,9 +4175,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Azonosító másolása"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "A legfrissebb biztonsági mentés letöltése"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Számlázás kezelése"
   },

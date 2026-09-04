@@ -5153,9 +5153,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "複製 ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "下載最新備份"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "管理帳務"
   },

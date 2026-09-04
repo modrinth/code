@@ -184,12 +184,12 @@
 
 			<div v-if="noticeButtons" class="flex gap-2">
 				<IconButton
-					v-if="noticeButtons.downloadBackup && onDownloadBackup && isBackupDownloadEnabled"
-					v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
+					v-if="noticeButtons.downloadWorld && onDownloadWorld"
+					v-tooltip="formatMessage(messages.downloadWorldTooltip)"
 					type="outlined"
-					:label="formatMessage(messages.downloadLatestBackupTooltip)"
+					:label="formatMessage(messages.downloadWorldTooltip)"
 					data-server-listing-button
-					@click="onDownloadBackup"
+					@click="onDownloadWorld"
 				>
 					<DownloadIcon />
 				</IconButton>
@@ -366,9 +366,9 @@ const messages = defineMessages({
 		defaultMessage:
 			'Your server has been suspended. Please contact Modrinth Support for more information.',
 	},
-	downloadLatestBackupTooltip: {
-		id: 'servers.listing.download-latest-backup-tooltip',
-		defaultMessage: 'Download latest backup',
+	downloadWorldTooltip: {
+		id: 'servers.listing.download-world-tooltip',
+		defaultMessage: 'Download world files',
 	},
 	copyCodeToClipboardTooltip: {
 		id: 'servers.listing.copy-code-tooltip',
@@ -434,7 +434,7 @@ type ServerListingProps = {
 	isProvisioning?: boolean
 	cancellationDate?: string | Date | null
 	onResubscribe?: (() => void) | null
-	onDownloadBackup?: (() => void) | null
+	onDownloadWorld?: (() => void) | null
 	owner?: ServerListingOwner
 }
 
@@ -443,7 +443,6 @@ const router = useRouter()
 
 const { archon, kyros, labrinth } = injectModrinthClient()
 
-const isBackupDownloadEnabled = false
 const isConfiguring = computed(() => props.flows?.intro)
 const isUpgrading = computed(
 	() => props.status === 'suspended' && props.suspension_reason === 'upgrading',
@@ -493,7 +492,7 @@ const noticeType = computed<NoticeType | null>(() => {
 })
 
 type NoticeButtons = {
-	downloadBackup?: boolean
+	downloadWorld?: boolean
 	copyId?: boolean
 	support?: boolean
 	manageBilling?: boolean
@@ -504,12 +503,12 @@ const noticeButtons = computed<NoticeButtons | null>(() => {
 	switch (noticeType.value) {
 		case 'cancelled':
 		case 'setToCancel':
-			return { downloadBackup: true, copyId: true, support: true, resubscribe: true }
+			return { downloadWorld: true, copyId: true, support: true, resubscribe: true }
 		case 'paymentfailed':
-			return { downloadBackup: true, copyId: true, support: true, manageBilling: true }
+			return { downloadWorld: true, copyId: true, support: true, manageBilling: true }
 		case 'moderated':
 		case 'suspended':
-			return { downloadBackup: true, copyId: true, support: true }
+			return { downloadWorld: true, copyId: true, support: true }
 		default:
 			return null
 	}
