@@ -55,7 +55,12 @@ pub async fn apply_launcher_overrides(
     let (mut document, input_bytes) = if path.exists() {
         read_document(&path).await?
     } else {
-        (GameOptionsDocument::empty(), Vec::new())
+        (
+            GameOptionsDocument::for_instance(&metadata, &state)
+                .await?
+                .unwrap_or_else(GameOptionsDocument::empty),
+            Vec::new(),
+        )
     };
     for (key, value) in overrides {
         validate_raw_key_value(key, value)?;

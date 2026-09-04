@@ -194,9 +194,9 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     };
     emit_install_job(&record.snapshot()).await?;
 
-	if let Err(error) =
-		Box::pin(prepare_initial_instance(&mut job.state, &state)).await
-	{
+    if let Err(error) =
+        Box::pin(prepare_initial_instance(&mut job.state, &state)).await
+    {
         let error_view = install_error_view(
             job.state.progress.phase,
             &error,
@@ -375,9 +375,9 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
         store::insert(id, &job_state, InstallJobStatus::Queued, &state).await?;
     emit_install_job(&record.snapshot()).await?;
 
-	if let Err(error) =
-		Box::pin(prepare_initial_instance(&mut job_state, &state)).await
-	{
+    if let Err(error) =
+        Box::pin(prepare_initial_instance(&mut job_state, &state)).await
+    {
         let error_view = install_error_view(
             job_state.progress.phase,
             &error,
@@ -446,16 +446,16 @@ async fn prepare_initial_instance(
             icon_config,
             link,
         } => {
-			let metadata = Box::pin(crate::api::instance::create(
-				name,
-				game_version,
-				loader,
-				loader_version,
-				icon_path,
-				icon_config,
-				link,
-			))
-			.await?;
+            let metadata = Box::pin(crate::api::instance::create(
+                name,
+                game_version,
+                loader,
+                loader_version,
+                icon_path,
+                icon_config,
+                link,
+            ))
+            .await?;
             set_display(
                 job_state,
                 metadata.instance.name,
@@ -493,16 +493,16 @@ async fn prepare_initial_instance(
                 .and_then(|edit| edit.link.clone())
                 .or_else(|| preview.link.clone())
                 .unwrap_or(InstanceLink::Unmanaged);
-			let metadata = Box::pin(crate::api::instance::create(
-				name,
-				preview.game_version,
-				preview.modloader,
-				preview.loader_version,
-				icon_path,
-				None,
-				link,
-			))
-			.await?;
+            let metadata = Box::pin(crate::api::instance::create(
+                name,
+                preview.game_version,
+                preview.modloader,
+                preview.loader_version,
+                icon_path,
+                None,
+                link,
+            ))
+            .await?;
             set_display(
                 job_state,
                 metadata.instance.name,
@@ -539,16 +539,16 @@ async fn prepare_initial_instance(
                         data.instance_icon_url.clone(),
                     )
                 };
-			let metadata = Box::pin(crate::api::instance::create(
-				data.name.clone(),
-				game_version,
-				loader,
-				loader_version,
-				icon_path,
-				None,
-				shared_link,
-			))
-			.await?;
+            let metadata = Box::pin(crate::api::instance::create(
+                data.name.clone(),
+                game_version,
+                loader,
+                loader_version,
+                icon_path,
+                None,
+                shared_link,
+            ))
+            .await?;
             set_display(
                 job_state,
                 metadata.instance.name,
@@ -562,16 +562,16 @@ async fn prepare_initial_instance(
         InstallRequest::ImportInstance {
             instance_folder, ..
         } => {
-			let metadata = Box::pin(crate::api::instance::create(
-				instance_folder,
-				"1.19.4".to_string(),
-				ModLoader::Vanilla,
-				Some("latest".to_string()),
-				None,
-				None,
-				InstanceLink::Unmanaged,
-			))
-			.await?;
+            let metadata = Box::pin(crate::api::instance::create(
+                instance_folder,
+                "1.19.4".to_string(),
+                ModLoader::Vanilla,
+                Some("latest".to_string()),
+                None,
+                None,
+                InstanceLink::Unmanaged,
+            ))
+            .await?;
             set_display(
                 job_state,
                 metadata.instance.name,
@@ -588,16 +588,16 @@ async fn prepare_initial_instance(
                             "Unknown instance".to_string(),
                         )
                     })?;
-			let created = Box::pin(crate::api::instance::create(
-				metadata.instance.name,
-				metadata.applied_content_set.game_version,
-				metadata.applied_content_set.loader,
-				metadata.applied_content_set.loader_version,
-				metadata.instance.icon_path,
-				None,
-				metadata.link,
-			))
-			.await?;
+            let created = Box::pin(crate::api::instance::create(
+                metadata.instance.name,
+                metadata.applied_content_set.game_version,
+                metadata.applied_content_set.loader,
+                metadata.applied_content_set.loader_version,
+                metadata.instance.icon_path,
+                None,
+                metadata.link,
+            ))
+            .await?;
             set_display(
                 job_state,
                 created.instance.name,
