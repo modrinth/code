@@ -298,7 +298,6 @@ const { checking: checkingSlugSuggestions, suggestions: slugSuggestions } =
 	useProjectSlugSuggestions({
 		title: name,
 		username: () => auth.value.user?.username,
-		enabled: showSlugSuggestions,
 	})
 const projectType = ref<ProjectTypes>('project')
 const projectTypeOptions = computed<ComboboxOption<ProjectTypes>[]>(() => [
