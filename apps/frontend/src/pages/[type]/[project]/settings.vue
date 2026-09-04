@@ -36,6 +36,9 @@ const {
 	versions,
 	currentMember,
 	setProcessing,
+	projectValidation,
+	projectValidationLoading,
+	refreshProjectValidation,
 } = injectProjectPageContext()
 
 const flags = useFeatureFlags()
@@ -166,7 +169,7 @@ const moderatorSeeUserUi = computed<boolean>({
 		<ModerationProjectNags
 			v-if="
 				projectV3 &&
-				((currentMember && project.status === 'draft') ||
+				((currentMember && (project.status === 'draft' || project.status === 'processing')) ||
 					tags.rejectedStatuses.includes(project.status))
 			"
 			:project="project"
@@ -176,6 +179,10 @@ const moderatorSeeUserUi = computed<boolean>({
 			:collapsed="collapsedChecklist"
 			:route-name="route.name as string"
 			:tags="tags"
+			:validation-nags="projectValidation?.nags ?? []"
+			:validation-loading="projectValidationLoading"
+			:validation-available="projectValidation !== null"
+			:refresh-validation="refreshProjectValidation"
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"
 		/>

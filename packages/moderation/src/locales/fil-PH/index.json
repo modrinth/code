@@ -35,12 +35,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Pumili ng mga pinaktumpak na tag"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Ang iyong paglalarawan ay may {length, plural, one {# mababasang titik} other {# na mababasang titik}}. Hindi kumulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paglikha ng maliwanag at makabuluhang paglalarawan."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Palawakin ang paglalarawan"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Baguhin ang paglalarawan"
   },
@@ -77,12 +71,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Ipaglinis ang mga magkaparehong link"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Ang iyong Paglalarawan ay dapat maglalaman ng simpleng teksto o image alt-text, panatilihing accessible sa mga gumamagamit ng screen reader o mahihina ang koneksiyon sa internet."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Siguraduhin ang aksesibilidad"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Di-wasto ang URL ng lisensiya."
   },
@@ -94,12 +82,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Maglagay ng wastong link ng lisensiya"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Ang paggamit ng pangikli ng link o iba pang paraan ng paglilihid ng link na maaaring tumuro sa link palabas o link ng lisensiya ay pinagbabawal, mangyaring gumamit lamang ng mga buong-ganapang taas na link."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Huwag gumamit ng pangikli ng link"
   },
   "nags.long-headers.description": {
     "defaultMessage": "Mayroon kang {count, plural, one {# uluhan} other {# na uluhan}} na mataas sa iyong paglalarawan. Kadalasang maikli lamang ang mga uluhan bilang pamagat ng mga pangkat, hindi mga buong pangungusap."
@@ -173,9 +155,6 @@
   "nags.server.title": {
     "defaultMessage": "Bisitahin ang server settings"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Bisitahin ang mga setting sa paglalarawan"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Bisitahin ang mga setting sa lisensiya"
   },
@@ -188,29 +167,14 @@
   "nags.settings.title": {
     "defaultMessage": "Bisitahin ang mga general na setting"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong proyekto. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit-akit na Buod."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Gawing katangi-tangi ang buod"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Ang iyong buid ay hindi dapat magtaglay ng formatting, line break, espesyal na titik, o link, kasi simpleng teksto lamang ang buod."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Linisin ang buod"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Ang iyong buod ay may {length, plural, one {# titik} other {# na titik}}. Hindi kukulang sa {minChars, plural, one {# titik} other {# na titik}} ang inimumungkahi sa paglikha ng makabuluhan at nakapaaanyayang paglalarawan."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Palawakin ang buod"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Ang pagpapanatili na malinis ang Pangalan ng proyekto ay tininityak na madali itong mahanap at maaalala. Ang impormasyon ukol sa bersiyon at loader ay sarili na naming ipapakita para sa iyong proyekto."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Linisin ang pangalan"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Nakapili ka ng {tagCount, plural, one {# tag} other {# na tag}}. Isaalang-alang na mabawasan ito sa {maxTagCount} o mas kaunti pa upang higit na tutumpak sa resulta ng paghanap ang iyong server."
@@ -246,4 +210,3 @@
     "defaultMessage": "Bisitahin ang mga setting sa mga link"
   }
 }
-

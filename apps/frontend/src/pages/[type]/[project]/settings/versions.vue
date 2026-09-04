@@ -14,6 +14,7 @@
 			:proceed-label="formatMessage(messages.deleteButton)"
 			@proceed="deleteVersion()"
 		/>
+		<ValidationMessage :check="environmentValidation" class="mb-4" />
 		<Admonition
 			v-if="withheldVersions.length > 0"
 			type="circle-warning"
@@ -362,7 +363,9 @@ import {
 import { useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
@@ -380,6 +383,7 @@ const {
 	loadVersions,
 	cdnDownloadReason,
 } = injectProjectPageContext()
+const environmentValidation = useProjectNagMessages('version-environment')
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.versions)
 
