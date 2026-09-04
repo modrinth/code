@@ -357,6 +357,23 @@ pub async fn test_patch_project() {
                 assert_status!(&resp, StatusCode::BAD_REQUEST);
             }
 
+            let resp = api
+                .edit_project(
+                    alpha_project_slug,
+                    json!({
+                        "summary": "",
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::BAD_REQUEST);
+            let body: serde_json::Value = test::read_body_json(resp).await;
+            assert_eq!(
+                body["description"],
+                "field summary failed validation with error: length"
+            );
+            assert!(body.get("details").is_none());
+
             // Failure because these are illegal requested statuses for a normal user.
             for req in ["unknown", "processing", "withheld", "scheduled"] {
                 let resp = api

@@ -462,10 +462,12 @@ pub async fn project_edit_internal(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    new_project
-        .validate()
-        .map_err(|err| eyre::eyre!(err))
-        .wrap_request_err("validating request")?;
+    new_project.validate().map_err(|err| {
+        let message =
+            crate::util::validate::validation_errors_to_string(err, None)
+                .replacen("Field ", "field ", 1);
+        ApiError::Request(eyre!(message))
+    })?;
 
     let Some(mut project_item) =
         db_models::DBProject::get(&info.into_inner().0, &**pool, &redis)
