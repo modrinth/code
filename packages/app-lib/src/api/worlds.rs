@@ -827,6 +827,25 @@ pub async fn add_server_to_instance(
     Ok(insert_index)
 }
 
+pub async fn ensure_managed_server_in_instance(
+    instance_id: &str,
+    name: String,
+    address: String,
+) -> Result<()> {
+    let state = State::get().await?;
+    let (instance_id, _) =
+        resolve_instance_identity(instance_id, &state).await?;
+    let metadata = crate::state::get_instance(&instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+    let data =
+        crate::api::instance::synced_servers::server_data(name, address, None);
+    crate::api::instance::synced_servers::ensure_managed_server(
+        &metadata, data, &state,
+    )
+    .await
+}
+
 pub async fn edit_server_in_instance(
     instance_id: &str,
     index: usize,
