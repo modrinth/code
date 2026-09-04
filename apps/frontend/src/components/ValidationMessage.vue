@@ -1,28 +1,34 @@
 <template>
-	<div v-if="validations.length > 0" class="flex w-full flex-col gap-1.5">
-		<div
-			v-for="(validation, index) in validations"
-			:key="validation.code ?? validation.message?.id ?? index"
-			class="flex w-full items-start gap-1.5"
-			:class="{
-				'text-red': validation.severity === 'error',
-				'text-orange': validation.severity === 'warning',
-				'text-purple': validation.severity === 'suggestion',
-			}"
-		>
-			<component
-				:is="
-					validation.severity === 'error'
-						? XCircleIcon
-						: validation.severity === 'suggestion'
-							? LightBulbIcon
-							: TriangleAlertIcon
-				"
-				class="mt-0.5"
-			/>
-			{{ validation.message ? formatMessage(validation.message, validation.values) : undefined }}
+	<Transition name="validation-message">
+		<div v-if="validations.length > 0" v-bind="$attrs" class="grid w-full grid-rows-[1fr]">
+			<div class="flex min-h-0 w-full flex-col gap-1.5 overflow-hidden">
+				<div
+					v-for="(validation, index) in validations"
+					:key="validation.code ?? validation.message?.id ?? index"
+					class="flex w-full items-start gap-1.5"
+					:class="{
+						'text-red': validation.severity === 'error',
+						'text-orange': validation.severity === 'warning',
+						'text-purple': validation.severity === 'suggestion',
+					}"
+				>
+					<component
+						:is="
+							validation.severity === 'error'
+								? XCircleIcon
+								: validation.severity === 'suggestion'
+									? LightBulbIcon
+									: TriangleAlertIcon
+						"
+						class="mt-0.5 shrink-0"
+					/>
+					{{
+						validation.message ? formatMessage(validation.message, validation.values) : undefined
+					}}
+				</div>
+			</div>
 		</div>
-	</div>
+	</Transition>
 </template>
 
 <script setup lang="ts">
@@ -30,6 +36,8 @@ import { LightBulbIcon, TriangleAlertIcon, XCircleIcon } from '@modrinth/assets'
 import type { FieldValidationMessage } from '@modrinth/moderation'
 import { injectProjectPageContext, useVIntl } from '@modrinth/ui'
 import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
+
+defineOptions({ inheritAttrs: false })
 
 type ValidationCheck = Omit<FieldValidationMessage, 'code'> & { code?: string }
 
@@ -111,3 +119,27 @@ const validations = computed(() => {
 			: []
 })
 </script>
+
+<style scoped>
+.validation-message-enter-active,
+.validation-message-leave-active {
+	transition:
+		grid-template-rows 150ms ease,
+		opacity 150ms ease,
+		transform 150ms ease;
+}
+
+.validation-message-enter-from,
+.validation-message-leave-to {
+	grid-template-rows: 0fr;
+	opacity: 0;
+	transform: translateY(-0.25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.validation-message-enter-active,
+	.validation-message-leave-active {
+		transition: none;
+	}
+}
+</style>
