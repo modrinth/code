@@ -117,7 +117,6 @@ pub enum GameOptionValueState {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GameOptionValidationIssue {
-    LocalValueNeedsSaving,
     MissingValue,
     NoCompatibleInstances,
     InvalidValue,

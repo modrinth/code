@@ -984,10 +984,6 @@ export const presentationMessages = defineMessages({
 		id: 'app.settings.game-options.custom-value.placeholder',
 		defaultMessage: 'Enter a value',
 	},
-	validationLocalValueNeedsSaving: {
-		id: 'app.settings.game-options.validation.local-value-needs-saving',
-		defaultMessage: 'Save this value before turning sync back on.',
-	},
 	validationMissingValue: {
 		id: 'app.settings.game-options.validation.missing-value',
 		defaultMessage: 'Choose a value first.',
@@ -1382,7 +1378,6 @@ const choices: Record<string, MessageDescriptor> = {
 }
 
 const validationMessages: Record<GameOptionValidationError, MessageDescriptor> = {
-	local_value_needs_saving: presentationMessages.validationLocalValueNeedsSaving,
 	missing_value: presentationMessages.validationMissingValue,
 	no_compatible_instances: presentationMessages.validationNoCompatibleInstances,
 	invalid_value: presentationMessages.validationInvalidValue,

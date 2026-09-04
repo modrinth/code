@@ -2633,9 +2633,6 @@
   "app.settings.game-options.validation.invalid-value": {
     "message": "Choose a valid value."
   },
-  "app.settings.game-options.validation.local-value-needs-saving": {
-    "message": "Save this value before turning sync back on."
-  },
   "app.settings.game-options.validation.missing-value": {
     "message": "Choose a value first."
   },
@@ -2721,22 +2718,40 @@
     "message": "Instances"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "Pick the instance whose command history becomes the shared copy."
+    "message": "Choose which instance to copy your command history from. This history is only used for the initial sync, and you can edit it from any instance afterward."
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-title": {
+    "message": "Choose command history source"
   },
   "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "Pick the instance whose saved creative hotbars become the shared copy."
+    "message": "Choose which instance to copy your saved creative hotbars from. These hotbars are only used for the initial sync, and you can edit them from any instance afterward."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
+    "message": "Choose creative hotbars source"
+  },
+  "app.settings.synced-options.choose-sync-source.data-packs-title": {
+    "message": "Choose data packs source"
   },
   "app.settings.synced-options.choose-sync-source.game-settings-description": {
-    "message": "Choose which instance to copy game settings from."
+    "message": "Choose which instance to copy your game settings from. These settings are only used for the initial sync, and you can edit them from any instance afterward."
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-title": {
+    "message": "Choose game settings source"
   },
   "app.settings.synced-options.choose-sync-source.load-error": {
     "message": "Could not load sync sources. Please try again."
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "Pick the instance whose multiplayer servers become the shared copy."
+    "message": "Choose which instance to copy your multiplayer servers from. These servers are only used for the initial sync, and you can edit them from any instance afterward."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
+    "message": "Choose multiplayer servers source"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "No instances found"
+  },
+  "app.settings.synced-options.choose-sync-source.resource-packs-title": {
+    "message": "Choose resource packs source"
   },
   "app.settings.synced-options.choose-sync-source.retry": {
     "message": "Try again"
@@ -2746,9 +2761,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Sync"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Choose a sync source"
   },
   "app.settings.synced-options.command-history": {
     "message": "Sync command history"
@@ -3132,13 +3144,16 @@
     "message": "New this update"
   },
   "app.sync-instances-update.choose-source.all": {
-    "message": "Choose the instance to use as the sync source for all selected settings."
+    "message": "Choose which instance to copy game settings, resource packs, command history, creative hotbars and multiplayer servers from. These settings are only used for the initial sync, and you can edit them from any instance afterward."
+  },
+  "app.sync-instances-update.choose-source.all-title": {
+    "message": "Choose sync source"
   },
   "app.sync-instances-update.choose-source.data-packs": {
-    "message": "Choose which instance to copy data packs from."
+    "message": "Choose which instance to copy your data packs from. These packs are only used for the initial sync, and you can edit them from any instance afterward."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
-    "message": "Choose which instance to copy resource packs from."
+    "message": "Choose which instance to copy your resource packs from. These packs are only used for the initial sync, and you can edit them from any instance afterward."
   },
   "app.sync-instances-update.creative-hotbars": {
     "message": "Sync creative hotbars"

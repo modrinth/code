@@ -81,7 +81,6 @@ export type GameSettingCategory = {
 }
 
 export type GameOptionValidationError =
-	| 'local_value_needs_saving'
 	| 'missing_value'
 	| 'no_compatible_instances'
 	| 'invalid_value'

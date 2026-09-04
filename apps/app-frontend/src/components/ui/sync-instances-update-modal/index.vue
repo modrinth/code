@@ -21,15 +21,21 @@ const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const sourceModal = useTemplateRef<InstanceType<typeof SyncSourceModal>>('sourceModal')
 const { formatMessage } = useVIntl()
 const {
-	isOpen,
 	globalOptionsQuery,
 	allSynced,
+	draftInitialized,
+	draftOptions,
 	syncMutation,
 	sourceOptions,
 	sourceInstanceId,
 	sources,
 	sourcesLoading,
 	sourcesError,
+	beginDraft,
+	finishDraft,
+	stageOptions,
+	isInitiallyEnabled,
+	applyDraft,
 	chooseSource,
 	retrySources,
 } = useSyncInstancesUpdate()
@@ -86,31 +92,66 @@ const messages = defineMessages({
 	},
 	allSourcesDescription: {
 		id: 'app.sync-instances-update.choose-source.all',
-		defaultMessage: 'Choose the instance to use as the sync source for all selected settings.',
+		defaultMessage:
+			'Choose which instance to copy game settings, resource packs, command history, creative hotbars and multiplayer servers from. These settings are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	allSourcesTitle: {
+		id: 'app.sync-instances-update.choose-source.all-title',
+		defaultMessage: 'Choose sync source',
 	},
 	game_options_source: {
 		id: 'app.settings.synced-options.choose-sync-source.game-settings-description',
-		defaultMessage: 'Choose which instance to copy game settings from.',
+		defaultMessage:
+			'Choose which instance to copy your game settings from. These settings are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	game_options_source_title: {
+		id: 'app.settings.synced-options.choose-sync-source.game-settings-title',
+		defaultMessage: 'Choose game settings source',
 	},
 	multiplayer_servers_source: {
 		id: 'app.settings.synced-options.choose-sync-source.multiplayer-servers-description',
-		defaultMessage: 'Pick the instance whose multiplayer servers become the shared copy.',
+		defaultMessage:
+			'Choose which instance to copy your multiplayer servers from. These servers are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	multiplayer_servers_source_title: {
+		id: 'app.settings.synced-options.choose-sync-source.multiplayer-servers-title',
+		defaultMessage: 'Choose multiplayer servers source',
 	},
 	command_history_source: {
 		id: 'app.settings.synced-options.choose-sync-source.command-history-description',
-		defaultMessage: 'Pick the instance whose command history becomes the shared copy.',
+		defaultMessage:
+			'Choose which instance to copy your command history from. This history is only used for the initial sync, and you can edit it from any instance afterward.',
+	},
+	command_history_source_title: {
+		id: 'app.settings.synced-options.choose-sync-source.command-history-title',
+		defaultMessage: 'Choose command history source',
 	},
 	creative_hotbars_source: {
 		id: 'app.settings.synced-options.choose-sync-source.creative-hotbars-description',
-		defaultMessage: 'Pick the instance whose saved creative hotbars become the shared copy.',
+		defaultMessage:
+			'Choose which instance to copy your saved creative hotbars from. These hotbars are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	creative_hotbars_source_title: {
+		id: 'app.settings.synced-options.choose-sync-source.creative-hotbars-title',
+		defaultMessage: 'Choose creative hotbars source',
 	},
 	resource_packs_source: {
 		id: 'app.sync-instances-update.choose-source.resource-packs',
-		defaultMessage: 'Choose which instance to copy resource packs from.',
+		defaultMessage:
+			'Choose which instance to copy your resource packs from. These packs are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	resource_packs_source_title: {
+		id: 'app.settings.synced-options.choose-sync-source.resource-packs-title',
+		defaultMessage: 'Choose resource packs source',
 	},
 	data_packs_source: {
 		id: 'app.sync-instances-update.choose-source.data-packs',
-		defaultMessage: 'Choose which instance to copy data packs from.',
+		defaultMessage:
+			'Choose which instance to copy your data packs from. These packs are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	data_packs_source_title: {
+		id: 'app.settings.synced-options.choose-sync-source.data-packs-title',
+		defaultMessage: 'Choose data packs source',
 	},
 	loadError: {
 		id: 'app.sync-instances-update.load-error',
@@ -130,11 +171,21 @@ const sourceDescription = computed(() => {
 			: messages.allSourcesDescription,
 	)
 })
+const sourceTitle = computed(() => {
+	const option = sourceOptions.value[0]
+	return formatMessage(
+		option && sourceOptions.value.length === 1
+			? messages[`${option}_source_title`]
+			: messages.allSourcesTitle,
+	)
+})
 const busy = computed(() => sourceOptions.value.length > 0 || syncMutation.isPending.value)
-const controlsDisabled = computed(() => !globalOptionsQuery.data.value || busy.value)
+const controlsDisabled = computed(() => !draftInitialized.value || busy.value)
+let allowHide = false
 
 function show() {
-	isOpen.value = true
+	allowHide = false
+	beginDraft()
 	modal.value?.show()
 }
 
@@ -153,8 +204,29 @@ function skip() {
 }
 
 function handleHide() {
-	isOpen.value = false
+	finishDraft()
 	skip()
+}
+
+function beforeHide() {
+	if (allowHide) {
+		allowHide = false
+		return true
+	}
+	void applyAndHide()
+	return false
+}
+
+async function applyAndHide() {
+	if (syncMutation.isPending.value) return
+	try {
+		await applyDraft()
+		allowHide = true
+		await nextTick()
+		if (modal.value?.hide() === false) allowHide = false
+	} catch {
+		return
+	}
 }
 
 async function openSourcePicker(options: readonly SyncUpdateOption[], retry = false) {
@@ -171,7 +243,7 @@ async function openSourcePicker(options: readonly SyncUpdateOption[], retry = fa
 	}
 
 	try {
-		await syncMutation.mutateAsync({ options: [...options], enabled: true })
+		stageOptions(options, true)
 		await nextTick()
 		if (retry) sourceModal.value?.hide()
 	} catch {
@@ -184,32 +256,27 @@ async function openSourcePicker(options: readonly SyncUpdateOption[], retry = fa
 function toggleOption(option: SyncUpdateOption, enabled: boolean) {
 	if (controlsDisabled.value) return
 	if (enabled) {
-		void openSourcePicker([option])
+		if (isInitiallyEnabled(option)) {
+			stageOptions([option], true)
+		} else {
+			void openSourcePicker([option])
+		}
 	} else {
-		syncMutation.mutate({ options: [option], enabled: false })
+		stageOptions([option], false)
 	}
 }
 
 async function confirmSource() {
 	if (
-		syncMutation.isPending.value ||
 		sourceOptions.value.length === 0 ||
 		!sources.value.some((source) => source.id === sourceInstanceId.value && source.eligible)
 	) {
 		return
 	}
 
-	try {
-		await syncMutation.mutateAsync({
-			options: [...sourceOptions.value],
-			enabled: true,
-			baseInstanceId: sourceInstanceId.value,
-		})
-		await nextTick()
-		sourceModal.value?.hide()
-	} catch {
-		return
-	}
+	stageOptions(sourceOptions.value, true, sourceInstanceId.value)
+	await nextTick()
+	sourceModal.value?.hide()
 }
 
 defineExpose({ show, showOnce, hide, skip })
@@ -224,6 +291,7 @@ defineExpose({ show, showOnce, hide, skip })
 		max-width="calc(100vw - 2rem)"
 		:aria-label="formatMessage(messages.title)"
 		:disable-close="busy"
+		:before-hide="beforeHide"
 		:on-after-hide="handleHide"
 		class="!overflow-y-auto !rounded-[20px]"
 	>
@@ -262,7 +330,13 @@ defineExpose({ show, showOnce, hide, skip })
 				</div>
 
 				<div class="mt-auto flex items-center gap-2.5">
-					<Button v-if="!allSynced" size="lg" :disabled="busy" @click="hide">
+					<Button
+						v-if="!allSynced"
+						size="lg"
+						:disabled="busy"
+						:loading="syncMutation.isPending.value"
+						@click="hide"
+					>
 						<CircleSlashIcon />
 						{{ formatMessage(messages.skip) }}
 					</Button>
@@ -272,6 +346,7 @@ defineExpose({ show, showOnce, hide, skip })
 						color="brand"
 						size="lg"
 						:disabled="controlsDisabled"
+						:loading="syncMutation.isPending.value"
 						@click="hide"
 					>
 						{{ formatMessage(commonMessages.continueButton) }}
@@ -308,7 +383,7 @@ defineExpose({ show, showOnce, hide, skip })
 						</label>
 						<Toggle
 							:id="`update-sync-${option}`"
-							:model-value="globalOptionsQuery.data.value?.[option] ?? false"
+							:model-value="draftOptions[option]"
 							:disabled="controlsDisabled"
 							@update:model-value="(enabled) => toggleOption(option, enabled)"
 						/>
@@ -320,6 +395,7 @@ defineExpose({ show, showOnce, hide, skip })
 	<SyncSourceModal
 		ref="sourceModal"
 		v-model="sourceInstanceId"
+		:title="sourceTitle"
 		:description="sourceDescription"
 		:sources="sources"
 		:loading="sourcesLoading"

@@ -24,10 +24,23 @@ export const syncUpdateOptions = (
 
 export type SyncUpdateOption = (typeof syncUpdateOptions)[number]
 
+type SyncUpdateOptionState = Record<SyncUpdateOption, boolean>
+type SyncUpdateSourceState = Partial<Record<SyncUpdateOption, string>>
+
+function createOptionState(value = false): SyncUpdateOptionState {
+	return Object.fromEntries(
+		syncUpdateOptions.map((option) => [option, value]),
+	) as SyncUpdateOptionState
+}
+
 export function useSyncInstancesUpdate() {
 	const queryClient = useQueryClient()
 	const { handleError } = injectNotificationManager()
 	const isOpen = ref(false)
+	const draftInitialized = ref(false)
+	const initialOptions = ref(createOptionState())
+	const draftOptions = ref(createOptionState())
+	const draftSourceInstanceIds = ref<SyncUpdateSourceState>({})
 	const sourceOptions = ref<SyncUpdateOption[]>([])
 	const sourceInstanceId = ref('')
 	const needsGameOptionsSource = computed(() => sourceOptions.value.includes('game_options'))
@@ -67,8 +80,29 @@ export function useSyncInstancesUpdate() {
 	const sourcesError = computed(() =>
 		needsGameOptionsSource.value ? gameSourcesQuery.isError.value : instancesQuery.isError.value,
 	)
-	const allSynced = computed(() =>
-		syncUpdateOptions.every((option) => globalOptionsQuery.data.value?.[option]),
+	const allSynced = computed(
+		() => draftInitialized.value && syncUpdateOptions.every((option) => draftOptions.value[option]),
+	)
+
+	function initializeDraft() {
+		const globalOptions = globalOptionsQuery.data.value
+		if (!globalOptions) return
+
+		const options = createOptionState()
+		for (const option of syncUpdateOptions) {
+			options[option] = globalOptions[option]
+		}
+		initialOptions.value = { ...options }
+		draftOptions.value = options
+		draftSourceInstanceIds.value = {}
+		draftInitialized.value = true
+	}
+
+	watch(
+		() => globalOptionsQuery.data.value,
+		() => {
+			if (isOpen.value && !draftInitialized.value) initializeDraft()
+		},
 	)
 
 	watch([sources, sourceOptions], ([candidates]) => {
@@ -79,18 +113,17 @@ export function useSyncInstancesUpdate() {
 
 	const syncMutation = useMutation({
 		mutationKey: syncedOptionsKeys.set,
-		mutationFn: async ({
-			options,
-			enabled,
-			baseInstanceId,
-		}: {
-			options: readonly SyncUpdateOption[]
-			enabled: boolean
-			baseInstanceId?: string
-		}) => {
-			for (const option of options.filter(isSyncedOptionAvailable)) {
+		mutationFn: async (
+			changes: {
+				option: SyncUpdateOption
+				enabled: boolean
+				baseInstanceId?: string
+			}[],
+		) => {
+			for (const { option, enabled, baseInstanceId } of changes) {
 				const updated = await set_global_synced_option(option, enabled, baseInstanceId)
 				queryClient.setQueryData(syncedOptionsKeys.global, updated)
+				initialOptions.value[option] = enabled
 			}
 		},
 		onMutate: () => queryClient.cancelQueries({ queryKey: syncedOptionsKeys.global }),
@@ -107,6 +140,59 @@ export function useSyncInstancesUpdate() {
 			]),
 	})
 
+	function beginDraft() {
+		isOpen.value = true
+		draftInitialized.value = false
+		sourceOptions.value = []
+		sourceInstanceId.value = ''
+		initializeDraft()
+	}
+
+	function finishDraft() {
+		isOpen.value = false
+		draftInitialized.value = false
+		draftSourceInstanceIds.value = {}
+		sourceOptions.value = []
+		sourceInstanceId.value = ''
+	}
+
+	function stageOptions(
+		options: readonly SyncUpdateOption[],
+		enabled: boolean,
+		baseInstanceId?: string,
+	) {
+		for (const option of options.filter(isSyncedOptionAvailable)) {
+			draftOptions.value[option] = enabled
+			if (enabled && !initialOptions.value[option] && baseInstanceId) {
+				draftSourceInstanceIds.value[option] = baseInstanceId
+			} else {
+				draftSourceInstanceIds.value[option] = undefined
+			}
+		}
+	}
+
+	function isInitiallyEnabled(option: SyncUpdateOption) {
+		return initialOptions.value[option]
+	}
+
+	async function applyDraft() {
+		if (!draftInitialized.value) return
+
+		const changes = syncUpdateOptions
+			.filter((option) => draftOptions.value[option] !== initialOptions.value[option])
+			.map((option) => ({
+				option,
+				enabled: draftOptions.value[option],
+				baseInstanceId: draftOptions.value[option]
+					? draftSourceInstanceIds.value[option]
+					: undefined,
+			}))
+		if (changes.length === 0) return
+
+		await syncMutation.mutateAsync(changes)
+		draftSourceInstanceIds.value = {}
+	}
+
 	function chooseSource(options: readonly SyncUpdateOption[]) {
 		sourceInstanceId.value = ''
 		sourceOptions.value = options.filter(isSyncedOptionAvailable)
@@ -122,12 +208,19 @@ export function useSyncInstancesUpdate() {
 		isOpen,
 		globalOptionsQuery,
 		allSynced,
+		draftInitialized,
+		draftOptions,
 		syncMutation,
 		sourceOptions,
 		sourceInstanceId,
 		sources,
 		sourcesLoading,
 		sourcesError,
+		beginDraft,
+		finishDraft,
+		stageOptions,
+		isInitiallyEnabled,
+		applyDraft,
 		chooseSource,
 		retrySources,
 	}
