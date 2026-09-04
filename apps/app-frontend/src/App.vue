@@ -153,7 +153,11 @@ import {
 } from '@/helpers/utils.js'
 import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n from '@/i18n.config'
-import { instanceKeys, screenshotKeys } from '@/pages/instance/query-options'
+import {
+	instanceKeys,
+	instanceListQueryOptions,
+	screenshotKeys,
+} from '@/pages/instance/query-options'
 import {
 	appUpdateState,
 	downloadAvailableAppUpdate,
@@ -708,7 +712,6 @@ function handleAdsConsentRequired(required) {
 async function setupApp() {
 	tags.initialize()
 	await onboardingChecklist.initialize()
-	const skipSyncUpdate = showChecklist.value
 
 	const {
 		native_decorations,
@@ -759,10 +762,12 @@ async function setupApp() {
 	appSettings.devMode = developer_mode
 	stateInitialized.value = true
 	await nextTick()
-	if (skipSyncUpdate) {
-		syncInstancesUpdateModal.value?.skip()
-	} else {
-		syncInstancesUpdateModal.value?.showOnce()
+	if (
+		appSettings.getFeatureFlag('show_sync_instances_update_modal') ||
+		(pending_update_toast_for_version === version &&
+			(await queryClient.fetchQuery(instanceListQueryOptions())).length > 0)
+	) {
+		syncInstancesUpdateModal.value?.show()
 	}
 
 	await getCurrentWindow().onResized(async () => {
@@ -1052,6 +1057,15 @@ const appSettingsModal = ref()
 const syncInstancesUpdateModal = ref()
 provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
 provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
+
+watch(
+	() => appSettings.getFeatureFlag('show_sync_instances_update_modal'),
+	(enabled) => {
+		if (enabled && stateInitialized.value) {
+			syncInstancesUpdateModal.value?.show()
+		}
+	},
+)
 
 watch(incompatibilityWarningModal, (modal) => {
 	if (modal) {

@@ -1,4 +1,10 @@
 {
+	"bundle": {
+		"icon": [
+			"icons/modrinth-liquid-glass.icns",
+			"icons/modrinth-liquid-glass.icon"
+		]
+	},
 	"app": {
 		"windows": [
 			{
