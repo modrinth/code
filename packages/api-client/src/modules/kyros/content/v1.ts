@@ -7,6 +7,24 @@ export class KyrosContentV1Module extends AbstractModule {
 		return 'kyros_content_v1'
 	}
 
+	/** GET /v1/worlds/:world_id/content/embedded-icon */
+	public async getEmbeddedAddonIcon(
+		worldId: string,
+		parentDirectory: 'mods' | 'plugins',
+		filename: string,
+	): Promise<Blob> {
+		return this.client.request<Blob>(`/worlds/${worldId}/content/embedded-icon`, {
+			api: '',
+			version: 'v1',
+			method: 'GET',
+			params: {
+				parent_directory: parentDirectory,
+				filename,
+			},
+			useNodeAuth: true,
+		})
+	}
+
 	/**
 	 * Upload addon files to a world via multipart form data
 	 *
