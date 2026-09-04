@@ -66,7 +66,7 @@ const messages = defineMessages({
 	},
 	gameSettingsDescription: {
 		id: 'app.settings.synced-options.game-settings.description',
-		defaultMessage: 'Use the same game options across your instances',
+		defaultMessage: 'Use the same game options across your instances.',
 	},
 	gameSettingsButton: {
 		id: 'app.settings.synced-options.game-settings.button',
