@@ -1,6 +1,7 @@
 //! Reads and edits `options.txt` without changing unrelated lines or file formatting.
 
 use super::super as synced_options;
+use super::catalog::release_version;
 use super::{
     MAX_KEY_BYTES, MAX_OPTIONS_BYTES, MAX_OPTIONS_LINES, MAX_VALUE_BYTES,
     OPTIONS_FILE,
@@ -51,6 +52,61 @@ impl GameOptionsDocument {
             default_line_ending: "\n".to_string(),
             lines: Vec::new(),
         }
+    }
+
+    /// Creates settings in the target game's format. Modern key bindings need
+    /// its data version so Minecraft does not run legacy migrations on them.
+    /// Unknown versions without embedded metadata wait for Minecraft's own file.
+    pub(super) async fn for_instance(
+        metadata: &InstanceMetadata,
+        state: &State,
+    ) -> crate::Result<Option<Self>> {
+        let content_set = &metadata.applied_content_set;
+        let version = &content_set.game_version;
+        let version_jar = content_set.loader_version.as_ref().map_or_else(
+            || version.clone(),
+            |loader| format!("{version}-{loader}"),
+        );
+        let path = state
+            .directories
+            .version_dir(&version_jar)
+            .join(format!("{version_jar}.jar"));
+        let embedded_version = if path.exists() {
+            crate::launcher::read_game_version_metadata_from_jar(&path)
+                .await?
+                .and_then(|metadata| metadata.world_version)
+        } else {
+            None
+        };
+        let data_version = match embedded_version {
+            Some(data_version) => Some(data_version),
+            None => match version.as_str() {
+                "1.10" => Some(510),
+                "1.10.1" => Some(511),
+                "1.10.2" => Some(512),
+                "1.11" => Some(819),
+                "1.11.1" => Some(921),
+                "1.11.2" => Some(922),
+                "1.12" => Some(1139),
+                "1.12.1" => Some(1241),
+                "1.12.2" => Some(1343),
+                "1.13" => Some(1519),
+                "1.13.1" => Some(1628),
+                "1.13.2" => Some(1631),
+                _ if release_version(version).is_some_and(
+                    |(major, minor, _)| major == 1 && minor < 10,
+                ) =>
+                {
+                    None
+                }
+                _ => return Ok(None),
+            },
+        };
+        let mut document = Self::empty();
+        if let Some(data_version) = data_version {
+            document.set("version", &data_version.to_string(), true)?;
+        }
+        Ok(Some(document))
     }
 
     pub(super) fn parse(bytes: &[u8]) -> crate::Result<Self> {

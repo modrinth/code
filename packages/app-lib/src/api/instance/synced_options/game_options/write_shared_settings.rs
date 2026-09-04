@@ -195,8 +195,20 @@ pub(super) async fn apply_shared_settings_to_instance(
     let (mut document, input_bytes) = if path.exists() {
         read_document(&path).await?
     } else {
-        (GameOptionsDocument::empty(), Vec::new())
+        let Some(document) =
+            GameOptionsDocument::for_instance(metadata, state).await?
+        else {
+            return Ok(SyncOutcome::WaitingForFile);
+        };
+        (document, Vec::new())
     };
+    if document.value("version").is_none()
+        && !supported_settings_cover_game_version(
+            &metadata.applied_content_set.game_version,
+        )
+    {
+        return Ok(SyncOutcome::Deferred);
+    }
     let applied =
         apply_shared_settings_to_document(metadata, &mut document, state)
             .await?;
