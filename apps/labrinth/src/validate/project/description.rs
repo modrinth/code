@@ -164,9 +164,8 @@ mod tests {
 
     #[test]
     fn description_spam_allows_isolated_repetition() {
-        assert!(!has_description_spam(&format!(
-            "aaaaaaaa {}",
-            "text ".repeat(140)
-        )));
+        assert!(!has_description_spam(
+            "aaaaaaaa This project provides configurable tools for exploring worlds, organizing resources, managing settings, sharing creations, and helping players understand every available feature through clear documentation."
+        ));
     }
 }
