@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, ButtonGroup } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 
 defineProps<{
 	modelValue?: boolean
@@ -16,10 +16,19 @@ const emit = defineEmits<{
 </script>
 
 <template>
-	<ButtonGroup v-tooltip="modelValue === undefined ? placeholder : undefined" :label="label">
+	<div
+		v-tooltip="modelValue === undefined ? placeholder : undefined"
+		role="group"
+		:aria-label="label"
+		class="inline-flex h-8 items-center gap-0.5 rounded-xl border border-solid border-surface-5 p-px shadow-[0_1px_3px_rgba(0,0,0,0.15)]"
+		:class="{ 'opacity-50': disabled }"
+	>
 		<Button
-			type="outlined"
-			:color="modelValue === true ? 'green' : undefined"
+			type="quiet"
+			size="xs"
+			:interaction="modelValue === true ? 'none' : 'surface'"
+			class="boolean-control-on !rounded-[10px] !px-3 !font-medium disabled:!opacity-100"
+			:class="modelValue === true ? '!text-green' : '!text-contrast'"
 			:aria-pressed="modelValue === true"
 			:disabled="disabled"
 			@click="emit('update:model-value', true)"
@@ -27,12 +36,27 @@ const emit = defineEmits<{
 			{{ onLabel }}
 		</Button>
 		<Button
-			:type="modelValue === false ? 'base' : 'outlined'"
+			type="quiet"
+			size="xs"
+			:interaction="modelValue === false ? 'none' : 'surface'"
+			class="boolean-control-off !rounded-[10px] !px-3 !font-medium !text-contrast disabled:!opacity-100"
 			:aria-pressed="modelValue === false"
 			:disabled="disabled"
 			@click="emit('update:model-value', false)"
 		>
 			{{ offLabel }}
 		</Button>
-	</ButtonGroup>
+	</div>
 </template>
+
+<style scoped>
+.boolean-control-on[aria-pressed='true'] {
+	background-color: color-mix(in srgb, var(--color-green) 30%, var(--surface-3));
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-green) 60%, transparent);
+}
+
+.boolean-control-off[aria-pressed='true'] {
+	background-color: var(--surface-4);
+	box-shadow: inset 0 0 0 1px var(--surface-5);
+}
+</style>
