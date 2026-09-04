@@ -153,6 +153,15 @@ pub(super) async fn capture(
     library: &mut PackLibrary,
     state: &State,
 ) -> crate::Result<Option<bool>> {
+    if super::super::synced_options::pending::contains(
+        &metadata.instance.id,
+        SyncedOption::ResourcePacks,
+        state,
+    )
+    .await?
+    {
+        return Ok(None);
+    }
     let Some(placements) =
         library.instances.get(&metadata.instance.id).cloned()
     else {

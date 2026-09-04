@@ -11,14 +11,16 @@ import {
 import { syncedPackKeys } from '@/helpers/synced-packs'
 import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 
-export const syncUpdateOptions = ([
-	'game_options',
-	'multiplayer_servers',
-	'command_history',
-	'creative_hotbars',
-	'resource_packs',
-	'data_packs',
-] as const).filter(isSyncedOptionAvailable)
+export const syncUpdateOptions = (
+	[
+		'game_options',
+		'multiplayer_servers',
+		'command_history',
+		'creative_hotbars',
+		'resource_packs',
+		'data_packs',
+	] as const
+).filter(isSyncedOptionAvailable)
 
 export type SyncUpdateOption = (typeof syncUpdateOptions)[number]
 

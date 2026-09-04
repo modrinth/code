@@ -39,7 +39,13 @@ pub(super) async fn load_participating_instances(
         if !metadata.synced_options.game_options {
             continue;
         }
-        let deferred = synced_options::sync_files_are_protected(&metadata);
+        let deferred = synced_options::sync_files_are_protected(&metadata)
+            || synced_options::pending::contains(
+                &metadata.instance.id,
+                crate::state::SyncedOption::GameOptions,
+                state,
+            )
+            .await?;
         let path = options_path(&metadata, state);
         let (document, inspection_error) = if path.exists() {
             match read_document(&path).await {

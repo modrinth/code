@@ -317,14 +317,11 @@ pub async fn list_sync_sources()
         let mut disabled_reason = None;
         let mut recognized_setting_count = 0;
         let mut custom_setting_count = 0;
-        if synced_options::sync_files_are_protected(&metadata) {
-            eligible = false;
-            disabled_reason =
-                Some(GameOptionsSourceIssue::InstallingOrUpdating);
-        } else if !path.exists() {
+        let installing = synced_options::sync_files_are_protected(&metadata);
+        if !installing && !path.exists() {
             eligible = false;
             disabled_reason = Some(GameOptionsSourceIssue::MissingOptionsFile);
-        } else {
+        } else if !installing {
             match read_document(&path).await {
                 Ok((document, _)) => {
                     let launcher_keys =

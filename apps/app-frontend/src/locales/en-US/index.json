@@ -3132,7 +3132,7 @@
     "message": "New this update"
   },
   "app.sync-instances-update.choose-source.all": {
-    "message": "Choose the instance to use as the sync source for all six settings."
+    "message": "Choose the instance to use as the sync source for all selected settings."
   },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Choose which instance to copy data packs from."

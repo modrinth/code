@@ -82,6 +82,17 @@ pub(in crate::api::instance) async fn instance_is_running(
         .await
 }
 
+pub(in crate::api::instance) fn option_can_apply_while_running(
+    option: SyncedOption,
+) -> bool {
+    matches!(
+        option,
+        SyncedOption::GameOptions
+            | SyncedOption::Screenshots
+            | SyncedOption::ResourcePacks
+    )
+}
+
 pub(in crate::api::instance) fn instance_option_enabled(
     metadata: &InstanceMetadata,
     option: SyncedOption,

@@ -929,15 +929,16 @@ impl Process {
 
         state.process_manager.remove(uuid);
         clear_persisted_process(&state, persisted_process).await;
-        let synced_pack_instance_id = instance_id.clone();
+        let sync_instance_id = instance_id.clone();
         tokio::spawn(async move {
-            if let Err(error) = crate::api::instance::reconcile_synced_packs(
-                &synced_pack_instance_id,
-            )
-            .await
+            if let Err(error) =
+                crate::api::instance::reconcile_instance_synced_options(
+                    &sync_instance_id,
+                )
+                .await
             {
                 tracing::warn!(
-                    "Failed to reconcile synced packs after closing {synced_pack_instance_id}: {error}"
+                    "Failed to reconcile synced options after closing {sync_instance_id}: {error}"
                 );
             }
         });
