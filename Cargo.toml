@@ -1,22 +1,22 @@
 [workspace]
 resolver = "2"
 members = [
-	"apps/app",
-	"apps/app-playground",
-	"apps/daedalus_client",
-	"apps/labrinth",
-	"packages/app-lib",
-	"packages/ariadne",
-	"packages/component-derive",
-	"packages/daedalus",
-	"packages/modrinth-content-management",
-	"packages/modrinth-log",
-	"packages/modrinth-maxmind",
-	"packages/modrinth-util",
-	"packages/neverbounce",
-	"packages/path-util",
-	"packages/serde-binhum",
-	"packages/xredis",
+  "apps/app",
+  "apps/app-playground",
+  "apps/daedalus_client",
+  "apps/labrinth",
+  "packages/app-lib",
+  "packages/ariadne",
+  "packages/component-derive",
+  "packages/daedalus",
+  "packages/modrinth-content-management",
+  "packages/modrinth-log",
+  "packages/modrinth-maxmind",
+  "packages/modrinth-util",
+  "packages/neverbounce",
+  "packages/path-util",
+  "packages/serde-binhum",
+  "packages/xredis",
 ]
 
 [workspace.package]
@@ -39,28 +39,35 @@ ariadne = { path = "packages/ariadne" }
 async-minecraft-ping = { path = "packages/async-minecraft-ping" }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
-	"runtime-tokio-hyper-rustls",
+  "runtime-tokio-hyper-rustls",
 ] }
 async-trait = "0.1.89"
-async-tungstenite = { version = "0.31.0", default-features = false, features = ["futures-03-sink"] }
+async-tungstenite = { version = "0.31.0", default-features = false, features = [
+  "futures-03-sink"
+] }
 async-walkdir = "2.1.0"
 async_zip = "0.0.18"
 aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
-	"default-https-client",
-	"rt-tokio",
-	"rustls",
+  "default-https-client",
+  "rt-tokio",
+  "rustls",
 ] }
 base64 = "0.22.1"
 bitflags = "2.9.4"
 bon = "3.9.3"
 bytemuck = "1.24.0"
 bytes = "1.10.1"
-cel = { version = "0.14.0", default-features = false, features = ["json", "regex"] }
+cel = { version = "0.14.0", default-features = false, features = [
+  "json",
+  "regex"
+] }
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.42"
 chumsky = "0.9.3"
-cidre = { version = "0.15.0", default-features = false, features = ["macos_15_0"] }
+cidre = { version = "0.15.0", default-features = false, features = [
+  "macos_15_0"
+] }
 clap = "4.5.48"
 clickhouse = "0.14.0"
 color-eyre = "0.6.5"
@@ -98,10 +105,10 @@ hmac = "0.12.1"
 httpdate = "1.0.3"
 hyper = "1.7.0"
 hyper-rustls = { version = "0.27.7", default-features = false, features = [
-	"aws-lc-rs",
-	"http1",
-	"native-tokio",
-	"tls12",
+  "aws-lc-rs",
+  "http1",
+  "native-tokio",
+  "tls12",
 ] }
 hyper-util = "0.1.17"
 iana-time-zone = "0.1.64"
@@ -113,21 +120,21 @@ jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }
 json5 = "1.3.1"
 lettre = { version = "0.11.19", default-features = false, features = [
-	"aws-lc-rs",
-	"builder",
-	"hostname",
-	"pool",
-	"rustls",
-	"rustls-native-certs",
-	"smtp-transport",
-	"tokio1",
-	"tokio1-rustls",
+  "aws-lc-rs",
+  "builder",
+  "hostname",
+  "pool",
+  "rustls",
+  "rustls-native-certs",
+  "smtp-transport",
+  "tokio1",
+  "tokio1-rustls",
 ] }
 lz4_flex = { version = "0.11.5", default-features = false, features = [
-	"checked-decode",
-	"safe-decode",
-	"safe-encode",
-	"std",
+  "checked-decode",
+  "safe-decode",
+  "safe-encode",
+  "std",
 ] }
 maxminddb = "0.26.0"
 modrinth-content-management = { path = "packages/modrinth-content-management" }
@@ -153,31 +160,34 @@ prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.3"
 quote = { version = "1.0" }
-rand = "=0.8.5" # Locked on 0.8 until argon2 and p256 update to 0.9
-rand_chacha = "=0.3.1" # Locked on 0.3 until we can update rand to 0.9
+rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
+rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 rdkafka = { version = "0.36.2", features = ["cmake-build"] }
 redis = "1.4.1"
 regex = "1.12.2"
 reqwest = { version = "0.12.24", default-features = false }
 rgb = "0.8.52"
-rust_decimal = { version = "1.39.0", features = ["serde-with-float", "serde-with-str"] }
+rust_decimal = { version = "1.39.0", features = [
+  "serde-with-float",
+  "serde-with-str"
+] }
 rust_iso3166 = "0.1.14"
 rust-s3 = { version = "0.37.0", default-features = false, features = [
-	"fail-on-err",
-	"tags",
-	"tokio-rustls-tls",
+  "fail-on-err",
+  "tags",
+  "tokio-rustls-tls",
 ] }
 rustls = "0.23.32"
 rusty-money = "0.4.1"
 scalar_api_reference = { version = "0.2.2", default-features = false }
 secrecy = "0.10.3"
 sentry = { version = "0.45.0", default-features = false, features = [
-	"backtrace",
-	"contexts",
-	"debug-images",
-	"panic",
-	"reqwest",
-	"rustls",
+  "backtrace",
+  "contexts",
+  "debug-images",
+  "panic",
+  "reqwest",
+  "rustls",
 ] }
 serde = "1.0.228"
 serde-binhum = { path = "packages/serde-binhum" }
@@ -208,8 +218,8 @@ tauri-plugin-opener = "2.5.0"
 tauri-plugin-os = "2.3.1"
 tauri-plugin-single-instance = "2.3.4"
 tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "0d30f2aa28ec668ce187d527da1c475da3c01cbc", default-features = false, features = [
-	"rustls-tls",
-	"zip",
+  "rustls-tls",
+  "zip",
 ] }
 tauri-plugin-window-state = "2.4.0"
 tempfile = "3.23.0"
@@ -237,20 +247,20 @@ validator = "0.20.0"
 webauthn-rs = "0.5.5"
 webauthn-rs-proto = "0.5.5"
 webp = { version = "0.3.1", default-features = false }
-webview2-com = "0.38.0" # Should be updated in lockstep with wry
+webview2-com = "0.38.0"  # Should be updated in lockstep with wry
 whoami = "1.6.1"
-windows = "=0.61.3" # Locked on 0.61 until we can update windows-core to 0.62
-windows-core = "=0.61.2" # Locked on 0.61 until webview2-com updates to 0.62
+windows = "=0.61.3"  # Locked on 0.61 until we can update windows-core to 0.62
+windows-core = "=0.61.2"  # Locked on 0.61 until webview2-com updates to 0.62
 winreg = "0.55.0"
 woothee = "0.13.0"
 xredis = { path = "packages/xredis" }
 yaserde = "0.12.0"
 zbus = "5.11.0"
 zip = { version = "6.0.0", default-features = false, features = [
-	"bzip2",
-	"deflate",
-	"deflate64",
-	"zstd",
+  "bzip2",
+  "deflate",
+  "deflate64",
+  "zstd",
 ] }
 zxcvbn = "3.1.0"
 
@@ -297,15 +307,15 @@ opt-level = 3
 
 # Optimize for speed and reduce size on release builds
 [profile.release]
-opt-level = "s" # Optimize for binary size
-strip = true    # Remove debug symbols
-lto = true      # Enables link to optimizations
-panic = "abort" # Strip expensive panic clean-up logic
+opt-level = "s"  # Optimize for binary size
+strip = true  # Remove debug symbols
+lto = true  # Enables link to optimizations
+panic = "abort"  # Strip expensive panic clean-up logic
 
 # Specific profile for labrinth production builds
 [profile.release-labrinth]
 inherits = "release"
 opt-level = 2
-strip = false        # Keep debug symbols for Sentry
-lto = "thin"         # Enable LTO but keep compile times reasonable
-panic = "unwind"     # Don't exit the whole app on panic in production
+strip = false  # Keep debug symbols for Sentry
+lto = "thin"  # Enable LTO but keep compile times reasonable
+panic = "unwind"  # Don't exit the whole app on panic in production
