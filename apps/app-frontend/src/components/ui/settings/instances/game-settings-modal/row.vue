@@ -296,6 +296,7 @@ function updateValue(value: string | number | boolean | undefined) {
 			<IconButton
 				:type="setting.sync_enabled ? 'outlined' : 'base'"
 				:color="setting.sync_enabled ? 'blue' : undefined"
+				:class="setting.sync_enabled ? '!bg-highlight-blue' : undefined"
 				:label="syncActionLabel"
 				:disabled="syncToggleDisabled"
 				:aria-pressed="setting.sync_enabled"
