@@ -4,7 +4,7 @@
 			v-if="showClear && hasLogs"
 			v-tooltip="clearDisabled ? clearDisabledTooltip : undefined"
 			type="quiet"
-			size="sm"
+			class="!text-sm !font-medium"
 			:disabled="clearDisabled"
 			@click="emit('clear')"
 		>
@@ -15,7 +15,7 @@
 			v-if="showDelete"
 			v-tooltip="deleteDisabled ? deleteDisabledTooltip : undefined"
 			type="quiet"
-			size="sm"
+			class="!text-sm !font-medium"
 			color="red"
 			interaction="filled"
 			:disabled="deleteDisabled"
@@ -28,7 +28,7 @@
 			v-if="hasLogs"
 			v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
 			type="quiet"
-			size="sm"
+			class="!text-sm !font-medium"
 			:disabled="shareDisabled"
 			:loading="sharing"
 			@click="emit('share')"
@@ -37,7 +37,7 @@
 			<ShareIcon v-else aria-hidden="true" />
 			{{ formatMessage(messages.share) }}
 		</Button>
-		<Button type="quiet" size="sm" @click="emit('toggle-fullscreen')">
+		<Button type="quiet" class="!text-sm !font-medium" @click="emit('toggle-fullscreen')">
 			<ContractIcon v-if="fullscreen" aria-hidden="true" />
 			<ExpandIcon v-else aria-hidden="true" />
 			{{ formatMessage(fullscreen ? messages.collapse : messages.expand) }}

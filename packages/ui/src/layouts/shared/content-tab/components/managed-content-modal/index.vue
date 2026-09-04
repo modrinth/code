@@ -513,7 +513,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				size="3rem"
 				:tint-by="props.sourceName"
 			/>
-			<span class="text-lg font-extrabold text-contrast">
+			<span class="text-2xl font-semibold text-contrast">
 				{{ props.header ?? formatMessage(messages.header) }}
 			</span>
 		</template>

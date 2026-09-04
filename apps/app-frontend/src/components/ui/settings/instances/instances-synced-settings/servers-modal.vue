@@ -299,16 +299,12 @@ defineExpose({ show })
 <template>
 	<NewModal
 		ref="serverEditorModal"
+		:header="formatMessage(messages.serverEditorTitle)"
 		no-padding
 		max-width="min(928px, calc(95vw - 10rem))"
 		width="min(928px, calc(95vw - 10rem))"
 	>
-		<template #title>
-			<span class="text-lg font-extrabold text-contrast">
-				{{ formatMessage(messages.serverEditorTitle) }}
-			</span>
-		</template>
-		<div class="flex h-[min(600px,calc(95vh-10rem))] flex-col">
+		<div class="flex max-h-[min(600px,calc(95vh-10rem))] flex-col">
 			<div
 				class="flex shrink-0 flex-col gap-4 border-0 border-b border-solid border-surface-4 px-6 py-4"
 			>
