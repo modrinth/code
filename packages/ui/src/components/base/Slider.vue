@@ -2,7 +2,7 @@
 	<div class="flex w-full items-center gap-4">
 		<span
 			v-if="currentValue !== null"
-			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
+			class="w-10 shrink-0 whitespace-nowrap py-2 text-right text-sm leading-5 text-secondary"
 		>
 			{{ min }}
 		</span>
@@ -48,7 +48,7 @@
 
 		<span
 			v-if="currentValue !== null"
-			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
+			class="w-10 shrink-0 whitespace-nowrap py-2 text-left text-sm leading-5 text-secondary"
 		>
 			{{ formatValue(max) }}
 		</span>
@@ -58,7 +58,8 @@
 			type="number"
 			size="medium"
 			wrapper-class="slider-value shrink-0"
-			:style="{ width: valueInputWidth }"
+			:class="currentValue === null ? 'w-full' : 'w-[65px]'"
+			:input-class="currentValue === null ? undefined : 'text-center'"
 			:disabled="disabled"
 			:placeholder="placeholder"
 			:aria-label="ariaLabel"
@@ -105,11 +106,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
-const valueInputWidth = computed(() =>
-	currentValue.value === null
-		? '100%'
-		: `calc(${Math.max(String(currentValue.value).length, 1)}ch + 2.125rem)`,
-)
 const visibleSnapPoints = computed(() =>
 	props.snapPoints.filter((snapPoint) => snapPoint >= props.min && snapPoint <= props.max),
 )

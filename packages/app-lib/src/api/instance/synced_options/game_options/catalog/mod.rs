@@ -6,6 +6,7 @@
 mod accessibility;
 mod chat;
 mod controls;
+mod data_versions;
 mod known_vanilla_keys;
 mod legacy_key_bindings;
 mod sound;
@@ -16,6 +17,7 @@ use super::api_types::{
     GameOptionEditorChoice, GameOptionEditorDefinition, GameOptionMappingKind,
 };
 
+pub(super) use data_versions::LEGACY_DATA_VERSIONS;
 use known_vanilla_keys::{KNOWN_VANILLA_KEYS, NEVER_SYNC_KEYS};
 pub(in crate::api::instance) use legacy_key_bindings::LEGACY_KEY_BINDINGS;
 pub(in crate::api::instance) use version_changes::*;

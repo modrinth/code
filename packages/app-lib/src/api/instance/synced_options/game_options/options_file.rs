@@ -1,7 +1,7 @@
 //! Reads and edits `options.txt` without changing unrelated lines or file formatting.
 
 use super::super as synced_options;
-use super::catalog::release_version;
+use super::catalog::{LEGACY_DATA_VERSIONS, release_version};
 use super::{
     MAX_KEY_BYTES, MAX_OPTIONS_BYTES, MAX_OPTIONS_LINES, MAX_VALUE_BYTES,
     OPTIONS_FILE,
@@ -78,30 +78,14 @@ impl GameOptionsDocument {
         } else {
             None
         };
-        let data_version = match embedded_version {
-            Some(data_version) => Some(data_version),
-            None => match version.as_str() {
-                "1.10" => Some(510),
-                "1.10.1" => Some(511),
-                "1.10.2" => Some(512),
-                "1.11" => Some(819),
-                "1.11.1" => Some(921),
-                "1.11.2" => Some(922),
-                "1.12" => Some(1139),
-                "1.12.1" => Some(1241),
-                "1.12.2" => Some(1343),
-                "1.13" => Some(1519),
-                "1.13.1" => Some(1628),
-                "1.13.2" => Some(1631),
-                _ if release_version(version).is_some_and(
-                    |(major, minor, _)| major == 1 && minor < 10,
-                ) =>
-                {
-                    None
-                }
-                _ => return Ok(None),
-            },
-        };
+        let data_version = embedded_version
+            .or_else(|| LEGACY_DATA_VERSIONS.get(version.as_str()).copied());
+        if data_version.is_none()
+            && !release_version(version)
+                .is_some_and(|(major, minor, _)| major == 1 && minor < 10)
+        {
+            return Ok(None);
+        }
         let mut document = Self::empty();
         if let Some(data_version) = data_version {
             document.set("version", &data_version.to_string(), true)?;
