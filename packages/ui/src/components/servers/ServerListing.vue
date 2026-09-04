@@ -182,17 +182,16 @@
 				{{ formatMessage(messages.suspendedNotice) }}
 			</div>
 
-			<div v-if="noticeButtons" class="flex gap-2">
-				<IconButton
+			<div v-if="noticeButtons" class="flex flex-wrap gap-2">
+				<Button
 					v-if="noticeButtons.downloadWorld && onDownloadWorld"
-					v-tooltip="formatMessage(messages.downloadWorldTooltip)"
 					type="outlined"
-					:label="formatMessage(messages.downloadWorldTooltip)"
 					data-server-listing-button
 					@click="onDownloadWorld"
 				>
 					<DownloadIcon />
-				</IconButton>
+					{{ formatMessage(commonMessages.downloadFilesButton) }}
+				</Button>
 				<Button
 					v-if="noticeButtons.copyId"
 					v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
@@ -272,7 +271,8 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { Button, ButtonLink, IconButton } from '#ui/components/base/buttons'
+import { Button, ButtonLink } from '#ui/components/base/buttons'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import {
 	CardIcon,
@@ -365,10 +365,6 @@ const messages = defineMessages({
 		id: 'servers.listing.notice.suspended',
 		defaultMessage:
 			'Your server has been suspended. Please contact Modrinth Support for more information.',
-	},
-	downloadWorldTooltip: {
-		id: 'servers.listing.download-world-tooltip',
-		defaultMessage: 'Download world files',
 	},
 	copyCodeToClipboardTooltip: {
 		id: 'servers.listing.copy-code-tooltip',

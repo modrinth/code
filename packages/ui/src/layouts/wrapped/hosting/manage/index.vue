@@ -188,7 +188,7 @@
 								:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
 								:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
 								:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
-								:on-download-world="getWorldDownload(server, serverFullList)"
+								:on-download-world="getWorldDownload(server.server_id, serverFullList)"
 							/>
 						</TransitionGroup>
 						<div v-else class="text-secondary">
@@ -216,7 +216,6 @@
 								v-for="server in sharedFilteredData.filter((s) => !s.is_medal)"
 								:key="`shared-${server.server_id}`"
 								v-bind="server"
-								:on-download-world="getWorldDownload(server, serverFullList)"
 							/>
 						</TransitionGroup>
 						<div v-else class="text-secondary">
@@ -565,9 +564,11 @@ function sortServers(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Serve
 }
 
 function shouldShowServer(server: Archon.Servers.v0.Server): boolean {
-	if (server.status !== 'suspended') return true
+	if (server.status !== 'suspended' || server.suspension_reason !== 'cancelled') return true
+	const cancellationDate = serverBillingMap.value.get(server.server_id)?.cancellationDate
+	if (!cancellationDate || !serverFullList.value) return true
 	return (
-		!!serverBillingMap.value.get(server.server_id)?.onResubscribe ||
+		isWithinServerResubscribeWindow(cancellationDate) ||
 		hasAvailableWorldDownload(server.server_id, serverFullList.value)
 	)
 }

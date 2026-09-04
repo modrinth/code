@@ -291,7 +291,9 @@
 								v-bind="subscription.serverInfo"
 								:pending-change="getPendingChange(subscription)"
 								:cancellation-date="getCancellationDate(subscription)"
-								:on-download-world="getWorldDownload(subscription.serverInfo, serverFullList)"
+								:on-download-world="
+									getWorldDownload(subscription.serverInfo.server_id, serverFullList)
+								"
 							/>
 							<div v-else class="w-fit">
 								<p>
@@ -1100,9 +1102,15 @@ const pyroSubscriptions = computed(() => {
 			}
 		})
 		.filter((subscription) => {
-			if (subscription.serverInfo?.status !== 'suspended') return true
+			if (
+				subscription.serverInfo?.status !== 'suspended' ||
+				subscription.serverInfo?.suspension_reason !== 'cancelled'
+			)
+				return true
+			const cancellationDate = getCancellationDate(subscription)
+			if (!cancellationDate || !serverFullList.value) return true
 			return (
-				canResubscribe(subscription) ||
+				isWithinServerResubscribeWindow(cancellationDate) ||
 				hasAvailableWorldDownload(subscription.serverInfo.server_id, serverFullList.value)
 			)
 		})
