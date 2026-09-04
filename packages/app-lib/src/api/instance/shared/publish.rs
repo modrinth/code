@@ -179,7 +179,12 @@ pub(super) async fn remote_publish_content(
         version_ids.retain(|id| id != modpack_id);
 
         if include_modpack_dependencies {
-			extend_shared_modpack_dependencies(&mut version_ids, modpack_id, state).await?;
+            extend_shared_modpack_dependencies(
+                &mut version_ids,
+                modpack_id,
+                state,
+            )
+            .await?;
         }
     }
     dedupe_strings(&mut version_ids);
@@ -190,7 +195,9 @@ pub(super) async fn remote_publish_content(
             .external_files
             .iter()
             .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
-            .map(|file| shared_external_file_key(&file.file_type, &file.file_name))
+            .map(|file| {
+                shared_external_file_key(&file.file_type, &file.file_name)
+            })
             .collect::<crate::Result<_>>()?,
     ))
 }
@@ -221,19 +228,23 @@ pub(super) async fn modpack_dependency_version_ids(
 
 /// Adds inherited pack versions without replacing explicitly selected projects.
 async fn extend_shared_modpack_dependencies(
-	version_ids: &mut Vec<String>,
-	modpack_id: &str,
-	state: &State,
+    version_ids: &mut Vec<String>,
+    modpack_id: &str,
+    state: &State,
 ) -> crate::Result<()> {
-	let dependency_ids = modpack_dependency_version_ids(modpack_id, state).await?;
-	let (explicit, inherited) = tokio::try_join!(
-		shared_versions_by_project(version_ids, state),
-		shared_versions_by_project(&dependency_ids, state),
-	)?;
-	version_ids.extend(inherited.into_values()
-		.filter(|version| !explicit.contains_key(&version.project_id))
-		.map(|version| version.id));
-	Ok(())
+    let dependency_ids =
+        modpack_dependency_version_ids(modpack_id, state).await?;
+    let (explicit, inherited) = tokio::try_join!(
+        shared_versions_by_project(version_ids, state),
+        shared_versions_by_project(&dependency_ids, state),
+    )?;
+    version_ids.extend(
+        inherited
+            .into_values()
+            .filter(|version| !explicit.contains_key(&version.project_id))
+            .map(|version| version.id),
+    );
+    Ok(())
 }
 
 pub(super) async fn shared_instance_install_modpack(
@@ -325,15 +336,20 @@ pub(super) async fn current_shared_content(
         };
         if let Some(file) = files.get(&file_id) {
             external_files.insert(ExternalFileKey {
-				content_type: entry.project_type.into(),
-				path: file.file_name.clone(),
-			});
+                content_type: entry.project_type.into(),
+                path: file.file_name.clone(),
+            });
         }
     }
     if include_linked_modpack_content
         && let Some(modpack_id) = shared_modpack_id(&metadata.link)
     {
-		extend_shared_modpack_dependencies(&mut version_ids, &modpack_id, state).await?;
+        extend_shared_modpack_dependencies(
+            &mut version_ids,
+            &modpack_id,
+            state,
+        )
+        .await?;
     }
     dedupe_strings(&mut version_ids);
 
@@ -437,9 +453,9 @@ pub(super) async fn collect_publish_snapshot(
         }
 
         disabled_external_files.insert(ExternalFileKey {
-			content_type: item.project_type.into(),
-			path: enabled_file_name(&item.file_name),
-		});
+            content_type: item.project_type.into(),
+            path: enabled_file_name(&item.file_name),
+        });
     }
 
     Ok(CurrentPublishSnapshot {
@@ -466,18 +482,28 @@ pub(super) async fn shared_versions_by_project(
     )
     .await?;
 
-	let fetched_ids = versions.iter().map(|version| version.id.as_str()).collect::<HashSet<_>>();
-	if let Some(missing) = version_ids.iter().find(|id| !fetched_ids.contains(id.as_str())) {
-		return Err(crate::ErrorKind::InputError(format!("Shared content version {missing} was not found")).into());
-	}
-	let mut snapshot = ContentSetSnapshot::default();
-	let mut by_project = HashMap::new();
-	for version in versions {
-		snapshot.insert_project(version.project_id.clone(), version.id.clone())
-			.map_err(|error| crate::ErrorKind::InputError(error.to_string()))?;
-		by_project.insert(version.project_id.clone(), version);
-	}
-	Ok(by_project)
+    let fetched_ids = versions
+        .iter()
+        .map(|version| version.id.as_str())
+        .collect::<HashSet<_>>();
+    if let Some(missing) = version_ids
+        .iter()
+        .find(|id| !fetched_ids.contains(id.as_str()))
+    {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Shared content version {missing} was not found"
+        ))
+        .into());
+    }
+    let mut snapshot = ContentSetSnapshot::default();
+    let mut by_project = HashMap::new();
+    for version in versions {
+        snapshot
+            .insert_project(version.project_id.clone(), version.id.clone())
+            .map_err(|error| crate::ErrorKind::InputError(error.to_string()))?;
+        by_project.insert(version.project_id.clone(), version);
+    }
+    Ok(by_project)
 }
 
 pub(super) async fn shared_project_names(

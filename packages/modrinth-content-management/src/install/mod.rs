@@ -6,9 +6,9 @@ use std::collections::{HashMap, HashSet};
 use crate::shared::{ContentType, Error};
 
 pub use model::{
-	Dependency, DependencyType, ResolutionPreferences, ResolveContentPlan,
-	ResolveContentRequest, ResolvedContent, SkippedContent, SkippedReason,
-	Version,
+    Dependency, DependencyType, ResolutionPreferences, ResolveContentPlan,
+    ResolveContentRequest, ResolvedContent, SkippedContent, SkippedReason,
+    Version,
 };
 pub use provider::ContentMetadataProvider;
 

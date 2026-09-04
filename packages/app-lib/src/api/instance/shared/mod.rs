@@ -1,10 +1,3 @@
-use modrinth_content_management::{
-	Change, CommonExternalFilePolicy, ConfigurationDiff, ContentSetConfiguration,
-	ContentSetDiffEntry, ContentSetDiffKind, ContentSetDiffOptions,
-	ContentSetSnapshot, ExternalFileKey, LoaderReference, diff_configuration,
-	diff_content_sets,
-};
-use std::collections::BTreeSet;
 use crate::SharedInstanceUnavailableReason;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
@@ -23,10 +16,17 @@ use crate::util::fetch::{
     NO_TIMEOUT_REQWEST_CLIENT, REQWEST_CLIENT,
 };
 use chrono::{DateTime, Utc};
+use modrinth_content_management::{
+    Change, CommonExternalFilePolicy, ConfigurationDiff,
+    ContentSetConfiguration, ContentSetDiffEntry, ContentSetDiffKind,
+    ContentSetDiffOptions, ContentSetSnapshot, ExternalFileKey,
+    LoaderReference, diff_configuration, diff_content_sets,
+};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use std::collections::BTreeSet;
 use std::collections::{HashMap, HashSet};
 use std::io::Read;
 
