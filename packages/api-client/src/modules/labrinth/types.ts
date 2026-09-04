@@ -1118,6 +1118,85 @@ export namespace Labrinth {
 				url: string
 			}
 
+			export type NormalizedProjectNagKind =
+				| 'minecraft-title-clause'
+				| 'project-name-non-standard-text'
+				| 'project-name-profanity'
+				| 'project-name-slur'
+				| 'project-name-version'
+				| 'project-summary-links'
+				| 'project-summary-matches-title'
+				| 'project-summary-non-english'
+				| 'project-summary-non-standard-text'
+				| 'project-summary-profanity'
+				| 'project-summary-slur'
+				| 'project-summary-spam'
+				| 'summary-special-formatting'
+				| 'summary-too-short'
+				| 'add-icon'
+				| 'feature-gallery-image'
+				| 'upload-gallery-image'
+				| 'gallery-text-non-standard'
+				| 'gallery-text-profanity'
+				| 'gallery-text-slur'
+				| 'add-description'
+				| 'adjacent-headers'
+				| 'description-ends-with-header'
+				| 'description-too-short'
+				| 'long-headers'
+				| 'missing-alt-text'
+				| 'project-description-banned-link'
+				| 'project-description-non-english'
+				| 'project-description-non-standard-text'
+				| 'project-description-profanity'
+				| 'project-description-slur'
+				| 'project-description-spam'
+				| 'add-custom-license-details'
+				| 'invalid-license-url'
+				| 'select-license'
+				| 'add-links'
+				| 'add-links-server'
+				| 'banned-link-usage'
+				| 'gpl-license-source-required'
+				| 'identical-links'
+				| 'misused-discord-link'
+				| 'verify-external-links'
+				| 'review-permissions'
+				| 'add-java-address'
+				| 'all-languages'
+				| 'select-compatibility'
+				| 'select-country'
+				| 'select-language'
+				| 'too-many-languages'
+				| 'all-tags-selected'
+				| 'multiple-resolution-tags'
+				| 'select-tags'
+				| 'too-many-tags'
+				| 'too-many-tags-server'
+				| 'select-environment'
+				| 'upload-version'
+				| 'check-disclosures'
+				| 'disclosures-special-formatting'
+				| 'moderator-feedback'
+
+			type ReplaceHyphensWithUnderscores<T extends string> = T extends `${infer Head}-${infer Tail}`
+				? `${Head}_${ReplaceHyphensWithUnderscores<Tail>}`
+				: T
+
+			export type ProjectNagKind = ReplaceHyphensWithUnderscores<NormalizedProjectNagKind>
+
+			export type ProjectNagSeverity = 'required' | 'warning' | 'suggestion'
+
+			export type ProjectNag = {
+				kind: ProjectNagKind
+				severity: ProjectNagSeverity
+				details: Record<string, unknown>
+			}
+
+			export type ProjectValidationResponse = {
+				nags: ProjectNag[]
+			}
+
 			export type Project = {
 				id: string
 				slug?: string

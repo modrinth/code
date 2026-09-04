@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecteer relevante tags"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Je beschrijving is {length, plural, one{# leesbare tekens}other {# leesbare tekens}}. Ten minste {minChars, plural, one {# teken}other {# tekens}} is aangeraden om een duidelijke en informatieve beschrijving te maken."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Verleng de beschrijving"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Pas de beschrijving aan"
   },
@@ -89,12 +83,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Identieke links opschonen"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Je beschrijving moet voldoende normale tekst of alternatieve tekst bij afbeeldingen bevatten, zodat deze toegankelijk blijft voor mensen die een schermlezer gebruiken of een trage internetverbinding hebben."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Zorg voor toegankelijkheid"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licentie URL is ongeldig."
   },
@@ -106,12 +94,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Voeg een geldige licentie link toe"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Gebruik van linkverkorters of andere methodes om te verbergen waar een link naar toe gaat in je externe links of licentie link is niet toegestaan, gelieve alleen volledige lengte links te gebruiken."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Gebruik geen link verkorters"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# kop} other {# koppen}} in jouw beschrijving {count, plural, one {is} other {zijn}} te lang. Koppen moeten beknopt zijn en dienen als onderdeeltitels, niet als volledige zinnen."
@@ -191,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "Toon server instellingen"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Bekijk beschrijving instellingen"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Bekijk licentie instellingen"
   },
@@ -212,29 +191,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Versie-instellingen bekijken"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Je samenvatting kan niet dezelfde naam hebben als je projectnaam. Het is belangrijk om een informatieve en interessante samenvatting te maken."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Maak je samenvatting uniek"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Je samenvatting moet geen opmaak, regeleindes, speciale karakters of links, omdat de samenvatting alleen text, uitlicht."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Verhelder de samenvatting"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Je samenvatting is {length, plural, one {# character} other {# characters}}. Minimaal {minChars, plural, one {# character} other {# characters}} is aanbevolen om een informatieve en interessante samevatting te maken."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Breidt de samenvatting uit"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "De naam van je project duidelijk houden zorgt ervoor dat het makkelijk te vinden is. Versie en lader informatie is automatisch bij je project uitgelicht."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Maak de naam duidelijk"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Je hebt {languageCount, plural, one {# taal} other {# talen}} geselecteerd. Geef alleen de talen op die je server daadwerkelijk ondersteunt."
@@ -282,4 +246,3 @@
     "defaultMessage": "Bezoek linkjes instellingen"
   }
 }
-

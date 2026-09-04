@@ -36,6 +36,12 @@
 						:disabled="!hasPermission"
 						trigger-type="base"
 					/>
+					<ValidationMessage
+						:check="licenseSelectionValidation"
+						:project-field="project.license.id"
+						:current-field="licenseId"
+						class="mt-2"
+					/>
 				</div>
 			</div>
 
@@ -72,7 +78,7 @@
 					</span>
 				</label>
 
-				<div class="w-1/2">
+				<div class="flex w-1/2 flex-col gap-2">
 					<Input
 						id="license-url"
 						v-model="current.licenseUrl"
@@ -83,6 +89,16 @@
 						"
 						:disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
+					/>
+					<ValidationMessage
+						:check="customLicenseValidation"
+						:project-field="project.license.id"
+						:current-field="licenseId"
+					/>
+					<ValidationMessage
+						:check="effectiveLicenseCheck"
+						:project-field="project.license.url ?? ''"
+						:current-field="current.licenseUrl"
 					/>
 				</div>
 			</div>
@@ -140,13 +156,7 @@
 			:original="saved"
 			:modified="current"
 			:saving="saving"
-			:can-save="
-				hasPermission &&
-				!(
-					current.license.friendly === 'Custom' &&
-					(current.license.short === '' || current.licenseUrl === '')
-				)
-			"
+			:can-save="canSave"
 			@reset="reset"
 			@save="save"
 		/>
@@ -166,8 +176,11 @@ import {
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
-import { builtinLicenses, formatProjectType, TeamMemberPermission } from '@modrinth/utils'
+import { builtinLicenses, formatProjectType, isAdmin, TeamMemberPermission } from '@modrinth/utils'
 import { computed } from 'vue'
+
+import ValidationMessage from '@/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
@@ -202,7 +215,14 @@ function getInitialLicense() {
 	)
 }
 
-const { saved, current, saving, hasChanges, reset, save } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	hasChanges,
+	reset,
+	save: saveLicense,
+} = useSavable(
 	() => ({
 		license: getInitialLicense(),
 		licenseUrl: project.value.license.url ?? '',
@@ -227,6 +247,10 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	},
 )
 
+const licenseSelectionValidation = useProjectNagMessages('license')
+const customLicenseValidation = useProjectNagMessages('custom-license')
+const effectiveLicenseCheck = useProjectNagMessages('license-url')
+
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 const selectedLicense = computed({
@@ -237,9 +261,19 @@ const selectedLicense = computed({
 	},
 })
 
-const hasPermission = computed(() => {
-	return (currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS
-})
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
+const hasPermission = computed(
+	() =>
+		isAdminUser.value ||
+		Boolean((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
+)
+
+const canSave = computed(() => hasPermission.value)
+
+async function save() {
+	if (!canSave.value) return
+	await saveLicense()
+}
 
 const licenseId = computed(() => {
 	let id = ''

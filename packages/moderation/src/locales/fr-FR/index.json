@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Regarder les avertissements sur le contenu"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Votre description contient {length, plural, one {# caractère lisible} other {# caractères lisibles}}. Il est recommandé d’en avoir au moins {minChars, plural, one {# caractère} other {# caractères}} pour obtenir une description claire et informative."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Étendre la description"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Modifier la description"
   },
@@ -95,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Nettoyer des liens identiques"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Votre description doit contenir suffisamment de texte clair ou de texte alternatif pour les images, afin de rester accessible aux personnes utilisant des lecteurs d’écran ou disposant d’une connexion Internet lente."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Garantir l’accessibilité"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "L’URL de la licence est invalide."
   },
@@ -112,12 +100,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Ajouter un lien de licence valide"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "L’utilisation de raccourcisseurs de liens ou de toute autre méthode visant à masquer la destination d’un lien, que ce soit pour vos liens externes ou votre lien de licence, est interdite. Veuillez n’utiliser que des liens complets appropriés."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Ne pas utiliser de raccourcisseurs de liens"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# en-tête} other {# en-têtes}} dans votre description {count, plural, one {est trop long} other {sont trop longs}}. Les en-têtes doivent être concis et servir de titres de section, et non de phrases complètes."
@@ -197,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Visiter les paramètres du serveur"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Accéder aux paramètres de la description"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Visiter les paramètres d'avertissement sur le contenu"
   },
@@ -221,29 +200,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Accéder aux paramètres des versions"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Votre résumé ne peut pas être identique au nom de votre projet. Il est important de créer un résumé informatif et attrayant."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Rendez le résumé unique"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Votre résumé ne doit pas contenir de mise en forme, de retours à la ligne, de caractères spéciaux ni de liens, car il sera affiché en texte brut uniquement."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Nettoyer le résumé"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Votre résumé contient {length, plural, one {# caractère} other {# caractères}}. Il est recommandé d’en avoir au moins {minChars, plural, one {# caractère} other {# caractères}} pour obtenir un résumé informatif et attrayant."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Développer le résumé"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Garder un nom de projet clair le rend plus mémorisable et plus facile à trouver. Les informations de version et de loader sont automatiquement affichées à côté de votre projet."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Nettoyer le nom"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Vous avez sélectionné {languageCount, plural, one {# langue} other {# langues}}. Veuillez indiquer uniquement les langues prises en charge par votre serveur."
@@ -291,4 +255,3 @@
     "defaultMessage": "Accéder aux paramètres des liens"
   }
 }
-
