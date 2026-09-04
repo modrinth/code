@@ -12,18 +12,14 @@
 				</p>
 			</div>
 			<div class="flex shrink-0 flex-col gap-2 md:w-[164px]">
-				<ButtonStyled color="brand">
-					<button class="!h-10 w-full" @click="emit('play')">
-						<PlayIcon aria-hidden="true" />
-						{{ formatMessage(messages.playServerButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button class="!h-10 w-full" @click="emit('invite')">
-						<UserPlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.invitePlayersButton) }}
-					</button>
-				</ButtonStyled>
+				<Button type="colored" color="brand" size="lg" class="w-full" @click="emit('play')">
+					<PlayIcon aria-hidden="true" />
+					{{ formatMessage(messages.playServerButton) }}
+				</Button>
+				<Button size="lg" class="w-full" @click="emit('invite')">
+					<UserPlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.invitePlayersButton) }}
+				</Button>
 			</div>
 		</div>
 
@@ -38,44 +34,41 @@
 				</p>
 			</div>
 			<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-				<div class="joined-buttons shrink-0">
-					<ButtonStyled>
-						<a
-							v-if="modpackDownloadUrl"
-							class="!h-10"
-							:href="modpackDownloadUrl"
-							:download="modpackFilename"
-						>
-							<DownloadIcon aria-hidden="true" />
-							{{ formatMessage(messages.downloadModpackButton) }}
-						</a>
-						<button v-else type="button" class="!h-10">
-							<DownloadIcon aria-hidden="true" />
-							{{ formatMessage(messages.downloadModpackButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<a
-							v-if="modpackDownloadUrl"
-							v-tooltip="formatMessage(messages.downloadModpackButton)"
-							class="!h-10 !w-10 !px-0"
-							:href="modpackDownloadUrl"
-							:download="modpackFilename"
-							:aria-label="formatMessage(messages.downloadModpackButton)"
-						>
-							<ChevronDownIcon aria-hidden="true" />
-						</a>
-						<button
-							v-else
-							v-tooltip="formatMessage(messages.downloadModpackButton)"
-							type="button"
-							class="!h-10 !w-10 !px-0"
-							:aria-label="formatMessage(messages.downloadModpackButton)"
-						>
-							<ChevronDownIcon aria-hidden="true" />
-						</button>
-					</ButtonStyled>
-				</div>
+				<ButtonGroup class="shrink-0">
+					<ButtonLink
+						v-if="modpackDownloadUrl"
+						size="lg"
+						:href="modpackDownloadUrl"
+						:download="modpackFilename"
+					>
+						<DownloadIcon aria-hidden="true" />
+						{{ formatMessage(messages.downloadModpackButton) }}
+					</ButtonLink>
+					<Button v-else size="lg">
+						<DownloadIcon aria-hidden="true" />
+						{{ formatMessage(messages.downloadModpackButton) }}
+					</Button>
+					<ButtonLink
+						v-if="modpackDownloadUrl"
+						v-tooltip="formatMessage(messages.downloadModpackButton)"
+						size="lg"
+						class="!w-10 !px-0"
+						:href="modpackDownloadUrl"
+						:download="modpackFilename"
+						:aria-label="formatMessage(messages.downloadModpackButton)"
+					>
+						<ChevronDownIcon aria-hidden="true" />
+					</ButtonLink>
+					<IconButton
+						v-else
+						v-tooltip="formatMessage(messages.downloadModpackButton)"
+						size="lg"
+						:circular="false"
+						:label="formatMessage(messages.downloadModpackButton)"
+					>
+						<ChevronDownIcon aria-hidden="true" />
+					</IconButton>
+				</ButtonGroup>
 				<div
 					class="flex h-10 min-w-0 items-center justify-between gap-3 rounded-xl bg-surface-2 px-4 sm:w-[313px]"
 				>
@@ -107,7 +100,7 @@ import {
 } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { Button, ButtonGroup, ButtonLink, IconButton } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const props = defineProps<{
