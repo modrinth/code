@@ -1871,12 +1871,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "No se ha podido eliminar el contenido"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "No se ha podido desactivar el contenido"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "No se ha podido habilitar el contenido"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "No se ha podido actualizar el contenido"
   },
@@ -1891,9 +1885,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "No se ha podido eliminar el contenido"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "No se ha podido alternar {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "No se ha podido desvincular el modpack"

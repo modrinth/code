@@ -1718,12 +1718,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "コンテンツの削除に失敗しました"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "コンテンツの無効化に失敗しました"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "コンテンツの有効化に失敗しました"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "コンテンツの更新に失敗しました"
   },
@@ -1738,9 +1732,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "コンテンツの削除に失敗しました"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "{name}の切り替えに失敗しました"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Modパックのリンク解除に失敗しました"

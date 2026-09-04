@@ -1328,12 +1328,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Gagal memadamkan kandungan"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Gagal menyahdayakan kandungan"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Gagal mendayakan kandungan"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Gagal mengemas kini kandungan"
   },
@@ -1348,9 +1342,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Gagal mengalih keluar kandungan"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Gagal menogol {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Gagal menyahpaut pek mod"
@@ -4959,4 +4950,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

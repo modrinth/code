@@ -491,7 +491,7 @@ export const commonMessages = defineMessages({
 	clientRetainedWarning: {
 		id: 'label.client-retained-warning',
 		defaultMessage:
-			'This is a client-side mod that was installed as a dependency and may cause issues when starting your server',
+			'This client-side mod was also installed on the server because another mod depends on it',
 	},
 	clientDependsWarning: {
 		id: 'label.client-depends-warning',

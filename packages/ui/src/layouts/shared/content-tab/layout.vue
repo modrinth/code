@@ -180,9 +180,18 @@ function getItemId(item: ContentItem) {
 }
 
 type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
+const defaultSortMode: SortMode = 'alphabetical-asc'
 const sortMode = ctx.filterPersistKey
-	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, 'alphabetical-asc')
-	: ref<SortMode>('alphabetical-asc')
+	? useSessionStorage<SortMode>(`content-sort:${ctx.filterPersistKey}`, defaultSortMode)
+	: ref<SortMode>(defaultSortMode)
+
+const validSortModes: readonly string[] = [
+	'alphabetical-asc',
+	'alphabetical-desc',
+	'date-added-newest',
+	'date-added-oldest',
+]
+if (!validSortModes.includes(sortMode.value)) sortMode.value = defaultSortMode
 
 const sortLabels: Record<SortMode, () => string> = {
 	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),
@@ -191,32 +200,36 @@ const sortLabels: Record<SortMode, () => string> = {
 	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
 }
 
-const sortOptions = computed<ButtonMenuOption[]>(() => [
-	{
-		id: 'alphabetical-asc',
-		label: formatMessage(messages.sortAlphabeticalAscending),
-		icon: ArrowDownAZIcon,
-		action: () => (sortMode.value = 'alphabetical-asc'),
-	},
-	{
-		id: 'alphabetical-desc',
-		label: formatMessage(messages.sortAlphabeticalDescending),
-		icon: ArrowUpZAIcon,
-		action: () => (sortMode.value = 'alphabetical-desc'),
-	},
-	{
-		id: 'date-added-newest',
-		label: formatMessage(messages.sortDateAddedNewest),
-		icon: ClockArrowDownIcon,
-		action: () => (sortMode.value = 'date-added-newest'),
-	},
-	{
-		id: 'date-added-oldest',
-		label: formatMessage(messages.sortDateAddedOldest),
-		icon: ClockArrowUpIcon,
-		action: () => (sortMode.value = 'date-added-oldest'),
-	},
-])
+const sortOptions = computed<ButtonMenuOption[]>(() => {
+	const options: ButtonMenuOption[] = [
+		{
+			id: 'alphabetical-asc',
+			label: formatMessage(messages.sortAlphabeticalAscending),
+			icon: ArrowDownAZIcon,
+			action: () => (sortMode.value = 'alphabetical-asc'),
+		},
+		{
+			id: 'alphabetical-desc',
+			label: formatMessage(messages.sortAlphabeticalDescending),
+			icon: ArrowUpZAIcon,
+			action: () => (sortMode.value = 'alphabetical-desc'),
+		},
+		{
+			id: 'date-added-newest',
+			label: formatMessage(messages.sortDateAddedNewest),
+			icon: ClockArrowDownIcon,
+			action: () => (sortMode.value = 'date-added-newest'),
+		},
+		{
+			id: 'date-added-oldest',
+			label: formatMessage(messages.sortDateAddedOldest),
+			icon: ClockArrowUpIcon,
+			action: () => (sortMode.value = 'date-added-oldest'),
+		},
+	]
+
+	return options
+})
 
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
@@ -424,14 +437,22 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 		const base = ctx.mapToTableItem(item)
 		const id = getItemId(item)
 		const locked = base.locked ?? item.locked ?? false
-		const clientWarning = getClientWarningType(item, ctx.showEnvironmentWarnings)
+		const clientWarning = base.enabledFor
+			? null
+			: getClientWarningType(item, ctx.showEnvironmentWarnings)
 		return {
 			...base,
 			id,
 			locked,
 			disabled:
 				isChanging(id) || ctx.isBusy.value || isBulkOperating.value || item.installing === true,
-			disabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
+			disabledTooltip: ctx.isBusy.value
+				? (ctx.busyMessage?.value ?? null)
+				: isChanging(id)
+					? formatMessage(messages.pleaseWait)
+					: item.installing
+						? formatMessage(commonMessages.installingLabel)
+						: null,
 			toggleDisabled: ctx.isBusy.value || base.toggleDisabled,
 			toggleDisabledTooltip: ctx.isBusy.value
 				? (ctx.busyMessage?.value ?? null)
@@ -505,7 +526,10 @@ function canDeleteItem(item: ContentItem) {
 }
 
 function canToggleItem(item: ContentItem) {
-	return ctx.canToggleItem?.(item) ?? true
+	return (
+		ctx.canToggleItem?.(item) ??
+		!!(ctx.toggleEnabled || ctx.bulkEnableItems || ctx.bulkDisableItems)
+	)
 }
 
 const deletableSelectedItems = computed(() => selectedItems.value.filter(canDeleteItem))
@@ -617,6 +641,7 @@ async function disableItemsWithoutWarning(items: ContentItem[]) {
 		await ctx.bulkDisableItems(items)
 		return
 	}
+	if (!ctx.toggleEnabled) return
 
 	for (const item of items) {
 		const id = getItemId(item)
@@ -730,7 +755,7 @@ async function confirmDisable() {
 			if (ctx.bulkDisableItems) {
 				await ctx.bulkDisableItems(itemsToDisable)
 			} else {
-				await ctx.toggleEnabled(item)
+				await ctx.toggleEnabled?.(item)
 			}
 		} finally {
 			unmarkChanging(id)
@@ -744,7 +769,7 @@ async function confirmDisable() {
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
-	if (ctx.isBusy.value) return
+	if (ctx.isBusy.value || !ctx.toggleEnabled) return
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (!item) return
 	if (!canToggleItem(item)) return
@@ -782,7 +807,8 @@ async function bulkEnable() {
 		}
 		return
 	}
-	await runBulk('enable', items, (item) => ctx.toggleEnabled(item), { onComplete: clearSelection })
+	if (!ctx.toggleEnabled) return
+	await runBulk('enable', items, (item) => ctx.toggleEnabled!(item), { onComplete: clearSelection })
 }
 
 async function bulkDisable() {
@@ -803,6 +829,14 @@ function handleSwitchVersionById(id: string) {
 	if (item && !item.locked) {
 		ctx.switchVersion?.(item)
 	}
+}
+
+async function handleSetEnabledForById(id: string, side: 'server' | 'player', enabled: boolean) {
+	if (ctx.isBusy.value || !ctx.setEnabledFor) return
+	const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
+	if (!item) return
+
+	await ctx.setEnabledFor(item, side, enabled)
 }
 
 // Bulk updating
@@ -1220,7 +1254,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							class="mt-2"
 							:items="tableItems"
 							:show-selection="true"
+							:show-enabled-for-column="!!ctx.setEnabledFor"
 							@update:enabled="handleToggleEnabledById"
+							@update:enabled-for="handleSetEnabledForById"
 							@delete="handleDeleteById"
 							@update="handleUpdateById"
 							@switch-version="handleSwitchVersionById"
