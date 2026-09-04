@@ -5555,9 +5555,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Available in North America, Europe, and Southeast Asia."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Pick a customized plan with just the specs you need."
   },
@@ -5566,6 +5563,9 @@
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Get started"
+  },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Powered by AMD Ryzen 7950X, 9950X, or equivalent, with DDR5 memory."
   },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Large"

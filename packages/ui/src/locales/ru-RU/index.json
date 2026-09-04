@@ -5303,9 +5303,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "{interval, select, monthly {за месяц} quarterly {за 3 месяца} yearly {за год} other {billed {interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Доступно в Северной Америке, Европе и Юго‑Восточной Азии."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Соберите свой план с нужными характеристиками."
   },

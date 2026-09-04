@@ -5147,9 +5147,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Kuzey Amerika, Avrupa ve Güneydoğu Asya'da mevcut."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Sana gereken şeyler için özel bir plan oluştur."
   },
