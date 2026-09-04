@@ -816,9 +816,7 @@ fn has_repeated_ngram_density(words: &[String]) -> bool {
         .values()
         .map(|count| count.saturating_sub(1))
         .sum::<usize>();
-    if duplicate_ngrams * 100
-        < total_ngrams * MIN_DUPLICATE_NGRAM_PERCENT
-    {
+    if duplicate_ngrams * 100 < total_ngrams * MIN_DUPLICATE_NGRAM_PERCENT {
         return false;
     }
 
