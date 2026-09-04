@@ -1346,12 +1346,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Không thể xóa nội dung"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Không thể tắt nội dung"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Không thể bật nội dung"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Không thể cập nhật nội dung"
   },
@@ -1366,9 +1360,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Không thể xóa nội dung"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Lỗi khi chuyển đổi {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Hủy liên kết modpack thất bại"
