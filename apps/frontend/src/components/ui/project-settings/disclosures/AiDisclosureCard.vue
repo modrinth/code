@@ -77,6 +77,7 @@ function setUse(use: AiUsage, enabled: boolean) {
 		:icon="SparklesIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_ec72dfca13"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<p>

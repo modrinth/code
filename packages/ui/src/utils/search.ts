@@ -281,7 +281,7 @@ export function formatDisclosureTypeLabel(
 			return formatMessage(
 				defineMessage({
 					id: 'search.filter_type.advanced.disclosure.system_interactions',
-					defaultMessage: 'Invasive system interactions',
+					defaultMessage: 'External system interactions',
 				}),
 			)
 		case 'telemetry':

@@ -3480,7 +3480,7 @@
     "defaultMessage": "Photosensitivity warning"
   },
   "project.disclosure.system-interactions.title": {
-    "defaultMessage": "Contains invasive system interactions"
+    "defaultMessage": "Contains external system interactions"
   },
   "project.disclosure.telemetry.title": {
     "defaultMessage": "Contains {consent, select, opt_in {opt-in telemetry} opt_out {opt-out telemetry} always_active {always-active telemetry} other {telemetry}}"
@@ -4212,7 +4212,7 @@
     "defaultMessage": "Paid features"
   },
   "search.filter_type.advanced.disclosure.system_interactions": {
-    "defaultMessage": "Invasive system interactions"
+    "defaultMessage": "External system interactions"
   },
   "search.filter_type.advanced.disclosure.telemetry": {
     "defaultMessage": "Telemetry"

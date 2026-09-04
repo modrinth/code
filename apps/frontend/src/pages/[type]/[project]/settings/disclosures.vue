@@ -116,7 +116,7 @@ const issueMessages = defineMessages({
 	},
 	'system-interactions-note': {
 		id: 'project.settings.disclosures.save-blocked.system-interactions-note',
-		defaultMessage: 'Invasive system interactions disclosure must include a description.',
+		defaultMessage: 'External system interactions disclosure must include a description.',
 	},
 }) satisfies Record<DisclosureFormIssue, MessageDescriptor>
 

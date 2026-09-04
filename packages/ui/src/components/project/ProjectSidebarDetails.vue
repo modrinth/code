@@ -343,7 +343,7 @@ const messages = defineMessages({
 	},
 	systemInteractionsTitle: {
 		id: 'project.disclosure.system-interactions.title',
-		defaultMessage: 'Contains invasive system interactions',
+		defaultMessage: 'Contains external system interactions',
 	},
 })
 

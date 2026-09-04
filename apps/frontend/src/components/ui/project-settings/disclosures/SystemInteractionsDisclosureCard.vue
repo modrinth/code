@@ -22,7 +22,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	title: {
 		id: 'project.settings.disclosures.system-interactions.title',
-		defaultMessage: 'Invasive system interactions',
+		defaultMessage: 'External system interactions',
 	},
 	description: {
 		id: 'project.settings.disclosures.system-interactions.description',
@@ -31,7 +31,7 @@ const messages = defineMessages({
 	},
 	noteLabel: {
 		id: 'project.settings.disclosures.system-interactions.note-label',
-		defaultMessage: 'Describe the invasive system interactions',
+		defaultMessage: 'Describe the external system interactions',
 	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.system-interactions.note-placeholder',
@@ -47,6 +47,7 @@ const messages = defineMessages({
 		:icon="MonitorCogIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_ec72dfca13"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>

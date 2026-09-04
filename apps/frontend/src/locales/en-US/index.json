@@ -3911,6 +3911,9 @@
   "project.settings.disclosures.description.2": {
     "message": "Unsure how to apply content disclosure to your project? Check out our <faq-link>Content Disclosures FAQ</faq-link>."
   },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Click to learn more about when to use this disclosure."
+  },
   "project.settings.disclosures.last-updated": {
     "message": "Last updated on {date} by {user}"
   },
@@ -3966,7 +3969,7 @@
     "message": "Photosensitivity warning disclosure must include a description."
   },
   "project.settings.disclosures.save-blocked.system-interactions-note": {
-    "message": "Invasive system interactions disclosure must include a description."
+    "message": "External system interactions disclosure must include a description."
   },
   "project.settings.disclosures.save-blocked.telemetry-empty": {
     "message": "Telemetry disclosure must list at least one type of data collected."
@@ -3975,13 +3978,13 @@
     "message": "You must enable this if your project reads or edits things on the user's system outside of the game."
   },
   "project.settings.disclosures.system-interactions.note-label": {
-    "message": "Describe the invasive system interactions"
+    "message": "Describe the external system interactions"
   },
   "project.settings.disclosures.system-interactions.note-placeholder": {
     "message": "e.g. It adds a file to the desktop called wake_up.txt"
   },
   "project.settings.disclosures.system-interactions.title": {
-    "message": "Invasive system interactions"
+    "message": "External system interactions"
   },
   "project.settings.disclosures.telemetry.consent-description": {
     "message": "What is the consent model of your telemetry?"
