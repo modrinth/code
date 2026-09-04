@@ -19,15 +19,11 @@ use chrono::Utc;
 
 fn validation_issue(
     sync_enabled: bool,
-    value_state: GameOptionValueState,
     value: Option<&CanonicalValue>,
     compatibility: &GameOptionCompatibility,
 ) -> Option<GameOptionValidationIssue> {
     if !sync_enabled {
         return None;
-    }
-    if value_state == GameOptionValueState::UniformLocal {
-        return Some(GameOptionValidationIssue::LocalValueNeedsSaving);
     }
     if value.is_none() {
         return Some(GameOptionValidationIssue::MissingValue);
@@ -93,7 +89,6 @@ pub(super) async fn load_settings_editor(
             preference.map(|value| value.enabled).unwrap_or(false);
         let validation_error = validation_issue(
             sync_enabled,
-            value_state,
             canonical_value.as_ref(),
             &compatibility,
         );
@@ -143,7 +138,6 @@ pub(super) async fn load_settings_editor(
         let sync_enabled = preference.is_some_and(|value| value.enabled);
         let validation_error = validation_issue(
             sync_enabled,
-            value_state,
             canonical_value.as_ref(),
             &compatibility,
         );

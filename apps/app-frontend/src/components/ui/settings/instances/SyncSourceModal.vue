@@ -15,6 +15,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { getInstanceIconUrl } from '@/helpers/instance'
 
 const props = defineProps<{
+	title: string
 	description: string
 	sources: {
 		id: string
@@ -39,10 +40,6 @@ const search = ref('')
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	title: {
-		id: 'app.settings.synced-options.choose-sync-source.title',
-		defaultMessage: 'Choose a sync source',
-	},
 	search: {
 		id: 'app.settings.synced-options.choose-sync-source.search-placeholder',
 		defaultMessage: 'Search instance',
@@ -92,7 +89,7 @@ defineExpose({ show, hide })
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.title)"
+		:header="title"
 		no-padding
 		actions-divider
 		max-width="560px"
@@ -130,12 +127,7 @@ defineExpose({ show, hide })
 			>
 				{{ formatMessage(messages.empty) }}
 			</div>
-			<div
-				v-else
-				role="radiogroup"
-				:aria-label="formatMessage(messages.title)"
-				class="flex flex-col gap-1"
-			>
+			<div v-else role="radiogroup" :aria-label="title" class="flex flex-col gap-1">
 				<CheckCircleButton
 					v-for="source in filteredSources"
 					:key="source.id"

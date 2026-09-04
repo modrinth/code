@@ -104,29 +104,59 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.creative-hotbars.description',
 		defaultMessage: 'Use the same saved creative hotbars across your instances.',
 	},
+	gameSettingsSyncSourceTitle: {
+		id: 'app.settings.synced-options.choose-sync-source.game-settings-title',
+		defaultMessage: 'Choose game settings source',
+	},
 	multiplayerServersSyncSourceDescription: {
 		id: 'app.settings.synced-options.choose-sync-source.multiplayer-servers-description',
-		defaultMessage: 'Pick the instance whose multiplayer servers become the shared copy.',
+		defaultMessage:
+			'Choose which instance to copy your multiplayer servers from. These servers are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	multiplayerServersSyncSourceTitle: {
+		id: 'app.settings.synced-options.choose-sync-source.multiplayer-servers-title',
+		defaultMessage: 'Choose multiplayer servers source',
 	},
 	commandHistorySyncSourceDescription: {
 		id: 'app.settings.synced-options.choose-sync-source.command-history-description',
-		defaultMessage: 'Pick the instance whose command history becomes the shared copy.',
+		defaultMessage:
+			'Choose which instance to copy your command history from. This history is only used for the initial sync, and you can edit it from any instance afterward.',
+	},
+	commandHistorySyncSourceTitle: {
+		id: 'app.settings.synced-options.choose-sync-source.command-history-title',
+		defaultMessage: 'Choose command history source',
 	},
 	creativeHotbarsSyncSourceDescription: {
 		id: 'app.settings.synced-options.choose-sync-source.creative-hotbars-description',
-		defaultMessage: 'Pick the instance whose saved creative hotbars become the shared copy.',
+		defaultMessage:
+			'Choose which instance to copy your saved creative hotbars from. These hotbars are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	creativeHotbarsSyncSourceTitle: {
+		id: 'app.settings.synced-options.choose-sync-source.creative-hotbars-title',
+		defaultMessage: 'Choose creative hotbars source',
 	},
 	gameSettingsSyncSourceDescription: {
 		id: 'app.settings.synced-options.choose-sync-source.game-settings-description',
-		defaultMessage: 'Choose which instance to copy game settings from.',
+		defaultMessage:
+			'Choose which instance to copy your game settings from. These settings are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	resourcePacksSyncSourceTitle: {
+		id: 'app.settings.synced-options.choose-sync-source.resource-packs-title',
+		defaultMessage: 'Choose resource packs source',
 	},
 	resourcePacksSyncSourceDescription: {
 		id: 'app.sync-instances-update.choose-source.resource-packs',
-		defaultMessage: 'Choose which instance to copy resource packs from.',
+		defaultMessage:
+			'Choose which instance to copy your resource packs from. These packs are only used for the initial sync, and you can edit them from any instance afterward.',
+	},
+	dataPacksSyncSourceTitle: {
+		id: 'app.settings.synced-options.choose-sync-source.data-packs-title',
+		defaultMessage: 'Choose data packs source',
 	},
 	dataPacksSyncSourceDescription: {
 		id: 'app.sync-instances-update.choose-source.data-packs',
-		defaultMessage: 'Choose which instance to copy data packs from.',
+		defaultMessage:
+			'Choose which instance to copy your data packs from. These packs are only used for the initial sync, and you can edit them from any instance afterward.',
 	},
 	noServersSyncedYet: {
 		id: 'app.settings.synced-options.multiplayer-servers.none-synced-yet',
@@ -250,6 +280,25 @@ const baseSourcesError = computed(() =>
 		: instancesQuery.isError.value,
 )
 let baseSourceGeneration = 0
+
+const baseInstanceTitle = computed(() => {
+	switch (baseOption.value) {
+		case 'game_options':
+			return formatMessage(messages.gameSettingsSyncSourceTitle)
+		case 'multiplayer_servers':
+			return formatMessage(messages.multiplayerServersSyncSourceTitle)
+		case 'command_history':
+			return formatMessage(messages.commandHistorySyncSourceTitle)
+		case 'creative_hotbars':
+			return formatMessage(messages.creativeHotbarsSyncSourceTitle)
+		case 'resource_packs':
+			return formatMessage(messages.resourcePacksSyncSourceTitle)
+		case 'data_packs':
+			return formatMessage(messages.dataPacksSyncSourceTitle)
+		default:
+			return ''
+	}
+})
 
 const baseInstanceDescription = computed(() => {
 	switch (baseOption.value) {
@@ -505,6 +554,7 @@ onScopeDispose(clearBaseSource)
 		<SyncSourceModal
 			ref="baseModal"
 			v-model="baseInstanceId"
+			:title="baseInstanceTitle"
 			:description="baseInstanceDescription"
 			:sources="baseInstances"
 			:loading="baseSourcesLoading"
