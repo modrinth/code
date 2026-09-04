@@ -235,29 +235,26 @@ fn find_all_nag_project_ids(
         .unwrap_or(1);
     let chunk_size = dataset.projects.len().div_ceil(worker_count).max(1);
     let worker_results = std::thread::scope(|scope| {
-        let workers = dataset
-            .projects
-            .chunks(chunk_size)
-            .map(|projects| {
-                scope.spawn(move || {
-                    let mut project_ids =
-                        BTreeMap::<ProjectNagKind, Vec<String>>::new();
-                    for project in projects {
-                        let kinds = validate(project, &[])
-                            .into_iter()
-                            .map(|nag| nag.kind)
-                            .collect::<BTreeSet<_>>();
-                        for kind in kinds {
-                            project_ids
-                                .entry(kind)
-                                .or_default()
-                                .push(project.id.to_string());
-                        }
+        let mut workers = Vec::new();
+        for projects in dataset.projects.chunks(chunk_size) {
+            workers.push(scope.spawn(move || {
+                let mut project_ids =
+                    BTreeMap::<ProjectNagKind, Vec<String>>::new();
+                for project in projects {
+                    let kinds = validate(project, &[])
+                        .into_iter()
+                        .map(|nag| nag.kind)
+                        .collect::<BTreeSet<_>>();
+                    for kind in kinds {
+                        project_ids
+                            .entry(kind)
+                            .or_default()
+                            .push(project.id.to_string());
                     }
-                    project_ids
-                })
-            })
-            .collect::<Vec<_>>();
+                }
+                project_ids
+            }));
+        }
         workers
             .into_iter()
             .map(|worker| {
@@ -294,19 +291,16 @@ fn find_language_project_ids(
         .unwrap_or(1);
     let chunk_size = dataset.projects.len().div_ceil(worker_count).max(1);
     let ids = std::thread::scope(|scope| -> Result<Vec<String>> {
-        let workers = dataset
-            .projects
-            .chunks(chunk_size)
-            .map(|projects| {
-                scope.spawn(move || {
-                    projects
-                        .iter()
-                        .filter(|project| is_non_english(project))
-                        .map(|project| project.id.to_string())
-                        .collect::<Vec<_>>()
-                })
-            })
-            .collect::<Vec<_>>();
+        let mut workers = Vec::new();
+        for projects in dataset.projects.chunks(chunk_size) {
+            workers.push(scope.spawn(move || {
+                projects
+                    .iter()
+                    .filter(|project| is_non_english(project))
+                    .map(|project| project.id.to_string())
+                    .collect::<Vec<_>>()
+            }));
+        }
         workers
             .into_iter()
             .map(|worker| {
