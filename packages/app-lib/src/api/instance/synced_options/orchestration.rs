@@ -340,18 +340,12 @@ pub async fn set_global_option(
     }
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
-    let was_enabled = get_global_options_with_state(&state).await?.get(option);
 
     let initializing_game_options_from_base = enabled
         && option == SyncedOption::GameOptions
         && base_instance_id.is_some();
     if enabled
         && option != SyncedOption::Screenshots
-        && (!was_enabled
-            || !matches!(
-                option,
-                SyncedOption::ResourcePacks | SyncedOption::DataPacks
-            ))
         && let Some(base_instance_id) = base_instance_id
     {
         if option == SyncedOption::GameOptions {

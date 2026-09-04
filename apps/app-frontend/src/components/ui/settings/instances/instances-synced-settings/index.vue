@@ -120,6 +120,14 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.choose-sync-source.game-settings-description',
 		defaultMessage: 'Choose which instance to copy game settings from.',
 	},
+	resourcePacksSyncSourceDescription: {
+		id: 'app.sync-instances-update.choose-source.resource-packs',
+		defaultMessage: 'Choose which instance to copy resource packs from.',
+	},
+	dataPacksSyncSourceDescription: {
+		id: 'app.sync-instances-update.choose-source.data-packs',
+		defaultMessage: 'Choose which instance to copy data packs from.',
+	},
 	noServersSyncedYet: {
 		id: 'app.settings.synced-options.multiplayer-servers.none-synced-yet',
 		defaultMessage: "You haven't synced any servers yet",
@@ -253,6 +261,10 @@ const baseInstanceDescription = computed(() => {
 			return formatMessage(messages.commandHistorySyncSourceDescription)
 		case 'creative_hotbars':
 			return formatMessage(messages.creativeHotbarsSyncSourceDescription)
+		case 'resource_packs':
+			return formatMessage(messages.resourcePacksSyncSourceDescription)
+		case 'data_packs':
+			return formatMessage(messages.dataPacksSyncSourceDescription)
 		default:
 			return ''
 	}
@@ -427,12 +439,7 @@ async function chooseBaseInstance(option: SyncedOption) {
 
 function toggleGlobalOption(option: SyncedOption, enabled: boolean) {
 	if (!isSyncedOptionAvailable(option) || !canToggleGlobalOptions.value) return
-	if (
-		enabled &&
-		option !== 'screenshots' &&
-		option !== 'resource_packs' &&
-		option !== 'data_packs'
-	) {
+	if (enabled && option !== 'screenshots') {
 		void chooseBaseInstance(option)
 		return
 	}
