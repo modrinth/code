@@ -1454,8 +1454,8 @@ const patchProjectMutation = useMutation({
 
 // Mutation for changing project status (setProcessing)
 const patchStatusMutation = useMutation({
-	mutationFn: async ({ projectId, status }) => {
-		await client.labrinth.projects_v2.edit(projectId, { status })
+	mutationFn: async (variables) => {
+		await client.labrinth.projects_v2.edit(variables.projectId, { status: variables.status })
 	},
 
 	onMutate: async ({ projectId, status }) => {
@@ -1469,6 +1469,12 @@ const patchStatusMutation = useMutation({
 		})
 
 		return { previousProject, projectId }
+	},
+
+	onSuccess: async (_data, { threadId }) => {
+		if (threadId) {
+			await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
+		}
 	},
 
 	onError: (err, _variables, context) => {
@@ -2161,7 +2167,11 @@ async function setProcessing() {
 
 	startLoading()
 	patchStatusMutation.mutate(
-		{ projectId: project.value.id, status: 'processing' },
+		{
+			projectId: project.value.id,
+			status: 'processing',
+			threadId: project.value.thread_id,
+		},
 		{ onSettled: () => stopLoading() },
 	)
 }
