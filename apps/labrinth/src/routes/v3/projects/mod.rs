@@ -499,8 +499,13 @@ pub async fn project_edit_internal(
     let submit_for_review = new_project.status
         == Some(ProjectStatus::Processing)
         && !user.role.is_mod();
+    let leave_review = matches!(
+        new_project.status,
+        Some(ProjectStatus::Draft | ProjectStatus::Rejected)
+    );
     let validate_for_review = submit_for_review
-        || project_item.inner.status == ProjectStatus::Processing;
+        || (project_item.inner.status == ProjectStatus::Processing
+            && !leave_review);
     if submit_for_review {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::Auth(eyre!(

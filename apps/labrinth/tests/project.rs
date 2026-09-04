@@ -591,6 +591,56 @@ async fn test_edit_invalid_project_in_review_rolls_back() {
 }
 
 #[actix_rt::test]
+async fn test_leaving_review_skips_validation() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+            let original_project = api
+                .get_project_deserialized(project_slug, USER_USER_PAT)
+                .await;
+
+            for (status, expected_status) in [
+                ("draft", ProjectStatus::Draft),
+                ("rejected", ProjectStatus::Rejected),
+            ] {
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({
+                            "description": original_project.description.clone(),
+                            "status": "processing",
+                        }),
+                        ADMIN_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({
+                            "description": "",
+                            "status": status,
+                        }),
+                        ADMIN_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let project = api
+                    .get_project_deserialized(project_slug, USER_USER_PAT)
+                    .await;
+                assert_eq!(project.status, expected_status);
+                assert!(project.description.is_empty());
+            }
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
 async fn test_add_invalid_gallery_item_in_review_rolls_back() {
     with_test_environment(
         None,
