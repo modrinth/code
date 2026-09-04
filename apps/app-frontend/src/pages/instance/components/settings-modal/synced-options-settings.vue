@@ -14,6 +14,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, ref } from 'vue'
 
 import GameSettingsModal from '@/components/ui/settings/instances/game-settings-modal/index.vue'
+import CommandHistoryModal from '@/components/ui/settings/instances/instances-synced-settings/command-history-modal.vue'
+import SyncedServersModal from '@/components/ui/settings/instances/instances-synced-settings/servers-modal.vue'
 import SyncedPacksModal from '@/components/ui/settings/instances/SyncedPacksModal.vue'
 import {
 	get_synced_option_join_preview,
@@ -27,6 +29,7 @@ import {
 	gameOptionsSyncSourcesQueryOptions,
 	initializedSyncedOptionsQueryOptions,
 	syncedOptionsKeys,
+	syncedServersQueryOptions,
 } from '@/helpers/synced-options'
 import type { GameInstance } from '@/helpers/types'
 import { appSettingsModalOpenSyncedOptionsKey } from '@/providers/app-settings-modal'
@@ -44,6 +47,8 @@ const queryClient = useQueryClient()
 const openAppSettingsSyncedOptions = inject(appSettingsModalOpenSyncedOptionsKey, () => {})
 
 const syncedPacksModal = ref<InstanceType<typeof SyncedPacksModal>>()
+const commandHistoryModal = ref<InstanceType<typeof CommandHistoryModal>>()
+const syncedServersModal = ref<InstanceType<typeof SyncedServersModal>>()
 
 const messages = defineMessages({
 	resourcePacks: {
@@ -78,6 +83,18 @@ const messages = defineMessages({
 		id: 'instance.settings.synced-options.packs-override',
 		defaultMessage:
 			'Turn off this override to edit synced packs. Independent packs can be managed in the content tab.',
+	},
+	syncedDataOverride: {
+		id: 'instance.settings.synced-options.data-override',
+		defaultMessage: 'Turn off this override to edit synced data.',
+	},
+	noSyncedDataToEdit: {
+		id: 'app.settings.synced-options.edit.no-synced-data',
+		defaultMessage: 'Choose a sync source before editing this setting.',
+	},
+	noServersSyncedYet: {
+		id: 'app.settings.synced-options.multiplayer-servers.none-synced-yet',
+		defaultMessage: "You haven't synced any servers yet",
 	},
 	sharedSettingsDescription: {
 		id: 'instance.settings.tabs.synced-options.shared-settings.description',
@@ -223,6 +240,7 @@ const overviewQuery = useQuery(
 	})),
 )
 const initializedOptionsQuery = useQuery(initializedSyncedOptionsQueryOptions())
+const syncedServersQuery = useQuery(syncedServersQueryOptions())
 const instancesQuery = useQuery(instanceListQueryOptions())
 const gameOptionSourcesQuery = useQuery(gameOptionsSyncSourcesQueryOptions())
 
@@ -305,6 +323,20 @@ function disabledReason(option: InstanceSyncedOption): string | undefined {
 		return formatMessage(messages[globalDisabledMessages[option]])
 	}
 	return capabilities.value.get(option)?.disabled_reason ?? undefined
+}
+
+function syncedDataDisabledReason(
+	option: 'multiplayer_servers' | 'command_history',
+): string | undefined {
+	const reason = disabledReason(option)
+	if (reason) return reason
+	if (!enabled(option)) return formatMessage(messages.syncedDataOverride)
+	if (option === 'multiplayer_servers' && !syncedServersQuery.data.value?.length) {
+		return formatMessage(messages.noServersSyncedYet)
+	}
+	if (!initializedOptionsQuery.data.value?.[option]) {
+		return formatMessage(messages.noSyncedDataToEdit)
+	}
 }
 
 function showAppSyncedOptions(): void {
@@ -457,6 +489,8 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 <template>
 	<div class="flex flex-col gap-6">
 		<SyncedPacksModal ref="syncedPacksModal" />
+		<CommandHistoryModal ref="commandHistoryModal" />
+		<SyncedServersModal ref="syncedServersModal" />
 		<GameSettingsModal
 			ref="gameSettingsModal"
 			:instance-id="gameSettingsInstanceId"
@@ -553,6 +587,33 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 							@click="openGameSettings"
 						>
 							<EditIcon />
+						</IconButton>
+					</span>
+					<span
+						v-if="row.option === 'multiplayer_servers' || row.option === 'command_history'"
+						v-tooltip="
+							syncedDataDisabledReason(row.option) ?? formatMessage(commonMessages.editButton)
+						"
+						class="flex"
+					>
+						<IconButton
+							type="outlined"
+							circular
+							:label="formatMessage(commonMessages.editButton)"
+							:disabled="
+								mutation.isPending.value ||
+								overviewQuery.isPending.value ||
+								initializedOptionsQuery.isPending.value ||
+								(row.option === 'multiplayer_servers' && syncedServersQuery.isPending.value) ||
+								!!syncedDataDisabledReason(row.option)
+							"
+							@click="
+								row.option === 'multiplayer_servers'
+									? syncedServersModal?.show()
+									: commandHistoryModal?.show()
+							"
+						>
+							<EditIcon aria-hidden="true" />
 						</IconButton>
 					</span>
 					<span
