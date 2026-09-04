@@ -3764,6 +3764,9 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revoke invite"
   },
+  "instance.settings.synced-options.data-override": {
+    "message": "Turn off this override to edit synced data."
+  },
   "instance.settings.synced-options.data-packs": {
     "message": "Unsync data packs"
   },

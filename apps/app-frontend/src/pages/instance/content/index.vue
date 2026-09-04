@@ -428,8 +428,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 				attachment?.server_manager_icon_url ??
 				linkedProject?.icon_url ??
 				undefined)
-			: (sharedManager?.avatarUrl ??
-				(instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : undefined))
+			: (sharedManager?.avatarUrl ?? getInstanceIconUrl(instance.value.icon_path) ?? undefined)
 		const managerLink = serverManaged
 			? linkedProject
 				? {
