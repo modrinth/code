@@ -29,6 +29,12 @@ pub(super) async fn sync_is_active_for_instance(
     state: &State,
 ) -> crate::Result<bool> {
     Ok(metadata.synced_options.game_options
+        && !synced_options::pending::contains(
+            &metadata.instance.id,
+            SyncedOption::GameOptions,
+            state,
+        )
+        .await?
         && game_options_sync_is_enabled(&state.pool).await?)
 }
 

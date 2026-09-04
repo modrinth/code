@@ -282,7 +282,7 @@ const baseInstances = computed(() =>
 				id: instance.id,
 				name: instance.name,
 				icon_path: instance.icon_path,
-				eligible: instance.install_stage === 'installed' && !instance.quarantined,
+				eligible: !instance.quarantined,
 			})),
 )
 

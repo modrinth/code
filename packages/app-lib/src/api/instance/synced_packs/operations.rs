@@ -1,7 +1,8 @@
 use super::super::DesyncServerMode;
 use super::super::synced_options::{
     get_global_options, instance_dir, instance_is_running,
-    instance_option_enabled, sync_files_are_protected,
+    instance_option_enabled, option_can_apply_while_running,
+    sync_files_are_protected,
 };
 use super::reconciliation::{apply_all, participating, synced_instance_ids};
 use super::storage::{cache_bytes, read_library, write_library};
@@ -32,8 +33,11 @@ async fn source(
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
     super::super::projects::ensure_metadata_content_unlocked(&metadata)?;
+    let option = ProjectType::get_from_parent_folder(project_path)
+        .and_then(|project_type| pack_option(project_type).ok());
     if sync_files_are_protected(&metadata)
-        || instance_is_running(&metadata, state).await?
+        || (!option.is_some_and(option_can_apply_while_running)
+            && instance_is_running(&metadata, state).await?)
     {
         return Err(crate::ErrorKind::InputError(
             "Close the instance before syncing its packs.".to_string(),

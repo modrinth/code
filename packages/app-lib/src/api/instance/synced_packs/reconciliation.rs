@@ -64,6 +64,15 @@ pub(super) async fn capture(
     library: &mut PackLibrary,
     state: &State,
 ) -> crate::Result<bool> {
+    if super::super::synced_options::pending::contains(
+        &metadata.instance.id,
+        SyncedOption::ResourcePacks,
+        state,
+    )
+    .await?
+    {
+        return Ok(false);
+    }
     let Some(placements) =
         library.instances.get(&metadata.instance.id).cloned()
     else {
@@ -417,6 +426,11 @@ async fn apply_pack(
             state,
         )
         .await?;
+        if !plan.dependencies.is_empty()
+            && instance_is_running(metadata, state).await?
+        {
+            return Ok(());
+        }
         for dependency in &plan.dependencies {
             commands::add_project_from_version(
                 instance_id,
@@ -480,13 +494,27 @@ pub(super) async fn apply_instance(
     library: &mut PackLibrary,
     state: &State,
 ) -> crate::Result<()> {
+    if super::super::synced_options::pending::contains(
+        &metadata.instance.id,
+        SyncedOption::ResourcePacks,
+        state,
+    )
+    .await?
+    {
+        return Ok(());
+    }
     if sync_files_are_protected(metadata)
-        || instance_is_running(metadata, state).await?
         || super::super::projects::ensure_metadata_content_unlocked(metadata)
             .is_err()
     {
         return Ok(());
     }
+    let running = instance_is_running(metadata, state).await?;
+    let running_items = if running {
+        commands::list_content(&metadata.instance.id, None, None, state).await?
+    } else {
+        Vec::new()
+    };
     let global = get_global_options().await?;
     let previous_placements = library
         .instances
@@ -496,6 +524,32 @@ pub(super) async fn apply_instance(
     let packs = library.packs.clone();
     for (id, pack) in &packs {
         if !participating(metadata, pack, global) {
+            continue;
+        }
+        if running
+            && (pack.item.project_type != ProjectType::ResourcePack
+                || previous_placements.get(id).is_some_and(|placement| {
+                    !placement.path.is_empty()
+                        && instance_dir(metadata, state)
+                            .join(&placement.path)
+                            .exists()
+                })
+                || running_items.iter().any(|item| {
+                    item.project_type == pack.item.project_type
+                        && (item.id == pack.sha1
+                            || same_path(
+                                &item.file_path,
+                                &pack_path(pack, &pack.item.file_name),
+                            )
+                            || pack.item.project.as_ref().is_some_and(
+                                |project| {
+                                    item.project.as_ref().is_some_and(
+                                        |candidate| candidate.id == project.id,
+                                    )
+                                },
+                            ))
+                }))
+        {
             continue;
         }
         if let Err(error) = apply_pack(metadata, id, pack, library, state).await
@@ -519,7 +573,7 @@ pub(super) async fn apply_instance(
         .cloned()
         .unwrap_or_default();
     for (id, placement) in placements {
-        if packs.contains_key(&id) {
+        if running || packs.contains_key(&id) {
             continue;
         }
         let included = ProjectType::get_from_parent_folder(&placement.path)

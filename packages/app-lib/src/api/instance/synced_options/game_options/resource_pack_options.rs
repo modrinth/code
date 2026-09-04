@@ -1,5 +1,6 @@
 //! Reads and merges Minecraft's active resource-pack list.
 
+use super::super::{instance_is_running, sync_files_are_protected};
 use super::options_file::{input_error, options_path, read_document};
 use crate::state::{InstanceMetadata, State};
 use crate::util::io;
@@ -73,6 +74,9 @@ pub(in crate::api::instance) async fn merge_resource_pack_entries(
     selected: &[String],
     state: &State,
 ) -> crate::Result<ResourcePackOptionsUpdate> {
+    if sync_files_are_protected(metadata) {
+        return Ok(ResourcePackOptionsUpdate::Deferred);
+    }
     let path = options_path(metadata, state);
     if !path.exists() {
         return Ok(ResourcePackOptionsUpdate::Deferred);
@@ -93,6 +97,9 @@ pub(in crate::api::instance) async fn merge_resource_pack_entries(
     };
     if options.entries == original {
         return Ok(ResourcePackOptionsUpdate::Applied(options));
+    }
+    if instance_is_running(metadata, state).await? {
+        return Ok(ResourcePackOptionsUpdate::Deferred);
     }
     let raw = serde_json::to_string(&options.entries)?;
     document.set("resourcePacks", &raw, false)?;

@@ -1097,15 +1097,15 @@ pub async fn launch_minecraft(
     )
     .await?;
 
-	let _instance_content_lock =
-		state.lock_instance_content(&instance.id).await;
-	if crate::state::instance_has_running_process(&instance.id, &state).await? {
-		return Err(crate::ErrorKind::LauncherError(format!(
-			"Instance {} is already running",
-			instance.id
-		))
-		.as_error());
-	}
+    let _instance_content_lock =
+        state.lock_instance_content(&instance.id).await;
+    if crate::state::instance_has_running_process(&instance.id, &state).await? {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Instance {} is already running",
+            instance.id
+        ))
+        .as_error());
+    }
 
     crate::state::instances::commands::set_instance_last_played(
         &instance.id,
