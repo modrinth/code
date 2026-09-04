@@ -105,6 +105,57 @@ export class ArchonContentV1Module extends AbstractModule {
 		})
 	}
 
+	/** POST /v1/:server_id/worlds/:world_id/addons/set-enabled-server */
+	public async setAddonEnabledServer(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.SetAddonEnabledRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/addons/set-enabled-server`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/** POST /v1/:server_id/worlds/:world_id/addons/set-enabled-player */
+	public async setAddonEnabledPlayer(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.SetAddonEnabledRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/addons/set-enabled-player`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/** POST /v1/:server_id/worlds/:world_id/addons/set-locked-side-toggle */
+	public async setAddonSideToggleLocked(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.SetAddonSideToggleLockedRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/addons/set-locked-side-toggle`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
 	/** POST /v1/:server_id/worlds/:world_id/addons/delete-many */
 	public async deleteAddons(
 		serverId: string,

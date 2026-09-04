@@ -542,12 +542,6 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolusyon"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Bigong mapatay ang tumutunggaling kontento"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Bigong mabukas ang kontento"
-  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Bigong ma-unlink ang modpack"
   },
@@ -2736,4 +2730,3 @@
     "defaultMessage": "Uri"
   }
 }
-

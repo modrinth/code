@@ -29,11 +29,16 @@ import { truncatedTooltip } from '#ui/utils/truncate'
 
 import type {
 	ClientWarningType,
+	ContentCardEmbeddedIcon,
 	ContentCardProject,
 	ContentCardVersion,
+	ContentEnabledForState,
 	ContentOwner,
+	ContentSide,
 	ContentSource,
 } from '../types'
+import ContentCardItemIcon from './ContentCardItemIcon.vue'
+import ContentEnabledFor from './ContentEnabledFor.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -90,6 +95,8 @@ interface Props {
 	hideDelete?: boolean
 	hideActions?: boolean
 	inline?: boolean
+	enabledFor?: ContentEnabledForState
+	embeddedIcon?: ContentCardEmbeddedIcon
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -120,12 +127,15 @@ const props = withDefaults(defineProps<Props>(), {
 	hideDelete: false,
 	hideActions: false,
 	inline: false,
+	enabledFor: undefined,
+	embeddedIcon: undefined,
 })
 
 const selected = defineModel<boolean>('selected')
 
 const emit = defineEmits<{
 	'update:enabled': [value: boolean]
+	'update:enabled-for': [side: ContentSide, value: boolean]
 	select: [value: boolean, event?: MouseEvent]
 	delete: [event: MouseEvent]
 	update: []
@@ -147,6 +157,11 @@ const isToggleDisabled = computed(() => isDisabled.value || props.toggleDisabled
 const syncStatusLabel = computed(() =>
 	formatMessage(props.syncUpdatePending ? messages.syncUpdatePending : messages.synced),
 )
+const toggleTooltip = computed(() => {
+	if (!isToggleDisabled.value) return undefined
+	return props.toggleDisabledTooltip ?? props.disabledTooltip ?? undefined
+})
+const isEnabledForDisabled = computed(() => !props.enabledFor?.server && !props.enabledFor?.player)
 
 const clientWarningMessage = computed(() => {
 	switch (props.clientWarning) {
@@ -171,12 +186,15 @@ const installTooltip = computed(() => {
 <template>
 	<div
 		role="row"
-		class="flex items-center justify-between"
+		class="flex items-center"
 		:class="{
-			'h-[74px] gap-4 px-3': !inline,
+			'h-[74px] gap-4 px-3': !inline && !enabledFor,
+			'h-[72px] gap-2 px-3': !inline && enabledFor,
 			'gap-3': inline,
+			'justify-between': !enabledFor,
 			'opacity-50 grayscale': disabled && !installing,
-			'opacity-50': installing,
+			'opacity-50':
+				installing || (enabledFor && (isEnabledForDisabled || enabled === false) && !disabled),
 		}"
 	>
 		<div
@@ -184,7 +202,9 @@ const installTooltip = computed(() => {
 			:class="
 				hideActions || !showVersion
 					? 'flex-1'
-					: 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
+					: enabledFor
+						? 'flex-1 @[800px]:w-[340px] @[800px]:shrink-0 @[800px]:flex-none'
+						: 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 			"
 		>
 			<Checkbox
@@ -198,15 +218,14 @@ const installTooltip = computed(() => {
 
 			<div
 				class="flex min-w-0 items-center gap-3 transition-[filter,opacity] duration-200"
-				:class="enabled === false && !disabled ? 'grayscale opacity-50' : ''"
+				:class="!enabledFor && enabled === false && !disabled ? 'grayscale opacity-50' : ''"
 			>
 				<div v-tooltip="installTooltip" class="relative flex shrink-0 items-center">
-					<Avatar
+					<ContentCardItemIcon
 						:src="project.icon_url"
 						:alt="project.title"
-						size="3rem"
-						no-shadow
-						class="rounded-2xl border border-surface-5"
+						:tint-by="project.id"
+						:embedded-icon="embeddedIcon"
 					/>
 					<div
 						v-if="installing"
@@ -326,12 +345,21 @@ const installTooltip = computed(() => {
 			</div>
 		</div>
 
+		<div v-if="enabledFor" class="hidden w-[200px] shrink-0 @[800px]:block">
+			<ContentEnabledFor
+				:model-value="enabledFor"
+				:disabled="isDisabled"
+				:disabled-tooltip="isDisabled ? disabledTooltip : undefined"
+				@update:model-value="(side, value) => emit('update:enabled-for', side, value)"
+			/>
+		</div>
+
 		<div
 			v-if="showVersion"
 			class="hidden flex-col gap-0.5 transition-[filter,opacity] duration-200 @[800px]:flex"
 			:class="[
-				hideActions ? 'flex-1' : 'flex-1 min-w-0',
-				enabled === false && !disabled ? 'grayscale opacity-50' : '',
+				hideActions ? 'flex-1' : enabledFor ? 'min-w-0 flex-1' : 'flex-1 min-w-0',
+				!enabledFor && enabled === false && !disabled ? 'grayscale opacity-50' : '',
 			]"
 		>
 			<template v-if="version">
@@ -367,7 +395,8 @@ const installTooltip = computed(() => {
 
 		<div
 			v-if="!hideActions"
-			class="flex min-w-[160px] shrink-0 items-center justify-end gap-2 transition-colors duration-200"
+			class="flex shrink-0 items-center justify-end gap-2 transition-colors duration-200"
+			:class="enabledFor ? 'w-[168px]' : 'min-w-[160px]'"
 		>
 			<slot name="additionalButtonsLeft" />
 			<span
@@ -441,11 +470,7 @@ const installTooltip = computed(() => {
 
 			<Toggle
 				v-if="enabled !== undefined && !hideToggle"
-				v-tooltip="
-					isToggleDisabled && (toggleDisabledTooltip || disabledTooltip)
-						? (toggleDisabledTooltip ?? disabledTooltip)
-						: undefined
-				"
+				v-tooltip="toggleTooltip"
 				:model-value="enabled"
 				:disabled="isToggleDisabled"
 				:aria-label="project.title"
