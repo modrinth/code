@@ -29,7 +29,7 @@
 					type="text"
 					autocomplete="off"
 					:spellcheck="false"
-					input-class="!h-10"
+					size="medium"
 					wrapper-class="flex-1 min-w-0"
 					clearable
 					:placeholder="
@@ -48,24 +48,21 @@
 				</div>
 			</div>
 			<div class="flex flex-wrap items-center justify-between gap-2">
-				<div class="flex flex-wrap items-center gap-1.5">
-					<FilterIcon class="size-5 text-secondary" />
-					<button
-						:class="filterPillClass(selectedFilters.length === 0)"
-						@click="selectedFilters = []"
-					>
+				<FilterPills
+					:model-value="selectedFilters"
+					:options="filterOptions"
+					@update:model-value="updateFilters"
+				>
+					<template #all>
 						{{ formatMessage(commonMessages.allProjectType) }}
-					</button>
-					<button
-						v-for="option in filterOptions"
-						:key="option.id"
-						:class="filterPillClass(selectedFilters.includes(option.id))"
-						@click="toggleFilter(option.id)"
-					>
-						{{ option.label }}
-					</button>
-				</div>
-				<Button type="quiet" :disabled="refreshingAll" size="sm" @click="refreshAllWorlds">
+					</template>
+				</FilterPills>
+				<Button
+					type="quiet"
+					:disabled="refreshingAll"
+					class="!text-sm !font-medium"
+					@click="refreshAllWorlds"
+				>
 					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
 					{{
 						formatMessage(refreshingAll ? messages.refreshingButton : commonMessages.refreshButton)
@@ -130,12 +127,13 @@
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
-import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import { CompassIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	commonMessages,
 	defineMessages,
 	EmptyState,
+	FilterPills,
 	GAME_MODES,
 	type GameVersion,
 	injectNotificationManager,
@@ -263,26 +261,13 @@ function play() {
 const selectedFilters = ref<string[]>([])
 const searchFilter = ref('')
 
-function filterPillClass(isActive: boolean) {
-	return [
-		'cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]',
-		isActive
-			? 'border-brand bg-brand-highlight text-brand'
-			: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5',
-	]
-}
-
-function toggleFilter(id: string) {
-	const idx = selectedFilters.value.indexOf(id)
-	if (idx >= 0) {
-		selectedFilters.value.splice(idx, 1)
-	} else {
-		selectedFilters.value.push(id)
-		if (id === 'singleplayer') {
-			selectedFilters.value = selectedFilters.value.filter((f) => f !== 'online' && f !== 'offline')
-		} else if (id === 'online' || id === 'offline') {
-			selectedFilters.value = selectedFilters.value.filter((f) => f !== 'singleplayer')
-		}
+function updateFilters(filters: string[]) {
+	const addedFilter = filters.find((id) => !selectedFilters.value.includes(id))
+	selectedFilters.value = filters
+	if (addedFilter === 'singleplayer') {
+		selectedFilters.value = filters.filter((id) => id !== 'online' && id !== 'offline')
+	} else if (addedFilter === 'online' || addedFilter === 'offline') {
+		selectedFilters.value = filters.filter((id) => id !== 'singleplayer')
 	}
 }
 
