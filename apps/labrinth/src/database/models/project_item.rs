@@ -576,10 +576,42 @@ impl DBProject {
     where
         E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
     {
-        let val = redis.get_cached_keys_with_slug(
+        Self::get_many_inner(project_strings, exec, redis, true).await
+    }
+
+    pub async fn get_many_uncached<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
+        project_strings: &[T],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<ProjectQueryResult>, ApiError>
+    where
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
+    {
+        Self::get_many_inner(project_strings, exec, redis, false).await
+    }
+
+    async fn get_many_inner<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
+        project_strings: &[T],
+        exec: E,
+        redis: &RedisPool,
+        use_cache: bool,
+    ) -> Result<Vec<ProjectQueryResult>, ApiError>
+    where
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
+    {
+        let val = redis.get_keys_with_slug_cache(
             PROJECTS_NAMESPACE,
             PROJECTS_SLUGS_NAMESPACE,
             false,
+            use_cache,
             project_strings,
             |ids| async move {
                 let mut exec = exec
