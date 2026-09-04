@@ -908,9 +908,7 @@ pub(super) fn extract_description_text(markdown: &str) -> String {
     let without_html = HTML_TAG.replace_all(&with_html_image_alt, " ");
     without_html
         .lines()
-        .map(|line| {
-            line.trim_start_matches(|character| matches!(character, '>' | '#'))
-        })
+        .map(|line| line.trim_start_matches(['>', '#']))
         .collect::<Vec<_>>()
         .join("\n")
         .replace(['*', '_', '~', '`', '>', '-', '|'], " ")
