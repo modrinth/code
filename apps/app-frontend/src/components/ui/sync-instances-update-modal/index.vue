@@ -9,14 +9,12 @@ import {
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-import { useLocalStorage } from '@vueuse/core'
 import { computed, nextTick, useTemplateRef } from 'vue'
 
 import SyncSourceModal from '@/components/ui/settings/instances/SyncSourceModal.vue'
 
 import { type SyncUpdateOption, syncUpdateOptions, useSyncInstancesUpdate } from './use-sync'
 
-const hasSeenUpdate = useLocalStorage('sync-instances-update-modal-shown', false)
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const sourceModal = useTemplateRef<InstanceType<typeof SyncSourceModal>>('sourceModal')
 const { formatMessage } = useVIntl()
@@ -189,23 +187,8 @@ function show() {
 	modal.value?.show()
 }
 
-function showOnce() {
-	if (!hasSeenUpdate.value) {
-		show()
-	}
-}
-
 function hide() {
 	modal.value?.hide()
-}
-
-function skip() {
-	hasSeenUpdate.value = true
-}
-
-function handleHide() {
-	finishDraft()
-	skip()
 }
 
 function beforeHide() {
@@ -279,7 +262,7 @@ async function confirmSource() {
 	sourceModal.value?.hide()
 }
 
-defineExpose({ show, showOnce, hide, skip })
+defineExpose({ show, hide })
 </script>
 
 <template>
@@ -292,7 +275,7 @@ defineExpose({ show, showOnce, hide, skip })
 		:aria-label="formatMessage(messages.title)"
 		:disable-close="busy"
 		:before-hide="beforeHide"
-		:on-after-hide="handleHide"
+		:on-after-hide="finishDraft"
 		class="!overflow-y-auto !rounded-[20px]"
 	>
 		<div class="relative grid w-[768px] max-w-full grid-cols-2 max-[700px]:grid-cols-1">

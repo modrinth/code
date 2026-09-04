@@ -70,6 +70,7 @@ pub enum FeatureFlag {
     WorldsInHome,
     ServerRamAsBytesAlwaysOn,
     AlwaysShowAppControls,
+	ShowSyncInstancesUpdateModal,
     SkipUnknownPackWarning,
     PrideFundraiser,
     ServersInApp,
