@@ -1,4 +1,5 @@
-//! Compares prepared content sets and composes caller-specific changes.
+//! Finds added, removed, and updated content, with room for extra changes
+//! such as linking a modpack.
 
 use std::collections::BTreeSet;
 
@@ -12,10 +13,13 @@ pub use model::{
     ExternalFileKey,
 };
 
-/// Computes changes from `before` to `after`, ordered by project and file identity.
+/// Lists what would change when replacing `before` with `after`.
 ///
-/// Callers select the publishing or installation scope before comparison.
-/// External files are compared by identity, using the supplied policy for common files.
+/// Projects are matched by project ID and updated when their version ID changes.
+/// Files are matched by content type and path. For matching files, `options`
+/// decides whether to show an update; file contents are not checked.
+///
+/// Results are sorted by project ID, followed by files sorted by type and path.
 pub fn diff_content_sets(
     before: &ContentSetSnapshot,
     after: &ContentSetSnapshot,

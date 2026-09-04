@@ -1,4 +1,4 @@
-//! Resolves requested content and its required dependencies through a metadata provider.
+//! Chooses which version of a project to install and finds the dependencies it needs.
 
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
@@ -12,7 +12,6 @@ pub use model::{
 };
 pub use provider::ContentMetadataProvider;
 
-// Skip Fabric API if you're installing a fabric project onto a quilt instance.
 const QUILT_FABRIC_API_EXCEPTION_PROJECT_ID: &str = "P7dR8mSH";
 
 pub async fn resolve_content<P: ContentMetadataProvider>(

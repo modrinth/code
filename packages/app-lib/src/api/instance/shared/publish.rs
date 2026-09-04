@@ -226,7 +226,8 @@ pub(super) async fn modpack_dependency_version_ids(
         .collect())
 }
 
-/// Adds inherited pack versions without replacing explicitly selected projects.
+/// Adds the modpack's dependencies to the list. If a project is already in the
+/// list, keep that version instead of the one bundled with the modpack.
 async fn extend_shared_modpack_dependencies(
     version_ids: &mut Vec<String>,
     modpack_id: &str,

@@ -1,4 +1,4 @@
-//! Content identifiers and errors shared by content-management features.
+//! Common content types and errors used when installing or comparing content.
 
 use serde::{Deserialize, Serialize};
 
@@ -68,7 +68,7 @@ impl std::str::FromStr for ContentType {
 }
 
 impl ContentType {
-    /// Returns the canonical content type used by shared-instance manifests.
+    /// Returns the API name, such as `mod` or `resourcepack`.
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Mod => "mod",

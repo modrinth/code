@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::diff::Change;
 
-/// Shared configuration independent of any application's loader or link model.
+/// The linked modpack, Minecraft version, and loader settings to compare.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ContentSetConfiguration {
     pub modpack_version_id: Option<String>,
@@ -24,8 +24,11 @@ pub enum ConfigurationDiff {
     Loader(Change<LoaderReference>),
 }
 
-/// Compares modpack, Minecraft and loader configuration in that order.
-/// Empty optional version IDs are equivalent to absent IDs.
+/// Lists changes to the linked modpack, Minecraft version, and mod loader.
+///
+/// Some sources use an empty string where others use `None` for an unset
+/// modpack ID or loader version. Treat them the same so this difference alone
+/// does not show an update.
 pub fn diff_configuration(
     before: &ContentSetConfiguration,
     after: &ContentSetConfiguration,

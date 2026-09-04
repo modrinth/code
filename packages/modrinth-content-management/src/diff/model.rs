@@ -5,16 +5,20 @@ use serde::{Deserialize, Serialize};
 
 use crate::shared::{ContentType, Error};
 
-/// A caller-prepared set of content in the scope being compared.
+/// The projects and files to compare.
+///
+/// Include only content relevant to the operation. For example, when receiving
+/// a shared-instance update, leave out mods the player added themselves.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ContentSetSnapshot {
-    /// Modrinth project IDs mapped to version IDs.
+    /// Each project has one version. Keys are project IDs; values are version IDs.
     pub projects: BTreeMap<String, String>,
     pub external_files: BTreeSet<ExternalFileKey>,
 }
 
 impl ContentSetSnapshot {
-    /// Adds a project, rejecting conflicting versions without replacing it.
+    /// Adds a project's version. Adding the same version again does nothing.
+    /// Adding a different version for that project returns an error and keeps the original.
     pub fn insert_project(
         &mut self,
         project_id: String,
@@ -35,7 +39,9 @@ impl ContentSetSnapshot {
     }
 }
 
-/// Identifies a file by its content type and path within that type's directory.
+/// A file's type and path, so a mod and a plugin with the same filename are
+/// treated as separate files. For example, `mods/example.jar` uses type `Mod`
+/// and path `example.jar`.
 #[derive(
     Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
 )]
@@ -61,7 +67,7 @@ pub enum Change<T> {
 }
 
 impl<T> Change<T> {
-    /// Transforms the values while preserving the classification of the change.
+    /// Converts the before/after values, for example from version IDs to display names.
     pub fn map<U>(self, mut map: impl FnMut(T) -> U) -> Change<U> {
         match self {
             Self::Added { after } => Change::Added { after: map(after) },
@@ -75,7 +81,6 @@ impl<T> Change<T> {
         }
     }
 
-    /// Returns the classification of this change.
     pub fn kind(&self) -> ContentSetDiffKind {
         match self {
             Self::Added { .. } => ContentSetDiffKind::Added,
@@ -84,7 +89,7 @@ impl<T> Change<T> {
         }
     }
 
-    /// Returns the value before the change, if it existed.
+    /// Returns `None` for an added item because it had no previous value.
     pub fn before(&self) -> Option<&T> {
         match self {
             Self::Removed { before } | Self::Updated { before, .. } => {
@@ -94,7 +99,7 @@ impl<T> Change<T> {
         }
     }
 
-    /// Returns the value after the change, if it exists.
+    /// Returns `None` for a removed item because it no longer has a value.
     pub fn after(&self) -> Option<&T> {
         match self {
             Self::Added { after } | Self::Updated { after, .. } => Some(after),
@@ -104,7 +109,8 @@ impl<T> Change<T> {
 }
 
 impl<T: Clone + PartialEq> Change<T> {
-    /// Compares optional values, returning no entry when they are equal.
+    /// Compares the old and new values. `None` means the item is absent.
+    /// Returns no change if the values are equal or both absent.
     pub fn between(before: Option<&T>, after: Option<&T>) -> Option<Self> {
         match (before, after) {
             (None, Some(after)) => Some(Self::Added {
@@ -137,7 +143,8 @@ pub enum ContentSetDiffEntry {
     },
 }
 
-/// Policy for files present on both sides when their bytes are not compared.
+/// Decides whether to show an update when a file has the same type and path
+/// in both sets. The comparison does not read the files or compare their contents.
 #[derive(
     Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize,
 )]
@@ -153,7 +160,8 @@ pub struct ContentSetDiffOptions {
     pub common_external_files: CommonExternalFilePolicy,
 }
 
-/// Content changes and typed entries contributed by the caller.
+/// Changes to projects and files, plus any extra changes the app or server adds,
+/// such as a linked modpack or selected config files.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ContentSetDiff<E = Infallible> {
     pub content: Vec<ContentSetDiffEntry>,
@@ -161,14 +169,15 @@ pub struct ContentSetDiff<E = Infallible> {
 }
 
 impl<E> ContentSetDiff<E> {
-    /// Includes both content changes and caller-provided changes.
+    /// Returns true for extra changes too, even when no projects or files changed.
     pub fn has_changes(&self) -> bool {
         !self.content.is_empty() || !self.additional.is_empty()
     }
 }
 
 impl ContentSetDiff {
-    /// Attaches typed changes without coupling the comparator to the caller.
+    /// Adds other changes to the result, such as a modpack change or selected config files.
+    /// These count towards `has_changes()` too.
     pub fn with_additional<E>(
         self,
         entries: impl IntoIterator<Item = E>,
