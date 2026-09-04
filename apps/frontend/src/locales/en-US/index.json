@@ -3842,6 +3842,12 @@
   "project.notification.icon-updated.title": {
     "message": "Project icon updated"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "You cannot save edits to your project which result in failing validation."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Failed to save project in review"
+  },
   "project.notification.updated.message": {
     "message": "Your project has been updated."
   },
