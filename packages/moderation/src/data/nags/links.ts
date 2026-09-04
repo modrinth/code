@@ -23,7 +23,8 @@ const messages = defineMessages({
 	gplTitle: { id: 'nags.gpl-license-source-required.title', defaultMessage: 'Provide source code' },
 	gpl: {
 		id: 'nags.gpl-license-source-required.description',
-		defaultMessage: `Your {type}'s license requires source code to be published. Please provide a source code link, add sources files, or change license.`,
+		defaultMessage:
+			'Your {type} uses a license which requires source code to be available. Please provide a source code link, or add a source code additional file to each version, or consider using a different license.',
 	},
 	identicalTitle: { id: 'nags.identical-links.title', defaultMessage: 'Remove identical links' },
 	identical: {

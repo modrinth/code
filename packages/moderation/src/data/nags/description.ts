@@ -8,10 +8,10 @@ const messages = defineMessages({
 		id: 'nags.add-description.description',
 		defaultMessage: `A description that clearly describes your project's content, purpose, and appeal is required.`,
 	},
-	adjacentTitle: { id: 'nags.adjacent-headers.title', defaultMessage: 'Remove adjacent headers' },
+	adjacentTitle: { id: 'nags.adjacent-headers.title', defaultMessage: 'Separate adjacent headers' },
 	adjacent: {
 		id: 'nags.adjacent-headers.description',
-		defaultMessage: 'Headers of the same level should not be placed next to each other.',
+		defaultMessage: 'Headers of the same level should be placed next to each other.',
 	},
 	endsTitle: {
 		id: 'nags.description-ends-with-header.title',
@@ -19,12 +19,14 @@ const messages = defineMessages({
 	},
 	ends: {
 		id: 'nags.description-ends-with-header.description',
-		defaultMessage: `Your project's description should not end with a header that is not followed by any text.`,
+		defaultMessage:
+			'Your project’s description should not end with a header that is not followed by any text.',
 	},
 	shortTitle: { id: 'nags.description-too-short.title', defaultMessage: 'Expand the description' },
 	short: {
 		id: 'nags.description-too-short.description',
-		defaultMessage: `Your project's description is too brief. Add more details to clearly describe the project's content, purpose, and appeal.`,
+		defaultMessage:
+			"Your project’s description is too brief. Add more details to clearly describe the project's content, purpose, and appeal.",
 	},
 	longTitle: { id: 'nags.long-headers.title', defaultMessage: 'Shorten headers' },
 	long: {
@@ -42,34 +44,46 @@ const messages = defineMessages({
 		id: 'nags.invalid-project-description.title',
 		defaultMessage: 'Modify the description',
 	},
+	translateTitle: {
+		id: 'nags.project-description-non-english.title',
+		defaultMessage: 'Translate your project’s description',
+	},
+	bannedLinkTitle: {
+		id: 'nags.project-description-banned-link.title',
+		defaultMessage: 'Remove link from description',
+	},
 	bannedLink: {
 		id: 'nags.project-description-banned-link.description',
 		defaultMessage: 'The link “{fullUrl}” is not allowed in project descriptions.',
 	},
 	nonEnglish: {
 		id: 'nags.project-description-non-english.description',
-		defaultMessage: `Your project's description must be written in English or include an English translation.`,
+		defaultMessage:
+			'Your project’s description must be written in English or include an English translation.',
 	},
 	nonStandard: {
 		id: 'nags.project-description-non-standard-text.description',
-		defaultMessage: `Excessive use of non-standard text characters, such as “Fancy text” or “Zalgo”, is not allowed in your project's description.`,
+		defaultMessage:
+			'Excessive use of non-standard text characters, such as “Fancy text” or “Zalgo”, is not allowed in your project’s description.',
 	},
 	profanity: {
 		id: 'nags.project-description-profanity.description',
-		defaultMessage: `Your project's description cannot contain excessive profanity. Detected: “{value}”.`,
+		defaultMessage:
+			'Your project’s description cannot contain excessive profanity. Detected: “{value}”.',
 	},
 	slur: {
 		id: 'nags.project-description-slur.description',
-		defaultMessage: `Your project's description must not contain offensive terms. Detected: “{value}”.`,
+		defaultMessage:
+			'Your project’s description must not contain offensive terms. Detected: “{value}”.',
 	},
 	spamTitle: {
 		id: 'nags.project-description-spam.title',
-		defaultMessage: 'Remove description spam',
+		defaultMessage: 'Remove spam from the description',
 	},
 	spam: {
 		id: 'nags.project-description-spam.description',
 		defaultMessage:
-			'Repeated characters, words, or phrases cannot be used to pad a project description.',
+			'Repeated characters, words, or phrases cannot be used to pad your project’s description.',
 	},
 })
 
@@ -105,12 +119,12 @@ export const descriptionNags = {
 		destination: 'description',
 	},
 	'project-description-banned-link': {
-		title: messages.fixTitle,
+		title: messages.bannedLinkTitle,
 		description: messages.bannedLink,
 		destination: 'description',
 	},
 	'project-description-non-english': {
-		title: messages.fixTitle,
+		title: messages.translateTitle,
 		description: messages.nonEnglish,
 		destination: 'description',
 	},

@@ -3,7 +3,7 @@ import { defineMessages } from '@modrinth/ui'
 import type { NagDefinitions } from './types.ts'
 
 const messages = defineMessages({
-	checkTitle: { id: 'nags.check-disclosures.title', defaultMessage: 'Review disclosures' },
+	checkTitle: { id: 'nags.check-disclosures.title', defaultMessage: 'Review content disclosures' },
 	check: {
 		id: 'nags.check-disclosures.description',
 		defaultMessage:
@@ -11,7 +11,7 @@ const messages = defineMessages({
 	},
 	formattingTitle: {
 		id: 'nags.disclosures-special-formatting.title',
-		defaultMessage: 'Fix disclosure formatting',
+		defaultMessage: 'Remove HTML from content disclosures',
 	},
 	formatting: {
 		id: 'nags.disclosures-special-formatting.description',

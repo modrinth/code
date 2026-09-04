@@ -11,7 +11,7 @@ const messages = defineMessages({
 	},
 	all: {
 		id: 'nags.all-tags-selected.description',
-		defaultMessage: `You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. Tags should be used to help users find relevant projects. Please only select relevant tags.`,
+		defaultMessage: `You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project.`,
 	},
 	resolutionTitle: {
 		id: 'nags.multiple-resolution-tags.title',
@@ -19,7 +19,7 @@ const messages = defineMessages({
 	},
 	resolution: {
 		id: 'nags.multiple-resolution-tags.description',
-		defaultMessage: `You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have the tag that matches the primary resolution.`,
+		defaultMessage: `You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution.`,
 	},
 	selectTitle: { id: 'nags.select-tags.title', defaultMessage: 'Select tags' },
 	select: {
@@ -29,11 +29,11 @@ const messages = defineMessages({
 	},
 	tooMany: {
 		id: 'nags.too-many-tags.description',
-		defaultMessage: `You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to ensure your project appears in relevant search results.`,
+		defaultMessage: `You've selected {tagCount, plural, one {# tag} other {# tags}}. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results.`,
 	},
 	tooManyServer: {
 		id: 'nags.too-many-tags-server.description',
-		defaultMessage: `You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to ensure your project appears in relevant search results.`,
+		defaultMessage: `You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to make sure your server appears in relevant search results.`,
 	},
 	editTags: { id: 'nags.edit-tags.title', defaultMessage: 'Edit tags' },
 })
