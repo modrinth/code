@@ -10,7 +10,6 @@ export const DEFAULT_FEATURE_FLAGS = {
 	show_sync_instances_update_modal: false,
 	pride_fundraiser: true,
 	i18n_debug: false,
-	ServerPlayFrontend: false,
 	localhost_sign_in: false,
 }
 
