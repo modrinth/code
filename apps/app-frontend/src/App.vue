@@ -385,6 +385,7 @@ const {
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
 	onboardingChecklist,
+	tags,
 } = setupProviders(
 	tauriApiClient,
 	notificationManager,
@@ -705,6 +706,7 @@ function handleAdsConsentRequired(required) {
 }
 
 async function setupApp() {
+	tags.initialize()
 	await onboardingChecklist.initialize()
 	const skipSyncUpdate = showChecklist.value
 
@@ -1457,8 +1459,10 @@ async function fetchIntercomToken() {
 }
 
 watch(
-	[showAd, adConsentAvailable],
-	async ([showAds, canManageConsent]) => {
+	[stateInitialized, showAd, adConsentAvailable],
+	async ([ready, showAds, canManageConsent]) => {
+		if (!ready) return
+
 		if (showAds) {
 			await init_ads_window(true)
 			return
