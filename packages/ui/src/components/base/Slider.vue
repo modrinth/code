@@ -9,7 +9,7 @@
 
 		<div
 			v-if="currentValue !== null"
-			class="relative h-10 min-w-0 flex-1"
+			class="relative mx-2 h-10 min-w-0 flex-1"
 			:class="disabled ? 'opacity-50' : ''"
 		>
 			<div
@@ -103,7 +103,7 @@ const props = withDefaults(defineProps<Props>(), {
 	unit: '',
 })
 
-const currentValue = ref(props.modelValue === null ? null : clampValue(props.modelValue))
+const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const valueInputWidth = computed(() =>
 	currentValue.value === null
@@ -117,11 +117,18 @@ const visibleSnapPoints = computed(() =>
 watch(
 	() => props.modelValue,
 	(newValue) => {
-		currentValue.value = newValue === null ? null : clampValue(newValue ?? props.min)
+		currentValue.value = newValue === null ? null : normalizeValue(newValue ?? props.min)
 	},
 )
 
-function clampValue(value: number) {
+function normalizeValue(value: number) {
+	if (!Number.isFinite(value)) return props.min
+
+	if (props.forceStep && props.step > 0) {
+		value = props.min + Math.round((value - props.min) / props.step) * props.step
+		value = Number(value.toFixed(8))
+	}
+
 	return Math.max(props.min, Math.min(value, props.max))
 }
 
@@ -139,13 +146,7 @@ function formatValue(value: number) {
 function inputValueValid(inputValue: number) {
 	if (!Number.isFinite(inputValue)) return
 
-	let newValue = inputValue
-	if (props.forceStep && props.step > 0) {
-		newValue = props.min + Math.round((newValue - props.min) / props.step) * props.step
-		newValue = Number(newValue.toFixed(8))
-	}
-
-	currentValue.value = clampValue(newValue)
+	currentValue.value = normalizeValue(inputValue)
 	emit('update:modelValue', currentValue.value)
 }
 
