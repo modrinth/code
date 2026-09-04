@@ -868,7 +868,7 @@ const messages = defineMessages({
 	faqCpuKindAnswer: {
 		id: 'hosting-marketing.faq.cpu-kind.answer',
 		defaultMessage:
-			'Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory.',
+			'Modrinth Hosting servers are powered by AMD Ryzen 7950X or 9950X equivalent, paired with DDR5 memory.',
 	},
 	faqBurstThreads: {
 		id: 'hosting-marketing.faq.burst-threads',

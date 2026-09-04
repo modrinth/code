@@ -2358,7 +2358,7 @@
     "message": "What kind of CPUs do Modrinth Hosting servers run on?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory."
+    "message": "Modrinth Hosting servers are powered by AMD Ryzen 7950X or 9950X equivalent, paired with DDR5 memory."
   },
   "hosting-marketing.faq.currency": {
     "message": "What currency are the prices in?"
