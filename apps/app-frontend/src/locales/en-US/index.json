@@ -827,8 +827,20 @@
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Remove server"
   },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "This server will also be removed from {count, plural, one {# other instance} other {# other instances}} because it’s synced."
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Remove everywhere"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Remove here"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "Remove it from the server lists of all synced instances, or only this instance. Removing it only here will turn on overrides for this instance."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "This server is synced"
+  },
+  "app.instance.worlds.remove-server-modal.synced-title": {
+    "message": "Remove server?"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Remove server"
@@ -3179,6 +3191,36 @@
   "app.sync-instances-update.title": {
     "message": "Sync your instances"
   },
+  "app.synced-content.change.disable-description": {
+    "message": "Disable it across all synced instances, or only in this instance. Disabling it only here will turn on overrides for this instance."
+  },
+  "app.synced-content.change.disable-everywhere": {
+    "message": "Disable everywhere"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "Disable this content across all synced instances."
+  },
+  "app.synced-content.change.disable-here": {
+    "message": "Disable here"
+  },
+  "app.synced-content.change.disable-title": {
+    "message": "Disable content?"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "Enable it across all synced instances, or only in this instance. Enabling it only here will turn on overrides for this instance."
+  },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "Enable everywhere"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "Enable this content across all synced instances."
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "Enable here"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "Enable content?"
+  },
   "app.synced-content.delete.description": {
     "message": "Deleting this content will delete it across all your instances"
   },
@@ -3196,12 +3238,6 @@
   },
   "app.synced-content.desync.title": {
     "message": "Desync content"
-  },
-  "app.synced-content.warning.disable": {
-    "message": "Disabling this content will also disable it in the other instances where it is synced. To change it only here, desync it first."
-  },
-  "app.synced-content.warning.enable": {
-    "message": "Enabling this content will also enable it in the other instances where it is synced. To change it only here, desync it first."
   },
   "app.synced-content.warning.modal-title": {
     "message": "Sync warning"
@@ -4023,7 +4059,7 @@
     "message": "Unsync game settings"
   },
   "instance.settings.tabs.synced-options.game-settings.description": {
-    "message": "Keep this instance's options.txt separate from the synced copy"
+    "message": "Keep this instance's options.txt separate from the synced copy."
   },
   "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
     "message": "Game settings syncing is turned off in app settings."

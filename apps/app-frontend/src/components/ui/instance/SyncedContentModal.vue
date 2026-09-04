@@ -28,7 +28,10 @@ const messages = defineMessages({
 	warningTitle: { id: 'app.synced-content.warning.modal-title', defaultMessage: 'Sync warning' },
 	title: { id: 'app.synced-content.warning.title', defaultMessage: 'This content is synced' },
 	enableTitle: { id: 'app.synced-content.change.enable-title', defaultMessage: 'Enable content?' },
-	disableTitle: { id: 'app.synced-content.change.disable-title', defaultMessage: 'Disable content?' },
+	disableTitle: {
+		id: 'app.synced-content.change.disable-title',
+		defaultMessage: 'Disable content?',
+	},
 	enable: {
 		id: 'app.synced-content.change.enable-description',
 		defaultMessage:
@@ -114,11 +117,7 @@ function show() {
 	})
 }
 
-async function confirmChange(
-	value: SyncedPackAction,
-	content: ContentItem[],
-	canOverride = false,
-) {
+async function confirmChange(value: SyncedPackAction, content: ContentItem[], canOverride = false) {
 	allowInstanceOverride.value = canOverride
 	mode.value = 'change'
 	action.value = value

@@ -124,9 +124,7 @@ export function useSyncedPackActions(
 			const options = new Set<'resource_packs' | 'data_packs'>(
 				items
 					.filter((item) => item.synced_pack)
-					.map((item) =>
-						item.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs',
-					),
+					.map((item) => (item.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs')),
 			)
 			try {
 				for (const option of options) {
