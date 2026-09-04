@@ -9,16 +9,21 @@ export function setupTagsProvider(notificationManager: AbstractWebNotificationMa
 
 	const gameVersions = ref([])
 	const loaders = ref([])
-	get_game_versions()
-		.then((v) => {
-			gameVersions.value = v
-		})
-		.catch(handleError)
-	get_loaders()
-		.then((v) => {
-			loaders.value = v
-		})
-		.catch(handleError)
+
+	function initialize() {
+		get_game_versions()
+			.then((v) => {
+				gameVersions.value = v
+			})
+			.catch(handleError)
+		get_loaders()
+			.then((v) => {
+				loaders.value = v
+			})
+			.catch(handleError)
+	}
 
 	provideTags({ gameVersions, loaders })
+
+	return { initialize }
 }
