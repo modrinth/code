@@ -1,7 +1,10 @@
-use super::content_set_diff::{
-    ContentSetDiffEntry, ContentSetDiffKind, ContentSetDiffOptions,
-    ContentSetSnapshot, ContentSetSnapshotVersion, diff_content_sets,
+use modrinth_content_management::{
+	Change, CommonExternalFilePolicy, ConfigurationDiff, ContentSetConfiguration,
+	ContentSetDiffEntry, ContentSetDiffKind, ContentSetDiffOptions,
+	ContentSetSnapshot, ExternalFileKey, LoaderReference, diff_configuration,
+	diff_content_sets,
 };
+use std::collections::BTreeSet;
 use crate::SharedInstanceUnavailableReason;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;

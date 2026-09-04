@@ -1,12 +1,16 @@
+//! Resolves requested content and its required dependencies through a metadata provider.
+
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 
-use crate::model::{
-    ContentType, Dependency, DependencyType, Error, ResolutionPreferences,
-    ResolveContentPlan, ResolveContentRequest, ResolvedContent, SkippedContent,
-    SkippedReason, Version,
+use crate::shared::{ContentType, Error};
+
+pub use model::{
+	Dependency, DependencyType, ResolutionPreferences, ResolveContentPlan,
+	ResolveContentRequest, ResolvedContent, SkippedContent, SkippedReason,
+	Version,
 };
-use crate::provider::ContentMetadataProvider;
+pub use provider::ContentMetadataProvider;
 
 // Skip Fabric API if you're installing a fabric project onto a quilt instance.
 const QUILT_FABRIC_API_EXCEPTION_PROJECT_ID: &str = "P7dR8mSH";
@@ -352,3 +356,6 @@ fn should_skip_quilt_fabric_api(
             .iter()
             .any(|loader| loaders_match(loader, "quilt"))
 }
+
+mod model;
+mod provider;
