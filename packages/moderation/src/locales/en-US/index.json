@@ -213,7 +213,7 @@
     "defaultMessage": "Your project's description must not contain offensive terms. Detected: “{value}”."
   },
   "nags.project-description-spam.description": {
-    "defaultMessage": "Repeated characters, words, or phrases cannot be used to pad a project description."
+    "defaultMessage": "Repeated characters, words, or phrases cannot be used to pad your project's description."
   },
   "nags.project-description-spam.title": {
     "defaultMessage": "Remove description spam"
@@ -255,7 +255,7 @@
     "defaultMessage": "Your project's summary must not contain offensive terms. Detected: “{value}”."
   },
   "nags.project-summary-spam.description": {
-    "defaultMessage": "Repeated characters, words, or phrases should not be used to pad your project's summary."
+    "defaultMessage": "Repeated characters, words, or phrases cannot be used to pad your project's summary."
   },
   "nags.project-summary-spam.title": {
     "defaultMessage": "Remove summary spam"
