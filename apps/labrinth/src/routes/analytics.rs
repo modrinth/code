@@ -1,4 +1,5 @@
 use crate::auth::get_user_from_headers;
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBProject;
 use crate::env::ENV;
@@ -74,7 +75,7 @@ pub async fn page_view_ingest(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -82,7 +83,7 @@ pub async fn page_view_ingest(
         Scopes::empty(),
     )
     .await
-    .ok();
+    .wrap_auth_err("authenticating API request")?;
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = Url::parse(&url_input.url)
@@ -290,7 +291,7 @@ pub async fn minecraft_server_play_ingest(
     redis: web::Data<RedisPool>,
     http: web::Data<HttpClient>,
 ) -> Result<(), ApiError> {
-    let user = get_user_from_headers(
+    let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -298,8 +299,8 @@ pub async fn minecraft_server_play_ingest(
         Scopes::empty(),
     )
     .await
-    .map(|(_, user)| user)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|(_, user)| user);
 
     let project_id = play_input.project_id;
 

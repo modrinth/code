@@ -1,5 +1,6 @@
 use super::ApiError;
 use crate::auth::checks::{filter_visible_versions, is_visible_version};
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::ReadOnlyPgPool;
@@ -72,7 +73,7 @@ pub async fn get_version_from_hash(
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -80,8 +81,8 @@ pub async fn get_version_from_hash(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let hash = info.into_inner().0.to_lowercase();
     let algorithm = hash_query.algorithm.clone().unwrap_or_else(|| {
         default_algorithm_from_hashes(std::slice::from_ref(&hash))
@@ -204,7 +205,7 @@ pub async fn get_update_from_hash(
     update_data: web::Json<UpdateData>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &***pool,
         &redis,
@@ -212,8 +213,8 @@ pub async fn get_update_from_hash(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let hash = info.into_inner().0.to_lowercase();
     if let Some(file) = database::models::DBVersion::get_file_from_hash(
         hash_query.algorithm.clone().unwrap_or_else(|| {
@@ -327,7 +328,7 @@ pub async fn get_versions_from_hashes(
     file_data: web::Json<FileHashes>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &***pool,
         &redis,
@@ -335,8 +336,8 @@ pub async fn get_versions_from_hashes(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let algorithm = file_data
         .algorithm
@@ -410,7 +411,7 @@ pub async fn get_projects_from_hashes(
     file_data: web::Json<FileHashes>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -418,8 +419,8 @@ pub async fn get_projects_from_hashes(
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let algorithm = file_data
         .algorithm
@@ -691,7 +692,7 @@ pub async fn update_individual_files(
     update_data: web::Json<ManyFileUpdateData>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -699,8 +700,8 @@ pub async fn update_individual_files(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let algorithm = update_data.algorithm.clone().unwrap_or_else(|| {
         default_algorithm_from_hashes(
@@ -1035,7 +1036,7 @@ pub async fn download_version(
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1043,8 +1044,8 @@ pub async fn download_version(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let hash = info.into_inner().0.to_lowercase();
     let algorithm = hash_query.algorithm.clone().unwrap_or_else(|| {

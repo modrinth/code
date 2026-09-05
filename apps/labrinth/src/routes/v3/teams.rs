@@ -1,5 +1,6 @@
 use crate::auth::checks::{is_visible_organization, is_visible_project};
 use crate::auth::get_user_from_headers;
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::database::DBProject;
 use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -66,7 +67,7 @@ pub async fn team_members_get_project_internal(
             .wrap_api_err("fetching project from database")?;
 
     if let Some(project) = project_data {
-        let current_user = get_user_from_headers(
+        let current_user = get_maybe_user_from_headers(
             &req,
             &**pool,
             &redis,
@@ -74,8 +75,8 @@ pub async fn team_members_get_project_internal(
             Scopes::PROJECT_READ,
         )
         .await
-        .map(|x| x.1)
-        .ok();
+        .wrap_auth_err("authenticating API request")?
+        .map(|x| x.1);
 
         if !is_visible_project(&project.inner, &current_user, &pool, false)
             .await
@@ -155,7 +156,7 @@ pub async fn team_members_get_organization(
             .await
             .wrap_internal_err("fetching organization from database")?;
 
-    let current_user = get_user_from_headers(
+    let current_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -163,8 +164,8 @@ pub async fn team_members_get_organization(
         Scopes::ORGANIZATION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if let Some(organization) = organization_data
         && is_visible_organization(&organization, &current_user, &pool, &redis)
@@ -255,7 +256,7 @@ pub async fn team_members_get(
     .await
     .wrap_internal_err("fetching users from database")?;
 
-    let current_user = get_user_from_headers(
+    let current_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -263,8 +264,8 @@ pub async fn team_members_get(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let logged_in = current_user
@@ -346,7 +347,7 @@ pub async fn teams_get(
     .await
     .wrap_internal_err("fetching users from database")?;
 
-    let current_user = get_user_from_headers(
+    let current_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -354,8 +355,8 @@ pub async fn teams_get(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let teams_groups = teams_data.into_iter().chunk_by(|data| data.team_id.0);
 

@@ -55,6 +55,8 @@ pub struct User {
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
     pub role: Role,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_locked: Option<bool>,
     pub badges: Badges,
     pub campaigns: UserCampaigns,
 
@@ -113,6 +115,7 @@ impl From<DBUser> for User {
             bio: data.bio,
             created: data.created,
             role: Role::from_string(&data.role),
+            account_locked: None,
             badges: data.badges,
             campaigns: UserCampaigns {
                 pride_26: data.campaign_pride_26,
@@ -177,6 +180,7 @@ impl User {
             bio: db_user.bio,
             created: db_user.created,
             role: Role::from_string(&db_user.role),
+            account_locked: Some(db_user.account_locked),
             badges: db_user.badges,
             campaigns: UserCampaigns {
                 pride_26: db_user.campaign_pride_26,
