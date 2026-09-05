@@ -917,9 +917,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Schválit s odpovědí"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Uzavřít vlákno"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Uzavřít s odpovědí"
   },

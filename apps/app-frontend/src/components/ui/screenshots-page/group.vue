@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDroppable } from '@dnd-kit/vue'
-import { defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import type { InstanceScreenshot } from '@/helpers/instance'
 
@@ -12,6 +12,9 @@ const props = defineProps<{
 	id: string
 	title: string
 	screenshots: InstanceScreenshot[]
+	renderedScreenshots?: InstanceScreenshot[]
+	virtualGridHeight?: number
+	virtualGridTop?: number
 	selectedKeys: ReadonlySet<string>
 	selectionActive: boolean
 	activeDraggedKeys: ReadonlySet<string>
@@ -24,7 +27,6 @@ const props = defineProps<{
 	highlightedScreenshotId?: string
 	copiedScreenshotIds: ReadonlySet<string>
 	forceOpen: boolean
-	animateEntry: boolean
 	hideHeader?: boolean
 	editableTitle?: boolean
 	startEditingTitle?: boolean
@@ -36,11 +38,116 @@ const props = defineProps<{
 const collapsed = defineModel<boolean>('collapsed', { required: true })
 const dropTarget = ref<HTMLElement>()
 const { formatMessage } = useVIntl()
+const debugLayout = useDebugLogger('Screenshots:Group')
 const messages = defineMessages({
 	emptyGroup: {
 		id: 'app.screenshots.group.empty',
 		defaultMessage: 'Drag and drop to add screenshots.',
 	},
+})
+
+const shouldShowGrid = computed(() =>
+	Boolean(props.hideHeader || props.forceOpen || !collapsed.value),
+)
+const visibleScreenshots = ref<InstanceScreenshot[]>(props.renderedScreenshots ?? props.screenshots)
+const renderGrid = ref(shouldShowGrid.value)
+const virtualGridStyle = computed(() =>
+	props.virtualGridHeight === undefined ? undefined : { height: `${props.virtualGridHeight}px` },
+)
+const visibleGridStyle = computed(() =>
+	props.virtualGridTop === undefined
+		? undefined
+		: { transform: `translateY(${props.virtualGridTop}px)` },
+)
+let unmountGridTimeout: ReturnType<typeof setTimeout> | undefined
+let resizeObserver: ResizeObserver | undefined
+
+async function logGeometry(reason: string) {
+	await nextTick()
+	const rect = dropTarget.value?.getBoundingClientRect()
+	debugLayout(reason, {
+		id: props.id,
+		title: props.title,
+		collapsed: collapsed.value,
+		shouldShowGrid: shouldShowGrid.value,
+		renderGrid: renderGrid.value,
+		screenshotCount: props.screenshots.length,
+		renderedCount: visibleScreenshots.value.length,
+		firstScreenshotId: visibleScreenshots.value.at(0)?.id,
+		lastScreenshotId: visibleScreenshots.value.at(-1)?.id,
+		virtualGridHeight: props.virtualGridHeight,
+		virtualGridTop: props.virtualGridTop,
+		actual: rect
+			? { top: rect.top, left: rect.left, width: rect.width, height: rect.height }
+			: undefined,
+	})
+}
+
+watch(
+	() => props.renderedScreenshots ?? props.screenshots,
+	(screenshots) => {
+		if (shouldShowGrid.value) visibleScreenshots.value = screenshots
+		void logGeometry('rendered screenshots changed')
+	},
+)
+
+watch(
+	() => [props.virtualGridHeight, props.virtualGridTop] as const,
+	() => void logGeometry('virtual grid geometry changed'),
+)
+
+watch(
+	shouldShowGrid,
+	(showGrid, previouslyShown) => {
+		if (unmountGridTimeout) clearTimeout(unmountGridTimeout)
+		if (showGrid) {
+			visibleScreenshots.value = props.renderedScreenshots ?? props.screenshots
+			renderGrid.value = true
+			void logGeometry('grid shown')
+			return
+		}
+		if (!previouslyShown) {
+			renderGrid.value = false
+			return
+		}
+		unmountGridTimeout = setTimeout(() => {
+			renderGrid.value = false
+			void logGeometry('grid unmounted after collapse')
+			unmountGridTimeout = undefined
+		}, 300)
+	},
+	{ flush: 'post' },
+)
+
+onMounted(() => {
+	debugLayout('mounted', { id: props.id, title: props.title })
+	void logGeometry('mounted geometry')
+	if (dropTarget.value) {
+		resizeObserver = new ResizeObserver(([entry]) => {
+			const rect = entry?.target.getBoundingClientRect()
+			debugLayout('actual size changed', {
+				id: props.id,
+				title: props.title,
+				width: rect?.width,
+				height: rect?.height,
+				expectedHeight:
+					(props.hideHeader ? 0 : 40) +
+					(shouldShowGrid.value ? 10 + (props.virtualGridHeight ?? 0) : 0) +
+					12,
+			})
+		})
+		resizeObserver.observe(dropTarget.value)
+	}
+})
+
+onBeforeUnmount(() => {
+	debugLayout('unmounted', {
+		id: props.id,
+		title: props.title,
+		renderedCount: visibleScreenshots.value.length,
+	})
+	resizeObserver?.disconnect()
+	if (unmountGridTimeout) clearTimeout(unmountGridTimeout)
 })
 
 const emit = defineEmits<{
@@ -98,44 +205,39 @@ function getSelectionKey(screenshot: InstanceScreenshot) {
 			<template #actions="{ startEditing }">
 				<slot name="actions" :start-editing="startEditing" />
 			</template>
-			<TransitionGroup
-				tag="div"
-				class="grid min-h-[45px] w-full grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4"
-				move-class="transition-transform duration-200 ease-out motion-reduce:transition-none"
-				:enter-active-class="
-					animateEntry
-						? 'transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none'
-						: ''
-				"
-				:enter-from-class="animateEntry ? 'opacity-0' : ''"
-				enter-to-class="opacity-100 scale-100"
-			>
-				<ScreenshotCard
-					v-for="screenshot in screenshots"
-					:key="getSelectionKey(screenshot)"
-					:screenshot="screenshot"
-					:selection-key="getSelectionKey(screenshot)"
-					:selected="selectedKeys.has(getSelectionKey(screenshot))"
-					:selection-active="selectionActive"
-					:active-dragged="activeDraggedKeys.has(getSelectionKey(screenshot))"
-					:can-drag="canDrag"
-					:show-instance-name="showInstanceName"
-					:highlighted="highlightedScreenshotId === screenshot.id"
-					:copied="copiedScreenshotIds.has(screenshot.id)"
-					@activate="(event) => emit('activate', screenshot, event)"
-					@toggle-selection="emit('toggle-selection', screenshot)"
-					@copy="emit('copy', screenshot)"
-					@edit="emit('edit', screenshot)"
-					@more="(event) => emit('more', screenshot, event)"
-				/>
-				<p
-					v-if="screenshots.length === 0"
-					key="empty-group"
-					class="col-span-full m-0 pl-0.5 pt-1 text-base font-base text-secondary opacity-80"
+			<div v-if="renderGrid" class="relative min-h-[45px] w-full" :style="virtualGridStyle">
+				<div
+					class="grid min-h-[45px] w-full grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4"
+					:class="{ 'absolute inset-x-0 top-0': virtualGridHeight !== undefined }"
+					:style="visibleGridStyle"
 				>
-					{{ formatMessage(messages.emptyGroup) }}
-				</p>
-			</TransitionGroup>
+					<ScreenshotCard
+						v-for="screenshot in visibleScreenshots"
+						:key="getSelectionKey(screenshot)"
+						:screenshot="screenshot"
+						:selection-key="getSelectionKey(screenshot)"
+						:selected="selectedKeys.has(getSelectionKey(screenshot))"
+						:selection-active="selectionActive"
+						:active-dragged="activeDraggedKeys.has(getSelectionKey(screenshot))"
+						:can-drag="canDrag"
+						:show-instance-name="showInstanceName"
+						:highlighted="highlightedScreenshotId === screenshot.id"
+						:copied="copiedScreenshotIds.has(screenshot.id)"
+						@activate="(event) => emit('activate', screenshot, event)"
+						@toggle-selection="emit('toggle-selection', screenshot)"
+						@copy="emit('copy', screenshot)"
+						@edit="emit('edit', screenshot)"
+						@more="(event) => emit('more', screenshot, event)"
+					/>
+					<p
+						v-if="screenshots.length === 0"
+						key="empty-group"
+						class="col-span-full m-0 pl-0.5 pt-1 text-base font-base text-secondary opacity-80"
+					>
+						{{ formatMessage(messages.emptyGroup) }}
+					</p>
+				</div>
+			</div>
 		</ScreenshotSection>
 	</div>
 </template>

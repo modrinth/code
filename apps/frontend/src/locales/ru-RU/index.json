@@ -1019,9 +1019,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Одобрить с ответом"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Закрыть ветку"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Закрыть с ответом"
   },
@@ -3436,12 +3433,6 @@
   },
   "project-type.shader.singular": {
     "message": "Шейдер"
-  },
-  "project.actions.back-to-all-projects": {
-    "message": "Вернуться ко всем проектам"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Вернуться на страницу проекта"
   },
   "project.actions.check-modpack-archives": {
     "message": "Проверить распаковку сборки"

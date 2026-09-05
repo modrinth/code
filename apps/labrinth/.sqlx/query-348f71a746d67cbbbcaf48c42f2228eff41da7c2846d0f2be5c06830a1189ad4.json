@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT COUNT(*) AS \"count!\"\n\t\tFROM delphi_rule_effects effect\n\t\tINNER JOIN delphi_rule_revisions published\n\t\t\tON published.revision = effect.revision\n\t\tWHERE effect.rule_id = $1\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "348f71a746d67cbbbcaf48c42f2228eff41da7c2846d0f2be5c06830a1189ad4"
+}

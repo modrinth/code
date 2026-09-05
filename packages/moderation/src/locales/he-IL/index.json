@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "בחר תגיות מדויקות"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "התיאור שלך הוא {length, plural, one {# דמות} other {# דמויות}}. מומלץ להשתמש לפחות ב-{minChars, plural, one {# דמות} other {# דמויות}} כדי ליצור תיאור ברור ואינפורמטיבי."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "הרחב את התיאור"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "ערוך תיאור"
   },
@@ -89,12 +83,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "תמחק קישורים זהים"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "התיאור שלך צריך להכיל מספיק טקסט פשוט או טקסט חלופי לתמונה, כדי שיישאר נגיש למשתמשים עם הקראות מסך או חיבורי אינטרנט איטיים."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "הבטח נגישות"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "כתובת ה-URL של הרישיון אינה חוקית."
   },
@@ -106,12 +94,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "הוסף קישור רישיון חוקי"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "שימוש במקצרי קישורים או בשיטות אחרות כדי לטשטש את היעד של קישור אסור בקישורים חיצוניים או בקישור הרישיון. אנא השתמש רק בקישורים מלאים ומתאימים."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "אל תשתמש במקצרי קישורים"
   },
   "nags.long-headers.title": {
     "defaultMessage": "קצר כותרות"
@@ -176,9 +158,6 @@
   "nags.server.title": {
     "defaultMessage": "בקר בהגדרות השרת"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "בקר בהגדרות התיאור"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "בקר בהגדרות הרישיון"
   },
@@ -191,12 +170,6 @@
   "nags.settings.title": {
     "defaultMessage": "בקר בהגדרות כלליות"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "התקציר שלך לא יכול להיות זהה לשם הפרוייקט שלך. זה חשוב ליצור תקציר אינפורמטיבי ומעניין."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "עשה את התקציר שלך ייחודי"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "התקציר שלך לא יכול לכלול פרמוט, הפסקות שורה, תווים מיוחדים או קישורים, מכיוון שהוא יוצג בטקסט פשוט."
   },
@@ -205,12 +178,6 @@
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "הארך את התקציר"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "שמירה על שם הפרויקט נקי הופכת אותו לזכיר וקל יותר למציאה. פרטי הגרסה והטוען מוצגים אוטומטית לצד הפרויקט."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "נקה את השם"
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "בחר תגים מדוייקים"

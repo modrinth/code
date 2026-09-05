@@ -4337,9 +4337,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Fizetési mód"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Elérhető Észak-Amerikában, Európában és Délkelet-Ázsiában."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Válassz egy személyre szabott csomagot, ami pontosan az igényeidnek megfelelő specifikációkkal rendelkezik."
   },

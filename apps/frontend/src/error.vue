@@ -110,7 +110,6 @@ import {
 	commonMessages,
 	defineMessage,
 	defineMessages,
-	injectNotificationManager,
 	IntlFormatted,
 	LoadingBar,
 	normalizeChildren,
@@ -131,10 +130,10 @@ import { getSignInRouteObj } from '~/composables/auth.js'
 import { setupProviders } from '~/providers/setup.ts'
 
 const auth = await useAuth()
-setupProviders(auth)
+const { notificationManager } = setupProviders(auth)
 
 const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
+const { addNotification } = notificationManager
 const isSwitchingAccount = useIsSwitchingAccount()
 
 const props = defineProps({

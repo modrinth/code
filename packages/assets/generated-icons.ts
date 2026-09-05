@@ -20,6 +20,7 @@ import _ArrowLeftIcon from './icons/arrow-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpDownIcon from './icons/arrow-up-down.svg?component'
+import _ArrowUpFromLineIcon from './icons/arrow-up-from-line.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
 import _ArrowUpZAIcon from './icons/arrow-up-z-a.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
@@ -278,6 +279,7 @@ import _SplitIcon from './icons/split.svg?component'
 import _SquareIcon from './icons/square.svg?component'
 import _SquarePlusIcon from './icons/square-plus.svg?component'
 import _StarIcon from './icons/star.svg?component'
+import _StickyNotePlusIcon from './icons/sticky-note-plus.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _StoreIcon from './icons/store.svg?component'
 import _StrikethroughIcon from './icons/strikethrough.svg?component'
@@ -477,6 +479,7 @@ export const ArrowLeftIcon = _ArrowLeftIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpDownIcon = _ArrowUpDownIcon
+export const ArrowUpFromLineIcon = _ArrowUpFromLineIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon
 export const ArrowUpZAIcon = _ArrowUpZAIcon
 export const AsteriskIcon = _AsteriskIcon
@@ -735,6 +738,7 @@ export const SplitIcon = _SplitIcon
 export const SquareIcon = _SquareIcon
 export const SquarePlusIcon = _SquarePlusIcon
 export const StarIcon = _StarIcon
+export const StickyNotePlusIcon = _StickyNotePlusIcon
 export const StopCircleIcon = _StopCircleIcon
 export const StoreIcon = _StoreIcon
 export const StrikethroughIcon = _StrikethroughIcon

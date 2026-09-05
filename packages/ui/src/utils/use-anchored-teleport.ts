@@ -146,6 +146,7 @@ export function useAnchoredTeleport(
 	function handlePointerDown(event: PointerEvent) {
 		const target = event.target as Node | null
 		if (!target || triggerElement()?.contains(target) || panel.value?.contains(target)) return
+		if (document.getElementById('teleports')?.contains(target)) return
 		close()
 	}
 

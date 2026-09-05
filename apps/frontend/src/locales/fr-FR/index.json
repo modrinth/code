@@ -1025,9 +1025,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Approuver avec réponse"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Fermer le fil"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Fermer avec réponse"
   },
@@ -3445,12 +3442,6 @@
   },
   "project-type.shader.singular": {
     "message": "Shader"
-  },
-  "project.actions.back-to-all-projects": {
-    "message": "Retour à tous les projets"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Retour à la page du projet"
   },
   "project.actions.create-server": {
     "message": "Créer un serveur"

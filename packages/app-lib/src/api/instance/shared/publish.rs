@@ -258,7 +258,7 @@ pub(super) async fn shared_instance_install_modpack(
             .as_ref()
             .map(|project| project.title.clone())
             .unwrap_or(modpack_version.name),
-        icon_url: project.and_then(|project| project.icon_url),
+        icon_url: project.and_then(|project| project.raw_icon_url),
     }))
 }
 

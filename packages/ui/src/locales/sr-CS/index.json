@@ -4637,9 +4637,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "naplaćuje se {interval, select, monthly {mesečno} quarterly {svaka 3 meseca} yearly {godišnje} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Dostupno u Severnoj Americi, Evropi i Jugoistočnoj Aziji."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Izaberi prilagođeni plan sa upravo onim specifikacijama koje su ti potrebne."
   },
@@ -5658,4 +5655,3 @@
     "defaultMessage": "Tip"
   }
 }
-

@@ -1,12 +1,12 @@
 <template>
 	<div class="overlay"></div>
 	<img
-		src="https://cdn-raw.modrinth.com/medal-banner-background.webp"
+		src="https://cdn.modrinth.com/medal-banner-background.webp"
 		class="background-pattern dark-pattern shadow-xl"
 		alt=""
 	/>
 	<img
-		src="https://cdn-raw.modrinth.com/medal-banner-background-light.webp"
+		src="https://cdn.modrinth.com/medal-banner-background-light.webp"
 		class="background-pattern light-pattern shadow-xl"
 		alt=""
 	/>

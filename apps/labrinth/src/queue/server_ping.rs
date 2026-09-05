@@ -285,7 +285,7 @@ impl ServerPingQueue {
                 if ping.data.is_none() {
                     return true;
                 };
-                ping.when.signed_duration_since(now)
+                now.signed_duration_since(ping.when)
                     > TimeDelta::seconds(
                         ENV.SERVER_PING_MIN_INTERVAL_SEC as i64,
                     )

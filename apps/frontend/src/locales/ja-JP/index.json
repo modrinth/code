@@ -1022,9 +1022,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "送信して承認"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "スレッドを閉じる"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "返信して閉じる"
   },

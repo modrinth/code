@@ -244,7 +244,7 @@ const messages = defineMessages({
 		defaultMessage: 'Please enter a valid date of birth. Year cannot be 0000.',
 	},
 	under13HelperText: {
-		id: 'auth.create-account.date-of-birth.under13-helper',
+		id: 'auth.create-account.date-of-birth.not-meet-age-requirement',
 		defaultMessage: 'You do not meet the age requirement to create an account at Modrinth.',
 	},
 	ageRequirementWarningTitle: {

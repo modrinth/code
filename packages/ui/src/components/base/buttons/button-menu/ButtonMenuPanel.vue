@@ -67,7 +67,7 @@ defineExpose({ element })
 			/>
 			<div
 				data-anchored-scroll-region
-				class="flex min-w-48 flex-col p-2 overflow-y-auto"
+				class="flex flex-col p-2 overflow-y-auto"
 				:style="{ maxHeight: props.panelStyle.maxHeight }"
 			>
 				<slot />

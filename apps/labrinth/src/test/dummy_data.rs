@@ -363,7 +363,7 @@ pub async fn add_project_beta(api: &ApiV3) -> (Project, Version) {
 
     let modify_json = serde_json::from_value(json!([
         { "op": "add", "path": "/summary", "value": "A dummy project for testing with." },
-        { "op": "add", "path": "/description", "value": "This project is not-yet-approved, and versions are draft." },
+        { "op": "add", "path": "/description", "value": "This project is not yet approved, but it contains enough descriptive information to satisfy project review validation requirements while remaining available for testing private project behavior." },
         { "op": "add", "path": "/initial_versions/0/status", "value": "unlisted" },
         { "op": "add", "path": "/status", "value": "private" },
         { "op": "add", "path": "/requested_status", "value": "private" },

@@ -62,14 +62,14 @@ useHead({
 
 const AD_PRESETS = {
 	medal: {
-		light: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-light.webp',
-		dark: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-dark.webp',
+		light: 'https://cdn.modrinth.com/modrinth-hosting-medal-light.webp',
+		dark: 'https://cdn.modrinth.com/modrinth-hosting-medal-dark.webp',
 		description: 'Host your next server with Modrinth Hosting',
 		link: '/hosting?plan&ref=medal',
 	},
 	'modrinth-hosting': {
-		light: 'https://cdn-raw.modrinth.com/modrinth-hosting-light.webp',
-		dark: 'https://cdn-raw.modrinth.com/modrinth-hosting-dark.webp',
+		light: 'https://cdn.modrinth.com/modrinth-hosting-light.webp',
+		dark: 'https://cdn.modrinth.com/modrinth-hosting-dark.webp',
 		description: 'Host your next server with Modrinth Hosting',
 		link: '/hosting',
 	},

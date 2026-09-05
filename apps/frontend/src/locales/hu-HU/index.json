@@ -1007,9 +1007,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Jóváhagyás és válasz"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Gondolatmenet lezárása"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Bezárás és válasz"
   },

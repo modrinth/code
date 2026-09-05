@@ -32,23 +32,27 @@ export async function batchCheckQueueCandidates(
 ): Promise<Map<string, QueueCandidateCheck>> {
 	const results = new Map<string, QueueCandidateCheck>()
 
-	const projects = await client.labrinth.projects_v3.getMultiple(projectIds).catch(() => [])
+	const projects = await client.labrinth.projects_v3.getMultiple(projectIds)
 	const projectsById = new Map(projects.map((project) => [project.id, project]))
 
 	const checks = await Promise.allSettled(
 		projectIds.map(async (id) => {
-			const lockResponse = await moderationQueue.checkLock(id)
 			const project = projectsById.get(id) ?? null
+			if (!project) {
+				return { id, locked: false, isProcessing: false }
+			}
+
+			const lockResponse = await moderationQueue.checkLock(id)
 
 			return {
 				id,
 				locked: lockResponse.locked,
 				expired: lockResponse.expired,
 				isOwnLock: lockResponse.is_own_lock,
-				slug: project?.slug,
-				projectType: project?.project_types[0],
-				status: project?.status,
-				isProcessing: project === null ? true : project.status === 'processing',
+				slug: project.slug,
+				projectType: project.project_types[0],
+				status: project.status,
+				isProcessing: project.status === 'processing',
 			}
 		}),
 	)
@@ -57,7 +61,7 @@ export async function batchCheckQueueCandidates(
 		if (result.status === 'fulfilled') {
 			results.set(result.value.id, result.value)
 		} else {
-			results.set(projectIds[index], { locked: false, isProcessing: true })
+			results.set(projectIds[index], { locked: false, isProcessing: false })
 		}
 	})
 

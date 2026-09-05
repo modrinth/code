@@ -1,0 +1,81 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tUPDATE delphi_rules\n\t\tSET\n\t\t\tname = $2,\n\t\t\trule = $3,\n\t\t\tpriority = $4,\n\t\t\ton_issue_types = $5,\n\t\t\trevision = (\n\t\t\t\tSELECT revision + 1 FROM delphi_rule_revisions LIMIT 1\n\t\t\t),\n\t\t\tupdated_at = CURRENT_TIMESTAMP,\n\t\t\tupdated_by = $6\n\t\tWHERE id = $1 AND NOT delete_on_next_revision\n\t\tRETURNING\n\t\t\tid AS \"id!: DelphiRuleId\",\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\ton_issue_types,\n\t\t\trevision,\n\t\t\tcreated_at,\n\t\t\tupdated_at,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!: DelphiRuleId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "rule",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "priority",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "on_issue_types",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 5,
+        "name": "revision",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_by",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "TextArray",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "0cf618abf01774d1af5c9a7f23fe515f204468685333be953b746da8620af127"
+}

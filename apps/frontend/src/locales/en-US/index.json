@@ -782,6 +782,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Date of birth"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "You do not meet the age requirement to create an account at Modrinth."
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Select your date of birth"
   },
@@ -792,7 +795,7 @@
     "message": "Date of birth required"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "You do not meet the age requirement to create an account at Modrinth."
+    "message": "You cannot create an account at Modrinth unless you are over 13 years old."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Relevant source code"
@@ -1070,8 +1073,8 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Approve with reply"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Close thread"
+  "conversation-thread.action.close-report": {
+    "message": "Close report"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Close with reply"
@@ -2355,7 +2358,7 @@
     "message": "What kind of CPUs do Modrinth Hosting servers run on?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory."
+    "message": "Modrinth Hosting servers are powered by AMD Ryzen 7950X or 9950X equivalent, paired with DDR5 memory."
   },
   "hosting-marketing.faq.currency": {
     "message": "What currency are the prices in?"
@@ -3017,6 +3020,9 @@
   "moderation.moderate": {
     "message": "Moderate"
   },
+  "moderation.page.delphi-rules": {
+    "message": "Delphi rules"
+  },
   "moderation.page.external-projects": {
     "message": "External projects"
   },
@@ -3419,6 +3425,9 @@
   "project-member-header.success-join": {
     "message": "You have joined the project team"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Your project has been submitted for review!"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Publishing checklist"
   },
@@ -3511,12 +3520,6 @@
   },
   "project-type.shader.singular": {
     "message": "Shader"
-  },
-  "project.actions.back-to-all-projects": {
-    "message": "Back to all projects"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Back to project page"
   },
   "project.actions.check-modpack-archives": {
     "message": "Check modpack unzip"
@@ -3842,6 +3845,12 @@
   "project.notification.icon-updated.title": {
     "message": "Project icon updated"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "You cannot save edits to your project which result in failing validation."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Failed to save project in review"
+  },
   "project.notification.updated.message": {
     "message": "Your project has been updated."
   },
@@ -4088,6 +4097,12 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "You already have another {platform} link."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Please select a platform for this Donation link."
+  },
   "project.settings.monetization.description": {
     "message": "Projects on Modrinth are automatically enrolled in the <rewards-program-link>Rewards Program</rewards-program-link>. If you don't want to (or can't for legal reasons) earn revenue from this project, you can turn it off here."
   },
@@ -4291,6 +4306,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Upload versions before adding tags"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Suggestions:"
   },
   "project.versions.copy-id-option": {
     "message": "Copy ID"
@@ -5254,6 +5272,9 @@
   },
   "settings.billing.plan.title": {
     "message": "{size} Plan"
+  },
+  "settings.billing.price.includes-tax": {
+    "message": "Includes {amount} tax"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"

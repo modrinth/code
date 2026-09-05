@@ -50,12 +50,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "コンテンツの開示を確認"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "説明文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい説明文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "説明を展開する"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "説明を編集する"
   },
@@ -92,12 +86,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "リンクの重複を整理"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "視覚障害のある方やインターネット回線速度の遅い方への配慮のため、十分で分かりやすい説明または画像の代替テキストが必要です。"
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "アクセシビリティを確保する"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "ライセンスのURLが無効です。"
   },
@@ -109,12 +97,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "有効なライセンスのリンクを追加する"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "外部リンクやライセンスのリンクにおいて、リンク先を不明確にするためのリンク短縮サービスやその他の方法の使用は禁止されています。適切なフルリンクのみを使用してください。"
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "短縮リンクサービスを使用しないでください"
   },
   "nags.long-headers.description": {
     "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}{count, plural, other{}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
@@ -194,9 +176,6 @@
   "nags.server.title": {
     "defaultMessage": "サーバー設定を表示する"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "説明の設定を表示"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "開示設定を開く"
   },
@@ -215,29 +194,14 @@
   "nags.settings.title": {
     "defaultMessage": "一般設定を表示"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "プロジェクトの名前と要約は同じにできません。情報豊富で魅力的な要約を作成することが重要です。"
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "要約を独自のものにしましょう"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "要約には、プレーンテキストのみが表示されるため、フォーマット、改行、特殊文字、またはリンクを含めないでください。"
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "要約を整理"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "要約文が{length, plural, other {#文字}}しかありません。より明確で分かりやすい要約文を作成するためには、少なくとも{minChars, plural, other {#文字}}以上であることが推奨されます。"
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "要約を展開"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "プロジェクトの名前を簡潔にすることで、検索しやすくなります。バージョンとローダー情報は、プロジェクトと共に自動的に表示されます。"
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "名前を整理"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "{languageCount, plural, one {# language} other {# languages}}を選択しました。サーバーが実際にサポートしている言語のみを一覧表示してください。"
@@ -285,4 +249,3 @@
     "defaultMessage": "リンク設定を表示"
   }
 }
-

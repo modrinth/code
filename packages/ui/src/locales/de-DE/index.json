@@ -5393,9 +5393,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "{interval, select, monthly {monatlich} quarterly {vierteljährlich} yearly {jährlich} other {{interval}}} abgerechnet"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Verfügbar in Nordamerika, Europa und Südostasien."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Wähle einen benutzerdefinierten Plan mit genau den Spezifikationen, die du benötigst."
   },

@@ -5210,9 +5210,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "naliczane {interval, select, monthly {miesięcznie} quarterly {co kwartał} yearly {rocznie} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Dostępne w Północnej Ameryce, Europie i Południowowschodniej Azji."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Wybierz dostosowany plan ze specyfikacją, której potrzebujesz."
   },

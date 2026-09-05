@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="executeSearch">
+		<form class="flex flex-col gap-2 sm:flex-row sm:items-center" @submit.prevent="executeSearch">
 			<Input
 				v-model="query"
 				:icon="SearchIcon"
@@ -8,9 +8,10 @@
 				autocomplete="off"
 				placeholder="Search global trace keys..."
 				clearable
-				wrapper-class="flex-1 w-full"
+				size="medium"
+				wrapper-class="min-w-0 flex-1"
 			/>
-			<Button type="colored" color="brand" native-type="submit" :disabled="isLoading">
+			<Button type="colored" color="brand" size="lg" native-type="submit" :disabled="isLoading">
 				<SearchIcon aria-hidden="true" />
 				Search
 			</Button>
@@ -20,7 +21,7 @@
 			v-if="!isLoading && !loadError && total > 0"
 			class="mt-4 flex flex-wrap items-center justify-between gap-3"
 		>
-			<p class="m-0 text-sm text-secondary">Showing {{ pageStart }}-{{ pageEnd }} of {{ total }}</p>
+			<p class="m-0">Showing {{ pageStart }}-{{ pageEnd }} of {{ total }}</p>
 			<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
 		</div>
 
@@ -63,7 +64,7 @@
 							</p>
 							<p class="m-0 break-all text-secondary">
 								<span class="font-semibold text-contrast">Path</span>
-								{{ decodeTracePath(getLatestLocalTrace(trace)?.file_path ?? '') }}
+								<IssueDetailPath :segments="[getLatestLocalTrace(trace)?.file_path]" />
 							</p>
 						</div>
 					</div>
@@ -131,6 +132,7 @@ import {
 } from '@modrinth/ui'
 
 import GlobalDetailLocalTraceCard from '~/components/ui/moderation/GlobalDetailLocalTraceCard.vue'
+import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -163,24 +165,19 @@ function getLatestLocalTrace(trace: Labrinth.TechReview.Internal.GlobalIssueDeta
 	return trace.local_traces.at(-1)
 }
 
-function decodeTracePath(path: string): string {
-	try {
-		return decodeURIComponent(path)
-	} catch {
-		return path
-	}
-}
-
 function getSeverityBadgeColor(
 	severity: Labrinth.TechReview.Internal.DelphiSeverity | undefined,
 ): string {
 	switch (severity) {
+		case 'malware':
 		case 'severe':
 			return 'border-red/60 bg-highlight-red text-red'
 		case 'high':
 			return 'border-orange/60 bg-highlight-orange text-orange'
 		case 'medium':
 			return 'border-green/60 bg-highlight-green text-green'
+		case 'hidden':
+			return 'border-divider bg-surface-2 text-secondary'
 		case 'low':
 		default:
 			return 'border-blue/60 bg-highlight-blue text-blue'

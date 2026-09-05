@@ -5072,9 +5072,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "facturation {interval, select, monthly {mensuelle} quarterly {trimestrielle} yearly {annuelle} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une couverture étendue."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Choisissez un forfait personnalisé avec uniquement les spécifications dont vous avez besoin."
   },

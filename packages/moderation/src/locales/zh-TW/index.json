@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "檢查內容揭露資訊"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "你的描述目前長度為 {length, plural, other {# 個可閱讀字元}}。建議至少輸入 {minChars, plural, other {# 個字元}}，以建立清晰且資訊完整的描述。"
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "擴展描述"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "編輯描述"
   },
@@ -95,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "清理重複連結"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "請在描述中提供充足的純文字或圖片替代文字，讓螢幕閱讀器使用者與網路速度較慢的使用者也能順利閱讀。"
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "確保無障礙體驗"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "授權條款網址無效。"
   },
@@ -112,12 +100,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "新增有效授權條款連結"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "禁止在你的外部連結或授權條款連結中使用短網址或其他方法來隱藏連結的實際指向，請只使用適當的完整連結。"
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
     "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}{count, plural, other {}}字數過多。標題的作用是作為章節標題，應保持簡潔，避免使用完整的長句子。"
@@ -197,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "前往伺服器設定"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "前往描述設定"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "前往揭露資訊設定"
   },
@@ -221,29 +200,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "前往版本設定"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "你的摘要不能與你的專案名稱相同。撰寫一段既實用又吸引人的摘要非常重要。"
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "讓摘要與眾不同"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "你的摘要不應包含排版、換行、特殊字元或連結，因為摘要只會顯示純文字。"
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "清理摘要"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "您的摘要長度為 {length, plural, one {# 個字元} other {# 個字元}}。建議至少輸入 {minChars, plural, one {# 個字元} other {# 個字元}}，以建立資訊完整且吸引人的摘要。"
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "擴展摘要"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "保持專案名稱簡潔，能讓它更易於記憶且方便搜尋。版本與載入器資訊會自動顯示在你的專案旁。"
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "清理名稱"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "你選擇了 {languageCount, plural, other {# 種語言}}。請只列出你的伺服器目前實際支援的語言。"
@@ -291,4 +255,3 @@
     "defaultMessage": "前往連結設定"
   }
 }
-

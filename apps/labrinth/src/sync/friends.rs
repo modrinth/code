@@ -1,4 +1,4 @@
-use crate::database::PgPool;
+use crate::database::ReadOnlyPgPool;
 use crate::database::models::notification_item::DBNotification;
 use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
@@ -47,13 +47,13 @@ impl ToSingleRedisArg for RedisFriendsMessage {}
 
 pub async fn handle_pubsub(
     mut messages: mpsc::Receiver<Vec<u8>>,
-    pool: PgPool,
+    ro_pool: ReadOnlyPgPool,
     sockets: Data<ActiveSockets>,
 ) {
     while let Some(message) = messages.recv().await {
         let payload = postcard::from_bytes::<RedisFriendsMessage>(&message);
 
-        let pool = pool.clone();
+        let ro_pool = ro_pool.clone();
         let sockets = sockets.clone();
         actix_rt::spawn(async move {
             match payload {
@@ -61,7 +61,7 @@ pub async fn handle_pubsub(
                     let _ = broadcast_to_local_friends(
                         status.user_id,
                         ServerToClientMessage::StatusUpdate { status },
-                        &pool,
+                        &ro_pool,
                         &sockets,
                     )
                     .await;
@@ -71,7 +71,7 @@ pub async fn handle_pubsub(
                     let _ = broadcast_to_local_friends(
                         user,
                         ServerToClientMessage::UserOffline { id: user },
-                        &pool,
+                        &ro_pool,
                         &sockets,
                     )
                     .await;
@@ -94,7 +94,8 @@ pub async fn handle_pubsub(
                     notification_id,
                 }) => {
                     if let Ok(Some(notification)) =
-                        DBNotification::get(notification_id.into(), &pool).await
+                        DBNotification::get(notification_id.into(), &*ro_pool)
+                            .await
                     {
                         let _ = send_notification_to_user(
                             &sockets,

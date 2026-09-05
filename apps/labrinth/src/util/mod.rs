@@ -4,6 +4,7 @@ pub mod archon;
 pub mod avalara1099;
 pub mod bitflag;
 pub mod captcha;
+pub mod cel;
 pub mod cors;
 pub mod date;
 pub mod error;

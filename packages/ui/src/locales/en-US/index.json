@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "Continue"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copied to clipboard"
+  },
   "button.copy-filename": {
     "defaultMessage": "Copy filename"
   },
@@ -1412,6 +1415,27 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "e.g. config.yml"
   },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "A file with this name already exists."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "Could not check whether this file already exists."
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "Create ZIP"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "Create ZIP"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "The archive name must be a single file name."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Archive name"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "Enter an archive name."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "Deleting \"{name}\""
   },
@@ -1523,6 +1547,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "File operations are disabled while the operation is in progress."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "Create ZIP"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Error running dry run"
   },
@@ -1604,6 +1631,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Upload from .zip URL"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "{progress}% compressed"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "Creating {source}"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "Creating {source} finished"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "Creating {source} failed"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Current file: {file}"
   },
@@ -1627,6 +1666,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "New name"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "Create ZIP"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
@@ -2023,15 +2065,6 @@
   },
   "image-viewer.edit": {
     "defaultMessage": "Edit"
-  },
-  "image-viewer.editor.censor.blur": {
-    "defaultMessage": "Blur"
-  },
-  "image-viewer.editor.censor.mode": {
-    "defaultMessage": "Censor type"
-  },
-  "image-viewer.editor.censor.solid": {
-    "defaultMessage": "Solid"
   },
   "image-viewer.editor.colour": {
     "defaultMessage": "Colour"
@@ -5129,6 +5162,12 @@
   "servers.busy.installing": {
     "defaultMessage": "Server is installing"
   },
+  "servers.files.zip-created": {
+    "defaultMessage": "ZIP created"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "Created {destination}"
+  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Also send a friend request"
   },
@@ -5516,9 +5555,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Available in North America, Europe, and Southeast Asia."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Pick a customized plan with just the specs you need."
   },
@@ -5527,6 +5563,9 @@
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Get started"
+  },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Powered by AMD Ryzen 7950X, 9950X, or equivalent, with DDR5 memory."
   },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Large"
@@ -5644,6 +5683,27 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "What happens?"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Rotate credentials"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Please try again later."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "Failed to rotate SFTP credentials"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "The previous username and password will stop working."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Rotate credentials"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Your SFTP username and password have been regenerated."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "SFTP credentials rotated"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "An unexpected error occurred while installing. Please try again later."

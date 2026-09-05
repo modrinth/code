@@ -1022,9 +1022,6 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Accepteren met antwoord"
   },
-  "conversation-thread.action.close-thread": {
-    "message": "Sluit thread"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Sluit met antwoord"
   },
@@ -3442,12 +3439,6 @@
   },
   "project-type.shader.singular": {
     "message": "Shader"
-  },
-  "project.actions.back-to-all-projects": {
-    "message": "Terug naar alle projecten"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Terug naar project pagina"
   },
   "project.actions.check-modpack-archives": {
     "message": "Uitpakken van modpack controleren"

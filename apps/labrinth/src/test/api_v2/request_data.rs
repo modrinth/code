@@ -91,7 +91,7 @@ pub fn get_public_project_creation_data_json(
             "slug": slug,
             "project_type": version_jar.as_ref().map_or("mod".to_string(), |f| f.project_type()),
             "description": "A dummy project for testing with.",
-            "body": "This project is approved, and versions are listed.",
+            "body": "This project is approved and its versions are listed. It contains enough descriptive information to satisfy project review validation requirements and explain what the project provides to its users.",
             "client_side": "required",
             "server_side": "optional",
             "initial_versions": initial_versions,

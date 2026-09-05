@@ -34,14 +34,16 @@ import {
 	type ImageViewerEditorSavePayload,
 	injectNotificationManager,
 	ReadyTransition,
+	useDebugLogger,
 	useFormatDateTime,
 	useReadyState,
+	useScrollViewport,
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { save } from '@tauri-apps/plugin-dialog'
 import { readFile } from '@tauri-apps/plugin-fs'
-import { useStorage } from '@vueuse/core'
+import { useElementSize, useStorage, useWindowSize } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -107,6 +109,29 @@ type ScreenshotDropData = {
 	customGroupId?: string | null
 }
 
+type ScreenshotGroupLayout = {
+	id: string
+	group: ScreenshotGroupData
+	top: number
+	height: number
+	isOpen: boolean
+	gridHeight: number
+	gridTop: number
+}
+
+type VirtualizedScreenshotGroupLayout = ScreenshotGroupLayout & {
+	renderedScreenshots: InstanceScreenshot[]
+	virtualGridTop: number
+}
+
+const SCREENSHOT_GRID_GAP = 12
+const SCREENSHOT_GROUP_SPACING = 12
+const SCREENSHOT_GROUP_HEADER_HEIGHT = 40
+const SCREENSHOT_GROUP_CONTENT_SPACING = 10
+const SCREENSHOT_GROUP_OVERSCAN = 2000
+const SCREENSHOT_GRID_MIN_HEIGHT = 45
+const FALLBACK_SCREENSHOT_CARD_WIDTH = 320
+
 const props = withDefaults(
 	defineProps<{
 		instanceId?: string
@@ -150,7 +175,6 @@ const selectedKeys = ref(new Set<string>())
 const copiedScreenshotIds = ref(new Set<string>())
 const copiedResetTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 const screenshotsPage = ref<HTMLElement>()
-const regrouping = ref(false)
 const screenshotToDelete = ref<InstanceScreenshot | null>(null)
 const deleteFromPreview = ref(false)
 const activeDrag = ref<ActiveScreenshotDrag | null>(null)
@@ -173,6 +197,32 @@ const route = useRoute()
 const router = useRouter()
 const { formatMessage } = useVIntl()
 const { addNotification, handleError } = injectNotificationManager()
+const debugLayout = useDebugLogger('Screenshots:Layout')
+let screenshotsScrollLogFrame: number | undefined
+const {
+	listContainer: screenshotListContainer,
+	containerOffset: screenshotListOffset,
+	relativeScrollTop: screenshotListScrollTop,
+	scrollContainer: screenshotScrollContainer,
+	viewportHeight: screenshotViewportHeight,
+} = useScrollViewport({
+	onScroll: () => {
+		if (screenshotsScrollLogFrame === undefined) {
+			screenshotsScrollLogFrame = requestAnimationFrame(() => {
+				screenshotsScrollLogFrame = undefined
+				debugLayout('scroll', {
+					groupBy: groupBy.value,
+					relativeScrollTop: screenshotListScrollTop.value,
+					listOffset: screenshotListOffset.value,
+					viewportHeight: screenshotViewportHeight.value,
+					listWidth: screenshotListWidth.value,
+				})
+			})
+		}
+	},
+})
+const { width: screenshotListWidth } = useElementSize(screenshotListContainer)
+const { width: windowWidth } = useWindowSize()
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 const formatMonth = useFormatDateTime({ month: 'long', year: 'numeric' })
 const messages = defineMessages({
@@ -386,10 +436,10 @@ const groupedScreenshots = computed((): ScreenshotGroupData[] => {
 			screenshotGroups.set(screenshot.instance_id, group)
 		}
 
-		const syncedInstances = (instancesQuery.data.value ?? [])
-			.filter((instance) => instance.synced_options.screenshots)
-			.sort((a, b) => a.name.localeCompare(b.name))
-		const groups = syncedInstances.flatMap((instance) => {
+		const instances = [...(instancesQuery.data.value ?? [])].sort((a, b) =>
+			a.name.localeCompare(b.name),
+		)
+		const groups = instances.flatMap((instance) => {
 			const instanceScreenshots = screenshotGroups.get(instance.id)
 			return instanceScreenshots
 				? [
@@ -466,6 +516,142 @@ const groupedScreenshots = computed((): ScreenshotGroupData[] => {
 			...b.screenshots.map((screenshot) => new Date(screenshot.created_at).getTime()),
 		)
 		return sort.value === 'oldest' ? aTime - bTime : bTime - aTime
+	})
+})
+
+const screenshotColumnCount = computed(() => {
+	if (windowWidth.value >= 1536) return 4
+	if (windowWidth.value >= 640) return 2
+	return 1
+})
+
+const screenshotCardWidth = computed(() => {
+	if (screenshotListWidth.value <= 0) return FALLBACK_SCREENSHOT_CARD_WIDTH
+	const gapsWidth = (screenshotColumnCount.value - 1) * SCREENSHOT_GRID_GAP
+	return Math.max(0, (screenshotListWidth.value - gapsWidth) / screenshotColumnCount.value)
+})
+
+const screenshotCardHeight = computed(() => (screenshotCardWidth.value * 9) / 16)
+const screenshotRowHeight = computed(() => screenshotCardHeight.value + SCREENSHOT_GRID_GAP)
+
+const screenshotGroupLayouts = computed<ScreenshotGroupLayout[]>(() => {
+	const layouts: ScreenshotGroupLayout[] = []
+	let top = 0
+
+	for (const group of groupedScreenshots.value) {
+		const isHeaderHidden = groupBy.value === 'none'
+		const isOpen = isHeaderHidden || search.value.length > 0 || !collapsedGroups.value[group.id]
+		const rowCount = Math.ceil(group.screenshots.length / screenshotColumnCount.value)
+		const gridHeight =
+			rowCount === 0
+				? SCREENSHOT_GRID_MIN_HEIGHT
+				: rowCount * screenshotCardHeight.value + Math.max(0, rowCount - 1) * SCREENSHOT_GRID_GAP
+		const headerHeight = isHeaderHidden ? 0 : SCREENSHOT_GROUP_HEADER_HEIGHT
+		const gridTop = top + headerHeight + SCREENSHOT_GROUP_CONTENT_SPACING
+		const height =
+			headerHeight +
+			(isOpen ? SCREENSHOT_GROUP_CONTENT_SPACING + gridHeight : 0) +
+			SCREENSHOT_GROUP_SPACING
+
+		layouts.push({ id: group.id, group, top, height, isOpen, gridHeight, gridTop })
+		top += height
+	}
+
+	return layouts
+})
+
+const virtualizedScreenshotGroups = computed<VirtualizedScreenshotGroupLayout[]>(() => {
+	const hasViewport = Boolean(screenshotListContainer.value && screenshotScrollContainer.value)
+	const viewportStart = hasViewport
+		? Math.max(0, screenshotListScrollTop.value - SCREENSHOT_GROUP_OVERSCAN)
+		: 0
+	const viewportEnd = hasViewport
+		? screenshotListScrollTop.value + screenshotViewportHeight.value + SCREENSHOT_GROUP_OVERSCAN
+		: SCREENSHOT_GROUP_OVERSCAN
+
+	return screenshotGroupLayouts.value.map((layout) => {
+		const isInRenderRange = layout.top + layout.height >= viewportStart && layout.top <= viewportEnd
+		if (!layout.isOpen || layout.group.screenshots.length === 0) {
+			return { ...layout, renderedScreenshots: [], virtualGridTop: 0 }
+		}
+		if (!isInRenderRange) {
+			return { ...layout, renderedScreenshots: [], virtualGridTop: 0 }
+		}
+
+		const rowCount = Math.ceil(layout.group.screenshots.length / screenshotColumnCount.value)
+		const firstRow = Math.min(
+			rowCount,
+			Math.max(0, Math.floor((viewportStart - layout.gridTop) / screenshotRowHeight.value)),
+		)
+		const lastRow = Math.min(
+			rowCount,
+			Math.max(
+				firstRow,
+				Math.ceil((viewportEnd - layout.gridTop + SCREENSHOT_GRID_GAP) / screenshotRowHeight.value),
+			),
+		)
+		const firstScreenshot = firstRow * screenshotColumnCount.value
+		const lastScreenshot = lastRow * screenshotColumnCount.value
+
+		return {
+			...layout,
+			renderedScreenshots: layout.group.screenshots.slice(firstScreenshot, lastScreenshot),
+			virtualGridTop: firstRow * screenshotRowHeight.value,
+		}
+	})
+})
+
+watch(
+	[groupBy, screenshotListWidth, windowWidth, screenshotColumnCount, screenshotCardHeight],
+	([currentGroupBy, listWidth, currentWindowWidth, columns, cardHeight], previous) => {
+		debugLayout('responsive geometry changed', {
+			groupBy: currentGroupBy,
+			listWidth,
+			windowWidth: currentWindowWidth,
+			columns,
+			cardHeight,
+			previous,
+		})
+	},
+	{ immediate: true },
+)
+
+watch(
+	screenshotGroupLayouts,
+	(layouts) => {
+		debugLayout('group layouts changed', {
+			groupBy: groupBy.value,
+			groupCount: layouts.length,
+			totalHeight: layouts.at(-1) ? layouts.at(-1)!.top + layouts.at(-1)!.height : 0,
+			layouts: layouts.map((layout) => ({
+				id: layout.id,
+				top: layout.top,
+				height: layout.height,
+				gridTop: layout.gridTop,
+				gridHeight: layout.gridHeight,
+				isOpen: layout.isOpen,
+				screenshotCount: layout.group.screenshots.length,
+			})),
+		})
+	},
+	{ immediate: true },
+)
+
+watch(virtualizedScreenshotGroups, (groups) => {
+	debugLayout('render window changed', {
+		groupBy: groupBy.value,
+		relativeScrollTop: screenshotListScrollTop.value,
+		viewportHeight: screenshotViewportHeight.value,
+		renderedGroups: groups
+			.filter((group) => group.renderedScreenshots.length > 0)
+			.map((group) => ({
+				id: group.id,
+				top: group.top,
+				virtualGridTop: group.virtualGridTop,
+				renderedCount: group.renderedScreenshots.length,
+				firstScreenshotId: group.renderedScreenshots.at(0)?.id,
+				lastScreenshotId: group.renderedScreenshots.at(-1)?.id,
+			})),
 	})
 })
 
@@ -555,10 +741,8 @@ watch(groupBy, async (currentGroupBy, previousGroupBy) => {
 	if (currentGroupBy === previousGroupBy) return
 
 	const previousPositions = getScreenshotCardPositions()
-	regrouping.value = true
 	await nextTick()
 	animateScreenshotCardsFrom(previousPositions)
-	regrouping.value = false
 })
 
 let handledFocus: string | undefined
@@ -959,15 +1143,49 @@ async function revealScreenshot(id: string) {
 	if (group) setGroupCollapsed(group.id, false)
 
 	await nextTick()
-	const card = document.querySelector<HTMLElement>(`[data-screenshot-id="${CSS.escape(id)}"]`)
-	card?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-	card?.focus()
+	await waitForScreenshotViewport()
 	highlightedScreenshotId.value = id
+
+	const layout = screenshotGroupLayouts.value.find((candidate) => candidate.group.id === group?.id)
+	const screenshotIndex = layout?.group.screenshots.findIndex((screenshot) => screenshot.id === id)
+	const scrollTarget = screenshotScrollContainer.value
+	if (layout && screenshotIndex !== undefined && screenshotIndex >= 0 && scrollTarget) {
+		const row = Math.floor(screenshotIndex / screenshotColumnCount.value)
+		const top = Math.max(
+			0,
+			screenshotListOffset.value +
+				layout.gridTop +
+				row * screenshotRowHeight.value +
+				screenshotCardHeight.value / 2 -
+				screenshotViewportHeight.value / 2,
+		)
+		scrollTarget.scrollTo({ top, behavior: 'smooth' })
+	}
+
+	const card = await waitForScreenshotCard(id)
+	card?.focus({ preventScroll: true })
 	revealTimeout = setTimeout(() => {
 		if (highlightedScreenshotId.value === id) highlightedScreenshotId.value = undefined
 		if (revealedScreenshotId.value === id) revealedScreenshotId.value = undefined
 		revealTimeout = undefined
 	}, 2400)
+}
+
+async function waitForScreenshotViewport() {
+	for (let frame = 0; frame < 10; frame++) {
+		if (screenshotListContainer.value && screenshotScrollContainer.value) return
+		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+	}
+}
+
+async function waitForScreenshotCard(id: string) {
+	const selector = `[data-screenshot-id="${CSS.escape(id)}"]`
+	for (let frame = 0; frame < 60; frame++) {
+		const card = screenshotListContainer.value?.querySelector<HTMLElement>(selector)
+		if (card) return card
+		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+	}
+	return undefined
 }
 
 async function confirmDelete() {
@@ -1171,6 +1389,7 @@ watch(activeDropGroupId, (groupId) => {
 onBeforeUnmount(() => {
 	clearGroupHoverOpenTimeout()
 	if (revealTimeout) clearTimeout(revealTimeout)
+	if (screenshotsScrollLogFrame !== undefined) cancelAnimationFrame(screenshotsScrollLogFrame)
 	for (const timeout of copiedResetTimeouts.values()) clearTimeout(timeout)
 	copiedResetTimeouts.clear()
 })
@@ -1312,65 +1531,85 @@ onBeforeUnmount(() => {
 				@drag-over="handleDragOver"
 				@drag-end="handleDragEnd"
 			>
-				<div class="flex flex-col">
-					<ScreenshotGroupSection
-						v-for="group in groupedScreenshots"
-						:id="group.id"
-						:key="group.id"
-						:title="group.title"
-						:screenshots="group.screenshots"
-						:selected-keys="selectedKeys"
-						:selection-active="selectionActive"
-						:active-dragged-keys="activeDraggedKeys"
-						:show-drop-outline="activeDropGroupId === group.id && canDropScreenshotsOnGroup(group)"
-						:can-drag="groupBy === 'custom' || (isGlobal && groupBy === 'instance')"
-						:drop-instance-id="groupBy === 'instance' ? group.dropInstanceId : undefined"
-						:drop-custom-group="groupBy === 'custom'"
-						:drop-custom-group-id="group.customGroupId ?? undefined"
-						:show-instance-name="isGlobal && groupBy !== 'instance'"
-						:highlighted-screenshot-id="highlightedScreenshotId"
-						:copied-screenshot-ids="copiedScreenshotIds"
-						:animate-entry="!regrouping"
-						:force-open="search.length > 0"
-						:hide-header="groupBy === 'none'"
-						:editable-title="Boolean(group.customGroupId)"
-						:start-editing-title="groupIdPendingNameEdit === group.customGroupId"
-						:max-title-length="MAX_INSTANCE_GROUP_NAME_LENGTH"
-						:validate-title="validateCustomGroupName"
-						:on-title-change="(name: string) => renameCustomGroup(group.customGroupId, name)"
-						:collapsed="Boolean(collapsedGroups[group.id])"
-						@update:collapsed="(value) => setGroupCollapsed(group.id, value)"
-						@activate="activateScreenshot"
-						@toggle-selection="toggleScreenshotSelection"
-						@copy="copyScreenshot"
-						@edit="editScreenshot"
-						@more="showScreenshotOptions"
+				<div
+					ref="screenshotListContainer"
+					class="w-full"
+					:style="{
+						overflowAnchor: 'none',
+						visibility: screenshotListWidth > 0 ? 'visible' : 'hidden',
+					}"
+				>
+					<div
+						v-for="{
+							id,
+							group,
+							gridHeight,
+							renderedScreenshots,
+							virtualGridTop,
+						} in virtualizedScreenshotGroups"
+						:key="id"
 					>
-						<template v-if="group.customGroupId" #actions="{ startEditing }">
-							<div
-								class="flex shrink-0 items-center opacity-0 transition-opacity duration-250 group-hover/header:opacity-100 focus-within:opacity-100"
-							>
-								<IconButton
-									v-tooltip="formatMessage(messages.editGroup)"
-									:label="formatMessage(messages.editGroup)"
-									type="quiet"
-									size="sm"
-									@click.stop="startEditing"
+						<ScreenshotGroupSection
+							:id="group.id"
+							:title="group.title"
+							:screenshots="group.screenshots"
+							:rendered-screenshots="renderedScreenshots"
+							:virtual-grid-height="gridHeight"
+							:virtual-grid-top="virtualGridTop"
+							:selected-keys="selectedKeys"
+							:selection-active="selectionActive"
+							:active-dragged-keys="activeDraggedKeys"
+							:show-drop-outline="
+								activeDropGroupId === group.id && canDropScreenshotsOnGroup(group)
+							"
+							:can-drag="groupBy === 'custom' || (isGlobal && groupBy === 'instance')"
+							:drop-instance-id="groupBy === 'instance' ? group.dropInstanceId : undefined"
+							:drop-custom-group="groupBy === 'custom'"
+							:drop-custom-group-id="group.customGroupId ?? undefined"
+							:show-instance-name="isGlobal && groupBy !== 'instance'"
+							:highlighted-screenshot-id="highlightedScreenshotId"
+							:copied-screenshot-ids="copiedScreenshotIds"
+							:force-open="search.length > 0"
+							:hide-header="groupBy === 'none'"
+							:editable-title="Boolean(group.customGroupId)"
+							:start-editing-title="groupIdPendingNameEdit === group.customGroupId"
+							:max-title-length="MAX_INSTANCE_GROUP_NAME_LENGTH"
+							:validate-title="validateCustomGroupName"
+							:on-title-change="(name: string) => renameCustomGroup(group.customGroupId, name)"
+							:collapsed="Boolean(collapsedGroups[group.id])"
+							@update:collapsed="(value) => setGroupCollapsed(group.id, value)"
+							@activate="activateScreenshot"
+							@toggle-selection="toggleScreenshotSelection"
+							@copy="copyScreenshot"
+							@edit="editScreenshot"
+							@more="showScreenshotOptions"
+						>
+							<template v-if="group.customGroupId" #actions="{ startEditing }">
+								<div
+									class="flex shrink-0 items-center opacity-0 transition-opacity duration-250 group-hover/header:opacity-100 focus-within:opacity-100"
 								>
-									<EditIcon />
-								</IconButton>
-								<IconButton
-									v-tooltip="formatMessage(messages.deleteGroup)"
-									:label="formatMessage(messages.deleteGroup)"
-									type="quiet"
-									size="sm"
-									@click.stop="requestCustomGroupDeletion(group.customGroupId)"
-								>
-									<TrashIcon />
-								</IconButton>
-							</div>
-						</template>
-					</ScreenshotGroupSection>
+									<IconButton
+										v-tooltip="formatMessage(messages.editGroup)"
+										:label="formatMessage(messages.editGroup)"
+										type="quiet"
+										size="sm"
+										@click.stop="startEditing"
+									>
+										<EditIcon />
+									</IconButton>
+									<IconButton
+										v-tooltip="formatMessage(messages.deleteGroup)"
+										:label="formatMessage(messages.deleteGroup)"
+										type="quiet"
+										size="sm"
+										@click.stop="requestCustomGroupDeletion(group.customGroupId)"
+									>
+										<TrashIcon />
+									</IconButton>
+								</div>
+							</template>
+						</ScreenshotGroupSection>
+					</div>
 				</div>
 				<Teleport to="body">
 					<div class="pointer-events-none fixed inset-0 z-[9999]">

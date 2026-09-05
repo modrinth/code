@@ -1118,6 +1118,85 @@ export namespace Labrinth {
 				url: string
 			}
 
+			export type NormalizedProjectNagKind =
+				| 'minecraft-title-clause'
+				| 'project-name-non-standard-text'
+				| 'project-name-profanity'
+				| 'project-name-slur'
+				| 'project-name-version'
+				| 'project-summary-links'
+				| 'project-summary-matches-title'
+				| 'project-summary-non-english'
+				| 'project-summary-non-standard-text'
+				| 'project-summary-profanity'
+				| 'project-summary-slur'
+				| 'project-summary-spam'
+				| 'summary-special-formatting'
+				| 'summary-too-short'
+				| 'add-icon'
+				| 'feature-gallery-image'
+				| 'upload-gallery-image'
+				| 'gallery-text-non-standard'
+				| 'gallery-text-profanity'
+				| 'gallery-text-slur'
+				| 'add-description'
+				| 'adjacent-headers'
+				| 'description-ends-with-header'
+				| 'description-too-short'
+				| 'long-headers'
+				| 'missing-alt-text'
+				| 'project-description-banned-link'
+				| 'project-description-non-english'
+				| 'project-description-non-standard-text'
+				| 'project-description-profanity'
+				| 'project-description-slur'
+				| 'project-description-spam'
+				| 'add-custom-license-details'
+				| 'invalid-license-url'
+				| 'select-license'
+				| 'add-links'
+				| 'add-links-server'
+				| 'banned-link-usage'
+				| 'gpl-license-source-required'
+				| 'identical-links'
+				| 'misused-discord-link'
+				| 'verify-external-links'
+				| 'review-permissions'
+				| 'add-java-address'
+				| 'all-languages'
+				| 'select-compatibility'
+				| 'select-country'
+				| 'select-language'
+				| 'too-many-languages'
+				| 'all-tags-selected'
+				| 'multiple-resolution-tags'
+				| 'select-tags'
+				| 'too-many-tags'
+				| 'too-many-tags-server'
+				| 'select-environment'
+				| 'upload-version'
+				| 'check-disclosures'
+				| 'disclosures-special-formatting'
+				| 'moderator-feedback'
+
+			type ReplaceHyphensWithUnderscores<T extends string> = T extends `${infer Head}-${infer Tail}`
+				? `${Head}_${ReplaceHyphensWithUnderscores<Tail>}`
+				: T
+
+			export type ProjectNagKind = ReplaceHyphensWithUnderscores<NormalizedProjectNagKind>
+
+			export type ProjectNagSeverity = 'required' | 'warning' | 'suggestion'
+
+			export type ProjectNag = {
+				kind: ProjectNagKind
+				severity: ProjectNagSeverity
+				details: Record<string, unknown>
+			}
+
+			export type ProjectValidationResponse = {
+				nags: ProjectNag[]
+			}
+
 			export type Project = {
 				id: string
 				slug?: string
@@ -1732,6 +1811,7 @@ export namespace Labrinth {
 				compact_instance_cards: boolean
 				show_play_time: boolean
 				hide_nametag: boolean
+				show_all_screenshots: boolean
 				warn_on_unknown_modpacks: boolean
 				skip_non_essential_warnings: boolean
 			}
@@ -2413,6 +2493,126 @@ export namespace Labrinth {
 
 	export namespace TechReview {
 		export namespace Internal {
+			export type DelphiRule = {
+				id: number
+				name: string
+				rule: string
+				priority: number
+				on_issue_types: string[]
+				revision: number
+				current_revision?: number
+				created_at: string
+				updated_at: string
+				created_by: number | null
+				updated_by: number | null
+				affected_details_count: number
+				affected_details: DelphiRuleAffectedDetail[]
+			}
+
+			export type DelphiRuleAffectedDetail = {
+				detail_id: string
+				issue_id: string
+				project_id: string | null
+				project_name: string | null
+				project_icon_url: string | null
+				version_id: string | null
+				version_name: string | null
+				version_number: string | null
+				issue_type: string
+				key: string
+				jar: string | null
+				file_path: string
+				original_severity: DelphiSeverity
+				severity: DelphiSeverity
+			}
+
+			export type GetRuleAffectedDetailsRequest = {
+				limit?: number
+				page?: number
+			}
+
+			export type GetRuleAffectedDetailsResponse = {
+				total: number
+				details: DelphiRuleAffectedDetail[]
+			}
+
+			export type WriteDelphiRule = {
+				name: string
+				rule: string
+				priority: number
+				on_issue_types: string[]
+			}
+
+			export type DelphiIssueTypeSchemaResponse = Record<string, unknown>
+
+			export type TestDelphiRuleRequest = {
+				rule: string
+				inputs: RuleInput[]
+			}
+
+			export type DelphiRuleEffect = {
+				severity: DelphiSeverity
+			}
+
+			export type DelphiRuleSchema = Record<string, unknown>
+
+			export type DelphiRuleSchemaResponse = {
+				input: DelphiRuleSchema
+				output: DelphiRuleSchema
+				components: Record<string, DelphiRuleSchema>
+			}
+
+			export type RuleInput = {
+				schema_version: number
+				trace: RuleTrace
+				file_traces: RuleTrace[]
+				scan: {
+					delphi_version: number
+				}
+				artifact: {
+					size: number | null
+					hashes: Record<string, string>
+				}
+				project: {
+					id: string | null
+					types: string[]
+				}
+				version: {
+					id: string | null
+					loaders: string[]
+				}
+				file: {
+					id: string | null
+				}
+			}
+
+			export type RuleTrace = {
+				key: string
+				issue_type: string
+				severity: DelphiSeverity
+				jar: string | null
+				file_path: string
+				data: Record<string, unknown>
+			}
+
+			export type TestDelphiRuleResponse = {
+				effects: Array<DelphiRuleEffect | null>
+			}
+
+			export type DelphiRuleScanPhase = 'scanning' | 'publishing' | 'complete'
+
+			export type DelphiRuleScanEvent = {
+				phase: DelphiRuleScanPhase
+				revision: number
+				scanned: number
+				total: number
+				effects: number
+			}
+
+			export type DelphiRuleScanErrorEvent = {
+				message: string
+			}
+
 			export type SearchProjectsRequest = {
 				limit?: number
 				page?: number
@@ -2522,6 +2722,7 @@ export namespace Labrinth {
 
 			export type VersionReport = {
 				version_id: string
+				version_number?: string
 				files: FileReport[]
 			}
 
@@ -2535,6 +2736,10 @@ export namespace Labrinth {
 				file_size: number
 				download_url: string
 				issues: FileIssue[]
+			}
+
+			export type GetIssueRequest = {
+				include_hidden?: boolean
 			}
 
 			export type FileIssue = {
@@ -2658,7 +2863,7 @@ export namespace Labrinth {
 
 			export type FlagReason = 'delphi'
 
-			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
+			export type DelphiSeverity = 'hidden' | 'low' | 'medium' | 'high' | 'severe' | 'malware'
 
 			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
 

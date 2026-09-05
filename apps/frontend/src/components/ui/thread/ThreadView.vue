@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div v-if="flags.developerMode" class="m-4 font-bold text-heading">
+		<div v-if="flags.showThreadIds" class="m-4 font-bold text-heading">
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>
@@ -23,10 +23,12 @@
 			<p class="text-lg text-secondary">No messages yet</p>
 		</div>
 
-		<template v-if="closed">
-			<p class="text-secondary">This thread is closed and new messages cannot be sent to it.</p>
-			<slot name="closedActions" />
-		</template>
+		<div v-if="closed" class="flex flex-col gap-4 p-4 pt-2">
+			<p class="m-0 text-secondary">This thread is closed and new messages cannot be sent to it.</p>
+			<div>
+				<slot name="closedActions" />
+			</div>
+		</div>
 
 		<template v-else>
 			<div class="px-4 py-2">
@@ -41,43 +43,64 @@
 				class="mt-4 flex flex-col items-stretch justify-between gap-3 px-4 pb-4 sm:flex-row sm:items-center sm:gap-2"
 			>
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-					<Button
-						v-if="sortedMessages.length > 0"
-						type="colored"
-						color="brand"
-						:disabled="!replyBody"
-						class="w-full gap-2 sm:w-auto"
-						@click="sendReply()"
-					>
-						<ReplyIcon class="size-4" />
-						Reply
-					</Button>
-					<Button
-						v-else
-						type="colored"
-						color="brand"
-						:disabled="!replyBody"
-						class="w-full gap-2 sm:w-auto"
-						@click="sendReply()"
-					>
-						<SendIcon class="size-4" />
-						Send
-					</Button>
-					<Button
-						v-if="isStaff(auth.user)"
-						:disabled="!replyBody"
-						class="w-full sm:w-auto"
-						@click="sendReply(true)"
-					>
-						Add note
-					</Button>
+					<template v-if="primaryAction === 'note' && isStaff(auth.user)">
+						<Button
+							type="colored"
+							color="brand"
+							:disabled="!replyBody"
+							class="w-full sm:w-auto"
+							@click="sendReply(false)"
+						>
+							<SendIcon />
+							Send publicly
+						</Button>
+						<Button :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(true)">
+							<StickyNotePlusIcon />
+							Add private note
+						</Button>
+					</template>
+					<template v-else>
+						<Button
+							v-if="sortedMessages.length > 0"
+							type="colored"
+							color="brand"
+							:disabled="!replyBody"
+							class="w-full gap-2 sm:w-auto"
+							@click="sendReply()"
+						>
+							<ReplyIcon class="size-4" />
+							Reply
+						</Button>
+						<Button
+							v-else
+							type="colored"
+							color="brand"
+							:disabled="!replyBody"
+							class="w-full gap-2 sm:w-auto"
+							@click="sendReply()"
+						>
+							<SendIcon class="size-4" />
+							Send publicly
+						</Button>
+						<Button
+							v-if="isStaff(auth.user)"
+							:disabled="!replyBody"
+							class="w-full sm:w-auto"
+							@click="sendReply(true)"
+						>
+							<StickyNotePlusIcon />
+							Add private note
+						</Button>
+					</template>
 					<TeleportOverflowMenu
 						v-if="visibleQuickReplies.length > 0"
+						type="outlined"
 						label="More options"
 						:options="visibleQuickReplies"
 						class="!w-auto !rounded-xl !px-2.5"
 					>
-						Quick reply
+						<ArrowUpFromLineIcon />
+						Load preset
 						<ChevronDownIcon />
 					</TeleportOverflowMenu>
 				</div>
@@ -91,7 +114,14 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { ChevronDownIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
+import {
+	ArrowUpFromLineIcon,
+	ChevronDownIcon,
+	MessageIcon,
+	ReplyIcon,
+	SendIcon,
+	StickyNotePlusIcon,
+} from '@modrinth/assets'
 import type { QuickReply } from '@modrinth/moderation'
 import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import {
@@ -109,6 +139,19 @@ import { isStaff } from '~/helpers/users.js'
 import ThreadMessage from './ThreadMessage.vue'
 
 const { addNotification } = injectNotificationManager()
+
+const props = withDefaults(
+	defineProps<{
+		thread: Thread
+		quickReplies?: ReadonlyArray<QuickReply<T>>
+		quickReplyContext?: T
+		closed?: boolean
+		primaryAction?: 'reply' | 'note'
+	}>(),
+	{
+		primaryAction: 'reply',
+	},
+)
 
 const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 	const replies = props.quickReplies
@@ -131,13 +174,6 @@ const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 		)
 })
 
-const props = defineProps<{
-	thread: Thread
-	quickReplies?: ReadonlyArray<QuickReply<T>>
-	quickReplyContext?: T
-	closed?: boolean
-}>()
-
 async function handleQuickReply(reply: QuickReply<T>, context: T) {
 	const message = typeof reply.message === 'function' ? await reply.message(context) : reply.message
 
@@ -151,7 +187,7 @@ defineExpose({
 	sendReply,
 })
 
-const auth = await useAuth()
+const auth = useAuthState()
 
 const emit = defineEmits<{
 	updateThread: [thread: Thread]

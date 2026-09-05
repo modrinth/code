@@ -158,6 +158,7 @@
 				class="fixed z-[9999] flex flex-col overflow-x-hidden overflow-y-auto rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl"
 				:style="addMenuStyle"
 				role="menu"
+				@pointerdown.stop
 				@mousedown.stop
 				@keydown="handleAddMenuKeydown"
 				@mousemove="(event) => handleMenuMouseMove(event, 'menu')"

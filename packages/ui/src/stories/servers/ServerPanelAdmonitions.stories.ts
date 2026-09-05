@@ -71,6 +71,15 @@ const meta = {
 						progress: 0.35,
 						bytes_processed: 2_000_000,
 					},
+					{
+						id: 'fs-op-2',
+						op: 'zip',
+						src: 'world.zip',
+						state: 'failure-error',
+						progress: 0,
+						cancellable: false,
+						error: 'ZIP operation ended before completion',
+					},
 				])
 
 				const serverContext: ModrinthServerContext = {

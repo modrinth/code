@@ -239,18 +239,20 @@ export class KyrosFilesV0Module extends AbstractModule {
 	 * @param path - Path to archive file
 	 * @param override - If true, overwrite existing files
 	 * @param dry - If true, perform dry run (returns conflicts without extracting)
+	 * @param target - Directory to extract the archive into
 	 * @returns Extract result with modpack name and conflicting files
 	 */
 	public async extractFile(
 		path: string,
 		override: boolean = true,
 		dry: boolean = false,
+		target: string = '/',
 	): Promise<Kyros.Files.v0.ExtractResult> {
 		return this.client.request<Kyros.Files.v0.ExtractResult>('/fs/unarchive', {
 			api: '',
 			version: 'v1',
 			method: 'POST',
-			params: { src: path, trg: '/', override, dry },
+			params: { src: path, trg: target, override, dry },
 			useNodeAuth: true,
 		})
 	}
