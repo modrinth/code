@@ -223,7 +223,7 @@ pub struct EditUser {
     #[validate(length(max = 160))]
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
-	pub account_locked: Option<bool>,
+    pub account_locked: Option<bool>,
     pub badges: Option<Badges>,
     pub allow_friend_requests: Option<bool>,
 }
@@ -269,7 +269,7 @@ pub async fn user_edit(
             username: new_user.username,
             bio: new_user.bio,
             role: new_user.role,
-			account_locked: new_user.account_locked,
+            account_locked: new_user.account_locked,
             badges: new_user.badges,
             venmo_handle: None,
             allow_friend_requests: new_user.allow_friend_requests,

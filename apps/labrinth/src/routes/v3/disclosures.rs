@@ -54,7 +54,7 @@ pub async fn get_project_disclosures(
         .wrap_internal_err("failed to fetch project")?
         .wrap_not_found_err("resource not found")?;
 
-	let user_option = get_maybe_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -62,8 +62,8 @@ pub async fn get_project_disclosures(
         Scopes::PROJECT_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|(_, user)| user);
+    .wrap_auth_err("authenticating API request")?
+    .map(|(_, user)| user);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await

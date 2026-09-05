@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use super::ApiError;
 use crate::auth::checks::is_visible_organization;
 use crate::auth::{
-	filter_visible_projects, get_user_from_headers, require_verified_email,
+    filter_visible_projects, get_user_from_headers, require_verified_email,
 };
 use crate::database::PgPool;
 use crate::database::models::team_item::DBTeamMember;
@@ -57,7 +57,7 @@ pub async fn organization_projects_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-	let current_user = get_maybe_user_from_headers(
+    let current_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -65,8 +65,8 @@ pub async fn organization_projects_get(
         Scopes::ORGANIZATION_READ | Scopes::PROJECT_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let organization_data = DBOrganization::get(&id, &**pool, &redis)
         .await
@@ -239,7 +239,7 @@ pub async fn organization_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-	let current_user = get_maybe_user_from_headers(
+    let current_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -247,8 +247,8 @@ pub async fn organization_get(
         Scopes::ORGANIZATION_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let organization_data = DBOrganization::get(&id, &**pool, &redis)
@@ -450,7 +450,7 @@ pub async fn organizations_get(
     .await
     .wrap_internal_err("fetching users from database")?;
 
-	let current_user = get_maybe_user_from_headers(
+    let current_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -458,8 +458,8 @@ pub async fn organizations_get(
         Scopes::ORGANIZATION_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let user_id = current_user.as_ref().map(|x| x.id.into());
     let include_notes = current_user.as_ref().is_some_and(|x| x.role.is_mod());
     let notes = if include_notes {

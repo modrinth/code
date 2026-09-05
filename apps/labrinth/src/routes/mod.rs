@@ -276,14 +276,14 @@ impl actix_web::ResponseError for ApiError {
         match self {
             Self::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Request(..) => StatusCode::BAD_REQUEST,
-			Self::Auth(report) => {
-				match report.downcast_ref::<AuthenticationError>() {
-					Some(AuthenticationError::AccountLocked) => {
-						StatusCode::FORBIDDEN
-					}
-					_ => StatusCode::UNAUTHORIZED,
-				}
-			}
+            Self::Auth(report) => {
+                match report.downcast_ref::<AuthenticationError>() {
+                    Some(AuthenticationError::AccountLocked) => {
+                        StatusCode::FORBIDDEN
+                    }
+                    _ => StatusCode::UNAUTHORIZED,
+                }
+            }
             Self::NotFound(..) => StatusCode::NOT_FOUND,
             Self::Conflict(..) => StatusCode::CONFLICT,
             Self::FailedDependency(..) => StatusCode::FAILED_DEPENDENCY,
@@ -303,26 +303,26 @@ mod tests {
     use super::ApiError;
 
     #[test]
-	fn account_locked_preserves_forbidden_status_through_auth_context() {
-		use crate::{
-			auth::{AuthenticationError, templates::ErrorPage},
-			util::error::Context,
-		};
-		use actix_web::{ResponseError, http::StatusCode};
+    fn account_locked_preserves_forbidden_status_through_auth_context() {
+        use crate::{
+            auth::{AuthenticationError, templates::ErrorPage},
+            util::error::Context,
+        };
+        use actix_web::{ResponseError, http::StatusCode};
 
-		let direct = AuthenticationError::AccountLocked;
-		assert_eq!(direct.status_code(), StatusCode::FORBIDDEN);
-		let wrapped = Err::<(), _>(direct)
-			.wrap_auth_err("checking account lock")
-			.unwrap_err()
-			.wrap_err("authenticating API request");
-		assert_eq!(wrapped.status_code(), StatusCode::FORBIDDEN);
-		assert_eq!(wrapped.as_api_error().error, "auth_error");
-		let page = ErrorPage::from(AuthenticationError::AccountLocked);
-		assert_eq!(page.error_response().status(), StatusCode::FORBIDDEN);
-	}
+        let direct = AuthenticationError::AccountLocked;
+        assert_eq!(direct.status_code(), StatusCode::FORBIDDEN);
+        let wrapped = Err::<(), _>(direct)
+            .wrap_auth_err("checking account lock")
+            .unwrap_err()
+            .wrap_err("authenticating API request");
+        assert_eq!(wrapped.status_code(), StatusCode::FORBIDDEN);
+        assert_eq!(wrapped.as_api_error().error, "auth_error");
+        let page = ErrorPage::from(AuthenticationError::AccountLocked);
+        assert_eq!(page.error_response().status(), StatusCode::FORBIDDEN);
+    }
 
-	#[test]
+    #[test]
     fn api_error_serializes_source_chain_as_details() {
         let error = ApiError::Request(
             eyre::eyre!("root cause")

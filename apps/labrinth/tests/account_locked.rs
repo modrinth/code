@@ -4,56 +4,56 @@ use actix_http::StatusCode;
 use actix_web::{http::Method, test};
 use chrono::{Duration, Utc};
 use common::{
-	api_common::AppendsOptionalPat,
-	api_v3::{
-		ApiV3,
-		oauth::{
-			get_auth_code_from_redirect_params, get_authorize_accept_flow_id,
-		},
-	},
-	database::{ADMIN_USER_PAT, FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
-	environment::{TestEnvironment, with_test_environment},
+    api_common::AppendsOptionalPat,
+    api_v3::{
+        ApiV3,
+        oauth::{
+            get_auth_code_from_redirect_params, get_authorize_accept_flow_id,
+        },
+    },
+    database::{ADMIN_USER_PAT, FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
+    environment::{TestEnvironment, with_test_environment},
 };
 use labrinth::{
-	auth::{
-		AuthenticationError, get_user_from_headers,
-		validate::{
-			get_full_user_from_headers_allow_locked,
-			get_maybe_user_from_headers, get_user_record_from_bearer_token,
-		},
-	},
-	database::models::{
-		DBUserId, flow_item::DBFlow, session_item::SessionBuilder,
-	},
-	env::ENV,
-	models::pats::Scopes,
-	queue::session::AuthQueue,
+    auth::{
+        AuthenticationError, get_user_from_headers,
+        validate::{
+            get_full_user_from_headers_allow_locked,
+            get_maybe_user_from_headers, get_user_record_from_bearer_token,
+        },
+    },
+    database::models::{
+        DBUserId, flow_item::DBFlow, session_item::SessionBuilder,
+    },
+    env::ENV,
+    models::pats::Scopes,
+    queue::session::AuthQueue,
 };
 use serde_json::{Value, json};
 
 pub mod common;
 
 async fn set_account_locked(
-	env: &TestEnvironment<ApiV3>,
-	user: &str,
-	account_locked: bool,
+    env: &TestEnvironment<ApiV3>,
+    user: &str,
+    account_locked: bool,
 ) {
-	let response = env
-		.call(
-			test::TestRequest::patch()
-				.uri(&format!("/v3/user/{user}"))
-				.append_pat(ADMIN_USER_PAT)
-				.set_json(json!({"account_locked": account_locked}))
-				.to_request(),
-		)
-		.await;
-	assert_status!(&response, StatusCode::NO_CONTENT);
+    let response = env
+        .call(
+            test::TestRequest::patch()
+                .uri(&format!("/v3/user/{user}"))
+                .append_pat(ADMIN_USER_PAT)
+                .set_json(json!({"account_locked": account_locked}))
+                .to_request(),
+        )
+        .await;
+    assert_status!(&response, StatusCode::NO_CONTENT);
 }
 
 #[actix_rt::test]
 async fn account_locked_is_visible_only_to_self_and_admin_in_both_api_versions()
 {
-	with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
 		let mut restricted_tokens = Vec::new();
 		for pat in [USER_USER_PAT, ADMIN_USER_PAT] {
 			let response = env
@@ -207,147 +207,147 @@ async fn account_locked_is_visible_only_to_self_and_admin_in_both_api_versions()
 #[actix_rt::test]
 async fn existing_pat_session_and_oauth_credentials_obey_account_locks_and_cache_invalidation()
  {
-	with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-		let client = &env.dummy.oauth_client_alpha;
-		let oauth_token = env
-			.api
-			.complete_full_authorize_flow(
-				&client.client_id,
-				&client.client_secret,
-				Some("USER_READ USER_WRITE"),
-				None,
-				None,
-				USER_USER_PAT,
-			)
-			.await;
-		let mut transaction = env.db.pool.begin().await.unwrap();
-		SessionBuilder {
-			session: "mra_account_locked_test".into(),
-			user_id: DBUserId(3),
-			os: None,
-			platform: None,
-			city: None,
-			country: None,
-			ip: "127.0.0.1".into(),
-			user_agent: "account lock test".into(),
-			expires: None,
-			session_expires: None,
-		}
-		.insert(&mut transaction)
-		.await
-		.unwrap();
-		transaction.commit().await.unwrap();
-		let tokens = [
-			USER_USER_PAT.unwrap(),
-			"mra_account_locked_test",
-			oauth_token.as_str(),
-		];
-		let queue = AuthQueue::new();
-		for account_locked in [false, true, false] {
-			set_account_locked(&env, "3", account_locked).await;
-			for token in tokens {
-				let req = test::TestRequest::get()
-					.append_pat(Some(token))
-					.append_header((
-						"x-ratelimit-key",
-						ENV.RATE_LIMIT_IGNORE_KEY.as_str(),
-					))
-					.to_http_request();
-				let result = get_user_from_headers(
-					&req,
-					&*env.db.pool,
-					&env.db.redis_pool,
-					&queue,
-					Scopes::USER_READ,
-				)
-				.await;
-				match account_locked {
-					true => assert!(matches!(
-						result,
-						Err(AuthenticationError::AccountLocked)
-					)),
-					false => assert_eq!(
-						result.unwrap().1.account_locked,
-						Some(false)
-					),
-				}
-				let (_, user) = get_full_user_from_headers_allow_locked(
-					&req,
-					&*env.db.pool,
-					&env.db.redis_pool,
-					&queue,
-					Scopes::USER_READ,
-				)
-				.await
-				.unwrap();
-				assert_eq!(user.account_locked, account_locked);
-				let response = env
-					.call(
-						test::TestRequest::get()
-							.uri("/v3/user")
-							.append_pat(Some(token))
-							.append_header((
-								"x-ratelimit-key",
-								ENV.RATE_LIMIT_IGNORE_KEY.as_str(),
-							))
-							.to_request(),
-					)
-					.await;
-				assert_status!(&response, StatusCode::OK);
-				let body: Value = test::read_body_json(response).await;
-				assert_eq!(body["account_locked"], json!(account_locked));
-				if account_locked {
-					assert!(body["auth_providers"].is_null());
-					assert!(body["email"].is_null());
-					assert!(matches!(
-						get_maybe_user_from_headers(
-							&req,
-							&*env.db.pool,
-							&env.db.redis_pool,
-							&queue,
-							Scopes::SESSION_ACCESS,
-						)
-						.await,
-						Err(AuthenticationError::AccountLocked)
-					));
-					assert!(matches!(
-						get_user_record_from_bearer_token(
-							&req,
-							Some(token),
-							&*env.db.pool,
-							&env.db.redis_pool,
-							&queue,
-							true,
-						)
-						.await,
-						Err(AuthenticationError::AccountLocked)
-					));
-				}
-			}
-		}
-		let req = test::TestRequest::get()
-			.append_pat(Some(&oauth_token))
-			.to_http_request();
-		let result = get_full_user_from_headers_allow_locked(
-			&req,
-			&*env.db.pool,
-			&env.db.redis_pool,
-			&queue,
-			Scopes::USER_AUTH_WRITE,
-		)
-		.await;
-		assert!(matches!(
-			result,
-			Err(AuthenticationError::InvalidCredentials)
-		));
-	})
-	.await;
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+        let client = &env.dummy.oauth_client_alpha;
+        let oauth_token = env
+            .api
+            .complete_full_authorize_flow(
+                &client.client_id,
+                &client.client_secret,
+                Some("USER_READ USER_WRITE"),
+                None,
+                None,
+                USER_USER_PAT,
+            )
+            .await;
+        let mut transaction = env.db.pool.begin().await.unwrap();
+        SessionBuilder {
+            session: "mra_account_locked_test".into(),
+            user_id: DBUserId(3),
+            os: None,
+            platform: None,
+            city: None,
+            country: None,
+            ip: "127.0.0.1".into(),
+            user_agent: "account lock test".into(),
+            expires: None,
+            session_expires: None,
+        }
+        .insert(&mut transaction)
+        .await
+        .unwrap();
+        transaction.commit().await.unwrap();
+        let tokens = [
+            USER_USER_PAT.unwrap(),
+            "mra_account_locked_test",
+            oauth_token.as_str(),
+        ];
+        let queue = AuthQueue::new();
+        for account_locked in [false, true, false] {
+            set_account_locked(&env, "3", account_locked).await;
+            for token in tokens {
+                let req = test::TestRequest::get()
+                    .append_pat(Some(token))
+                    .append_header((
+                        "x-ratelimit-key",
+                        ENV.RATE_LIMIT_IGNORE_KEY.as_str(),
+                    ))
+                    .to_http_request();
+                let result = get_user_from_headers(
+                    &req,
+                    &*env.db.pool,
+                    &env.db.redis_pool,
+                    &queue,
+                    Scopes::USER_READ,
+                )
+                .await;
+                match account_locked {
+                    true => assert!(matches!(
+                        result,
+                        Err(AuthenticationError::AccountLocked)
+                    )),
+                    false => assert_eq!(
+                        result.unwrap().1.account_locked,
+                        Some(false)
+                    ),
+                }
+                let (_, user) = get_full_user_from_headers_allow_locked(
+                    &req,
+                    &*env.db.pool,
+                    &env.db.redis_pool,
+                    &queue,
+                    Scopes::USER_READ,
+                )
+                .await
+                .unwrap();
+                assert_eq!(user.account_locked, account_locked);
+                let response = env
+                    .call(
+                        test::TestRequest::get()
+                            .uri("/v3/user")
+                            .append_pat(Some(token))
+                            .append_header((
+                                "x-ratelimit-key",
+                                ENV.RATE_LIMIT_IGNORE_KEY.as_str(),
+                            ))
+                            .to_request(),
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::OK);
+                let body: Value = test::read_body_json(response).await;
+                assert_eq!(body["account_locked"], json!(account_locked));
+                if account_locked {
+                    assert!(body["auth_providers"].is_null());
+                    assert!(body["email"].is_null());
+                    assert!(matches!(
+                        get_maybe_user_from_headers(
+                            &req,
+                            &*env.db.pool,
+                            &env.db.redis_pool,
+                            &queue,
+                            Scopes::SESSION_ACCESS,
+                        )
+                        .await,
+                        Err(AuthenticationError::AccountLocked)
+                    ));
+                    assert!(matches!(
+                        get_user_record_from_bearer_token(
+                            &req,
+                            Some(token),
+                            &*env.db.pool,
+                            &env.db.redis_pool,
+                            &queue,
+                            true,
+                        )
+                        .await,
+                        Err(AuthenticationError::AccountLocked)
+                    ));
+                }
+            }
+        }
+        let req = test::TestRequest::get()
+            .append_pat(Some(&oauth_token))
+            .to_http_request();
+        let result = get_full_user_from_headers_allow_locked(
+            &req,
+            &*env.db.pool,
+            &env.db.redis_pool,
+            &queue,
+            Scopes::USER_AUTH_WRITE,
+        )
+        .await;
+        assert!(matches!(
+            result,
+            Err(AuthenticationError::InvalidCredentials)
+        ));
+    })
+    .await;
 }
 
 #[actix_rt::test]
 async fn locked_accounts_cannot_mutate_resources_read_sensitive_data_or_unlock_themselves()
  {
-	with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
 		for pat in [USER_USER_PAT, MOD_USER_PAT] {
 			let response = env.call(test::TestRequest::patch().uri("/v3/user/3")
 				.append_pat(pat).set_json(json!({"account_locked": true})).to_request()).await;
@@ -405,7 +405,7 @@ async fn locked_accounts_cannot_mutate_resources_read_sensitive_data_or_unlock_t
 #[actix_rt::test]
 async fn flows_created_before_lock_cannot_reset_password_verify_email_or_issue_tokens()
  {
-	with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
 		let password_flow = DBFlow::ForgotPassword { user_id: DBUserId(3) }.insert(Duration::hours(1), &env.db.redis_pool).await.unwrap();
 		let email_flow = DBFlow::ConfirmEmail { user_id: DBUserId(3), confirm_email: "user@modrinth.com".into() }.insert(Duration::hours(1), &env.db.redis_pool).await.unwrap();
 		let login_flow = DBFlow::Login2FA { user_id: DBUserId(3) }.insert(Duration::hours(1), &env.db.redis_pool).await.unwrap();

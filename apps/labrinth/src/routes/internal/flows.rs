@@ -2,8 +2,8 @@ use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
 use crate::auth::{
-	AuthProvider, AuthenticationError, check_account_unlocked,
-	get_user_from_headers,
+    AuthProvider, AuthenticationError, check_account_unlocked,
+    get_user_from_headers,
 };
 use crate::database::PgPool;
 use crate::database::PgTransaction;
@@ -255,7 +255,7 @@ impl TempUser {
             bio: self.bio,
             created: Utc::now(),
             role: Role::Developer.to_string(),
-			account_locked: false,
+            account_locked: false,
             badges: Badges::default(),
             campaign_pride_26: None,
             allow_friend_requests: true,
@@ -1109,7 +1109,7 @@ pub async fn init(
             &session_queue,
             false,
         )
-		.await?
+        .await?
         .map(|(_scopes, user)| user.id)
     } else {
         None
@@ -1292,7 +1292,7 @@ pub async fn auth_callback(
                 "attempting to link a PayPal account without being logged in",
             )?;
 
-			let updated = sqlx::query!(
+            let updated = sqlx::query!(
                 "
                 UPDATE users
                 SET paypal_country = $1, paypal_email = $2, paypal_id = $3
@@ -1307,9 +1307,9 @@ pub async fn auth_callback(
             .await
             .wrap_err("failed to update user PayPal info")?;
 
-			if updated.rows_affected() == 0 {
-				return Err(AuthenticationError::AccountLocked);
-			}
+            if updated.rows_affected() == 0 {
+                return Err(AuthenticationError::AccountLocked);
+            }
 
             transaction
                 .commit()
@@ -1332,22 +1332,22 @@ pub async fn auth_callback(
                 return Err(AuthenticationError::ProviderAlreadyLinked);
             }
 
-			let user = DBUser::get_id(id, &**client, &redis)
-				.await?
-				.ok_or(AuthenticationError::InvalidCredentials)?;
-			check_account_unlocked(user.account_locked)?;
+            let user = DBUser::get_id(id, &**client, &redis)
+                .await?
+                .ok_or(AuthenticationError::InvalidCredentials)?;
+            check_account_unlocked(user.account_locked)?;
 
             provider
                 .update_user_id(id, Some(&oauth_user.id), &mut transaction)
                 .await?;
 
-			NotificationBuilder {
-				body: NotificationBody::AuthProviderAdded {
-					provider: provider.as_str().to_string(),
-				},
+            NotificationBuilder {
+                body: NotificationBody::AuthProviderAdded {
+                    provider: provider.as_str().to_string(),
+                },
             }
-			.insert(user.id, &mut transaction, &redis)
-			.await?;
+            .insert(user.id, &mut transaction, &redis)
+            .await?;
 
             transaction.commit().await?;
             crate::database::models::DBUser::clear_caches(
@@ -1366,7 +1366,7 @@ pub async fn auth_callback(
             .await?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-			check_account_unlocked(user.account_locked)?;
+            check_account_unlocked(user.account_locked)?;
 
             if user.totp_secret.is_some() {
                 let flow = DBFlow::Login2FA { user_id: user.id }
@@ -2103,7 +2103,7 @@ impl ReadyAccountRegisterFlow {
             bio: None,
             created: Utc::now(),
             role: Role::Developer.to_string(),
-			account_locked: false,
+            account_locked: false,
             badges: Badges::default(),
             campaign_pride_26: None,
             allow_friend_requests: true,
@@ -2320,8 +2320,8 @@ pub async fn login_password(
         .map_err(|_| AuthenticationError::InvalidCredentials)
         .wrap_auth_err("authenticating API request")?;
 
-	check_account_unlocked(user.account_locked)
-		.wrap_auth_err("checking account lock")?;
+    check_account_unlocked(user.account_locked)
+        .wrap_auth_err("checking account lock")?;
 
     if user.totp_secret.is_some() {
         let flow = DBFlow::Login2FA { user_id: user.id }
@@ -2464,8 +2464,8 @@ pub async fn login_2fa(
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)
                 .wrap_auth_err("fetching user from database")?;
 
-		check_account_unlocked(user.account_locked)
-			.wrap_auth_err("checking account lock")?;
+        check_account_unlocked(user.account_locked)
+            .wrap_auth_err("checking account lock")?;
 
         let mut transaction = pool
             .begin()
@@ -2918,12 +2918,12 @@ pub async fn reset_password_begin(
     if let Some(DBUser {
         id: user_id,
         email: user_email,
-		account_locked,
+        account_locked,
         ..
     }) = user
     {
-		check_account_unlocked(account_locked)
-			.wrap_auth_err("checking account lock")?;
+        check_account_unlocked(account_locked)
+            .wrap_auth_err("checking account lock")?;
 
         let flow = DBFlow::ForgotPassword { user_id }
             .insert(Duration::hours(24), &redis)
@@ -3048,8 +3048,8 @@ pub async fn change_password(
         user
     };
 
-	check_account_unlocked(user.account_locked)
-		.wrap_auth_err("checking account lock")?;
+    check_account_unlocked(user.account_locked)
+        .wrap_auth_err("checking account lock")?;
 
     let mut transaction = pool
         .begin()
@@ -3422,8 +3422,8 @@ pub async fn verify_email(
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)
                 .wrap_auth_err("fetching user from database")?;
 
-		check_account_unlocked(user.account_locked)
-			.wrap_auth_err("checking account lock")?;
+        check_account_unlocked(user.account_locked)
+            .wrap_auth_err("checking account lock")?;
 
         if user.email != Some(confirm_email) {
             return Err(ApiError::Request(eyre::eyre!(
@@ -3865,14 +3865,14 @@ pub async fn authenticate_passkey_finish(
 
     if let Some(DBFlow::AuthenticatePasskey { state }) = flow {
         let credential_id = response.credential.get_credential_id();
-		let (db_passkey, account_locked) =
+        let (db_passkey, account_locked) =
             DBPasskey::get_by_credential_id(credential_id, &**pool)
                 .await
                 .wrap_internal_err("failed to fetch passkey")?
                 .wrap_request_err_with(|| "passkey not found")?;
 
-		check_account_unlocked(account_locked)
-			.wrap_auth_err("checking account lock")?;
+        check_account_unlocked(account_locked)
+            .wrap_auth_err("checking account lock")?;
 
         let mut transaction = pool
             .begin()

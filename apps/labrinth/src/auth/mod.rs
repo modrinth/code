@@ -9,8 +9,8 @@ pub use checks::{
 };
 use serde::{Deserialize, Serialize};
 pub use validate::{
-	check_account_unlocked, check_is_moderator_from_headers,
-	get_user_from_bearer_token, get_user_from_headers,
+    check_account_unlocked, check_is_moderator_from_headers,
+    get_user_from_bearer_token, get_user_from_headers,
 };
 
 use crate::file_hosting::FileHostingError;
@@ -39,8 +39,8 @@ pub enum AuthenticationError {
     Mail(#[from] crate::queue::email::MailError),
     #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
-	#[error("account is locked")]
-	AccountLocked,
+    #[error("account is locked")]
+    AccountLocked,
     #[error("Authentication method was not valid")]
     InvalidAuthMethod,
     #[error("GitHub Token from incorrect Client ID")]
@@ -76,7 +76,7 @@ impl actix_web::ResponseError for AuthenticationError {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             AuthenticationError::InvalidCredentials => StatusCode::UNAUTHORIZED,
-			AuthenticationError::AccountLocked => StatusCode::FORBIDDEN,
+            AuthenticationError::AccountLocked => StatusCode::FORBIDDEN,
             AuthenticationError::Decoding(..) => StatusCode::BAD_REQUEST,
             AuthenticationError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::InvalidAuthMethod => StatusCode::UNAUTHORIZED,
@@ -112,7 +112,7 @@ impl AuthenticationError {
             AuthenticationError::SerDe(..) => "invalid_input",
             AuthenticationError::Reqwest(..) => "network_error",
             AuthenticationError::InvalidCredentials => "invalid_credentials",
-			AuthenticationError::AccountLocked => "account_locked",
+            AuthenticationError::AccountLocked => "account_locked",
             AuthenticationError::Decoding(..) => "decoding_error",
             AuthenticationError::Mail(..) => "mail_error",
             AuthenticationError::InvalidAuthMethod => "invalid_auth_method",

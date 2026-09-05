@@ -49,7 +49,7 @@ pub async fn resolve_content(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ResolveContentPlan>, ApiError> {
-	let user_option = get_maybe_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -57,8 +57,8 @@ pub async fn resolve_content(
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let cache_public_result = user_option.is_none();
     let mut provider = LabrinthContentProvider {
         pool: pool.get_ref(),

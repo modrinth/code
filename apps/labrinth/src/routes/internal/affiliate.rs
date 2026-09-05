@@ -54,7 +54,7 @@ pub async fn ingest_click(
     session_queue: web::Data<AuthQueue>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
 ) -> Result<(), ApiError> {
-	let user = get_maybe_user_from_headers(
+    let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -62,8 +62,8 @@ pub async fn ingest_click(
         Scopes::empty(),
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|(_, user)| user);
+    .wrap_auth_err("authenticating API request")?
+    .map(|(_, user)| user);
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = ingest_click.url;

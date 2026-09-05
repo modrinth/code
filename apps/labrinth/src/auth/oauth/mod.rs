@@ -313,10 +313,10 @@ pub async fn request_token(
                 user_id,
             }
             .insert(&mut transaction)
-			.await?
-			.ok_or_else(|| {
-				OAuthError::error(OAuthErrorType::InvalidAuthCode)
-			})?;
+            .await?
+            .ok_or_else(|| {
+                OAuthError::error(OAuthErrorType::InvalidAuthCode)
+            })?;
 
             transaction.commit().await?;
 

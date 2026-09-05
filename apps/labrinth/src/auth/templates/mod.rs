@@ -40,7 +40,7 @@ impl Display for ErrorPage {
 
 impl ErrorPage {
     pub fn render(&self) -> HttpResponse {
-		HttpResponse::build(self.code)
+        HttpResponse::build(self.code)
             .append_header(("Content-Type", "text/html; charset=utf-8"))
             .body(self.to_string())
     }

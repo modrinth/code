@@ -52,7 +52,7 @@ pub struct DBUser {
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
     pub role: String,
-	pub account_locked: bool,
+    pub account_locked: bool,
     pub badges: Badges,
     #[serde(default)]
     pub campaign_pride_26: Option<Pride26CampaignDonation>,

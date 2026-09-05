@@ -95,7 +95,7 @@ pub async fn maven_metadata(
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-	let user_option = get_maybe_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -103,8 +103,8 @@ pub async fn maven_metadata(
         Scopes::PROJECT_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
@@ -333,7 +333,7 @@ pub async fn version_file(
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-	let user_option = get_maybe_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -341,8 +341,8 @@ pub async fn version_file(
         Scopes::PROJECT_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
@@ -420,7 +420,7 @@ pub async fn version_file_sha1(
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-	let user_option = get_maybe_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -428,8 +428,8 @@ pub async fn version_file_sha1(
         Scopes::PROJECT_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
@@ -486,7 +486,7 @@ pub async fn version_file_sha512(
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-	let user_option = get_maybe_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -494,8 +494,8 @@ pub async fn version_file_sha512(
         Scopes::PROJECT_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await

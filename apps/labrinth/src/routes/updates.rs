@@ -61,7 +61,7 @@ pub async fn forge_updates(
         .wrap_api_err("fetching project from database")?
         .wrap_request_err_with(|| ERROR.to_string())?;
 
-	let user_option = get_maybe_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -69,8 +69,8 @@ pub async fn forge_updates(
         Scopes::PROJECT_READ,
     )
     .await
-	.wrap_auth_err("authenticating API request")?
-	.map(|x| x.1);
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
