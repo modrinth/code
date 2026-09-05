@@ -28,6 +28,7 @@ export function useAnalyticsChartLegend({
 	allChartDatasets,
 	previousChartDatasets,
 	shouldShowPreviousPeriod,
+	isSameDayLastWeekComparison,
 	isRatioMode,
 	hiddenGraphDatasetIds,
 	selectedBreakdowns,
@@ -40,6 +41,7 @@ export function useAnalyticsChartLegend({
 	allChartDatasets: ComputedRef<ChartDataset[]>
 	previousChartDatasets: ComputedRef<ChartDataset[]>
 	shouldShowPreviousPeriod: ComputedRef<boolean>
+	isSameDayLastWeekComparison: ComputedRef<boolean>
 	isRatioMode: Ref<boolean>
 	hiddenGraphDatasetIds: Ref<string[]>
 	selectedBreakdowns: Ref<readonly AnalyticsBreakdownPreset[]>
@@ -51,6 +53,11 @@ export function useAnalyticsChartLegend({
 	const { formatMessage } = useVIntl()
 	const hoveredLegendEntryId = ref<string | null>(null)
 	const hiddenDatasetIds = computed(() => new Set(hiddenGraphDatasetIds.value))
+	const previousPeriodSuffixMessage = computed(() =>
+		isSameDayLastWeekComparison.value
+			? analyticsChartMessages.sameDayLastWeekSuffix
+			: analyticsChartMessages.previousPeriodSuffix,
+	)
 	const previousChartDatasetByOriginalId = computed(() => {
 		const datasets = new Map<string, ChartDataset>()
 		for (const dataset of previousChartDatasets.value) {
@@ -117,7 +124,7 @@ export function useAnalyticsChartLegend({
 			const previousDataset = previousChartDatasetByOriginalId.value.get(entry.id)
 			const previousEntry: AnalyticsChartLegendEntry = {
 				id: getPreviousPeriodDatasetId(entry.id),
-				name: formatMessage(analyticsChartMessages.previousPeriodSuffix, { name: entry.name }),
+				name: formatMessage(previousPeriodSuffixMessage.value, { name: entry.name }),
 				projectName: entry.projectName,
 				tooltip: entry.tooltip,
 				color: entry.color,
@@ -151,7 +158,7 @@ export function useAnalyticsChartLegend({
 			)
 			datasets.set(getPreviousPeriodDatasetId(dataset.projectId), {
 				projectId: getPreviousPeriodDatasetId(dataset.projectId),
-				label: formatMessage(analyticsChartMessages.previousPeriodSuffix, {
+				label: formatMessage(previousPeriodSuffixMessage.value, {
 					name: dataset.label,
 				}),
 				projectName: dataset.projectName,

@@ -37,6 +37,7 @@ function isProjectAnalyticsPoint(
 export function buildComparisonFetchRequest(
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
 	minStartTime = ANALYTICS_START_TIME,
+	comparisonOffsetMs?: number,
 ): AnalyticsProjectFetchRequest | null {
 	if (!isAnalyticsFetchRequestReady(fetchRequest)) {
 		return null
@@ -50,7 +51,12 @@ export function buildComparisonFetchRequest(
 		return null
 	}
 
-	const previousStart = new Date(startTimestamp - duration)
+	const offset = comparisonOffsetMs ?? duration
+	if (!Number.isFinite(offset) || offset < duration) {
+		return null
+	}
+
+	const previousStart = new Date(startTimestamp - offset)
 
 	if (previousStart.getTime() < minStartTime) {
 		return null
@@ -64,7 +70,9 @@ export function buildComparisonFetchRequest(
 			resolution:
 				'slices' in fetchRequest.time_range.resolution
 					? {
-							slices: fetchRequest.time_range.resolution.slices * 2,
+							slices: Math.ceil(
+								fetchRequest.time_range.resolution.slices * ((offset + duration) / duration),
+							),
 						}
 					: fetchRequest.time_range.resolution,
 		},
@@ -99,10 +107,11 @@ export function splitAnalyticsTimeSlices(
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[],
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null,
 	minStartTime = ANALYTICS_START_TIME,
+	comparisonOffsetMs?: number,
 ): AnalyticsTimeSliceSplit {
 	if (
 		!isAnalyticsFetchRequestReady(fetchRequest) ||
-		!buildComparisonFetchRequest(fetchRequest, minStartTime)
+		!buildComparisonFetchRequest(fetchRequest, minStartTime, comparisonOffsetMs)
 	) {
 		return {
 			currentTimeSlices: timeSlices,
@@ -112,11 +121,20 @@ export function splitAnalyticsTimeSlices(
 
 	const currentSliceCount = getAnalyticsTimeSliceCount(fetchRequest.time_range, timeSlices.length)
 	const currentStartIndex = Math.max(0, timeSlices.length - currentSliceCount)
-	const previousStartIndex = Math.max(0, currentStartIndex - currentSliceCount)
+	const startTimestamp = new Date(fetchRequest.time_range.start).getTime()
+	const endTimestamp = new Date(fetchRequest.time_range.end).getTime()
+	const duration = endTimestamp - startTimestamp
+	const offsetSliceCount = Math.round(
+		currentSliceCount * ((comparisonOffsetMs ?? duration) / duration),
+	)
+	const previousStartIndex = Math.max(0, currentStartIndex - offsetSliceCount)
 
 	return {
 		currentTimeSlices: timeSlices.slice(currentStartIndex),
-		previousTimeSlices: timeSlices.slice(previousStartIndex, currentStartIndex),
+		previousTimeSlices: timeSlices.slice(
+			previousStartIndex,
+			previousStartIndex + currentSliceCount,
+		),
 	}
 }
 
