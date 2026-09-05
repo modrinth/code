@@ -1,4 +1,3 @@
-use crate::auth::AccountLockRequirement;
 use actix_web::{HttpRequest, delete, patch, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
@@ -56,7 +55,6 @@ pub async fn analytics_event_create(
         &redis,
         &session_queue,
         Scopes::empty(),
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -118,7 +116,6 @@ pub async fn analytics_event_edit(
         &redis,
         &session_queue,
         Scopes::empty(),
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -170,7 +167,6 @@ pub async fn analytics_event_delete(
         &redis,
         &session_queue,
         Scopes::empty(),
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

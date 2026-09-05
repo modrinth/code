@@ -1,4 +1,3 @@
-use crate::auth::AccountLockRequirement;
 use actix_web::{HttpRequest, post, web};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -148,7 +147,6 @@ pub async fn search_global_issue_details(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating global issue search")?;
@@ -373,7 +371,6 @@ pub async fn get_global_issue_detail(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating global issue detail request")?;

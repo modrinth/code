@@ -1,12 +1,11 @@
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::util::error::ApiContext as _;
 use std::any::type_name;
 use std::cmp::Reverse;
 use std::collections::HashMap;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
-use crate::auth::{
-	AccountLockRequirement, filter_visible_projects, get_user_from_headers,
-};
+use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{
     DBGalleryItem, DBModCategory, ProjectQueryResult,
@@ -261,17 +260,16 @@ pub async fn projects_get(
         .await
         .wrap_api_err("fetching requested projects")?;
 
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     let projects =
         filter_visible_projects(projects_data, &user_option, &pool, false)
@@ -309,17 +307,16 @@ pub async fn project_get_internal(
     let project_data = db_models::DBProject::get(&string, &**pool, &redis)
         .await
         .wrap_internal_err("failed to fetch project")?;
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|(_, user)| user)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|(_, user)| user);
 
     if let Some(data) = project_data
         && is_visible_project(&data.inner, &user_option, &pool, false)
@@ -461,7 +458,6 @@ pub async fn project_edit_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1749,17 +1745,16 @@ pub async fn dependency_list_internal(
         .await
         .wrap_api_err("fetching project from database")?;
 
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     if let Some(project) = result {
         if !is_visible_project(&project.inner, &user_option, &pool, false)
@@ -1914,7 +1909,6 @@ pub async fn projects_edit(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2292,7 +2286,6 @@ pub async fn project_icon_edit_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2446,7 +2439,6 @@ pub async fn delete_project_icon_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2610,7 +2602,6 @@ pub async fn add_gallery_item_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2842,7 +2833,6 @@ pub async fn edit_gallery_item_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3074,7 +3064,6 @@ pub async fn delete_gallery_item_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3226,7 +3215,6 @@ pub async fn project_delete_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_DELETE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -3537,7 +3525,6 @@ pub async fn project_follow_internal(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3643,7 +3630,6 @@ pub async fn project_unfollow_internal(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3725,17 +3711,16 @@ pub async fn project_get_organization(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user = get_user_from_headers(
+	let current_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let string = info.into_inner().0;

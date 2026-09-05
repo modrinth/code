@@ -49,7 +49,7 @@ impl DBPasskey {
     pub async fn get_by_credential_id<'a, E>(
         credential_id: &[u8],
         exec: E,
-	) -> Result<Option<(DBPasskey, bool)>, DatabaseError>
+    ) -> Result<Option<(DBPasskey, bool)>, DatabaseError>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -67,19 +67,19 @@ impl DBPasskey {
         )
         .fetch_optional(exec)
         .await?
-		.map(|x| {
-			(
-				DBPasskey {
-					id: DBPasskeyId(x.id),
-					user_id: DBUserId(x.user_id),
-					name: x.name,
-					credential_id: x.credential_id,
-					passkey: x.passkey.0,
-					created_at: x.created_at,
-					last_used: x.last_used,
-				},
-				x.account_locked,
-			)
+        .map(|x| {
+            (
+                DBPasskey {
+                    id: DBPasskeyId(x.id),
+                    user_id: DBUserId(x.user_id),
+                    name: x.name,
+                    credential_id: x.credential_id,
+                    passkey: x.passkey.0,
+                    created_at: x.created_at,
+                    last_used: x.last_used,
+                },
+                x.account_locked,
+            )
         });
 
         Ok(row)

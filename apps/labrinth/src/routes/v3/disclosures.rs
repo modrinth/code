@@ -1,3 +1,4 @@
+use crate::auth::validate::get_maybe_user_from_headers;
 use actix_web::{HttpRequest, get, patch, web};
 use chrono::Utc;
 use eyre::eyre;
@@ -6,7 +7,7 @@ use utoipa::ToSchema;
 use xredis::RedisPool;
 
 use crate::auth::checks::{is_team_member_project, is_visible_project};
-use crate::auth::{AccountLockRequirement, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database::{DBProject, models as db_models};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::disclosures::{
@@ -53,17 +54,16 @@ pub async fn get_project_disclosures(
         .wrap_internal_err("failed to fetch project")?
         .wrap_not_found_err("resource not found")?;
 
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|(_, user)| user)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|(_, user)| user);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
@@ -142,7 +142,6 @@ pub async fn modify_project_disclosures(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

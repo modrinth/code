@@ -1,7 +1,5 @@
 use crate::auth::validate::get_user_from_bearer_token;
-use crate::auth::{
-	AccountLockRequirement, AuthenticationError, get_user_from_headers,
-};
+use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
@@ -161,7 +159,6 @@ pub async fn list(
         &redis,
         &session_queue,
         Scopes::SESSION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -218,7 +215,6 @@ pub async fn delete(
         &redis,
         &session_queue,
         Scopes::SESSION_DELETE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -296,7 +292,6 @@ pub async fn refresh(
         &redis,
         &session_queue,
         true, // Allow expired sessions, since we want to allow refreshing expired sessions
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

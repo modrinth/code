@@ -1,5 +1,5 @@
-use crate::auth::AccountLockRequirement;
-use crate::auth::validate::get_full_user_from_headers;
+use crate::auth::validate::get_full_user_from_headers_allow_locked;
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::util::error::ApiContext as _;
 use std::{
     cmp::Reverse,
@@ -82,17 +82,16 @@ pub async fn all_projects(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<AllProjectsResponse>, ApiError> {
-    let user = get_user_from_headers(
+	let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
     let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
         .wrap_internal_err("fetching user from database")?
@@ -237,7 +236,6 @@ pub async fn admin_user_email(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -298,17 +296,16 @@ pub async fn projects_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+	let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
@@ -352,13 +349,12 @@ pub async fn user_auth_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-	let (scopes, db_user) = get_full_user_from_headers(
+	let (scopes, db_user) = get_full_user_from_headers_allow_locked(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		AccountLockRequirement::None,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -405,7 +401,6 @@ pub async fn get_user_preferences(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -450,7 +445,6 @@ pub async fn edit_user_preferences(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -555,25 +549,18 @@ pub async fn users_get(
         .await
         .wrap_internal_err("fetching users from database")?;
 
-	let auth_user = get_full_user_from_headers(
+	let auth_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
 		Scopes::empty(),
-		AccountLockRequirement::None,
     )
     .await
-    .ok();
+	.wrap_auth_err("authenticating API request")?;
 
 	let is_mod = auth_user.as_ref().is_some_and(|(scopes, user)| {
-		match user.account_locked {
-			false => {
-				scopes.contains(Scopes::SESSION_ACCESS)
-					&& Role::from_string(&user.role).is_mod()
-			}
-			true => false,
-		}
+		scopes.contains(Scopes::SESSION_ACCESS) && user.role.is_mod()
 	});
 	let notes = if is_mod {
         DBModerationNote::get_many_users(
@@ -594,8 +581,7 @@ pub async fn users_get(
 			let visible_account_locked = auth_user
 				.as_ref()
 				.filter(|(_, viewer)| {
-					viewer.id == user_id
-						|| Role::from_string(&viewer.role).is_admin()
+					viewer.id == user_id.into() || viewer.role.is_admin()
 				})
 				.map(|_| data.account_locked);
 			let mut user = User::from(data);
@@ -635,34 +621,28 @@ pub async fn user_get(
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(data) = user_data {
-		let auth_user = get_full_user_from_headers(
+		let auth_user = get_maybe_user_from_headers(
             &req,
             &**pool,
             &redis,
             &session_queue,
 			Scopes::empty(),
-			AccountLockRequirement::None,
         )
         .await
-        .ok();
+		.wrap_auth_err("authenticating API request")?;
 
-		let staff_role =
-			auth_user.as_ref().and_then(|(scopes, user)| {
-				match user.account_locked {
-					false => scopes
-						.contains(Scopes::SESSION_ACCESS)
-						.then(|| Role::from_string(&user.role)),
-					true => None,
-				}
-			});
-		let is_admin = staff_role.as_ref().is_some_and(Role::is_admin);
-		let is_mod = staff_role.as_ref().is_some_and(Role::is_mod);
+		let staff_role = auth_user.as_ref().and_then(|(scopes, user)| {
+			scopes
+				.contains(Scopes::SESSION_ACCESS)
+				.then_some(&user.role)
+		});
+		let is_admin = staff_role.is_some_and(Role::is_admin);
+		let is_mod = staff_role.is_some_and(Role::is_mod);
         let user_id = data.id;
 		let visible_account_locked = auth_user
 			.as_ref()
 			.filter(|(_, viewer)| {
-				viewer.id == user_id
-					|| Role::from_string(&viewer.role).is_admin()
+				viewer.id == user_id.into() || viewer.role.is_admin()
 			})
 			.map(|_| data.account_locked);
 
@@ -711,7 +691,6 @@ pub async fn user_notes_edit(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -791,17 +770,16 @@ pub async fn collections_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+	let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::COLLECTION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
@@ -839,17 +817,16 @@ pub async fn orgs_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+	let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
@@ -983,7 +960,6 @@ pub async fn user_edit(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1222,7 +1198,6 @@ pub async fn user_icon_edit(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1318,7 +1293,6 @@ pub async fn user_icon_delete(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1390,7 +1364,6 @@ pub async fn user_delete(
         &redis,
         &session_queue,
         Scopes::USER_DELETE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1454,7 +1427,6 @@ pub async fn user_follows(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1515,7 +1487,6 @@ pub async fn user_notifications(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

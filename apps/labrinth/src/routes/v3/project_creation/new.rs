@@ -1,4 +1,3 @@
-use crate::auth::AccountLockRequirement;
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
 use eyre::eyre;
@@ -137,7 +136,6 @@ pub async fn create(
         &redis,
         &session_queue,
         Scopes::PROJECT_CREATE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating project creator")?;

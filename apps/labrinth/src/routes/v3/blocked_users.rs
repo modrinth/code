@@ -1,4 +1,4 @@
-use crate::auth::{AccountLockRequirement, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBUser;
 use crate::database::models::blocked_user_item::DBBlockedUser;
@@ -34,7 +34,6 @@ pub async fn block_user(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -93,7 +92,6 @@ pub async fn unblock_user(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -129,7 +127,6 @@ pub async fn get_blocked_users(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

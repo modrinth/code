@@ -3,7 +3,7 @@ use eyre::eyre;
 use serde::Serialize;
 use xredis::RedisPool;
 
-use crate::auth::{AccountLockRequirement, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database::models::DBProjectId;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::{
@@ -102,7 +102,6 @@ pub async fn validate(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::None,
     )
     .await
     .wrap_auth_err("authenticating API request")?

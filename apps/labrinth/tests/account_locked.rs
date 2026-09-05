@@ -16,7 +16,11 @@ use common::{
 };
 use labrinth::{
 	auth::{
-		AccountLockRequirement, AuthenticationError, get_user_from_headers,
+		AuthenticationError, get_user_from_headers,
+		validate::{
+			get_full_user_from_headers_allow_locked,
+			get_maybe_user_from_headers, get_user_record_from_bearer_token,
+		},
 	},
 	database::models::{
 		DBUserId, flow_item::DBFlow, session_item::SessionBuilder,
@@ -82,6 +86,9 @@ async fn account_locked_is_visible_only_to_self_and_admin_in_both_api_versions()
 					(Some(restricted_tokens[0].as_str()), true),
 					(Some(restricted_tokens[1].as_str()), true),
 				] {
+					let locked_viewer = account_locked
+						&& (pat == USER_USER_PAT
+							|| pat == Some(restricted_tokens[0].as_str()));
 					for target in ["3", "User"] {
 						let response = env
 							.call(
@@ -91,6 +98,10 @@ async fn account_locked_is_visible_only_to_self_and_admin_in_both_api_versions()
 									.to_request(),
 							)
 							.await;
+						if locked_viewer {
+							assert_status!(&response, StatusCode::FORBIDDEN);
+							continue;
+						}
 						assert_status!(&response, StatusCode::OK);
 						let body: Value = test::read_body_json(response).await;
 						assert_eq!(
@@ -130,6 +141,10 @@ async fn account_locked_is_visible_only_to_self_and_admin_in_both_api_versions()
 								.to_request(),
 						)
 						.await;
+					if locked_viewer {
+						assert_status!(&response, StatusCode::FORBIDDEN);
+						continue;
+					}
 					assert_status!(&response, StatusCode::OK);
 					let body: Vec<Value> = test::read_body_json(response).await;
 					assert_eq!(body.len(), 2);
@@ -171,6 +186,10 @@ async fn account_locked_is_visible_only_to_self_and_admin_in_both_api_versions()
 							"stripe_customer_id",
 							"allow_friend_requests",
 							"eligibility_verified_at",
+							"github_id",
+							"discord_id",
+							"steam_id",
+							"moderation_notes",
 						] {
 							assert!(
 								body[field].is_null(),
@@ -234,47 +253,87 @@ async fn existing_pat_session_and_oauth_credentials_obey_account_locks_and_cache
 						ENV.RATE_LIMIT_IGNORE_KEY.as_str(),
 					))
 					.to_http_request();
-				for requirement in [
-					AccountLockRequirement::None,
-					AccountLockRequirement::NotLocked,
-				] {
-					let result = get_user_from_headers(
-						&req,
-						&*env.db.pool,
-						&env.db.redis_pool,
-						&queue,
-						Scopes::USER_READ,
-						requirement,
+				let result = get_user_from_headers(
+					&req,
+					&*env.db.pool,
+					&env.db.redis_pool,
+					&queue,
+					Scopes::USER_READ,
+				)
+				.await;
+				match account_locked {
+					true => assert!(matches!(
+						result,
+						Err(AuthenticationError::AccountLocked)
+					)),
+					false => assert_eq!(
+						result.unwrap().1.account_locked,
+						Some(false)
+					),
+				}
+				let (_, user) = get_full_user_from_headers_allow_locked(
+					&req,
+					&*env.db.pool,
+					&env.db.redis_pool,
+					&queue,
+					Scopes::USER_READ,
+				)
+				.await
+				.unwrap();
+				assert_eq!(user.account_locked, account_locked);
+				let response = env
+					.call(
+						test::TestRequest::get()
+							.uri("/v3/user")
+							.append_pat(Some(token))
+							.append_header((
+								"x-ratelimit-key",
+								ENV.RATE_LIMIT_IGNORE_KEY.as_str(),
+							))
+							.to_request(),
 					)
 					.await;
-					match (account_locked, requirement) {
-						(true, AccountLockRequirement::NotLocked) => {
-							assert!(matches!(
-								result,
-								Err(AuthenticationError::AccountLocked)
-							));
-						}
-						(false, AccountLockRequirement::NotLocked)
-						| (_, AccountLockRequirement::None) => {
-							assert_eq!(
-								result.unwrap().1.account_locked,
-								Some(account_locked)
-							);
-						}
-					}
+				assert_status!(&response, StatusCode::OK);
+				let body: Value = test::read_body_json(response).await;
+				assert_eq!(body["account_locked"], json!(account_locked));
+				if account_locked {
+					assert!(body["auth_providers"].is_null());
+					assert!(body["email"].is_null());
+					assert!(matches!(
+						get_maybe_user_from_headers(
+							&req,
+							&*env.db.pool,
+							&env.db.redis_pool,
+							&queue,
+							Scopes::SESSION_ACCESS,
+						)
+						.await,
+						Err(AuthenticationError::AccountLocked)
+					));
+					assert!(matches!(
+						get_user_record_from_bearer_token(
+							&req,
+							Some(token),
+							&*env.db.pool,
+							&env.db.redis_pool,
+							&queue,
+							true,
+						)
+						.await,
+						Err(AuthenticationError::AccountLocked)
+					));
 				}
 			}
 		}
 		let req = test::TestRequest::get()
 			.append_pat(Some(&oauth_token))
 			.to_http_request();
-		let result = get_user_from_headers(
+		let result = get_full_user_from_headers_allow_locked(
 			&req,
 			&*env.db.pool,
 			&env.db.redis_pool,
 			&queue,
 			Scopes::USER_AUTH_WRITE,
-			AccountLockRequirement::None,
 		)
 		.await;
 		assert!(matches!(
@@ -296,7 +355,15 @@ async fn locked_accounts_cannot_mutate_resources_read_sensitive_data_or_unlock_t
 		}
 		set_account_locked(&env, "3", true).await;
 		let project = format!("/v3/project/{}", env.dummy.project_alpha.project_id);
+		let validation = format!("{project}/validate");
 		for (method, uri, body) in [
+			(Method::GET, project.as_str(), json!(null)),
+			(Method::GET, validation.as_str(), json!(null)),
+			(Method::GET, "/v3/user/3/projects", json!(null)),
+			(Method::GET, "/v3/organizations?ids=%5B%5D", json!(null)),
+			(Method::GET, "/v3/collections?ids=%5B%5D", json!(null)),
+			(Method::GET, "/v3/versions?ids=%5B%5D", json!(null)),
+			(Method::POST, "/analytics/view", json!({"url":"https://modrinth.com/"})),
 			(Method::PATCH, "/v3/user/3", json!({"account_locked":false})),
 			(Method::PATCH, project.as_str(), json!({"title":"changed"})),
 			(Method::PATCH, "/v3/organization/missing", json!({"name":"changed"})),
@@ -312,10 +379,26 @@ async fn locked_accounts_cannot_mutate_resources_read_sensitive_data_or_unlock_t
 			let body: Value = test::read_body_json(response).await;
 			assert_eq!(body["error"], "auth_error", "{uri}");
 		}
+		for pat in [None, Some("mrp_invalid")] {
+			let response = env.call(test::TestRequest::get().uri(&project)
+				.append_pat(pat).to_request()).await;
+			assert_status!(&response, StatusCode::OK);
+		}
 		set_account_locked(&env, "1", true).await;
 		let response = env.call(test::TestRequest::patch().uri("/v3/user/3")
 			.append_pat(ADMIN_USER_PAT).set_json(json!({"account_locked":false})).to_request()).await;
 		assert_status!(&response, StatusCode::FORBIDDEN);
+		for version in ["v2", "v3"] {
+			let response = env.call(test::TestRequest::get()
+				.uri(&format!("/{version}/user"))
+				.append_pat(ADMIN_USER_PAT).to_request()).await;
+			assert_status!(&response, StatusCode::OK);
+			let body: Value = test::read_body_json(response).await;
+			assert_eq!(body["account_locked"], true);
+			for field in ["email", "auth_providers", "github_id", "discord_id", "steam_id", "payout_data", "moderation_notes"] {
+				assert!(body[field].is_null(), "{field} must not be exposed to a locked admin");
+			}
+		}
 	}).await;
 }
 

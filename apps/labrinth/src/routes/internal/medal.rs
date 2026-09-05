@@ -1,4 +1,4 @@
-use crate::auth::AccountLockRequirement;
+use crate::auth::check_account_unlocked;
 use crate::database::PgPool;
 use crate::util::error::Context as _;
 use actix_web::{HttpResponse, post, web};
@@ -53,8 +53,7 @@ pub async fn verify(
     match maybe_fields {
         None => Err(ApiError::NotFound(eyre::eyre!("resource not found"))),
 		Some(fields) => {
-			AccountLockRequirement::NotLocked
-				.check(fields.account_locked)
+			check_account_unlocked(fields.account_locked)
 				.wrap_auth_err("checking account lock")?;
 			Ok(HttpResponse::Ok().json(VerifyResponse {
 				user_id: fields.user_id.into(),
@@ -98,8 +97,7 @@ pub async fn redeem(
             return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
         }
         Some(fields) => {
-			AccountLockRequirement::NotLocked
-				.check(fields.account_locked)
+			check_account_unlocked(fields.account_locked)
 				.wrap_auth_err("checking account lock")?;
             if fields.redeemal_status.is_some() {
                 return Err(ApiError::Conflict(eyre::eyre!(

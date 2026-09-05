@@ -11,32 +11,22 @@ use actix_web::http::header::{AUTHORIZATION, HeaderValue};
 use chrono::Utc;
 use xredis::RedisPool;
 
-/// Account lock requirement, independent of token scopes and user role.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AccountLockRequirement {
-	None,
-	NotLocked,
-}
-
-impl AccountLockRequirement {
-	pub fn check(
-		self,
-		account_locked: bool,
-	) -> Result<(), AuthenticationError> {
-		match (self, account_locked) {
-			(Self::NotLocked, true) => Err(AuthenticationError::AccountLocked),
-			(Self::NotLocked, false) | (Self::None, _) => Ok(()),
-		}
+pub fn check_account_unlocked(
+	account_locked: bool,
+) -> Result<(), AuthenticationError> {
+	match account_locked {
+		true => Err(AuthenticationError::AccountLocked),
+		false => Ok(()),
 	}
 }
 
+/// Allows anonymous or invalid credentials, but rejects locked accounts.
 pub async fn get_maybe_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
-	account_lock_requirement: AccountLockRequirement,
 ) -> Result<Option<(Scopes, User)>, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -45,26 +35,21 @@ where
         return Ok(None);
     }
 
-    // Fetch DB user record and minos user from headers
-    let Some((scopes, db_user)) = get_user_record_from_bearer_token(
+	match get_user_from_headers(
         req,
-        None,
         executor,
         redis,
         session_queue,
-        false,
-		account_lock_requirement,
+		required_scopes,
     )
-    .await?
-    else {
-        return Ok(None);
-    };
-
-    if !scopes.contains(required_scopes) {
-        return Ok(None);
+	.await
+	{
+		Ok(user) => Ok(Some(user)),
+		Err(AuthenticationError::AccountLocked) => {
+			Err(AuthenticationError::AccountLocked)
+		}
+		Err(_) => Ok(None),
     }
-
-    Ok(Some((scopes, User::from_full(db_user))))
 }
 
 pub async fn get_full_user_from_headers<'a, E>(
@@ -73,7 +58,6 @@ pub async fn get_full_user_from_headers<'a, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
-	account_lock_requirement: AccountLockRequirement,
 ) -> Result<(Scopes, DBUser), AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -85,7 +69,34 @@ where
         redis,
         session_queue,
         false,
-		account_lock_requirement,
+	)
+	.await?
+	.ok_or(AuthenticationError::InvalidCredentials)?;
+	if !scopes.contains(required_scopes) {
+		return Err(AuthenticationError::InvalidCredentials);
+	}
+	Ok((scopes, db_user))
+}
+
+/// Authenticates without rejecting locked accounts. The caller must check
+/// `account_locked` before exposing private data or allowing other actions.
+pub async fn get_full_user_from_headers_allow_locked<'a, E>(
+	req: &HttpRequest,
+	executor: E,
+	redis: &RedisPool,
+	session_queue: &AuthQueue,
+	required_scopes: Scopes,
+) -> Result<(Scopes, DBUser), AuthenticationError>
+where
+	E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+	let (scopes, db_user) = get_user_record_from_bearer_token_allow_locked(
+		req,
+		None,
+		executor,
+		redis,
+		session_queue,
+		false,
     )
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -104,7 +115,6 @@ pub async fn get_user_from_headers<'a, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
-	account_lock_requirement: AccountLockRequirement,
 ) -> Result<(Scopes, User), AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -115,7 +125,6 @@ where
         redis,
         session_queue,
         required_scopes,
-		account_lock_requirement,
     )
     .await?;
 
@@ -129,7 +138,6 @@ pub async fn get_user_from_bearer_token<'a, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     allow_expired: bool,
-	account_lock_requirement: AccountLockRequirement,
 ) -> Result<(Scopes, User), AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -141,7 +149,6 @@ where
         redis,
         session_queue,
         allow_expired,
-		account_lock_requirement,
     )
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -149,15 +156,40 @@ where
     Ok((scopes, User::from_full(db_user)))
 }
 
-pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
+pub async fn get_user_record_from_bearer_token<'a, E>(
     req: &HttpRequest,
     token: Option<&str>,
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
     allow_expired: bool,
-	account_lock_requirement: AccountLockRequirement,
-) -> Result<Option<(Scopes, user_item::DBUser)>, AuthenticationError>
+) -> Result<Option<(Scopes, DBUser)>, AuthenticationError>
+where
+	E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+	let user = get_user_record_from_bearer_token_allow_locked(
+		req,
+		token,
+		executor,
+		redis,
+		session_queue,
+		allow_expired,
+	)
+	.await?;
+	if let Some((_, user)) = &user {
+		check_account_unlocked(user.account_locked)?;
+	}
+	Ok(user)
+}
+
+async fn get_user_record_from_bearer_token_allow_locked<'a, E>(
+	req: &HttpRequest,
+	token: Option<&str>,
+	executor: E,
+	redis: &RedisPool,
+	session_queue: &AuthQueue,
+	allow_expired: bool,
+) -> Result<Option<(Scopes, DBUser)>, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
@@ -257,10 +289,6 @@ where
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };
 
-	if let Some((_, user)) = &possible_user {
-		account_lock_requirement.check(user.account_locked)?;
-	}
-
     Ok(possible_user)
 }
 
@@ -286,7 +314,6 @@ pub async fn check_is_moderator_from_headers<'a, 'b, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
-	account_lock_requirement: AccountLockRequirement,
 ) -> Result<User, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -297,7 +324,6 @@ where
         redis,
         session_queue,
         required_scopes,
-		account_lock_requirement,
     )
     .await?
     .1;

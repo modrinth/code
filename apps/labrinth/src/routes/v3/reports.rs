@@ -1,7 +1,4 @@
-use crate::auth::{
-	AccountLockRequirement, check_is_moderator_from_headers,
-	get_user_from_headers,
-};
+use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::SharedInstanceId;
@@ -88,7 +85,6 @@ pub async fn report_create(
         &redis,
         &session_queue,
         Scopes::REPORT_CREATE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -414,7 +410,6 @@ pub async fn reports(
         &redis,
         &session_queue,
         Scopes::REPORT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -525,7 +520,6 @@ pub async fn reports_get(
         &redis,
         &session_queue,
         Scopes::REPORT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -565,7 +559,6 @@ pub async fn report_get(
         &redis,
         &session_queue,
         Scopes::REPORT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -623,7 +616,6 @@ pub async fn report_edit(
         &redis,
         &session_queue,
         Scopes::REPORT_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -761,7 +753,6 @@ pub async fn report_delete(
         &redis,
         &session_queue,
         Scopes::REPORT_DELETE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

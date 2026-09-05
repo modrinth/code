@@ -1,4 +1,4 @@
-use crate::auth::{AccountLockRequirement, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::PgPool;
 use crate::models::ids::NotificationId;
@@ -54,7 +54,6 @@ pub async fn notifications_get(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -112,7 +111,6 @@ pub async fn notification_get(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -164,7 +162,6 @@ pub async fn notification_read(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -236,7 +233,6 @@ pub async fn notification_delete(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -312,7 +308,6 @@ pub async fn notifications_read(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -392,7 +387,6 @@ pub async fn notifications_delete(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

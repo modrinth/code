@@ -1,3 +1,4 @@
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::util::error::ApiContext as _;
 use std::collections::HashMap;
 
@@ -5,7 +6,7 @@ use super::ApiError;
 use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
-use crate::auth::{AccountLockRequirement, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
@@ -84,17 +85,16 @@ pub async fn version_project_get_helper(
         .await
         .wrap_api_err("fetching project from database")?;
 
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     if let Some(project) = result {
         if !is_visible_project(&project.inner, &user_option, &pool, false)
@@ -212,17 +212,16 @@ pub async fn versions_get(
     .await
     .wrap_internal_err("fetching versions from database")?;
 
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     let mut versions = filter_visible_versions(
         versions_data,
@@ -295,17 +294,16 @@ pub async fn version_get_helper(
             .await
             .wrap_internal_err("fetching version from database")?;
 
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     if let Some(data) = version_data
         && is_visible_version(&data.inner, &user_option, &pool, &redis)
@@ -473,7 +471,6 @@ pub async fn version_edit_helper(
         &redis,
         &session_queue,
         Scopes::VERSION_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1031,17 +1028,16 @@ pub async fn version_list_internal(
         .await
         .wrap_api_err("fetching project from database")?;
 
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     if let Some(project) = result {
         if !is_visible_project(&project.inner, &user_option, &pool, false)
@@ -1236,7 +1232,6 @@ pub async fn version_delete(
         &redis,
         &session_queue,
         Scopes::VERSION_DELETE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

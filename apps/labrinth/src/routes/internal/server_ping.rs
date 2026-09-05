@@ -1,4 +1,3 @@
-use crate::auth::AccountLockRequirement;
 use std::time::Duration;
 use xredis::RedisPool;
 
@@ -44,7 +43,6 @@ pub async fn ping_minecraft_java(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

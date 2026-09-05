@@ -1,4 +1,4 @@
-use crate::auth::AccountLockRequirement;
+use crate::auth::check_account_unlocked;
 use crate::database::PgPool;
 use crate::database::models::blocked_user_item::DBBlockedUser;
 use crate::database::models::friend_item::DBFriend;
@@ -51,8 +51,7 @@ pub async fn invite_privacy_status(
     .wrap_internal_err("resolving user ids")?;
 
 	let user = user.wrap_not_found_err("user not found")?;
-	AccountLockRequirement::NotLocked
-		.check(user.account_locked)
+	check_account_unlocked(user.account_locked)
 		.wrap_auth_err("checking inviter account lock")?;
 	let user_id = user.id;
     let target_id = target.wrap_not_found_err("target not found")?.id;

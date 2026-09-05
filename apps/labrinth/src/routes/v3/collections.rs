@@ -1,7 +1,7 @@
 use crate::auth::checks::is_visible_collection;
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::auth::{
-	AccountLockRequirement, filter_visible_collections, get_user_from_headers,
-	require_verified_email,
+	filter_visible_collections, get_user_from_headers, require_verified_email,
 };
 use crate::database::PgPool;
 use crate::database::models::{
@@ -76,7 +76,6 @@ pub async fn collection_create(
         &redis,
         &session_queue,
         Scopes::COLLECTION_CREATE,
-		AccountLockRequirement::NotLocked,
     )
     .await?
     .1;
@@ -175,17 +174,16 @@ pub async fn collections_get(
             .await
             .wrap_internal_err("fetching collections from database")?;
 
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::COLLECTION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     let collections =
         filter_visible_collections(collections_data, &user_option, false)
@@ -213,17 +211,16 @@ pub async fn collection_get(
         database::models::DBCollection::get(id, &**pool, &redis)
             .await
             .wrap_internal_err("fetching collection from database")?;
-    let user_option = get_user_from_headers(
+	let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::COLLECTION_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|x| x.1);
 
     if let Some(data) = collection_data
         && is_visible_collection(&data, &user_option, false)
@@ -271,7 +268,6 @@ pub async fn collection_edit(
         &redis,
         &session_queue,
         Scopes::COLLECTION_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -455,7 +451,6 @@ pub async fn collection_icon_edit(
         &redis,
         &session_queue,
         Scopes::COLLECTION_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -554,7 +549,6 @@ pub async fn delete_collection_icon(
         &redis,
         &session_queue,
         Scopes::COLLECTION_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -626,7 +620,6 @@ pub async fn collection_delete(
         &redis,
         &session_queue,
         Scopes::COLLECTION_DELETE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

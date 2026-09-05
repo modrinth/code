@@ -2,7 +2,7 @@ use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
 use crate::auth::{
-	AccountLockRequirement, AuthProvider, AuthenticationError,
+	AuthProvider, AuthenticationError, check_account_unlocked,
 	get_user_from_headers,
 };
 use crate::database::PgPool;
@@ -1108,7 +1108,6 @@ pub async fn init(
             &redis,
             &session_queue,
             false,
-			AccountLockRequirement::NotLocked,
         )
 		.await?
         .map(|(_scopes, user)| user.id)
@@ -1148,7 +1147,6 @@ pub async fn init(
             &redis,
             &session_queue,
             false,
-			AccountLockRequirement::NotLocked,
         )
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -1337,7 +1335,7 @@ pub async fn auth_callback(
 			let user = DBUser::get_id(id, &**client, &redis)
 				.await?
 				.ok_or(AuthenticationError::InvalidCredentials)?;
-			AccountLockRequirement::NotLocked.check(user.account_locked)?;
+			check_account_unlocked(user.account_locked)?;
 
             provider
                 .update_user_id(id, Some(&oauth_user.id), &mut transaction)
@@ -1368,7 +1366,7 @@ pub async fn auth_callback(
             .await?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-			AccountLockRequirement::NotLocked.check(user.account_locked)?;
+			check_account_unlocked(user.account_locked)?;
 
             if user.totp_secret.is_some() {
                 let flow = DBFlow::Login2FA { user_id: user.id }
@@ -1661,7 +1659,6 @@ pub async fn discord_community_link(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1734,7 +1731,6 @@ pub async fn delete_auth_provider(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2324,8 +2320,7 @@ pub async fn login_password(
         .map_err(|_| AuthenticationError::InvalidCredentials)
         .wrap_auth_err("authenticating API request")?;
 
-	AccountLockRequirement::NotLocked
-		.check(user.account_locked)
+	check_account_unlocked(user.account_locked)
 		.wrap_auth_err("checking account lock")?;
 
     if user.totp_secret.is_some() {
@@ -2469,8 +2464,7 @@ pub async fn login_2fa(
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)
                 .wrap_auth_err("fetching user from database")?;
 
-		AccountLockRequirement::NotLocked
-			.check(user.account_locked)
+		check_account_unlocked(user.account_locked)
 			.wrap_auth_err("checking account lock")?;
 
         let mut transaction = pool
@@ -2542,7 +2536,6 @@ pub async fn begin_2fa_flow(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2604,7 +2597,6 @@ pub async fn finish_2fa_flow(
             &redis,
             &session_queue,
             Scopes::USER_AUTH_WRITE,
-			AccountLockRequirement::NotLocked,
         )
         .await
         .wrap_auth_err("authenticating API request")?
@@ -2753,7 +2745,6 @@ pub async fn remove_2fa(
         &redis,
         &session_queue,
         false,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2931,8 +2922,7 @@ pub async fn reset_password_begin(
         ..
     }) = user
     {
-		AccountLockRequirement::NotLocked
-			.check(account_locked)
+		check_account_unlocked(account_locked)
 			.wrap_auth_err("checking account lock")?;
 
         let flow = DBFlow::ForgotPassword { user_id }
@@ -3024,7 +3014,6 @@ pub async fn change_password(
             &redis,
             &session_queue,
             false,
-			AccountLockRequirement::NotLocked,
         )
         .await
         .wrap_auth_err("authenticating API request")?
@@ -3059,8 +3048,7 @@ pub async fn change_password(
         user
     };
 
-	AccountLockRequirement::NotLocked
-		.check(user.account_locked)
+	check_account_unlocked(user.account_locked)
 		.wrap_auth_err("checking account lock")?;
 
     let mut transaction = pool
@@ -3210,7 +3198,6 @@ pub async fn set_email(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3341,7 +3328,6 @@ pub async fn resend_verify_email(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3436,8 +3422,7 @@ pub async fn verify_email(
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)
                 .wrap_auth_err("fetching user from database")?;
 
-		AccountLockRequirement::NotLocked
-			.check(user.account_locked)
+		check_account_unlocked(user.account_locked)
 			.wrap_auth_err("checking account lock")?;
 
         if user.email != Some(confirm_email) {
@@ -3510,7 +3495,6 @@ pub async fn subscribe_newsletter(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3563,7 +3547,6 @@ pub async fn get_newsletter_subscription_status(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3618,7 +3601,6 @@ pub async fn register_passkey_start(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3722,7 +3704,6 @@ pub async fn register_passkey_finish(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3890,8 +3871,7 @@ pub async fn authenticate_passkey_finish(
                 .wrap_internal_err("failed to fetch passkey")?
                 .wrap_request_err_with(|| "passkey not found")?;
 
-		AccountLockRequirement::NotLocked
-			.check(account_locked)
+		check_account_unlocked(account_locked)
 			.wrap_auth_err("checking account lock")?;
 
         let mut transaction = pool
@@ -4009,7 +3989,6 @@ pub async fn list_passkeys(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -4064,7 +4043,6 @@ pub async fn rename_passkey(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -4125,7 +4103,6 @@ pub async fn delete_passkey(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

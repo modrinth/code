@@ -1,4 +1,4 @@
-use crate::auth::{AccountLockRequirement, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::image_item;
@@ -297,7 +297,6 @@ pub async fn thread_get(
         &redis,
         &session_queue,
         Scopes::THREAD_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -371,7 +370,6 @@ pub async fn threads_get(
         &redis,
         &session_queue,
         Scopes::THREAD_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -429,7 +427,6 @@ pub async fn thread_send_message(
         &redis,
         &session_queue,
         Scopes::THREAD_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -700,7 +697,6 @@ pub async fn message_delete(
         &redis,
         &session_queue,
         Scopes::THREAD_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

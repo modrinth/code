@@ -1,4 +1,4 @@
-use crate::auth::{AccountLockRequirement, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::blocked_user_item::DBBlockedUser;
 use crate::database::models::friend_item::DBFriend;
@@ -43,7 +43,6 @@ pub async fn add_friend(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -194,7 +193,6 @@ pub async fn remove_friend(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -249,7 +247,6 @@ pub async fn friends(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

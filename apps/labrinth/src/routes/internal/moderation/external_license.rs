@@ -1,4 +1,3 @@
-use crate::auth::AccountLockRequirement;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use std::collections::HashMap;
@@ -358,7 +357,6 @@ pub async fn search(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating external license search")?;
@@ -432,7 +430,6 @@ pub async fn lookup(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -473,7 +470,6 @@ pub async fn get_by_sha1(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -511,7 +507,6 @@ pub async fn get_by_sha1_bulk(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -572,7 +567,6 @@ async fn upsert_file_license(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -686,7 +680,6 @@ pub async fn update_license(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

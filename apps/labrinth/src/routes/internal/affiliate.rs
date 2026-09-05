@@ -1,4 +1,4 @@
-use crate::auth::AccountLockRequirement;
+use crate::auth::validate::get_maybe_user_from_headers;
 use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
 use xredis::RedisPool;
 
@@ -54,17 +54,16 @@ pub async fn ingest_click(
     session_queue: web::Data<AuthQueue>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
 ) -> Result<(), ApiError> {
-    let user = get_user_from_headers(
+	let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::empty(),
-		AccountLockRequirement::None,
     )
     .await
-    .map(|(_, user)| user)
-    .ok();
+	.wrap_auth_err("authenticating API request")?
+	.map(|(_, user)| user);
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = ingest_click.url;
@@ -160,7 +159,6 @@ pub async fn get_all(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -217,7 +215,6 @@ pub async fn create(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -303,7 +300,6 @@ pub async fn get(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -348,7 +344,6 @@ pub async fn delete(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -406,7 +401,6 @@ pub async fn patch(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

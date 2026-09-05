@@ -7,7 +7,6 @@
 //!   requests, you have to zip together M arrays of N elements
 //!   - this makes it inconvenient to have separate endpoints
 
-use crate::auth::AccountLockRequirement;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 
@@ -196,7 +195,6 @@ pub async fn fetch_analytics(
         &redis,
         &session_queue,
         Scopes::ANALYTICS,
-		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
