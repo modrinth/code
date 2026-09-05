@@ -7,32 +7,6 @@ export class LabrinthUsersV3Module extends AbstractModule {
 	}
 
 	/**
-	 * Look up a user by email. Requires an administrator session.
-	 * GET /v3/user_email
-	 */
-	public async getByEmail(email: string): Promise<Labrinth.Users.v3.User> {
-		return this.client.request<Labrinth.Users.v3.User>('/user_email', {
-			api: 'labrinth',
-			version: 3,
-			method: 'GET',
-			params: { email },
-		})
-	}
-
-	/**
-	 * Look up a user by Discord ID. Requires a moderator or administrator session.
-	 * GET /v3/user_discord
-	 */
-	public async getByDiscordId(discordId: string): Promise<Labrinth.Users.v3.User> {
-		return this.client.request<Labrinth.Users.v3.User>('/user_discord', {
-			api: 'labrinth',
-			version: 3,
-			method: 'GET',
-			params: { discord_id: discordId },
-		})
-	}
-
-	/**
 	 * Get the authenticated user.
 	 * GET /v3/user
 	 */

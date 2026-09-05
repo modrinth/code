@@ -74,11 +74,11 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { DiscordIcon, MailIcon } from '@modrinth/assets'
 import {
 	Button,
 	defineMessages,
-	injectModrinthClient,
 	injectNotificationManager,
 	Input,
 	useVIntl,
@@ -86,7 +86,6 @@ import {
 import { isAdmin } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
-const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const auth = await useAuth()
@@ -96,14 +95,22 @@ const discordId = ref('')
 
 const { refetch: lookupEmail, isFetching: isFetchingEmail } = useQuery({
 	queryKey: computed(() => ['users', 'lookup', 'email', userEmail.value.trim()]),
-	queryFn: () => labrinth.users_v3.getByEmail(userEmail.value.trim()),
+	queryFn: async () =>
+		(await useBaseFetch('user_email', {
+			apiVersion: 3,
+			query: { email: userEmail.value.trim() },
+		})) as Labrinth.Users.v3.User,
 	enabled: false,
 	retry: false,
 })
 
 const { refetch: lookupDiscord, isFetching: isFetchingDiscord } = useQuery({
 	queryKey: computed(() => ['users', 'lookup', 'discord', discordId.value.trim()]),
-	queryFn: () => labrinth.users_v3.getByDiscordId(discordId.value.trim()),
+	queryFn: async () =>
+		(await useBaseFetch('user_discord', {
+			apiVersion: 3,
+			query: { discord_id: discordId.value.trim() },
+		})) as Labrinth.Users.v3.User,
 	enabled: false,
 	retry: false,
 })
