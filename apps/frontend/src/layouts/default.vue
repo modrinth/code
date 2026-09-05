@@ -431,8 +431,7 @@
 							label: 'User lookup',
 							icon: UserSearchIcon,
 							type: 'link',
-							to: '/admin/user_email',
-							shown: isAdmin(auth.user),
+							to: '/admin/user_lookup',
 						},
 						{
 							type: 'divider',

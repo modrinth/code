@@ -1,8 +1,11 @@
-use crate::common::api_common::{ApiProject, ApiTeams};
+use crate::common::api_common::{ApiProject, ApiTeams, AppendsOptionalPat};
 use actix_web::test;
 use common::dummy_data::TestFile;
 use common::{
-    database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},
+	database::{
+		ADMIN_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, MOD_USER_PAT,
+		USER_USER_ID, USER_USER_PAT,
+	},
     environment::{
         TestEnvironment, with_test_environment, with_test_environment_all,
     },
@@ -10,6 +13,104 @@ use common::{
 use labrinth::test::api_v3::ApiV3;
 
 pub mod common;
+
+#[actix_rt::test]
+async fn discord_lookup_requires_staff_and_returns_public_user() {
+	with_test_environment(
+		None,
+		|test_env: TestEnvironment<ApiV3>| async move {
+			let mut user = Box::pin(
+				labrinth::database::models::DBUser::get_id(
+					labrinth::database::models::DBUserId(3),
+					&*test_env.db.pool,
+					&test_env.db.redis_pool,
+				),
+			)
+			.await
+			.unwrap()
+			.unwrap();
+			user.id = labrinth::database::models::DBUserId(6);
+			user.username = "DiscordLookupUser".to_string();
+			user.email = None;
+			user.discord_id = Some(123456789012345678);
+			let mut transaction = test_env.db.pool.begin().await.unwrap();
+			user.insert(&mut transaction).await.unwrap();
+			transaction.commit().await.unwrap();
+
+			for pat in [None, USER_USER_PAT] {
+				let req = test::TestRequest::get()
+					.uri("/v3/user_discord?discord_id=123456789012345678")
+					.append_pat(pat)
+					.to_request();
+				let resp = test_env.call(req).await;
+				assert_status!(&resp, actix_http::StatusCode::UNAUTHORIZED);
+			}
+
+			for pat in [MOD_USER_PAT, ADMIN_USER_PAT] {
+				let req = test::TestRequest::get()
+					.uri("/v3/user_discord?discord_id=123456789012345678")
+					.append_pat(pat)
+					.to_request();
+				let resp = test_env.call(req).await;
+				assert_status!(&resp, actix_http::StatusCode::OK);
+
+				let user: serde_json::Value = test::read_body_json(resp).await;
+				assert_eq!(user["id"], "6");
+				assert_eq!(user["username"], "DiscordLookupUser");
+				assert!(user["email"].is_null());
+				assert!(user["payout_data"].is_null());
+				assert!(user.get("password").is_none());
+				assert!(user.get("totp_secret").is_none());
+			}
+
+			for query in [
+				"discord_id=123456789012345679",
+				"discord_id=0",
+				"discord_id=-1",
+				"discord_id=invalid",
+				"discord_id=9223372036854775808",
+				"",
+			] {
+				let req = test::TestRequest::get()
+					.uri(&format!("/v3/user_discord?{query}"))
+					.append_pat(MOD_USER_PAT)
+					.to_request();
+				let resp = test_env.call(req).await;
+				assert_status!(&resp, actix_http::StatusCode::BAD_REQUEST);
+			}
+		},
+	)
+	.await;
+}
+
+#[actix_rt::test]
+async fn email_lookup_remains_admin_only_and_returns_public_user() {
+	with_test_environment(
+		None,
+		|test_env: TestEnvironment<ApiV3>| async move {
+			for pat in [None, USER_USER_PAT, MOD_USER_PAT, ADMIN_USER_PAT] {
+				let req = test::TestRequest::get()
+					.uri("/v3/user_email?email=USER%40MODRINTH.COM")
+					.append_pat(pat)
+					.to_request();
+				let resp = test_env.call(req).await;
+
+				if pat == ADMIN_USER_PAT {
+					assert_status!(&resp, actix_http::StatusCode::OK);
+					let user: serde_json::Value =
+						test::read_body_json(resp).await;
+					assert_eq!(user["id"], USER_USER_ID);
+					assert_eq!(user["username"], "User");
+					assert!(user.get("password").is_none());
+					assert!(user.get("totp_secret").is_none());
+				} else {
+					assert_status!(&resp, actix_http::StatusCode::UNAUTHORIZED);
+				}
+			}
+		},
+	)
+	.await;
+}
 
 // user GET (permissions, different users)
 // users GET

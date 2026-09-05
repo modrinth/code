@@ -6,7 +6,7 @@ use std::{
 use xredis::RedisPool;
 
 use super::{ApiError, oauth_clients::get_user_clients};
-use crate::database::PgPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::util::error::Context;
 use crate::{
     auth::{
@@ -22,7 +22,7 @@ use crate::{
         organizations::Organization,
         pats::Scopes,
         projects::Project,
-        users::{Badges, Role},
+		users::{Badges, Role, User},
     },
     queue::session::AuthQueue,
     util::{img::delete_old_images, routes::read_limited_from_payload},
@@ -41,6 +41,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(users_get_route)
         .service(users_search)
         .service(admin_user_email)
+		.service(admin_user_discord)
         .service(all_projects)
         .service(projects_list_route)
         .service(user_notes_edit)
@@ -67,6 +68,11 @@ pub struct AllProjectsResponse {
 #[derive(Deserialize)]
 pub struct UserEmailQuery {
     pub email: String,
+}
+
+#[derive(Deserialize)]
+pub struct UserDiscordQuery {
+	pub discord_id: i64,
 }
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
@@ -216,7 +222,7 @@ pub async fn all_projects(
 #[utoipa::path(
 	tag = "users",
 	params(("email" = String, Query)),
-	responses((status = OK))
+	responses((status = OK, body = User))
 )]
 #[get("/user_email")]
 pub async fn admin_user_email(
@@ -225,7 +231,7 @@ pub async fn admin_user_email(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     email: web::Query<UserEmailQuery>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<User>, ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -267,10 +273,62 @@ pub async fn admin_user_email(
     .wrap_internal_err("fetching user from database")?;
 
     if let Some(user) = user {
-        Ok(HttpResponse::Ok().json(user))
+		Ok(web::Json(user.into()))
     } else {
         Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
+}
+
+#[utoipa::path(
+	tag = "users",
+	params(("discord_id" = i64, Query)),
+	responses((status = OK, body = User))
+)]
+#[get("/user_discord")]
+pub async fn admin_user_discord(
+	req: HttpRequest,
+	ro_pool: web::Data<ReadOnlyPgPool>,
+	redis: web::Data<RedisPool>,
+	session_queue: web::Data<AuthQueue>,
+	query: web::Query<UserDiscordQuery>,
+) -> Result<web::Json<User>, ApiError> {
+	check_is_moderator_from_headers(
+		&req,
+		&***ro_pool,
+		&redis,
+		&session_queue,
+		Scopes::SESSION_ACCESS,
+	)
+	.await
+	.wrap_auth_err("authenticating API request")?;
+
+	if query.discord_id <= 0 {
+		return Err(ApiError::Request(eyre!(
+			"discord ID must be a positive integer"
+		)));
+	}
+
+	let user_id = sqlx::query_scalar!(
+		r#"SELECT id FROM users WHERE discord_id = $1"#,
+		query.discord_id
+	)
+	.fetch_optional(&***ro_pool)
+	.await
+	.wrap_internal_err("fetching user ID from database")?
+	.wrap_request_err(
+		"the discord ID provided is not associated with a user",
+	)?;
+
+	let user = DBUser::get_id(
+		crate::database::models::DBUserId(user_id),
+		&***ro_pool,
+		&redis,
+	)
+	.await
+	.wrap_internal_err("fetching user from database")?
+	.wrap_not_found_err("resource not found")?;
+
+	Ok(web::Json(user.into()))
 }
 
 #[utoipa::path(tag = "users", responses((status = OK)))]

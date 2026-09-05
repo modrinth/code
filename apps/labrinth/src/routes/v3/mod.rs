@@ -198,6 +198,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		threads::message_delete_route,
 		users::all_projects,
 		users::admin_user_email,
+		users::admin_user_discord,
 		users::projects_list_route,
 		users::user_auth_get_route,
 		users::users_search,

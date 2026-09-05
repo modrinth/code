@@ -15,10 +15,9 @@
 							icon: FileSearchCornerIcon,
 						},
 						{
-							link: '/admin/user_email',
+							link: '/admin/user_lookup',
 							label: 'User lookup',
 							icon: UserSearchIcon,
-							shown: admin,
 						},
 						{
 							type: 'heading',
