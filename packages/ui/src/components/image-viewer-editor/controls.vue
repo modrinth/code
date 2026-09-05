@@ -15,6 +15,7 @@ import IconButton from '#ui/components/base/buttons/IconButton.vue'
 import SplitButton from '#ui/components/base/buttons/SplitButton.vue'
 import type { OverflowMenuOption } from '#ui/components/base/buttons/types'
 import Chips from '#ui/components/base/Chips.vue'
+import ColorPicker from '#ui/components/base/inputs/ColorPicker.vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -104,10 +105,6 @@ function handlePropertyInput(event: Event) {
 	updatePropertyValue(Number((event.target as HTMLInputElement).value))
 }
 
-function handleColorInput(event: Event) {
-	updateColor((event.target as HTMLInputElement).value)
-}
-
 function formatEraserMode(value: ScreenshotEraserMode) {
 	return formatMessage(value === 'element' ? messages.element : messages.area)
 }
@@ -136,27 +133,14 @@ function formatEraserMode(value: ScreenshotEraserMode) {
 				size="small"
 				hide-checkmark-icon
 			/>
-			<label
+			<ColorPicker
 				v-if="hasColorProperty"
-				v-tooltip="formatMessage(messages.colour)"
-				class="relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl transition-[filter,box-shadow] hover:brightness-125 focus-within:ring-4 focus-within:ring-brand-shadow"
-			>
-				<span
-					class="size-full rounded-xl border border-solid border-surface-5"
-					:style="{ backgroundColor: color }"
-				/>
-				<input
-					:value="color"
-					type="color"
-					:aria-label="formatMessage(messages.colour)"
-					class="absolute inset-0 cursor-pointer opacity-0"
-					@focus="beginPropertyEdit"
-					@pointerdown="beginPropertyEdit"
-					@input="handleColorInput"
-					@change="commitPropertyEdit"
-					@blur="commitPropertyEdit"
-				/>
-			</label>
+				:model-value="color"
+				:label="formatMessage(messages.colour)"
+				@update:model-value="updateColor"
+				@focus="beginPropertyEdit"
+				@change="commitPropertyEdit"
+			/>
 			<div
 				v-if="propertyValueKind"
 				class="flex w-52 min-w-0 items-center gap-2"
