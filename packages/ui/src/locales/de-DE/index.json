@@ -1901,12 +1901,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Inhalte konnten nicht gelöscht werden"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Inhalte konnten nicht deaktiviert werden"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Inhalte konnten nicht aktiviert werden"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Inhalte konnten nicht aktualisiert werden"
   },
@@ -1921,9 +1915,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Entfernen von Inhalten fehlgeschlagen"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Umschalten von {name} fehlgeschlagen"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Modpack konnte nicht getrennt werden"

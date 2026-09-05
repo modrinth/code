@@ -1829,12 +1829,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Falha ao excluir o conteúdo"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Falha ao desativar o conteúdo"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Falha ao ativar o conteúdo"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Falha ao atualizar o conteúdo"
   },
@@ -1849,9 +1843,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Falha ao remover o conteúdo"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Falha ao alterar {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Falha ao desvincular o pacote de mods"

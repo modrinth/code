@@ -1595,12 +1595,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Nem sikerült törölni a tartalmat"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "A tartalom letiltása nem sikerült"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "A tartalom engedélyezése nem sikerült"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "A tartalom frissítése sikertelen"
   },

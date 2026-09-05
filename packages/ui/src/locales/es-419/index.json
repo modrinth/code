@@ -1901,12 +1901,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Error al eliminar el contenido"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Error al desactivar el contenido"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Error al activar el contenido"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Error al actualizar el contenido"
   },
@@ -1921,9 +1915,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Error al eliminar el contenido"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Error al activar/desactivar {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Error al desvincular el modpack"

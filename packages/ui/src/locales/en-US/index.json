@@ -554,6 +554,30 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} updated"
   },
+  "content.enabled-for.description": {
+    "defaultMessage": "Choose where this content is enabled. Turn both off to disable it."
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Enabled for"
+  },
+  "content.enabled-for.locked": {
+    "defaultMessage": "These choices are locked. Select Unlock from the row menu to change them."
+  },
+  "content.enabled-for.not-supported-here": {
+    "defaultMessage": "This content isn't designed to be enabled here."
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Player"
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Please wait"
+  },
+  "content.enabled-for.required-here": {
+    "defaultMessage": "This content needs to be enabled here to work correctly."
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Server"
+  },
   "content.filter.disabled": {
     "defaultMessage": "Disabled"
   },
@@ -1940,14 +1964,17 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
+  "hosting.content.enabled-for.lock-environment": {
+    "defaultMessage": "Lock"
+  },
+  "hosting.content.enabled-for.unknown-environment": {
+    "defaultMessage": "We couldn't tell where this content should be enabled. Review the Server and Player choices."
+  },
+  "hosting.content.enabled-for.unlock-environment": {
+    "defaultMessage": "Unlock"
+  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Failed to delete content"
-  },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Failed to disable content"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Failed to enable content"
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Failed to update content"
@@ -1964,8 +1991,14 @@
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Failed to remove content"
   },
+  "hosting.content.failed-to-set-enabled-for": {
+    "defaultMessage": "Failed to change where {name} is enabled"
+  },
+  "hosting.content.failed-to-set-side-lock": {
+    "defaultMessage": "Failed to change the environment lock for {name}"
+  },
   "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Failed to toggle {name}"
+    "defaultMessage": "Failed to enable or disable {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Failed to unlink modpack"
@@ -2511,7 +2544,7 @@
     "defaultMessage": "This is a client-side mod and may cause issues when starting your server"
   },
   "label.client-retained-warning": {
-    "defaultMessage": "This is a client-side mod that was installed as a dependency and may cause issues when starting your server"
+    "defaultMessage": "This client-side mod was also installed on the server because another mod depends on it"
   },
   "label.collections": {
     "defaultMessage": "Collections"

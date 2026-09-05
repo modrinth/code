@@ -1712,12 +1712,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Kunde inte radera innehåll"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Kunde inte inaktivera innehåll"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Kunde inte aktivera innehåll"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Kunde inte uppdatera innehåll"
   },
@@ -1732,9 +1726,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Kunde inte radera innehållet"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Kunde inte växla {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Kunde inte avlänka modpaketet"

@@ -1865,12 +1865,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Nie udało się usunąć zawartości"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Nie udało się wyłączyć zawartości"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Nie udało się włączyć zawartości"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Nie udało się zaktualizować zawartości"
   },
@@ -1885,9 +1879,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Nie udało się usunąć zawartości"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Nie udało się przełączyć {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Nie udało się rozłączyć od paczki modów"
