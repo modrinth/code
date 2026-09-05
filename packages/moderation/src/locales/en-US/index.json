@@ -36,10 +36,10 @@
     "defaultMessage": "Add external links"
   },
   "nags.adjacent-headers.description": {
-    "defaultMessage": "Headers of the same level should be placed next to each other."
+    "defaultMessage": "Headers of the same level should not be placed next to each other."
   },
   "nags.adjacent-headers.title": {
-    "defaultMessage": "Separate adjacent headers"
+    "defaultMessage": "Remove adjacent headers"
   },
   "nags.all-languages.description": {
     "defaultMessage": "You've selected all available language options. Please list only the languages your server actively supports."
@@ -48,7 +48,7 @@
     "defaultMessage": "Select accurate languages"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project."
+    "defaultMessage": "You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. Tags should be used to help users find relevant projects. Please only select relevant tags."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Select accurate tags"
@@ -63,16 +63,16 @@
     "defaultMessage": "Make sure users are aware of any important details by filling in content disclosures that apply to your {type}."
   },
   "nags.check-disclosures.title": {
-    "defaultMessage": "Review content disclosures"
+    "defaultMessage": "Review disclosures"
   },
   "nags.description-ends-with-header.description": {
-    "defaultMessage": "Your project’s description should not end with a header that is not followed by any text."
+    "defaultMessage": "Your project's description should not end with a header that is not followed by any text."
   },
   "nags.description-ends-with-header.title": {
     "defaultMessage": "Remove ending header"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Your project’s description is too brief. Add more details to clearly describe the project's content, purpose, and appeal."
+    "defaultMessage": "Your project's description is too brief. Add more details to clearly describe the project's content, purpose, and appeal."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expand the description"
@@ -81,7 +81,7 @@
     "defaultMessage": "Content disclosures should not contain HTML, since they can only display inline Markdown and plain text."
   },
   "nags.disclosures-special-formatting.title": {
-    "defaultMessage": "Remove HTML from content disclosures"
+    "defaultMessage": "Fix disclosure formatting"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Edit description"
@@ -120,7 +120,7 @@
     "defaultMessage": "Visit gallery page"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Your {type} uses a license which requires source code to be available. Please provide a source code link, or add a source code additional file to each version, or consider using a different license."
+    "defaultMessage": "Your {type}'s license requires source code to be published. Please provide a source code link, add sources files, or change license."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Provide source code"
@@ -189,7 +189,7 @@
     "defaultMessage": "Review feedback"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution."
+    "defaultMessage": "You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have the tag that matches the primary resolution."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Select correct resolution"
@@ -197,38 +197,35 @@
   "nags.project-description-banned-link.description": {
     "defaultMessage": "The link “{fullUrl}” is not allowed in project descriptions."
   },
-  "nags.project-description-banned-link.title": {
-    "defaultMessage": "Remove link from description"
-  },
   "nags.project-description-non-english.description": {
-    "defaultMessage": "Your project’s description must be written in English or include an English translation."
+    "defaultMessage": "Your project's description must be written in English or include an English translation."
   },
   "nags.project-description-non-english.title": {
-    "defaultMessage": "Translate your project’s description"
+    "defaultMessage": "Translate the description"
   },
   "nags.project-description-non-standard-text.description": {
-    "defaultMessage": "Excessive use of non-standard text characters, such as “Fancy text” or “Zalgo”, is not allowed in your project’s description."
+    "defaultMessage": "Excessive use of non-standard text characters, such as “Fancy text” or “Zalgo”, is not allowed in your project's description."
   },
   "nags.project-description-profanity.description": {
-    "defaultMessage": "Your project’s description cannot contain excessive profanity. Detected: “{value}”."
+    "defaultMessage": "Your project's description cannot contain excessive profanity. Detected: “{value}”."
   },
   "nags.project-description-slur.description": {
-    "defaultMessage": "Your project’s description must not contain offensive terms. Detected: “{value}”."
+    "defaultMessage": "Your project's description must not contain offensive terms. Detected: “{value}”."
   },
   "nags.project-description-spam.description": {
-    "defaultMessage": "Repeated characters, words, or phrases cannot be used to pad your project’s description."
+    "defaultMessage": "Repeated characters, words, or phrases cannot be used to pad your project's description."
   },
   "nags.project-description-spam.title": {
-    "defaultMessage": "Remove spam from the description"
+    "defaultMessage": "Remove description spam"
   },
   "nags.project-name-non-standard-text.description": {
     "defaultMessage": "Non-standard text characters, such as “Fancy text” or “Zalgo”, are not allowed in the project name."
   },
   "nags.project-name-profanity.description": {
-    "defaultMessage": "Your project’s name cannot contain profanity. Detected: “{value}”."
+    "defaultMessage": "Your project's name cannot contain profanity. Detected: “{value}”."
   },
   "nags.project-name-slur.description": {
-    "defaultMessage": "Your project’s name must not contain offensive terms. Detected: “{value}”."
+    "defaultMessage": "Your project's name must not contain offensive terms. Detected: “{value}”."
   },
   "nags.project-name-version.title": {
     "defaultMessage": "Modify project name"
@@ -237,13 +234,13 @@
     "defaultMessage": "Review the summary"
   },
   "nags.project-summary-links.description": {
-    "defaultMessage": "Links, URLs, and IPs should not be placed in the summary. Detected: {value}"
+    "defaultMessage": "Links, URLs, and IPs should not be placed in the summary. Detected: \"{value}\""
   },
   "nags.project-summary-links.title": {
-    "defaultMessage": "Remove links from the summary"
+    "defaultMessage": "Remove summary links"
   },
   "nags.project-summary-non-english.description": {
-    "defaultMessage": "Your project’s summary must be written in English or include an English translation."
+    "defaultMessage": "Your project's summary must be written in English or include an English translation."
   },
   "nags.project-summary-non-english.title": {
     "defaultMessage": "Translate the summary"
@@ -252,22 +249,22 @@
     "defaultMessage": "Non-standard text characters, such as “Fancy text” or “Zalgo”, are not allowed in the summary."
   },
   "nags.project-summary-profanity.description": {
-    "defaultMessage": "Your project’s summary cannot contain profanity. Detected: “{value}”."
+    "defaultMessage": "Your project's summary cannot contain profanity. Detected: “{value}”."
   },
   "nags.project-summary-slur.description": {
-    "defaultMessage": "Your project’s summary must not contain offensive terms. Detected: “{value}”."
+    "defaultMessage": "Your project's summary must not contain offensive terms. Detected: “{value}”."
   },
   "nags.project-summary-spam.description": {
-    "defaultMessage": "Repeated characters, words, or phrases should be used to pad your project’s summary."
+    "defaultMessage": "Repeated characters, words, or phrases cannot be used to pad your project's summary."
   },
   "nags.project-summary-spam.title": {
-    "defaultMessage": "Remove summary formatting"
+    "defaultMessage": "Remove summary spam"
   },
   "nags.review-permissions.description": {
-    "defaultMessage": "Make sure you have provided proof of your permission to distribute all external content in your Modpack."
+    "defaultMessage": "Make sure you have provided proof of your permission to distribute any external content in your Modpack."
   },
   "nags.review-permissions.title": {
-    "defaultMessage": "Review external permissions"
+    "defaultMessage": "Check content permission"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Select what versions your server supports, choose a Modpack, or upload your own."
@@ -345,13 +342,13 @@
     "defaultMessage": "Select accurate languages"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to make sure your server appears in relevant search results."
+    "defaultMessage": "You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to ensure your project appears in relevant search results."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Select accurate tags"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "You've selected {tagCount, plural, one {# tag} other {# tags}}. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results."
+    "defaultMessage": "You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to ensure your project appears in relevant search results."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Select accurate tags"
@@ -384,7 +381,7 @@
     "defaultMessage": "Visit links settings"
   },
   "project.text-validation.summary-matches-title": {
-    "defaultMessage": "Your project’s summary should provide unique information and not repeat the project’s name."
+    "defaultMessage": "Your project's summary should provide unique information and not repeat the project's name."
   },
   "project.text-validation.summary-too-short": {
     "defaultMessage": "Your summary is too brief. Add a sentence or two that describes your project."
