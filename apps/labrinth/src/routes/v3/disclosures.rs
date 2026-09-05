@@ -14,6 +14,7 @@ use crate::models::disclosures::{
     ProjectDisclosureType,
 };
 use crate::models::pats::Scopes;
+use crate::models::projects::ProjectStatus;
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -279,6 +280,16 @@ pub async fn modify_project_disclosures(
         )
         .await
         .wrap_internal_err("failed to remove project disclosure")?;
+    }
+
+    if project.inner.status == ProjectStatus::Processing {
+        super::projects::validate::ensure_project_is_valid_for_review(
+            project.inner.id,
+            &pool,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
     }
 
     transaction

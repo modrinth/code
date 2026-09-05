@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ValidationMessage :check="galleryImagesValidation" class="mb-4" />
 		<AiImageWarningModal ref="aiImageWarningModal" />
 		<Modal
 			v-if="currentMember"
@@ -44,6 +45,12 @@
 					:maxlength="64"
 					placeholder="Enter title..."
 				/>
+				<ValidationMessage
+					class="mt-2 max-w-[550px]"
+					:check="galleryTitleValidation"
+					:project-field="filteredGallery[editIndex]?.title ?? ''"
+					:current-field="editTitle"
+				/>
 				<label for="gallery-image-desc">
 					<span class="label__title">Description</span>
 				</label>
@@ -52,6 +59,12 @@
 					v-model="editDescription"
 					:maxlength="255"
 					placeholder="Enter description..."
+				/>
+				<ValidationMessage
+					class="mt-2 max-w-[550px]"
+					:check="galleryDescriptionValidation"
+					:project-field="filteredGallery[editIndex]?.description ?? ''"
+					:current-field="editDescription"
 				/>
 				<label for="gallery-image-ordering">
 					<span class="label__title">Order Index</span>
@@ -90,7 +103,7 @@
 						v-if="editIndex === -1"
 						type="colored"
 						color="brand"
-						:disabled="shouldPreventActions"
+						:disabled="shouldPreventActions || !canSaveGalleryFields"
 						@click="createGalleryItem"
 					>
 						<PlusIcon aria-hidden="true" />
@@ -100,7 +113,7 @@
 						v-else
 						type="colored"
 						color="brand"
-						:disabled="shouldPreventActions"
+						:disabled="shouldPreventActions || !canSaveGalleryFields"
 						@click="editGalleryItem"
 					>
 						<SaveIcon aria-hidden="true" />
@@ -304,6 +317,8 @@ import {
 } from '@modrinth/ui'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
 
@@ -342,13 +357,28 @@ const editOrder = ref(null)
 const editFile = ref(null)
 const previewImage = ref(null)
 const shouldPreventActions = ref(false)
-
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
 
 const filteredGallery = computed(
 	() => project.value.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
 )
+const selectedGalleryIndex = computed(() => {
+	const selectedItem = filteredGallery.value[editIndex.value]
+	return selectedItem ? (project.value.gallery ?? []).indexOf(selectedItem) : -1
+})
+const galleryTitleValidation = useProjectNagMessages(
+	'gallery-text',
+	'name',
+	() => selectedGalleryIndex.value,
+)
+const galleryDescriptionValidation = useProjectNagMessages(
+	'gallery-text',
+	'description',
+	() => selectedGalleryIndex.value,
+)
+const galleryImagesValidation = useProjectNagMessages('gallery-images')
+const canSaveGalleryFields = computed(() => true)
 
 const nextImage = () => {
 	expandedGalleryIndex.value++
@@ -422,6 +452,7 @@ const showPreviewImage = () => {
 }
 
 const createGalleryItem = async () => {
+	if (!canSaveGalleryFields.value) return
 	shouldPreventActions.value = true
 
 	const success = await createGalleryItemMutation(
@@ -440,6 +471,7 @@ const createGalleryItem = async () => {
 }
 
 const editGalleryItem = async () => {
+	if (!canSaveGalleryFields.value) return
 	shouldPreventActions.value = true
 
 	const success = await editGalleryItemMutation(

@@ -27,6 +27,17 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 		})
 	}
 
+	public async validate(id: string): Promise<Labrinth.Projects.v3.ProjectValidationResponse> {
+		return this.client.request<Labrinth.Projects.v3.ProjectValidationResponse>(
+			`/project/${id}/validate`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
 	/**
 	 * Get a project's dependencies (v3)
 	 *

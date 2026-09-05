@@ -50,12 +50,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Controlla le informative"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "La descrizione è di {length, plural, one {# carattere} other {# caratteri}}. Usane almeno {minChars} per tenerla chiara e informativa."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Espandi la descrizione"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Modifica la descrizione"
   },
@@ -89,12 +83,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Rimuovi i link identici"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "La descrizione dovrebbe essere minuta e avere delle descrizioni testuali alle immagini per chi usa lettori dello schermo o abbia connessioni a Internet lente."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Garantisci l'accessibilità"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "L'URL della licenza non è valido."
   },
@@ -106,12 +94,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Aggiungi un link alla licenza valido"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "L'utilizzo di link brevi o altri metodi per oscurare la destinazione di un link, sia nei collegamenti esterni sia nel link alla licenza, è vietato. Usa solo link completi e trasparenti."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Non abbreviare i link"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {Una intestazione} other {# intestazioni}} nella descrizione {count, plural, one {è troppo lunga} other {sono troppo lunghe}}. Tipicamente dovrebbero essere brevi e funzionare da titoli, non da frasi complete."
@@ -188,9 +170,6 @@
   "nags.server.title": {
     "defaultMessage": "Impostazioni del server"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Impostazioni della descrizione"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Impostazioni delle informative"
   },
@@ -212,29 +191,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Impostazioni delle versioni"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "La sintesi non può essere identica al nome del progetto. Ѐ importante scriverne una informativa e accattivante."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Scrivi una sintesi unica"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "La sintesi non dovrebbe contenere formattazioni, interruzioni di riga, caratteri speciali o link, perché verrà mostrata come testo semplice."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Rivedi la sintesi"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "La sintesi è di {length, plural, one {# carattere} other {# caratteri}}. Usane almeno {minChars} per tenerla allettante e informativa."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Espandi la sintesi"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Mantenere breve il nome del progetto lo rende facile da ricordare e da trovare. Le informazioni sulla versione e sul loader vengono mostrate automaticamente insieme al progetto."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Rivedi il nome"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Hai selezionato {languageCount, plural, one {# lingua} other {# lingue}}. Seleziona solo quelle che il server usa attivamente."

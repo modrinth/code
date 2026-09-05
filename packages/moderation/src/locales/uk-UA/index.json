@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Перевірте маркування вмісту"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Ваш опис містить {length, plural, one {# видимий символ} few {# видимі символів} other {# видимих символів}}. Радимо щонайменше {minChars, plural, one {# символ} few {# символи} other {# символів}} для чіткого й змістовного опису."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Доповніть опис"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Відредагуйте опис"
   },
@@ -95,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Приберіть однакові посилання"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Ваш опис повинен містити достатню кількість простого тексту або альтернативного тексту зображень, щоби він був зрозумілим для тих, хто використовує читачі екрану або має повільне з’єднання з інтернетом."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Забезпечте доступність"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Посилання на ліцензію неправильне."
   },
@@ -112,12 +100,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Додайте правильне посилання на ліцензію"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Використання вкорочувачів посилань або інших методів для приховування адрес зовнішніх посилань й посилань на ліцензію заборонено. Використовуйте лише повні посилання."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Не використовуйте вкорочувачі посилань"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# заголовок} few {# заголовки} other {# заголовків}} у вашому описі {count, plural, one {є задовгим} other {є задовгими}}. Заголовки мають бути стислими та виступати в ролі назв розділів, а не повних речень."
@@ -197,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Відвідайте налаштування сервера"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Відвідайте налаштування опису"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Перейти до налаштувань маркування"
   },
@@ -221,29 +200,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Відвідайте налаштування версій"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Ваша анотація не може бути такою ж, як назва вашого проєкту. Це важливо для створення інформативної та привабливої анотації."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Зробіть анотацію унікальною"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Ваша анотація не має містити форматування, розривів рядків, спеціальних символів або посилань, оскільки анотація показує лише звичайний текст."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Очистьте анотацію"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Ваша анотація складається з {length, plural, one {# символа} other {# символів}}. Рекомендуємо зробити анотацію хоча б з {minChars, plural, one {# символа} other {# символів}}, щоб вона виглядала інформативно й привабливо."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Доповніть анотацію"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Якщо вибрати лаконічну назву для проєкту, його буде легше запам’ятати та знайти. Інформація про версію та завантажувач автоматично показується поруч із назвою."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Скоротіть назву"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Ви вибрали {languageCount, plural, one {# мову} few {# мови} other {# мов}}. Вибирайте лише ті, які ваш сервер прямо підтримує."
@@ -291,4 +255,3 @@
     "defaultMessage": "Відвідайте налаштування посилань"
   }
 }
-

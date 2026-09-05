@@ -15,7 +15,7 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { isStaff, TeamMemberPermission } from '@modrinth/utils'
+import { isAdmin, isStaff, TeamMemberPermission } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 
@@ -38,13 +38,20 @@ import {
 	TelemetryDisclosureCard,
 	toModifyRequests,
 } from '~/components/ui/project-settings/disclosures'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
 const DISCLOSURE_QUERY_STALE_TIME = 1000 * 60 * 5
 
 const { formatMessage } = useVIntl()
 const { labrinth } = injectModrinthClient()
-const { projectV2: project, projectV3, currentMember } = injectProjectPageContext()
+const {
+	projectV2: project,
+	projectV3,
+	currentMember,
+	refreshProjectValidation,
+} = injectProjectPageContext()
 const queryClient = useQueryClient()
 const flags = useFeatureFlags()
 const auth = await useAuth()
@@ -172,8 +179,11 @@ function resolveUpdatedBy(userId: string | null | undefined): DisclosureUpdatedB
 	)
 }
 
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(
-	() => !!((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
+	() =>
+		isAdminUser.value ||
+		!!((currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS),
 )
 
 const {
@@ -209,6 +219,7 @@ const hasChanges = computed(
 async function save() {
 	if (!hasChanges.value) return
 	await saveForm()
+	await refreshProjectValidation()
 }
 
 function disclosureUpdateProps(type: DisclosureType) {
@@ -248,15 +259,19 @@ watch(
 )
 
 const issues = computed(() => getDisclosureFormIssues(current.value, projectTypes.value))
+const disclosureTextValidation = useProjectNagMessages('disclosure-text')
+const disclosureValidation = useProjectNagMessages('disclosures')
 
-const canSave = computed(() => hasPermission.value && issues.value.length === 0)
+const canSave = computed(
+	() => hasPermission.value && (isAdminUser.value || issues.value.length === 0),
+)
 
 const saveDisabledReason = computed(() => {
 	if (!hasPermission.value) {
 		// should never come up but y'never know
 		return formatMessage(messages.noPermission)
 	}
-	return issues.value.map((issue) => formatMessage(issueMessages[issue]))
+	return [...issues.value.map((issue) => formatMessage(issueMessages[issue]))]
 })
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
@@ -277,6 +292,12 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 				</template>
 			</IntlFormatted>
 		</p>
+		<ValidationMessage
+			:check="[...disclosureValidation, ...disclosureTextValidation]"
+			:project-field="JSON.stringify(savedSnapshot)"
+			:current-field="JSON.stringify(currentSnapshot)"
+			class="mb-4"
+		/>
 		<EmptyState
 			v-if="!canEditDisclosures"
 			type="no-documents"

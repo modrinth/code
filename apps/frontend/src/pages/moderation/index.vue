@@ -68,6 +68,15 @@
 				</Combobox>
 
 				<Button
+					type="outlined"
+					class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
+					@click="openModerateByIdsModal"
+				>
+					<ListFilterIcon class="flex-shrink-0" />
+					Moderate by IDs
+				</Button>
+
+				<Button
 					type="colored"
 					color="orange"
 					size="lg"
@@ -104,8 +113,15 @@
 			:skipped-ids="moderationQueue.currentQueue.skipped"
 			@review-skipped="reviewSkippedQueue"
 		/>
+		<ModerateByIdsModal ref="moderateByIdsModal" @apply="startModeratingByIds" />
 
 		<ModerationQueueSkeleton v-if="pending" />
+		<EmptyState
+			v-else-if="loadError"
+			type="no-tasks"
+			heading="Failed to load projects"
+			:description="loadErrorMessage"
+		/>
 		<EmptyState
 			v-else-if="paginatedProjects.length === 0"
 			:type="!!query ? 'no-search-result' : 'no-tasks'"
@@ -146,7 +162,9 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import ConfettiExplosion from 'vue-confetti-explosion'
+import type { LocationQueryValue } from 'vue-router'
 
+import ModerateByIdsModal from '~/components/ui/moderation/ModerateByIdsModal.vue'
 import ModerationFilterCount from '~/components/ui/moderation/ModerationFilterCount.vue'
 import ModerationQueueCard from '~/components/ui/moderation/ModerationQueueCard.vue'
 import ModerationQueueSkeleton from '~/components/ui/moderation/ModerationQueueSkeleton.vue'
@@ -160,14 +178,16 @@ import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligib
 useHead({ title: 'Projects queue - Modrinth' })
 
 const { formatMessage } = useVIntl()
+const notificationManager = injectNotificationManager()
+const { addNotification } = notificationManager
 const formatNumber = useFormatNumber()
-const { addNotification } = injectNotificationManager()
 const moderationQueue = useModerationQueue()
 const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
 
 const queueSummaryModal = ref()
+const moderateByIdsModal = ref<InstanceType<typeof ModerateByIdsModal>>()
 
 const visible = ref(false)
 if (import.meta.client && history && history.state && history.state.confetti) {
@@ -428,17 +448,20 @@ const moderationProjectsQueryKey = computed(
 )
 
 const {
-	data: moderationProjectsResponse,
-	isPending: moderationProjectsPending,
-	isPlaceholderData: moderationProjectsPlaceholder,
+	data: standardProjectsResponse,
+	isPending: standardProjectsPending,
+	isPlaceholderData: standardProjectsPlaceholder,
+	error: standardProjectsError,
 } = useQuery({
 	queryKey: moderationProjectsQueryKey,
 	queryFn: ({ queryKey }) => client.labrinth.moderation_internal.getProjects(queryKey[1]),
 	placeholderData: (previousData) => previousData,
 })
-
-const pending = computed(
-	() => moderationProjectsPending.value || moderationProjectsPlaceholder.value,
+const moderationProjectsResponse = computed(() => standardProjectsResponse.value)
+const pending = computed(() => standardProjectsPending.value || standardProjectsPlaceholder.value)
+const loadError = computed(() => standardProjectsError.value)
+const loadErrorMessage = computed(
+	() => loadError.value?.message ?? 'An unknown error occurred while loading the moderation queue.',
 )
 const totalProjects = computed(() => moderationProjectsResponse.value?.total ?? 0)
 const totalPages = computed(() => Math.ceil(totalProjects.value / itemsPerPage.value))
@@ -503,6 +526,10 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
+function openModerateByIdsModal() {
+	moderateByIdsModal.value?.show()
+}
+
 async function findFirstEligibleProject(): Promise<string | null> {
 	const candidateIds = [...moderationQueue.currentQueue.items]
 	if (candidateIds.length === 0) return null
@@ -539,6 +566,23 @@ async function navigateToModerationProject(projectId: string) {
 			showChecklist: true,
 		},
 	})
+}
+
+async function startModeratingByIds(projectIds: string[]) {
+	await moderationQueue.setQueue(projectIds)
+
+	const targetProjectId = await findFirstEligibleProject()
+
+	if (!targetProjectId) {
+		addNotification({
+			title: 'No projects available',
+			text: 'None of the provided projects are awaiting moderation or available to review.',
+			type: 'warning',
+		})
+		return
+	}
+
+	await navigateToModerationProject(targetProjectId)
 }
 
 async function getFilteredProjectIds(): Promise<string[]> {

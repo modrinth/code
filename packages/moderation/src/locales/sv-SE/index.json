@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Läs innehållsinformation"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Din beskrivning är {length, plural, one {# tecken} other {# tecken}} lång. Minst {minChars, plural, one {# tecken} other {# tecken}} rekommenderas för en klar och informativ beskrivning."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Utöka beskrivningen"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Redigera beskrivning"
   },
@@ -95,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Städa upp identiska länkar"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Din beskrivning ska ha tillräckligt med vanlig text eller bild-alternativtext, för att hålla det tillgängligt till de som använder skärmavläsare eller de med långsamma internetkopplingar."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Säkerställ tillgänglighet"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licens-URL är ogiltig."
   },
@@ -112,12 +100,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Lägg till en giltig licenslänk"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Att använda en länkförkortare eller andra metoder för att gömma vart en länk leder i dina externa länkar eller licenslänkar är förbjudet, vänligen använd lämpliga länkar i full längd."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Använd inte länkförkortare"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# rubrik} other {# rubriker}} i din beskrivning är för {count, plural, one {lång} other {långa}}. Rubriker ska vara korta och fungera som titlar till olika delar, inte hela meningar."
@@ -197,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Besök serverinställningar"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Besök beskrivningsinställningar"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Besök informationsinställningar"
   },
@@ -221,29 +200,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Besök versionsinställningar"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Din sammanfattning kan inte vara samma som projektnamnet. Det är viktigt att skriva en informativ och lockande sammanfattning."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Gör sammanfattningen unik"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Din sammanfattning bör inte innehålla formatering, radbrytningar, specialtecken eller länkar. Den visas endast som oformaterad text."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Rensa upp sammanfattningen"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Din sammanfattning är {length} tecken långt. Åtminstone {minChars} tecken rekommenderas för en informativ och lockande sammanfattning"
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Expandera sammanfattningen"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Om du håller projektetnamnet fint blir det minnesvärt och lättare att hitta. Versions- och laddarinformation visas automatiskt tillsammans med ditt projekt."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Rensa upp namnet"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Du har valt {languageCount} språk. Vänligen skriv endast upp språk som din server aktivt stödjer."
@@ -291,4 +255,3 @@
     "defaultMessage": "Besök länkinställningar"
   }
 }
-

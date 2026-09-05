@@ -3,6 +3,7 @@ name = "labrinth"
 version = "2.7.0"
 edition.workspace = true
 license = "AGPL-3.0-only"
+default-run = "labrinth"
 
 # This seems redundant, but it's necessary for Docker to work
 [[bin]]
@@ -40,6 +41,7 @@ component-derive = { workspace = true }
 const_format = { workspace = true }
 dashmap = { workspace = true }
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
+dioxus-devtools = { workspace = true }
 dotenvy = { workspace = true }
 either = { workspace = true }
 eyre = { workspace = true }
@@ -70,6 +72,7 @@ image = { workspace = true, features = [
 itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
+linkify = { workspace = true }
 modrinth-content-management = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
@@ -79,6 +82,7 @@ paste = { workspace = true }
 path-util = { workspace = true }
 postcard = { workspace = true }
 prometheus = { workspace = true }
+psl = { workspace = true }
 quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
@@ -89,6 +93,7 @@ reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls-
 rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
 rustls.workspace = true
+rustrict = { workspace = true }
 rusty-money = { workspace = true }
 scalar_api_reference = { workspace = true, features = ["actix-web"] }
 sentry = { workspace = true }
@@ -118,6 +123,8 @@ tokio-stream = { workspace = true }
 totp-rs = { workspace = true, features = ["gen_secret"] }
 tracing = { workspace = true }
 tracing-actix-web = { workspace = true }
+unicode-normalization = { workspace = true }
+unicode-segmentation = { workspace = true }
 url = { workspace = true }
 urlencoding = { workspace = true }
 utoipa = { workspace = true, features = ["url"] }
@@ -126,6 +133,7 @@ validator = { workspace = true, features = ["derive"] }
 webauthn-rs = { workspace = true, features = ["conditional-ui", "danger-allow-state-serialisation"] }
 webauthn-rs-proto = { workspace = true }
 webp = { workspace = true }
+whatlang = { workspace = true }
 woothee = { workspace = true }
 xredis = { workspace = true }
 yaserde = { workspace = true, features = ["derive"] }

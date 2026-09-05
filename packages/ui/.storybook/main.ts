@@ -10,7 +10,10 @@ const config: StorybookConfig = {
 			docgen: false,
 		},
 	},
-	stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+	stories: [
+		'../src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+		'../../../apps/frontend/src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+	],
 	addons: ['@storybook/addon-themes', '@storybook/addon-a11y'],
 	viteFinal: async (config) =>
 		mergeConfig(config, {
