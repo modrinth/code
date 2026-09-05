@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2 class="m-0 mb-4 text-2xl font-semibold">{{ formatMessage(messages.title) }}</h2>
+		<h2 class="m-0 mb-4 text-2xl font-semibold">User lookup</h2>
 		<form
 			v-if="isAdmin(auth.user)"
 			class="card flex flex-col gap-3"
@@ -9,7 +9,7 @@
 			<div class="flex flex-col gap-2">
 				<label for="user-email">
 					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.email) }}
+						User email
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
@@ -18,7 +18,7 @@
 					v-model="userEmail"
 					type="email"
 					:maxlength="64"
-					:placeholder="formatMessage(messages.emailPlaceholder)"
+					placeholder="Enter user email..."
 					:disabled="isLookingUp"
 					autocomplete="off"
 					required
@@ -33,7 +33,7 @@
 					:loading="isFetchingEmail"
 				>
 					<MailIcon aria-hidden="true" />
-					{{ formatMessage(messages.getAccount) }}
+					Get user account
 				</Button>
 			</div>
 		</form>
@@ -41,7 +41,7 @@
 			<div class="flex flex-col gap-2">
 				<label for="discord-id">
 					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.discordId) }}
+						Discord ID
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
@@ -52,7 +52,7 @@
 					inputmode="numeric"
 					pattern="[0-9]+"
 					:maxlength="19"
-					:placeholder="formatMessage(messages.discordPlaceholder)"
+					placeholder="Enter Discord ID..."
 					:disabled="isLookingUp"
 					autocomplete="off"
 					required
@@ -67,7 +67,7 @@
 					:loading="isFetchingDiscord"
 				>
 					<DiscordIcon aria-hidden="true" />
-					{{ formatMessage(messages.getAccount) }}
+					Get user account
 				</Button>
 			</div>
 		</form>
@@ -76,18 +76,11 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DiscordIcon, MailIcon } from '@modrinth/assets'
-import {
-	Button,
-	defineMessages,
-	injectNotificationManager,
-	Input,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, injectNotificationManager, Input } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 const { addNotification } = injectNotificationManager()
-const { formatMessage } = useVIntl()
 const auth = await useAuth()
 
 const userEmail = ref('')
@@ -130,28 +123,12 @@ async function lookupUser(kind: 'email' | 'discord') {
 	} catch (err) {
 		console.error(err)
 		addNotification({
-			title: formatMessage(messages.lookupFailed),
-			text: err instanceof Error ? err.message : formatMessage(messages.lookupFailed),
+			title: 'User lookup failed',
+			text: err instanceof Error ? err.message : 'User lookup failed',
 			type: 'error',
 		})
 	} finally {
 		stopLoading()
 	}
 }
-
-const messages = defineMessages({
-	title: { id: 'admin.user-lookup.title', defaultMessage: 'User lookup' },
-	email: { id: 'admin.user-lookup.email', defaultMessage: 'User email' },
-	emailPlaceholder: {
-		id: 'admin.user-lookup.email-placeholder',
-		defaultMessage: 'Enter user email...',
-	},
-	discordId: { id: 'admin.user-lookup.discord-id', defaultMessage: 'Discord ID' },
-	discordPlaceholder: {
-		id: 'admin.user-lookup.discord-placeholder',
-		defaultMessage: 'Enter Discord ID...',
-	},
-	getAccount: { id: 'admin.user-lookup.get-account', defaultMessage: 'Get user account' },
-	lookupFailed: { id: 'admin.user-lookup.failed', defaultMessage: 'User lookup failed' },
-})
 </script>
