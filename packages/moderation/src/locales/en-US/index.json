@@ -200,6 +200,9 @@
   "nags.project-description-non-english.description": {
     "defaultMessage": "Your project's description must be written in English or include an English translation."
   },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "Translate the description"
+  },
   "nags.project-description-non-standard-text.description": {
     "defaultMessage": "Excessive use of non-standard text characters, such as “Fancy text” or “Zalgo”, is not allowed in your project's description."
   },
@@ -238,6 +241,9 @@
   },
   "nags.project-summary-non-english.description": {
     "defaultMessage": "Your project's summary must be written in English or include an English translation."
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "Translate the summary"
   },
   "nags.project-summary-non-standard-text.description": {
     "defaultMessage": "Non-standard text characters, such as “Fancy text” or “Zalgo”, are not allowed in the summary."
