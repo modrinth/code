@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 
-use crate::model::{Error, Version};
+use crate::install::Version;
+use crate::shared::Error;
 
 #[async_trait]
 pub trait ContentMetadataProvider: Send + Sync {
