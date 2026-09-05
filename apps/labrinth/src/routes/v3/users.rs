@@ -292,15 +292,22 @@ pub async fn admin_user_discord(
     session_queue: web::Data<AuthQueue>,
     query: web::Query<UserDiscordQuery>,
 ) -> Result<web::Json<User>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &***ro_pool,
-        &redis,
-        &session_queue,
-        Scopes::SESSION_ACCESS,
-    )
-    .await
-    .wrap_auth_err("authenticating API request")?;
+	let user = get_user_from_headers(
+		&req,
+		&***ro_pool,
+		&redis,
+		&session_queue,
+		Scopes::SESSION_ACCESS,
+	)
+	.await
+	.map(|x| x.1)
+	.wrap_auth_err("authenticating API request")?;
+
+	if !user.role.is_admin() {
+		return Err(ApiError::Auth(eyre!(
+			"you must be an admin to look up users by discord ID"
+		)));
+	}
 
     let user_id = DBUser::get_by_discord_id(query.discord_id, &***ro_pool)
         .await

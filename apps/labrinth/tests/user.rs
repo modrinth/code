@@ -15,7 +15,7 @@ use labrinth::test::api_v3::ApiV3;
 pub mod common;
 
 #[actix_rt::test]
-async fn discord_lookup_requires_staff_and_returns_public_user() {
+async fn discord_lookup_requires_admin_and_returns_public_user() {
     with_test_environment(
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
@@ -36,7 +36,7 @@ async fn discord_lookup_requires_staff_and_returns_public_user() {
             user.insert(&mut transaction).await.unwrap();
             transaction.commit().await.unwrap();
 
-            for pat in [None, USER_USER_PAT] {
+			for pat in [None, USER_USER_PAT, MOD_USER_PAT] {
                 let req = test::TestRequest::get()
                     .uri("/v3/user_discord?discord_id=123456789012345678")
                     .append_pat(pat)
@@ -45,22 +45,20 @@ async fn discord_lookup_requires_staff_and_returns_public_user() {
                 assert_status!(&resp, actix_http::StatusCode::UNAUTHORIZED);
             }
 
-            for pat in [MOD_USER_PAT, ADMIN_USER_PAT] {
-                let req = test::TestRequest::get()
-                    .uri("/v3/user_discord?discord_id=123456789012345678")
-                    .append_pat(pat)
-                    .to_request();
-                let resp = test_env.call(req).await;
-                assert_status!(&resp, actix_http::StatusCode::OK);
+			let req = test::TestRequest::get()
+				.uri("/v3/user_discord?discord_id=123456789012345678")
+				.append_pat(ADMIN_USER_PAT)
+				.to_request();
+			let resp = test_env.call(req).await;
+			assert_status!(&resp, actix_http::StatusCode::OK);
 
-                let user: serde_json::Value = test::read_body_json(resp).await;
-                assert_eq!(user["id"], "6");
-                assert_eq!(user["username"], "DiscordLookupUser");
-                assert!(user["email"].is_null());
-                assert!(user["payout_data"].is_null());
-                assert!(user.get("password").is_none());
-                assert!(user.get("totp_secret").is_none());
-            }
+			let user: serde_json::Value = test::read_body_json(resp).await;
+			assert_eq!(user["id"], "6");
+			assert_eq!(user["username"], "DiscordLookupUser");
+			assert!(user["email"].is_null());
+			assert!(user["payout_data"].is_null());
+			assert!(user.get("password").is_none());
+			assert!(user.get("totp_secret").is_none());
 
             for query in [
                 "discord_id=123456789012345679",
@@ -74,7 +72,7 @@ async fn discord_lookup_requires_staff_and_returns_public_user() {
             ] {
                 let req = test::TestRequest::get()
                     .uri(&format!("/v3/user_discord?{query}"))
-                    .append_pat(MOD_USER_PAT)
+					.append_pat(ADMIN_USER_PAT)
                     .to_request();
                 let resp = test_env.call(req).await;
                 assert_status!(&resp, actix_http::StatusCode::BAD_REQUEST);
