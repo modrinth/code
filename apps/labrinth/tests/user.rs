@@ -69,6 +69,8 @@ async fn discord_lookup_requires_staff_and_returns_public_user() {
 				"discord_id=-1",
 				"discord_id=invalid",
 				"discord_id=9223372036854775808",
+				"discord_id=18446744073709551615",
+				"discord_id=18446744073709551616",
 				"",
 			] {
 				let req = test::TestRequest::get()

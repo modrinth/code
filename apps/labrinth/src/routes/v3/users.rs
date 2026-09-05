@@ -72,7 +72,7 @@ pub struct UserEmailQuery {
 
 #[derive(Deserialize)]
 pub struct UserDiscordQuery {
-	pub discord_id: i64,
+	pub discord_id: u64,
 }
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
@@ -281,7 +281,7 @@ pub async fn admin_user_email(
 
 #[utoipa::path(
 	tag = "users",
-	params(("discord_id" = i64, Query)),
+	params(("discord_id" = u64, Query)),
 	responses((status = OK, body = User))
 )]
 #[get("/user_discord")]
@@ -302,31 +302,17 @@ pub async fn admin_user_discord(
 	.await
 	.wrap_auth_err("authenticating API request")?;
 
-	if query.discord_id <= 0 {
-		return Err(ApiError::Request(eyre!(
-			"discord ID must be a positive integer"
-		)));
-	}
+	let user_id = DBUser::get_by_discord_id(query.discord_id, &***ro_pool)
+		.await
+		.wrap_internal_err("fetching user ID from database")?
+		.wrap_request_err(
+			"the discord ID provided is not associated with a user",
+		)?;
 
-	let user_id = sqlx::query_scalar!(
-		r#"SELECT id FROM users WHERE discord_id = $1"#,
-		query.discord_id
-	)
-	.fetch_optional(&***ro_pool)
-	.await
-	.wrap_internal_err("fetching user ID from database")?
-	.wrap_request_err(
-		"the discord ID provided is not associated with a user",
-	)?;
-
-	let user = DBUser::get_id(
-		crate::database::models::DBUserId(user_id),
-		&***ro_pool,
-		&redis,
-	)
-	.await
-	.wrap_internal_err("fetching user from database")?
-	.wrap_not_found_err("resource not found")?;
+	let user = DBUser::get_id(user_id, &***ro_pool, &redis)
+		.await
+		.wrap_internal_err("fetching user from database")?
+		.wrap_not_found_err("resource not found")?;
 
 	Ok(web::Json(user.into()))
 }
