@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
 use xredis::RedisPool;
 
@@ -59,6 +60,7 @@ pub async fn ingest_click(
         &redis,
         &session_queue,
         Scopes::empty(),
+		StandingRequirement::None,
     )
     .await
     .map(|(_, user)| user)
@@ -158,6 +160,7 @@ pub async fn get_all(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -214,6 +217,7 @@ pub async fn create(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -299,6 +303,7 @@ pub async fn get(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -343,6 +348,7 @@ pub async fn delete(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -400,6 +406,7 @@ pub async fn patch(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

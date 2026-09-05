@@ -1,6 +1,7 @@
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
+use crate::models::users::AccountStanding;
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
@@ -49,30 +50,37 @@ impl DBPasskey {
     pub async fn get_by_credential_id<'a, E>(
         credential_id: &[u8],
         exec: E,
-    ) -> Result<Option<DBPasskey>, DatabaseError>
+	) -> Result<Option<(DBPasskey, AccountStanding)>, DatabaseError>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         let row = sqlx::query!(
             r#"
-            SELECT id, user_id, name, credential_id,
+			SELECT user_passkeys.id, user_id, name, credential_id,
                    passkey AS "passkey: sqlx::types::Json<Passkey>",
-                   last_used, created_at
+				   last_used, created_at,
+				   users.account_standing AS "account_standing: AccountStanding"
             FROM user_passkeys
+			JOIN users ON users.id = user_passkeys.user_id
             WHERE credential_id = $1
             "#,
             credential_id,
         )
         .fetch_optional(exec)
         .await?
-        .map(|x| DBPasskey {
-            id: DBPasskeyId(x.id),
-            user_id: DBUserId(x.user_id),
-            name: x.name,
-            credential_id: x.credential_id,
-            passkey: x.passkey.0,
-            created_at: x.created_at,
-            last_used: x.last_used,
+		.map(|x| {
+			(
+				DBPasskey {
+					id: DBPasskeyId(x.id),
+					user_id: DBUserId(x.user_id),
+					name: x.name,
+					credential_id: x.credential_id,
+					passkey: x.passkey.0,
+					created_at: x.created_at,
+					last_used: x.last_used,
+				},
+				x.account_standing,
+			)
         });
 
         Ok(row)

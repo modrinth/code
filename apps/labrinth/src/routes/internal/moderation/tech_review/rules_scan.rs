@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use std::collections::{BTreeMap, HashMap};
 
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
@@ -161,6 +162,7 @@ pub async fn get_rule_schema(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -206,6 +208,7 @@ pub async fn get_detail_rule_input(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -354,6 +357,7 @@ pub async fn scan_rules(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

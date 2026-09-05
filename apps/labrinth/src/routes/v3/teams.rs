@@ -1,5 +1,5 @@
 use crate::auth::checks::{is_visible_organization, is_visible_project};
-use crate::auth::get_user_from_headers;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::database::DBProject;
 use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -72,6 +72,7 @@ pub async fn team_members_get_project_internal(
             &redis,
             &session_queue,
             Scopes::PROJECT_READ,
+			StandingRequirement::Full,
         )
         .await
         .map(|x| x.1)
@@ -161,6 +162,7 @@ pub async fn team_members_get_organization(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -261,6 +263,7 @@ pub async fn team_members_get(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -352,6 +355,7 @@ pub async fn teams_get(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -418,6 +422,7 @@ pub async fn join_team(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -536,6 +541,7 @@ pub async fn add_team_member(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -822,6 +828,7 @@ pub async fn edit_team_member(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1035,6 +1042,7 @@ pub async fn transfer_ownership(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1250,6 +1258,7 @@ pub async fn remove_team_member(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?

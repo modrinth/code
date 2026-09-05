@@ -2,7 +2,7 @@ use crate::database::PgPool;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
 use crate::models::projects::Project;
-use crate::models::users::{Badges, Role, User};
+use crate::models::users::{AccountStanding, Badges, Role, User};
 use crate::models::v2::notifications::LegacyNotification;
 use crate::models::v2::projects::LegacyProject;
 use crate::models::v2::user::LegacyUser;
@@ -223,6 +223,7 @@ pub struct EditUser {
     #[validate(length(max = 160))]
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
+	pub account_standing: Option<AccountStanding>,
     pub badges: Option<Badges>,
     pub allow_friend_requests: Option<bool>,
 }
@@ -268,6 +269,7 @@ pub async fn user_edit(
             username: new_user.username,
             bio: new_user.bio,
             role: new_user.role,
+			account_standing: new_user.account_standing,
             badges: new_user.badges,
             venmo_handle: None,
             allow_friend_requests: new_user.allow_friend_requests,

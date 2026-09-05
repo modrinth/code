@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use std::time::Duration;
 use xredis::RedisPool;
 
@@ -43,6 +44,7 @@ pub async fn ping_minecraft_java(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

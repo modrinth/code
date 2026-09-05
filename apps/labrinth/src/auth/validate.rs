@@ -3,7 +3,7 @@ use crate::auth::AuthenticationError;
 use crate::database::models::{DBUser, user_item};
 use crate::env::ENV;
 use crate::models::pats::Scopes;
-use crate::models::users::User;
+use crate::models::users::{AccountStanding, User};
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::session::get_session_metadata;
 use actix_web::HttpRequest;
@@ -11,12 +11,37 @@ use actix_web::http::header::{AUTHORIZATION, HeaderValue};
 use chrono::Utc;
 use xredis::RedisPool;
 
+/// Required account standing, independent of token scopes and user role.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StandingRequirement {
+	Full,
+	None,
+}
+
+impl StandingRequirement {
+	pub fn check(
+		self,
+		standing: AccountStanding,
+	) -> Result<(), AuthenticationError> {
+		match (self, standing) {
+			(Self::Full, AccountStanding::Locked) => {
+				Err(AuthenticationError::AccountLocked)
+			}
+			(Self::Full, AccountStanding::Full)
+			| (Self::None, AccountStanding::Full | AccountStanding::Locked) => {
+				Ok(())
+			}
+		}
+	}
+}
+
 pub async fn get_maybe_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
+	standing_requirement: StandingRequirement,
 ) -> Result<Option<(Scopes, User)>, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -33,6 +58,7 @@ where
         redis,
         session_queue,
         false,
+		standing_requirement,
     )
     .await?
     else {
@@ -52,6 +78,7 @@ pub async fn get_full_user_from_headers<'a, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
+	standing_requirement: StandingRequirement,
 ) -> Result<(Scopes, DBUser), AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -63,6 +90,7 @@ where
         redis,
         session_queue,
         false,
+		standing_requirement,
     )
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -81,6 +109,7 @@ pub async fn get_user_from_headers<'a, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
+	standing_requirement: StandingRequirement,
 ) -> Result<(Scopes, User), AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -91,6 +120,7 @@ where
         redis,
         session_queue,
         required_scopes,
+		standing_requirement,
     )
     .await?;
 
@@ -104,6 +134,7 @@ pub async fn get_user_from_bearer_token<'a, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     allow_expired: bool,
+	standing_requirement: StandingRequirement,
 ) -> Result<(Scopes, User), AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -115,6 +146,7 @@ where
         redis,
         session_queue,
         allow_expired,
+		standing_requirement,
     )
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -129,6 +161,7 @@ pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     allow_expired: bool,
+	standing_requirement: StandingRequirement,
 ) -> Result<Option<(Scopes, user_item::DBUser)>, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -229,6 +262,10 @@ where
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };
 
+	if let Some((_, user)) = &possible_user {
+		standing_requirement.check(user.account_standing)?;
+	}
+
     Ok(possible_user)
 }
 
@@ -254,6 +291,7 @@ pub async fn check_is_moderator_from_headers<'a, 'b, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
+	standing_requirement: StandingRequirement,
 ) -> Result<User, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -264,6 +302,7 @@ where
         redis,
         session_queue,
         required_scopes,
+		standing_requirement,
     )
     .await?
     .1;

@@ -4,7 +4,9 @@ use std::cmp::Reverse;
 use std::collections::HashMap;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
-use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::auth::{
+	StandingRequirement, filter_visible_projects, get_user_from_headers,
+};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
@@ -260,6 +262,7 @@ pub async fn projects_get(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -307,6 +310,7 @@ pub async fn project_get_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|(_, user)| user)
@@ -452,6 +456,7 @@ pub async fn project_edit_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1581,6 +1586,7 @@ pub async fn dependency_list_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -1739,6 +1745,7 @@ pub async fn projects_edit(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2116,6 +2123,7 @@ pub async fn project_icon_edit_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2269,6 +2277,7 @@ pub async fn delete_project_icon_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2432,6 +2441,7 @@ pub async fn add_gallery_item_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2638,6 +2648,7 @@ pub async fn edit_gallery_item_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2859,6 +2870,7 @@ pub async fn delete_gallery_item_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3000,6 +3012,7 @@ pub async fn project_delete_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_DELETE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -3310,6 +3323,7 @@ pub async fn project_follow_internal(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3415,6 +3429,7 @@ pub async fn project_unfollow_internal(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3502,6 +3517,7 @@ pub async fn project_get_organization(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)

@@ -1,3 +1,5 @@
+use crate::auth::StandingRequirement;
+use crate::auth::validate::get_full_user_from_headers;
 use crate::util::error::ApiContext as _;
 use std::{
     cmp::Reverse,
@@ -14,7 +16,9 @@ use crate::{
         filter_visible_collections, filter_visible_projects,
         get_user_from_headers,
     },
-    database::models::{DBModerationNote, DBOrganization, DBProjectId, DBUser},
+	database::models::{
+		DBModerationNote, DBOrganization, DBProjectId, DBUser, DBUserId,
+	},
     file_hosting::{FileHost, FileHostPublicity},
     models::{
         ids::OrganizationId,
@@ -22,7 +26,7 @@ use crate::{
         organizations::Organization,
         pats::Scopes,
         projects::Project,
-        users::{Badges, Role},
+		users::{AccountStanding, Badges, Role, User},
     },
     queue::session::AuthQueue,
     util::{img::delete_old_images, routes::read_limited_from_payload},
@@ -84,6 +88,7 @@ pub async fn all_projects(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -232,6 +237,7 @@ pub async fn admin_user_email(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -298,6 +304,7 @@ pub async fn projects_list(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -345,15 +352,25 @@ pub async fn user_auth_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (scopes, mut user) = get_user_from_headers(
+	let (scopes, db_user) = get_full_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::USER_READ,
+		StandingRequirement::None,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
+
+	let mut user = match db_user.account_standing {
+		AccountStanding::Full => User::from_full(db_user),
+		AccountStanding::Locked => {
+			let mut user = User::from(db_user);
+			user.account_standing = Some(AccountStanding::Locked);
+			return Ok(HttpResponse::Ok().json(user));
+		}
+	};
 
     if !scopes.contains(Scopes::USER_READ_EMAIL) {
         user.email = None;
@@ -388,6 +405,7 @@ pub async fn get_user_preferences(
         &redis,
         &session_queue,
         Scopes::USER_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -432,6 +450,7 @@ pub async fn edit_user_preferences(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -536,18 +555,27 @@ pub async fn users_get(
         .await
         .wrap_internal_err("fetching users from database")?;
 
-    let auth_user = get_user_from_headers(
+	let auth_user = get_full_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+		Scopes::empty(),
+		StandingRequirement::None,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
-    let notes = if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+	let is_mod = auth_user.as_ref().is_some_and(|(scopes, user)| {
+		match user.account_standing {
+			AccountStanding::Full => {
+				scopes.contains(Scopes::SESSION_ACCESS)
+					&& Role::from_string(&user.role).is_mod()
+			}
+			AccountStanding::Locked => false,
+		}
+	});
+	let notes = if is_mod {
         DBModerationNote::get_many_users(
             &users_data.iter().map(|x| x.id).collect::<Vec<_>>(),
             &**pool,
@@ -559,13 +587,22 @@ pub async fn users_get(
         HashMap::new()
     };
 
-    let users: Vec<crate::models::users::User> = users_data
+	let users: Vec<User> = users_data
         .into_iter()
         .map(|data| {
-            let mut user = crate::models::users::User::from(data.clone());
-            if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+			let user_id = data.id;
+			let visible_standing = auth_user
+				.as_ref()
+				.filter(|(_, viewer)| {
+					viewer.id == user_id
+						|| Role::from_string(&viewer.role).is_admin()
+				})
+				.map(|_| data.account_standing);
+			let mut user = User::from(data);
+			user.account_standing = visible_standing;
+			if is_mod {
                 user.moderation_notes =
-                    Some(notes.get(&data.id).cloned().map(Into::into));
+					Some(notes.get(&user_id).cloned().map(Into::into));
             }
             user
         })
@@ -598,27 +635,43 @@ pub async fn user_get(
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(data) = user_data {
-        let auth_user = get_user_from_headers(
+		let auth_user = get_full_user_from_headers(
             &req,
             &**pool,
             &redis,
             &session_queue,
-            Scopes::SESSION_ACCESS,
+			Scopes::empty(),
+			StandingRequirement::None,
         )
         .await
-        .map(|x| x.1)
         .ok();
 
-        let is_admin = auth_user.as_ref().is_some_and(|x| x.role.is_admin());
-        let is_mod = auth_user.as_ref().is_some_and(|x| x.role.is_mod());
+		let staff_role =
+			auth_user.as_ref().and_then(|(scopes, user)| {
+				match user.account_standing {
+					AccountStanding::Full => scopes
+						.contains(Scopes::SESSION_ACCESS)
+						.then(|| Role::from_string(&user.role)),
+					AccountStanding::Locked => None,
+				}
+			});
+		let is_admin = staff_role.as_ref().is_some_and(Role::is_admin);
+		let is_mod = staff_role.as_ref().is_some_and(Role::is_mod);
         let user_id = data.id;
+		let visible_standing = auth_user
+			.as_ref()
+			.filter(|(_, viewer)| {
+				viewer.id == user_id
+					|| Role::from_string(&viewer.role).is_admin()
+			})
+			.map(|_| data.account_standing);
 
-        let mut response: crate::models::users::User = if is_admin {
+		let mut response = if is_admin {
             let github_id =
                 data.github_id.and_then(|id| u64::try_from(id).ok());
             let discord_id = data.discord_id.map(|id| id.to_string());
             let steam_id = data.steam_id.map(|id| id.to_string());
-            let mut user = crate::models::users::User::from_full(data);
+			let mut user = User::from_full(data);
             user.github_id = github_id;
             user.discord_id = discord_id;
             user.steam_id = steam_id;
@@ -626,6 +679,8 @@ pub async fn user_get(
         } else {
             data.into()
         };
+
+		response.account_standing = visible_standing;
 
         if is_mod {
             let note = DBModerationNote::get_user(user_id, &**pool, &redis)
@@ -656,6 +711,7 @@ pub async fn user_notes_edit(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -741,6 +797,7 @@ pub async fn collections_list(
         &redis,
         &session_queue,
         Scopes::COLLECTION_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -788,6 +845,7 @@ pub async fn orgs_list(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -891,6 +949,7 @@ pub struct EditUser {
     #[validate(length(max = 160))]
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
+	pub account_standing: Option<AccountStanding>,
     pub badges: Option<Badges>,
     #[validate(length(max = 160))]
     pub venmo_handle: Option<String>,
@@ -924,6 +983,7 @@ pub async fn user_edit(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -989,6 +1049,25 @@ pub async fn user_edit(
                 .execute(&mut transaction)
                 .await
                 .wrap_internal_err("fetching bio from database")?;
+			}
+
+			if let Some(account_standing) = new_user.account_standing {
+				if !user.role.is_admin() {
+					return Err(ApiError::Auth(eyre::eyre!(
+						"only admins can edit account standing"
+					)));
+				}
+
+				sqlx::query!(
+					r#"
+					UPDATE users SET account_standing = $1 WHERE id = $2
+					"#,
+					account_standing.as_str(),
+					id as DBUserId,
+				)
+				.execute(&mut transaction)
+				.await
+				.wrap_internal_err("updating account standing")?;
             }
 
             if let Some(role) = &new_user.role {
@@ -1143,6 +1222,7 @@ pub async fn user_icon_edit(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1238,6 +1318,7 @@ pub async fn user_icon_delete(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1309,6 +1390,7 @@ pub async fn user_delete(
         &redis,
         &session_queue,
         Scopes::USER_DELETE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1372,6 +1454,7 @@ pub async fn user_follows(
         &redis,
         &session_queue,
         Scopes::USER_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1432,6 +1515,7 @@ pub async fn user_notifications(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?

@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use crate::util::error::ApiContext as _;
 use std::{collections::HashMap, fmt};
 use xredis::RedisPool;
@@ -244,6 +245,7 @@ pub async fn get_issue(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -311,6 +313,7 @@ pub async fn get_report(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -761,6 +764,7 @@ pub async fn search_projects(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -993,6 +997,7 @@ pub async fn get_project_report(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1096,6 +1101,7 @@ pub async fn submit_report(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1303,6 +1309,7 @@ pub async fn update_issue_details(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("updating database records for `update_issue_details`")?;
@@ -1456,6 +1463,7 @@ pub async fn update_global_issue_details(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err(
@@ -1595,6 +1603,7 @@ pub async fn add_report(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("inserting database records for `add_report`")?;
@@ -1679,6 +1688,7 @@ pub async fn get_user_flagged_projects(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1719,6 +1729,7 @@ pub async fn get_users_flagged_projects(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1774,6 +1785,7 @@ pub async fn get_organization_flagged_projects(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1815,6 +1827,7 @@ pub async fn get_organizations_flagged_projects(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

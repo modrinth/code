@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::models::analytics::{Download, DownloadReason};
@@ -168,6 +169,7 @@ pub async fn count_download(
         &redis,
         &session_queue,
         false,
+		StandingRequirement::None,
     )
     .await
     .ok()

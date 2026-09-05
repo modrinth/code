@@ -2,7 +2,7 @@ use super::ApiError;
 use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
-use crate::auth::get_user_from_headers;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::database::models::ids::DBVersionId;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBProject, DBVersion};
@@ -54,6 +54,7 @@ pub async fn resolve_content(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)

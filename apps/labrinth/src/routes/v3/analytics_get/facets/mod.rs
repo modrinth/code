@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use xredis::RedisPool;
@@ -79,6 +80,7 @@ pub async fn fetch_facets(
         &redis,
         &session_queue,
         Scopes::ANALYTICS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

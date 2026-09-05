@@ -2,7 +2,7 @@ use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use std::collections::HashMap;
 
-use crate::auth::get_user_from_headers;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::models::ids::{DBNotificationId, DBUserId};
 use crate::database::models::notification_item::DBNotification;
@@ -375,6 +375,7 @@ pub async fn send_custom_email(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?

@@ -1,6 +1,6 @@
 use crate::{
     auth::AuthProvider,
-    models::users::{Badges, Role, UserPayoutData},
+	models::users::{AccountStanding, Badges, Role, UserPayoutData},
 };
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
@@ -15,6 +15,8 @@ pub struct LegacyUser {
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
     pub role: Role,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub account_standing: Option<AccountStanding>,
     pub badges: Badges,
 
     pub auth_providers: Option<Vec<AuthProvider>>, // this was changed in v3, but not changes ones we want to keep out of v2
@@ -39,6 +41,7 @@ impl From<crate::models::v3::users::User> for LegacyUser {
             bio: data.bio,
             created: data.created,
             role: data.role,
+			account_standing: data.account_standing,
             badges: data.badges,
             payout_data: data.payout_data,
             auth_providers: data.auth_providers,

@@ -1,4 +1,4 @@
-use crate::auth::get_user_from_headers;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::models::DBProject;
 use crate::env::ENV;
@@ -80,6 +80,7 @@ pub async fn page_view_ingest(
         &redis,
         &session_queue,
         Scopes::empty(),
+		StandingRequirement::None,
     )
     .await
     .ok();
@@ -210,6 +211,7 @@ pub async fn playtime_ingest(
         &redis,
         &session_queue,
         Scopes::PERFORM_ANALYTICS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -296,6 +298,7 @@ pub async fn minecraft_server_play_ingest(
         &redis,
         &session_queue,
         Scopes::empty(),
+		StandingRequirement::None,
     )
     .await
     .map(|(_, user)| user)

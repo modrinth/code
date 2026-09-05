@@ -1,4 +1,4 @@
-use crate::auth::get_user_from_headers;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::database::PgPool;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
@@ -30,6 +30,7 @@ pub async fn export(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?

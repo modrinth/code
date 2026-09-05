@@ -1,5 +1,5 @@
 use super::project_creation::{CreateError, UploadedFile};
-use crate::auth::get_user_from_headers;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
@@ -223,6 +223,7 @@ async fn version_create_inner(
         redis,
         session_queue,
         Scopes::VERSION_CREATE,
+		StandingRequirement::Full,
     )
     .await?
     .1;
@@ -705,6 +706,7 @@ async fn upload_file_to_version_inner(
         &redis,
         session_queue,
         Scopes::VERSION_WRITE,
+		StandingRequirement::Full,
     )
     .await?
     .1;

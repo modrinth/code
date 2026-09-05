@@ -2,7 +2,7 @@ use crate::database;
 use crate::database::models::generate_pat_id;
 use crate::util::error::Context as _;
 
-use crate::auth::get_user_from_headers;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::routes::ApiError;
 
 use actix_web::web::{self, Data};
@@ -53,6 +53,7 @@ pub async fn get_pats(
         &redis,
         &session_queue,
         Scopes::PAT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -129,6 +130,7 @@ pub async fn create_pat(
         &redis,
         &session_queue,
         Scopes::PAT_CREATE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -240,6 +242,7 @@ pub async fn edit_pat(
         &redis,
         &session_queue,
         Scopes::PAT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -358,6 +361,7 @@ pub async fn delete_pat(
         &redis,
         &session_queue,
         Scopes::PAT_DELETE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?

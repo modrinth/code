@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 use xredis::RedisPool;
 
 use crate::auth::checks::{is_team_member_project, is_visible_project};
-use crate::auth::get_user_from_headers;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::database::{DBProject, models as db_models};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::disclosures::{
@@ -58,6 +58,7 @@ pub async fn get_project_disclosures(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|(_, user)| user)
@@ -140,6 +141,7 @@ pub async fn modify_project_disclosures(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?

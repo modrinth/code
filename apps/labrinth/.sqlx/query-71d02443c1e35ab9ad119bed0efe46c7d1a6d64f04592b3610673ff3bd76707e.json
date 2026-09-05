@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE users\n                SET paypal_country = $1, paypal_email = $2, paypal_id = $3\n\t\t\t\tWHERE id = $4 AND account_standing = 'full'\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "71d02443c1e35ab9ad119bed0efe46c7d1a6d64f04592b3610673ff3bd76707e"
+}

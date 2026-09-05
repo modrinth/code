@@ -1,8 +1,8 @@
 use std::fmt::Write;
 
-use crate::auth::get_user_from_headers;
 use crate::auth::oauth::uris::{OAuthRedirectUris, ValidatedRedirectUri};
 use crate::auth::validate::extract_authorization_header;
+use crate::auth::{StandingRequirement, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::oauth_client_authorization_item::DBOAuthClientAuthorization;
@@ -83,6 +83,7 @@ pub async fn init_oauth(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
+		StandingRequirement::Full,
     )
     .await?
     .1;
@@ -313,7 +314,10 @@ pub async fn request_token(
                 user_id,
             }
             .insert(&mut transaction)
-            .await?;
+			.await?
+			.ok_or_else(|| {
+				OAuthError::error(OAuthErrorType::InvalidAuthCode)
+			})?;
 
             transaction.commit().await?;
 
@@ -350,6 +354,7 @@ pub async fn accept_or_reject_client_scopes(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
+		StandingRequirement::Full,
     )
     .await?
     .1;

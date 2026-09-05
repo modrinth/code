@@ -8,7 +8,7 @@ use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::projects::ProjectStatus;
 use crate::models::threads::MessageBody;
-use crate::models::users::Badges;
+use crate::models::users::{AccountStanding, Badges};
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
@@ -20,7 +20,7 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-const USERS_NAMESPACE: &str = "users:v4";
+const USERS_NAMESPACE: &str = "users:v5";
 const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v4";
 const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v4";
 
@@ -52,6 +52,7 @@ pub struct DBUser {
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
     pub role: String,
+	pub account_standing: AccountStanding,
     pub badges: Badges,
     #[serde(default)]
     pub campaign_pride_26: Option<Pride26CampaignDonation>,
@@ -90,14 +91,14 @@ impl DBUser {
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
                 venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
-                eligibility_verified_at
+				eligibility_verified_at, account_standing
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
                 $14, $15, $16, $17, $18, $19, $20, $21, $22,
-                $23
+				$23, $24
             )
             ",
             self.id as DBUserId,
@@ -123,6 +124,7 @@ impl DBUser {
             self.allow_friend_requests,
             self.is_subscribed_to_newsletter,
             self.eligibility_verified_at,
+			self.account_standing.as_str(),
         )
         .execute(&mut *transaction)
         .await?;
@@ -202,10 +204,10 @@ impl DBUser {
                     .collect::<Vec<_>>();
 
                 let users = sqlx::query!(
-                    "
+					r#"
                     SELECT id, email,
                         avatar_url, raw_avatar_url, username, bio,
-                        created, role, badges,
+						created, role, badges, account_standing AS "account_standing: AccountStanding",
                         (
                             SELECT MAX(campaign_donations.donated_at)
                             FROM campaign_donations
@@ -222,7 +224,7 @@ impl DBUser {
                         eligibility_verified_at
                     FROM users
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
-                    ",
+					"#,
                     &user_ids,
                     &slugs,
                 )
@@ -244,6 +246,7 @@ impl DBUser {
                             bio: u.bio,
                             created: u.created,
                             role: u.role,
+							account_standing: u.account_standing,
                             badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
                             campaign_pride_26: u
                                 .campaign_pride_26_last_donated_at

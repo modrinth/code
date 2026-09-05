@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use crate::database::PgPool;
 use crate::util::error::Context as _;
 use crate::{
@@ -29,6 +30,7 @@ pub async fn get_project_limits(
         &redis,
         &session_queue,
         Scopes::empty(),
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -53,6 +55,7 @@ pub async fn get_organization_limits(
         &redis,
         &session_queue,
         Scopes::empty(),
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -77,6 +80,7 @@ pub async fn get_collection_limits(
         &redis,
         &session_queue,
         Scopes::empty(),
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

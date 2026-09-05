@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use crate::util::error::ApiContext as _;
 use std::{collections::HashMap, fmt::Write, time::Instant};
 use xredis::RedisPool;
@@ -334,6 +335,7 @@ pub async fn _run(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -360,6 +362,7 @@ pub async fn version(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -392,6 +395,7 @@ pub async fn issue_type_schema(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .wrap_auth_err("deserializing HTTP response")?;

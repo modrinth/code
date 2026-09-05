@@ -66,15 +66,16 @@ impl DBOAuthAccessToken {
     pub async fn insert(
         &self,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<chrono::Duration, DatabaseError> {
+    ) -> Result<Option<chrono::Duration>, DatabaseError> {
         let r = sqlx::query!(
             "
             INSERT INTO oauth_access_tokens (
                 id, authorization_id, token_hash, scopes, last_used
             )
-            VALUES (
-                $1, $2, $3, $4, $5
-            )
+			SELECT $1, $2, $3, $4, $5
+			FROM oauth_client_authorizations auths
+			JOIN users ON users.id = auths.user_id
+			WHERE auths.id = $2 AND users.account_standing = 'full'
             RETURNING created, expires
             ",
             self.id.0,
@@ -83,13 +84,10 @@ impl DBOAuthAccessToken {
             self.scopes.to_postgres(),
             Option::<DateTime<Utc>>::None
         )
-        .fetch_one(exec)
+        .fetch_optional(exec)
         .await?;
 
-        let (created, expires) = (r.created, r.expires);
-        let time_until_expiration = expires - created;
-
-        Ok(time_until_expiration)
+        Ok(r.map(|r| r.expires - r.created))
     }
 
     pub fn hash_token(token: &str) -> String {

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n\t\t\t\t\t\tcreated, role, badges, account_standing AS \"account_standing: AccountStanding\",\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n\t\t\t\t\t",
   "describe": {
     "columns": [
       {
@@ -50,96 +50,101 @@
       },
       {
         "ordinal": 9,
+        "name": "account_standing: AccountStanding",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
         "name": "campaign_pride_26_last_donated_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "campaign_pride_26_total_amount_donated_usd",
         "type_info": "Numeric"
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "github_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "discord_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "gitlab_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "google_id",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "steam_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "microsoft_id",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "email_verified",
         "type_info": "Bool"
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "password",
         "type_info": "Text"
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "totp_secret",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "paypal_id",
         "type_info": "Text"
       },
       {
-        "ordinal": 21,
+        "ordinal": 22,
         "name": "paypal_country",
         "type_info": "Text"
       },
       {
-        "ordinal": 22,
+        "ordinal": 23,
         "name": "paypal_email",
         "type_info": "Text"
       },
       {
-        "ordinal": 23,
+        "ordinal": 24,
         "name": "venmo_handle",
         "type_info": "Text"
       },
       {
-        "ordinal": 24,
+        "ordinal": 25,
         "name": "stripe_customer_id",
         "type_info": "Text"
       },
       {
-        "ordinal": 25,
+        "ordinal": 26,
         "name": "allow_friend_requests",
         "type_info": "Bool"
       },
       {
-        "ordinal": 26,
+        "ordinal": 27,
         "name": "is_subscribed_to_newsletter",
         "type_info": "Bool"
       },
       {
-        "ordinal": 27,
+        "ordinal": 28,
         "name": "eligibility_verified_at",
         "type_info": "Timestamptz"
       }
@@ -157,6 +162,7 @@
       true,
       false,
       true,
+      false,
       false,
       false,
       false,
@@ -181,5 +187,5 @@
       true
     ]
   },
-  "hash": "3ca51012492b969bb6a474ee22c9e53e57b6da3a1145f0d86a2bab36be436eb6"
+  "hash": "f34fca2fe5161d28eac97054ebf4cb85f234d858851232d9688e62f9530651e8"
 }

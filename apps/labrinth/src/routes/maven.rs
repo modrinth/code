@@ -1,3 +1,4 @@
+use crate::auth::StandingRequirement;
 use crate::auth::checks::{is_visible_project, is_visible_version};
 use crate::database::PgPool;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
@@ -100,6 +101,7 @@ pub async fn maven_metadata(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -338,6 +340,7 @@ pub async fn version_file(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -425,6 +428,7 @@ pub async fn version_file_sha1(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)
@@ -491,6 +495,7 @@ pub async fn version_file_sha512(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
+		StandingRequirement::Full,
     )
     .await
     .map(|x| x.1)

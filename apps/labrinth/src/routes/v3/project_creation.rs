@@ -1,6 +1,7 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
 use crate::auth::{
-    AuthenticationError, get_user_from_headers, require_verified_email,
+	AuthenticationError, StandingRequirement, get_user_from_headers,
+	require_verified_email,
 };
 use crate::database::PgPool;
 use crate::database::PgTransaction;
@@ -482,6 +483,7 @@ async fn project_create_inner(
         redis,
         session_queue,
         Scopes::PROJECT_CREATE,
+		StandingRequirement::Full,
     )
     .await?;
 
