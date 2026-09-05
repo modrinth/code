@@ -68,8 +68,7 @@ const messages = defineMessages({
 	},
 	spam: {
 		id: 'nags.project-description-spam.description',
-		defaultMessage:
-			'Repeated characters, words, or phrases cannot be used to pad a project description.',
+		defaultMessage: `Repeated characters, words, or phrases cannot be used to pad your project's description.`,
 	},
 	translateTitle: {
 		id: 'nags.project-description-non-english.title',
