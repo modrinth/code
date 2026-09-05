@@ -25,10 +25,8 @@ use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::{LoaderVersion, Manifest};
-use regex::Regex;
 use serde::Deserialize;
-use std::fmt::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tokio::process::Command;
 
 mod args;
@@ -673,6 +671,17 @@ pub async fn install_minecraft_with_reporter(
 			&state.pool,
 		)
 		.await?;
+		if let Err(error) =
+			crate::api::instance::reconcile_instance_synced_options(
+				&instance.id,
+			)
+			.await
+		{
+			tracing::warn!(
+				"Failed to reconcile synced options after installing {}: {error}",
+				instance.id
+			);
+		}
 		emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 	}
     if let Some(loading_bar) = &loading_bar {
@@ -733,29 +742,37 @@ pub async fn install_minecraft_for_instance_id_with_reporter(
 pub async fn read_protocol_version_from_jar(
     path: PathBuf,
 ) -> crate::Result<Option<u32>> {
+    Ok(read_game_version_metadata_from_jar(&path)
+        .await?
+        .and_then(|data| data.protocol_version))
+}
+
+#[derive(Deserialize, Debug)]
+pub(crate) struct GameVersionMetadata {
+    pub(crate) protocol_version: Option<u32>,
+    pub(crate) world_version: Option<u32>,
+}
+
+/// Reads the game's embedded metadata, available from snapshot 18w47b onward.
+pub(crate) async fn read_game_version_metadata_from_jar(
+    path: &Path,
+) -> crate::Result<Option<GameVersionMetadata>> {
     let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
-    let Some(entry_index) = zip
-        .file()
-        .entries()
-        .iter()
-        .position(|x| matches!(x.filename().as_str(), Ok("version.json")))
-    else {
+    let Some(entry_index) = zip.file().entries().iter().position(|entry| {
+        entry
+            .filename()
+            .as_str()
+            .is_ok_and(|name| name == "version.json")
+    }) else {
         return Ok(None);
     };
 
-    #[derive(Deserialize, Debug)]
-    struct VersionData {
-        protocol_version: Option<u32>,
-    }
-
-    let mut data = vec![];
+    let mut data = Vec::new();
     zip.reader_with_entry(entry_index)
         .await?
         .read_to_end_checked(&mut data)
         .await?;
-    let data: VersionData = serde_json::from_slice(&data)?;
-
-    Ok(data.protocol_version)
+    Ok(Some(serde_json::from_slice(&data)?))
 }
 
 fn link_project_and_version(
@@ -924,11 +941,7 @@ pub async fn launch_minecraft(
 
     let env_args = Vec::from(env_args);
 
-    let _instance_content_lock =
-        state.lock_instance_content(&instance.id).await;
-
     // Check if instance has a running process, and reject running the command if it does
-    // Done late so a quick double call doesn't launch two instances
     let existing_processes = process::get_by_instance_id(&instance.id).await?;
     if let Some(process) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
@@ -1067,47 +1080,39 @@ pub async fn launch_minecraft(
 
     command.envs(env_args.iter().cloned());
 
-    // Overwrites the minecraft options.txt file with the settings from the profile
-    // Uses 'a:b' syntax which is not quite yaml
-    if !mc_set_options.is_empty() {
-        let options_path = instance_path.join("options.txt");
+    if let Err(error) =
+        crate::api::instance::reconcile_synced_packs(&instance.id).await
+    {
+        tracing::warn!(
+            "Failed to reconcile synced packs before launching {}: {error}",
+            instance.id
+        );
+    }
 
-        let (mut options_string, input_encoding) = if options_path.exists() {
-            io::read_any_encoding_to_string(&options_path).await?
-        } else {
-            (String::new(), encoding_rs::UTF_8)
-        };
+    if let Err(error) =
+        crate::api::instance::sync_game_options_before_launch(&instance.id)
+            .await
+    {
+        tracing::warn!(
+            "Failed to reconcile game options before launching {}: {error}",
+            instance.id
+        );
+    }
 
-        // UTF-16 encodings may be successfully detected and read, but we cannot encode
-        // them back, and it's technically possible that the game client strongly expects
-        // such encoding
-        if input_encoding != input_encoding.output_encoding() {
-            return Err(crate::ErrorKind::LauncherError(format!(
-                "The instance options.txt file uses an unsupported encoding: {}. \
-                Please either turn off instance options that need to modify this file, \
-                or convert the file to an encoding that both the game and this app support, \
-                such as UTF-8.",
-                input_encoding.name()
-            ))
-            .into());
-        }
+    crate::api::instance::apply_game_options_launcher_overrides(
+        &instance.id,
+        mc_set_options,
+    )
+    .await?;
 
-        for (key, value) in mc_set_options {
-            let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
-            // check if the regex exists in the file
-            if !re.is_match(&options_string) {
-                // The key was not found in the file, so append it
-                write!(&mut options_string, "\n{key}:{value}").unwrap();
-            } else {
-                let replaced_string = re
-                    .replace_all(&options_string, &format!("{key}:{value}"))
-                    .to_string();
-                options_string = replaced_string;
-            }
-        }
-
-        io::write(&options_path, input_encoding.encode(&options_string).0)
-            .await?;
+    let _instance_content_lock =
+        state.lock_instance_content(&instance.id).await;
+    if crate::state::instance_has_running_process(&instance.id, &state).await? {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Instance {} is already running",
+            instance.id
+        ))
+        .as_error());
     }
 
     crate::state::instances::commands::set_instance_last_played(

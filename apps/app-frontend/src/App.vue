@@ -14,7 +14,7 @@ import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	CompassIcon,
-	ImagesIcon,
+	ImageIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
@@ -91,8 +91,6 @@ import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyIn
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
-import NewIconEditorNotification from '@/components/ui/new-icon-editor-notification/index.vue'
-import { shouldShowNewIconEditorNotification } from '@/components/ui/new-icon-editor-notification/show-notification'
 import OnboardingChecklist from '@/components/ui/onboarding-checklist/index.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
@@ -100,12 +98,14 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import SurveyPopup from '@/components/ui/SurveyPopup.vue'
+import SyncInstancesUpdateModal from '@/components/ui/sync-instances-update-modal/index.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useError } from '@/composables/use-error.js'
 import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-refresh'
+import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
 import { getAccountAppearance, rememberAccountAppearance } from '@/helpers/account-appearance.ts'
@@ -124,7 +124,6 @@ import { install_create_modpack_instance, install_get_modpack_preview } from '@/
 import {
 	can_current_user_use_shared_instances,
 	get as getInstance,
-	get_global_synced_options,
 	run,
 	set_global_synced_option,
 } from '@/helpers/instance'
@@ -137,8 +136,9 @@ import {
 	setActive,
 } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
-import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+import { appSettingsKeys, get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
+import { globalSyncedOptionsQueryOptions, syncedOptionsKeys } from '@/helpers/synced-options'
 import { hasActivePride26Midas, hasMidasBadge } from '@/helpers/user-campaigns.ts'
 import { get_user_preferences } from '@/helpers/user-preferences.ts'
 import { parse_modrinth_user_link } from '@/helpers/users'
@@ -153,7 +153,11 @@ import {
 } from '@/helpers/utils.js'
 import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n from '@/i18n.config'
-import { instanceKeys, screenshotKeys } from '@/pages/instance/query-options'
+import {
+	instanceKeys,
+	instanceListQueryOptions,
+	screenshotKeys,
+} from '@/pages/instance/query-options'
 import {
 	appUpdateState,
 	downloadAvailableAppUpdate,
@@ -189,6 +193,7 @@ import {
 
 const appSettings = useAppSettings()
 const appTheme = useTheme()
+const quickInstances = useQuickInstanceLimit()
 const router = useRouter()
 const route = useRoute()
 const { channel: appEventChannel, events: appEvents } = setupAppEventsProvider()
@@ -384,6 +389,7 @@ const {
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
 	onboardingChecklist,
+	tags,
 } = setupProviders(
 	tauriApiClient,
 	notificationManager,
@@ -452,8 +458,7 @@ const isDevEnvironment = ref(false)
 
 const stateInitialized = ref(false)
 const globalSyncedOptionsQuery = useQuery({
-	queryKey: ['global-synced-options'],
-	queryFn: get_global_synced_options,
+	...globalSyncedOptionsQueryOptions(),
 	enabled: computed(() => stateInitialized.value),
 })
 
@@ -705,15 +710,8 @@ function handleAdsConsentRequired(required) {
 }
 
 async function setupApp() {
+	tags.initialize()
 	await onboardingChecklist.initialize()
-
-	if (shouldShowNewIconEditorNotification(showChecklist.value)) {
-		addPopupNotification({
-			contentType: 'custom',
-			component: NewIconEditorNotification,
-			autoCloseMs: null,
-		})
-	}
 
 	const {
 		native_decorations,
@@ -725,6 +723,11 @@ async function setupApp() {
 		toggle_sidebar,
 		sync_theme_across_devices,
 		sync_behavior_across_devices,
+		sync_features_across_devices,
+		show_files_tab_in_instances,
+		show_worlds_tab_in_instances,
+		show_screenshots_tab_in_instances,
+		show_skin_selector_in_sidebar,
 		developer_mode,
 		feature_flags,
 		pending_update_toast_for_version,
@@ -749,10 +752,23 @@ async function setupApp() {
 	appTheme.advancedRendering = advanced_rendering
 	appTheme.syncAcrossDevices = sync_theme_across_devices
 	appSettings.syncBehaviorAcrossDevices = sync_behavior_across_devices
+	appSettings.syncFeaturesAcrossDevices = sync_features_across_devices
 	appSettings.hideNametagSkinsPage = hide_nametag_skins_page
 	appSettings.toggleSidebar = toggle_sidebar
+	appSettings.showFilesTabInInstances = show_files_tab_in_instances
+	appSettings.showWorldsTabInInstances = show_worlds_tab_in_instances
+	appSettings.showScreenshotsTabInInstances = show_screenshots_tab_in_instances
+	appSettings.showSkinSelectorInSidebar = show_skin_selector_in_sidebar
 	appSettings.devMode = developer_mode
 	stateInitialized.value = true
+	await nextTick()
+	if (
+		appSettings.getFeatureFlag('show_sync_instances_update_modal') ||
+		(pending_update_toast_for_version === version &&
+			(await queryClient.fetchQuery(instanceListQueryOptions())).length > 0)
+	) {
+		syncInstancesUpdateModal.value?.show()
+	}
 
 	await getCurrentWindow().onResized(async () => {
 		isMaximized.value = await getCurrentWindow().isMaximized()
@@ -1038,8 +1054,18 @@ const updateToPlayModal = ref()
 
 const modrinthLoginModal = ref()
 const appSettingsModal = ref()
+const syncInstancesUpdateModal = ref()
 provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
 provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
+
+watch(
+	() => appSettings.getFeatureFlag('show_sync_instances_update_modal'),
+	(enabled) => {
+		if (enabled && stateInitialized.value) {
+			syncInstancesUpdateModal.value?.show()
+		}
+	},
+)
 
 watch(incompatibilityWarningModal, (modal) => {
 	if (modal) {
@@ -1096,7 +1122,6 @@ watch(
 
 				if (behavior && appSettings.syncBehaviorAcrossDevices) {
 					const behaviorFeatureFlags = {
-						worlds_in_home: behavior.show_jump_in,
 						compact_instance_cards: behavior.compact_instance_cards,
 						show_instance_play_time: behavior.show_play_time,
 						skip_unknown_pack_warning: !behavior.warn_on_unknown_modpacks,
@@ -1120,25 +1145,53 @@ watch(
 						settingsChanged = true
 					}
 
+					for (const [flag, value] of Object.entries(behaviorFeatureFlags)) {
+						if (settings.feature_flags[flag] !== value) {
+							settings.feature_flags[flag] = value
+							settingsChanged = true
+						}
+					}
+				}
+
+				if (behavior && appSettings.syncFeaturesAcrossDevices) {
+					const featureFlags = {
+						worlds_in_home: behavior.show_jump_in,
+					}
+					const featureSettings = {
+						show_files_tab_in_instances: 'showFilesTabInInstances',
+						show_worlds_tab_in_instances: 'showWorldsTabInInstances',
+						show_screenshots_tab_in_instances: 'showScreenshotsTabInInstances',
+						show_skin_selector_in_sidebar: 'showSkinSelectorInSidebar',
+					}
+					for (const [key, stateKey] of Object.entries(featureSettings)) {
+						const value = behavior[key] ?? settings[key]
+						appSettings[stateKey] = value
+						if (settings[key] !== value) {
+							settings[key] = value
+							settingsChanged = true
+						}
+					}
+					Object.assign(appSettings.featureFlags, featureFlags)
+					if (typeof behavior.quick_instance_count === 'number') {
+						quickInstances.setLimit(behavior.quick_instance_count)
+					}
+
 					const showAllScreenshots = behavior.show_all_screenshots
 					if (typeof showAllScreenshots === 'boolean') {
 						const globalSyncedOptions =
 							globalSyncedOptionsQuery.data.value ??
-							(await queryClient.fetchQuery({
-								queryKey: ['global-synced-options'],
-								queryFn: get_global_synced_options,
-							}))
+							(await queryClient.fetchQuery(globalSyncedOptionsQueryOptions()))
 						if (globalSyncedOptions.screenshots !== showAllScreenshots) {
 							const updatedGlobalSyncedOptions = await set_global_synced_option(
 								'screenshots',
 								showAllScreenshots,
 							)
-							queryClient.setQueryData(['global-synced-options'], updatedGlobalSyncedOptions)
+							queryClient.setQueryData(syncedOptionsKeys.global, updatedGlobalSyncedOptions)
 							await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
 						}
 					}
 
-					for (const [flag, value] of Object.entries(behaviorFeatureFlags)) {
+					for (const [flag, value] of Object.entries(featureFlags)) {
 						if (settings.feature_flags[flag] !== value) {
 							settings.feature_flags[flag] = value
 							settingsChanged = true
@@ -1148,6 +1201,7 @@ watch(
 
 				if (settingsChanged) {
 					await setSettings(settings)
+					queryClient.setQueryData(appSettingsKeys.all, settings)
 				}
 			})
 			.catch(handleError)
@@ -1419,8 +1473,10 @@ async function fetchIntercomToken() {
 }
 
 watch(
-	[showAd, adConsentAvailable],
-	async ([showAds, canManageConsent]) => {
+	[stateInitialized, showAd, adConsentAvailable],
+	async ([ready, showAds, canManageConsent]) => {
+		if (!ready) return
+
 		if (showAds) {
 			await init_ads_window(true)
 			return
@@ -2035,6 +2091,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<Suspense>
 			<AppSettingsModal ref="appSettingsModal" />
 		</Suspense>
+		<SyncInstancesUpdateModal ref="syncInstancesUpdateModal" />
 		<Suspense>
 			<ModrinthAccountRequiredModal ref="modrinthLoginModal" :request-auth="requestModrinthAuth" />
 		</Suspense>
@@ -2082,7 +2139,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<CompassIcon />
 			</NavButton>
-			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
+			<NavButton
+				v-if="appSettings.showSkinSelectorInSidebar"
+				v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)"
+				to="/skins"
+			>
 				<ShirtIcon />
 			</NavButton>
 			<NavButton
@@ -2090,7 +2151,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(messages.screenshots)"
 				to="/screenshots"
 			>
-				<ImagesIcon />
+				<ImageIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(messages.modrinthHosting)"

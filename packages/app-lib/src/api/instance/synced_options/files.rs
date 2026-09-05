@@ -82,11 +82,23 @@ pub(in crate::api::instance) async fn instance_is_running(
         .await
 }
 
+pub(in crate::api::instance) fn option_can_apply_while_running(
+    option: SyncedOption,
+) -> bool {
+    matches!(
+        option,
+        SyncedOption::GameOptions
+            | SyncedOption::Screenshots
+            | SyncedOption::ResourcePacks
+    )
+}
+
 pub(in crate::api::instance) fn instance_option_enabled(
     metadata: &InstanceMetadata,
     option: SyncedOption,
 ) -> bool {
     match option {
+        SyncedOption::GameOptions => metadata.synced_options.game_options,
         SyncedOption::CommandHistory => metadata.synced_options.command_history,
         SyncedOption::MultiplayerServers => {
             metadata.synced_options.multiplayer_servers
@@ -95,6 +107,8 @@ pub(in crate::api::instance) fn instance_option_enabled(
             metadata.synced_options.creative_hotbars
         }
         SyncedOption::Screenshots => metadata.synced_options.screenshots,
+        SyncedOption::ResourcePacks => metadata.synced_options.resource_packs,
+        SyncedOption::DataPacks => metadata.synced_options.data_packs,
     }
 }
 
@@ -208,6 +222,28 @@ pub(in crate::api::instance) async fn finish_checkpoint(
 		WHERE instance_id = ? AND feature = ? AND variant = ?
 		",
         link_mode,
+        instance_id,
+        option_name,
+        variant,
+    )
+    .execute(&state.pool)
+    .await?;
+    Ok(())
+}
+
+pub(in crate::api::instance) async fn finish_plain_checkpoint(
+    instance_id: &str,
+    option: SyncedOption,
+    variant: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let option_name = option.as_str();
+    sqlx::query!(
+        "
+		UPDATE instance_sync_checkpoints
+		SET status = 'ready', link_mode = NULL
+		WHERE instance_id = ? AND feature = ? AND variant = ?
+		",
         instance_id,
         option_name,
         variant,

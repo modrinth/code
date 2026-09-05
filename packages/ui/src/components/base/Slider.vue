@@ -1,10 +1,17 @@
 <template>
 	<div class="flex w-full items-center gap-4">
-		<span class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary">
+		<span
+			v-if="currentValue !== null"
+			class="w-10 shrink-0 whitespace-nowrap py-2 text-right text-sm leading-5 text-secondary"
+		>
 			{{ min }}
 		</span>
 
-		<div class="relative h-10 min-w-0 flex-1" :class="disabled ? 'opacity-50' : ''">
+		<div
+			v-if="currentValue !== null"
+			class="relative mx-2 min-w-0 flex-1"
+			:class="[heightClass, disabled ? 'opacity-50' : '']"
+		>
 			<div
 				class="pointer-events-none absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-surface-5"
 			>
@@ -26,30 +33,36 @@
 
 			<input
 				ref="input"
-				v-model="currentValue"
+				:value="currentValue"
 				type="range"
 				:min="min"
 				:max="max"
 				:step="step"
-				class="slider absolute top-0 h-10 min-h-0 appearance-none border-0 bg-transparent p-0 shadow-none outline-none"
+				class="slider absolute top-0 h-full min-h-0 appearance-none overflow-visible border-0 bg-transparent p-0 shadow-none outline-none"
 				:class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
 				:disabled="disabled"
+				:aria-label="ariaLabel"
 				@input="onInputWithSnap(($event.target as HTMLInputElement).value)"
 			/>
 		</div>
 
-		<span class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary">
+		<span
+			v-if="currentValue !== null"
+			class="w-10 shrink-0 whitespace-nowrap py-2 text-left text-sm leading-5 text-secondary"
+		>
 			{{ formatValue(max) }}
 		</span>
 
 		<Input
-			:model-value="String(currentValue)"
+			:model-value="currentValue ?? undefined"
 			type="number"
-			size="medium"
+			:size="size"
 			wrapper-class="slider-value shrink-0"
-			input-class="!font-semibold"
-			:style="{ width: valueInputWidth }"
+			:class="currentValue === null ? 'w-full' : 'w-[65px]'"
+			:input-class="currentValue === null ? undefined : 'text-center'"
 			:disabled="disabled"
+			:placeholder="placeholder"
+			:aria-label="ariaLabel"
 			:min="min"
 			:max="max"
 			:step="step"
@@ -62,11 +75,13 @@
 import { computed, ref, watch } from 'vue'
 
 import Input from './inputs/Input.vue'
+import type { InputSize } from './inputs/types'
 
 const emit = defineEmits<{ 'update:modelValue': [number] }>()
 
 interface Props {
-	modelValue?: number
+	size?: InputSize
+	modelValue?: number | null
 	min: number
 	max: number
 	step?: number
@@ -75,9 +90,12 @@ interface Props {
 	snapRange?: number
 	disabled?: boolean
 	unit?: string
+	placeholder?: string
+	ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
+	size: 'medium',
 	modelValue: 0,
 	min: 0,
 	max: 100,
@@ -89,11 +107,17 @@ const props = withDefaults(defineProps<Props>(), {
 	unit: '',
 })
 
-const currentValue = ref(clampValue(props.modelValue))
-const currentPercentage = computed(() => getPercentage(currentValue.value))
-const valueInputWidth = computed(
-	() => `calc(${Math.max(String(currentValue.value).length, 1)}ch + 2.125rem)`,
+const heightClass = computed(
+	() =>
+		({
+			small: 'h-8',
+			standard: 'h-9',
+			medium: 'h-10',
+			large: 'h-12',
+		})[props.size],
 )
+const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
+const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>
 	props.snapPoints.filter((snapPoint) => snapPoint >= props.min && snapPoint <= props.max),
 )
@@ -101,11 +125,18 @@ const visibleSnapPoints = computed(() =>
 watch(
 	() => props.modelValue,
 	(newValue) => {
-		currentValue.value = clampValue(newValue ?? props.min)
+		currentValue.value = newValue === null ? null : normalizeValue(newValue ?? props.min)
 	},
 )
 
-function clampValue(value: number) {
+function normalizeValue(value: number) {
+	if (!Number.isFinite(value)) return props.min
+
+	if (props.forceStep && props.step > 0) {
+		value = props.min + Math.round((value - props.min) / props.step) * props.step
+		value = Number(value.toFixed(8))
+	}
+
 	return Math.max(props.min, Math.min(value, props.max))
 }
 
@@ -121,14 +152,9 @@ function formatValue(value: number) {
 }
 
 function inputValueValid(inputValue: number) {
-	if (Number.isNaN(inputValue)) return
+	if (!Number.isFinite(inputValue)) return
 
-	let newValue = inputValue
-	if (props.forceStep && props.step > 0) {
-		newValue -= newValue % props.step
-	}
-
-	currentValue.value = clampValue(newValue)
+	currentValue.value = normalizeValue(inputValue)
 	emit('update:modelValue', currentValue.value)
 }
 

@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Namensschild ausblenden"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Zeige kürzlich gespielte Welten oder Instanzen im Abschnitt „Loslegen“ auf der Startseite an."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Mit Welten oder Instanzen loslegen"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiere die Modrinth App, wenn Minecraft startet."
   },
@@ -349,48 +343,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Update der Modrinth App erforderlich"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Es konnten keine zufälligen Symbole auf Instanzen angewendet werden."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Icon für {num, plural, one {# Instanz} other {# Instanzen}} randomisiert."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Neu in diesem Update"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Schließen"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Erstelle direkt in der Modrinth-App benutzerdefinierte Icons für deine Instanzen. Kombiniere Hintergründe mit Symbolen aus Minecraft und beliebten Mods!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# Instanz hat} other {# Instanzen haben}} noch kein Icon. Möchtest du, dass wir {count, plural, one {dieser ein zufälliges Icon} other {diesen zufällige Icons}} zuweisen, um loszulegen?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Zufällige Icons"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Überspringen"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Benutzerdefinierter Icon-Editor"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Schließen"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Personalisiere deine Instanzen!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Ausblenden"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Neuer Icon-Editor"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Update ansehen"
   },
   "app.install.phase.downloading_content": {
     "message": "Inhalte werden heruntergeladen"

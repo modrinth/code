@@ -144,7 +144,7 @@ export async function get_dependencies_as_content_items(
 	return adaptContentItems(items)
 }
 
-function adaptContentItems(items: ContentItem[]): ContentItem[] {
+export function adaptContentItems(items: ContentItem[]): ContentItem[] {
 	return items.map((item) => {
 		const embeddedMetadata = item.embedded_metadata
 		if (!embeddedMetadata?.icon_path) return item
@@ -289,10 +289,17 @@ export async function set_synced_option(
 }
 
 export type SyncedOption =
+	| 'resource_packs'
+	| 'data_packs'
+	| 'game_options'
 	| 'command_history'
 	| 'multiplayer_servers'
 	| 'creative_hotbars'
 	| 'screenshots'
+
+export function isSyncedOptionAvailable(option: SyncedOption): boolean {
+	return option !== 'data_packs'
+}
 
 export type GlobalSyncedOptions = Record<SyncedOption, boolean>
 
@@ -333,6 +340,10 @@ export async function get_synced_options_overview(
 
 export async function get_global_synced_options(): Promise<GlobalSyncedOptions> {
 	return await invoke('plugin:instance|instance_get_global_synced_options')
+}
+
+export async function get_initialized_synced_options(): Promise<GlobalSyncedOptions> {
+	return await invoke('plugin:instance|instance_get_initialized_synced_options')
 }
 
 export async function set_global_synced_option(

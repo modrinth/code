@@ -326,30 +326,6 @@
   "app.hosting.update-required.title": {
     "message": "Потрібне оновлення Modrinth App"
   },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Нове оновлення"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Закрити"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Випадкові іконки"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Пропустити"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Закрити"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Персоналізуйте свої примірники!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Відхилити"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Переглянути оновлення"
-  },
   "app.install.phase.downloading_content": {
     "message": "Завантаження вмісту"
   },

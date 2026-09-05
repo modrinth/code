@@ -284,9 +284,6 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "閉じる"
-  },
   "app.install.phase.downloading_content": {
     "message": "コンテンツをダウンロード中"
   },

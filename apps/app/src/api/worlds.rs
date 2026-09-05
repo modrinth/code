@@ -23,6 +23,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             backup_world,
             delete_world,
             add_server_to_instance,
+            ensure_managed_server_in_instance,
             edit_server_in_instance,
             remove_server_from_instance,
             desync_server,
@@ -164,6 +165,18 @@ pub async fn add_server_to_instance(
         content_kind,
     )
     .await?)
+}
+
+#[tauri::command]
+pub async fn ensure_managed_server_in_instance(
+    instance_id: &str,
+    name: String,
+    address: String,
+) -> Result<()> {
+    Ok(
+        worlds::ensure_managed_server_in_instance(instance_id, name, address)
+            .await?,
+    )
 }
 
 #[tauri::command]

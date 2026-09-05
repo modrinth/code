@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE settings\n            SET\n                max_concurrent_writes = $1,\n                max_concurrent_downloads = $2,\n\n                theme = $3,\n                locale = $4,\n                default_page = $5,\n                collapsed_navigation = $6,\n                advanced_rendering = $7,\n                native_decorations = $8,\n\n                discord_rpc = $9,\n                developer_mode = $10,\n                telemetry = $11,\n                personalized_ads = $12,\n\n                extra_launch_args = jsonb($13),\n                custom_env_vars = jsonb($14),\n                mc_memory_max = $15,\n                mc_force_fullscreen = $16,\n                mc_game_resolution_x = $17,\n                mc_game_resolution_y = $18,\n                hide_on_process_start = $19,\n\n                hook_pre_launch = $20,\n                hook_wrapper = $21,\n                hook_post_exit = $22,\n\n                custom_dir = $23,\n                prev_custom_dir = $24,\n                migrated = $25,\n\n                toggle_sidebar = $26,\n                feature_flags = $27,\n                hide_nametag_skins_page = $28,\n\n                skipped_update = $29,\n                pending_update_toast_for_version = $30,\n                auto_download_updates = $31,\n\n                sync_theme_across_devices = $32,\n                sync_behavior_across_devices = $33,\n\t\t\t\tsync_features_across_devices = $34,\n\t\t\t\tshow_files_tab_in_instances = $35,\n\t\t\t\tshow_worlds_tab_in_instances = $36,\n\t\t\t\tshow_screenshots_tab_in_instances = $37,\n\t\t\t\tshow_skin_selector_in_sidebar = $38,\n\n\t\t\t\tversion = $39\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 39
+    },
+    "nullable": []
+  },
+  "hash": "05b2976127c9c71488506c93b27801b9b6b187e7c75ca59fdffda2f0fb10e964"
+}

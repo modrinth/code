@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Skrýt jmenovku"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Zobrazit nedávno hrané světy nebo instance v \"Nedávno hrané\" sekci na domovské obrazovce."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Hrát světy nebo instance"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizovat Modrinth aplikaci při spuštění Minecraftu."
   },
@@ -346,48 +340,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Modrinth App potřebuje být aktualizovaná"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Nepodařilo se použít náhodné ikony pro instance."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Náhodná ikona pro {num, plural, one {# instanci} few {# instance} many {# instancí} other {# instancí}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nové z této aktualizace"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Zavřít"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Vytvořit vlastní ikonu pro vaší instanci přímo v Modrinth App. Smíchejte a porovnejte pozadí se symboly z Minecraftu a populárních módů!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# instance nemá} few {# instance nemají} many {# instancí nemá} other {# instancí nemá}} zatím žádnou ikonu. Chcete, abychom {count, plural, one {jí} other {jim}} dali náhodné na začátek?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Náhodné ikony"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Přeskočit"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Editor vlastních ikon"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Zavřít"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Přizpůsobte si své instance!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Zavřít"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nový editor ikon"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Zobrazit aktualizaci"
   },
   "app.install.phase.downloading_content": {
     "message": "Stahování obsahu"

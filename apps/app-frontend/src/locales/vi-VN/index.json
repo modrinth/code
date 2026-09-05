@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ẩn thẻ tên"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Hiển thị các thế giới hoặc phiên chơi gần đây trong mục \"Jump in\" trên trang chủ."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Bước vào các thế giới hoặc các khu vực riêng biệt"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Thu nhỏ ứng dụng Modrinth khi Minecraft khởi động."
   },
@@ -307,24 +301,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Yêu cầu cập nhật ứng dụng Modrinth"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Không thể áp dụng các biểu tượng ngẫu nhiên cho các thực thể."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Điểm mới trong bản cập nhật này"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Tạo biểu tượng tùy chỉnh cho các instance của bạn ngay trong ứng dụng Modrinth. Hãy kết hợp các hình nền với những biểu tượng từ Minecraft và các bản mod phổ biến!"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Trình chỉnh sửa biểu tượng tùy chỉnh"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Tùy chỉnh các instance của bạn!"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Trình chỉnh sửa biểu tượng mới"
   },
   "app.install.phase.downloading_content": {
     "message": "Đang tải nội dung"

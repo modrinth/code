@@ -45,6 +45,11 @@ pub struct BehaviorPreferences {
     pub show_play_time: bool,
     pub hide_nametag: bool,
     pub show_all_screenshots: bool,
+    pub show_files_tab_in_instances: bool,
+    pub show_worlds_tab_in_instances: bool,
+    pub show_screenshots_tab_in_instances: bool,
+    pub show_skin_selector_in_sidebar: bool,
+    pub quick_instance_count: u8,
     pub warn_on_unknown_modpacks: bool,
     pub skip_non_essential_warnings: bool,
 }
@@ -59,6 +64,11 @@ impl Default for BehaviorPreferences {
             show_play_time: true,
             hide_nametag: false,
             show_all_screenshots: true,
+            show_files_tab_in_instances: true,
+            show_worlds_tab_in_instances: true,
+            show_screenshots_tab_in_instances: false,
+            show_skin_selector_in_sidebar: true,
+            quick_instance_count: 20,
             warn_on_unknown_modpacks: true,
             skip_non_essential_warnings: false,
         }

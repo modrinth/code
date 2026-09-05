@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Nascondi nome"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Elenca i mondi o le istanze recenti nella sezione \"Avvio rapido\" della pagina Home."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Avvio rapido di mondi o istanze"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimizza l'app all'avvio di Minecraft."
   },
@@ -349,48 +343,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Aggiornamento richiesto"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Impossibile applicare icone casuali alle istanze."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Applicata una icona casuale a {num, plural, one {# istanza} other {# istanze}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Novità"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Chiudi"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Crea icone personalizzate per le tue istanze direttamente nell'app. Abbina a piacimento sfondi e simboli provenienti da Minecraft e da altre mod famose!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# istanza non ha} other {# istanze non hanno}} ancora una icona. Vorresti che {count, plural, one {venga scelta} other {vengano scelte}} a caso?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Icone casuali"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Salta"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Editor di icone"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Chiudi"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Personalizza le tue istanze!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Ignora"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nuovo editor di icone"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Scopri di più"
   },
   "app.install.phase.downloading_content": {
     "message": "Download dei contenuti"
