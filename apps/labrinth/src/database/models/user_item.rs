@@ -8,7 +8,7 @@ use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::projects::ProjectStatus;
 use crate::models::threads::MessageBody;
-use crate::models::users::{AccountStanding, Badges};
+use crate::models::users::Badges;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
@@ -52,7 +52,7 @@ pub struct DBUser {
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
     pub role: String,
-	pub account_standing: AccountStanding,
+	pub account_locked: bool,
     pub badges: Badges,
     #[serde(default)]
     pub campaign_pride_26: Option<Pride26CampaignDonation>,
@@ -91,7 +91,7 @@ impl DBUser {
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
                 venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
-				eligibility_verified_at, account_standing
+				eligibility_verified_at, account_locked
             )
             VALUES (
                 $1, $2, $3, $4, $5,
@@ -124,7 +124,7 @@ impl DBUser {
             self.allow_friend_requests,
             self.is_subscribed_to_newsletter,
             self.eligibility_verified_at,
-			self.account_standing.as_str(),
+			self.account_locked,
         )
         .execute(&mut *transaction)
         .await?;
@@ -207,7 +207,7 @@ impl DBUser {
 					r#"
                     SELECT id, email,
                         avatar_url, raw_avatar_url, username, bio,
-						created, role, badges, account_standing AS "account_standing: AccountStanding",
+						created, role, badges, account_locked,
                         (
                             SELECT MAX(campaign_donations.donated_at)
                             FROM campaign_donations
@@ -246,7 +246,7 @@ impl DBUser {
                             bio: u.bio,
                             created: u.created,
                             role: u.role,
-							account_standing: u.account_standing,
+							account_locked: u.account_locked,
                             badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
                             campaign_pride_26: u
                                 .campaign_pride_26_last_donated_at

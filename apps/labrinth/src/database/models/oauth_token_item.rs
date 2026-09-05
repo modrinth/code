@@ -75,7 +75,7 @@ impl DBOAuthAccessToken {
 			SELECT $1, $2, $3, $4, $5
 			FROM oauth_client_authorizations auths
 			JOIN users ON users.id = auths.user_id
-			WHERE auths.id = $2 AND users.account_standing = 'full'
+			WHERE auths.id = $2 AND NOT users.account_locked
             RETURNING created, expires
             ",
             self.id.0,

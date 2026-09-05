@@ -1,6 +1,6 @@
 use self::payments::*;
 use self::update_subscriptions::*;
-use crate::auth::{StandingRequirement, get_user_from_headers};
+use crate::auth::{AccountLockRequirement, get_user_from_headers};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -139,7 +139,7 @@ pub async fn subscriptions(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -220,7 +220,7 @@ pub async fn refund_charge(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -512,7 +512,7 @@ pub async fn reprocess_charge_tax(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -714,7 +714,7 @@ pub async fn edit_subscription(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1213,7 +1213,7 @@ pub async fn user_customer(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1265,7 +1265,7 @@ pub async fn charges(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1332,7 +1332,7 @@ pub async fn add_payment_method_flow(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1395,7 +1395,7 @@ pub async fn edit_payment_method(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1470,7 +1470,7 @@ pub async fn remove_payment_method(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1572,7 +1572,7 @@ pub async fn payment_methods(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1750,7 +1750,7 @@ pub async fn initiate_payment(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2830,7 +2830,7 @@ pub async fn credit(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

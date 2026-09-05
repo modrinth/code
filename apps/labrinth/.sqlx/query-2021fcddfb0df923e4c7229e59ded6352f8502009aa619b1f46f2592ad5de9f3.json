@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n\t\t\t\t\t\tcreated, role, badges, account_standing AS \"account_standing: AccountStanding\",\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n\t\t\t\t\t",
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n\t\t\t\t\t\tcreated, role, badges, account_locked,\n                        (\n                            SELECT MAX(campaign_donations.donated_at)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_last_donated_at,\n                        (\n                            SELECT SUM(campaign_donations.amount_usd)\n                            FROM campaign_donations\n                            WHERE campaign_donations.user_id = users.id\n                        ) AS campaign_pride_26_total_amount_donated_usd,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        eligibility_verified_at\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n\t\t\t\t\t",
   "describe": {
     "columns": [
       {
@@ -50,8 +50,8 @@
       },
       {
         "ordinal": 9,
-        "name": "account_standing: AccountStanding",
-        "type_info": "Varchar"
+        "name": "account_locked",
+        "type_info": "Bool"
       },
       {
         "ordinal": 10,
@@ -187,5 +187,5 @@
       true
     ]
   },
-  "hash": "f34fca2fe5161d28eac97054ebf4cb85f234d858851232d9688e62f9530651e8"
+  "hash": "2021fcddfb0df923e4c7229e59ded6352f8502009aa619b1f46f2592ad5de9f3"
 }

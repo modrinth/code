@@ -313,7 +313,7 @@ mod tests {
 		let direct = AuthenticationError::AccountLocked;
 		assert_eq!(direct.status_code(), StatusCode::FORBIDDEN);
 		let wrapped = Err::<(), _>(direct)
-			.wrap_auth_err("checking account standing")
+			.wrap_auth_err("checking account lock")
 			.unwrap_err()
 			.wrap_err("authenticating API request");
 		assert_eq!(wrapped.status_code(), StatusCode::FORBIDDEN);

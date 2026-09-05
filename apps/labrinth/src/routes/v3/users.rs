@@ -1,4 +1,4 @@
-use crate::auth::StandingRequirement;
+use crate::auth::AccountLockRequirement;
 use crate::auth::validate::get_full_user_from_headers;
 use crate::util::error::ApiContext as _;
 use std::{
@@ -26,7 +26,7 @@ use crate::{
         organizations::Organization,
         pats::Scopes,
         projects::Project,
-		users::{AccountStanding, Badges, Role, User},
+		users::{Badges, Role, User},
     },
     queue::session::AuthQueue,
     util::{img::delete_old_images, routes::read_limited_from_payload},
@@ -88,7 +88,7 @@ pub async fn all_projects(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -237,7 +237,7 @@ pub async fn admin_user_email(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -304,7 +304,7 @@ pub async fn projects_list(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -358,16 +358,16 @@ pub async fn user_auth_get(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		StandingRequirement::None,
+		AccountLockRequirement::None,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
 
-	let mut user = match db_user.account_standing {
-		AccountStanding::Full => User::from_full(db_user),
-		AccountStanding::Locked => {
+	let mut user = match db_user.account_locked {
+		false => User::from_full(db_user),
+		true => {
 			let mut user = User::from(db_user);
-			user.account_standing = Some(AccountStanding::Locked);
+			user.account_locked = Some(true);
 			return Ok(HttpResponse::Ok().json(user));
 		}
 	};
@@ -405,7 +405,7 @@ pub async fn get_user_preferences(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -450,7 +450,7 @@ pub async fn edit_user_preferences(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -561,18 +561,18 @@ pub async fn users_get(
         &redis,
         &session_queue,
 		Scopes::empty(),
-		StandingRequirement::None,
+		AccountLockRequirement::None,
     )
     .await
     .ok();
 
 	let is_mod = auth_user.as_ref().is_some_and(|(scopes, user)| {
-		match user.account_standing {
-			AccountStanding::Full => {
+		match user.account_locked {
+			false => {
 				scopes.contains(Scopes::SESSION_ACCESS)
 					&& Role::from_string(&user.role).is_mod()
 			}
-			AccountStanding::Locked => false,
+			true => false,
 		}
 	});
 	let notes = if is_mod {
@@ -591,15 +591,15 @@ pub async fn users_get(
         .into_iter()
         .map(|data| {
 			let user_id = data.id;
-			let visible_standing = auth_user
+			let visible_account_locked = auth_user
 				.as_ref()
 				.filter(|(_, viewer)| {
 					viewer.id == user_id
 						|| Role::from_string(&viewer.role).is_admin()
 				})
-				.map(|_| data.account_standing);
+				.map(|_| data.account_locked);
 			let mut user = User::from(data);
-			user.account_standing = visible_standing;
+			user.account_locked = visible_account_locked;
 			if is_mod {
                 user.moderation_notes =
 					Some(notes.get(&user_id).cloned().map(Into::into));
@@ -641,30 +641,30 @@ pub async fn user_get(
             &redis,
             &session_queue,
 			Scopes::empty(),
-			StandingRequirement::None,
+			AccountLockRequirement::None,
         )
         .await
         .ok();
 
 		let staff_role =
 			auth_user.as_ref().and_then(|(scopes, user)| {
-				match user.account_standing {
-					AccountStanding::Full => scopes
+				match user.account_locked {
+					false => scopes
 						.contains(Scopes::SESSION_ACCESS)
 						.then(|| Role::from_string(&user.role)),
-					AccountStanding::Locked => None,
+					true => None,
 				}
 			});
 		let is_admin = staff_role.as_ref().is_some_and(Role::is_admin);
 		let is_mod = staff_role.as_ref().is_some_and(Role::is_mod);
         let user_id = data.id;
-		let visible_standing = auth_user
+		let visible_account_locked = auth_user
 			.as_ref()
 			.filter(|(_, viewer)| {
 				viewer.id == user_id
 					|| Role::from_string(&viewer.role).is_admin()
 			})
-			.map(|_| data.account_standing);
+			.map(|_| data.account_locked);
 
 		let mut response = if is_admin {
             let github_id =
@@ -680,7 +680,7 @@ pub async fn user_get(
             data.into()
         };
 
-		response.account_standing = visible_standing;
+		response.account_locked = visible_account_locked;
 
         if is_mod {
             let note = DBModerationNote::get_user(user_id, &**pool, &redis)
@@ -711,7 +711,7 @@ pub async fn user_notes_edit(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -797,7 +797,7 @@ pub async fn collections_list(
         &redis,
         &session_queue,
         Scopes::COLLECTION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -845,7 +845,7 @@ pub async fn orgs_list(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -949,7 +949,7 @@ pub struct EditUser {
     #[validate(length(max = 160))]
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
-	pub account_standing: Option<AccountStanding>,
+	pub account_locked: Option<bool>,
     pub badges: Option<Badges>,
     #[validate(length(max = 160))]
     pub venmo_handle: Option<String>,
@@ -983,7 +983,7 @@ pub async fn user_edit(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1051,23 +1051,23 @@ pub async fn user_edit(
                 .wrap_internal_err("fetching bio from database")?;
 			}
 
-			if let Some(account_standing) = new_user.account_standing {
+			if let Some(account_locked) = new_user.account_locked {
 				if !user.role.is_admin() {
 					return Err(ApiError::Auth(eyre::eyre!(
-						"only admins can edit account standing"
+						"only admins can edit account lock"
 					)));
 				}
 
 				sqlx::query!(
 					r#"
-					UPDATE users SET account_standing = $1 WHERE id = $2
+					UPDATE users SET account_locked = $1 WHERE id = $2
 					"#,
-					account_standing.as_str(),
+					account_locked,
 					id as DBUserId,
 				)
 				.execute(&mut transaction)
 				.await
-				.wrap_internal_err("updating account standing")?;
+				.wrap_internal_err("updating account lock")?;
             }
 
             if let Some(role) = &new_user.role {
@@ -1222,7 +1222,7 @@ pub async fn user_icon_edit(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1318,7 +1318,7 @@ pub async fn user_icon_delete(
         &redis,
         &session_queue,
         Scopes::USER_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1390,7 +1390,7 @@ pub async fn user_delete(
         &redis,
         &session_queue,
         Scopes::USER_DELETE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1454,7 +1454,7 @@ pub async fn user_follows(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1515,7 +1515,7 @@ pub async fn user_notifications(
         &redis,
         &session_queue,
         Scopes::NOTIFICATION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

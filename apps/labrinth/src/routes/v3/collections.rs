@@ -1,6 +1,6 @@
 use crate::auth::checks::is_visible_collection;
 use crate::auth::{
-	StandingRequirement, filter_visible_collections, get_user_from_headers,
+	AccountLockRequirement, filter_visible_collections, get_user_from_headers,
 	require_verified_email,
 };
 use crate::database::PgPool;
@@ -76,7 +76,7 @@ pub async fn collection_create(
         &redis,
         &session_queue,
         Scopes::COLLECTION_CREATE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await?
     .1;
@@ -181,7 +181,7 @@ pub async fn collections_get(
         &redis,
         &session_queue,
         Scopes::COLLECTION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -219,7 +219,7 @@ pub async fn collection_get(
         &redis,
         &session_queue,
         Scopes::COLLECTION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -271,7 +271,7 @@ pub async fn collection_edit(
         &redis,
         &session_queue,
         Scopes::COLLECTION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -455,7 +455,7 @@ pub async fn collection_icon_edit(
         &redis,
         &session_queue,
         Scopes::COLLECTION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -554,7 +554,7 @@ pub async fn delete_collection_icon(
         &redis,
         &session_queue,
         Scopes::COLLECTION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -626,7 +626,7 @@ pub async fn collection_delete(
         &redis,
         &session_queue,
         Scopes::COLLECTION_DELETE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

@@ -1,6 +1,6 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{
-	AuthenticationError, StandingRequirement, get_user_from_headers,
+	AccountLockRequirement, AuthenticationError, get_user_from_headers,
 };
 use crate::database::PgPool;
 use crate::database::models::DBUserId;
@@ -72,7 +72,7 @@ pub async fn post_compliance_form(
         &redis,
         &session_queue,
         Scopes::PAYOUTS_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -524,7 +524,7 @@ pub async fn calculate_fees(
         &redis,
         &session_queue,
         false,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -564,7 +564,7 @@ pub async fn create_payout(
         &redis,
         &session_queue,
         false,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -792,7 +792,7 @@ pub async fn transaction_history(
         &redis,
         &session_queue,
         Scopes::PAYOUTS_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -884,7 +884,7 @@ pub async fn cancel_payout(
         &redis,
         &session_queue,
         Scopes::PAYOUTS_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1068,7 +1068,7 @@ pub async fn get_balance(
         &redis,
         &session_queue,
         Scopes::PAYOUTS_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

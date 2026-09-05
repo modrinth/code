@@ -1,4 +1,4 @@
-use crate::auth::StandingRequirement;
+use crate::auth::AccountLockRequirement;
 use actix_web::{HttpRequest, delete, get, post, put, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
@@ -194,7 +194,7 @@ pub async fn test_rule(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -251,7 +251,7 @@ pub async fn get_rules(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -429,7 +429,7 @@ pub async fn get_rule_affected_details(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -540,7 +540,7 @@ pub async fn create_rule(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -629,7 +629,7 @@ pub async fn update_rule(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -713,7 +713,7 @@ pub async fn delete_rule(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

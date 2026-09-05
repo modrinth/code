@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\t\tSELECT user_passkeys.id, user_id, name, credential_id,\n                   passkey AS \"passkey: sqlx::types::Json<Passkey>\",\n\t\t\t\t   last_used, created_at,\n\t\t\t\t   users.account_standing AS \"account_standing: AccountStanding\"\n            FROM user_passkeys\n\t\t\tJOIN users ON users.id = user_passkeys.user_id\n            WHERE credential_id = $1\n            ",
+  "query": "\n\t\t\tSELECT user_passkeys.id, user_id, name, credential_id,\n                   passkey AS \"passkey: sqlx::types::Json<Passkey>\",\n\t\t\t\t   last_used, created_at,\n\t\t\t\t   users.account_locked\n            FROM user_passkeys\n\t\t\tJOIN users ON users.id = user_passkeys.user_id\n            WHERE credential_id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -40,8 +40,8 @@
       },
       {
         "ordinal": 7,
-        "name": "account_standing: AccountStanding",
-        "type_info": "Varchar"
+        "name": "account_locked",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -60,5 +60,5 @@
       false
     ]
   },
-  "hash": "8cbb892dae7d23e27969d53f64036783dac56fb576672161dc66ddb44c059be1"
+  "hash": "de703148611b2cdc3b5743046098892405dd4df00fa9548c643ea8e33e4f06df"
 }

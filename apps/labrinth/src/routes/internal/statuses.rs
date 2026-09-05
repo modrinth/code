@@ -1,5 +1,5 @@
+use crate::auth::AccountLockRequirement;
 use crate::auth::AuthenticationError;
-use crate::auth::StandingRequirement;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::models::notification_item::DBNotification;
@@ -69,7 +69,7 @@ pub async fn ws_init(
         &redis,
         &session_queue,
         false,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

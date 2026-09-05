@@ -6,35 +6,6 @@ use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-#[derive(
-	Debug,
-	Clone,
-	Copy,
-	Default,
-	PartialEq,
-	Eq,
-	Serialize,
-	Deserialize,
-	sqlx::Decode,
-	utoipa::ToSchema,
-)]
-#[serde(rename_all = "lowercase")]
-#[sqlx(rename_all = "lowercase")]
-pub enum AccountStanding {
-	#[default]
-	Full,
-	Locked,
-}
-
-impl AccountStanding {
-	pub fn as_str(&self) -> &'static str {
-		match self {
-			Self::Full => "full",
-			Self::Locked => "locked",
-		}
-	}
-}
-
 pub const DELETED_USER: UserId = UserId(127155982985829);
 
 bitflags::bitflags! {
@@ -85,7 +56,7 @@ pub struct User {
     pub created: DateTime<Utc>,
     pub role: Role,
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub account_standing: Option<AccountStanding>,
+	pub account_locked: Option<bool>,
     pub badges: Badges,
     pub campaigns: UserCampaigns,
 
@@ -144,7 +115,7 @@ impl From<DBUser> for User {
             bio: data.bio,
             created: data.created,
             role: Role::from_string(&data.role),
-			account_standing: None,
+			account_locked: None,
             badges: data.badges,
             campaigns: UserCampaigns {
                 pride_26: data.campaign_pride_26,
@@ -209,7 +180,7 @@ impl User {
             bio: db_user.bio,
             created: db_user.created,
             role: Role::from_string(&db_user.role),
-			account_standing: Some(db_user.account_standing),
+			account_locked: Some(db_user.account_locked),
             badges: db_user.badges,
             campaigns: UserCampaigns {
                 pride_26: db_user.campaign_pride_26,

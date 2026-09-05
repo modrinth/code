@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use super::ApiError;
 use crate::auth::checks::is_visible_organization;
 use crate::auth::{
-	StandingRequirement, filter_visible_projects, get_user_from_headers,
+	AccountLockRequirement, filter_visible_projects, get_user_from_headers,
 	require_verified_email,
 };
 use crate::database::PgPool;
@@ -63,7 +63,7 @@ pub async fn organization_projects_get(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_READ | Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -139,7 +139,7 @@ pub async fn organization_create(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_CREATE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await?
     .1;
@@ -247,7 +247,7 @@ pub async fn organization_get(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -335,7 +335,7 @@ pub async fn organization_notes_edit(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -460,7 +460,7 @@ pub async fn organizations_get(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -566,7 +566,7 @@ pub async fn organizations_edit(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -749,7 +749,7 @@ pub async fn organization_delete(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_DELETE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -939,7 +939,7 @@ pub async fn organization_projects_add(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1122,7 +1122,7 @@ pub async fn organization_projects_remove(
         &redis,
         &session_queue,
         Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1336,7 +1336,7 @@ pub async fn organization_icon_edit(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1454,7 +1454,7 @@ pub async fn delete_organization_icon(
         &redis,
         &session_queue,
         Scopes::ORGANIZATION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

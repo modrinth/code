@@ -5,7 +5,7 @@ use super::ApiError;
 use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
-use crate::auth::{StandingRequirement, get_user_from_headers};
+use crate::auth::{AccountLockRequirement, get_user_from_headers};
 use crate::database;
 use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
@@ -90,7 +90,7 @@ pub async fn version_project_get_helper(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -218,7 +218,7 @@ pub async fn versions_get(
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -301,7 +301,7 @@ pub async fn version_get_helper(
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -473,7 +473,7 @@ pub async fn version_edit_helper(
         &redis,
         &session_queue,
         Scopes::VERSION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1037,7 +1037,7 @@ pub async fn version_list_internal(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -1236,7 +1236,7 @@ pub async fn version_delete(
         &redis,
         &session_queue,
         Scopes::VERSION_DELETE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

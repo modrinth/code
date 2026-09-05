@@ -1,4 +1,4 @@
-use crate::auth::StandingRequirement;
+use crate::auth::AccountLockRequirement;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use std::{collections::HashSet, fmt::Display};
@@ -73,7 +73,7 @@ pub async fn get_user_clients(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -201,7 +201,7 @@ pub async fn oauth_client_create(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await?
     .1;
@@ -270,7 +270,7 @@ pub async fn oauth_client_delete(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -341,7 +341,7 @@ pub async fn oauth_client_edit(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -447,7 +447,7 @@ pub async fn oauth_client_icon_edit(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -538,7 +538,7 @@ pub async fn oauth_client_icon_delete(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -605,7 +605,7 @@ pub async fn get_user_oauth_authorizations(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -645,7 +645,7 @@ pub async fn revoke_oauth_authorization(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

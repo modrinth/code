@@ -1,6 +1,6 @@
 use super::threads::is_authorized_thread;
 use crate::auth::checks::{is_team_member_project, is_team_member_version};
-use crate::auth::{StandingRequirement, get_user_from_headers};
+use crate::auth::{AccountLockRequirement, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::{
@@ -69,7 +69,7 @@ pub async fn images_add(
         &redis,
         &session_queue,
         context.relevant_scope(),
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

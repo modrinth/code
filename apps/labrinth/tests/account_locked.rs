@@ -15,29 +15,31 @@ use common::{
 	environment::{TestEnvironment, with_test_environment},
 };
 use labrinth::{
-	auth::{AuthenticationError, StandingRequirement, get_user_from_headers},
+	auth::{
+		AccountLockRequirement, AuthenticationError, get_user_from_headers,
+	},
 	database::models::{
 		DBUserId, flow_item::DBFlow, session_item::SessionBuilder,
 	},
 	env::ENV,
-	models::{pats::Scopes, users::AccountStanding},
+	models::pats::Scopes,
 	queue::session::AuthQueue,
 };
 use serde_json::{Value, json};
 
 pub mod common;
 
-async fn set_standing(
+async fn set_account_locked(
 	env: &TestEnvironment<ApiV3>,
 	user: &str,
-	standing: AccountStanding,
+	account_locked: bool,
 ) {
 	let response = env
 		.call(
 			test::TestRequest::patch()
 				.uri(&format!("/v3/user/{user}"))
 				.append_pat(ADMIN_USER_PAT)
-				.set_json(json!({"account_standing": standing}))
+				.set_json(json!({"account_locked": account_locked}))
 				.to_request(),
 		)
 		.await;
@@ -45,7 +47,8 @@ async fn set_standing(
 }
 
 #[actix_rt::test]
-async fn standing_is_visible_only_to_self_and_admin_in_both_api_versions() {
+async fn account_locked_is_visible_only_to_self_and_admin_in_both_api_versions()
+{
 	with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
 		let mut restricted_tokens = Vec::new();
 		for pat in [USER_USER_PAT, ADMIN_USER_PAT] {
@@ -55,7 +58,7 @@ async fn standing_is_visible_only_to_self_and_admin_in_both_api_versions() {
 						.uri("/_internal/pat")
 						.append_pat(pat)
 						.set_json(json!({
-							"name": "standing visibility",
+							"name": "account lock visibility",
 							"scopes": Scopes::empty(),
 							"expires": Utc::now() + Duration::days(1),
 						}))
@@ -67,8 +70,8 @@ async fn standing_is_visible_only_to_self_and_admin_in_both_api_versions() {
 			restricted_tokens
 				.push(body["access_token"].as_str().unwrap().to_owned());
 		}
-		for standing in [AccountStanding::Full, AccountStanding::Locked] {
-			set_standing(&env, "3", standing).await;
+		for account_locked in [false, true] {
+			set_account_locked(&env, "3", account_locked).await;
 			for version in ["v2", "v3"] {
 				for (pat, visible) in [
 					(None, false),
@@ -91,8 +94,8 @@ async fn standing_is_visible_only_to_self_and_admin_in_both_api_versions() {
 						assert_status!(&response, StatusCode::OK);
 						let body: Value = test::read_body_json(response).await;
 						assert_eq!(
-							body.get("account_standing"),
-							visible.then(|| json!(standing)).as_ref()
+							body.get("account_locked"),
+							visible.then(|| json!(account_locked)).as_ref()
 						);
 						assert_eq!(
 							body["email"].is_string(),
@@ -132,14 +135,14 @@ async fn standing_is_visible_only_to_self_and_admin_in_both_api_versions() {
 					assert_eq!(body.len(), 2);
 					for user in body {
 						let expected = if user["id"] == "3" {
-							visible.then(|| json!(standing))
+							visible.then(|| json!(account_locked))
 						} else {
 							(pat == ADMIN_USER_PAT
 								|| pat == Some(restricted_tokens[1].as_str()))
-							.then(|| json!("full"))
+							.then(|| json!(false))
 						};
 						assert_eq!(
-							user.get("account_standing"),
+							user.get("account_locked"),
 							expected.as_ref()
 						);
 					}
@@ -154,10 +157,10 @@ async fn standing_is_visible_only_to_self_and_admin_in_both_api_versions() {
 					.await;
 				assert_status!(&response, StatusCode::OK);
 				let body: Value = test::read_body_json(response).await;
-				assert_eq!(body["account_standing"], json!(standing));
-				match standing {
-					AccountStanding::Full => assert!(body["email"].is_string()),
-					AccountStanding::Locked => {
+				assert_eq!(body["account_locked"], json!(account_locked));
+				match account_locked {
+					false => assert!(body["email"].is_string()),
+					true => {
 						for field in [
 							"email",
 							"email_verified",
@@ -183,7 +186,7 @@ async fn standing_is_visible_only_to_self_and_admin_in_both_api_versions() {
 }
 
 #[actix_rt::test]
-async fn existing_pat_session_and_oauth_credentials_obey_standing_and_cache_invalidation()
+async fn existing_pat_session_and_oauth_credentials_obey_account_locks_and_cache_invalidation()
  {
 	with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
 		let client = &env.dummy.oauth_client_alpha;
@@ -200,14 +203,14 @@ async fn existing_pat_session_and_oauth_credentials_obey_standing_and_cache_inva
 			.await;
 		let mut transaction = env.db.pool.begin().await.unwrap();
 		SessionBuilder {
-			session: "mra_standing_test".into(),
+			session: "mra_account_locked_test".into(),
 			user_id: DBUserId(3),
 			os: None,
 			platform: None,
 			city: None,
 			country: None,
 			ip: "127.0.0.1".into(),
-			user_agent: "standing test".into(),
+			user_agent: "account lock test".into(),
 			expires: None,
 			session_expires: None,
 		}
@@ -217,16 +220,12 @@ async fn existing_pat_session_and_oauth_credentials_obey_standing_and_cache_inva
 		transaction.commit().await.unwrap();
 		let tokens = [
 			USER_USER_PAT.unwrap(),
-			"mra_standing_test",
+			"mra_account_locked_test",
 			oauth_token.as_str(),
 		];
 		let queue = AuthQueue::new();
-		for standing in [
-			AccountStanding::Full,
-			AccountStanding::Locked,
-			AccountStanding::Full,
-		] {
-			set_standing(&env, "3", standing).await;
+		for account_locked in [false, true, false] {
+			set_account_locked(&env, "3", account_locked).await;
 			for token in tokens {
 				let req = test::TestRequest::get()
 					.append_pat(Some(token))
@@ -235,9 +234,10 @@ async fn existing_pat_session_and_oauth_credentials_obey_standing_and_cache_inva
 						ENV.RATE_LIMIT_IGNORE_KEY.as_str(),
 					))
 					.to_http_request();
-				for requirement in
-					[StandingRequirement::None, StandingRequirement::Full]
-				{
+				for requirement in [
+					AccountLockRequirement::None,
+					AccountLockRequirement::NotLocked,
+				] {
 					let result = get_user_from_headers(
 						&req,
 						&*env.db.pool,
@@ -247,24 +247,18 @@ async fn existing_pat_session_and_oauth_credentials_obey_standing_and_cache_inva
 						requirement,
 					)
 					.await;
-					match (standing, requirement) {
-						(
-							AccountStanding::Locked,
-							StandingRequirement::Full,
-						) => {
+					match (account_locked, requirement) {
+						(true, AccountLockRequirement::NotLocked) => {
 							assert!(matches!(
 								result,
 								Err(AuthenticationError::AccountLocked)
 							));
 						}
-						(AccountStanding::Full, StandingRequirement::Full)
-						| (
-							AccountStanding::Full | AccountStanding::Locked,
-							StandingRequirement::None,
-						) => {
+						(false, AccountLockRequirement::NotLocked)
+						| (_, AccountLockRequirement::None) => {
 							assert_eq!(
-								result.unwrap().1.account_standing,
-								Some(standing)
+								result.unwrap().1.account_locked,
+								Some(account_locked)
 							);
 						}
 					}
@@ -280,7 +274,7 @@ async fn existing_pat_session_and_oauth_credentials_obey_standing_and_cache_inva
 			&env.db.redis_pool,
 			&queue,
 			Scopes::USER_AUTH_WRITE,
-			StandingRequirement::None,
+			AccountLockRequirement::None,
 		)
 		.await;
 		assert!(matches!(
@@ -297,13 +291,13 @@ async fn locked_accounts_cannot_mutate_resources_read_sensitive_data_or_unlock_t
 	with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
 		for pat in [USER_USER_PAT, MOD_USER_PAT] {
 			let response = env.call(test::TestRequest::patch().uri("/v3/user/3")
-				.append_pat(pat).set_json(json!({"account_standing": "locked"})).to_request()).await;
+				.append_pat(pat).set_json(json!({"account_locked": true})).to_request()).await;
 			assert_status!(&response, StatusCode::UNAUTHORIZED);
 		}
-		set_standing(&env, "3", AccountStanding::Locked).await;
+		set_account_locked(&env, "3", true).await;
 		let project = format!("/v3/project/{}", env.dummy.project_alpha.project_id);
 		for (method, uri, body) in [
-			(Method::PATCH, "/v3/user/3", json!({"account_standing":"full"})),
+			(Method::PATCH, "/v3/user/3", json!({"account_locked":false})),
 			(Method::PATCH, project.as_str(), json!({"title":"changed"})),
 			(Method::PATCH, "/v3/organization/missing", json!({"name":"changed"})),
 			(Method::PATCH, "/v3/collection/missing", json!({"name":"changed"})),
@@ -318,9 +312,9 @@ async fn locked_accounts_cannot_mutate_resources_read_sensitive_data_or_unlock_t
 			let body: Value = test::read_body_json(response).await;
 			assert_eq!(body["error"], "auth_error", "{uri}");
 		}
-		set_standing(&env, "1", AccountStanding::Locked).await;
+		set_account_locked(&env, "1", true).await;
 		let response = env.call(test::TestRequest::patch().uri("/v3/user/3")
-			.append_pat(ADMIN_USER_PAT).set_json(json!({"account_standing":"full"})).to_request()).await;
+			.append_pat(ADMIN_USER_PAT).set_json(json!({"account_locked":false})).to_request()).await;
 		assert_status!(&response, StatusCode::FORBIDDEN);
 	}).await;
 }
@@ -337,7 +331,7 @@ async fn flows_created_before_lock_cannot_reset_password_verify_email_or_issue_t
 		let flow = get_authorize_accept_flow_id(response).await;
 		let response = env.api.oauth_accept(&flow, USER_USER_PAT).await;
 		let auth_code = get_auth_code_from_redirect_params(&response).await;
-		set_standing(&env, "3", AccountStanding::Locked).await;
+		set_account_locked(&env, "3", true).await;
 
 		for (method, uri, body) in [
 			(Method::PATCH, "/_internal/auth/password", json!({"flow":password_flow,"new_password":"a long secure test password 489313"})),

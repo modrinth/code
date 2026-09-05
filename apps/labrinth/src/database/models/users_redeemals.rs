@@ -1,5 +1,4 @@
 use crate::database::models::DBUserId;
-use crate::models::users::AccountStanding;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_scalar};
@@ -245,7 +244,7 @@ impl UserRedeemal {
 #[derive(Debug)]
 pub struct RedeemalLookupFields {
     pub user_id: DBUserId,
-	pub account_standing: AccountStanding,
+	pub account_locked: bool,
     pub redeemal_status: Option<Status>,
 }
 
@@ -269,7 +268,7 @@ impl RedeemalLookupFields {
             r#"
             SELECT
                 users.id,
-				users.account_standing AS "account_standing: AccountStanding",
+				users.account_locked,
                 users_redeemals.status AS "status: Option<String>"
             FROM
                 users
@@ -293,7 +292,7 @@ impl RedeemalLookupFields {
 
         Ok(maybe_row.map(|row| RedeemalLookupFields {
             user_id: DBUserId(row.id),
-			account_standing: row.account_standing,
+			account_locked: row.account_locked,
             redeemal_status: row
                 .status
                 .as_deref()

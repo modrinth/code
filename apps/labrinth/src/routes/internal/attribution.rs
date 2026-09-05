@@ -5,7 +5,8 @@ use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
 use crate::auth::{
-	StandingRequirement, check_is_moderator_from_headers, get_user_from_headers,
+	AccountLockRequirement, check_is_moderator_from_headers,
+	get_user_from_headers,
 };
 use crate::database::PgPool;
 use crate::database::models::{
@@ -127,7 +128,7 @@ pub async fn scan(
         &redis,
         &session_queue,
         Scopes::VERSION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -243,7 +244,7 @@ async fn force_scan_file(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -327,7 +328,7 @@ pub async fn list(
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -661,7 +662,7 @@ pub async fn update_group(
         &redis,
         &session_queue,
         Scopes::VERSION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -750,7 +751,7 @@ pub async fn delete_groups(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("deleting database records for `delete_groups`")?;
@@ -790,7 +791,7 @@ pub async fn delete_all_groups(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("deleting database records for `delete_all_groups`")?;
@@ -911,7 +912,7 @@ pub async fn assign(
         &redis,
         &session_queue,
         Scopes::VERSION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1075,7 +1076,7 @@ pub async fn split(
         &redis,
         &session_queue,
         Scopes::VERSION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?

@@ -1,7 +1,7 @@
 use super::ApiError;
 use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{
-	StandingRequirement, filter_visible_projects, get_user_from_headers,
+	AccountLockRequirement, filter_visible_projects, get_user_from_headers,
 };
 use crate::database::PgPool;
 use crate::database::ReadOnlyPgPool;
@@ -80,7 +80,7 @@ pub async fn get_version_from_hash(
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -213,7 +213,7 @@ pub async fn get_update_from_hash(
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -337,7 +337,7 @@ pub async fn get_versions_from_hashes(
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -421,7 +421,7 @@ pub async fn get_projects_from_hashes(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -703,7 +703,7 @@ pub async fn update_individual_files(
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)
@@ -864,7 +864,7 @@ pub async fn delete_file(
         &redis,
         &session_queue,
         Scopes::VERSION_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1049,7 +1049,7 @@ pub async fn download_version(
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)

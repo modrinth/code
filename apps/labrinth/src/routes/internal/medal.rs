@@ -1,4 +1,4 @@
-use crate::auth::StandingRequirement;
+use crate::auth::AccountLockRequirement;
 use crate::database::PgPool;
 use crate::util::error::Context as _;
 use actix_web::{HttpResponse, post, web};
@@ -53,9 +53,9 @@ pub async fn verify(
     match maybe_fields {
         None => Err(ApiError::NotFound(eyre::eyre!("resource not found"))),
 		Some(fields) => {
-			StandingRequirement::Full
-				.check(fields.account_standing)
-				.wrap_auth_err("checking account standing")?;
+			AccountLockRequirement::NotLocked
+				.check(fields.account_locked)
+				.wrap_auth_err("checking account lock")?;
 			Ok(HttpResponse::Ok().json(VerifyResponse {
 				user_id: fields.user_id.into(),
 				redeemed: fields.redeemal_status.is_some(),
@@ -98,9 +98,9 @@ pub async fn redeem(
             return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
         }
         Some(fields) => {
-			StandingRequirement::Full
-				.check(fields.account_standing)
-				.wrap_auth_err("checking account standing")?;
+			AccountLockRequirement::NotLocked
+				.check(fields.account_locked)
+				.wrap_auth_err("checking account lock")?;
             if fields.redeemal_status.is_some() {
                 return Err(ApiError::Conflict(eyre::eyre!(
                     "User already redeemed this offer",

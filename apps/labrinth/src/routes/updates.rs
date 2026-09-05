@@ -9,7 +9,7 @@ use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
-use crate::auth::{StandingRequirement, get_user_from_headers};
+use crate::auth::{AccountLockRequirement, get_user_from_headers};
 use crate::database;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::models::pats::Scopes;
@@ -67,7 +67,7 @@ pub async fn forge_updates(
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .map(|x| x.1)

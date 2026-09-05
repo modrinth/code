@@ -9,7 +9,7 @@ pub use checks::{
 };
 use serde::{Deserialize, Serialize};
 pub use validate::{
-	StandingRequirement, check_is_moderator_from_headers,
+	AccountLockRequirement, check_is_moderator_from_headers,
 	get_user_from_bearer_token, get_user_from_headers,
 };
 

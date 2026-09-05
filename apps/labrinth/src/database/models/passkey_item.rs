@@ -1,7 +1,6 @@
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
-use crate::models::users::AccountStanding;
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
@@ -50,7 +49,7 @@ impl DBPasskey {
     pub async fn get_by_credential_id<'a, E>(
         credential_id: &[u8],
         exec: E,
-	) -> Result<Option<(DBPasskey, AccountStanding)>, DatabaseError>
+	) -> Result<Option<(DBPasskey, bool)>, DatabaseError>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -59,7 +58,7 @@ impl DBPasskey {
 			SELECT user_passkeys.id, user_id, name, credential_id,
                    passkey AS "passkey: sqlx::types::Json<Passkey>",
 				   last_used, created_at,
-				   users.account_standing AS "account_standing: AccountStanding"
+				   users.account_locked
             FROM user_passkeys
 			JOIN users ON users.id = user_passkeys.user_id
             WHERE credential_id = $1
@@ -79,7 +78,7 @@ impl DBPasskey {
 					created_at: x.created_at,
 					last_used: x.last_used,
 				},
-				x.account_standing,
+				x.account_locked,
 			)
         });
 

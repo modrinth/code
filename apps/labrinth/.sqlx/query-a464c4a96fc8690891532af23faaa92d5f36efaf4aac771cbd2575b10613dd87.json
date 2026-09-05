@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE users\n                SET paypal_country = $1, paypal_email = $2, paypal_id = $3\n\t\t\t\tWHERE id = $4 AND NOT account_locked\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a464c4a96fc8690891532af23faaa92d5f36efaf4aac771cbd2575b10613dd87"
+}

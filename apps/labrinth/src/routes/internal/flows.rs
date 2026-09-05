@@ -2,7 +2,7 @@ use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
 use crate::auth::{
-	AuthProvider, AuthenticationError, StandingRequirement,
+	AccountLockRequirement, AuthProvider, AuthenticationError,
 	get_user_from_headers,
 };
 use crate::database::PgPool;
@@ -17,7 +17,7 @@ use crate::models::error::ApiError as ApiErrorResponse;
 use crate::models::ids::PasskeyId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
-use crate::models::users::{AccountStanding, Badges, Role};
+use crate::models::users::{Badges, Role};
 use crate::queue::email::EmailQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -255,7 +255,7 @@ impl TempUser {
             bio: self.bio,
             created: Utc::now(),
             role: Role::Developer.to_string(),
-			account_standing: AccountStanding::Full,
+			account_locked: false,
             badges: Badges::default(),
             campaign_pride_26: None,
             allow_friend_requests: true,
@@ -1108,7 +1108,7 @@ pub async fn init(
             &redis,
             &session_queue,
             false,
-			StandingRequirement::Full,
+			AccountLockRequirement::NotLocked,
         )
 		.await?
         .map(|(_scopes, user)| user.id)
@@ -1148,7 +1148,7 @@ pub async fn init(
             &redis,
             &session_queue,
             false,
-			StandingRequirement::Full,
+			AccountLockRequirement::NotLocked,
         )
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -1298,7 +1298,7 @@ pub async fn auth_callback(
                 "
                 UPDATE users
                 SET paypal_country = $1, paypal_email = $2, paypal_id = $3
-				WHERE id = $4 AND account_standing = 'full'
+				WHERE id = $4 AND NOT account_locked
                 ",
                 oauth_user.country,
                 oauth_user.email,
@@ -1337,7 +1337,7 @@ pub async fn auth_callback(
 			let user = DBUser::get_id(id, &**client, &redis)
 				.await?
 				.ok_or(AuthenticationError::InvalidCredentials)?;
-			StandingRequirement::Full.check(user.account_standing)?;
+			AccountLockRequirement::NotLocked.check(user.account_locked)?;
 
             provider
                 .update_user_id(id, Some(&oauth_user.id), &mut transaction)
@@ -1368,7 +1368,7 @@ pub async fn auth_callback(
             .await?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-			StandingRequirement::Full.check(user.account_standing)?;
+			AccountLockRequirement::NotLocked.check(user.account_locked)?;
 
             if user.totp_secret.is_some() {
                 let flow = DBFlow::Login2FA { user_id: user.id }
@@ -1661,7 +1661,7 @@ pub async fn discord_community_link(
         &redis,
         &session_queue,
         Scopes::SESSION_ACCESS,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -1734,7 +1734,7 @@ pub async fn delete_auth_provider(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2107,7 +2107,7 @@ impl ReadyAccountRegisterFlow {
             bio: None,
             created: Utc::now(),
             role: Role::Developer.to_string(),
-			account_standing: AccountStanding::Full,
+			account_locked: false,
             badges: Badges::default(),
             campaign_pride_26: None,
             allow_friend_requests: true,
@@ -2324,9 +2324,9 @@ pub async fn login_password(
         .map_err(|_| AuthenticationError::InvalidCredentials)
         .wrap_auth_err("authenticating API request")?;
 
-	StandingRequirement::Full
-		.check(user.account_standing)
-		.wrap_auth_err("checking account standing")?;
+	AccountLockRequirement::NotLocked
+		.check(user.account_locked)
+		.wrap_auth_err("checking account lock")?;
 
     if user.totp_secret.is_some() {
         let flow = DBFlow::Login2FA { user_id: user.id }
@@ -2469,9 +2469,9 @@ pub async fn login_2fa(
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)
                 .wrap_auth_err("fetching user from database")?;
 
-		StandingRequirement::Full
-			.check(user.account_standing)
-			.wrap_auth_err("checking account standing")?;
+		AccountLockRequirement::NotLocked
+			.check(user.account_locked)
+			.wrap_auth_err("checking account lock")?;
 
         let mut transaction = pool
             .begin()
@@ -2542,7 +2542,7 @@ pub async fn begin_2fa_flow(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2604,7 +2604,7 @@ pub async fn finish_2fa_flow(
             &redis,
             &session_queue,
             Scopes::USER_AUTH_WRITE,
-			StandingRequirement::Full,
+			AccountLockRequirement::NotLocked,
         )
         .await
         .wrap_auth_err("authenticating API request")?
@@ -2753,7 +2753,7 @@ pub async fn remove_2fa(
         &redis,
         &session_queue,
         false,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -2927,13 +2927,13 @@ pub async fn reset_password_begin(
     if let Some(DBUser {
         id: user_id,
         email: user_email,
-		account_standing,
+		account_locked,
         ..
     }) = user
     {
-		StandingRequirement::Full
-			.check(account_standing)
-			.wrap_auth_err("checking account standing")?;
+		AccountLockRequirement::NotLocked
+			.check(account_locked)
+			.wrap_auth_err("checking account lock")?;
 
         let flow = DBFlow::ForgotPassword { user_id }
             .insert(Duration::hours(24), &redis)
@@ -3024,7 +3024,7 @@ pub async fn change_password(
             &redis,
             &session_queue,
             false,
-			StandingRequirement::Full,
+			AccountLockRequirement::NotLocked,
         )
         .await
         .wrap_auth_err("authenticating API request")?
@@ -3059,9 +3059,9 @@ pub async fn change_password(
         user
     };
 
-	StandingRequirement::Full
-		.check(user.account_standing)
-		.wrap_auth_err("checking account standing")?;
+	AccountLockRequirement::NotLocked
+		.check(user.account_locked)
+		.wrap_auth_err("checking account lock")?;
 
     let mut transaction = pool
         .begin()
@@ -3210,7 +3210,7 @@ pub async fn set_email(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3341,7 +3341,7 @@ pub async fn resend_verify_email(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3436,9 +3436,9 @@ pub async fn verify_email(
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)
                 .wrap_auth_err("fetching user from database")?;
 
-		StandingRequirement::Full
-			.check(user.account_standing)
-			.wrap_auth_err("checking account standing")?;
+		AccountLockRequirement::NotLocked
+			.check(user.account_locked)
+			.wrap_auth_err("checking account lock")?;
 
         if user.email != Some(confirm_email) {
             return Err(ApiError::Request(eyre::eyre!(
@@ -3510,7 +3510,7 @@ pub async fn subscribe_newsletter(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3563,7 +3563,7 @@ pub async fn get_newsletter_subscription_status(
         &redis,
         &session_queue,
         Scopes::USER_READ,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3618,7 +3618,7 @@ pub async fn register_passkey_start(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3722,7 +3722,7 @@ pub async fn register_passkey_finish(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -3884,15 +3884,15 @@ pub async fn authenticate_passkey_finish(
 
     if let Some(DBFlow::AuthenticatePasskey { state }) = flow {
         let credential_id = response.credential.get_credential_id();
-		let (db_passkey, account_standing) =
+		let (db_passkey, account_locked) =
             DBPasskey::get_by_credential_id(credential_id, &**pool)
                 .await
                 .wrap_internal_err("failed to fetch passkey")?
                 .wrap_request_err_with(|| "passkey not found")?;
 
-		StandingRequirement::Full
-			.check(account_standing)
-			.wrap_auth_err("checking account standing")?;
+		AccountLockRequirement::NotLocked
+			.check(account_locked)
+			.wrap_auth_err("checking account lock")?;
 
         let mut transaction = pool
             .begin()
@@ -4009,7 +4009,7 @@ pub async fn list_passkeys(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -4064,7 +4064,7 @@ pub async fn rename_passkey(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
@@ -4125,7 +4125,7 @@ pub async fn delete_passkey(
         &redis,
         &session_queue,
         Scopes::USER_AUTH_WRITE,
-		StandingRequirement::Full,
+		AccountLockRequirement::NotLocked,
     )
     .await
     .wrap_auth_err("authenticating API request")?
