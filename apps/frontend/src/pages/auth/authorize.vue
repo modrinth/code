@@ -326,3 +326,14 @@ definePageMeta({
 	middleware: 'auth',
 })
 </script>
+
+<style>
+.button-row {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	gap: var(--gap-md);
+}
+</style>
