@@ -4952,9 +4952,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Copiar ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Descargar último respaldo"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Gestiona facturaciones"
   },

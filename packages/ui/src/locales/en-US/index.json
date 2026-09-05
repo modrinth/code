@@ -206,6 +206,9 @@
   "button.download": {
     "defaultMessage": "Download"
   },
+  "button.download-files": {
+    "defaultMessage": "Download files"
+  },
   "button.downloading": {
     "defaultMessage": "Downloading"
   },
@@ -5162,6 +5165,18 @@
   "servers.busy.installing": {
     "defaultMessage": "Server is installing"
   },
+  "servers.download.failed.description": {
+    "defaultMessage": "An error occurred while trying to download the world's files."
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "Download failed"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "This world's files cannot currently be downloaded."
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "Download unavailable"
+  },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP created"
   },
@@ -5314,9 +5329,6 @@
   },
   "servers.listing.copy-id-label": {
     "defaultMessage": "Copy ID"
-  },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Download latest backup"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Manage billing"

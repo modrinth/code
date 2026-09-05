@@ -71,16 +71,27 @@
 							<template #all>{{ formatMessage(commonMessages.allProjectType) }}</template>
 						</FilterPills>
 					</div>
-					<Button
-						v-tooltip="backupCreationDisabled"
-						type="colored"
-						color="brand"
-						:disabled="!!backupCreationDisabled"
-						@click="showCreateModel"
-					>
-						<PlusIcon class="size-5" />
-						{{ formatMessage(messages.createBackup) }}
-					</Button>
+					<div class="flex flex-wrap items-center gap-2">
+						<Button
+							type="outlined"
+							:disabled="!server.node || !worldId"
+							:loading="isDownloadingFiles"
+							@click="downloadFiles"
+						>
+							<DownloadIcon class="size-5" />
+							{{ formatMessage(commonMessages.downloadFilesButton) }}
+						</Button>
+						<Button
+							v-tooltip="backupCreationDisabled"
+							type="colored"
+							color="brand"
+							:disabled="!!backupCreationDisabled"
+							@click="showCreateModel"
+						>
+							<PlusIcon class="size-5" />
+							{{ formatMessage(messages.createBackup) }}
+						</Button>
+					</div>
 				</div>
 
 				<div class="flex w-full flex-col gap-1.5">
@@ -95,17 +106,27 @@
 							:description="formatMessage(messages.emptyDescription)"
 						>
 							<template #actions>
-								<Button
-									v-tooltip="backupCreationDisabled"
-									type="colored"
-									color="brand"
-									:disabled="!!backupCreationDisabled"
-									class="mx-auto w-min"
-									@click="showCreateModel"
-								>
-									<PlusIcon class="size-5" />
-									{{ formatMessage(messages.createBackup) }}
-								</Button>
+								<div class="flex flex-wrap justify-center gap-2">
+									<Button
+										type="outlined"
+										:disabled="!server.node || !worldId"
+										:loading="isDownloadingFiles"
+										@click="downloadFiles"
+									>
+										<DownloadIcon class="size-5" />
+										{{ formatMessage(commonMessages.downloadFilesButton) }}
+									</Button>
+									<Button
+										v-tooltip="backupCreationDisabled"
+										type="colored"
+										color="brand"
+										:disabled="!!backupCreationDisabled"
+										@click="showCreateModel"
+									>
+										<PlusIcon class="size-5" />
+										{{ formatMessage(messages.createBackup) }}
+									</Button>
+								</div>
 							</template>
 						</EmptyState>
 						<EmptyState
@@ -287,6 +308,7 @@ import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModa
 import { useBackupsSelection } from '#ui/composables/hosting/backups-selection'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import { useServerWorldDownload } from '#ui/composables/server-download'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import { useBulkOperation } from '#ui/layouts/shared/content-tab/composables/bulk-operations'
 import {
@@ -363,6 +385,21 @@ const filterPillOptions = computed<FilterPillOption[]>(() => [
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { server, worldId, busyReasons } = injectModrinthServerContext()
+const { downloadWorldFiles } = useServerWorldDownload()
+const isDownloadingFiles = ref(false)
+
+async function downloadFiles() {
+	const node = server.value.node
+	const currentWorldId = worldId.value
+	if (!node || !currentWorldId || isDownloadingFiles.value) return
+
+	isDownloadingFiles.value = true
+	try {
+		await downloadWorldFiles(node.instance, currentWorldId)
+	} finally {
+		isDownloadingFiles.value = false
+	}
+}
 
 const props = defineProps<{
 	isServerRunning: boolean

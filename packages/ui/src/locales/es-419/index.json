@@ -5153,9 +5153,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Copiar ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Descargar el respaldo más reciente"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Gestionar facturación"
   },

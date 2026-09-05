@@ -4820,9 +4820,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "신분증 복사"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "최신 백업 다운로드"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "청구 관리"
   },

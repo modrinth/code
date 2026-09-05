@@ -3905,9 +3905,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Salin ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Muat turun sandaran terkini"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Urus pengebilan"
   },

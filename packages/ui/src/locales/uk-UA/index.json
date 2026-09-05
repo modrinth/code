@@ -4931,9 +4931,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Скопіювати ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Завантажити останню резервну копію"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Керування платежами"
   },

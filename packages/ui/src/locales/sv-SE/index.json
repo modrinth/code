@@ -4649,9 +4649,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Kopiera ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Ladda ner senaste säkerhetskopian"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Hantera användarfakturering"
   },

@@ -4625,9 +4625,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Kopieer ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Laatste back-up downloaden"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Facturering beheren"
   },
