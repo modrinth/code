@@ -24,11 +24,11 @@ const messages = defineMessages({
 	},
 	profanity: {
 		id: 'nags.project-name-profanity.description',
-		defaultMessage: 'Your project’s name cannot contain profanity. Detected: “{value}”.',
+		defaultMessage: `Your project's name cannot contain profanity. Detected: “{value}”.`,
 	},
 	slur: {
 		id: 'nags.project-name-slur.description',
-		defaultMessage: 'Your project’s name must not contain offensive terms. Detected: “{value}”.',
+		defaultMessage: `Your project's name must not contain offensive terms. Detected: “{value}”.`,
 	},
 	version: {
 		id: 'project.text-validation.title-version-number',

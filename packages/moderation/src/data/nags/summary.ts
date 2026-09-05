@@ -5,30 +5,24 @@ import type { NagDefinitions } from './types.ts'
 const messages = defineMessages({
 	linksTitle: {
 		id: 'nags.project-summary-links.title',
-		defaultMessage: 'Remove links from the summary',
+		defaultMessage: 'Remove summary links',
 	},
 	links: {
 		id: 'nags.project-summary-links.description',
-		defaultMessage: 'Links, URLs, and IPs should not be placed in the summary. Detected: {value}',
+		defaultMessage: 'Links, URLs, and IPs should not be placed in the summary. Detected: "{value}"',
 	},
 	reviewTitle: {
 		id: 'nags.project-summary-content.title',
 		defaultMessage: 'Review the summary',
 	},
-	translateTitle: {
-		id: 'nags.project-summary-non-english.title',
-		defaultMessage: 'Translate the summary',
-	},
 	matchesTitle: {
 		id: 'project.text-validation.summary-matches-title',
-		defaultMessage:
-			'Your project’s summary should provide unique information and not repeat the project’s name.',
+		defaultMessage: `Your project's summary should provide unique information and not repeat the project's name.`,
 	},
 	fixTitle: { id: 'nags.invalid-project-summary.title', defaultMessage: 'Modify the summary' },
 	nonEnglish: {
 		id: 'nags.project-summary-non-english.description',
-		defaultMessage:
-			'Your project’s summary must be written in English or include an English translation.',
+		defaultMessage: `Your project's summary must be written in English or include an English translation.`,
 	},
 	nonStandardText: {
 		id: 'nags.project-summary-non-standard-text.description',
@@ -37,20 +31,19 @@ const messages = defineMessages({
 	},
 	profanity: {
 		id: 'nags.project-summary-profanity.description',
-		defaultMessage: 'Your project’s summary cannot contain profanity. Detected: “{value}”.',
+		defaultMessage: `Your project's summary cannot contain profanity. Detected: “{value}”.`,
 	},
 	slur: {
 		id: 'nags.project-summary-slur.description',
-		defaultMessage: 'Your project’s summary must not contain offensive terms. Detected: “{value}”.',
+		defaultMessage: `Your project's summary must not contain offensive terms. Detected: “{value}”.`,
 	},
 	spamTitle: {
 		id: 'nags.project-summary-spam.title',
-		defaultMessage: 'Remove summary formatting',
+		defaultMessage: 'Remove summary spam',
 	},
 	spam: {
 		id: 'nags.project-summary-spam.description',
-		defaultMessage:
-			'Repeated characters, words, or phrases should be used to pad your project’s summary.',
+		defaultMessage: `Repeated characters, words, or phrases should not be used to pad your project's summary.`,
 	},
 	formattingTitle: {
 		id: 'nags.summary-special-formatting.title',
@@ -67,6 +60,10 @@ const messages = defineMessages({
 		defaultMessage: 'Your summary is too brief. Add a sentence or two that describes your project.',
 	},
 	editSummary: { id: 'nags.edit-summary.title', defaultMessage: 'Edit summary' },
+	translateTitle: {
+		id: 'nags.project-summary-non-english.title',
+		defaultMessage: 'Translate the summary',
+	},
 })
 
 export const summaryNags = {
