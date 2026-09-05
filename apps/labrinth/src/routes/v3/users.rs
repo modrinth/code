@@ -22,7 +22,7 @@ use crate::{
         organizations::Organization,
         pats::Scopes,
         projects::Project,
-		users::{Badges, Role, User},
+        users::{Badges, Role, User},
     },
     queue::session::AuthQueue,
     util::{img::delete_old_images, routes::read_limited_from_payload},
@@ -41,7 +41,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(users_get_route)
         .service(users_search)
         .service(admin_user_email)
-		.service(admin_user_discord)
+        .service(admin_user_discord)
         .service(all_projects)
         .service(projects_list_route)
         .service(user_notes_edit)
@@ -72,7 +72,7 @@ pub struct UserEmailQuery {
 
 #[derive(Deserialize)]
 pub struct UserDiscordQuery {
-	pub discord_id: u64,
+    pub discord_id: u64,
 }
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
@@ -273,7 +273,7 @@ pub async fn admin_user_email(
     .wrap_internal_err("fetching user from database")?;
 
     if let Some(user) = user {
-		Ok(web::Json(user.into()))
+        Ok(web::Json(user.into()))
     } else {
         Err(ApiError::NotFound(eyre::eyre!("resource not found")))
     }
@@ -286,35 +286,35 @@ pub async fn admin_user_email(
 )]
 #[get("/user_discord")]
 pub async fn admin_user_discord(
-	req: HttpRequest,
-	ro_pool: web::Data<ReadOnlyPgPool>,
-	redis: web::Data<RedisPool>,
-	session_queue: web::Data<AuthQueue>,
-	query: web::Query<UserDiscordQuery>,
+    req: HttpRequest,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    query: web::Query<UserDiscordQuery>,
 ) -> Result<web::Json<User>, ApiError> {
-	check_is_moderator_from_headers(
-		&req,
-		&***ro_pool,
-		&redis,
-		&session_queue,
-		Scopes::SESSION_ACCESS,
-	)
-	.await
-	.wrap_auth_err("authenticating API request")?;
+    check_is_moderator_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
 
-	let user_id = DBUser::get_by_discord_id(query.discord_id, &***ro_pool)
-		.await
-		.wrap_internal_err("fetching user ID from database")?
-		.wrap_request_err(
-			"the discord ID provided is not associated with a user",
-		)?;
+    let user_id = DBUser::get_by_discord_id(query.discord_id, &***ro_pool)
+        .await
+        .wrap_internal_err("fetching user ID from database")?
+        .wrap_request_err(
+            "the discord ID provided is not associated with a user",
+        )?;
 
-	let user = DBUser::get_id(user_id, &***ro_pool, &redis)
-		.await
-		.wrap_internal_err("fetching user from database")?
-		.wrap_not_found_err("resource not found")?;
+    let user = DBUser::get_id(user_id, &***ro_pool, &redis)
+        .await
+        .wrap_internal_err("fetching user from database")?
+        .wrap_not_found_err("resource not found")?;
 
-	Ok(web::Json(user.into()))
+    Ok(web::Json(user.into()))
 }
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
