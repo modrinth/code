@@ -5,6 +5,27 @@
   "action.continue": {
     "message": "Continue"
   },
+  "admin.user-lookup.discord-id": {
+    "message": "Discord ID"
+  },
+  "admin.user-lookup.discord-placeholder": {
+    "message": "Enter Discord ID..."
+  },
+  "admin.user-lookup.email": {
+    "message": "User email"
+  },
+  "admin.user-lookup.email-placeholder": {
+    "message": "Enter user email..."
+  },
+  "admin.user-lookup.failed": {
+    "message": "User lookup failed"
+  },
+  "admin.user-lookup.get-account": {
+    "message": "Get user account"
+  },
+  "admin.user-lookup.title": {
+    "message": "User lookup"
+  },
   "ads-consent.accept": {
     "message": "Accept all"
   },
