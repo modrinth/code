@@ -70,6 +70,7 @@
 					:container-height="containerSize.height"
 					:pinned="isHoverPinned"
 					:ratio-mode="isRatioMode"
+					:is-same-day-last-week-comparison="isSameDayLastWeekComparison"
 					:capitalize-labels="shouldCapitalizeDatasetLabels"
 					:shift-key-pressed="isShiftKeyPressed"
 					@entry-click="(datasetId, shiftKey) => emit('entry-click', datasetId, shiftKey)"
@@ -122,6 +123,7 @@ const props = defineProps<{
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null
 	sliceCount: number
 	shouldShowPreviousPeriod: boolean
+	isSameDayLastWeekComparison: boolean
 	allChartDatasets: ChartDataset[]
 	currentLegendEntries: AnalyticsChartLegendEntry[]
 	legendEntries: AnalyticsChartLegendEntry[]
@@ -167,6 +169,7 @@ const {
 	allChartDatasets: computed(() => props.allChartDatasets),
 	chartRangeBounds: computed(() => props.chartRangeBounds),
 	shouldShowPreviousPeriod: computed(() => props.shouldShowPreviousPeriod),
+	isSameDayLastWeekComparison: computed(() => props.isSameDayLastWeekComparison),
 	onRangeSelected: (start, end, groupBy) => emit('range-select', start, end, groupBy),
 })
 

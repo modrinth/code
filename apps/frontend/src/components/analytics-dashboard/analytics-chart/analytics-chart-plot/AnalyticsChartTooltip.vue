@@ -21,7 +21,7 @@
 				<span v-if="previousRangeLabel" class="min-w-0 space-x-1 truncate text-xs text-primary">
 					<span class="font-medium">{{ previousRangeLabel }}</span>
 					<span class="font-normal text-secondary">
-						{{ formatMessage(analyticsChartMessages.previousPeriodShort) }}
+						{{ formatMessage(previousPeriodMessage) }}
 					</span>
 				</span>
 			</div>
@@ -177,6 +177,7 @@ const props = defineProps<{
 	containerHeight: number
 	pinned: boolean
 	ratioMode: boolean
+	isSameDayLastWeekComparison: boolean
 	capitalizeLabels: boolean
 	shiftKeyPressed: boolean
 }>()
@@ -188,6 +189,11 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const previousPeriodMessage = computed(() =>
+	props.isSameDayLastWeekComparison
+		? analyticsChartMessages.sameDayLastWeekShort
+		: analyticsChartMessages.previousPeriodShort,
+)
 
 function onEntryClick(event: MouseEvent, entry: AnalyticsChartTooltipEntry) {
 	if (entry.toggleDisabled && !event.shiftKey) return
