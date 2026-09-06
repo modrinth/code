@@ -171,7 +171,7 @@ pub(super) async fn remote_publish_content(
     version: &InstanceVersionResponse,
     include_modpack_dependencies: bool,
     state: &State,
-) -> crate::Result<(Vec<String>, HashSet<String>)> {
+) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
     let mut version_ids = version.modrinth_ids.clone();
     if let Some(modpack_id) =
         version.modpack_id.as_deref().filter(|id| !id.is_empty())
@@ -179,9 +179,12 @@ pub(super) async fn remote_publish_content(
         version_ids.retain(|id| id != modpack_id);
 
         if include_modpack_dependencies {
-            version_ids.extend(
-                modpack_dependency_version_ids(modpack_id, state).await?,
-            );
+            extend_shared_modpack_dependencies(
+                &mut version_ids,
+                modpack_id,
+                state,
+            )
+            .await?;
         }
     }
     dedupe_strings(&mut version_ids);
@@ -192,8 +195,10 @@ pub(super) async fn remote_publish_content(
             .external_files
             .iter()
             .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
-            .map(|file| file.file_name.clone())
-            .collect(),
+            .map(|file| {
+                shared_external_file_key(&file.file_type, &file.file_name)
+            })
+            .collect::<crate::Result<_>>()?,
     ))
 }
 
@@ -219,6 +224,28 @@ pub(super) async fn modpack_dependency_version_ids(
         .into_iter()
         .filter_map(|dependency| dependency.version_id)
         .collect())
+}
+
+/// Adds the modpack's dependencies to the list. If a project is already in the
+/// list, keep that version instead of the one bundled with the modpack.
+async fn extend_shared_modpack_dependencies(
+    version_ids: &mut Vec<String>,
+    modpack_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let dependency_ids =
+        modpack_dependency_version_ids(modpack_id, state).await?;
+    let (explicit, inherited) = tokio::try_join!(
+        shared_versions_by_project(version_ids, state),
+        shared_versions_by_project(&dependency_ids, state),
+    )?;
+    version_ids.extend(
+        inherited
+            .into_values()
+            .filter(|version| !explicit.contains_key(&version.project_id))
+            .map(|version| version.id),
+    );
+    Ok(())
 }
 
 pub(super) async fn shared_instance_install_modpack(
@@ -272,7 +299,7 @@ pub(super) async fn current_shared_content(
     metadata: &crate::state::InstanceMetadata,
     include_linked_modpack_content: bool,
     state: &State,
-) -> crate::Result<(Vec<String>, HashSet<String>)> {
+) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
     let entries =
         crate::state::instances::adapters::sqlite::content_rows::get_content_entries(
             &metadata.applied_content_set.id,
@@ -288,7 +315,7 @@ pub(super) async fn current_shared_content(
     .map(|file| (file.id.clone(), file))
     .collect::<HashMap<_, _>>();
     let mut version_ids = Vec::new();
-    let mut external_files = HashSet::new();
+    let mut external_files = BTreeSet::new();
 
     for entry in entries {
         let include_entry = entry.source_kind
@@ -309,14 +336,21 @@ pub(super) async fn current_shared_content(
             continue;
         };
         if let Some(file) = files.get(&file_id) {
-            external_files.insert(file.file_name.clone());
+            external_files.insert(ExternalFileKey {
+                content_type: entry.project_type.into(),
+                path: file.file_name.clone(),
+            });
         }
     }
     if include_linked_modpack_content
         && let Some(modpack_id) = shared_modpack_id(&metadata.link)
     {
-        version_ids
-            .extend(modpack_dependency_version_ids(&modpack_id, state).await?);
+        extend_shared_modpack_dependencies(
+            &mut version_ids,
+            &modpack_id,
+            state,
+        )
+        .await?;
     }
     dedupe_strings(&mut version_ids);
 
@@ -328,7 +362,7 @@ pub(super) struct CurrentPublishSnapshot {
     pub(super) external_files: Vec<ExternalFileCandidate>,
     pub(super) disabled_project_ids: HashSet<String>,
     pub(super) disabled_version_ids: Vec<String>,
-    pub(super) disabled_external_files: HashSet<String>,
+    pub(super) disabled_external_files: BTreeSet<ExternalFileKey>,
     pub(super) config_files: Vec<ConfigFile>,
 }
 
@@ -370,7 +404,7 @@ pub(super) async fn collect_publish_snapshot(
     let mut disabled_project_ids = HashSet::new();
     let mut disabled_version_ids = Vec::new();
     let mut seen_disabled_version_ids = HashSet::new();
-    let mut disabled_external_files = HashSet::new();
+    let mut disabled_external_files = BTreeSet::new();
 
     for item in items {
         if item.enabled {
@@ -419,7 +453,10 @@ pub(super) async fn collect_publish_snapshot(
             continue;
         }
 
-        disabled_external_files.insert(enabled_file_name(&item.file_name));
+        disabled_external_files.insert(ExternalFileKey {
+            content_type: item.project_type.into(),
+            path: enabled_file_name(&item.file_name),
+        });
     }
 
     Ok(CurrentPublishSnapshot {
@@ -446,10 +483,28 @@ pub(super) async fn shared_versions_by_project(
     )
     .await?;
 
-    Ok(versions
-        .into_iter()
-        .map(|version| (version.project_id.clone(), version))
-        .collect())
+    let fetched_ids = versions
+        .iter()
+        .map(|version| version.id.as_str())
+        .collect::<HashSet<_>>();
+    if let Some(missing) = version_ids
+        .iter()
+        .find(|id| !fetched_ids.contains(id.as_str()))
+    {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Shared content version {missing} was not found"
+        ))
+        .into());
+    }
+    let mut snapshot = ContentSetSnapshot::default();
+    let mut by_project = HashMap::new();
+    for version in versions {
+        snapshot
+            .insert_project(version.project_id.clone(), version.id.clone())
+            .map_err(|error| crate::ErrorKind::InputError(error.to_string()))?;
+        by_project.insert(version.project_id.clone(), version);
+    }
+    Ok(by_project)
 }
 
 pub(super) async fn shared_project_names(
