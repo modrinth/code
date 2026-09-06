@@ -383,6 +383,14 @@ export function useSearch(
 		{ display: 'Date updated', name: 'updated' },
 	])
 
+	// minimum and maximum are both inclusive dates
+	const projectTypeVersionDateRanges: Map<ProjectType, { minimum?: Date; maximum?: Date }> =
+		new Map([
+			['datapack', { minimum: new Date('2017-10-25T14:43:50Z') }], // datapacks were added in 17w34a
+		])
+	// unfortunately I don't know of a way to make the ranges loader specific, which would be nice aswell
+	// (as far as I can tell, one filter can't interact with a different filter)
+
 	const currentSortType: Ref<SortType> = ref(sortTypes[0])
 
 	const route = useRoute()
@@ -441,6 +449,27 @@ export function useSearch(
 				}
 			}
 		}
+
+		const versionDateRanges = projectTypes.value.map(
+			(projectType) => projectTypeVersionDateRanges.get(projectType) ?? {},
+		)
+		// try expanding the range as much as possible based on the project types
+		// this code is ugly
+		const versionDateRange = versionDateRanges.reduce((prev, cur) => {
+			let minimum
+			if (prev.minimum && cur.minimum) {
+				minimum = prev.minimum.getTime() < cur.minimum.getTime() ? prev.minimum : cur.minimum
+			} else {
+				minimum = prev.minimum ?? cur.minimum
+			}
+			let maximum
+			if (prev.maximum && cur.maximum) {
+				maximum = prev.maximum.getTime() > cur.maximum.getTime() ? prev.maximum : cur.maximum
+			} else {
+				maximum = prev.maximum ?? cur.maximum
+			}
+			return { minimum, maximum }
+		}, {})
 
 		const filterTypes: FilterType[] = [
 			...Object.values(categoryFilters),
@@ -524,13 +553,22 @@ export function useSearch(
 					},
 				],
 				searchable: true,
-				options: tags.value.gameVersions.map((gameVersion) => ({
-					id: gameVersion.version,
-					toggle_group: gameVersion.version_type !== 'release' ? 'all_versions' : undefined,
-					value: `game_versions:${gameVersion.version}`,
-					query_value: gameVersion.version,
-					method: 'or',
-				})),
+				options: tags.value.gameVersions
+					.filter((gameVersion) => {
+						const date = new Date(gameVersion.date)
+						if (versionDateRange.minimum && date.getTime() < versionDateRange.minimum.getTime())
+							return false
+						if (versionDateRange.maximum && date.getTime() > versionDateRange.maximum.getTime())
+							return false
+						return true
+					})
+					.map((gameVersion) => ({
+						id: gameVersion.version,
+						toggle_group: gameVersion.version_type !== 'release' ? 'all_versions' : undefined,
+						value: `game_versions:${gameVersion.version}`,
+						query_value: gameVersion.version,
+						method: 'or',
+					})),
 				ordering: projectTypes.value.includes('mod')
 					? 2
 					: projectTypes.value.includes('shader')
