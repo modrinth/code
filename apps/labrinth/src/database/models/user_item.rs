@@ -320,6 +320,26 @@ impl DBUser {
         Ok(users)
     }
 
+    pub async fn get_by_discord_id<'a, E>(
+        discord_id: u64,
+        exec: E,
+    ) -> Result<Option<DBUserId>, sqlx::Error>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let Ok(discord_id) = i64::try_from(discord_id) else {
+            return Ok(None);
+        };
+
+        sqlx::query_scalar!(
+            r#"SELECT id FROM users WHERE discord_id = $1"#,
+            discord_id
+        )
+        .fetch_optional(exec)
+        .await
+        .map(|id| id.map(DBUserId))
+    }
+
     pub async fn get_by_email<'a, E>(
         email: &str,
         exec: E,
