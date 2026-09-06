@@ -50,6 +50,22 @@ export interface EmbeddedContentMetadata {
 	icon_url?: string | null
 }
 
+export type ContentSide = 'server' | 'player'
+
+export interface ContentEnabledForState {
+	server: boolean
+	player: boolean
+	locked: boolean
+	disabledSides?: ContentSide[]
+	warningTooltip?: string | null
+}
+
+export interface ContentCardEmbeddedIcon {
+	queryKey: readonly unknown[]
+	queryFn: () => Promise<Blob>
+	fallbackUrl?: string | null
+}
+
 export interface ContentCardTableItem {
 	id: string
 	project: ContentCardProject
@@ -74,6 +90,8 @@ export interface ContentCardTableItem {
 	hideDelete?: boolean
 	hideSwitchVersion?: boolean
 	overflowOptions?: ButtonMenuOption[]
+	enabledFor?: ContentEnabledForState
+	embeddedIcon?: ContentCardEmbeddedIcon
 }
 
 export type ContentCardTableSortColumn = 'project' | 'version'

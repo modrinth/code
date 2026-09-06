@@ -1847,12 +1847,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Errore nella rimozione dei contenuti"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Errore nella disabilitazione dei contenuti"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Errore nell'abilitazione dei contenuti"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Errore nell'aggiornamento dei contenuti"
   },
@@ -1867,9 +1861,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Errore nella rimozione dei contenuti"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Impossibile cambiare lo stato di \"{name}\""
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Errore nello scollegamento del pacchetto"

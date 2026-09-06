@@ -1841,12 +1841,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "İçeriği silmek başarısız"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "İçeriği kapatmak başarısız"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "İçeriği açmak başarısız"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "İçeriği güncelleme başarısız"
   },
@@ -1861,9 +1855,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "İçerik çıkarılamadı"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "{name} durumu değiştirilemedi"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Mod paketinin bağlantısı koparılamadı"

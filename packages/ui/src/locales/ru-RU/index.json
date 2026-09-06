@@ -1820,12 +1820,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Не удалось удалить контент"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Не удалось отключить контент"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Не удалось включить контент"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Не удалось обновить контент"
   },
@@ -1840,9 +1834,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не удалось удалить контент"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Не удалось переключить {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Не удалось отвязать сборку"

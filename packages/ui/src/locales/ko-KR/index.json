@@ -1793,12 +1793,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "콘텐츠 삭제 실패"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "콘텐츠 비활성화 실패"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "콘텐츠 활성화 실패"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "콘텐츠 업데이트 실패"
   },
@@ -1813,9 +1807,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "콘텐츠 제거 실패"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "{name} 전환 실패"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "모드팩 연결 해제 실패"
