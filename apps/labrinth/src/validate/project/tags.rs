@@ -18,8 +18,8 @@ pub(super) fn validate(
     let tag_count =
         project.categories.len() + project.additional_categories.len();
     let is_minecraft_server = project.components.minecraft_server.is_some();
-    let (project_type, actual_project_type) =
-        LegacyProject::get_project_type(&project.project_types);
+    let project_type =
+        LegacyProject::get_project_type(&project.project_types).0;
 
     if !project.versions.is_empty() && project.categories.is_empty() {
         nags.push(ProjectNag::new(
@@ -83,9 +83,9 @@ pub(super) fn validate(
     if let Some(available_categories) = available_categories {
         let total_available_tags = available_categories
             .iter()
-            .filter(|category| category.project_type == actual_project_type)
+            .filter(|category| category.project_type == project_type)
             .count();
-        if tag_count == total_available_tags && project_type != "project" {
+        if total_available_tags > 0 && tag_count == total_available_tags {
             nags.push(
                 ProjectNag::new(
                     ProjectNagKind::AllTagsSelected,

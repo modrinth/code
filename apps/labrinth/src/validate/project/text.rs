@@ -54,21 +54,6 @@ static DESCRIPTION_LINK_FINDER: LazyLock<LinkFinder> = LazyLock::new(|| {
     finder.kinds(&[LinkKind::Url]).url_must_have_scheme(false);
     finder
 });
-static HEADER: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?m)^#{1,3}[\t ]+(.+?)\s*#*\s*$").unwrap());
-static HEADER_LINE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^([#]{1,6})[\t ]+.+?\s*#*\s*$").unwrap());
-static SETEXT_HEADER: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?m)^([^\r\n]+)\r?\n[\t ]*(?:=+|-+)[\t ]*$").unwrap()
-});
-static HTML_HEADER: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?is)<h[1-3]\b[^>]*>(.*?)</h[1-3]>").unwrap()
-});
-static ADJACENT_HTML_HEADERS: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?is)</h([1-3])>\s*<h([1-3])\b").unwrap());
-static TRAILING_HTML_HEADER: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?is)</h[1-6]>\s*(?:</[a-z][^>]*>\s*)*$").unwrap()
-});
 
 const URL_SHORTENERS: &[&str] =
     &["bit.ly", "adf.ly", "tinyurl.com", "short.io", "is.gd"];
@@ -646,8 +631,7 @@ pub(super) fn contains_description_spam(markdown: &str) -> bool {
 }
 
 fn extract_description_spam_blocks(markdown: &str) -> Vec<String> {
-    let without_code = CODE_BLOCK.replace_all(markdown, "\n\n");
-    let with_inline_code = INLINE_CODE.replace_all(&without_code, "$1");
+    let with_inline_code = INLINE_CODE.replace_all(markdown, "$1");
     let without_images = MARKDOWN_IMAGE.replace_all(&with_inline_code, " ");
     let with_link_labels = MARKDOWN_LINK.replace_all(&without_images, "$1");
     let without_html_images = HTML_IMAGE.replace_all(&with_link_labels, " ");
@@ -890,8 +874,7 @@ pub(super) fn has_paired_html_formatting(text: &str) -> bool {
 }
 
 pub(super) fn extract_description_text(markdown: &str) -> String {
-    let without_code = CODE_BLOCK.replace_all(markdown, " ");
-    let without_code = INLINE_CODE.replace_all(&without_code, " ");
+    let without_code = INLINE_CODE.replace_all(markdown, " ");
     let with_image_alt = MARKDOWN_IMAGE.replace_all(&without_code, "$1");
     let without_links = MARKDOWN_LINK.replace_all(&with_image_alt, " ");
     let with_html_image_alt = HTML_IMAGE.replace_all(
@@ -918,125 +901,15 @@ pub(super) fn extract_description_text(markdown: &str) -> String {
 }
 
 pub(super) fn extract_description_blocks(markdown: &str) -> Vec<String> {
-    let without_code = CODE_BLOCK.replace_all(markdown, "");
     DESCRIPTION_BLOCK_BREAK
-        .split(&without_code)
+        .split(markdown)
         .map(extract_description_text)
         .filter(|block| !block.is_empty())
         .collect()
 }
 
-pub(super) fn long_header_count(markdown: &str) -> usize {
-    let markdown_headers = HEADER
-        .captures_iter(markdown)
-        .filter(|captures| header_is_long(&captures[1]))
-        .count();
-    let setext_headers = SETEXT_HEADER
-        .captures_iter(markdown)
-        .filter(|captures| !captures[1].trim_start().starts_with('#'))
-        .filter(|captures| header_is_long(&captures[1]))
-        .count();
-    let html_headers = HTML_HEADER
-        .captures_iter(markdown)
-        .filter(|captures| header_is_long(&captures[1]))
-        .count();
-
-    markdown_headers + setext_headers + html_headers
-}
-
-fn header_is_long(header: &str) -> bool {
-    let with_image_alt = MARKDOWN_IMAGE.replace_all(header, "$1");
-    let with_link_text = MARKDOWN_LINK.replace_all(&with_image_alt, "$1");
-    let without_html = HTML_TAG.replace_all(&with_link_text, " ");
-    let rendered = without_html
-        .replace(['*', '_', '~', '`'], "")
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ");
-
-    rendered.graphemes(true).count() > 80
-}
-
-pub(super) fn description_ends_with_header(markdown: &str) -> bool {
-    let trimmed = markdown.trim_end();
-    if trimmed.is_empty() {
-        return false;
-    }
-
-    let lines = trimmed.lines().collect::<Vec<_>>();
-    let last_line = lines.last().map_or("", |line| line.trim());
-    if HEADER_LINE.is_match(last_line) {
-        return true;
-    }
-    if lines.len() >= 2
-        && is_setext_underline(last_line)
-        && !lines[lines.len() - 2].trim().is_empty()
-    {
-        return true;
-    }
-
-    TRAILING_HTML_HEADER.is_match(trimmed)
-}
-
-pub(super) fn has_adjacent_same_level_headers(markdown: &str) -> bool {
-    let lines = markdown.lines().collect::<Vec<_>>();
-    let mut previous_header = None;
-    let mut index = 0;
-    while index < lines.len() {
-        let line = lines[index].trim();
-        if line.is_empty() {
-            index += 1;
-            continue;
-        }
-
-        let mut header_level = HEADER_LINE
-            .captures(line)
-            .and_then(|captures| captures.get(1))
-            .map(|hashes| hashes.as_str().len());
-        if header_level.is_none()
-            && lines
-                .get(index + 1)
-                .is_some_and(|underline| is_setext_underline(underline.trim()))
-        {
-            header_level =
-                Some(if lines[index + 1].trim_start().starts_with('=') {
-                    1
-                } else {
-                    2
-                });
-            index += 1;
-        }
-
-        if let Some(level) = header_level {
-            if level <= 3 && previous_header == Some(level) {
-                return true;
-            }
-            previous_header = Some(level);
-        } else {
-            previous_header = None;
-        }
-        index += 1;
-    }
-
-    ADJACENT_HTML_HEADERS
-        .captures_iter(markdown)
-        .any(|captures| {
-            captures.get(1).map(|level| level.as_str())
-                == captures.get(2).map(|level| level.as_str())
-        })
-}
-
-fn is_setext_underline(line: &str) -> bool {
-    let mut characters = line.chars();
-    let Some(marker @ ('=' | '-')) = characters.next() else {
-        return false;
-    };
-    characters.all(|character| character == marker)
-}
-
 pub(super) fn has_image_without_alt_text(markdown: &str) -> bool {
-    let without_code = CODE_BLOCK.replace_all(markdown, "");
-    let without_code = INLINE_CODE.replace_all(&without_code, "");
+    let without_code = INLINE_CODE.replace_all(markdown, "");
     MARKDOWN_IMAGE
         .captures_iter(&without_code)
         .any(|captures| captures[1].trim().is_empty())
