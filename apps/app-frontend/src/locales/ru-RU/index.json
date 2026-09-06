@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Без имени над скином"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Показывать недавние миры или сборки в секции «Недавнее» на главной странице."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Недавние миры или сборки"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Сворачивать Modrinth App при запуске Minecraft."
   },
@@ -349,48 +343,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Обновите Modrinth App"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Не удалось применить случайные иконки к сборкам."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Установлен случайный значок для {num, plural, one {# сборки} few {# сборок} many {# сборок} other {# сборок}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Новый контент"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Закрыть"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Создавайте собственные иконки прямо в Modrinth App. Сочетайте фоны с символами из Minecraft и популярных модов!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "У {count, plural, one {# сборки} other {# сборок}} нет {count, plural, one {иконки} other {иконок}}. Хотите создать {count, plural, one {случайную} other {случайные}}?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Случайные иконки"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Пропустить"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Редактор иконок"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Закрыть"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Персонализируйте свои сборки!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Закрыть"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Новый редактор иконок"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Подробнее"
   },
   "app.install.phase.downloading_content": {
     "message": "Скачивание контента"

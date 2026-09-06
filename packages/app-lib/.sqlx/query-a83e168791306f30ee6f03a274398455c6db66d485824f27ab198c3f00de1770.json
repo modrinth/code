@@ -3,17 +3,60 @@
   "query": "\n\t\tSELECT\n\t\t\tscreenshots.id,\n\t\t\tscreenshots.instance_id,\n\t\t\tscreenshots.file_name,\n\t\t\tscreenshots.content_hash,\n\t\t\tscreenshots.file_size,\n\t\t\tscreenshots.modified_at,\n\t\t\tscreenshots.created_at,\n\t\t\tmemberships.group_id AS \"group_id?\"\n\t\tFROM screenshots\n\t\tLEFT JOIN screenshot_group_memberships memberships\n\t\t\tON memberships.screenshot_id = screenshots.id\n\t\tWHERE screenshots.instance_id = ?\n\t\tORDER BY screenshots.file_name, screenshots.id\n\t\t",
   "describe": {
     "columns": [
-      { "name": "id", "ordinal": 0, "type_info": "Text" },
-      { "name": "instance_id", "ordinal": 1, "type_info": "Text" },
-      { "name": "file_name", "ordinal": 2, "type_info": "Text" },
-      { "name": "content_hash", "ordinal": 3, "type_info": "Text" },
-      { "name": "file_size", "ordinal": 4, "type_info": "Integer" },
-      { "name": "modified_at", "ordinal": 5, "type_info": "Integer" },
-      { "name": "created_at", "ordinal": 6, "type_info": "Integer" },
-      { "name": "group_id?", "ordinal": 7, "type_info": "Text" }
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "instance_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_name",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "content_hash",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_size",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified_at",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "group_id?",
+        "ordinal": 7,
+        "type_info": "Text"
+      }
     ],
-    "parameters": { "Right": 1 },
-    "nullable": [false, false, false, false, false, false, false, false]
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
   },
   "hash": "a83e168791306f30ee6f03a274398455c6db66d485824f27ab198c3f00de1770"
 }

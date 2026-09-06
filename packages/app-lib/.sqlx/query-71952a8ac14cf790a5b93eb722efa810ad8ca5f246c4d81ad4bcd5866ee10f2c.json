@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_game_option_update_state\n\t\t\t(instance_id, had_file, sha1, document)\n\t\tVALUES (?, ?, ?, ?)\n\t\tON CONFLICT(instance_id) DO UPDATE SET\n\t\t\thad_file = excluded.had_file, sha1 = excluded.sha1,\n\t\t\tdocument = excluded.document\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "71952a8ac14cf790a5b93eb722efa810ad8ca5f246c4d81ad4bcd5866ee10f2c"
+}

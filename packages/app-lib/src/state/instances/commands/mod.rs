@@ -14,6 +14,9 @@ pub(crate) use self::get_instance::{
     get_instance, get_instance_metadata, get_instances_metadata, list_instances,
 };
 
+mod game_options;
+pub(crate) use self::game_options::*;
+
 mod list_content;
 pub(crate) use self::list_content::{
     dependencies_to_content_items, get_content_projects,

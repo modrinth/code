@@ -71,7 +71,12 @@ pub async fn get_content_items(
     cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<Vec<ContentItem>> {
     let state = State::get().await?;
-    crate::state::list_content(instance_id, None, cache_behaviour, &state).await
+    let mut items =
+        crate::state::list_content(instance_id, None, cache_behaviour, &state)
+            .await?;
+    super::synced_packs::decorate_content(instance_id, &mut items, &state)
+        .await?;
+    Ok(items)
 }
 
 #[tracing::instrument]

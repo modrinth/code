@@ -158,9 +158,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Dölj namnskylt"
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Hoppa in i världar eller instanser"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimera Modrinth App när Minecraft startar."
   },
@@ -328,42 +325,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Modrinth App-uppdatering krävs"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Kunde inte tillämpa slumpmässiga ikoner till instanser."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Slumpmässig ikon för {num, plural, one {# instans} other {# instanser}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nytt den här uppdateringen"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Stäng"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# instans har ingen ikon} other {# instanser har inga ikoner}} än. Vill du att vi ska ge {count, plural, one {den en slumpmässig} other {dem slumpmässiga}} för att komma igång?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Slumpmässiga ikoner"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Hoppa över"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Stäng"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Anpassa dina instanser!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Avfärda"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Ny ikonredigerare"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Visa uppdatering"
   },
   "app.install.phase.downloading_content": {
     "message": "Laddar ner innehåll"

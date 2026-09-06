@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "隱藏名牌"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "在首頁的「繼續遊玩」區塊中顯示最近遊玩的世界或實例。"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "繼續遊玩世界或實例"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "當 Minecraft 啟動時將 Modrinth App 最小化。"
   },
@@ -349,48 +343,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "需要更新 Modrinth App"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "無法將隨機圖示套用到實例。"
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "已隨機產生 {num, plural, other {# 個實例}}的圖示。"
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "更新內容"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "關閉"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "直接在 Modrinth App 中為你的實例建立自訂圖示。自由搭配 Minecraft 及熱門模組中的圖案與背景！"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "你有 {count, plural, other {# 個實例}}還沒有圖示。要我們先幫你的{count, plural, other {實例}}隨機產生圖示嗎？"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "隨機產生圖示"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "跳過"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "自訂圖示編輯器"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "關閉"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "讓你的實例更具個人風格！"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "忽略"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "新的圖示編輯器"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "查看更新"
   },
   "app.install.phase.downloading_content": {
     "message": "正在下載內容"

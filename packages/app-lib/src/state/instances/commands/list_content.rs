@@ -506,6 +506,7 @@ pub(crate) async fn dependencies_to_content_items(
                 project_type_from_api_name(&project.project_type);
 
             Some(ContentItem {
+                synced_pack: None,
                 file_name: version
                     .and_then(|version| version.files.first())
                     .map(|file| file.filename.clone())
@@ -908,6 +909,7 @@ async fn content_files_to_content_items(
             });
 
             ContentItem {
+                synced_pack: None,
                 file_name: file.file_name.clone(),
                 file_path: path.clone(),
                 id: file.hash.clone(),

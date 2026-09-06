@@ -528,10 +528,13 @@ pub(crate) async fn get_instance_sync_preferences(
     .collect::<HashSet<_>>();
 
     Ok(InstanceSyncedOptions {
+        game_options: enabled_features.contains("game_options"),
         command_history: enabled_features.contains("command_history"),
         multiplayer_servers: enabled_features.contains("multiplayer_servers"),
         creative_hotbars: enabled_features.contains("creative_hotbars"),
         screenshots: enabled_features.contains("screenshots"),
+        resource_packs: enabled_features.contains("resource_packs"),
+        data_packs: enabled_features.contains("data_packs"),
     })
 }
 
@@ -555,6 +558,7 @@ async fn attach_sync_preferences(
             .filter(|row| row.instance_id == record.instance.id)
         {
             match row.feature.as_str() {
+                "game_options" => record.synced_options.game_options = true,
                 "command_history" => {
                     record.synced_options.command_history = true
                 }
@@ -565,6 +569,8 @@ async fn attach_sync_preferences(
                     record.synced_options.creative_hotbars = true
                 }
                 "screenshots" => record.synced_options.screenshots = true,
+                "resource_packs" => record.synced_options.resource_packs = true,
+                "data_packs" => record.synced_options.data_packs = true,
                 _ => {}
             }
         }
