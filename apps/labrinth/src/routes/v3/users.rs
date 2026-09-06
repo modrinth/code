@@ -1,3 +1,5 @@
+use crate::auth::validate::get_full_user_from_headers_allow_locked;
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::util::error::ApiContext as _;
 use std::{
     cmp::Reverse,
@@ -14,7 +16,9 @@ use crate::{
         filter_visible_collections, filter_visible_projects,
         get_user_from_headers,
     },
-    database::models::{DBModerationNote, DBOrganization, DBProjectId, DBUser},
+    database::models::{
+        DBModerationNote, DBOrganization, DBProjectId, DBUser, DBUserId,
+    },
     file_hosting::{FileHost, FileHostPublicity},
     models::{
         ids::OrganizationId,
@@ -84,7 +88,7 @@ pub async fn all_projects(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<AllProjectsResponse>, ApiError> {
-    let user = get_user_from_headers(
+    let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -92,8 +96,8 @@ pub async fn all_projects(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
         .wrap_internal_err("fetching user from database")?
@@ -343,7 +347,7 @@ pub async fn projects_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -351,8 +355,8 @@ pub async fn projects_list(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
@@ -396,7 +400,7 @@ pub async fn user_auth_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (scopes, mut user) = get_user_from_headers(
+    let (scopes, db_user) = get_full_user_from_headers_allow_locked(
         &req,
         &**pool,
         &redis,
@@ -405,6 +409,15 @@ pub async fn user_auth_get(
     )
     .await
     .wrap_auth_err("authenticating API request")?;
+
+    let mut user = match db_user.account_locked {
+        false => User::from_full(db_user),
+        true => {
+            let mut user = User::from(db_user);
+            user.account_locked = Some(true);
+            return Ok(HttpResponse::Ok().json(user));
+        }
+    };
 
     if !scopes.contains(Scopes::USER_READ_EMAIL) {
         user.email = None;
@@ -587,18 +600,20 @@ pub async fn users_get(
         .await
         .wrap_internal_err("fetching users from database")?;
 
-    let auth_user = get_user_from_headers(
+    let auth_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::empty(),
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?;
 
-    let notes = if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+    let is_mod = auth_user.as_ref().is_some_and(|(scopes, user)| {
+        scopes.contains(Scopes::SESSION_ACCESS) && user.role.is_mod()
+    });
+    let notes = if is_mod {
         DBModerationNote::get_many_users(
             &users_data.iter().map(|x| x.id).collect::<Vec<_>>(),
             &**pool,
@@ -610,13 +625,21 @@ pub async fn users_get(
         HashMap::new()
     };
 
-    let users: Vec<crate::models::users::User> = users_data
+    let users: Vec<User> = users_data
         .into_iter()
         .map(|data| {
-            let mut user = crate::models::users::User::from(data.clone());
-            if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+            let user_id = data.id;
+            let visible_account_locked = auth_user
+                .as_ref()
+                .filter(|(_, viewer)| {
+                    viewer.id == user_id.into() || viewer.role.is_admin()
+                })
+                .map(|_| data.account_locked);
+            let mut user = User::from(data);
+            user.account_locked = visible_account_locked;
+            if is_mod {
                 user.moderation_notes =
-                    Some(notes.get(&data.id).cloned().map(Into::into));
+                    Some(notes.get(&user_id).cloned().map(Into::into));
             }
             user
         })
@@ -649,27 +672,37 @@ pub async fn user_get(
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(data) = user_data {
-        let auth_user = get_user_from_headers(
+        let auth_user = get_maybe_user_from_headers(
             &req,
             &**pool,
             &redis,
             &session_queue,
-            Scopes::SESSION_ACCESS,
+            Scopes::empty(),
         )
         .await
-        .map(|x| x.1)
-        .ok();
+        .wrap_auth_err("authenticating API request")?;
 
-        let is_admin = auth_user.as_ref().is_some_and(|x| x.role.is_admin());
-        let is_mod = auth_user.as_ref().is_some_and(|x| x.role.is_mod());
+        let staff_role = auth_user.as_ref().and_then(|(scopes, user)| {
+            scopes
+                .contains(Scopes::SESSION_ACCESS)
+                .then_some(&user.role)
+        });
+        let is_admin = staff_role.is_some_and(Role::is_admin);
+        let is_mod = staff_role.is_some_and(Role::is_mod);
         let user_id = data.id;
+        let visible_account_locked = auth_user
+            .as_ref()
+            .filter(|(_, viewer)| {
+                viewer.id == user_id.into() || viewer.role.is_admin()
+            })
+            .map(|_| data.account_locked);
 
-        let mut response: crate::models::users::User = if is_admin {
+        let mut response = if is_admin {
             let github_id =
                 data.github_id.and_then(|id| u64::try_from(id).ok());
             let discord_id = data.discord_id.map(|id| id.to_string());
             let steam_id = data.steam_id.map(|id| id.to_string());
-            let mut user = crate::models::users::User::from_full(data);
+            let mut user = User::from_full(data);
             user.github_id = github_id;
             user.discord_id = discord_id;
             user.steam_id = steam_id;
@@ -677,6 +710,8 @@ pub async fn user_get(
         } else {
             data.into()
         };
+
+        response.account_locked = visible_account_locked;
 
         if is_mod {
             let note = DBModerationNote::get_user(user_id, &**pool, &redis)
@@ -786,7 +821,7 @@ pub async fn collections_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -794,8 +829,8 @@ pub async fn collections_list(
         Scopes::COLLECTION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
@@ -833,7 +868,7 @@ pub async fn orgs_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -841,8 +876,8 @@ pub async fn orgs_list(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
@@ -942,6 +977,7 @@ pub struct EditUser {
     #[validate(length(max = 160))]
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
+    pub account_locked: Option<bool>,
     pub badges: Option<Badges>,
     #[validate(length(max = 160))]
     pub venmo_handle: Option<String>,
@@ -1040,6 +1076,25 @@ pub async fn user_edit(
                 .execute(&mut transaction)
                 .await
                 .wrap_internal_err("fetching bio from database")?;
+            }
+
+            if let Some(account_locked) = new_user.account_locked {
+                if !user.role.is_admin() {
+                    return Err(ApiError::Auth(eyre::eyre!(
+                        "only admins can edit account lock"
+                    )));
+                }
+
+                sqlx::query!(
+                    r#"
+					UPDATE users SET account_locked = $1 WHERE id = $2
+					"#,
+                    account_locked,
+                    id as DBUserId,
+                )
+                .execute(&mut transaction)
+                .await
+                .wrap_internal_err("updating account lock")?;
             }
 
             if let Some(role) = &new_user.role {
