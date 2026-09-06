@@ -126,6 +126,8 @@ pub fn get_jvm_arguments(
     ipc_addr: SocketAddr,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
+    let injected_quick_play_server =
+        injected_quick_play_server(quick_play_type, quick_play_version);
 
     if let Some(args) = arguments {
         parse_arguments(
@@ -168,18 +170,20 @@ pub fn get_jvm_arguments(
         parsed_arguments.push(argument.replace("${path}", &full_path));
     }
 
-    parsed_arguments.push(format!(
-        "-javaagent:{}",
-        canonicalize(agent_path)
-            .map_err(|_| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Specified Java Agent path {} does not exist",
-                    libraries_path.to_string_lossy()
-                ))
-                .as_error()
-            })?
-            .to_string_lossy()
-    ));
+    if injected_quick_play_server.is_some() {
+        parsed_arguments.push(format!(
+            "-javaagent:{}",
+            canonicalize(agent_path)
+                .map_err(|_| {
+                    crate::ErrorKind::LauncherError(format!(
+                        "Specified Java Agent path {} does not exist",
+                        libraries_path.to_string_lossy()
+                    ))
+                    .as_error()
+                })?
+                .to_string_lossy()
+        ));
+    }
 
     parsed_arguments
         .push(format!("-Dmodrinth.internal.ipc.host={}", ipc_addr.ip()));
@@ -192,9 +196,7 @@ pub fn get_jvm_arguments(
             .as_str()
             .unwrap()
     ));
-    if let QuickPlayType::Server(server) = quick_play_type
-        && quick_play_version.server == QuickPlayServerVersion::Injected
-    {
+    if let Some(server) = injected_quick_play_server {
         let (host, port) = server.require_resolved()?;
         parsed_arguments.extend_from_slice(&[
             format!("-Dmodrinth.internal.quickPlay.host={host}"),
@@ -209,6 +211,21 @@ pub fn get_jvm_arguments(
     }
 
     Ok(parsed_arguments)
+}
+
+fn injected_quick_play_server(
+    quick_play_type: &QuickPlayType,
+    quick_play_version: QuickPlayVersion,
+) -> Option<&crate::server_address::ServerAddress> {
+    match quick_play_type {
+        QuickPlayType::Server(server)
+            if quick_play_version.server
+                == QuickPlayServerVersion::Injected =>
+        {
+            Some(server)
+        }
+        _ => None,
+    }
 }
 
 fn parse_jvm_argument(
