@@ -4487,9 +4487,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "IDをコピー"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "最新のバックアップをダウンロード"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "請求設定"
   },

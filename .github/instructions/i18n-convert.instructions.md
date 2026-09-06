@@ -33,24 +33,24 @@ Please follow these rules precisely:
   "By creating an account, you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>."
 - Render rich-text messages with `<IntlFormatted>` from `@modrinth/ui` using named slots:
   <IntlFormatted :message-id="messages.tosLabel">
-    <template #terms-link="{ children }">
-      <NuxtLink to="/terms">
-        <component :is="() => children" />
-      </NuxtLink>
-    </template>
-    <template #privacy-link="{ children }">
-      <NuxtLink to="/privacy">
-        <component :is="() => children" />
-      </NuxtLink>
-    </template>
+  <template #terms-link="{ children }">
+  <NuxtLink to="/terms">
+  <component :is="() => children" />
+  </NuxtLink>
+  </template>
+  <template #privacy-link="{ children }">
+  <NuxtLink to="/privacy">
+  <component :is="() => children" />
+  </NuxtLink>
+  </template>
   </IntlFormatted>
 - For simple emphasis: `'Welcome to <strong>Modrinth</strong>!'` with a slot:
   <template #strong="{ children }">
-    <strong><component :is="() => children" /></strong>
+  <strong><component :is="() => children" /></strong>
   </template>
 - For more complex child handling, use `normalizeChildren` from `@modrinth/ui`:
   <template #bold="{ children }">
-    <strong><component :is="() => normalizeChildren(children)" /></strong>
+  <strong><component :is="() => normalizeChildren(children)" /></strong>
   </template>
 
 5. Formatting in templates

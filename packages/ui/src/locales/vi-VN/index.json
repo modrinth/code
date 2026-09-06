@@ -3908,9 +3908,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Sao chép ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Tải bản sao lưu mới nhất"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Quản lý giao dịch"
   },

@@ -4913,9 +4913,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "ID'yi Kopyala"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Son yedeği indirin"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Faturalandırmayı yönetin"
   },

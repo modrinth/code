@@ -4400,9 +4400,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Kopiraj ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Instaliraj najnoviji backup"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Upravljaj naplatom"
   },

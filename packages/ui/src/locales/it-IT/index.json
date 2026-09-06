@@ -5096,9 +5096,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Copia ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Scarica l'ultimo backup"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Gestione fatturazione"
   },

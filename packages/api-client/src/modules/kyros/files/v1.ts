@@ -1,9 +1,39 @@
 import { AbstractModule } from '../../../core/abstract-module'
+import { getNodeBaseUrl } from '../../../utils/node-url'
 import type { Kyros } from '../types'
 
 export class KyrosFilesV1Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'kyros_files_v1'
+	}
+
+	/**
+	 * Authorize a short-lived, single-use full-world download.
+	 */
+	public async authorizeFullWorldDownload(
+		nodeUrlHost: string,
+		worldId: string,
+	): Promise<Kyros.Files.v1.FullWorldDownloadAuthorization> {
+		return this.client.request<Kyros.Files.v1.FullWorldDownloadAuthorization>(
+			`/worlds/${worldId}/files/download-full-zip/authorize`,
+			{
+				api: getNodeBaseUrl(nodeUrlHost),
+				version: 'v1',
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Build the browser URL for a previously authorized full-world download.
+	 */
+	public getFullWorldDownloadUrl(nodeUrlHost: string, worldId: string, token: string): string {
+		const url = new URL(
+			`/v1/worlds/${worldId}/files/download-full-zip`,
+			getNodeBaseUrl(nodeUrlHost),
+		)
+		url.searchParams.set('token', token)
+		return url.toString()
 	}
 
 	/**
