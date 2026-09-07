@@ -81,10 +81,12 @@ fn create_thumbnail(
         .save_with_format(&temporary, image::ImageFormat::Png)
         .map_err(std::io::Error::other)?;
     std::fs::rename(&temporary, &target)?;
-    if GENERATED_THUMBNAILS.fetch_add(1, Ordering::Relaxed) % 32 == 0 {
-        if let Err(error) = prune_cache(cache, &target) {
-            tracing::warn!(%error, "Could not prune thumbnail cache");
-        }
+    if GENERATED_THUMBNAILS
+        .fetch_add(1, Ordering::Relaxed)
+        .is_multiple_of(32)
+        && let Err(error) = prune_cache(cache, &target)
+    {
+        tracing::warn!(%error, "Could not prune thumbnail cache");
     }
     Ok(target)
 }
