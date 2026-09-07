@@ -197,6 +197,30 @@ pub(crate) async fn list_content(
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
 ) -> crate::Result<Vec<ContentItem>> {
+    list_content_inner(
+        instance_id,
+        content_set_id,
+        cache_behaviour,
+        false,
+        state,
+    )
+    .await
+}
+
+pub(crate) async fn list_pack_content(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<Vec<ContentItem>> {
+    list_content_inner(instance_id, None, None, true, state).await
+}
+
+async fn list_content_inner(
+    instance_id: &str,
+    content_set_id: Option<&str>,
+    cache_behaviour: Option<CacheBehaviour>,
+    packs_only: bool,
+    state: &State,
+) -> crate::Result<Vec<ContentItem>> {
     let resolved = resolve_content_scope_with_instance(
         instance_id,
         content_set_id,
@@ -241,9 +265,14 @@ pub(crate) async fn list_content(
     } else {
         ContentFilter::All
     };
-    let files =
-        content_projects_for_scope(&resolved, cache_behaviour, state, filter)
-            .await?;
+    let files = content_projects_for_scope_inner(
+        &resolved,
+        cache_behaviour,
+        state,
+        filter,
+        packs_only,
+    )
+    .await?;
     let files = files.into_iter().collect::<Vec<_>>();
 
     content_files_to_content_items(
@@ -609,7 +638,33 @@ async fn content_projects_for_scope(
     state: &State,
     filter: ContentFilter<'_>,
 ) -> crate::Result<DashMap<String, ContentFile>> {
-    let files = sync_instance_content_files(&resolved.instance, state).await?;
+    content_projects_for_scope_inner(
+        resolved,
+        cache_behaviour,
+        state,
+        filter,
+        false,
+    )
+    .await
+}
+
+async fn content_projects_for_scope_inner(
+    resolved: &ResolvedContentScope,
+    cache_behaviour: Option<CacheBehaviour>,
+    state: &State,
+    filter: ContentFilter<'_>,
+    packs_only: bool,
+) -> crate::Result<DashMap<String, ContentFile>> {
+    let mut files =
+        sync_instance_content_files(&resolved.instance, state).await?;
+    if packs_only {
+        files.retain(|file| {
+            matches!(
+                project_type_for_file(file),
+                Some(ProjectType::ResourcePack | ProjectType::DataPack),
+            )
+        });
+    }
     let entries = sqlite::content_rows::get_content_entries(
         &resolved.content_set.id,
         &state.pool,
@@ -641,15 +696,20 @@ async fn content_projects_for_scope(
         .into_iter()
         .map(|file| (file.hash.clone(), file))
         .collect::<HashMap<_, _>>();
-    let installed_channels = get_installed_update_channels(
-        &file_info_by_hash,
-        cache_behaviour,
-        &state.pool,
-        &state.api_semaphore,
-    )
-    .await?;
+    let installed_channels = if packs_only {
+        HashMap::new()
+    } else {
+        get_installed_update_channels(
+            &file_info_by_hash,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+    };
     let update_keys = files
         .iter()
+        .filter(|_| !packs_only)
         .filter(|file| file_info_by_hash.contains_key(&file.sha1))
         .filter_map(|file| {
             let project_type = project_type_for_file(file)?;

@@ -382,7 +382,7 @@ fn missing_initial_minecraft_bytes(
         )?)
 }
 
-#[tracing::instrument(skip(st, version))]
+#[tracing::instrument(skip(st, version, reporter))]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,

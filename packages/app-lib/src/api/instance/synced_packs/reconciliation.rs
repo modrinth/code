@@ -1,4 +1,6 @@
-use super::storage::{read_bytes, read_library, write_library};
+use super::storage::{
+    cache_bytes, read_bytes, read_cached_bytes, read_library, write_library,
+};
 use super::{
     PackLibrary, PackPlacement, SyncedPack, pack_option, pack_path, same_path,
     version_compatible,
@@ -6,8 +8,9 @@ use super::{
 use crate::event::{InstancePayloadType, emit::emit_instance};
 use crate::state::instances::commands;
 use crate::state::{
-    CacheBehaviour, CachedEntry, ContentItem, ContentSourceKind,
-    InstanceMetadata, ProjectType, State, SyncedOption, SyncedPackInfo,
+    CacheBehaviour, CachedEntry, ContentItem, ContentItemVersion,
+    ContentSourceKind, InstanceMetadata, ProjectType, State, SyncedOption,
+    SyncedPackInfo,
 };
 use crate::util::fetch;
 
@@ -85,8 +88,7 @@ pub(super) async fn capture(
     }
     let global = get_global_options().await?;
     let items =
-        commands::list_content(&metadata.instance.id, None, None, state)
-            .await?;
+        commands::list_pack_content(&metadata.instance.id, state).await?;
     let mut shared_changed = false;
     for (id, mut placement) in placements {
         let Some(pack) = library.packs.get(&id).cloned() else {
@@ -200,6 +202,7 @@ async fn apply_pack(
     id: &str,
     pack: &SyncedPack,
     library: &mut PackLibrary,
+    items: &mut Vec<ContentItem>,
     state: &State,
 ) -> crate::Result<()> {
     let instance_id = &metadata.instance.id;
@@ -223,19 +226,19 @@ async fn apply_pack(
     {
         return Ok(());
     }
-    let items = commands::list_content(instance_id, None, None, state).await?;
     let matching = previous
         .as_ref()
         .filter(|placement| !placement.path.is_empty())
-        .and_then(|placement| current_item(&items, pack, placement))
+        .and_then(|placement| current_item(items, pack, placement))
         .or_else(|| {
             items.iter().find(|item| {
                 local(item)
                     && item.id == pack.sha1
                     && item.project_type == pack.item.project_type
             })
-        });
-    if matching.is_some_and(|item| !local(item)) {
+        })
+        .cloned();
+    if matching.as_ref().is_some_and(|item| !local(item)) {
         return Err(crate::ErrorKind::InputError(
             "This pack is managed in this instance.".to_string(),
         )
@@ -267,7 +270,7 @@ async fn apply_pack(
                 .as_ref()
                 .is_none_or(|placement| placement.suspended);
             let path = if changed {
-                toggle_pack(metadata, item, pack.item.enabled, state).await?
+                toggle_pack(metadata, &item, pack.item.enabled, state).await?
             } else {
                 item.file_path.clone()
             };
@@ -278,7 +281,7 @@ async fn apply_pack(
                 .insert(
                     id.to_string(),
                     PackPlacement {
-                        path,
+                        path: path.clone(),
                         sha1: item.id.clone(),
                         enabled: pack.item.enabled,
                         pending: !compatible,
@@ -288,6 +291,13 @@ async fn apply_pack(
                         ..Default::default()
                     },
                 );
+            if let Some(cached) = items
+                .iter_mut()
+                .find(|cached| cached.file_path == item.file_path)
+            {
+                cached.file_path = path;
+                cached.enabled = pack.item.enabled;
+            }
             if changed || joined {
                 emit_instance(instance_id, InstancePayloadType::Synced).await?;
             }
@@ -324,6 +334,7 @@ async fn apply_pack(
         {
             commands::remove_project(instance_id, &previous.path, state)
                 .await?;
+            items.retain(|item| item.file_path != previous.path);
             emit_instance(instance_id, InstancePayloadType::Synced).await?;
         }
         library
@@ -391,21 +402,33 @@ async fn apply_pack(
             }
         }
     }
-    let bytes = if let Some(file) = file {
-        fetch::fetch(
-            &file.url,
-            file.hashes.get("sha1").map(String::as_str),
-            None,
-            None,
-            &state.fetch_semaphore,
-            &state.pool,
-        )
-        .await?
+    let (bytes, sha1) = if let Some(file) = file {
+        let cached = if let Some(sha1) = file.hashes.get("sha1") {
+            read_cached_bytes(sha1, state)
+                .await?
+                .map(|bytes| (bytes, sha1.clone()))
+        } else {
+            None
+        };
+        if let Some(cached) = cached {
+            cached
+        } else {
+            let bytes = fetch::fetch(
+                &file.url,
+                file.hashes.get("sha1").map(String::as_str),
+                None,
+                None,
+                &state.fetch_semaphore,
+                &state.pool,
+            )
+            .await?;
+            let sha1 = cache_bytes(bytes.clone(), state).await?;
+            (bytes, sha1)
+        }
     } else {
-        read_bytes(pack, state).await?
+        (read_bytes(pack, state).await?, pack.sha1.clone())
     };
     super::operations::validate_pack(&bytes, pack.item.project_type)?;
-    let sha1 = fetch::sha1_async(bytes.clone()).await?;
     let mut pending = previous.clone().unwrap_or_default();
     pending.pending = true;
     library
@@ -414,7 +437,9 @@ async fn apply_pack(
         .or_default()
         .insert(id.to_string(), pending);
     write_library(library, state).await?;
-    if let (Some(project), Some(version)) = (&pack.item.project, &version) {
+    if let (Some(project), Some(version)) = (&pack.item.project, &version)
+        && !version.dependencies.is_empty()
+    {
         let plan = commands::resolve_install_plan(
             instance_id,
             commands::InstanceInstallProjectRequest {
@@ -442,12 +467,16 @@ async fn apply_pack(
             )
             .await?;
         }
+        if !plan.dependencies.is_empty() {
+            *items = commands::list_pack_content(instance_id, state).await?;
+        }
     }
     let file_name = if pack.item.enabled {
         file_name.to_string()
     } else {
         format!("{file_name}.disabled")
     };
+    let size = bytes.len() as u64;
     let path = commands::add_project_bytes(
         instance_id,
         &file_name,
@@ -468,7 +497,22 @@ async fn apply_pack(
         && owns_file(metadata, &previous, state).await?
     {
         commands::remove_project(instance_id, &previous.path, state).await?;
+        items.retain(|item| item.file_path != previous.path);
     }
+    let mut installed = pack.item.clone();
+    installed.id = sha1.clone();
+    installed.file_path = path.clone();
+    installed.file_name = file_name;
+    installed.size = size;
+    installed.source_kind = Some(ContentSourceKind::Local);
+    installed.version = version.as_ref().map(|version| ContentItemVersion {
+        id: version.id.clone(),
+        version_number: version.version_number.clone(),
+        file_name: installed.file_name.clone(),
+        date_published: Some(version.date_published.to_rfc3339()),
+    });
+    items.retain(|item| item.file_path != path);
+    items.push(installed);
     library
         .instances
         .entry(instance_id.clone())
@@ -510,12 +554,16 @@ pub(super) async fn apply_instance(
         return Ok(());
     }
     let running = instance_is_running(metadata, state).await?;
-    let running_items = if running {
-        commands::list_content(&metadata.instance.id, None, None, state).await?
+    let global = get_global_options().await?;
+    let mut items = if library
+        .packs
+        .values()
+        .any(|pack| participating(metadata, pack, global))
+    {
+        commands::list_pack_content(&metadata.instance.id, state).await?
     } else {
         Vec::new()
     };
-    let global = get_global_options().await?;
     let previous_placements = library
         .instances
         .get(&metadata.instance.id)
@@ -534,7 +582,7 @@ pub(super) async fn apply_instance(
                             .join(&placement.path)
                             .exists()
                 })
-                || running_items.iter().any(|item| {
+                || items.iter().any(|item| {
                     item.project_type == pack.item.project_type
                         && (item.id == pack.sha1
                             || same_path(
@@ -552,7 +600,8 @@ pub(super) async fn apply_instance(
         {
             continue;
         }
-        if let Err(error) = apply_pack(metadata, id, pack, library, state).await
+        if let Err(error) =
+            apply_pack(metadata, id, pack, library, &mut items, state).await
         {
             tracing::warn!(
                 "Could not sync pack {id} to {}: {error}",
@@ -565,6 +614,8 @@ pub(super) async fn apply_instance(
                 .entry(id.clone())
                 .or_default();
             placement.error = Some(error.to_string());
+            items = commands::list_pack_content(&metadata.instance.id, state)
+                .await?;
         }
     }
     let placements = library
@@ -691,6 +742,29 @@ pub(crate) async fn reconcile_after_change(
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
     reconcile(&metadata, SyncedOption::ResourcePacks, &state).await
+}
+
+pub(in crate::api::instance) fn schedule_reconciliation() {
+    tokio::spawn(async {
+        let result: crate::Result<()> = async {
+			let state = State::get().await?;
+			let instances = crate::state::list_instances(&state.pool).await?;
+			for metadata in instances {
+				let instance_id = &metadata.instance.id;
+				if let Err(error) = reconcile_after_change(instance_id).await {
+					tracing::warn!(
+						"Could not reconcile synced packs for {instance_id}: {error}"
+					);
+				}
+				emit_instance(instance_id, InstancePayloadType::Synced).await?;
+			}
+			Ok(())
+		}
+		.await;
+        if let Err(error) = result {
+            tracing::warn!("Could not finish syncing packs: {error}");
+        }
+    });
 }
 
 pub(in crate::api::instance) async fn reconcile_after_content_change(

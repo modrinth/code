@@ -44,7 +44,7 @@ async fn source(
         )
         .into());
     }
-    let item = commands::list_content(instance_id, None, None, state)
+    let item = commands::list_pack_content(instance_id, state)
         .await?
         .into_iter()
         .find(|item| item.file_path == project_path)
@@ -281,7 +281,7 @@ pub(in crate::api::instance) async fn seed_from_instance(
 ) -> crate::Result<()> {
     super::super::projects::ensure_metadata_content_unlocked(metadata)?;
     let instance_id = &metadata.instance.id;
-    let items = commands::list_content(instance_id, None, None, state).await?;
+    let items = commands::list_pack_content(instance_id, state).await?;
     let mut candidates = Vec::new();
     for item in items {
         if pack_option(item.project_type).ok() != Some(option)
@@ -292,18 +292,23 @@ pub(in crate::api::instance) async fn seed_from_instance(
             continue;
         }
         let candidate = pack_from_item(item.clone(), metadata, state).await?;
-        if !candidate
-            .game_versions
-            .contains(&metadata.applied_content_set.game_version)
-        {
-            return Err(crate::ErrorKind::InputError(
-				"A pack in the selected sync source is incompatible with its Minecraft version.".to_string(),
-			).into());
-        }
         candidates.push((item, candidate));
     }
 
     let mut library = read_library(state).await?;
+    for placements in library.instances.values_mut() {
+        for (id, placement) in placements {
+            if library.packs.get(id).is_some_and(|pack| {
+                pack_option(pack.item.project_type).ok() == Some(option)
+            }) {
+                placement.suspended = true;
+            }
+        }
+    }
+    if option == SyncedOption::ResourcePacks {
+        library.resource_pack_observations.clear();
+        library.resource_pack_incompatible_observations.clear();
+    }
     for (item, mut pack) in candidates {
         let id = existing_pack(&library, &pack)
             .map(|(id, _)| id.clone())
@@ -376,15 +381,6 @@ async fn sync_pack_inner(
     }
     let (metadata, item) = source(instance_id, project_path, &state).await?;
     let candidate = pack_from_item(item.clone(), &metadata, &state).await?;
-    if !candidate
-        .game_versions
-        .contains(&metadata.applied_content_set.game_version)
-    {
-        return Err(crate::ErrorKind::InputError(
-            "This pack version is incompatible with this instance.".to_string(),
-        )
-        .into());
-    }
     let mut library = read_library(&state).await?;
     if let Err(error) =
         super::selection::capture(&metadata, &mut library, &state).await
@@ -462,7 +458,6 @@ pub async fn list_synced_packs(
 ) -> crate::Result<Vec<ContentItem>> {
     pack_option(project_type)?;
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
     let library = read_library(&state).await?;
     let global = get_global_options().await?;
     let instances = crate::state::list_instances(&state.pool).await?;

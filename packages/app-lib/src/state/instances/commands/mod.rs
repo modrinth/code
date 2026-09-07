@@ -22,7 +22,7 @@ pub(crate) use self::list_content::{
     dependencies_to_content_items, get_content_projects,
     get_installed_project_ids_for_instance, get_instance_install_candidates,
     get_linked_modpack_info, list_content, list_content_sets,
-    list_linked_modpack_content,
+    list_linked_modpack_content, list_pack_content,
 };
 
 mod embedded_content_metadata;

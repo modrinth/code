@@ -697,11 +697,12 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
             if let Some(record) =
                 store::complete_success(job_id, &job_state, &state).await?
             {
-                if let Err(error) =
+                if let Err(error) = Box::pin(
                     crate::api::instance::reconcile_instance_synced_options(
                         &instance_id,
-                    )
-                    .await
+                    ),
+                )
+                .await
                 {
                     tracing::warn!(
                         "Failed to reconcile synced options after installing {instance_id}: {error}"
@@ -866,11 +867,11 @@ async fn run_request(
                 .ok_or_else(|| {
                     crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
-            crate::launcher::install_minecraft_with_reporter(
+            Box::pin(crate::launcher::install_minecraft_with_reporter(
                 &context,
                 false,
                 Some(InstallProgressReporter::new(job_id, job_state.clone())),
-            )
+            ))
             .await?;
             Ok(Some(instance_id))
         }
@@ -947,13 +948,13 @@ async fn run_request(
                 },
             )
             .await?;
-            crate::api::pack::import::import_instance_with_reporter(
+            Box::pin(crate::api::pack::import::import_instance_with_reporter(
                 &instance_id,
                 launcher_type,
                 base_path,
                 instance_folder,
                 InstallProgressReporter::new(job_id, job_state.clone()),
-            )
+            ))
             .await?;
             Ok(Some(instance_id))
         }
@@ -973,13 +974,15 @@ async fn run_request(
             )
             .await?;
             let state = State::get().await?;
-            crate::api::pack::import::copy_dotminecraft_with_reporter(
-                &instance_id,
-                crate::api::instance::get_full_path(&source_instance_id)
-                    .await?,
-                &state.io_semaphore,
-                InstallProgressReporter::new(job_id, job_state.clone()),
-                InstallPhaseDetails::Empty,
+            Box::pin(
+                crate::api::pack::import::copy_dotminecraft_with_reporter(
+                    &instance_id,
+                    crate::api::instance::get_full_path(&source_instance_id)
+                        .await?,
+                    &state.io_semaphore,
+                    InstallProgressReporter::new(job_id, job_state.clone()),
+                    InstallPhaseDetails::Empty,
+                ),
             )
             .await?;
             let context =
@@ -991,11 +994,11 @@ async fn run_request(
                 .ok_or_else(|| {
                     crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
-            crate::launcher::install_minecraft_with_reporter(
+            Box::pin(crate::launcher::install_minecraft_with_reporter(
                 &context,
                 false,
                 Some(InstallProgressReporter::new(job_id, job_state.clone())),
-            )
+            ))
             .await?;
             emit_instance(&instance_id, InstancePayloadType::Edited).await?;
             Ok(Some(instance_id))
@@ -1020,11 +1023,11 @@ async fn run_request(
                 .ok_or_else(|| {
                     crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
-            crate::launcher::install_minecraft_with_reporter(
+            Box::pin(crate::launcher::install_minecraft_with_reporter(
                 &context,
                 force,
                 Some(InstallProgressReporter::new(job_id, job_state.clone())),
-            )
+            ))
             .await?;
             Ok(Some(instance_id))
         }

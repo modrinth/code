@@ -503,6 +503,24 @@ async fn enable_global_option_from_base(
         return queue_source(&source, option, state).await;
     }
 
+    if matches!(
+        option,
+        SyncedOption::ResourcePacks | SyncedOption::DataPacks
+    ) {
+        seed_from_instance(&source, option, state).await?;
+        complete_pending_source(base_instance_id, option, state).await?;
+        instance_rows::set_instance_sync_preference(
+            base_instance_id,
+            option,
+            true,
+            &state.pool,
+        )
+        .await?;
+        set_global_option_enabled(option, true, state).await?;
+        synced_packs::schedule_reconciliation();
+        return get_global_options_with_state(state).await;
+    }
+
     let instances = crate::state::list_instances(&state.pool).await?;
     for metadata in &instances {
         if metadata.instance.id != base_instance_id

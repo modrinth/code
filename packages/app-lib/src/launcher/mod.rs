@@ -355,7 +355,7 @@ pub async fn install_minecraft_with_reporter(
     .await?;
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
-    let result = async {
+    let result = Box::pin(async {
     let instance_path = get_instance_full_path(&instance.path).await?;
     if let Some(reporter) = &reporter {
         reporter
@@ -499,17 +499,17 @@ pub async fn install_minecraft_with_reporter(
             )
             .await?;
     }
-    download::download_minecraft(
-        &state,
-        &version_info,
-        loading_bar.as_ref(),
-        &java_version.architecture,
-        repairing,
-        minecraft_updated,
-        reporter.clone(),
-        phase_details.clone(),
-    )
-    .await?;
+	Box::pin(download::download_minecraft(
+		&state,
+		&version_info,
+		loading_bar.as_ref(),
+		&java_version.architecture,
+		repairing,
+		minecraft_updated,
+		reporter.clone(),
+		phase_details.clone(),
+	))
+	.await?;
 
     let client_path = state
         .directories
@@ -672,9 +672,9 @@ pub async fn install_minecraft_with_reporter(
 		)
 		.await?;
 		if let Err(error) =
-			crate::api::instance::reconcile_instance_synced_options(
+			Box::pin(crate::api::instance::reconcile_instance_synced_options(
 				&instance.id,
-			)
+			))
 			.await
 		{
 			tracing::warn!(
@@ -689,7 +689,7 @@ pub async fn install_minecraft_with_reporter(
     }
 
     Ok::<(), crate::Error>(())
-    }
+	})
     .await;
 
     if result.is_err() {

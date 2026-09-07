@@ -68,3 +68,25 @@ pub(super) async fn read_bytes(
     }
     Ok(bytes)
 }
+
+pub(super) async fn read_cached_bytes(
+    sha1: &str,
+    state: &State,
+) -> crate::Result<Option<Bytes>> {
+    if sha1.len() != 40 || !sha1.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+        return Ok(None);
+    }
+    let bytes = match io::read(directory(state).join("files").join(sha1)).await
+    {
+        Ok(bytes) => Bytes::from(bytes),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(None);
+        }
+        Err(error) => return Err(error.into()),
+    };
+    if fetch::sha1_async(bytes.clone()).await? != sha1 {
+        io::remove_file(directory(state).join("files").join(sha1)).await?;
+        return Ok(None);
+    }
+    Ok(Some(bytes))
+}

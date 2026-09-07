@@ -209,7 +209,7 @@ onBeforeUnmount(cancelRecording)
 			class="flex min-w-0 flex-1"
 		>
 			<Button
-				:type="recording || conflicts.length ? 'outlined' : 'quiet'"
+				:type="recording || conflicts.length ? 'outlined' : 'base'"
 				:color="recording ? 'brand' : conflicts.length ? 'orange' : undefined"
 				size="md"
 				:disabled="disabled"

@@ -433,8 +433,18 @@ const globalOptionMutation = useMutation({
 			await queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.servers })
 		}
 	},
-	onSettled: async () => {
+	onSettled: async (_data, _error, { option }) => {
 		if (queryClient.isMutating({ mutationKey: syncedOptionsKeys.set }) === 1) {
+			if (option === 'resource_packs' || option === 'data_packs') {
+				void Promise.all([
+					queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
+					queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
+					queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.global }),
+					queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.initialized }),
+					queryClient.invalidateQueries({ queryKey: syncedPackKeys.all }),
+				])
+				return
+			}
 			await invalidateSyncedOptions()
 		}
 	},

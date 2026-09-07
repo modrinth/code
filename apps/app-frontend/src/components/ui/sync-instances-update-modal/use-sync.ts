@@ -128,8 +128,8 @@ export function useSyncInstancesUpdate() {
 		},
 		onMutate: () => queryClient.cancelQueries({ queryKey: syncedOptionsKeys.global }),
 		onError: handleError,
-		onSettled: () =>
-			Promise.all([
+		onSettled: () => {
+			void Promise.all([
 				queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.global }),
 				queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.initialized }),
 				queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.gameSources }),
@@ -137,7 +137,8 @@ export function useSyncInstancesUpdate() {
 				queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
 				queryClient.invalidateQueries({ queryKey: ['worlds'] }),
 				queryClient.invalidateQueries({ queryKey: syncedPackKeys.all }),
-			]),
+			])
+		},
 	})
 
 	function beginDraft() {
