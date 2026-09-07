@@ -26,6 +26,7 @@ use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::{LoaderVersion, Manifest};
 use serde::Deserialize;
+use std::future::Future;
 use std::path::{Path, PathBuf};
 use tokio::process::Command;
 
@@ -316,7 +317,16 @@ async fn get_instance_full_path(instance_path: &str) -> crate::Result<PathBuf> {
     Ok(full_path)
 }
 
-pub async fn install_minecraft_with_reporter(
+/// Keeps installation state on the heap so callers do not inherit its size.
+pub fn install_minecraft_with_reporter(
+    context: &InstanceLaunchContext,
+    repairing: bool,
+    reporter: Option<InstallProgressReporter>,
+) -> impl Future<Output = crate::Result<()>> + Send + '_ {
+    Box::pin(install_minecraft_inner(context, repairing, reporter))
+}
+
+async fn install_minecraft_inner(
     context: &InstanceLaunchContext,
     repairing: bool,
     reporter: Option<InstallProgressReporter>,
@@ -672,9 +682,9 @@ pub async fn install_minecraft_with_reporter(
 		)
 		.await?;
 		if let Err(error) =
-			Box::pin(crate::api::instance::reconcile_instance_synced_options(
+			crate::api::instance::reconcile_instance_synced_options(
 				&instance.id,
-			))
+			)
 			.await
 		{
 			tracing::warn!(

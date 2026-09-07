@@ -4,6 +4,7 @@ use crate::util::io;
 use crate::{ErrorKind, State};
 use quartz_nbt::NbtCompound;
 use serde::{Deserialize, Serialize};
+use std::future::Future;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -990,7 +991,14 @@ pub(crate) async fn monitor_persisted_processes() -> crate::Result<()> {
     Ok(())
 }
 
-pub async fn reconcile_instance(instance_id: &str) -> crate::Result<()> {
+/// Keeps reconciliation state on the heap so callers do not inherit its size.
+pub fn reconcile_instance(
+    instance_id: &str,
+) -> impl Future<Output = crate::Result<()>> + Send + '_ {
+    Box::pin(reconcile_instance_inner(instance_id))
+}
+
+async fn reconcile_instance_inner(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     apply_pending_changes(&state).await?;
