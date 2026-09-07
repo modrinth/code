@@ -7,39 +7,13 @@ authors: [bOHH0P9Z, AJfd8YH6]
 
 Hey everyone,
 
-With this update, we’ve introduced syncing across your instances, along with a new screenshots page for viewing all your screenshots in one place.
+With this update we've added the ability to sync your game options, servers, resource packs, command history, and creative hotbars across your instances, along with a new screenshots page for viewing all your screenshots in one place.
 
 ### TL;DR
 
-- New Screenshots page with a built-in viewer and editor
 - Sync game options, servers, resource packs, command history, and creative hotbars across instances
 - Override synced content on individual instances when needed
-
-## Screenshot page
-
-To start, we’ve added a new screenshots page to the sidebar, bringing screenshots from all your instances together.
-
-By default, screenshots are grouped by date, but you can also group them by instance or create your own groups to organize them however you want. You can drag and drop screenshots between groups too, just like you can with instances.
-
-![The screenshots page with screenshots grouped across instances.](./screenshots-page.webp)
-
-In your app settings, you can also enable a screenshots tab on individual instances if you’d prefer to view them there. We’ve also added more control over instance tabs, letting you enable or disable worlds and files.
-
-### Screenshot viewer
-
-Screenshots can be opened in a larger view so you can take a closer look. From there, you can edit, copy, show in folder, or delete them.
-
-![The screenshot viewer with actions to edit, copy, show in folder, or delete a screenshot.](./screenshot-viewer.webp)
-
-### Screenshot editor
-
-Screenshots can also be marked up and saved as a new copy. The editor includes tools for cropping, drawing, highlighting, adding shapes, and more.
-
-<div class="video-wrapper mb-8">
-	<video autoplay loop muted playsinline>
-		<source src="/news/article/sync-settings/screenshot-editor.webm" type="video/webm" />
-	</video>
-</div>
+- New Screenshots page with a built-in viewer and editor
 
 ## Synced settings
 
@@ -75,7 +49,7 @@ Your multiplayer server list can also stay synced across your instances. You can
 
 ### Resource packs
 
-Resource pack syncing is the only option disabled by default for all users.
+Resource pack syncing is the only new option disabled by default for all users.
 
 When enabled packs will only sync to compatible instances, meaning they must support the game version and loader used by that instance. Enabling, disabling, and deleting actions will sync across instances, while version changes will not.
 
@@ -89,6 +63,32 @@ Resource packs included with a modpack will not be synced to your other instance
 
 ### Misc
 
-We’ve also added syncing for command history and creative hotbars. Command history can also be viewed and edited from your app settings.
+We’ve also added syncing for command history and creative hotbars. Command history can be viewed and edited from your app settings as-well.
+
+## Screenshot page
+
+We’ve also added a new screenshots page to the sidebar, bringing screenshots from all your instances together.
+
+By default, screenshots are grouped by date, but you can also group them by instance or create your own groups to organize them however you want. You can drag and drop screenshots between groups too, just like you can with instances.
+
+![The screenshots page with screenshots grouped across instances.](./screenshots-page.webp)
+
+In your app settings, you can also enable a screenshots tab on individual instances if you’d prefer to view them there. We’ve also added more control over instance tabs, letting you enable or disable worlds and files.
+
+### Screenshot viewer
+
+Screenshots can be opened in a larger view so you can take a closer look. From there, you can edit, copy, show in folder, or delete them.
+
+![The screenshot viewer with actions to edit, copy, show in folder, or delete a screenshot.](./screenshot-viewer.webp)
+
+### Screenshot editor
+
+Screenshots can also be marked up and saved as a new copy. The editor includes tools for cropping, drawing, highlighting, adding shapes, and more.
+
+<div class="video-wrapper mb-8">
+	<video autoplay loop muted playsinline>
+		<source src="/news/article/sync-settings/screenshot-editor.webm" type="video/webm" />
+	</video>
+</div>
 
 Enjoy!
