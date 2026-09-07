@@ -1,14 +1,17 @@
+//! Chooses which version of a project to install and finds the dependencies it needs.
+
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 
-use crate::model::{
-    ContentType, Dependency, DependencyType, Error, ResolutionPreferences,
-    ResolveContentPlan, ResolveContentRequest, ResolvedContent, SkippedContent,
-    SkippedReason, Version,
-};
-use crate::provider::ContentMetadataProvider;
+use crate::shared::{ContentType, Error};
 
-// Skip Fabric API if you're installing a fabric project onto a quilt instance.
+pub use model::{
+    Dependency, DependencyType, ResolutionPreferences, ResolveContentPlan,
+    ResolveContentRequest, ResolvedContent, SkippedContent, SkippedReason,
+    Version,
+};
+pub use provider::ContentMetadataProvider;
+
 const QUILT_FABRIC_API_EXCEPTION_PROJECT_ID: &str = "P7dR8mSH";
 
 pub async fn resolve_content<P: ContentMetadataProvider>(
@@ -352,3 +355,6 @@ fn should_skip_quilt_fabric_api(
             .iter()
             .any(|loader| loaders_match(loader, "quilt"))
 }
+
+mod model;
+mod provider;

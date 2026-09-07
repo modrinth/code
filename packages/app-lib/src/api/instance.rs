@@ -1,7 +1,6 @@
 //! Theseus instance management interface
 
 mod content;
-mod content_set_diff;
 mod export_mrpack;
 mod get;
 mod groups;

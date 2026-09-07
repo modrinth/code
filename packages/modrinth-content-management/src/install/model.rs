@@ -1,33 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(thiserror::Error, Debug)]
-pub enum Error {
-    #[error("metadata provider error: {0}")]
-    Provider(String),
-    #[error("project `{0}` was not found")]
-    ProjectNotFound(String),
-    #[error("version `{0}` was not found")]
-    VersionNotFound(String),
-    #[error("version `{version_id}` does not belong to project `{project_id}`")]
-    VersionProjectMismatch {
-        version_id: String,
-        project_id: String,
-    },
-    #[error("no compatible version was found for project `{0}`")]
-    NoCompatibleVersion(String),
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum ContentType {
-    Mod,
-    Plugin,
-    DataPack,
-    ResourcePack,
-    Shader,
-    ModPack,
-}
+use crate::shared::ContentType;
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ResolutionPreferences {
