@@ -46,7 +46,7 @@
 				</div>
 			</div>
 			<div v-if="aiFunctionalityDisclosure">
-				<BrainCircuitIcon aria-hidden="true" />
+				<BrainCogIcon aria-hidden="true" />
 				<div class="flex flex-col gap-1">
 					<span>
 						{{ capitalizeString(formatMessage(messages.aiFunctionalityTitle)) }}
@@ -244,7 +244,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BookTextIcon,
-	BrainCircuitIcon,
+	BrainCogIcon,
 	CalendarIcon,
 	CircleDollarSignIcon,
 	DropdownIcon,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BrainCircuitIcon } from '@modrinth/assets'
+import { BrainCogIcon } from '@modrinth/assets'
 import { commonMessages, defineMessages, SettingsFormGroup, Textarea, useVIntl } from '@modrinth/ui'
 
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
@@ -36,7 +36,7 @@ const messages = defineMessages({
 	<DisclosureToggleCard
 		v-bind="props"
 		v-model="model.enabled"
-		:icon="BrainCircuitIcon"
+		:icon="BrainCogIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_4482fb3bf7"

@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArchiveIcon,
-	BrainCircuitIcon,
+	BrainCogIcon,
 	CircleDollarSignIcon,
 	ClientIcon,
 	EyeIcon,
@@ -225,7 +225,7 @@ export type DisclosureTypeFilter = Labrinth.Projects.v3.ProjectDisclosureType
 
 const DISCLOSURE_TYPE_ICONS: Record<DisclosureTypeFilter, Component> = {
 	ai_content: SparklesIcon,
-	ai_functionality: BrainCircuitIcon,
+	ai_functionality: BrainCogIcon,
 	advertisements: MegaphoneIcon,
 	epilepsy_triggers: EyeIcon,
 	system_interactions: MonitorCogIcon,
