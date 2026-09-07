@@ -36,7 +36,7 @@ const versionRef = ref<HTMLElement | null>(null)
 		}"
 	>
 		<div
-			class="relative flex shrink-0 items-center overflow-clip"
+			class="relative flex shrink-0 items-center max-w-full overflow-clip"
 			:class="compactMode ? 'size-10 rounded-lg' : 'aspect-square min-w-full rounded-2xl'"
 		>
 			<Avatar
