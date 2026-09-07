@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LinkIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import { LinkIcon, ShredderIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
@@ -25,10 +25,6 @@ const allowInstanceOverride = ref(false)
 let resolveChoice: ((choice: Choice) => void) | undefined
 
 const messages = defineMessages({
-	removeResourcePackTitle: {
-		id: 'app.synced-content.delete.resource-pack-title',
-		defaultMessage: '{count, plural, one {Remove resource pack?} other {Remove resource packs?}}',
-	},
 	resourcePackHeader: {
 		id: 'app.synced-content.delete.resource-pack-header',
 		defaultMessage:
@@ -39,16 +35,15 @@ const messages = defineMessages({
 		defaultMessage:
 			'You can remove {count, plural, one {it} other {them}} from just this instance or from all synced instances. Removing {count, plural, one {it} other {them}} from only this instance will enable overrides, and this instance will no longer receive synced resource pack changes.',
 	},
-	removeTitle: { id: 'app.synced-content.delete.title', defaultMessage: 'Remove content?' },
 	removeDescription: {
 		id: 'app.synced-content.delete.override-description',
 		defaultMessage:
 			'You can remove it from just this instance or from all synced instances. Removing it from only this instance will enable overrides, and this instance will no longer receive synced changes for these content types.',
 	},
-	removeHere: { id: 'app.synced-content.delete.remove-here', defaultMessage: 'Remove here' },
-	removeEverywhere: {
-		id: 'app.synced-content.delete.remove-everywhere',
-		defaultMessage: 'Remove everywhere',
+	deleteHere: { id: 'app.synced-content.delete.delete-here', defaultMessage: 'Delete here' },
+	deleteEverywhere: {
+		id: 'app.synced-content.delete.delete-everywhere',
+		defaultMessage: 'Delete everywhere',
 	},
 	title: { id: 'app.synced-content.warning.title', defaultMessage: 'This content is synced' },
 	enableTitle: { id: 'app.synced-content.change.enable-title', defaultMessage: 'Enable content?' },
@@ -114,7 +109,7 @@ const title = computed(
 	() =>
 		({
 			change: action.value === 'enable' ? messages.enableTitle : messages.disableTitle,
-			delete: removingResourcePacks.value ? messages.removeResourcePackTitle : messages.removeTitle,
+			delete: removingResourcePacks.value ? messages.resourcePackHeader : messages.title,
 			desync: messages.desyncTitle,
 		})[mode.value],
 )
@@ -189,12 +184,17 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 	<NewModal
 		ref="modal"
 		:header="formatMessage(title, { count: syncedItems.length })"
-		fade="warning"
+		:fade="mode === 'delete' ? 'danger' : 'warning'"
 		max-width="560px"
+		no-padding
 		@hide="settle(null)"
 	>
-		<div class="flex flex-col gap-6">
+		<div class="flex flex-col gap-6 px-6 pt-6">
+			<p v-if="mode === 'delete'" class="m-0 text-primary">
+				{{ formatMessage(description, { count: syncedItems.length }) }}
+			</p>
 			<Admonition
+				v-else
 				type="warning"
 				:header="
 					formatMessage(removingResourcePacks ? messages.resourcePackHeader : messages.title, {
@@ -283,18 +283,15 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 				<template v-else>
 					<Button
 						:type="allowInstanceOverride ? 'outlined' : 'colored'"
-						color="orange"
+						color="red"
 						@click="finish('all')"
 					>
-						{{ formatMessage(messages.removeEverywhere) }}
+						<ShredderIcon aria-hidden="true" />
+						{{ formatMessage(messages.deleteEverywhere) }}
 					</Button>
-					<Button
-						v-if="allowInstanceOverride"
-						type="colored"
-						color="orange"
-						@click="finish('here')"
-					>
-						{{ formatMessage(messages.removeHere) }}
+					<Button v-if="allowInstanceOverride" type="colored" color="red" @click="finish('here')">
+						<TrashIcon aria-hidden="true" />
+						{{ formatMessage(messages.deleteHere) }}
 					</Button>
 				</template>
 			</div>

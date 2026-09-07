@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TrashIcon, XIcon } from '@modrinth/assets'
+import { ShredderIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
@@ -44,10 +44,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'This server will be removed from your server list and from the in-game server list. You can add it again later if you know the address.',
 	},
-	syncedServerTitle: {
-		id: 'app.instance.worlds.remove-server-modal.synced-title',
-		defaultMessage: 'Remove server?',
-	},
 	syncedServerHeader: {
 		id: 'app.instance.worlds.remove-server-modal.synced-header',
 		defaultMessage: 'This server is synced',
@@ -89,7 +85,7 @@ const isSyncedServer = computed(
 const isSingleplayer = computed(() => props.world?.type === 'singleplayer')
 const titleMessage = computed(() =>
 	isSyncedServer.value
-		? messages.syncedServerTitle
+		? messages.syncedServerHeader
 		: isServer.value
 			? messages.removeServerTitle
 			: messages.deleteWorldTitle,
@@ -135,9 +131,14 @@ defineExpose({ show, hide })
 		:header="formatMessage(titleMessage)"
 		:fade="isSyncedServer ? 'warning' : 'danger'"
 		max-width="560px"
+		no-padding
 	>
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-4 px-6 pt-6">
+			<p v-if="isSyncedServer" class="m-0 text-primary">
+				{{ formatMessage(warningBodyMessage) }}
+			</p>
 			<Admonition
+				v-else
 				:type="isSyncedServer ? 'warning' : 'critical'"
 				:header="formatMessage(warningHeaderMessage, { name: world?.name })"
 			>
@@ -153,9 +154,11 @@ defineExpose({ show, hide })
 				</Button>
 				<template v-if="isSyncedServer">
 					<Button type="outlined" color="orange" @click="confirm('all')">
+						<ShredderIcon aria-hidden="true" />
 						{{ formatMessage(messages.removeEverywhere) }}
 					</Button>
 					<Button type="colored" color="orange" @click="confirm('here')">
+						<TrashIcon aria-hidden="true" />
 						{{ formatMessage(messages.removeHere) }}
 					</Button>
 				</template>

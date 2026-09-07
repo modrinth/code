@@ -839,9 +839,6 @@
   "app.instance.worlds.remove-server-modal.synced-header": {
     "message": "This server is synced"
   },
-  "app.instance.worlds.remove-server-modal.synced-title": {
-    "message": "Remove server?"
-  },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Remove server"
   },
@@ -3236,6 +3233,12 @@
   "app.synced-content.change.enable-title": {
     "message": "Enable content?"
   },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "Delete everywhere"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "Delete here"
+  },
   "app.synced-content.delete.description": {
     "message": "Deleting this content will delete it across all your instances"
   },
@@ -3245,23 +3248,11 @@
   "app.synced-content.delete.override-description": {
     "message": "You can remove it from just this instance or from all synced instances. Removing it from only this instance will enable overrides, and this instance will no longer receive synced changes for these content types."
   },
-  "app.synced-content.delete.remove-everywhere": {
-    "message": "Remove everywhere"
-  },
-  "app.synced-content.delete.remove-here": {
-    "message": "Remove here"
-  },
   "app.synced-content.delete.resource-pack-description": {
     "message": "You can remove {count, plural, one {it} other {them}} from just this instance or from all synced instances. Removing {count, plural, one {it} other {them}} from only this instance will enable overrides, and this instance will no longer receive synced resource pack changes."
   },
   "app.synced-content.delete.resource-pack-header": {
     "message": "{count, plural, one {This resource pack is synced} other {These resource packs are synced}}"
-  },
-  "app.synced-content.delete.resource-pack-title": {
-    "message": "{count, plural, one {Remove resource pack?} other {Remove resource packs?}}"
-  },
-  "app.synced-content.delete.title": {
-    "message": "Remove content?"
   },
   "app.synced-content.desync.description": {
     "message": "This instance will keep its own copy. Do you want to keep this content synced in other instances, or remove it from them?"
