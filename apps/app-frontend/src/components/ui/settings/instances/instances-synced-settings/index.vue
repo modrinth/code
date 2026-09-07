@@ -272,13 +272,13 @@ const baseSourcesLoading = computed(() =>
 	baseOption.value === null
 		? false
 		: baseOption.value === 'game_options'
-			? gameOptionSourcesQuery.isFetching.value
-			: instancesQuery.isFetching.value,
+			? gameOptionSourcesQuery.isPending.value
+			: instancesQuery.isPending.value,
 )
 const baseSourcesError = computed(() =>
 	baseOption.value === 'game_options'
-		? gameOptionSourcesQuery.isError.value
-		: instancesQuery.isError.value,
+		? gameOptionSourcesQuery.isError.value && !gameOptionSourcesQuery.data.value
+		: instancesQuery.isError.value && !instancesQuery.data.value,
 )
 let baseSourceGeneration = 0
 
