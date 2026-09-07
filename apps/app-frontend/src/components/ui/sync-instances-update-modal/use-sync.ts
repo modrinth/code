@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue'
 
 import { isSyncedOptionAvailable, set_global_synced_option } from '@/helpers/instance'
 import {
+	canSourceMultiplayerServers,
 	gameOptionsSyncSourcesQueryOptions,
 	globalSyncedOptionsQueryOptions,
 	syncedOptionsKeys,
@@ -44,6 +45,7 @@ export function useSyncInstancesUpdate() {
 	const sourceOptions = ref<SyncUpdateOption[]>([])
 	const sourceInstanceId = ref('')
 	const needsGameOptionsSource = computed(() => sourceOptions.value.includes('game_options'))
+	const needsServerSource = computed(() => sourceOptions.value.includes('multiplayer_servers'))
 	const globalOptionsQuery = useQuery({
 		...globalSyncedOptionsQueryOptions(),
 		enabled: isOpen,
@@ -55,7 +57,11 @@ export function useSyncInstancesUpdate() {
 	const instancesQuery = useQuery({
 		...instanceListQueryOptions(),
 		staleTime: 0,
-		enabled: computed(() => sourceOptions.value.length > 0 && !needsGameOptionsSource.value),
+		enabled: computed(
+			() =>
+				sourceOptions.value.length > 0 &&
+				(!needsGameOptionsSource.value || needsServerSource.value),
+		),
 	})
 	const sources = computed(() =>
 		needsGameOptionsSource.value
@@ -63,22 +69,35 @@ export function useSyncInstancesUpdate() {
 					id: source.source_id,
 					name: source.name,
 					icon_path: source.icon_path,
-					eligible: source.eligible,
+					eligible:
+						source.eligible &&
+						(!needsServerSource.value ||
+							(instancesQuery.data.value ?? []).some(
+								(instance) =>
+									instance.id === source.source_id && canSourceMultiplayerServers(instance),
+							)),
 				}))
 			: (instancesQuery.data.value ?? []).map((instance) => ({
 					id: instance.id,
 					name: instance.name,
 					icon_path: instance.icon_path,
-					eligible: instance.install_stage === 'installed' && !instance.quarantined,
+					eligible:
+						instance.install_stage === 'installed' &&
+						!instance.quarantined &&
+						(!needsServerSource.value || canSourceMultiplayerServers(instance)),
 				})),
 	)
-	const sourcesLoading = computed(() =>
-		needsGameOptionsSource.value
-			? gameSourcesQuery.isPending.value || gameSourcesQuery.isFetching.value
-			: instancesQuery.isPending.value || instancesQuery.isFetching.value,
+	const sourcesLoading = computed(
+		() =>
+			(needsGameOptionsSource.value &&
+				(gameSourcesQuery.isPending.value || gameSourcesQuery.isFetching.value)) ||
+			((!needsGameOptionsSource.value || needsServerSource.value) &&
+				(instancesQuery.isPending.value || instancesQuery.isFetching.value)),
 	)
-	const sourcesError = computed(() =>
-		needsGameOptionsSource.value ? gameSourcesQuery.isError.value : instancesQuery.isError.value,
+	const sourcesError = computed(
+		() =>
+			(needsGameOptionsSource.value && gameSourcesQuery.isError.value) ||
+			((!needsGameOptionsSource.value || needsServerSource.value) && instancesQuery.isError.value),
 	)
 	const allSynced = computed(
 		() => draftInitialized.value && syncUpdateOptions.every((option) => draftOptions.value[option]),
@@ -199,10 +218,14 @@ export function useSyncInstancesUpdate() {
 		sourceOptions.value = options.filter(isSyncedOptionAvailable)
 	}
 
-	function retrySources() {
-		return needsGameOptionsSource.value
-			? gameSourcesQuery.refetch({ cancelRefetch: false })
-			: instancesQuery.refetch({ cancelRefetch: false })
+	async function retrySources() {
+		const results = await Promise.all([
+			...(needsGameOptionsSource.value ? [gameSourcesQuery.refetch({ cancelRefetch: false })] : []),
+			...(!needsGameOptionsSource.value || needsServerSource.value
+				? [instancesQuery.refetch({ cancelRefetch: false })]
+				: []),
+		])
+		return { isSuccess: results.every((result) => result.isSuccess) }
 	}
 
 	return {

@@ -25,7 +25,31 @@ const allowInstanceOverride = ref(false)
 let resolveChoice: ((choice: Choice) => void) | undefined
 
 const messages = defineMessages({
-	warningTitle: { id: 'app.synced-content.warning.modal-title', defaultMessage: 'Sync warning' },
+	removeResourcePackTitle: {
+		id: 'app.synced-content.delete.resource-pack-title',
+		defaultMessage: '{count, plural, one {Remove resource pack?} other {Remove resource packs?}}',
+	},
+	resourcePackHeader: {
+		id: 'app.synced-content.delete.resource-pack-header',
+		defaultMessage:
+			'{count, plural, one {This resource pack is synced} other {These resource packs are synced}}',
+	},
+	resourcePackDescription: {
+		id: 'app.synced-content.delete.resource-pack-description',
+		defaultMessage:
+			'You can remove {count, plural, one {it} other {them}} from just this instance or from all synced instances. Removing {count, plural, one {it} other {them}} from only this instance will enable overrides, and this instance will no longer receive synced resource pack changes.',
+	},
+	removeTitle: { id: 'app.synced-content.delete.title', defaultMessage: 'Remove content?' },
+	removeDescription: {
+		id: 'app.synced-content.delete.override-description',
+		defaultMessage:
+			'You can remove it from just this instance or from all synced instances. Removing it from only this instance will enable overrides, and this instance will no longer receive synced changes for these content types.',
+	},
+	removeHere: { id: 'app.synced-content.delete.remove-here', defaultMessage: 'Remove here' },
+	removeEverywhere: {
+		id: 'app.synced-content.delete.remove-everywhere',
+		defaultMessage: 'Remove everywhere',
+	},
 	title: { id: 'app.synced-content.warning.title', defaultMessage: 'This content is synced' },
 	enableTitle: { id: 'app.synced-content.change.enable-title', defaultMessage: 'Enable content?' },
 	disableTitle: {
@@ -78,17 +102,30 @@ const messages = defineMessages({
 	},
 })
 
+const syncedItems = computed(() => items.value.filter((item) => item.synced_pack))
+const removingResourcePacks = computed(
+	() =>
+		mode.value === 'delete' &&
+		syncedItems.value.length > 0 &&
+		syncedItems.value.every((item) => item.project_type === 'resourcepack'),
+)
+
 const title = computed(
 	() =>
 		({
 			change: action.value === 'enable' ? messages.enableTitle : messages.disableTitle,
-			delete: messages.warningTitle,
+			delete: removingResourcePacks.value ? messages.removeResourcePackTitle : messages.removeTitle,
 			desync: messages.desyncTitle,
 		})[mode.value],
 )
 const description = computed(() => {
 	if (mode.value === 'desync') return messages.desyncDescription
-	if (mode.value === 'delete') return messages.deleteDescription
+	if (mode.value === 'delete') {
+		if (!allowInstanceOverride.value) return messages.deleteDescription
+		return removingResourcePacks.value
+			? messages.resourcePackDescription
+			: messages.removeDescription
+	}
 	if (!allowInstanceOverride.value) {
 		return action.value === 'enable'
 			? messages.enableEverywhereDescription
@@ -127,11 +164,12 @@ async function confirmChange(value: SyncedPackAction, content: ContentItem[], ca
 	return choice === 'all' || (canOverride && choice === 'here') ? choice : null
 }
 
-async function confirmDelete(content: ContentItem[]) {
+async function confirmDelete(content: ContentItem[], canOverride = false) {
+	allowInstanceOverride.value = canOverride
 	mode.value = 'delete'
 	items.value = content
 	const choice = await show()
-	return choice === 'all' ? choice : null
+	return choice === 'all' || (canOverride && choice === 'here') ? choice : null
 }
 
 async function confirmDesync(item: ContentItem) {
@@ -150,17 +188,21 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(title)"
-		:fade="mode === 'delete' ? 'danger' : 'warning'"
+		:header="formatMessage(title, { count: syncedItems.length })"
+		fade="warning"
 		max-width="560px"
 		@hide="settle(null)"
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition
-				:type="mode === 'delete' ? 'critical' : 'warning'"
-				:header="formatMessage(messages.title)"
+				type="warning"
+				:header="
+					formatMessage(removingResourcePacks ? messages.resourcePackHeader : messages.title, {
+						count: syncedItems.length,
+					})
+				"
 			>
-				{{ formatMessage(description) }}
+				{{ formatMessage(description, { count: syncedItems.length }) }}
 			</Admonition>
 			<div v-if="mode === 'desync'" class="flex max-h-[212px] flex-col gap-2 overflow-y-auto">
 				<div
@@ -219,14 +261,6 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 				</template>
 				<template v-else-if="mode === 'change'">
 					<Button
-						v-if="allowInstanceOverride"
-						type="colored"
-						color="orange"
-						@click="finish('here')"
-					>
-						{{ formatMessage(action === 'enable' ? messages.enableHere : messages.disableHere) }}
-					</Button>
-					<Button
 						:type="allowInstanceOverride ? 'outlined' : 'colored'"
 						color="orange"
 						@click="finish('all')"
@@ -237,11 +271,32 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 							)
 						}}
 					</Button>
+					<Button
+						v-if="allowInstanceOverride"
+						type="colored"
+						color="orange"
+						@click="finish('here')"
+					>
+						{{ formatMessage(action === 'enable' ? messages.enableHere : messages.disableHere) }}
+					</Button>
 				</template>
-				<Button v-else type="colored" color="red" @click="finish('all')">
-					<TrashIcon aria-hidden="true" />
-					{{ formatMessage(commonMessages.deleteLabel) }}
-				</Button>
+				<template v-else>
+					<Button
+						:type="allowInstanceOverride ? 'outlined' : 'colored'"
+						color="orange"
+						@click="finish('all')"
+					>
+						{{ formatMessage(messages.removeEverywhere) }}
+					</Button>
+					<Button
+						v-if="allowInstanceOverride"
+						type="colored"
+						color="orange"
+						@click="finish('here')"
+					>
+						{{ formatMessage(messages.removeHere) }}
+					</Button>
+				</template>
 			</div>
 		</template>
 	</NewModal>

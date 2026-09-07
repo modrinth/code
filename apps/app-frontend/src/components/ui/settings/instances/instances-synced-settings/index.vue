@@ -19,6 +19,7 @@ import {
 } from '@/helpers/instance'
 import { appSettingsKeys } from '@/helpers/settings'
 import {
+	canSourceMultiplayerServers,
 	gameOptionsSyncSourcesQueryOptions,
 	globalSyncedOptionsQueryOptions,
 	initializedSyncedOptionsQueryOptions,
@@ -331,7 +332,9 @@ const baseInstances = computed(() =>
 				id: instance.id,
 				name: instance.name,
 				icon_path: instance.icon_path,
-				eligible: !instance.quarantined,
+				eligible:
+					!instance.quarantined &&
+					(baseOption.value !== 'multiplayer_servers' || canSourceMultiplayerServers(instance)),
 			})),
 )
 

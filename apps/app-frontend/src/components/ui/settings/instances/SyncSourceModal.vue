@@ -40,6 +40,10 @@ const search = ref('')
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	ineligible: {
+		id: 'app.settings.synced-options.choose-sync-source.ineligible',
+		defaultMessage: 'You cannot choose this instance as a sync source',
+	},
 	search: {
 		id: 'app.settings.synced-options.choose-sync-source.search-placeholder',
 		defaultMessage: 'Search instance',
@@ -128,25 +132,29 @@ defineExpose({ show, hide })
 				{{ formatMessage(messages.empty) }}
 			</div>
 			<div v-else role="radiogroup" :aria-label="title" class="flex flex-col gap-1">
-				<CheckCircleButton
+				<div
 					v-for="source in filteredSources"
 					:key="source.id"
-					:checked="selectedInstanceId === source.id"
-					:disabled="pending || !source.eligible"
-					class="min-h-10"
-					@click="selectedInstanceId = source.id"
+					v-tooltip="!source.eligible ? formatMessage(messages.ineligible) : undefined"
 				>
-					<span class="size-5 shrink-0 overflow-hidden rounded-[6px]">
-						<Avatar
-							:src="getInstanceIconUrl(source.icon_path)"
-							:alt="source.name"
-							:tint-by="source.id"
-							size="1.25rem"
-							no-shadow
-						/>
-					</span>
-					<span class="min-w-0 flex-1 truncate">{{ source.name }}</span>
-				</CheckCircleButton>
+					<CheckCircleButton
+						:checked="selectedInstanceId === source.id"
+						:disabled="pending || !source.eligible"
+						class="min-h-10"
+						@click="selectedInstanceId = source.id"
+					>
+						<span class="size-5 shrink-0 overflow-hidden rounded-[6px]">
+							<Avatar
+								:src="getInstanceIconUrl(source.icon_path)"
+								:alt="source.name"
+								:tint-by="source.id"
+								size="1.25rem"
+								no-shadow
+							/>
+						</span>
+						<span class="min-w-0 flex-1 truncate">{{ source.name }}</span>
+					</CheckCircleButton>
+				</div>
 			</div>
 		</div>
 		<template #actions>

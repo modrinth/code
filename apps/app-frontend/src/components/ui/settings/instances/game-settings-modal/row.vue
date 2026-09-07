@@ -19,6 +19,7 @@ import {
 	canonicalBooleanValue,
 	canonicalValueFromInput,
 	canonicalValueText,
+	isKeybindSetting,
 	settingCanBeEnabled,
 } from './editors'
 import GameKeybindInput from './keybind-input.vue'
@@ -265,7 +266,7 @@ function updateValue(value: string | number | boolean | undefined) {
 			/>
 
 			<GameKeybindInput
-				v-else-if="setting.editor.type === 'key_binding'"
+				v-else-if="isKeybindSetting(setting)"
 				:model-value="valueText"
 				:setting-label="settingLabel"
 				:conflicts="keybindConflicts"

@@ -87,6 +87,13 @@ export function canonicalBooleanValue(setting: EditableGameSetting): boolean | u
 	return setting.canonical_value?.type === 'bool' ? setting.canonical_value.value : undefined
 }
 
+export function isKeybindSetting(setting: EditableGameSetting): boolean {
+	return (
+		setting.editor.type === 'key_binding' ||
+		(setting.editor.type === 'external_raw' && !!setting.raw_key?.startsWith('key_key'))
+	)
+}
+
 export function canonicalValueFromInput(
 	setting: EditableGameSetting,
 	value: string | number | boolean | undefined,

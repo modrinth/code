@@ -33,7 +33,12 @@ import { computed, ref } from 'vue'
 
 import type { EditableGameSetting, GameSettingCategory } from '@/helpers/game-options'
 
-import { settingCanBeEnabled, settingSearchText } from './editors'
+import {
+	canonicalValueText,
+	isKeybindSetting,
+	settingCanBeEnabled,
+	settingSearchText,
+} from './editors'
 import { minecraftKeybindConflictKey } from './keybinds'
 import {
 	formatGameSettingDescription,
@@ -201,9 +206,8 @@ const keybindConflicts = computed(() => {
 
 	const bindings = new Map<string, EditableGameSetting[]>()
 	for (const setting of draftState.value.settings) {
-		if (setting.editor.type !== 'key_binding' || setting.canonical_value?.type !== 'key_binding')
-			continue
-		const key = minecraftKeybindConflictKey(setting.option_id, setting.canonical_value.value)
+		if (!isKeybindSetting(setting)) continue
+		const key = minecraftKeybindConflictKey(setting.option_id, canonicalValueText(setting))
 		if (!key) continue
 		bindings.set(key, [...(bindings.get(key) ?? []), setting])
 	}

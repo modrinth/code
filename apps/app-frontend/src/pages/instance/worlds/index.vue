@@ -332,12 +332,7 @@ function isManagedServerWorld(world: World): world is ServerWorld {
 }
 
 async function refreshManagedServerMetadata() {
-	await ensureManagedServerWorldExists(
-		instance.value.id,
-		managedServerName.value,
-		managedServerAddress.value,
-	)
-
+	const instanceId = instance.value.id
 	const projectId = instance.value.link?.project_id
 	if (!projectId) {
 		managedServerName.value = null
@@ -350,6 +345,7 @@ async function refreshManagedServerMetadata() {
 			get_project(projectId),
 			get_project_v3(projectId),
 		])
+		if (instance.value.id !== instanceId || instance.value.link?.project_id !== projectId) return
 
 		if (projectV3?.minecraft_server == null) {
 			managedServerName.value = null
@@ -366,6 +362,8 @@ async function refreshManagedServerMetadata() {
 
 		managedServerName.value = project.title
 		managedServerAddress.value = serverAddress
+		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)
+		await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instanceId) })
 	} catch (err) {
 		console.error(
 			`Failed to resolve managed server metadata for instance: ${instance.value.id}`,
@@ -377,7 +375,7 @@ async function refreshManagedServerMetadata() {
 }
 
 watch(
-	() => instance.value.link?.project_id,
+	() => [instance.value.id, instance.value.link?.project_id],
 	async () => {
 		await refreshManagedServerMetadata()
 	},

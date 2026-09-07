@@ -55,7 +55,7 @@ const messages = defineMessages({
 	syncedServerDescription: {
 		id: 'app.instance.worlds.remove-server-modal.synced-description',
 		defaultMessage:
-			'Remove it from the server lists of all synced instances, or only this instance. Removing it only here will turn on overrides for this instance.',
+			'You can remove it from just this instance or from all synced instances. Removing it from only this instance will enable overrides, and this instance will no longer receive synced server changes.',
 	},
 	removeHere: {
 		id: 'app.instance.worlds.remove-server-modal.remove-here',
@@ -152,11 +152,11 @@ defineExpose({ show, hide })
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
 				<template v-if="isSyncedServer">
-					<Button type="colored" color="orange" @click="confirm('here')">
-						{{ formatMessage(messages.removeHere) }}
-					</Button>
 					<Button type="outlined" color="orange" @click="confirm('all')">
 						{{ formatMessage(messages.removeEverywhere) }}
+					</Button>
+					<Button type="colored" color="orange" @click="confirm('here')">
+						{{ formatMessage(messages.removeHere) }}
 					</Button>
 				</template>
 				<Button

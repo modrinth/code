@@ -178,6 +178,9 @@ const sourceTitle = computed(() => {
 	)
 })
 const busy = computed(() => sourceOptions.value.length > 0 || syncMutation.isPending.value)
+const anySynced = computed(
+	() => draftInitialized.value && syncUpdateOptions.some((option) => draftOptions.value[option]),
+)
 const controlsDisabled = computed(() => !draftInitialized.value || busy.value)
 let allowHide = false
 
@@ -302,7 +305,7 @@ defineExpose({ show, hide })
 						{{ formatMessage(messages.title) }}
 					</h2>
 					<p class="m-0 leading-6 text-primary">{{ formatMessage(messages.description) }}</p>
-					<p v-if="!allSynced" class="m-0 leading-6 text-primary">
+					<p class="m-0 leading-6 text-primary">
 						{{ formatMessage(messages.manageLater) }}
 					</p>
 				</div>
@@ -320,8 +323,9 @@ defineExpose({ show, hide })
 						:loading="syncMutation.isPending.value"
 						@click="hide"
 					>
-						<CircleSlashIcon />
-						{{ formatMessage(messages.skip) }}
+						<CircleSlashIcon v-if="!anySynced" />
+						{{ formatMessage(anySynced ? commonMessages.continueButton : messages.skip) }}
+						<RightArrowIcon v-if="anySynced" />
 					</Button>
 					<Button
 						v-if="allSynced"

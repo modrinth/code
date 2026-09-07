@@ -119,28 +119,30 @@ export function useSyncedPackActions(
 		if (!items.some((item) => item.synced_pack)) return true
 		const choice = await modal.value?.confirmChange(action, items, true)
 		if (!choice) return false
-		if (choice === 'here') {
-			const instanceId = instance.value.id
-			const options = new Set<'resource_packs' | 'data_packs'>(
-				items
-					.filter((item) => item.synced_pack)
-					.map((item) => (item.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs')),
-			)
-			try {
-				for (const option of options) {
-					const updated = await set_synced_option(instanceId, option, false)
-					queryClient.setQueryData(instanceKeys.detail(instanceId), updated)
-				}
-			} catch (error) {
-				handleError(error)
-				return false
-			} finally {
-				await Promise.all([
-					queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
-					queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
-				])
-				await refresh()
+		return choice === 'here' ? enableOverrides(items) : true
+	}
+
+	async function enableOverrides(items: ContentItem[]) {
+		const instanceId = instance.value.id
+		const options = new Set<'resource_packs' | 'data_packs'>(
+			items
+				.filter((item) => item.synced_pack)
+				.map((item) => (item.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs')),
+		)
+		try {
+			for (const option of options) {
+				const updated = await set_synced_option(instanceId, option, false)
+				queryClient.setQueryData(instanceKeys.detail(instanceId), updated)
 			}
+		} catch (error) {
+			handleError(error)
+			return false
+		} finally {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
+				queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
+			])
+			await refresh()
 		}
 		return true
 	}
@@ -148,8 +150,9 @@ export function useSyncedPackActions(
 	async function confirmDeleteItems(items: ContentItem[]) {
 		deleteEverywhere.clear()
 		if (!items.some((item) => item.synced_pack)) return undefined
-		const choice = await modal.value?.confirmDelete(items)
+		const choice = await modal.value?.confirmDelete(items, true)
 		if (!choice) return false
+		if (choice === 'here') return enableOverrides(items)
 		if (choice === 'all') {
 			for (const item of items) if (item.synced_pack) deleteEverywhere.add(item.synced_pack.id)
 		}
@@ -162,7 +165,6 @@ export function useSyncedPackActions(
 			await remove_synced_pack(item.synced_pack.id)
 			return true
 		}
-		await desync_pack(instance.value.id, item.synced_pack.id, 'keep_in_other_instances')
 		return false
 	}
 

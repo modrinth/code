@@ -542,6 +542,22 @@ const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 
 const messages = defineMessages({
+	syncUpdateTitle: {
+		id: 'app.sync-instances-update.notification.title',
+		defaultMessage: 'Sync your instances',
+	},
+	syncUpdateDescription: {
+		id: 'app.sync-instances-update.notification.description',
+		defaultMessage: 'Keep game settings, servers, resource packs, and more in sync across your instances.',
+	},
+	syncUpdateView: {
+		id: 'app.sync-instances-update.notification.view-update',
+		defaultMessage: 'View update',
+	},
+	syncUpdateDismiss: {
+		id: 'app.sync-instances-update.notification.dismiss',
+		defaultMessage: 'Dismiss',
+	},
 	warning: { id: 'app.notification.warning', defaultMessage: 'Warning' },
 	goBack: { id: 'app.navigation.go-back', defaultMessage: 'Go back' },
 	goForward: { id: 'app.navigation.go-forward', defaultMessage: 'Go forward' },
@@ -765,7 +781,7 @@ async function setupApp() {
 		(pending_update_toast_for_version === version &&
 			(await queryClient.fetchQuery(instanceListQueryOptions())).length > 0)
 	) {
-		syncInstancesUpdateModal.value?.show()
+		showSyncInstancesUpdateNotification()
 	}
 
 	await getCurrentWindow().onResized(async () => {
@@ -1045,6 +1061,40 @@ const updateToPlayModal = ref()
 const modrinthLoginModal = ref()
 const appSettingsModal = ref()
 const syncInstancesUpdateModal = ref()
+let syncInstancesUpdateNotificationId: string | number | null = null
+
+function showSyncInstancesUpdateNotification() {
+	if (
+		popupNotificationManager
+			.getNotifications()
+			.some((notification) => notification.id === syncInstancesUpdateNotificationId)
+	) {
+		return
+	}
+
+	const notification = addPopupNotification({
+		contentType: 'standard',
+		title: formatMessage(messages.syncUpdateTitle),
+		text: formatMessage(messages.syncUpdateDescription),
+		type: 'info',
+		hideIcon: true,
+		autoCloseMs: null,
+		buttons: [
+			{
+				label: formatMessage(messages.syncUpdateDismiss),
+				color: 'standard',
+				action: () => popupNotificationManager.removeNotification(notification.id),
+			},
+			{
+				label: formatMessage(messages.syncUpdateView),
+				color: 'brand',
+				action: () => syncInstancesUpdateModal.value?.show(),
+			},
+		],
+	})
+	syncInstancesUpdateNotificationId = notification.id
+}
+
 provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
 provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
 
@@ -1052,7 +1102,7 @@ watch(
 	() => appSettings.getFeatureFlag('show_sync_instances_update_modal'),
 	(enabled) => {
 		if (enabled && stateInitialized.value) {
-			syncInstancesUpdateModal.value?.show()
+			showSyncInstancesUpdateNotification()
 		}
 	},
 )

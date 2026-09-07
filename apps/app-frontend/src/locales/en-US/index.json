@@ -834,7 +834,7 @@
     "message": "Remove here"
   },
   "app.instance.worlds.remove-server-modal.synced-description": {
-    "message": "Remove it from the server lists of all synced instances, or only this instance. Removing it only here will turn on overrides for this instance."
+    "message": "You can remove it from just this instance or from all synced instances. Removing it from only this instance will enable overrides, and this instance will no longer receive synced server changes."
   },
   "app.instance.worlds.remove-server-modal.synced-header": {
     "message": "This server is synced"
@@ -2750,6 +2750,9 @@
   "app.settings.synced-options.choose-sync-source.game-settings-title": {
     "message": "Choose game settings source"
   },
+  "app.settings.synced-options.choose-sync-source.ineligible": {
+    "message": "You cannot choose this instance as a sync source"
+  },
   "app.settings.synced-options.choose-sync-source.load-error": {
     "message": "Could not load sync sources. Please try again."
   },
@@ -3179,6 +3182,18 @@
   "app.sync-instances-update.manage-later": {
     "message": "You can enable syncing now and manage it later in your app settings."
   },
+  "app.sync-instances-update.notification.description": {
+    "message": "Keep game settings, servers, resource packs, and more in sync across your instances."
+  },
+  "app.sync-instances-update.notification.dismiss": {
+    "message": "Dismiss"
+  },
+  "app.sync-instances-update.notification.title": {
+    "message": "Sync your instances"
+  },
+  "app.sync-instances-update.notification.view-update": {
+    "message": "View update"
+  },
   "app.sync-instances-update.retry": {
     "message": "Try again"
   },
@@ -3227,6 +3242,27 @@
   "app.synced-content.delete.mixed": {
     "message": "Selected content that is not synced will only be deleted from this instance."
   },
+  "app.synced-content.delete.override-description": {
+    "message": "You can remove it from just this instance or from all synced instances. Removing it from only this instance will enable overrides, and this instance will no longer receive synced changes for these content types."
+  },
+  "app.synced-content.delete.remove-everywhere": {
+    "message": "Remove everywhere"
+  },
+  "app.synced-content.delete.remove-here": {
+    "message": "Remove here"
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "You can remove {count, plural, one {it} other {them}} from just this instance or from all synced instances. Removing {count, plural, one {it} other {them}} from only this instance will enable overrides, and this instance will no longer receive synced resource pack changes."
+  },
+  "app.synced-content.delete.resource-pack-header": {
+    "message": "{count, plural, one {This resource pack is synced} other {These resource packs are synced}}"
+  },
+  "app.synced-content.delete.resource-pack-title": {
+    "message": "{count, plural, one {Remove resource pack?} other {Remove resource packs?}}"
+  },
+  "app.synced-content.delete.title": {
+    "message": "Remove content?"
+  },
   "app.synced-content.desync.description": {
     "message": "This instance will keep its own copy. Do you want to keep this content synced in other instances, or remove it from them?"
   },
@@ -3238,9 +3274,6 @@
   },
   "app.synced-content.desync.title": {
     "message": "Desync content"
-  },
-  "app.synced-content.warning.modal-title": {
-    "message": "Sync warning"
   },
   "app.synced-content.warning.title": {
     "message": "This content is synced"
