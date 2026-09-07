@@ -16,13 +16,12 @@ use crate::state::{
     VersionV3,
 };
 use crate::util::fetch::{
-    DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
+    DownloadMeta, DownloadReason, FetchSemaphore, fetch_file_mirrors,
 };
-use async_zip::base::read::seek::ZipFileReader;
+use async_zip::tokio::read::fs::ZipFileReader;
 use dashmap::DashMap;
 use sqlx::SqlitePool;
 use std::collections::{HashMap, HashSet};
-use std::io::Cursor;
 
 #[derive(Clone, Debug)]
 struct ResolvedContentScope {
@@ -1403,18 +1402,18 @@ async fn get_modpack_identifiers(
         loader: content_set.loader.as_str().to_string(),
         dependent_on: Some(version_id.to_string()),
     };
-    let mrpack_bytes = fetch_mirrors(
+    let mrpack_file = fetch_file_mirrors(
         &[&primary_file.url],
         primary_file.hashes.get("sha1").map(String::as_str),
         Some(&download_meta),
         None,
         fetch_semaphore,
         pool,
+        None,
     )
     .await?;
-    let reader = Cursor::new(&mrpack_bytes);
-    let mut zip_reader =
-        ZipFileReader::with_tokio(reader).await.map_err(|_| {
+    let zip_reader =
+        ZipFileReader::new(mrpack_file.path()).await.map_err(|_| {
             crate::ErrorKind::InputError(
                 "Failed to read modpack zip".to_string(),
             )
@@ -1468,11 +1467,24 @@ async fn get_modpack_identifiers(
         })
         .collect::<Vec<_>>();
 
+    let mut buffer = vec![0_u8; 256 * 1024];
     for index in override_entries {
-        let mut file_bytes = Vec::new();
-        let mut entry_reader = zip_reader.reader_with_entry(index).await?;
-        entry_reader.read_to_end_checked(&mut file_bytes).await?;
-        hashes.push(sha1_async(bytes::Bytes::from(file_bytes)).await?);
+        let mut reader = zip_reader.reader_with_entry(index).await?;
+        let crc32 = reader.entry().crc32();
+        let mut hasher = sha1_smol::Sha1::new();
+        loop {
+            let read =
+                futures_lite::io::AsyncReadExt::read(&mut reader, &mut buffer)
+                    .await?;
+            if read == 0 {
+                break;
+            }
+            hasher.update(&buffer[..read]);
+        }
+        if reader.compute_hash() != crc32 {
+            return Err(async_zip::error::ZipError::CRC32CheckError.into());
+        }
+        hashes.push(hasher.hexdigest());
     }
 
     CachedEntry::cache_modpack_files(

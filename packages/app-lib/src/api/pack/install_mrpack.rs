@@ -13,11 +13,10 @@ use crate::pack::install_from::{
 use crate::state::instances::ContentSourceKind;
 use crate::state::{
     CachedEntry, CachedFile, EditInstance, InstanceInstallStage, SideType,
-    cache_file_hash,
+    cache_file_hash_metadata,
 };
 use crate::util::fetch::{
-    DownloadMeta, DownloadReason, FetchProgressFn, fetch_mirrors_with_progress,
-    write,
+    DownloadMeta, DownloadReason, FetchProgressFn, fetch_file_mirrors,
 };
 use crate::util::io;
 use async_zip::base::read::seek::ZipFileReader as SeekZipFileReader;
@@ -143,6 +142,9 @@ impl MrpackZipReader {
                         ))
                     })?,
             )),
+            CreatePackFile::Downloaded(file) => {
+                Ok(Self::File(FsZipFileReader::new(file.path()).await?))
+            }
             CreatePackFile::Path(path) => Ok(Self::File(
                 FsZipFileReader::new(path).await.map_err(|_| {
                     crate::Error::from(crate::ErrorKind::InputError(
@@ -830,7 +832,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 };
                 let progress =
                     &mut report_download_progress as &mut FetchProgressFn<'_>;
-                let file = match fetch_mirrors_with_progress(
+                let file = match fetch_file_mirrors(
                     &project
                         .downloads
                         .iter()
@@ -862,14 +864,14 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                         return Err(error);
                     }
                 };
-                let downloaded_bytes = file.len() as u64;
+                let downloaded_bytes = file.size;
 
                 let path = target_path;
 				content_context
 					.reporter
 					.preserve_failure_context(
 						context.clone(),
-						write(&path, &file, &state.io_semaphore).await,
+						file.copy_to(&path, &state.io_semaphore).await,
 					)
 					.await?;
 				let modified_at_ns = crate::state::file_modified_at_ns(
@@ -882,15 +884,12 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                         .reporter
                         .preserve_failure_context(
                             context.clone(),
-                            cache_file_hash(
-                                file.clone(),
-                                &content_context.instance_path,
-                                project.path.as_str(),
+                            cache_file_hash_metadata(
+								&content_context.instance_path,
+								project.path.as_str(),
+								file.size,
 								modified_at_ns,
-                                project
-                                    .hashes
-                                    .get(&PackFileHash::Sha1)
-                                    .map(|x| &**x),
+								file.sha1.clone(),
                                 ProjectType::get_from_parent_folder(&path),
                                 None,
                                 &state.pool,
@@ -1204,6 +1203,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
 fn pack_source_path(file: &CreatePackFile) -> String {
     match file {
         CreatePackFile::Bytes(_) => "downloaded mrpack bytes".to_string(),
+        CreatePackFile::Downloaded(_) => "downloaded mrpack file".to_string(),
         CreatePackFile::Path(path) => path.display().to_string(),
     }
 }
