@@ -66,7 +66,7 @@
 			:min="min"
 			:max="max"
 			:step="step"
-			@change="onInput(($event.target as HTMLInputElement).value)"
+			@change="onInput"
 		/>
 	</div>
 </template>
@@ -169,8 +169,10 @@ function onInputWithSnap(value: string) {
 	inputValueValid(parsedValue)
 }
 
-function onInput(value: string) {
-	inputValueValid(Number.parseFloat(value))
+function onInput(event: Event) {
+	const target = event.target as HTMLInputElement
+	inputValueValid(target.valueAsNumber)
+	target.value = currentValue.value === null ? '' : String(currentValue.value)
 }
 </script>
 
