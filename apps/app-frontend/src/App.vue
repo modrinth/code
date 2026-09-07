@@ -548,7 +548,8 @@ const messages = defineMessages({
 	},
 	syncUpdateDescription: {
 		id: 'app.sync-instances-update.notification.description',
-		defaultMessage: 'Keep game settings, servers, resource packs, and more in sync across your instances.',
+		defaultMessage:
+			'Keep game settings, servers, resource packs, and more in sync across your instances.',
 	},
 	syncUpdateView: {
 		id: 'app.sync-instances-update.notification.view-update',
