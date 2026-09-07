@@ -1127,9 +1127,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "על אילו מעבדים (CPUs) רצים השרתים של Modrinth Hosting?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "שרתי האחסון של Modrinth מבוססים על מעבדי AMD Ryzen 7900 ו-7950X3D (או שווי ערך) במהירות של 5GHz ומעלה, בשילוב עם זיכרון DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "באיזה מטבע מוצגים המחירים?"
   },
@@ -1459,9 +1456,6 @@
   },
   "layout.action.new-project": {
     "message": "פרוייקט חדש"
-  },
-  "layout.action.new-server-project": {
-    "message": "יצירת שרת חדש"
   },
   "layout.action.publish": {
     "message": "פרסם"

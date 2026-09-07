@@ -1,7 +1,4 @@
 {
-  "nags.add-description.description": {
-    "defaultMessage": "Une description qui décrit clairement l'intérêt du projet et sa fonction est requise."
-  },
   "nags.add-description.title": {
     "defaultMessage": "Ajouter une description"
   },
@@ -23,14 +20,8 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Ajoutez-les détails de votre licence"
   },
-  "nags.add-links-server.description": {
-    "defaultMessage": "Ajoutez tous les liens pertinents destinés à des utilisateurs extérieurs à Modrinth, tels qu'un site web, une boutique ou une invitation Discord."
-  },
   "nags.add-links-server.title": {
     "defaultMessage": "Ajouter des liens externes"
-  },
-  "nags.add-links.description": {
-    "defaultMessage": "Ajoutez tous les liens pertinents pointant en dehors de Modrinth, tels que le code source, un système de suivi des problèmes ou une invitation Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Ajouter des liens externes"
@@ -41,17 +32,14 @@
   "nags.all-languages.title": {
     "defaultMessage": "Sélectionnez les langues appropriées"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Vous avez sélectionné {totalAvailableTags, plural, one {# le tag disponible} other {# tous les tags disponibles}}. Cela va à l'encontre de l'objectif des tags, qui sont destinés à aider les utilisateurs à trouver des projets pertinents. Veuillez ne sélectionner que les tags qui sont pertinents pour votre projet."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Sélectionnez des tags précis"
   },
   "nags.check-disclosures.description": {
     "defaultMessage": "Soyez sûr que tous les utilisateurs sont avertis de tout détail importent en remplissant les avertissements sur le contenu de votre {type}."
   },
-  "nags.check-disclosures.title": {
-    "defaultMessage": "Regarder les avertissements sur le contenu"
+  "nags.description-too-short.title": {
+    "defaultMessage": "Étendre la description"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Modifier la description"
@@ -65,9 +53,6 @@
   "nags.edit-tags.title": {
     "defaultMessage": "Modifier les tags"
   },
-  "nags.edit-title.title": {
-    "defaultMessage": "Modifier le titre"
-  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "L'image mise en avant dans la galerie est souvent la première impression que votre projet donne."
   },
@@ -77,23 +62,11 @@
   "nags.gallery.title": {
     "defaultMessage": "Voir la galerie"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Votre {type} utilise une license qui a besoin d'avoir le code source disponible. Merci de mettre un lien au code source ou aux fichiers source pour chaque version additionnelle, ou sinon vous pouvez changer de license."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fournir le code source"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Certains de vos liens externes semblent être identiques. Chaque lien ne devrait être entré qu'une seule fois et avec le type de lien correspondant."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Nettoyer des liens identiques"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "L’URL de la licence est invalide."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "L’URL de votre licence pointe vers {domain}, ce qui n’est pas approprié pour les informations de licence. Les URLs de licence doivent renvoyer directement à votre fichier de licence, et non vers des réseaux sociaux, plateformes de jeux, etc."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "L’URL de votre licence semble mal formée. Veuillez fournir une URL valide pointant vers le texte de votre licence."
@@ -119,9 +92,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Ajouter un texte alternatif"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Les invitations Discord ne peuvent pas être utilisées pour d’autres types de liens. Veuillez placer votre lien Discord uniquement dans le champ « Lien d’invitation Discord »."
-  },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Déplacer l'invitation Discord"
   },
@@ -134,17 +104,8 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Voir les retours"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Vous avez sélectionné {count, plural, one {# tag de résolution} other {# tags de résolution}} ({tags}). Les packs de ressources ne devraient généralement avoir qu’un seul tag de résolution correspondant à leur résolution principale."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Sélectionner la bonne résolution"
-  },
-  "nags.review-permissions.description": {
-    "defaultMessage": "Soyez sûr que vous avez fourni la preuve de votre permission de distribuer du contenu externe dans votre Modpack."
-  },
-  "nags.review-permissions.title": {
-    "defaultMessage": "Révision des permissions externes"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Sélectionnez quelles versions votre serveur prend en charge, choisissez un modpack, ou publiez le vôtre."
@@ -188,9 +149,6 @@
   "nags.settings.links.title": {
     "defaultMessage": "Accéder aux paramètres des liens"
   },
-  "nags.settings.permissions.title": {
-    "defaultMessage": "Visiter le tableau des permissions"
-  },
   "nags.settings.tags.title": {
     "defaultMessage": "Accéder aux paramètres des tags"
   },
@@ -199,12 +157,6 @@
   },
   "nags.settings.versions.title": {
     "defaultMessage": "Accéder aux paramètres des versions"
-  },
-  "nags.summary-special-formatting.description": {
-    "defaultMessage": "Votre résumé ne doit pas contenir de mise en forme, de retours à la ligne, de caractères spéciaux ni de liens, car il sera affiché en texte brut uniquement."
-  },
-  "nags.summary-special-formatting.title": {
-    "defaultMessage": "Nettoyer le résumé"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Développer le résumé"
@@ -215,14 +167,8 @@
   "nags.too-many-languages.title": {
     "defaultMessage": "Sélectionnez les langues appropriées"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "Vous avez sélectionné {tagCount, plural, one {# tag} other {# tags}}. Veuillez réduire à {maxTagCount} ou moins pour garantir que votre serveur apparaisse dans les résultats de recherche pertinents."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Sélectionnez des tags correspondants"
-  },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Vous avez sélectionné {tagCount, plural, one {# tag} other {# tags}}. Pensez à réduire à {maxTagCount} ou moins afin que votre projet apparaisse dans des résultats de recherche pertinents."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Sélectionnez des tags précis"
@@ -245,13 +191,8 @@
   "nags.upload-version.title": {
     "defaultMessage": "Ajouter une version"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Certains de vos liens externes peuvent utiliser des domaines inappropriés pour ce type de lien."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Vérifier les liens externes"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Accéder aux paramètres des liens"
   }
 }
+

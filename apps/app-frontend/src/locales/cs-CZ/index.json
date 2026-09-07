@@ -215,6 +215,9 @@
   "app.behavior-settings.content.title": {
     "message": "Domovská stránka a kontent"
   },
+  "app.behavior-settings.show-all-screenshots.title": {
+    "message": "Zobrazit všechny snímky obrazovky společně"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Spuštění a navigace"
   },
@@ -260,6 +263,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Schovat již nainstalované"
   },
+  "app.browse.project-actions.label": {
+    "message": "Akce projektu"
+  },
   "app.browse.project-type.data-packs": {
     "message": "Data Packy"
   },
@@ -287,6 +293,9 @@
   "app.content-install.no-compatible-versions": {
     "message": "Žádné dostupné verze se neshodují s {compatibilityLabel}. Vyberte verzi, kterou chcete přesto nainstalovat. Závislosti nebudou nainstalovány automaticky."
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Otevřít složku zaloh"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Zadej popis modpacku..."
   },
@@ -313,6 +322,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Akce instance"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "Tato instance byla uzamčena"
@@ -343,6 +355,9 @@
   },
   "app.hosting.update-required.download": {
     "message": "Stáhnout novou aktualizaci"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Nadšený Modrinth Bot"
   },
   "app.hosting.update-required.title": {
     "message": "Modrinth App potřebuje být aktualizovaná"
@@ -460,6 +475,9 @@
   },
   "app.instance.action.stop": {
     "message": "Zastavit"
+  },
+  "app.instance.actions.label": {
+    "message": "Akce instance"
   },
   "app.instance.add-server.add": {
     "message": "Přidat"
@@ -740,6 +758,9 @@
   "app.instance.tab.logs": {
     "message": "Logy"
   },
+  "app.instance.tab.screenshots": {
+    "message": "Snímky obrazovky"
+  },
   "app.instance.tab.share": {
     "message": "Sdílet"
   },
@@ -845,6 +866,9 @@
   "app.java-selector.test-installation": {
     "message": "Otestovat instalaci Javy"
   },
+  "app.library.actions.label": {
+    "message": "Akce knihovny"
+  },
   "app.library.context-menu.create-instance": {
     "message": "Nová instance"
   },
@@ -889,6 +913,12 @@
   },
   "app.library.group-by.loader": {
     "message": "Loader"
+  },
+  "app.library.group-by.none": {
+    "message": "Bez seskupení"
+  },
+  "app.library.group.actions.label": {
+    "message": "Akce skupiny"
   },
   "app.library.group.collapse": {
     "message": "Sbalit skupinu"
@@ -968,6 +998,9 @@
   "app.library.group.search-instance": {
     "message": "Hledat instanci"
   },
+  "app.library.group.ungrouped": {
+    "message": "Bez skupiny"
+  },
   "app.library.group.unknown": {
     "message": "Neznámá skupina"
   },
@@ -1004,14 +1037,26 @@
   "app.library.instance.action.view-instance": {
     "message": "Zobrazit instanci"
   },
+  "app.library.instance.actions.label": {
+    "message": "Akce instance"
+  },
   "app.library.instance.deselect": {
-    "message": "Odoznačit instanci"
+    "message": "Zrušit výběr instance"
   },
   "app.library.instance.deselect-with-name": {
-    "message": "Odoznačit {name}"
+    "message": "Zrušit výběr {name}"
   },
   "app.library.instance.installing": {
     "message": "Instalování..."
+  },
+  "app.library.instance.loading": {
+    "message": "Načítání instance..."
+  },
+  "app.library.instance.new": {
+    "message": "Nová instance"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "Otevřít {name}"
   },
   "app.library.instance.play": {
     "message": "Hrát"
@@ -1030,6 +1075,18 @@
   },
   "app.library.search.placeholder": {
     "message": "Vyhledat"
+  },
+  "app.library.selection.aria-label": {
+    "message": "Vybrané instance"
+  },
+  "app.library.selection.deleting": {
+    "message": "Mazání vybraných instancí"
+  },
+  "app.library.selection.new-group": {
+    "message": "Nová skupina"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "Odebrat ze skupiny"
   },
   "app.library.selection.selected-count": {
     "message": "{count} vybráno"
@@ -1067,6 +1124,9 @@
   "app.modal.install-to-play.block-user": {
     "message": "Zablokovat uživatele"
   },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "Nahlašovaná instance"
+  },
   "app.modal.install-to-play.delete-instance": {
     "message": "Smazat instanci"
   },
@@ -1093,6 +1153,9 @@
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Sdílená instance"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "Společný obsah instance"
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Tato sdílená instance obsahuje soubory, které nejsou publikované na Modrinthu. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
@@ -1136,11 +1199,17 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Je vyžadována aktualizace pro hraní {name}. Prosím aktualizujte na nejnovější verzy pro spuštění hry."
   },
+  "app.nav.add-account": {
+    "message": "Přidat účet"
+  },
   "app.nav.create-new-instance": {
     "message": "Vytvořit novou instanci"
   },
   "app.nav.home": {
     "message": "Domov"
+  },
+  "app.nav.loading-profile": {
+    "message": "Načítání profilu..."
   },
   "app.nav.modrinth-account": {
     "message": "Modrinth účet"
@@ -1148,11 +1217,23 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
+  "app.nav.remove-account": {
+    "message": "Odebrat účet"
+  },
+  "app.nav.screenshots": {
+    "message": "Screenshoty"
+  },
   "app.nav.sign-in-to-modrinth-account": {
-    "message": "Přihlásit se do Modrinth účtu"
+    "message": "Přihlásit se do Modrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "Změnit účet"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgradovat na Modrinth+"
+  },
+  "app.nav.view-profile": {
+    "message": "Zobrazit profil"
   },
   "app.navigation.go-back": {
     "message": "Zpět"
@@ -1174,6 +1255,9 @@
   },
   "app.notification.warning": {
     "message": "Varování"
+  },
+  "app.project.actions.label": {
+    "message": "Akce projektu"
   },
   "app.project.coming-soon": {
     "message": "Již brzy"
@@ -1217,14 +1301,164 @@
   "app.project.versions.already-installed": {
     "message": "Již staženo"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "Akce instance"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "Přetažením zobrazíte nedávné instance"
   },
   "app.quick-instance-switcher.drag-tooltip": {
     "message": "Přetažením změnte velikost"
   },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "Instance byla uzamčena"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "Zobrazit instanci"
+  },
   "app.restarting": {
     "message": "Restartování..."
+  },
+  "app.screenshots.copied": {
+    "message": "Zkopírováno"
+  },
+  "app.screenshots.copy": {
+    "message": "Kopírovat obrázek"
+  },
+  "app.screenshots.delete-success": {
+    "message": "Snímek obrazovky odstraněn"
+  },
+  "app.screenshots.delete-title": {
+    "message": "Odstranit snímek obrazovky"
+  },
+  "app.screenshots.deselect": {
+    "message": "Zrušit výběr {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "Upravit snímek obrazovky"
+  },
+  "app.screenshots.empty-description": {
+    "message": "Snímky obrazovky, které pořídíte ve hře, se zobrazí zde."
+  },
+  "app.screenshots.empty-heading": {
+    "message": "Zatím žádné snímky obrazovky"
+  },
+  "app.screenshots.error-heading": {
+    "message": "Snímky obrazovky se nepodařilo načíst"
+  },
+  "app.screenshots.group-by": {
+    "message": "Seskupit podle"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "Všechny snímky obrazovky"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "Sbalit skupinu"
+  },
+  "app.screenshots.group.custom": {
+    "message": "Vlastní skupina"
+  },
+  "app.screenshots.group.date": {
+    "message": "Datum"
+  },
+  "app.screenshots.group.delete": {
+    "message": "Odstranit skupinu"
+  },
+  "app.screenshots.group.edit": {
+    "message": "Upravit název skupiny"
+  },
+  "app.screenshots.group.empty": {
+    "message": "Přetažením přidáte snímky obrazovky."
+  },
+  "app.screenshots.group.expand": {
+    "message": "Rozbalit skupinu"
+  },
+  "app.screenshots.group.instance": {
+    "message": "Instance"
+  },
+  "app.screenshots.group.new": {
+    "message": "Nová skupina"
+  },
+  "app.screenshots.group.none": {
+    "message": "Žádné seskupování"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "Tento měsíc"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "Tento týden"
+  },
+  "app.screenshots.group.today": {
+    "message": "Dnes"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "Bez skupiny"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "Včera"
+  },
+  "app.screenshots.heading": {
+    "message": "Snímky obrazovky"
+  },
+  "app.screenshots.more-actions": {
+    "message": "Více akcí"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "Zkuste jiné vyhledávání nebo filtr."
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "Žádné odpovídající snímky obrazovky"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "Hledat"
+  },
+  "app.screenshots.select": {
+    "message": "Vybrat {name}"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "Vybrané snímky obrazovky"
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural, one {# snímek obrazovky smazán} few {# snímky obrazovky smazány} other {# snímků obrazovky smazáno}}"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "Odstranit vybrané snímky obrazovky"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "Exportovat ZIP"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Modrinth screenshots.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "{instance} screenshots.zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "Odebrat ze skupiny"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "{count} vybráno"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "ZIP archiv"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "Zobrazit ve složce"
+  },
+  "app.screenshots.sort-by": {
+    "message": "Seřadit podle"
+  },
+  "app.screenshots.sort.name": {
+    "message": "Název"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "Nejnovější"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "Nejstarší"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -1253,6 +1487,9 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Výška"
   },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Jáva a paměť"
+  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Argumenty předány Javě při spuštění instance."
   },
@@ -1262,11 +1499,83 @@
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argumenty Javy"
   },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "Spustí se před spuštěním instance."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Šířka"
+  },
+  "app.settings.default-instance-options.window.title": {
+    "message": "Okno"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
   },
   "app.settings.downloading": {
     "message": "Stahování v{version}"
+  },
+  "app.settings.java-installations.location.title": {
+    "message": "Umístění Javy {version, number}"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetrie"
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Vždy zobrazazovat podrobnosti kopie"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "Načítání aplikace může být pomalejší, dokud se mezipaměť neobnoví."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Vymazat mezipaměť aplikace?"
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Vymazat mezipaměť"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "Mezipaměť aplikace"
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Otevřít složku zaloh"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Zálohy databáze aplikace"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Procházet pro adresář aplikace"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "Složka aplikace"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Instance"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "Prohledat instanci"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "Synch."
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "Historie příkazů synchronizace"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "Použij stejnou historii příkazu napříč instancemi."
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "Upravit historii příkazů"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "Adresa serveru"
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "Upravit synchronizované servery"
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "Název serveru"
   },
   "app.settings.tabs.appearance": {
     "message": "Vzhled"
@@ -1330,6 +1639,9 @@
   },
   "app.skins.modal.cape-section": {
     "message": "Plášť"
+  },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "Pro ukládání skinů se přihlaste."
   },
   "app.skins.modal.edit-title": {
     "message": "Úprava skinu"
@@ -1417,6 +1729,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Přihlásit se do Microsoftu"
   },
   "app.skins.title": {
     "message": "Výběr skinu"
@@ -1508,6 +1823,12 @@
   "app.world.world-item.players-online": {
     "message": "{count} online"
   },
+  "content.shared-instance.disable-button": {
+    "message": "Přesto zakázat"
+  },
+  "content.shared-instance.disable-many-button": {
+    "message": "Přesto zakázat {count, number} projekty"
+  },
   "friends.action.add-friend": {
     "message": "Přidat přítele"
   },
@@ -1531,6 +1852,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>Přidej si přátele</link>, abys viděl, co hrají!"
+  },
+  "friends.friend.actions.label": {
+    "message": "Akce přítele"
   },
   "friends.friend.cancel-request": {
     "message": "Zrušit žádost"
@@ -1570,6 +1894,36 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Přihlas se k Modrinth účtu</link>, abys mohl přidávat přátele a vidět, co hrají!"
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "Odpojování..."
+  },
+  "instance.action.create-shortcut": {
+    "message": "Vytvořit zkratku"
+  },
+  "instance.action.export-modpack": {
+    "message": "Exportovat modpack"
+  },
+  "instance.action.launch-instance": {
+    "message": "Instance launcheru"
+  },
+  "instance.action.more-actions": {
+    "message": "Více akcí"
+  },
+  "instance.action.open-folder": {
+    "message": "Otevřít složku"
+  },
+  "instance.action.repair": {
+    "message": "Opravit"
+  },
+  "instance.action.settings": {
+    "message": "Nastavení instance"
+  },
+  "instance.action.starting": {
+    "message": "Spouštění..."
+  },
+  "instance.action.stopping": {
+    "message": "Zastavování..."
   },
   "instance.add-server.add-and-play": {
     "message": "Přidat a hrát"
@@ -1613,6 +1967,225 @@
   "instance.files.save-as": {
     "message": "Uložit jako..."
   },
+  "instance.icon-editor.background": {
+    "message": "Pozadí"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "Modrá"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "Tmavě šedá"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "Tmavě zelená"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Šedá"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "Zelená"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "Indigová"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "Levandulová"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "Světle šedá"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Limetková"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "Oranžová"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Růžová"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "Fialová"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Červená"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "Růžová"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "Žlutá"
+  },
+  "instance.icon-editor.description": {
+    "message": "Promíchejte prvky pro vytvoření vlastní ikony."
+  },
+  "instance.icon-editor.recents": {
+    "message": "Nedávné"
+  },
+  "instance.icon-editor.save": {
+    "message": "Ikona uložení"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "Náhodné"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "Batoh"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Beacon"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Modrý Žralok"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Knihovna"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Hnědý medvěd"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Dort"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "Ohniště"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "Truhla"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Kolečko"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Příkazový Blok"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Hrnec na vaření"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "Gauč"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Pracovní stůl"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Montážní klíč"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "Zaklínací stůl"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "Ender truhla"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "Ender Drak"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "Motor"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "Pec"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Glóbus"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "Blok Trávy"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "Lucerna"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "Distributor kyslíku"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "Palačinky"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "Krumpáč"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "Poké Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "Redstone Blok"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "Kostlivec"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "Slimový blok"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "Vesmírná helma"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Lepivý píst"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "Meč"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "Terminál"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Brambůrek"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Pneumatika"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "Dynamit (TNT)"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Modrinth klíč"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "message": "Editor ikon"
+  },
+  "instance.last-played": {
+    "message": "Naposledy hráno"
+  },
+  "instance.locked.delete-button": {
+    "message": "Smazat instanci"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "Tato instance byla uzamčena"
+  },
+  "instance.playtime.never-played": {
+    "message": "Nikdy nehráno"
+  },
   "instance.server-modal.address": {
     "message": "Adresa"
   },
@@ -1624,6 +2197,33 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Balíček textur"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Akce"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Odkaz s pozvánkou"
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Vyprší"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Zrušit pozvánku"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Zrušit pozvánku pro {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Aktivní pozvánky"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Využití"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Zrušit pozvánku"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Zrušit pozvánku"
   },
   "instance.settings.tabs.general": {
     "message": "Obecné"
@@ -1655,6 +2255,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "Upravit ikonu"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "Vytvořit ikonu"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "Upravit ikonu"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Odebrat ikonu"
   },
@@ -1663,6 +2269,9 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Vybrat ikonu"
+  },
+  "instance.settings.tabs.general.icon": {
+    "message": "Ikona"
   },
   "instance.settings.tabs.general.name": {
     "message": "Jméno"
@@ -1691,9 +2300,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Vyber aktualizační kanál"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Hooky umožňují pokročilým uživatelům spustit určité systémové příkazy před a po spuštění hry."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Po ukončení"
   },
@@ -1712,8 +2318,14 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Zadej příkaz k provedení před spuštěním..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Spouštěcí příkazy hry"
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: Název složky instance"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: Alias pro $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: Název instance"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -1730,47 +2342,17 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} verze"
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Vlastní proměnná prostředí"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Vlastní argumenty Javy"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Vlastní instalace Javy"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Vlastní nastavení paměti"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Zadej proměnná prostředí..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Zadej argumenty Javy..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Proměnné prostředí"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooky"
   },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Argumenty Javy"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Instalace Javy"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Přiřazeno paměti"
-  },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Okno"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Vlastní nastavení okna"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Režim celé obrazovky"
@@ -1796,8 +2378,20 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Zadej šířku..."
   },
+  "instance.shared-instance.network-error.title": {
+    "message": "Chyba sítě"
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Přidáno"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Odstraněno"
+  },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft server"
+  },
+  "instance.worlds.actions.label": {
+    "message": "Akce světa"
   },
   "instance.worlds.cant_connect": {
     "message": "Nelze se připojit k serveru"
@@ -1807,6 +2401,12 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "Vytvořit záložku"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "Ponechat"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "Odstranit"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Nezobrazovat na domovské stránce"
@@ -1835,6 +2435,12 @@
   "instance.worlds.play_instance": {
     "message": "Hrát instanci"
   },
+  "instance.worlds.shortcut-created": {
+    "message": "Zkratka vytvořena"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "Nepodařilo se vytvořit zkratku"
+  },
   "instance.worlds.view_instance": {
     "message": "Zobrazit instanci"
   },
@@ -1859,6 +2465,39 @@
   "minecraft-account.sign-in": {
     "message": "Přihlásit se do Minecraftu"
   },
+  "minecraft-required.description-header": {
+    "message": "Přihlaste se k účtu Microsoft"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Nemáte účet?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Získat Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Získat podporu"
+  },
+  "minecraft-required.header": {
+    "message": "Je vyžadován Minecraft"
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Pokračovat v prohlížeči"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Vytvořit účet"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Znovu otevřít prohlížeč"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "Přihlásit se do Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "Přihlaste se k Modrinth účtu"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Přihlášení"
+  },
   "search.filter.locked.instance": {
     "message": "Poskytováno instancí"
   },
@@ -1873,5 +2512,11 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Pouze módy ze strany klientu mohou být přidány na server"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Účet"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Zobrazení"
   }
 }

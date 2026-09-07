@@ -782,6 +782,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "出生日期"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "你未達到建立 Modrinth 帳號的最低年齡限制。"
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "選取你的出生日期"
   },
@@ -792,7 +795,7 @@
     "message": "出生日期是必填欄位"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "你未達到建立 Modrinth 帳號的最低年齡限制。"
+    "message": "你必須年滿 13 歲才能建立 Modrinth 帳號。"
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "相關原始碼"
@@ -817,6 +820,33 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "輸入使用者名稱"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "請輸入驗證應用程式中的 6 位數驗證碼，或其中一個備用碼。"
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "雙重驗證"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "輸入驗證碼..."
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "使用通行金鑰繼續"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "上次使用{method, select, password {密碼} passkey {通行金鑰} github { GitHub } discord { Discord } google { Google } microsoft { Microsoft } gitlab { GitLab } steam { Steam } paypal { PayPal } other {{method}} }登入。"
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "重新驗證"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "其他登入方式"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "使用 {provider} 登入"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} 需要重新驗證。"
   },
   "auth.reset-password.method-choice.action": {
     "message": "傳送密碼重設電子郵件"
@@ -860,6 +890,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "輸入驗證碼..."
   },
+  "auth.sign-in.add-account": {
+    "message": "新增帳號"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "選擇要在 Modrinth App 中使用的帳號"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "使用電子郵件繼續"
   },
@@ -874,6 +910,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "上次使用"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "我們正在帶你返回 Modrinth App。如果沒有出現任何反應，請點擊下方的按鈕。"
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "前往 Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "開啟 Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "你已登入"
   },
   "auth.sign-in.no-account": {
     "message": "還沒有帳號嗎？"
@@ -1024,6 +1072,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "回覆並核准"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "關閉檢舉"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "回覆並關閉"
@@ -1272,7 +1323,7 @@
     "message": "用一兩句話描述你的收藏。"
   },
   "create.collection.summary-label": {
-    "message": "簡介"
+    "message": "摘要"
   },
   "create.collection.summary-placeholder": {
     "message": "這個收藏關於……"
@@ -1329,7 +1380,7 @@
     "message": "用一兩句話描述你的組織。"
   },
   "create.organization.summary-label": {
-    "message": "簡介"
+    "message": "摘要"
   },
   "create.organization.summary-placeholder": {
     "message": "一個用於……的組織"
@@ -1368,7 +1419,7 @@
     "message": "用一兩句話描述你的專案。"
   },
   "create.project.summary-label": {
-    "message": "簡介"
+    "message": "摘要"
   },
   "create.project.summary-placeholder": {
     "message": "這個專案加入了..."
@@ -1755,10 +1806,10 @@
     "message": "你為 PayPal 國際交易選擇了美元。<direct-paypal-link>切換到直接 PayPal 連結</direct-paypal-link>以獲得更優惠的手續費（約 2% 而不是約 6%）。"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
-    "message": "最低提領金額：{min}，最高提領金額：{max}。"
+    "message": "單次提領金額，最低 {min}，最高 {max}。"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
-    "message": "最低提領金額：{min}。"
+    "message": "單次提領金額，最低 {min}。"
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "提領"
@@ -2189,6 +2240,12 @@
   "error.generic.401.signed-in-as": {
     "message": "你目前登入的帳號："
   },
+  "error.generic.401.switch-account": {
+    "message": "或者，切換到另一個帳號："
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "無法切換帳號，請再試一次。"
+  },
   "error.generic.401.title": {
     "message": "你沒有這個頁面的存取權"
   },
@@ -2205,10 +2262,10 @@
     "message": "因法律原因無法提供內容"
   },
   "error.generic.default.list_item.1": {
-    "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Modrinth 是否停機。"
+    "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Modrinth 是不是停機了。"
   },
   "error.generic.default.list_item.2": {
-    "message": "如果這個問題持續發生，你或許會想加入我們的 <discord-link>Discord 伺服器</discord-link>，通知 Modrinth 團隊。"
+    "message": "如果這個問題持續發生，你可以考慮加入我們的 <discord-link>Discord 伺服器</discord-link>，通知 Modrinth 團隊。"
   },
   "error.generic.default.list_title": {
     "message": "請在幾分鐘後再試一次。"
@@ -2301,7 +2358,7 @@
     "message": "Modrinth Hosting 伺服器執行於哪種 CPU？"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting 伺服器搭載 AMD Ryzen 7900 與 7950X3D 同等級的高效能 CPU，時脈達 5 GHz 以上，並搭配 DDR5 記憶體。"
+    "message": "Modrinth Hosting 伺服器搭載 AMD Ryzen 7950X、9950X 或同等級的 CPU，並搭配 DDR5 記憶體。"
   },
   "hosting-marketing.faq.currency": {
     "message": "價格是以哪種貨幣計算？"
@@ -2661,7 +2718,7 @@
     "message": "新增專案"
   },
   "layout.action.new-server-project": {
-    "message": "新的伺服器"
+    "message": "新增伺服器專案"
   },
   "layout.action.publish": {
     "message": "發布"
@@ -2674,6 +2731,9 @@
   },
   "layout.action.tech-review": {
     "message": "技術審查"
+  },
+  "layout.action.user-lookup": {
+    "message": "使用者查詢"
   },
   "layout.avatar.alt": {
     "message": "你的顯示圖片"
@@ -2870,6 +2930,9 @@
   "layout.nav.active-reports": {
     "message": "處理中的檢舉"
   },
+  "layout.nav.add-account": {
+    "message": "新增帳號"
+  },
   "layout.nav.discover": {
     "message": "探索"
   },
@@ -2900,6 +2963,9 @@
   "layout.nav.projects": {
     "message": "專案"
   },
+  "layout.nav.remove-account": {
+    "message": "移除帳號"
+  },
   "layout.nav.revenue": {
     "message": "收益"
   },
@@ -2908,6 +2974,12 @@
   },
   "layout.nav.search": {
     "message": "搜尋"
+  },
+  "layout.nav.switch-account": {
+    "message": "切換帳號"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "無法切換帳號，請再試一次。"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升級至 Modrinth+"
@@ -2947,6 +3019,9 @@
   },
   "moderation.moderate": {
     "message": "管理"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Delphi 規則"
   },
   "moderation.page.external-projects": {
     "message": "外部專案"
@@ -3350,6 +3425,9 @@
   "project-member-header.success-join": {
     "message": "你加入了專案團隊"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "你的專案已提交審查！"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "發布檢查清單"
   },
@@ -3489,7 +3567,7 @@
     "message": "查看{projectType}相依項"
   },
   "project.ai-image-warning-modal.body.1": {
-    "message": "Modrinth 上不允許使用 AI 生成的圖片來呈現你的專案。試圖規避檢測機制可能會導致你的 Modrinth 帳號遭到停權。"
+    "message": "Modrinth 上不允許使用 AI 生成的圖片來呈現你的專案。試圖規避偵測機制可能會導致你的 Modrinth 帳號遭到停權。"
   },
   "project.ai-image-warning-modal.body.2": {
     "message": "關於 Modrinth 的生成式 AI 政策的更多資訊，請參閱我們的《<rules>內容規範</rules>》第 6 節。"
@@ -3767,6 +3845,12 @@
   "project.notification.icon-updated.title": {
     "message": "專案圖示已更新"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "你不能儲存未通過驗證的專案變更。"
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "無法儲存審查中的專案"
+  },
   "project.notification.updated.message": {
     "message": "你的專案已更新。"
   },
@@ -3780,7 +3864,7 @@
     "message": "回到專案頁面"
   },
   "project.settings.danger-zone": {
-    "message": "危險操作"
+    "message": "危險動作"
   },
   "project.settings.delete-project.button": {
     "message": "刪除專案"
@@ -3805,6 +3889,9 @@
   },
   "project.settings.disclosures.advertising.description.1": {
     "message": "如果這個專案包含其他作品的廣告、贊助或宣傳，則必須啟用這個選項。"
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "如果該宣傳沒有直接的金錢價值，<emphasis>並且</emphasis>是一般人會認為「相關」且「不顯眼」的（例如在你自己所製作的模組的設定頁面角落，放置你的 Modrinth 個人檔案的連結），我們便不會將其視為廣告<italic></italic><italic></italic>。"
   },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "例如：Adds the Modrinth SMP server to your server list automatically."
@@ -3906,7 +3993,7 @@
     "message": "光敏感警告"
   },
   "project.settings.disclosures.save-blocked.advertising-note": {
-    "message": "廣告宣傳披露必須附上說明。"
+    "message": "廣告宣傳揭露必須附上說明。"
   },
   "project.settings.disclosures.save-blocked.derivative-empty": {
     "message": "衍生作品揭露必須列出至少一個原始作品。"
@@ -4009,6 +4096,12 @@
   },
   "project.settings.general.url.title": {
     "message": "網址"
+  },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "你已經有一個 {platform} 連結了。"
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "請為這個贊助連結選擇平台。"
   },
   "project.settings.monetization.description": {
     "message": "Modrinth 上的專案會自動加入<rewards-program-link>獎勵計畫</rewards-program-link>。如果你不想（或因法律原因無法）從專案獲取收益，可在這裡關閉營利功能。"
@@ -4213,6 +4306,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "請先上傳版本再新增標籤"
+  },
+  "project.slug-suggestions.label": {
+    "message": "建議："
   },
   "project.versions.copy-id-option": {
     "message": "複製 ID"
@@ -4887,7 +4983,7 @@
     "message": "密碼"
   },
   "settings.account.security.providers.action.manage": {
-    "message": "管理登入提供商"
+    "message": "管理驗證提供商"
   },
   "settings.account.security.providers.description": {
     "message": "從你的帳號新增或移除登入方式，包括 GitHub、GitLab、Microsoft、Discord、Steam 以及 Google。"
@@ -5176,6 +5272,9 @@
   },
   "settings.billing.plan.title": {
     "message": "{size}方案"
+  },
+  "settings.billing.price.includes-tax": {
+    "message": "含稅 {amount}"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
