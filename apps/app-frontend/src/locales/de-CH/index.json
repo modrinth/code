@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Namensschild ausblenden"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Zeige kürzlich gespielte Welten oder Instanzen im Abschnitt „Loslegen“ auf der Startseite an."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Mit Welten oder Instanzen loslegen"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiere die Modrinth App, wenn Minecraft startet."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Startseite & Inhalte"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Zeige Screenshots von all deinen Instanzen auf der Screenshots-Seite an."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Alle Screenshots zusammen anzeigen"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Start & Navigation"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Update der Modrinth App erforderlich"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Es konnten keine zufälligen Symbole auf Instanzen angewendet werden."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Icon für {num, plural, one {# Instanz} other {# Instanzen}} randomisiert."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Neu in diesem Update"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Schließen"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Erstelle direkt in der Modrinth-App benutzerdefinierte Icons für deine Instanzen. Kombiniere Hintergründe mit Symbolen aus Minecraft und beliebten Mods!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# Instanz hat} other {# Instanzen haben}} noch kein Icon. Möchtest du, dass wir {count, plural, one {dieser ein zufälliges Icon} other {diesen zufällige Icons}} zuweisen, um loszulegen?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Zufällige Icons"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Überspringen"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Benutzerdefinierter Icon-Editor"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Schließen"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Personalisiere deine Instanzen!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Ausblenden"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Neuer Icon-Editor"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Update ansehen"
   },
   "app.install.phase.downloading_content": {
     "message": "Inhalte werden heruntergeladen"
@@ -814,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Server entfernen"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Dieser Server wird außerdem aus {count, plural, one {# anderen Instanz} other {# anderen Instanzen}} entfernt, da er synchronisiert wird."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Server entfernen"
@@ -1714,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Synchronisieren"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Wähle eine Synchronisations Quelle"
   },
   "app.settings.synced-options.command-history": {
     "message": "Synchronisiere die Befehls Historie"
@@ -2755,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Aktiviere das überschreiben, um die Synchronisieren Einstellungen separat zu halten von der Instanz."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Reiter"
   },
   "instance.settings.tabs.window": {
     "message": "Eigene Fenster Einstellungen"

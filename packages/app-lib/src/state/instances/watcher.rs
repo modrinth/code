@@ -8,7 +8,11 @@ use crate::state::{
 use crate::worlds::WorldType;
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
-use std::{collections::HashMap, sync::Arc, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+    time::Duration,
+};
 use tokio::sync::{RwLock, mpsc::channel};
 
 use super::adapters::sqlite::instance_rows;
@@ -20,7 +24,7 @@ pub struct FileWatcher {
 
 pub async fn init_watcher() -> crate::Result<FileWatcher> {
     let (tx, mut rx) = channel(1);
-    let instance_ids = Arc::new(RwLock::new(HashMap::new()));
+    let instance_ids = Arc::new(RwLock::new(HashMap::<String, String>::new()));
     let event_instance_ids = instance_ids.clone();
 
     let file_watcher = new_debouncer(
@@ -41,6 +45,8 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                     let instance_ids = event_instance_ids.read().await;
                     let mut visited_instances = Vec::new();
                     let mut visited_screenshot_instances = Vec::new();
+                    let mut synced_option_files =
+                        HashMap::<String, HashSet<String>>::new();
 
                     for e in &events {
                         let mut instance_path = None;
@@ -76,6 +82,24 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                             let is_screenshot_event = first_file_name
                                 .as_ref()
                                 .is_some_and(|name| *name == "screenshots");
+                            if let Some(file_name) = first_file_name
+                                .as_ref()
+                                .and_then(|name| name.to_str())
+                                .filter(|name| {
+                                    matches!(
+                                        *name,
+                                        "command_history.txt"
+                                            | "hotbar.nbt"
+                                            | "options.txt"
+                                            | "servers.dat"
+                                    )
+                                })
+                            {
+                                synced_option_files
+                                    .entry(instance_id.clone())
+                                    .or_default()
+                                    .insert(file_name.to_owned());
+                            }
                             if first_file_name
                                 .as_ref()
                                 .is_some_and(|x| *x == "crash-reports")
@@ -169,18 +193,6 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 },
                                             )
                                         });
-                                    let synced_option_file = first_file_name
-                                        .as_ref()
-                                        .and_then(|name| name.to_str())
-                                        .filter(|name| {
-                                            matches!(
-                                                *name,
-                                                "command_history.txt"
-                                                    | "hotbar.nbt"
-                                                    | "servers.dat"
-                                            )
-                                        })
-                                        .map(ToOwned::to_owned);
                                     tokio::spawn(async move {
                                         if sync_content
                                             && let Ok(state) =
@@ -196,17 +208,10 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 "Failed to sync instance content after filesystem change: {error}"
                                             );
 										}
-                                        if let Some(file_name) = synced_option_file
-											&& let Err(error) =
-												crate::api::instance::reconcile_synced_option_file(
-													&emit_instance_id,
-													&file_name,
-												)
-												.await
+                                        if sync_content
+											&& let Err(error) = crate::api::instance::reconcile_synced_packs(&emit_instance_id).await
 										{
-											tracing::error!(
-												"Failed to reconcile {file_name} after filesystem change: {error}"
-											);
+											tracing::error!("Failed to reconcile synced packs after filesystem change: {error}");
 										}
                                         if reconcile_screenshots
                                             && let Err(error) =
@@ -234,6 +239,24 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 }
                             }
                         }
+                    }
+
+                    for (instance_id, file_names) in synced_option_files {
+                        tokio::spawn(async move {
+                            for file_name in file_names {
+                                if let Err(error) =
+                                    crate::api::instance::reconcile_synced_option_file(
+                                        &instance_id,
+                                        &file_name,
+                                    )
+                                    .await
+                                {
+                                    tracing::error!(
+                                        "Failed to reconcile {file_name} after filesystem change: {error}"
+                                    );
+                                }
+                            }
+                        });
                     }
                 }
                 Err(error) => tracing::warn!("Unable to watch file: {error}"),

@@ -19,7 +19,7 @@ const VERSIONS: VersionEntry[] = [
 - Added a sync source picker when enabling command history, multiplayer servers, or creative hotbars sync.
 
 ## Changed
-- Moved the global Screenshots page toggle from Synced settings into Behavior settings as "Show all screenshots together".
+- Moved the global Screenshots page toggle from Synced settings into Features settings as "Show all screenshots in sidebar".
 - Screenshots tab on instances is now independent of sync settings.
 - Redesigned the slider control used for settings such as memory allocation.
 - Removed the blur censor tool in the screenshot editor. It did not work properly and was not functional as a censor.

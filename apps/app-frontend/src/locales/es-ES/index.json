@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar etiqueta de nombre"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Mostrar los mundos o instancias reproducidos recientemente en la sección \"Comenzar\" de la página de inicio."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Comenzar mundos o instancias"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiza la aplicación Modrinth cuando se inicia Minecraft."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Inicio y contenido"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Ver las screenshots de todas tus instancias en la Página de screenshots."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Mostrar todas las screenshots juntas"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Comienzo y navegación"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Se requiere actualizar Modrinth App"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Error al aplicar iconos aleatorios a las instancias."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Icono aleatorio para {num, plural, one {# instance} other {# instances}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nuevo en esta actualización"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Cerrar"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Crea iconos personalizados para tus instancias directamente en la aplicación Modrinth. ¡Mezclar y emparejar fondos con símbolos de Minecraft y mods populares!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {#Esta instancia no} other {#Estas instancias no}} tienen iconos aún. ¿Quieres que le demos {count, plural, one {¡} other {¡}} ¡unos aleatorios para empezar?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Iconos aleatorios"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Saltar"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Editor de iconos personalizados"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Cerrar"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "¡Personaliza tus instancias!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Descartar"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Editor de iconos nuevos"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Ver la actualización"
   },
   "app.install.phase.downloading_content": {
     "message": "Descargando contenido"
@@ -814,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Eliminar servidor"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Este servidor también será eliminado de {count, plural, one {# otra instancia} other {# otras instancias}} porque está sincronizado."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Eliminar servidor"
@@ -1711,9 +1654,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Sincronizar"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Elige una fuente de sincronización"
   },
   "app.settings.synced-options.command-history": {
     "message": "Sincronizar historial de comandos"
@@ -2752,9 +2692,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Anula la sincronización para mantener la configuración propia de esta instancia."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Pestañas"
   },
   "instance.settings.tabs.window": {
     "message": "Configuración de ventanas personalizadas"

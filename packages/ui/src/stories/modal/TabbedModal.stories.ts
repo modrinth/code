@@ -107,6 +107,39 @@ export const WithTitleSlot: StoryObj = {
 	}),
 }
 
+export const WithContentSlot: StoryObj = {
+	render: () => ({
+		components: { TabbedModal, Button },
+		setup() {
+			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
+			const tabs = [
+				{
+					name: { id: 'general', defaultMessage: 'General' },
+					icon: InfoIcon,
+				},
+				{
+					name: { id: 'appearance', defaultMessage: 'Appearance' },
+					icon: PaintbrushIcon,
+				},
+			]
+			return { modalRef, tabs }
+		},
+		template: /* html */ `
+			<div>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open with Content Slot</Button>
+				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs">
+					<template #content="{ tab, index }">
+						<div class="space-y-4 py-2">
+							<h2 class="m-0 text-xl font-bold text-contrast">{{ tab?.name.defaultMessage }}</h2>
+							<p class="m-0 text-secondary">Content supplied by the parent for tab {{ index + 1 }}.</p>
+						</div>
+					</template>
+				</TabbedModal>
+			</div>
+		`,
+	}),
+}
+
 export const WithFooter: StoryObj = {
 	render: () => ({
 		components: { TabbedModal, Button },

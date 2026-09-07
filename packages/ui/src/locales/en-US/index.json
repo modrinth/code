@@ -365,6 +365,15 @@
   "collections.label.private": {
     "defaultMessage": "Private"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "Collapse"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Expand"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Share"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "content"
   },
@@ -376,6 +385,12 @@
   },
   "content.card.select-project": {
     "defaultMessage": "Select {project}"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "Some synced copies are waiting for changes. An instance may be running, have a frozen or incompatible version, or already contain its own copy."
+  },
+  "content.card.synced": {
+    "defaultMessage": "Synced across instances"
   },
   "content.card.uploaded": {
     "defaultMessage": "Uploaded"
@@ -2390,6 +2405,9 @@
   "instances.content-install.show-unavailable": {
     "defaultMessage": "Show unavailable"
   },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "Disabled"
+  },
   "instances.managed-content-modal.download-file": {
     "defaultMessage": "Download File"
   },
@@ -2398,6 +2416,9 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "No content found"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "Enabled"
   },
   "instances.managed-content-modal.external-content": {
     "defaultMessage": "External"
@@ -2419,6 +2440,9 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "Warnings"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"

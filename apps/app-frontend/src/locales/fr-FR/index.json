@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Cacher le pseudo"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Affiche les mondes récemment joués dans la section \"Lancement rapide\" de la page principale."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Lancement rapide dans les mondes ou les instances"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiser Modrinth App quand Minecraft se lance."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Accueil et contenu"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Voir les captures d'écrans de toutes vos instances sur la page des Captures d'écran."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Montrer toutes les captures d'écran ensemble"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Démarrage et navigation"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Mise à jour de Modrinth App requise"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Impossible d'appliquer des icônes aléatoires aux instances."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Appliqué une icône aléatoire pour {num, plural,one {# instance} other {# instances}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nouveautés de cette mise à jour"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Fermer"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Créez des icônes personnalisées pour vos instances directement dans l'application Modrinth. Mélangez et associez des arrière-plans avec des symboles de Minecraft et des mods populaires !"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {Une instance n'a} other {# instances n'ont}} pas encore d'icône. Vous voulez qu'on {count, plural, one {lui} other {leur}} attribue {count, plural, one {une icône aléatoire} other {des icônes aléatoires}} pour commencer ?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Icônes aléatoires"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Ignorer"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Éditeur d'icônes personnalisées"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Fermer"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Personnalisez vos instances !"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Ignorer"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nouvel éditeur d'icônes"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Voir la mise à jour"
   },
   "app.install.phase.downloading_content": {
     "message": "Téléchargement du contenu"
@@ -814,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Supprimer le serveur"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Ce serveur sera également retiré de {count, plural, one {# autre instance} other {# autres instances}} car il est synchronisé."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Supprimer le serveur"
@@ -1708,9 +1651,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Synchroniser"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Choisissez une source de synchronisation"
   },
   "app.settings.synced-options.command-history": {
     "message": "Synchroniser l'historique des commandes"

@@ -4,7 +4,7 @@ use crate::state::instances::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, Dependency, DependencyType, KnownModrinthFile,
-    ModLoader, ProjectType, State, Version, cache_file_hash,
+    ModLoader, ProjectType, State, Version, cache_file_hash_metadata,
 };
 use crate::util::fetch::{self, DownloadMeta, DownloadReason};
 use crate::util::io;
@@ -30,8 +30,7 @@ pub(crate) struct InstalledContentFile {
 
 pub(crate) struct DownloadedProjectVersion {
     pub file_name: String,
-    pub bytes: Bytes,
-    pub sha1: Option<String>,
+    pub file: fetch::DownloadedFile,
     pub project_type: ProjectType,
     pub project_id: String,
     pub version_id: String,
@@ -203,25 +202,29 @@ pub(crate) async fn install_resolved_content_plan(
     instance_id: &str,
     plan: &ResolveContentPlan,
     state: &State,
-) -> crate::Result<()> {
-    add_resolved_content(
-        instance_id,
-        &plan.primary,
-        DownloadReason::Standalone,
-        state,
-    )
-    .await?;
-    for dependency in &plan.dependencies {
+) -> crate::Result<Vec<String>> {
+    let mut paths = vec![
         add_resolved_content(
             instance_id,
-            dependency,
-            DownloadReason::Dependency,
+            &plan.primary,
+            DownloadReason::Standalone,
             state,
         )
-        .await?;
+        .await?,
+    ];
+    for dependency in &plan.dependencies {
+        paths.push(
+            add_resolved_content(
+                instance_id,
+                dependency,
+                DownloadReason::Dependency,
+                state,
+            )
+            .await?,
+        );
     }
 
-    Ok(())
+    Ok(paths)
 }
 
 pub(crate) async fn switch_project_version_with_dependencies(
@@ -407,13 +410,14 @@ pub(crate) async fn download_project_version(
         loader: content_set.loader.as_str().to_string(),
         dependent_on: dependent_on_version_id,
     };
-    let bytes = fetch::fetch(
+    let downloaded_file = fetch::fetch_file(
         &file.url,
         file.hashes.get("sha1").map(|hash| hash.as_str()),
         Some(&download_meta),
         None,
         &state.fetch_semaphore,
         &state.pool,
+        None,
     )
     .await?;
     let project_type = ProjectType::get_from_loaders(version.loaders.clone())
@@ -427,8 +431,7 @@ pub(crate) async fn download_project_version(
 
     Ok(DownloadedProjectVersion {
         file_name: file.filename.clone(),
-        bytes,
-        sha1: file.hashes.get("sha1").cloned(),
+        file: downloaded_file,
         project_type,
         project_id,
         version_id,
@@ -443,25 +446,38 @@ pub(crate) async fn add_downloaded_project_version(
 ) -> crate::Result<String> {
     let DownloadedProjectVersion {
         file_name,
-        bytes,
-        sha1,
+        file,
         project_type,
         project_id,
         version_id,
     } = downloaded;
-
-    add_project_bytes(
-        instance_id,
+    if !path_util::is_safe_file_name(&file_name) {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Project file {file_name} has an invalid file name"
+        ))
+        .into());
+    }
+    let _content_lock = state.lock_instance_content(instance_id).await;
+    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let relative_path = format!("{}/{}", project_type.get_folder(), file_name);
+    let full_path =
+        instance_full_path(state, &scope.instance).join(&relative_path);
+    file.copy_to(&full_path, &state.io_semaphore).await?;
+    finish_project_install(
+        &scope,
+        &relative_path,
         &file_name,
-        bytes,
-        sha1.as_deref(),
-        Some(project_type),
+        &full_path,
+        file.size,
+        &file.sha1,
+        project_type,
         source_kind,
-        Some(project_id.as_str()),
-        Some(version_id.as_str()),
+        Some(&project_id),
+        Some(&version_id),
         state,
     )
-    .await
+    .await?;
+    Ok(relative_path)
 }
 
 pub(crate) async fn add_project_from_path(
@@ -526,14 +542,44 @@ pub(crate) async fn add_project_bytes(
     };
 
     fetch::write(&full_path, &bytes, &state.io_semaphore).await?;
-    let modified_at_ns =
-        crate::state::file_modified_at_ns(&io::metadata(&full_path).await?)?;
-    cache_file_hash(
-        bytes.clone(),
-        &scope.instance.id,
+    finish_project_install(
+        &scope,
         &relative_path,
+        file_name,
+        &full_path,
+        bytes.len() as u64,
+        &sha1,
+        project_type,
+        source_kind,
+        project_id,
+        version_id,
+        state,
+    )
+    .await?;
+    Ok(relative_path)
+}
+
+async fn finish_project_install(
+    scope: &ContentScope,
+    relative_path: &str,
+    file_name: &str,
+    full_path: &Path,
+    size: u64,
+    sha1: &str,
+    project_type: ProjectType,
+    source_kind: ContentSourceKind,
+    project_id: Option<&str>,
+    version_id: Option<&str>,
+    state: &State,
+) -> crate::Result<()> {
+    let modified_at_ns =
+        crate::state::file_modified_at_ns(&io::metadata(full_path).await?)?;
+    cache_file_hash_metadata(
+        &scope.instance.id,
+        relative_path,
+        size,
         modified_at_ns,
-        Some(&sha1),
+        sha1.to_string(),
         Some(project_type),
         project_id.zip(version_id).map(|(project_id, version_id)| {
             KnownModrinthFile {
@@ -549,18 +595,18 @@ pub(crate) async fn add_project_bytes(
     let file = content_rows::upsert_instance_file_from_parts(
         content_rows::UpsertInstanceFile {
             instance_id: &scope.instance.id,
-            relative_path: &relative_path,
+            relative_path,
             file_name,
             enabled: !relative_path.ends_with(".disabled"),
-            sha1: &sha1,
-            size: bytes.len() as u64,
+            sha1,
+            size,
             missing: false,
         },
         &mut tx,
     )
     .await?;
     upsert_entry_for_file(
-        &scope,
+        scope,
         &file,
         project_type,
         project_id,
@@ -570,9 +616,9 @@ pub(crate) async fn add_project_bytes(
     )
     .await?;
     tx.commit().await?;
-    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
+    super::mark_shared_instance_stale(&scope.instance.id, &state.pool).await?;
 
-    Ok(relative_path)
+    Ok(())
 }
 
 pub(crate) async fn record_project_file(

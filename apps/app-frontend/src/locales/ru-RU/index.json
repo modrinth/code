@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Без имени над скином"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Показывать недавно сыгранные миры и сборки на главной."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Недавние миры и сборки"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Сворачивать Modrinth App при запуске Minecraft."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Главная и контент"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Просматривайте скриншоты всех сборок во вкладке Скриншоты."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Показывать все скриншоты вместе"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Запуск и навигация"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Обновите Modrinth App"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Не удалось обновить иконки сборок."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "{num, plural, =1 {Сгенерирована иконка} other {Сгенерированы иконки}} для {num, plural, one {# сборки} other {# сборок}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Новинка"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Закрыть"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Создавайте свои иконки для сборок прямо в Modrinth App. Сочетайте фоны со значками из Minecraft и популярных модов!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "У {count, plural, one {# сборки} other {# сборок}} нет {count, plural, =1 {иконки} other {иконок}}. Сгенерировать {count, plural, =1 {случайную} other {случайные}}?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Сгенерировать"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Не надо"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Редактор иконок"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Закрыть"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Украсьте свои сборки!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Закрыть"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Новый редактор иконок"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Подробнее"
   },
   "app.install.phase.downloading_content": {
     "message": "Скачивание контента"
@@ -799,9 +745,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Удалить сервер"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Этот сервер также будет удалён из {count, plural, one {# сборки} other {# сборок}}, потому что он синхронизирован."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Удаление сервера"
@@ -1690,9 +1633,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Синхронизировать"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Выбор источника синхронизации"
   },
   "app.settings.synced-options.command-history": {
     "message": "Синхронизация истории команд"
@@ -2728,9 +2668,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Включить принудительное разделение, чтобы хранить синхронизированные настройки отдельно для этой сборки."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Вкладки"
   },
   "instance.settings.tabs.window": {
     "message": "Переопределение настроек окна"

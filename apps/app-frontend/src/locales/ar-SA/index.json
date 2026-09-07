@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "إخفاء الاسم"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "عرض العوالم أو النسخ التي لعبتها مؤخرًا في قسم \"ابدأ اللعب\" بالصفحة الرئيسية."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "الدخول إلى العوالم أو النسخ"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "تصغير تطبيق Modrinth عند تشغيل Minecraft."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "الصفحة الرئيسية والمحتوى"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "عرض لقطات الشاشة من جميع نسخ التثبيت لديك على صفحة لقطات الشاشة."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "عرض جميع لقطات الشاشة معا"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "بدء التشغيل والتنقل"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "يلزم تحديث تطبيق Modrinth"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "تعذّر تطبيق أيقونات عشوائية على النسخ."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "تم تعيين أيقونة عشوائية لـ {num, plural, one {نسخة واحدة} two {نسختين} few {# نسخ} many {# نسخة} other {# نسخة}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "جديد في هذا التحديث"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "إغلاق"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "أنشئ أيقونات مخصصة لنسخك مباشرةً في Modrinth App. امزج بين الخلفيات والرموز من Minecraft والمودات الشائعة!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# نسخة لا تحتوي} two {# نسختان لا تحتويان} few {# نسخ لا تحتوي} many {# نسخة لا تحتوي} other {# نسخة لا تحتوي}} على أيقونات بعد. هل تريد منا تعيين أيقونات عشوائية لـ{count, plural, one {نسخة واحدة} two {نسختين} few {# نسخ} many {# نسخة} other {# نسخة}} للبدء؟"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "أيقونات عشوائية"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "تخطي"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "محرر الأيقونات المخصصة"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "إغلاق"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "خصّص نسخك!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "تجاهل"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "محرر الأيقونات الجديد"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "عرض التحديث"
   },
   "app.install.phase.downloading_content": {
     "message": "جارٍ تنزيل المحتوى"
@@ -811,9 +757,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "إزالة الخادم"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "سيتم أيضاً إزالة هذا الخادم من {count, plural, zero {نسخة أخرى} one {نسخة أخرى} two {نسختان آخرين} few {# نسخ أخرى} many {# نسخة آخر} other {# نسخ آخر}} لأنه متزامن."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "إزالة الخادم"
@@ -1711,9 +1654,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "مزامنة"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "اختر مصدر المزامنة"
   },
   "app.settings.synced-options.command-history": {
     "message": "مزامنة سجل الأوامر"
@@ -2752,9 +2692,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "تمكين تجاوز للحفاظ على إعدادات متزامنة منفصلة لهذه النسخة."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "علامات تبويب"
   },
   "instance.settings.tabs.window": {
     "message": "إعدادات نافذة مخصصة"

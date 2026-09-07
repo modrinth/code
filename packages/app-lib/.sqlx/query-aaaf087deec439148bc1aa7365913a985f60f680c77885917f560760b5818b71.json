@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\tINSERT INTO synced_game_option_preferences\n\t\t\t\t(option_id, enabled, source, revision)\n\t\t\tVALUES (?, 1, 'discovery_default', ?)\n\t\t\tON CONFLICT(option_id) DO NOTHING\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "aaaf087deec439148bc1aa7365913a985f60f680c77885917f560760b5818b71"
+}

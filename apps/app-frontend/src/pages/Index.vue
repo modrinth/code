@@ -3,9 +3,11 @@ import { PlayIcon, PlusIcon } from '@modrinth/assets'
 import { ContextMenu, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
-import { computed, inject, onActivated, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 
 import LibrarySection from '@/components/ui/library/index.vue'
+import { libraryScrollTop } from '@/components/ui/library/view-state'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -23,6 +25,9 @@ const { hasCreatedInstance, isReady } = injectOnboardingChecklist()
 const showCreationModal = inject<() => void>('showCreationModal')
 const pageOptions = ref<InstanceType<typeof ContextMenu>>()
 const appSettings = useAppSettings()
+onBeforeRouteLeave(() => {
+	libraryScrollTop.value = document.querySelector('.app-viewport')?.scrollTop ?? 0
+})
 
 const messages = defineMessages({
 	home: {
@@ -39,14 +44,13 @@ const messages = defineMessages({
 	},
 })
 
-const homeBreadcrumb = useRootBreadcrumb({
+useRootBreadcrumb({
 	slot: 'root',
 	id: 'home',
 	label: formatMessage(messages.home),
 	to: '/',
 	visual: { type: 'icon', component: PlayIcon },
 })
-onActivated(homeBreadcrumb.reset)
 
 const instancesQuery = useQuery(instanceListQueryOptions())
 const instances = computed(() => instancesQuery.data.value ?? [])

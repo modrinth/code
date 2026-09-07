@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Приховати ім'я"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Показувати нещодавно зіграні світи або примірники в розділі «Швидкий перехід» на головній сторінці."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Швидкий перехід до світів або примірників"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Згортати Modrinth App під час запуску Minecraft."
   },
@@ -334,48 +328,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Потрібне оновлення Modrinth App"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Не вдалося застосувати випадкові значки до примірників."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Застосовано випадкові значки для {num, plural, one {# примірника} other {# примірників}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Нове оновлення"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Закрити"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Створюйте власні значки для примірників прямо в Modrinth App. Поєднуйте тло різних кольорів із піктограмами з Minecraft і популярних модів!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# ваш примірник не має значка} few {# ваші примірники не мають значка} other {# ваших примірників не мають значка}}. Хочете застосувати для {count, plural, one {нього} other {них}} випадкові значки?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Випадкові значки"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Пропустити"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Редактор значків"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Закрити"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Персоналізуйте свої примірники!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Відхилити"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Новий редактор значків"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Переглянути оновлення"
   },
   "app.install.phase.downloading_content": {
     "message": "Завантаження вмісту"

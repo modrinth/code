@@ -17,6 +17,12 @@ pub use self::instance_types::*;
 
 pub(crate) mod instances;
 pub use self::instances::*;
+pub(crate) use self::instances::{StoredOption, StoredPreference};
+pub(crate) use self::instances::{
+    game_options_sync_is_enabled, load_game_option_preferences,
+    load_game_options_sync_state, load_shared_game_options,
+    shared_game_options_exist,
+};
 
 mod settings;
 pub use self::settings::*;
@@ -220,7 +226,7 @@ impl State {
         Ok(())
     }
 
-    /// Get the current launcher state, waiting for initialization
+    /// Get the current launcher state, waiting for initialization.
     pub async fn get() -> crate::Result<Arc<Self>> {
         if !LAUNCHER_STATE.initialized() {
             tracing::error!(

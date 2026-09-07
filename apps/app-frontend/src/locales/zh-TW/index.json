@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "隱藏名牌"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "在首頁的「繼續遊玩」區塊中顯示最近遊玩的世界或實例。"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "繼續遊玩世界或實例"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "當 Minecraft 啟動時將 Modrinth App 最小化。"
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "首頁與內容"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "在「螢幕擷取畫面」頁面查看所有實例的擷圖。"
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "集中顯示所有擷圖"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "啟動與瀏覽"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "需要更新 Modrinth App"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "無法將隨機圖示套用到實例。"
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "已隨機產生 {num, plural, other {# 個實例}}的圖示。"
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "更新內容"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "關閉"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "直接在 Modrinth App 中為你的實例建立自訂圖示。自由搭配 Minecraft 及熱門模組中的圖案與背景！"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "你有 {count, plural, other {# 個實例}}還沒有圖示。要我們先幫你的{count, plural, other {實例}}隨機產生圖示嗎？"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "隨機產生圖示"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "跳過"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "自訂圖示編輯器"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "關閉"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "讓你的實例更具個人風格！"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "忽略"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "新的圖示編輯器"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "查看更新"
   },
   "app.install.phase.downloading_content": {
     "message": "正在下載內容"
@@ -814,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "移除伺服器"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "由於這個伺服器已同步，因此也將從{count, plural, other {另外 # 個實例}}中移除。"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "移除伺服器"
@@ -1714,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "同步"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "選擇同步來源"
   },
   "app.settings.synced-options.command-history": {
     "message": "同步指令紀錄"
@@ -2755,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "在這個實例使用不同於同步設定的設定。"
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "頁籤"
   },
   "instance.settings.tabs.window": {
     "message": "自訂視窗設定"

@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "הסתר שם משתמש"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "הצג עולמות או התקנות ששוחקו לאחרונה במתחם ה\"קפוץ פנימה\" בדף הבית."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "קפוץ לעולמות או אקסמפלרים"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "מזער את אפליקציית Modrinth בעת הפעלת Minecraft."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "בית ותוכן"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "הצג צילומי מסך מכל האקסמפלרים שלך בדף צילומי המסך."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "הצג את כל צילומי המסך יחד"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "הפעלה וניווט"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "אפליקציית ה- Modrinth דורשת עדכון"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "נכשל החלת אייקונים אקראיים על אקסמפלרים."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "אייקון אקראי עבור {num, plural, one {אקסמפלר #} other {# אקסמפלרים}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "חדש בעדכון זה"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "סגור"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "צור סמלים אישיים להתקנות שלך ישר בתוך אפליקציית ה Modrinth. בחר בין רקעים וסימנים מ Minecraft ומודים פופולריים!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "ל-{count, plural, one {לאקסמפלר # אחד} other {# אקסמפלרים}} עדיין אין אייקון. תרצה שניתן {count, plural, one {לו} other {להם}} אייקון אקראי כדי להתחיל?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "סמל אקראי"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "דלג"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "עורך אייקון מותאם אישית"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "סגור"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "התאם אישית את האקסמפלרים שלך!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "התעלם"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "עורך סמלים חדש"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "הצג עדכון"
   },
   "app.install.phase.downloading_content": {
     "message": "מוריד תוכן"
@@ -814,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "הסר שרת"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "השרת הזה יוסר גם מ־{count, plural, one {# התקנה אחרת} other {# התקנות אחרות}} מכיוון שהוא מסונכרן."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "הסר שרת"
