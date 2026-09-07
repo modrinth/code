@@ -58,8 +58,8 @@
 					</div>
 				</div>
 			</div>
-			<div class="button-row">
-				<Button size="xl" class="wide-button" :disabled="pending" @click="onReject">
+			<div class="flex gap-1">
+				<Button size="xl" class="flex-1" :disabled="pending" @click="onReject">
 					<XIcon />
 					{{ formatMessage(messages.decline) }}
 				</Button>
@@ -67,7 +67,7 @@
 					type="colored"
 					color="brand"
 					size="xl"
-					class="wide-button"
+					class="flex-1"
 					:disabled="pending"
 					@click="onAuthorize"
 				>
@@ -326,14 +326,3 @@ definePageMeta({
 	middleware: 'auth',
 })
 </script>
-
-<style>
-.button-row {
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	gap: var(--gap-md);
-}
-</style>
