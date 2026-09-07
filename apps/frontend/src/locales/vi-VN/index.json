@@ -794,9 +794,6 @@
   "auth.reset-password.title.long": {
     "message": "Đặt lại mật khẩu của bạn"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Nhập mã..."
-  },
   "auth.sign-in.title": {
     "message": "Đăng nhập"
   },
@@ -3781,9 +3778,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Nhập mã xác thực hai yếu tố"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Nhập mã..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Xác thực hai yếu tố giúp bảo mật tài khoản của bạn bằng cách yêu cầu quyền truy cập vào thiết bị thứ hai để đăng nhập."

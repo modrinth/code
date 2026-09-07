@@ -665,9 +665,6 @@
   "auth.reset-password.title.long": {
     "message": "Resetuj svoju lozinku"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Unesi kod..."
-  },
   "auth.sign-in.title": {
     "message": "Prijavi se"
   },

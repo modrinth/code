@@ -857,9 +857,6 @@
   "auth.sign-in.2fa.label": {
     "message": "双因素验证"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "输入验证码……"
-  },
   "auth.sign-in.continue-with-email": {
     "message": "使用邮箱继续"
   },
@@ -4930,9 +4927,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "输入双因素验证码"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "输入验证码……"
   },
   "settings.account.two-factor.setup.intro": {
     "message": "双因素验证需要访问另一部设备才能登录，从而保护你的账户安全。"

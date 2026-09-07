@@ -1,8 +1,8 @@
 import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
 import { nextTick } from 'vue'
 
-import { useAuthCookie } from '@/composables/auth-cookie.ts'
 import { useAuthState } from '@/composables/auth.ts'
+import { useAuthCookie } from '@/composables/auth-cookie.ts'
 import type { CookieOptions } from '#app'
 import { useTheme } from '~/composables/nuxt-accessors.ts'
 import { getThemeType } from '~/plugins/theme/themes.ts'

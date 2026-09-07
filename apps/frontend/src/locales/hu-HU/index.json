@@ -839,9 +839,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Kétlépcsős bejelentkezés"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Kód beírása..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Folytatás e-maillel"
   },
@@ -4459,9 +4456,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Írd be a kétlépcsős hitelesítés kódját"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Írd ide a kódot..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "A kétlépcsős hitelesítés biztosítja fiókod biztonságát azzal, hogy a bejelentkezéshez egy második eszköz használatát is megköveteli."

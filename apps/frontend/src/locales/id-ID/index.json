@@ -470,9 +470,6 @@
   "auth.reset-password.title.long": {
     "message": "Atur ulang kata sandi Anda"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Masukkan kode..."
-  },
   "auth.sign-in.title": {
     "message": "Masuk"
   },

@@ -2,7 +2,7 @@
 	<div
 		:class="[wrapperClass, attrs.class]"
 		:style="attrs.style"
-		class="flex w-full max-w-[18.375rem] min-w-0 flex-col gap-3"
+		class="flex w-full min-w-0 max-w-[18.375rem] flex-col gap-3"
 	>
 		<Input
 			v-if="backupCode"
@@ -40,15 +40,14 @@
 				>
 					<span
 						:class="{
-							'bg-brand-highlight': focused && isSelected(index - 1) && selectionEnd > selectionStart,
+							'bg-brand-highlight':
+								focused && isSelected(index - 1) && selectionEnd > selectionStart,
 						}"
 					>
 						{{ model[index - 1] }}
 					</span>
 					<span
-						v-if="
-							focused && !readonly && selectionStart === selectionEnd && isSelected(index - 1)
-						"
+						v-if="focused && !readonly && selectionStart === selectionEnd && isSelected(index - 1)"
 						class="absolute h-5 w-px bg-current"
 					/>
 				</InputFrame>
@@ -267,14 +266,11 @@ onMounted(() => {
 	if (props.autofocus) focus()
 })
 
-watch(
-	model,
-	(value) => {
-		if (props.disabled || props.readonly) return
-		const complete = backupCode.value ? /^[A-Za-z0-9]{11}$/.test(value) : /^\d{6}$/.test(value)
-		if (complete) emit('complete', value)
-	},
-)
+watch(model, (value) => {
+	if (props.disabled || props.readonly) return
+	const complete = backupCode.value ? /^[A-Za-z0-9]{11}$/.test(value) : /^\d{6}$/.test(value)
+	if (complete) emit('complete', value)
+})
 
 watch(
 	() => props.allowBackupCode,

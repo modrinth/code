@@ -857,9 +857,6 @@
   "auth.sign-in.2fa.label": {
     "message": "雙重驗證"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "輸入驗證碼..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "使用電子郵件繼續"
   },
@@ -4930,9 +4927,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "輸入雙重驗證碼"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "輸入驗證碼..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "雙重驗證要求必須使用第二部裝置才能登入，藉此確保你的帳號安全性。"

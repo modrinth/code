@@ -854,9 +854,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Двофакторна автентифікація"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Уведіть код…"
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Продовжити з електронною поштою"
   },
@@ -4924,9 +4921,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Укажіть код двофакторної автентифікації"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Укажіть код…"
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Двофакторна автентифікація забезпечує безпеку вашого облікового запису, вимагаючи для входу доступ до другого пристрою."

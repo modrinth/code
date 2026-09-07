@@ -245,9 +245,6 @@
   "auth.reset-password.title.long": {
     "message": "Resetează-ți parola"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Introdu codul..."
-  },
   "auth.sign-in.title": {
     "message": "Conectare"
   },

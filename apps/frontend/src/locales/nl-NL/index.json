@@ -857,9 +857,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Tweefactorauthenticatie"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Voer code in..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Doorgaan met e-mail"
   },
@@ -4789,9 +4786,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Voer de twee factor authenticatie code in"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Voer de code in..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "2FA authenticatie zorgt ervoor dat je account veilig blijft, omdat je een tweede apparaat nodig hebt om in te loggen."

@@ -857,9 +857,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Autenticación de dos factores"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Introduce el código..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar con el correo electrónico"
   },
@@ -4933,9 +4930,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Introduce el código de verificación en dos pasos"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Introduce el código..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "La verificación en dos pasos mantiene tu cuenta segura al requerir acceso a un segundo dispositivo para iniciar sesión."

@@ -269,9 +269,6 @@
   "auth.reset-password.title.long": {
     "message": "Palauta salasanasi"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Anna koodi..."
-  },
   "auth.sign-in.title": {
     "message": "Kirjaudu sisään"
   },

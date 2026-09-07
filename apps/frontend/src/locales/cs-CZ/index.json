@@ -755,9 +755,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Dvoufázové ověření"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Zadejte kód..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Pokračovat s Emailem"
   },
@@ -2746,9 +2743,6 @@
   },
   "settings.account.password.modal.header.add": {
     "message": "Přidat heslo"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Zadejte kód..."
   },
   "settings.account.two-factor.verify.label": {
     "message": "Ověřit kód"

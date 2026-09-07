@@ -791,9 +791,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Tvåfaktorsautentisering"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Ange kod..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Fortsätt med e-post"
   },
@@ -4198,9 +4195,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Ange tvåfaktorskod"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Ange kod..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Tvåfaktorsautentisering håller ditt konto säkert genom att behöva åtkomst till en enhet till för att kunna logga in."

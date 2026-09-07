@@ -500,7 +500,6 @@
 </template>
 
 <script setup>
-import { nextTick, watch } from 'vue'
 import {
 	CheckIcon,
 	DownloadIcon,
@@ -537,6 +536,7 @@ import GoogleIcon from 'assets/icons/auth/sso-google.svg'
 import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
 import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
+import { nextTick, watch } from 'vue'
 
 import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
 import TwoFactorAuthCodeInput from '~/components/ui/auth/TwoFactorAuthCodeInput.vue'

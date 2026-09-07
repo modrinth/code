@@ -857,9 +857,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Zwei-Faktor-Authentifizierung"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Code eingeben..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Weiter mit E-Mail"
   },
@@ -4933,9 +4930,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Zwei-Faktor-Code eingeben"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Code eingeben..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Die Zwei-Faktor-Authentifizierung schützt dein Konto, indem sie für die Anmeldung den Zugriff auf ein zweites Gerät erfordert."

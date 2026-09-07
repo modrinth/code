@@ -854,9 +854,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Weryfikacja dwuetapowa"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Wprowadź kod..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Kontynuuj przez e-mail"
   },
@@ -4723,9 +4720,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Wprowadź otrzymany kod"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Wprowadź kod..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Weryfikacja dwu etapowa, ma na celu chronić twoje konto wymagając drugie urządzenie, aby się zalogować."

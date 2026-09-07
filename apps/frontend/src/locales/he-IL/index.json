@@ -308,9 +308,6 @@
   "auth.reset-password.title.long": {
     "message": "הפס סיסמתכם"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "כתבו קוד..."
-  },
   "auth.sign-in.title": {
     "message": "הכנס"
   },
