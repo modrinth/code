@@ -165,7 +165,7 @@
     "message": "Показан топ‑{count} {itemType, select,\n  project {проектов}\n  country {стран}\n  monetization {типов монетизации}\n  downloadSource {источников скачивания}\n  downloadReason {причин скачивания}\n  member {участников}\n  projectVersion {версий проекта}\n  loader {загрузчиков}\n  gameVersion {версий игры}\n  other {элементов}\n} из таблицы"
   },
   "analytics.chart.tooltip.dependent-on-project": {
-    "message": "Зависит от {project}"
+    "message": "Зависит от {project}"
   },
   "analytics.chart.tooltip.dependent-project-version": {
     "message": "{dependentProject} зависит от {dependencyProject}, версия {version}"
@@ -776,6 +776,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Дата рождения"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "Вы не соответствуете возрастным ограничениям для создания аккаунта на Modrinth."
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Введите дату рождения"
   },
@@ -786,7 +789,7 @@
     "message": "Необходима дата рождения"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Вы не подходите по возрастным требованиям для создания аккаунта на Modrinth."
+    "message": "Вы не можете создать аккаунт на Modrinth, если вы младше 13 лет."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Исходный код"
@@ -810,7 +813,31 @@
     "message": "Имя пользователя"
   },
   "auth.create-account.username.placeholder": {
-    "message": "Введите никнейм"
+    "message": "Введите имя пользователя"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Введите 6‑значный код из аутентификатора или используйте резервный код."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Подтверждение входа"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Использовать ключ доступа"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "Способ последнего входа: {method, select, password {пароль} passkey {ключ доступа} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Повторный вход"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Войти другим способом"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Войти через {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} нуждается в повторном входе."
   },
   "auth.reset-password.method-choice.action": {
     "message": "Отправить письмо"
@@ -851,6 +878,12 @@
   "auth.sign-in.2fa.label": {
     "message": "Подтверждение входа"
   },
+  "auth.sign-in.add-account": {
+    "message": "Добавить аккаунт"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Выбор аккаунта в Modrinth App"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Войти по паролю"
   },
@@ -865,6 +898,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Последнее"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Вы вернётесь в Modrinth App. Если ничего не произойдёт, нажмите кнопку ниже."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Перейти на Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Открыть Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Вход выполнен"
   },
   "auth.sign-in.no-account": {
     "message": "Нет аккаунта?"
@@ -1016,6 +1061,9 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Одобрить с ответом"
   },
+  "conversation-thread.action.close-report": {
+    "message": "Закрыть жалобу"
+  },
   "conversation-thread.action.close-with-reply": {
     "message": "Закрыть с ответом"
   },
@@ -1149,7 +1197,7 @@
     "message": "Загрузите основные и вспомогательные файлы"
   },
   "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
-    "message": "Перетащите или выберите файлы"
+    "message": "Перетащите файлы или нажмите для обзора"
   },
   "create-project-version.create-modal.stage.details.details-tab": {
     "message": "Сведения"
@@ -1704,7 +1752,7 @@
     "message": "Нет близких по сумме номиналов"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
-    "message": "Рядом с вашим числом нет наименований. Самая высокая и доступная это {max}"
+    "message": "Нет близких к сумме номиналов. Доступный максимум — {max}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Способ вывода"
@@ -1854,7 +1902,7 @@
     "message": "Указанные ниже ссылки будут перезаписаны во всех выбранных проектах. Пустые поля будут проигнорированы. Вы можете удалить ссылку из всех выбранных проектов с помощью значка корзины."
   },
   "dashboard.projects.links.discord-invite.description": {
-    "message": "Ссылка-приглашение на ваш Discord сервер."
+    "message": "Ссылка приглашение на ваш Discord сервер."
   },
   "dashboard.projects.links.discord-invite.label": {
     "message": "Discord"
@@ -2118,7 +2166,7 @@
     "message": "Сумма слишком мала"
   },
   "dashboard.withdraw.error.payout-method-disabled.text": {
-    "message": "Этот способ вывода отключён платёжным сервисом. Выберите другой вывода или свяжитесь с поддержкой."
+    "message": "Этот способ вывода отключён платёжным сервисом. Выберите другой способ вывода или свяжитесь с поддержкой."
   },
   "dashboard.withdraw.error.payout-method-disabled.title": {
     "message": "Способ вывода недоступен"
@@ -2179,6 +2227,12 @@
   },
   "error.generic.401.signed-in-as": {
     "message": "Текущий аккаунт:"
+  },
+  "error.generic.401.switch-account": {
+    "message": "Или смените аккаунт:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Не удалось сменить аккаунт. Повторите попытку."
   },
   "error.generic.401.title": {
     "message": "У вас нет доступа к этой странице"
@@ -2292,7 +2346,7 @@
     "message": "Какие процессоры используются на серверах Modrinth Hosting?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Серверы Modrinth Hosting оснащены процессорами уровня AMD Ryzen 7900 и 7950X3D с частотой более 5 ГГц и памятью DDR5."
+    "message": "Серверы Modrinth Hosting оснащены процессорами уровня AMD Ryzen 7950X или 9950X и памятью DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "В какой валюте указаны цены?"
@@ -2652,7 +2706,7 @@
     "message": "Новый проект"
   },
   "layout.action.new-server-project": {
-    "message": "Новый сервер"
+    "message": "Новый серверный проект"
   },
   "layout.action.publish": {
     "message": "Опубликовать"
@@ -2665,6 +2719,9 @@
   },
   "layout.action.tech-review": {
     "message": "Техпроверка"
+  },
+  "layout.action.user-lookup": {
+    "message": "Поиск пользователя"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -2861,6 +2918,9 @@
   "layout.nav.active-reports": {
     "message": "Активные жалобы"
   },
+  "layout.nav.add-account": {
+    "message": "Добавить аккаунт"
+  },
   "layout.nav.discover": {
     "message": "Найти"
   },
@@ -2891,6 +2951,9 @@
   "layout.nav.projects": {
     "message": "Проекты"
   },
+  "layout.nav.remove-account": {
+    "message": "Удалить аккаунт"
+  },
   "layout.nav.revenue": {
     "message": "Доход"
   },
@@ -2899,6 +2962,12 @@
   },
   "layout.nav.search": {
     "message": "Поиск"
+  },
+  "layout.nav.switch-account": {
+    "message": "Сменить аккаунт"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Не удалось сменить аккаунт. Повторите попытку."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Перейти на Modrinth+"
@@ -2938,6 +3007,9 @@
   },
   "moderation.moderate": {
     "message": "Модерировать"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Правила Delphi"
   },
   "moderation.page.external-projects": {
     "message": "Сторонние проекты"
@@ -3337,6 +3409,9 @@
   },
   "project-member-header.success-join": {
     "message": "Вы присоединились к команде проекта"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Проект отправлен на проверку!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольный список для публикации"
@@ -3755,6 +3830,12 @@
   "project.notification.icon-updated.title": {
     "message": "Иконка обновлена"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "Невозможно сохранить изменения, приводящие к ошибке проверки."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Не удалось сохранить проект"
+  },
   "project.notification.updated.message": {
     "message": "Ваш проект обновлён."
   },
@@ -3813,7 +3894,7 @@
     "message": "Например: The Chinese and Arabic translations are AI-generated."
   },
   "project.settings.disclosures.ai.title": {
-    "message": "Есть контент, созданный ИИ"
+    "message": "Есть ИИ‑контент"
   },
   "project.settings.disclosures.ai.types-description": {
     "message": "Что было сгенерировано ИИ?"
@@ -3954,7 +4035,7 @@
     "message": "Загрузите версии перед настройкой маркировки"
   },
   "project.settings.editing-project": {
-    "message": "Настройка проекта"
+    "message": "Редактирование проекта {projectType}"
   },
   "project.settings.general.name.description": {
     "message": "Не используйте лишние приписки, скобки и описания — введите только название проекта."
@@ -4000,6 +4081,12 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Ссылка на {platform} повторяется."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Выберите платформу для этой ссылки."
   },
   "project.settings.monetization.description": {
     "message": "Проекты на Modrinth автоматически зачисляются в <rewards-program-link>программу наград</rewards-program-link>. Если вы не хотите (или не можете по юридическим причинам) получать доход от этого проекта, вы можете отключить его здесь."
@@ -4148,9 +4235,6 @@
   "project.settings.server.srv-records-tooltip": {
     "message": "Адрес который вы сюда вводите,может иметь DNS записей SRV _minecraft._tcp.(ваш домен), которые указывают на ваш адрес и порт сервера Майнкрафта."
   },
-  "project.settings.tags.all-tags-selected-warning": {
-    "message": "Вы выбрали все {count} доступных тегов. Пожалуйста, выберите теги, которые применяются к вашему проекту."
-  },
   "project.settings.tags.categories-description": {
     "message": "Выберите все категории, которые отражают темы или функции вашего {type}"
   },
@@ -4192,6 +4276,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Загрузите версии перед добавлением тегов"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Предложения:"
   },
   "project.versions.copy-id-option": {
     "message": "Копировать ID"
@@ -5152,6 +5239,9 @@
   },
   "settings.billing.plan.title": {
     "message": "{size} план"
+  },
+  "settings.billing.price.includes-tax": {
+    "message": "Налог: {amount}"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} в {interval}"

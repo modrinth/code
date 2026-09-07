@@ -1316,9 +1316,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Jenis CPU apa yang digunakan oleh server Modrinth Hosting untuk berjalan?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Server Modrinth Hosting didukung oleh CPU AMD Ryzen 7900 dan CPU setara 7950X3D berkecepatan 5+ GHz, dipasangkan dengan memori DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Dalam mata uang apa harga-harga tersebut?"
   },
@@ -1648,9 +1645,6 @@
   },
   "layout.action.new-project": {
     "message": "Proyek baru"
-  },
-  "layout.action.new-server-project": {
-    "message": "Server baru"
   },
   "layout.action.publish": {
     "message": "Terbitkan"

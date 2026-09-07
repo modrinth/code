@@ -782,6 +782,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Geboortedatum"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "Je bent niet oud genoeg om een account aan te maken bij Morinth"
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Kies je geboortedatum"
   },
@@ -792,7 +795,7 @@
     "message": "Geboortedatum verplicht"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Je voldoet niet aan de leeftijdsvereiste om een account aan te maken bij Modrinth."
+    "message": "Je kan alleen een account aanmaken bij Morinth"
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Relevante broncode"
@@ -817,6 +820,30 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "Voer je gebruikersnaam in"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Voer de 6-cijferige code uit je authenticator-app in, of een van je reservecodes."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Tweefactorauthenticatie"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Ga verder met toegangscode"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "De laatste keer dat er werd ingelogd, gebeurde dat met {method, select, password {een wachtwoord} passkey {een toegangscode} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Opnieuw authenticeren"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Op een andere manier inloggen"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Inloggen met {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} moet opnieuw worden geauthenticeerd."
   },
   "auth.reset-password.method-choice.action": {
     "message": "Herstel email verzenden"
@@ -857,6 +884,12 @@
   "auth.sign-in.2fa.label": {
     "message": "Tweefactorauthenticatie"
   },
+  "auth.sign-in.add-account": {
+    "message": "Account toevoegen"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Kies een account om in de Modrinth-app te gebruiken"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Doorgaan met e-mail"
   },
@@ -871,6 +904,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Laatst gebruikt"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "We sturen je terug naar de Modrinth-app. Als er niets gebeurt, klik dan op de onderstaande knop."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Ga naar Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Modrinth-app openen"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Je bent aangemeld"
   },
   "auth.sign-in.no-account": {
     "message": "Heb je nog geen account?"
@@ -1018,6 +1063,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Accepteren met antwoord"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Rapport afsluiten"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Sluit met antwoord"
@@ -2183,6 +2231,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Je bent momenteel aangemeld als:"
   },
+  "error.generic.401.switch-account": {
+    "message": "Of switch naar een ander account"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Kon niet van account veranderen, probeer later opnieuw"
+  },
   "error.generic.401.title": {
     "message": "Je hebt geen toegang tot deze pagina"
   },
@@ -2295,7 +2349,7 @@
     "message": "Op wat voor CPU's draaien de servers van Modrinth Hosting?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "De servers van Modrinth Hosting draaien op AMD Ryzen 7900 en 7950X3D-equivalent CPU's met een kloksnelheid van 5 GHz of hoger, in combinatie met DDR5-geheugen."
+    "message": "De servers van Modrinth Hosting worden aangedreven door op AMD Ryzen 7950X of 9950X in combinatie met DDR5-geheugen."
   },
   "hosting-marketing.faq.currency": {
     "message": "In welke valuta zijn de prijzen?"
@@ -2655,7 +2709,7 @@
     "message": "Nieuw project"
   },
   "layout.action.new-server-project": {
-    "message": "Nieuwe server"
+    "message": "Nieuw server project"
   },
   "layout.action.publish": {
     "message": "Publiceer"
@@ -2668,6 +2722,9 @@
   },
   "layout.action.tech-review": {
     "message": "Technologie beoordeling"
+  },
+  "layout.action.user-lookup": {
+    "message": "Gebruiker zoeken"
   },
   "layout.avatar.alt": {
     "message": "Jouw avatar"
@@ -2864,6 +2921,9 @@
   "layout.nav.active-reports": {
     "message": "Actieve meldingen"
   },
+  "layout.nav.add-account": {
+    "message": "Account toevoegen"
+  },
   "layout.nav.discover": {
     "message": "Ontdek"
   },
@@ -2894,6 +2954,9 @@
   "layout.nav.projects": {
     "message": "Projecten"
   },
+  "layout.nav.remove-account": {
+    "message": "Account verwijderen"
+  },
   "layout.nav.revenue": {
     "message": "Inkomsten"
   },
@@ -2902,6 +2965,12 @@
   },
   "layout.nav.search": {
     "message": "Zoeken"
+  },
+  "layout.nav.switch-account": {
+    "message": "Van account wisselen"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Kon niet van account wisselen. Probeer het nog eens."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade naar Modrinth+"
@@ -2941,6 +3010,9 @@
   },
   "moderation.moderate": {
     "message": "Modereer"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Delphi regels"
   },
   "moderation.page.external-projects": {
     "message": "Externe projecten"
@@ -3343,6 +3415,9 @@
   },
   "project-member-header.success-join": {
     "message": "Je doet mee met het project team"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Je project is ingediend ter beoordeling!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Controlelijst publiceren"
@@ -3761,6 +3836,12 @@
   "project.notification.icon-updated.title": {
     "message": "Project icoon bijgewerkt"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "Je kunt geen bewerkingen opslaan in je project die leiden tot een falende validatie."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Kan project niet opslaan tijdens review"
+  },
   "project.notification.updated.message": {
     "message": "Jouw project is bijgewerkt."
   },
@@ -3833,11 +3914,35 @@
   "project.settings.disclosures.archived.description.2": {
     "message": "Gearchiveerde projecten blijven vindbaar wanneer de zichtbaarheid is ingesteld op Openbaar. Als je je project uit de lijst wilt verwijderen, stel dan de zichtbaarheid in op Verborgen."
   },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "Bijv. Ik heb geen tijd meer om dit project bij te houden, voel je vrij om het te forken!"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "Project archiveren"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "Content informatie"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "Je moet deze optie inschakelen als je project is afgeleid van een ander project, bijvoorbeeld omdat het een afsplitsing is of een aanzienlijk deel van het werk van iemand anders bevat."
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "Link naar originele werk"
+  },
   "project.settings.disclosures.derivative.link-placeholder": {
     "message": "https://voorbeeld.com"
   },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "Naam van originele werk"
+  },
   "project.settings.disclosures.derivative.name-placeholder": {
     "message": "Voorbeeld project"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Leg uit hoe het project is gebaseerd op het originele werk"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "Bevat afgeleide inhoud"
   },
   "project.settings.disclosures.description": {
     "message": "Je moet alle relevante vermeldingen over de inhoud toevoegen aan je project, in overeenstemming met <rules>de inhoudsregels van Modrinth</rules>."
@@ -3847,6 +3952,96 @@
   },
   "project.settings.disclosures.last-updated.moderator": {
     "message": "moderator"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "Alstublieft <contact-support-link>contact support</contact-support-link> als deze openbaarmaking moet worden verwijderd."
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "Deze openbaarmaking is vergrendeld door de moderators. Neem <contact-support-link>contact op met support</contact-support-link> als u denkt dat dit een fout is."
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "Neem contact op met de <contact-support-link>supportafdeling</contact-support-link> als deze verklaring moet worden bewerkt of verwijderd."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "Je moet dit inschakelen als je project functies bevat die je kunt verkrijgen door geld uit de echte wereld te besteden."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "bijvoorbeeld: cosmetische producten beschikbaar als Patreon-beloning"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "Geef een overzicht van de soorten betaalde functies"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Bevat betaalde functies"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "Schakel dit in als je project iets bevat waarvan je denkt dat het gevaarlijk kan zijn voor bepaalde mensen die gevoelig zijn voor het knipperen van lampen of patronen."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "bijv. Het voegt een zaklamp item met een strobe modus toe. Het kan worden uitgeschakeld in Toegankelijkheid instellingen in-game."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "Waarschuwing voor lichtgevoeligheid"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "Reclame openbaar maken vereist een verklaring."
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "Derivatieve openbaarmaking van werken moet ten minste één bronwerk vermelden."
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "Derivatieve werkbronnen moeten een naam hebben."
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "Je hebt geen toestemming om de openbaarmaking van dit project te bewerken."
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "Betaalde functies die openbaar worden gemaakt moeten ten minste één betaalde eigenschap tonen."
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "Photosensitiviteitswaarschuwing moet een beschrijving bevatten."
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "De openbaarmaking van externe systemen moet een beschrijving bevatten."
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "Telemetrie openbaarmaking moet ten minste één type verzamelde gegevens tonen."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "Je moet dit inschakelen als je project dingen leest of bewerkt op het systeem van de gebruiker buiten het spel."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Beschrijf de interacties van het externe systeem"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "bijv. Er wordt een bestand met de naam wake_up.txt aan het bureaublad toegevoegd"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "Externe systeem interacties"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "Wat is het toestemmingsmodel van je telemetrie?"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "Je kunt een privacybeleid toevoegen of een lijst met soorten gegevens die worden verzameld. Vergeet niet te vermelden of de gegevens anoniem zijn of persoonsgegevens bevatten."
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "Welke gegevens worden verzameld?"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "bijv. Anonieme lanceringsanalytics om Minecraft versie en mod loader gebruik bij te houden."
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "Je moet dit inschakelen als je project verbruiksgegevens terugstuurt naar jezelf of een derde partij."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Bevat telemetrie"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "Versies uploaden voor het toevoegen van onthullingen"
+  },
+  "project.settings.editing-project": {
+    "message": "{projectType} project bewerken"
   },
   "project.settings.general.name.description": {
     "message": "Probeer voorvoegsels, achtervoegsels, tussenvoegsels en omschrijvingen te vermijden, alleen de echte naam."
@@ -3892,6 +4087,21 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Je hebt al een andere {platform} link."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Selecteer een platform voor deze donatie link."
+  },
+  "project.settings.monetization.description": {
+    "message": "Projecten op Modrinth worden automatisch ingeschreven in het <rewards-program-link>Beloningen Programma</rewards-program-link>. Als je geen inkomsten wilt (of niet kunt verdienen om juridische redenen) van dit project, kun je het hier uitschakelen."
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "Dit project komt niet in aanmerking voor het genereren van inkomsten. Als u denkt dat dit een fout is, neem dan contact op met de <contact-support-link>supportafdeling</contact-support-link>."
+  },
+  "project.settings.monetization.title": {
+    "message": "Monetisatie"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Toon alsjeblieft aan dat je toestemming hebt om alle onderstaande bestanden te verspreiden. Zodra dit is voltooid, worden de achtergehouden versies automatisch gepubliceerd."
@@ -4085,6 +4295,12 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "Je hebt {count} tags geselecteerd. Overweeg om dit aantal terug te brengen tot 12 of minder, zodat je project gericht blijft en gemakkelijker te vinden is."
   },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "Versies uploaden voor het toevoegen van onthullingen"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Suggesties:"
+  },
   "project.versions.copy-id-option": {
     "message": "ID kopiëren"
   },
@@ -4181,17 +4397,29 @@
   "report.not-for.dmca.description": {
     "message": "Zie onze <policy-link>Auteursrechtbeleid</policy-link>."
   },
+  "report.note.ai-images.1": {
+    "message": "We hebben zojuist onze regels bijgewerkt om AI-gegenereerde afbeeldingen te verbieden in pictogrammen, galerijen en beschrijvingen. We geven makers een vrijwaringsperiode om AI-afbeeldingen uit hun projecten te verwijderen voordat we rapporten voor hen gaan accepteren."
+  },
+  "report.note.check-back-later": {
+    "message": "Kom later terug zodra de genadeperiode is afgelopen. Rapporten van dit type worden op dit moment niet geaccepteerd."
+  },
   "report.note.copyright.1": {
     "message": "Houd er rekening mee dat je *geen* DMCA-verzoek tot verwijdering indient, maar een melding van opnieuw geüploade inhoud."
   },
   "report.note.copyright.2": {
     "message": "Als je in plaats hiervan een DMCA-verzoek tot verwijdering (een juridische procedure) wilde indienen, raadpleeg dan ons <copyright-policy-link>auteursrechtbeleid</copyright-policy-link>."
   },
+  "report.note.fully-ai-generated.1": {
+    "message": "We hebben zojuist onze regels bijgewerkt om AI-gegenereerde projecten volledig te verbieden. We geven makers een vrijwaringsperiode om door AI-gegenereerde projecten volledig bij te werken of op te nemen voordat we rapporten voor hen accepteren."
+  },
   "report.note.malicious.1": {
     "message": "Rapporten voor malware en niet geaccepteerde content moeten bewijs hebben zoals code voorbeelden."
   },
   "report.note.malicious.2": {
     "message": "Samenvattingen van Microsoft Defender, VirusTotal, of AI malware is geen goede vorm van bewijs en zal niet geaccepteerd worden."
+  },
+  "report.note.missing-disclosure.1": {
+    "message": "Content onthullingen zijn een nieuwe functie die we zojuist hebben toegevoegd. We geven de makers een vrijwaringsperiode om hun onthullingen up-to-date te krijgen voordat we rapporten voor ontbrekende of onjuiste onthullingen gaan accepteren."
   },
   "report.please-report": {
     "message": "Graag rapporteer:"
@@ -4210,6 +4438,9 @@
   },
   "report.report-item": {
     "message": "Meld {title} aan moderators"
+  },
+  "report.reported-for": {
+    "message": "Gerapporteerd voor {type}"
   },
   "report.submit": {
     "message": "Melding indienen"
@@ -5023,6 +5254,9 @@
   },
   "settings.billing.plan.title": {
     "message": "{size} Plan"
+  },
+  "settings.billing.price.includes-tax": {
+    "message": "Inclusief {amount} belasting"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"

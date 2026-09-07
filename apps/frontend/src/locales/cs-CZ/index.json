@@ -14,6 +14,9 @@
   "ads-consent.reject": {
     "message": "Odmítnout vše"
   },
+  "ads-consent.title": {
+    "message": "Vaše soukromí a způsob, jakým reklamy podporují Modrinth"
+  },
   "analytics.action.add": {
     "message": "Přidat"
   },
@@ -128,6 +131,9 @@
   "analytics.chart.legend.monetization-details.aria": {
     "message": "Zobrazit podrobnosti analytiky monetizace"
   },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (Předch.)"
+  },
   "analytics.chart.tooltip.dependent-on-project": {
     "message": "Závisí na {project}"
   },
@@ -163,6 +169,9 @@
   },
   "analytics.chart.view.area": {
     "message": "Oblast"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Sloupcový"
   },
   "analytics.chart.view.line": {
     "message": "Čára"
@@ -249,37 +258,37 @@
     "message": "6h"
   },
   "analytics.group-by.date": {
-    "message": "Datum"
+    "message": "Datumu"
   },
   "analytics.group-by.day": {
-    "message": "Den"
+    "message": "Dne"
   },
   "analytics.group-by.month": {
-    "message": "Měsíc"
+    "message": "Měsíce"
   },
   "analytics.group-by.selected.day": {
-    "message": "Seskupit podle dnů"
+    "message": "Seskupit podle dne"
   },
   "analytics.group-by.selected.hour": {
-    "message": "Seskupit podle hodin"
+    "message": "Seskupit po hodině"
   },
   "analytics.group-by.selected.month": {
-    "message": "Seskupit podle měsíců"
+    "message": "Seskupit podle měsíce"
   },
   "analytics.group-by.selected.six-hours": {
     "message": "Seskupit po 6 hodinách"
   },
   "analytics.group-by.selected.week": {
-    "message": "Seskupit podle týdnů"
+    "message": "Seskupit podle týdne"
   },
   "analytics.group-by.selected.year": {
     "message": "Seskupit podle roků"
   },
   "analytics.group-by.week": {
-    "message": "Týden"
+    "message": "Týdne"
   },
   "analytics.group-by.year": {
-    "message": "Rok"
+    "message": "Roku"
   },
   "analytics.loading.fetching-results": {
     "message": "Načítání výsledků..."
@@ -419,8 +428,23 @@
   "analytics.table.export-csv": {
     "message": "Exportovat CSV"
   },
+  "analytics.table.export.grouped": {
+    "message": "Seskupeno podle {groupBy}"
+  },
   "analytics.table.search.placeholder": {
     "message": "Hledat..."
+  },
+  "analytics.threshold.countries-above": {
+    "message": "Země nad"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "Verze hry nad"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "Verze projektu nad"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "Projekty nad"
   },
   "analytics.title": {
     "message": "Analytika"
@@ -689,9 +713,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "Datum narození je povinné"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Nesplňujete věkové omezení pro vytvoření účtu na Modrinthu."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Relevantní zdrojový kód"
   },
@@ -715,6 +736,15 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "Zadejte uživatelské jméno"
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Dvoufázové ověření"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Přihlásit se jiným způsobem"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Přihlásit se pomocí {provider}"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Poslat e-mail pro obnovení"
@@ -755,6 +785,9 @@
   "auth.sign-in.2fa.label": {
     "message": "Dvoufázové ověření"
   },
+  "auth.sign-in.add-account": {
+    "message": "Přidat účet"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Pokračovat s Emailem"
   },
@@ -769,6 +802,9 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Naposledy použitý"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Otevřít Modrinth App"
   },
   "auth.sign-in.no-account": {
     "message": "Nemáte účet?"
@@ -844,6 +880,9 @@
   },
   "auth.verify-email.title": {
     "message": "Ověřit e-mail"
+  },
+  "collection.aria-label.upload-icon": {
+    "message": "Nahrát ikonu"
   },
   "collection.button.edit-icon": {
     "message": "Upravit ikonu"
@@ -995,6 +1034,51 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Doplňkové soubory slouží jako podpůrné materiály (např. zdrojový kód), ne jako alternativní verze či varianty."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Podrobnosti"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Soubory"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Nahrát soubor"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Podrobnosti"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Soubory"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Číslo verze"
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Typ verze"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Podrobnosti"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Upravit"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Soubory"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Nahrané soubory"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Verze"
+  },
   "create.collection.collection-info": {
     "message": "Tvá nová kolekce bude vytvořena jako veřejná a bude obsahovat {count, plural, =0 {žádné projekty} one {# projekt} few {# projekty} other {# projektů}}."
   },
@@ -1091,6 +1175,9 @@
   "create.project.name-placeholder": {
     "message": "Zadejte název projektu..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "{name} Ikona"
+  },
   "create.project.owner-label": {
     "message": "Vlastník"
   },
@@ -1118,8 +1205,14 @@
   "create.project.type-server": {
     "message": "Server"
   },
+  "create.project.unknown-user": {
+    "message": "Neznámý uživatel"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Avatar uživatele"
   },
   "create.project.visibility-description": {
     "message": "Viditelnost vašeho projektu poté co bude schválena."
@@ -1150,6 +1243,9 @@
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
     "message": "Jste si jistý, že chcete zrušit svůj partnerský odkaz „{title}“?"
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "{count, plural, one {z # projektu} few {ze # projektů} other {z # projektů}}"
   },
   "dashboard.analytics.total-downloads": {
     "message": "Stažení celkem"
@@ -1378,6 +1474,9 @@
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverové projekty nepodporují hromadné úpravy"
+  },
+  "dashboard.projects.empty": {
+    "message": "Zatím nemáte žádné projekty. Začněte kliknutím na zelené tlačítko výše."
   },
   "dashboard.projects.head-title": {
     "message": "Projekty"
@@ -1805,9 +1904,6 @@
   "layout.action.new-project": {
     "message": "Nový projekt"
   },
-  "layout.action.new-server-project": {
-    "message": "Nový server"
-  },
   "layout.action.publish": {
     "message": "Zveřejnit"
   },
@@ -2015,6 +2111,9 @@
   "moderation.page.reports": {
     "message": "Hlášení"
   },
+  "modpack-scan-modal.new-groups": {
+    "message": "Nové skupiny"
+  },
   "muralpay.country.at": {
     "message": "Rakousko"
   },
@@ -2116,6 +2215,9 @@
   },
   "muralpay.placeholder.account-number": {
     "message": "Zadejte číslo účtu"
+  },
+  "organization.label.downloads": {
+    "message": "stažení"
   },
   "project-member-header.error-decline": {
     "message": "Nepodařilo se zamítnout pozvánku do týmu"
@@ -2249,6 +2351,27 @@
   "project.description.title": {
     "message": "Popisek"
   },
+  "project.download.compatible-version-title": {
+    "message": "Kompatibilní verze"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "Jakákoli kompatibilní"
+  },
+  "project.download.dependency-download-file": {
+    "message": "Stáhnout {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Stáhnout {filename} ({size})"
+  },
+  "project.download.download": {
+    "message": "Stáhnout"
+  },
+  "project.download.download-as-zip": {
+    "message": "Stáhnout jako .zip"
+  },
+  "project.download.download-version": {
+    "message": "Stáhnout {version}"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} nepodporuje {gameVersion} pro {platform}"
   },
@@ -2257,6 +2380,9 @@
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} nepodporuje {platform} pro {gameVersion}"
+  },
+  "project.download.recommended-title": {
+    "message": "Doporučené"
   },
   "project.download.select-game-version": {
     "message": "Vybrat verzi hry"
@@ -2392,6 +2518,12 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Stav"
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} kategorie} other {Kategorie}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {{types} rozlišení} other {Rozlišení}}"
   },
   "project.versions.title": {
     "message": "Verze"
@@ -2920,6 +3052,9 @@
   },
   "version.download.required-resource-pack": {
     "message": "Povinný resource pack"
+  },
+  "version.download.version": {
+    "message": "Stáhnout {version} ({size})"
   },
   "version.edit.button": {
     "message": "Upravit"

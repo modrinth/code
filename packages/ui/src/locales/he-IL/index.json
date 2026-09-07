@@ -50,6 +50,9 @@
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "שגיאה"
   },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "טעינת פרטי המנוי נכשלה."
+  },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "תוכנית"
   },

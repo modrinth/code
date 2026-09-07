@@ -8,8 +8,20 @@
   "app.action-bar.downloads": {
     "message": "Nedlastninger"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Gjem aktive nedlastinger"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Skjul flere kjørende tilfeller"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopiert"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopidetaljer"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Avvis"
   },
   "app.action-bar.install.open-instance": {
     "message": "Åpne tilfelle"
@@ -17,8 +29,71 @@
   "app.action-bar.install.retry": {
     "message": "Prøv igjen"
   },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Avbrutt grunnet lukking av app"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Kunne ikke lese modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Avbrutt"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Opprydding ble ikke ferdig"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Kunne ikke laste ned filer"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Nedlastet fil er ødelagt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Kunne ikke lagre filer"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Nedlasting kunne ikke fullføres"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instansen ble ikke funnet"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Filbanen er ugyldig"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Modpackdata er ugyldig"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Modpackfiler har ugyldig metadata"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Konfigureringen av Java kunne ikke fullføres"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Oppsett av loader feilet"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Kunne ikke oppdatere lokale data"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Oppsett av Minecraft mislyktes"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Kunne ikke nå Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Ikke tillatelse til å skrive"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Kunne ikke laste ned filer"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Noe gikk galt"
+  },
   "app.action-bar.install.unknown-instance": {
     "message": "Ukjent tilfelle"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Oppdaterer delt innhold"
   },
   "app.action-bar.installs": {
     "message": "Installeringer"
@@ -38,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "Last inn på nytt for å oppdatere"
   },
+  "app.action-bar.show-downloads": {
+    "message": "Vis aktive nedlastninger"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Vis flere kjørende tilfeller"
   },
@@ -56,6 +134,27 @@
   "app.action-bar.view-logs": {
     "message": "Vis logger"
   },
+  "app.ads-consent.accept": {
+    "message": "Godta alt"
+  },
+  "app.ads-consent.body": {
+    "message": "Annonser gjør Modrinth mulig og finansierer betalinger til skapere. Partnerne våre kan lagre eller få tilgang til informasjonskapsler i appen for å tilpasse annonser og måle ytelse."
+  },
+  "app.ads-consent.manage": {
+    "message": "Administrer preferanser"
+  },
+  "app.ads-consent.reject": {
+    "message": "Avslå alle"
+  },
+  "app.ads-consent.title": {
+    "message": "Ditt personvern og hvordan annonser støtter Modrinth"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Vis instanser i biblioteket i et kompakt radoppsett."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Kompakt modus"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Hjem"
   },
@@ -64,6 +163,9 @@
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gjøm navnelapp"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimer app"
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis spilletid"
@@ -362,9 +464,6 @@
   "instance.settings.tabs.general.name": {
     "message": "Navn"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Startkroker lar avanserte brukere køre visse systemkommandoer før og etter spillet blir startet."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Etter avslutning"
   },
@@ -383,9 +482,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Skriv inn forstartskommando..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Spillstartkroker"
-  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
@@ -401,29 +497,8 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} versjon"
   },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Egendefinert minneallokasjon"
-  },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Miljøvariabler"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooker"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Java argumenter"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Java installasjon"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Minne tildelt"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Vindu"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Tilpasset vindusinstillinger"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullskjerm"

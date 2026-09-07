@@ -665,9 +665,6 @@
   "instance.settings.tabs.general.update-channel.release": {
     "message": "Terbitan"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Cangkuk membenarkan pengguna lanjutan menjalankan perintah sistem tertentu sebelum dan selepas melancarkan permainan."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Selepas keluar"
   },
@@ -686,9 +683,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Masukkan perintah yang akan dijalankan sebelum pemasangan dilancarkan..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Cangkuk pelancaran permainan"
-  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Pembalut"
   },
@@ -704,47 +698,17 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versi {loader}"
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Pembolehubah persekitaran tersuai"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Argumen Java tersuai"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Pemasangan Java tersuai"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Peruntukan ingatan tersuai"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Masukkan pembolehubah persekitaran..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Masukkan argumen Java..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Pembolehubah persekitaran"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Cangkuk"
   },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Argumen Java"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Pemasangan Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Ingatan yang diperuntukkan"
-  },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/laluan/ke/java"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Tetingkap"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Tetapan tetingkap tersuai"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Skrin penuh"

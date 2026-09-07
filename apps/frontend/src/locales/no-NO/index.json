@@ -575,9 +575,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "Fødselsdato kreves"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Du oppfyller ikke aldersgrensa for å opprette en konto hos Modrinth."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Relevant kildekode"
   },
@@ -1742,9 +1739,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Hvilke CPU-typer kjører Modrinth Hosting-serverne på?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting-serverne kjører på AMD Ryzen 7900 and 7950X3D-like CPU-er med 5+ GH<, kombinert med DDR5-minne."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Hvilken valutta er prisene i?"
   },
@@ -2083,9 +2077,6 @@
   },
   "layout.action.new-project": {
     "message": "Nytt prosjekt"
-  },
-  "layout.action.new-server-project": {
-    "message": "Ny server"
   },
   "layout.action.publish": {
     "message": "Publiser"

@@ -8,6 +8,12 @@
   "app.action-bar.downloads": {
     "message": "Descărcări"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Ascunde descărcările active"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Ascunde mai mult instanțe pornite"
+  },
   "app.action-bar.install.copied-details": {
     "message": "Copiat"
   },
@@ -23,14 +29,89 @@
   "app.action-bar.install.retry": {
     "message": "Reîncearcă"
   },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Anulat din cauza închiderii aplicației"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Nu s-a putut citi modpack-ul"
+  },
   "app.action-bar.install.summary.canceled": {
     "message": "Anulat"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Curățarea nu s-a terminat"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Nu s-au putut descărca fișierele"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Fișierul descărcat este corupt"
   },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "Nu s-au putut salva fișierele"
   },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Descărcarea nu s-a putut finaliza"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instanța nu a fost găsită"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Calea fișierului este invalidă"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Datele modpack-ului nu sunt valide"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Fișierele modpack-ului au metadate invalide"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Configurarea Java nu s-a putut finaliza"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Configurarea leaderului"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Datele locale nu au putut fi actualizate"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Configurarea Minecraft a eșuat"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Modrinth nu a putut fi accesat"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Nu există permisiunea de scriere"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Pachetul nu a putut fi descărcat"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Ceva nu a funcționat corect"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Instanță necunoscută"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Actualizând conținutul partajat"
+  },
+  "app.action-bar.installs": {
+    "message": "Instalări"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Setează ca instanță principală"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Nu rulează nicio instanță"
+  },
   "app.action-bar.offline": {
     "message": "Offline"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Instanță principală"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "Reîncarcă pentru a actualiza"
   },
   "app.action-bar.update": {
     "message": "Actualizează"
@@ -347,9 +428,6 @@
   "instance.settings.tabs.general.name": {
     "message": "Nume"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Cârligele permit utilizatorilor avansați să ruleze anumite comenzi de sistem înainte și după lansarea jocului."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "După ieșire"
   },
@@ -368,9 +446,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Introdu comanda înainte de lansare..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Cârlige de lansare ale jocului"
-  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
@@ -386,26 +461,8 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versiune {loader}"
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Variabile de mediu"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Legături"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Argumente Java"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Instalări Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Memorie Alocată"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Ferească"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Setări personalizate de fereastră"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Ecran complet"

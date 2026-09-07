@@ -734,9 +734,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Ce fel de CPU-uri folosesc serverele Modrinth Hosting?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Serverele Modrinth Hosting folosesc AMD Ryzen 7900 si 7950X3D sau echivalent la 5+ GHz, împreuna cu memorie DDR5."
-  },
   "hosting-marketing.faq.ddos-protection": {
     "message": "Au serverele Modrinth Hosting protectie DDos?"
   },
