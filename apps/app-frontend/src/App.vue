@@ -1061,7 +1061,7 @@ const updateToPlayModal = ref()
 const modrinthLoginModal = ref()
 const appSettingsModal = ref()
 const syncInstancesUpdateModal = ref()
-let syncInstancesUpdateNotificationId: string | number | null = null
+let syncInstancesUpdateNotificationId = null
 
 function showSyncInstancesUpdateNotification() {
 	if (
