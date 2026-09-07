@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Verberg nametag"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Laat recent gespeelde werelden of instanties zien in de \"Laatst gespeeld\" sectie in de startpagina"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Spring in werelden of instanties"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimaliseer de Modrinth-app zodra Minecraft opstart."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Startpagina en inhoud"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Laat schermafbeeldingen van al je instanties zien op de schermafbeeldingen pagina"
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Zie alle schermafbeeldingen bij elkaar"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Opstarten en navigeren"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Update van Modrinth-app vereist"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Het toepassen van willekeurige iconen op instanties is mislukt."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Importeer {num, plural, one {# instantie} other {# instanties}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nieuwe update"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Sluiten"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Maak aangepaste pictogrammen voor je exemplaren rechts in de Modrinth App. Mix en match achtergronden met symbolen van Minecraft en populaire mods!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# instantie is niet} other {# keer niet}} Wil je dat we {count, plural, one {Het} other {ze}} Willekeurige mensen om te beginnen?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Willekeurig pictogram"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Overslaan"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Aangepaste pictogrambewerker"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Sluit"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Personaliseer je instances!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Negeer"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nieuwe pictogrameditor"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Bekijk de update"
   },
   "app.install.phase.downloading_content": {
     "message": "Inhoud aan het downloaden"
@@ -814,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Server verwijderen"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Deze server zal ook verwijderd worden uit {count, plural, one {# andere instantie} other {# andere instanties}} omdat het gesynchroniseerd is."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Server verwijderen"
@@ -1714,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Synchroniseer"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Kies een synchronisatiebron"
   },
   "app.settings.synced-options.command-history": {
     "message": "Opdrachtgeschiedenis desynchroniseren"
@@ -2755,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Schakel een override in om een gesynchroniseerde instelling gescheiden te houden voor deze instantie."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Tabbladen"
   },
   "instance.settings.tabs.window": {
     "message": "Aangepaste venster instellingen"

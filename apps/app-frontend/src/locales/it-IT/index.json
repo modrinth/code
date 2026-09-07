@@ -209,12 +209,6 @@
   "app.behavior-settings.content.title": {
     "message": "Home e contenuti"
   },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Visualizza tutti gli screenshot di tutte le istanze in un'unica pagina."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Mostra gli screenshot assieme"
-  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Avvio e navigazione"
   },
@@ -763,9 +757,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Rimuovi server"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Il server sarà rimosso anche da {count, plural, one {un'altra istanza} other {# altre istanze}} per via della sincronizzazione."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Rimuovere il server"
@@ -1657,9 +1648,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Sincronizza"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Scegli l'istanza madre"
   },
   "app.settings.synced-options.command-history": {
     "message": "Sincronizza la cronologia comandi"
@@ -2698,9 +2686,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Sovrascrivi le impostazioni di sincronizzazione di questa istanza."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Schede"
   },
   "instance.settings.tabs.window": {
     "message": "Impostazioni della finestra personalizzate"

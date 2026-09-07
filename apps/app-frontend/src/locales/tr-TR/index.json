@@ -209,12 +209,6 @@
   "app.behavior-settings.content.title": {
     "message": "Ana sayfa ve içerik"
   },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Ekran görüntüleri sayfasında tüm örneklerinizin ekran görüntülerini görüntüleyin."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Tüm ekran görüntülerini bir arada göster"
-  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Başlatma ve gezinme"
   },
@@ -766,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Sunucuyu kaldır"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Bu sunucu ayrıca senkronize olduğu için {count, plural, one {# diğer örnekten} other {# diğer örnekten}} kaldırılacaktır."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Sunucuyu kaldır"
@@ -1666,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Eşitle"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Bir senkronizasyon kaynağı seçin"
   },
   "app.settings.synced-options.command-history": {
     "message": "Komut geçmişini senkronize et"
@@ -2707,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Bu örnek için, eşitlenmiş bir ayarı ayrı tutmak üzere bir geçersiz kılmayı etkinleştirin."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Sekmeler"
   },
   "instance.settings.tabs.window": {
     "message": "Özel pencere ayarları"

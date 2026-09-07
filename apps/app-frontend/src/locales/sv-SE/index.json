@@ -200,12 +200,6 @@
   "app.behavior-settings.content.title": {
     "message": "Hem och innehåll"
   },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Visa skärmdumpar från alla dina instanser på skärmdumpssidan."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Visa alla skärmdumpar tillsammans"
-  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Uppstart och navigering"
   },
@@ -751,9 +745,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Ta bort server"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Den här servern kommer också tas bort från {count, plural, one {# annan instans} other {# andra instanser}} eftersom den är synkroniserad."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Ta bort server"
@@ -1576,9 +1567,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Synkronisera"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Välj en synkroniseringskälla"
   },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "Synkronisera flerspelarservrar"
@@ -2515,9 +2503,6 @@
   },
   "instance.settings.tabs.synced-options.open-app-settings": {
     "message": "Hantera synkroniserade inställningar"
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Flikar"
   },
   "instance.settings.tabs.window": {
     "message": "Anpassade fönsterinställningar"

@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "ネームタグを非表示にする"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "ホーム画面の「さっそく遊ぶ」セクションに、最近プレイしたワールドやインスタンスを表示します。"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "ワールドやインスタンスに参加する"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minecraftを起動したときにModrinth Appを最小化します。"
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "ホームとコンテンツ"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "スクリーンショットベージですべてのインスタンスのスクリーンショットを表示できます。"
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "すべてのスクリーンショットをまとめて表示"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "起動とナビゲーション"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Modrinth Appの更新が必要です"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "インスタンスへのランダムアイコンの設定に失敗しました。"
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "{num, plural, other {#}}個のインスタンスのアイコンをランダムに変更しました。"
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "今回の新機能"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "閉じる"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Modrinth App内で、インスタンス用のカスタムアイコンを作成できます。背景とMinecraftや人気Modのシンボルを自由に組み合わせて、自分好みのアイコンを作りましょう！"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, other {#}} 件には、まだアイコンが設定されていません。まずは、{count, plural, one {こちら} other {これら}}にランダムなアイコンを割り当てますか？"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "ランダムなアイコン"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "スキップする"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "カスタムアイコンエディター"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "閉じる"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "起動構成をカスタマイズ編集しましょう！"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "閉じる"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "新しいアイコンエディター"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "アップデートを表示"
   },
   "app.install.phase.downloading_content": {
     "message": "コンテンツをダウンロード中"
@@ -814,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "サーバーの削除"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "このサーバーは同期されているため、{count, plural, other {#}}個の他のインスタンスからも削除されます。"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "サーバーの削除"
@@ -1714,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "同期"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "同期元を選択"
   },
   "app.settings.synced-options.command-history": {
     "message": "コマンド履歴を同期"
@@ -2755,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "このインスタンスに対して同期設定を個別に保持するための上書きを有効にします。"
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "タブ"
   },
   "instance.settings.tabs.window": {
     "message": "カスタムウィンドウの設定"

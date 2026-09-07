@@ -209,12 +209,6 @@
   "app.behavior-settings.content.title": {
     "message": "首頁與內容"
   },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "在「螢幕擷取畫面」頁面查看所有實例的擷圖。"
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "集中顯示所有擷圖"
-  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "啟動與瀏覽"
   },
@@ -766,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "移除伺服器"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "由於這個伺服器已同步，因此也將從{count, plural, other {另外 # 個實例}}中移除。"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "移除伺服器"
@@ -1666,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "同步"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "選擇同步來源"
   },
   "app.settings.synced-options.command-history": {
     "message": "同步指令紀錄"
@@ -2707,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "在這個實例使用不同於同步設定的設定。"
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "頁籤"
   },
   "instance.settings.tabs.window": {
     "message": "自訂視窗設定"

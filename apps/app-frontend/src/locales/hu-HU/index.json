@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Névcímke eltüntetése"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "A legutóbb játszott világok és példányok megjelenítése a kezdőlap „Folytasd itt” részében."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "„Folytasd itt” a világokat és a példányokat is"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "A Modrinth App bezáródik a Minecraft indításakor"
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Kezdőlap és tartalom"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Tekintsd meg az összes példányod képernyőképeit a Képernyőképek oldalon."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Az összes képernyőkép együttes megjelenítése"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Indítás és navigáció"
@@ -364,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Frissítés szükséges a Modrinth Apphoz"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Nem sikerült véletlenszerű ikonokat rendelni a példányokhoz."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Véletlenszerű ikon beállítva {num, plural, one {# játékprofilhoz} other {# játékprofilhoz}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "A frissítés újdonságai"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Bezárás"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Hozz létre egyedi ikonokat a példányaidhoz közvetlenül a Modrinth Appban. Kombináld a háttereket a Minecraftból és népszerű modokból származó szimbólumokkal!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {Egy példánynak} other {# példánynak}} még nincs ikonja. Szeretnéd, ha adnánk neki{count, plural, one { egy} other {k néhány}} véletlenszerű példát a kezdéshez?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Véletlenszerű ikonok"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Átugrás"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Saját ikon szerkesztő"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Bezárás"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Szabd személyre a példányodat!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Elvet"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Új ikon szerkesztő"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Frissítés megtekintése"
   },
   "app.install.phase.downloading_content": {
     "message": "A tartalom letöltése..."
@@ -814,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Szerver eltávolítása"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Ez a szerver eltávolításra kerül további {count, plural, one {# példányból} other {# példányból}} is, mivel szinkronizálva van."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Szerver eltávolítása"
@@ -1714,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Szinkronizálás"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Válassz szinkronizálási forrást"
   },
   "app.settings.synced-options.command-history": {
     "message": "Parancselőzmények szinkronizálása"
@@ -2755,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Engedélyezz egy felülbírálást, hogy egy szinkronizált beállítás külön legyen kezelve ennél a példánynál."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Lapok"
   },
   "instance.settings.tabs.window": {
     "message": "Egyéni ablakbeállítások"

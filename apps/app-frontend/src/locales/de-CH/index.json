@@ -209,12 +209,6 @@
   "app.behavior-settings.content.title": {
     "message": "Startseite & Inhalte"
   },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Zeige Screenshots von all deinen Instanzen auf der Screenshots-Seite an."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Alle Screenshots zusammen anzeigen"
-  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Start & Navigation"
   },
@@ -766,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Server entfernen"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Dieser Server wird außerdem aus {count, plural, one {# anderen Instanz} other {# anderen Instanzen}} entfernt, da er synchronisiert wird."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Server entfernen"
@@ -1666,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Synchronisieren"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Wähle eine Synchronisations Quelle"
   },
   "app.settings.synced-options.command-history": {
     "message": "Synchronisiere die Befehls Historie"
@@ -2707,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Aktiviere das überschreiben, um die Synchronisieren Einstellungen separat zu halten von der Instanz."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Reiter"
   },
   "instance.settings.tabs.window": {
     "message": "Eigene Fenster Einstellungen"

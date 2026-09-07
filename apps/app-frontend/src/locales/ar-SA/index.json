@@ -209,12 +209,6 @@
   "app.behavior-settings.content.title": {
     "message": "الصفحة الرئيسية والمحتوى"
   },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "عرض لقطات الشاشة من جميع نسخ التثبيت لديك على صفحة لقطات الشاشة."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "عرض جميع لقطات الشاشة معا"
-  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "بدء التشغيل والتنقل"
   },
@@ -763,9 +757,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "إزالة الخادم"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "سيتم أيضاً إزالة هذا الخادم من {count, plural, zero {نسخة أخرى} one {نسخة أخرى} two {نسختان آخرين} few {# نسخ أخرى} many {# نسخة آخر} other {# نسخ آخر}} لأنه متزامن."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "إزالة الخادم"
@@ -1663,9 +1654,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "مزامنة"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "اختر مصدر المزامنة"
   },
   "app.settings.synced-options.command-history": {
     "message": "مزامنة سجل الأوامر"
@@ -2704,9 +2692,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "تمكين تجاوز للحفاظ على إعدادات متزامنة منفصلة لهذه النسخة."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "علامات تبويب"
   },
   "instance.settings.tabs.window": {
     "message": "إعدادات نافذة مخصصة"

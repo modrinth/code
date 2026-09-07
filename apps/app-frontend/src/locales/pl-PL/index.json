@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ukryj nazwę"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Pokaż niedawno odtwarzane światy lub instalacje w sekcji \"Wskocz\"."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Wskocz do światów lub instalacji"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizuje Modrinth App po uruchomieniu Minecraft."
   },
@@ -214,12 +208,6 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Strona główna i zawartość"
-  },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Zobacz zrzuty ekranu ze wszystkich twoich instancji na stronie zrzutów ekranu."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Pokaż wszystkie zrzuty ekranu razem"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Uruchamianie i nawigacja"
@@ -358,48 +346,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Wymagana aktualizacja Modrinth App"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Nie udało się zastosować losowych ikon do instancji."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Utworzono losową ikonę dla {num, plural, other {# instancji}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nowości w tej aktualizacji"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Zamknij"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Twórz ikony dla swoich instancji bezpośrednio w Modrinth App. Masz do wybrania różne tła i symbole z Minecraft i popularnych modów!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# instalacja nie} other {# instalacje nie}} mają jeszcze ikony. Chcesz byśmy dodali {count, plural, one {-} other {-}} kilka losowych na początek?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Losowe ikony"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Pomiń"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Edytor ikon"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Zamknij"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "Spersonalizuj swoje instancje!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Odrzuć"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nowy edytor ikon"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Pokaż aktualizację"
   },
   "app.install.phase.downloading_content": {
     "message": "Pobieranie zawartości"
@@ -793,9 +739,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Usuń serwer"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Ten serwer zostanie również usunięty z {count, plural, one {# innej instancji} other {# innych instancji}} ponieważ są one zsynchronizowane."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Usuń serwer"
@@ -1672,9 +1615,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Synchronizuj"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Wybierz źródło synchronizacji"
   },
   "app.settings.synced-options.command-history": {
     "message": "Zsynchronizuj historię komend"
@@ -2611,9 +2551,6 @@
   },
   "instance.settings.tabs.sharing": {
     "message": "Udostępnianie"
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Zakładki"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pełny ekran"

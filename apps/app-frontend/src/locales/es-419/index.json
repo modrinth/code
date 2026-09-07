@@ -209,12 +209,6 @@
   "app.behavior-settings.content.title": {
     "message": "Página de inicio y contenido"
   },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": "Ver las screenshots de todas tus instancias en la Página de screenshots."
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": "Mostrar todas las screenshots juntas"
-  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicio y navegación"
   },
@@ -766,9 +760,6 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Eliminar servidor"
-  },
-  "app.instance.worlds.remove-server-modal.synced-removal-notice": {
-    "message": "Este servidor va también va a ser eliminado de {count, plural, one {otra instancia} other {# otras instancias}} porque están sincronizadas."
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Eliminar servidor"
@@ -1666,9 +1657,6 @@
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Sincronizar"
-  },
-  "app.settings.synced-options.choose-sync-source.title": {
-    "message": "Elige una fuente de sincronización"
   },
   "app.settings.synced-options.command-history": {
     "message": "Sincronizar historial de comandos"
@@ -2707,9 +2695,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Anula la sincronización para mantener la configuración propia de esta instancia."
-  },
-  "instance.settings.tabs.tab-visibility": {
-    "message": "Pestañas"
   },
   "instance.settings.tabs.window": {
     "message": "Configuración de ventanas personalizadas"

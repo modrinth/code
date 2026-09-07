@@ -209,12 +209,6 @@
   "app.behavior-settings.content.title": {
     "message": "홈 및 콘텐츠"
   },
-  "app.behavior-settings.show-all-screenshots.description": {
-    "message": ""
-  },
-  "app.behavior-settings.show-all-screenshots.title": {
-    "message": ""
-  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "시작 및 탐색"
   },
