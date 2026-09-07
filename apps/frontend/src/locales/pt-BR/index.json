@@ -791,9 +791,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "Data de nascimento necessária"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Você não atende ao requisito de idade para criar uma conta no Modrinth."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Código-fonte relevante"
   },
@@ -2300,9 +2297,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Que tipo de CPUs os servidores do Modrinth Hosting utilizam?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Os servidores do Modrinth Hosting são equipados com CPUs AMD Ryzen 7900 e 7950X3D equivalentes a 5+ GHz, combinadas com memória DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Em que moeda são os preços apresentados?"
   },
@@ -2659,9 +2653,6 @@
   },
   "layout.action.new-project": {
     "message": "Novo projeto"
-  },
-  "layout.action.new-server-project": {
-    "message": "Novo servidor"
   },
   "layout.action.publish": {
     "message": "Publicar"

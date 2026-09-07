@@ -1,7 +1,4 @@
 {
-  "nags.add-description.description": {
-    "defaultMessage": "Cần có một bản mô tả nêu rõ mục đích và chức năng của dự án."
-  },
   "nags.add-description.title": {
     "defaultMessage": "Thêm một mô tả"
   },
@@ -23,14 +20,8 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Thông tin giấy phép"
   },
-  "nags.add-links-server.description": {
-    "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Modrinth, chẳng hạn như trang web, cửa hàng hoặc lời mời tham gia Discord."
-  },
   "nags.add-links-server.title": {
     "defaultMessage": "Thêm liên kết ngoài"
-  },
-  "nags.add-links.description": {
-    "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Modrinth, chẳng hạn như mã nguồn, trình theo dõi lỗi hoặc lời mời tham gia Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Thêm liên kết ngoài"
@@ -41,11 +32,11 @@
   "nags.all-languages.title": {
     "defaultMessage": "Chọn ngôn ngữ chính xác"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Bạn đã chọn tất cả {totalAvailableTags} thẻ có sẵn. Điều này làm mất đi mục đích của thẻ, vốn được dùng để giúp người dùng tìm thấy các dự án phù hợp. Vui lòng chỉ chọn những thẻ thực sự liên quan đến dự án của bạn."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Chọn các thẻ chính xác"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Mở rộng mô tả"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Chỉnh sửa mô tả"
@@ -59,9 +50,6 @@
   "nags.edit-tags.title": {
     "defaultMessage": "Chỉnh sửa thẻ"
   },
-  "nags.edit-title.title": {
-    "defaultMessage": "Chỉnh sửa tiêu đề"
-  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Hình ảnh thư viện nổi bật thường là cách dự án của bạn tạo ấn tượng đầu tiên."
   },
@@ -71,23 +59,11 @@
   "nags.gallery.title": {
     "defaultMessage": "Truy cập trang thư viện"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "{type} của bạn đang sử dụng giấy phép hiện đang yêu cầu mã nguồn hiện đang có sẵn. Hãy cung cấp đường link dẫn đến mã nguồn hoặc file nguồn cho từng phiên bản, hoặc sử dụng một giấy phép khác."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Cung cấp mã nguồn"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Một số liên kết ngoài của bạn có vẻ giống hệt nhau. Mỗi liên kết chỉ nên được nhập một lần và với loại liên kết phù hợp."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Xóa các đường link giống nhau"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL giấy phép không hợp lệ."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "URL giấy phép của bạn trỏ tới {domain}, đây không phải là nơi phù hợp để cung cấp thông tin giấy phép. URL giấy phép phải liên kết trực tiếp tới tệp giấy phép của bạn, không phải mạng xã hội, nền tảng trò chơi, v.v."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL giấy phép của bạn có vẻ không đúng định dạng. Vui lòng cung cấp một URL hợp lệ dẫn tới nội dung giấy phép."
@@ -113,9 +89,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Thêm văn bản thay thế cho hình ảnh"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Liên kết mời Discord không thể được dùng cho các loại liên kết khác. Vui lòng chỉ đặt liên kết Discord của bạn trong trường Liên kết mời Discord."
-  },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Di chuyển liên kết mời Discord"
   },
@@ -128,17 +101,8 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Xem phản hồi"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Bạn đã chọn {count, plural,  other {# thẻ độ phân giải}} ({tags}). Gói tài nguyên thường chỉ nên có một thẻ độ phân giải phù hợp với độ phân giải chính của nó."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Chọn độ phân giải đúng"
-  },
-  "nags.review-permissions.description": {
-    "defaultMessage": "Chắc chắn rằng bạn đã cung cấp bằng chứng về quyền của bạn để phân phối bất kì nội dung ngoài nào trong Modpack của bạn."
-  },
-  "nags.review-permissions.title": {
-    "defaultMessage": "Xem lại quyền bên ngoài"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Chọn các phiên bản mà máy chủ của bạn hỗ trợ, chọn một Modpack hoặc tải lên Modpack của riêng bạn."
@@ -179,20 +143,11 @@
   "nags.settings.links.title": {
     "defaultMessage": "Truy cập cài đặt liên kết"
   },
-  "nags.settings.permissions.title": {
-    "defaultMessage": "Truy cập bảng quản lý quyền"
-  },
   "nags.settings.tags.title": {
     "defaultMessage": "Truy cập cài đặt thẻ"
   },
   "nags.settings.title": {
     "defaultMessage": "Truy cập cài đặt chung"
-  },
-  "nags.summary-special-formatting.description": {
-    "defaultMessage": "Phần tóm tắt không nên chứa định dạng, xuống dòng, ký tự đặc biệt hoặc liên kết, vì phần tóm tắt chỉ hiển thị văn bản thuần."
-  },
-  "nags.summary-special-formatting.title": {
-    "defaultMessage": "Làm gọn phần tóm tắt"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Mở rộng phần tóm tắt"
@@ -203,14 +158,8 @@
   "nags.too-many-languages.title": {
     "defaultMessage": "Chọn ngôn ngữ chính xác"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# tag} other {# tags}}. vui lòng giảm {maxTagCount} hoặc ít hơn để đảm bảo máy chủ của bạn xuất hiện trong kết quả tìm kiếm có liên quan."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Chọn thẻ chính xác"
-  },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# thẻ} other {# thẻ}}. Hãy cân nhắc giảm xuống còn {maxTagCount} thẻ hoặc ít hơn để đảm bảo dự án của bạn xuất hiện trong các kết quả tìm kiếm phù hợp."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Chọn các thẻ chính xác"
@@ -227,13 +176,8 @@
   "nags.upload-version.title": {
     "defaultMessage": "Tải lên một phiên bản"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Một số liên kết bên ngoài của bạn có thể đang sử dụng tên miền không phù hợp với loại liên kết đó."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Xác minh các liên kết bên ngoài"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Truy cập cài đặt liên kết"
   }
 }
+

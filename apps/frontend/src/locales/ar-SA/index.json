@@ -791,9 +791,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "تاريخ الميلاد مطلوب"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "لا تستوفي متطلبات العمر لإنشاء حساب على Modrinth."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "شفرة المصدر ذات الصلة"
   },
@@ -2297,9 +2294,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "ما نوع وحدات المعالجة المركزية التي تعمل بها خوادم Modrinth Hosting؟"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "تعمل خوادم Modrinth Hosting بمعالجات مكافئة لمعالجات AMD Ryzen 7900 و7950X3D بتردد يتجاوز 5 جيجاهرتز، ومزوّدة بذاكرة DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "ما العملة التي تُعرض بها الأسعار؟"
   },
@@ -2656,9 +2650,6 @@
   },
   "layout.action.new-project": {
     "message": "مشروع جديد"
-  },
-  "layout.action.new-server-project": {
-    "message": "خادم جديد"
   },
   "layout.action.publish": {
     "message": "نشر"

@@ -39,7 +39,7 @@
     "message": "依赖于"
   },
   "analytics.breakdown.dependent-project-download": {
-    "message": "依赖的项目"
+    "message": "依赖项目"
   },
   "analytics.breakdown.dependent-project-type": {
     "message": "依赖的项目类型"
@@ -782,6 +782,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "出生日期"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "您的年龄不满足 Modrinth 账户要求。"
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "请选择你的出生日期"
   },
@@ -792,7 +795,7 @@
     "message": "需提供出生日期"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "你还未满足在 Modrinth 上创建账号的年龄需求。"
+    "message": "您必须已满 13 岁，才能在 Modrinth 创建账户。"
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "相关源代码"
@@ -817,6 +820,33 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "请输入用户名"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "请输入验证器应用生成的 6 位验证码，或使用backup code。"
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "双重身份验证"
+  },
+  "auth.reauthenticate.2fa.placeholder": {
+    "message": "输入验证码……"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "使用通行密钥登录"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "上次登录使用的是 {method, select, password {密码} passkey {通行密钥} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }。"
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "重新身份验证"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "使用其他方式登录"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "使用 {provider} 登录"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} 需要重新进行身份验证。"
   },
   "auth.reset-password.method-choice.action": {
     "message": "发送密码重置邮件"
@@ -860,6 +890,12 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "输入验证码……"
   },
+  "auth.sign-in.add-account": {
+    "message": "添加账户"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "选择要在 Modrinth App 中使用的账户"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "使用邮箱继续"
   },
@@ -874,6 +910,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "最后一次登录"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "将返回 Modrinth 应用。如果未自动跳转，请点击下方按钮。"
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "前往 Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "打开 Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "已登录"
   },
   "auth.sign-in.no-account": {
     "message": "没有账号？"
@@ -1024,6 +1072,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "批准并回复"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "关闭举报"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "关闭并回复"
@@ -2189,6 +2240,12 @@
   "error.generic.401.signed-in-as": {
     "message": "你目前登录的账号："
   },
+  "error.generic.401.switch-account": {
+    "message": "或切换到其他账户："
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "无法切换账户，请重试。"
+  },
   "error.generic.401.title": {
     "message": "你没有该页面的访问权限"
   },
@@ -2301,7 +2358,7 @@
     "message": "Modrinth Hosting 服务器是在哪种 CPU 上运行的？"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting 服务器由 AMD Ryzen 7900 和 7950X3D 等效 CPU 提供动力，主频为 5+ GHz，并配备 DDR5 内存。"
+    "message": "Modrinth Hosting 服务器搭载 AMD Ryzen 7950X 或 9950X（或同级别）的 CPU，并配备 DDR5 内存。"
   },
   "hosting-marketing.faq.currency": {
     "message": "价格以哪一种货币计算？"
@@ -2661,7 +2718,7 @@
     "message": "新建项目"
   },
   "layout.action.new-server-project": {
-    "message": "新建服务器"
+    "message": "新建服务器项目"
   },
   "layout.action.publish": {
     "message": "发布"
@@ -2674,6 +2731,9 @@
   },
   "layout.action.tech-review": {
     "message": "技术审查"
+  },
+  "layout.action.user-lookup": {
+    "message": "用户查找"
   },
   "layout.avatar.alt": {
     "message": "你的头像"
@@ -2870,6 +2930,9 @@
   "layout.nav.active-reports": {
     "message": "处理中的举报"
   },
+  "layout.nav.add-account": {
+    "message": "添加账户"
+  },
   "layout.nav.discover": {
     "message": "发现"
   },
@@ -2900,6 +2963,9 @@
   "layout.nav.projects": {
     "message": "项目"
   },
+  "layout.nav.remove-account": {
+    "message": "移除账户"
+  },
   "layout.nav.revenue": {
     "message": "收益"
   },
@@ -2908,6 +2974,12 @@
   },
   "layout.nav.search": {
     "message": "搜索"
+  },
+  "layout.nav.switch-account": {
+    "message": "切换账户"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "无法切换账户，请稍后重试。"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升级至 Modrinth+"
@@ -2947,6 +3019,9 @@
   },
   "moderation.moderate": {
     "message": "审核"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Delphi 规则"
   },
   "moderation.page.external-projects": {
     "message": "外部项目"
@@ -3349,6 +3424,9 @@
   },
   "project-member-header.success-join": {
     "message": "你加入了项目团队"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "您的项目已提交审核！"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "发布前检查单"
@@ -3767,6 +3845,12 @@
   "project.notification.icon-updated.title": {
     "message": "已更新项目图标"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "您不能保存到验证失败的内容。"
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "保存失败"
+  },
   "project.notification.updated.message": {
     "message": "你的项目已更新。"
   },
@@ -3885,10 +3969,10 @@
     "message": "如果需要删除此披露，请 <contact-support-link>联系支持</contact-support-link>。"
   },
   "project.settings.disclosures.paid-features.description": {
-    "message": "如果你的项目包含可以通过真金白银获得的功能，你必须启用此功能。"
+    "message": "如果你的项目包含可以通过实际的钱获得的功能，您必须启用此功能"
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
-    "message": "例如：化妆品可用作Patreon奖励"
+    "message": "例如：提供外观饰品作为Patreon奖励"
   },
   "project.settings.disclosures.paid-features.features-description": {
     "message": "列出支付功能的类型"
@@ -3900,7 +3984,7 @@
     "message": "如果你的项目包含任何你认为可能对某些患有光敏性癫痫的人有危险的内容，请务必启用此功能。"
   },
   "project.settings.disclosures.photosensitivity.note-placeholder": {
-    "message": "例如，它添加了一个手势模式的手电筒。它可以在游戏中的辅助功能设置中禁用。"
+    "message": "例如：加入了有频闪模式的手电筒。可以在游戏中的辅助功能设置中禁用。"
   },
   "project.settings.disclosures.photosensitivity.title": {
     "message": "光敏性癫痫警告"
@@ -3936,7 +4020,7 @@
     "message": "描述外部系统的交互"
   },
   "project.settings.disclosures.system-interactions.note-placeholder": {
-    "message": "例如，它将一个文件添加到叫wake_up.txt的桌面"
+    "message": "例如：它会在桌面上添加名为wake_up.txt的文件"
   },
   "project.settings.disclosures.system-interactions.title": {
     "message": "与外部系统的交互"
@@ -4010,8 +4094,14 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "你已经有了一个{platform}链接了。"
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "请为此捐赠链接选择一个平台。"
+  },
   "project.settings.monetization.description": {
-    "message": "Modrints上的项目自动注册于 <rewards-program-link>奖励方案</rewards-program-link>如果你不想(或由于法律原因不能)从这个项目赚取收入，你可以在这里关闭它。"
+    "message": "Modrinth上的项目会自动加入<rewards-program-link>激励计划</rewards-program-link>。如果你不想（或由于法律原因不能）从这个项目赚取收入，你可以在这里关闭它。"
   },
   "project.settings.monetization.disabled-description": {
     "message": "本项目不适用于变现。如果您认为此为错误，请<contact-support-link>联系支持团队</contact-support-link>。"
@@ -4176,16 +4266,16 @@
     "message": "选择你的{type}作用于哪类特性。"
   },
   "project.settings.tags.group-title.categories": {
-    "message": "{showType, select, yes {{types} 类别} other {类别}}"
+    "message": "{showType, select, yes {{types}类别} other {类别}}"
   },
   "project.settings.tags.group-title.features": {
-    "message": "{showType, select, yes {{types} 功能} other {功能}}"
+    "message": "{showType, select, yes {{types}功能特点} other {功能特点}}"
   },
   "project.settings.tags.group-title.performance-impact": {
-    "message": "{showType, select, yes {{types} 性能影响} other {性能影响}}"
+    "message": "{showType, select, yes {{types}性能要求} other {性能要求}}"
   },
   "project.settings.tags.group-title.resolutions": {
-    "message": "{showType, select, yes {{types} 功能} other {功能}}"
+    "message": "{showType, select, yes {{types}分辨率} other {分辨率}}"
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "你选择了 {count} 个分辨率标签（{tags}）。资源包通常应仅保留一个标签。"
@@ -4213,6 +4303,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "添加标签前上传版本"
+  },
+  "project.slug-suggestions.label": {
+    "message": "建议："
   },
   "project.versions.copy-id-option": {
     "message": "复制 ID"
@@ -5176,6 +5269,9 @@
   },
   "settings.billing.plan.title": {
     "message": "{size}方案"
+  },
+  "settings.billing.price.includes-tax": {
+    "message": "包含{amount}元税"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"

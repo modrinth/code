@@ -173,6 +173,9 @@
   "button.continue": {
     "defaultMessage": "Continua"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copiato negli appunti"
+  },
   "button.copy-filename": {
     "defaultMessage": "Copia nome del file"
   },
@@ -513,7 +516,7 @@
     "defaultMessage": "Nessun cambiamento"
   },
   "content.diff-modal.reviewed-files": {
-    "defaultMessage": "I file non pubblicati su Modrinth non sono revisionati."
+    "defaultMessage": "I file non provenienti da Modrinth non sono revisionati."
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Non è stato possibile analizzare alcuni contenuti sul tuo server, pertanto potrebbero essere toccati da questa modifica."
@@ -1367,6 +1370,27 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "es. config.yml"
   },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "Esiste già un file con questo nome."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "Impossibile verificare se questo file esiste già."
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "Crea ZIP"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "Crea ZIP"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "Il nome dell'archivio deve essere un file singolo."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Nome archivio"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "Inserisci il nome dell'archivio."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "Eliminare \"{name}\"?"
   },
@@ -1461,7 +1485,7 @@
     "defaultMessage": "Ingrandisci"
   },
   "files.image_viewer.zoom_out": {
-    "defaultMessage": "Riduci"
+    "defaultMessage": "Rimpicciolisci"
   },
   "files.item-type.file": {
     "defaultMessage": "file"
@@ -1477,6 +1501,9 @@
   },
   "files.layout.busy-warning": {
     "defaultMessage": "Attendi il termine dell'operazione precedente prima di effettuarne un'altra."
+  },
+  "files.layout.create-zip": {
+    "defaultMessage": "Crea ZIP"
   },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Errore durante la simulazione"
@@ -1556,6 +1583,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Carica .zip da URL"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "{progress}% compresso"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "Creazione di {source}"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "Creazione di {source} terminata"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "Creazione di {source} fallita"
+  },
   "files.operations.current-file": {
     "defaultMessage": "File attuale: {file}"
   },
@@ -1563,13 +1602,13 @@
     "defaultMessage": "{size} estratti"
   },
   "files.operations.extracting": {
-    "defaultMessage": "Estrazione ({source})"
+    "defaultMessage": "Estrazione di {source}"
   },
   "files.operations.extracting-completed": {
-    "defaultMessage": "Estrazione completata ({source})"
+    "defaultMessage": "Estrazione di {source} completata"
   },
   "files.operations.extracting-failed": {
-    "defaultMessage": "Estrazione fallita ({source})"
+    "defaultMessage": "Estrazione di {source} fallita"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "pacchetto di mod da URL"
@@ -1579,6 +1618,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Nuovo nome"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "Crea ZIP"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# oggetto} other {# oggetti}}"
@@ -1963,6 +2005,108 @@
   },
   "icon-select.select": {
     "defaultMessage": "Scegli icona"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Chiudi"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Modifica"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Colore"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Reimposta"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Elimina annotazione selezionata"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Area"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Elemento"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Modalità gomma"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Strumenti di modifica immagini"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Altre opzioni di salvataggio"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Sovrascrivi"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Ripeti"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Salva copia"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Salva immagine"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Dimensione"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Freccia"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Censura"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Ritaglia"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellisse"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Gomma"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Evidenziatore"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Penna"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Rettangolo"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Selezione"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Testo"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Annulla"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Larghezza"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Adatta"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "Adatta allo spazio di lavoro"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Ingrandisci"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Rimpicciolisci"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Immagine successiva"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Immagine precedente"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Cerca tra le versioni..."
@@ -2552,6 +2696,9 @@
   "label.yes": {
     "defaultMessage": "Sì"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Cambio account..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Ceco"
   },
@@ -3056,6 +3203,9 @@
   "profile.button.set-affiliate": {
     "defaultMessage": "Imposta come affiliato"
   },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Mostra istanze condivise"
+  },
   "profile.button.unblock": {
     "defaultMessage": "Sblocca"
   },
@@ -3090,7 +3240,7 @@
     "defaultMessage": "Metodi di pagamento"
   },
   "profile.details.label.view-github-profile": {
-    "defaultMessage": "Visita profilo"
+    "defaultMessage": "Mostra profilo"
   },
   "profile.details.title": {
     "defaultMessage": "Informazioni"
@@ -3958,6 +4108,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "S"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Canale"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, plural, one {# selezionata} other {# selezionate}}"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Abilita filtro per {filter}"
@@ -4949,6 +5105,12 @@
   "servers.busy.installing": {
     "defaultMessage": "Installazione del server in corso"
   },
+  "servers.files.zip-created": {
+    "defaultMessage": "ZIP creata"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "Creata su {destination}"
+  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Invia anche una richiesta di amicizia"
   },
@@ -5345,6 +5507,9 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Inizia"
   },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Alimentato da AMD Ryzen 7950X, 9950X o equivalenti, con memoria DDR5."
+  },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Grande"
   },
@@ -5461,6 +5626,27 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Cosa succede?"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Genera credenziali"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Riprova più tardi."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "Impossibile generare le credenziali"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "Il nome utente e la password precedenti smetteranno di funzionare."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Genera credenziali"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Il nome utente e la password sono stati rigenerati."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "Credenziali generate"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Si è verificato un errore durante l'installazione. Riprova più tardi."
@@ -6498,7 +6684,7 @@
     "defaultMessage": "File sconosciuti"
   },
   "unknown-file-warning-modal.reviewed-files": {
-    "defaultMessage": "I file non pubblicati su Modrinth non sono revisionati."
+    "defaultMessage": "I file non provenienti da Modrinth non sono revisionati."
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "File non riconosciuti"
@@ -6597,6 +6783,12 @@
     "defaultMessage": "Quest'utente lavora per Modrinth."
   },
   "user.profile.badge.staff.name": {
+    "defaultMessage": "Team di Modrinth"
+  },
+  "user.role.moderator": {
+    "defaultMessage": "Moderatore dei contenuti"
+  },
+  "user.role.modrinth-team": {
     "defaultMessage": "Team di Modrinth"
   },
   "version.content.name": {
