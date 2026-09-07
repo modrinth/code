@@ -632,9 +632,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Tofaktor-autentisering"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Skriv inn kode..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Fortsett med e-post"
   },
@@ -3481,9 +3478,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Skriv inn tofaktor-kode"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Skriv inn kode..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Tofaktor-autentisering holder kontoen din beskytta med at du trenger ei anna enhet for å logge inn."

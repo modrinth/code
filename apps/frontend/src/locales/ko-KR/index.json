@@ -821,9 +821,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "2단계 인증"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "코드 입력..."
-  },
   "auth.reauthenticate.continue-with-passkey": {
     "message": "패스키로 계속하기"
   },
@@ -880,9 +877,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "2단계 인증"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "코드 입력..."
   },
   "auth.sign-in.add-account": {
     "message": "계정 추가"
@@ -4996,9 +4990,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "2단계 인증 코드 입력"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "코드 입력..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "2단계 인증은 로그인시 또 다른 기기의 접속을 요구함으로써 계정을 보호합니다."

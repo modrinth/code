@@ -674,9 +674,6 @@
   "auth.reset-password.title.long": {
     "message": "Tetap semula kata laluan anda"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Masukkan kod..."
-  },
   "auth.sign-in.create-account": {
     "message": "Daftar"
   },
@@ -3625,9 +3622,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Masukkan kod dua faktor"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Masukkan kod..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Pengesahan dua faktor memastikan akaun anda selamat dengan memerlukan akses kepada peranti kedua untuk log masuk."

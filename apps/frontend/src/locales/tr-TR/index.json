@@ -827,9 +827,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "İki aşamalı doğrulama"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "Kodu girin..."
-  },
   "auth.reauthenticate.continue-with-passkey": {
     "message": "Giriş anahtarı ile devam et"
   },
@@ -886,9 +883,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "İki aşamalı doğrulama"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Kodu girin..."
   },
   "auth.sign-in.add-account": {
     "message": "Hesap ekle"
@@ -4939,9 +4933,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Çift aşamalı kodu girin"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Kodu girin..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "İki faktörlü kimlik doğrulama, oturum açmak için ikinci bir cihaza erişim gerektirerek hesabınızı güvenli tutar."

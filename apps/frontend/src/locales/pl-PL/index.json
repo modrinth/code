@@ -818,9 +818,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "Uwierzytelnianie dwuskładnikowe"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "Wprowadź kod..."
-  },
   "auth.reauthenticate.page-title": {
     "message": "Ponownie uwierzytelnij"
   },
@@ -871,9 +868,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "Weryfikacja dwuetapowa"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Wprowadź kod..."
   },
   "auth.sign-in.add-account": {
     "message": "Dodaj konto"
@@ -4978,9 +4972,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Wprowadź otrzymany kod"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Wprowadź kod..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Weryfikacja dwu etapowa, ma na celu chronić twoje konto wymagając drugie urządzenie, aby się zalogować."

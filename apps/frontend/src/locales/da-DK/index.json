@@ -638,9 +638,6 @@
   "auth.reset-password.title.long": {
     "message": "Nulstil din adgangskode"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Indtast kode..."
-  },
   "auth.sign-in.add-account": {
     "message": "Tilføj konto"
   },
@@ -3049,9 +3046,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Indtast to-faktor-kode"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Indtast kode..."
   },
   "settings.account.two-factor.verify.label": {
     "message": "Verificer kode"

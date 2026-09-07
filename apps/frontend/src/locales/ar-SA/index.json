@@ -854,9 +854,6 @@
   "auth.sign-in.2fa.label": {
     "message": "المصادقة الثنائية"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "أدخل الرمز..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "المتابعة باستخدام البريد الإلكتروني"
   },

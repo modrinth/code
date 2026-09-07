@@ -740,9 +740,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "Dvoufázové ověření"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "Zadej kód..."
-  },
   "auth.reauthenticate.sign-in-another-way": {
     "message": "Přihlásit se jiným způsobem"
   },
@@ -787,9 +784,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "Dvoufázové ověření"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Zadejte kód..."
   },
   "auth.sign-in.add-account": {
     "message": "Přidat účet"
@@ -2881,9 +2875,6 @@
   },
   "settings.account.password.modal.header.add": {
     "message": "Přidat heslo"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Zadejte kód..."
   },
   "settings.account.two-factor.verify.label": {
     "message": "Ověřit kód"

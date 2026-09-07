@@ -827,9 +827,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "二要素認証"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "コードを入力…"
-  },
   "auth.reauthenticate.continue-with-passkey": {
     "message": "パスキーで続ける"
   },
@@ -886,9 +883,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "二要素認証"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "コードを入力…"
   },
   "auth.sign-in.add-account": {
     "message": "アカウントを追加"
@@ -4228,9 +4222,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "二要素認証コードを入力"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "コードを入力…"
   },
   "settings.account.two-factor.setup.intro": {
     "message": "2段階認証では、サインイン時にあなたの別のデバイスへのアクセスを求めることで、アカウントの安全性を高めます。"

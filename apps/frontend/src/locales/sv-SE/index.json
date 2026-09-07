@@ -806,9 +806,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "Tvåfaktorsautentisering"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "Ange kod..."
-  },
   "auth.reauthenticate.continue-with-passkey": {
     "message": "Fortsätt med passkey"
   },
@@ -859,9 +856,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "Tvåfaktorsautentisering"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Ange kod..."
   },
   "auth.sign-in.add-account": {
     "message": "Lägg till konto"
@@ -4450,9 +4444,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Ange tvåfaktorskod"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Ange kod..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Tvåfaktorsautentisering håller ditt konto säkert genom att kräva åtkomst till en andra enhet för att logga in."

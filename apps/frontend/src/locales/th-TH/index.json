@@ -491,9 +491,6 @@
   "auth.reset-password.title.long": {
     "message": "ตั้งรหัสผ่านของคุณใหม่"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "ป้อนรหัส"
-  },
   "auth.sign-in.title": {
     "message": "ลงชื่อเข้าใช้"
   },

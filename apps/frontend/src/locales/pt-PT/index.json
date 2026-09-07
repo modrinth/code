@@ -854,9 +854,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Autenticação de dois fatores"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Inserir código..."
-  },
   "auth.sign-in.choose-account": {
     "message": "Escolha uma conta para usar no App Modrinth"
   },
@@ -3670,9 +3667,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Autenticação de dois fatores"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Inserir código..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Autenticação de dois fatores mantém a tua conta segura ao requerer acesso a um segundo dispositivo para iniciar sessão."

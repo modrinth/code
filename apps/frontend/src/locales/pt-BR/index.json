@@ -854,9 +854,6 @@
   "auth.sign-in.2fa.label": {
     "message": "Autenticação de dois fatores"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Insira o código..."
-  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar com e-mail"
   },
@@ -4831,9 +4828,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Insira o código de dois fatores"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Insira o código..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "A autenticação de dois fatores mantém sua conta segura, exigindo o acesso a um segundo dispositivo para efetuar o login."

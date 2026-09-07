@@ -821,9 +821,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "Подтверждение входа"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "Введите код..."
-  },
   "auth.reauthenticate.continue-with-passkey": {
     "message": "Использовать ключ доступа"
   },
@@ -880,9 +877,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "Подтверждение входа"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Введите код..."
   },
   "auth.sign-in.add-account": {
     "message": "Добавить аккаунт"
@@ -5002,9 +4996,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Код подтверждения"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Введите код..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Двухфакторная аутентификация защищает аккаунт, требуя доступ ко второму устройству при входе в систему."

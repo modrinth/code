@@ -827,9 +827,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "Authentification à double facteur"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "Entrer le code..."
-  },
   "auth.reauthenticate.sign-in-another-way": {
     "message": "Se connecter d'une autre manière"
   },
@@ -874,9 +871,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "Authentification à deux facteurs"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Saisir le code..."
   },
   "auth.sign-in.add-account": {
     "message": "Ajouter un compte"
@@ -4912,9 +4906,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Saisir le code d’authentification à deux facteurs"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Saisir le code..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "L’authentification à deux facteurs protège votre compte en exigeant l’accès à un second appareil pour vous connecter."

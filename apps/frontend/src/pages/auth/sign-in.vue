@@ -13,6 +13,8 @@
 		:accounts="launcherAccountChoices"
 		:on-password-sign-in="beginPasswordSignIn"
 		:on-two-factor-sign-in="begin2FASignIn"
+		:two-factor-pending="twoFactorPending"
+		:two-factor-error="twoFactorError"
 		:on-passkey-sign-in="beginPasskeySignin"
 		:on-set-captcha-ref="setCaptchaRef"
 		@select="onSelectLauncherAccount"
@@ -283,24 +285,28 @@ async function beginPasswordSignIn() {
 }
 
 const twoFactorCode = ref('')
-async function begin2FASignIn() {
+const twoFactorPending = ref(false)
+const twoFactorError = ref(false)
+
+async function begin2FASignIn(code: string) {
+	if (twoFactorPending.value) return
+	twoFactorPending.value = true
+	twoFactorError.value = false
 	startLoading()
 	try {
 		const res = await client.labrinth.auth_v2.login2FA({
 			flow: flow.value,
-			code: twoFactorCode.value,
+			code,
 		})
 
 		await finishSignIn(res.session, 'password')
-	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: getErrorMessage(err),
-			type: 'error',
-		})
-		captcha.value?.reset?.()
+	} catch {
+		twoFactorCode.value = ''
+		twoFactorError.value = true
+	} finally {
+		twoFactorPending.value = false
+		stopLoading()
 	}
-	stopLoading()
 }
 
 async function beginPasskeySignin() {

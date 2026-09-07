@@ -175,30 +175,53 @@
 		>
 			<div class="flex flex-col gap-6">
 				<template v-if="auth.user.has_totp && twoFactorStep === 0">
-					<label for="two-factor-code">
-						<span class="text-md font-semibold text-contrast">{{
-							formatMessage(messages.twoFactorEnterCodeLabel)
-						}}</span>
-						<span class="label__description">{{
+					<div class="flex flex-col gap-2.5">
+						<label
+							id="remove-two-factor-label"
+							for="two-factor-code"
+							class="text-md font-semibold text-contrast"
+						>
+							{{ formatMessage(messages.twoFactorEnterCodeLabel) }}
+						</label>
+						<TwoFactorAuthCodeInput
+							id="two-factor-code"
+							ref="removeTwoFactorCodeInput"
+							v-model="twoFactorCode"
+							allow-backup-code
+							:error="twoFactorIncorrect"
+							:readonly="twoFactorSubmitting"
+							aria-labelledby="remove-two-factor-label"
+							:aria-describedby="
+								twoFactorIncorrect
+									? 'remove-two-factor-description remove-two-factor-error'
+									: 'remove-two-factor-description'
+							"
+							@update:model-value="twoFactorIncorrect = false"
+							@keydown.enter.prevent="removeTwoFactor()"
+						/>
+						<span id="remove-two-factor-description" class="label__description">{{
 							formatMessage(messages.twoFactorEnterCodeDescription)
 						}}</span>
-					</label>
-					<Input
-						id="two-factor-code"
-						v-model="twoFactorCode"
-						:maxlength="11"
-						:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
-						@keyup.enter="removeTwoFactor()"
-					/>
-					<p v-if="twoFactorIncorrect" class="known-errors m-0">
-						{{ formatMessage(messages.twoFactorIncorrectError) }}
-					</p>
+						<p
+							v-if="twoFactorIncorrect"
+							id="remove-two-factor-error"
+							role="alert"
+							class="known-errors m-0"
+						>
+							{{ formatMessage(messages.twoFactorIncorrectError) }}
+						</p>
+					</div>
 					<div class="flex justify-end gap-2.5">
 						<Button @click="$refs.manageTwoFactorModal.hide()">
 							<XIcon />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</Button>
-						<Button type="colored" color="red" @click="removeTwoFactor">
+						<Button
+							type="colored"
+							color="red"
+							:disabled="twoFactorSubmitting || !twoFactorCode"
+							@click="removeTwoFactor"
+						>
 							<TrashIcon />
 							{{ formatMessage(messages.twoFactorRemoveButton) }}
 						</Button>
@@ -210,12 +233,13 @@
 						<p class="m-0">
 							<IntlFormatted :message-id="messages.twoFactorSetupScan">
 								<template #authy-link="{ children }">
-									<a href="https://authy.com/" target="_blank" rel="noreferrer">
+									<a class="underline" href="https://authy.com/" target="_blank" rel="noreferrer">
 										<component :is="() => children" />
 									</a>
 								</template>
 								<template #microsoft-authenticator-link="{ children }">
 									<a
+										class="underline"
 										href="https://www.microsoft.com/en-us/security/mobile-authenticator-app"
 										target="_blank"
 										rel="noreferrer"
@@ -240,25 +264,41 @@
 						</p>
 					</template>
 					<template v-if="twoFactorStep === 1">
-						<label for="verify-code">
-							<span class="text-md font-semibold text-contrast">{{
-								formatMessage(messages.twoFactorVerifyCodeLabel)
-							}}</span>
-							<span class="label__description">{{
+						<div class="flex flex-col gap-2.5">
+							<label
+								id="verify-two-factor-label"
+								for="verify-code"
+								class="text-md font-semibold text-contrast"
+							>
+								{{ formatMessage(messages.twoFactorVerifyCodeLabel) }}
+							</label>
+							<TwoFactorAuthCodeInput
+								id="verify-code"
+								ref="twoFactorCodeInput"
+								v-model="twoFactorCode"
+								:error="twoFactorIncorrect"
+								:readonly="twoFactorSubmitting"
+								aria-labelledby="verify-two-factor-label"
+								:aria-describedby="
+									twoFactorIncorrect
+										? 'verify-two-factor-description verify-two-factor-error'
+										: 'verify-two-factor-description'
+								"
+								@update:model-value="twoFactorIncorrect = false"
+								@keydown.enter.prevent="verifyTwoFactorCode()"
+							/>
+							<span id="verify-two-factor-description" class="label__description">{{
 								formatMessage(messages.twoFactorVerifyCodeDescription)
 							}}</span>
-						</label>
-						<Input
-							id="verify-code"
-							v-model="twoFactorCode"
-							:maxlength="6"
-							autocomplete="one-time-code"
-							:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
-							@keyup.enter="verifyTwoFactorCode()"
-						/>
-						<p v-if="twoFactorIncorrect" class="known-errors m-0">
-							{{ formatMessage(messages.twoFactorIncorrectError) }}
-						</p>
+							<p
+								v-if="twoFactorIncorrect"
+								id="verify-two-factor-error"
+								role="alert"
+								class="known-errors m-0"
+							>
+								{{ formatMessage(messages.twoFactorIncorrectError) }}
+							</p>
+						</div>
 					</template>
 					<template v-if="twoFactorStep === 2">
 						<p class="m-0">{{ formatMessage(messages.twoFactorBackupCodesIntro) }}</p>
@@ -268,7 +308,11 @@
 						</ul>
 					</template>
 					<div class="flex justify-end gap-2.5">
-						<Button v-if="twoFactorStep === 1" @click="twoFactorStep = 0">
+						<Button
+							v-if="twoFactorStep === 1"
+							:disabled="twoFactorSubmitting"
+							@click="twoFactorStep = 0"
+						>
 							<LeftArrowIcon />
 							{{ formatMessage(commonMessages.backButton) }}
 						</Button>
@@ -278,6 +322,7 @@
 						</Button>
 						<Button
 							v-if="twoFactorStep <= 1"
+							:disabled="twoFactorSubmitting || (twoFactorStep === 1 && twoFactorCode.length !== 6)"
 							type="colored"
 							color="brand"
 							@click="twoFactorStep === 1 ? verifyTwoFactorCode() : (twoFactorStep = 1)"
@@ -491,8 +536,10 @@ import GoogleIcon from 'assets/icons/auth/sso-google.svg'
 import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
 import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
+import { nextTick, watch } from 'vue'
 
 import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
+import TwoFactorAuthCodeInput from '~/components/ui/auth/TwoFactorAuthCodeInput.vue'
 import { forgetStoredAccount } from '~/composables/accounts.ts'
 import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
 import { useAuthCookie } from '~/composables/auth-cookie.ts'
@@ -670,11 +717,7 @@ const messages = defineMessages({
 	},
 	twoFactorEnterCodeDescription: {
 		id: 'settings.account.two-factor.field.code.description',
-		defaultMessage: 'Please enter a two-factor code to proceed.',
-	},
-	twoFactorCodePlaceholder: {
-		id: 'settings.account.two-factor.field.code.placeholder',
-		defaultMessage: 'Enter code...',
+		defaultMessage: 'Enter a code from your authenticator app, or use one of your backup codes.',
 	},
 	twoFactorIncorrectError: {
 		id: 'settings.account.two-factor.error.incorrect-code',
@@ -858,11 +901,16 @@ const manageTwoFactorModal = ref()
 const twoFactorSecret = ref(null)
 const twoFactorFlow = ref(null)
 const twoFactorStep = ref(0)
+const twoFactorCodeInput = ref()
+const removeTwoFactorCodeInput = ref()
+const twoFactorSubmitting = ref(false)
 async function showTwoFactorModal() {
 	twoFactorStep.value = 0
-	twoFactorCode.value = null
+	twoFactorCode.value = ''
 	twoFactorIncorrect.value = false
 	if (auth.value.user.has_totp) {
+		await nextTick()
+		removeTwoFactorCodeInput.value?.clear()
 		manageTwoFactorModal.value.show()
 		return
 	}
@@ -870,7 +918,6 @@ async function showTwoFactorModal() {
 	twoFactorSecret.value = null
 	twoFactorFlow.value = null
 	backupCodes.value = []
-	manageTwoFactorModal.value.show()
 
 	startLoading()
 	try {
@@ -888,12 +935,28 @@ async function showTwoFactorModal() {
 		})
 	}
 	stopLoading()
+	manageTwoFactorModal.value.show()
 }
 
 const twoFactorIncorrect = ref(false)
-const twoFactorCode = ref(null)
+const twoFactorCode = ref('')
 const backupCodes = ref([])
+
+watch(twoFactorStep, async (step) => {
+	twoFactorCode.value = ''
+	twoFactorIncorrect.value = false
+	if (step !== 1) {
+		return
+	}
+
+	await nextTick()
+	twoFactorCodeInput.value?.focus()
+})
+
 async function verifyTwoFactorCode() {
+	if (twoFactorSubmitting.value || !/^\d{6}$/.test(twoFactorCode.value)) return
+	twoFactorSubmitting.value = true
+	twoFactorIncorrect.value = false
 	startLoading()
 	try {
 		const res = await useBaseFetch('auth/2fa', {
@@ -909,11 +972,16 @@ async function verifyTwoFactorCode() {
 		await useAuth(auth.value.token)
 	} catch {
 		twoFactorIncorrect.value = true
+	} finally {
+		twoFactorSubmitting.value = false
+		stopLoading()
 	}
-	stopLoading()
 }
 
 async function removeTwoFactor() {
+	if (twoFactorSubmitting.value || !twoFactorCode.value) return
+	twoFactorSubmitting.value = true
+	twoFactorIncorrect.value = false
 	startLoading()
 	try {
 		await useBaseFetch('auth/2fa', {
@@ -926,8 +994,10 @@ async function removeTwoFactor() {
 		await useAuth(auth.value.token)
 	} catch {
 		twoFactorIncorrect.value = true
+	} finally {
+		twoFactorSubmitting.value = false
+		stopLoading()
 	}
-	stopLoading()
 }
 
 const authProviders = [

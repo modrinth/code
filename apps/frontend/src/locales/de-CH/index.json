@@ -827,9 +827,6 @@
   "auth.reauthenticate.2fa.label": {
     "message": "Zwei-Faktor-Authentifizierung"
   },
-  "auth.reauthenticate.2fa.placeholder": {
-    "message": "Code eingeben..."
-  },
   "auth.reauthenticate.continue-with-passkey": {
     "message": "Mit Passkey fortfahren"
   },
@@ -886,9 +883,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "Zwei-Faktor-Authentifizierung"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Code eingeben..."
   },
   "auth.sign-in.add-account": {
     "message": "Konto hinzufügen"
@@ -5026,9 +5020,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Zwei-Faktor-Code eingeben"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Code eingeben..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Die Zwei-Faktor-Authentifizierung schützt dein Konto, indem es für die Anmeldung den Zugriff auf ein zweites Gerät erfordert."
