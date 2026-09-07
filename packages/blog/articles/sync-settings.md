@@ -2,6 +2,7 @@
 title: Sync settings across instances
 summary: Keep game options, servers, resource packs, and more the same across your instances.
 date: 2026-09-07T20:00:00+01:00
+authors: [bOHH0P9Z, AJfd8YH6]
 ---
 
 Hey everyone,
