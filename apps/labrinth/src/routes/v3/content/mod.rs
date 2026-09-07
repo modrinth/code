@@ -632,6 +632,16 @@ fn resolve_provider_error(error: impl std::fmt::Display) -> ResolveError {
 
 fn resolve_error_to_api(error: ResolveError) -> ApiError {
     match error {
+		ResolveError::UnknownContentType(content_type) => ApiError::Request(
+			eyre::eyre!("unknown content type `{content_type}`"),
+		),
+		ResolveError::ConflictingProjectVersions {
+			project_id,
+			before,
+			after,
+		} => ApiError::Request(eyre::eyre!(
+			"project `{project_id}` has conflicting versions `{before}` and `{after}`"
+		)),
         ResolveError::Provider(message) => {
             ApiError::Internal(eyre::eyre!(message))
         }
