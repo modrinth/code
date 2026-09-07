@@ -26,7 +26,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 								width="20"
 								height="20"
 								alt="Time icon"
-								src="https://cdn-raw.modrinth.com/email/earth.png"
+								src="https://cdn.modrinth.com/email/earth.png"
 							/>
 						</Column>
 						<Column>
@@ -41,7 +41,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 								width="20"
 								height="20"
 								alt="Time icon"
-								src="https://cdn-raw.modrinth.com/email/monitor-smartphone.png"
+								src="https://cdn.modrinth.com/email/monitor-smartphone.png"
 							/>
 						</Column>
 						<Column>
@@ -56,7 +56,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 								width="20"
 								height="20"
 								alt="Time icon"
-								src="https://cdn-raw.modrinth.com/email/clock.png"
+								src="https://cdn.modrinth.com/email/clock.png"
 							/>
 						</Column>
 						<Column>

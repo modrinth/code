@@ -12,6 +12,7 @@ import {
 	Accordion,
 	Button,
 	commonMessages,
+	ContextMenu,
 	defineMessages,
 	injectNotificationManager,
 	InlineEditableText,
@@ -21,7 +22,6 @@ import {
 } from '@modrinth/ui'
 import { computed, inject, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
 import type {
@@ -163,6 +163,10 @@ const messages = defineMessages({
 		id: 'app.library.group.empty',
 		defaultMessage: 'Drag and drop to add instances.',
 	},
+	groupActionsLabel: {
+		id: 'app.library.group.actions.label',
+		defaultMessage: 'Group actions',
+	},
 })
 
 function openInstanceContextMenu(event: MouseEvent, instanceId: string, instanceGroupId: string) {
@@ -204,49 +208,45 @@ function requestGroupDeletion() {
 
 function openGroupContextMenu(event: MouseEvent) {
 	groupContextMenuOpen.value = true
-	groupOptions.value?.showMenu(
-		event,
-		props.instanceGroup,
-		isFavorites.value
-			? [{ name: 'new_instance' }]
-			: isCustomGroup.value
-				? [
-						{ name: 'new_instance' },
-						{ name: 'add_instances' },
-						{ name: 'edit_name' },
-						{ type: 'divider' },
-						{ name: 'delete_group', color: 'danger' },
-					]
-				: [{ name: 'new_instance' }],
-	)
-}
-
-function handleGroupOption({ option }: { option: string }) {
-	if (option === 'new_instance') {
-		showCreationModal?.()
-		return
-	}
-
-	if (option === 'add_instances') {
-		openGroupInstancesModal(props.instanceGroup.id)
-		return
-	}
-
-	if (option === 'edit_name') {
-		void groupNameInput.value?.startEditing()
-		return
-	}
-
-	if (option === 'delete_group') {
-		requestGroupDeletion()
-	}
+	groupOptions.value?.open(event, [
+		{
+			id: 'new_instance',
+			label: formatMessage(messages.newInstance),
+			icon: PlusIcon,
+			action: () => showCreationModal?.(),
+		},
+		{
+			id: 'add_instances',
+			label: formatMessage(messages.addToGroup),
+			icon: SquarePlusIcon,
+			shown: isCustomGroup.value,
+			action: () => openGroupInstancesModal(props.instanceGroup.id),
+		},
+		{
+			id: 'edit_name',
+			label: formatMessage(messages.editGroupName),
+			icon: EditIcon,
+			shown: isCustomGroup.value,
+			action: () => void groupNameInput.value?.startEditing(),
+		},
+		{ type: 'divider', shown: isCustomGroup.value },
+		{
+			id: 'delete_group',
+			label: formatMessage(messages.deleteGroup),
+			icon: TrashIcon,
+			shown: isCustomGroup.value,
+			tone: 'red',
+			hoverFilledOnly: true,
+			action: requestGroupDeletion,
+		},
+	])
 }
 
 function prepareGroupToggle(event: PointerEvent) {
 	const editor = groupNameInput.value
 	const contextMenuWasOpen = groupContextMenuOpen.value
 	if (contextMenuWasOpen) {
-		groupOptions.value?.hideMenu()
+		groupOptions.value?.close()
 	}
 
 	shouldSkipGroupToggle = Boolean(
@@ -523,16 +523,9 @@ onMounted(startInstanceGridResizeObserver)
 
 	<ContextMenu
 		ref="groupOptions"
-		@menu-closed="groupContextMenuOpen = false"
-		@option-clicked="handleGroupOption"
-	>
-		<template #new_instance> <PlusIcon /> {{ formatMessage(messages.newInstance) }} </template>
-		<template #add_instances>
-			<SquarePlusIcon /> {{ formatMessage(messages.addToGroup) }}
-		</template>
-		<template #edit_name> <EditIcon /> {{ formatMessage(messages.editGroupName) }} </template>
-		<template #delete_group> <TrashIcon /> {{ formatMessage(messages.deleteGroup) }} </template>
-	</ContextMenu>
+		:label="formatMessage(messages.groupActionsLabel)"
+		@close="groupContextMenuOpen = false"
+	/>
 
 	<NewModal
 		ref="confirmDeleteGroupModal"

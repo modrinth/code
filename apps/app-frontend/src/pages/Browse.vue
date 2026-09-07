@@ -2,7 +2,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
-	ClipboardCopyIcon,
 	CompassIcon,
 	ExternalIcon,
 	GlobeIcon,
@@ -15,6 +14,7 @@ import {
 	BrowsePageLayout,
 	BrowseSidebar,
 	commonMessages,
+	ContextMenu,
 	CreationFlowModal,
 	defineMessages,
 	formatProjectTypeSentence,
@@ -38,7 +38,6 @@ import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -516,7 +515,6 @@ const {
 	getServerModpackContent,
 	getServerCardActions,
 	handleRightClick,
-	handleOptionsClick,
 } = useAppServerBrowse({
 	instance,
 	isFromWorlds,
@@ -550,6 +548,10 @@ const messages = defineMessages({
 	addServersToInstance: {
 		id: 'app.browse.add-servers-to-instance',
 		defaultMessage: 'Adding server to instance',
+	},
+	projectActionsLabel: {
+		id: 'app.browse.project-actions.label',
+		defaultMessage: 'Project actions',
 	},
 	addToAnInstance: {
 		id: 'app.browse.add-to-an-instance',
@@ -1328,15 +1330,12 @@ provideBrowseManager({
 </script>
 
 <template>
-	<div class="flex flex-col gap-3 p-6">
+	<div class="flex flex-col gap-2 p-6">
 		<BrowsePageLayout>
 			<template #after>
-				<ContextMenu ref="contextMenuRef" @option-clicked="handleOptionsClick">
-					<template #open_link>
-						<GlobeIcon /> {{ formatMessage(commonMessages.openInModrinthButton) }} <ExternalIcon />
-					</template>
-					<template #copy_link>
-						<ClipboardCopyIcon /> {{ formatMessage(commonMessages.copyLinkButton) }}
+				<ContextMenu ref="contextMenuRef" :label="formatMessage(messages.projectActionsLabel)">
+					<template #open_link="{ option }">
+						<GlobeIcon /> {{ option.label }} <ExternalIcon />
 					</template>
 				</ContextMenu>
 			</template>

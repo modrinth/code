@@ -2003,9 +2003,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Betalingsmetode"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Tilgængelig i Nord Amerika, Europa og Sydøst Asien."
-  },
   "servers.purchase.step.plan.custom.heading": {
     "defaultMessage": "Ved du lige hvad du har brug for?"
   },
@@ -2217,4 +2214,3 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
-

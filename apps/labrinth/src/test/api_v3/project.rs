@@ -12,8 +12,7 @@ use actix_web::{
 };
 use async_trait::async_trait;
 use bytes::Bytes;
-use chrono::{DateTime, Utc};
-use rust_decimal::Decimal;
+
 use serde_json::json;
 
 use crate::test::asserts::assert_status;
@@ -562,76 +561,6 @@ impl ApiV3 {
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
-        assert_status!(&resp, StatusCode::OK);
-        test::read_body_json(resp).await
-    }
-
-    pub async fn get_analytics_revenue(
-        &self,
-        id_or_slugs: Vec<&str>,
-        ids_are_version_ids: bool,
-        start_date: Option<DateTime<Utc>>,
-        end_date: Option<DateTime<Utc>>,
-        resolution_minutes: Option<u32>,
-        pat: Option<&str>,
-    ) -> ServiceResponse {
-        let pv_string = if ids_are_version_ids {
-            let version_string: String =
-                serde_json::to_string(&id_or_slugs).unwrap();
-            let version_string = urlencoding::encode(&version_string);
-            format!("version_ids={version_string}")
-        } else {
-            let projects_string: String =
-                serde_json::to_string(&id_or_slugs).unwrap();
-            let projects_string = urlencoding::encode(&projects_string);
-            format!("project_ids={projects_string}")
-        };
-
-        let mut extra_args = String::new();
-        if let Some(start_date) = start_date {
-            let start_date = start_date.to_rfc3339();
-            // let start_date = serde_json::to_string(&start_date).unwrap();
-            let start_date = urlencoding::encode(&start_date);
-            write!(&mut extra_args, "&start_date={start_date}").unwrap();
-        }
-        if let Some(end_date) = end_date {
-            let end_date = end_date.to_rfc3339();
-            // let end_date = serde_json::to_string(&end_date).unwrap();
-            let end_date = urlencoding::encode(&end_date);
-            write!(&mut extra_args, "&end_date={end_date}").unwrap();
-        }
-        if let Some(resolution_minutes) = resolution_minutes {
-            write!(&mut extra_args, "&resolution_minutes={resolution_minutes}")
-                .unwrap();
-        }
-
-        let req = test::TestRequest::get()
-            .uri(&format!("/v3/analytics/revenue?{pv_string}{extra_args}",))
-            .append_pat(pat)
-            .to_request();
-
-        self.call(req).await
-    }
-
-    pub async fn get_analytics_revenue_deserialized(
-        &self,
-        id_or_slugs: Vec<&str>,
-        ids_are_version_ids: bool,
-        start_date: Option<DateTime<Utc>>,
-        end_date: Option<DateTime<Utc>>,
-        resolution_minutes: Option<u32>,
-        pat: Option<&str>,
-    ) -> HashMap<String, HashMap<i64, Decimal>> {
-        let resp = self
-            .get_analytics_revenue(
-                id_or_slugs,
-                ids_are_version_ids,
-                start_date,
-                end_date,
-                resolution_minutes,
-                pat,
-            )
-            .await;
         assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }

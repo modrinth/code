@@ -691,8 +691,7 @@ pub async fn project_edit(
         true,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // If client and server side were set, we will call
     // the version setting route for each version to set the side types for each of them.

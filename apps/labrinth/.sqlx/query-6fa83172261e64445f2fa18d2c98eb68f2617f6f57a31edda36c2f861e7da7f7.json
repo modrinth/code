@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT didws.project_id AS \"project_id!: DBProjectId\"\n        FROM delphi_issue_details_with_statuses didws\n        WHERE didws.id = ANY($1::bigint[])\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "6fa83172261e64445f2fa18d2c98eb68f2617f6f57a31edda36c2f861e7da7f7"
+}

@@ -23,6 +23,7 @@ pub fn get_image_ext(content_type: &str) -> Option<&'static str> {
 }
 
 pub fn project_file_type(ext: &str) -> Option<&str> {
+    // Notify #mr-devops before adding new filetype.
     match ext {
         "jar" => Some("application/java-archive"),
         "zip" | "litemod" => Some("application/zip"),

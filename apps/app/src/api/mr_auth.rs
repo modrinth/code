@@ -14,6 +14,9 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
             modrinth_login,
             logout,
             get,
+            get_all,
+            set_active,
+            remove_account,
             cancel_modrinth_login,
         ])
         .build()
@@ -23,6 +26,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
 pub async fn modrinth_login<R: Runtime>(
     app: tauri::AppHandle<R>,
     flow: mr_auth::ModrinthAuthFlow,
+    add_account: Option<bool>,
 ) -> Result<ModrinthCredentials> {
     let (auth_code_recv_socket_tx, auth_code_recv_socket) = oneshot::channel();
     let auth_code = tokio::spawn(oauth_utils::auth_code_reply::listen(
@@ -31,9 +35,9 @@ pub async fn modrinth_login<R: Runtime>(
 
     let auth_code_recv_socket = auth_code_recv_socket.await.unwrap()?;
 
-    let auth_request_uri = format!(
+    let mut auth_request_uri = format!(
         "{}?launcher=true&ipver={}&port={}",
-        mr_auth::authenticate_begin_flow(flow),
+        mr_auth::authenticate_begin_flow(flow).await?,
         if auth_code_recv_socket.is_ipv4() {
             "4"
         } else {
@@ -41,6 +45,10 @@ pub async fn modrinth_login<R: Runtime>(
         },
         auth_code_recv_socket.port()
     );
+
+    if add_account.unwrap_or(false) {
+        auth_request_uri.push_str("&add_account=true");
+    }
 
     app.opener()
         .open_url(auth_request_uri, None::<&str>)
@@ -76,6 +84,21 @@ pub async fn logout() -> Result<()> {
 #[tauri::command]
 pub async fn get() -> Result<Option<ModrinthCredentials>> {
     Ok(theseus::mr_auth::get_credentials().await?)
+}
+
+#[tauri::command]
+pub async fn get_all() -> Result<Vec<ModrinthCredentials>> {
+    Ok(theseus::mr_auth::get_all().await?)
+}
+
+#[tauri::command]
+pub async fn set_active(user_id: String) -> Result<()> {
+    Ok(theseus::mr_auth::set_active(&user_id).await?)
+}
+
+#[tauri::command]
+pub async fn remove_account(user_id: String) -> Result<()> {
+    Ok(theseus::mr_auth::remove_user(&user_id).await?)
 }
 
 #[tauri::command]

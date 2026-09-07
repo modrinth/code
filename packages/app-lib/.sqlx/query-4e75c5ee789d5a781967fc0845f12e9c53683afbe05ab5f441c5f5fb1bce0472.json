@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT id, name\n\t\tFROM screenshot_groups\n\t\tORDER BY display_order, name, id\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "4e75c5ee789d5a781967fc0845f12e9c53683afbe05ab5f441c5f5fb1bce0472"
+}

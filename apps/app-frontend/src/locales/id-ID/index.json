@@ -593,12 +593,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Pilih kanal pembaruan"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Luncurkan kait"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Luncurkan kait tersuai"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Kait membolehkan pengguna ahli untuk menjalankan beberapa perintah sistem sebelum dan setelah meluncurkan permainan."
   },
@@ -637,9 +631,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versi {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java dan memori"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Variabel lingkungan tersuai"

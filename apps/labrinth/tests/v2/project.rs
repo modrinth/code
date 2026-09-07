@@ -406,6 +406,45 @@ async fn permissions_upload_version() {
 }
 
 #[actix_rt::test]
+async fn invalid_review_submission_returns_validation_error() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV2>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({ "status": "draft" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let response = api
+                .edit_project(
+                    project_slug,
+                    json!({
+                        "body": "",
+                        "status": "processing",
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let error: serde_json::Value = test::read_body_json(response).await;
+            assert_eq!(
+                error["description"],
+                "project must have no required validation nags before or while under review"
+            );
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
 pub async fn test_patch_v2() {
     // Hits V3-specific patchable fields
     // Other fields are tested in test_patch_project (the v2 version of that test)

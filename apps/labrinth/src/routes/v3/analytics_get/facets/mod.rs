@@ -59,7 +59,7 @@ pub struct ProjectPlaytimeFacets {
     pub country: Vec<String>,
 }
 
-/// Get analytics facets.  
+/// Get analytics facets.
 #[utoipa::path(
 	context_path = "/analytics",
 	tag = "analytics",

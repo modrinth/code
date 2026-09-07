@@ -1,8 +1,8 @@
 const whitelistedParams = ['flow', 'error']
 
-export default defineNuxtRouteMiddleware(async (_to, from) => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
 	const config = useRuntimeConfig()
-	const auth = await useAuth()
+	const auth = await useAuth(null, to)
 
 	if (auth.value.user) return
 

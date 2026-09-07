@@ -1,6 +1,6 @@
 <template>
 	<Teleport to="body">
-		<div v-if="open" class="modal-root">
+		<div v-if="open" class="modal-root" data-modal-root :data-modal-id="modalId">
 			<div
 				:class="{ shown: visible }"
 				class="tauri-overlay"
@@ -267,6 +267,12 @@ function getFocusableElements(): HTMLElement[] {
 	return Array.from(modalBodyRef.value.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
 }
 
+function renderedModalDepth(): number {
+	return Array.from(document.querySelectorAll<HTMLElement>('[data-modal-root]')).filter(
+		(root) => root.dataset.modalId !== modalId,
+	).length
+}
+
 function show(event?: MouseEvent) {
 	if (hideTimeout) {
 		clearTimeout(hideTimeout)
@@ -274,7 +280,7 @@ function show(event?: MouseEvent) {
 	}
 	props.onShow?.()
 	const wasEmpty = modalStackSize() === 0
-	stackDepth.value = modalStackSize()
+	stackDepth.value = Math.max(modalStackSize(), renderedModalDepth())
 	open.value = true
 	previousFocusEl = document.activeElement
 	pushModal()

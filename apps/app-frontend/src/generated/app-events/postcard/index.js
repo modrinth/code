@@ -352,12 +352,16 @@ function deserialize_INSTANCE_PAYLOAD_TYPE(d) {
         };
     case 3:
         return {
+            tag: "screenshots_updated"
+        };
+    case 4:
+        return {
             tag: "world_updated",
             value: {
                 world: d.deserialize_string()
             }
         };
-    case 4:
+    case 5:
         return {
             tag: "server_joined",
             value: {
@@ -366,18 +370,18 @@ function deserialize_INSTANCE_PAYLOAD_TYPE(d) {
                 timestamp: d.deserialize_string()
             }
         };
-    case 5:
+    case 6:
         return {
             tag: "edited"
         };
-    case 6:
+    case 7:
         return {
             tag: "content_install_finished",
             value: {
                 project_ids: d.deserialize_array(() => d.deserialize_string())
             }
         };
-    case 7:
+    case 8:
         return {
             tag: "content_install_failed",
             value: {
@@ -385,7 +389,7 @@ function deserialize_INSTANCE_PAYLOAD_TYPE(d) {
                 message: d.deserialize_string()
             }
         };
-    case 8:
+    case 9:
         return {
             tag: "removed"
         };

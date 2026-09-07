@@ -17,7 +17,7 @@ import type { RouteLocationRaw } from 'vue-router'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import ProgressSpinner from '#ui/components/base/ProgressSpinner.vue'
@@ -67,7 +67,7 @@ interface Props {
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
 	hideSwitchVersion?: boolean
-	overflowOptions?: OverflowMenuOption[]
+	overflowOptions?: ButtonMenuOption[]
 	disabled?: boolean
 	disabledTooltip?: string | null
 	toggleDisabled?: boolean

@@ -47,7 +47,12 @@
 						class="flex flex-col items-center gap-4 rounded-3xl border border-solid border-surface-5 bg-surface-3 p-6"
 					>
 						<div class="flex w-full items-center gap-3 rounded-xl bg-surface-2 p-3">
-							<Avatar :src="instance.icon" :alt="instance.name" size="48px" />
+							<Avatar
+								:src="instance.icon"
+								:alt="instance.name"
+								size="48px"
+								pad-transparent-corners
+							/>
 							<div class="flex min-w-0 flex-col gap-1">
 								<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
 								<span class="flex items-center gap-1.5 text-sm font-medium leading-4 text-primary">

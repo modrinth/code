@@ -11,6 +11,116 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-01T00:51:50+00:00`,
+		product: 'app',
+		version: '0.19.2',
+		body: `## Added
+- Added options to hide Files, Worlds, and Screenshots tabs in instance settings.
+- Added a sync source picker when enabling command history, multiplayer servers, or creative hotbars sync.
+
+## Changed
+- Moved the global Screenshots page toggle from Synced settings into Behavior settings as "Show all screenshots together".
+- Screenshots tab on instances is now independent of sync settings.
+- Redesigned the slider control used for settings such as memory allocation.
+- Removed the blur censor tool in the screenshot editor. It did not work properly and was not functional as a censor.
+- Command history, multiplayer servers, and creative hotbars are now disabled by default until you choose a sync source.
+
+## Fixed
+- Fixed issues with java, window, and hooks overrides in instance settings.
+- Fixed remaining lag when scrolling large screenshot libraries.
+- Fixed GIF and WebP images not displaying correctly in the screenshot viewer.
+- Fixed screenshot cards flashing or failing to fade in while the gallery loads.
+- Fixed log spam on event updates.`,
+	},
+	{
+		date: `2026-09-01T00:51:50+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed error page not working.`,
+	},
+	{
+		date: `2026-08-27T18:54:17+00:00`,
+		product: 'app',
+		version: '0.19.1',
+		body: `## Changed
+- Updated style of spoilers in descriptions.
+- Updated style of code formatting and snippets in descriptions.
+- Fourth-level headings in descriptions now have more contrast compared to regular body text.
+
+## Fixed
+- Fixed lag on Screenshots page/tab when you have a lot of screenshots`,
+	},
+	{
+		date: `2026-08-27T18:54:17+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated style of spoilers in descriptions.
+- Updated style of code formatting and snippets in descriptions.
+- Fourth-level headings in descriptions now have more contrast compared to regular body text.`,
+	},
+	{
+		date: `2026-08-27T17:07:29+00:00`,
+		product: 'app',
+		version: '0.19.0',
+		body: `## Added
+- Added option to switch between multiple signed-in Modrinth accounts.
+- Added the ability to view the app signed out as well even when accounts are added.
+- Added right-click context menu actions for Jump in items.
+- Added "Add a friend" to account menu.
+- Added a new global screenshots page accessible via the sidebar, which shows all screenshots you've taken from all of your instances.
+- Added an option to instances which allows you to opt-out an instance from the global screenshots page, which will enable an instance-local screenshot tab showing screenshots only for that instance.
+- Added a new screenshot editor, allowing you to annotate, doodle and blur out areas of your screenshots.
+- Added syncing between instances for command history, the in-game server list and creative hotbars. You will need to enable this for any existing instances in the Sync override tab of your instance settings.
+
+## Changed
+- Improved the consistency of filter dropdowns on the Versions page.
+- Improved the consistency of context menus, now they look the same as overflow menus.
+- Changed profile button to say "View profile" in account menu.
+- Added "Open backups folder" button from the state initialization error screen.
+- Appearance settings now remember your preferred dark theme when using "Sync with system".
+- Theme changes now happen instantly, disabling any funky transitions while it happens.
+- Splash screen is now responsive to color theme.
+- Made resize handle on "Jump in" section always visible.
+
+## Fixed
+- Non-instance icons with transparent corners are no longer padded, fixing many icons flashing in after a second.
+- Fixed window controls being covered by the splash screen.
+- Fixed "Official Modrinth account" badge on official profiles appearing gray instead of green
+- Fixed newer snapshots since 26.1 not being grouped properly.
+- Fixed settings menu headers being cut off when the window is small.
+- Fixed creating a new group when only one group exists does not show the group.
+- Fixed inconsistencies with text inputs.`,
+	},
+	{
+		date: `2026-08-27T17:07:29+00:00`,
+		product: 'web',
+		body: `## Added
+- Added option to switch between multiple signed-in Modrinth accounts.
+- Added the ability to view the site signed out as well even when accounts are added.
+
+## Changed
+- Improved the consistency of filter dropdowns on the Versions and Changelog pages.
+- When signing into Modrinth App, you're now given the choice of which account you'd like to sign into.
+- When you get a "You don't have access to this page" error, you are given the option to switch to another account.
+- Theme changes now happen instantly, disabling any funky transitions while it happens.
+- Renamed "Source jar" to "Sources jar" and "Javadoc jar" to "Javadocs jar"
+- Changed the icons for publish options to include a plus on them.
+- Redesigned the gallery image viewer to match what we have in Modrinth App for screenshots.
+- Opening an image in a new tab will now open the raw image.
+- Collections by non-creators are no longer indexed.
+- Changed Settings page favicons to have a Settings cog icon in the corner.
+- Removed cog emoji from project settings page titles.
+
+## Fixed
+- Non-instance icons with transparent corners are no longer padded, fixing many icons flashing in after a second.
+- Fixed color theme settings not showing what your preferred dark theme is.
+- Fixed "Official Modrinth account" badge on official profiles appearing gray instead of green
+- Fixed project status badges not visible on your projects in organizations
+- Fixed projects in organizations not being sorted by status.
+- Fixed newer snapshots since 26.1 not being grouped properly.
+- Fixed inconsistencies with text inputs.`,
+	},
+	{
 		date: `2026-08-20T22:10:10+00:00`,
 		product: 'app',
 		version: '0.18.2',
@@ -3403,7 +3513,7 @@ const VERSIONS: VersionEntry[] = [
 		body: `### Improvements
 - The report form has been updated to walk you through the report process better and clarify some things like that the form is for Modrinth rules and terms violations, not for bug reports or DMCA takedowns.
 
-![A screenshot of the new report form on Modrinth, using Iris Shaders as an example. The title says "Report Iris Shaders to moderators". Below that, it says "Please report violations of Modrinth Rules or Terms of Use. Examples include malicious, spam, offensive, deceptive, misleading, and illegal content. This form is not for bug reports or DMCA takedowns (See our Copyright Policy)." Then, there is a form that asks "Which of Modrinth's rules is this project violating?" with many options: Spam, Reuploaded work, Inappropriate, Malicious, Name-squatting, Poor description, Invalid metadata, Other. Reuploaded work is selected. Below that, is a note in an orange box with a warning icon: "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content. If you meant to file a DMCA takedown request (which is a legal action) instead, please see our Copyright Policy." Then, it asks you to provide additional context, including links and images, with a text editor and a submit button at the bottom.](https://cdn-raw.modrinth.com/changelog/web/2025-02-02/reports.jpg)`,
+![A screenshot of the new report form on Modrinth, using Iris Shaders as an example. The title says "Report Iris Shaders to moderators". Below that, it says "Please report violations of Modrinth Rules or Terms of Use. Examples include malicious, spam, offensive, deceptive, misleading, and illegal content. This form is not for bug reports or DMCA takedowns (See our Copyright Policy)." Then, there is a form that asks "Which of Modrinth's rules is this project violating?" with many options: Spam, Reuploaded work, Inappropriate, Malicious, Name-squatting, Poor description, Invalid metadata, Other. Reuploaded work is selected. Below that, is a note in an orange box with a warning icon: "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content. If you meant to file a DMCA takedown request (which is a legal action) instead, please see our Copyright Policy." Then, it asks you to provide additional context, including links and images, with a text editor and a submit button at the bottom.](https://cdn.modrinth.com/changelog/web/2025-02-02/reports.jpg)`,
 	},
 	{
 		date: `2025-01-28T19:00:00-08:00`,

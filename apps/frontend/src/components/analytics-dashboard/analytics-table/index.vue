@@ -192,8 +192,8 @@
 import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
 import { TeleportOverflowMenu } from '@modrinth/ui'
 import {
+	type ButtonMenuOption,
 	Input,
-	type OverflowMenuOption,
 	Pagination,
 	Table,
 	useFormatNumber,
@@ -363,7 +363,7 @@ const displayedIncludeDateColumn = computed(() =>
 const groupByLabel = computed(() =>
 	getAnalyticsTableGroupByLabel(selectedGroupBy.value, formatMessage),
 )
-const csvExportOptions = computed<OverflowMenuOption[]>(() => {
+const csvExportOptions = computed<ButtonMenuOption[]>(() => {
 	if (showGraphDatasetSelection.value) {
 		return [
 			{

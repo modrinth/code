@@ -109,7 +109,12 @@
 						class="flex min-w-0 cursor-pointer items-center gap-2.5 overflow-hidden border-0 bg-transparent p-0 text-left"
 						@click="emit('navigate', inst)"
 					>
-						<Avatar :src="inst.iconUrl ?? undefined" size="2rem" rounded="md" />
+						<Avatar
+							:src="inst.iconUrl ?? undefined"
+							size="2rem"
+							rounded="md"
+							pad-transparent-corners
+						/>
 						<span class="truncate font-semibold text-contrast hover:underline">{{
 							inst.name
 						}}</span>
@@ -145,7 +150,12 @@
 		<div v-else class="flex flex-col gap-6 p-6">
 			<div class="flex items-center gap-2.5">
 				<div class="group relative size-[7.75rem] shrink-0">
-					<Avatar :src="iconPreviewUrl ?? undefined" size="100%" no-shadow />
+					<Avatar
+						:src="iconPreviewUrl ?? undefined"
+						size="100%"
+						no-shadow
+						pad-transparent-corners
+					/>
 					<div
 						v-if="iconPreviewUrl"
 						class="pointer-events-none absolute right-1.5 top-1.5 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"

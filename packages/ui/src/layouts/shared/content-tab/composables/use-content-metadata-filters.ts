@@ -6,6 +6,10 @@ import type {
 	DropdownFilterBarCategory,
 	DropdownFilterBarOption,
 } from '#ui/components/base/DropdownFilterBar.vue'
+import {
+	type EnvironmentFilterValue,
+	getEnvironmentFilterValue,
+} from '#ui/components/project/settings/environment/environments'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import type { ContentItem } from '../types'
@@ -57,30 +61,6 @@ const openSourceLicenseIds = new Set([
 	'UPL-1.0',
 	'Zlib',
 ])
-
-type EnvironmentFilterValue = 'client' | 'server' | 'client_and_server' | 'singleplayer'
-
-function getEnvironmentFilterValue(
-	environment?: ContentItem['environment'],
-): EnvironmentFilterValue | undefined {
-	switch (environment) {
-		case 'client_only':
-			return 'client'
-		case 'server_only':
-		case 'dedicated_server_only':
-			return 'server'
-		case 'client_and_server':
-		case 'client_only_server_optional':
-		case 'server_only_client_optional':
-		case 'client_or_server':
-		case 'client_or_server_prefers_both':
-			return 'client_and_server'
-		case 'singleplayer_only':
-			return 'singleplayer'
-		default:
-			return undefined
-	}
-}
 
 const messages = defineMessages({
 	author: {

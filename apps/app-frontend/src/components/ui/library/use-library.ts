@@ -1,5 +1,20 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import {
+	ClipboardCopyIcon,
+	EditIcon,
+	EyeIcon,
+	FolderOpenIcon,
+	MinusIcon,
+	PaletteIcon,
+	PlayIcon,
+	PlusIcon,
+	StarIcon,
+	StopCircleIcon,
+	TrashIcon,
+	UploadIcon,
+} from '@modrinth/assets'
+import type { ButtonMenuLeafOption, ButtonMenuOption } from '@modrinth/ui'
+import { defineMessages, formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { open as openDialog } from '@tauri-apps/plugin-dialog'
 import { useEventListener, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -98,7 +113,7 @@ export type InstanceCard = {
 }
 
 type InstanceContextMenu = {
-	showMenu: (event: MouseEvent, item: InstanceCard, options: unknown[]) => void
+	open: (event: MouseEvent, options: ButtonMenuOption[]) => void
 }
 
 type ConfirmDeleteModal = {
@@ -109,10 +124,58 @@ type IconEditorModal = {
 	show: () => void
 }
 
-type ContextMenuSelection = {
-	option: string
-	item: InstanceCard
-}
+const instanceActionMessages = defineMessages({
+	play: { id: 'app.library.instance.action.play', defaultMessage: 'Play' },
+	stop: { id: 'app.library.instance.action.stop', defaultMessage: 'Stop' },
+	addToFavorites: {
+		id: 'app.library.instance.action.add-to-favorites',
+		defaultMessage: 'Add to favorites',
+	},
+	removeFromFavorites: {
+		id: 'app.library.instance.action.remove-from-favorites',
+		defaultMessage: 'Remove from favorites',
+	},
+	addContent: { id: 'app.library.instance.action.add-content', defaultMessage: 'Add content' },
+	viewInstance: {
+		id: 'app.library.instance.action.view-instance',
+		defaultMessage: 'View instance',
+	},
+	editIcon: {
+		id: 'instance.settings.tabs.general.edit-icon',
+		defaultMessage: 'Edit icon',
+	},
+	selectIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.select',
+		defaultMessage: 'Select icon',
+	},
+	replaceIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.replace',
+		defaultMessage: 'Replace icon',
+	},
+	createIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.create',
+		defaultMessage: 'Create an icon',
+	},
+	editCreatedIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.edit-created',
+		defaultMessage: 'Edit icon',
+	},
+	removeIcon: {
+		id: 'instance.settings.tabs.general.edit-icon.remove',
+		defaultMessage: 'Remove icon',
+	},
+	duplicateInstance: {
+		id: 'app.library.instance.action.duplicate',
+		defaultMessage: 'Duplicate instance',
+	},
+	delete: { id: 'app.library.instance.action.delete', defaultMessage: 'Delete' },
+	openFolder: { id: 'app.library.instance.action.open-folder', defaultMessage: 'Open folder' },
+	copyPath: { id: 'app.library.instance.action.copy-path', defaultMessage: 'Copy path' },
+	removeFromGroup: {
+		id: 'app.library.instance.action.remove-from-group',
+		defaultMessage: 'Remove from group',
+	},
+})
 
 function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { handleError } = injectNotificationManager()
@@ -160,7 +223,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const currentDeleteInstances = computed(() =>
 		instances.value.filter((instance) => instance.id === currentDeleteInstanceId.value),
 	)
-	const currentContextGroupId = ref<string | null>(null)
 	const confirmDeleteModal = ref<ConfirmDeleteModal | null>(null)
 	const iconEditorModal = ref<IconEditorModal | null>(null)
 	const currentIconEditorInstanceId = ref<string | null>(null)
@@ -1156,121 +1218,153 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		trackEvent('InstanceSaveCreatedIcon')
 	}
 
+	const setInstanceGroups = async (item: InstanceCard, groupIds: string[]) =>
+		await edit(item.instance.id, { group_ids: groupIds }).catch((error) =>
+			handleError(toError(error)),
+		)
+
+	const buildInstanceIconOptions = (item: InstanceCard): ButtonMenuLeafOption[] => [
+		{
+			id: item.instance.icon_path ? 'replace_icon' : 'select_icon',
+			label: formatMessage(
+				item.instance.icon_path
+					? instanceActionMessages.replaceIcon
+					: instanceActionMessages.selectIcon,
+			),
+			icon: UploadIcon,
+			action: () => void selectInstanceIcon(item),
+		},
+		{
+			id: item.instance.icon_config ? 'edit_created_icon' : 'create_icon',
+			label: formatMessage(
+				item.instance.icon_config
+					? instanceActionMessages.editCreatedIcon
+					: instanceActionMessages.createIcon,
+			),
+			icon: PaletteIcon,
+			action: () => void openInstanceIconEditor(item),
+		},
+		{
+			id: 'remove_icon',
+			label: formatMessage(instanceActionMessages.removeIcon),
+			icon: TrashIcon,
+			shown: !!item.instance.icon_path,
+			action: () => void removeInstanceIcon(item),
+		},
+	]
+
 	const handleInstanceContextMenu = (
 		event: MouseEvent,
 		item: InstanceCard,
 		instanceGroupId: string,
 	) => {
-		currentContextGroupId.value =
+		const removableGroupId =
 			displayState.value.group === 'Group' &&
 			instanceGroupId !== 'group:none' &&
 			instanceGroupId !== FAVORITES_GROUP_ID
 				? instanceGroupId
 				: null
+		const isFavorite = item.instance.group_ids.includes(FAVORITES_GROUP_ID)
+		const canAddContent = !item.instance.quarantined && !item.instance.link
 
-		const baseOptions = [
+		instanceOptions.value?.open(event, [
 			{
-				name: item.instance.group_ids.includes(FAVORITES_GROUP_ID)
-					? 'remove_from_favorites'
-					: 'add_to_favorites',
+				id: 'stop',
+				label: formatMessage(instanceActionMessages.stop),
+				icon: StopCircleIcon,
+				shown: item.playing,
+				tone: 'red',
+				action: () => void item.stop(null, 'InstanceGridContextMenu'),
+			},
+			{
+				id: 'play',
+				label: formatMessage(instanceActionMessages.play),
+				icon: PlayIcon,
+				shown: !item.playing && !item.instance.quarantined,
+				tone: 'brand',
+				action: () => void item.play(null, 'InstanceGridContextMenu'),
+			},
+			{
+				id: isFavorite ? 'remove_from_favorites' : 'add_to_favorites',
+				label: formatMessage(
+					isFavorite
+						? instanceActionMessages.removeFromFavorites
+						: instanceActionMessages.addToFavorites,
+				),
+				icon: StarIcon,
+				action: () =>
+					void setInstanceGroups(
+						item,
+						isFavorite
+							? item.instance.group_ids.filter((groupId) => groupId !== FAVORITES_GROUP_ID)
+							: [...new Set([...item.instance.group_ids, FAVORITES_GROUP_ID])],
+					),
 			},
 			{ type: 'divider' },
-			...(!item.instance.quarantined && !item.instance.link
-				? [{ name: 'add_content' }, { type: 'divider' }]
-				: []),
-			{ name: 'edit' },
-			{ name: 'duplicate' },
-			{ name: 'open' },
-			{ name: 'copy' },
 			{
-				name: 'edit_icon',
-				children: [
-					{ name: item.instance.icon_path ? 'replace_icon' : 'select_icon' },
-					{ name: item.instance.icon_config ? 'edit_created_icon' : 'create_icon' },
-					...(item.instance.icon_path ? [{ name: 'remove_icon' }] : []),
-				],
+				id: 'add_content',
+				label: formatMessage(instanceActionMessages.addContent),
+				icon: PlusIcon,
+				shown: canAddContent,
+				action: () => void item.addContent(),
 			},
-			...(currentContextGroupId.value
-				? [{ name: 'remove_from_group' }, { type: 'divider' }]
-				: [{ type: 'divider' }]),
-			{ name: 'delete', color: 'danger' },
-		]
-
-		instanceOptions.value?.showMenu(
-			event,
-			item,
-			item.playing
-				? [{ name: 'stop', color: 'danger' }, ...baseOptions]
-				: [
-						...(item.instance.quarantined ? [] : [{ name: 'play', color: 'primary' }]),
-						...baseOptions,
-					],
-		)
-	}
-
-	const handleInstanceOption = async ({ option, item }: ContextMenuSelection) => {
-		switch (option) {
-			case 'play':
-				await item.play(null, 'InstanceGridContextMenu')
-				break
-			case 'stop':
-				await item.stop(null, 'InstanceGridContextMenu')
-				break
-			case 'add_content':
-				await item.addContent()
-				break
-			case 'add_to_favorites':
-				await edit(item.instance.id, {
-					group_ids: [...new Set([...item.instance.group_ids, FAVORITES_GROUP_ID])],
-				}).catch((error) => handleError(toError(error)))
-				break
-			case 'remove_from_favorites':
-				await edit(item.instance.id, {
-					group_ids: item.instance.group_ids.filter(
-						(instanceGroupId) => instanceGroupId !== FAVORITES_GROUP_ID,
+			{ type: 'divider', shown: canAddContent },
+			{
+				id: 'edit',
+				label: formatMessage(instanceActionMessages.viewInstance),
+				icon: EyeIcon,
+				action: () => void item.seeInstance(),
+			},
+			{
+				id: 'duplicate',
+				label: formatMessage(instanceActionMessages.duplicateInstance),
+				icon: ClipboardCopyIcon,
+				disabled: item.instance.install_stage !== 'installed',
+				action: () => void duplicateInstance(item.instance.id),
+			},
+			{
+				id: 'open',
+				label: formatMessage(instanceActionMessages.openFolder),
+				icon: FolderOpenIcon,
+				action: () => void item.openFolder(),
+			},
+			{
+				id: 'copy',
+				label: formatMessage(instanceActionMessages.copyPath),
+				icon: ClipboardCopyIcon,
+				action: () => void navigator.clipboard.writeText(item.instance.id),
+			},
+			{
+				type: 'submenu',
+				id: 'edit_icon',
+				label: formatMessage(instanceActionMessages.editIcon),
+				icon: EditIcon,
+				options: buildInstanceIconOptions(item),
+			},
+			{
+				id: 'remove_from_group',
+				label: formatMessage(instanceActionMessages.removeFromGroup),
+				icon: MinusIcon,
+				shown: !!removableGroupId,
+				action: () =>
+					void setInstanceGroups(
+						item,
+						item.instance.group_ids.filter((groupId) => groupId !== removableGroupId),
 					),
-				}).catch((error) => handleError(toError(error)))
-				break
-			case 'edit':
-				await item.seeInstance()
-				break
-			case 'select_icon':
-			case 'replace_icon':
-				await selectInstanceIcon(item)
-				break
-			case 'create_icon':
-			case 'edit_created_icon':
-				await openInstanceIconEditor(item)
-				break
-			case 'remove_icon':
-				await removeInstanceIcon(item)
-				break
-			case 'duplicate':
-				if (item.instance.install_stage === 'installed') {
-					await duplicateInstance(item.instance.id)
-				}
-				break
-			case 'open':
-				await item.openFolder()
-				break
-			case 'copy':
-				await navigator.clipboard.writeText(item.instance.id)
-				break
-			case 'remove_from_group':
-				if (currentContextGroupId.value) {
-					const groupId = currentContextGroupId.value
-					await edit(item.instance.id, {
-						group_ids: item.instance.group_ids.filter(
-							(instanceGroupId) => instanceGroupId !== groupId,
-						),
-					}).catch((error) => handleError(toError(error)))
-				}
-				break
-			case 'delete':
-				currentDeleteInstanceId.value = item.instance.id
-				confirmDeleteModal.value?.show()
-				break
-		}
+			},
+			{ type: 'divider' },
+			{
+				id: 'delete',
+				label: formatMessage(instanceActionMessages.delete),
+				icon: TrashIcon,
+				tone: 'red',
+				hoverFilledOnly: true,
+				action: () => {
+					currentDeleteInstanceId.value = item.instance.id
+					confirmDeleteModal.value?.show()
+				},
+			},
+		])
 	}
 
 	return {
@@ -1339,7 +1433,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		moveGroup,
 		deleteInstance,
 		handleInstanceContextMenu,
-		handleInstanceOption,
 		handleInstanceIconSaved,
 	}
 }

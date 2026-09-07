@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_server_pack_state (instance_id, version_id)\n\t\tVALUES (?, ?)\n\t\tON CONFLICT(instance_id) DO UPDATE SET\n\t\t\tversion_id = excluded.version_id\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "5d509c2cce1728990fbf9ee4921eae357c1043ac65bc021fe093da5e72b2684a"
+}

@@ -255,7 +255,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		:provided-message="lockedMessages?.providedBy"
 	/>
 
-	<div class="search [overflow-anchor:none]">
+	<div class="search mt-1 [overflow-anchor:none]">
 		<section v-if="ctx.loading.value" class="offline">
 			<component :is="ctx.loadingComponent ?? LoadingIndicator" />
 		</section>

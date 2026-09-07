@@ -25,6 +25,7 @@ interface ThemeSettings {
 	current: AppearanceRef<AppearanceThemeSelection>
 	options: AppearanceRef<readonly AppearanceThemeSelection[]>
 	system: AppearanceRef<AppearanceTheme>
+	preferredDark: AppearanceRef<AppearanceTheme>
 	update: AppearanceSetter<AppearanceThemeSelection>
 	syncAcrossDevices: AppearanceSetting<boolean>
 }
@@ -54,6 +55,7 @@ export interface AppearanceSettingsProviderOptions {
 		current: AppearanceRef<AppearanceThemeSelection>
 		options: AppearanceRef<readonly AppearanceThemeSelection[]>
 		system: AppearanceRef<AppearanceTheme>
+		preferredDark: AppearanceRef<AppearanceTheme>
 		set: AppearanceSetter<AppearanceThemeSelection>
 		syncAcrossDevices: WritableAppearanceSetting<boolean>
 		syncDisabled: AppearanceRef<boolean>
@@ -197,6 +199,7 @@ export function provideAppearanceSettings(
 			current: options.theme.current,
 			options: options.theme.options,
 			system: options.theme.system,
+			preferredDark: options.theme.preferredDark,
 			update: updateTheme,
 			syncAcrossDevices: {
 				value: options.theme.syncAcrossDevices.value,

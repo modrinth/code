@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Nastavi"
   },
-  "admin.billing.error.not-found": {
-    "message": "Korisnik nije pronađen"
-  },
   "ads-consent.accept": {
     "message": "Prihvati sve"
   },

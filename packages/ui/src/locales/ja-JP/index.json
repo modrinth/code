@@ -4622,9 +4622,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支払い方法"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "北米、ヨーロッパ、東南アジアでご利用いただけます。"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "必要な仕様だけのカスタマイズされたプランを選択。"
   },

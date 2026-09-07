@@ -15,6 +15,7 @@ const theme = appearance.theme
 const currentTheme = theme.current
 const themeOptions = theme.options
 const systemTheme = theme.system
+const preferredDarkTheme = theme.preferredDark
 const syncAcrossDevices = theme.syncAcrossDevices.value
 const syncDisabled = theme.syncAcrossDevices.disabled
 const advancedRendering = appearance.advancedRendering.value
@@ -46,6 +47,7 @@ const sidebarPreferenceValues = sidebarPreferences?.value
 				:model-value="currentTheme"
 				:theme-options="themeOptions"
 				:system-theme-color="systemTheme"
+				:preferred-dark-theme="preferredDarkTheme"
 				@update:model-value="theme.update"
 			/>
 

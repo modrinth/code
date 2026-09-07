@@ -851,9 +851,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Iniciar sessão em uma conta Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Conectado como <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Assinar o Modrinth+"
   },
@@ -1066,9 +1063,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "Comportamento"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Configurações padrão do jogo"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalações Java"
@@ -1631,12 +1625,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecionar canal de atualização"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Ações de inicialização"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Ações de inicialização personalizadas"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "As ações permitem usuários experientes que executem certos comandos do sistema antes ou após iniciar o jogo."
   },
@@ -1699,9 +1687,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "As opções de instalação estarão indisponíveis enquanto esta instância estiver privada."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java e memória"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Variáveis ​​de ambiente personalizadas"

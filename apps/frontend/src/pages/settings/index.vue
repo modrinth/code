@@ -287,6 +287,9 @@ provideAppearanceSettings({
 		current: computed(() => current.value.theme),
 		options: themeOptions,
 		system: systemTheme,
+		preferredDark: computed(() =>
+			isDarkTheme(current.value.theme) ? current.value.theme : theme.preferences.dark,
+		),
 		set: setTheme,
 		syncAcrossDevices: {
 			value: computed(() => current.value.syncAcrossDevices),

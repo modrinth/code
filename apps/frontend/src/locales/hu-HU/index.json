@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Tovább"
   },
-  "admin.billing.error.not-found": {
-    "message": "Felhasználó nem található"
-  },
   "ads-consent.accept": {
     "message": "Összes elfogadása"
   },
@@ -1009,9 +1006,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Jóváhagyás és válasz"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Gondolatmenet lezárása"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Bezárás és válasz"
@@ -2503,9 +2497,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Fájl keresés"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Keresés e-mail cím alapján"
   },
   "layout.action.manage-affiliates": {
     "message": "Partnerlinkek kezelése"

@@ -516,7 +516,7 @@ const selectedRewardOption = computed(() => {
 })
 
 const selectedMethodDetails = computed(() => {
-	console.log(rewardOptions.value, selectedGiftCardId.value)
+	debug(rewardOptions.value, selectedGiftCardId.value)
 	if (!selectedGiftCardId.value) return null
 	const option = rewardOptions.value.find((opt) => opt.value === selectedGiftCardId.value)
 	debug('Selected method details:', option?.methodDetails)

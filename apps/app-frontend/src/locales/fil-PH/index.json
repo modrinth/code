@@ -494,12 +494,6 @@
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Mga launch hook"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Mga pasadyang launch hook"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga pansistemang utos o system command bago at pagkatapos ma-launch ang laro."
   },
@@ -538,9 +532,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon ng {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java at memorya"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Environment variables"

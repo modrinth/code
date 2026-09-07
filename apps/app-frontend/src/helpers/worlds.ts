@@ -29,11 +29,17 @@ export type SingleplayerWorld = BaseWorld & {
 export type ServerWorld = BaseWorld & {
 	type: 'server'
 	index: number
+	server_id?: string
+	source?: ServerSource
 	address: string
 	pack_status: ServerPackStatus
 	project_id?: string
 	content_kind?: string
 }
+
+export type ServerSource = 'user_synced' | 'modpack' | 'linked_server_project' | 'local_desynced'
+
+export type DesyncServerMode = 'keep_in_other_instances' | 'remove_from_other_instances'
 
 export type World = SingleplayerWorld | ServerWorld
 
@@ -43,6 +49,14 @@ export type WorldWithInstance = {
 
 export type SingleplayerGameMode = 'survival' | 'creative' | 'adventure' | 'spectator'
 export type ServerPackStatus = 'enabled' | 'disabled' | 'prompt'
+
+export async function desync_server(
+	instanceId: string,
+	serverId: string,
+	mode: DesyncServerMode,
+): Promise<void> {
+	return await invoke('plugin:worlds|desync_server', { instanceId, serverId, mode })
+}
 
 export type ServerStatus = {
 	// https://minecraft.wiki/w/Text_component_format
@@ -260,17 +274,6 @@ function parseServerHost(address: string): string {
 	return trimmedAddress.toLowerCase()
 }
 
-function isIPv4Host(host: string): boolean {
-	const segments = host.split('.')
-	if (segments.length !== 4) return false
-
-	return segments.every((segment) => {
-		if (!/^\d+$/.test(segment)) return false
-		const value = Number.parseInt(segment, 10)
-		return value >= 0 && value <= 255
-	})
-}
-
 /**
  * Normalization converts addresses to a canonical form (lowercase-host:port, default port 25565)
  */
@@ -307,28 +310,6 @@ export function normalizeServerAddress(address: string): string {
 
 	return `${host}:${port}`
 }
-
-/**
- * Domain key used for deduping server entries by removing a single leading subdomain.
- * Example: test.cobblemon.gg and cobblemon.gg map to cobblemon.gg
- */
-export function getServerDomainKey(address: string): string {
-	const normalizedAddress = normalizeServerAddress(address)
-	if (!normalizedAddress) return ''
-
-	const separator = normalizedAddress.lastIndexOf(':')
-	if (separator <= 0 || separator === normalizedAddress.length - 1) return normalizedAddress
-
-	const host = normalizedAddress.slice(0, separator).replace(/\.+$/, '')
-	if (!host) return normalizedAddress
-	if (host.includes(':') || isIPv4Host(host)) return normalizedAddress
-
-	const segments = host.split('.').filter(Boolean)
-	if (segments.length <= 2) return host
-
-	return segments.slice(1).join('.')
-}
-
 export function resolveManagedServerWorld(
 	worlds: World[],
 	managedName: string | null | undefined,

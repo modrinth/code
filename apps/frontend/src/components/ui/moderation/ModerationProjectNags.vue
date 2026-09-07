@@ -25,59 +25,99 @@
 			<div class="input-group">
 				<IconButton
 					label="Toggle details"
+					:aria-expanded="!collapsed"
 					:class="{ '[&>svg]:rotate-180': !collapsed }"
 					@click="$emit('toggleCollapsed')"
 				>
-					<DropdownIcon class="duration-250 transition-transform ease-in-out" />
+					<DropdownIcon class="transition-transform duration-300 ease-in-out" />
 				</IconButton>
 			</div>
 		</div>
-		<div v-if="!collapsed" class="mt-4 grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-2">
-			<div
-				v-for="nag in visibleNags"
-				:key="nag.id"
-				class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
-			>
-				<span class="flex items-center gap-2 font-medium text-contrast">
-					<component
-						:is="nag.icon || getDefaultIcon(nag.status)"
-						v-tooltip="getStatusTooltip(nag.status)"
-						:class="[
-							'size-4',
-							nag.status === 'required' && 'text-red',
-							nag.status === 'warning' && 'text-orange',
-							nag.status === 'suggestion' && 'text-purple',
-						]"
-						:aria-label="getStatusTooltip(nag.status)"
-					/>
-					{{ getFormattedMessage(nag.title) }}
-				</span>
-				{{ getNagDescription(nag) }}
-				<NuxtLink
-					v-if="nag.link && shouldShowLink(nag)"
-					:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
-						nag.link.path
-					}`"
-					class="goto-link mt-auto"
+		<Accordion :open-by-default="!collapsed" content-class="mt-4">
+			<div class="relative">
+				<div
+					v-if="!disableHorizontalScroll"
+					class="nag-scroll-shadow-left pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
+					:class="showLeftNagShadow ? 'opacity-100' : 'opacity-0'"
+				/>
+				<div
+					ref="nagScroller"
+					class="flex w-full gap-2 pb-2"
+					:class="{
+						'grid grid-cols-4': disableHorizontalScroll,
+						'overflow-x-auto overflow-y-hidden': !disableHorizontalScroll,
+						'cursor-grab select-none': canScrollNags,
+						'is-dragging': draggingNags,
+					}"
+					@pointerdown="onNagPointerDown"
+					@pointermove="onNagPointerMove"
+					@pointerup="finishNagDrag"
+					@pointercancel="finishNagDrag"
+					@click.capture="onNagClick"
+					@wheel="onNagWheel"
+					@scroll="updateNagScrollShadows"
 				>
-					{{ getFormattedMessage(nag.link.title) }}
-					<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
-				</NuxtLink>
-				<Button
-					v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
-					v-tooltip="
-						!canSubmitForReview ? getFormattedMessage(messages.submitChecklistTooltip) : undefined
-					"
-					type="colored"
-					color="orange"
-					:disabled="!canSubmitForReview"
-					@click="submitForReview"
-				>
-					<SendIcon />
-					{{ getFormattedMessage(messages.submitForReviewButton) }}
-				</Button>
+					<div
+						v-for="nag in visibleNags"
+						:key="nag.id"
+						class="flex w-[268px] shrink-0 flex-col gap-2.5 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+					>
+						<span class="flex items-start gap-2 font-medium text-contrast">
+							<component
+								:is="nag.icon || getDefaultIcon(nag.status)"
+								v-tooltip="getStatusTooltip(nag.status)"
+								:class="[
+									'mt-0.5 size-4 min-w-4',
+									nag.status === 'required' && 'text-red',
+									nag.status === 'warning' && 'text-orange',
+									nag.status === 'suggestion' && 'text-purple',
+								]"
+								:aria-label="getStatusTooltip(nag.status)"
+							/>
+							{{ getFormattedMessage(nag.title) }}
+						</span>
+						<span>
+							<span
+								v-for="(segment, index) in getNagDescriptionSegments(nag)"
+								:key="index"
+								:class="{ 'break-all': segment.isUrl }"
+								v-text="segment.text"
+							/>
+						</span>
+						<NuxtLink
+							v-if="nag.link && shouldShowLink(nag)"
+							:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
+								nag.link.path
+							}`"
+							class="goto-link mt-auto"
+						>
+							{{ getFormattedMessage(nag.link.title) }}
+							<ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
+						</NuxtLink>
+						<Button
+							v-if="nag.status === 'special-submit-action' && nag.id === 'submit-for-review'"
+							v-tooltip="
+								!canSubmitForReview
+									? getFormattedMessage(messages.submitChecklistTooltip)
+									: undefined
+							"
+							type="colored"
+							color="orange"
+							:disabled="!canSubmitForReview"
+							@click="submitForReview"
+						>
+							<SendIcon />
+							{{ getFormattedMessage(messages.submitForReviewButton) }}
+						</Button>
+					</div>
+				</div>
+				<div
+					v-if="!disableHorizontalScroll"
+					class="nag-scroll-shadow-right pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-surface-3 transition-opacity duration-200"
+					:class="showRightNagShadow ? 'opacity-100' : 'opacity-0'"
+				/>
 			</div>
-		</div>
+		</Accordion>
 	</div>
 </template>
 
@@ -93,22 +133,37 @@ import {
 	TriangleAlertIcon,
 } from '@modrinth/assets'
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
-import { nags } from '@modrinth/moderation'
-import { Button, IconButton } from '@modrinth/ui'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import { nagDestinations, normalizeProjectNagKind, toProjectNag } from '@modrinth/moderation'
+import { Accordion, Button, IconButton } from '@modrinth/ui'
+import {
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	type MessageDescriptor,
+	useVIntl,
+} from '@modrinth/ui'
 import type { Component } from 'vue'
-import { computed } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 interface Tags {
+	categories?: Labrinth.Tags.v2.Category[]
 	rejectedStatuses: string[]
+	gameVersions: { version: string }[]
+	loaders: { name: string }[]
 }
 
 interface Props {
 	project: Labrinth.Projects.v2.Project
 	projectV3: Labrinth.Projects.v3.Project
 	versions?: Labrinth.Versions.v3.Version[]
+	nags?: Nag[]
+	validationNags?: Labrinth.Projects.v3.ProjectNag[]
+	validationLoading?: boolean
+	validationAvailable?: boolean
+	refreshValidation?: () => Promise<Labrinth.Projects.v3.ProjectValidationResponse | null>
 	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
+	disableHorizontalScroll?: boolean
 	routeName?: string
 	tags: Tags
 }
@@ -160,15 +215,24 @@ const messages = defineMessages({
 		id: 'project-moderation-nags.suggestion',
 		defaultMessage: 'Suggestion',
 	},
+	projectSubmittedForReview: {
+		id: 'project-moderation-nags.project-submitted-for-review',
+		defaultMessage: 'Your project has been submitted for review!',
+	},
 })
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 
 const props = withDefaults(defineProps<Props>(), {
 	versions: () => [],
 	currentMember: null,
 	collapsed: false,
+	disableHorizontalScroll: false,
 	routeName: '',
+	validationNags: () => [],
+	validationLoading: false,
+	validationAvailable: true,
 })
 
 const emit = defineEmits<{
@@ -176,33 +240,176 @@ const emit = defineEmits<{
 	setProcessing: [processing: boolean]
 }>()
 
+const isProcessing = computed(() => props.project.status === 'processing')
+
+const nagScroller = ref<HTMLElement | null>(null)
+const canScrollNags = ref(false)
+const showLeftNagShadow = ref(false)
+const showRightNagShadow = ref(false)
+const draggingNags = ref(false)
+
+let nagScrollerResizeObserver: ResizeObserver | null = null
+let nagDragPointerId: number | null = null
+let nagDragCaptureTarget: Element | null = null
+let nagDragStartX = 0
+let nagDragStartScrollLeft = 0
+let suppressNagClick = false
+let suppressNagClickTimeout: ReturnType<typeof setTimeout> | null = null
+
+function updateNagScrollShadows() {
+	const el = nagScroller.value
+	if (!el || props.disableHorizontalScroll) {
+		canScrollNags.value = false
+		showLeftNagShadow.value = false
+		showRightNagShadow.value = false
+		return
+	}
+
+	canScrollNags.value = el.scrollWidth > el.clientWidth + 1
+	showLeftNagShadow.value = canScrollNags.value && el.scrollLeft > 0
+	showRightNagShadow.value =
+		canScrollNags.value && el.scrollLeft < el.scrollWidth - el.clientWidth - 1
+}
+
+function onNagWheel(event: WheelEvent) {
+	const el = nagScroller.value
+	if (props.disableHorizontalScroll || !el || el.scrollWidth <= el.clientWidth) return
+
+	const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
+	event.preventDefault()
+	el.scrollLeft += delta
+}
+
+function onNagPointerDown(event: PointerEvent) {
+	const el = nagScroller.value
+	if (
+		props.disableHorizontalScroll ||
+		!el ||
+		el.scrollWidth <= el.clientWidth + 1 ||
+		event.pointerType === 'touch' ||
+		event.button !== 0
+	)
+		return
+
+	nagDragPointerId = event.pointerId
+	nagDragStartX = event.clientX
+	nagDragStartScrollLeft = el.scrollLeft
+	suppressNagClick = false
+	nagDragCaptureTarget =
+		event.target instanceof Element ? (event.target.closest('a, button') ?? el) : el
+	nagDragCaptureTarget.setPointerCapture(event.pointerId)
+}
+
+function onNagPointerMove(event: PointerEvent) {
+	const el = nagScroller.value
+	if (!el || event.pointerId !== nagDragPointerId) return
+
+	const distance = event.clientX - nagDragStartX
+	if (!draggingNags.value && Math.abs(distance) < 4) return
+
+	draggingNags.value = true
+	suppressNagClick = true
+	event.preventDefault()
+	el.scrollLeft = nagDragStartScrollLeft - distance
+}
+
+function finishNagDrag(event: PointerEvent) {
+	if (event.pointerId !== nagDragPointerId) return
+
+	if (nagDragCaptureTarget?.hasPointerCapture(event.pointerId)) {
+		nagDragCaptureTarget.releasePointerCapture(event.pointerId)
+	}
+	nagDragPointerId = null
+	nagDragCaptureTarget = null
+	draggingNags.value = false
+
+	if (suppressNagClick) {
+		if (suppressNagClickTimeout) clearTimeout(suppressNagClickTimeout)
+		suppressNagClickTimeout = setTimeout(() => {
+			suppressNagClick = false
+			suppressNagClickTimeout = null
+		}, 0)
+	}
+}
+
+function onNagClick(event: MouseEvent) {
+	if (!suppressNagClick) return
+
+	event.preventDefault()
+	event.stopPropagation()
+	suppressNagClick = false
+	if (suppressNagClickTimeout) clearTimeout(suppressNagClickTimeout)
+	suppressNagClickTimeout = null
+}
+
+onMounted(() => {
+	nagScrollerResizeObserver = new ResizeObserver(updateNagScrollShadows)
+	if (nagScroller.value) nagScrollerResizeObserver.observe(nagScroller.value)
+	nextTick(updateNagScrollShadows)
+})
+
+onBeforeUnmount(() => {
+	nagScrollerResizeObserver?.disconnect()
+	if (suppressNagClickTimeout) clearTimeout(suppressNagClickTimeout)
+})
+
+watch(nagScroller, (el, previousEl) => {
+	if (previousEl) nagScrollerResizeObserver?.unobserve(previousEl)
+	if (el) nagScrollerResizeObserver?.observe(el)
+	nextTick(updateNagScrollShadows)
+})
+
+watch(
+	() => props.disableHorizontalScroll,
+	() => nextTick(updateNagScrollShadows),
+)
+
 const nagContext = computed<NagContext>(() => ({
 	project: props.project,
 	projectV3: props.projectV3,
 	versions: props.versions,
-	currentMember: props.currentMember?.user as Labrinth.Users.v2.User,
+	currentMember: props.currentMember?.user,
 	currentRoute: props.routeName,
 	tags: props.tags,
-	submitProject: submitForReview,
 }))
 
 const canSubmitForReview = computed(() => {
 	return (
-		applicableNags.value.filter((nag) => nag.status === 'required' && !isNagComplete(nag))
-			.length === 0
+		!props.validationLoading &&
+		props.validationAvailable &&
+		!props.validationNags.some((nag) => nag.severity === 'required')
 	)
 })
 
 async function submitForReview() {
-	if (canSubmitForReview.value) {
-		emit('setProcessing', true)
-	}
+	if (!canSubmitForReview.value) return
+	const validation = await props.refreshValidation?.()
+	if (!validation || validation.nags.some((nag) => nag.severity === 'required')) return
+	if (!props.collapsed) emit('toggleCollapsed')
+	emit('setProcessing', true)
+	await navigateTo(
+		`/${props.project.project_type}/${props.project.slug ?? props.project.id}/${nagDestinations.moderation.path}`,
+	)
+	addNotification({
+		type: 'success',
+		title: formatMessage(commonMessages.successLabel),
+		text: formatMessage(messages.projectSubmittedForReview),
+	})
 }
 
 const applicableNags = computed<Nag[]>(() => {
-	return nags.filter((nag) => {
-		return nag.shouldShow(nagContext.value)
-	})
+	if (props.nags) return props.nags
+
+	const nagsByKind = new Map<
+		Labrinth.Projects.v3.NormalizedProjectNagKind,
+		Labrinth.Projects.v3.ProjectNag
+	>()
+	for (const nag of props.validationNags) {
+		const kind = normalizeProjectNagKind(nag.kind)
+		if (kind && !nagsByKind.has(kind)) nagsByKind.set(kind, nag)
+	}
+
+	return [...nagsByKind.values()].map((nag) => toProjectNag(nag, props.project.project_type))
 })
 
 function isNagComplete(nag: Nag): boolean {
@@ -232,9 +439,8 @@ const visibleNags = computed<Nag[]>(() => {
 			status: 'special-submit-action',
 			shouldShow: (ctx) => ctx.tags.rejectedStatuses.includes(ctx.project.status),
 			link: {
-				path: 'moderation',
+				...nagDestinations.moderation,
 				title: messages.visitModerationPage,
-				shouldShow: () => props.routeName !== 'type-project-moderation',
 			},
 		})
 	}
@@ -247,8 +453,50 @@ const visibleNags = computed<Nag[]>(() => {
 	return finalNags
 })
 
+watch(visibleNags, () => nextTick(updateNagScrollShadows))
+
+watch(isProcessing, (processing) => {
+	if (processing && !props.collapsed) emit('toggleCollapsed')
+})
+
+let validationProjectId = props.project.id
+let previousActionableNagKeys: Set<string> | null = null
+
+watch(
+	[
+		() => props.project.id,
+		() => props.validationLoading,
+		() => props.validationAvailable,
+		() => props.validationNags,
+	],
+	([projectId, validationLoading, validationAvailable, validationNags]) => {
+		if (projectId !== validationProjectId) {
+			validationProjectId = projectId
+			previousActionableNagKeys = null
+		}
+
+		if (validationLoading || !validationAvailable) return
+
+		const actionableNagKeys = new Set(
+			validationNags
+				.filter((nag) => nag.severity === 'required' || nag.severity === 'warning')
+				.map((nag) => `${nag.severity}:${nag.kind}`),
+		)
+		const previousNagKeys = previousActionableNagKeys
+		const hasNewActionableNag =
+			previousNagKeys !== null && [...actionableNagKeys].some((key) => !previousNagKeys.has(key))
+
+		previousActionableNagKeys = actionableNagKeys
+
+		if (isProcessing.value && props.collapsed && hasNewActionableNag) {
+			emit('toggleCollapsed')
+		}
+	},
+	{ deep: true, immediate: true },
+)
+
 function shouldShowLink(nag: Nag): boolean {
-	return nag.link?.shouldShow ? nag.link.shouldShow(nagContext.value) : false
+	return nag.link?.shouldShow(nagContext.value) ?? false
 }
 
 function getDefaultIcon(status: NagStatus): Component {
@@ -283,7 +531,14 @@ function getNagDescription(nag: Nag): string {
 	if (typeof nag.description === 'function') {
 		return nag.description(nagContext.value)
 	}
-	return formatMessage(nag.description)
+	return formatMessage(nag.description, nag.values)
+}
+
+function getNagDescriptionSegments(nag: Nag): { text: string; isUrl: boolean }[] {
+	return getNagDescription(nag)
+		.split(/(https?:\/\/[^\s"'<>“”]+)/gi)
+		.filter(Boolean)
+		.map((text) => ({ text, isUrl: /^https?:\/\//i.test(text) }))
 }
 
 function getFormattedMessage(message: string | MessageDescriptor): string {
@@ -295,7 +550,18 @@ function getFormattedMessage(message: string | MessageDescriptor): string {
 </script>
 
 <style lang="scss" scoped>
-.duration-250 {
-	transition-duration: 250ms;
+.is-dragging,
+.is-dragging * {
+	cursor: grabbing !important;
+}
+
+.nag-scroll-shadow-left {
+	-webkit-mask-image: linear-gradient(to right, black, transparent);
+	mask-image: linear-gradient(to right, black, transparent);
+}
+
+.nag-scroll-shadow-right {
+	-webkit-mask-image: linear-gradient(to left, black, transparent);
+	mask-image: linear-gradient(to left, black, transparent);
 }
 </style>

@@ -3,6 +3,7 @@
 		<template #leading>
 			<Avatar
 				:src="organization.icon_url"
+				:raw-src="organization.raw_icon_url"
 				:alt="organization.name"
 				:tint-by="organization.id"
 				size="96px"
@@ -69,9 +70,9 @@ import {
 import { ButtonLink, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	Avatar,
+	type ButtonMenuOption,
 	commonMessages,
 	defineMessages,
-	type OverflowMenuOption,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
@@ -132,7 +133,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
 
-const moreActions = computed<OverflowMenuOption[]>(() => [
+const moreActions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'manage-projects',
 		label: formatMessage(messages.manageProjects),

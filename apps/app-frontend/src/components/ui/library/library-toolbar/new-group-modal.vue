@@ -60,6 +60,7 @@
 							:alt="instance.name"
 							size="2rem"
 							rounded="md"
+							pad-transparent-corners
 						/>
 						<div class="flex min-w-0 items-center gap-2">
 							<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>

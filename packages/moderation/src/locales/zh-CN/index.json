@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "查看内容披露"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，让描述详尽清晰。"
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "扩展描述"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "编辑描述"
   },
@@ -95,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "清除重复的链接"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "你的介绍描述应包含足够的纯文本或图片替代文本，确保使用屏幕阅读器的用户或网速较慢的用户也能正常访问。"
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "确保无障碍体验"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "许可证 URL 不可用。"
   },
@@ -112,12 +100,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "添加一个有效的许可证链接"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "禁止使用短链接或其他方式来隐藏外部链接或许可证的实际链接。请务必使用完整的原始链接。"
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "不要使用短链接"
   },
   "nags.long-headers.description": {
     "defaultMessage": "描述中有 {count, plural, other {# 个标题}}过长。标题应简洁，用作章节名，不应是完整的句子。"
@@ -197,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "访问服务器设置"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "访问描述设置"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "访问权限设置"
   },
@@ -221,29 +200,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "查看版本设置"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "你的简介不能与项目名称相同。撰写一个兼具信息量与吸引力的简介是十分重要的。"
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "让你的简介与众不同"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "你的简介不应包含任何格式、换行符、特殊字符或链接，因为简介仅会以纯文本形式展示。"
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "清除简介"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "你的简介包含 {length, plural, other {# 个字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，来让简介既丰富又引人入胜。"
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "扩充你的简介"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "保持项目名称简洁，有助于玩家记忆与查找。版本和加载器信息会自动随你的项目一同显示。"
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "清理名称"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "你选择了 {languageCount, plural, other {# 个语言}}，请仅列出你的服务器目前实际支持的语言。"
@@ -291,4 +255,3 @@
     "defaultMessage": "访问链接设置"
   }
 }
-

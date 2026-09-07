@@ -8,6 +8,7 @@ import { setupOnboardingChecklistProvider } from './onboarding-checklist'
 import { setupCreationModal } from './setup/creation-modal'
 import { setupFileDropProvider } from './setup/file-drop'
 import { setupFilePickerProvider } from './setup/file-picker'
+import { setupImageViewerEditorProvider } from './setup/image-viewer-editor'
 import { setupInstanceImportProvider } from './setup/instance-import'
 import { setupTagsProvider } from './setup/tags'
 import { setupUserCountryProvider } from './setup/user-country'
@@ -23,6 +24,7 @@ export function setupProviders(
 	setupTagsProvider(notificationManager)
 	setupFileDropProvider()
 	setupFilePickerProvider()
+	setupImageViewerEditorProvider()
 	setupInstanceImportProvider(notificationManager)
 	const onboardingChecklist = setupOnboardingChecklistProvider(appEvents)
 

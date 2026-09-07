@@ -1,1 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12H2M11.1 4H7.2c-.8 0-1.5.4-1.8 1.1L2 12v6c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-6l-1.5-3M6 16h0M10 16h0M14.4 4h6M17.4 1v6"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"
+	xmlns:serif="http://www.serif.com/"
+	style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
+    <path d="M10,16L10.01,16" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M22,14.328L22,12.473C22,12.162 21.927,11.855 21.788,11.577L18.55,5.11C18.213,4.431 17.518,4 16.76,4L7.24,4C6.482,4 5.787,4.431 5.45,5.11L2.212,11.577C2.073,11.855 2,12.162 2,12.473L2,18C2,19.097 2.903,20 4,20L12.636,20" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M21.946,12.013L2.054,12.013" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M6,16L6.01,16" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <g>
+        <path d="M19,16L19,22" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+        <path d="M22,19L16,19" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    </g>
+</svg>

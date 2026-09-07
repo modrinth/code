@@ -44,6 +44,7 @@ pub struct BehaviorPreferences {
     pub compact_instance_cards: bool,
     pub show_play_time: bool,
     pub hide_nametag: bool,
+    pub show_all_screenshots: bool,
     pub warn_on_unknown_modpacks: bool,
     pub skip_non_essential_warnings: bool,
 }
@@ -57,6 +58,7 @@ impl Default for BehaviorPreferences {
             compact_instance_cards: false,
             show_play_time: true,
             hide_nametag: false,
+            show_all_screenshots: true,
             warn_on_unknown_modpacks: true,
             skip_non_essential_warnings: false,
         }

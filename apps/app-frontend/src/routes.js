@@ -64,6 +64,11 @@ export default new createRouter({
 			component: Pages.Skins,
 		},
 		{
+			path: '/screenshots',
+			name: 'Screenshots',
+			component: Pages.Screenshots,
+		},
+		{
 			path: '/user/:user/:projectType?',
 			name: 'User',
 			component: Pages.User,
@@ -133,6 +138,11 @@ export default new createRouter({
 					path: 'files',
 					name: 'InstanceFiles',
 					component: Instance.Files,
+				},
+				{
+					path: 'screenshots',
+					name: 'InstanceScreenshots',
+					component: Instance.Screenshots,
 				},
 				{
 					path: 'logs',

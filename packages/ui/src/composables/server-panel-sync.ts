@@ -96,6 +96,9 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			case 'server.network.patch':
 				handleServerNetworkPatch(serverId, event)
 				break
+			case 'server.sftp.patch':
+				handleServerSftpPatch(serverId, event)
+				break
 			case 'server.transfer.start':
 			case 'server.transfer.done':
 				void invalidateServerDetails(serverId)
@@ -146,6 +149,24 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 							subdomain: event.subdomain,
 						}
 					: current,
+		)
+	}
+
+	function handleServerSftpPatch(serverId: string, event: Archon.Sync.v1.ServerSftpPatchEvent) {
+		applySftpCredentials(serverId, {
+			sftp_username: event.sftp_username,
+			sftp_password: event.sftp_password,
+		})
+	}
+
+	function applySftpCredentials(serverId: string, credentials: Archon.Servers.v1.SftpCredentials) {
+		queryClient.setQueryData<Archon.Servers.v0.Server>(
+			legacyServerDetailKey(serverId),
+			(current) => (current ? { ...current, ...credentials } : current),
+		)
+		queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
+			serverV1DetailKey(serverId),
+			(current) => (current ? { ...current, ...credentials } : current),
 		)
 	}
 

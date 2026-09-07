@@ -63,6 +63,7 @@ pub async fn setup_search_projects(
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[4..6] },
         { "op": "add", "path": "/initial_versions/0/environment", "value": "server_only" },
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
+        { "op": "add", "path": "/link_urls", "value": { "source": "https://github.com/modrinth/labrinth" } },
     ]))
     .unwrap();
     project_creation_futures.push(create_async_future(
@@ -140,6 +141,7 @@ pub async fn setup_search_projects(
         { "op": "add", "path": "/initial_versions/0/environment", "value": "client_or_server" },
         { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.5"] },
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
+        { "op": "add", "path": "/link_urls", "value": { "source": "https://github.com/modrinth/labrinth" } },
     ]))
     .unwrap();
     project_creation_futures.push(create_async_future(
@@ -155,6 +157,7 @@ pub async fn setup_search_projects(
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
         { "op": "add", "path": "/initial_versions/0/environment", "value": "client_or_server_prefers_both" },
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
+        { "op": "add", "path": "/link_urls", "value": { "source": "https://github.com/modrinth/labrinth" } },
     ]))
     .unwrap();
     project_creation_futures.push(create_async_future(
@@ -172,6 +175,7 @@ pub async fn setup_search_projects(
         { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
         { "op": "add", "path": "/initial_versions/0/environment", "value": "client_or_server_prefers_both" },
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
+        { "op": "add", "path": "/link_urls", "value": { "source": "https://github.com/modrinth/labrinth" } },
         { "op": "add", "path": "/initial_versions/0/loaders", "value": ["forge"] },
         { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.2"] },
     ]))

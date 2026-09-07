@@ -221,8 +221,10 @@
 				<TagItem
 					v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
 					:key="`env-tag-${tagIdx}`"
+					v-tooltip="getFilterTooltip(formatMessage(tag.label))"
 					data-no-row-click
 					class="w-fit max-w-full truncate text-center"
+					:action="() => toggleEnvironmentFilter(version.environment)"
 				>
 					<component :is="tag.icon" />
 					<span class="min-w-0 truncate">{{ formatMessage(tag.label).replace('and', '&') }}</span>
@@ -406,7 +408,9 @@
 								<TagItem
 									v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
 									:key="`env-tag-${tagIdx}`"
-									class="text-center"
+									v-tooltip="getFilterTooltip(formatMessage(tag.label))"
+									class="text-center smart-clickable:allow-pointer-events"
+									:action="() => toggleEnvironmentFilter(version.environment)"
 								>
 									<component :is="tag.icon" />
 									{{ formatMessage(tag.label).replace('and', '&') }}
@@ -485,7 +489,7 @@ import { Button } from '#ui/components/base/buttons'
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { formatTag } from '../../utils/tag-messages'
-import { getEnvironmentTags } from './settings/environment/environments'
+import { getEnvironmentFilterValue, getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime({ style: 'narrow' })
@@ -653,6 +657,13 @@ function getPlatformTooltip(platform: string): string {
 	return getFilterTooltip(formatTag(formatMessage, platform, 'loader'))
 }
 
+function toggleEnvironmentFilter(environment?: Labrinth.Projects.v3.Environment) {
+	const value = getEnvironmentFilterValue(environment)
+	if (value) {
+		versionFilters.value?.toggleFilter('environment', value)
+	}
+}
+
 function isFileRowVisible(version: VersionTableRow): boolean {
 	return props.showFiles && Array.isArray(version.files) && version.files.length > 0
 }
@@ -683,13 +694,20 @@ const selectedPlatforms: Ref<string[]> = computed(
 	() => versionFilters.value?.selectedPlatforms ?? [],
 )
 const selectedChannels: Ref<string[]> = computed(() => versionFilters.value?.selectedChannels ?? [])
+const selectedEnvironments: Ref<string[]> = computed(
+	() => versionFilters.value?.selectedEnvironments ?? [],
+)
 
 const filteredVersions = computed(() => {
 	return normalizedVersions.value.filter(
 		(version) =>
 			hasAnySelected(version.game_versions, selectedGameVersions.value) &&
 			hasAnySelected(version.loaders, selectedPlatforms.value) &&
-			isAnySelected(version.version_type, selectedChannels.value),
+			isAnySelected(version.version_type, selectedChannels.value) &&
+			isAnySelected(
+				getEnvironmentFilterValue(version.environment) ?? '',
+				selectedEnvironments.value,
+			),
 	)
 })
 

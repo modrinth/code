@@ -4124,9 +4124,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "dibilkan {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Tersedia di Amerika Utara, Eropah dan Asia Tenggara."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Pilih pelan tersuai dengan hanya spesifikasi yang anda perlukan."
   },
@@ -4959,4 +4956,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

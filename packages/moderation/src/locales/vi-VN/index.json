@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Chọn các thẻ chính xác"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Mô tả của bạn hiện có {length, plural, one {# ký tự có thể đọc} other {# ký tự có thể đọc}}. Khuyến nghị nên có ít nhất {minChars, plural, one {# ký tự} other {# ký tự}} để tạo ra một mô tả rõ ràng và đầy đủ thông tin."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Mở rộng mô tả"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Chỉnh sửa mô tả"
   },
@@ -89,12 +83,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Xóa các đường link giống nhau"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Phần mô tả của bạn nên chứa đủ văn bản thuần hoặc văn bản thay thế cho hình ảnh (alt-text), nhằm đảm bảo khả năng truy cập cho người dùng trình đọc màn hình hoặc có kết nối internet chậm."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Đảm bảo khả năng truy cập"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL giấy phép không hợp lệ."
   },
@@ -106,12 +94,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Thêm liên kết giấy phép hợp lệ"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Việc sử dụng trình rút gọn liên kết hoặc các phương pháp khác để che giấu đích đến của liên kết trong các liên kết bên ngoài hoặc liên kết giấy phép là không được phép. Vui lòng chỉ sử dụng các liên kết đầy đủ và phù hợp."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Không sử dụng trình rút gọn liên kết"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural,  other {# tiêu đề}} trong phần mô tả của bạn {count, plural,  other {quá dài}}. Tiêu đề nên ngắn gọn và đóng vai trò là tiêu đề mục, không phải là câu hoàn chỉnh."
@@ -191,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "Truy cập cài đặt máy chủ"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Truy cập cài đặt mô tả"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Truy cập cài đặt giấy phép"
   },
@@ -209,29 +188,14 @@
   "nags.settings.title": {
     "defaultMessage": "Truy cập cài đặt chung"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Phần tóm tắt của bạn không được trùng với tên dự án. Việc tạo một bản tóm tắt mang tính cung cấp thông tin và thu hút là rất quan trọng."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Làm cho phần tóm tắt trở nên khác biệt"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Phần tóm tắt không nên chứa định dạng, xuống dòng, ký tự đặc biệt hoặc liên kết, vì phần tóm tắt chỉ hiển thị văn bản thuần."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Làm gọn phần tóm tắt"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Phần tóm tắt của bạn hiện có {length} ký tự. Khuyến nghị nên có ít nhất {minChars} ký tự để tạo ra một bản tóm tắt đầy đủ thông tin và hấp dẫn."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Mở rộng phần tóm tắt"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Giữ tên dự án gọn gàng sẽ giúp dễ ghi nhớ và dễ tìm kiếm hơn. Thông tin phiên bản và trình tải sẽ được tự động hiển thị cùng với dự án của bạn."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Làm gọn tên dự án"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Bạn đã chọn {languageCount} ngôn ngữ. Xin hãy chỉ chọn những ngôn ngữ máy chủ của bạn hỗ trợ tích cực."
@@ -273,4 +237,3 @@
     "defaultMessage": "Truy cập cài đặt liên kết"
   }
 }
-

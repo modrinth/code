@@ -347,12 +347,6 @@
   "instance.settings.tabs.general.name": {
     "message": "Nume"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Cârlige de lansare"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Cârlige de lansare personalizate"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Cârligele permit utilizatorilor avansați să ruleze anumite comenzi de sistem înainte și după lansarea jocului."
   },
@@ -391,9 +385,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versiune {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java și memorie"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variabile de mediu"

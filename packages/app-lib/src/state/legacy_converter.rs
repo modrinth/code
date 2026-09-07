@@ -3,7 +3,8 @@ use crate::jre::check_jre;
 use crate::prelude::ModLoader;
 use crate::state;
 use crate::state::instances::{
-    InstanceLaunchOverrides, InstanceLaunchOverridesData, playtime_to_storage,
+    InstanceLaunchOverrides, InstanceLaunchOverridesData,
+    InstanceTabVisibility, playtime_to_storage,
 };
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
@@ -639,6 +640,7 @@ where
         force_fullscreen: input.force_fullscreen,
         game_resolution: input.game_resolution,
         hooks: input.hooks,
+        visible_tabs: InstanceTabVisibility::default(),
     };
     let launch_overrides_data = serde_json::to_string(
         &InstanceLaunchOverridesData::from(&launch_overrides),

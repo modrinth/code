@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Twój opis składa się z {length, plural, one {# czytenego znaku} other {# czytelnych znaków}}. Zalecane jest użycie chociaż {minChars, plural, one {# znaku} other {# znaków}} by stworzyć przejrzysty i informatywny opis."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Rozwiń opis"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Edytuj opis"
   },
@@ -89,12 +83,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Usuń identyczne linki"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Twój opis powinien zawierać wystarczająco zwykłego tekstu lub tekstu alternatywnego obrazów, aby był przystępny dla osób korzystających z czytników ekranu lub mających wolne połączenie z internetem."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Zapewnij dostępność"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Adres URL licencji jest nieprawidłowy."
   },
@@ -106,12 +94,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Dodaj poprawny link do licencji"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Używanie skracaczy linków lub innych metod ukrywania gdzie prowadzi link w twoich linkach zewnętrznych oraz linku licencji jest niedozwolone, używaj tylko linków o pełnej długości."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Nie używaj skracaczy linków"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# nagłówek} few {# nagłówki} other {# nagłówków}} w twoim opisie {count, plural, one {jest za długi} few {są za długie} other {jest za długich}}. Nagłówki powinny być zwięzłe i pełnić funkcję tytułów sekcji, a nie pełnych zdań."
@@ -191,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "Odwiedź ustawienia serwera"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Odwiedź ustawienia opisu"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Odwiedź ustawienia licencji"
   },
@@ -212,29 +191,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Zobacz ustawienia wersji"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Twoje podsumowanie nie może być kopią nazwy projektu. Ważne jest, by stworzyć bogate w informacje i interesujące podsumowanie."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Podsumowanie powinno być unikatowe"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Twoje podsumowanie nie powinno zawierać formatowania, podziałów wiersza, specjalnych znaków lub linków, ponieważ podsumowanie wyświetla tylko prosty tekst."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Uporządkuj podsumowanie"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Twoje podsumowanie składa się z {length, plural, one {# znaku} other {# znaków}}. Zalecane jest użycie chociaż {minChars, plural, one {# znaku} other {# znaków}} by stworzyć informatywne i ciekawe podsumowanie."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Rozwiń podsumowanie"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Utrzymanie nazwy projektu w czystości sprawia, że łatwiej ją zapamiętać i znaleźć. Informacje o wersji i loaderze są automatycznie wyświetlane obok projektu."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Oczyść nazwę"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Wybrano {languageCount, plural, one {# język} few {# języki} other {# języków}}. Podaj tylko języki, które są faktycznie wspierane przez Twój serwer."
@@ -276,4 +240,3 @@
     "defaultMessage": "Odwiedź ustawienia linków"
   }
 }
-

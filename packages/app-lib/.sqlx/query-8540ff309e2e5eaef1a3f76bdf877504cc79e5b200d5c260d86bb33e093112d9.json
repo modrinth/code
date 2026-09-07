@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT feature, globally_enabled AS \"globally_enabled!: bool\"\n\t\tFROM sync_feature_settings\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "feature",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "globally_enabled!: bool",
+        "ordinal": 1,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "8540ff309e2e5eaef1a3f76bdf877504cc79e5b200d5c260d86bb33e093112d9"
+}

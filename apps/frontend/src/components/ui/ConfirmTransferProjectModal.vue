@@ -3,7 +3,12 @@
 		<template #title>
 			<div class="flex items-center gap-2">
 				<span class="text-lg font-extrabold text-contrast">Transfer</span>
-				<Avatar :src="project.icon_url" :alt="project.name" size="xs" />
+				<Avatar
+					:src="project.icon_url"
+					:raw-src="project.raw_icon_url"
+					:alt="project.name"
+					size="xs"
+				/>
 				<span class="text-lg font-extrabold text-contrast">{{ project.name }}</span>
 			</div>
 		</template>

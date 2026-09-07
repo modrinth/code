@@ -201,7 +201,10 @@ export default defineNuxtPlugin({
 
 			locale.value = newLocale
 			if (persist) {
-				useCookie('locale', { maxAge: 31536000, path: '/' }).value = newLocale
+				// Awaiting loadLocale above drops the Nuxt context on the server, where useCookie needs it
+				nuxtApp.runWithContext(() => {
+					useCookie('locale', { maxAge: 31536000, path: '/' }).value = newLocale
+				})
 			}
 		}
 

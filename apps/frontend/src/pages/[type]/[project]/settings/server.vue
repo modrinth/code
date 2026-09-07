@@ -20,6 +20,12 @@
 						:placeholder="formatMessage(messages.selectRegionPlaceholder)"
 						:disabled="!hasPermission"
 					/>
+					<ValidationMessage
+						:check="regionValidation"
+						:project-field="projectV3?.minecraft_server?.region ?? ''"
+						:current-field="region"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Language -->
@@ -41,6 +47,14 @@
 						:max-tag-rows="2"
 						:placeholder="formatMessage(messages.selectLanguagesPlaceholder)"
 						:disabled="!hasPermission"
+					/>
+					<ValidationMessage
+						:check="languageValidation"
+						:project-field="
+							JSON.stringify([...(projectV3?.minecraft_server?.languages ?? [])].sort())
+						"
+						:current-field="JSON.stringify([...languages].sort())"
+						class="mt-2"
 					/>
 				</div>
 
@@ -127,6 +141,12 @@
 							/></template>
 						</IntlFormatted>
 					</div>
+					<ValidationMessage
+						:check="javaAddressValidation"
+						:project-field="projectV3?.minecraft_java_server?.address ?? ''"
+						:current-field="javaAddress.trim()"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Bedrock Address -->
@@ -151,7 +171,10 @@
 					</div>
 				</div>
 
-				<CompatibilityCard />
+				<div>
+					<CompatibilityCard />
+					<ValidationMessage :check="compatibilityValidation" class="mt-2" />
+				</div>
 			</div>
 		</section>
 
@@ -186,8 +209,11 @@ import {
 	usePageLeaveSafety,
 	useVIntl,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
 const PING_TIMEOUT_MS = 5000
 
@@ -272,6 +298,11 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 
+const regionValidation = useProjectNagMessages('server-region')
+const languageValidation = useProjectNagMessages('server-languages')
+const javaAddressValidation = useProjectNagMessages('java-address')
+const compatibilityValidation = useProjectNagMessages('server-compatibility')
+
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.server)
 
 const javaAddress = ref('')
@@ -298,9 +329,12 @@ watch(javaAddress, () => {
 	}, 500)
 })
 
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+	return (
+		isAdminUser.value || ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+	)
 })
 
 async function pingJavaServer() {
@@ -478,7 +512,7 @@ function resetChanges() {
 }
 
 async function handleSave() {
-	if (javaAddress.value.trim() && !javaPingResult.value?.online) {
+	if (!isAdminUser.value && javaAddress.value.trim() && !javaPingResult.value?.online) {
 		addNotification({
 			title: formatMessage(messages.cannotSaveTitle),
 			text: formatMessage(messages.cannotSaveText),

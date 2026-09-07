@@ -578,12 +578,6 @@
   "instance.settings.tabs.general.name": {
     "message": "ชื่อ"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Launch Hook"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "กำหนด Launch Hook เอง"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Launch Hook จะช่วยให้ผู้เล่นที่ชำนาญสามารถใช้คำสั่งต่อระบบบางอย่างได้ ทั้งก่อนและหลังเกมถูกเปิด"
   },
@@ -622,9 +616,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "เวอร์ชัน {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java และ หน่วยความจำ"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Environment Variables"

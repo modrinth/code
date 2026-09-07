@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH inserted AS (\n            INSERT INTO delphi_tech_review_queue (project_id)\n            SELECT unnest($1::bigint[])\n            ON CONFLICT (project_id) DO NOTHING\n            RETURNING project_id\n        )\n        SELECT\n            inserted.project_id AS \"project_id!: DBProjectId\",\n            (\n                SELECT thread.id\n                FROM threads thread\n                WHERE thread.mod_id = inserted.project_id\n                ORDER BY thread.id\n                LIMIT 1\n            ) AS \"thread_id!: DBThreadId\"\n        FROM inserted\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "thread_id!: DBThreadId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "0b94bdb7bf42fdfd0fb1b015fe582bfe8c43582acd17e726616da863e35742c5"
+}

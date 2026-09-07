@@ -179,6 +179,7 @@ onMounted(() => {
 				:src="getInstanceIconUrl(instance.icon_path)"
 				:tint-by="instance.id"
 				:alt="formatMessage(messages.instanceIcon)"
+				pad-transparent-corners
 			/>
 			<div class="h-full flex items-center font-bold text-contrast leading-normal">
 				<span class="line-clamp-2">{{ instance.name }}</span>
@@ -244,6 +245,7 @@ onMounted(() => {
 					:tint-by="instance.id"
 					:alt="formatMessage(messages.instanceIcon)"
 					:class="`transition-all ${modLoading || installing ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
+					pad-transparent-corners
 				/>
 				<div class="absolute inset-0 flex items-center justify-center">
 					<IconButton

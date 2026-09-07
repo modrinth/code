@@ -58,6 +58,7 @@ export type ModerationTechReviewContext = {
 export type ModerationGlobalContext = {
 	scope: 'global'
 	officialUrl: string
+	alternativeUrl: string
 	notifyCopied: (value: string, title: string) => void
 }
 

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO synced_hotbar_state\n\t\t\t(singleton, schema_version, revision, nbt)\n\t\tVALUES (1, ?, ?, ?)\n\t\tON CONFLICT(singleton) DO UPDATE SET\n\t\t\tschema_version = excluded.schema_version,\n\t\t\trevision = excluded.revision,\n\t\t\tnbt = excluded.nbt\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "df901b84d082e28c63b41db4a0de9c86aa6b24f126c30a02b50473d4a0b78086"
+}

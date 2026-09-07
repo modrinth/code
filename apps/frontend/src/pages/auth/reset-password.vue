@@ -218,7 +218,7 @@ useHead({
 
 const auth = await useAuth()
 if (auth.value.user) {
-	await navigateTo('/dashboard')
+	await navigateTo(`/user/${auth.value.user.username}`)
 }
 
 const route = useNativeRoute()

@@ -43,7 +43,9 @@ async function copyProjectLink() {
 </script>
 
 <template>
-	<div class="bg-surface-3 p-4 rounded-2xl flex flex-col gap-3">
+	<div
+		class="bg-surface-3 p-4 rounded-2xl flex flex-col gap-3 border border-solid border-surface-4"
+	>
 		<div class="flex gap-4 justify-between">
 			<div class="flex flex-col gap-2">
 				<span class="text-contrast font-semibold">{{ title }}</span>
@@ -88,7 +90,9 @@ async function copyProjectLink() {
 			<div class="font-medium">Notes:</div>
 			<div>{{ notes ?? 'N/A' }}</div>
 		</div>
-		<div class="bg-surface-2 p-4 rounded-2xl flex flex-col gap-3">
+		<div
+			class="bg-surface-2 p-4 rounded-2xl flex flex-col gap-3 border border-solid border-surface-4"
+		>
 			<span class="text-contrast font-semibold">Files</span>
 			<span v-if="!(files?.length > 0)" class="text-secondary">
 				No files available for external project.

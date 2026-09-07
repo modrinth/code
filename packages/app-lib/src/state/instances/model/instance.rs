@@ -23,6 +23,45 @@ pub struct InstanceIconConfig {
     pub symbol: String,
 }
 
+#[derive(
+    Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize,
+)]
+pub struct InstanceSyncedOptions {
+    pub command_history: bool,
+    pub multiplayer_servers: bool,
+    pub creative_hotbars: bool,
+    pub screenshots: bool,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SyncedOption {
+    CommandHistory,
+    MultiplayerServers,
+    CreativeHotbars,
+    Screenshots,
+}
+
+impl SyncedOption {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::CommandHistory => "command_history",
+            Self::MultiplayerServers => "multiplayer_servers",
+            Self::CreativeHotbars => "creative_hotbars",
+            Self::Screenshots => "screenshots",
+        }
+    }
+
+    pub const ALL: [Self; 4] = [
+        Self::CommandHistory,
+        Self::MultiplayerServers,
+        Self::CreativeHotbars,
+        Self::Screenshots,
+    ];
+}
+
+pub type InstanceSyncedOption = SyncedOption;
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
     pub id: String,

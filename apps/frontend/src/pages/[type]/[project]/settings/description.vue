@@ -17,23 +17,21 @@
 			</div>
 			<MarkdownEditor
 				v-model="current.description"
-				:disabled="
-					!currentMember ||
-					(currentMember?.permissions! & TeamMemberPermission.EDIT_BODY) !==
-						TeamMemberPermission.EDIT_BODY
-				"
+				:disabled="!hasPermission"
 				:on-image-upload="onUploadHandler"
 			/>
-			<div v-if="descriptionWarning" class="mt-2">
-				<SettingsInlineWarning>
-					{{ descriptionWarning }}
-				</SettingsInlineWarning>
-			</div>
+			<ValidationMessage
+				:check="descriptionValidation"
+				:project-field="saved.description"
+				:current-field="current.description"
+				class="mt-2"
+			/>
 		</div>
 		<UnsavedChangesPopup
 			:original="saved"
 			:modified="current"
 			:saving="saving"
+			:can-save="canSave"
 			@reset="reset"
 			@save="save"
 		/>
@@ -41,22 +39,22 @@
 </template>
 
 <script lang="ts" setup>
-import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
 import {
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	injectProjectPageContext,
 	MarkdownEditor,
-	SettingsInlineWarning,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
-import { TeamMemberPermission } from '@modrinth/utils'
+import { isAdmin, TeamMemberPermission } from '@modrinth/utils'
 import { computed, useTemplateRef } from 'vue'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
@@ -64,7 +62,14 @@ const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.description)
 
-const { saved, current, saving, hasChanges, reset, save } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	hasChanges,
+	reset,
+	save: saveForm,
+} = useSavable(
 	() => ({ description: project.value.body }),
 	async ({ description }) => {
 		await patchProject({ body: description })
@@ -73,16 +78,21 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
-const descriptionWarning = computed(() => {
-	const text = current.value.description?.trim() || ''
-	const charCount = countText(text)
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
+const hasPermission = computed(
+	() =>
+		isAdminUser.value ||
+		(!!currentMember.value &&
+			(currentMember.value.permissions & TeamMemberPermission.EDIT_BODY) ===
+				TeamMemberPermission.EDIT_BODY),
+)
+const descriptionValidation = useProjectNagMessages('description')
+const canSave = computed(() => hasPermission.value)
 
-	if (charCount < MIN_DESCRIPTION_CHARS) {
-		return `It's recommended to have a description with at least ${MIN_DESCRIPTION_CHARS} readable characters. (${charCount}/${MIN_DESCRIPTION_CHARS})`
-	}
-
-	return null
-})
+async function save() {
+	if (!canSave.value) return
+	await saveForm()
+}
 
 async function onUploadHandler(file: File) {
 	if (await fileDeclaresAi(file)) {

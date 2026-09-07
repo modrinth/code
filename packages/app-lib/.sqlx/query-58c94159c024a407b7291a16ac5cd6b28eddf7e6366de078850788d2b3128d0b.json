@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT expected_sha1, merge_base,\n\t\t\tsource_revision AS \"source_revision!: i64\", status\n\t\tFROM instance_sync_checkpoints\n\t\tWHERE instance_id = ? AND feature = ? AND variant = ?\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "expected_sha1",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "merge_base",
+        "ordinal": 1,
+        "type_info": "Blob"
+      },
+      {
+        "name": "source_revision!: i64",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "status",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "58c94159c024a407b7291a16ac5cd6b28eddf7e6366de078850788d2b3128d0b"
+}

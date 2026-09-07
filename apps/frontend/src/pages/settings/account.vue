@@ -493,7 +493,9 @@ import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
 
 import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
+import { forgetStoredAccount } from '~/composables/accounts.ts'
 import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
+import { useAuthCookie } from '~/composables/auth-cookie.ts'
 
 definePageMeta({
 	middleware: 'auth',
@@ -987,7 +989,8 @@ async function deleteAccount() {
 		})
 	}
 
-	useCookie('auth-token').value = null
+	forgetStoredAccount(auth.value.user.id)
+	useAuthCookie().value = null
 	window.location.href = '/'
 
 	stopLoading()

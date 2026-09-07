@@ -13,11 +13,9 @@
 		:proceed-label="`Revoke`"
 		@proceed="confirmRevokeAffiliateCode"
 	/>
-	<div class="page">
-		<div
-			class="mb-6 flex items-center gap-6 border-0 border-b-[1px] border-solid border-divider pb-6"
-		>
-			<h1 class="m-0 grow text-2xl font-extrabold">Manage affiliate links</h1>
+	<div>
+		<div class="mb-4 flex items-center justify-between gap-4">
+			<h2 class="m-0 text-2xl font-semibold">Manage affiliate links</h2>
 			<div class="flex items-center gap-2">
 				<Input
 					v-model="filterQuery"
@@ -260,12 +258,3 @@ async function confirmRevokeAffiliateCode() {
 	}
 }
 </script>
-
-<style lang="scss" scoped>
-.page {
-	padding: 1rem;
-	margin-left: auto;
-	margin-right: auto;
-	max-width: 78.5rem;
-}
-</style>

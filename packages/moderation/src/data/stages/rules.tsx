@@ -3,6 +3,7 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { group, markdown, stage, toggle } from '../../types/node'
+import { Priorities } from '../priorities'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -77,7 +78,10 @@ export default function () {
 					.suggestedStatus('flagged')
 					.message(),
 
-				toggle('ai-generated', 'AI Generated').suggestedStatus('flagged').message(),
+				toggle('ai-generated', 'AI Generated')
+					.suggestedStatus('flagged')
+					.message()
+					.priority(Priorities.alerts),
 				toggle('ai-images', 'AI Images').suggestedStatus('flagged').message(),
 
 				toggle('rule-breaking-other', 'Other')

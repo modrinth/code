@@ -938,12 +938,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Chọn kênh cập nhật"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Khởi chạy Hooks"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hooks khởi chạy tuỳ biến"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Hooks cho phép người dùng nâng cao chạy câu lệnh hệ thống trước và sau khi chạy game."
   },
@@ -982,9 +976,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Phiên bản {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java và bộ nhớ"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Tùy chọn biến môi trường"

@@ -181,7 +181,7 @@
 		<div v-for="app in usersApps" :key="app.id" class="universal-card recessed token mt-4">
 			<div class="token-info">
 				<div class="token-icon">
-					<Avatar size="sm" :src="app.icon_url" />
+					<Avatar size="sm" :src="app.icon_url" :raw-src="app.raw_icon_url" />
 					<div>
 						<h2 class="token-title">{{ app.name }}</h2>
 						<div>

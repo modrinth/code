@@ -12,6 +12,9 @@ pub(crate) async fn remove_instance(
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
     let _content_lock = state.lock_instance_content(instance_id).await;
+    let _synced_options_lock = state.lock_synced_options().await;
+    crate::api::instance::remove_generated_instance_files(instance_id, state)
+        .await?;
 
     delete_instance_row_and_locks(&instance.id, state).await?;
 

@@ -1232,9 +1232,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "登入 Modrinth 帳號"
   },
-  "app.nav.signed-in-as": {
-    "message": "以 <user>{username}</user> 登入"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "升級至 Modrinth+"
   },
@@ -1246,9 +1243,6 @@
   },
   "app.navigation.home": {
     "message": "首頁"
-  },
-  "app.navigation.more-options": {
-    "message": "更多選項"
   },
   "app.navigation.next-image": {
     "message": "下一張圖片"
@@ -1483,9 +1477,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "行為"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "預設遊戲選項"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java 安裝"
@@ -2309,12 +2300,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "選擇更新通道"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "啟動掛勾"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "自訂啟動掛勾"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "掛勾讓進階使用者能在遊戲啟動前和啟動後執行特定的系統指令。"
   },
@@ -2377,9 +2362,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "實例被鎖定時無法使用安裝設定選項。"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java 和記憶體"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "自訂環境變數"

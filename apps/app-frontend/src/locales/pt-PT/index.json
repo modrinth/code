@@ -806,12 +806,6 @@
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Ganchos de inicio"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Ganchos de inicio personalizados"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Ganchos permitem a utilizadores avançados executarem certos comandos de sistema antes e após abrir o jogo."
   },
@@ -868,9 +862,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versão {loader}"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java e memória"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variáveis de ambiente"

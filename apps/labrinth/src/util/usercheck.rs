@@ -5,12 +5,16 @@ use reqwest::StatusCode;
 use serde::{Deserialize, Deserializer, Serialize};
 use tracing::{debug, error, warn};
 
+use xredis::RedisPool;
+
 use crate::env::ENV;
 use crate::util::http::HTTP_CLIENT;
 use crate::util::neverbounce::email_check_error_generic;
 
 pub const DEFAULT_API_URL: &str = "https://api.usercheck.com";
 const TIMEOUT: Duration = Duration::from_secs(5);
+const CACHE_NAMESPACE: &str = "usercheck_gate:v1";
+const CACHE_EXPIRY_SECONDS: i64 = 60 * 60;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DecisionAction {
@@ -21,6 +25,15 @@ pub enum DecisionAction {
 }
 
 impl DecisionAction {
+    fn from_api_value(value: &str) -> Self {
+        match value {
+            "allow" => Self::Allow,
+            "block" => Self::Block,
+            "challenge" => Self::Challenge,
+            value => Self::Unrecognized(value.to_owned()),
+        }
+    }
+
     fn as_str(&self) -> &str {
         match self {
             DecisionAction::Allow => "allow",
@@ -36,12 +49,7 @@ impl<'de> Deserialize<'de> for DecisionAction {
     where
         D: Deserializer<'de>,
     {
-        Ok(match String::deserialize(deserializer)?.as_str() {
-            "allow" => Self::Allow,
-            "block" => Self::Block,
-            "challenge" => Self::Challenge,
-            value => Self::Unrecognized(value.to_owned()),
-        })
+        Ok(Self::from_api_value(&String::deserialize(deserializer)?))
     }
 }
 
@@ -76,8 +84,6 @@ struct ResponseMeta {
 #[derive(Serialize)]
 struct DecisionRequest<'a> {
     email: &'a str,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    ip: Option<&'a str>,
 }
 
 /// Asks the configured UserCheck gate whether a signup should proceed.
@@ -87,9 +93,11 @@ struct DecisionRequest<'a> {
 /// signup, while anything else is an error that rejects the signup.
 /// `Challenge` resolves to `Allow` because these flows have no step-up
 /// mechanism past the captcha that already ran.
+///
+/// Verdicts are cached in Redis for an hour, keyed by email address.
 pub async fn check_email_gate(
+    redis: &RedisPool,
     email: &str,
-    ip: Option<&str>,
 ) -> eyre::Result<DecisionAction> {
     if ENV.USERCHECK_API_KEY.is_empty() || ENV.USERCHECK_GATE_ID.is_empty() {
         debug!(
@@ -99,8 +107,28 @@ pub async fn check_email_gate(
         return Ok(DecisionAction::Allow);
     }
 
+    let cache_key = {
+        let mut redis = redis.connect().await?;
+        let key = redis
+            .key()
+            .entity(CACHE_NAMESPACE, email.to_ascii_lowercase());
+
+        if let Some(cached) = redis.get(&key).await? {
+            let action = DecisionAction::from_api_value(&cached);
+
+            debug!(
+                action = action.as_str(),
+                "UserCheck gate decision served from cache",
+            );
+
+            return Ok(action);
+        }
+
+        key
+    };
+
     let decision_time_start = Instant::now();
-    let response = request_decision(email, ip).await;
+    let response = request_decision(email).await;
     let decision_time = decision_time_start.elapsed();
 
     let response = match response {
@@ -171,6 +199,12 @@ pub async fn check_email_gate(
         ),
     }
 
+    redis
+        .connect()
+        .await?
+        .set(&cache_key, action.as_str(), Some(CACHE_EXPIRY_SECONDS))
+        .await?;
+
     Ok(action)
 }
 
@@ -180,10 +214,7 @@ pub fn gate_block_error() -> eyre::Error {
     )
 }
 
-async fn request_decision(
-    email: &str,
-    ip: Option<&str>,
-) -> reqwest::Result<DecisionResponse> {
+async fn request_decision(email: &str) -> reqwest::Result<DecisionResponse> {
     HTTP_CLIENT
         .post(format!(
             "{}/v0/gates/{}/decisions",
@@ -192,7 +223,7 @@ async fn request_decision(
         ))
         .bearer_auth(&ENV.USERCHECK_API_KEY)
         .timeout(TIMEOUT)
-        .json(&DecisionRequest { email, ip })
+        .json(&DecisionRequest { email })
         .send()
         .await?
         .error_for_status()?

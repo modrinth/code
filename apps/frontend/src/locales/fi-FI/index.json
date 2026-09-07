@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Jatka"
   },
-  "admin.billing.error.not-found": {
-    "message": "Käyttäjää ei löydetty"
-  },
   "analytics.action.add": {
     "message": "Lisää"
   },
@@ -385,9 +382,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Hyväksy vastauksella"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Sulje keskustelu"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Sulje vastauksella"

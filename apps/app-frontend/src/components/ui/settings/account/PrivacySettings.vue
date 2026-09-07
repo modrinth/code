@@ -88,7 +88,7 @@ watch(
 		</div>
 	</div>
 
-	<div class="mt-8 flex items-center justify-between gap-4">
+	<div class="mt-8 first:mt-0 flex items-center justify-between gap-4">
 		<div>
 			<h2 class="m-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.telemetryTitle) }}

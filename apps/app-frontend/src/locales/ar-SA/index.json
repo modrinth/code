@@ -1154,9 +1154,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "تسجيل الدخول إلى حساب Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "تسجيل الدخول ك <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "الترقية إلى Modrinth+"
   },
@@ -1168,9 +1165,6 @@
   },
   "app.navigation.home": {
     "message": "الصفحة الرئيسية"
-  },
-  "app.navigation.more-options": {
-    "message": "المزيد من الخيارات"
   },
   "app.navigation.next-image": {
     "message": "الصورة التالية"
@@ -1405,9 +1399,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "السلوك"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "خيارات اللعبة الافتراضية"
   },
   "app.settings.tabs.java-installations": {
     "message": "تثبيتات جافا"
@@ -2216,12 +2207,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "اختر قناة التحديث"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "إجراءات تشغيل إضافية"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "إجراءات تشغيل إضافية مخصصة"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "إجراءات التشغيل المضافة تسمح للمستخدمين المتقدمين بإنشاء أوامر نظامية محددة قبل و عند تشغيل اللعبة."
   },
@@ -2284,9 +2269,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "إعدادات التثبيت غير متاحة أثناء قفل هذه النسخة."
-  },
-  "instance.settings.tabs.java": {
-    "message": "جافا والذاكرة"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "متغيرات البيئة المخصصة"

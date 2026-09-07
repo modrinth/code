@@ -547,7 +547,7 @@ pub async fn project_write_scopes() {
                 &[beta_project_id.as_str()],
                 json!(
                 {
-                    "description": "test_project_version_write_scopes Description"
+                    "description": "This description verifies project write scopes while containing enough information to satisfy project review validation requirements for a project that is currently being processed."
                 }),
                 pat.as_deref(),
             )

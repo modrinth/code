@@ -120,13 +120,11 @@
 			</div>
 		</div>
 	</NewModal>
-	<div class="page">
-		<div
-			class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
-		>
+	<div>
+		<div class="mb-4 flex items-center justify-between gap-4">
 			<div class="flex items-center gap-2">
 				<Avatar :src="user?.avatar_url" :alt="user?.username" size="32px" circle />
-				<h1 class="m-0 text-2xl font-extrabold">{{ user?.username }}'s subscriptions</h1>
+				<h2 class="m-0 text-2xl font-semibold">{{ user?.username }}'s subscriptions</h2>
 			</div>
 			<div class="flex items-center gap-2">
 				<ButtonLink :to="`/user/${user?.id}`">
@@ -210,7 +208,6 @@ import {
 	Button,
 	ButtonLink,
 	CopyCode,
-	defineMessages,
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -219,7 +216,6 @@ import {
 	Toggle,
 	useFormatDateTime,
 	useRelativeTime,
-	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
@@ -236,17 +232,7 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 })
 
-const vintl = useVIntl()
-
-const { formatMessage } = vintl
 const formatRelativeTime = useRelativeTime()
-
-const messages = defineMessages({
-	userNotFoundError: {
-		id: 'admin.billing.error.not-found',
-		defaultMessage: 'User not found',
-	},
-})
 
 const userId = useRouteId('user')
 
@@ -266,7 +252,7 @@ watch(userError, (error) => {
 		showError({
 			fatal: true,
 			statusCode: error.statusCode ?? error.status ?? 404,
-			message: formatMessage(messages.userNotFoundError),
+			message: 'User not found',
 		})
 	}
 })
@@ -410,11 +396,3 @@ async function modifyCharge() {
 	modifying.value = false
 }
 </script>
-<style scoped>
-.page {
-	padding: 1rem;
-	margin-left: auto;
-	margin-right: auto;
-	max-width: 56rem;
-}
-</style>

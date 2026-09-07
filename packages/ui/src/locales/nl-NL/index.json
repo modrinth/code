@@ -4862,9 +4862,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "facturering {interval, select, monthly {maandelijks} quarterly {driemaandelijks} yearly {jaarlijks} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Verkrijgbaar in Noord-Amerika, Europa en Zuidoost-Azië."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Configureer je eigen plan met de specs die je nodig hebt."
   },

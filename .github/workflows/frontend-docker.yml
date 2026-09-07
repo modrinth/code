@@ -73,7 +73,7 @@ jobs:
       - name: Build frontend
         run: pnpm web:build
         env:
-          NITRO_PRESET: node-server
+          NITRO_PRESET: node_cluster
           BUILD_ENV: ${{ steps.meta.outputs.env }}
           CF_PAGES_BRANCH: ${{ github.ref_name }}
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}

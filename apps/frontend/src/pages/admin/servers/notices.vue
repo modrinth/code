@@ -116,11 +116,9 @@
 		</div>
 	</NewModal>
 	<AssignNoticeModal ref="assignNoticeModal" @close="refreshNotices" />
-	<div class="page">
-		<div
-			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
-		>
-			<h1 class="m-0 text-2xl">Server notices</h1>
+	<div>
+		<div class="mb-4 flex items-center justify-between gap-4">
+			<h2 class="m-0 text-2xl font-semibold">Server notices</h2>
 			<Button type="colored" color="brand" @click="openNewNoticeModal">
 				<PlusIcon />
 				{{ formatMessage(messages.createNotice) }}
@@ -498,11 +496,3 @@ const messages = defineMessages({
 	},
 })
 </script>
-<style lang="scss" scoped>
-.page {
-	padding: 1rem;
-	margin-left: auto;
-	margin-right: auto;
-	max-width: 78.5rem;
-}
-</style>

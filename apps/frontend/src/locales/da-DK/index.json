@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Forsæt"
   },
-  "admin.billing.error.not-found": {
-    "message": "Bruger ikke fundet"
-  },
   "ads-consent.accept": {
     "message": "Tillad alle"
   },
@@ -679,9 +676,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Godkend med svar"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Luk tråd"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Luk med svar"

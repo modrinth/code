@@ -746,6 +746,11 @@ export namespace Archon {
 				worlds: WorldFull[]
 			}
 
+			export type SftpCredentials = {
+				sftp_username: string
+				sftp_password: string
+			}
+
 			export type ServerResources = {
 				cpu: number
 				memory_mb: number
@@ -981,6 +986,11 @@ export namespace Archon {
 				type: 'server.network.patch'
 				ports: ServerNetworkPort[]
 			}
+			export type ServerSftpPatchEvent = {
+				type: 'server.sftp.patch'
+				sftp_username: string
+				sftp_password: string
+			}
 			export type ServerTransferEvent = {
 				type: 'server.transfer.start' | 'server.transfer.done'
 				target_node: string
@@ -1094,6 +1104,7 @@ export namespace Archon {
 				| BackupOperationDoneEvent
 				| ServerPatchEvent
 				| ServerNetworkPatchEvent
+				| ServerSftpPatchEvent
 				| ServerTransferEvent
 				| UsersPatchEvent
 				| WorldPatchEvent

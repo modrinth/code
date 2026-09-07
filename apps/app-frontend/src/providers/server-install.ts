@@ -127,7 +127,7 @@ export function createServerInstall(opts: {
 			gameVersion,
 			loader: 'vanilla',
 			loaderVersion: null,
-			iconPath: project.icon_url ?? null,
+			iconPath: project.raw_icon_url ?? null,
 			link: {
 				type: 'server_project',
 				project_id: project.id,
@@ -248,7 +248,7 @@ export function createServerInstall(opts: {
 				project_id: contentProjectId,
 				version_id: contentVersionId,
 				title: project.title,
-				icon_url: project.icon_url,
+				icon_url: project.raw_icon_url,
 			},
 			{
 				name: project.title,

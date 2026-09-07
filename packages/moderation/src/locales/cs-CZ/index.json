@@ -53,12 +53,6 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Zkontrolovat zveřejnění obsahu"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Rozšiřte popis"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Upravte popis"
   },
@@ -95,12 +89,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Odstraňte duplicitní odkazy"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Popis by měl obsahovat dostatečné množství prostého textu nebo popisků u obrázku, aby byl přístupný i těm, kteří používají čtečky obrazovky nebo mají pomalé připojení k internetu."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Zajistěte přístupnost"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL licence je neplatná."
   },
@@ -112,12 +100,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Přidejte platný odkaz na licenci"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Používání zkracovačů odkazů nebo jiných způsobů, jak zakrýt, kam může odkaz vést, je zakázáno, používejte prosím pouze vhodné odkazy v plné délce."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Nepoužívejte zkracovače odkazů"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# nadpis} other {# nadpisy}} ve vašem popisu {count, plural, one {je} other {jsou}} příliš dlouhé. Nadpisy by měly být stručné a měly by fungovat jako názvy sekcí, ne jako celé věty."
@@ -197,9 +179,6 @@
   "nags.server.title": {
     "defaultMessage": "Přejděte do nastavení serveru"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Přejděte do nastavení popisu"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "Přejděte do nastavení zveřejnění"
   },
@@ -221,29 +200,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "Přejděte do nastavení verze"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Souhrn se nesmí shodovat s názvem projektu. Je důležité vytvořit informativní a poutavý souhrn."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Vytvořte jedinečný souhrn"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Souhrn by neměl obsahovat formátování, zalomení řádků, speciální znaky ani odkazy, protože zobrazí pouze prostý text."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Odstraňte nevhodné formátování ze souhrnu"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Váš popis má {length, plural, one {# čitelný znak} few {# čitelné znaky} other {# čitelných znaků}}. Pro vytvoření jasného a informativního popisu doporučujeme alespoň {minChars, plural, one {# znak} few {# znaky} other {# znaků}}."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Rozšířte shrnutí"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Udržování mít jméno svého projektu čisté usnadňuje si ho zapamatovat a vyhledat. Verze a informace o modovim načítači se automaticky zobrazují vedle vašeho projektu."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Odstraňte technické údaje z názvu"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Vyberte si přesné jazyky"

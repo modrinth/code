@@ -621,7 +621,7 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 		"
 	>
 		<section
-			class="mt-6 flex min-w-0 flex-col gap-3 sm:mt-0"
+			class="mt-6 flex min-w-0 flex-col gap-2 sm:mt-0"
 			:class="cosmetics.rightSearchLayout ? 'lg:order-1' : 'lg:order-2'"
 		>
 			<BrowsePageLayout>

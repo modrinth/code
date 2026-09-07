@@ -2,15 +2,67 @@
 	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+	html.theme-color-transitioning *,
+	html.theme-color-transitioning *::before,
+	html.theme-color-transitioning *::after,
+	html.theme-color-transitioning *::backdrop,
+	html.theme-color-transitioning *::placeholder {
+		animation: none !important;
+		animation-delay: 0s !important;
+		transition:
+			color,
+			background-color,
+			border-color,
+			outline-color,
+			fill,
+			stroke,
+			box-shadow,
+			text-decoration-color,
+			caret-color,
+			column-rule-color 125ms ease-in-out !important;
+		transition-delay: 0s !important;
+	}
+
+	/* save bars and stuff should still animate in/out */
+	html.theme-color-transitioning .floating-action-bar {
+		animation: revert !important;
+		animation-delay: revert !important;
+		transition:
+			color,
+			background-color,
+			border-color,
+			outline-color,
+			fill,
+			stroke,
+			box-shadow,
+			text-decoration-color,
+			caret-color,
+			column-rule-color 125ms ease-in-out,
+			transform 0.25s cubic-bezier(0.15, 1.4, 0.64, 0.96),
+			opacity 0.25s cubic-bezier(0.15, 1.4, 0.64, 0.96),
+			bottom 0.25s ease-in-out !important;
+		transition-delay: 0s !important;
+	}
+
+	html.theme-color-transitioning .floating-action-bar *,
+	html.theme-color-transitioning .floating-action-bar *::before,
+	html.theme-color-transitioning .floating-action-bar *::after {
+		animation: revert !important;
+		animation-delay: revert !important;
+	}
+}
+
 .floating-expand-enter-from,
 .floating-expand-leave-to {
 	opacity: 0;
-	scale: 0.9 0.3;
+	scale: var(--floating-expand-x, 0.9) var(--floating-expand-y, 0.3);
 }
 
 .floating-expand-enter-to,
 .floating-expand-leave-from {
 	opacity: 1;
+	scale: 1 1;
 }
 
 .floating-expand-enter-active,
@@ -18,7 +70,37 @@
 	transition:
 		opacity 0.125s var(--ease-out-expo),
 		scale 0.125s var(--ease-out-expo);
-	transform-origin: top;
+	transform-origin: var(--floating-expand-origin, top);
+}
+
+.button-menu-item[data-tone]:not([data-hover-filled-only]),
+.button-menu-item[data-tone]:not([data-hover-filled-only]) svg {
+	color: var(--button-menu-item-tone);
+}
+
+.button-menu-item[data-tone][data-hover-filled]:hover,
+.button-menu-item[data-tone][data-hover-filled]:focus-visible {
+	color: var(--color-accent-contrast);
+	background-color: var(--button-menu-item-tone);
+}
+
+.button-menu-item[data-tone][data-hover-filled]:hover svg,
+.button-menu-item[data-tone][data-hover-filled]:focus-visible svg {
+	color: inherit;
+}
+
+.button-menu-trailing {
+	color: var(--button-menu-trailing-color, var(--color-secondary));
+}
+
+.button-menu-trailing:hover,
+.button-menu-trailing:focus-visible {
+	color: var(--color-accent-contrast);
+}
+
+.button-menu-trailing:hover::before,
+.button-menu-trailing:focus-visible::before {
+	background-color: var(--button-menu-trailing-color, var(--color-secondary));
 }
 
 @layer utilities {

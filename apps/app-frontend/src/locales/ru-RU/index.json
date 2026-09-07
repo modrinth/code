@@ -1211,9 +1211,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Войти в аккаунт Modrinth"
   },
-  "app.nav.signed-in-as": {
-    "message": "Текущий аккаунт: <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Перейти на Modrinth+"
   },
@@ -1225,9 +1222,6 @@
   },
   "app.navigation.home": {
     "message": "Главная"
-  },
-  "app.navigation.more-options": {
-    "message": "Дополнительно"
   },
   "app.navigation.next-image": {
     "message": "Следующее изображение"
@@ -1462,9 +1456,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "Поведение"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Предустановки игры"
   },
   "app.settings.tabs.java-installations": {
     "message": "Расположение Java"
@@ -2285,12 +2276,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Выберите канал обновления"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Команды запуска"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Переопределение команд запуска"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
   },
@@ -2353,9 +2338,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Параметры установки недоступны, пока сборка заблокирована."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java и память"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Переопределение переменных среды"

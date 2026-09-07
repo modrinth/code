@@ -869,7 +869,7 @@ export function createContentInstall(opts: {
 				project_id: project.id,
 				version_id: version,
 				title: project.title,
-				icon_url: project.icon_url,
+				icon_url: project.raw_icon_url,
 			})
 			const instanceId = installJobInstanceId(job)
 			if (instanceId) {
@@ -985,7 +985,7 @@ export function createContentInstall(opts: {
 				project_id: project.id,
 				version_id: version,
 				title: project.title,
-				icon_url: project.icon_url,
+				icon_url: project.raw_icon_url,
 			})
 			const instanceId = installJobInstanceId(job)
 			if (instanceId) {

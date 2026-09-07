@@ -47,12 +47,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Pilih tag yang tepat"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Panjang keterangan Anda adalah {length, plural, other {# karakter yang dapat dibaca}}. Setidaknya {minChars, plural, other {# karakter}} disarankan untuk membuat keterangan yang jelas dan informatif."
-  },
-  "nags.description-too-short.title": {
-    "defaultMessage": "Kembangkan keterangan"
-  },
   "nags.edit-description.title": {
     "defaultMessage": "Sunting keterangan"
   },
@@ -89,12 +83,6 @@
   "nags.identical-links.title": {
     "defaultMessage": "Bersihkan tautan identik"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Keterangan Anda seharusnya berisi teks biasa atau teks alt gambar yang cukup, agar memastikan aksesibilitas terhadap pengguna pembaca layar atau pengguna dengan koneksi internet yang lambat."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Pastikan aksesibilitas"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL lisensi tidak sah."
   },
@@ -106,12 +94,6 @@
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Tambah tautan lisensi yang sah"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Penggunaan pemendek tautan atau metode lain untuk mengaburkan tujuan tautan pada tautan eksternal atau tautan lisensi Anda tidak diperbolehkan. Mohon hanya menggunakan tautan penuh yang sesuai saja."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Jangan gunakan pemendek tautan"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, other {# tajuk}} dalam keterangan Anda{count, plural, other{}} terlalu panjang. Tajuk seharusnya ringkas dan bertindak sebagai judul suatu bagian, bukan kalimat penuh."
@@ -191,9 +173,6 @@
   "nags.server.title": {
     "defaultMessage": "Kunjungi pengaturan server"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Kunjungi pengaturan keterangan"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Kunjungi pengaturan lisensi"
   },
@@ -209,29 +188,14 @@
   "nags.settings.title": {
     "defaultMessage": "Kunjungi pengaturan umum"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Ringkasan Anda tidak boleh sama dengan nama proyek Anda. Membuat ringkasan yang informatif dan menarik adalah penting."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Buat ringkasan yang unik"
-  },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Ringkasan Anda seharusnya tidak mengandung pemformatan, pemecah baris, karakter khusus, atau tautan, karena ringkasan hanya akan menampilkan teks biasa."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Bersihkan ringkasan"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Panjang ringkasan Anda adalah {length, plural, other {# karakter yang dapat dibaca}}. Setidaknya {minChars, plural, other {# karakter}} disarankan untuk membuat keterangan yang informatif dan menarik."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Kembangkan ringkasan"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Nama proyek yang ringkas membuatnya mudah diingat dan memudahkan pencarian. Informasi versi dan pemuat akan ditampilkan bersamaan secara otomatis dengan proyek Anda."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Bersihkan nama"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "Anda telah memilih {languageCount, plural, other {# bahasa}}. Mohon hanya memilih bahasa yang benar-benar didukung oleh server Anda."
@@ -273,4 +237,3 @@
     "defaultMessage": "Kunjungi pengaturan tautan"
   }
 }
-

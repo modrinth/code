@@ -3,7 +3,10 @@ import { createStripeElements } from '@modrinth/utils'
 import { loadStripe, type Stripe as StripsJs, type StripeElements } from '@stripe/stripe-js'
 import { ref } from 'vue'
 
+import { useDebugLogger } from '../../composables/debug-logger'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
+
+const debug = useDebugLogger('AddPaymentMethod')
 
 const emit = defineEmits<{
 	(e: 'startLoading' | 'stopLoading'): void
@@ -70,7 +73,7 @@ async function submit(): Promise<boolean> {
 		},
 	})
 
-	console.log(result)
+	debug(result)
 
 	const { error } = result
 

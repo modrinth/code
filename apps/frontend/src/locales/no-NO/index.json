@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Fortsett"
   },
-  "admin.billing.error.not-found": {
-    "message": "Bruker ikke funnet"
-  },
   "analytics.action.add": {
     "message": "Legg til"
   },
@@ -796,9 +793,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Godkjenn med svar"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Lukk tråden"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Lukk med svar"
@@ -2077,9 +2071,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Filoppslag"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Bla gjennom med email"
   },
   "layout.action.manage-affiliates": {
     "message": "Hold styr på tilknytte lenker"

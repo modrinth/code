@@ -51,6 +51,7 @@
 							:alt="instance.name"
 							size="2rem"
 							rounded="md"
+							pad-transparent-corners
 						/>
 						<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
 					</div>

@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Continuar"
   },
-  "admin.billing.error.not-found": {
-    "message": "Usuario no encontrado"
-  },
   "ads-consent.accept": {
     "message": "Aceptar todos"
   },
@@ -1027,9 +1024,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Aprobar con respuesta"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Cerrar hilo"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cerrar con respuesta"
@@ -2642,9 +2636,6 @@
   "layout.action.file-lookup": {
     "message": "Búsqueda de archivos"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Búsqueda por correo electrónico"
-  },
   "layout.action.manage-affiliates": {
     "message": "Manejar enlaces de afiliados"
   },
@@ -3442,12 +3433,6 @@
   },
   "project-type.shader.singular": {
     "message": "Sombreador"
-  },
-  "project.actions.back-to-all-projects": {
-    "message": "Volver a todos los proyectos"
-  },
-  "project.actions.back-to-project-page": {
-    "message": "Volver a la página del proyecto"
   },
   "project.actions.checking-modpack-archives": {
     "message": "Comprobando..."

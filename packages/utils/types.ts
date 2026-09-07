@@ -89,6 +89,7 @@ export interface ProjectV3 {
 
 	versions: ModrinthId[]
 	icon_url?: string
+	raw_icon_url?: string
 
 	link_urls: Record<
 		string,
@@ -129,6 +130,7 @@ export interface Project {
 
 	body: string
 	icon_url?: string
+	raw_icon_url?: string
 	color?: number
 
 	categories: Category[]
@@ -230,6 +232,7 @@ export type Organization = {
 	team_id: ModrinthId
 	description: string
 	icon_url: string
+	raw_icon_url: string | null
 	color: number
 	members: OrganizationMember[]
 }
@@ -254,6 +257,7 @@ export type Collection = {
 	name: string
 	description: string
 	icon_url: string
+	raw_icon_url: string | null
 	color: number
 	status: CollectionStatus
 	created: string

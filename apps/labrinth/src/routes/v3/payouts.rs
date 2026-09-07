@@ -919,7 +919,7 @@ pub async fn cancel_payout(
                     }
                     PayoutMethodType::Tremendous => {
                         payouts
-                            .make_tremendous_request::<(), ()>(
+                            .make_tremendous_request::<(), serde_json::Value>(
                                 Method::POST,
                                 &format!("rewards/{platform_id}/cancel"),
                                 None,

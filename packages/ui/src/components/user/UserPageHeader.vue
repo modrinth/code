@@ -16,7 +16,7 @@
 				:icon="BadgeCheckIcon"
 				:icon-props="{ fill: 'var(--color-brand-highlight)' }"
 				:tooltip="formatMessage(messages.officialAccount)"
-				class="border-brand-highlight bg-brand-highlight text-brand"
+				class="border-brand-highlight bg-brand-highlight !text-brand"
 			>
 				{{ formatMessage(messages.officialAccount) }}
 			</PageHeaderBadgeItem>
@@ -89,6 +89,7 @@ import {
 	AffiliateIcon,
 	BadgeCheckIcon,
 	BanIcon,
+	BoxesIcon,
 	BoxIcon,
 	CalendarIcon,
 	ChartIcon,
@@ -103,7 +104,7 @@ import {
 import { computed } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { Button, ButtonLink, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
@@ -139,6 +140,10 @@ const messages = defineMessages({
 	infoButton: {
 		id: 'profile.button.info',
 		defaultMessage: 'View user details',
+	},
+	sharedInstancesButton: {
+		id: 'profile.button.shared-instances',
+		defaultMessage: 'View shared instances',
 	},
 	officialAccount: {
 		id: 'profile.official-account',
@@ -215,6 +220,7 @@ const emit = defineEmits<{
 	openBilling: []
 	toggleAffiliate: []
 	openInfo: []
+	openSharedInstances: []
 	openAnalytics: []
 	editUser: []
 }>()
@@ -228,7 +234,7 @@ const formatDateTime = useFormatDateTime({
 const downloadsTooltip = computed(() => formatNumber(props.downloads))
 const joinedTooltip = computed(() => formatDateTime(props.user.created))
 
-const moreActions = computed<OverflowMenuOption[]>(() => [
+const moreActions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'manage-projects',
 		label: formatMessage(messages.profileManageProjectsButton),
@@ -290,6 +296,14 @@ const moreActions = computed<OverflowMenuOption[]>(() => [
 		label: formatMessage(messages.infoButton),
 		icon: InfoIcon,
 		action: () => emit('openInfo'),
+		tone: 'orange',
+		shown: props.showStaffActions && props.isStaff,
+	},
+	{
+		id: 'open-shared-instances',
+		label: formatMessage(messages.sharedInstancesButton),
+		icon: BoxesIcon,
+		action: () => emit('openSharedInstances'),
 		tone: 'orange',
 		shown: props.showStaffActions && props.isStaff,
 	},

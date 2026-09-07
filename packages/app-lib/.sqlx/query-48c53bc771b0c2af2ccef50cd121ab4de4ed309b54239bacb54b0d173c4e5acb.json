@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE screenshots\n\t\tSET instance_id = ?, file_name = ?\n\t\tWHERE instance_id = ? AND file_name = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "48c53bc771b0c2af2ccef50cd121ab4de4ed309b54239bacb54b0d173c4e5acb"
+}

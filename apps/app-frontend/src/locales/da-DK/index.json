@@ -881,12 +881,6 @@
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Startkommandoer"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Brugerfinansieret startkommandoer"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Startkommandoer giver avancerede brugere mulighed for at køre bestemte systemkommandoer før og efter spillet startes."
   },
@@ -925,9 +919,6 @@
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java og hukommelse"
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Indskriv Java argumenter..."

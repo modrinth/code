@@ -1178,9 +1178,6 @@
   "app.nav.sign-in-to-modrinth-account": {
     "message": "Logga in till ett Modrinth-konto"
   },
-  "app.nav.signed-in-as": {
-    "message": "Inloggad som <user>{username}</user>"
-  },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Uppgradera till Modrinth+"
   },
@@ -1192,9 +1189,6 @@
   },
   "app.navigation.home": {
     "message": "Hem"
-  },
-  "app.navigation.more-options": {
-    "message": "Mer alternativ"
   },
   "app.navigation.next-image": {
     "message": "Nästa bild"
@@ -1378,9 +1372,6 @@
   },
   "app.settings.tabs.behavior": {
     "message": "Beteende"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standard spelinställningar"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java-installationer"
@@ -2144,12 +2135,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Välj uppdateringskanal"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Startkrokar"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Egendefinierade startkrokar"
-  },
   "instance.settings.tabs.hooks.description": {
     "message": "Krokar gör det möjligt för avancerade användare att köra vissa systemkommandon före och efter att spelet startas."
   },
@@ -2203,9 +2188,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Installationsinställningar är otillgängligt medan den här instansen är låst."
-  },
-  "instance.settings.tabs.java": {
-    "message": "Java och minne"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
     "message": "Anpassade miljövariabler"

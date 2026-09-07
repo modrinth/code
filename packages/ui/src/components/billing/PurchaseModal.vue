@@ -466,6 +466,7 @@ import { calculateSavings, createStripeElements, getCurrency } from '@modrinth/u
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
+import { useDebugLogger } from '../../composables/debug-logger'
 import { useVIntl } from '../../composables/i18n'
 import { useFormatDateTime, useFormatPrice } from '../../composables/index.ts'
 import { paymentMethodMessages } from '../../utils/common-messages'
@@ -481,6 +482,7 @@ import NewModal from '../modal/NewModal.vue'
 const { formatMessage } = useVIntl()
 const formatPrice = useFormatPrice()
 const formatDate = useFormatDateTime({ dateStyle: 'long' })
+const debug = useDebugLogger('PurchaseModal')
 
 const props = defineProps({
 	product: {
@@ -648,7 +650,7 @@ const updateCustomServerStock = async () => {
 						mutatedProduct.value,
 					)
 					customOutOfStock.value = capacityStatus.custom?.available === 0
-					console.log(capacityStatus)
+					debug(capacityStatus)
 				}
 			} else {
 				const capacityStatus = await props.fetchCapacityStatuses(mutatedProduct.value)

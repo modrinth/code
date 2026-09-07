@@ -5,7 +5,14 @@
 			:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
 		>
 			<template #title>
-				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
+				<Avatar
+					:src="project.icon_url"
+					:raw-src="project.raw_icon_url"
+					:alt="project.title"
+					class="icon"
+					size="32px"
+					no-shadow
+				/>
 				<span class="text-lg font-extrabold text-contrast">
 					{{ project.license.name ? project.license.name : formatMessage(messages.licenseTitle) }}
 				</span>

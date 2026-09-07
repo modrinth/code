@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM processes WHERE pid = ? AND start_time = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "209158894a8658b61fda164cb35bd807403238b5fd6891803a00464dbfa663fc"
+}

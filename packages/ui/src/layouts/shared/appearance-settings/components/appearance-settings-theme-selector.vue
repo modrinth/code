@@ -5,11 +5,12 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const { formatMessage } = useVIntl()
 
-const { ariaLabel, modelValue, themeOptions, systemThemeColor } = defineProps<{
+const { ariaLabel, modelValue, themeOptions, systemThemeColor, preferredDarkTheme } = defineProps<{
 	ariaLabel: string
 	modelValue: T
 	themeOptions: readonly T[]
 	systemThemeColor: T
+	preferredDarkTheme: T
 }>()
 
 const emit = defineEmits<{
@@ -94,7 +95,7 @@ function getPreviewClass(option: T): string {
 					aria-hidden="true"
 				/>
 				<MoonIcon
-					v-else-if="'dark' === option"
+					v-else-if="option === preferredDarkTheme"
 					v-tooltip="formatMessage(themeTooltips.preferredDark)"
 					class="theme-icon shrink-0"
 					aria-hidden="true"

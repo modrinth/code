@@ -12,12 +12,13 @@ into application code.
 
 ## Select a component
 
-| Component    | Use                                                                        |
-| ------------ | -------------------------------------------------------------------------- |
-| `Input`      | Single-line text, email, password, number, URL, or search entry            |
-| `Textarea`   | Multi-line text entry                                                       |
-| `DateInput`  | A native browser control for a date or a local date and time               |
-| `DatePicker` | A styled calendar for ranges, multiple dates, time, or inline presentation |
+| Component     | Use                                                                        |
+| ------------- | -------------------------------------------------------------------------- |
+| `Input`       | Single-line text, email, password, number, URL, or search entry            |
+| `Textarea`    | Multi-line text entry                                                      |
+| `DateInput`   | A native browser control for a date or a local date and time               |
+| `DatePicker`  | A styled calendar for ranges, multiple dates, time, or inline presentation |
+| `ColorPicker` | A swatch button that opens a hue and saturation picker with a hex field    |
 
 Use a dedicated component for each other type of control. Do not use `Input` instead
 of a select, checkbox, radio group, toggle, or file picker.
@@ -26,7 +27,7 @@ Import the public input components from `@modrinth/ui`. In `packages/ui`, import
 from `#ui/components/base/inputs`:
 
 ```ts
-import { DateInput, DatePicker, Input, Textarea } from '@modrinth/ui'
+import { ColorPicker, DateInput, DatePicker, Input, Textarea } from '@modrinth/ui'
 ```
 
 ## Labels and field descriptions
@@ -38,12 +39,7 @@ For a visible label, set the same value for the label `for` and the control `id`
 
 ```vue
 <label for="project-name">Project name</label>
-<Input
-	id="project-name"
-	v-model="projectName"
-	name="name"
-	autocomplete="off"
-/>
+<Input id="project-name" v-model="projectName" name="name" autocomplete="off" />
 ```
 
 An input does not have a `label` prop. Do not use a placeholder as the only label. The
@@ -52,13 +48,7 @@ placeholder is not visible after the user enters a value.
 If a visible label repeats other content, use an accessible name such as `aria-label`:
 
 ```vue
-<Input
-	v-model="query"
-	:icon="SearchIcon"
-	type="search"
-	aria-label="Search projects"
-	placeholder="Search projects..."
-/>
+<Input v-model="query" :icon="SearchIcon" type="search" aria-label="Search projects" placeholder="Search projects..." />
 ```
 
 Connect descriptions and validation messages to the control with `aria-describedby`.
@@ -66,12 +56,7 @@ The component sends additional attributes to the native control:
 
 ```vue
 <label for="project-slug">Project URL</label>
-<Input
-	id="project-slug"
-	v-model="slug"
-	:error="Boolean(slugError)"
-	aria-describedby="project-slug-help project-slug-error"
-/>
+<Input id="project-slug" v-model="slug" :error="Boolean(slugError)" aria-describedby="project-slug-help project-slug-error" />
 <p id="project-slug-help">Use lowercase letters, numbers, and dashes.</p>
 <p v-if="slugError" id="project-slug-error">
 	{{ slugError }}
@@ -87,22 +72,9 @@ Bind the field value with `v-model`. For text types, the `Input` model is a stri
 `type="number"`, the model is a number or `undefined`:
 
 ```vue
-<Input
-	v-model="email"
-	type="email"
-	name="email"
-	autocomplete="email"
-	placeholder="name@example.com"
-/>
+<Input v-model="email" type="email" name="email" autocomplete="email" placeholder="name@example.com" />
 
-<Input
-	v-model="serverCount"
-	type="number"
-	:min="1"
-	:max="100"
-	:step="1"
-	clamp
-/>
+<Input v-model="serverCount" type="number" :min="1" :max="100" :step="1" clamp />
 ```
 
 An empty number input sets the model to `undefined`. The `clamp` prop keeps the number
@@ -117,14 +89,7 @@ the native input type are different.
 Use `Textarea` for multi-line content:
 
 ```vue
-<Textarea
-	id="project-summary"
-	v-model="summary"
-	name="summary"
-	:maxlength="500"
-	:rows="4"
-	resize="vertical"
-/>
+<Textarea id="project-summary" v-model="summary" name="summary" :maxlength="500" :rows="4" resize="vertical" />
 ```
 
 `Textarea` has three rows by default. The default value of `resize` is `none`. The other
@@ -145,8 +110,8 @@ nameInput.value?.focus()
 
 `Input`, `Textarea`, and `DateInput` have the same three appearances:
 
-| Appearance    | Use                                                                 |
-| ------------- | ------------------------------------------------------------------- |
+| Appearance    | Use                                                                |
+| ------------- | ------------------------------------------------------------------ |
 | `surface`     | Standard fields on pages, cards, and modals. This is the default.  |
 | `button`      | Compact fields in panels that use the button surface.              |
 | `transparent` | Fields in a container that already shows the visible field border. |
@@ -195,12 +160,7 @@ standard input height.
 Set `icon` on `Input` to show a decorative leading icon:
 
 ```vue
-<Input
-	v-model="query"
-	:icon="SearchIcon"
-	type="search"
-	placeholder="Search..."
-/>
+<Input v-model="query" :icon="SearchIcon" type="search" placeholder="Search..." />
 ```
 
 Use the `leading` slot for other decorative content. The component hides this content
@@ -245,13 +205,7 @@ The clear button is visible only when the field has a value. It is not visible w
 field is disabled or readonly:
 
 ```vue
-<Input
-	v-model="query"
-	type="search"
-	clearable
-	clear-label="Clear search"
-	@clear="refreshResults"
-/>
+<Input v-model="query" type="search" clearable clear-label="Clear search" @clear="refreshResults" />
 ```
 
 For `Input` and `DateInput`, set a localized `clear-label`. This label is the accessible
@@ -285,13 +239,7 @@ Set `error` after validation finds an invalid value. `Input`, `Textarea`, and
 control:
 
 ```vue
-<Input
-	id="website"
-	v-model="website"
-	type="url"
-	:error="Boolean(websiteError)"
-	aria-describedby="website-error"
-/>
+<Input id="website" v-model="website" type="url" :error="Boolean(websiteError)" aria-describedby="website-error" />
 <p v-if="websiteError" id="website-error">{{ websiteError }}</p>
 ```
 
@@ -314,15 +262,7 @@ string:
 
 ```vue
 <label for="scheduled-date">Scheduled date</label>
-<DateInput
-	id="scheduled-date"
-	v-model="scheduledDate"
-	type="datetime-local"
-	:min="minimumDate"
-	clearable
-	clear-label="Clear scheduled date"
-	picker-label="Open scheduled date picker"
-/>
+<DateInput id="scheduled-date" v-model="scheduledDate" type="datetime-local" :min="minimumDate" clearable clear-label="Clear scheduled date" picker-label="Open scheduled date picker" />
 ```
 
 Set `min`, `max`, and `step` for native limits. The calendar button gives focus to the
@@ -344,21 +284,9 @@ functions:
 selections as formatted strings:
 
 ```vue
-<DatePicker
-	v-model="releaseDate"
-	placeholder="Select a release date..."
-	:min-date="today"
-	clearable
-	close-on-select
-/>
+<DatePicker v-model="releaseDate" placeholder="Select a release date..." :min-date="today" clearable close-on-select />
 
-<DatePicker
-	v-model="reportingRange"
-	mode="range"
-	:show-months="2"
-	default-view-date="2026-01-01"
-	placeholder="Select a reporting range..."
-/>
+<DatePicker v-model="reportingRange" mode="range" :show-months="2" default-view-date="2026-01-01" placeholder="Select a reporting range..." />
 ```
 
 The modes use these model types:
@@ -376,13 +304,7 @@ is set.
 Set `date-format` and `alt-format` to use other Flatpickr formats:
 
 ```vue
-<DatePicker
-	v-model="startsAt"
-	enable-time
-	time24hr
-	date-format="Y-m-d H:i"
-	alt-format="j M Y, H:i"
-/>
+<DatePicker v-model="startsAt" enable-time time24hr date-format="Y-m-d H:i" alt-format="j M Y, H:i" />
 ```
 
 Make sure that model strings agree with `date-format`. The `alt-format` prop changes
@@ -413,15 +335,40 @@ The component sends a `clamp` event when it uses a different day. Use this event
 interface must explain the change:
 
 ```vue
-<DatePicker
-	v-model="renewalDate"
-	preserve-day
-	@clamp="showClampedDayMessage"
-/>
+<DatePicker v-model="renewalDate" preserve-day @clamp="showClampedDayMessage" />
 ```
 
 The picker has `focus()`, `open()`, `close()`, and `clear()` methods. Use these methods
 only when a workflow requires control from the parent component.
+
+## Color picker
+
+`ColorPicker` shows a swatch button. It opens a popup with a saturation and
+brightness area, a hue slider, and a hex field. Its model is a 6-digit hex string
+such as `#ff6b6b`:
+
+```vue
+<ColorPicker v-model="strokeColor" label="Stroke colour" />
+```
+
+Set a localized `label`. It is the accessible name of the swatch button and the popup,
+and it is the content of the button's tooltip.
+
+`ColorPicker` has two sizes for the swatch button: `md` (the default, 36 px) and `sm`
+(32 px). It does not use the shared `InputSize` scale, because the button is a square
+swatch rather than a text field.
+
+The component sends a `focus` event when the popup opens and a `change` event with the
+final value when the popup closes. Use these events to group the edits made while the
+popup is open into a single undo step, the way a native `<input type="color">` groups
+edits into one `change`:
+
+```vue
+<ColorPicker v-model="strokeColor" label="Stroke colour" @focus="beginColorEdit" @change="commitColorEdit" />
+```
+
+Set `disabled` to prevent changes. The picker has `open()` and `close()` methods. Use
+these methods only when a workflow requires control from the parent component.
 
 ## Classes and native attributes
 

@@ -1,5 +1,6 @@
 <template>
 	<SignInView
+		v-if="signInReady || subtleLauncherRedirectUri"
 		v-model:email="email"
 		v-model:password="password"
 		v-model:token="token"
@@ -9,10 +10,12 @@
 		:redirect-target="redirectTarget"
 		:route-query="route.query"
 		:globals="globals"
+		:accounts="launcherAccountChoices"
 		:on-password-sign-in="beginPasswordSignIn"
 		:on-two-factor-sign-in="begin2FASignIn"
 		:on-passkey-sign-in="beginPasskeySignin"
 		:on-set-captcha-ref="setCaptchaRef"
+		@select="onSelectLauncherAccount"
 	/>
 </template>
 
@@ -30,9 +33,18 @@ import type { LocationQueryValue } from 'vue-router'
 
 import SignInView from '@/components/ui/auth/SignIn.vue'
 import {
-	getLauncherRedirectUrl,
+	hydrateStoredAccounts,
+	isStoredAccountAuthMethod,
 	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+	rememberStoredAccount,
+	type StoredAccount,
+	type StoredAccountAuthMethod,
+	useStoredAccounts,
+} from '@/composables/accounts.ts'
+import {
+	ADD_ACCOUNT_QUERY_PARAM,
+	getLauncherRedirectUrl,
 	promotePendingSignInOAuthProvider,
 } from '@/composables/auth.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
@@ -120,8 +132,104 @@ if (route.query.code) {
 	await finishSignIn()
 }
 
-if (auth.value.user) {
+const isAddingAccount = route.query[ADD_ACCOUNT_QUERY_PARAM] !== undefined
+const isLauncherSignIn = route.query.launcher !== undefined
+const storedAccounts = useStoredAccounts()
+const signInReady = ref(!isLauncherSignIn)
+
+const choosableAccounts = computed((): StoredAccount[] => {
+	const user = auth.value.user
+	const token = auth.value.token
+	const accounts = storedAccounts.value.map((stored) => {
+		if (user && token && stored.id === user.id) {
+			return {
+				...stored,
+				username: user.username,
+				avatarUrl: user.avatar_url ?? stored.avatarUrl,
+				token,
+				role: user.role,
+			}
+		}
+
+		return stored
+	})
+
+	if (user && token && !accounts.some((account) => account.id === user.id)) {
+		accounts.push({
+			id: user.id,
+			username: user.username,
+			avatarUrl: user.avatar_url ?? null,
+			token,
+			role: user.role,
+		})
+	}
+
+	return accounts
+})
+
+const launcherAccountChoices = computed(() => {
+	if (!isLauncherSignIn) return []
+
+	const minimumAccounts = isAddingAccount ? 1 : 2
+	return choosableAccounts.value.length >= minimumAccounts ? choosableAccounts.value : []
+})
+
+if (auth.value.user && !isAddingAccount && !isLauncherSignIn) {
 	await finishSignIn()
+}
+
+onMounted(async () => {
+	if (!isLauncherSignIn) {
+		return
+	}
+
+	hydrateStoredAccounts()
+
+	if (subtleLauncherRedirectUri.value) {
+		signInReady.value = true
+		return
+	}
+
+	if (
+		auth.value.user &&
+		!isAddingAccount &&
+		choosableAccounts.value.length === 1 &&
+		route.query.code === undefined
+	) {
+		await showLauncherOpeningPage(auth.value.token)
+		if (subtleLauncherRedirectUri.value) {
+			signInReady.value = true
+		}
+		return
+	}
+
+	signInReady.value = true
+})
+
+function getLauncherCallbackUrl(sessionToken: string) {
+	return `${getLauncherRedirectUrl(route)}/?code=${sessionToken}`
+}
+
+async function showLauncherOpeningPage(sessionToken: string) {
+	promotePendingSignInOAuthProvider()
+
+	const redirectUrl = getLauncherCallbackUrl(sessionToken)
+
+	if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
+		await navigateTo(redirectUrl, {
+			external: true,
+		})
+		return
+	}
+
+	subtleLauncherRedirectUri.value = redirectUrl
+}
+
+function onSelectLauncherAccount(account: { id: string }) {
+	const stored = choosableAccounts.value.find((choice) => choice.id === account.id)
+	if (stored) {
+		void showLauncherOpeningPage(stored.token)
+	}
 }
 
 const captcha = ref<{ reset?: () => void } | null>(null)
@@ -161,7 +269,7 @@ async function beginPasswordSignIn() {
 		if (res.flow) {
 			flow.value = res.flow
 		} else {
-			await finishSignIn(res.session)
+			await finishSignIn(res.session, 'password')
 		}
 	} catch (err) {
 		addNotification({
@@ -183,7 +291,7 @@ async function begin2FASignIn() {
 			code: twoFactorCode.value,
 		})
 
-		await finishSignIn(res.session)
+		await finishSignIn(res.session, 'password')
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -208,7 +316,7 @@ async function beginPasskeySignin() {
 		})
 
 		pendingSignInOAuthProvider.value = 'passkey'
-		await finishSignIn(result.session)
+		await finishSignIn(result.session, 'passkey')
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -219,30 +327,11 @@ async function beginPasskeySignin() {
 	stopLoading()
 }
 
-async function finishSignIn(sessionToken?: string | null) {
+async function finishSignIn(sessionToken?: string | null, authMethod?: StoredAccountAuthMethod) {
 	if (route.query.launcher) {
-		let token = sessionToken
-		if (!token) {
-			token = auth.value.token
-		}
-
-		promotePendingSignInOAuthProvider()
-
-		const redirectUrl = `${getLauncherRedirectUrl(route)}/?code=${token}`
-
-		if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
-			await navigateTo(redirectUrl, {
-				external: true,
-			})
-		} else {
-			// When redirecting to localhost, the auth token is very visible in the URL to the user.
-			// While we could make it harder to find with a POST request, such is security by obscurity:
-			// the user and other applications would still be able to sniff the token in the request body.
-			// So, to make the UX a little better by not changing the displayed URL, while keeping the
-			// token hidden from very casual observation and keeping the protocol as close to OAuth's
-			// standard flows as possible, let's execute the redirect within an iframe that visually
-			// covers the entire page.
-			subtleLauncherRedirectUri.value = redirectUrl
+		const token = sessionToken ?? auth.value.token
+		if (token) {
+			await showLauncherOpeningPage(token)
 		}
 
 		return
@@ -254,6 +343,20 @@ async function finishSignIn(sessionToken?: string | null) {
 		queryClient.clear()
 	}
 
+	const signedIn = await useAuth()
+	if (signedIn.value.user && signedIn.value.token) {
+		const nextAuthMethod =
+			authMethod ??
+			(isStoredAccountAuthMethod(pendingSignInOAuthProvider.value)
+				? pendingSignInOAuthProvider.value
+				: undefined)
+		rememberStoredAccount(
+			signedIn.value.user,
+			signedIn.value.token,
+			nextAuthMethod ? { authMethod: nextAuthMethod } : undefined,
+		)
+	}
+
 	promotePendingSignInOAuthProvider()
 
 	if (route.query.redirect) {
@@ -261,8 +364,8 @@ async function finishSignIn(sessionToken?: string | null) {
 		await navigateTo(redirect, {
 			replace: true,
 		})
-	} else {
-		await navigateTo('/dashboard')
+	} else if (signedIn.value.user) {
+		await navigateTo(`/user/${signedIn.value.user.username}`)
 	}
 }
 </script>
