@@ -210,9 +210,10 @@ export function disposeSharedRenderer(): void {
 
 export async function renderSkinPreview(skin: Skin, capes: Cape[]): Promise<RawRenderResult> {
 	sharedRenderer ??= new BatchSkinRenderer(await loadSkinRendering())
-	const variant = skin.variant === 'UNKNOWN'
-		? await determineModelType(skin.texture).catch(() => 'CLASSIC')
-		: skin.variant
+	const variant =
+		skin.variant === 'UNKNOWN'
+			? await determineModelType(skin.texture).catch(() => 'CLASSIC')
+			: skin.variant
 	return sharedRenderer.renderSkin(
 		await get_normalized_skin_texture(skin),
 		getModelUrlForVariant(variant),

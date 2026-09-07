@@ -36,7 +36,9 @@ export function setupErrorReporting(app: App, router: Router): void {
 		void load()
 			.then((sentry) => sentry.captureException(error))
 			.catch(() => {})
-			.finally(() => { queuedErrors-- })
+			.finally(() => {
+				queuedErrors--
+			})
 	}
 
 	function onError(event: ErrorEvent) {

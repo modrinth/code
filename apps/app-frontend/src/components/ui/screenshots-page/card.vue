@@ -12,8 +12,8 @@ import {
 } from '@modrinth/ui'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import type { InstanceScreenshot } from '@/helpers/instance'
 import { useImageThumbnail } from '@/composables/use-image-thumbnail'
+import type { InstanceScreenshot } from '@/helpers/instance'
 
 const props = defineProps<{
 	screenshot: InstanceScreenshot
@@ -34,7 +34,11 @@ const emit = defineEmits<{
 }>()
 
 const card = ref<HTMLElement>()
-const thumbnail = useImageThumbnail(() => props.screenshot.path, 512, () => props.screenshot.modified_at)
+const thumbnail = useImageThumbnail(
+	() => props.screenshot.path,
+	512,
+	() => props.screenshot.modified_at,
+)
 const image = ref<HTMLImageElement>()
 const imageReady = ref(false)
 const { formatMessage } = useVIntl()
@@ -147,20 +151,17 @@ onBeforeUnmount(() => {
 	})
 })
 
-watch(
-	thumbnail,
-	(url, previousUrl) => {
-		loadGeneration += 1
-		loadStartedAt = performance.now()
-		imageReady.value = false
-		debugImage('source changed', {
-			id: props.screenshot.id,
-			fileName: props.screenshot.file_name,
-			previousUrl,
-			url,
-		})
-	},
-)
+watch(thumbnail, (url, previousUrl) => {
+	loadGeneration += 1
+	loadStartedAt = performance.now()
+	imageReady.value = false
+	debugImage('source changed', {
+		id: props.screenshot.id,
+		fileName: props.screenshot.file_name,
+		previousUrl,
+		url,
+	})
+})
 </script>
 
 <template>

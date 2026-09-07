@@ -966,8 +966,8 @@ async fn fetch_advanced_with_target(
                     return Ok(bytes);
                 } else if attempt <= FETCH_ATTEMPTS {
                     continue;
-                } else if let Err(err) = bytes {
-                    return Err(err);
+                } else {
+                    bytes?;
                 }
             }
             Err(_) if attempt <= FETCH_ATTEMPTS => continue,

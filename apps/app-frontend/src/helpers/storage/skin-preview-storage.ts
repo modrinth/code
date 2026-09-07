@@ -28,7 +28,9 @@ export class SkinPreviewStorage {
 					db.createObjectStore('previews')
 				}
 			}
-		}).finally(() => { this.opening = undefined })
+		}).finally(() => {
+			this.opening = undefined
+		})
 		return this.opening
 	}
 

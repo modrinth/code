@@ -14,11 +14,10 @@ pub async fn get() -> crate::Result<Settings> {
     if crate::state::game_options_sync_is_enabled(&state.pool).await?
         && let Some(fullscreen) =
             crate::api::instance::shared_fullscreen_value(&state).await?
+        && settings.force_fullscreen != fullscreen
     {
-        if settings.force_fullscreen != fullscreen {
-            settings.force_fullscreen = fullscreen;
-            settings.update(&state.pool).await?;
-        }
+        settings.force_fullscreen = fullscreen;
+        settings.update(&state.pool).await?;
     }
     Ok(settings)
 }

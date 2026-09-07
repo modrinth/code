@@ -290,15 +290,14 @@ pub async fn capture_pack_base(
     .execute(&state.pool)
     .await?;
 
-    if sync_is_active_for_instance(&metadata, &state).await? {
-        if let Err(error) =
+    if sync_is_active_for_instance(&metadata, &state).await?
+        && let Err(error) =
             apply_shared_settings_to_instance(&metadata, &state, true).await
-        {
-            tracing::warn!(
-                "Captured the modpack options.txt for {}, but shared settings could not be overlaid yet: {error}",
-                metadata.instance.id
-            );
-        }
+    {
+        tracing::warn!(
+            "Captured the modpack options.txt for {}, but shared settings could not be overlaid yet: {error}",
+            metadata.instance.id
+        );
     }
     Ok(())
 }

@@ -61,21 +61,24 @@ function activate() {
 	activated = true
 	removeActivationListeners()
 	if (!enabled || pending || analytics) return
-	pending = import('posthog-js').then(({ posthog }) => {
-		if (!enabled) return
-		posthog.init('phc_9Iqi6lFs9sr5BSqh9RRNRSJ0mATS9PSgirDiX3iOYJ', {
-			persistence: 'localStorage',
-			api_host: 'https://posthog.modrinth.com',
+	pending = import('posthog-js')
+		.then(({ posthog }) => {
+			if (!enabled) return
+			posthog.init('phc_9Iqi6lFs9sr5BSqh9RRNRSJ0mATS9PSgirDiX3iOYJ', {
+				persistence: 'localStorage',
+				api_host: 'https://posthog.modrinth.com',
+			})
+			analytics = posthog
+			if (explicitlyOptedIn) posthog.opt_in_capturing()
+			if (debug) posthog.debug()
+			for (const event of events.splice(0)) posthog.capture(event.name, event.properties)
 		})
-		analytics = posthog
-		if (explicitlyOptedIn) posthog.opt_in_capturing()
-		if (debug) posthog.debug()
-		for (const event of events.splice(0)) posthog.capture(event.name, event.properties)
-	}).catch(() => {
-		events.length = 0
-	}).finally(() => {
-		pending = undefined
-	})
+		.catch(() => {
+			events.length = 0
+		})
+		.finally(() => {
+			pending = undefined
+		})
 }
 
 export const initAnalytics = () => {

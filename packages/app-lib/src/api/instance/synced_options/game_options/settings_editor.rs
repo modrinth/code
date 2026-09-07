@@ -205,7 +205,7 @@ pub async fn preview_changes(
     let state = State::get().await?;
     let _guard = state.lock_synced_options().await;
     if request.expected_catalog_revision != CATALOG_REVISION {
-        return Ok(load_settings_editor(&state).await?);
+        return load_settings_editor(&state).await;
     }
     let mut editor_state = load_settings_editor(&state).await?;
     let participants = load_participating_instances(&state).await?;

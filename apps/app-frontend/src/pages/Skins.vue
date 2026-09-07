@@ -407,7 +407,9 @@ async function loadSkins() {
 			shouldPreserveKnownEquippedSkin && locallyKnownEquippedSkin
 				? mergeEquippedSkin(loadedSkins, locallyKnownEquippedSkin)
 				: loadedSkins
-		void cleanupUnusedPreviews(skins.value).catch((error) => console.warn('Could not clean skin previews', error))
+		void cleanupUnusedPreviews(skins.value).catch((error) =>
+			console.warn('Could not clean skin previews', error),
+		)
 		selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
 		originalSelectedSkin.value = selectedSkin.value
 	} catch (error) {
@@ -545,7 +547,9 @@ function removeLocalSkin(deletedSkin: Skin) {
 		originalSelectedSkin.value = nextSkins.find((skin) => skin.is_equipped) ?? null
 	}
 
-	void cleanupUnusedPreviews(skins.value).catch((error) => console.warn('Could not clean skin previews', error))
+	void cleanupUnusedPreviews(skins.value).catch((error) =>
+		console.warn('Could not clean skin previews', error),
+	)
 }
 
 function setLocallyEquippedSkin(skinToApply: Skin) {
@@ -626,7 +630,9 @@ function updateLocalSkin(savedSkin: Skin, applied: boolean, previousSkin?: Skin)
 		}
 	}
 
-	void cleanupUnusedPreviews(skins.value).catch((error) => console.warn('Could not clean skin previews', error))
+	void cleanupUnusedPreviews(skins.value).catch((error) =>
+		console.warn('Could not clean skin previews', error),
+	)
 }
 
 async function reorderSavedSkins(orderedSkins: Skin[]) {
@@ -642,14 +648,18 @@ async function reorderSavedSkins(orderedSkins: Skin[]) {
 	const nextSavedSkins = [...orderedSkins, ...remainingSavedSkins]
 
 	skins.value = [...nextSavedSkins, ...defaultSkins]
-	void cleanupUnusedPreviews(skins.value).catch((error) => console.warn('Could not clean skin previews', error))
+	void cleanupUnusedPreviews(skins.value).catch((error) =>
+		console.warn('Could not clean skin previews', error),
+	)
 
 	try {
 		const persistedSavedSkins = await preserveExternalSkins(nextSavedSkins)
 
 		if (persistedSavedSkins.some((skin, index) => skin !== nextSavedSkins[index])) {
 			skins.value = [...persistedSavedSkins, ...defaultSkins]
-			void cleanupUnusedPreviews(skins.value).catch((error) => console.warn('Could not clean skin previews', error))
+			void cleanupUnusedPreviews(skins.value).catch((error) =>
+				console.warn('Could not clean skin previews', error),
+			)
 		}
 
 		await set_custom_skin_order(
@@ -661,7 +671,9 @@ async function reorderSavedSkins(orderedSkins: Skin[]) {
 		skins.value = previousSkins
 		selectedSkin.value = previousSelectedSkin
 		originalSelectedSkin.value = previousOriginalSelectedSkin
-		void cleanupUnusedPreviews(skins.value).catch((error) => console.warn('Could not clean skin previews', error))
+		void cleanupUnusedPreviews(skins.value).catch((error) =>
+			console.warn('Could not clean skin previews', error),
+		)
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.reorderSkinErrorTitle),
@@ -798,7 +810,6 @@ async function loadCurrentUser() {
 		currentUserId.value = undefined
 	}
 }
-
 
 async function login() {
 	accountsCard.value.setLoginDisabled(true)

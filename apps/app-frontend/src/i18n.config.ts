@@ -54,10 +54,13 @@ export async function setLocale(requestedLocale: string): Promise<void> {
 				fetchMessages(localeUrls[`./locales/${locale}/index.json`]),
 				fetchMessages(uiLocaleUrls[`../../../packages/ui/src/locales/${locale}/index.json`]),
 			])
-				.then(([app, ui]) => buildLocaleMessages({
-					[`./app/${locale}/index.json`]: { default: app },
-					[`./ui/${locale}/index.json`]: { default: ui },
-				})[locale])
+				.then(
+					([app, ui]) =>
+						buildLocaleMessages({
+							[`./app/${locale}/index.json`]: { default: app },
+							[`./ui/${locale}/index.json`]: { default: ui },
+						})[locale],
+				)
 				.finally(() => pendingLocales.delete(locale))
 			pendingLocales.set(locale, pending)
 		}

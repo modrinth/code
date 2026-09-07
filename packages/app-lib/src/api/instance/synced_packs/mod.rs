@@ -45,6 +45,9 @@ struct SyncedPack {
 
 #[derive(Clone, Default, Serialize, Deserialize)]
 struct PackPlacement {
+    /// This instance supplied the pack and accepts its installed version.
+    #[serde(default)]
+    is_source: bool,
     path: String,
     sha1: String,
     enabled: bool,

@@ -3,8 +3,8 @@ import { Avatar, truncatedTooltip } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { getInstanceIconUrl } from '@/helpers/instance'
 import { useImageThumbnail } from '@/composables/use-image-thumbnail'
+import { getInstanceIconUrl } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
 const props = withDefaults(
@@ -25,7 +25,7 @@ const appSettings = useAppSettings()
 const compactMode = computed(() => appSettings.getFeatureFlag('compact_instance_cards'))
 const thumbnail = useImageThumbnail(
 	localIcon,
-	() => compactMode.value ? 96 : 384,
+	() => (compactMode.value ? 96 : 384),
 	() => String(props.instance.modified),
 )
 const iconSrc = computed(() =>

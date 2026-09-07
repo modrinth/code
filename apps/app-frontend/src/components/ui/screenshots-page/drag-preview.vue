@@ -2,8 +2,8 @@
 import { TagItem } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-import type { InstanceScreenshot } from '@/helpers/instance'
 import { useImageThumbnail } from '@/composables/use-image-thumbnail'
+import type { InstanceScreenshot } from '@/helpers/instance'
 
 import { gatherDuration } from './use-screenshot-drag-gather'
 
@@ -17,7 +17,11 @@ const props = withDefaults(
 	},
 )
 
-const thumbnail = useImageThumbnail(() => props.screenshot.path, 512, () => props.screenshot.modified_at)
+const thumbnail = useImageThumbnail(
+	() => props.screenshot.path,
+	512,
+	() => props.screenshot.modified_at,
+)
 const showGatheredCount = ref(false)
 let countTimer: number | undefined
 

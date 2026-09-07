@@ -376,7 +376,7 @@ async fn set_global_option_with_state(
                             "Unknown sync source instance.".to_string(),
                         )
                     })?;
-            match capability_status(&source, option, true, &state).await {
+            match capability_status(&source, option, true, state).await {
                 CapabilityStatus::Supported => {}
                 CapabilityStatus::Unsupported(reason)
                 | CapabilityStatus::Indeterminate(reason) => {
@@ -386,20 +386,20 @@ async fn set_global_option_with_state(
             if sync_files_are_protected(&source) {
                 return queue_source(&source, option, state).await;
             }
-            seed_from_instance(&source, option, &state).await?;
+            seed_from_instance(&source, option, state).await?;
             complete_pending_source(base_instance_id, option, state).await?;
         } else {
             return enable_global_option_from_base(
                 option,
                 base_instance_id,
-                &state,
+                state,
             )
             .await;
         }
     }
 
     if !initializing_game_options_from_base {
-        set_global_option_enabled(option, enabled, &state).await?;
+        set_global_option_enabled(option, enabled, state).await?;
     }
 
     let instances = match crate::state::list_instances(&state.pool).await {
@@ -408,7 +408,7 @@ async fn set_global_option_with_state(
             tracing::warn!(
                 "Game-settings sync changed, but participating instances could not be listed yet: {error}"
             );
-            return get_global_options_with_state(&state).await;
+            return get_global_options_with_state(state).await;
         }
         Err(error) => return Err(error),
     };
@@ -422,23 +422,23 @@ async fn set_global_option_with_state(
                 SyncedOption::ResourcePacks | SyncedOption::DataPacks
             )
         {
-            detach_option(&metadata, option, &state).await?;
+            detach_option(&metadata, option, state).await?;
             continue;
         }
         let running = !option_can_apply_while_running(option)
-            && instance_is_running(&metadata, &state).await?;
+            && instance_is_running(&metadata, state).await?;
         if sync_files_are_protected(&metadata) || running {
             continue;
         }
         let result = if !instance_option_enabled(&metadata, option) {
-            detach_option(&metadata, option, &state).await
+            detach_option(&metadata, option, state).await
         } else {
-            match capability_status(&metadata, option, enabled, &state).await {
+            match capability_status(&metadata, option, enabled, state).await {
                 CapabilityStatus::Supported => {
-                    reconcile_option(&metadata, option, &state).await
+                    reconcile_option(&metadata, option, state).await
                 }
                 CapabilityStatus::Unsupported(_) => {
-                    detach_option(&metadata, option, &state).await
+                    detach_option(&metadata, option, state).await
                 }
                 CapabilityStatus::Indeterminate(_) => Ok(()),
             }
@@ -455,7 +455,7 @@ async fn set_global_option_with_state(
         }
     }
 
-    get_global_options_with_state(&state).await
+    get_global_options_with_state(state).await
 }
 
 async fn set_global_option_enabled(
@@ -738,8 +738,8 @@ pub async fn set_instance_option(
             detach_option(&metadata, option, &state).await
         };
         if let Err(error) = result {
-            if option == SyncedOption::GameOptions {
-                if let Err(rollback_error) =
+            if option == SyncedOption::GameOptions
+                && let Err(rollback_error) =
                     instance_rows::set_instance_sync_preference(
                         instance_id,
                         option,
@@ -747,11 +747,10 @@ pub async fn set_instance_option(
                         &state.pool,
                     )
                     .await
-                {
-                    tracing::error!(
-                        "Failed to roll back the game-settings sync preference for {instance_id}: {rollback_error}"
-                    );
-                }
+            {
+                tracing::error!(
+                    "Failed to roll back the game-settings sync preference for {instance_id}: {rollback_error}"
+                );
             }
             return Err(error);
         }

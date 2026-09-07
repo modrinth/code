@@ -320,6 +320,52 @@ pub(super) async fn capture(
     Ok((shared_changed || observation_changed).then_some(shared_changed))
 }
 
+pub(super) async fn apply_removal(
+    metadata: &InstanceMetadata,
+    library: &mut PackLibrary,
+    placement: Option<&PackPlacement>,
+    state: &State,
+) -> crate::Result<()> {
+    let Some(placement) = placement else {
+        return Ok(());
+    };
+    if placement.excluded
+        || placement.suspended
+        || placement.error.is_some()
+        || !metadata.synced_options.resource_packs
+        || !get_global_options().await?.get(SyncedOption::ResourcePacks)
+    {
+        return Ok(());
+    }
+    let directory = instance_dir(metadata, state);
+    let mut managed = BTreeSet::new();
+    for path in std::iter::once(&placement.path)
+        .chain(placement.resource_pack_selection_path.iter())
+    {
+        if !path.is_empty()
+            && ProjectType::get_from_parent_folder(path)
+                == Some(ProjectType::ResourcePack)
+            && !directory.join(path).exists()
+            && let Some(entry) = option_entry(path)
+        {
+            managed.insert(
+                entry.strip_prefix("file/").unwrap_or(&entry).to_string(),
+            );
+            managed.insert(entry);
+        }
+    }
+    if !managed.is_empty() {
+        library
+            .resource_pack_observations
+            .remove(&metadata.instance.id);
+        library
+            .resource_pack_incompatible_observations
+            .remove(&metadata.instance.id);
+        merge_resource_pack_entries(metadata, &managed, &[], state).await?;
+    }
+    Ok(())
+}
+
 pub(super) async fn apply(
     metadata: &InstanceMetadata,
     library: &mut PackLibrary,

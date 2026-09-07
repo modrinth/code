@@ -32,23 +32,27 @@ export function buildCrowdinUrl(key: string, locale: string): string {
 
 export function initI18nDebugRuntime(context: I18nDebugContext): () => void {
 	let runtime: EffectScope | undefined
-	const stop = watch(context.enabled, (enabled) => {
-		runtime?.stop()
-		runtime = undefined
-		if (!enabled) {
-			document.body.classList.remove('i18n-debug')
-			clearAllAnnotations()
-			return
-		}
-		import('@modrinth/assets/styles/i18n-debug.css')
-		document.body.classList.add('i18n-debug')
-		runtime = effectScope()
-		runtime.run(() => {
-			startMutationObserver(context.registry, context.keyReveal)
-			setupKeyTooltip()
-			registerKeyboardShortcuts(context.panelOpen, context.keyReveal)
-		})
-	}, { immediate: true })
+	const stop = watch(
+		context.enabled,
+		(enabled) => {
+			runtime?.stop()
+			runtime = undefined
+			if (!enabled) {
+				document.body.classList.remove('i18n-debug')
+				clearAllAnnotations()
+				return
+			}
+			import('@modrinth/assets/styles/i18n-debug.css')
+			document.body.classList.add('i18n-debug')
+			runtime = effectScope()
+			runtime.run(() => {
+				startMutationObserver(context.registry, context.keyReveal)
+				setupKeyTooltip()
+				registerKeyboardShortcuts(context.panelOpen, context.keyReveal)
+			})
+		},
+		{ immediate: true },
+	)
 	return () => {
 		stop()
 		runtime?.stop()

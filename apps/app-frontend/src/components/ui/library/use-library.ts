@@ -53,6 +53,7 @@ import {
 	set_group_order as setInstanceGroupOrder,
 } from '@/helpers/instance-groups'
 import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
+
 import { librarySearch } from './view-state'
 
 export const librarySortOptions = [

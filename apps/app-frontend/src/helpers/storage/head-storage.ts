@@ -26,7 +26,9 @@ export class HeadStorage {
 					db.createObjectStore('heads')
 				}
 			}
-		}).finally(() => { this.opening = undefined })
+		}).finally(() => {
+			this.opening = undefined
+		})
 		return this.opening
 	}
 

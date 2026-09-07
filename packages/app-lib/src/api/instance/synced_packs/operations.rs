@@ -4,7 +4,9 @@ use super::super::synced_options::{
     instance_option_enabled, option_can_apply_while_running,
     sync_files_are_protected,
 };
-use super::reconciliation::{apply_all, participating, synced_instance_ids};
+use super::reconciliation::{
+    apply_all, apply_removal, participating, synced_instance_ids,
+};
 use super::storage::{cache_bytes, read_library, write_library};
 use super::{
     PackLibrary, PackPlacement, PackSyncPreview, PackSyncTarget, SyncedPack,
@@ -302,6 +304,7 @@ pub(in crate::api::instance) async fn seed_from_instance(
                 pack_option(pack.item.project_type).ok() == Some(option)
             }) {
                 placement.suspended = true;
+                placement.is_source = false;
             }
         }
     }
@@ -322,6 +325,7 @@ pub(in crate::api::instance) async fn seed_from_instance(
             .insert(
                 id,
                 PackPlacement {
+                    is_source: true,
                     path: item.file_path,
                     sha1: item.id,
                     enabled: item.enabled,
@@ -431,6 +435,7 @@ async fn sync_pack_inner(
         .insert(
             id,
             PackPlacement {
+                is_source: true,
                 path: item.file_path,
                 sha1: item.id,
                 enabled: item.enabled,
@@ -585,7 +590,7 @@ pub async fn remove_synced_pack(pack_id: &str) -> crate::Result<()> {
     })?;
     pack_option(pack.item.project_type)?;
     library.packs.remove(pack_id);
-    apply_all(&mut library, &state).await
+    apply_removal(pack_id, &mut library, &state).await
 }
 
 pub async fn desync_pack(
@@ -623,7 +628,7 @@ pub async fn desync_pack(
     placement.excluded = true;
     if mode == DesyncServerMode::RemoveFromOtherInstances {
         library.packs.remove(pack_id);
-        apply_all(&mut library, &state).await?;
+        apply_removal(pack_id, &mut library, &state).await?;
     } else {
         write_library(&library, &state).await?;
     }

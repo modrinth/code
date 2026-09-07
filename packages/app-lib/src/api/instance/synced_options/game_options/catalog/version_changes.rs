@@ -391,13 +391,13 @@ pub(in crate::api::instance) fn decode_value(
             let value = decode_string_token(raw)?;
             choices
                 .contains(&value.as_str())
-                .then(|| CanonicalValue::Enum(value))
+                .then_some(CanonicalValue::Enum(value))
         }
         ValueEncoding::QuotedEnum(choices) => {
             let value = decode_string_token(raw)?;
             choices
                 .contains(&value.as_str())
-                .then(|| CanonicalValue::Enum(value))
+                .then_some(CanonicalValue::Enum(value))
         }
         ValueEncoding::Text => Some(CanonicalValue::Text(raw.to_string())),
         ValueEncoding::KeyBinding => {
@@ -469,7 +469,7 @@ pub(in crate::api::instance) fn decode_value(
             let raw = decode_string_token(raw)?;
             CLOUD_VALUES
                 .contains(&raw.as_str())
-                .then(|| CanonicalValue::Enum(raw))
+                .then_some(CanonicalValue::Enum(raw))
         }
         ValueEncoding::MusicToast => {
             let raw = decode_string_token(raw)?;
@@ -765,7 +765,7 @@ fn validate_value(
                 }
             }
             (SettingEditor::Enum(choices), CanonicalValue::Enum(value))
-                if !choices.iter().any(|choice| *choice == value.as_str()) =>
+                if !choices.contains(&value.as_str()) =>
             {
                 return Err(input_error(format!(
                     "Invalid choice for {}",

@@ -22,29 +22,34 @@ export function acquireSkinPreview(skin: Skin, capes: Cape[]) {
 	let entry = previews.get(key)
 	if (!entry) {
 		const created: PreviewEntry = { users: 0, promise: Promise.resolve(undefined) }
-		created.promise = skinPreviewStorage.retrieve(key).catch(() => null).then(async (cached) => {
-			if (created.users === 0) return
-			if (!cached) {
-				pendingRenders++
-				const render = renderQueue.then(async () => {
-					if (created.users === 0) return
-					const { renderSkinPreview } = await import('./batch-skin-renderer')
-					const result = await renderSkinPreview(skin, capes)
-					await skinPreviewStorage.store(key, result).catch(() => {})
-					return result
-				}).finally(async () => {
-					if (--pendingRenders === 0) {
-						const { disposeSharedRenderer } = await import('./batch-skin-renderer')
-						if (pendingRenders === 0) disposeSharedRenderer()
-					}
-				})
-				renderQueue = render.catch(() => {})
-				cached = (await render) ?? null
-			}
-			if (!cached || created.users === 0) return
-			created.result = { forwards: URL.createObjectURL(cached.forwards) }
-			return created.result
-		})
+		created.promise = skinPreviewStorage
+			.retrieve(key)
+			.catch(() => null)
+			.then(async (cached) => {
+				if (created.users === 0) return
+				if (!cached) {
+					pendingRenders++
+					const render = renderQueue
+						.then(async () => {
+							if (created.users === 0) return
+							const { renderSkinPreview } = await import('./batch-skin-renderer')
+							const result = await renderSkinPreview(skin, capes)
+							await skinPreviewStorage.store(key, result).catch(() => {})
+							return result
+						})
+						.finally(async () => {
+							if (--pendingRenders === 0) {
+								const { disposeSharedRenderer } = await import('./batch-skin-renderer')
+								if (pendingRenders === 0) disposeSharedRenderer()
+							}
+						})
+					renderQueue = render.catch(() => {})
+					cached = (await render) ?? null
+				}
+				if (!cached || created.users === 0) return
+				created.result = { forwards: URL.createObjectURL(cached.forwards) }
+				return created.result
+			})
 		previews.set(key, created)
 		entry = created
 	}

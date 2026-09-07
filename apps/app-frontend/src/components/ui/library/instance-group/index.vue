@@ -21,8 +21,8 @@ import {
 	useScrollViewport,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useElementSize, useWindowSize } from '@vueuse/core'
+import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
@@ -99,7 +99,8 @@ watch(
 	() => props.instanceGroup.instances.map((instance) => instance.id),
 	(ids, previousIds) => {
 		if (!props.animationsReady) return
-		if (ids.length === previousIds.length && ids.every((id, index) => id === previousIds[index])) return
+		if (ids.length === previousIds.length && ids.every((id, index) => id === previousIds[index]))
+			return
 		clearTimeout(cardMoveTimer)
 		animateCardMoves.value = true
 		cardMoveTimer = setTimeout(() => {
@@ -123,19 +124,24 @@ const columnCount = computed(() => {
 	const minWidth = remSize.value * (compactMode.value ? 15 : windowWidth.value < 1280 ? 8 : 10)
 	return Math.max(1, Math.floor((gridWidth.value + gap.value) / (minWidth + gap.value)))
 })
-const cardWidth = computed(() =>
-	(gridWidth.value - gap.value * (columnCount.value - 1)) / columnCount.value,
+const cardWidth = computed(
+	() => (gridWidth.value - gap.value * (columnCount.value - 1)) / columnCount.value,
 )
 const cardHeight = computed(() =>
 	compactMode.value ? remSize.value * 3.875 : Math.max(0, cardWidth.value) + remSize.value * 3.375,
 )
-const gridHeight = computed(() => Math.max(
-	45,
-	Math.ceil(props.instanceGroup.instances.length / columnCount.value) * (cardHeight.value + gap.value) - gap.value,
-))
+const gridHeight = computed(() =>
+	Math.max(
+		45,
+		Math.ceil(props.instanceGroup.instances.length / columnCount.value) *
+			(cardHeight.value + gap.value) -
+			gap.value,
+	),
+)
 const visibleInstances = computed(() => {
 	if (gridWidth.value <= 0) return []
-	if (!props.hideHeader && isSectionCollapsed(props.instanceGroup.id) && !isSearching.value) return []
+	if (!props.hideHeader && isSectionCollapsed(props.instanceGroup.id) && !isSearching.value)
+		return []
 	const top = scrollTop.value - containerOffset.value
 	const stride = cardHeight.value + gap.value
 	const first = Math.max(0, Math.floor((top - 300) / stride)) * columnCount.value
@@ -145,7 +151,8 @@ const visibleInstances = computed(() => {
 	return props.instanceGroup.instances.flatMap((instance, index) => {
 		const inViewport = index >= first && index < end
 		const focused = focusedInstanceId.value === instance.id
-		const dragged = dragging &&
+		const dragged =
+			dragging &&
 			(dragging.fromGroup ?? 'group:none') === props.instanceGroup.id &&
 			dragging.primaryInstanceId === instance.id
 		return inViewport || focused || dragged ? [{ instance, index }] : []
@@ -600,11 +607,18 @@ watch([gridHeight, () => props.instanceGroup.instances], () => nextTick(syncScro
 						tag="section"
 						:css="animationsReady"
 						class="relative min-h-[45px] w-full h-full"
-						:move-class="animateCardMoves ? 'transition-transform duration-200 ease-out motion-reduce:transition-none' : 'transition-none'"
+						:move-class="
+							animateCardMoves
+								? 'transition-transform duration-200 ease-out motion-reduce:transition-none'
+								: 'transition-none'
+						"
 						enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
 						enter-from-class="data-[animate-entry=true]:opacity-0"
 						enter-to-class="opacity-100 scale-100"
-						@after-enter="(element: Element) => enteringInstanceIds.delete(element.getAttribute('data-instance-id') ?? '')"
+						@after-enter="
+							(element: Element) =>
+								enteringInstanceIds.delete(element.getAttribute('data-instance-id') ?? '')
+						"
 					>
 						<div
 							v-for="{ instance, index } in visibleInstances"

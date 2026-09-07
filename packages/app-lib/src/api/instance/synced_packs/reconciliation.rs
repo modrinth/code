@@ -13,6 +13,8 @@ use crate::state::{
     SyncedPackInfo,
 };
 use crate::util::fetch;
+use modrinth_content_management::ResolutionPreferences;
+use std::collections::BTreeMap;
 
 use super::super::synced_options::{
     GlobalSyncedOptions, get_global_options, instance_dir, instance_is_running,
@@ -245,7 +247,12 @@ async fn apply_pack(
         .into());
     }
     if let Some(item) = matching {
-        let compatible = if pack.item.project.is_some() {
+        let is_source = previous
+            .as_ref()
+            .is_some_and(|placement| placement.is_source);
+        let compatible = if is_source {
+            true
+        } else if pack.item.project.is_some() {
             if let Some(version) = &item.version {
                 CachedEntry::get_version(
                     &version.id,
@@ -281,6 +288,7 @@ async fn apply_pack(
                 .insert(
                     id.to_string(),
                     PackPlacement {
+                        is_source,
                         path: path.clone(),
                         sha1: item.id.clone(),
                         enabled: pack.item.enabled,
@@ -446,7 +454,7 @@ async fn apply_pack(
                 project_id: project.id.clone(),
                 version_id: Some(version.id.clone()),
                 content_type: pack.item.project_type.into(),
-                selected: Default::default(),
+                selected: ResolutionPreferences::default(),
             },
             state,
         )
@@ -538,6 +546,15 @@ pub(super) async fn apply_instance(
     library: &mut PackLibrary,
     state: &State,
 ) -> crate::Result<()> {
+    apply_instance_inner(metadata, library, state, None).await
+}
+
+async fn apply_instance_inner(
+    metadata: &InstanceMetadata,
+    library: &mut PackLibrary,
+    state: &State,
+    removed_pack_id: Option<&str>,
+) -> crate::Result<()> {
     if super::super::synced_options::pending::contains(
         &metadata.instance.id,
         SyncedOption::ResourcePacks,
@@ -555,10 +572,11 @@ pub(super) async fn apply_instance(
     }
     let running = instance_is_running(metadata, state).await?;
     let global = get_global_options().await?;
-    let mut items = if library
-        .packs
-        .values()
-        .any(|pack| participating(metadata, pack, global))
+    let mut items = if removed_pack_id.is_none()
+        && library
+            .packs
+            .values()
+            .any(|pack| participating(metadata, pack, global))
     {
         commands::list_pack_content(&metadata.instance.id, state).await?
     } else {
@@ -569,7 +587,11 @@ pub(super) async fn apply_instance(
         .get(&metadata.instance.id)
         .cloned()
         .unwrap_or_default();
-    let packs = library.packs.clone();
+    let packs = if removed_pack_id.is_none() {
+        library.packs.clone()
+    } else {
+        BTreeMap::default()
+    };
     for (id, pack) in &packs {
         if !participating(metadata, pack, global) {
             continue;
@@ -624,7 +646,10 @@ pub(super) async fn apply_instance(
         .cloned()
         .unwrap_or_default();
     for (id, placement) in placements {
-        if running || packs.contains_key(&id) {
+        if running
+            || library.packs.contains_key(&id)
+            || removed_pack_id.is_some_and(|removed| removed != id)
+        {
             continue;
         }
         let included = ProjectType::get_from_parent_folder(&placement.path)
@@ -652,16 +677,60 @@ pub(super) async fn apply_instance(
             placements.remove(&id);
         }
     }
-    if let Err(error) =
+    let selection_result = if let Some(pack_id) = removed_pack_id {
+        super::selection::apply_removal(
+            metadata,
+            library,
+            previous_placements.get(pack_id),
+            state,
+        )
+        .await
+    } else {
         super::selection::apply(metadata, library, &previous_placements, state)
             .await
-    {
+    };
+    if let Err(error) = selection_result {
         tracing::warn!(
             "Could not apply resource-pack selection for {}: {error}",
             metadata.instance.id
         );
     }
     Ok(())
+}
+
+pub(super) async fn apply_removal(
+    pack_id: &str,
+    library: &mut PackLibrary,
+    state: &State,
+) -> crate::Result<()> {
+    library.resource_pack_order.retain(|id| id != pack_id);
+    write_library(library, state).await?;
+    let instance_ids: Vec<_> = library
+        .instances
+        .iter()
+        .filter(|(_, placements)| placements.contains_key(pack_id))
+        .map(|(id, _)| id.clone())
+        .collect();
+    for instance_id in instance_ids {
+        let Some(metadata) =
+            crate::state::get_instance(&instance_id, &state.pool).await?
+        else {
+            library.instances.remove(&instance_id);
+            library.resource_pack_observations.remove(&instance_id);
+            library
+                .resource_pack_incompatible_observations
+                .remove(&instance_id);
+            continue;
+        };
+        if let Err(error) =
+            apply_instance_inner(&metadata, library, state, Some(pack_id)).await
+        {
+            tracing::warn!(
+                "Could not remove synced pack {pack_id} from {instance_id}: {error}"
+            );
+        }
+    }
+    write_library(library, state).await
 }
 
 pub(super) async fn apply_all(

@@ -455,7 +455,8 @@ defineExpose({ getAddSkinButtonElement })
 						>
 							<BakedSkinButton
 								class="h-full w-full min-w-0 box-border rounded-[20px]"
-								:skin="skin" :capes="capes"
+								:skin="skin"
+								:capes="capes"
 								:selected="isSkinSelected(skin)"
 								:active="isSkinActive(skin)"
 								:disabled="readOnly"
@@ -496,7 +497,8 @@ defineExpose({ getAddSkinButtonElement })
 						>
 							<BakedSkinButton
 								class="h-full w-full min-w-0 box-border rounded-[20px]"
-								:skin="skin" :capes="capes"
+								:skin="skin"
+								:capes="capes"
 								:selected="isSkinSelected(skin)"
 								:active="isSkinActive(skin)"
 								:disabled="readOnly"
@@ -538,7 +540,8 @@ defineExpose({ getAddSkinButtonElement })
 						v-for="skin in section.skins"
 						:key="skinKey(skin, section.key)"
 						class="aspect-[31/40] w-full min-w-0 box-border rounded-[20px]"
-						:skin="skin" :capes="capes"
+						:skin="skin"
+						:capes="capes"
 						:selected="isSkinSelected(skin)"
 						:active="isSkinActive(skin)"
 						:tooltip="skin.name"

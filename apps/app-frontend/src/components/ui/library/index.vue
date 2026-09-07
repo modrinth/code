@@ -18,6 +18,7 @@ import {
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
+
 import { libraryScrollTop } from './view-state'
 
 const props = defineProps<{
@@ -354,7 +355,9 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 					data-library-page-background
 					tag="div"
 					class="flex flex-col"
-					:move-class="animationsReady ? 'transition-transform duration-200 ease-out' : 'transition-none'"
+					:move-class="
+						animationsReady ? 'transition-transform duration-200 ease-out' : 'transition-none'
+					"
 					enter-active-class="transition-[opacity,transform] duration-200 ease-out"
 					enter-from-class="opacity-0 -translate-y-2"
 					enter-to-class="opacity-100 translate-y-0"
