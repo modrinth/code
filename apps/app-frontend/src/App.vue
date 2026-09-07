@@ -61,7 +61,7 @@ import {
 	UserRoleIcon,
 	useVIntl,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+import { renderString } from '@modrinth/utils/parse'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { convertFileSrc, invoke } from '@tauri-apps/api/core'
@@ -152,7 +152,7 @@ import {
 	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
 import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
-import i18n from '@/i18n.config'
+import i18n, { setLocale } from '@/i18n.config'
 import {
 	instanceKeys,
 	instanceListQueryOptions,
@@ -182,8 +182,6 @@ import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
 import { setupAppUserPreferencesProvider } from '@/providers/setup/user-preferences.ts'
 import { appMessages } from '@/utils/app-messages'
 
-import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
-import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 import {
@@ -735,7 +733,7 @@ async function setupApp() {
 
 	// Initialize locale from saved settings
 	if (locale) {
-		i18n.global.locale.value = locale
+		await setLocale(locale)
 	}
 
 	Object.assign(appSettings.featureFlags, feature_flags)
@@ -819,14 +817,6 @@ async function setupApp() {
 
 	get_opening_command().then(handleCommand)
 	fetchCredentials()
-
-	try {
-		const skins = (await get_available_skins()) ?? []
-		const capes = (await get_available_capes()) ?? []
-		generateSkinPreviews(skins, capes)
-	} catch (error) {
-		console.warn('Failed to generate skin previews in app setup.', error)
-	}
 
 	if (pending_update_toast_for_version !== null) {
 		const settings = await getSettings()
@@ -1108,7 +1098,7 @@ watch(
 					appTheme.preferred = selectedTheme
 				}
 				if (i18n.global.locale.value !== locale) {
-					i18n.global.locale.value = locale
+					await setLocale(locale)
 				}
 
 				if (appTheme.syncAcrossDevices && settings.theme !== selectedTheme) {
@@ -2353,9 +2343,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<RouterView v-else v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense @pending="onSuspensePending" @resolve="onSuspenseResolve">
-						<KeepAlive include="LibraryPage">
-							<component :is="Component"></component>
-						</KeepAlive>
+						<component :is="Component"></component>
 					</Suspense>
 				</template>
 			</RouterView>

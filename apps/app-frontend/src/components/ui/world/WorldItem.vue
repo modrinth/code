@@ -18,15 +18,16 @@ import {
 	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { ButtonMenuOption, MessageDescriptor } from '@modrinth/ui'
 import {
 	Avatar,
 	BulletDivider,
 	Button,
+	type ButtonMenuOption,
 	commonMessages,
 	ContextMenu,
 	defineMessages,
 	injectNotificationManager,
+	type MessageDescriptor,
 	SmartClickable,
 	TagItem,
 	TeleportOverflowMenu,
@@ -35,7 +36,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { getPingLevel } from '@modrinth/utils'
+import { getPingLevel } from '@modrinth/utils/utils'
 import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'

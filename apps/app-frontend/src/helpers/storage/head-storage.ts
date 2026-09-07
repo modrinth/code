@@ -7,9 +7,11 @@ export class HeadStorage {
 	private dbName = 'head-storage'
 	private version = 1
 	private db: IDBDatabase | null = null
+	private opening: Promise<void> | undefined
 
 	async init(): Promise<void> {
-		return new Promise((resolve, reject) => {
+		if (this.db) return
+		this.opening ??= new Promise<void>((resolve, reject) => {
 			const request = indexedDB.open(this.dbName, this.version)
 
 			request.onerror = () => reject(request.error)
@@ -24,7 +26,8 @@ export class HeadStorage {
 					db.createObjectStore('heads')
 				}
 			}
-		})
+		}).finally(() => { this.opening = undefined })
+		return this.opening
 	}
 
 	async store(key: string, blob: Blob): Promise<void> {
@@ -122,10 +125,10 @@ export class HeadStorage {
 		let deletedCount = 0
 
 		return new Promise((resolve, reject) => {
-			const request = store.openCursor()
+			const request = store.openKeyCursor()
 
 			request.onsuccess = (event) => {
-				const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result
+				const cursor = (event.target as IDBRequest<IDBCursor>).result
 
 				if (cursor) {
 					const key = cursor.primaryKey as string

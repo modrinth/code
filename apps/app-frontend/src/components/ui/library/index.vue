@@ -18,6 +18,7 @@ import {
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
+import { libraryScrollTop } from './view-state'
 
 const props = defineProps<{
 	instances: GameInstance[]
@@ -56,6 +57,21 @@ const {
 	setSelectedLibraryInstances,
 	toggleLibraryInstanceSelection,
 } = provideLibrary(toRef(props, 'instances'))
+
+let restoreScrollFrame: number | undefined
+let unmounted = false
+const animationsReady = ref(false)
+watch(libraryGroupsLoaded, async (loaded) => {
+	if (!loaded || animationsReady.value) return
+	await nextTick()
+	if (unmounted) return
+	restoreScrollFrame = requestAnimationFrame(() => {
+		document.querySelector('.app-viewport')?.scrollTo(0, libraryScrollTop.value)
+		restoreScrollFrame = requestAnimationFrame(() => {
+			animationsReady.value = true
+		})
+	})
+})
 
 const hasActiveFilters = computed(() =>
 	Object.values(filters.value).some((selectedValues) => selectedValues.length > 0),
@@ -161,6 +177,8 @@ function onGroupDragEnd() {
 }
 
 onUnmounted(() => {
+	unmounted = true
+	if (restoreScrollFrame !== undefined) cancelAnimationFrame(restoreScrollFrame)
 	document.documentElement.classList.remove(GROUP_REORDERING_CLASS)
 })
 
@@ -258,6 +276,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 			</div>
 			<Transition
 				v-else
+				:css="animationsReady"
 				enter-active-class="transition-opacity duration-200 ease-out motion-reduce:transition-none"
 				enter-from-class="opacity-0"
 				enter-to-class="opacity-100"
@@ -270,6 +289,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 				>
 					<div v-if="visibleFavoritesGroup" class="min-w-0">
 						<InstanceGroup
+							:animations-ready="animationsReady"
 							:instance-group="visibleFavoritesGroup"
 							:selection-anchor-instance-id="
 								anchorInstance?.groupId === FAVORITES_GROUP_ID ? anchorInstance.instanceId : null
@@ -309,6 +329,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 								:data-instance-group-reorder-id="instanceGroup.id"
 							>
 								<InstanceGroup
+									:animations-ready="animationsReady"
 									:can-drag-reorder="canDragReorderGroups"
 									:hide-header="
 										instanceGroup.id === 'group:none' && visibleInstanceGroups.length === 1
@@ -329,10 +350,11 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 
 				<TransitionGroup
 					v-else-if="libraryGroupsLoaded"
+					:css="animationsReady"
 					data-library-page-background
 					tag="div"
 					class="flex flex-col"
-					move-class="transition-transform duration-200 ease-out"
+					:move-class="animationsReady ? 'transition-transform duration-200 ease-out' : 'transition-none'"
 					enter-active-class="transition-[opacity,transform] duration-200 ease-out"
 					enter-from-class="opacity-0 -translate-y-2"
 					enter-to-class="opacity-100 translate-y-0"
@@ -343,6 +365,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 						class="min-w-0"
 					>
 						<InstanceGroup
+							:animations-ready="animationsReady"
 							:hide-header="instanceGroup.key === 'None' && visibleInstanceGroups.length === 1"
 							:instance-group="instanceGroup"
 							:selection-anchor-instance-id="

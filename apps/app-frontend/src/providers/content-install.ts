@@ -1,6 +1,8 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { ContentInstallInstance, ContentInstallProjectInfo, ContentItem } from '@modrinth/ui'
 import {
+	type ContentInstallInstance,
+	type ContentInstallProjectInfo,
+	type ContentItem,
 	createContext,
 	defineMessage,
 	getLatestMatchingInstallVersion,

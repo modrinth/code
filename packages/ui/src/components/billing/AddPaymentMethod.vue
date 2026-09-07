@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createStripeElements } from '@modrinth/utils'
-import { loadStripe, type Stripe as StripsJs, type StripeElements } from '@stripe/stripe-js'
+import type { Stripe as StripsJs, StripeElements } from '@stripe/stripe-js'
 import { ref } from 'vue'
 
 import { useDebugLogger } from '../../composables/debug-logger'
@@ -42,6 +42,7 @@ async function reload(paymentMethods: Stripe.PaymentMethod[]) {
 
 		const result = await props.createSetupIntent()
 
+		const { loadStripe } = await import('@stripe/stripe-js/pure')
 		stripe.value = await loadStripe(props.publishableKey)
 		const {
 			elements: newElements,

@@ -24,7 +24,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
+import { capitalizeString } from '@modrinth/utils/utils'
 import type { Dayjs } from 'dayjs'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'

@@ -9,9 +9,11 @@ export class SkinPreviewStorage {
 	private dbName = 'skin-previews'
 	private version = 1
 	private db: IDBDatabase | null = null
+	private opening: Promise<void> | undefined
 
 	async init(): Promise<void> {
-		return new Promise((resolve, reject) => {
+		if (this.db) return
+		this.opening ??= new Promise<void>((resolve, reject) => {
 			const request = indexedDB.open(this.dbName, this.version)
 
 			request.onerror = () => reject(request.error)
@@ -26,7 +28,8 @@ export class SkinPreviewStorage {
 					db.createObjectStore('previews')
 				}
 			}
-		})
+		}).finally(() => { this.opening = undefined })
+		return this.opening
 	}
 
 	async store(key: string, result: RawRenderResult): Promise<void> {
@@ -123,10 +126,10 @@ export class SkinPreviewStorage {
 		let deletedCount = 0
 
 		return new Promise((resolve, reject) => {
-			const request = store.openCursor()
+			const request = store.openKeyCursor()
 
 			request.onsuccess = (event) => {
-				const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result
+				const cursor = (event.target as IDBRequest<IDBCursor>).result
 
 				if (cursor) {
 					const key = cursor.primaryKey as string

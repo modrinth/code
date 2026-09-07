@@ -1,5 +1,6 @@
-import type { InjectionKey, Ref } from 'vue'
-import { inject, provide, watch } from 'vue'
+import { useEventListener } from '@vueuse/core'
+import type { EffectScope, InjectionKey, Ref } from 'vue'
+import { effectScope, inject, onScopeDispose, provide, watch } from 'vue'
 
 export interface RegistryEntry {
 	key: string
@@ -29,21 +30,41 @@ export function buildCrowdinUrl(key: string, locale: string): string {
 	return `https://crowdin.com/translate/modrinth-platform/all/en-${locale}?filter=basic&value=0&search_type=identifier&search=${encodeURIComponent(key)}`
 }
 
-export function initI18nDebugRuntime(context: I18nDebugContext): void {
-	import('@modrinth/assets/styles/i18n-debug.css')
-	document.body.classList.add('i18n-debug')
-	startMutationObserver(context.registry, context.keyReveal)
-	setupKeyTooltip()
-	registerKeyboardShortcuts(context.panelOpen, context.keyReveal)
+export function initI18nDebugRuntime(context: I18nDebugContext): () => void {
+	let runtime: EffectScope | undefined
+	const stop = watch(context.enabled, (enabled) => {
+		runtime?.stop()
+		runtime = undefined
+		if (!enabled) {
+			document.body.classList.remove('i18n-debug')
+			clearAllAnnotations()
+			return
+		}
+		import('@modrinth/assets/styles/i18n-debug.css')
+		document.body.classList.add('i18n-debug')
+		runtime = effectScope()
+		runtime.run(() => {
+			startMutationObserver(context.registry, context.keyReveal)
+			setupKeyTooltip()
+			registerKeyboardShortcuts(context.panelOpen, context.keyReveal)
+		})
+	}, { immediate: true })
+	return () => {
+		stop()
+		runtime?.stop()
+		document.body.classList.remove('i18n-debug')
+		clearAllAnnotations()
+	}
 }
 
 function startMutationObserver(registry: Map<string, RegistryEntry>, keyReveal: Ref<boolean>) {
 	let pending = false
+	let frame: number | undefined
 
 	const observer = new MutationObserver((mutations) => {
 		if (pending || keyReveal.value) return
 		pending = true
-		requestAnimationFrame(() => {
+		frame = requestAnimationFrame(() => {
 			pending = false
 			if (!keyReveal.value) {
 				processMutations(mutations, registry)
@@ -60,6 +81,11 @@ function startMutationObserver(registry: Map<string, RegistryEntry>, keyReveal: 
 	// Re-annotate whenever the registry grows (keys register after render)
 	let annotateTimer: ReturnType<typeof setTimeout> | undefined
 	let lastSize = 0
+	onScopeDispose(() => {
+		observer.disconnect()
+		if (frame !== undefined) cancelAnimationFrame(frame)
+		clearTimeout(annotateTimer)
+	})
 	watch(
 		() => registry.size,
 		(size) => {
@@ -166,6 +192,7 @@ function setupKeyTooltip() {
 	tooltip.className = 'i18n-key-tooltip'
 	tooltip.style.display = 'none'
 	document.body.appendChild(tooltip)
+	onScopeDispose(() => tooltip.remove())
 
 	let activeTarget: Element | null = null
 
@@ -183,7 +210,7 @@ function setupKeyTooltip() {
 		tooltip.style.left = `${left}px`
 	}
 
-	document.body.addEventListener('mouseover', (e) => {
+	useEventListener(document.body, 'mouseover', (e) => {
 		const target = (e.target as Element).closest?.('[data-i18n-key]')
 		if (!target) return
 		const key = target.getAttribute('data-i18n-key')
@@ -194,7 +221,7 @@ function setupKeyTooltip() {
 		positionTooltip()
 	})
 
-	document.body.addEventListener('mouseout', (e) => {
+	useEventListener(document.body, 'mouseout', (e) => {
 		const target = (e.target as Element).closest?.('[data-i18n-key]')
 		if (!target) return
 		const related = (e as MouseEvent).relatedTarget as Element | null
@@ -203,11 +230,11 @@ function setupKeyTooltip() {
 		tooltip.style.display = 'none'
 	})
 
-	document.addEventListener('scroll', () => positionTooltip(), { capture: true, passive: true })
+	useEventListener(document, 'scroll', () => positionTooltip(), { capture: true, passive: true })
 }
 
 function registerKeyboardShortcuts(panelOpen: Ref<boolean>, keyReveal: Ref<boolean>) {
-	document.addEventListener('keydown', (e: KeyboardEvent) => {
+	useEventListener(document, 'keydown', (e: KeyboardEvent) => {
 		// Use Cmd on macOS, Ctrl on other platforms
 		const mod = e.metaKey || e.ctrlKey
 		if (!mod || !e.shiftKey) return
