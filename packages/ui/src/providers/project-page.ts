@@ -41,6 +41,7 @@ export interface ProjectPageContext {
 	patchProjectV3: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
 	patchIcon: (icon: File) => Promise<boolean>
 	setProcessing: () => Promise<void>
+	withdrawSubmission: () => Promise<boolean>
 	createGalleryItem: (
 		file: File,
 		title?: string,
