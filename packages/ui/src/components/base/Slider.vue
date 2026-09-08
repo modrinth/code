@@ -2,9 +2,9 @@
 	<div class="flex w-full items-center gap-4">
 		<span
 			v-if="currentValue !== null"
-			class="w-10 shrink-0 whitespace-nowrap py-2 text-right text-sm leading-5 text-secondary"
+			class="min-w-10 shrink-0 whitespace-nowrap py-2 text-right text-sm leading-5 text-secondary"
 		>
-			{{ min }}
+			{{ minLabel ?? min }}
 		</span>
 
 		<div
@@ -48,9 +48,9 @@
 
 		<span
 			v-if="currentValue !== null"
-			class="w-10 shrink-0 whitespace-nowrap py-2 text-left text-sm leading-5 text-secondary"
+			class="min-w-10 shrink-0 whitespace-nowrap py-2 text-left text-sm leading-5 text-secondary"
 		>
-			{{ formatValue(max) }}
+			{{ maxLabel ?? formatValue(max) }}
 		</span>
 
 		<Input
@@ -58,7 +58,7 @@
 			type="number"
 			:size="size"
 			wrapper-class="slider-value shrink-0"
-			:class="currentValue === null ? 'w-full' : 'w-[65px]'"
+			:style="{ width: currentValue === null ? '100%' : inputWidth }"
 			:input-class="currentValue === null ? undefined : 'text-center'"
 			:disabled="disabled"
 			:placeholder="placeholder"
@@ -90,6 +90,8 @@ interface Props {
 	snapRange?: number
 	disabled?: boolean
 	unit?: string
+	minLabel?: string
+	maxLabel?: string
 	placeholder?: string
 	ariaLabel?: string
 }
@@ -117,6 +119,11 @@ const heightClass = computed(
 		})[props.size],
 )
 const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
+const inputWidth = computed(() => {
+	const digits = Math.max(String(props.min).length, String(props.max).length)
+	const padding = props.size === 'small' || props.size === 'standard' ? 1.5 : 2
+	return `max(65px, calc(${digits}ch + ${padding}rem + 2px))`
+})
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>
 	props.snapPoints.filter((snapPoint) => snapPoint >= props.min && snapPoint <= props.max),

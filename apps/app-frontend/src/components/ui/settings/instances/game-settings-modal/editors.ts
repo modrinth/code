@@ -64,6 +64,11 @@ export function gameSettingChanges(
 	})
 }
 
+export function gameSettingNumberScale(setting: EditableGameSetting): number {
+	if (setting.editor.unit !== 'percent') return 1
+	return setting.option_id === 'sensitivity' ? 200 : 100
+}
+
 export function canonicalValueText(setting: EditableGameSetting): string {
 	const value = setting.canonical_value
 	if (!value) return ''
@@ -74,7 +79,7 @@ export function canonicalValueText(setting: EditableGameSetting): string {
 		case 'integer':
 		case 'decimal':
 			return setting.editor.unit === 'percent'
-				? String(Number((Number(value.value) * 100).toFixed(8)))
+				? String(Number((Number(value.value) * gameSettingNumberScale(setting)).toFixed(8)))
 				: String(value.value)
 		case 'string_list':
 			return value.value.join(', ')
@@ -114,7 +119,7 @@ export function canonicalValueFromInput(
 				type: 'decimal',
 				value:
 					setting.editor.unit === 'percent'
-						? String(Number((parsed / 100).toFixed(8)))
+						? String(Number((parsed / gameSettingNumberScale(setting)).toFixed(8)))
 						: String(value),
 			}
 		}

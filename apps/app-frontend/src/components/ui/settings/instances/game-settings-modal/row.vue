@@ -19,10 +19,12 @@ import {
 	canonicalBooleanValue,
 	canonicalValueFromInput,
 	canonicalValueText,
+	gameSettingNumberScale,
 	isKeybindSetting,
 	settingCanBeEnabled,
 } from './editors'
 import GameKeybindInput from './keybind-input.vue'
+import { minecraftLanguageOptions } from './languages'
 import {
 	formatGameSettingChoice,
 	formatGameSettingDescription,
@@ -93,6 +95,13 @@ const settingDescription = computed(() =>
 	formatGameSettingDescription(formatMessage, props.setting),
 )
 const valueText = computed(() => canonicalValueText(props.setting))
+const languageOptions = computed<ComboboxOption<string>[]>(() => {
+	const value = valueText.value
+	if (value && !minecraftLanguageOptions.some((option) => option.value === value)) {
+		return [{ value, label: value }, ...minecraftLanguageOptions]
+	}
+	return minecraftLanguageOptions
+})
 const enumOptions = computed<ComboboxOption<string>[]>(() =>
 	(props.setting.editor.choices ?? []).map((choice) => ({
 		value: choice.value,
@@ -106,7 +115,7 @@ const isSlider = computed(
 	() => isNumber.value && props.setting.editor.min != null && props.setting.editor.max != null,
 )
 const booleanValue = computed(() => canonicalBooleanValue(props.setting))
-const numberScale = computed(() => (props.setting.editor.unit === 'percent' ? 100 : 1))
+const numberScale = computed(() => gameSettingNumberScale(props.setting))
 const inputMin = computed(() =>
 	props.setting.editor.min === null || props.setting.editor.min === undefined
 		? undefined
@@ -251,6 +260,20 @@ function updateValue(value: string | number | boolean | undefined) {
 				:off-label="formatMessage(messages.off)"
 				:placeholder="placeholder"
 				:disabled="editorDisabled"
+				@update:model-value="updateValue"
+			/>
+
+			<Combobox
+				v-else-if="setting.option_id === 'language'"
+				:model-value="valueText"
+				:options="languageOptions"
+				:placeholder="placeholder"
+				:disabled="editorDisabled"
+				:aria-label="settingLabel"
+				:search-input-attrs="{ 'aria-label': settingLabel }"
+				searchable
+				select-search-text-on-focus
+				class="min-w-0"
 				@update:model-value="updateValue"
 			/>
 

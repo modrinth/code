@@ -50,7 +50,7 @@ const messages = defineMessages({
 	},
 	resourcePacksDescription: {
 		id: 'app.settings.synced-options.resource-packs.description',
-		defaultMessage: 'Use the same resource packs across your instances',
+		defaultMessage: 'Use the same resource packs across your instances.',
 	},
 	dataPacks: { id: 'app.settings.synced-options.data-packs', defaultMessage: 'Sync data packs' },
 	dataPacksDescription: {

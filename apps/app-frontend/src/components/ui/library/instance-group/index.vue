@@ -128,7 +128,7 @@ const cardWidth = computed(
 	() => (gridWidth.value - gap.value * (columnCount.value - 1)) / columnCount.value,
 )
 const cardHeight = computed(() =>
-	compactMode.value ? remSize.value * 3.875 : Math.max(0, cardWidth.value) + remSize.value * 3.375,
+	compactMode.value ? remSize.value * 3.875 + 2 : Math.max(0, cardWidth.value) + remSize.value * 3.375,
 )
 const gridHeight = computed(() =>
 	Math.max(

@@ -335,6 +335,8 @@ const messages = defineMessages({
 						:step="64"
 						:snap-points="snapPoints"
 						:snap-range="512"
+						min-label="512 MB"
+						:max-label="`${Number((maxMemory / 1024).toFixed(1))} GB`"
 						unit="MB"
 					/>
 					<p class="m-0 mt-1 leading-tight">
