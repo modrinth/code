@@ -87,7 +87,7 @@
 										class="text-link"
 										:class="{ 'cursor-wait opacity-50': withdrawingSubmission }"
 										:aria-disabled="withdrawingSubmission"
-										@click.prevent="withdrawSubmission"
+										@click.prevent="handleWithdrawSubmission"
 									>
 										<component :is="() => normalizeChildren(children)" />
 									</a>
@@ -158,8 +158,8 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
-	normalizeChildren,
 	type MessageDescriptor,
+	normalizeChildren,
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
@@ -272,6 +272,9 @@ const props = withDefaults(defineProps<Props>(), {
 	validationNags: () => [],
 	validationLoading: false,
 	validationAvailable: true,
+	nags: undefined,
+	withdrawSubmission: undefined,
+	refreshValidation: undefined,
 })
 
 const emit = defineEmits<{
@@ -428,7 +431,7 @@ const canWithdrawSubmission = computed(
 			((props.currentMember?.permissions ?? 0) & (1 << 2)) !== 0),
 )
 
-async function withdrawSubmission() {
+async function handleWithdrawSubmission() {
 	if (!isProcessing.value || !canWithdrawSubmission.value || withdrawingSubmission.value) return
 
 	withdrawingSubmission.value = true

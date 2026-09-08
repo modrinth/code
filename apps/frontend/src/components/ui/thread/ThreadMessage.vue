@@ -97,7 +97,9 @@
 					submitted the project for review.
 				</span>
 				<span
-					v-else-if="message.body.old_status === 'processing' && message.body.new_status === 'draft'"
+					v-else-if="
+						message.body.old_status === 'processing' && message.body.new_status === 'draft'
+					"
 				>
 					{{ formatMessage(messages.withdrewFromReview) }}
 				</span>

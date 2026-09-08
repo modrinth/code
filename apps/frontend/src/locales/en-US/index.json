@@ -3446,6 +3446,9 @@
   "project-moderation-nags.resubmit-for-review-desc": {
     "message": "Your project has been {status, select, rejected {rejected} withheld {withheld} other {{status}}} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message."
   },
+  "project-moderation-nags.submission-withdrawn": {
+    "message": "Your submission has been withdrawn. "
+  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "You must complete the required steps in the publishing checklist!"
   },
@@ -3457,6 +3460,15 @@
   },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published."
+  },
+  "project-moderation-nags.submitted-for-review": {
+    "message": "Pending moderator review"
+  },
+  "project-moderation-nags.submitted-for-review-desc": {
+    "message": "Your project has been submitted for moderator review."
+  },
+  "project-moderation-nags.submitted-for-review-with-withdrawal": {
+    "message": "Your project has been submitted for review. If your project is not ready for review, you can <withdraw-link>withdraw your submission</withdraw-link>."
   },
   "project-moderation-nags.suggestion": {
     "message": "Suggestion"
@@ -5488,6 +5500,9 @@
   },
   "shared-instance.invite.unavailable.title": {
     "message": "This invite isn't available"
+  },
+  "thread-message.withdrew-from-review": {
+    "message": "withdrew the project from review"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Latest news from Modrinth"
