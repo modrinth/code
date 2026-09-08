@@ -2,7 +2,7 @@
 	<div class="flex w-full items-center gap-4">
 		<span
 			v-if="currentValue !== null"
-			class="w-10 shrink-0 whitespace-nowrap py-2 text-right text-sm leading-5 text-secondary"
+			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
 		>
 			{{ min }}
 		</span>
@@ -48,7 +48,7 @@
 
 		<span
 			v-if="currentValue !== null"
-			class="w-10 shrink-0 whitespace-nowrap py-2 text-left text-sm leading-5 text-secondary"
+			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
 		>
 			{{ formatValue(max) }}
 		</span>
