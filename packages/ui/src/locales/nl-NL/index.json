@@ -3599,9 +3599,6 @@
   "project.disclosure.ai-generated-content.use.content": {
     "defaultMessage": "inhoud"
   },
-  "project.disclosure.ai-generated-content.use.functionality": {
-    "defaultMessage": "functionaliteit"
-  },
   "project.disclosure.ai-generated-content.use.text": {
     "defaultMessage": "tekst"
   },
@@ -3994,9 +3991,6 @@
   },
   "project.settings.disclosures.ai.types-code": {
     "defaultMessage": "Code"
-  },
-  "project.settings.disclosures.ai.types-functionality": {
-    "defaultMessage": "Functionaliteit"
   },
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "Tekst"

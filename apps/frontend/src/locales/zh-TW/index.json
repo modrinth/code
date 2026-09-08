@@ -3884,9 +3884,6 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "如果這個專案包含其他作品的廣告、贊助或宣傳，則必須啟用這個選項。"
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "如果該宣傳沒有直接的金錢價值，<emphasis>並且</emphasis>是一般人會認為「相關」且「不顯眼」的（例如在你自己所製作的模組的設定頁面角落，放置你的 Modrinth 個人檔案的連結），我們便不會將其視為廣告<italic></italic><italic></italic>。"
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "例如：Adds the Modrinth SMP server to your server list automatically."
   },

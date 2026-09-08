@@ -3515,9 +3515,6 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Du måste aktivera detta om ditt projekt innehåller annonser, sponsorer eller kampanjer för andra verk."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Om marknadsföringen inte har något direkt monetärt värde <emphasis>och</emphasis> det är för något som en normal person skulle anse vara <italic>relevant</italic> och <italic>icke påträngande</italic> (såsom en länk till din Modrinth-profil i hörnet av inställningarna för ditt modd), så skulle vi inte anse det som reklam."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "t.ex. Lägger automatiskt till Modrinth SMP-servern till din serverlista."
   },

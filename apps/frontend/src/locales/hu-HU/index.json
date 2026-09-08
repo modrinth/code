@@ -3872,9 +3872,6 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Ezt akkor kell engedélyezned, ha a projekted reklámokat, szponzorációkat vagy más művek népszerűsítését tartalmazza."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Ha a promóciónak nincs közvetlen pénzbeli értéke <emphasis>és</emphasis> olyasmire vonatkozik, amit egy átlagos ember <italic>relevánsnak</italic> és <italic>nem tolakodónak</italic> tartana (például a Modrinth-profilodra mutató hivatkozás a saját modod beállítási oldalának sarkában), akkor azt nem tekintjük hirdetésnek."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "pl. Automatikusan hozzáadja a Modrinth SMP-szerverét a szerverlistádhoz."
   },
