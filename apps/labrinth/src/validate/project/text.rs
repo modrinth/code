@@ -2,6 +2,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::sync::LazyLock;
 
 use linkify::{LinkFinder, LinkKind};
+use pulldown_cmark::{Event, Parser, Tag};
 use regex::Regex;
 use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::UnicodeSegmentation;
@@ -127,6 +128,49 @@ const PROFANITY_TERMS: &[&str] = &[
 
 pub(super) fn normalize_project_field_text(text: &str) -> String {
     text.trim().nfc().collect()
+}
+
+pub(super) fn project_text_similarity(left: &str, right: &str) -> f64 {
+	let left = normalized_for_similarity(left);
+	let right = normalized_for_similarity(right);
+	let longest_length = left.len().max(right.len());
+	if longest_length == 0 {
+		return 0.0;
+	}
+
+	1.0 - levenshtein_distance(&left, &right) as f64 / longest_length as f64
+}
+
+fn normalized_for_similarity(text: &str) -> Vec<char> {
+	normalize_project_field_text(text)
+		.to_lowercase()
+		.chars()
+		.filter(|character| !character.is_whitespace())
+		.collect()
+}
+
+fn levenshtein_distance(left: &[char], right: &[char]) -> usize {
+	if left.len() > right.len() {
+		return levenshtein_distance(right, left);
+	}
+
+	let mut previous_row = (0..=left.len()).collect::<Vec<_>>();
+	for (right_index, right_character) in right.iter().enumerate() {
+		let mut current_row = Vec::with_capacity(left.len() + 1);
+		current_row.push(right_index + 1);
+		for (left_index, left_character) in left.iter().enumerate() {
+			current_row.push(
+				(current_row[left_index] + 1)
+					.min(previous_row[left_index + 1] + 1)
+					.min(
+						previous_row[left_index]
+							+ usize::from(left_character != right_character),
+					),
+			);
+		}
+		previous_row = current_row;
+	}
+	previous_row[left.len()]
 }
 
 pub(super) fn js_string_length(text: &str) -> usize {
@@ -838,6 +882,8 @@ pub(super) fn find_link_or_ip(text: &str) -> Option<String> {
 pub(super) fn has_summary_formatting(summary: &str) -> bool {
     has_paired_html_formatting(summary)
         || MARKDOWN_LINK.is_match(summary)
+		|| Parser::new(summary)
+			.any(|event| matches!(event, Event::Start(Tag::Emphasis)))
         || summary.lines().any(|line| {
             let line = line.trim_start();
             line.starts_with('#')
@@ -1074,4 +1120,41 @@ fn language_chunks(block: &str) -> Vec<String> {
 fn has_enough_language_content(text: &str) -> bool {
     WORD.find_iter(text).count() >= 8
         && text.trim().graphemes(true).count() >= 35
+}
+
+#[cfg(test)]
+mod tests {
+	use super::{has_summary_formatting, project_text_similarity};
+
+	#[test]
+	fn summary_detects_markdown_emphasis() {
+		for summary in ["*this*", "Adds *new features* to Minecraft", "*a*", "_this_"] {
+			assert!(has_summary_formatting(summary), "{summary:?}");
+		}
+	}
+
+	#[test]
+	fn summary_allows_literal_asterisks() {
+		for summary in ["A single * asterisk", "2 * 3 * 4", r"\*this\*", "An unmatched *asterisk"] {
+			assert!(!has_summary_formatting(summary), "{summary:?}");
+		}
+	}
+
+	#[test]
+	fn similarity_ignores_case_whitespace_and_unicode_composition() {
+		assert_eq!(project_text_similarity(" Café tools ", "CAFE\u{301}\nTOOLS"), 1.0);
+	}
+
+	#[test]
+	fn similarity_distinguishes_the_eighty_percent_boundary() {
+		assert!(project_text_similarity("abcde", "abcdx") >= 0.8);
+		assert!(project_text_similarity("abcde", "abcxy") < 0.8);
+	}
+
+	#[test]
+	fn empty_fields_do_not_match() {
+		assert_eq!(project_text_similarity(" ", "\n"), 0.0);
+		assert_eq!(project_text_similarity("", "some text"), 0.0);
+		assert_eq!(project_text_similarity("some text", ""), 0.0);
+	}
 }
