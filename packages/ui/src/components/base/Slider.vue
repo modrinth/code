@@ -176,8 +176,8 @@ function onInput(value: string) {
 
 <style lang="scss" scoped>
 .slider {
-	left: -0.625rem;
-	width: calc(100% + 1.25rem);
+	left: -0.5rem;
+	width: calc(100% + 1rem);
 
 	&::-webkit-slider-runnable-track {
 		height: 0.25rem;
@@ -193,23 +193,39 @@ function onInput(value: string) {
 	&::-webkit-slider-thumb {
 		-webkit-appearance: none;
 		appearance: none;
-		width: 1.25rem;
-		height: 1.25rem;
-		margin-top: -0.5rem;
+		width: 1rem;
+		height: 1rem;
+		margin-top: -0.375rem;
 		border: 0;
 		border-radius: 9999px;
-		background: var(--color-text-default);
+		background: var(--color-contrast);
+		box-shadow:
+			0 0 0 2px transparent,
+			0 0 0 4px transparent;
+		transition: box-shadow 0.15s ease-in-out;
+	}
+
+	&::-moz-range-thumb {
+		width: 1rem;
+		height: 1rem;
+		border: 0;
+		border-radius: 9999px;
+		background: var(--color-contrast);
+		box-shadow:
+			0 0 0 2px transparent,
+			0 0 0 4px transparent;
+		transition: box-shadow 0.15s ease-in-out;
+	}
+
+	&:hover::-webkit-slider-thumb,
+	&:active::-webkit-slider-thumb {
 		box-shadow:
 			0 0 0 2px var(--surface-3),
 			0 0 0 4px var(--color-brand);
 	}
 
-	&::-moz-range-thumb {
-		width: 1.25rem;
-		height: 1.25rem;
-		border: 0;
-		border-radius: 9999px;
-		background: var(--color-text-default);
+	&:hover::-moz-range-thumb,
+	&:active::-moz-range-thumb {
 		box-shadow:
 			0 0 0 2px var(--surface-3),
 			0 0 0 4px var(--color-brand);
@@ -227,6 +243,11 @@ function onInput(value: string) {
 			0 0 0 2px var(--surface-3),
 			0 0 0 4px var(--color-brand),
 			0 0 0 8px var(--color-brand-highlight);
+	}
+
+	&:focus,
+	&:focus-visible {
+		box-shadow: none;
 	}
 
 	&:disabled {
