@@ -42,6 +42,7 @@ pub enum Error {
     Serialize,
 )]
 #[serde(rename_all = "lowercase")]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub enum ContentType {
     Mod,
     Plugin,
