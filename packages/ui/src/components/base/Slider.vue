@@ -20,12 +20,12 @@
 
 			<div
 				v-if="visibleSnapPoints.length"
-				class="pointer-events-none absolute inset-x-0 top-1/2 h-6 -translate-y-1/2"
+				class="pointer-events-none absolute inset-x-0 top-1/2 h-4 -translate-y-1/2"
 			>
 				<span
 					v-for="snapPoint in visibleSnapPoints"
 					:key="snapPoint"
-					class="absolute top-0 h-6 w-1 -translate-x-1/2 rounded-full"
+					class="absolute top-0 h-4 w-1 -translate-x-1/2 rounded-full"
 					:class="snapPoint <= currentValue ? 'bg-brand' : 'bg-surface-5'"
 					:style="{ left: `${getPercentage(snapPoint)}%` }"
 				/>
