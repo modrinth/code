@@ -159,14 +159,20 @@ function inputValueValid(inputValue: number) {
 }
 
 function onInputWithSnap(value: string) {
-	let parsedValue = Number.parseFloat(value)
+	const parsedValue = Number.parseFloat(value)
+
+	let snappedValue = parsedValue
+	let closestDistance = props.snapRange
 
 	for (const snapPoint of props.snapPoints) {
 		const distance = Math.abs(snapPoint - parsedValue)
-		if (distance < props.snapRange) parsedValue = snapPoint
+		if (distance < closestDistance) {
+			closestDistance = distance
+			snappedValue = snapPoint
+		}
 	}
 
-	inputValueValid(parsedValue)
+	inputValueValid(snappedValue)
 }
 
 function onInput(value: string) {
