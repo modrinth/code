@@ -59,6 +59,11 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.derivative.note-label',
 		defaultMessage: 'Explain how your project is based on the original work',
 	},
+	notePlaceholder: {
+		id: 'project.settings.disclosures.derivative.note-placeholder',
+		defaultMessage:
+			'This is a fork that adds a few new biomes and ports it to newer Minecraft versions.',
+	},
 })
 
 function emptyDerivativeSource(): DerivativeSource {
@@ -167,6 +172,7 @@ function setOptionalField(
 						:model-value="source.note ?? undefined"
 						:rows="3"
 						:disabled="disabled"
+						:placeholder="formatMessage(messages.notePlaceholder)"
 						@update:model-value="(value) => setOptionalField(index, 'note', value)"
 					/>
 				</SettingsFormGroup>

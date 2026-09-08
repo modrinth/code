@@ -3962,6 +3962,9 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Explain how your project is based on the original work"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "This is a fork that adds a few new biomes and ports it to newer Minecraft versions."
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Contains derivative content"
   },
