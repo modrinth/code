@@ -4,6 +4,7 @@ use crate::diff::Change;
 
 /// The linked modpack, Minecraft version, and loader settings to compare.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ContentSetConfiguration {
     pub modpack_version_id: Option<String>,
     pub game_version: String,
@@ -11,6 +12,7 @@ pub struct ContentSetConfiguration {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct LoaderReference {
     pub name: String,
     pub version: Option<String>,
@@ -18,6 +20,7 @@ pub struct LoaderReference {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(tag = "type", content = "change", rename_all = "snake_case")]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub enum ConfigurationDiff {
     Modpack(Change<String>),
     GameVersion(Change<String>),

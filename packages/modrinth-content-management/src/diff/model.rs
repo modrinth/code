@@ -10,6 +10,7 @@ use crate::shared::{ContentType, Error};
 /// Include only content relevant to the operation. For example, when receiving
 /// a shared-instance update, leave out mods the player added themselves.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ContentSetSnapshot {
     /// Each project has one version. Keys are project IDs; values are version IDs.
     pub projects: BTreeMap<String, String>,
@@ -45,6 +46,7 @@ impl ContentSetSnapshot {
 #[derive(
     Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
 )]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ExternalFileKey {
     pub content_type: ContentType,
     pub path: String,
@@ -52,6 +54,7 @@ pub struct ExternalFileKey {
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub enum ContentSetDiffKind {
     Added,
     Removed,
@@ -60,6 +63,7 @@ pub enum ContentSetDiffKind {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub enum Change<T> {
     Added { after: T },
     Removed { before: T },
@@ -132,6 +136,7 @@ impl<T: Clone + PartialEq> Change<T> {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub enum ContentSetDiffEntry {
     Project {
         project_id: String,
@@ -149,6 +154,7 @@ pub enum ContentSetDiffEntry {
     Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize,
 )]
 #[serde(rename_all = "snake_case")]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub enum CommonExternalFilePolicy {
     #[default]
     AssumeUnchanged,
@@ -156,6 +162,7 @@ pub enum CommonExternalFilePolicy {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ContentSetDiffOptions {
     pub common_external_files: CommonExternalFilePolicy,
 }
@@ -163,6 +170,7 @@ pub struct ContentSetDiffOptions {
 /// Changes to projects and files, plus any extra changes the app or server adds,
 /// such as a linked modpack or selected config files.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ContentSetDiff<E = Infallible> {
     pub content: Vec<ContentSetDiffEntry>,
     pub additional: Vec<E>,
