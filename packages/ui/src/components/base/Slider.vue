@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import Input from './inputs/Input.vue'
 import type { InputSize } from './inputs/types'
@@ -116,6 +116,7 @@ const heightClass = computed(
 			large: 'h-12',
 		})[props.size],
 )
+const input = useTemplateRef<HTMLInputElement>('input')
 const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>
@@ -173,6 +174,10 @@ function onInputWithSnap(value: string) {
 	}
 
 	inputValueValid(snappedValue)
+
+	if (input.value && currentValue.value !== null) {
+		input.value.value = String(currentValue.value)
+	}
 }
 
 function onInput(value: string) {
