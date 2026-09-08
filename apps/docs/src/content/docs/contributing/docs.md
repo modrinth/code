@@ -18,7 +18,7 @@ pnpm run docs:dev
 ```
 
 When ready, you will have a hot-reloading environment of the docs site running on port 4321.
-To open it up, enter http://localhost:4321 on your Browser.
+To open it up, enter http://localhost:4321 on your Browser, or click [here].
 
 ## Ready to open a PR?
 
@@ -27,3 +27,4 @@ While there is no linting requirement on Docs, we do ask that you quickly check 
 [docs]: https://github.com/modrinth/code/tree/main/apps/docs
 [pnpm]: https://pnpm.io
 [git]: https://git-scm.com/
+[here]: http://localhost:4321/
