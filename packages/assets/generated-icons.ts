@@ -182,6 +182,7 @@ import _LeftArrowIcon from './icons/left-arrow.svg?component'
 import _LibraryIcon from './icons/library.svg?component'
 import _LightBulbIcon from './icons/light-bulb.svg?component'
 import _LinkIcon from './icons/link.svg?component'
+import _Link2Icon from './icons/link-2.svg?component'
 import _ListIcon from './icons/list.svg?component'
 import _ListBulletedIcon from './icons/list-bulleted.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
@@ -642,6 +643,7 @@ export const LeftArrowIcon = _LeftArrowIcon
 export const LibraryIcon = _LibraryIcon
 export const LightBulbIcon = _LightBulbIcon
 export const LinkIcon = _LinkIcon
+export const Link2Icon = _Link2Icon
 export const ListIcon = _ListIcon
 export const ListBulletedIcon = _ListBulletedIcon
 export const ListEndIcon = _ListEndIcon

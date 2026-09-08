@@ -93,6 +93,7 @@ pub use self::shared::{
     unlink_shared_instance, unpublish_shared_instance, update_shared_instance,
 };
 pub use self::synced_options::game_options::{
+	GameSettingLocaleLabels, get_game_setting_locale_labels,
     CanonicalValue as GameOptionCanonicalValue, EditableGameSetting,
     GameOptionCompatibility, GameOptionCompatibilityBucket,
     GameOptionCompatibilityReason, GameOptionCompatibilityStatus,
@@ -113,6 +114,7 @@ pub use self::synced_options::game_options::{
     sync_before_launch as sync_game_options_before_launch,
 };
 pub(crate) use self::synced_options::game_options::{
+	GameLocaleIndexer, queue_game_locale_index, start_game_locale_indexer,
     shared_fullscreen_value, sync_all_participating_instances,
     update_shared_fullscreen_from_app,
 };

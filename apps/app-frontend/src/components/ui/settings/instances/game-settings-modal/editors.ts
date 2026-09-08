@@ -95,7 +95,7 @@ export function canonicalBooleanValue(setting: EditableGameSetting): boolean | u
 export function isKeybindSetting(setting: EditableGameSetting): boolean {
 	return (
 		setting.editor.type === 'key_binding' ||
-		(setting.editor.type === 'external_raw' && !!setting.raw_key?.startsWith('key_key'))
+		(setting.editor.type === 'external_raw' && !!setting.raw_key?.startsWith('key_'))
 	)
 }
 

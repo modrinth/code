@@ -153,6 +153,25 @@ export type SaveGameSettingsResult = {
 	conflicts?: string[]
 }
 
+export type GameSettingLocaleLabel = {
+	label: string
+	choices: Record<string, string>
+}
+
+export async function get_game_setting_locale_labels(
+	instanceId: string | undefined,
+	locale: string,
+	optionIds: string[],
+	refreshSources = false,
+): Promise<{ settings: Record<string, GameSettingLocaleLabel> }> {
+	return await invoke('plugin:instance|instance_get_game_setting_locale_labels', {
+		instanceId,
+		locale,
+		optionIds,
+		refreshSources,
+	})
+}
+
 export async function list_game_options_sync_sources(): Promise<GameOptionsSourceCandidate[]> {
 	return await invoke('plugin:instance|instance_list_game_options_sync_sources')
 }

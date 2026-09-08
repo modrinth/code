@@ -40,13 +40,10 @@ import {
 	settingSearchText,
 } from './editors'
 import { minecraftKeybindConflictKey } from './keybinds'
-import {
-	formatGameSettingDescription,
-	formatGameSettingLabel,
-	gameSettingCategoryMessage,
-} from './messages'
+import { formatGameSettingDescription, gameSettingCategoryMessage } from './messages'
 import GameSettingRow from './row.vue'
 import { useGameSettingsEditor } from './use-editor'
+import { useGameSettingLabels } from './use-labels'
 
 const props = defineProps<{
 	instanceId?: string
@@ -119,6 +116,7 @@ const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 const activeCategoryId = ref('')
 const search = ref('')
+const opened = ref(false)
 let allowClose = false
 
 const {
@@ -152,6 +150,16 @@ const categoryIcons: Record<string, Component> = {
 	accessibility: EyeIcon,
 	custom: WrenchIcon,
 	custom_settings: WrenchIcon,
+}
+
+const localeLabels = useGameSettingLabels(
+	opened,
+	() => props.instanceId,
+	() => draftState.value?.settings ?? [],
+)
+
+function settingLabel(setting: EditableGameSetting) {
+	return localeLabels.value[setting.option_id]?.label ?? setting.raw_key ?? setting.option_id
 }
 
 const categories = computed<GameSettingCategory[]>(() => {
@@ -192,7 +200,7 @@ const categorySettings = computed(() => {
 			query &&
 			!settingSearchText(
 				setting,
-				formatGameSettingLabel(formatMessage, setting),
+				settingLabel(setting),
 				formatGameSettingDescription(formatMessage, setting),
 			).includes(query)
 		)
@@ -220,7 +228,7 @@ const keybindConflicts = computed(() => {
 				setting.option_id,
 				settings
 					.filter((candidate) => candidate.option_id !== setting.option_id)
-					.map((candidate) => formatGameSettingLabel(formatMessage, candidate)),
+					.map((candidate) => settingLabel(candidate)),
 			)
 		}
 	}
@@ -267,6 +275,7 @@ async function load() {
 }
 
 function show() {
+	opened.value = true
 	allowClose = false
 	search.value = ''
 	modal.value?.show()
@@ -278,6 +287,7 @@ function hide() {
 }
 
 function reset() {
+	opened.value = false
 	resetEditor()
 	allowClose = false
 }
@@ -394,6 +404,7 @@ defineExpose({ show, hide })
 							v-for="setting in categorySettings"
 							:key="setting.option_id"
 							:setting="setting"
+							:locale-label="localeLabels[setting.option_id]"
 							:keybind-conflicts="keybindConflicts.get(setting.option_id)"
 							:show-sync-toggle="!isLocalEditor"
 							@update:sync-enabled="setSyncEnabled([setting.option_id], $event)"

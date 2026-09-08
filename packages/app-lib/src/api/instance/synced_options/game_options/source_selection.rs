@@ -37,6 +37,7 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
     let now = Utc::now().timestamp();
     let source_version = metadata.applied_content_set.game_version.as_str();
     let source_id = metadata.instance.id.as_str();
+	let locale_snapshot = super::locales::capture_observation(metadata, state).await;
     let mut tx = state.pool.begin().await?;
     let catalog_revision = CATALOG_REVISION as i64;
 
@@ -298,7 +299,9 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
         update_app_fullscreen_setting(&mut tx, value, fullscreen_sync_enabled)
             .await?;
     }
+	super::locales::record_observations(&mut tx, metadata, &document, locale_snapshot.as_deref()).await;
     tx.commit().await?;
+	super::locales::queue_game_locale_index();
     Ok(())
 }
 

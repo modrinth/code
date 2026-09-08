@@ -317,7 +317,11 @@ function openContextMenu(event, instance) {
 			<div
 				class="h-px w-8 transition-colors duration-200"
 				:class="
-					showOverdrag ? 'bg-red' : canDrag ? 'bg-surface-5 group-hover:bg-secondary' : 'bg-surface-5'
+					showOverdrag
+						? 'bg-red'
+						: canDrag
+							? 'bg-surface-5 group-hover:bg-secondary'
+							: 'bg-surface-5'
 				"
 			></div>
 		</div>

@@ -12,7 +12,11 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import type { EditableGameSetting, GameOptionCanonicalValue } from '@/helpers/game-options'
+import type {
+	EditableGameSetting,
+	GameOptionCanonicalValue,
+	GameSettingLocaleLabel,
+} from '@/helpers/game-options'
 
 import GameSettingBooleanControl from './boolean-control.vue'
 import {
@@ -26,9 +30,7 @@ import {
 import GameKeybindInput from './keybind-input.vue'
 import { minecraftLanguageOptions } from './languages'
 import {
-	formatGameSettingChoice,
 	formatGameSettingDescription,
-	formatGameSettingLabel,
 	formatGameSettingValidation,
 	presentationMessages,
 } from './messages'
@@ -36,6 +38,7 @@ import {
 const props = withDefaults(
 	defineProps<{
 		setting: EditableGameSetting
+		localeLabel?: GameSettingLocaleLabel
 		keybindConflicts?: string[]
 		disabled?: boolean
 		showSyncToggle?: boolean
@@ -90,7 +93,9 @@ const messages = defineMessages({
 	},
 })
 
-const settingLabel = computed(() => formatGameSettingLabel(formatMessage, props.setting))
+const settingLabel = computed(
+	() => props.localeLabel?.label ?? props.setting.raw_key ?? props.setting.option_id,
+)
 const settingDescription = computed(() =>
 	formatGameSettingDescription(formatMessage, props.setting),
 )
@@ -105,7 +110,7 @@ const languageOptions = computed<ComboboxOption<string>[]>(() => {
 const enumOptions = computed<ComboboxOption<string>[]>(() =>
 	(props.setting.editor.choices ?? []).map((choice) => ({
 		value: choice.value,
-		label: formatGameSettingChoice(formatMessage, props.setting.option_id, choice.value),
+		label: props.localeLabel?.choices[choice.value] ?? choice.value,
 	})),
 )
 const isNumber = computed(

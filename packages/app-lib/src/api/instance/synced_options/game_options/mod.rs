@@ -25,6 +25,7 @@ mod fullscreen;
 mod instance_support;
 mod launch_overrides;
 mod local_settings_editor;
+mod locales;
 mod options_file;
 mod pack_updates;
 mod read_instance_changes;
@@ -51,6 +52,8 @@ pub use local_settings_editor::{
 };
 pub use pack_updates::{GameOptionsPackSource, capture_pack_base};
 pub use settings_editor::{get_config, preview_changes, save_changes};
+pub use locales::{GameSettingLocaleLabels, get_game_setting_locale_labels};
+pub(crate) use locales::{GameLocaleIndexer, queue_game_locale_index, start_game_locale_indexer};
 pub use source_selection::list_sync_sources;
 
 pub(crate) use fullscreen::{

@@ -99,6 +99,9 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     .entry(instance_id.clone())
                                     .or_default()
                                     .insert(file_name.to_owned());
+								if file_name == "options.txt" {
+									crate::api::instance::queue_game_locale_index();
+								}
                             }
                             if first_file_name
                                 .as_ref()
