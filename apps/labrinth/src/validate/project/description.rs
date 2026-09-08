@@ -8,13 +8,14 @@ use super::text::{
     extract_description_text, find_banned_description_link,
     has_image_without_alt_text, has_sufficient_english_blocks,
     js_string_length, non_standard_text_ratio, normalize_project_field_text,
-    profanity_matches, project_requires_english,
+	profanity_matches, project_requires_english, project_text_similarity,
 };
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
 use crate::models::projects::Project;
 
 const MIN_DESCRIPTION_CHARS: usize = 125;
+const MAX_DESCRIPTION_SUMMARY_SIMILARITY: f64 = 0.8;
 const MAX_PROFANITY_COUNT: usize = 2;
 const NON_STANDARD_TEXT_FAILURE_THRESHOLD: f64 = 0.05;
 
@@ -91,6 +92,14 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             );
         }
     }
+	if project_text_similarity(&normalized_text, &project.summary)
+		>= MAX_DESCRIPTION_SUMMARY_SIMILARITY
+	{
+		nags.push(ProjectNag::new(
+			ProjectNagKind::ProjectDescriptionMatchesSummary,
+			ProjectNagSeverity::Required,
+		));
+	}
     if has_spam {
         nags.push(ProjectNag::new(
             ProjectNagKind::ProjectDescriptionSpam,
