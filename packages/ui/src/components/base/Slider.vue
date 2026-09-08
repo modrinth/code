@@ -58,7 +58,8 @@
 			type="number"
 			:size="size"
 			wrapper-class="slider-value shrink-0"
-			:class="currentValue === null ? 'w-full' : 'w-[65px]'"
+			:class="currentValue === null ? 'w-full' : undefined"
+			:style="currentValue === null ? undefined : { '--value-chars': valueFieldChars }"
 			:input-class="currentValue === null ? undefined : 'text-center'"
 			:disabled="disabled"
 			:placeholder="placeholder"
@@ -116,6 +117,11 @@ const heightClass = computed(
 			large: 'h-12',
 		})[props.size],
 )
+const valueFieldChars = computed(() => {
+	const decimals = (String(props.step).split('.')[1] ?? '').length
+
+	return Math.max(props.min.toFixed(decimals).length, props.max.toFixed(decimals).length, 2)
+})
 const input = useTemplateRef<HTMLInputElement>('input')
 const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
@@ -269,6 +275,8 @@ function onInput(value: string) {
 
 .slider-value :deep(input[type='number']) {
 	-moz-appearance: textfield;
+	flex: none;
+	width: calc(var(--value-chars) * 1ch);
 
 	&::-webkit-inner-spin-button,
 	&::-webkit-outer-spin-button {
