@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT EXISTS(\n\t\t\tSELECT 1 FROM synced_game_option_state WHERE singleton = 1\n\t\t) AS \"exists!: bool\"\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists!: bool",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "7062aaed9cde80d865cf4c845cb40fb48d24b62a5ddddfc6de2f14b80d2bfc7c"
+}

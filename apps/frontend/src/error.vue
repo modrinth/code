@@ -130,7 +130,7 @@ import { getSignInRouteObj } from '~/composables/auth.js'
 import { setupProviders } from '~/providers/setup.ts'
 
 const auth = await useAuth()
-const { notificationManager } = setupProviders(auth)
+const { client, notificationManager } = setupProviders(auth)
 
 const { formatMessage } = useVIntl()
 const { addNotification } = notificationManager
@@ -173,7 +173,7 @@ const otherAccounts = computed(() =>
 )
 
 async function signOut() {
-	await switchToSignedOut()
+	await switchToSignedOut(client)
 }
 
 async function onSelectStoredAccount(account) {

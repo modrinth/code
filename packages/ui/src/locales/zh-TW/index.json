@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "繼續"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "已複製到剪貼簿"
+  },
   "button.copy-filename": {
     "defaultMessage": "複製檔案名稱"
   },
@@ -612,7 +615,7 @@
     "defaultMessage": "正在安裝內容..."
   },
   "content.managed-card.summary.loading": {
-    "defaultMessage": "正在載入受管理內容簡介"
+    "defaultMessage": "正在載入受管理內容的摘要"
   },
   "content.managed-card.summary.no-provided-content": {
     "defaultMessage": "沒有提供內容"
@@ -741,10 +744,10 @@
     "defaultMessage": "名稱（Z-A）"
   },
   "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "最新在前"
+    "defaultMessage": "由新到舊"
   },
   "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "最舊在前"
+    "defaultMessage": "由舊到新"
   },
   "content.page-layout.sort.label": {
     "defaultMessage": "排序依據：{mode}"
@@ -1290,7 +1293,7 @@
     "defaultMessage": "原始專案"
   },
   "external-files.permissions-card.proof-image-alt": {
-    "defaultMessage": "擷圖證明 {n}"
+    "defaultMessage": "證明擷圖 {n}"
   },
   "external-files.permissions-card.proof-images-label": {
     "defaultMessage": "證明圖片："
@@ -1401,16 +1404,37 @@
     "defaultMessage": "檔案將被覆寫"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "建立 {type}"
+    "defaultMessage": "建立{type}"
   },
   "files.create-modal.header": {
-    "defaultMessage": "建立一個 {type}"
+    "defaultMessage": "建立{type}"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "例如：my-folder"
   },
   "files.create-modal.placeholder-file": {
     "defaultMessage": "例如：config.yml"
+  },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "已存在同名檔案。"
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "無法確認這個檔案是否已存在。"
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "建立 ZIP"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "建立 ZIP"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "壓縮檔名稱必須是單一檔案名稱。"
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "壓縮檔名稱"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "請輸入壓縮檔名稱。"
   },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "即將刪除「{name}」"
@@ -1523,6 +1547,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "作業進行中，已停用檔案操作功能。"
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "建立 ZIP"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "執行模擬測試時發生錯誤"
   },
@@ -1545,7 +1572,7 @@
     "defaultMessage": "解壓縮已開始"
   },
   "files.layout.selected-count": {
-    "defaultMessage": "已選擇 {count} 個"
+    "defaultMessage": "已選取 {count} 個"
   },
   "files.layout.unsaved-changes": {
     "defaultMessage": "您有未儲存的變更"
@@ -1604,6 +1631,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "從 .zip 網址上傳"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "已壓縮 {progress}%"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "正在建立 {source}"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "已完成建立 {source}"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "無法建立 {source}"
+  },
   "files.operations.current-file": {
     "defaultMessage": "目前檔案：{file}"
   },
@@ -1627,6 +1666,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "新名稱"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "建立 ZIP"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, other {# 個項目}}"
@@ -1689,7 +1731,7 @@
     "defaultMessage": "將{type}拖曳至此處上傳"
   },
   "files.validation.name-invalid-directory": {
-    "defaultMessage": "名稱只能包含英數字、破折號、底線或空格"
+    "defaultMessage": "名稱只能包含英數字、連字號、底線或空格。"
   },
   "files.validation.name-invalid-file": {
     "defaultMessage": "名稱只能包含英數字、破折號、底線、點或空格"
@@ -2017,6 +2059,108 @@
   },
   "icon-select.select": {
     "defaultMessage": "選擇圖示"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "關閉"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "編輯"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "色彩"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} 像素"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "重設裁切"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "刪除選取的註解"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "區域"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "物件"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "橡皮擦模式"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "圖片編輯工具"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "更多儲存選項"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "覆寫"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "重做"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "儲存副本"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "儲存圖片"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "大小"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "箭頭"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "遮蓋"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "裁切"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "橢圓形"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "橡皮擦"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "螢光筆"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "筆"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "矩形"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "選取"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "文字"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "復原"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "大小"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "合適大小"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "調整成工作區大小"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "放大"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "縮小"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "下一張圖片"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "上一張圖片"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "搜尋版本..."
@@ -2609,6 +2753,9 @@
   "label.yes": {
     "defaultMessage": "是"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "正在切換帳號..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "捷克文"
   },
@@ -3000,7 +3147,7 @@
     "defaultMessage": "Amazon Pay"
   },
   "payment-method.amex": {
-    "defaultMessage": "美國運通"
+    "defaultMessage": "American Express"
   },
   "payment-method.card_display": {
     "defaultMessage": "{card_brand}（末四碼 {last_four}）"
@@ -3015,7 +3162,7 @@
     "defaultMessage": "慈善機構"
   },
   "payment-method.diners": {
-    "defaultMessage": "大來卡"
+    "defaultMessage": "Diners Club"
   },
   "payment-method.discover": {
     "defaultMessage": "Discover"
@@ -3033,7 +3180,7 @@
     "defaultMessage": "JCB"
   },
   "payment-method.mastercard": {
-    "defaultMessage": "萬事達卡"
+    "defaultMessage": "Mastercard"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -3112,6 +3259,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "設為聯盟行銷夥伴"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "查看共用實例"
   },
   "profile.button.unblock": {
     "defaultMessage": "解除封鎖"
@@ -4010,6 +4160,12 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.channel": {
+    "defaultMessage": "更新通道"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "已選取 {count, number} 項"
+  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "切換篩選 {filter}"
   },
@@ -4086,7 +4242,7 @@
     "defaultMessage": "揭露資訊缺失或不正確"
   },
   "report.type.name-squatting": {
-    "defaultMessage": "名稱佔用"
+    "defaultMessage": "名稱搶占"
   },
   "report.type.spam": {
     "defaultMessage": "垃圾內容"
@@ -5000,6 +5156,12 @@
   "servers.busy.installing": {
     "defaultMessage": "正在安裝伺服器"
   },
+  "servers.files.zip-created": {
+    "defaultMessage": "已建立 ZIP"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "已建立 {destination}"
+  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "同時傳送好友邀請"
   },
@@ -5146,9 +5308,6 @@
   },
   "servers.listing.copy-id-label": {
     "defaultMessage": "複製 ID"
-  },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "下載最新備份"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "管理帳務"
@@ -5396,6 +5555,9 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "立即開始"
   },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "搭載 AMD Ryzen 7950X、9950X 或同等級的 CPU，搭配 DDR5 記憶體。"
+  },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "大型"
   },
@@ -5512,6 +5674,27 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "會發生什麼事？"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "輪替憑證"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "請稍後再試。"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "無法輪替 SFTP 憑證"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "原有的使用者名稱和密碼將失效。"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "輪替憑證"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "你的 SFTP 使用者名稱和密碼已重新產生。"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "已輪替 SFTP 憑證"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "安裝時發生非預期的錯誤。請稍後再試。"
@@ -5634,7 +5817,7 @@
     "defaultMessage": "進階繪製"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "defaultMessage": "在新分頁中開啟 Modrinth 的外部連結。這項設定僅適用於外部連結，內部連結和 Markdown 說明中的連結仍會在同一個分頁中開啟，而廣告和編輯頁面的連結會在新分頁中開啟。"
+    "defaultMessage": "在新分頁中開啟 Modrinth 的外部連結。這項設定僅適用於外部連結，內部連結和 Markdown 描述中的連結仍會在同一個分頁中開啟，而廣告和編輯頁面的連結會在新分頁中開啟。"
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "defaultMessage": "在新分頁中開啟外部連結"
@@ -5700,13 +5883,13 @@
     "defaultMessage": "搜尋結果"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Modrinth App 在這個語言的翻譯完成度為 {percentage}%。"
+    "defaultMessage": "Modrinth App 在這個語言的翻譯完成度約為 {percentage}%。"
   },
   "settings.language.coverage.label": {
     "defaultMessage": "翻譯完成度 {percentage}%"
   },
   "settings.language.coverage.website-tooltip": {
-    "defaultMessage": "本網站在這個語言的翻譯完成度為 {percentage}%。"
+    "defaultMessage": "本網站在這個語言的翻譯完成度約為 {percentage}%。"
   },
   "settings.language.description": {
     "defaultMessage": "選擇你偏好的{platform}語言。翻譯由 <crowdin-link>Crowdin</crowdin-link> 上的志願者所貢獻。"
@@ -5928,7 +6111,7 @@
     "defaultMessage": "邀請"
   },
   "sharing.invite-players-modal.invite-expiry-description": {
-    "defaultMessage": "你的邀請連結會在 {duration} 後過期。"
+    "defaultMessage": "你的邀請連結會在 {duration}後過期。"
   },
   "sharing.invite-players-modal.invite-link-heading": {
     "defaultMessage": "或者，使用邀請連結"
@@ -6659,6 +6842,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth 團隊"
   },
+  "user.role.moderator": {
+    "defaultMessage": "內容管理員"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Modrinth 團隊"
+  },
   "version.content.name": {
     "defaultMessage": "名稱"
   },
@@ -6669,7 +6858,7 @@
     "defaultMessage": "開發用 jar"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
+    "defaultMessage": "Javadocs jar"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "可選資源包"
@@ -6684,7 +6873,7 @@
     "defaultMessage": "簽署檔案"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "原始碼 jar"
+    "defaultMessage": "Sources jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "其他"
@@ -6726,7 +6915,7 @@
     "defaultMessage": "已知不相容"
   },
   "version.section.no-changes": {
-    "defaultMessage": "未提供變更日誌。"
+    "defaultMessage": "未提供更新日誌。"
   },
   "version.section.no-modpack-mod-loader": {
     "defaultMessage": "無模組載入器"
@@ -6750,3 +6939,4 @@
     "defaultMessage": "類型"
   }
 }
+

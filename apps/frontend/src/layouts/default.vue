@@ -1533,7 +1533,7 @@ watch(
 )
 
 async function logoutUser() {
-	await switchToSignedOut()
+	await switchToSignedOut(client)
 }
 
 function runAnalytics() {

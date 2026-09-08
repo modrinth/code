@@ -389,9 +389,6 @@
   "auth.reset-password.title.long": {
     "message": "Baguhin ang iyong password"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Ilagay ang code..."
-  },
   "auth.sign-in.title": {
     "message": "Mag-sign In"
   },
@@ -1304,9 +1301,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Anong uri ng CPU pinatatakbo ang mga server ng Modrinth Hosting?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Ang mga server ng Modrinth Hosting ay pinapagana ng AMD Ryzen 7900 at 7950X3D katumbas na CPU sa 5+ GHz, pinares nang memoryang DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Saang salapi pinipresyo ito?"
   },
@@ -1636,9 +1630,6 @@
   },
   "layout.action.new-project": {
     "message": "Bagong proyekto"
-  },
-  "layout.action.new-server-project": {
-    "message": "Bagong server"
   },
   "layout.action.publish": {
     "message": "Ilathala"

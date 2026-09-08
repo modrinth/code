@@ -782,6 +782,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Fecha de nacimiento"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "No cumples con el requisito de edad para crear una cuenta en Modrinth."
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Selecciona tu fecha de nacimiento"
   },
@@ -792,7 +795,7 @@
     "message": "Se requiere la fecha de nacimiento"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "No cumples con el requisito de edad para crear una cuenta en Modrinth."
+    "message": "No puedes crear una cuenta en Modrinth a menos que tengas más de 13 años."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Código fuente relevante"
@@ -817,6 +820,30 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "Ingresa tu nombre de usuario"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Ingresa el código de 6 dígitos de tu aplicación de autenticación o uno de tus códigos de respaldo."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Autenticación de dos factores"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Continuar con clave de acceso"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "La última vez se ha iniciado sesión con {method, select, password {una contraseña} passkey {una llave de acceso} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Reautenticar"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Iniciar sesión de otra forma"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Iniciar sesión con {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} necesita ser reautenticado."
   },
   "auth.reset-password.method-choice.action": {
     "message": "Enviar correo de recuperación"
@@ -857,8 +884,11 @@
   "auth.sign-in.2fa.label": {
     "message": "Autenticación de dos factores"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Introduce el código..."
+  "auth.sign-in.add-account": {
+    "message": "Añadir una cuenta"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Elige una cuenta para usar en la aplicación de Modrinth"
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar con el correo electrónico"
@@ -874,6 +904,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Último inicio de sesión"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Te estamos devolviendo a la aplicación Modrinth. Si nada sucede, usa el botón de abajo."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Ir a Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Abrir la aplicación de Modrinth"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Has iniciado sesión"
   },
   "auth.sign-in.no-account": {
     "message": "¿No tienes una cuenta?"
@@ -1024,6 +1066,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Aprovar con respuesta"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Cerrar informe"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cerrar con respuesta"
@@ -2189,6 +2234,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Has iniciado sesión como:"
   },
+  "error.generic.401.switch-account": {
+    "message": "O cambia a otra cuenta:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "No se consiguió cambiar la cuenta. Por favor, intenta de nuevo."
+  },
   "error.generic.401.title": {
     "message": "No tienes acceso a esta página"
   },
@@ -2301,7 +2352,7 @@
     "message": "¿Qué tipo de CPU utilizan los servidores de Modrinth Hosting?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Los servidores de Modrinth Hosting funcionan con CPU equivalentes a AMD Ryzen 7900 y 7950X3D a más de 5 GHz, junto con memoria DDR5."
+    "message": "Los servidores de Modrinth Hosting funcionan con CPU equivalentes a AMD Ryzen 7900X o un equivalente a 9950X, junto con memoria DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "¿En qué moneda están los precios?"
@@ -2661,7 +2712,7 @@
     "message": "Nuevo proyecto"
   },
   "layout.action.new-server-project": {
-    "message": "Nuevo servidor"
+    "message": "Nuevo proyecto de servidor"
   },
   "layout.action.publish": {
     "message": "Publicar"
@@ -2674,6 +2725,9 @@
   },
   "layout.action.tech-review": {
     "message": "Revisión técnica"
+  },
+  "layout.action.user-lookup": {
+    "message": "Buscar usuario"
   },
   "layout.avatar.alt": {
     "message": "Tu avatar"
@@ -2870,6 +2924,9 @@
   "layout.nav.active-reports": {
     "message": "Reportes activos"
   },
+  "layout.nav.add-account": {
+    "message": "Añadir una cuenta"
+  },
   "layout.nav.discover": {
     "message": "Descubre"
   },
@@ -2900,6 +2957,9 @@
   "layout.nav.projects": {
     "message": "Proyectos"
   },
+  "layout.nav.remove-account": {
+    "message": "Eliminar cuenta"
+  },
   "layout.nav.revenue": {
     "message": "Ingresos"
   },
@@ -2908,6 +2968,12 @@
   },
   "layout.nav.search": {
     "message": "Buscar"
+  },
+  "layout.nav.switch-account": {
+    "message": "Cambiar de cuenta"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "No se consiguió cambiar la cuenta. Por favor, intenta de nuevo."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Actualizar a Modrinth+"
@@ -2947,6 +3013,9 @@
   },
   "moderation.moderate": {
     "message": "Moderar"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Reglas de Delphi"
   },
   "moderation.page.external-projects": {
     "message": "Proyectos externos"
@@ -3350,6 +3419,9 @@
   "project-member-header.success-join": {
     "message": "Te has unido al equipo del proyecto"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "¡Tu proyecto ha sido enviado para revisión!"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista de verificación para la publicación"
   },
@@ -3732,7 +3804,7 @@
     "message": "Los moderadores de contenido no pueden dar soporte a la mayoría de los problemas y los mensajes de este hilo no notifican al staff."
   },
   "project.moderation.thread.help-center-note.2": {
-    "message": "Si necesitas ayuda o tienes consultas adicionales, por favor visita el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz click en la burbuja azúl para contactar con soporte."
+    "message": "Si necesitas ayuda o tienes consultas adicionales, por favor visita el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz clic en la burbuja azúl para contactar con soporte."
   },
   "project.moderation.thread.private-description": {
     "message": "Este es un hilo de conversación con los moderadores de Modrinth. Es posible que te envíen mensajes sobre cuestiones relacionadas con este proyecto."
@@ -3766,6 +3838,12 @@
   },
   "project.notification.icon-updated.title": {
     "message": "Ícono del proyecto actualizado"
+  },
+  "project.notification.review-save-failed.description": {
+    "message": "No puedes guardar ediciones en tu proyecto que resulten en una validación fallida."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Error al guardar el proyecto en la revisión"
   },
   "project.notification.updated.message": {
     "message": "Tu proyecto ha sido actualizado."
@@ -4007,6 +4085,12 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Ya tienes otro enlace de {platform}."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Por favor, seleccione una plataforma para este enlace de donación."
+  },
   "project.settings.monetization.description": {
     "message": "Los proyectos en Modrinth están inscritos automáticamente en el <rewards-program-link>Rewards Program</rewards-program-link>. Si usted no quiere (o no puede por razones legales) obtener ingresos de este proyecto, puede desactivarlo aquí."
   },
@@ -4210,6 +4294,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Sube versiones antes de añadir etiquetas"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Sugerencias:"
   },
   "project.versions.copy-id-option": {
     "message": "Copiar ID"
@@ -4928,9 +5015,6 @@
   "settings.account.two-factor.field.code.label": {
     "message": "Introduce el código de verificación en dos pasos"
   },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Introduce el código..."
-  },
   "settings.account.two-factor.setup.intro": {
     "message": "La verificación en dos pasos mantiene tu cuenta segura al requerir acceso a un segundo dispositivo para iniciar sesión."
   },
@@ -5173,6 +5257,9 @@
   },
   "settings.billing.plan.title": {
     "message": "Plan {size}"
+  },
+  "settings.billing.price.includes-tax": {
+    "message": "Incluye impuestos de {amount}"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"

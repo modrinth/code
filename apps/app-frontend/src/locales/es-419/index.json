@@ -159,19 +159,13 @@
     "message": "Inicio"
   },
   "app.appearance-settings.default-landing-page.library": {
-    "message": "Librería"
+    "message": "Biblioteca"
   },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Esconde tu nombre de usuario encima de tu personaje en la página del selector de Skin."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar etiqueta de nombre"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Muestra los mundos recientes en la sección \"Jugar\" en la página de inicio."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Jugar en mundos o instancias"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimiza la app de Modrinth al iniciar Minecraft."
@@ -260,6 +254,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Esconder los ya instalados"
   },
+  "app.browse.project-actions.label": {
+    "message": "Acciones del proyecto"
+  },
   "app.browse.project-type.data-packs": {
     "message": "Data Packs"
   },
@@ -287,6 +284,9 @@
   "app.content-install.no-compatible-versions": {
     "message": "No hay versiones disponibles que coincidan con {compatibilityLabel}. Selecciona una versión para instalarla de todas formas. Las dependencias no se instalarán automáticamente."
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Abrir la carpeta de respaldos"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Introduce la descripción del modpack..."
   },
@@ -313,6 +313,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Acciones de instancia"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "Esta instancia ha sido bloqueada"
@@ -349,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Se requiere actualizar la aplicación de Modrinth"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "Error al aplicar iconos aleatorios a las instancias."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "Otorgado ícono aleatorio para {num, plural, one {# instancia} other {# instancias}}."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "Nuevo en esta actualización"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "Cerrar"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Crea íconos personalizados para tus instancias directamente en la aplicación de Modrinth. ¡Mezcla y empareja fondos con símbolos de Minecraft y mods populares!"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "{count, plural, one {# instancia no tiene ícono} other {# instancias no tienen íconos}} todavía. ¿Quieres que le demos a {count, plural, one {este} other {ellos}} un estilo aleatorio para empezar?"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "Dar íconos aleatorios"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "Omitir"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "Editor de íconos personalizados"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "Cerrar"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "¡Personaliza tus instancias!"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "Descartar"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "Nuevo editor de íconos"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "Ver actualización"
   },
   "app.install.phase.downloading_content": {
     "message": "Descargando contenido"
@@ -463,6 +424,9 @@
   },
   "app.instance.action.stop": {
     "message": "Detener"
+  },
+  "app.instance.actions.label": {
+    "message": "Acciones de instancia"
   },
   "app.instance.add-server.add": {
     "message": "Añadir"
@@ -746,6 +710,9 @@
   "app.instance.tab.logs": {
     "message": "Registros"
   },
+  "app.instance.tab.screenshots": {
+    "message": "Screenshots"
+  },
   "app.instance.tab.share": {
     "message": "Compartir"
   },
@@ -851,6 +818,9 @@
   "app.java-selector.test-installation": {
     "message": "Probar instalación de Java"
   },
+  "app.library.actions.label": {
+    "message": "Acciones de la Biblioteca"
+  },
   "app.library.context-menu.create-instance": {
     "message": "Crear instancia"
   },
@@ -898,6 +868,9 @@
   },
   "app.library.group-by.none": {
     "message": "Sin agrupar"
+  },
+  "app.library.group.actions.label": {
+    "message": "Acciones de grupo"
   },
   "app.library.group.collapse": {
     "message": "Contraer grupo"
@@ -1021,6 +994,9 @@
   },
   "app.library.instance.action.view-instance": {
     "message": "Ver instancia"
+  },
+  "app.library.instance.actions.label": {
+    "message": "Acciones de instancia"
   },
   "app.library.instance.deselect": {
     "message": "Deseleccionar instancia"
@@ -1217,11 +1193,17 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Se necesita una actualización para jugar en {name}. Por favor actualiza a a la versión más reciente para iniciar el juego."
   },
+  "app.nav.add-account": {
+    "message": "Añadir una cuenta"
+  },
   "app.nav.create-new-instance": {
     "message": "Crear una instancia nueva"
   },
   "app.nav.home": {
     "message": "Inicio"
+  },
+  "app.nav.loading-profile": {
+    "message": "Cargando perfil..."
   },
   "app.nav.modrinth-account": {
     "message": "Cuenta Modrinth"
@@ -1229,11 +1211,23 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
+  "app.nav.remove-account": {
+    "message": "Eliminar cuenta"
+  },
+  "app.nav.screenshots": {
+    "message": "Screenshots"
+  },
   "app.nav.sign-in-to-modrinth-account": {
-    "message": "Inicia sesión con una cuenta Modrinth"
+    "message": "Inicia sesión en Modrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "Cambiar de cuenta"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Mejorar a Modrinth+"
+  },
+  "app.nav.view-profile": {
+    "message": "Ver perfil"
   },
   "app.navigation.go-back": {
     "message": "Volver"
@@ -1255,6 +1249,9 @@
   },
   "app.notification.warning": {
     "message": "Advertencia"
+  },
+  "app.project.actions.label": {
+    "message": "Acciones del proyecto"
   },
   "app.project.coming-soon": {
     "message": "Próximamente"
@@ -1298,14 +1295,176 @@
   "app.project.versions.already-installed": {
     "message": "Ya instalado"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "Acciones de instancia"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "Arrastra para mostrar las instancias recientes"
   },
   "app.quick-instance-switcher.drag-tooltip": {
     "message": "Arrastra para cambiar el tamaño"
   },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "Esta instancia ha sido bloqueada"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "Ver instancia"
+  },
   "app.restarting": {
     "message": "Reiniciando..."
+  },
+  "app.screenshots.copied": {
+    "message": "Copiado"
+  },
+  "app.screenshots.copy": {
+    "message": "Copiar imagen"
+  },
+  "app.screenshots.delete-description": {
+    "message": "¿Eliminar permanentemente {name}? Esta acción no se puede deshacer."
+  },
+  "app.screenshots.delete-success": {
+    "message": "Screenshot eliminada"
+  },
+  "app.screenshots.delete-title": {
+    "message": "Eliminar screenshot"
+  },
+  "app.screenshots.deselect": {
+    "message": "Deseleccionar {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "Editar screenshot"
+  },
+  "app.screenshots.empty-description": {
+    "message": "Las screenshots que sacas en el juego aparecerán aquí."
+  },
+  "app.screenshots.empty-heading": {
+    "message": "Aún no hay screenshots"
+  },
+  "app.screenshots.error-heading": {
+    "message": "No se pudieron cargar las screenshots"
+  },
+  "app.screenshots.go-to-instance": {
+    "message": "Ir a la instancia"
+  },
+  "app.screenshots.group-by": {
+    "message": "Agrupar por"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "Todas las screenshots"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "Contraer grupo"
+  },
+  "app.screenshots.group.custom": {
+    "message": "Grupo personalizado"
+  },
+  "app.screenshots.group.date": {
+    "message": "Fecha"
+  },
+  "app.screenshots.group.delete": {
+    "message": "Eliminar grupo"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "Las screenshots de este grupo serán desagrupadas."
+  },
+  "app.screenshots.group.edit": {
+    "message": "Editar nombre del grupo"
+  },
+  "app.screenshots.group.empty": {
+    "message": "Arrastra y suelta para añadir screenshots."
+  },
+  "app.screenshots.group.expand": {
+    "message": "Expander grupo"
+  },
+  "app.screenshots.group.instance": {
+    "message": "Instancia"
+  },
+  "app.screenshots.group.new": {
+    "message": "Nuevo grupo"
+  },
+  "app.screenshots.group.none": {
+    "message": "Sin agrupar"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "Este mes"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "Está semana"
+  },
+  "app.screenshots.group.today": {
+    "message": "Hoy"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "Desagrupado"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "Ayer"
+  },
+  "app.screenshots.heading": {
+    "message": "Screenshots"
+  },
+  "app.screenshots.more-actions": {
+    "message": "Más acciones"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "Intenta otra búsqueda o filtro."
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "No hay screenshots que coincidan"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "Buscar"
+  },
+  "app.screenshots.select": {
+    "message": "Seleccionar {name}"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "Screenshots seleccionadas"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "¿Eliminar {count, plural, one {la screenshot} other {las # screenshots}}? Está acción no se puede deshacer."
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural, one {Screenshot eliminada} other {# screenshots eliminadas}}"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "Eliminar screenshots seleccionadas"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "Exportar a ZIP"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Screenshots de Modrinth.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "Screenshots de {instance}.zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "Eliminar del grupo"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "{count} seleccionado(s)"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "Archivo ZIP"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "Mostrar en carpeta"
+  },
+  "app.screenshots.sort-by": {
+    "message": "Ordenar por"
+  },
+  "app.screenshots.sort.name": {
+    "message": "Nombre"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "Más recientes"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "Más antiguos"
   },
   "app.settings.app-version": {
     "message": "App de Modrinth {version}"
@@ -1334,6 +1493,9 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Largo"
   },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Java y memoria"
+  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Los argumentos dados a Java al iniciar una instancia."
   },
@@ -1342,6 +1504,9 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argumentos de Java"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "Hooks de lanzamiento"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "La memoria máxima disponible para cada instancia."
@@ -1375,6 +1540,9 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Ancho"
+  },
+  "app.settings.default-instance-options.window.title": {
+    "message": "Ventana"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Envuelven al proceso iniciador de Minecraft para añadir funcionalidades o configuraciones."
@@ -1472,6 +1640,60 @@
   "app.settings.sidebar.label.instances": {
     "message": "Instancias"
   },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "Elige la instancia cuyo historial de comandos se vuelva la copia compartida."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "Elige la instancia cuyas hotbars del creativo guardadas se vuelvan las copias compartidas."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "Elige la instancia cuyos servers multiplayers se vuelvan las copias compartidas."
+  },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "No se encontraron instancias"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "Buscar instancia"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "Sincronizar"
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "Sincronizar historial de comandos"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "Usar el mismo historial de comando entre todas tus instancias."
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "Editar historial de comandos"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "Sincronizar hotbars del creativo guardadas"
+  },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "Usa las mismas hotbars del creativo a través de tus instancias."
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "Sincronizar servers multiplayer"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "Dirección del server"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "Ten los mismos servers multiplayer a través de todas tus intancias."
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "Editar servers sincronizados"
+  },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "No hay server añadidos por el usuario sincronizados."
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "Nombre del server"
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "No hay servers sincronizados aún"
+  },
   "app.settings.tabs.appearance": {
     "message": "Apariencia"
   },
@@ -1489,6 +1711,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "Ajustes sincronizados"
   },
   "app.sidebar.playing-as": {
     "message": "Jugando como"
@@ -1798,6 +2023,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>¡Añade amigos</link> para ver qué están jugando!"
+  },
+  "friends.friend.actions.label": {
+    "message": "Acciones de amigos"
   },
   "friends.friend.cancel-request": {
     "message": "Cancelar solicitud"
@@ -2225,6 +2453,21 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revocar invitación"
   },
+  "instance.settings.tabs.behavior.description": {
+    "message": "Elige que pestañas aparecerán en esta instancia."
+  },
+  "instance.settings.tabs.behavior.files": {
+    "message": "Mostrar pestaña de Archivos"
+  },
+  "instance.settings.tabs.behavior.screenshots": {
+    "message": "Mostrar pestaña de Screenshots"
+  },
+  "instance.settings.tabs.behavior.screenshots.required": {
+    "message": "La pestaña de Screenshots no puede ser oculta mientras la Página de screenshots global está desactivada."
+  },
+  "instance.settings.tabs.behavior.worlds": {
+    "message": "Mostrar pestaña de Mundos"
+  },
   "instance.settings.tabs.general": {
     "message": "General"
   },
@@ -2301,7 +2544,7 @@
     "message": "Selecciona el canal de actualizaciones"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Los hooks permiten que usuarios avanzados ejecuten comandos del sistema antes y despues de lanzar el juego."
+    "message": "Ejecutar comandos de sistema específicos de instancias antes y después de iniciar el juego."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-cierre"
@@ -2322,7 +2565,7 @@
     "message": "Introduce el comando pre-inicio..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Hooks de inicio del juego"
+    "message": "Hooks del juego personalizados"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Todas estas se ejecutan en el directorio de trabajo de la instancia, con las siguientes variables:"
@@ -2364,16 +2607,16 @@
     "message": "Los ajustes de instalación no están disponibles mientras esta instancia esté bloqueada."
   },
   "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Variables de entorno personalizadas"
+    "message": "Establece las variables de entorno por separado para esta instancia."
   },
   "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Argumentos personalizados de Java"
+    "message": "Establece los argumentos Java por separado para esta instancia."
   },
   "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Instalación personalizada de Java"
+    "message": "Establece una instalación de Java diferente para esta instancia."
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Asignación de memoria personalizada"
+    "message": "Establece la asignación de memoria por separado para esta instancia."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Introduce las variables de entorno..."
@@ -2382,31 +2625,82 @@
     "message": "Introduce los argumentos de Java..."
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Variables de entorno"
+    "message": "Variables de entorno personalizadas"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Argumentos de Java"
+    "message": "Argumentos Java personalizados"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Instalación de Java"
+    "message": "Instalación de Java personalizada"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Memoria asignada"
+    "message": "Asignación de memoria personalizada"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/ruta/de/java"
   },
+  "instance.settings.tabs.settings-overrides": {
+    "message": "Sincronizar anulaciones"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Compartir"
   },
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "Desincronizar historial de comandos"
+  },
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "La sincronización del historial de comandos está desactivada en los ajustes de la aplicación."
+  },
+  "instance.settings.tabs.synced-options.command-history.override-description": {
+    "message": "No sincronizar el historial de comandos de esta instancia."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "Desincronizar las hotbars del creativo guardadas"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "La sincronización de hotbars del creativo está desactivada en los ajustes de la app."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
+    "message": "No sincronizar las hotbars del creativo de esta instancia."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
+    "message": "La versión que se está reemplazando será respaldada antes de que nada cambie."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "{instance} y tu versión sincronizada tienen diferentes hoybars del creativo. Elige la que quieres usar en tus instancias."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.title": {
+    "message": "Elige hotbars del creativo"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
+    "message": "Sobreescribir otros"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
+    "message": "Usar sincronizados"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "Desincronizar servers multiplayers"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "La sincronización de los servers multijugador está desactivada en los ajustes de la app."
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
+    "message": "No sincronizar los servers multiplayers de esta instancia."
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "Administrar ajustes de sincronizacion"
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "Anula la sincronización para mantener la configuración propia de esta instancia."
+  },
   "instance.settings.tabs.window": {
-    "message": "Ventana"
+    "message": "Configuración de ventanas personalizadas"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configuración de ventana personalizada"
+    "message": "Configurar una pantalla completa y la resolución separada para esta instancia."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pantalla completa"
@@ -2492,6 +2786,9 @@
   "instance.worlds.a_minecraft_server": {
     "message": "Un servidor de Minecraft"
   },
+  "instance.worlds.actions.label": {
+    "message": "Acciones del mundo"
+  },
   "instance.worlds.cant_connect": {
     "message": "No se puede conectar al servidor"
   },
@@ -2500,6 +2797,21 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "Crear un acceso directo"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "¿Quieres mantener este servidor en otras instancias sincronizadas o eliminarlo de ellas?"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "Mantener"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "Eliminar"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "Desincronizar server"
+  },
+  "instance.worlds.desync_server": {
+    "message": "Desincronizar"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "No mostrar en la página de inicio"
@@ -2533,6 +2845,9 @@
   },
   "instance.worlds.play_instance": {
     "message": "Iniciar instancia"
+  },
+  "instance.worlds.play_world": {
+    "message": "Jugar mundo"
   },
   "instance.worlds.shortcut-created": {
     "message": "Acceso directo creado"

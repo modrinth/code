@@ -345,16 +345,16 @@ export function getServerAddress(javaServer?: { address?: string | null } | null
 
 export async function ensureManagedServerWorldExists(
 	instanceId: string,
-	serverName: string,
+	serverName: string | null,
 	serverAddress: string | null,
 ) {
-	if (!instanceId || !serverAddress) return
+	if (!instanceId || !serverName || !serverAddress) return
 	try {
-		const worlds = await get_instance_worlds(instanceId)
-		const managedWorld = resolveManagedServerWorld(worlds, serverName, serverAddress)
-		if (!managedWorld) {
-			await add_server_to_instance(instanceId, serverName, serverAddress, 'prompt')
-		}
+		await invoke('plugin:worlds|ensure_managed_server_in_instance', {
+			instanceId,
+			name: serverName,
+			address: serverAddress,
+		})
 	} catch (err) {
 		console.error('Failed to ensure managed server world exists:', err)
 	}

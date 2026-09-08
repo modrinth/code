@@ -3,28 +3,35 @@
 		class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
 	>
 		<template v-if="flow">
-			<div class="flex flex-col items-end gap-4">
-				<div class="flex flex-col gap-1.5">
+			<div class="flex flex-col gap-4" :aria-busy="twoFactorPending">
+				<div class="flex w-full flex-col gap-1.5">
 					<label for="two-factor-code">
-						<span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
-						<span class="label__description">
+						<span id="two-factor-label" class="label__title">
+							{{ formatMessage(messages.twoFactorCodeLabel) }}
+						</span>
+						<span id="two-factor-description" class="label__description">
 							{{ formatMessage(messages.twoFactorCodeDescription) }}
 						</span>
 					</label>
-					<Input
+					<TwoFactorAuthCodeInput
 						id="two-factor-code"
+						ref="twoFactorInput"
 						v-model="twoFactorCode"
-						:maxlength="11"
-						inputmode="numeric"
-						:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
-						autocomplete="one-time-code"
-						@keyup.enter="begin2FASignIn"
+						class="mx-auto mt-3"
+						allow-backup-code
+						autofocus
+						:readonly="twoFactorPending"
+						:error="twoFactorError"
+						aria-labelledby="two-factor-label"
+						:aria-describedby="
+							twoFactorError ? 'two-factor-description two-factor-error' : 'two-factor-description'
+						"
+						@complete="begin2FASignIn"
 					/>
 				</div>
-				<Button type="colored" color="brand" @click="begin2FASignIn">
-					{{ formatMessage(commonMessages.signInButton) }}
-					<RightArrowIcon />
-				</Button>
+				<Admonition v-if="twoFactorError" id="two-factor-error" type="critical" role="alert">
+					{{ formatMessage(messages.twoFactorIncorrect) }}
+				</Admonition>
 			</div>
 		</template>
 		<template v-else-if="account">
@@ -150,6 +157,7 @@ import {
 	UserKeyIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	Avatar,
 	Button,
 	ButtonLink,
@@ -165,6 +173,7 @@ import { useStorage } from '@vueuse/core'
 import type { LocationQueryValue } from 'vue-router'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+import TwoFactorAuthCodeInput from '@/components/ui/auth/TwoFactorAuthCodeInput.vue'
 import {
 	hydrateStoredAccounts,
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
@@ -227,6 +236,10 @@ const route = useNativeRoute()
 const storedAccounts = useStoredAccounts()
 
 const messages = defineMessages({
+	twoFactorIncorrect: {
+		id: 'auth.two-factor.incorrect-code',
+		defaultMessage: 'The two-factor code is incorrect. Try again or use a backup code.',
+	},
 	title: {
 		id: 'auth.reauthenticate.title',
 		defaultMessage: '{name} needs to be reauthenticated.',
@@ -247,10 +260,6 @@ const messages = defineMessages({
 	continueWithPasskey: {
 		id: 'auth.reauthenticate.continue-with-passkey',
 		defaultMessage: 'Continue with passkey',
-	},
-	twoFactorCodePlaceholder: {
-		id: 'auth.reauthenticate.2fa.placeholder',
-		defaultMessage: 'Enter code...',
 	},
 	twoFactorCodeLabel: {
 		id: 'auth.reauthenticate.2fa.label',
@@ -303,6 +312,9 @@ const pendingSignInOAuthProvider = useStorage<OAuthProviderId | StoredAccountAut
 const password = ref('')
 const captchaToken = ref('')
 const twoFactorCode = ref('')
+const twoFactorPending = ref(false)
+const twoFactorError = ref(false)
+const twoFactorInput = ref<InstanceType<typeof TwoFactorAuthCodeInput>>()
 const flow = ref('')
 const captcha = ref<{ reset?: () => void } | null>(null)
 
@@ -376,18 +388,28 @@ async function beginPasswordSignIn() {
 	stopLoading()
 }
 
-async function begin2FASignIn() {
+async function begin2FASignIn(code: string) {
+	if (twoFactorPending.value) return
+	twoFactorPending.value = true
+	twoFactorError.value = false
 	startLoading()
 	try {
 		const res = await client.labrinth.auth_v2.login2FA({
 			flow: flow.value,
-			code: twoFactorCode.value,
+			code,
 		})
 		await completeSignIn(res.session, 'password')
-	} catch (err) {
-		notifyError(err)
+	} catch {
+		twoFactorCode.value = ''
+		twoFactorError.value = true
+	} finally {
+		twoFactorPending.value = false
+		stopLoading()
+		if (twoFactorError.value) {
+			await nextTick()
+			twoFactorInput.value?.focus()
+		}
 	}
-	stopLoading()
 }
 
 async function beginPasskeySignIn() {

@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "이름표 숨기기"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "홈 화면 중 \"바로 입장\" 부분에 최근에 플레이한 세계나 인스턴스를 표시합니다."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "세계나 인스턴스로 바로 입장"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "마인크래프트가 시작되면 Modrinth 앱을 최소화 합니다."
   },
@@ -260,6 +254,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "이미 설치된 항목 숨기기"
   },
+  "app.browse.project-actions.label": {
+    "message": ""
+  },
   "app.browse.project-type.data-packs": {
     "message": "데이터팩"
   },
@@ -343,36 +340,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "Modrinth App 업데이트 필요"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "인스턴스에 무작위 아이콘을 표시하는 데 실패했습니다."
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "인스턴스 {num, plural, other {#}}개의 아이콘을 무작위로 섞었습니다."
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "이번 업데이트"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "닫기"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "Modrinth App에서 자신의 인스턴스에 사용자 지정 아이콘을 만들어 보세요. 배경을 Minecraft 및 인기 모드의 문양과 자유롭게 조합할 수 있습니다!"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "무작위 아이콘"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "건너뛰기"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "닫기"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "닫기"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "업데이트 보기"
   },
   "app.install.phase.downloading_content": {
     "message": "콘텐츠 다운로드 중"
@@ -709,6 +676,9 @@
   },
   "app.instance.tab.logs": {
     "message": "로그"
+  },
+  "app.instance.tab.screenshots": {
+    "message": "스크린샷들"
   },
   "app.instance.tab.share": {
     "message": "공유"
@@ -1171,9 +1141,6 @@
   },
   "app.nav.modrinth-hosting": {
     "message": "Modrinth 호스팅"
-  },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Modrinth 계정으로 로그인"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ 로 업그레이드"
@@ -1955,9 +1922,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "업데이트 채널 선택"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "후크 기능을 사용하면 고급 사용자가 게임 실행 전후에 특정 시스템 명령을 실행할 수 있습니다."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "종료 후"
   },
@@ -1975,9 +1939,6 @@
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "실행 전 명령어 입력..."
-  },
-  "instance.settings.tabs.hooks.title": {
-    "message": "게임 실행 후크"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "래퍼"
@@ -1997,50 +1958,20 @@
   "instance.settings.tabs.installation.locked": {
     "message": "이 인스턴스가 잠긴 상태에서는 설치 설정을 사용할 수 없습니다."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "사용자 지정 환경 변수"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "사용자 지정 Java 매개변수"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "사용자 지정 Java 설치"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "사용자 지정 메모리 할당"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "환경 변수를 입력하세요..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Java 인수를 입력하세요..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "환경 변수"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "후크"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Java 매개변수"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Java 설치"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "할당된 메모리"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
   "instance.settings.tabs.sharing": {
     "message": "공유"
-  },
-  "instance.settings.tabs.window": {
-    "message": "창"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "창 맞춤 설정"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "전체 화면"

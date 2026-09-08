@@ -16,13 +16,12 @@ use crate::state::{
     VersionV3,
 };
 use crate::util::fetch::{
-    DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
+    DownloadMeta, DownloadReason, FetchSemaphore, fetch_file_mirrors,
 };
-use async_zip::base::read::seek::ZipFileReader;
+use async_zip::tokio::read::fs::ZipFileReader;
 use dashmap::DashMap;
 use sqlx::SqlitePool;
 use std::collections::{HashMap, HashSet};
-use std::io::Cursor;
 
 #[derive(Clone, Debug)]
 struct ResolvedContentScope {
@@ -197,6 +196,30 @@ pub(crate) async fn list_content(
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
 ) -> crate::Result<Vec<ContentItem>> {
+    list_content_inner(
+        instance_id,
+        content_set_id,
+        cache_behaviour,
+        false,
+        state,
+    )
+    .await
+}
+
+pub(crate) async fn list_pack_content(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<Vec<ContentItem>> {
+    list_content_inner(instance_id, None, None, true, state).await
+}
+
+async fn list_content_inner(
+    instance_id: &str,
+    content_set_id: Option<&str>,
+    cache_behaviour: Option<CacheBehaviour>,
+    packs_only: bool,
+    state: &State,
+) -> crate::Result<Vec<ContentItem>> {
     let resolved = resolve_content_scope_with_instance(
         instance_id,
         content_set_id,
@@ -241,9 +264,14 @@ pub(crate) async fn list_content(
     } else {
         ContentFilter::All
     };
-    let files =
-        content_projects_for_scope(&resolved, cache_behaviour, state, filter)
-            .await?;
+    let files = content_projects_for_scope_inner(
+        &resolved,
+        cache_behaviour,
+        state,
+        filter,
+        packs_only,
+    )
+    .await?;
     let files = files.into_iter().collect::<Vec<_>>();
 
     content_files_to_content_items(
@@ -506,6 +534,7 @@ pub(crate) async fn dependencies_to_content_items(
                 project_type_from_api_name(&project.project_type);
 
             Some(ContentItem {
+                synced_pack: None,
                 file_name: version
                     .and_then(|version| version.files.first())
                     .map(|file| file.filename.clone())
@@ -608,7 +637,33 @@ async fn content_projects_for_scope(
     state: &State,
     filter: ContentFilter<'_>,
 ) -> crate::Result<DashMap<String, ContentFile>> {
-    let files = sync_instance_content_files(&resolved.instance, state).await?;
+    content_projects_for_scope_inner(
+        resolved,
+        cache_behaviour,
+        state,
+        filter,
+        false,
+    )
+    .await
+}
+
+async fn content_projects_for_scope_inner(
+    resolved: &ResolvedContentScope,
+    cache_behaviour: Option<CacheBehaviour>,
+    state: &State,
+    filter: ContentFilter<'_>,
+    packs_only: bool,
+) -> crate::Result<DashMap<String, ContentFile>> {
+    let mut files =
+        sync_instance_content_files(&resolved.instance, state).await?;
+    if packs_only {
+        files.retain(|file| {
+            matches!(
+                project_type_for_file(file),
+                Some(ProjectType::ResourcePack | ProjectType::DataPack),
+            )
+        });
+    }
     let entries = sqlite::content_rows::get_content_entries(
         &resolved.content_set.id,
         &state.pool,
@@ -640,15 +695,20 @@ async fn content_projects_for_scope(
         .into_iter()
         .map(|file| (file.hash.clone(), file))
         .collect::<HashMap<_, _>>();
-    let installed_channels = get_installed_update_channels(
-        &file_info_by_hash,
-        cache_behaviour,
-        &state.pool,
-        &state.api_semaphore,
-    )
-    .await?;
+    let installed_channels = if packs_only {
+        HashMap::new()
+    } else {
+        get_installed_update_channels(
+            &file_info_by_hash,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+    };
     let update_keys = files
         .iter()
+        .filter(|_| !packs_only)
         .filter(|file| file_info_by_hash.contains_key(&file.sha1))
         .filter_map(|file| {
             let project_type = project_type_for_file(file)?;
@@ -908,6 +968,7 @@ async fn content_files_to_content_items(
             });
 
             ContentItem {
+                synced_pack: None,
                 file_name: file.file_name.clone(),
                 file_path: path.clone(),
                 id: file.hash.clone(),
@@ -1341,18 +1402,18 @@ async fn get_modpack_identifiers(
         loader: content_set.loader.as_str().to_string(),
         dependent_on: Some(version_id.to_string()),
     };
-    let mrpack_bytes = fetch_mirrors(
+    let mrpack_file = fetch_file_mirrors(
         &[&primary_file.url],
         primary_file.hashes.get("sha1").map(String::as_str),
         Some(&download_meta),
         None,
         fetch_semaphore,
         pool,
+        None,
     )
     .await?;
-    let reader = Cursor::new(&mrpack_bytes);
-    let mut zip_reader =
-        ZipFileReader::with_tokio(reader).await.map_err(|_| {
+    let zip_reader =
+        ZipFileReader::new(mrpack_file.path()).await.map_err(|_| {
             crate::ErrorKind::InputError(
                 "Failed to read modpack zip".to_string(),
             )
@@ -1406,11 +1467,24 @@ async fn get_modpack_identifiers(
         })
         .collect::<Vec<_>>();
 
+    let mut buffer = vec![0_u8; 256 * 1024];
     for index in override_entries {
-        let mut file_bytes = Vec::new();
-        let mut entry_reader = zip_reader.reader_with_entry(index).await?;
-        entry_reader.read_to_end_checked(&mut file_bytes).await?;
-        hashes.push(sha1_async(bytes::Bytes::from(file_bytes)).await?);
+        let mut reader = zip_reader.reader_with_entry(index).await?;
+        let crc32 = reader.entry().crc32();
+        let mut hasher = sha1_smol::Sha1::new();
+        loop {
+            let read =
+                futures_lite::io::AsyncReadExt::read(&mut reader, &mut buffer)
+                    .await?;
+            if read == 0 {
+                break;
+            }
+            hasher.update(&buffer[..read]);
+        }
+        if reader.compute_hash() != crc32 {
+            return Err(async_zip::error::ZipError::CRC32CheckError.into());
+        }
+        hashes.push(hasher.hexdigest());
     }
 
     CachedEntry::cache_modpack_files(

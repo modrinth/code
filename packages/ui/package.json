@@ -5,6 +5,12 @@
 	"private": true,
 	"main": "./index.ts",
 	"types": "./index.ts",
+	"sideEffects": [
+		"**/*.css",
+		"**/*.scss",
+		"./src/utils/ace-theme.ts",
+		"./src/utils/ace-mode-mcfunction.ts"
+	],
 	"imports": {
 		"#ui/*": "./src/*"
 	},

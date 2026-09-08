@@ -791,9 +791,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "Data de nascimento requerida"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Não cumpres os requisitos de idade para criar uma conta no Modrinth."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Código-fonte relevante"
   },
@@ -857,8 +854,8 @@
   "auth.sign-in.2fa.label": {
     "message": "Autenticação de dois fatores"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Inserir código..."
+  "auth.sign-in.choose-account": {
+    "message": "Escolha uma conta para usar no App Modrinth"
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar com e-mail"
@@ -1997,9 +1994,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Os servidores do Modrinth Hosting utilizam que tipo de CPUs?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Os servidores Modrinth Hosting estão equipados com CPUs AMD Ryzen 7900 e equivalentes ao 7950X3D com uma frequência de 5+ GHz, juntamente com memória DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Em que moeda estão os preços?"
   },
@@ -2332,9 +2326,6 @@
   },
   "layout.action.new-project": {
     "message": "Novo projeto"
-  },
-  "layout.action.new-server-project": {
-    "message": "Novo servidor"
   },
   "layout.action.publish": {
     "message": "Publicar"
@@ -3676,9 +3667,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Autenticação de dois fatores"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Inserir código..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Autenticação de dois fatores mantém a tua conta segura ao requerer acesso a um segundo dispositivo para iniciar sessão."

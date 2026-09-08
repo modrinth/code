@@ -4961,9 +4961,6 @@
   "servers.listing.copy-id-label": {
     "defaultMessage": "Copiar ID"
   },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Baixe a cópia de segurança mais recente"
-  },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Gerenciar cobrança"
   },
@@ -6338,9 +6335,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "Dev jar"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Pacote de recursos opcional"
   },
@@ -6352,9 +6346,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "Arquivo de assinatura"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "Jar fonte"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Outro"
@@ -6420,3 +6411,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

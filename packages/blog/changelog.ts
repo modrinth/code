@@ -11,6 +11,60 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-07T18:59:17+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added a new download files button on the Manage servers page that let's you download your suspended/cancelled server's files.
+- Added file zipping functionality to the Files tab of the server panel.
+
+## Fixed
+- Fixed issue where the server panel would constantly try to reconnect if the Modrinth Hosting API was unavailable.`,
+	},
+	{
+		date: `2026-09-07T18:59:17+00:00`,
+		product: 'app',
+		version: '0.20.0',
+		body: `## Added
+- Added \`options.txt\` syncing and editing in the Modrinth App, keeping game settings consistent across Minecraft versions.
+- Added optional resource pack syncing, disabled by default, which shares packs, enabled states, and load order across participating instances.
+- Added Sync and Desync actions, status indicators, and cross-instance change warnings for resource packs in the Content tab.
+- Added per-instance sync overrides for game settings and resource packs.
+- Added an update notice explaining the expanded syncing features and letting existing users choose whether to start syncing and select a source instance.
+- Added a Features settings tab for controlling optional parts of the Modrinth App interface.
+- Added Features controls for showing the Skin selector in the sidebar, limiting Quick instances, and syncing feature settings across devices.
+
+## Changed
+- Moved the Files, Worlds, and Screenshots tab controls from individual instance settings to Features settings, where they apply to every instance.
+- Moved "Show all screenshots in sidebar" and "Show Jump in section" from Behavior settings to Features settings.
+- Improved modpack installs and updates to preserve unsynced \`options.txt\` values while reapplying synced game settings.
+- Improved resource pack syncing to skip incompatible instances and show packs whose changes are waiting to be applied.
+- Replaced the native color picker in the screenshots editor with a modrinth-styled one.
+
+## Fixed
+- Reduced excessive memory usage during startup and while idle. **If you are still encountering suspiciously high memory usage (around 500+mb) please make a GitHub issue making note of what you were doing in the app for it to get that high.**
+- Fixed high memory usage when browsing large libraries, skins, screenshots, and instance icons.
+- Fixed memory leaks after leaving the Library page, while preserving search, filters, and scroll position.
+- Fixed excessive memory usage during Minecraft installation, modpack installation, and project updates.
+- Fixed unnecessary memory usage when loading cached project and version details.
+- Fixed memory spikes when saving edited screenshots or sharing instance config files.
+- Fixed instance cards animating from incorrect positions when opening the Library page.
+- Fixed unintentional card animations when scrolling or resizing the Library page.
+- Fixed broken buttons on the "Microsoft sign-in failed" modal.`,
+	},
+	{
+		date: `2026-09-07T18:59:17+00:00`,
+		product: 'web',
+		body: `## Added
+- Tax amount is now shown on the billing page for Modrinth+ and Modrinth Hosting subscriptions
+
+## Changed
+- Polished the 2FA code input stage of the sign in flow.
+
+## Fixed
+- Fixed broken buttons on the oauth2 authorize page.
+- Fixed issue where unfollowing a project could cause the follower count to be set to 4 billion.`,
+	},
+	{
 		date: `2026-09-01T00:51:50+00:00`,
 		product: 'app',
 		version: '0.19.2',
@@ -19,7 +73,7 @@ const VERSIONS: VersionEntry[] = [
 - Added a sync source picker when enabling command history, multiplayer servers, or creative hotbars sync.
 
 ## Changed
-- Moved the global Screenshots page toggle from Synced settings into Behavior settings as "Show all screenshots together".
+- Moved the global Screenshots page toggle from Synced settings into Features settings as "Show all screenshots in sidebar".
 - Screenshots tab on instances is now independent of sync settings.
 - Redesigned the slider control used for settings such as memory allocation.
 - Removed the blur censor tool in the screenshot editor. It did not work properly and was not functional as a censor.

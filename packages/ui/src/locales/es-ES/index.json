@@ -38,6 +38,9 @@
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Usa la barra de título y los controles del sistema operativo. Requiere un reinicio de la aplicación."
   },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "Marco de ventana del sistema"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "No se han podido cargar las versiones del servidor"
   },
@@ -97,6 +100,12 @@
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferencias guardadas"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "Los filtros de este link difieren de sus exclusiones avanzadas guardadas"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Las exclusiones avanzadas son guardadas a través de sesiones. Abrir un link compartido con los filtros los anulará."
   },
   "browse.filter-results": {
     "defaultMessage": "Filtrar resultados..."
@@ -166,6 +175,9 @@
   },
   "button.continue": {
     "defaultMessage": "Continuar"
+  },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copiado al portapapeles"
   },
   "button.copy-filename": {
     "defaultMessage": "Copiar nombre del archivo"
@@ -602,8 +614,17 @@
   "content.managed-card.summary.installing": {
     "defaultMessage": "Instalando contenido..."
   },
+  "content.managed-card.summary.loading": {
+    "defaultMessage": "Cargando resumen de contenido gestionado"
+  },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "No hay contenido proporcionado"
+  },
   "content.managed-card.switch-version": {
     "defaultMessage": "Cambiar versión"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "Sincronizado {time}"
   },
   "content.managed-card.update-available": {
     "defaultMessage": "Actualización disponible"
@@ -620,8 +641,14 @@
   "content.metadata-filter.author": {
     "defaultMessage": "Autor"
   },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "Entorno"
+  },
   "content.metadata-filter.open-source": {
     "defaultMessage": "Código abierto"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "Contenido compartido"
   },
   "content.metadata-filter.source.external": {
     "defaultMessage": "Externo"
@@ -1067,6 +1094,9 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Configurar servidor"
   },
+  "empty-state.upload-versions.description": {
+    "defaultMessage": "Vuelve una vez que hayas subido tus versiones."
+  },
   "external-files.permissions-card.add-files-modal.confirm": {
     "defaultMessage": "{count, plural, one {Agregar archivo} other {Agregar archivos}}"
   },
@@ -1385,6 +1415,27 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "ej. config.yml"
   },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "Ya existe un archivo con este nombre."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "No se pudo verificar si este archivo ya existe."
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "Crear ZIP"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "Crear ZIP"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "El nombre del archivo debe ser un nombre de archivo único."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Nombre del archivo"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "El nombre no puede estar vacío, introduce un nombre."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "Eliminando \"{name}\""
   },
@@ -1496,6 +1547,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Las operaciones de archivos están deshabilitadas mientras la operación está en progreso."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "Crear ZIP"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Ocurrió un error en la ejecución de prueba"
   },
@@ -1577,6 +1631,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Subir desde una URL .zip"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "Comprimido un {progress}%"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "Creando {source}"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "Se terminó de crear {source}"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "Error al crear {source}"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Actual archivo: {file}"
   },
@@ -1600,6 +1666,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Nuevo nombre"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "Crear ZIP"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# elemento} other {# elementos}}"
@@ -1744,6 +1813,9 @@
   },
   "filter-bar.no-options": {
     "defaultMessage": "No hay opciones disponibles."
+  },
+  "filter-bar.no-search-results": {
+    "defaultMessage": "No se encontraron opciones."
   },
   "filter-bar.search-placeholder": {
     "defaultMessage": "Buscar..."
@@ -1987,6 +2059,57 @@
   },
   "icon-select.select": {
     "defaultMessage": "Seleccionar icono"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Cerrar"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Editar"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Color"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} x {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Reiniciar recorte"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Eliminar anotación seleccionada"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Área"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Elemento"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Modo borrador"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Herramientas de edición de imagen"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Más opciones de guardar"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Sobreescribir"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Rehacer"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Guardar copia"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Guardar imagen"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Tamaño"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Flecha"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Buscar versión..."
@@ -3992,14 +4115,53 @@
   "report.type.inappropriate": {
     "defaultMessage": "Inapropiado"
   },
+  "report.type.missing-disclosure": {
+    "defaultMessage": "Falta o divulgación incorrecta"
+  },
+  "report.type.name-squatting": {
+    "defaultMessage": "Suplantación de identidad"
+  },
   "report.type.spam": {
     "defaultMessage": "Spam"
   },
   "s.bg": {
     "defaultMessage": "Tarea en segundo plano ejecutándose"
   },
+  "search.filter.dependency_type.any": {
+    "defaultMessage": "Cualquier tipo de dependencia"
+  },
+  "search.filter.dependency_type.embedded": {
+    "defaultMessage": "Incrustado"
+  },
   "search.filter.dependency_type.optional": {
     "defaultMessage": "Opcional"
+  },
+  "search.filter.dependency_type.optional_or_embedded": {
+    "defaultMessage": "Opcional o incrustado"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "Requerido"
+  },
+  "search.filter.dependency_type.required_or_embedded": {
+    "defaultMessage": "Requerido o incrustado"
+  },
+  "search.filter.dependency_type.required_or_optional": {
+    "defaultMessage": "Requerido u opcional"
+  },
+  "search.filter.dependent_project": {
+    "defaultMessage": "Depende de {project}"
+  },
+  "search.filter.dependent_project.clear": {
+    "defaultMessage": "Limpiar filtro de dependencia"
+  },
+  "search.filter.dependent_project.search_placeholder": {
+    "defaultMessage": "Buscar por un proyecto..."
+  },
+  "search.filter.excluded_projects": {
+    "defaultMessage": "Incluye: {projects}"
+  },
+  "search.filter.included_content.exclude": {
+    "defaultMessage": "Excluye"
   },
   "search.filter.included_content.excluded": {
     "defaultMessage": "Excluido"
@@ -4052,11 +4214,29 @@
   "search.filter.option.sub_options.expand.tooltip": {
     "defaultMessage": "Mostrar más opciones"
   },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Exclusiones avanzadas"
+  },
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "Publicidad"
+  },
+  "search.filter_type.advanced.disclosure.ai_content": {
+    "defaultMessage": "Contenido generado por IA"
+  },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "IA {usage}"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Archivado"
+  },
+  "search.filter_type.advanced.disclosure.derivative_work": {
+    "defaultMessage": "Contenido derivado"
+  },
+  "search.filter_type.advanced.disclosure.epilepsy_triggers": {
+    "defaultMessage": "Advertencia de fotosensibilidad"
+  },
+  "search.filter_type.advanced.disclosure.paid_features": {
+    "defaultMessage": "Características de paga"
   },
   "search.filter_type.advanced.disclosure.system_interactions": {
     "defaultMessage": "Interacciones del sistema externo"
@@ -4081,6 +4261,9 @@
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "Mostrar todas las versiones"
+  },
+  "search.filter_type.included_content": {
+    "defaultMessage": "Contenido incluido"
   },
   "search.filter_type.license": {
     "defaultMessage": "Licencia"
@@ -4118,8 +4301,20 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "search.photosensitivity-warning-modal.body.1": {
+    "defaultMessage": "No podemos garantizar que todo el contenido de Modrinth haya sido etiquetado apropiadamente."
+  },
+  "search.photosensitivity-warning-modal.body.2": {
+    "defaultMessage": "Las etiquetas de contenido para los activadores de fotosensibilidad son autoasignadas por los creadores que suben su contenido a Modrinth. Estos proyectos no han pasado por ninguna prueba de seguridad."
+  },
+  "search.photosensitivity-warning-modal.body.3": {
+    "defaultMessage": "El uso de cualquier contenido en Modrinth es bajo tu propio riesgo. ¡Por favor, mantente seguro! 💚"
+  },
   "search.photosensitivity-warning-modal.dont-show-again": {
     "defaultMessage": "No mostrar esto de nuevo"
+  },
+  "search.photosensitivity-warning-modal.title": {
+    "defaultMessage": "Los resultados no están garantizados para ser seguros"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modificado"
@@ -4838,6 +5033,12 @@
   "servers.busy.installing": {
     "defaultMessage": "El servidor se está instalando"
   },
+  "servers.files.zip-created": {
+    "defaultMessage": "ZIP creado"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "Creado en {destination}"
+  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Enviar también una solicitud de amistad"
   },
@@ -4888,6 +5089,12 @@
   },
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Buscando..."
+  },
+  "servers.installing-banner.description.applying": {
+    "defaultMessage": "Aplicando los cambios de instalación..."
+  },
+  "servers.installing-banner.description.controls": {
+    "defaultMessage": "Los controles del server se desbloquearán cuando finalice la instalación."
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Instalación fallida"
@@ -4945,9 +5152,6 @@
   },
   "servers.listing.copy-id-label": {
     "defaultMessage": "Copiar ID"
-  },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Descargar último respaldo"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Gestiona facturaciones"
@@ -5311,6 +5515,27 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "¿Qué pasará?"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Rotar credenciales"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Por favor, vuelve a intentarlo más tarde."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "Error al rotar las credenciales SFTP"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "El nombre de usuario y contraseña anteriores dejarán de funcionar."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Rotar credenciales"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Su nombre de usuario y contraseña SFTP han sido regenerados."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "Credenciales SFTP rotadas"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Se ha producido un error inesperado durante la instalación. Inténtalo de nuevo más tarde."
@@ -6398,9 +6623,6 @@
   "version.file-type.dev-jar": {
     "defaultMessage": "Jar de desarrollador"
   },
-  "version.file-type.javadoc-jar": {
-    "defaultMessage": "Jar de Javadoc"
-  },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Resourse pack opcional"
   },
@@ -6412,9 +6634,6 @@
   },
   "version.file-type.signature": {
     "defaultMessage": "Archivo de firma"
-  },
-  "version.file-type.sources-jar": {
-    "defaultMessage": "Jar fuente"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Otro"

@@ -57,10 +57,7 @@ services:
         hard: -1
     healthcheck:
       test:
-        [
-          'CMD-SHELL',
-          'curl --fail http://localhost:9200/_cluster/health?wait_for_status=yellow',
-        ]
+        ['CMD-SHELL', 'curl --fail http://localhost:9200/_cluster/health?wait_for_status=yellow']
       interval: 5s
       timeout: 5s
       retries: 30
@@ -89,10 +86,7 @@ services:
         hard: -1
     healthcheck:
       test:
-        [
-          'CMD-SHELL',
-          'curl --fail http://localhost:9200/_cluster/health?wait_for_status=yellow',
-        ]
+        ['CMD-SHELL', 'curl --fail http://localhost:9200/_cluster/health?wait_for_status=yellow']
       interval: 5s
       timeout: 5s
       retries: 30
@@ -121,10 +115,7 @@ services:
         hard: -1
     healthcheck:
       test:
-        [
-          'CMD-SHELL',
-          'curl --fail http://localhost:9200/_cluster/health?wait_for_status=yellow',
-        ]
+        ['CMD-SHELL', 'curl --fail http://localhost:9200/_cluster/health?wait_for_status=yellow']
       interval: 5s
       timeout: 5s
       retries: 30
@@ -432,14 +423,7 @@ services:
     environment:
       MP_ENABLE_SPAMASSASSIN: postmark
     healthcheck:
-      test:
-        [
-          'CMD',
-          'wget',
-          '-q',
-          '-O/dev/null',
-          'http://localhost:8025/api/v1/info',
-        ]
+      test: ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:8025/api/v1/info']
       interval: 3s
       timeout: 5s
       retries: 3
@@ -526,8 +510,7 @@ services:
       LABRINTH_ENDPOINT: http://host.docker.internal:8000/_internal/delphi/ingest
       LABRINTH_ADMIN_KEY: feedbeef
     healthcheck:
-      test:
-        ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health']
+      test: ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health']
       interval: 3s
       timeout: 5s
       retries: 3

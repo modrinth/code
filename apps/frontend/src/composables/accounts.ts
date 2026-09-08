@@ -1,6 +1,7 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
 import { nextTick } from 'vue'
 
+import { useAuthState } from '@/composables/auth.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
 import type { CookieOptions } from '#app'
 import { useTheme } from '~/composables/nuxt-accessors.ts'
@@ -374,11 +375,33 @@ export const switchToStoredAccount = async (
 	return 'ready'
 }
 
-export const switchToSignedOut = async () => {
+export const switchToSignedOut = async (client: AbstractModrinthClient) => {
 	if (!import.meta.client) return
 
-	useIsSwitchingAccount().value = true
-	useAuthCookie().value = null
+	const switching = useIsSwitchingAccount()
+	if (switching.value) return
+	switching.value = true
+
+	const auth = useAuthState()
+	const authCookie = useAuthCookie()
+	const userId = auth.value.user?.id
+	const token = authCookie.value || auth.value.token
+
+	if (token) {
+		await client.labrinth.sessions_v2.delete(token).catch(() => undefined)
+	}
+
+	const local = readLocal()
+	const accounts = local.length > 0 ? local : useStoredAccounts().value
+	setAccounts(
+		accounts.map((account) =>
+			account.id === userId || (token && account.token === token)
+				? { ...account, token: '' }
+				: account,
+		),
+	)
+	authCookie.value = null
+	auth.value = { user: null, token: '' }
 	await nextTick()
 	window.location.reload()
 }
