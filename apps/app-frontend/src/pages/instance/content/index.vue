@@ -1,6 +1,6 @@
 <template>
 	<ReadyTransition :pending="loading">
-		<ContentPageLayout>
+		<ContentPageLayout :highlighted-item-id="highlightedItemId">
 			<template #modals>
 				<SyncedContentModal ref="syncedContentModal" />
 				<UnknownFileWarningModal
@@ -122,7 +122,7 @@ import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
 import SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
@@ -235,6 +235,7 @@ const appEvents = injectAppEvents()
 const { installingItems, installRevisionByInstance, installFailureRevisionByInstance } =
 	injectContentInstall()
 const router = useRouter()
+const route = useRoute()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('Mods:ContentUpdate')
 const appSettings = useAppSettings()
@@ -300,6 +301,19 @@ const mergedProjects = computed<ContentItem[]>(() => {
 	const placeholders = pending.filter((item) => !realProjectIds.has(item.project?.id))
 	return placeholders.length > 0 ? [...displayProjects, ...placeholders] : displayProjects
 })
+
+const highlightedItemId = computed(() => {
+	const path = route.query.highlight
+	if (typeof path !== 'string') return undefined
+	return mergedProjects.value.find(matchesHighlightedFile)?.file_path ?? path
+})
+
+function matchesHighlightedFile(item: ContentItem) {
+	const path = route.query.highlight
+	return (
+		typeof path === 'string' && (item.file_path === path || item.file_path === `${path}.disabled`)
+	)
+}
 
 watch(
 	() => installFailureRevisionByInstance.value.get(instance.value.id) ?? 0,
@@ -393,6 +407,20 @@ const managedContentItems = computed(() => {
 
 	return dedupeManagedContentItems([...linkedContent, ...sourcedContent])
 })
+
+const highlightedManagedItemId = computed(() =>
+	mergedProjects.value.some(matchesHighlightedFile)
+		? undefined
+		: managedContentItems.value.find(matchesHighlightedFile)?.id,
+)
+
+watch(
+	[highlightedManagedItemId, managedContentModal],
+	([id, modal]) => {
+		if (id && modal) modal.show(managedContentItems.value, id)
+	},
+	{ flush: 'post' },
+)
 
 const managedContentSummary = computed(() =>
 	modpackContentQuery.isLoading.value && modpackContentQuery.data.value === undefined

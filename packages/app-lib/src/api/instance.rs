@@ -98,11 +98,12 @@ pub use self::synced_options::game_options::{
     GameOptionEditorChoice, GameOptionEditorDefinition, GameOptionKind,
     GameOptionMappingKind, GameOptionValidationIssue, GameOptionValueState,
     GameOptionsPackSource, GameOptionsSourceCandidate, GameOptionsSourceIssue,
-    GameSettingCategory, GameSettingChange, GameSettingsEditorState,
-    SaveGameSettingsResult, UpdateGameSettingsRequest,
+    GameSettingCategory, GameSettingChange, GameSettingLocaleLabels,
+    GameSettingsEditorState, SaveGameSettingsResult, UpdateGameSettingsRequest,
     apply_launcher_overrides as apply_game_options_launcher_overrides,
     capture_pack_base as capture_game_options_pack_base,
     get_config as get_synced_game_options_config,
+    get_game_setting_locale_labels,
     get_local_config as get_local_game_options_config,
     list_sync_sources as list_game_options_sync_sources,
     preview_changes as preview_synced_game_option_changes,
@@ -112,7 +113,8 @@ pub use self::synced_options::game_options::{
     sync_before_launch as sync_game_options_before_launch,
 };
 pub(crate) use self::synced_options::game_options::{
-    shared_fullscreen_value, sync_all_participating_instances,
+    GameLocaleIndexer, queue_game_locale_index, shared_fullscreen_value,
+    start_game_locale_indexer, sync_all_participating_instances,
     update_shared_fullscreen_from_app,
 };
 pub use self::synced_options::{
