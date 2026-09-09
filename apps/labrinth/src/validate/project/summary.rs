@@ -132,7 +132,7 @@ fn requires_language_nag(
     contains_link: bool,
     has_spam: bool,
 ) -> bool {
-    is_non_english_text(project, normalized_summary)
-        && !contains_link
+    !contains_link
         && !has_spam
+        && is_non_english_text(project, normalized_summary)
 }
