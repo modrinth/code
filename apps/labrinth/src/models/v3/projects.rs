@@ -580,8 +580,9 @@ impl ProjectStatus {
             ProjectStatus::Approved => true,
             ProjectStatus::Unlisted => true,
             ProjectStatus::Private => true,
-            ProjectStatus::Draft => true,
 
+            // `draft` used to be requestable for some reason, now considered a bug.
+            ProjectStatus::Draft => false,
             // `archived` is represented by a disclosure, not a status, so it
             // can no longer be requested or set as a status.
             ProjectStatus::Archived => false,
