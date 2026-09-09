@@ -56,7 +56,10 @@ async fn open_app_db_pool(db_path: &Path) -> crate::Result<Pool<Sqlite>> {
         .create_if_missing(true);
 
     Ok(SqlitePoolOptions::new()
-        .max_connections(100)
+        .max_connections(10)
+        .min_connections(1)
+        .idle_timeout(Duration::from_secs(120))
+        .max_lifetime(None)
         .connect_with(conn_options)
         .await?)
 }

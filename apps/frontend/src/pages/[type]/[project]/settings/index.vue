@@ -22,10 +22,22 @@
 					<label for="project-name">
 						<span class="label__title">Name</span>
 					</label>
-					<Input id="project-name" v-model="name" :maxlength="2048" :disabled="!hasPermission" />
+					<Input
+						id="project-name"
+						v-model="name"
+						:maxlength="2048"
+						wrapper-class="w-full max-w-72"
+						:disabled="!hasPermission"
+					/>
+					<ValidationMessage
+						:check="nameValidation"
+						:project-field="project.name"
+						:current-field="name"
+						class="mt-2"
+					/>
 				</div>
 
-				<div>
+				<div @focusin="onSlugSuggestionFocusIn" @focusout="onSlugSuggestionFocusOut">
 					<label for="project-slug">
 						<span class="label__title">URL</span>
 					</label>
@@ -43,6 +55,12 @@
 							</span>
 						</template>
 					</Input>
+					<SlugSuggestions
+						:selected="slug"
+						:suggestions="slugSuggestions"
+						:visible="hasPermission && showSlugSuggestions"
+						@select="slug = $event"
+					/>
 				</div>
 
 				<div>
@@ -56,11 +74,12 @@
 						:disabled="!hasPermission"
 						resize="vertical"
 					/>
-					<div v-if="summaryWarning" class="my-2">
-						<SettingsInlineWarning>
-							{{ summaryWarning }}
-						</SettingsInlineWarning>
-					</div>
+					<ValidationMessage
+						:check="summaryValidation"
+						:project-field="project.summary"
+						:current-field="summary"
+						class="mt-2"
+					/>
 				</div>
 
 				<div>
@@ -100,6 +119,12 @@
 							</Button>
 						</div>
 					</div>
+					<ValidationMessage
+						:check="iconValidation"
+						:project-field="false"
+						:current-field="Boolean(icon || deletedIcon)"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Server Project Settings -->
@@ -285,6 +310,7 @@
 			:original="original"
 			:modified="modified"
 			:saving="saving"
+			:can-save="canSave"
 			@reset="resetChanges"
 			@save="handleSave"
 		/>
@@ -294,7 +320,6 @@
 
 <script setup>
 import { ImageIcon, ScaleIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
-import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
 	Button,
@@ -319,10 +344,17 @@ import {
 	usePageLeaveSafety,
 	useVIntl,
 } from '@modrinth/ui'
-import { fileIsValid, formatProjectStatus } from '@modrinth/utils'
+import { fileIsValid, formatProjectStatus, isAdmin } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
+import {
+	useProjectSlugSuggestions,
+	useSlugSuggestionVisibility,
+} from '~/composables/project-slug-suggestions'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
@@ -333,6 +365,7 @@ const { addNotification } = injectNotificationManager()
 const {
 	projectV3: project,
 	currentMember,
+	allMembers,
 	patchProjectV3,
 	patchIcon,
 	invalidate,
@@ -350,6 +383,20 @@ const formatBytes = useFormatBytes()
 const name = ref(project.value.name)
 const slug = ref(project.value.slug ?? '')
 const summary = ref(project.value.summary)
+const {
+	onFocusIn: onSlugSuggestionFocusIn,
+	onFocusOut: onSlugSuggestionFocusOut,
+	visible: showSlugSuggestions,
+} = useSlugSuggestionVisibility()
+const ownerUsername = computed(
+	() => (allMembers.value.find((member) => member.is_owner) ?? allMembers.value[0])?.user.username,
+)
+const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
+	title: name,
+	username: ownerUsername,
+	currentProjectId: () => project.value.id,
+	enabled: showSlugSuggestions,
+})
 const icon = ref(null)
 const previewImage = ref(null)
 const deletedIcon = ref(false)
@@ -389,27 +436,24 @@ const bannerFile = ref(null)
 const bannerGalleryImage = computed(() =>
 	project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME),
 )
+const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
-	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+	return (
+		isAdminUser.value || ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+	)
 })
+
+const nameValidation = useProjectNagMessages('name')
+const summaryValidation = useProjectNagMessages('summary')
+const iconValidation = useProjectNagMessages('icon')
+const canSave = computed(() => hasPermission.value)
 
 const monetizationToggleDisabled = computed(() => !hasPermission.value || isForceDemonetized.value)
 
 const hasDeletePermission = computed(() => {
 	const DELETE_PROJECT = 1 << 7
 	return ((currentMember.value?.permissions ?? 0) & DELETE_PROJECT) === DELETE_PROJECT
-})
-
-const summaryWarning = computed(() => {
-	const text = summary.value?.trim() || ''
-	const charCount = text.length
-
-	if (charCount < MIN_SUMMARY_CHARS) {
-		return `It's recommended to have a summary with at least ${MIN_SUMMARY_CHARS} characters. (${charCount}/${MIN_SUMMARY_CHARS})`
-	}
-
-	return null
 })
 
 const visibilityOptions = computed(() =>
@@ -526,8 +570,11 @@ async function updateMonetizationStatus(status) {
 }
 
 async function handleSave() {
+	if (!canSave.value) return
 	saving.value = true
 	try {
+		summary.value = summary.value.trim()
+
 		const hasPatchChanges = Object.keys(basePatchData.value).length > 0
 
 		if (hasPatchChanges) {

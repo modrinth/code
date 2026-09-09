@@ -21,6 +21,16 @@ pub struct Settings {
     pub toggle_sidebar: bool,
     pub sync_theme_across_devices: bool,
     pub sync_behavior_across_devices: bool,
+    #[serde(default = "default_true")]
+    pub sync_features_across_devices: bool,
+    #[serde(default = "default_true")]
+    pub show_files_tab_in_instances: bool,
+    #[serde(default = "default_true")]
+    pub show_worlds_tab_in_instances: bool,
+    #[serde(default)]
+    pub show_screenshots_tab_in_instances: bool,
+    #[serde(default = "default_true")]
+    pub show_skin_selector_in_sidebar: bool,
 
     pub telemetry: bool,
     pub discord_rpc: bool,
@@ -48,6 +58,10 @@ pub struct Settings {
     pub version: usize,
 }
 
+fn default_true() -> bool {
+    true
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum FeatureFlag {
@@ -56,6 +70,7 @@ pub enum FeatureFlag {
     WorldsInHome,
     ServerRamAsBytesAlwaysOn,
     AlwaysShowAppControls,
+    ShowSyncInstancesUpdateModal,
     SkipUnknownPackWarning,
     PrideFundraiser,
     ServersInApp,
@@ -92,7 +107,9 @@ impl Settings {
                 hook_pre_launch, hook_wrapper, hook_post_exit,
                 custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
                 skipped_update, pending_update_toast_for_version, auto_download_updates,
-                sync_theme_across_devices, sync_behavior_across_devices,
+				sync_theme_across_devices, sync_behavior_across_devices, sync_features_across_devices,
+				show_files_tab_in_instances, show_worlds_tab_in_instances,
+				show_screenshots_tab_in_instances, show_skin_selector_in_sidebar,
                 version
             FROM settings
             "
@@ -153,6 +170,14 @@ impl Settings {
             auto_download_updates: res.auto_download_updates.map(|x| x == 1),
             sync_theme_across_devices: res.sync_theme_across_devices == 1,
             sync_behavior_across_devices: res.sync_behavior_across_devices == 1,
+            sync_features_across_devices: res.sync_features_across_devices == 1,
+            show_files_tab_in_instances: res.show_files_tab_in_instances == 1,
+            show_worlds_tab_in_instances: res.show_worlds_tab_in_instances == 1,
+            show_screenshots_tab_in_instances: res
+                .show_screenshots_tab_in_instances
+                == 1,
+            show_skin_selector_in_sidebar: res.show_skin_selector_in_sidebar
+                == 1,
             version: res.version as usize,
         })
     }
@@ -215,8 +240,13 @@ impl Settings {
 
                 sync_theme_across_devices = $32,
                 sync_behavior_across_devices = $33,
+				sync_features_across_devices = $34,
+				show_files_tab_in_instances = $35,
+				show_worlds_tab_in_instances = $36,
+				show_screenshots_tab_in_instances = $37,
+				show_skin_selector_in_sidebar = $38,
 
-                version = $34
+				version = $39
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -251,6 +281,11 @@ impl Settings {
             self.auto_download_updates,
             self.sync_theme_across_devices,
             self.sync_behavior_across_devices,
+            self.sync_features_across_devices,
+            self.show_files_tab_in_instances,
+            self.show_worlds_tab_in_instances,
+            self.show_screenshots_tab_in_instances,
+            self.show_skin_selector_in_sidebar,
             version,
         )
         .execute(exec)

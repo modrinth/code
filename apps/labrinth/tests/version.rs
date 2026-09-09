@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::common::api_common::ApiVersion;
+use crate::common::api_common::{ApiProject, ApiVersion};
 use crate::common::database::*;
 use crate::common::dummy_data::{
     DummyProjectAlpha, DummyProjectBeta, TestFile,
@@ -88,6 +88,77 @@ async fn test_get_version() {
         let resp = api.get_version(beta_version_id, ENEMY_USER_PAT).await;
         assert_status!(&resp, StatusCode::NOT_FOUND);
     })
+    .await;
+}
+
+#[actix_rt::test]
+async fn deleting_version_in_review_that_fails_validation_rolls_back() {
+    with_test_environment(
+        None,
+        |test_env: common::environment::TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project = &test_env.dummy.project_alpha;
+
+            let response = api
+                .edit_project(
+                    &project.project_slug,
+                    json!({ "status": "processing" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let response =
+                api.remove_version(&project.version_id, USER_USER_PAT).await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let response =
+                api.get_version(&project.version_id, USER_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn rejects_duplicate_filename_when_uploading_file_to_version() {
+    with_test_environment(
+        None,
+        |test_env: common::environment::TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let version_id = &test_env.dummy.project_alpha.version_id;
+            let version_before = api
+                .get_version_deserialized_common(version_id, USER_USER_PAT)
+                .await;
+            assert_eq!(version_before.files.len(), 1);
+            let primary_before = version_before.files[0].clone();
+
+            let conflicting_file = TestFile::BasicModRandom {
+                filename: primary_before.filename.clone(),
+                bytes: TestFile::build_random_jar().bytes(),
+            };
+            let response = api
+                .upload_file_to_version(
+                    version_id,
+                    &conflicting_file,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+
+            let version_after = api
+                .get_version_deserialized_common(version_id, USER_USER_PAT)
+                .await;
+            assert_eq!(version_after.files.len(), 1);
+            let primary_after = &version_after.files[0];
+            assert_eq!(primary_after.id, primary_before.id);
+            assert_eq!(primary_after.hashes, primary_before.hashes);
+            assert_eq!(primary_after.url, primary_before.url);
+            assert_eq!(primary_after.filename, primary_before.filename);
+            assert_eq!(primary_after.primary, primary_before.primary);
+            assert_eq!(primary_after.size, primary_before.size);
+        },
+    )
     .await;
 }
 

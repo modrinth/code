@@ -1,6 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { AbstractPopupNotificationManager } from '@modrinth/ui'
-import { createContext } from '@modrinth/ui'
+import { type AbstractPopupNotificationManager, createContext } from '@modrinth/ui'
 import { type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
@@ -127,7 +126,7 @@ export function createServerInstall(opts: {
 			gameVersion,
 			loader: 'vanilla',
 			loaderVersion: null,
-			iconPath: project.icon_url ?? null,
+			iconPath: project.raw_icon_url ?? null,
 			link: {
 				type: 'server_project',
 				project_id: project.id,
@@ -248,7 +247,7 @@ export function createServerInstall(opts: {
 				project_id: contentProjectId,
 				version_id: contentVersionId,
 				title: project.title,
-				icon_url: project.icon_url,
+				icon_url: project.raw_icon_url,
 			},
 			{
 				name: project.title,

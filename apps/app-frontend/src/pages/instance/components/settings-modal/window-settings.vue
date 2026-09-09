@@ -7,7 +7,6 @@ import { get } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
-import SettingsOptionsTransition from './settings-options-transition.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -25,6 +24,13 @@ const resolution: Ref<[number, number]> = ref(
 const fullscreenSetting: Ref<boolean> = ref(
 	instance.value.force_fullscreen ?? globalSettings.force_fullscreen,
 )
+
+watch(overrideWindowSettings, (enabled) => {
+	if (!enabled) {
+		resolution.value = globalSettings.game_resolution.slice() as [number, number]
+		fullscreenSetting.value = globalSettings.force_fullscreen
+	}
+})
 
 const editInstanceObject = computed(() => {
 	if (!overrideWindowSettings.value) {
@@ -50,11 +56,11 @@ watch(
 const messages = defineMessages({
 	window: {
 		id: 'instance.settings.tabs.window',
-		defaultMessage: 'Window',
+		defaultMessage: 'Custom window settings',
 	},
 	customWindowSettings: {
 		id: 'instance.settings.tabs.window.custom-window-settings',
-		defaultMessage: 'Use custom window settings for this instance.',
+		defaultMessage: 'Configure fullscreen and launch resolution separately for this instance.',
 	},
 	fullscreen: {
 		id: 'instance.settings.tabs.window.fullscreen',
@@ -102,58 +108,56 @@ const messages = defineMessages({
 			</div>
 			<Toggle id="override-window-settings" v-model="overrideWindowSettings" />
 		</div>
-		<SettingsOptionsTransition :show="overrideWindowSettings">
-			<div class="flex flex-col gap-6 pt-6">
-				<div class="flex items-center gap-4 justify-between">
-					<div class="flex flex-col gap-1">
-						<h2 class="m-0 text-lg font-semibold text-contrast">
-							{{ formatMessage(messages.fullscreen) }}
-						</h2>
-						<p class="m-0">
-							{{ formatMessage(messages.fullscreenDescription) }}
-						</p>
-					</div>
-					<Toggle id="fullscreen" v-model="fullscreenSetting" />
+		<div class="flex flex-col gap-6 pt-6" :class="{ 'opacity-50': !overrideWindowSettings }">
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.fullscreen) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.fullscreenDescription) }}
+					</p>
 				</div>
-
-				<div class="flex items-center gap-4 justify-between">
-					<div class="flex flex-col gap-1">
-						<h2 class="m-0 text-lg font-semibold text-contrast">
-							{{ formatMessage(messages.width) }}
-						</h2>
-						<p class="m-0">
-							{{ formatMessage(messages.widthDescription) }}
-						</p>
-					</div>
-					<Input
-						id="width"
-						v-model="resolution[0]"
-						autocomplete="off"
-						:disabled="fullscreenSetting"
-						type="number"
-						:placeholder="formatMessage(messages.enterWidth)"
-					/>
-				</div>
-
-				<div class="flex items-center gap-4 justify-between">
-					<div class="flex flex-col gap-1">
-						<h2 class="m-0 text-lg font-semibold text-contrast">
-							{{ formatMessage(messages.height) }}
-						</h2>
-						<p class="m-0">
-							{{ formatMessage(messages.heightDescription) }}
-						</p>
-					</div>
-					<Input
-						id="height"
-						v-model="resolution[1]"
-						autocomplete="off"
-						:disabled="fullscreenSetting"
-						type="number"
-						:placeholder="formatMessage(messages.enterHeight)"
-					/>
-				</div>
+				<Toggle id="fullscreen" v-model="fullscreenSetting" :disabled="!overrideWindowSettings" />
 			</div>
-		</SettingsOptionsTransition>
+
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.width) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.widthDescription) }}
+					</p>
+				</div>
+				<Input
+					id="width"
+					v-model="resolution[0]"
+					autocomplete="off"
+					:disabled="!overrideWindowSettings || fullscreenSetting"
+					type="number"
+					:placeholder="formatMessage(messages.enterWidth)"
+				/>
+			</div>
+
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.height) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.heightDescription) }}
+					</p>
+				</div>
+				<Input
+					id="height"
+					v-model="resolution[1]"
+					autocomplete="off"
+					:disabled="!overrideWindowSettings || fullscreenSetting"
+					type="number"
+					:placeholder="formatMessage(messages.enterHeight)"
+				/>
+			</div>
+		</div>
 	</div>
 </template>

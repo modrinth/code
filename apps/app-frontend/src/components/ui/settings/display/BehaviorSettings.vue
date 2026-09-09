@@ -2,28 +2,37 @@
 import {
 	defineMessages,
 	injectAuth,
+	injectNotificationManager,
 	injectUserPreferences,
 	Toggle,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { inject, onBeforeUnmount, onMounted } from 'vue'
 
 import {
 	DEFAULT_FEATURE_FLAGS,
 	type FeatureFlag,
 	useAppSettings,
 } from '@/composables/use-app-settings.ts'
-import { type AppSettings, get, set } from '@/helpers/settings.ts'
+import {
+	type AppSettings,
+	appSettingsKeys,
+	appSettingsQueryOptions,
+	get,
+	set,
+} from '@/helpers/settings.ts'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
 const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()
 const auth = injectAuth()
+const { handleError } = injectNotificationManager()
 const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
+const queryClient = useQueryClient()
 
-const worldsInHomeFlag: FeatureFlag = 'worlds_in_home'
 const compactInstanceCardsFlag: FeatureFlag = 'compact_instance_cards'
 const skipNonEssentialWarningsFlag: FeatureFlag = 'skip_non_essential_warnings'
 const skipUnknownPackWarningFlag: FeatureFlag = 'skip_unknown_pack_warning'
@@ -79,15 +88,6 @@ const messages = defineMessages({
 		id: 'app.appearance-settings.toggle-sidebar.description',
 		defaultMessage: 'Hide the right sidebar by default and add a button to show or hide it.',
 	},
-	jumpBackIntoWorldsTitle: {
-		id: 'app.appearance-settings.jump-back-into-worlds.title',
-		defaultMessage: 'Jump into worlds or instances',
-	},
-	jumpBackIntoWorldsDescription: {
-		id: 'app.appearance-settings.jump-back-into-worlds.description',
-		defaultMessage:
-			'Show recently played worlds or instances in the "Jump in" section on the Home page.',
-	},
 	compactModeTitle: {
 		id: 'app.appearance-settings.compact-mode.title',
 		defaultMessage: 'Compact mode',
@@ -136,7 +136,6 @@ type BehaviorSettingsState = {
 	syncBehaviorAcrossDevices: boolean
 	minimizeApp: boolean
 	hideRightSidebar: boolean
-	showJumpIn: boolean
 	compactInstanceCards: boolean
 	showPlayTime: boolean
 	hideNametag: boolean
@@ -144,14 +143,14 @@ type BehaviorSettingsState = {
 	skipNonEssentialWarnings: boolean
 }
 
-const persistedSettings = ref(await get())
+const settingsQuery = useQuery(appSettingsQueryOptions())
+await settingsQuery.suspense()
 
 function getBehaviorSettingsState(settings: AppSettings): BehaviorSettingsState {
 	return {
 		syncBehaviorAcrossDevices: settings.sync_behavior_across_devices,
 		minimizeApp: settings.hide_on_process_start,
 		hideRightSidebar: settings.toggle_sidebar,
-		showJumpIn: settings.feature_flags[worldsInHomeFlag] ?? DEFAULT_FEATURE_FLAGS[worldsInHomeFlag],
 		compactInstanceCards:
 			settings.feature_flags[compactInstanceCardsFlag] ??
 			DEFAULT_FEATURE_FLAGS[compactInstanceCardsFlag],
@@ -168,17 +167,15 @@ function getBehaviorSettingsState(settings: AppSettings): BehaviorSettingsState 
 	}
 }
 
-const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
-	() => getBehaviorSettingsState(persistedSettings.value),
-	async () => {
-		const value = current.value
-
+const settingsMutation = useMutation({
+	mutationKey: appSettingsKeys.update,
+	scope: { id: 'app-settings' },
+	mutationFn: async (value: BehaviorSettingsState) => {
 		if (value.syncBehaviorAcrossDevices && auth.user.value) {
 			await updatePreferences({
 				behavior: {
 					minimize_app: value.minimizeApp,
 					hide_right_sidebar: value.hideRightSidebar,
-					show_jump_in: value.showJumpIn,
 					compact_instance_cards: value.compactInstanceCards,
 					show_play_time: value.showPlayTime,
 					hide_nametag: value.hideNametag,
@@ -188,15 +185,15 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 			})
 		}
 
+		const latestSettings = await get()
 		const nextSettings: AppSettings = {
-			...persistedSettings.value,
+			...latestSettings,
 			sync_behavior_across_devices: value.syncBehaviorAcrossDevices,
 			hide_on_process_start: value.minimizeApp,
 			toggle_sidebar: value.hideRightSidebar,
 			hide_nametag_skins_page: value.hideNametag,
 			feature_flags: {
-				...persistedSettings.value.feature_flags,
-				[worldsInHomeFlag]: value.showJumpIn,
+				...latestSettings.feature_flags,
 				[compactInstanceCardsFlag]: value.compactInstanceCards,
 				[showPlayTimeFlag]: value.showPlayTime,
 				[skipUnknownPackWarningFlag]: !value.warnOnUnknownModpacks,
@@ -205,16 +202,23 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 		}
 
 		await set(nextSettings)
-		persistedSettings.value = nextSettings
+		queryClient.setQueryData(appSettingsKeys.all, nextSettings)
 		appSettings.setBehaviorSyncAcrossDevices(value.syncBehaviorAcrossDevices)
 		appSettings.toggleSidebar = value.hideRightSidebar
 		appSettings.hideNametagSkinsPage = value.hideNametag
-		appSettings.featureFlags[worldsInHomeFlag] = value.showJumpIn
 		appSettings.featureFlags[compactInstanceCardsFlag] = value.compactInstanceCards
 		appSettings.featureFlags[showPlayTimeFlag] = value.showPlayTime
 		appSettings.featureFlags[skipUnknownPackWarningFlag] = !value.warnOnUnknownModpacks
 		appSettings.featureFlags[skipNonEssentialWarningsFlag] = value.skipNonEssentialWarnings
 	},
+	onMutate: () => queryClient.cancelQueries({ queryKey: appSettingsKeys.all }),
+	onError: handleError,
+	onSettled: () => queryClient.invalidateQueries({ queryKey: appSettingsKeys.all }),
+})
+
+const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
+	() => getBehaviorSettingsState(settingsQuery.data.value!),
+	() => settingsMutation.mutateAsync({ ...current.value }),
 )
 
 async function saveBehaviorSettings(): Promise<void> {
@@ -302,18 +306,6 @@ onBeforeUnmount(() => {
 			{{ formatMessage(messages.contentTitle) }}
 		</h2>
 		<div class="mt-4 flex flex-col gap-6">
-			<div class="flex items-center justify-between gap-4">
-				<div>
-					<h3 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.jumpBackIntoWorldsTitle) }}
-					</h3>
-					<p class="m-0 mt-1">
-						{{ formatMessage(messages.jumpBackIntoWorldsDescription) }}
-					</p>
-				</div>
-				<Toggle id="jump-back-into-worlds" v-model="current.showJumpIn" />
-			</div>
-
 			<div class="flex items-center justify-between gap-4">
 				<div>
 					<h3 class="m-0 text-lg font-semibold text-contrast">

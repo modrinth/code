@@ -34,11 +34,6 @@ function isOfficialModrinthHost(): boolean {
 	return host === 'modrinth.com' || host === 'www.modrinth.com' || host === 'staging.modrinth.com'
 }
 
-function isLocalhost(): boolean {
-	const host = globalThis.location?.hostname
-	return host === 'localhost' || host === '127.0.0.1' || host === '[::1]'
-}
-
 const keybinds: { [id: string]: KeybindListener } = {
 	'next-stage': {
 		keybind: 'ArrowRight',
@@ -125,27 +120,21 @@ const keybinds: { [id: string]: KeybindListener } = {
 	},
 	'open-official-site': {
 		keybind: 'Ctrl+Shift+P',
-		description: 'Open current page on production/staging',
+		description: isOfficialModrinthHost()
+			? 'Open current page on production/staging'
+			: 'Open current page on alternative host',
 		scope: 'global',
-		enabled: () => !isOfficialModrinthHost(),
+		enabled: (ctx) => !isOfficialModrinthHost() || !!ctx.alternativeUrl,
 		action: (ctx) => {
-			globalThis.open(ctx.officialUrl, '_blank', 'noopener,noreferrer')
-		},
-	},
-	'open-localhost': {
-		keybind: [],
-		description: 'Open current page on localhost',
-		scope: 'global',
-		enabled: () => !isLocalhost(),
-		action: (ctx) => {
-			globalThis.open(ctx.localhostUrl, '_blank', 'noopener,noreferrer')
+			const url = isOfficialModrinthHost() ? ctx.alternativeUrl : ctx.officialUrl
+			globalThis.open(url, '_blank', 'noopener,noreferrer')
 		},
 	},
 	'copy-official-site': {
 		keybind: 'Ctrl+Shift+O',
-		description: 'Copy production/staging URL (localhost only)',
+		description: 'Copy official URL',
 		scope: 'global',
-		enabled: () => isLocalhost(),
+		enabled: () => !isOfficialModrinthHost(),
 		action: async (ctx) => {
 			await navigator.clipboard.writeText(ctx.officialUrl)
 			const environment = ctx.officialUrl.startsWith('https://staging.modrinth.com')

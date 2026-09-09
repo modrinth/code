@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT requested.project_id AS \"project_id!: DBProjectId\"\n        FROM unnest($1::bigint[]) AS requested(project_id)\n        WHERE NOT EXISTS (\n            SELECT 1\n            FROM delphi_issue_details_with_statuses detail\n            WHERE detail.project_id = requested.project_id\n        )\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "4e30093d30c2ee3c39e6e3f2d9ffdc2ba5455d2213e06bc3e273f250ef97a525"
+}

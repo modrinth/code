@@ -1,15 +1,10 @@
 <script setup lang="ts">
-import {
-	EditIcon,
-	RefreshCwIcon,
-	RotateCounterClockwiseIcon,
-	SpinnerIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { EditIcon, RefreshCwIcon, RotateCounterClockwiseIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	NewModal,
 	Toggle,
@@ -17,19 +12,29 @@ import {
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 
+import GameSettingsModal from '@/components/ui/settings/instances/game-settings-modal/index.vue'
+import CommandHistoryModal from '@/components/ui/settings/instances/instances-synced-settings/command-history-modal.vue'
+import SyncedServersModal from '@/components/ui/settings/instances/instances-synced-settings/servers-modal.vue'
+import SyncedPacksModal from '@/components/ui/settings/instances/SyncedPacksModal.vue'
 import {
 	get_synced_option_join_preview,
 	get_synced_options_overview,
+	isSyncedOptionAvailable,
 	set_synced_option,
 	type SyncedOption,
 	type SyncedOptionJoinResolution,
 } from '@/helpers/instance'
+import {
+	gameOptionsSyncSourcesQueryOptions,
+	initializedSyncedOptionsQueryOptions,
+	syncedOptionsKeys,
+	syncedServersQueryOptions,
+} from '@/helpers/synced-options'
 import type { GameInstance } from '@/helpers/types'
 import { appSettingsModalOpenSyncedOptionsKey } from '@/providers/app-settings-modal'
 
-import { instanceKeys, screenshotKeys } from '../../query-options'
+import { instanceKeys, instanceListQueryOptions } from '../../query-options'
 import HooksSettings from './hooks-settings.vue'
 import { injectInstanceSettings } from './instance-settings-context'
 import JavaSettings from './java-settings.vue'
@@ -39,27 +44,93 @@ const { instance, closeModal } = injectInstanceSettings()
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const queryClient = useQueryClient()
-const route = useRoute()
-const router = useRouter()
 const openAppSettingsSyncedOptions = inject(appSettingsModalOpenSyncedOptionsKey, () => {})
 
+const syncedPacksModal = ref<InstanceType<typeof SyncedPacksModal>>()
+const commandHistoryModal = ref<InstanceType<typeof CommandHistoryModal>>()
+const syncedServersModal = ref<InstanceType<typeof SyncedServersModal>>()
+
 const messages = defineMessages({
+	resourcePacks: {
+		id: 'instance.settings.synced-options.resource-packs',
+		defaultMessage: 'Unsync resource packs',
+	},
+	resourcePacksDescription: {
+		id: 'instance.settings.synced-options.resource-packs.description',
+		defaultMessage: "Keep this instance's resource packs separate from synced packs.",
+	},
+	resourcePacksDisabled: {
+		id: 'instance.settings.synced-options.resource-packs.disabled',
+		defaultMessage: 'Resource pack syncing is turned off in app settings.',
+	},
+	dataPacks: {
+		id: 'instance.settings.synced-options.data-packs',
+		defaultMessage: 'Unsync data packs',
+	},
+	dataPacksDescription: {
+		id: 'instance.settings.synced-options.data-packs.description',
+		defaultMessage: "Keep this instance's data packs separate from synced packs.",
+	},
+	dataPacksDisabled: {
+		id: 'instance.settings.synced-options.data-packs.disabled',
+		defaultMessage: 'Data pack syncing is turned off in app settings.',
+	},
+	editPacks: {
+		id: 'instance.settings.synced-options.edit-packs',
+		defaultMessage: 'Edit synced packs',
+	},
+	packsOverride: {
+		id: 'instance.settings.synced-options.packs-override',
+		defaultMessage:
+			'Turn off this override to edit synced packs. Independent packs can be managed in the content tab.',
+	},
+	syncedDataOverride: {
+		id: 'instance.settings.synced-options.data-override',
+		defaultMessage: 'Turn off this override to edit synced data.',
+	},
+	noSyncedDataToEdit: {
+		id: 'app.settings.synced-options.edit.no-synced-data',
+		defaultMessage: 'Choose a sync source before editing this setting.',
+	},
+	noServersSyncedYet: {
+		id: 'app.settings.synced-options.multiplayer-servers.none-synced-yet',
+		defaultMessage: "You haven't synced any servers yet",
+	},
 	sharedSettingsDescription: {
 		id: 'instance.settings.tabs.synced-options.shared-settings.description',
-		defaultMessage:
-			'Game settings can be shared between instances. Choose what to share in app settings.',
+		defaultMessage: 'Enable an override to keep a synced setting separate for this instance.',
 	},
 	openSyncedOptions: {
 		id: 'instance.settings.tabs.synced-options.open-app-settings',
-		defaultMessage: 'Open synced settings',
+		defaultMessage: 'Manage synced settings',
+	},
+	gameSettings: {
+		id: 'instance.settings.tabs.synced-options.game-settings',
+		defaultMessage: 'Unsync game settings',
+	},
+	gameSettingsDescription: {
+		id: 'instance.settings.tabs.synced-options.game-settings.description',
+		defaultMessage: "Keep this instance's options.txt separate from the synced copy.",
+	},
+	editGameSettings: {
+		id: 'app.settings.synced-options.game-settings.button',
+		defaultMessage: 'Edit game settings',
+	},
+	noGameOptionsToEdit: {
+		id: 'app.settings.synced-options.game-settings.no-options-to-edit',
+		defaultMessage: "You haven't got any options yet to edit",
+	},
+	gameSettingsDisabled: {
+		id: 'instance.settings.tabs.synced-options.game-settings.disabled-in-app',
+		defaultMessage: 'Game settings syncing is turned off in app settings.',
 	},
 	multiplayerServers: {
 		id: 'instance.settings.tabs.synced-options.multiplayer-servers',
-		defaultMessage: 'Multiplayer servers',
+		defaultMessage: 'Unsync multiplayer servers',
 	},
 	multiplayerServersDescription: {
-		id: 'instance.settings.tabs.synced-options.multiplayer-servers.exclude-description',
-		defaultMessage: 'Exclude this instance from multiplayer server syncing.',
+		id: 'instance.settings.tabs.synced-options.multiplayer-servers.override-description',
+		defaultMessage: "Keep this instance's multiplayer servers separate from synced servers.",
 	},
 	multiplayerServersDisabled: {
 		id: 'instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app',
@@ -67,11 +138,11 @@ const messages = defineMessages({
 	},
 	commandHistory: {
 		id: 'instance.settings.tabs.synced-options.command-history',
-		defaultMessage: 'Command history',
+		defaultMessage: 'Unsync command history',
 	},
 	commandHistoryDescription: {
-		id: 'instance.settings.tabs.synced-options.command-history.exclude-description',
-		defaultMessage: 'Exclude this instance from command history syncing.',
+		id: 'instance.settings.tabs.synced-options.command-history.override-description',
+		defaultMessage: "Keep this instance's command history separate from synced command history.",
 	},
 	commandHistoryDisabled: {
 		id: 'instance.settings.tabs.synced-options.command-history.disabled-in-app',
@@ -79,27 +150,15 @@ const messages = defineMessages({
 	},
 	creativeHotbars: {
 		id: 'instance.settings.tabs.synced-options.creative-hotbars',
-		defaultMessage: 'Saved creative hotbars',
+		defaultMessage: 'Unsync saved creative hotbars',
 	},
 	creativeHotbarsDescription: {
-		id: 'instance.settings.tabs.synced-options.creative-hotbars.exclude-description',
-		defaultMessage: 'Exclude this instance from saved creative hotbar syncing.',
+		id: 'instance.settings.tabs.synced-options.creative-hotbars.override-description',
+		defaultMessage: "Keep this instance's saved creative hotbars separate from synced hotbars.",
 	},
 	creativeHotbarsDisabled: {
 		id: 'instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app',
 		defaultMessage: 'Saved creative hotbar syncing is turned off in app settings.',
-	},
-	screenshots: {
-		id: 'instance.settings.tabs.synced-options.screenshots',
-		defaultMessage: 'Screenshots',
-	},
-	screenshotsDescription: {
-		id: 'instance.settings.tabs.synced-options.screenshots.exclude-description',
-		defaultMessage: 'Exclude this instance’s screenshots from the Screenshots page.',
-	},
-	screenshotsDisabled: {
-		id: 'instance.settings.tabs.synced-options.screenshots.disabled-in-app',
-		defaultMessage: 'Screenshots are turned off in app settings.',
 	},
 	hotbarConflictTitle: {
 		id: 'instance.settings.tabs.synced-options.hotbars-conflict.title',
@@ -124,22 +183,41 @@ const messages = defineMessages({
 	},
 })
 
-const globalDisabledMessages: Record<SyncedOption, keyof typeof messages> = {
+type InstanceSyncedOption = Exclude<SyncedOption, 'screenshots'>
+
+const globalDisabledMessages: Record<InstanceSyncedOption, keyof typeof messages> = {
+	resource_packs: 'resourcePacksDisabled',
+	data_packs: 'dataPacksDisabled',
+	game_options: 'gameSettingsDisabled',
 	multiplayer_servers: 'multiplayerServersDisabled',
 	command_history: 'commandHistoryDisabled',
 	creative_hotbars: 'creativeHotbarsDisabled',
-	screenshots: 'screenshotsDisabled',
 }
 
 const rows: Array<{
-	option: SyncedOption
+	option: InstanceSyncedOption
 	title: keyof typeof messages
 	description?: keyof typeof messages
 }> = [
 	{
+		option: 'game_options',
+		title: 'gameSettings',
+		description: 'gameSettingsDescription',
+	},
+	{
 		option: 'multiplayer_servers',
 		title: 'multiplayerServers',
 		description: 'multiplayerServersDescription',
+	},
+	{
+		option: 'resource_packs',
+		title: 'resourcePacks',
+		description: 'resourcePacksDescription',
+	},
+	{
+		option: 'data_packs',
+		title: 'dataPacks',
+		description: 'dataPacksDescription',
 	},
 	{
 		option: 'command_history',
@@ -151,12 +229,9 @@ const rows: Array<{
 		title: 'creativeHotbars',
 		description: 'creativeHotbarsDescription',
 	},
-	{
-		option: 'screenshots',
-		title: 'screenshots',
-		description: 'screenshotsDescription',
-	},
 ]
+
+const availableRows = rows.filter((row) => isSyncedOptionAvailable(row.option))
 
 const overviewQuery = useQuery(
 	computed(() => ({
@@ -164,6 +239,10 @@ const overviewQuery = useQuery(
 		queryFn: () => get_synced_options_overview(instance.value.id),
 	})),
 )
+const initializedOptionsQuery = useQuery(initializedSyncedOptionsQueryOptions())
+const syncedServersQuery = useQuery(syncedServersQueryOptions())
+const instancesQuery = useQuery(instanceListQueryOptions())
+const gameOptionSourcesQuery = useQuery(gameOptionsSyncSourcesQueryOptions())
 
 const capabilities = computed(
 	() =>
@@ -172,74 +251,211 @@ const capabilities = computed(
 				[],
 		),
 )
+const gameSettingsModal = ref<InstanceType<typeof GameSettingsModal> | null>(null)
 const hotbarResolutionModal = ref<InstanceType<typeof NewModal> | null>(null)
-const previewingOption = ref<SyncedOption | null>(null)
+const previewingOption = ref<InstanceSyncedOption | null>(null)
+const previewExcluded = ref<Partial<Record<InstanceSyncedOption, boolean>>>({})
 
-function excluded(option: SyncedOption): boolean {
+const gameSettingsInstanceId = computed(() =>
+	overviewQuery.data.value?.global_options.game_options && enabled('game_options')
+		? undefined
+		: instance.value.id,
+)
+const eligibleGameOptionSourceIds = computed(
+	() =>
+		new Set(
+			(gameOptionSourcesQuery.data.value ?? [])
+				.filter((source) => source.eligible)
+				.map((source) => source.source_id),
+		),
+)
+const hasSyncedGameOptionsToEdit = computed(
+	() =>
+		initializedOptionsQuery.data.value?.game_options === true ||
+		(instancesQuery.data.value ?? []).some(
+			(candidate) =>
+				candidate.synced_options.game_options &&
+				eligibleGameOptionSourceIds.value.has(candidate.id),
+		),
+)
+const hasGameOptionsToEdit = computed(() =>
+	gameSettingsInstanceId.value
+		? eligibleGameOptionSourceIds.value.has(gameSettingsInstanceId.value)
+		: hasSyncedGameOptionsToEdit.value,
+)
+const gameOptionsAvailabilityPending = computed(
+	() =>
+		gameOptionSourcesQuery.isPending.value ||
+		(gameSettingsInstanceId.value === undefined &&
+			(initializedOptionsQuery.isPending.value || instancesQuery.isPending.value)),
+)
+const gameSettingsTooltip = computed(() =>
+	!gameOptionsAvailabilityPending.value && !hasGameOptionsToEdit.value
+		? formatMessage(messages.noGameOptionsToEdit)
+		: formatMessage(messages.editGameSettings),
+)
+
+function excluded(option: InstanceSyncedOption): boolean {
+	const preview = previewExcluded.value[option]
+	if (preview !== undefined) return preview
+
 	return (
 		overviewQuery.data.value?.global_options[option] === true &&
 		!instance.value.synced_options[option]
 	)
 }
 
-function disabledReason(option: SyncedOption): string | undefined {
+function enabled(option: InstanceSyncedOption): boolean {
+	return instance.value.synced_options[option]
+}
+
+function setPreviewExcluded(option: InstanceSyncedOption, value?: boolean) {
+	if (value === undefined) {
+		const { [option]: _, ...next } = previewExcluded.value
+		previewExcluded.value = next
+	} else {
+		previewExcluded.value = { ...previewExcluded.value, [option]: value }
+	}
+}
+
+function disabledReason(option: InstanceSyncedOption): string | undefined {
 	if (overviewQuery.data.value?.global_options[option] === false) {
 		return formatMessage(messages[globalDisabledMessages[option]])
 	}
 	return capabilities.value.get(option)?.disabled_reason ?? undefined
 }
 
-function showAppSyncedOptions(): void {
-	closeModal?.()
-	openAppSettingsSyncedOptions()
+function syncedDataDisabledReason(
+	option: 'multiplayer_servers' | 'command_history',
+): string | undefined {
+	const reason = disabledReason(option)
+	if (reason) return reason
+	if (!enabled(option)) return formatMessage(messages.syncedDataOverride)
+	if (option === 'multiplayer_servers' && !syncedServersQuery.data.value?.length) {
+		return formatMessage(messages.noServersSyncedYet)
+	}
+	if (!initializedOptionsQuery.data.value?.[option]) {
+		return formatMessage(messages.noSyncedDataToEdit)
+	}
 }
 
+function showAppSyncedOptions(): void {
+	if (closeModal) {
+		closeModal(openAppSettingsSyncedOptions)
+	} else {
+		openAppSettingsSyncedOptions()
+	}
+}
+
+function openGameSettings(): void {
+	if (!hasGameOptionsToEdit.value || gameOptionsAvailabilityPending.value) return
+	gameSettingsModal.value?.show()
+}
+
+async function handleGameSettingsSaved(): Promise<void> {
+	await Promise.all([
+		queryClient.invalidateQueries({ queryKey: instanceKeys.all }),
+		queryClient.invalidateQueries({ queryKey: ['instance-synced-options'] }),
+		queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.initialized }),
+		queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.gameSources }),
+	])
+}
+
+type SyncedOptionMutationVariables = {
+	option: InstanceSyncedOption
+	enabled: boolean
+	resolution?: SyncedOptionJoinResolution
+}
+
+const mutationKey = ['instance-synced-options', 'set', instance.value.id] as const
 const mutation = useMutation({
-	mutationFn: ({
-		option,
-		enabled,
-		resolution,
-	}: {
-		option: SyncedOption
-		enabled: boolean
-		resolution?: SyncedOptionJoinResolution
-	}) => set_synced_option(instance.value.id, option, enabled, resolution),
-	onSuccess: async (updatedInstance, variables) => {
-		hotbarResolutionModal.value?.hide()
-		queryClient.setQueryData(instanceKeys.detail(updatedInstance.id), updatedInstance)
-		queryClient.setQueryData<GameInstance[]>(instanceKeys.list(), (instances) =>
+	mutationKey,
+	mutationFn: ({ option, enabled, resolution }: SyncedOptionMutationVariables) =>
+		set_synced_option(instance.value.id, option, enabled, resolution),
+	onMutate: async ({ option, enabled }) => {
+		const instanceId = instance.value.id
+		const detailKey = instanceKeys.detail(instanceId)
+		const listKey = instanceKeys.list()
+		await Promise.all([
+			queryClient.cancelQueries({ queryKey: detailKey }),
+			queryClient.cancelQueries({ queryKey: listKey }),
+		])
+
+		const previousEnabled = instance.value.synced_options[option]
+		const applyOption = (current: GameInstance): GameInstance => ({
+			...current,
+			synced_options: {
+				...current.synced_options,
+				[option]: enabled,
+			},
+		})
+
+		queryClient.setQueryData<GameInstance>(detailKey, (current) =>
+			applyOption(current ?? instance.value),
+		)
+		queryClient.setQueryData<GameInstance[]>(listKey, (instances) =>
 			instances?.map((candidate) =>
-				candidate.id === updatedInstance.id ? updatedInstance : candidate,
+				candidate.id === instanceId ? applyOption(candidate) : candidate,
 			),
 		)
-		await queryClient.invalidateQueries({
-			queryKey: ['instance-synced-options', updatedInstance.id],
-		})
+		setPreviewExcluded(option)
+
+		return { instanceId, previousEnabled }
+	},
+	onSuccess: () => {
+		hotbarResolutionModal.value?.hide()
+	},
+	onError: (error, { option }, context) => {
+		if (context) {
+			const rollbackOption = (current: GameInstance): GameInstance => ({
+				...current,
+				synced_options: {
+					...current.synced_options,
+					[option]: context.previousEnabled,
+				},
+			})
+			queryClient.setQueryData<GameInstance>(instanceKeys.detail(context.instanceId), (current) =>
+				current ? rollbackOption(current) : current,
+			)
+			queryClient.setQueryData<GameInstance[]>(instanceKeys.list(), (instances) =>
+				instances?.map((candidate) =>
+					candidate.id === context.instanceId ? rollbackOption(candidate) : candidate,
+				),
+			)
+		}
+		setPreviewExcluded(option)
+		handleError(error)
+	},
+	onSettled: async (_data, _error, variables) => {
+		if (variables.option === 'game_options') {
+			await queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.gameSources })
+		}
 		if (variables.option === 'multiplayer_servers') {
 			await queryClient.invalidateQueries({
-				queryKey: instanceKeys.worlds(updatedInstance.id),
+				queryKey: instanceKeys.worlds(instance.value.id),
 			})
 		}
-
-		if (variables.option === 'screenshots') {
-			await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
-			if (updatedInstance.synced_options.screenshots && route.name === 'InstanceScreenshots') {
-				await router.replace(`/instance/${encodeURIComponent(updatedInstance.id)}`)
-			} else if (!updatedInstance.synced_options.screenshots && route.name === 'Screenshots') {
-				await router.replace('/')
-			}
+		if (queryClient.isMutating({ mutationKey }) === 1) {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: instanceKeys.detail(instance.value.id) }),
+				queryClient.invalidateQueries({ queryKey: instanceKeys.list() }),
+				queryClient.invalidateQueries({
+					queryKey: ['instance-synced-options', instance.value.id],
+				}),
+			])
 		}
 	},
-	onError: handleError,
 })
 
-async function setExcluded(option: SyncedOption, nextExcluded: boolean) {
+async function setExcluded(option: InstanceSyncedOption, nextExcluded: boolean) {
+	if (!isSyncedOptionAvailable(option)) return
 	const enabled = !nextExcluded
 	if (!enabled || option !== 'creative_hotbars') {
 		mutation.mutate({ option, enabled })
 		return
 	}
 
+	setPreviewExcluded(option, nextExcluded)
 	previewingOption.value = option
 	try {
 		const preview = await get_synced_option_join_preview(instance.value.id, option)
@@ -249,10 +465,16 @@ async function setExcluded(option: SyncedOption, nextExcluded: boolean) {
 			mutation.mutate({ option, enabled })
 		}
 	} catch (error) {
+		setPreviewExcluded(option)
 		handleError(error)
 	} finally {
 		previewingOption.value = null
 	}
+}
+
+function cancelHotbarResolution() {
+	setPreviewExcluded('creative_hotbars')
+	hotbarResolutionModal.value?.hide()
 }
 
 function resolveHotbars(resolution: SyncedOptionJoinResolution) {
@@ -266,11 +488,21 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 
 <template>
 	<div class="flex flex-col gap-6">
+		<SyncedPacksModal ref="syncedPacksModal" />
+		<CommandHistoryModal ref="commandHistoryModal" />
+		<SyncedServersModal ref="syncedServersModal" />
+		<GameSettingsModal
+			ref="gameSettingsModal"
+			:instance-id="gameSettingsInstanceId"
+			@saved="handleGameSettingsSaved"
+		/>
+
 		<NewModal
 			ref="hotbarResolutionModal"
 			:header="formatMessage(messages.hotbarConflictTitle)"
 			fade="warning"
 			max-width="560px"
+			@hide="setPreviewExcluded('creative_hotbars')"
 		>
 			<div class="flex flex-col gap-3 text-primary">
 				<p class="m-0">
@@ -289,7 +521,7 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 					<Button
 						type="outlined"
 						:disabled="mutation.isPending.value"
-						@click="hotbarResolutionModal?.hide()"
+						@click="cancelHotbarResolution"
 					>
 						<XIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.cancelButton) }}
@@ -327,7 +559,11 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<div v-for="row in rows" :key="row.option" class="flex items-center justify-between gap-6">
+			<div
+				v-for="row in availableRows"
+				:key="row.option"
+				class="flex items-center justify-between gap-6"
+			>
 				<div class="flex min-w-0 flex-col gap-1">
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages[row.title]) }}
@@ -337,22 +573,85 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 					</p>
 				</div>
 				<div class="flex shrink-0 items-center gap-2">
-					<SpinnerIcon
-						v-if="
-							(mutation.isPending.value && mutation.variables.value?.option === row.option) ||
-							previewingOption === row.option
+					<span v-if="row.option === 'game_options'" v-tooltip="gameSettingsTooltip" class="flex">
+						<IconButton
+							type="outlined"
+							circular
+							:disabled="
+								mutation.isPending.value ||
+								overviewQuery.isPending.value ||
+								gameOptionsAvailabilityPending ||
+								!hasGameOptionsToEdit
+							"
+							:label="formatMessage(messages.editGameSettings)"
+							@click="openGameSettings"
+						>
+							<EditIcon />
+						</IconButton>
+					</span>
+					<span
+						v-if="row.option === 'multiplayer_servers' || row.option === 'command_history'"
+						v-tooltip="
+							syncedDataDisabledReason(row.option) ?? formatMessage(commonMessages.editButton)
 						"
-						class="size-5 animate-spin"
-					/>
+						class="flex"
+					>
+						<IconButton
+							type="outlined"
+							circular
+							:label="formatMessage(commonMessages.editButton)"
+							:disabled="
+								mutation.isPending.value ||
+								overviewQuery.isPending.value ||
+								initializedOptionsQuery.isPending.value ||
+								(row.option === 'multiplayer_servers' && syncedServersQuery.isPending.value) ||
+								!!syncedDataDisabledReason(row.option)
+							"
+							@click="
+								row.option === 'multiplayer_servers'
+									? syncedServersModal?.show()
+									: commandHistoryModal?.show()
+							"
+						>
+							<EditIcon aria-hidden="true" />
+						</IconButton>
+					</span>
+					<span
+						v-if="row.option === 'resource_packs' || row.option === 'data_packs'"
+						v-tooltip="
+							disabledReason(row.option) ??
+							formatMessage(enabled(row.option) ? messages.editPacks : messages.packsOverride)
+						"
+						class="flex"
+					>
+						<IconButton
+							type="outlined"
+							circular
+							:label="formatMessage(messages.editPacks)"
+							:disabled="
+								mutation.isPending.value ||
+								overviewQuery.isPending.value ||
+								!!disabledReason(row.option) ||
+								!enabled(row.option)
+							"
+							@click="
+								syncedPacksModal?.show(
+									row.option === 'resource_packs' ? 'resourcepack' : 'datapack',
+								)
+							"
+						>
+							<EditIcon />
+						</IconButton>
+					</span>
 					<span v-tooltip="disabledReason(row.option)" class="flex">
 						<Toggle
 							:id="`exclude-${row.option}`"
+							:aria-label="formatMessage(messages[row.title])"
 							:model-value="excluded(row.option)"
 							:disabled="
-								mutation.isPending.value ||
 								previewingOption !== null ||
 								overviewQuery.isPending.value ||
-								!!disabledReason(row.option)
+								(!!disabledReason(row.option) && !enabled(row.option))
 							"
 							@update:model-value="(excluded) => setExcluded(row.option, excluded)"
 						/>

@@ -91,14 +91,17 @@ const isLocalDisabled = computed(() => {
 })
 
 const BUTTON_BASE_CLASS =
-	'custom-focus-indicator flex size-8 cursor-pointer items-center justify-center border-0 border-l border-solid border-l-surface-5 bg-transparent p-0 transition-[background-color,filter] duration-150 ease-in-out first:rounded-s-[calc(var(--radius-md)-1px)] first:border-l-0 last:rounded-e-[calc(var(--radius-md)-1px)] disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-4'
+	'custom-focus-indicator flex size-8 cursor-pointer items-center justify-center border-0 border-l border-solid border-l-surface-5 p-0 transition-[background-color,filter] duration-150 ease-in-out first:rounded-s-[calc(var(--radius-md)-1px)] first:border-l-0 last:rounded-e-[calc(var(--radius-md)-1px)] disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-4'
 
 function buttonClass(decision: 'safe' | 'malware', scope: 'local' | 'global') {
+	const isSelected = selected(decision, scope)
+
 	return [
 		BUTTON_BASE_CLASS,
 		decision === 'safe' ? 'text-green' : 'text-red',
-		selected(decision, scope)
-			? 'bg-bg-green shadow-[inset_0_0_0_1px_var(--color-green)] hover:bg-bg-green focus-visible:bg-bg-green focus-visible:shadow-[inset_0_0_0_2px_var(--color-green)]'
+		isSelected && (decision === 'safe' ? 'bg-bg-green' : 'bg-bg-red'),
+		isSelected
+			? 'shadow-[inset_0_0_0_1px_currentColor] hover:bg-currentColor focus-visible:bg-currentColor focus-visible:shadow-[inset_0_0_0_2px_currentColor]'
 			: 'hover:bg-surface-4 focus-visible:bg-surface-4 focus-visible:shadow-[inset_0_0_0_2px_var(--color-brand)]',
 	]
 }

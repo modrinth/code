@@ -43,18 +43,22 @@
 				class="mt-4 flex flex-col items-stretch justify-between gap-3 px-4 pb-4 sm:flex-row sm:items-center sm:gap-2"
 			>
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-					<SplitButton
-						v-if="primaryAction === 'note' && isStaff(auth.user)"
-						type="colored"
-						color="brand"
-						menu-label="More send options"
-						:disabled="!replyBody"
-						:options="publicMessageOptions"
-						class="w-full sm:w-auto"
-						@click="sendReply(true)"
-					>
-						Add note
-					</SplitButton>
+					<template v-if="primaryAction === 'note' && isStaff(auth.user)">
+						<Button
+							type="colored"
+							color="brand"
+							:disabled="!replyBody"
+							class="w-full sm:w-auto"
+							@click="sendReply(false)"
+						>
+							<SendIcon />
+							Send publicly
+						</Button>
+						<Button :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(true)">
+							<StickyNotePlusIcon />
+							Add private note
+						</Button>
+					</template>
 					<template v-else>
 						<Button
 							v-if="sortedMessages.length > 0"
@@ -76,7 +80,7 @@
 							@click="sendReply()"
 						>
 							<SendIcon class="size-4" />
-							Send
+							Send publicly
 						</Button>
 						<Button
 							v-if="isStaff(auth.user)"
@@ -84,11 +88,13 @@
 							class="w-full sm:w-auto"
 							@click="sendReply(true)"
 						>
-							Add note
+							<StickyNotePlusIcon />
+							Add private note
 						</Button>
 					</template>
 					<TeleportOverflowMenu
 						v-if="visibleQuickReplies.length > 0"
+						type="outlined"
 						label="More options"
 						:options="visibleQuickReplies"
 						class="!w-auto !rounded-xl !px-2.5"
@@ -114,9 +120,10 @@ import {
 	MessageIcon,
 	ReplyIcon,
 	SendIcon,
+	StickyNotePlusIcon,
 } from '@modrinth/assets'
 import type { QuickReply } from '@modrinth/moderation'
-import { Button, SplitButton, TeleportOverflowMenu } from '@modrinth/ui'
+import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	type ButtonMenuOption,
 	CopyCode,
@@ -197,16 +204,6 @@ const members = computed(() => {
 })
 
 const replyBody = ref('')
-
-const publicMessageOptions = computed<ButtonMenuOption[]>(() => [
-	{
-		id: 'send-public',
-		label: 'Send publicly',
-		icon: SendIcon,
-		action: () => sendReply(false),
-		disabled: !replyBody.value,
-	},
-])
 
 function setReplyContent(content: string) {
 	replyBody.value = content

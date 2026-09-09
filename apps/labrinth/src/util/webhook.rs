@@ -353,7 +353,7 @@ pub async fn send_slack_project_webhook(
                 "elements": [
                     {
                         "type": "image",
-                        "image_url": "https://cdn-raw.modrinth.com/modrinth-new.png",
+                        "image_url": "https://cdn.modrinth.com/modrinth-new.png",
                         "alt_text": "Author"
                     },
                     {
@@ -492,7 +492,7 @@ pub async fn send_discord_webhook(
             footer: Some(DiscordEmbedFooter {
                 text: format!("{} on Modrinth", project.display_project_type),
                 icon_url: Some(
-                    "https://cdn-raw.modrinth.com/modrinth-new.png".to_string(),
+                    "https://cdn.modrinth.com/modrinth-new.png".to_string(),
                 ),
             }),
         };

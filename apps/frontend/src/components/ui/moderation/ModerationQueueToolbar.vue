@@ -18,19 +18,28 @@
 				<slot name="actions" />
 			</div>
 		</div>
-
 		<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 			<div class="flex min-w-0 flex-wrap items-center gap-3">
-				<slot name="meta" />
+				<div v-if="loading" class="h-6 w-64 animate-pulse rounded-full bg-surface-3"></div>
+				<slot v-else name="meta" />
 			</div>
 			<div class="flex shrink-0 items-center justify-end gap-2 sm:ml-auto">
-				<slot name="pagination-extra" />
-				<Pagination
-					v-if="totalPages > 1"
-					:page="page"
-					:count="totalPages"
-					@switch-page="$emit('switch-page', $event)"
-				/>
+				<div v-if="loading && !(totalPages > 1)" class="flex items-center gap-2">
+					<div
+						v-for="i in 3"
+						:key="`loading-skeleton-${i}`"
+						class="h-9 w-9 animate-pulse rounded-full bg-surface-3"
+					></div>
+				</div>
+				<template v-else>
+					<slot name="pagination-extra" />
+					<Pagination
+						v-if="totalPages > 1"
+						:page="page"
+						:count="totalPages"
+						@switch-page="$emit('switch-page', $event)"
+					/>
+				</template>
 			</div>
 		</div>
 	</div>
@@ -45,6 +54,7 @@ const query = defineModel<string>({ required: true })
 defineProps<{
 	page: number
 	totalPages: number
+	loading?: boolean
 }>()
 
 defineEmits<{

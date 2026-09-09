@@ -4,6 +4,7 @@
 			v-model="query"
 			:page="currentPage"
 			:total-pages="totalPages"
+			:loading="isLoading"
 			@search="goToPage(1)"
 			@switch-page="goToPage"
 		>
@@ -52,11 +53,11 @@
 
 				<MultiSelect
 					v-model="currentReporterOrProject"
-					:options="reporterOrProjectOptions"
+					:options="reportFilterOptions"
 					:max-height="500"
 					dropdown-min-width="360px"
 					no-options-message="no options found"
-					:searchable="reporterOrProjectOptions.length > 6"
+					:searchable="reportFilterOptions.length > 6"
 					:max-tag-rows="1"
 					fit-content
 					trigger-type="base"
@@ -85,6 +86,20 @@
 						</div>
 					</template>
 					<template #top>
+						<div
+							class="flex flex-row justify-between gap-1 border-0 border-b border-solid border-b-surface-5 py-2"
+						>
+							<div
+								v-for="section in hiddenSections"
+								:key="section.key"
+								class="flex flex-row gap-2 px-4"
+							>
+								<span class="font-semibold text-primary">
+									{{ section.key }}
+								</span>
+								<Checkbox v-model="section.enabled" />
+							</div>
+						</div>
 						<div>
 							<button
 								type="button"
@@ -165,7 +180,7 @@
 				</TeleportPopoutMenu>
 			</template>
 			<template #meta>
-				<div v-if="sortedReports.length > 0">
+				<div v-if="!isLoading && sortedReports.length > 0">
 					Showing {{ formatNumber(pageStart) }}–{{ formatNumber(pageEnd) }} of
 					{{ formatNumber(sortedReports.length) }} reports
 				</div>
@@ -207,8 +222,9 @@ import {
 	SortAscIcon,
 	SortDescIcon,
 } from '@modrinth/assets'
-import type { ExtendedReport } from '@modrinth/moderation'
+import type { ExtendedReport, OwnershipTarget } from '@modrinth/moderation'
 import {
+	Checkbox,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
@@ -466,24 +482,47 @@ watch(
 
 watch(() => route.query, readFiltersFromRoute, { deep: true })
 
+type FilterSection = {
+	key: 'project' | 'reporter' | 'target'
+	enabled: boolean
+}
+const hiddenSections = ref<FilterSection[]>([
+	{ key: 'project', enabled: true },
+	{ key: 'reporter', enabled: true },
+	{ key: 'target', enabled: true },
+])
+
 type ReportedType<T> = T & { report_item_count: number }
-const reporterOrProjectOptions = computed<MultiSelectItem<string>[]>(() => {
+const reportFilterOptions = computed<MultiSelectItem<string>[]>(() => {
 	if (!allReports.value) return []
 	const options: MultiSelectItem<string>[] = []
 
 	const uniqueProjectIds: { [id: string]: ReportedType<Labrinth.Projects.v2.Project> } = {}
 	const uniqueReporterIds: { [id: string]: ReportedType<User> } = {}
+	const uniqueTargetIds: { [id: string]: ReportedType<OwnershipTarget> } = {}
+
+	const projectsEnabled =
+		hiddenSections.value.find((section) => section.key === 'project')?.enabled ?? true
+	const reportersEnabled =
+		hiddenSections.value.find((section) => section.key === 'reporter')?.enabled ?? true
+	const targetsEnabled =
+		hiddenSections.value.find((section) => section.key === 'target')?.enabled ?? true
 
 	for (const report of filteredReports.value) {
-		if (report.project)
+		if (report.project && projectsEnabled)
 			uniqueProjectIds[report.project.id] = {
 				...report.project,
 				report_item_count: (uniqueProjectIds[report.project.id]?.report_item_count || 0) + 1,
 			}
-		if (report.reporter_user)
+		if (report.reporter_user && reportersEnabled)
 			uniqueReporterIds[report.reporter_user.id] = {
 				...report.reporter_user,
 				report_item_count: (uniqueReporterIds[report.reporter_user.id]?.report_item_count || 0) + 1,
+			}
+		if (report.target && targetsEnabled)
+			uniqueTargetIds[report.target.slug] = {
+				...report.target,
+				report_item_count: (uniqueTargetIds[report.target.slug]?.report_item_count || 0) + 1,
 			}
 	}
 
@@ -504,20 +543,39 @@ const reporterOrProjectOptions = computed<MultiSelectItem<string>[]>(() => {
 			})
 	}
 
-	options.push({ type: 'section-header', label: 'Reporters' })
-	Object.values(uniqueReporterIds)
-		.sort((a, b) =>
-			a.report_item_count === b.report_item_count
-				? a.username.localeCompare(b.username)
-				: b.report_item_count - a.report_item_count,
-		)
-		.forEach((reporter) => {
-			options.push({
-				value: `reporter/${reporter.id}`,
-				label: `${reporter.username} (${formatNumber(reporter.report_item_count)})`,
-				icon: reporter.avatar_url ? h('img', { src: reporter.avatar_url }) : undefined,
+	if (Object.keys(uniqueReporterIds).length !== 0) {
+		options.push({ type: 'section-header', label: 'Reporters' })
+		Object.values(uniqueReporterIds)
+			.sort((a, b) =>
+				a.report_item_count === b.report_item_count
+					? a.username.localeCompare(b.username)
+					: b.report_item_count - a.report_item_count,
+			)
+			.forEach((reporter) => {
+				options.push({
+					value: `reporter/${reporter.id}`,
+					label: `${reporter.username} (${formatNumber(reporter.report_item_count)})`,
+					icon: reporter.avatar_url ? h('img', { src: reporter.avatar_url }) : undefined,
+				})
 			})
-		})
+	}
+
+	if (Object.keys(uniqueTargetIds).length !== 0) {
+		options.push({ type: 'section-header', label: 'Targets' })
+		Object.values(uniqueTargetIds)
+			.sort((a, b) =>
+				a.report_item_count === b.report_item_count
+					? a.name.localeCompare(b.name)
+					: b.report_item_count - a.report_item_count,
+			)
+			.forEach((target) => {
+				options.push({
+					value: `target/${target.slug}`,
+					label: `${target.name} (${formatNumber(target.report_item_count)})`,
+					icon: target.avatar_url ? h('img', { src: target.avatar_url }) : undefined,
+				})
+			})
+	}
 
 	return options
 })
@@ -752,12 +810,13 @@ const sortedReports = computed(() => {
 		reporterOrProjectFilter.length === 0
 			? [...filteredReports.value]
 			: filteredReports.value.filter((report) => {
-					const reporterOrProjectFilterLookup = new Set(reporterOrProjectFilter)
+					const lookup = new Set(reporterOrProjectFilter)
 					const reporterValue = report.reporter_user ? `reporter/${report.reporter_user.id}` : null
 					const projectValue = report.project ? `project/${report.project.id}` : null
+					const targetValue = report.target ? `target/${report.target.slug}` : null
 					return (
-						(reporterValue && reporterOrProjectFilterLookup.has(reporterValue)) ||
-						(projectValue && reporterOrProjectFilterLookup.has(projectValue))
+						(reporterValue && lookup.has(reporterValue)) ||
+						(projectValue && lookup.has(projectValue)) | (targetValue && lookup.has(targetValue))
 					)
 				})
 

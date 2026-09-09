@@ -48,7 +48,7 @@ pub(super) struct ExternalFileCandidate {
 #[derive(Clone, Debug)]
 pub(super) enum ExternalFileSource {
     InstanceFile(String),
-    ConfigBundle(Vec<u8>),
+    ConfigBundle(std::sync::Arc<tempfile::TempPath>),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -836,6 +836,30 @@ pub(super) async fn send_bytes_request_to_url(
     file_sha512: Option<&str>,
     state: &State,
 ) -> crate::Result<reqwest::Response> {
+    let size = body.len() as u64;
+    send_body_request_to_url(
+        operation,
+        method,
+        path,
+        url,
+        body.into(),
+        Some(size),
+        file_sha512,
+        state,
+    )
+    .await
+}
+
+pub(super) async fn send_body_request_to_url(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    url: &str,
+    body: reqwest::Body,
+    content_length: Option<u64>,
+    file_sha512: Option<&str>,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
     let service_origin = url::Url::parse(service_base_url())
         .map_err(|error| {
             crate::ErrorKind::OtherError(format!(
@@ -879,6 +903,10 @@ pub(super) async fn send_bytes_request_to_url(
         .bearer_auth(credentials.session)
         .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
         .body(body);
+    if let Some(content_length) = content_length {
+        request =
+            request.header(reqwest::header::CONTENT_LENGTH, content_length);
+    }
     if let Some(file_sha512) = file_sha512 {
         request = request.header("x-file-sha512", file_sha512);
     }

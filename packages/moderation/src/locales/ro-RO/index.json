@@ -1,7 +1,4 @@
 {
-  "nags.add-description.description": {
-    "defaultMessage": "Este necesară o descriere care să explice clar scopul și funcția proiectului."
-  },
   "nags.add-description.title": {
     "defaultMessage": "Adaugă o descriere"
   },
@@ -17,26 +14,14 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Adăugați o adresă Java"
   },
-  "nags.add-links-server.description": {
-    "defaultMessage": "Adăugați orice linkuri relevante vizate în afara Modrinth, cum ar fi un site web, un magazin sau o invitație Discord."
-  },
   "nags.add-links-server.title": {
     "defaultMessage": "Adăugați linkuri externe"
-  },
-  "nags.add-links.description": {
-    "defaultMessage": "Adaugă orice link relevant către site-uri din afara Modrinth, cum ar fi codul sursă, un tracker de probleme sau o invitație de Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Adaugă link-uri externe"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Ați selectat toate {totalAvailableTags, plural, one {# tag disponibil} other {# tag-urile disponibile}}. Asta anulează scopul tag-urilor, care sunt folosite pentru a ajuta alți utilizatori să găsească proiecte relevante. Vă rugăm să selectați numai tag/urile care sunt relevante pentru proiectul vostru."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selectează etichete precise"
-  },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Descrierea dumneavoastră este {length, plural, one {# caracter lizibil} other {# caractere lizibile}}. Măcar {minChars, plural, one {# caracter este} other {# caractere sunt}} recomandate pentru a creea o descriere clară și informativă."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Extinde descrierea"
@@ -53,9 +38,6 @@
   "nags.edit-tags.title": {
     "defaultMessage": "Editează etichetele"
   },
-  "nags.edit-title.title": {
-    "defaultMessage": "Editează titlul"
-  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Imaginea principală din galerie este adesea prima impresie pe care o lasă proiectul tău."
   },
@@ -68,32 +50,14 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Oferă codul sursă"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Unele dintre linkurile dvs. externe par a fi identice. Fiecare link trebuie introdus o singură dată și cu tipul de link corespunzător."
-  },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Descrierea ta ar trebui să conțină suficient text simplu sau text alternativ pentru imagini, pentru a o face accesibilă persoanelor care folosesc cititoare de ecran sau care au o conexiune lentă la internet."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Asigură accesibilitatea"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL-ul licenței este invalid."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "URL-ul tău către licență este direcționat către {domain}, care nu este potrivit pentru informațiile despre licență. URL-urile licenței ar trebui să se lege direct de fișierul licenței tale, nu de rețele sociale, platforme de jocuri, etc."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL-ul licenței tale pare a fi format greșit. Te rugăm să furnizezi un URL valid către textul licenței."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Adaugă un link valid către licență"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Utilizarea de prescurtări de link-uri sau alte metode de a ascunde destinația unui link în secțiunea de link-uri externe sau în link-ul licenței este interzisă, te rugăm să folosești doar link-uri complete și valide."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Nu utilizați prescurtări de link"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# antet} other {# antete}} în descrierea ta {count, plural, one {este} other {sunt}} prea lung. Antetul trebuie să fie concis și să acționeze ca titluri de secțiune, nu ca propoziții întregi."
@@ -113,9 +77,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Adaugă text alternativ imaginii"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Invitațiile Discord nu pot fi folosite pentru alte tipuri de link-uri. Te rugăm să-ți pui link-ul de Discord doar în câmpul dedicat invitațiilor de Discord."
-  },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Mută invitația de Discord"
   },
@@ -127,9 +88,6 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Examinați feedback-ul"
-  },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Ați selectat {count, plural, one {# tag de resoluție} other {# tag-uri de resoluție}}. Pachete de resursă ar trebui tipic să aibă numai un tag de resoluție care să se potrivească cu resoluția primară."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selectează rezoluția corectă"
@@ -164,9 +122,6 @@
   "nags.server.title": {
     "defaultMessage": "Accesați setările serverului"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Vizitează setările descrierii"
-  },
   "nags.settings.license.title": {
     "defaultMessage": "Vizitează setările licenței"
   },
@@ -179,38 +134,11 @@
   "nags.settings.title": {
     "defaultMessage": "Vizitează setările generale"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Rezumatul tău nu poate fi identic cu numele proiectului. Este important să creezi un rezumat informativ și atractiv."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Fă rezumatul unic"
-  },
-  "nags.summary-special-formatting.description": {
-    "defaultMessage": "Rezumatul tău nu trebuie să conțină formatare, salturi de linie, caractere speciale sau link-uri, deoarece va fi afișat doar ca text simplu."
-  },
-  "nags.summary-special-formatting.title": {
-    "defaultMessage": "Curăță rezumatul"
-  },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Sumarul dumneavoastră are o lungime de {length, plural, one {# caracter} other {#caractere}}. Minim {minChars, plural, one {# caracter este recomandat} other {#caractere sunt recomandate}} pentru a creea un sumar informativ ți incitant."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Extinde rezumatul"
   },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Prin a face numele proiectului tău curat îl faci și mai ușor de ținut minte si de găsit. Informații de versiune și loader sunt afișate automatic lângă proiectul dumneavoastră."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Curăță numele"
-  },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "Ați selectat {tagCount, plural,one {#etichetă} other {etichetă}}. Vă rugăm să reduceți la{maxTagCount} sau mai puține pentru a vă asigura că serverul dvs. apare în rezultatele de căutare relevante."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Selectați etichete precise"
-  },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Ați selectat {tagCount, plural,one {#etichetă}other {#etichetă}}. Luați în considerare reducerea la {maxTagCount} sau mai puține pentru a vă asigura că proiectul dvs. apare în rezultatele de căutare relevante."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selectează etichete exacte"
@@ -223,12 +151,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Încarcă o versiune"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Unele dintre link-urile tale externe pot folosi domenii care nu sunt potrivite pentru acel tip de link."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Verifică link-urile externe"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Vizitează setările link-urilor"

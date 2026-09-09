@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "必須提供一段能清楚說明專案目的與功能的描述。"
+    "defaultMessage": "請提供能清楚說明專案內容、目的與吸引之處的描述。"
   },
   "nags.add-description.title": {
     "defaultMessage": "新增描述"
@@ -24,16 +24,22 @@
     "defaultMessage": "新增授權條款詳細資訊"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "新增 Modrinth 以外的任何相關連結，例如網站、商店或 Discord 邀請連結。"
+    "defaultMessage": "新增任何相關的外部資源連結，如網站、商店或永久的 Discord 邀請連結。"
   },
   "nags.add-links-server.title": {
     "defaultMessage": "新增外部連結"
   },
   "nags.add-links.description": {
-    "defaultMessage": "新增任何與專案相關且指向 Modrinth 以外的連結，例如原始碼、問題追蹤器或 Discord 邀請連結。"
+    "defaultMessage": "新增任何相關的外部資源連結，如原始碼、問題追蹤器或永久的 Discord 邀請連結。"
   },
   "nags.add-links.title": {
     "defaultMessage": "新增外部連結"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "同層級的標題不應彼此相鄰。"
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "移除相鄰的標題"
   },
   "nags.all-languages.description": {
     "defaultMessage": "你選擇了所有可用的語言選項。請只列出你的伺服器目前實際支援的語言。"
@@ -42,25 +48,46 @@
     "defaultMessage": "選擇精確的語言"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "你選擇了所有 {totalAvailableTags, plural, other {# 個可用標籤}}。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
+    "defaultMessage": "你選擇了所有 {totalAvailableTags, plural, other {# 個可用標籤}}。標籤旨在幫助使用者找到相關專案。請僅選擇相關的標籤。"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"
+  },
+  "nags.banned-link-usage.description": {
+    "defaultMessage": "不允許將連結「{url}」做為外部連結。"
+  },
+  "nags.banned-link-usage.title": {
+    "defaultMessage": "移除不被允許的連結"
   },
   "nags.check-disclosures.description": {
     "defaultMessage": "填寫適用於你的{type}的內容揭露資訊，以確保使用者知悉所有重要資訊。"
   },
   "nags.check-disclosures.title": {
-    "defaultMessage": "檢查內容揭露資訊"
+    "defaultMessage": "檢查揭露資訊"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "專案描述結尾不應放置無任何內文的標題。"
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "移除結尾的標題"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "你的描述目前長度為 {length, plural, other {# 個可閱讀字元}}。建議至少輸入 {minChars, plural, other {# 個字元}}，以建立清晰且資訊完整的描述。"
+    "defaultMessage": "你的專案描述過於簡略。請補充更多細節，清楚說明專案的內容、目的與吸引之處。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
   },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "內容揭露資訊不應包含 HTML，因為該欄位僅能顯示行內 Markdown 與純文字。"
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "修正揭露資訊的格式"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "編輯描述"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "編輯圖庫"
   },
   "nags.edit-license.title": {
     "defaultMessage": "編輯授權條款"
@@ -72,7 +99,7 @@
     "defaultMessage": "編輯標籤"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "編輯標題"
+    "defaultMessage": "編輯名稱"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "精選圖庫圖片通常是你的專案給人留下第一印象的關鍵。"
@@ -80,32 +107,38 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "精選圖庫圖片"
   },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "圖庫圖片的標題與描述中不允許使用非標準文字字元，如「花式文字」或「Zalgo 文字」。"
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "圖庫圖片的標題與描述不能包含過多的粗俗用語。偵測到的文字：「{value}」。"
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "圖庫圖片的標題與描述不得包含攻擊性詞彙。偵測到的文字：「{value}」。"
+  },
   "nags.gallery.title": {
     "defaultMessage": "前往圖庫頁面"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{type}使用的授權條款要求必須提供原始碼。請為每個額外版本提供原始碼連結或原始碼檔案，或是考慮使用不同的授權條款。"
+    "defaultMessage": "你的{type}使用的授權條款要求必須公開原始碼。請提供原始碼連結、附加原始碼檔案，或是更換授權條款。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "你輸入的部分外部連結似乎完全相同。每個連結僅應輸入一次，並選擇正確的連結類型。"
+    "defaultMessage": "你輸入的部分外部連結似乎完全相同。每個連結僅應列出一次，並選擇正確的連結類型。"
   },
   "nags.identical-links.title": {
-    "defaultMessage": "清理重複連結"
+    "defaultMessage": "移除重複連結"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "請在描述中提供充足的純文字或圖片替代文字，讓螢幕閱讀器使用者與網路速度較慢的使用者也能順利閱讀。"
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "確保無障礙體驗"
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "修改圖庫圖片文字"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "授權條款網址無效。"
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你的授權條款網址指向 {domain}，這不適合用來提供授權條款資訊。授權條款網址應直接連結到你的授權條款檔案，而非社群媒體、遊戲平臺等。"
+    "defaultMessage": "你的授權條款網址指向 {domain}，這不適合用來提供授權條款資訊。授權條款網址應直接連結到你的授權條款文字。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "你的授權條款網址似乎格式不正確。請提供有效的授權條款網址。"
@@ -113,11 +146,14 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "新增有效授權條款連結"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "禁止在你的外部連結或授權條款連結中使用短網址或其他方法來隱藏連結的實際指向，請只使用適當的完整連結。"
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "修改描述"
   },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "請勿使用短網址"
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "修改專案名稱"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "修改摘要"
   },
   "nags.long-headers.description": {
     "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}{count, plural, other {}}字數過多。標題的作用是作為章節標題，應保持簡潔，避免使用完整的長句子。"
@@ -153,16 +189,82 @@
     "defaultMessage": "檢查回饋"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你選擇了 {count, plural, other {# 個解析度標籤}} ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
+    "defaultMessage": "你選擇了 {count, plural, other {# 個解析度標籤}}（{tags}）。資源包通常應該只有與其主要解析度相符的標籤。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
   },
+  "nags.project-description-banned-link.description": {
+    "defaultMessage": "專案描述中不允許使用連結「{fullUrl}」。"
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "專案描述必須以英文撰寫或附上英文翻譯。"
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "翻譯描述"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "專案描述中不允許過度使用非標準文字字元，如「花式文字」或「Zalgo 文字」。"
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "專案描述不能包含過多的粗俗用語。偵測到的文字：「{value}」。"
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "專案描述不得包含攻擊性詞彙。偵測到的文字：「{value}」。"
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "專案描述不能靠重複輸入相同的文字、符號或短句來湊字數。"
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "移除描述中的重複文字"
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "專案名稱不允許使用非標準文字字元，如「花式文字」或「Zalgo 文字」。"
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "專案名稱不能包含粗俗用語。偵測到的文字：「{value}」。"
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "專案名稱不得包含攻擊性詞彙。偵測到的文字：「{value}」。"
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "修改專案名稱"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "檢查摘要"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "摘要中不應包含連結、網址或 IP 位址。偵測到的文字：「{value}」"
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "移除摘要中的連結"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "專案摘要必須以英文撰寫或附上英文翻譯。"
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "翻譯摘要"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "摘要中不允許使用非標準文字字元，如「花式文字」或「Zalgo 文字」。"
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "專案摘要不能包含粗俗用語。偵測到的文字：「{value}」。"
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "專案摘要不得包含攻擊性詞彙。偵測到的文字：「{value}」。"
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "專案摘要不能靠重複輸入相同的文字、符號或短句來湊字數。"
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "移除摘要中的重複文字"
+  },
   "nags.review-permissions.description": {
-    "defaultMessage": "請確保你提供了證據證明你有權在模組包中發布任何外部內容。"
+    "defaultMessage": "請確保你已提供證據，證明你有權在模組包中發布任何外部內容。"
   },
   "nags.review-permissions.title": {
-    "defaultMessage": "審查外部內容授權"
+    "defaultMessage": "檢查內容授權"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "選擇你的伺服器支援的版本、挑選一個模組包，或是上傳你自己的檔案。"
@@ -175,6 +277,12 @@
   },
   "nags.select-country.title": {
     "defaultMessage": "選擇地區"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "請指定你的專案的執行環境。"
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "選擇執行環境"
   },
   "nags.select-language.description": {
     "defaultMessage": "列出你的伺服器支援的一種或多種語言。"
@@ -197,9 +305,6 @@
   "nags.server.title": {
     "defaultMessage": "前往伺服器設定"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "前往描述設定"
-  },
   "nags.settings.disclosures.title": {
     "defaultMessage": "前往揭露資訊設定"
   },
@@ -210,7 +315,7 @@
     "defaultMessage": "前往連結設定"
   },
   "nags.settings.permissions.title": {
-    "defaultMessage": "前往授權資訊主頁"
+    "defaultMessage": "前往授權設定"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "前往標籤設定"
@@ -221,29 +326,14 @@
   "nags.settings.versions.title": {
     "defaultMessage": "前往版本設定"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "你的摘要不能與你的專案名稱相同。撰寫一段既實用又吸引人的摘要非常重要。"
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "讓摘要與眾不同"
-  },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "你的摘要不應包含排版、換行、特殊字元或連結，因為摘要只會顯示純文字。"
+    "defaultMessage": "摘要中不應包含 Markdown 或 HTML，因為該欄位僅能顯示純文字。"
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "清理摘要"
-  },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "您的摘要長度為 {length, plural, one {# 個字元} other {# 個字元}}。建議至少輸入 {minChars, plural, one {# 個字元} other {# 個字元}}，以建立資訊完整且吸引人的摘要。"
+    "defaultMessage": "修正摘要格式"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "擴展摘要"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "保持專案名稱簡潔，能讓它更易於記憶且方便搜尋。版本與載入器資訊會自動顯示在你的專案旁。"
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "清理名稱"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "你選擇了 {languageCount, plural, other {# 種語言}}。請只列出你的伺服器目前實際支援的語言。"
@@ -252,13 +342,13 @@
     "defaultMessage": "選擇精確的語言"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請減少到 {maxTagCount} 個或更少，以確保你的伺服器出現在相關的搜尋結果中。"
+    "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請減少到 {maxTagCount} 個或更少，以確保你的專案出現在相關的搜尋結果中。"
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "選擇精確的標籤"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請考慮減少到 {maxTagCount} 個或更少，以確保你的專案出現在相關的搜尋結果中。"
+    "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請減少到 {maxTagCount} 個或更少，以確保你的專案出現在相關的搜尋結果中。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"
@@ -282,13 +372,22 @@
     "defaultMessage": "上傳版本"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "你的部分外部連結可能使用了不適合該連結類型的網域。"
+    "defaultMessage": "你的部分外部連結可能指向了不適合該連結類型的網域。"
   },
   "nags.verify-external-links.title": {
-    "defaultMessage": "驗證外部連結"
+    "defaultMessage": "檢查外部連結"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "前往連結設定"
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "專案摘要應提供獨特資訊，避免重複專案名稱。"
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "你的摘要過於簡略。請新增一兩句話來描述你的專案。"
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "專案名稱不應包含版本號碼。"
   }
 }
 

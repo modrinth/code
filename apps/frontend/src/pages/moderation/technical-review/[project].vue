@@ -111,6 +111,7 @@ const reviewItem = computed(() => {
 
 const { loadingIssues, decompiledSources, handleLoadIssueSources } = useTechReviewSources(
 	() => reviewItem.value?.reports.flatMap((report) => report.issues) ?? [],
+	true,
 )
 
 const focusedDetailId = computed(() => route.query.detail?.toString() ?? null)
@@ -194,6 +195,7 @@ onUnmounted(() => {
 			:loading-issues="loadingIssues"
 			:decompiled-sources="decompiledSources"
 			:collapsed="false"
+			allow-showing-hidden-traces
 			disable-collapsing
 			@refetch="refetch"
 			@load-issue-sources="handleLoadIssueSources"

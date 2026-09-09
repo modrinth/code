@@ -28,6 +28,45 @@ export namespace Kyros {
 	}
 
 	export namespace Files {
+		export namespace v1 {
+			export interface FullWorldDownloadAuthorization {
+				token: string
+			}
+
+			export type DescendantType = 'regular' | 'directory' | 'symlink' | 'other'
+
+			export interface FileStatRequest {
+				path: string
+			}
+
+			export interface FileStatResponse {
+				name: string
+				full_path: string
+				size_bytes: number
+				type: DescendantType
+				mtime: string
+				ctime: string
+			}
+
+			export type ZipRequest =
+				| {
+						target_type: 'Directory'
+						path: string
+				  }
+				| {
+						target_type: 'ManyPaths'
+						parent: string
+						include: string[]
+						target: string
+				  }
+
+			export interface ZipProgress {
+				progress: number
+				done?: boolean
+				error?: string
+			}
+		}
+
 		export namespace v0 {
 			export interface DirectoryItem {
 				name: string

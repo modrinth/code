@@ -1,24 +1,29 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type { DetailDecision, FlattenedFileReport } from './types'
+import type { DetailDecision, FlattenedFileReport, TechRevProjectRef } from './types'
 
 export const severityOrder: Record<Labrinth.TechReview.Internal.DelphiSeverity, number> = {
+	malware: 4,
 	severe: 3,
 	high: 2,
 	medium: 1,
 	low: 0,
+	hidden: -1,
 }
 
 export function getSeverityBadgeColor(
 	severity: Labrinth.TechReview.Internal.DelphiSeverity,
 ): string {
 	switch (severity) {
+		case 'malware':
 		case 'severe':
 			return 'border-red/60 border bg-highlight-red text-red'
 		case 'high':
 			return 'border-orange/60 border bg-highlight-orange text-orange'
 		case 'medium':
 			return 'border-green/60 border bg-highlight-green text-green'
+		case 'hidden':
+			return 'border-divider border bg-surface-2 text-secondary'
 		case 'low':
 		default:
 			return 'border-blue/60 border bg-highlight-blue text-blue'
@@ -32,15 +37,13 @@ export function truncateMiddle(str: string, maxLength = 120): string {
 	return str.slice(0, front) + '...' + str.slice(front - keep)
 }
 
-export function getFileHighestSeverity(
-	file: FlattenedFileReport,
+export function getHighestSeverity(
+	details: { severity: Labrinth.TechReview.Internal.DelphiSeverity }[],
 ): Labrinth.TechReview.Internal.DelphiSeverity {
 	let highest: Labrinth.TechReview.Internal.DelphiSeverity = 'low'
-	for (const issue of file.issues) {
-		for (const detail of issue.details) {
-			if (severityOrder[detail.severity] > severityOrder[highest]) {
-				highest = detail.severity
-			}
+	for (const detail of details) {
+		if (severityOrder[detail.severity] > severityOrder[highest]) {
+			highest = detail.severity
 		}
 	}
 	return highest
@@ -67,10 +70,7 @@ export function getVersionLabel(file: FlattenedFileReport): string {
 	return file.version_number || file.version_id
 }
 
-export function getVersionPageHref(
-	project: { id: string; slug?: string; project_types: string[] },
-	versionId: string,
-): string {
+export function getVersionPageHref(project: TechRevProjectRef, versionId: string): string {
 	return `/${project.project_types[0] ?? 'project'}/${project.slug ?? project.id}/version/${versionId}`
 }
 

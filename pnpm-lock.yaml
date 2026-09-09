@@ -563,6 +563,9 @@ importers:
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../utils
+      '@tanstack/vue-query':
+        specifier: 5.101.4
+        version: 5.101.4(vue@3.5.27(typescript@5.9.3))
       vue:
         specifier: ^3.5.13
         version: 3.5.27(typescript@5.9.3)
@@ -712,6 +715,9 @@ importers:
       apexcharts:
         specifier: ^4.0.0
         version: 4.7.0
+      colord:
+        specifier: ^2.9.3
+        version: 2.9.3
       dayjs:
         specifier: ^1.11.10
         version: 1.11.19
@@ -6443,6 +6449,7 @@ packages:
   eslint@9.39.2:
     resolution: {integrity: sha512-LEyamqS7W5HB3ujJyvi0HQK/dtVINZvd5mAAp9eT5S/ujByGjiZLCzPcHVzuXbpJDJF/cxwHlfceVUDZ2lnSTw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'

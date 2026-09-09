@@ -1,6 +1,6 @@
 use crate::state::instances::{
     ContentSourceKind, Instance, InstanceIconConfig, InstanceLaunchOverrides,
-    InstanceLink,
+    InstanceLink, InstanceTabVisibility,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
@@ -82,6 +82,7 @@ pub struct InstanceLaunchOverridesPatch {
     )]
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
+    pub visible_tabs: Option<InstanceTabVisibility>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -298,6 +299,9 @@ fn apply_launch_overrides_patch(
     }
     if let Some(hooks) = patch.hooks {
         overrides.hooks = hooks;
+    }
+    if let Some(visible_tabs) = patch.visible_tabs {
+        overrides.visible_tabs = visible_tabs;
     }
 
     overrides

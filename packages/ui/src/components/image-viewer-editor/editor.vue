@@ -43,7 +43,6 @@ const emit = defineEmits<{
 	cancel: []
 	close: []
 	edit: []
-	imageReady: []
 	next: []
 	previous: []
 	save: [payload: ImageViewerEditorSavePayload]
@@ -85,6 +84,7 @@ const {
 	fitToViewport,
 	setZoom,
 	setFit,
+	waitForRender,
 	exportPng,
 	handleKeyboardShortcut,
 	isTextEditing,
@@ -108,11 +108,31 @@ const viewZoom = computed(() => zoom.value / Math.max(fitScale.value, Number.EPS
 const viewZoomPercent = computed(() => Math.round(viewZoom.value * 100))
 const viewZoomed = computed(() => viewZoom.value > 1.001)
 const canViewZoomIn = computed(() => canZoomIn.value && viewZoom.value < MAX_VIEW_ZOOM)
+const nativeImageView = computed(
+	() =>
+		props.mode === 'view' &&
+		[props.item.src, props.item.editorSource?.path].some(isGifOrWebpSource),
+)
 
 let resizeObserver: ResizeObserver | undefined
 let initializationGeneration = 0
 let initializationChain = Promise.resolve()
-let imageReadyFrame: number | undefined
+
+function isGifOrWebpSource(source?: string) {
+	if (!source) return false
+	let pathname = source
+	try {
+		pathname = new URL(source, 'https://modrinth.invalid').pathname
+	} catch {
+		// ... ignore
+	}
+	try {
+		pathname = decodeURIComponent(pathname)
+	} catch {
+		// ... ignore
+	}
+	return /\.(?:gif|webp)$/i.test(pathname)
+}
 
 function queueInitialization() {
 	const generation = ++initializationGeneration
@@ -120,7 +140,6 @@ function queueInitialization() {
 	const editorDataPromise = props.loadData(props.item)
 	initializationChain = initializationChain.then(async () => {
 		if (generation !== initializationGeneration) return
-		let initialized = false
 		try {
 			const editorData = await editorDataPromise
 			if (generation !== initializationGeneration || !canvasElement.value) return
@@ -128,7 +147,8 @@ function queueInitialization() {
 			if (generation !== initializationGeneration) return
 			setInteractionEnabled(props.mode === 'edit')
 			observeViewport()
-			initialized = true
+			await waitForRender()
+			if (generation !== initializationGeneration) return
 		} catch (error) {
 			if (generation !== initializationGeneration) return
 			handleError(error)
@@ -136,17 +156,8 @@ function queueInitialization() {
 		} finally {
 			if (generation === initializationGeneration) {
 				loadingEditorData.value = false
-				if (initialized) notifyImageReady()
 			}
 		}
-	})
-}
-
-function notifyImageReady() {
-	if (imageReadyFrame !== undefined) cancelAnimationFrame(imageReadyFrame)
-	imageReadyFrame = requestAnimationFrame(() => {
-		imageReadyFrame = undefined
-		emit('imageReady')
 	})
 }
 
@@ -164,7 +175,6 @@ function fitEditorToViewport() {
 	if (!viewportSize) return
 	fitToViewport(viewportSize.width, viewportSize.height)
 	if (isFit.value) centerViewport()
-	else notifyImageReady()
 }
 
 function getViewportSize() {
@@ -186,70 +196,7 @@ function centerViewport() {
 			0,
 			(viewport.value.scrollHeight - viewport.value.clientHeight) / 2,
 		)
-		notifyImageReady()
 	})
-}
-
-function getTextContrast(target: HTMLElement): 'dark' | 'light' {
-	const renderedCanvas = viewport.value?.querySelector<HTMLCanvasElement>('canvas.lower-canvas')
-	const context = renderedCanvas?.getContext('2d', { willReadFrequently: true })
-	if (!renderedCanvas || !context) return 'light'
-
-	const targetBounds = target.getBoundingClientRect()
-	const canvasBounds = renderedCanvas.getBoundingClientRect()
-	const intersection = {
-		left: Math.max(targetBounds.left, canvasBounds.left),
-		top: Math.max(targetBounds.top, canvasBounds.top),
-		right: Math.min(targetBounds.right, canvasBounds.right),
-		bottom: Math.min(targetBounds.bottom, canvasBounds.bottom),
-	}
-	if (intersection.right <= intersection.left || intersection.bottom <= intersection.top)
-		return 'light'
-
-	const scaleX = renderedCanvas.width / canvasBounds.width
-	const scaleY = renderedCanvas.height / canvasBounds.height
-	const sourceX = Math.max(0, Math.floor((intersection.left - canvasBounds.left) * scaleX))
-	const sourceY = Math.max(0, Math.floor((intersection.top - canvasBounds.top) * scaleY))
-	const sourceWidth = Math.min(
-		renderedCanvas.width - sourceX,
-		Math.max(1, Math.ceil((intersection.right - intersection.left) * scaleX)),
-	)
-	const sourceHeight = Math.min(
-		renderedCanvas.height - sourceY,
-		Math.max(1, Math.ceil((intersection.bottom - intersection.top) * scaleY)),
-	)
-
-	try {
-		const pixels = context.getImageData(sourceX, sourceY, sourceWidth, sourceHeight).data
-		const sampleStride = Math.max(1, Math.floor(Math.sqrt((sourceWidth * sourceHeight) / 4096)))
-		let luminanceTotal = 0
-		let sampleCount = 0
-		for (let y = 0; y < sourceHeight; y += sampleStride) {
-			for (let x = 0; x < sourceWidth; x += sampleStride) {
-				const offset = (y * sourceWidth + x) * 4
-				const red = srgbToLinear(pixels[offset] / 255)
-				const green = srgbToLinear(pixels[offset + 1] / 255)
-				const blue = srgbToLinear(pixels[offset + 2] / 255)
-				const alpha = pixels[offset + 3] / 255
-				luminanceTotal += (0.2126 * red + 0.7152 * green + 0.0722 * blue) * alpha
-				sampleCount++
-			}
-		}
-
-		const targetArea = targetBounds.width * targetBounds.height
-		const intersectionArea =
-			(intersection.right - intersection.left) * (intersection.bottom - intersection.top)
-		const coverage = targetArea > 0 ? intersectionArea / targetArea : 0
-		if (coverage < 0.9) return 'light'
-		const averageLuminance = sampleCount > 0 ? luminanceTotal / sampleCount : 0
-		return averageLuminance > 0.179 ? 'dark' : 'light'
-	} catch {
-		return 'light'
-	}
-}
-
-function srgbToLinear(value: number) {
-	return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
 }
 
 function resetView() {
@@ -360,10 +307,7 @@ function stopPan() {
 	const pan = panning.value
 	panning.value = undefined
 	if (!pan || props.mode !== 'view') return
-	if (pan.moved) {
-		notifyImageReady()
-		return
-	}
+	if (pan.moved) return
 	if (viewZoomed.value) resetView()
 	else setViewZoom(CLICK_ZOOM)
 }
@@ -427,7 +371,6 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
 	initializationGeneration++
-	if (imageReadyFrame !== undefined) cancelAnimationFrame(imageReadyFrame)
 	document.removeEventListener('keydown', handleKeydown)
 	document.removeEventListener('keyup', handleKeyup)
 	document.removeEventListener('edit-menu:undo', handleEditMenuUndo)
@@ -436,7 +379,7 @@ onBeforeUnmount(() => {
 	void dispose()
 })
 
-defineExpose({ getTextContrast, markSaved })
+defineExpose({ markSaved })
 </script>
 
 <template>
@@ -456,20 +399,31 @@ defineExpose({ getTextContrast, markSaved })
 		@wheel="handleWheel"
 	>
 		<img
-			v-if="mode === 'view' && loadingEditorData"
+			v-if="mode === 'view' && loadingEditorData && !nativeImageView"
 			:src="item.src"
 			:alt="item.alt"
-			class="pointer-events-none relative z-[2] m-auto block max-h-full max-w-full shrink-0 object-contain"
+			class="pointer-events-none relative z-[2] m-auto block h-full w-full shrink-0 object-contain"
 			draggable="false"
 		/>
 		<div
-			v-show="!loadingEditorData"
+			v-show="nativeImageView || !loadingEditorData"
 			class="editor-canvas relative z-[2] m-auto shrink-0"
+			:class="{
+				'h-full w-full': nativeImageView && loadingEditorData,
+				'is-native-image-view': nativeImageView,
+			}"
 			@pointerenter="updateBrushPointer"
 			@pointermove="updateBrushPointer"
 			@pointerleave="brushPointer.visible = false"
 		>
 			<canvas ref="canvasElement" :aria-label="item.alt" role="img" />
+			<img
+				v-if="nativeImageView"
+				:src="item.src"
+				:alt="item.alt"
+				class="pointer-events-none absolute inset-0 z-[2] h-full w-full object-contain"
+				draggable="false"
+			/>
 			<div
 				v-if="hasBrushPointer && brushPointer.visible"
 				class="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-solid shadow-[0_0_0_1px_rgb(0_0_0_/_80%),inset_0_0_0_1px_rgb(255_255_255_/_35%)]"
@@ -509,10 +463,10 @@ defineExpose({ getTextContrast, markSaved })
 				<LeftArrowIcon aria-hidden="true" />
 			</IconButton>
 			<span
-				class="flex min-w-14 justify-center gap-1 text-base font-semibold leading-5 tabular-nums text-white/50"
+				class="flex min-w-14 justify-center gap-1 text-base font-semibold leading-5 tabular-nums text-secondary"
 				aria-live="polite"
 			>
-				<strong class="font-semibold text-white">{{ index + 1 }}</strong>
+				<strong class="font-semibold text-contrast">{{ index + 1 }}</strong>
 				<span>/ {{ count }}</span>
 			</span>
 			<IconButton :label="formatMessage(messages.next)" type="quiet" @click="emit('next')">
@@ -533,7 +487,7 @@ defineExpose({ getTextContrast, markSaved })
 			<Button
 				v-tooltip="formatMessage(messages.fitToWorkspace)"
 				type="quiet"
-				class="w-16 px-2 tabular-nums text-white/60"
+				class="w-16 px-2 tabular-nums text-secondary"
 				@click="resetView"
 			>
 				{{ viewZoomPercent }}%
@@ -580,6 +534,22 @@ defineExpose({ getTextContrast, markSaved })
 .editor-canvas :deep(.canvas-container) {
 	flex: none;
 	box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 24%);
+}
+
+.editor-canvas.is-native-image-view :deep(.canvas-container) {
+	visibility: hidden;
+}
+
+.editor-viewport.is-view .editor-canvas.is-native-image-view {
+	cursor: zoom-in;
+}
+
+.editor-viewport.is-view-zoomed .editor-canvas.is-native-image-view {
+	cursor: grab;
+}
+
+.editor-viewport.is-panning .editor-canvas.is-native-image-view {
+	cursor: grabbing;
 }
 
 .editor-viewport.is-view :deep(.upper-canvas) {

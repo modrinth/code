@@ -201,7 +201,7 @@
     "message": "Inicialização e navegação"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Adicionar servidor à instância"
+    "message": "Adicionando servidor a instância"
   },
   "app.browse.add-to-an-instance": {
     "message": "Adicionar a uma instância"
@@ -316,6 +316,30 @@
   },
   "app.install.phase.running_loader_processors": {
     "message": "Executar processadores de carregamento"
+  },
+  "app.instance.action.add-content": {
+    "message": "Adicionar conteúdo"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Copiar caminho"
+  },
+  "app.instance.action.play": {
+    "message": "Jogar"
+  },
+  "app.instance.action.stop": {
+    "message": "Parar"
+  },
+  "app.instance.add-server.add": {
+    "message": "Adicionar"
+  },
+  "app.instance.add-server.added": {
+    "message": "Adicionado"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Adicionando..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Cancelar"
   },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Adicionado"
@@ -806,9 +830,6 @@
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Ganchos permitem a utilizadores avançados executarem certos comandos de sistema antes e após abrir o jogo."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Pós-saída"
   },
@@ -826,9 +847,6 @@
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Insere o comando pré-inicio..."
-  },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Ganchos de inicio do jogo"
   },
   "instance.settings.tabs.hooks.variables.inst-dir.description": {
     "message": "$INST_DIR: O caminho absoluto para a pasta da instância"
@@ -863,29 +881,11 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versão {loader}"
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Variáveis de ambiente"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Ganchos"
   },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Argumentos Java"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Instalação Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Memória alocada"
-  },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/caminho/para/java"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Janela"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Definições personalizadas de janela"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Ecrã Inteiro"

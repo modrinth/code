@@ -150,14 +150,12 @@
 								modSettings.get(moderationSettings.General.SlicerButtonInVersions)
 							"
 							v-tooltip="`Open in Slicer`"
-							type="quiet"
 							target="_blank"
 							:href="`https://slicer.run/?url=${encodeURIComponent(primaryFile?.url)}`"
-							class="!bg-button-bg"
 							aria-label="Open in Slicer"
 						>
 							<ExternalIcon aria-hidden="true" />
-							Open
+							Slicer
 						</ButtonLink>
 						<ButtonLink
 							v-for="file in promotedFiles.filter(

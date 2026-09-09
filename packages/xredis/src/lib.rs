@@ -113,6 +113,39 @@ impl RedisPool {
             .wrap_err("registering Redis blocking pool metrics")
     }
 
+    pub async fn get_keys_with_cache<F, Fut, T, K, E>(
+        &self,
+        namespace: &str,
+        use_cache: bool,
+        keys: &[K],
+        closure: F,
+    ) -> Result<Vec<T>>
+    where
+        F: FnOnce(Vec<K>) -> Fut,
+        Fut: Future<Output = Result<DashMap<K, T>, E>>,
+        E: std::error::Error + Send + Sync + 'static,
+        T: Serialize + DeserializeOwned,
+        K: Display
+            + Hash
+            + Eq
+            + PartialEq
+            + Clone
+            + DeserializeOwned
+            + Serialize
+            + Debug,
+    {
+        if use_cache {
+            self.get_cached_keys(namespace, keys, closure).await
+        } else {
+            Ok(closure(keys.to_vec())
+                .await
+                .wrap_err("fetching uncached values")?
+                .into_iter()
+                .map(|(_, value)| value)
+                .collect())
+        }
+    }
+
     pub async fn get_cached_keys<F, Fut, T, K, E>(
         &self,
         namespace: &str,
@@ -161,6 +194,49 @@ impl RedisPool {
         self.cache
             .get_cached_keys_raw(self, namespace, keys, closure)
             .await
+    }
+
+    pub async fn get_keys_with_slug_cache<F, Fut, T, I, K, S, E>(
+        &self,
+        namespace: &str,
+        slug_namespace: &str,
+        case_sensitive: bool,
+        use_cache: bool,
+        keys: &[I],
+        closure: F,
+    ) -> Result<Vec<T>>
+    where
+        F: FnOnce(Vec<I>) -> Fut,
+        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
+        E: std::error::Error + Send + Sync + 'static,
+        T: Serialize + DeserializeOwned,
+        I: Display + Hash + Eq + PartialEq + Clone + Debug,
+        K: Display
+            + Hash
+            + Eq
+            + PartialEq
+            + Clone
+            + DeserializeOwned
+            + Serialize,
+        S: Display + Clone + DeserializeOwned + Serialize + Debug,
+    {
+        if use_cache {
+            self.get_cached_keys_with_slug(
+                namespace,
+                slug_namespace,
+                case_sensitive,
+                keys,
+                closure,
+            )
+            .await
+        } else {
+            Ok(closure(keys.to_vec())
+                .await
+                .wrap_err("fetching uncached values by slug")?
+                .into_iter()
+                .map(|(_, (_, value))| value)
+                .collect())
+        }
     }
 
     pub async fn get_cached_keys_with_slug<F, Fut, T, I, K, S, E>(

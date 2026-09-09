@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	BugIcon,
 	CheckIcon,
 	DropdownIcon,
 	EyeOffIcon,
 	ScaleIcon,
+	ShieldAlertIcon,
 	ShieldCheckIcon,
 	SpinnerIcon,
 	XIcon,
@@ -390,7 +390,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 						:disabled="!canSubmitReview"
 						@click="handleSubmitReview('unsafe')"
 					>
-						<BugIcon /> Fail
+						<ShieldAlertIcon /> Fail
 					</Button>
 					<TeleportOverflowMenu
 						label="More options"

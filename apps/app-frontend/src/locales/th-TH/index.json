@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "ดาวน์โหลด"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "ซ่อนการดาวน์โหลดที่ดำเนินการอยู่"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "ซ่อนอินสแตนซ์ที่ทำงานอยู่เพิ่มเติม"
   },
@@ -20,11 +23,26 @@
   "app.action-bar.install.dismiss": {
     "message": "ปิด"
   },
+  "app.action-bar.install.open-instance": {
+    "message": "เปิด Instance"
+  },
   "app.action-bar.install.retry": {
     "message": "ลองอีกครั้ง"
   },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "ถูกยกเลิกจากการปิดแอป"
+  },
   "app.action-bar.install.summary.canceled": {
     "message": "ยกเลิกสำเร็จ"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "การ Cleanup ไม่สำเร็จ"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "ไม่สามารถดาวน์โหลดไฟล์ได้"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "ไฟล์ที่ดาวน์โหลดเสียหาย"
   },
   "app.action-bar.make-primary-instance": {
     "message": "กำหนดอินสแตนซ์หลัก"
@@ -578,9 +596,6 @@
   "instance.settings.tabs.general.name": {
     "message": "ชื่อ"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Launch Hook จะช่วยให้ผู้เล่นที่ชำนาญสามารถใช้คำสั่งต่อระบบบางอย่างได้ ทั้งก่อนและหลังเกมถูกเปิด"
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exit"
   },
@@ -599,9 +614,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "ป้อนคำสั่ง..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Game Launch Hook"
-  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
@@ -617,26 +629,8 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "เวอร์ชัน {loader}"
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Environment Variables"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Hook"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "อาร์กิวเมนต์ Java"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "การติดตั้ง Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "หน่วยความจำที่จัดสรร"
-  },
-  "instance.settings.tabs.window": {
-    "message": "หน้าต่าง"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "การตั้งค่าการปรับแต่งหน้าต่าง"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "เต็มหน้าจอ"

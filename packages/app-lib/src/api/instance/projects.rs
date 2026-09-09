@@ -41,6 +41,7 @@ pub async fn update_all_projects(
         &state,
     )
     .await?;
+    super::synced_packs::reconcile_after_content_change(instance_id).await;
     emit_loading(&loading_bar, 100.0, Some("Updated instance"))?;
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
@@ -67,6 +68,7 @@ pub async fn update_project(
         &state,
     )
     .await?;
+    super::synced_packs::reconcile_after_content_change(instance_id).await;
     if !skip_send_event.unwrap_or(false) {
         emit_instance(instance_id, InstancePayloadType::Edited).await?;
     }
@@ -93,6 +95,7 @@ pub async fn add_project_from_version(
             &state,
         )
         .await?;
+    super::synced_packs::sync_new_pack(instance_id, &project_path).await;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(project_path)
@@ -124,13 +127,18 @@ pub async fn install_project_with_dependencies(
     let project_ids = plan_project_ids(&plan);
     let install_plan = plan.clone();
     tokio::spawn(async move {
-        match crate::state::instances::commands::install_resolved_content_plan(
-            &instance_id,
-            &install_plan,
-            &state,
-        )
-        .await
-        {
+        let result = async {
+			let paths = crate::state::instances::commands::install_resolved_content_plan(
+				&instance_id,
+				&install_plan,
+				&state,
+			).await?;
+			for path in paths {
+				super::synced_packs::sync_new_pack(&instance_id, &path).await;
+			}
+			Ok::<(), crate::Error>(())
+		}.await;
+        match result {
             Ok(()) => {
                 if let Err(error) = emit_instance(
                     &instance_id,
@@ -210,6 +218,7 @@ pub async fn switch_project_version_with_dependencies(
             &state,
         )
         .await?;
+    super::synced_packs::reconcile_after_content_change(instance_id).await;
     emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
 
     Ok(path)
@@ -231,6 +240,7 @@ pub async fn add_project_from_path(
             &state,
         )
         .await?;
+    super::synced_packs::sync_new_pack(instance_id, &project_path).await;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(project_path)
@@ -267,6 +277,7 @@ pub async fn toggle_disable_project(
         &state,
     )
     .await?;
+    super::synced_packs::reconcile_after_content_change(instance_id).await;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(res)
@@ -286,6 +297,7 @@ pub async fn remove_project(
         &state,
     )
     .await?;
+    super::synced_packs::reconcile_after_content_change(instance_id).await;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(())
@@ -503,7 +515,7 @@ async fn ensure_instance_content_unlocked(
     Ok(())
 }
 
-fn ensure_metadata_content_unlocked(
+pub(super) fn ensure_metadata_content_unlocked(
     metadata: &crate::state::InstanceMetadata,
 ) -> crate::Result<()> {
     if metadata.quarantined {

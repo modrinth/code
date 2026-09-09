@@ -39,7 +39,7 @@
     "message": "已取消"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "未能完成清理"
+    "message": "无法完成清理"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "无法下载文件"
@@ -167,12 +167,6 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "隐藏名牌"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "在主页的“快速开始”区域显示最近运行过的世界或实例。"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "快速进入世界或实例"
-  },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "当 Minecraft 进程启动时，将 Modrinth App 最小化。"
   },
@@ -260,6 +254,9 @@
   "app.browse.hide-installed-modpacks": {
     "message": "隐藏已安装内容"
   },
+  "app.browse.project-actions.label": {
+    "message": "项目操作"
+  },
   "app.browse.project-type.data-packs": {
     "message": "数据包"
   },
@@ -287,6 +284,9 @@
   "app.content-install.no-compatible-versions": {
     "message": "没有与 {compatibilityLabel} 匹配的可用版本。如果仍要安装，请选择一个版本。依赖项将不会自动安装。"
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "打开备份文件夹"
+  },
   "app.export-modal.description-placeholder": {
     "message": "输入整合包描述……"
   },
@@ -313,6 +313,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "实例操作"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "此实例已被锁定"
@@ -349,48 +352,6 @@
   },
   "app.hosting.update-required.title": {
     "message": "需要更新 Modrinth App"
-  },
-  "app.icon-editor.apply-icons-modal.apply-error": {
-    "message": "无法为实例应用随机图标。"
-  },
-  "app.icon-editor.apply-icons-modal.apply-success": {
-    "message": "已为 {num, plural, one {# 个实例} other {# 个实例}} 随机分配图标。"
-  },
-  "app.icon-editor.apply-icons-modal.badge": {
-    "message": "本次更新的新功能"
-  },
-  "app.icon-editor.apply-icons-modal.close": {
-    "message": "关闭"
-  },
-  "app.icon-editor.apply-icons-modal.description": {
-    "message": "直接在 Modrinth App 中为你的实例创建自定义图标。自由搭配背景与来自《我的世界》及热门 Mod 的图案！"
-  },
-  "app.icon-editor.apply-icons-modal.instances-without-icons": {
-    "message": "还有 {count, plural, one {# 个实例} other {# 个实例}} 未设置图标。要先随机分配图标来试试看吗？"
-  },
-  "app.icon-editor.apply-icons-modal.random-icons": {
-    "message": "随机一个图标"
-  },
-  "app.icon-editor.apply-icons-modal.skip": {
-    "message": "跳过"
-  },
-  "app.icon-editor.apply-icons-modal.title": {
-    "message": "自定义图标编辑器"
-  },
-  "app.icon-editor.notification.close": {
-    "message": "关闭"
-  },
-  "app.icon-editor.notification.description": {
-    "message": "个性化你的实例！"
-  },
-  "app.icon-editor.notification.dismiss": {
-    "message": "忽略"
-  },
-  "app.icon-editor.notification.title": {
-    "message": "新的图标编辑器"
-  },
-  "app.icon-editor.notification.view-update": {
-    "message": "查看更新"
   },
   "app.install.phase.downloading_content": {
     "message": "正在下载内容"
@@ -463,6 +424,9 @@
   },
   "app.instance.action.stop": {
     "message": "停止"
+  },
+  "app.instance.actions.label": {
+    "message": "实例操作"
   },
   "app.instance.add-server.add": {
     "message": "添加"
@@ -746,6 +710,9 @@
   "app.instance.tab.logs": {
     "message": "日志"
   },
+  "app.instance.tab.screenshots": {
+    "message": "截图"
+  },
   "app.instance.tab.share": {
     "message": "分享"
   },
@@ -771,7 +738,7 @@
     "message": "正在删除 {name}"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "可安装 Mod"
+    "message": "含模组"
   },
   "app.instance.worlds.filter-offline": {
     "message": "离线"
@@ -851,6 +818,9 @@
   "app.java-selector.test-installation": {
     "message": "测试"
   },
+  "app.library.actions.label": {
+    "message": "实例库操作"
+  },
   "app.library.context-menu.create-instance": {
     "message": "新建实例"
   },
@@ -898,6 +868,9 @@
   },
   "app.library.group-by.none": {
     "message": "不分类"
+  },
+  "app.library.group.actions.label": {
+    "message": "分组操作"
   },
   "app.library.group.collapse": {
     "message": "折叠分组"
@@ -1021,6 +994,9 @@
   },
   "app.library.instance.action.view-instance": {
     "message": "查看实例"
+  },
+  "app.library.instance.actions.label": {
+    "message": "实例操作"
   },
   "app.library.instance.deselect": {
     "message": "取消选择实例"
@@ -1217,11 +1193,17 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "为了玩{name}你需要更新。"
   },
+  "app.nav.add-account": {
+    "message": "添加账户"
+  },
   "app.nav.create-new-instance": {
     "message": "创建实例"
   },
   "app.nav.home": {
     "message": "首页"
+  },
+  "app.nav.loading-profile": {
+    "message": "个人主页加载中……"
   },
   "app.nav.modrinth-account": {
     "message": "Modrinth账户"
@@ -1229,11 +1211,23 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
+  "app.nav.remove-account": {
+    "message": "移除账户"
+  },
+  "app.nav.screenshots": {
+    "message": "截图"
+  },
   "app.nav.sign-in-to-modrinth-account": {
-    "message": "登录Modrinth账户"
+    "message": "登录到 Modrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "切换账户"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "升级至Modrinth+"
+  },
+  "app.nav.view-profile": {
+    "message": "查看个人主页"
   },
   "app.navigation.go-back": {
     "message": "返回"
@@ -1255,6 +1249,9 @@
   },
   "app.notification.warning": {
     "message": "警告"
+  },
+  "app.project.actions.label": {
+    "message": "项目操作"
   },
   "app.project.coming-soon": {
     "message": "即将到来"
@@ -1298,14 +1295,176 @@
   "app.project.versions.already-installed": {
     "message": "已安装"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "实例操作"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "拖动以显示最近的实例"
   },
   "app.quick-instance-switcher.drag-tooltip": {
     "message": "拖拽以调整大小"
   },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "此实例已被锁定"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "查看实例"
+  },
   "app.restarting": {
     "message": "正在重启…"
+  },
+  "app.screenshots.copied": {
+    "message": "已复制"
+  },
+  "app.screenshots.copy": {
+    "message": "复制图片"
+  },
+  "app.screenshots.delete-description": {
+    "message": "确定要永久删除 {name} 吗？此操作无法撤销。"
+  },
+  "app.screenshots.delete-success": {
+    "message": "截图已删除"
+  },
+  "app.screenshots.delete-title": {
+    "message": "删除截图"
+  },
+  "app.screenshots.deselect": {
+    "message": "取消选择 {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "编辑截图"
+  },
+  "app.screenshots.empty-description": {
+    "message": "在游戏中截取的截图将显示在这里。"
+  },
+  "app.screenshots.empty-heading": {
+    "message": "暂无截图"
+  },
+  "app.screenshots.error-heading": {
+    "message": "无法加载截图"
+  },
+  "app.screenshots.go-to-instance": {
+    "message": "跳转至实例"
+  },
+  "app.screenshots.group-by": {
+    "message": "分组方式"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "全部截图"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "折叠分组"
+  },
+  "app.screenshots.group.custom": {
+    "message": "自定义分组"
+  },
+  "app.screenshots.group.date": {
+    "message": "按日期"
+  },
+  "app.screenshots.group.delete": {
+    "message": "删除分组"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "此组中的截图将被解散分组。"
+  },
+  "app.screenshots.group.edit": {
+    "message": "编辑分组名称"
+  },
+  "app.screenshots.group.empty": {
+    "message": "拖放文件到此处以添加截图。"
+  },
+  "app.screenshots.group.expand": {
+    "message": "展开分组"
+  },
+  "app.screenshots.group.instance": {
+    "message": "实例"
+  },
+  "app.screenshots.group.new": {
+    "message": "新建分组"
+  },
+  "app.screenshots.group.none": {
+    "message": "不分组"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "本月"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "本周"
+  },
+  "app.screenshots.group.today": {
+    "message": "今天"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "未分组"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "昨天"
+  },
+  "app.screenshots.heading": {
+    "message": "截图"
+  },
+  "app.screenshots.more-actions": {
+    "message": "更多操作"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "请尝试更改搜索关键词或筛选条件。"
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "未匹配到任何截图"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "搜索"
+  },
+  "app.screenshots.select": {
+    "message": "选中 {name}"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "选中的截图"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "确定要删除 {count, plural, one {# 张截图} other {# 张截图}}吗？此操作无法撤销。"
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "已删除 {count, plural, one {# 张截图} other {# 张截图}}"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "删除所有截图"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "导出为ZIP"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Modrinth 截图.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "{instance} 截图.zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "将其移出分组"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "已选 {count} 项"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "ZIP文件"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "在文件夹中显示"
+  },
+  "app.screenshots.sort-by": {
+    "message": "排序方式"
+  },
+  "app.screenshots.sort.name": {
+    "message": "截图名"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "最新"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "从旧到新"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -1334,6 +1493,9 @@
   "app.settings.default-instance-options.height.title": {
     "message": "高度"
   },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Java 和内存"
+  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "启动实例时传递给 Java 的参数。"
   },
@@ -1342,6 +1504,9 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java参数"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "启动 hook"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "每个实例的最大可用内存。"
@@ -1375,6 +1540,9 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "宽度"
+  },
+  "app.settings.default-instance-options.window.title": {
+    "message": "窗口设置"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "用来包装 Minecraft 启动过程的命令。"
@@ -1472,6 +1640,51 @@
   "app.settings.sidebar.label.instances": {
     "message": "实例"
   },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "没有找到实例"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "搜索实例"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "同步"
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "同步命令记录"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "在不同的实例之间同步命令记录。"
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "编辑指令历史记录"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "同步保存的创造模式物品栏"
+  },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "在不同的实例之间同步创造模式物品栏。"
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "同步多人模式服务器列表"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "服务器地址"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "在不同的实例直接同步多人模式服务器列表。"
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "编辑同步的服务器"
+  },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "当前未同步任何用户添加的服务器。"
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "服务器名称"
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "暂无已同步的服务器"
+  },
   "app.settings.tabs.appearance": {
     "message": "外观"
   },
@@ -1489,6 +1702,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "资源管理"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "同步设置"
   },
   "app.sidebar.playing-as": {
     "message": "游玩账户"
@@ -1798,6 +2014,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>添加好友</link> 来看看他们都在玩什么！"
+  },
+  "friends.friend.actions.label": {
+    "message": "好友操作"
   },
   "friends.friend.cancel-request": {
     "message": "取消请求"
@@ -2225,6 +2444,21 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "撤销邀请"
   },
+  "instance.settings.tabs.behavior.description": {
+    "message": "选择在实例页面要显示的标签页。"
+  },
+  "instance.settings.tabs.behavior.files": {
+    "message": "显示文件标签页"
+  },
+  "instance.settings.tabs.behavior.screenshots": {
+    "message": "显示截图标签页"
+  },
+  "instance.settings.tabs.behavior.screenshots.required": {
+    "message": "全局截图页面关闭时无法隐藏实例的截图标签页。"
+  },
+  "instance.settings.tabs.behavior.worlds": {
+    "message": "显示世界标签页"
+  },
   "instance.settings.tabs.general": {
     "message": "通用"
   },
@@ -2301,7 +2535,7 @@
     "message": "选择更新渠道"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "钩子供高级用户使用，可设置游戏启动前后运行的特定系统命令。"
+    "message": "在实例启动前后运行系统命令。"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "退出后执行"
@@ -2322,28 +2556,28 @@
     "message": "输入启动前命令……"
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "游戏启动钩子"
+    "message": "自定义启动钩子"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "在此实例工作目录中的钩柄遵循以下这些变量："
   },
   "instance.settings.tabs.hooks.variables.inst-dir.description": {
-    "message": "$INST_DIR:实例文件夹的绝对路径"
+    "message": "$INST_DIR：实例文件夹的绝对路径"
   },
   "instance.settings.tabs.hooks.variables.inst-id.description": {
-    "message": "$INST_ID:实例文件夹名称"
+    "message": "$INST_ID：实例文件夹名称"
   },
   "instance.settings.tabs.hooks.variables.inst-java-args.description": {
-    "message": "$INST_JAVA_ARGS:已为游戏提供的JVM参数"
+    "message": "$INST_JAVA_ARGS：为游戏提供的JVM参数"
   },
   "instance.settings.tabs.hooks.variables.inst-java.description": {
-    "message": "$INST_JAVA:Java核心文件的绝对路径"
+    "message": "$INST_JAVA：Java核心文件的绝对路径"
   },
   "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
-    "message": "$INST_MC_DIR:的别名是 $INST_DIR"
+    "message": "$INST_MC_DIR：$INST_DIR的别名"
   },
   "instance.settings.tabs.hooks.variables.inst-name.description": {
-    "message": "$INST_NAME:实例名"
+    "message": "$INST_NAME：实例名"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "包装器命令"
@@ -2364,16 +2598,16 @@
     "message": "当实例被锁定时，安装设置不可用。"
   },
   "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "自定义环境变量"
+    "message": "为此实例单独设置环境变量。"
   },
   "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "自定义Java参数"
+    "message": "设置自定义 Java 虚拟机参数。"
   },
   "instance.settings.tabs.java.custom-java-installation": {
-    "message": "自定义Java安装"
+    "message": "设置自定义的 Java 路径。"
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "自定义内存分配"
+    "message": "手动分配游戏内存。"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "输入环境变量……"
@@ -2382,31 +2616,82 @@
     "message": "输入 Java 参数……"
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "环境变量"
+    "message": "自定义环境变量"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "钩子"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Java 参数"
+    "message": "自定义 Java 参数"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Java 安装路径"
+    "message": "自定义 Java"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "内存分配"
+    "message": "手动分配内存"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
+  "instance.settings.tabs.settings-overrides": {
+    "message": "自定义同步"
+  },
   "instance.settings.tabs.sharing": {
     "message": "共享"
   },
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "不同步命令记录"
+  },
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "指令历史同步功能已在应用设置中关闭。"
+  },
+  "instance.settings.tabs.synced-options.command-history.override-description": {
+    "message": "使此实例的命令历史记录独立于同步的命令历史记录。"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "取消同步已保存的创造模式快捷栏"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "已保存的创造模式快捷栏同步功能已在应用设置中关闭。"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
+    "message": "让此实例保存的创造模式快捷栏与同步的快捷栏保持独立。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
+    "message": "在进行任何变更前，被替换的版本将被自动备份。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "{instance} 与已同步版本包含不同的创造模式快捷栏。请选择要在各实例中使用的版本。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.title": {
+    "message": "选择创造模式快捷栏"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
+    "message": "覆盖其他实例的数据"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
+    "message": "使用已同步版本"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "取消同步多人游戏服务器"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "多人游戏服务器同步功能已在应用设置中关闭。"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
+    "message": "让此实例的多人游戏服务器与同步的服务器保持独立。"
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "管理同步设置"
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "启用覆盖设置，使同步的设置在此实例中保持独立。"
+  },
   "instance.settings.tabs.window": {
-    "message": "游戏窗口"
+    "message": "自定义窗口设置"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "自定义窗口设置"
+    "message": "为此实例分别配置全屏模式和启动分辨率。"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "全屏"
@@ -2492,6 +2777,9 @@
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 服务器"
   },
+  "instance.worlds.actions.label": {
+    "message": "世界操作"
+  },
   "instance.worlds.cant_connect": {
     "message": "无法连接至服务器"
   },
@@ -2500,6 +2788,21 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "创建快捷方式"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "是否要在其他已同步的实例中保留此服务器，还是将它一并移除？"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "保留"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "移除"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "取消服务器同步"
+  },
+  "instance.worlds.desync_server": {
+    "message": "取消同步"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "在主界面隐藏"
@@ -2533,6 +2836,9 @@
   },
   "instance.worlds.play_instance": {
     "message": "游玩实例"
+  },
+  "instance.worlds.play_world": {
+    "message": "游玩此世界"
   },
   "instance.worlds.shortcut-created": {
     "message": "已创建快捷方式"

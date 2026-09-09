@@ -1,33 +1,26 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { CheckIcon, CodeIcon, ExternalIcon, TimerIcon, VersionIcon } from '@modrinth/assets'
 import {
-	CheckIcon,
-	CodeIcon,
-	DownloadIcon,
-	ExternalIcon,
-	TimerIcon,
-	VersionIcon,
-} from '@modrinth/assets'
-import {
-	Avatar,
 	ButtonLink,
 	CopyCode,
 	CopyLinkButton,
 	getProjectTypeIcon,
 	NavTabs,
-	useFormatBytes,
+	Toggle,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType } from '@modrinth/utils'
 import { computed, provide, ref, watch } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
+import ModerationItemHeader from '~/components/ui/moderation/ModerationItemHeader.vue'
 import {
-	getFileHighestSeverity,
+	getHighestSeverity,
 	getSeverityBadgeColor,
 	getVersionLabel,
 	getVersionPageHref,
-	severityOrder,
 } from '~/components/ui/moderation/tech-review/helpers'
+import TechRevFileActions from '~/components/ui/moderation/tech-review/TechRevFileActions.vue'
 import TechRevFileDetailTab from '~/components/ui/moderation/tech-review/TechRevFileDetailTab.vue'
 import TechRevFilesTab from '~/components/ui/moderation/tech-review/TechRevFilesTab.vue'
 import TechRevThreadTab from '~/components/ui/moderation/tech-review/TechRevThreadTab.vue'
@@ -48,10 +41,9 @@ const props = defineProps<{
 	loadingIssues: Set<string>
 	decompiledSources: Map<string, string>
 	collapsed: boolean
+	allowShowingHiddenTraces?: boolean
 	disableCollapsing?: boolean
 }>()
-
-const formatBytes = useFormatBytes()
 
 const emit = defineEmits<{
 	refetch: []
@@ -60,7 +52,33 @@ const emit = defineEmits<{
 	showMaliciousSummary: [unsafeFiles: UnsafeFile[]]
 }>()
 
-const decisions = useTechReviewDecisions(() => props.item.reports)
+const showHiddenTraces = ref(false)
+const hiddenTraceCount = computed(() =>
+	props.item.reports.reduce(
+		(reportCount, report) =>
+			reportCount +
+			report.issues.reduce(
+				(issueCount, issue) =>
+					issueCount + issue.details.filter((detail) => detail.severity === 'hidden').length,
+				0,
+			),
+		0,
+	),
+)
+const nonHiddenReports = computed(() =>
+	props.item.reports.flatMap((report) => {
+		const issues = report.issues.flatMap((issue) => {
+			const details = issue.details.filter((detail) => detail.severity !== 'hidden')
+			return details.length > 0 ? [{ ...issue, details }] : []
+		})
+		return issues.length > 0 ? [{ ...report, issues }] : []
+	}),
+)
+const visibleReports = computed(() =>
+	showHiddenTraces.value ? props.item.reports : nonHiddenReports.value,
+)
+
+const decisions = useTechReviewDecisions(visibleReports)
 provide(TECH_REVIEW_DECISIONS_KEY, decisions)
 
 const projectStatus = ref<Labrinth.Projects.v2.ProjectStatus>(props.item.project.status)
@@ -81,7 +99,7 @@ const selectedFileId = ref<string | null>(null)
 
 const selectedFile = computed(() => {
 	if (!selectedFileId.value) return null
-	return props.item.reports.find((r) => r.id === selectedFileId.value) ?? null
+	return visibleReports.value.find((r) => r.id === selectedFileId.value) ?? null
 })
 
 watch(selectedFile, (newFile) => {
@@ -90,14 +108,11 @@ watch(selectedFile, (newFile) => {
 	}
 })
 
-const highestSeverity = computed(() => {
-	let highest: Labrinth.TechReview.Internal.DelphiSeverity = 'low'
-	for (const report of props.item.reports) {
-		const severity = getFileHighestSeverity(report)
-		if (severityOrder[severity] > severityOrder[highest]) highest = severity
-	}
-	return highest
-})
+const highestSeverity = computed(() =>
+	getHighestSeverity(
+		visibleReports.value.flatMap((report) => report.issues.flatMap((issue) => issue.details)),
+	),
+)
 
 const navTabsLinks = computed(() => {
 	const links = tabs.map((tab) => ({
@@ -153,11 +168,14 @@ function viewFileFlags(file: FlattenedFileReport) {
 	currentTab.value = 'File'
 }
 
-function findFileForDetail(detailId: string): FlattenedFileReport | null {
+function findFileForDetail(
+	detailId: string,
+): { file: FlattenedFileReport; hidden: boolean } | null {
 	for (const report of props.item.reports) {
 		for (const issue of report.issues) {
-			if (issue.details.some((detail) => detail.id === detailId)) {
-				return report
+			const detail = issue.details.find((detail) => String(detail.id) === detailId)
+			if (detail) {
+				return { file: report, hidden: detail.severity === 'hidden' }
 			}
 		}
 	}
@@ -175,10 +193,15 @@ function backToFileList() {
 watch(
 	() => props.focusedDetailId,
 	(detailId) => {
-		if (detailId) {
-			const file = findFileForDetail(detailId)
-			if (file) viewFileFlags(file)
+		if (!detailId) return
+
+		const result = findFileForDetail(detailId)
+		if (!result) return
+		if (result.hidden) {
+			if (!props.allowShowingHiddenTraces) return
+			showHiddenTraces.value = true
 		}
+		viewFileFlags(result.file)
 	},
 	{ immediate: true },
 )
@@ -189,122 +212,91 @@ watch(
 		class="shadow-card overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-3"
 	>
 		<div
-			class="flex flex-col gap-4 border-0 border-b border-solid border-surface-4 bg-surface-3 p-4"
+			class="flex flex-col gap-3 border-0 border-b border-solid border-surface-4 bg-surface-3 p-4 pb-3"
 		>
-			<div class="flex items-start justify-between">
-				<div class="flex items-center gap-3">
-					<NuxtLink
-						:to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
-						target="_blank"
-						tabindex="-1"
-					>
-						<Avatar
-							:src="item.project.icon_url"
-							class="rounded-2xl border border-surface-5 bg-surface-4 !shadow-none"
-							size="4rem"
-						/>
-					</NuxtLink>
-
-					<div class="flex flex-col gap-1.5">
-						<div class="flex items-center gap-2">
-							<NuxtLink
-								:to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
-								target="_blank"
-								class="text-lg font-semibold text-contrast hover:underline focus-visible:underline"
+			<div class="flex flex-wrap items-start justify-between">
+				<ModerationItemHeader
+					:avatar-url="item.project.icon_url"
+					:title="item.project.name"
+					:title-to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
+					:owner="item.project_owner"
+				>
+					<template #badges>
+						<div
+							class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+						>
+							<component
+								:is="getProjectTypeIcon(item.project.project_types[0] as any)"
+								aria-hidden="true"
+								class="h-4 w-4"
+							/>
+							<span
+								v-for="project_type in item.project.project_types"
+								:key="project_type + item.project.id"
+								class="text-sm font-medium text-secondary"
+								>{{ formatProjectType(project_type, true) }}</span
 							>
-								{{ item.project.name }}
-							</NuxtLink>
-
-							<div
-								class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
-							>
-								<component
-									:is="getProjectTypeIcon(item.project.project_types[0] as any)"
-									aria-hidden="true"
-									class="h-4 w-4"
-								/>
-								<span
-									v-for="project_type in item.project.project_types"
-									:key="project_type + item.project.id"
-									class="text-sm font-medium text-secondary"
-									>{{ formatProjectType(project_type, true) }}</span
-								>
-							</div>
-
-							<div
-								class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1"
-								:class="
-									isProjectApproved
-										? 'border-green bg-highlight-green'
-										: 'border-orange bg-highlight-orange'
-								"
-							>
-								<CheckIcon v-if="isProjectApproved" aria-hidden="true" class="h-4 w-4 text-green" />
-								<TimerIcon v-else aria-hidden="true" class="h-4 w-4 text-orange" />
-								<span
-									class="text-sm font-medium"
-									:class="isProjectApproved ? 'text-green' : 'text-orange'"
-								>
-									{{ isProjectApproved ? 'Live' : 'In review' }}
-								</span>
-							</div>
-
-							<div class="rounded-full border-solid px-2.5 py-1" :class="severityColor">
-								<span class="text-sm font-medium">{{
-									capitalizeString(highestSeverity.toLowerCase())
-								}}</span>
-							</div>
 						</div>
 
-						<div class="flex items-center gap-2">
-							<NuxtLink
-								:to="`/${item.project_owner.kind}/${item.project_owner.id}`"
-								target="_blank"
-								class="flex items-center gap-1 text-sm font-medium text-secondary hover:underline"
+						<div
+							class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1"
+							:class="
+								isProjectApproved
+									? 'border-green bg-highlight-green'
+									: 'border-orange bg-highlight-orange'
+							"
+						>
+							<CheckIcon v-if="isProjectApproved" aria-hidden="true" class="h-4 w-4 text-green" />
+							<TimerIcon v-else aria-hidden="true" class="h-4 w-4 text-orange" />
+							<span
+								class="text-sm font-medium"
+								:class="isProjectApproved ? 'text-green' : 'text-orange'"
 							>
-								<Avatar
-									:src="item.project_owner.icon_url"
-									class="rounded-full border border-surface-5 bg-surface-4 !shadow-none"
-									size="1.5rem"
-									circle
-								/>
-								{{ item.project_owner.name }}
-							</NuxtLink>
-							<CopyCode v-tooltip="'Copy user ID'" :text="item.project_owner.id" />
+								{{ isProjectApproved ? 'Live' : 'In review' }}
+							</span>
+						</div>
+
+						<div class="rounded-full border-solid px-2.5 py-1" :class="severityColor">
+							<span class="text-sm font-medium">
+								{{ capitalizeString(highestSeverity.toLowerCase()) }}
+							</span>
+						</div>
+					</template>
+				</ModerationItemHeader>
+
+				<div class="flex flex-col items-end gap-2">
+					<div class="flex flex-wrap items-center justify-end gap-3">
+						<span class="text-base text-secondary">{{ formattedDate }}</span>
+						<div class="flex items-center gap-2">
+							<ButtonLink
+								v-if="props.item.project.link_urls?.['source']?.url"
+								v-tooltip="'Open sources in new tab'"
+								:href="props.item.project.link_urls?.['source']?.url"
+								target="_blank"
+								circular
+								icon-only
+							>
+								<CodeIcon />
+							</ButtonLink>
+							<CopyLinkButton
+								copy-label="Copy tech review link"
+								:url="`https://modrinth.com/moderation/technical-review/${props.item.project.id}`"
+							/>
+							<ButtonLink
+								v-tooltip="'Open tech review in new tab'"
+								:href="`/moderation/technical-review/${props.item.project.id}`"
+								target="_blank"
+								circular
+								icon-only
+							>
+								<ExternalIcon />
+							</ButtonLink>
 						</div>
 					</div>
-				</div>
-
-				<div class="flex items-center gap-3">
-					<span class="text-base text-secondary">{{ formattedDate }}</span>
-					<div class="flex items-center gap-2">
-						<ButtonLink
-							v-if="props.item.project.link_urls?.['source']?.url"
-							v-tooltip="'Open sources in new tab'"
-							:href="props.item.project.link_urls?.['source']?.url"
-							target="_blank"
-							class="!w-9 !rounded-full !px-0"
-						>
-							<CodeIcon />
-						</ButtonLink>
-						<CopyCode v-tooltip="'Copy project ID'" :text="item.project.id" />
-						<CopyLinkButton
-							copy-label="Copy project link"
-							:url="`https://modrinth.com/moderation/technical-review/${props.item.project.id}`"
-						/>
-						<ButtonLink
-							v-tooltip="'Open tech review in new tab'"
-							:href="`/moderation/technical-review/${props.item.project.id}`"
-							target="_blank"
-							circular
-							icon-only
-						>
-							<ExternalIcon />
-						</ButtonLink>
-					</div>
+					<CopyCode v-tooltip="'Copy project ID'" :text="item.project.id" />
 				</div>
 			</div>
-			<div class="flex flex-row justify-between">
+			<div class="flex flex-wrap items-end justify-between gap-3">
 				<NavTabs
 					mode="local"
 					:links="navTabsLinks"
@@ -313,41 +305,30 @@ watch(
 					@tab-click="handleTabClick"
 				/>
 
-				<div v-if="currentTab === 'File' && selectedFile" class="flex flex-row items-end gap-2">
-					<ButtonLink
-						type="outlined"
-						target="_blank"
-						:href="getVersionPageHref(item.project, selectedFile.version_id)"
-						class="!bg-surface-2"
-						:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
+				<div class="flex flex-wrap items-end justify-end gap-4">
+					<label
+						v-if="allowShowingHiddenTraces"
+						class="flex cursor-pointer items-center gap-3 text-sm"
 					>
-						<VersionIcon aria-hidden="true" />
-						{{ getVersionLabel(selectedFile) }}
-					</ButtonLink>
-					<ButtonLink
-						type="outlined"
-						target="_blank"
-						:href="`https://slicer.run/?url=${encodeURIComponent(selectedFile.download_url)}`"
-						class="!bg-surface-2"
-						aria-label="Open in Slicer"
-					>
-						<ExternalIcon aria-hidden="true" /> Slicer
-					</ButtonLink>
-					<ButtonLink
-						v-tooltip="
-							`Download ${selectedFile.file_name} (${formatBytes(selectedFile.file_size)})`
-						"
-						type="outlined"
-						target="_blank"
-						:href="selectedFile.download_url"
-						:download="selectedFile.file_name"
-						class="!bg-surface-2"
-						aria-label="Download"
-						icon-only
-						circular
-					>
-						<DownloadIcon aria-hidden="true" />
-					</ButtonLink>
+						<span class="text-right text-secondary">
+							Show hidden traces
+							<span class="text-tertiary block text-xs">{{ hiddenTraceCount }} hidden</span>
+						</span>
+						<Toggle v-model="showHiddenTraces" :disabled="hiddenTraceCount === 0" small />
+					</label>
+					<div v-if="currentTab === 'File' && selectedFile" class="flex items-center gap-2">
+						<ButtonLink
+							v-tooltip="'View version'"
+							type="outlined"
+							target="_blank"
+							:href="getVersionPageHref(item.project, selectedFile.version_id)"
+							:aria-label="`Open version ${getVersionLabel(selectedFile)}`"
+						>
+							<VersionIcon aria-hidden="true" />
+							{{ getVersionLabel(selectedFile) }}
+						</ButtonLink>
+						<TechRevFileActions :file="selectedFile" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -359,7 +340,7 @@ watch(
 				:project="item.project"
 				:project-owner="item.project_owner"
 				:thread="item.thread"
-				:reports="item.reports"
+				:reports="nonHiddenReports"
 				:disable-collapsing="disableCollapsing"
 				@refetch="emit('refetch')"
 				@mark-complete="emit('markComplete', $event)"
@@ -368,7 +349,7 @@ watch(
 			/>
 			<TechRevFilesTab
 				v-else-if="currentTab === 'Files'"
-				:reports="item.reports"
+				:reports="visibleReports"
 				:project="item.project"
 				@view-flags="viewFileFlags"
 			/>

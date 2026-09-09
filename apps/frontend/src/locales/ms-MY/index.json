@@ -674,9 +674,6 @@
   "auth.reset-password.title.long": {
     "message": "Tetap semula kata laluan anda"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Masukkan kod..."
-  },
   "auth.sign-in.create-account": {
     "message": "Daftar"
   },
@@ -1826,9 +1823,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Apakah jenis CPU yang digunakan oleh pelayan Modrinth Hosting?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Pelayan Modrinth Hosting dikuasakan oleh CPU setara AMD Ryzen 7900 dan 7950X3D pada 5+ GHz, digandingkan dengan ingatan DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Dalam mata wang apa harga-harga tersebut?"
   },
@@ -2164,9 +2158,6 @@
   },
   "layout.action.new-project": {
     "message": "Projek baharu"
-  },
-  "layout.action.new-server-project": {
-    "message": "Pelayan baharu"
   },
   "layout.action.publish": {
     "message": "Terbitkan"
@@ -3631,9 +3622,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Masukkan kod dua faktor"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Masukkan kod..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Pengesahan dua faktor memastikan akaun anda selamat dengan memerlukan akses kepada peranti kedua untuk log masuk."

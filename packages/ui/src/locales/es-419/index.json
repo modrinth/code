@@ -176,6 +176,9 @@
   "button.continue": {
     "defaultMessage": "Continuar"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copiado al portapapeles"
+  },
   "button.copy-filename": {
     "defaultMessage": "Copiar nombre de archivo"
   },
@@ -1412,6 +1415,27 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "por ej., config.yml"
   },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "Ya existe un archivo con este nombre."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "No se pudo comprobar si este archivo ya existe."
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "Crear ZIP"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "Crear ZIP"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "El nombre del archivo debe ser un único nombre de archivo."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Nombre de archivo"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "Ingrese un nombre de archivo."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "Borrando \"{name}\""
   },
@@ -1523,6 +1547,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Las operaciones de archivos están deshabilitadas mientras se realiza la operación."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "Crear ZIP"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Ocurrió un error en la ejecución de prueba"
   },
@@ -1604,6 +1631,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Cargar archivo .zip desde URL"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "{progress}% comprimido"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "Creando {source}"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "Creación de {source} finalizada"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "La creación de {source} falló"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Archivo actual: {file}"
   },
@@ -1627,6 +1666,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Nuevo nombre"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "Crear ZIP"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# elemento} other {# elementos}}"
@@ -2017,6 +2059,108 @@
   },
   "icon-select.select": {
     "defaultMessage": "Seleccionar ícono"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Cerrar"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Editar"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Color"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} x {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Reiniciar recorte"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Eliminar anotación seleccionada"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Área"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Elemento"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Modo borrador"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Herramientas de edición de imagen"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Más opciones de guardar"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Sobreescribir"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Rehacer"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Guardar copia"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Guardar imagen"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Tamaño"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Flecha"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Censura"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Recorte"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Círculo"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Borrador"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Resaltar"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Bolígrafo"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Rectángulo"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Seleccionar"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Texto"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Deshacer"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Ancho"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Ajustar"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "Ajustar al área de trabajo"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Acercar"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Alejar"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Próxima imagen"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Imagen anterior"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Buscar versión..."
@@ -2609,6 +2753,9 @@
   "label.yes": {
     "defaultMessage": "Sí"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Cambiando cuentas..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Checo"
   },
@@ -3112,6 +3259,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Configurar como afiliado"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Ver instancias compartidas"
   },
   "profile.button.unblock": {
     "defaultMessage": "Desbloquear"
@@ -4015,6 +4165,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Canal"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, number} seleccionado"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Activar/desactivar el filtro para {filter}"
@@ -5006,6 +5162,12 @@
   "servers.busy.installing": {
     "defaultMessage": "El servidor se está instalando"
   },
+  "servers.files.zip-created": {
+    "defaultMessage": "ZIP creado"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "Creado en {destination}"
+  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Mandar solicitud de amistad también"
   },
@@ -5152,9 +5314,6 @@
   },
   "servers.listing.copy-id-label": {
     "defaultMessage": "Copiar ID"
-  },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Descargar el respaldo más reciente"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Gestionar facturación"
@@ -5393,9 +5552,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "facturado {interval, select, monthly {mensual} quarterly {trimestral} yearly {anual} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Disponible en Norteamérica, Europa y el Sudeste Asiático."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Elige un plan personalizado con solo las especificaciones que necesites."
   },
@@ -5404,6 +5560,9 @@
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Comenzar"
+  },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Desarrollado por AMD Ryzen 7950X, 9950X, o equivalente, con memoria DDR5."
   },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Grande"
@@ -5521,6 +5680,27 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "¿Que pasa?"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Rotar credenciales"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Por favor, vuelve a intentarlo más tarde."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "Error al rotar las credenciales SFTP"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "El nombre de usuario y contraseña anteriores dejarán de funcionar."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Rotar credenciales"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Su nombre de usuario y contraseña SFTP han sido regenerados."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "Credenciales SFTP rotadas"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Se produjo un error inesperado durante la instalación. Por favor, inténtalo de nuevo más tarde."
@@ -6582,7 +6762,7 @@
     "defaultMessage": "Este usuario ha estado presente desde la Beta de Modrinth, la cuál terminó en febrero de 2022."
   },
   "user.profile.badge.beta.link": {
-    "defaultMessage": "Haz click para leer sobre el lanzamiento de Modrinth Beta."
+    "defaultMessage": "Haz clic para leer sobre el lanzamiento de Modrinth Beta."
   },
   "user.profile.badge.beta.name": {
     "defaultMessage": "Beta Tester"
@@ -6648,7 +6828,7 @@
     "defaultMessage": "Este usuario está haciendo un esfuerzo adicional para apoyar a Modrinth y a los creadores de la plataforma."
   },
   "user.profile.badge.plus.link": {
-    "defaultMessage": "Haz click para saber más de como puedes volverte miembro."
+    "defaultMessage": "Haz clic para saber más de como puedes volverte miembro."
   },
   "user.profile.badge.plus.name": {
     "defaultMessage": "Miembro de Modrinth+"
@@ -6657,7 +6837,7 @@
     "defaultMessage": "Este usuario participó en al menos uno de las Fundaciones Orgullo de Modrinth para la comunidad LGBTQ+."
   },
   "user.profile.badge.pride.link": {
-    "defaultMessage": "Haz click para ver la última Fundación Orgullo."
+    "defaultMessage": "Haz clic para ver la última Fundación Orgullo."
   },
   "user.profile.badge.pride.name": {
     "defaultMessage": "Soporte de la Fundacion Orgullo"
@@ -6666,6 +6846,12 @@
     "defaultMessage": "Este usuario trabaja para Modrinth."
   },
   "user.profile.badge.staff.name": {
+    "defaultMessage": "Equipo de Modrinth"
+  },
+  "user.role.moderator": {
+    "defaultMessage": "Moderador de Contenido"
+  },
+  "user.role.modrinth-team": {
     "defaultMessage": "Equipo de Modrinth"
   },
   "version.content.name": {
@@ -6678,7 +6864,7 @@
     "defaultMessage": "Dev jar"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc jar"
+    "defaultMessage": "Javadocs jar"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Paquete de recursos opcional"
@@ -6693,7 +6879,7 @@
     "defaultMessage": "Archivo de firma"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "Source jar"
+    "defaultMessage": "Sources jar"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Otros"
@@ -6759,3 +6945,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

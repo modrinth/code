@@ -488,7 +488,7 @@ defineExpose({ show, hide })
 							</summary>
 							<div class="flex flex-wrap gap-1 pt-2">
 								<span
-									v-for="name of row.scan?.scanned_file_names ?? []"
+									v-for="name in row.scan?.scanned_file_names ?? []"
 									:key="name"
 									v-tooltip="name"
 									class="flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium text-contrast"

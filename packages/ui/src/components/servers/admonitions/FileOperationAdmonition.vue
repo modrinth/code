@@ -4,15 +4,22 @@
 		:dismissible="dismissible && isTerminal"
 		:progress="'progress' in op ? (op.progress ?? 0) : 0"
 		:progress-color="op.state === 'done' ? 'green' : op.state?.startsWith('fail') ? 'red' : 'blue'"
-		:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
+		:waiting="!isTerminal && (op.state === 'queued' || !op.progress || op.progress === 0)"
 		@dismiss="$emit('dismiss')"
 	>
 		<template #icon="{ iconClass }">
-			<PackageOpenIcon :class="iconClass" />
+			<FolderArchiveIcon v-if="op.op === 'zip'" :class="iconClass" />
+			<PackageOpenIcon v-else :class="iconClass" />
 		</template>
 		<template #header>{{ title }}</template>
 		<span class="text-secondary">
-			<span>
+			<span v-if="op.state?.startsWith('fail') && op.error">
+				{{ op.error }}
+			</span>
+			<span v-else-if="op.op === 'zip'">
+				{{ formatMessage(messages.compressed, { progress: Math.round((op.progress ?? 0) * 100) }) }}
+			</span>
+			<span v-else>
 				{{
 					formatMessage(messages.extracted, {
 						size: formatBytes(op.bytes_processed ?? 0),
@@ -25,7 +32,7 @@
 		</span>
 		<template v-if="op.id" #top-right-actions>
 			<Button
-				v-if="!isTerminal"
+				v-if="!isTerminal && op.cancellable !== false"
 				v-tooltip="!canWriteFiles ? permissionDeniedMessage : undefined"
 				type="outlined"
 				class="!border !text-blue [&>svg]:!text-blue !shadow-[inset_0_0_0_1px_var(--color-blue)]"
@@ -40,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { PackageOpenIcon } from '@modrinth/assets'
+import { FolderArchiveIcon, PackageOpenIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -89,6 +96,22 @@ const messages = defineMessages({
 		id: 'files.operations.current-file',
 		defaultMessage: 'Current file: {file}',
 	},
+	compressing: {
+		id: 'files.operations.compressing',
+		defaultMessage: 'Creating {source}',
+	},
+	compressingCompleted: {
+		id: 'files.operations.compressing-completed',
+		defaultMessage: 'Creating {source} finished',
+	},
+	compressingFailed: {
+		id: 'files.operations.compressing-failed',
+		defaultMessage: 'Creating {source} failed',
+	},
+	compressed: {
+		id: 'files.operations.compressed',
+		defaultMessage: '{progress}% compressed',
+	},
 })
 
 const isTerminal = computed(() => props.op.state === 'done' || !!props.op.state?.startsWith('fail'))
@@ -97,6 +120,15 @@ const sourceName = computed(() =>
 )
 
 const title = computed(() => {
+	if (props.op.op === 'zip') {
+		if (props.op.state === 'done') {
+			return formatMessage(messages.compressingCompleted, { source: sourceName.value })
+		}
+		if (props.op.state?.startsWith('fail')) {
+			return formatMessage(messages.compressingFailed, { source: sourceName.value })
+		}
+		return formatMessage(messages.compressing, { source: sourceName.value })
+	}
 	if (props.op.state === 'done') {
 		return formatMessage(messages.extractingCompleted, { source: sourceName.value })
 	}

@@ -1,0 +1,50 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT option_id, kind, raw_key, canonical_value_json,\n\t\t\tseeded AS \"seeded!: bool\", revision AS \"revision!: i64\"\n\t\tFROM synced_game_option_values\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "option_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "kind",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "raw_key",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "canonical_value_json",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "seeded!: bool",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "revision!: i64",
+        "ordinal": 5,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "083e4766729cc70fd43bcc2b920165d10b9a34a68eb4e85b7380eee167db92b0"
+}

@@ -64,6 +64,7 @@ function clearExpiredCache(): void {
 
 export function useTechReviewSources(
 	issues: MaybeRefOrGetter<Labrinth.TechReview.Internal.FileIssue[]>,
+	includeHidden: MaybeRefOrGetter<boolean> = false,
 ) {
 	const client = injectModrinthClient()
 
@@ -81,7 +82,9 @@ export function useTechReviewSources(
 		loadingIssues.add(issueId)
 
 		try {
-			const issueData = await client.labrinth.tech_review_internal.getIssue(issueId)
+			const issueData = await client.labrinth.tech_review_internal.getIssue(issueId, {
+				include_hidden: toValue(includeHidden),
+			})
 
 			for (const detail of issueData.details) {
 				if (detail.decompiled_source) {

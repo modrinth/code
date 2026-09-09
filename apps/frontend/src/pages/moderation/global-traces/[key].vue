@@ -41,7 +41,7 @@
 						</p>
 						<p class="m-0 break-all text-secondary">
 							<span class="font-semibold text-contrast">Path</span>
-							{{ decodeTracePath(latestLocalTrace.file_path) }}
+							<IssueDetailPath :segments="[latestLocalTrace.file_path]" />
 						</p>
 					</div>
 				</div>
@@ -100,6 +100,7 @@ import {
 } from '@modrinth/ui'
 
 import GlobalDetailLocalTraceCard from '~/components/ui/moderation/GlobalDetailLocalTraceCard.vue'
+import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -134,22 +135,17 @@ const pageEnd = computed(() =>
 )
 const latestLocalTrace = computed(() => trace.value?.local_traces.at(-1))
 
-function decodeTracePath(path: string): string {
-	try {
-		return decodeURIComponent(path)
-	} catch {
-		return path
-	}
-}
-
 function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
 	switch (severity) {
+		case 'malware':
 		case 'severe':
 			return 'border-red/60 bg-highlight-red text-red'
 		case 'high':
 			return 'border-orange/60 bg-highlight-orange text-orange'
 		case 'medium':
 			return 'border-green/60 bg-highlight-green text-green'
+		case 'hidden':
+			return 'border-divider bg-surface-2 text-secondary'
 		case 'low':
 		default:
 			return 'border-blue/60 bg-highlight-blue text-blue'

@@ -794,9 +794,6 @@
   "auth.reset-password.title.long": {
     "message": "Đặt lại mật khẩu của bạn"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Nhập mã..."
-  },
   "auth.sign-in.title": {
     "message": "Đăng nhập"
   },
@@ -1988,9 +1985,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Những loại CPU nào được sử dụng trên Modrinth?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Máy chủ Modrinth được vận hành bởi dòng CPU tương đương với AMD Ryzen 7900 và 7950X3D với nhịp xung 5+ GHz, cùng với bộ nhớ DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Tiền tệ nào được sử dụng để liệt kê giá?"
   },
@@ -2329,9 +2323,6 @@
   },
   "layout.action.new-project": {
     "message": "Dự án mới"
-  },
-  "layout.action.new-server-project": {
-    "message": "Máy chủ mới"
   },
   "layout.action.publish": {
     "message": "Đăng tải"
@@ -3781,9 +3772,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Nhập mã xác thực hai yếu tố"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Nhập mã..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Xác thực hai yếu tố giúp bảo mật tài khoản của bạn bằng cách yêu cầu quyền truy cập vào thiết bị thứ hai để đăng nhập."

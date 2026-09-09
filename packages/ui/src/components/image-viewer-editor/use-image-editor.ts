@@ -5,7 +5,6 @@ import { useDebugLogger } from '#ui/composables/debug-logger'
 import { renderCensorRegion } from './image-viewer-editor-censor-object'
 import type {
 	EditorHistoryEntry,
-	ScreenshotCensorMode,
 	ScreenshotEditorObjectKind,
 	ScreenshotEditorObjectState,
 	ScreenshotEditorPropertyKind,
@@ -29,7 +28,6 @@ type EditorFabricObject = FabricObject & {
 	editorKind?: ScreenshotEditorObjectKind
 	fontSize?: number
 	sourceRect?: ScreenshotEditorSourceRect
-	censorMode?: ScreenshotCensorMode
 	censorColor?: string
 }
 
@@ -55,7 +53,6 @@ const CENSOR_REGENERATED_PROPERTIES = new Set([
 	'clipPath',
 	'editorKind',
 	'sourceRect',
-	'censorMode',
 	'censorColor',
 ])
 const TOOL_SHORTCUTS: Partial<Record<string, ScreenshotEditorTool>> = {
@@ -81,7 +78,6 @@ export function useImageEditor() {
 	const color = ref('#ffffff')
 	const strokeWidth = ref(6)
 	const fontSize = ref(30)
-	const censorMode = ref<ScreenshotCensorMode>('blur')
 	const eraserMode = ref<ScreenshotEraserMode>('element')
 	const zoom = ref(1)
 	const fitScale = ref(1)
@@ -120,10 +116,9 @@ export function useImageEditor() {
 			kind === 'rectangle' ||
 			kind === 'ellipse' ||
 			kind === 'text' ||
-			(kind === 'censor' && selectionCount.value === 0 && censorMode.value === 'solid')
+			(kind === 'censor' && selectionCount.value === 0)
 		)
 	})
-	const showCensorMode = computed(() => selectionCount.value === 0 && tool.value === 'censor')
 	const showEraserMode = computed(() => selectionCount.value === 0 && tool.value === 'eraser')
 	const canZoomOut = computed(() => zoom.value > MIN_ZOOM)
 	const canZoomIn = computed(() => zoom.value < MAX_ZOOM)
@@ -138,6 +133,7 @@ export function useImageEditor() {
 		eraser: 24,
 	}
 	let defaultColor = '#ffffff'
+	let defaultCensorColor = '#000000'
 	let defaultFontSize = 30
 
 	let fabric: FabricModule | undefined
@@ -246,10 +242,7 @@ export function useImageEditor() {
 				recordHistory()
 				return
 			}
-			if (target) {
-				refreshModifiedCensors(target as EditorFabricObject)
-				editorCanvas.requestRenderAll()
-			}
+			if (target) editorCanvas.requestRenderAll()
 			recordHistory()
 			syncSelectionProperties()
 		})
@@ -585,7 +578,7 @@ export function useImageEditor() {
 		}
 
 		if (activeObjects.length > 0) return
-		color.value = defaultColor
+		color.value = tool.value === 'censor' ? defaultCensorColor : defaultColor
 		if (tool.value === 'text') {
 			fontSize.value = defaultFontSize
 		} else if (tool.value === 'highlight') {
@@ -605,7 +598,8 @@ export function useImageEditor() {
 		if (selected && kind && kind !== 'censor') {
 			setObjectColor(selected, kind, nextColor)
 		} else if (selectionCount.value === 0) {
-			defaultColor = nextColor
+			if (tool.value === 'censor') defaultCensorColor = nextColor
+			else defaultColor = nextColor
 			refreshToolSettings()
 		}
 	}
@@ -1064,7 +1058,7 @@ export function useImageEditor() {
 
 		if (tool.value === 'censor') {
 			editorCanvas.remove(preview)
-			const censorCanvas = renderCensorRegion(sourceImage!, rect, censorMode.value, color.value)
+			const censorCanvas = renderCensorRegion(rect, color.value)
 			const censor = new fabric.FabricImage(censorCanvas, {
 				left: rect.left,
 				top: rect.top,
@@ -1075,7 +1069,6 @@ export function useImageEditor() {
 			})
 			setEditorMetadata(censor, 'censor', rect)
 			const editorCensor = censor as EditorFabricObject
-			editorCensor.censorMode = censorMode.value
 			editorCensor.censorColor = color.value
 			styleObjectControls(censor)
 			const censorCount = annotationObjects().filter(
@@ -1120,39 +1113,6 @@ export function useImageEditor() {
 		cropDrawingStart = undefined
 		cropDrawingPrevious = undefined
 		constructingObject = false
-	}
-
-	function refreshModifiedCensors(target: EditorFabricObject) {
-		const targets =
-			'getObjects' in target && typeof target.getObjects === 'function'
-				? (target.getObjects() as EditorFabricObject[])
-				: [target]
-		for (const object of targets) refreshCensor(object)
-	}
-
-	function refreshCensor(object: EditorFabricObject) {
-		if (
-			object.editorKind !== 'censor' ||
-			object.censorMode !== 'blur' ||
-			!sourceImage ||
-			object.width <= 0 ||
-			object.height <= 0
-		) {
-			return
-		}
-		const censorCanvas = renderCensorRegion(
-			sourceImage,
-			{ left: 0, top: 0, width: object.width, height: object.height },
-			'blur',
-			object.censorColor ?? '#000000',
-			object.calcTransformMatrix(),
-		)
-		;(object as FabricImage).setElement(censorCanvas, {
-			width: object.width,
-			height: object.height,
-		})
-		object.dirty = true
-		object.setCoords()
 	}
 
 	function deleteSelection() {
@@ -1204,7 +1164,6 @@ export function useImageEditor() {
 				const state = object.toObject([
 					'editorKind',
 					'sourceRect',
-					'censorMode',
 					'censorColor',
 				]) as ScreenshotEditorObjectState
 				if (object.editorKind === 'censor') delete state.src
@@ -1215,8 +1174,7 @@ export function useImageEditor() {
 
 	async function enlivenEditorObjects(states: ScreenshotEditorObjectState[]) {
 		const fabricModule = fabric
-		const editorSourceImage = sourceImage
-		if (!fabricModule || !editorSourceImage) return []
+		if (!fabricModule) return []
 		const enlivenObjects = fabricModule.util.enlivenObjects as unknown as (
 			objects: ScreenshotEditorObjectState[],
 		) => Promise<EditorFabricObject[]>
@@ -1232,31 +1190,22 @@ export function useImageEditor() {
 				if (!isSourceRect(state.sourceRect)) {
 					throw new Error('Could not restore screenshot censor region')
 				}
-				const restoredMode: ScreenshotCensorMode = state.censorMode === 'solid' ? 'solid' : 'blur'
 				const restoredColor = typeof state.censorColor === 'string' ? state.censorColor : '#000000'
 				const serializedClipPath =
 					state.clipPath && typeof state.clipPath === 'object'
 						? (state.clipPath as ScreenshotEditorObjectState)
 						: undefined
-				const censorCanvas = renderCensorRegion(
-					editorSourceImage,
-					state.sourceRect,
-					restoredMode,
-					restoredColor,
-				)
+				const censorCanvas = renderCensorRegion(state.sourceRect, restoredColor)
 				const objectOptions = Object.fromEntries(
 					Object.entries(state).filter(
 						([property]) => !CENSOR_REGENERATED_PROPERTIES.has(property),
 					),
 				) as ScreenshotEditorObjectState
-				const censor = new fabricModule.FabricImage(
-					censorCanvas,
-					objectOptions as unknown as FabricImageOptions,
-				) as EditorFabricObject
+				const censor = new fabricModule.FabricImage(censorCanvas, {
+					...objectOptions,
+				} as unknown as FabricImageOptions) as EditorFabricObject
 				setEditorMetadata(censor, 'censor', state.sourceRect)
-				censor.censorMode = restoredMode
 				censor.censorColor = restoredColor
-				refreshCensor(censor)
 				if (serializedClipPath) {
 					const [clipPath] = await enlivenObjects([serializedClipPath])
 					if (clipPath) censor.clipPath = clipPath
@@ -1351,6 +1300,16 @@ export function useImageEditor() {
 		isFit.value = true
 		zoom.value = fitScale.value
 		applyDisplayScale()
+	}
+
+	function waitForRender() {
+		const editorCanvas = canvas.value
+		if (!editorCanvas) return Promise.resolve()
+
+		return new Promise<void>((resolve) => {
+			editorCanvas.once('after:render', () => resolve())
+			editorCanvas.requestRenderAll()
+		})
 	}
 
 	function applyDisplayScale() {
@@ -1586,7 +1545,6 @@ export function useImageEditor() {
 		color,
 		strokeWidth,
 		fontSize,
-		censorMode,
 		eraserMode,
 		zoom,
 		fitScale,
@@ -1598,7 +1556,6 @@ export function useImageEditor() {
 		canZoomIn,
 		hasColorProperty,
 		propertyValueKind,
-		showCensorMode,
 		showEraserMode,
 		showCropControls,
 		cropWidth,
@@ -1621,6 +1578,7 @@ export function useImageEditor() {
 		fitToViewport,
 		setZoom,
 		setFit,
+		waitForRender,
 		exportPng,
 		handleKeyboardShortcut,
 		isTextEditing,

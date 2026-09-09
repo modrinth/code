@@ -5,6 +5,12 @@
 	"private": true,
 	"main": "./index.ts",
 	"types": "./index.ts",
+	"sideEffects": [
+		"**/*.css",
+		"**/*.scss",
+		"./src/utils/ace-theme.ts",
+		"./src/utils/ace-mode-mcfunction.ts"
+	],
 	"imports": {
 		"#ui/*": "./src/*"
 	},
@@ -74,6 +80,7 @@
 		"@xterm/xterm": "^6.0.0",
 		"ace-builds": "^1.43.5",
 		"apexcharts": "^4.0.0",
+		"colord": "^2.9.3",
 		"dayjs": "^1.11.10",
 		"dompurify": "^3.1.7",
 		"es-toolkit": "^1.44.0",

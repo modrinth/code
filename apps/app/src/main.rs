@@ -12,7 +12,6 @@ use tauri_plugin_fs::FsExt;
 use theseus::prelude::*;
 
 mod api;
-mod error;
 
 #[cfg(target_os = "macos")]
 mod macos;

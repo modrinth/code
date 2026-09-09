@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Statistieken bekijken"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "Gebruik de titelbalk en vensterbedieningselementen van je besturingssysteem. Hiervoor moet de app opnieuw worden opgestart."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "Systeemvensterframe"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Serverinstellingen konden niet worden geladen"
   },
@@ -92,6 +98,15 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Opnieuw abonneren op de server"
   },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Opgeslagen instellingen toepassen"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "De filters van deze link wijken af van je opgeslagen geavanceerde uitsluitingen"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Geavanceerde uitsluitingen worden tussen sessies door opgeslagen. Als je een gedeelde link met filters opent, worden deze overschreven."
+  },
   "browse.filter-results": {
     "defaultMessage": "Resultaten filteren..."
   },
@@ -131,6 +146,9 @@
   "button.accept": {
     "defaultMessage": "Accepteer"
   },
+  "button.add-another": {
+    "defaultMessage": "Nog een toevoegen"
+  },
   "button.add-server-to-instance": {
     "defaultMessage": "Voeg server toevoegen aan instantie"
   },
@@ -157,6 +175,9 @@
   },
   "button.continue": {
     "defaultMessage": "Doorgaan"
+  },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Kopieer de code naar het klembord"
   },
   "button.copy-filename": {
     "defaultMessage": "Kopieer bestandsnaam"
@@ -202,6 +223,9 @@
   },
   "button.hide-snapshots": {
     "defaultMessage": "Verberg snapshots"
+  },
+  "button.i-understand": {
+    "defaultMessage": "Ik begrijp het"
   },
   "button.install": {
     "defaultMessage": "Installeer"
@@ -347,8 +371,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
+  "content.card.frozen": {
+    "defaultMessage": "Dit project is vergrendeld met de huidige versie totdat het is losgemaakt."
+  },
   "content.card.select-project": {
     "defaultMessage": "Selecteer {project}"
+  },
+  "content.card.uploaded": {
+    "defaultMessage": "Geüpload"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Weet je zeker dat je {count, plural, one {# project} other {# projecten}} wilt bijwerken naar de nieuwste compatibele versie? Het wordt aanbevolen om de inhoud één voor één bij te werken."
@@ -566,6 +596,90 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "wereld"
   },
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "Inhoud van modpack"
+  },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "Aangeboden door"
+  },
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "server"
+  },
+  "content.managed-card.settings": {
+    "defaultMessage": "Installatie-instellingen"
+  },
+  "content.managed-card.shared-content": {
+    "defaultMessage": "Gedeelde inhoud"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "Inhoud aan het installeren..."
+  },
+  "content.managed-card.summary.loading": {
+    "defaultMessage": "Laden van beheerde inhoud samenvatting"
+  },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "Geen opgegeven inhoud"
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "Versie wijzigen"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "Gesynchroniseerd {time}"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "Update beschikbaar"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "Geüpdatet op {time}"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "Bezig met bijwerken..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "Bekijk inhoud"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "Auteur"
+  },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "Omgeving"
+  },
+  "content.metadata-filter.open-source": {
+    "defaultMessage": "Open source"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "Gedeelde inhoud"
+  },
+  "content.metadata-filter.source.external": {
+    "defaultMessage": "Extern"
+  },
+  "content.metadata-filter.state": {
+    "defaultMessage": "Staat"
+  },
+  "content.metadata-filter.state.disabled": {
+    "defaultMessage": "Uitgeschakeld"
+  },
+  "content.metadata-filter.state.enabled": {
+    "defaultMessage": "Ingeschakeld"
+  },
+  "content.metadata-filter.update.available": {
+    "defaultMessage": "Update beschikbaar"
+  },
+  "content.metadata-filter.warning.client-depends": {
+    "defaultMessage": "Client is afhankelijk van bestand"
+  },
+  "content.metadata-filter.warning.client-only": {
+    "defaultMessage": "Inhoud exclusief voor klanten"
+  },
+  "content.metadata-filter.warning.client-retained": {
+    "defaultMessage": "Clientbestand bewaard"
+  },
+  "content.metadata-filter.warning.none": {
+    "defaultMessage": "Geen waarschuwingen"
+  },
+  "content.metadata-filter.warnings": {
+    "defaultMessage": "Waarschuwingen"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
   },
@@ -589,6 +703,12 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Laden van inhoud is mislukt"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "Filter"
+  },
+  "content.page-layout.filter.author-count": {
+    "defaultMessage": "{count, plural, one {# author} other {# authors}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Inhoud aan het laden..."
@@ -616,6 +736,12 @@
   },
   "content.page-layout.share.project-names": {
     "defaultMessage": "Projectnamen"
+  },
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "Naam (A-Z)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "Naam (Z-A)"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Nieuwste eerst"
@@ -715,6 +841,15 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Spelversie zoeken..."
+  },
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "Aanpassen"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "Willekeurig"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Uploaden"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Recentste"
@@ -890,6 +1025,21 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Modpack zoeken"
   },
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "Weet je al wat je wilt spelen?"
+  },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Instantie aanmaken"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Modpack installeren"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "Geen resultaten gevonden"
+  },
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "Zoek naar mods, modpacks, en meer..."
+  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Begin helemaal opnieuw door een loader en een spelversie te kiezen."
   },
@@ -901,6 +1051,18 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Instantie importeren"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Kies een project en we gebruiken de laatste versie."
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Beginnen met een mod of modpack"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.description": {
+    "defaultMessage": "Installeer modpack uit een .mrpack bestand op uw apparaat."
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "Modpack uploaden"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Klassiek Minecraft zonder mods of plug-ins."
@@ -931,6 +1093,9 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Server instellen"
+  },
+  "empty-state.upload-versions.description": {
+    "defaultMessage": "Kom terug zodra je jouw versies hebt geüpload."
   },
   "external-files.permissions-card.add-files-modal.confirm": {
     "defaultMessage": "{count, plural, one {Bestand toevoegen} other {Bestanden toevoegen}}"
@@ -1250,6 +1415,27 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "Bijv. config.yml"
   },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "Een bestand met deze naam bestaat al."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "Kon niet controleren of dit bestand al bestaat."
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "ZIP maken"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "ZIP maken"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "De archiefnaam moet een enkele bestandsnaam zijn."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Archief naam"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "Voer een archief naam in."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "“{name}” verwijderen"
   },
@@ -1361,6 +1547,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Bestandsbewerkingen zijn uitgeschakeld terwijl de bewerking wordt uitgevoerd."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "ZIP maken"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Fout bij uitvoeren van proefdraai"
   },
@@ -1442,6 +1631,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Uploaden via een .zip-URL"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "{progress}% gecomprimeerd"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "{source} maken"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "Uitpakken van {source} is voltooid"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "Uitpakken van {source} is voltooid"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Huidig bestand: {file}"
   },
@@ -1462,6 +1663,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Nieuwe naam"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "ZIP maken"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
@@ -1591,6 +1795,30 @@
   },
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "De inhoud van een .zip-bestand uploaden via een URL"
+  },
+  "filter-bar.add": {
+    "defaultMessage": "Toevoegen"
+  },
+  "filter-bar.clear": {
+    "defaultMessage": "Wissen"
+  },
+  "filter-bar.clear-named-filter": {
+    "defaultMessage": "Wis {name} filter"
+  },
+  "filter-bar.filtered-by": {
+    "defaultMessage": "Filteren op"
+  },
+  "filter-bar.no-options": {
+    "defaultMessage": "Geen opties beschikbaar."
+  },
+  "filter-bar.no-search-results": {
+    "defaultMessage": "Geen opties gevonden."
+  },
+  "filter-bar.search-placeholder": {
+    "defaultMessage": "Zoeken..."
+  },
+  "filter-bar.select-all": {
+    "defaultMessage": "Alles selecteren"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresregel"
@@ -1745,6 +1973,9 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Het uploaden van het bestand is mislukt"
   },
+  "hosting.content.managed-content.modpack-header": {
+    "defaultMessage": "Inhoud van modpack"
+  },
   "hosting.loader.failed-to-change-version": {
     "defaultMessage": "Het is niet gelukt om de versie van het modpack te wijzigen"
   },
@@ -1825,6 +2056,108 @@
   },
   "icon-select.select": {
     "defaultMessage": "Selecteer icoon"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Sluiten"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Bewerken"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Kleur"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Bijsnijden resetten"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Geselecteerde aantekening verwijderen"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Gebied"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Element"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Wisser modus"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Functies voor afbeelding bewerken"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Meer opslagopties"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Overschrijven"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Opnieuw doen"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Kopie opslaan"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Afbeelding opslaan"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Grootte"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Pijl"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Censureer"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Bijsnijden"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellips"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Gum"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Hoogtepunt"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Pen"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Rechthoek"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Selecteer"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Tekst"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Ongedaan maken"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Breedte"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Passend"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "Aanpassen aan workspace"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Inzoomen"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Uitzoomen"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Volgende afbeelding"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Vorige afbeelding"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Zoek de versie..."
@@ -2018,6 +2351,9 @@
   "instances.content-install.header": {
     "defaultMessage": "Project installeren"
   },
+  "instances.content-install.hide-unavailable": {
+    "defaultMessage": "Verberg niet beschikbaar"
+  },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Deze instantie maakt gebruik van een andere loader of spelversie dan dit project ondersteunt."
   },
@@ -2047,6 +2383,39 @@
   },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Zoek instantie"
+  },
+  "instances.content-install.show-unavailable": {
+    "defaultMessage": "Laat niet beschikbaar zien"
+  },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "Het downloaden is mislukt"
+  },
+  "instances.managed-content-modal.empty-description": {
+    "defaultMessage": "Deze modpack bevat geen extra inhoud."
+  },
+  "instances.managed-content-modal.empty-title": {
+    "defaultMessage": "Geen inhoud gevonden"
+  },
+  "instances.managed-content-modal.external-content": {
+    "defaultMessage": "Extern"
+  },
+  "instances.managed-content-modal.external-content-description": {
+    "defaultMessage": "Dit bestand is niet gepubliceerd op Modrinth."
+  },
+  "instances.managed-content-modal.header": {
+    "defaultMessage": "Beheer content"
+  },
+  "instances.managed-content-modal.loading": {
+    "defaultMessage": "Inhoud aan het laden..."
+  },
+  "instances.managed-content-modal.no-results": {
+    "defaultMessage": "Geen projecten voldoen aan je zoekopdracht."
+  },
+  "instances.managed-content-modal.open-in-slicer": {
+    "defaultMessage": "In Slicer openen"
+  },
+  "instances.managed-content-modal.search-placeholder": {
+    "defaultMessage": "Zoek naar {count, number} {count, plural, one {project} other {projecten}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"
@@ -2191,6 +2560,9 @@
   },
   "label.error": {
     "defaultMessage": "Fout"
+  },
+  "label.explanation": {
+    "defaultMessage": "Toelichting"
   },
   "label.extract-failed": {
     "defaultMessage": "Uitpakken is mislukt"
@@ -2371,6 +2743,9 @@
   },
   "label.yes": {
     "defaultMessage": "Ja"
+  },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Van account wisselen..."
   },
   "locale.cs-CZ": {
     "defaultMessage": "Tsjechisch"
@@ -2642,6 +3017,39 @@
   "notification.error.title": {
     "defaultMessage": "Er is een fout opgetreden"
   },
+  "notifications.actor.unknown": {
+    "defaultMessage": "Iemand"
+  },
+  "notifications.close": {
+    "defaultMessage": "Sluiten"
+  },
+  "notifications.dismiss": {
+    "defaultMessage": "Bericht afwijzen"
+  },
+  "notifications.friend-request.body": {
+    "defaultMessage": "<actor>{actor}</actor> heeft u een vriendschapsverzoek gestuurd."
+  },
+  "notifications.instance-invite.body": {
+    "defaultMessage": "<actor>{actor}</actor> heeft je uitgenodigd voor <entity>{entity}</entity> instantie."
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "Start het spel"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "Instantie"
+  },
+  "notifications.instance-ready.status": {
+    "defaultMessage": "Geïnstalleerd en klaar om te spelen."
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "Accepteer"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "Wijs af"
+  },
+  "notifications.server-invite.body": {
+    "defaultMessage": "<actor>{actor}</actor> nodigde je uit om de server <entity>{entity}</entity> te beheren."
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Geaccepteerd"
   },
@@ -2842,6 +3250,9 @@
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Als partner instellen"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Gekoppelde gedeelde instantie"
   },
   "profile.button.unblock": {
     "defaultMessage": "Deblokkeren"
@@ -3172,6 +3583,48 @@
   },
   "project.about.tags.title": {
     "defaultMessage": "Tags"
+  },
+  "project.disclosure.advertising.title": {
+    "defaultMessage": "Bevat advertenties"
+  },
+  "project.disclosure.ai-generated-content.title": {
+    "defaultMessage": "Bevat door AI gegenereerde {types}"
+  },
+  "project.disclosure.ai-generated-content.use.assets": {
+    "defaultMessage": "materialen"
+  },
+  "project.disclosure.ai-generated-content.use.code": {
+    "defaultMessage": "code"
+  },
+  "project.disclosure.ai-generated-content.use.content": {
+    "defaultMessage": "inhoud"
+  },
+  "project.disclosure.ai-generated-content.use.functionality": {
+    "defaultMessage": "functionaliteit"
+  },
+  "project.disclosure.ai-generated-content.use.text": {
+    "defaultMessage": "tekst"
+  },
+  "project.disclosure.derivative-work.show-fewer": {
+    "defaultMessage": "Minder tonen"
+  },
+  "project.disclosure.derivative-work.show-more": {
+    "defaultMessage": "Toon {count} meer"
+  },
+  "project.disclosure.derivative-work.title": {
+    "defaultMessage": "Dit is afgeleid werk van:"
+  },
+  "project.disclosure.paid-features.title": {
+    "defaultMessage": "Bevat betaalde functies"
+  },
+  "project.disclosure.photosensitivity.title": {
+    "defaultMessage": "Waarschuwing voor lichtgevoeligheid"
+  },
+  "project.disclosure.system-interactions.title": {
+    "defaultMessage": "Beschrijf de interacties van het externe systeem"
+  },
+  "project.disclosure.telemetry.title": {
+    "defaultMessage": "Bevat {consent, select, opt_in {Neem telemetry aan} opt_out {opt-out telemetry} always_active {Altijd-actieve telemetrie} other {telemetry}}"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {download} other {downloads}}"
@@ -3536,6 +3989,30 @@
   "project.settings.description.title": {
     "defaultMessage": "Omschrijving"
   },
+  "project.settings.disclosures.ai.types-assets": {
+    "defaultMessage": "Materialen"
+  },
+  "project.settings.disclosures.ai.types-code": {
+    "defaultMessage": "Code"
+  },
+  "project.settings.disclosures.ai.types-functionality": {
+    "defaultMessage": "Functionaliteit"
+  },
+  "project.settings.disclosures.ai.types-text": {
+    "defaultMessage": "Tekst"
+  },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "defaultMessage": "Altijd actief"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-in": {
+    "defaultMessage": "Deelnemen"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-out": {
+    "defaultMessage": "Uitschrijven"
+  },
+  "project.settings.disclosures.title": {
+    "defaultMessage": "Openbaarmakingen"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Heeft enig functionaliteit op client en server, al is het minder compleet."
   },
@@ -3665,6 +4142,12 @@
   "project.stats.followers-label": {
     "defaultMessage": "{count, plural, one {volger} other {volgers}}"
   },
+  "project.status.archived.body": {
+    "defaultMessage": "is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."
+  },
+  "project.status.archived.header": {
+    "defaultMessage": "{title} is gearchiveerd"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3673,6 +4156,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Kanaal"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, number} geselecteerd"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Filter voor {filter} in- of uitschakelen"
@@ -3731,8 +4220,83 @@
   "report.item-type.version": {
     "defaultMessage": "versie"
   },
+  "report.type.ai-images": {
+    "defaultMessage": "AI-gegenereerde afbeeldingen in pictogram, galerij of beschrijving"
+  },
+  "report.type.copyright": {
+    "defaultMessage": "Opnieuw geüpload werk"
+  },
+  "report.type.fully-ai-generated": {
+    "defaultMessage": "Volledig AI-gegenereerd project"
+  },
+  "report.type.inappropriate": {
+    "defaultMessage": "Ongepast"
+  },
+  "report.type.malicious": {
+    "defaultMessage": "Schadelijk"
+  },
+  "report.type.missing-disclosure": {
+    "defaultMessage": "Ontbrekende of onjuiste openbaarmaking"
+  },
+  "report.type.name-squatting": {
+    "defaultMessage": "Naamkraken"
+  },
+  "report.type.spam": {
+    "defaultMessage": "Spam"
+  },
   "s.bg": {
     "defaultMessage": "Achtergrondtaak wordt uitgevoerd"
+  },
+  "search.filter.dependency_type.any": {
+    "defaultMessage": "Elk type afhankelijkheid"
+  },
+  "search.filter.dependency_type.embedded": {
+    "defaultMessage": "Ingesloten"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "Optioneel"
+  },
+  "search.filter.dependency_type.optional_or_embedded": {
+    "defaultMessage": "Optioneel of ingesloten"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "Vereist"
+  },
+  "search.filter.dependency_type.required_or_embedded": {
+    "defaultMessage": "Vereist of ingesloten"
+  },
+  "search.filter.dependency_type.required_or_optional": {
+    "defaultMessage": "Vereist of optioneel"
+  },
+  "search.filter.dependent_project": {
+    "defaultMessage": "Afhankelijk van {project}"
+  },
+  "search.filter.dependent_project.clear": {
+    "defaultMessage": "Afhankelijke filter wissen"
+  },
+  "search.filter.dependent_project.search_placeholder": {
+    "defaultMessage": "Zoek naar een project..."
+  },
+  "search.filter.excluded_projects": {
+    "defaultMessage": "Exclusief: {projects}"
+  },
+  "search.filter.included_content.exclude": {
+    "defaultMessage": "Uitsluiten"
+  },
+  "search.filter.included_content.excluded": {
+    "defaultMessage": "Uitgesloten"
+  },
+  "search.filter.included_content.remove_project": {
+    "defaultMessage": "Verwijder {project}"
+  },
+  "search.filter.included_content.remove_project.tooltip": {
+    "defaultMessage": "Verwijder project"
+  },
+  "search.filter.included_content.search_placeholder": {
+    "defaultMessage": "Inhoud zoeken..."
+  },
+  "search.filter.included_projects": {
+    "defaultMessage": "Exclusief: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter vergrendeld"
@@ -3764,6 +4328,45 @@
   "search.filter.option.show_more": {
     "defaultMessage": "Meer tonen"
   },
+  "search.filter.option.sub_options.collapse.tooltip": {
+    "defaultMessage": "Verberg meer opties"
+  },
+  "search.filter.option.sub_options.expand.tooltip": {
+    "defaultMessage": "Toon meer opties"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Geavanceerde uitsluitingen"
+  },
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "Advertenties"
+  },
+  "search.filter_type.advanced.disclosure.ai_content": {
+    "defaultMessage": "AI-gegenereerde inhoud"
+  },
+  "search.filter_type.advanced.disclosure.ai_content.usage": {
+    "defaultMessage": "AI {usage}"
+  },
+  "search.filter_type.advanced.disclosure.archived": {
+    "defaultMessage": "Gearchiveerd"
+  },
+  "search.filter_type.advanced.disclosure.derivative_work": {
+    "defaultMessage": "Derivatieve inhoud"
+  },
+  "search.filter_type.advanced.disclosure.epilepsy_triggers": {
+    "defaultMessage": "Waarschuwing voor lichtgevoeligheid"
+  },
+  "search.filter_type.advanced.disclosure.paid_features": {
+    "defaultMessage": "Betaalde functie"
+  },
+  "search.filter_type.advanced.disclosure.system_interactions": {
+    "defaultMessage": "Externe systeem interacties"
+  },
+  "search.filter_type.advanced.disclosure.telemetry": {
+    "defaultMessage": "Telemetrie"
+  },
+  "search.filter_type.compatible_dependency_project_ids": {
+    "defaultMessage": "Afhankelijk van"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Omgeving"
   },
@@ -3778,6 +4381,9 @@
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "Toon alle versies"
+  },
+  "search.filter_type.included_content": {
+    "defaultMessage": "Inbegrepen inhoud"
   },
   "search.filter_type.license": {
     "defaultMessage": "Licentie"
@@ -3814,6 +4420,21 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Lader"
+  },
+  "search.photosensitivity-warning-modal.body.1": {
+    "defaultMessage": "We kunnen niet garanderen dat alle inhoud van Modrinth op de juiste manier geëtiketteerd is."
+  },
+  "search.photosensitivity-warning-modal.body.2": {
+    "defaultMessage": "Content labels voor fotosensibiliseringstriggers worden zelf toegewezen door de makers die hun content uploaden naar Modrinth. Deze projecten hebben geen enkele veiligheidstests ondergaan."
+  },
+  "search.photosensitivity-warning-modal.body.3": {
+    "defaultMessage": "Het gebruiken van inhoud op Modrinth is op eigen risico. Blijf veilig! 💚"
+  },
+  "search.photosensitivity-warning-modal.dont-show-again": {
+    "defaultMessage": "Laat dit niet meer zien"
+  },
+  "search.photosensitivity-warning-modal.title": {
+    "defaultMessage": "Resultaten zijn niet gegarandeerd veilig"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Gemodificeerd"
@@ -4532,6 +5153,12 @@
   "servers.busy.installing": {
     "defaultMessage": "De server wordt geïnstalleerd"
   },
+  "servers.files.zip-created": {
+    "defaultMessage": "ZIP aangemaakt"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "Aangemaakt op {destination}"
+  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Ook een vriendschapsverzoek sturen"
   },
@@ -4583,14 +5210,59 @@
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Bezig met zoeken..."
   },
+  "servers.installing-banner.description.applying": {
+    "defaultMessage": "Je installatiewijzigingen toepassen..."
+  },
+  "servers.installing-banner.description.controls": {
+    "defaultMessage": "Serverbesturingselementen worden ontgrendeld wanneer de installatie is voltooid."
+  },
+  "servers.installing-banner.description.duration": {
+    "defaultMessage": "Deze installatie kan enkele minuten duren..."
+  },
+  "servers.installing-banner.description.preparing": {
+    "defaultMessage": "We zijn je server aan het klaarmaken..."
+  },
+  "servers.installing-banner.description.still-working": {
+    "defaultMessage": "Werkt nog steeds - uw installatie is in uitvoering..."
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installeren is mislukt"
+  },
+  "servers.installing-banner.error.header.local-modpack": {
+    "defaultMessage": "Het uploaden van {filename} is mislukt"
+  },
+  "servers.installing-banner.error.header.minecraft": {
+    "defaultMessage": "Installatie van Minecraft {version} is mislukt"
+  },
+  "servers.installing-banner.error.header.modpack": {
+    "defaultMessage": "Het opnieuw installeren van het modpack is mislukt"
+  },
+  "servers.installing-banner.error.header.platform": {
+    "defaultMessage": "Fout bij het installeren van {loader} {loaderVersion} voor Minecraft {gameVersion}"
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Tijdens de installatie is er een onverwachte fout opgetreden."
   },
+  "servers.installing-banner.installing-local-modpack": {
+    "defaultMessage": "Installeren {filename}"
+  },
+  "servers.installing-banner.installing-minecraft": {
+    "defaultMessage": "Minecraft {version} installeren"
+  },
+  "servers.installing-banner.installing-modpack": {
+    "defaultMessage": "Modpack aan het installeren"
+  },
+  "servers.installing-banner.installing-platform": {
+    "defaultMessage": "{loader} installeren voor Minecraft {version}"
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "We zijn je server aan het klaarmaken"
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Heb je al een server?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Meer informatie"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -4607,8 +5279,14 @@
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Mods installeren met één klik"
   },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Nodig vrienden uit om je server te spelen met één klik vanuit de Modrinth app."
+  },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Speel met vrienden"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Bij Modrinth aanmelden"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Stel je server in net zoals een eigen wereld."
@@ -4624,9 +5302,6 @@
   },
   "servers.listing.copy-id-label": {
     "defaultMessage": "Kopieer ID"
-  },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Laatste back-up downloaden"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Facturering beheren"
@@ -4720,6 +5395,9 @@
   },
   "servers.manage.error.title": {
     "defaultMessage": "De servers konden niet worden geladen"
+  },
+  "servers.manage.error.unknown": {
+    "defaultMessage": "Onbekende fout"
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Er is een fout opgetreden"
@@ -4862,9 +5540,6 @@
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "facturering {interval, select, monthly {maandelijks} quarterly {driemaandelijks} yearly {jaarlijks} other {{interval}}}"
   },
-  "servers.purchase.step.plan.billing-subtitle": {
-    "defaultMessage": "Verkrijgbaar in Noord-Amerika, Europa en Zuidoost-Azië."
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Configureer je eigen plan met de specs die je nodig hebt."
   },
@@ -4873,6 +5548,9 @@
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Aan de slag"
+  },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Mogelijk gemaakt door AMD Ryzen 7950X, 9950X, of gelijkwaardig met DDR5 geheugen."
   },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Groot"
@@ -4991,6 +5669,27 @@
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Wat gebeurt er dan?"
   },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Inloggegevens roteren"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Probeer het later nog eens."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "Het roteren van SFTP-gegevens is mislukt"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "De vorige gebruikersnaam en wachtwoord zullen niet meer werken."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Inloggegevens roteren"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Uw SFTP gebruikersnaam en wachtwoord zijn opnieuw gegenereerd."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "SFTP-referenties gedraaid"
+  },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Er is een onverwachte fout opgetreden tijdens de installatie. Probeer het later nog eens."
   },
@@ -5069,8 +5768,71 @@
   "settings.billing.title": {
     "defaultMessage": "Facturen en abonnementen"
   },
+  "settings.display.project-list-layouts.datapack": {
+    "defaultMessage": "Data Packs pagina"
+  },
+  "settings.display.project-list-layouts.description": {
+    "defaultMessage": "Kies de gewenste lay-out voor elke pagina waarop projectlijsten op dit apparaat worden weergegeven."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "defaultMessage": "Mods pagina"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "defaultMessage": "Raster"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "defaultMessage": "Rijen"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "defaultMessage": "Modpacks pagina"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "defaultMessage": "Plugins pagina"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "defaultMessage": "Resource Packs pagina"
+  },
+  "settings.display.project-list-layouts.server": {
+    "defaultMessage": "Servers pagina"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "defaultMessage": "Shaders pagina"
+  },
+  "settings.display.project-list-layouts.title": {
+    "defaultMessage": "Indelingen van projectlijsten"
+  },
+  "settings.display.project-list-layouts.user": {
+    "defaultMessage": "Profielpagina's voor gebruikers"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "defaultMessage": "Schakelt geavanceerde rendering in zoals vervaging effecten die prestatieproblemen kunnen veroorzaken zonder hardware-acceleratie."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "defaultMessage": "Geavanceerde weergave"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "defaultMessage": "Maak links die buiten Modrinth gaan open in een nieuw tabblad. Ongeacht deze instelling, links op hetzelfde domein en in Markdown beschrijvingen zullen worden geopend in hetzelfde tabblad, en links naar advertenties en bewerken pagina's worden geopend in een nieuw tabblad."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "defaultMessage": "Externe links openen in nieuw tabblad"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.description": {
+    "defaultMessage": "Lijn de project-details zijbalk uit naar de rechterkant van de paginainhoud."
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "defaultMessage": "Links uitgelijnde zijbalk voor inhoudspagina's"
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "defaultMessage": "Lijnt de filterzijbalk uit aan de rechterkant van de zoekresultaten."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "defaultMessage": "Rechts uitgelijnde zijbalk voor zoek pagina's"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "Donker"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Selecteer je voorkeur kleurenthema voor de Modrinth App."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Licht"
@@ -5087,6 +5849,15 @@
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
   },
+  "settings.display.theme.sync-across-devices": {
+    "defaultMessage": "Thema synchroniseren tussen apparaten"
+  },
+  "settings.display.theme.sync-across-devices.description": {
+    "defaultMessage": "Gebruik dit thema overal waar je bent aangemeld. Schakel dit uit om een apart thema op dit apparaat te houden."
+  },
+  "settings.display.theme.sync-across-devices.sign-in-tooltip": {
+    "defaultMessage": "Log in op Modrinth om thema te synchroniseren"
+  },
   "settings.display.theme.system": {
     "defaultMessage": "Synchroniseren met systeem"
   },
@@ -5096,11 +5867,23 @@
   "settings.feature-flags.title": {
     "defaultMessage": "Functievlaggen"
   },
+  "settings.form.group.optional": {
+    "defaultMessage": "(optioneel)"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "Standaardtalen"
   },
   "settings.language.categories.search-result": {
     "defaultMessage": "Zoekresultaten"
+  },
+  "settings.language.coverage.app-tooltip": {
+    "defaultMessage": "Ongeveer {percentage}% van de Modrinth App is beschikbaar in deze taal."
+  },
+  "settings.language.coverage.label": {
+    "defaultMessage": "{percentage}% ondersteund"
+  },
+  "settings.language.coverage.website-tooltip": {
+    "defaultMessage": "Ongeveer {percentage}% van de Modrinth App is beschikbaar in deze taal."
   },
   "settings.language.description": {
     "defaultMessage": "Kies de taal van je voorkeur voor het/de {platform}. De vertalingen worden aangeleverd door vrijwilligers <crowdin-link>op Crowdin</crowdin-link>."
@@ -5128,6 +5911,12 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Persoonlijke toegangstokens"
+  },
+  "settings.preferences.update-failed.description": {
+    "defaultMessage": "Je instellingen konden niet worden opgeslagen in je Modrinth account. Probeer het opnieuw."
+  },
+  "settings.preferences.update-failed.title": {
+    "defaultMessage": "Instellingen synchroniseren mislukt"
   },
   "settings.profile.bio.description": {
     "defaultMessage": "Een korte beschrijving om iedereen iets over jezelf te vertellen."
@@ -5213,6 +6002,12 @@
   "settings.social.friend-requests.title": {
     "defaultMessage": "Vriendschapsverzoeken"
   },
+  "settings.social.hosting-access.description": {
+    "defaultMessage": "Uitnodigen om een Modrinth Hosting-server te beheren."
+  },
+  "settings.social.hosting-access.title": {
+    "defaultMessage": "Hosting toegang uitnodigingen"
+  },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "Iedereen"
   },
@@ -5222,8 +6017,23 @@
   "settings.social.interaction-source.friends-of-friends": {
     "defaultMessage": "Vrienden van vrienden"
   },
+  "settings.social.interaction-source.loading": {
+    "defaultMessage": "Je voorkeuren worden geladen..."
+  },
   "settings.social.interaction-source.no-one": {
     "defaultMessage": "Niemand"
+  },
+  "settings.social.interaction-source.saving": {
+    "defaultMessage": "Je voorkeuren opslaan..."
+  },
+  "settings.social.interaction-source.unavailable": {
+    "defaultMessage": "Je voorkeuren zijn momenteel niet beschikbaar."
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "Bepaal wie u uitnodigingen kan sturen naar gedeelde instanties."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Inhoud van de gedeelde instantie"
   },
   "settings.social.sign-in-required.description": {
     "defaultMessage": "Met een Modrinth-account kun je bepalen wie er contact met je kan opnemen en kun je geblokkeerde gebruikers beheren"
@@ -5248,6 +6058,9 @@
   },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "Avatar van {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Annuleren"
   },
   "sharing.invite-players-modal.custom-expiry": {
     "defaultMessage": "Aangepast..."
@@ -5284,6 +6097,9 @@
   },
   "sharing.invite-players-modal.friends-heading": {
     "defaultMessage": "Je vrienden - {count}"
+  },
+  "sharing.invite-players-modal.heading": {
+    "defaultMessage": "Nodig spelers uit"
   },
   "sharing.invite-players-modal.invite": {
     "defaultMessage": "Uitnodigen"
@@ -5329,6 +6145,24 @@
   },
   "sharing.invite-players-modal.update-invite-link-failed-title": {
     "defaultMessage": "Het bijwerken van de uitnodigingslink is mislukt"
+  },
+  "sharing.invite-players-toast.accept": {
+    "defaultMessage": "Accepteer"
+  },
+  "sharing.invite-players-toast.decline": {
+    "defaultMessage": "Afwijzen"
+  },
+  "sharing.invite-players-toast.invited-you-to": {
+    "defaultMessage": "heeft je uitgenodigd voor"
+  },
+  "sharing.invite-players-toast.server-suffix": {
+    "defaultMessage": "server."
+  },
+  "skins.select": {
+    "defaultMessage": "Selecteer skin"
+  },
+  "skins.select-named": {
+    "defaultMessage": "Selecteer {name}"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -5858,6 +6692,15 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Wil je de pagina verlaten?"
   },
+  "ui.pagination.go-to-page": {
+    "defaultMessage": "Ga naar pagina"
+  },
+  "ui.pagination.next-page": {
+    "defaultMessage": "Volgende pagina"
+  },
+  "ui.pagination.previous-page": {
+    "defaultMessage": "Vorige pagina"
+  },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count, plural, one {# waarschuwing} other {# waarschuwingen}}"
   },
@@ -5991,6 +6834,12 @@
     "defaultMessage": "Deze gebruiker werkt bij Modrinth."
   },
   "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth-team"
+  },
+  "user.role.moderator": {
+    "defaultMessage": "Inhoudsmoderator"
+  },
+  "user.role.modrinth-team": {
     "defaultMessage": "Modrinth-team"
   },
   "version.content.name": {

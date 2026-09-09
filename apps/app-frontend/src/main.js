@@ -1,36 +1,21 @@
 import 'floating-vue/dist/style.css'
 import 'overlayscrollbars/overlayscrollbars.css'
 
-import * as Sentry from '@sentry/vue'
-import { VueScanPlugin } from '@taijased/vue-render-tracker'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import FloatingVue from 'floating-vue'
 import { createApp } from 'vue'
 
 import App from '@/App.vue'
 import { overlayScrollbarsDirective } from '@/directives/overlayScrollbars'
+import { setupErrorReporting } from '@/helpers/error-reporting'
 import i18nPlugin from '@/plugins/i18n'
 import i18nDebugPlugin from '@/plugins/i18n-debug'
 import router from '@/routes'
 
-const vueScan = new VueScanPlugin({
-	enabled: false, // Enable or disable the tracker
-	showOverlay: true, // Show overlay to visualize renders
-	log: false, // Log render events to the console
-	playSound: false, // Play sound on each render
-})
-
-let app = createApp(App)
-
-Sentry.init({
-	app,
-	dsn: 'https://9508775ee5034536bc70433f5f531dd4@o485889.ingest.us.sentry.io/4504579615227904',
-	integrations: [Sentry.browserTracingIntegration({ router })],
-	tracesSampleRate: 0.1,
-})
+const app = createApp(App)
+setupErrorReporting(app, router)
 
 app.use(VueQueryPlugin)
-app.use(vueScan)
 app.use(router)
 app.use(FloatingVue, {
 	themes: {
@@ -50,4 +35,12 @@ app.use(i18nPlugin)
 app.use(i18nDebugPlugin)
 app.directive('overlay-scrollbars', overlayScrollbarsDirective)
 
-app.mount('#app')
+async function mount() {
+	if (import.meta.env.DEV && import.meta.env.VITE_VUE_SCAN === 'true') {
+		const { VueScanPlugin } = await import('@taijased/vue-render-tracker')
+		app.use(new VueScanPlugin({ enabled: true, showOverlay: true, log: false, playSound: false }))
+	}
+	app.mount('#app')
+}
+
+void mount()
