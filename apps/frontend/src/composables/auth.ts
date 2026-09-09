@@ -205,14 +205,6 @@ export const getSignInRouteObj = (route: FullPathRoute, redirectOverride?: strin
 
 export const ADD_ACCOUNT_QUERY_PARAM = 'add_account'
 
-export const getAddAccountRouteObj = (route: FullPathRoute) => ({
-	path: '/auth/sign-in',
-	query: {
-		redirect: getSignInRedirectPath(route),
-		[ADD_ACCOUNT_QUERY_PARAM]: 'true',
-	},
-})
-
 export const getAuthUrl = (provider: string, redirect?: string) => {
 	const config = useRuntimeConfig()
 	const route = useNativeRoute()

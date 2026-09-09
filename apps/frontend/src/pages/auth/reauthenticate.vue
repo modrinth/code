@@ -181,11 +181,7 @@ import {
 	type StoredAccountAuthMethod,
 	useStoredAccounts,
 } from '@/composables/accounts.ts'
-import {
-	ADD_ACCOUNT_QUERY_PARAM,
-	getAuthUrl,
-	promotePendingSignInOAuthProvider,
-} from '@/composables/auth.ts'
+import { getAuthUrl, promotePendingSignInOAuthProvider } from '@/composables/auth.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
 
 const oauthProviders = [
@@ -298,7 +294,6 @@ const signInAnotherWayRoute = computed(() => ({
 	path: '/auth/sign-in',
 	query: {
 		redirect: redirectTarget.value,
-		[ADD_ACCOUNT_QUERY_PARAM]: 'true',
 	},
 }))
 
