@@ -32,6 +32,7 @@ pub(super) fn validate(
 fn disclosure_has_paired_html(disclosure: &ProjectDisclosure) -> bool {
     match disclosure {
         ProjectDisclosure::AiContent { note, .. }
+        | ProjectDisclosure::AiFunctionality { note, .. }
         | ProjectDisclosure::Advertisements { note }
         | ProjectDisclosure::EpilepsyTriggers { note }
         | ProjectDisclosure::SystemInteractions { note, .. }
