@@ -35,9 +35,9 @@ import BehaviorSettings from '@/components/ui/settings/display/BehaviorSettings.
 import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSettings.vue'
 import FeaturesSettings from '@/components/ui/settings/display/FeaturesSettings.vue'
 import LanguageSettings from '@/components/ui/settings/display/LanguageSettings.vue'
+import InstancesSyncedSettings from '@/components/ui/settings/instances/instances-synced-settings/index.vue'
 import JavaSettings from '@/components/ui/settings/instances/JavaSettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/instances/ResourceManagementSettings.vue'
-import InstancesSyncedSettings from '@/components/ui/settings/instances/instances-synced-settings/index.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get, set } from '@/helpers/settings.ts'
 import {
