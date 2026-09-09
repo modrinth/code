@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::sync::LazyLock;
 
 use linkify::{LinkFinder, LinkKind};
@@ -7,15 +7,16 @@ use regex::Regex;
 use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::UnicodeSegmentation;
 use url::Url;
-use whatlang::{Detector, Lang};
 
 use crate::models::exp::minecraft::Language;
 use crate::models::projects::Project;
 
+pub(super) use super::language::{
+	has_sufficient_english_blocks, is_likely_english_summary,
+};
+
 static WORD: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"[\p{L}\p{M}\p{N}]+").unwrap());
-static NON_LATIN_LETTER: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"[\p{Alphabetic}&&[^\p{Latin}]]").unwrap());
 static SPAM_TOKEN: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"[\p{L}\p{M}\p{N}]+(?:['_\u{2019}.:+/-][\p{L}\p{M}\p{N}]+)*"#)
         .unwrap()
@@ -25,7 +26,6 @@ static SUMMARY_LINK_FINDER: LazyLock<LinkFinder> = LazyLock::new(|| {
     finder.kinds(&[LinkKind::Url]).url_must_have_scheme(false);
     finder
 });
-static LANGUAGE_DETECTOR: LazyLock<Detector> = LazyLock::new(Detector::new);
 static MARKDOWN_LINK: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"!?\[([^\]]*)\]\([^)]+\)").unwrap());
 static HTML_TAG: LazyLock<Regex> =
@@ -39,8 +39,6 @@ static HTML_CLOSE_TAG: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?is)</([a-z][\w:-]*)\s*>").unwrap());
 static CODE_BLOCK: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?s)```.*?```").unwrap());
-static DESCRIPTION_BLOCK_BREAK: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\n\s*\n+").unwrap());
 static INLINE_CODE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"`([^`]*)`").unwrap());
 static MARKDOWN_IMAGE: LazyLock<Regex> =
@@ -919,7 +917,7 @@ pub(super) fn has_paired_html_formatting(text: &str) -> bool {
     })
 }
 
-pub(super) fn extract_description_text(markdown: &str) -> String {
+fn strip_description_markup(markdown: &str) -> String {
     let without_code = INLINE_CODE.replace_all(markdown, " ");
     let with_image_alt = MARKDOWN_IMAGE.replace_all(&without_code, "$1");
     let without_links = MARKDOWN_LINK.replace_all(&with_image_alt, " ");
@@ -934,8 +932,11 @@ pub(super) fn extract_description_text(markdown: &str) -> String {
                 .map_or_else(|| " ".to_owned(), |alt| alt.as_str().to_owned())
         },
     );
-    let without_html = HTML_TAG.replace_all(&with_html_image_alt, " ");
-    without_html
+    HTML_TAG.replace_all(&with_html_image_alt, " ").into_owned()
+}
+
+pub(super) fn extract_description_text(markdown: &str) -> String {
+    strip_description_markup(markdown)
         .lines()
         .map(|line| line.trim_start_matches(['>', '#']))
         .collect::<Vec<_>>()
@@ -946,12 +947,96 @@ pub(super) fn extract_description_text(markdown: &str) -> String {
         .join(" ")
 }
 
+static LANGUAGE_CONFIG_ENTRY: LazyLock<Regex> = LazyLock::new(|| {
+	Regex::new(r"^([A-Za-z_][A-Za-z0-9_.-]*):(?:\s+(.*))?$").unwrap()
+});
+static LANGUAGE_IDENTIFIER: LazyLock<Regex> = LazyLock::new(|| {
+	Regex::new(r"\b[A-Za-z][A-Za-z0-9_-]*(?:\.[A-Za-z][A-Za-z0-9_-]*)+\b")
+		.unwrap()
+});
+static LANGUAGE_COMMAND: LazyLock<Regex> = LazyLock::new(|| {
+	Regex::new(r"(^|[\s|,(])/[A-Za-z][A-Za-z0-9_:./-]*").unwrap()
+});
+static LANGUAGE_ARGUMENT: LazyLock<Regex> =
+	LazyLock::new(|| Regex::new(r"\[[A-Za-z][A-Za-z0-9_ /|.-]*\]").unwrap());
+
+/// Remove machine syntax before punctuation normalization turns identifiers into words.
+fn description_language_input(markdown: &str) -> String {
+	let readable = strip_description_markup(markdown);
+	let readable = text_without_explicit_links(&readable);
+	let mut in_yaml = false;
+	readable
+		.lines()
+		.map(|line| {
+			let trimmed = line.trim();
+			if matches!(trimmed, "yaml" | "yml") {
+				in_yaml = true;
+				return String::new();
+			}
+			if let Some(entry) = LANGUAGE_CONFIG_ENTRY.captures(trimmed) {
+				let value = entry.get(2).map_or("", |value| value.as_str());
+				let machine_value =
+					matches!(value, "true" | "false" | "null" | "~")
+						|| value.parse::<f64>().is_ok()
+						|| value.starts_with(['"', '\'']);
+				if in_yaml || entry[1].contains('_') || machine_value {
+					return String::new();
+				}
+			} else if !trimmed.is_empty() {
+				in_yaml = false;
+			}
+			let has_command = LANGUAGE_COMMAND.is_match(line);
+			let without_commands = LANGUAGE_COMMAND.replace_all(line, "$1");
+			let without_identifiers =
+				LANGUAGE_IDENTIFIER.replace_all(&without_commands, " ");
+			if has_command {
+				LANGUAGE_ARGUMENT
+					.replace_all(&without_identifiers, " ")
+					.into_owned()
+			} else {
+				without_identifiers.into_owned()
+			}
+		})
+		.collect::<Vec<_>>()
+		.join("\n")
+}
+
 pub(super) fn extract_description_blocks(markdown: &str) -> Vec<String> {
-    DESCRIPTION_BLOCK_BREAK
-        .split(markdown)
-        .map(extract_description_text)
-        .filter(|block| !block.is_empty())
-        .collect()
+	let readable = description_language_input(markdown);
+	let mut blocks = Vec::new();
+	let mut paragraph = Vec::new();
+	let mut heading_only = false;
+	let mut blank = false;
+	for line in readable.lines() {
+		let line = line.trim();
+		if line.is_empty() {
+			blank = true;
+			continue;
+		}
+		let heading = line.starts_with('#');
+		let metadata_list = line
+			.split_once(':')
+			.is_some_and(|(_, values)| values.matches(',').count() >= 3);
+		if (heading
+			|| metadata_list
+			|| (blank
+				&& !heading_only
+				&& (WORD.find_iter(&paragraph.join(" ")).count() >= 8
+					|| WORD.find_iter(line).count() >= 8)))
+			&& !paragraph.is_empty()
+		{
+			blocks.push(extract_description_text(&paragraph.join("\n")));
+			paragraph.clear();
+		}
+		paragraph.push(line);
+		heading_only = heading;
+		blank = false;
+	}
+	if !paragraph.is_empty() {
+		blocks.push(extract_description_text(&paragraph.join("\n")));
+	}
+	blocks.retain(|block| !block.is_empty());
+	blocks
 }
 
 pub(super) fn has_image_without_alt_text(markdown: &str) -> bool {
@@ -1011,115 +1096,6 @@ pub(super) fn project_requires_english(project: &Project) -> bool {
 
     (project.components.minecraft_java_server.is_none() && !has_locale_tag)
         || is_english_server
-}
-
-pub(super) fn is_likely_english_summary(text: &str) -> bool {
-    let detection_text = normalize_language_text(text);
-    if has_dominant_non_latin_script(&detection_text) {
-        return false;
-    }
-
-    if !has_enough_language_content(&detection_text) {
-        return true;
-    }
-
-    LANGUAGE_DETECTOR
-        .detect(&detection_text)
-        .is_none_or(|info| info.lang() == Lang::Eng || !info.is_reliable())
-}
-
-pub(super) fn has_sufficient_english_blocks(blocks: &[String]) -> bool {
-    let mut english_chunks = 0;
-    let mut non_english_chunks = 0;
-
-    for block in blocks {
-        let detection_text = normalize_language_text(block);
-        if has_dominant_non_latin_script(&detection_text) {
-            non_english_chunks += 1;
-
-            let latin_text = NON_LATIN_LETTER.replace_all(&detection_text, " ");
-            if has_enough_language_content(&latin_text)
-                && LANGUAGE_DETECTOR
-                    .detect(&latin_text)
-                    .is_some_and(|info| info.lang() == Lang::Eng)
-            {
-                english_chunks += 1;
-            }
-            continue;
-        }
-
-        for chunk in language_chunks(&detection_text) {
-            let Some(info) = LANGUAGE_DETECTOR.detect(&chunk) else {
-                continue;
-            };
-
-            if info.lang() == Lang::Eng {
-                english_chunks += 1;
-            } else if info.is_reliable() {
-                non_english_chunks += 1;
-            }
-        }
-    }
-
-    let classified_chunks = english_chunks + non_english_chunks;
-    classified_chunks == 0 || english_chunks * 10 >= classified_chunks * 3
-}
-
-fn normalize_language_text(text: &str) -> String {
-    text.nfkc().collect()
-}
-
-fn has_dominant_non_latin_script(text: &str) -> bool {
-    const MIN_NON_LATIN_LETTERS: usize = 5;
-
-    let non_latin_letters = NON_LATIN_LETTER.find_iter(text).count();
-    let alphabetic_letters = text
-        .chars()
-        .filter(|character| character.is_alphabetic())
-        .count();
-    non_latin_letters >= MIN_NON_LATIN_LETTERS
-        && non_latin_letters * 2 >= alphabetic_letters
-}
-
-fn language_chunks(block: &str) -> Vec<String> {
-    const CHUNK_WORDS: usize = 24;
-    const CHUNK_STRIDE_WORDS: usize = 12;
-
-    let words = WORD
-        .find_iter(block)
-        .map(|word| word.as_str())
-        .collect::<Vec<_>>();
-    if words.len() < 8 {
-        return Vec::new();
-    }
-    if words.len() <= CHUNK_WORDS {
-        let chunk = words.join(" ");
-        return has_enough_language_content(&chunk)
-            .then_some(chunk)
-            .into_iter()
-            .collect();
-    }
-
-    let mut starts = BTreeSet::new();
-    let mut start = 0;
-    while start + 8 <= words.len() {
-        starts.insert(start);
-        start += CHUNK_STRIDE_WORDS;
-    }
-    starts.insert(words.len() - CHUNK_WORDS);
-
-    starts
-        .into_iter()
-        .map(|start| {
-            words[start..(start + CHUNK_WORDS).min(words.len())].join(" ")
-        })
-        .filter(|chunk| has_enough_language_content(chunk))
-        .collect()
-}
-
-fn has_enough_language_content(text: &str) -> bool {
-    WORD.find_iter(text).count() >= 8
-        && text.trim().graphemes(true).count() >= 35
 }
 
 #[cfg(test)]
