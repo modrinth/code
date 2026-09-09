@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PlusIcon, SearchIcon, SquarePlusIcon } from '@modrinth/assets'
-import { Button, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
+import { Button, defineMessages, Input, useVIntl } from '@modrinth/ui'
 import { computed, inject } from 'vue'
 
 import FilterMenu from '@/components/ui/library/library-toolbar/filter-menu.vue'
@@ -29,7 +29,7 @@ function openNewGroup() {
 <template>
 	<div class="flex flex-col gap-2">
 		<div class="flex flex-wrap gap-2">
-			<StyledInput
+			<Input
 				v-model="search"
 				:icon="SearchIcon"
 				type="text"

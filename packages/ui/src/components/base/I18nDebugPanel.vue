@@ -13,7 +13,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { IconButton } from '#ui/components/base/buttons'
 
 import { injectI18nDebug } from '../../composables/i18n-debug'
-import StyledInput from './StyledInput.vue'
+import Input from './inputs/Input.vue'
 
 const debugContext = injectI18nDebug()
 
@@ -346,7 +346,7 @@ const listMaxHeight = computed(() => `${panelHeight.value - 120}px`)
 					<div v-if="!minimized" class="flex flex-col overflow-hidden w-full">
 						<!-- Search -->
 						<div class="px-3 py-2.5 !w-full">
-							<StyledInput
+							<Input
 								ref="searchInputRef"
 								v-model="searchQuery"
 								placeholder="Search keys or values..."

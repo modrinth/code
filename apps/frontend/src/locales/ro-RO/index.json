@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Continuă"
   },
-  "admin.billing.error.not-found": {
-    "message": "Utilizatorul nu a fost găsit"
-  },
   "app-marketing.download.description": {
     "message": "Aplicația noastră de desktop este disponibilă pe toate platformele, alege versiunea ta favorită."
   },
@@ -247,9 +244,6 @@
   },
   "auth.reset-password.title.long": {
     "message": "Resetează-ți parola"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Introdu codul..."
   },
   "auth.sign-in.title": {
     "message": "Conectare"
@@ -740,9 +734,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Ce fel de CPU-uri folosesc serverele Modrinth Hosting?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Serverele Modrinth Hosting folosesc AMD Ryzen 7900 si 7950X3D sau echivalent la 5+ GHz, împreuna cu memorie DDR5."
-  },
   "hosting-marketing.faq.ddos-protection": {
     "message": "Au serverele Modrinth Hosting protectie DDos?"
   },
@@ -940,9 +931,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Căutare fișier"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Căutare după email"
   },
   "layout.action.manage-server-notices": {
     "message": "Administrează notificările serverului"

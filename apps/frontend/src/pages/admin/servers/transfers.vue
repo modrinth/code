@@ -8,11 +8,9 @@
 		proceed-label="Cancel transfer"
 		@proceed="confirmCancel"
 	/>
-	<div class="mx-auto max-w-[78.5rem] p-4">
-		<div
-			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
-		>
-			<h1 class="m-0 text-2xl">Server transfers</h1>
+	<div>
+		<div class="mb-4 flex items-center justify-between gap-4">
+			<h2 class="m-0 text-2xl font-semibold">Server transfers</h2>
 			<Button type="colored" color="brand" @click="openTransferModal">
 				<PlusIcon />
 				New transfer

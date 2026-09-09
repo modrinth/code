@@ -48,7 +48,7 @@
 					<label for="proof">
 						<span class="label__title">Proof</span>
 					</label>
-					<StyledInput
+					<Input
 						id="proof"
 						v-model="(modPackData[currentIndex] as ModerationUnknownModpackItem).proof"
 						autocomplete="off"
@@ -58,7 +58,7 @@
 					<label for="link">
 						<span class="label__title">Link</span>
 					</label>
-					<StyledInput
+					<Input
 						id="link"
 						v-model="(modPackData[currentIndex] as ModerationUnknownModpackItem).url"
 						autocomplete="off"
@@ -68,7 +68,7 @@
 					<label for="title">
 						<span class="label__title">Title</span>
 					</label>
-					<StyledInput
+					<Input
 						id="title"
 						v-model="(modPackData[currentIndex] as ModerationUnknownModpackItem).title"
 						autocomplete="off"
@@ -189,7 +189,7 @@
 
 <script setup lang="ts">
 import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
-import { Button, StyledInput } from '@modrinth/ui'
+import { Button, Input } from '@modrinth/ui'
 import type {
 	ModerationFlameModpackItem,
 	ModerationJudgements,

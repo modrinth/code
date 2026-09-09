@@ -25,6 +25,7 @@ export const Interactive: StoryObj = {
 				v-model="currentTheme"
 				:theme-options="themeOptions"
 				system-theme-color="dark"
+				preferred-dark-theme="oled"
 			/>
 		`,
 	}),

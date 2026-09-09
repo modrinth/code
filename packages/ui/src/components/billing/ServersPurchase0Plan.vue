@@ -70,9 +70,9 @@ const messages = defineMessages({
 		id: 'servers.purchase.step.plan.most-popular',
 		defaultMessage: 'Most Popular',
 	},
-	billingSubtitle: {
-		id: 'servers.purchase.step.plan.billing-subtitle',
-		defaultMessage: 'Available in North America, Europe, and Southeast Asia.',
+	hardwareSubtitle: {
+		id: 'servers.purchase.step.plan.hardware-subtitle',
+		defaultMessage: 'Powered by AMD Ryzen 7950X, 9950X, or equivalent, with DDR5 memory.',
 	},
 	customHeading: {
 		id: 'servers.purchase.step.plan.custom.heading',
@@ -165,7 +165,7 @@ function selectCustom() {
 </script>
 
 <template>
-	<div class="flex flex-col items-center gap-2 mb-5 !mt-0">
+	<div class="flex flex-col items-center gap-2 mb-5 pb-1.5 !mt-0">
 		<OptionGroup
 			v-slot="{ option }"
 			v-model="selectedInterval"
@@ -178,7 +178,7 @@ function selectCustom() {
 			</span>
 		</OptionGroup>
 		<div class="text-sm text-secondary text-center">
-			{{ formatMessage(messages.billingSubtitle) }}
+			{{ formatMessage(messages.hardwareSubtitle) }}
 		</div>
 	</div>
 	<Transition

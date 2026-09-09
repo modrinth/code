@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE screenshot_groups SET display_order = display_order + 1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "778ef883e1e68bb549dd1b82761f674df6125b03954683a70431257cc8c923e9"
+}

@@ -155,11 +155,30 @@ const generatedState = shallowRef<GeneratedState>(
 	}) as GeneratedState,
 )
 
+// Read once, with no effect active, so this does not register a subscriber on `generatedState`.
+const frozenState = generatedState.value
+
+/**
+ * Non-tracking server-side view of the state above.
+ *
+ * `generatedState` lives for the lifetime of the isolate, so every per-request `computed()` that
+ * reads it registers a subscriber link on its dep. SSR never unmounts, so those links are never
+ * released, and each one pins the whole request graph that created it. This ref deliberately never
+ * calls `track()`, so reads register nothing. The data is frozen and `setGameVersions` is
+ * client-only, so the server has nothing to react to.
+ *
+ * It must stay a real ref: consumers pass it straight into templates and rely on Vue unwrapping it.
+ */
+const serverGeneratedState = customRef<GeneratedState>(() => ({
+	get: () => frozenState,
+	set: () => {},
+}))
+
 /**
  * Composable for accessing the globally used generated state.
  * This includes both fetched data and runtime-defined constants.
  */
-export const useGeneratedState = () => generatedState
+export const useGeneratedState = () => (import.meta.server ? serverGeneratedState : generatedState)
 
 /**
  * Replaces the build-time game versions with a freshly fetched list. Client-only: mutating this

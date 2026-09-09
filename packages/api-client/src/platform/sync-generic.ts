@@ -59,6 +59,7 @@ export class GenericSyncClient extends AbstractSyncClient {
 
 			const controller = new AbortController()
 			connection.controller = controller
+			let result: StreamReadResult | undefined
 
 			try {
 				const stream = await this.client.stream('/sync', {
@@ -84,25 +85,26 @@ export class GenericSyncClient extends AbstractSyncClient {
 				connection.reconnectAttempts = 0
 				this.updateStatus(connection, 'connected')
 
-				const result = await this.consumeStream(connection, stream)
-				connection.controller = undefined
-				if (connection.stopped) return
-
-				if (result === 'protocol-reconnect') {
-					connection.reconnectAttempts = 0
-					continue
-				}
-
-				await this.waitForReconnect(connection)
+				result = await this.consumeStream(connection, stream)
 			} catch (error) {
-				connection.controller = undefined
 				if (connection.stopped || this.isAbortError(error)) return
 
 				connection.reconnectAttempts++
 				this.updateStatus(connection, 'error', error)
 				console.warn(`[Sync] Connection failed for server ${connection.serverId}:`, error)
-				await this.waitForReconnect(connection)
+			} finally {
+				controller.abort()
+				connection.controller = undefined
 			}
+
+			if (connection.stopped) return
+
+			if (result === 'protocol-reconnect') {
+				connection.reconnectAttempts = 0
+				continue
+			}
+
+			await this.waitForReconnect(connection)
 		}
 	}
 

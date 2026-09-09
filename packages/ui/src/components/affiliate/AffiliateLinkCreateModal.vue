@@ -7,7 +7,7 @@
 				</span>
 				<span class="text-secondary mb-2">{{ formatMessage(messages.createUserDescription) }}</span>
 			</label>
-			<StyledInput
+			<Input
 				v-if="showUserField"
 				id="create-affiliate-user-input"
 				v-model="affiliateUsername"
@@ -28,14 +28,7 @@
 			</label>
 			<div class="flex items-center gap-2">
 				<div class="relative inline-flex items-center flex-1">
-					<AutoBrandIcon
-						:keyword="affiliateLinkTitle"
-						aria-hidden="true"
-						class="absolute left-3 h-5 w-5 z-[1] pointer-events-none text-secondary"
-					>
-						<AffiliateIcon />
-					</AutoBrandIcon>
-					<StyledInput
+					<Input
 						id="create-affiliate-title-input"
 						v-model="affiliateLinkTitle"
 						autocomplete="off"
@@ -43,8 +36,13 @@
 						:placeholder="formatMessage(messages.createTitlePlaceholder)"
 						clearable
 						wrapper-class="w-full"
-						input-class="pl-10"
-					/>
+					>
+						<template #leading>
+							<AutoBrandIcon :keyword="affiliateLinkTitle">
+								<AffiliateIcon />
+							</AutoBrandIcon>
+						</template>
+					</Input>
 				</div>
 				<Button
 					type="colored"
@@ -69,7 +67,7 @@ import { Button } from '#ui/components/base/buttons'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import { AutoBrandIcon, NewModal, StyledInput } from '../index'
+import { AutoBrandIcon, Input, NewModal } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
 const props = withDefaults(

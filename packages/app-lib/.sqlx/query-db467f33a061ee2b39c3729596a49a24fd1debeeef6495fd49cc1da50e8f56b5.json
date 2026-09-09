@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\tINSERT INTO instance_server_projection_entries\n\t\t\t\t(instance_id, owner, server_id, nbt, position)\n\t\t\tVALUES (?, ?, ?, ?, ?)\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "db467f33a061ee2b39c3729596a49a24fd1debeeef6495fd49cc1da50e8f56b5"
+}

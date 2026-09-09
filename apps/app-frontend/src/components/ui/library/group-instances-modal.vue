@@ -23,7 +23,7 @@
 
 		<div class="flex h-[400px] flex-col gap-3 overflow-y-auto bg-surface-2 py-4">
 			<div class="px-6">
-				<StyledInput
+				<Input
 					v-model="groupInstancesSearch"
 					:icon="SearchIcon"
 					:placeholder="formatMessage(messages.searchPlaceholder)"
@@ -51,6 +51,7 @@
 							:alt="instance.name"
 							size="2rem"
 							rounded="md"
+							pad-transparent-corners
 						/>
 						<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
 					</div>
@@ -96,8 +97,8 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
+	Input,
 	NewModal,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref, watch } from 'vue'

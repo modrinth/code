@@ -559,7 +559,7 @@ useSeoMeta({
 					{{ formatMessage(messages.moreDownloadOptions) }}
 				</Button>
 			</div>
-			<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="" />
+			<img src="https://cdn.modrinth.com/app-landing/app-screenshot.webp" alt="" />
 			<div class="bottom-transition" />
 		</div>
 		<div class="features">
@@ -617,12 +617,12 @@ useSeoMeta({
 						<p>{{ formatMessage(messages.playWithFavoriteModsDescription) }}</p>
 					</div>
 					<img
-						src="https://cdn-raw.modrinth.com/app-landing/cobblemon-launcher.webp"
+						src="https://cdn.modrinth.com/app-landing/cobblemon-launcher.webp"
 						:alt="formatMessage(messages.appScreenshotAlt)"
 						class="launcher"
 					/>
 					<img
-						src="https://cdn-raw.modrinth.com/app-landing/cobblemon.webp"
+						src="https://cdn.modrinth.com/app-landing/cobblemon.webp"
 						:alt="formatMessage(messages.minecraftScreenshotAlt)"
 						class="minecraft"
 					/>
@@ -1205,8 +1205,8 @@ useSeoMeta({
 <style scoped lang="scss">
 .landing-hero {
 	position: relative;
-	background: #0f1121 url('https://cdn-raw.modrinth.com/app-landing/cube-black.png') no-repeat
-		center 4rem;
+	background: #0f1121 url('https://cdn.modrinth.com/app-landing/cube-black.png') no-repeat center
+		4rem;
 	background-size: cover;
 	padding: 6rem 1rem 12rem 1rem;
 	margin-top: -5rem;
@@ -2376,7 +2376,7 @@ useSeoMeta({
 	}
 
 	.landing-hero {
-		background: url('https://cdn-raw.modrinth.com/app-landing/cube-light.png') no-repeat center 4rem;
+		background: url('https://cdn.modrinth.com/app-landing/cube-light.png') no-repeat center 4rem;
 		background-size: cover;
 	}
 

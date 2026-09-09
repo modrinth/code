@@ -29,14 +29,16 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	Input,
 	IntlFormatted,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
+import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { setupAttributionModerationProvider } from '~/providers/setup/attribution-moderation'
 
 setupAttributionModerationProvider()
@@ -49,7 +51,8 @@ const isModerator = computed(() => {
 })
 
 const { formatMessage } = useVIntl()
-const { projectV2: project } = injectProjectPageContext()
+const { projectV2: project, refreshProjectValidation } = injectProjectPageContext()
+const permissionsValidation = useProjectNagMessages('permissions')
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
@@ -406,6 +409,7 @@ const deleteAllGroupsMutation = useMutation({
 	mutationFn: () => labrinth.attribution_internal.deleteAllGroups(project.value.id),
 	onSuccess: async () => {
 		await queryClient.invalidateQueries({ queryKey: ['project-attribution', project.value.id] })
+		await refreshProjectValidation()
 		addNotification({
 			type: 'success',
 			title: formatMessage(messages.deleteAllGroups),
@@ -472,6 +476,7 @@ function dismissInfoBanner() {
 }
 </script>
 <template>
+	<ValidationMessage :check="permissionsValidation" class="mb-4" />
 	<ConfirmModal
 		v-if="isModerator"
 		ref="deleteAllGroupsModalRef"
@@ -558,7 +563,7 @@ function dismissInfoBanner() {
 		</template>
 		<div class="flex flex-col gap-2">
 			<div class="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
-				<StyledInput
+				<Input
 					v-model="searchQuery"
 					type="text"
 					autocomplete="off"

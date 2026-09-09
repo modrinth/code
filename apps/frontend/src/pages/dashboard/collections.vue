@@ -4,7 +4,7 @@
 		<h2 class="text-2xl">{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
 		<div class="mb-3 flex flex-col gap-3">
 			<label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
-			<StyledInput
+			<Input
 				id="search-input"
 				v-model="filterQuery"
 				:icon="SearchIcon"
@@ -152,7 +152,7 @@ import {
 	defineMessages,
 	DropdownSelect,
 	injectModrinthClient,
-	StyledInput,
+	Input,
 	useCompactNumber,
 	useVIntl,
 } from '@modrinth/ui'

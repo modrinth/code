@@ -1,23 +1,9 @@
 <script setup lang="ts">
-import {
-	ClipboardCopyIcon,
-	EditIcon,
-	EyeIcon,
-	FolderOpenIcon,
-	MinusIcon,
-	PaletteIcon,
-	PlayIcon,
-	PlusIcon,
-	StarIcon,
-	StopCircleIcon,
-	TrashIcon,
-	UploadIcon,
-} from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import { StarIcon } from '@modrinth/assets'
+import { ContextMenu, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
-import ContextMenu from '@/components/ui/context-menu/index.vue'
 import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
@@ -33,6 +19,8 @@ import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInsta
 import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
+import { libraryScrollTop } from './view-state'
+
 const props = defineProps<{
 	instances: GameInstance[]
 }>()
@@ -44,55 +32,9 @@ const messages = defineMessages({
 		id: 'app.library.search.no-results.title',
 		defaultMessage: 'No instances match your search.',
 	},
-	play: { id: 'app.library.instance.action.play', defaultMessage: 'Play' },
-	stop: { id: 'app.library.instance.action.stop', defaultMessage: 'Stop' },
-	addToFavorites: {
-		id: 'app.library.instance.action.add-to-favorites',
-		defaultMessage: 'Add to favorites',
-	},
-	removeFromFavorites: {
-		id: 'app.library.instance.action.remove-from-favorites',
-		defaultMessage: 'Remove from favorites',
-	},
-	addContent: { id: 'app.library.instance.action.add-content', defaultMessage: 'Add content' },
-	viewInstance: {
-		id: 'app.library.instance.action.view-instance',
-		defaultMessage: 'View instance',
-	},
-	editIcon: {
-		id: 'instance.settings.tabs.general.edit-icon',
-		defaultMessage: 'Edit icon',
-	},
-	selectIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.select',
-		defaultMessage: 'Select icon',
-	},
-	replaceIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.replace',
-		defaultMessage: 'Replace icon',
-	},
-	createIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.create',
-		defaultMessage: 'Create an icon',
-	},
-	editCreatedIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.edit-created',
-		defaultMessage: 'Edit icon',
-	},
-	removeIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.remove',
-		defaultMessage: 'Remove icon',
-	},
-	duplicateInstance: {
-		id: 'app.library.instance.action.duplicate',
-		defaultMessage: 'Duplicate instance',
-	},
-	delete: { id: 'app.library.instance.action.delete', defaultMessage: 'Delete' },
-	openFolder: { id: 'app.library.instance.action.open-folder', defaultMessage: 'Open folder' },
-	copyPath: { id: 'app.library.instance.action.copy-path', defaultMessage: 'Copy path' },
-	removeFromGroup: {
-		id: 'app.library.instance.action.remove-from-group',
-		defaultMessage: 'Remove from group',
+	instanceActionsLabel: {
+		id: 'app.library.instance.actions.label',
+		defaultMessage: 'Instance actions',
 	},
 })
 
@@ -111,12 +53,26 @@ const {
 	currentDeleteInstances,
 	clearLibraryInstanceSelection,
 	deleteInstance,
-	handleInstanceOption,
 	handleInstanceIconSaved,
 	selectedLibraryInstances,
 	setSelectedLibraryInstances,
 	toggleLibraryInstanceSelection,
 } = provideLibrary(toRef(props, 'instances'))
+
+let restoreScrollFrame: number | undefined
+let unmounted = false
+const animationsReady = ref(false)
+watch(libraryGroupsLoaded, async (loaded) => {
+	if (!loaded || animationsReady.value) return
+	await nextTick()
+	if (unmounted) return
+	restoreScrollFrame = requestAnimationFrame(() => {
+		document.querySelector('.app-viewport')?.scrollTo(0, libraryScrollTop.value)
+		restoreScrollFrame = requestAnimationFrame(() => {
+			animationsReady.value = true
+		})
+	})
+})
 
 const hasActiveFilters = computed(() =>
 	Object.values(filters.value).some((selectedValues) => selectedValues.length > 0),
@@ -222,6 +178,8 @@ function onGroupDragEnd() {
 }
 
 onUnmounted(() => {
+	unmounted = true
+	if (restoreScrollFrame !== undefined) cancelAnimationFrame(restoreScrollFrame)
 	document.documentElement.classList.remove(GROUP_REORDERING_CLASS)
 })
 
@@ -319,6 +277,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 			</div>
 			<Transition
 				v-else
+				:css="animationsReady"
 				enter-active-class="transition-opacity duration-200 ease-out motion-reduce:transition-none"
 				enter-from-class="opacity-0"
 				enter-to-class="opacity-100"
@@ -331,6 +290,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 				>
 					<div v-if="visibleFavoritesGroup" class="min-w-0">
 						<InstanceGroup
+							:animations-ready="animationsReady"
 							:instance-group="visibleFavoritesGroup"
 							:selection-anchor-instance-id="
 								anchorInstance?.groupId === FAVORITES_GROUP_ID ? anchorInstance.instanceId : null
@@ -370,8 +330,11 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 								:data-instance-group-reorder-id="instanceGroup.id"
 							>
 								<InstanceGroup
+									:animations-ready="animationsReady"
 									:can-drag-reorder="canDragReorderGroups"
-									:hide-header="visibleInstanceGroups.length === 1"
+									:hide-header="
+										instanceGroup.id === 'group:none' && visibleInstanceGroups.length === 1
+									"
 									:instance-group="instanceGroup"
 									:selection-anchor-instance-id="
 										anchorInstance?.groupId === instanceGroup.id ? anchorInstance?.instanceId : null
@@ -388,10 +351,13 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 
 				<TransitionGroup
 					v-else-if="libraryGroupsLoaded"
+					:css="animationsReady"
 					data-library-page-background
 					tag="div"
 					class="flex flex-col"
-					move-class="transition-transform duration-200 ease-out"
+					:move-class="
+						animationsReady ? 'transition-transform duration-200 ease-out' : 'transition-none'
+					"
 					enter-active-class="transition-[opacity,transform] duration-200 ease-out"
 					enter-from-class="opacity-0 -translate-y-2"
 					enter-to-class="opacity-100 translate-y-0"
@@ -402,6 +368,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 						class="min-w-0"
 					>
 						<InstanceGroup
+							:animations-ready="animationsReady"
 							:hide-header="instanceGroup.key === 'None' && visibleInstanceGroups.length === 1"
 							:instance-group="instanceGroup"
 							:selection-anchor-instance-id="
@@ -430,34 +397,10 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 		:config="currentIconEditorInstance?.icon_config"
 		@saved="handleInstanceIconSaved"
 	/>
-	<ContextMenu :ref="setInstanceOptions" @option-clicked="handleInstanceOption">
-		<template #play> <PlayIcon /> {{ formatMessage(messages.play) }} </template>
-		<template #stop> <StopCircleIcon /> {{ formatMessage(messages.stop) }} </template>
-		<template #add_to_favorites>
-			<StarIcon /> {{ formatMessage(messages.addToFavorites) }}
-		</template>
-		<template #remove_from_favorites>
+	<ContextMenu :ref="setInstanceOptions" :label="formatMessage(messages.instanceActionsLabel)">
+		<template #remove_from_favorites="{ option }">
 			<StarIcon style="color: var(--color-text-default); fill: var(--color-text-default)" />
-			{{ formatMessage(messages.removeFromFavorites) }}
-		</template>
-		<template #add_content> <PlusIcon /> {{ formatMessage(messages.addContent) }} </template>
-		<template #edit> <EyeIcon /> {{ formatMessage(messages.viewInstance) }} </template>
-		<template #edit_icon> <EditIcon /> {{ formatMessage(messages.editIcon) }} </template>
-		<template #select_icon> <UploadIcon /> {{ formatMessage(messages.selectIcon) }} </template>
-		<template #replace_icon> <UploadIcon /> {{ formatMessage(messages.replaceIcon) }} </template>
-		<template #create_icon> <PaletteIcon /> {{ formatMessage(messages.createIcon) }} </template>
-		<template #edit_created_icon>
-			<PaletteIcon /> {{ formatMessage(messages.editCreatedIcon) }}
-		</template>
-		<template #remove_icon> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
-		<template #duplicate>
-			<ClipboardCopyIcon /> {{ formatMessage(messages.duplicateInstance) }}
-		</template>
-		<template #delete> <TrashIcon /> {{ formatMessage(messages.delete) }} </template>
-		<template #open> <FolderOpenIcon /> {{ formatMessage(messages.openFolder) }} </template>
-		<template #copy> <ClipboardCopyIcon /> {{ formatMessage(messages.copyPath) }} </template>
-		<template #remove_from_group>
-			<MinusIcon /> {{ formatMessage(messages.removeFromGroup) }}
+			{{ option.label }}
 		</template>
 	</ContextMenu>
 </template>

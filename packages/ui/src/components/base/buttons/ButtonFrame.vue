@@ -164,7 +164,7 @@ defineExpose({ element })
 }
 
 .button-frame--outlined {
-	box-shadow: inset 0 0 0 1px var(--button-color, var(--surface-5));
+	box-shadow: 0 0 0 1px var(--button-color, var(--surface-5));
 }
 
 .button-frame--quiet {

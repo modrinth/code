@@ -23,11 +23,11 @@ import { useSessionStorage } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
-import { Button, type OverflowMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
@@ -63,6 +63,7 @@ const debug = useDebugLogger('ContentPageLayout')
 const props = withDefaults(
 	defineProps<{
 		bottomPadding?: boolean
+		highlightedItemId?: string
 	}>(),
 	{
 		bottomPadding: true,
@@ -191,7 +192,7 @@ const sortLabels: Record<SortMode, () => string> = {
 	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
 }
 
-const sortOptions = computed<OverflowMenuOption[]>(() => [
+const sortOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'alphabetical-asc',
 		label: formatMessage(messages.sortAlphabeticalAscending),
@@ -278,6 +279,17 @@ const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters 
 		showSharedContent: ctx.showSharedContentFilter,
 		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
 	})
+
+watch(
+	() => props.highlightedItemId,
+	(id) => {
+		if (!id) return
+		searchQuery.value = ''
+		selectedFilters.value = []
+		selectedMetadataFilters.value = {}
+	},
+	{ immediate: true },
+)
 
 const metadataFilterAuthors = computed(() => {
 	const authors = new Map<string, NonNullable<ContentItem['owner']>>()
@@ -563,6 +575,16 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 }
 
 async function showDeletionConfirmation(event?: MouseEvent) {
+	const confirmed = await ctx.confirmDeleteItems?.(pendingDeletionItems.value)
+	if (confirmed !== undefined) {
+		if (!confirmed) return
+		if (pendingDeletionWarning.value) {
+			confirmDeletionModal.value?.show()
+		} else {
+			await confirmDelete()
+		}
+		return
+	}
 	if (
 		!pendingDeletionWarning.value &&
 		(event?.shiftKey || skipNonEssentialWarnings.value) &&
@@ -596,6 +618,7 @@ async function confirmDependencyWarningDelete(disableDependentsAfterDeleting: bo
 
 	pendingDependencyWarningItems.value = []
 	pendingDependencyWarningDependents.value = []
+	if ((await ctx.confirmDeleteItems?.(pendingDeletionItems.value)) === false) return
 	if (pendingDeletionWarning.value) {
 		confirmDeletionModal.value?.show()
 		return
@@ -685,6 +708,7 @@ async function confirmDelete() {
 async function promptDisableItems(items: ContentItem[]) {
 	const toggleableItems = items.filter(canToggleItem)
 	if (toggleableItems.length === 0) return
+	if (ctx.confirmAction && !(await ctx.confirmAction('disable', toggleableItems))) return
 	pendingDisableItems.value = toggleableItems
 	const warning = ctx.getDisableWarning?.(toggleableItems) ?? null
 	if (warning) {
@@ -752,6 +776,7 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 		await promptDisableItems([item])
 		return
 	}
+	if (ctx.confirmAction && !(await ctx.confirmAction('enable', [item]))) return
 	markChanging(id)
 	try {
 		await ctx.toggleEnabled(item)
@@ -764,6 +789,7 @@ async function bulkEnable() {
 	if (ctx.isBusy.value) return
 	const items = toggleableSelectedItems.value.filter((item) => !item.enabled)
 	if (items.length === 0) return
+	if (ctx.confirmAction && !(await ctx.confirmAction('enable', items))) return
 	if (ctx.bulkEnableItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'enable'
@@ -794,7 +820,7 @@ async function bulkDisable() {
 
 function handleUpdateById(id: string) {
 	const item = ctx.items.value.find((item) => getItemId(item) === id)
-	if (item?.locked) return
+	if (!item || item.locked) return
 	ctx.updateItem?.(id)
 }
 
@@ -936,19 +962,19 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				/>
 
 				<template v-if="ctx.items.value.length > 0">
-					<div class="flex flex-col gap-4">
-						<span v-if="ctx.managedContent.value" class="text-xl font-semibold text-contrast">
+					<div class="flex flex-col gap-2">
+						<span v-if="ctx.managedContent.value" class="mb-2 text-xl font-semibold text-contrast">
 							{{ formatMessage(messages.additionalContent) }}
 						</span>
 
 						<div class="flex flex-wrap items-center gap-2">
-							<StyledInput
+							<Input
 								v-model="searchQuery"
 								:icon="SearchIcon"
 								type="text"
 								autocomplete="off"
 								:spellcheck="false"
-								input-class="!h-10"
+								size="medium"
 								wrapper-class="flex-1 min-w-0"
 								clearable
 								:placeholder="
@@ -1217,7 +1243,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 						<ContentCardTable
 							v-model:selected-ids="selectedIds"
+							class="mt-2"
 							:items="tableItems"
+							:highlighted-item-id="highlightedItemId"
 							:show-selection="true"
 							@update:enabled="handleToggleEnabledById"
 							@delete="handleDeleteById"

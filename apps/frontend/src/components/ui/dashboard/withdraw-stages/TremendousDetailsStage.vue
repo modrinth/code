@@ -39,7 +39,7 @@
 					>{{ formatMessage(formFieldLabels.email) }} <span class="text-red">*</span></span
 				>
 			</label>
-			<StyledInput
+			<Input
 				v-model="deliveryEmail"
 				type="email"
 				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
@@ -131,7 +131,7 @@
 
 			<div v-if="showGiftCardSelector && useFixedDenominations" class="flex flex-col gap-2.5">
 				<template v-if="useDenominationSuggestions">
-					<StyledInput
+					<Input
 						v-model="denominationSearchInput"
 						type="number"
 						:icon="SearchIcon"
@@ -321,10 +321,10 @@ import {
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	Input,
 	IntlFormatted,
 	normalizeChildren,
 	paymentMethodMessages,
-	StyledInput,
 	useDebugLogger,
 	useFormatMoney,
 	useVIntl,
@@ -516,7 +516,7 @@ const selectedRewardOption = computed(() => {
 })
 
 const selectedMethodDetails = computed(() => {
-	console.log(rewardOptions.value, selectedGiftCardId.value)
+	debug(rewardOptions.value, selectedGiftCardId.value)
 	if (!selectedGiftCardId.value) return null
 	const option = rewardOptions.value.find((opt) => opt.value === selectedGiftCardId.value)
 	debug('Selected method details:', option?.methodDetails)

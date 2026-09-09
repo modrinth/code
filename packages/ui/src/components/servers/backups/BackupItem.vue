@@ -13,7 +13,7 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
 
 import { useFormatDateTime } from '../../../composables'
@@ -94,8 +94,8 @@ const itemBorderClass = computed(() => {
 	return 'border-transparent'
 })
 
-const overflowMenuOptions = computed<OverflowMenuOption[]>(() => {
-	const options: OverflowMenuOption[] = []
+const overflowMenuOptions = computed<ButtonMenuOption[]>(() => {
+	const options: ButtonMenuOption[] = []
 
 	if (props.showCopyIdAction) {
 		options.push({

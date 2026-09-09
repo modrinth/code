@@ -1,4 +1,4 @@
-import { Checkbox, Combobox, MarkdownEditor, StyledInput, Toggle } from '@modrinth/ui'
+import { Checkbox, Combobox, Input, MarkdownEditor, Toggle } from '@modrinth/ui'
 import { markRaw } from 'vue'
 
 import { withAutoProps, withChildren } from './builder'
@@ -280,7 +280,7 @@ export function text(id: string) {
 			withTweak,
 			(n) =>
 				withComponent(n, {
-					component: markRaw(StyledInput),
+					component: markRaw(Input),
 					componentProps: () => ({ class: 'min-w-40 flex-1', autocomplete: 'off' }),
 				}),
 			withExtraProps,

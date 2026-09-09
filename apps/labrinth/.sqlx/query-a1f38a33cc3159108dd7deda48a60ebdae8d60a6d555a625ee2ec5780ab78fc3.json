@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT detail.project_id AS \"project_id!: DBProjectId\"\n        FROM delphi_issue_details_with_statuses detail\n        WHERE detail.key = ANY($1::text[])\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "a1f38a33cc3159108dd7deda48a60ebdae8d60a6d555a625ee2ec5780ab78fc3"
+}

@@ -29,6 +29,9 @@ export default defineNuxtPlugin((nuxt) => {
 	if (import.meta.server) {
 		nuxt.hooks.hook('app:rendered', () => {
 			vueQueryState.value = dehydrate(queryClient)
+
+			// Hack to prevent memory leak when gcTime is being set on the server side.
+			queryClient.clear()
 		})
 	}
 

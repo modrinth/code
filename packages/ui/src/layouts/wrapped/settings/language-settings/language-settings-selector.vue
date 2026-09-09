@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { SearchIcon } from '@modrinth/assets'
 import Fuse from 'fuse.js/dist/fuse.basic'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 
-import Button from '#ui/components/base/buttons/Button.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import CheckCircleButton from '#ui/components/base/buttons/CheckCircleButton.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import {
 	buildLocaleMessages,
 	defineMessages,
@@ -71,7 +71,7 @@ type LocaleInfo = {
 	category: Category
 	tag: string
 	displayName: string
-	browserDisplayName: string
+	translatedName: string
 	flagUrl?: string
 	searchTerms?: string[]
 	coverage?: LanguageCoverageStats
@@ -80,34 +80,6 @@ type LocaleInfo = {
 const localeFlagRegions: Record<string, string> = {
 	'es-419': 'mx',
 	'sr-CS': 'rs',
-}
-
-const $browserLocales = ref([props.currentLocale])
-
-onMounted(() => {
-	$browserLocales.value = navigator.languages.length
-		? [...navigator.languages]
-		: [navigator.language]
-})
-
-const $browserDisplayNames = computed(() => {
-	try {
-		return new Intl.DisplayNames($browserLocales.value, { type: 'language' })
-	} catch {
-		return undefined
-	}
-})
-
-function getBrowserDisplayName(tag: string, fallback: string): string {
-	try {
-		return $browserDisplayNames.value?.of(tag) ?? fallback
-	} catch {
-		try {
-			return $browserDisplayNames.value?.of(tag.split('-')[0]) ?? fallback
-		} catch {
-			return fallback
-		}
-	}
 }
 
 function getFlagUrl(tag: string): string | undefined {
@@ -125,14 +97,13 @@ const $locales = computed(() => {
 		const meta = localeMetas[tag] ?? null
 		const displayName = meta?.displayName ?? loc.name
 		const translatedName = formatMessage(loc.translatedName)
-		const browserDisplayName = getBrowserDisplayName(tag, translatedName)
 		const searchTerms = meta?.searchTerms === '-' ? undefined : meta?.searchTerms?.split('\n')
 
 		result.push({
 			tag,
 			category: 'default',
 			displayName,
-			browserDisplayName,
+			translatedName,
 			flagUrl: getFlagUrl(tag),
 			searchTerms,
 			coverage: props.coverageByLocale?.[tag],
@@ -149,7 +120,7 @@ const isQueryEmpty = () => $query.value.trim().length === 0
 const fuse = computed(
 	() =>
 		new Fuse<LocaleInfo>($locales.value, {
-			keys: ['tag', 'displayName', 'browserDisplayName', 'searchTerms'],
+			keys: ['tag', 'displayName', 'translatedName', 'searchTerms'],
 			threshold: 0.4,
 			distance: 100,
 		}),
@@ -215,18 +186,16 @@ function onItemClick(e: MouseEvent, loc: LocaleInfo) {
 	changeLocale(loc.tag)
 }
 
-function showBrowserDisplayName(loc: LocaleInfo): boolean {
-	return (
-		loc.browserDisplayName.localeCompare(loc.displayName, undefined, { sensitivity: 'base' }) !== 0
-	)
+function showTranslatedName(loc: LocaleInfo): boolean {
+	return loc.translatedName.localeCompare(loc.displayName, undefined, { sensitivity: 'base' }) !== 0
 }
 
 function getItemLabel(loc: LocaleInfo) {
 	const coverageLabel = loc.coverage
 		? `. ${formatMessage(messages.coverageLabel, { percentage: loc.coverage.percentage })}`
 		: ''
-	const browserDisplayName = showBrowserDisplayName(loc) ? `. ${loc.browserDisplayName}` : ''
-	return `${loc.displayName}${browserDisplayName}${coverageLabel}`
+	const translatedName = showTranslatedName(loc) ? `. ${loc.translatedName}` : ''
+	return `${loc.displayName}${translatedName}${coverageLabel}`
 }
 
 function getCoverageTooltip(coverage: LanguageCoverageStats): string {
@@ -249,7 +218,7 @@ function getCategoryName(category: Category): string {
 <template>
 	<div class="flex flex-col gap-4">
 		<div v-if="$locales.length > 1" class="-mb-4">
-			<StyledInput
+			<Input
 				id="language-search"
 				v-model="$query"
 				:icon="SearchIcon"
@@ -272,7 +241,12 @@ function getCategoryName(category: Category): string {
 			</div>
 		</div>
 
-		<div ref="$languagesList" class="flex flex-col gap-2.5">
+		<div
+			ref="$languagesList"
+			role="radiogroup"
+			:aria-label="getCategoryName(isQueryEmpty() ? 'default' : 'searchResult')"
+			class="flex flex-col gap-1"
+		>
 			<template v-for="[category, categoryLocales] in $displayCategories" :key="category">
 				<strong class="mt-4 font-semibold text-contrast">
 					{{ getCategoryName(category) }}
@@ -287,18 +261,10 @@ function getCategoryName(category: Category): string {
 				</div>
 
 				<template v-for="loc in categoryLocales" :key="loc.tag">
-					<Button
-						:type="$activeLocale === loc.tag ? 'colored' : 'base'"
-						:color="$activeLocale === loc.tag ? 'green' : undefined"
-						:aria-pressed="$activeLocale === loc.tag"
+					<CheckCircleButton
+						:checked="$activeLocale === loc.tag"
 						:disabled="isChangingLocale() && $changingTo !== loc.tag"
 						:aria-label="getItemLabel(loc)"
-						class="w-full !justify-start !gap-2 !text-left sm:!h-10"
-						:class="
-							$activeLocale === loc.tag
-								? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)]'
-								: ''
-						"
 						@click="(e) => onItemClick(e, loc)"
 					>
 						<img
@@ -313,10 +279,10 @@ function getCategoryName(category: Category): string {
 						<span class="flex min-w-0 flex-1 items-baseline gap-2 overflow-hidden">
 							<span class="truncate text-sm sm:text-base">{{ loc.displayName }}</span>
 							<span
-								v-if="showBrowserDisplayName(loc)"
+								v-if="showTranslatedName(loc)"
 								class="truncate text-xs font-normal text-secondary sm:text-sm"
 							>
-								{{ loc.browserDisplayName }}
+								{{ loc.translatedName }}
 							</span>
 						</span>
 
@@ -327,7 +293,7 @@ function getCategoryName(category: Category): string {
 						>
 							{{ loc.coverage.percentage }}%
 						</span>
-					</Button>
+					</CheckCircleButton>
 				</template>
 			</template>
 		</div>

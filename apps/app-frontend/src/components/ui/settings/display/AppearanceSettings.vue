@@ -6,19 +6,20 @@ import {
 	provideAppearanceSettings,
 	useSavable,
 } from '@modrinth/ui'
-import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { platform } from '@tauri-apps/plugin-os'
+import { computed, inject, onBeforeUnmount, onMounted, watch } from 'vue'
 
-import { type ColorTheme, useTheme } from '@/composables/use-theme.ts'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { type ColorTheme, isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { type AppSettings, get, set } from '@/helpers/settings.ts'
-import { getOS } from '@/helpers/utils'
 import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
 const theme = useTheme()
+const appSettings = useAppSettings()
 const auth = injectAuth()
 const { updatePreferences } = injectUserPreferences()
 const settingsModal = inject(appSettingsModalContextKey, null)
-const os = await getOS()
-const settings = ref(await get())
+const os = platform()
 
 type AppearanceSettingsState = {
 	theme: ColorTheme
@@ -27,17 +28,17 @@ type AppearanceSettingsState = {
 	nativeDecorations: boolean
 }
 
-function getAppearanceSettingsState(settings: AppSettings): AppearanceSettingsState {
+function getAppearanceSettingsState(): AppearanceSettingsState {
 	return {
-		theme: settings.theme,
-		syncAcrossDevices: settings.sync_theme_across_devices,
-		advancedRendering: settings.advanced_rendering,
-		nativeDecorations: settings.native_decorations,
+		theme: theme.preferred,
+		syncAcrossDevices: theme.syncAcrossDevices,
+		advancedRendering: theme.advancedRendering,
+		nativeDecorations: appSettings.nativeDecorations,
 	}
 }
 
 const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
-	() => getAppearanceSettingsState(settings.value),
+	getAppearanceSettingsState,
 	async (appearanceChanges) => {
 		const value = current.value
 		if (
@@ -51,7 +52,7 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 		}
 
 		const nextSettings: AppSettings = {
-			...settings.value,
+			...(await get()),
 			theme: value.theme,
 			sync_theme_across_devices: value.syncAcrossDevices,
 			advanced_rendering: value.advancedRendering,
@@ -59,18 +60,24 @@ const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
 		}
 
 		await set(nextSettings)
-		settings.value = nextSettings
+		if (isDarkTheme(value.theme)) {
+			theme.preferredDark = value.theme
+		}
 		theme.preferred = value.theme
 		theme.syncAcrossDevices = value.syncAcrossDevices
 		theme.advancedRendering = value.advancedRendering
+		appSettings.nativeDecorations = value.nativeDecorations
 	},
 )
 
 const themeOptions = computed(() =>
 	theme.options.filter(
-		(option) =>
-			option !== 'retro' || settings.value.developer_mode || current.value.theme === 'retro',
+		(option) => option !== 'retro' || appSettings.devMode || current.value.theme === 'retro',
 	),
+)
+
+const preferredDarkTheme = computed(() =>
+	isDarkTheme(current.value.theme) ? current.value.theme : theme.preferredDark,
 )
 
 function setTheme(value: ColorTheme): void {
@@ -126,7 +133,8 @@ provideAppearanceSettings({
 	theme: {
 		current: computed(() => current.value.theme),
 		options: themeOptions,
-		system: computed(() => theme.native),
+		system: computed(() => (theme.native === 'light' ? 'light' : preferredDarkTheme.value)),
+		preferredDark: preferredDarkTheme,
 		set: setTheme,
 		syncAcrossDevices: {
 			value: computed(() => current.value.syncAcrossDevices),
@@ -139,7 +147,7 @@ provideAppearanceSettings({
 		set: setAdvancedRendering,
 	},
 	nativeDecorations:
-		os !== 'MacOS'
+		os !== 'macos'
 			? {
 					value: computed(() => current.value.nativeDecorations),
 					set: setNativeDecorations,

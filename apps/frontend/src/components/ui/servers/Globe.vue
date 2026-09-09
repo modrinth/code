@@ -42,9 +42,12 @@
 </template>
 
 <script setup>
+import { useDebugLogger } from '@modrinth/ui'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { onMounted, onUnmounted, ref } from 'vue'
+
+const debug = useDebugLogger('Globe')
 
 const container = ref(null)
 const showLabels = ref(false)
@@ -87,7 +90,7 @@ const isLocationVisible = (location) => {
 }
 
 const toggleLocationClicked = (location) => {
-	console.log('clicked', location.name)
+	debug('clicked', location.name)
 	locations.value.find((loc) => loc.name === location.name).clicked = !location.clicked
 }
 

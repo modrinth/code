@@ -17,6 +17,7 @@ pub mod reports;
 pub mod settings;
 pub mod shortcuts;
 pub mod tags;
+mod thumbnails;
 pub mod users;
 pub mod utils;
 
@@ -83,11 +84,7 @@ macro_rules! impl_serialize {
                 S: Serializer,
             {
                 match self {
-                    // For the Theseus variant, we add a special display for the error,
-                    // to view the spans if subscribed to them (which is information that is lost when serializing)
                     TheseusSerializableError::Theseus(theseus_error) => {
-                        $crate::error::display_tracing_error(theseus_error);
-
                         let unavailable_reason = match theseus_error.raw.as_ref() {
                             theseus::ErrorKind::SharedInstanceUnavailable(reason) => Some(reason),
                             _ => None,

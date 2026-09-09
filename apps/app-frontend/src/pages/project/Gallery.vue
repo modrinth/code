@@ -14,88 +14,31 @@
 			</span>
 		</Card>
 	</div>
-	<Teleport to="#teleports">
-		<div v-if="expandedGalleryItem" class="expanded-image-modal" @click="hideImage">
-			<div class="content">
-				<img
-					class="image"
-					:class="{ 'zoomed-in': zoomedIn }"
-					:src="
-						expandedGalleryItem.raw_url
-							? expandedGalleryItem.raw_url
-							: 'https://cdn.modrinth.com/placeholder-banner.svg'
-					"
-					:alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
-					@click.stop="() => {}"
-				/>
-
-				<div class="floating" @click.stop="() => {}">
-					<div class="text">
-						<h2 v-if="expandedGalleryItem.title">
-							{{ expandedGalleryItem.title }}
-						</h2>
-						<p v-if="expandedGalleryItem.description">
-							{{ expandedGalleryItem.description }}
-						</p>
-					</div>
-					<div class="controls">
-						<div class="buttons">
-							<IconButton label="Close" class="close" @click="hideImage">
-								<XIcon aria-hidden="true" />
-							</IconButton>
-							<ButtonLink
-								class="open btn icon-only !w-9 !px-0 !rounded-full"
-								target="_blank"
-								:href="
-									expandedGalleryItem.raw_url
-										? expandedGalleryItem.raw_url
-										: 'https://cdn.modrinth.com/placeholder-banner.svg'
-								"
-							>
-								<ExternalIcon aria-hidden="true" />
-							</ButtonLink>
-							<IconButton label="Toggle zoom" @click="zoomedIn = !zoomedIn">
-								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-								<ContractIcon v-else aria-hidden="true" />
-							</IconButton>
-							<IconButton
-								v-if="filteredGallery.length > 1"
-								label="Previous image"
-								class="previous"
-								@click="previousImage()"
-							>
-								<LeftArrowIcon aria-hidden="true" />
-							</IconButton>
-							<IconButton
-								v-if="filteredGallery.length > 1"
-								label="Next image"
-								class="next"
-								@click="nextImage()"
-							>
-								<RightArrowIcon aria-hidden="true" />
-							</IconButton>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</Teleport>
+	<ImageViewerEditor
+		ref="galleryViewer"
+		:items="galleryViewerItems"
+		editor="disabled"
+		@navigate="trackGalleryNavigation"
+	>
+		<template #actions="{ item }">
+			<Button
+				type="quiet"
+				class="!w-9 !rounded-full !p-0"
+				aria-label="Open image in new tab"
+				@click="openUrl(item.src)"
+			>
+				<ExternalIcon aria-hidden="true" />
+			</Button>
+		</template>
+	</ImageViewerEditor>
 </template>
 
 <script setup>
-import {
-	CalendarIcon,
-	ContractIcon,
-	ExpandIcon,
-	ExternalIcon,
-	LeftArrowIcon,
-	RightArrowIcon,
-	XIcon,
-} from '@modrinth/assets'
-import { ButtonLink, Card, IconButton, useFormatDateTime } from '@modrinth/ui'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { CalendarIcon, ExternalIcon } from '@modrinth/assets'
+import { Button, Card, ImageViewerEditor, useFormatDateTime } from '@modrinth/ui'
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { computed, ref } from 'vue'
 
-import { release_ads_window_hold, take_ads_window_hold } from '@/helpers/ads.js'
 import { trackEvent } from '@/helpers/analytics'
 
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
@@ -117,84 +60,31 @@ const filteredGallery = computed(
 	() => props.project.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
 )
 
-const expandedGalleryItem = ref(null)
-const expandedGalleryIndex = ref(0)
-const zoomedIn = ref(false)
-let adsWindowHold = false
-
-const hideImage = () => {
-	expandedGalleryItem.value = null
-	if (adsWindowHold) {
-		adsWindowHold = false
-		release_ads_window_hold()
-	}
-}
-
-const nextImage = () => {
-	expandedGalleryIndex.value++
-	if (expandedGalleryIndex.value >= filteredGallery.value.length) {
-		expandedGalleryIndex.value = 0
-	}
-	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value]
-	trackEvent('GalleryImageNext', {
-		project_id: props.project.id,
-		url: expandedGalleryItem.value.url,
-	})
-}
-
-const previousImage = () => {
-	expandedGalleryIndex.value--
-	if (expandedGalleryIndex.value < 0) {
-		expandedGalleryIndex.value = filteredGallery.value.length - 1
-	}
-	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value]
-	trackEvent('GalleryImagePrevious', {
-		project_id: props.project.id,
-		url: expandedGalleryItem.value,
-	})
-}
+const galleryViewer = ref()
+const galleryViewerItems = computed(() =>
+	filteredGallery.value.map((image) => ({
+		id: image.url,
+		src: image.raw_url ?? 'https://cdn.modrinth.com/placeholder-banner.svg',
+		alt: image.title || 'Gallery image',
+		title: image.title,
+		description: image.description,
+	})),
+)
 
 const expandImage = (item, index) => {
-	if (!adsWindowHold) {
-		adsWindowHold = true
-		take_ads_window_hold()
-	}
-	expandedGalleryItem.value = item
-	expandedGalleryIndex.value = index
-	zoomedIn.value = false
-
+	galleryViewer.value?.show(index)
 	trackEvent('GalleryImageExpand', {
 		project_id: props.project.id,
 		url: item.url,
 	})
 }
 
-function keyListener(e) {
-	if (expandedGalleryItem.value) {
-		if (e.key === 'Escape') {
-			e.preventDefault()
-			hideImage()
-		} else if (e.key === 'ArrowLeft') {
-			e.preventDefault()
-			previousImage()
-		} else if (e.key === 'ArrowRight') {
-			e.preventDefault()
-			nextImage()
-		}
-	}
+function trackGalleryNavigation(item, _index, direction) {
+	trackEvent(direction === 'next' ? 'GalleryImageNext' : 'GalleryImagePrevious', {
+		project_id: props.project.id,
+		url: item.id,
+	})
 }
-
-onMounted(() => {
-	document.addEventListener('keydown', keyListener)
-})
-
-onUnmounted(() => {
-	document.removeEventListener('keydown', keyListener)
-	if (adsWindowHold) {
-		adsWindowHold = false
-		release_ads_window_hold()
-	}
-})
 </script>
 
 <style scoped lang="scss">
@@ -228,141 +118,5 @@ onUnmounted(() => {
 		padding: 0 1rem 1rem;
 		vertical-align: center;
 	}
-}
-
-.expanded-image-modal {
-	position: fixed;
-	z-index: 11;
-	overflow: auto;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: #000000;
-	background-color: rgba(0, 0, 0, 0.7);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	.content {
-		position: relative;
-		width: calc(100vw - 2 * var(--gap-lg));
-		height: calc(100vh - 2 * var(--gap-lg));
-
-		.circle-button {
-			padding: 0.5rem;
-			line-height: 1;
-			display: flex;
-			max-width: 2rem;
-			color: var(--color-button-text);
-			background-color: var(--color-button-bg);
-			border-radius: var(--size-rounded-max);
-			margin: 0;
-			box-shadow: inset 0px -1px 1px rgb(17 24 39 / 10%);
-
-			&:not(:last-child) {
-				margin-right: 0.5rem;
-			}
-
-			&:hover {
-				background-color: var(--color-button-bg-hover) !important;
-
-				svg {
-					color: var(--color-button-text-hover) !important;
-				}
-			}
-
-			&:active {
-				background-color: var(--color-button-bg-active) !important;
-
-				svg {
-					color: var(--color-button-text-active) !important;
-				}
-			}
-
-			svg {
-				height: 1rem;
-				width: 1rem;
-			}
-		}
-
-		.image {
-			position: absolute;
-			left: 50%;
-			top: 50%;
-			transform: translate(-50%, -50%);
-			max-width: calc(100vw - 2 * var(--gap-lg));
-			max-height: calc(100vh - 2 * var(--gap-lg));
-			border-radius: var(--radius-lg);
-
-			&.zoomed-in {
-				object-fit: cover;
-				width: auto;
-				height: calc(100vh - 2 * var(--gap-lg));
-				max-width: calc(100vw - 2 * var(--gap-lg));
-			}
-		}
-		.floating {
-			position: absolute;
-			left: 50%;
-			transform: translateX(-50%);
-			bottom: var(--gap-md);
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			gap: var(--gap-md);
-			transition: opacity 0.25s ease-in-out;
-			opacity: 1;
-			padding: 2rem 2rem 0 2rem;
-
-			&:not(&:hover) {
-				opacity: 0.4;
-				.text {
-					transform: translateY(2.5rem) scale(0.8);
-					opacity: 0;
-				}
-				.controls {
-					transform: translateY(0.25rem) scale(0.9);
-				}
-			}
-
-			.text {
-				display: flex;
-				flex-direction: column;
-				max-width: 40rem;
-				transition:
-					opacity 0.25s ease-in-out,
-					transform 0.25s ease-in-out;
-				text-shadow: 1px 1px 10px #000000d4;
-				margin-bottom: 0.25rem;
-				gap: 0.5rem;
-
-				h2 {
-					color: var(--dark-color-base);
-					font-size: 1.25rem;
-					text-align: center;
-					margin: 0;
-				}
-
-				p {
-					color: var(--dark-color-base);
-					margin: 0;
-				}
-			}
-			.controls {
-				background-color: var(--color-raised-bg);
-				padding: var(--gap-md);
-				border-radius: var(--radius-md);
-				transition:
-					opacity 0.25s ease-in-out,
-					transform 0.25s ease-in-out;
-			}
-		}
-	}
-}
-
-.buttons {
-	display: flex;
-	gap: 0.5rem;
 }
 </style>

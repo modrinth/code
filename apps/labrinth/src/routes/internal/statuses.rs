@@ -1,8 +1,8 @@
 use crate::auth::AuthenticationError;
 use crate::auth::validate::get_user_record_from_bearer_token;
-use crate::database::PgPool;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::models::notification_item::DBNotification;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::notifications::{Notification, NotificationBody};
 use crate::models::pats::Scopes;
 use crate::models::users::User;
@@ -54,6 +54,7 @@ struct LauncherHeartbeatInit {
 pub async fn ws_init(
     req: HttpRequest,
     pool: Data<PgPool>,
+    ro_pool: Data<ReadOnlyPgPool>,
     web::Query(auth): web::Query<LauncherHeartbeatInit>,
     body: Payload,
     db: Data<ActiveSockets>,
@@ -93,7 +94,7 @@ pub async fn ws_init(
     };
 
     let friends =
-        DBFriend::get_user_friends(user.id.into(), Some(true), &**pool)
+        DBFriend::get_user_friends(user.id.into(), Some(true), &***ro_pool)
             .await
             .wrap_internal_err("fetching friends from database")?;
 
@@ -140,7 +141,7 @@ pub async fn ws_init(
     let unread_launcher_invites =
         DBNotification::get_many_user_exposed_on_site(
             user_id.into(),
-            &**pool,
+            &***ro_pool,
             &redis,
         )
         .await
@@ -336,7 +337,7 @@ pub async fn ws_init(
                             let _ = broadcast_to_local_friends(
                                 user.id,
                                 ServerToClientMessage::FriendSocketStoppedListening { user: user.id },
-                                &pool,
+                                &ro_pool,
                                 &db,
                             )
                             .await;
@@ -394,7 +395,7 @@ pub async fn ws_init(
         }
 
         let _ = shutdown_sender.send(());
-        let _ = close_socket(socket_id, &pool, &db, &redis).await;
+        let _ = close_socket(socket_id, &ro_pool, &db, &redis).await;
     });
 
     Ok(res)
@@ -413,14 +414,15 @@ pub async fn broadcast_friends_message(
 pub async fn broadcast_to_local_friends(
     user_id: UserId,
     message: ServerToClientMessage,
-    pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     sockets: &ActiveSockets,
 ) -> Result<(), crate::database::models::DatabaseError> {
     broadcast_to_known_local_friends(
         user_id,
         message,
         sockets,
-        DBFriend::get_user_friends(user_id.into(), Some(true), pool).await?,
+        DBFriend::get_user_friends(user_id.into(), Some(true), &**ro_pool)
+            .await?,
     )
     .await
 }
@@ -508,7 +510,7 @@ pub async fn send_notification_to_user(
 
 pub async fn close_socket(
     id: SocketId,
-    pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     db: &ActiveSockets,
     redis: &RedisPool,
 ) -> Result<(), crate::database::models::DatabaseError> {
@@ -541,7 +543,7 @@ pub async fn close_socket(
                         ServerToClientMessage::SocketClosed {
                             socket: owned_socket,
                         },
-                        pool,
+                        ro_pool,
                         db,
                     )
                     .await;

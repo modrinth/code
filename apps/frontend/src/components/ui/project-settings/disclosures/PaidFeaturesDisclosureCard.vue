@@ -5,8 +5,8 @@ import {
 	commonMessages,
 	defineMessages,
 	IconButton,
+	Input,
 	SettingsFormGroup,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
@@ -32,7 +32,7 @@ const messages = defineMessages({
 	description: {
 		id: 'project.settings.disclosures.paid-features.description',
 		defaultMessage:
-			'You must enable this if your project contains features that can be obtained by spending real-world money.',
+			'Must be enabled if this project contains features that can be unlocked by spending real-world money.',
 	},
 	featuresDescription: {
 		id: 'project.settings.disclosures.paid-features.features-description',
@@ -70,12 +70,13 @@ function removeFeature(index: number) {
 		:icon="CircleDollarSignIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_37c3b31394"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
 			<SettingsFormGroup :title="formatMessage(messages.featuresDescription)">
 				<div v-for="(_, index) in model.features" :key="index" class="flex items-center gap-2">
-					<StyledInput
+					<Input
 						v-model="model.features[index]"
 						class="min-w-0 flex-1"
 						:disabled="disabled"

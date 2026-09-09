@@ -98,6 +98,11 @@ pub(crate) async fn create_instance(
 
         let mut tx = state.pool.begin().await?;
         instance_rows::insert_instance(&instance, &mut tx).await?;
+        instance_rows::insert_default_instance_sync_preferences(
+            &instance_id,
+            &mut tx,
+        )
+        .await?;
         if let Some(icon_config) = &input.icon_config {
             instance_rows::update_instance_icon_config(
                 &instance_id,
@@ -125,6 +130,17 @@ pub(crate) async fn create_instance(
             &state.directories,
         )
         .await;
+        if let Err(error) =
+            crate::api::instance::reconcile_instance_synced_options(
+                &instance.id,
+            )
+            .await
+        {
+            tracing::warn!(
+                "Failed to reconcile synced options for newly created instance {}: {error}",
+                instance.id
+            );
+        }
 
         Ok(instance)
     }
@@ -200,9 +216,8 @@ pub(crate) async fn resolve_icon_path(
         .await
         {
             Ok(bytes) => bytes,
-            Err(error)
-                if ignore_missing_remote_icon && is_not_found_error(&error) =>
-            {
+            Err(error) if ignore_missing_remote_icon => {
+                tracing::warn!("Error while getting instance icon: {error}");
                 return Ok(None);
             }
             Err(error) => return Err(error),
@@ -217,18 +232,6 @@ pub(crate) async fn resolve_icon_path(
     };
 
     Ok(Some(file.to_string_lossy().to_string()))
-}
-
-fn is_not_found_error(error: &crate::Error) -> bool {
-    match error.raw.as_ref() {
-        crate::ErrorKind::FetchError(error) => {
-            error.status() == Some(reqwest::StatusCode::NOT_FOUND)
-        }
-        crate::ErrorKind::LabrinthError(error) => {
-            error.status == Some(reqwest::StatusCode::NOT_FOUND.as_u16())
-        }
-        _ => false,
-    }
 }
 
 fn content_source_kind(link: &InstanceLink) -> ContentSourceKind {

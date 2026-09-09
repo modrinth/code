@@ -18,7 +18,7 @@
 			<label for="new-group-name" class="font-semibold text-contrast">
 				{{ formatMessage(messages.groupName) }}
 			</label>
-			<StyledInput
+			<Input
 				id="new-group-name"
 				ref="groupNameInput"
 				v-model="newGroupName"
@@ -32,7 +32,7 @@
 
 		<div class="flex h-[400px] flex-col gap-3 overflow-y-auto bg-surface-2 py-4">
 			<div class="px-6">
-				<StyledInput
+				<Input
 					v-model="newGroupSearch"
 					:icon="SearchIcon"
 					:placeholder="formatMessage(messages.searchInstance)"
@@ -60,6 +60,7 @@
 							:alt="instance.name"
 							size="2rem"
 							rounded="md"
+							pad-transparent-corners
 						/>
 						<div class="flex min-w-0 items-center gap-2">
 							<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
@@ -103,15 +104,7 @@
 
 <script setup lang="ts">
 import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	Button,
-	defineMessages,
-	NewModal,
-	StyledInput,
-	TagItem,
-	useVIntl,
-} from '@modrinth/ui'
+import { Avatar, Button, defineMessages, Input, NewModal, TagItem, useVIntl } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'
@@ -157,7 +150,7 @@ const {
 } = useLibrary()
 
 const modal = ref<InstanceType<typeof NewModal>>()
-const groupNameInput = ref<InstanceType<typeof StyledInput>>()
+const groupNameInput = ref<InstanceType<typeof Input>>()
 const groupNamesById = computed(
 	() => new Map(libraryGroups.value.map((group) => [group.id, group.name])),
 )

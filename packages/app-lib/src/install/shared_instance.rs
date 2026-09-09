@@ -225,6 +225,7 @@ pub(super) async fn apply_shared_instance_update(
     let plan = SharedInstanceApplyPlan::build(&metadata, data, state).await?;
 
     if plan.configuration_changed {
+        crate::api::instance::prepare_instance_update(instance_id).await?;
         remove_existing_shared_instance_content(instance_id, state).await?;
         Box::pin(apply_shared_instance_content(
             job_id,
@@ -234,6 +235,23 @@ pub(super) async fn apply_shared_instance_update(
             data,
         ))
         .await?;
+        if data.modpack.is_none() {
+            if let Err(error) =
+                crate::api::instance::capture_game_options_pack_base(
+                    instance_id,
+                    None,
+                )
+                .await
+            {
+                tracing::warn!(
+                    "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
+                );
+            }
+            crate::api::instance::reconcile_instance_after_pack_update(
+                instance_id,
+            )
+            .await?;
+        }
         return Ok(());
     }
 
@@ -579,6 +597,14 @@ pub(super) async fn apply_shared_instance_content(
     .await?;
 
     if let Some(modpack) = data.modpack.clone() {
+        crate::api::instance::edit(
+            instance_id,
+            crate::state::EditInstance {
+                link: Some(shared_instance_link(Some(&modpack))),
+                ..Default::default()
+            },
+        )
+        .await?;
         let location = shared_instance_pack_location(modpack);
         update_progress(
             job_id,

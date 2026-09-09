@@ -4,9 +4,9 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import Button from '../../components/base/buttons/Button.vue'
 import ButtonGroup from '../../components/base/buttons/ButtonGroup.vue'
 import SplitButton from '../../components/base/buttons/SplitButton.vue'
-import type { OverflowMenuOption } from '../../components/base/buttons/types'
+import type { ButtonMenuOption } from '../../components/base/buttons/types'
 
-const splitOptions: OverflowMenuOption[] = [
+const splitOptions: ButtonMenuOption[] = [
 	{
 		id: 'settings',
 		label: 'Server settings',

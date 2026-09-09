@@ -8,6 +8,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	show_version_environment_column: false,
 	server_ram_as_bytes_always_on: false,
 	always_show_app_controls: false,
+	show_sync_instances_update_modal: false,
 	skip_non_essential_warnings: false,
 	skip_unknown_pack_warning: false,
 	pride_fundraiser: true,
@@ -22,16 +23,22 @@ export const DEFAULT_FEATURE_FLAGS = {
 	friends_offline_collapsed: true,
 	friends_pending_collapsed: true,
 	dismissed_photosensitivity_filter_warning: false,
+	localhost_sign_in: false,
 }
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
 type FeatureFlags = Record<FeatureFlag, boolean>
 
 const syncBehaviorAcrossDevices = ref(false)
+const syncFeaturesAcrossDevices = ref(false)
 const featureFlags = reactive<FeatureFlags>({ ...DEFAULT_FEATURE_FLAGS })
 
 function setBehaviorSyncAcrossDevices(enabled: boolean): void {
 	syncBehaviorAcrossDevices.value = enabled
+}
+
+function setFeaturesSyncAcrossDevices(enabled: boolean): void {
+	syncFeaturesAcrossDevices.value = enabled
 }
 
 function getFeatureFlag(key: FeatureFlag): boolean {
@@ -40,11 +47,18 @@ function getFeatureFlag(key: FeatureFlag): boolean {
 
 const appSettings = reactive({
 	syncBehaviorAcrossDevices,
+	syncFeaturesAcrossDevices,
 	hideNametagSkinsPage: false,
 	toggleSidebar: false,
+	showFilesTabInInstances: true,
+	showWorldsTabInInstances: true,
+	showScreenshotsTabInInstances: false,
+	showSkinSelectorInSidebar: true,
+	nativeDecorations: false,
 	devMode: false,
 	featureFlags,
 	setBehaviorSyncAcrossDevices,
+	setFeaturesSyncAcrossDevices,
 	getFeatureFlag,
 })
 

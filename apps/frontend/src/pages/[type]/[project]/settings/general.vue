@@ -5,22 +5,37 @@ import {
 	defineMessages,
 	IconSelect,
 	injectProjectPageContext,
+	Input,
 	type MessageDescriptor,
 	SettingsLabel,
-	StyledInput,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
 
+import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
+import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectNagMessages } from '~/composables/project-nag-validation'
+import {
+	useProjectSlugSuggestions,
+	useSlugSuggestionVisibility,
+} from '~/composables/project-slug-suggestions'
+
 const { formatMessage } = useVIntl()
 
-const { projectV2: project, patchProject } = injectProjectPageContext()
+const { allMembers, projectV2: project, patchProject } = injectProjectPageContext()
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.general)
 
-const { saved, current, saving, hasChanges, reset, save } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	hasChanges,
+	reset: resetForm,
+	save: saveForm,
+} = useSavable(
 	() => ({
 		title: project.value.title,
 		tagline: project.value.description,
@@ -37,6 +52,34 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
+
+const titleValidation = useProjectNagMessages('name')
+const taglineValidation = useProjectNagMessages('summary')
+const iconValidation = useProjectNagMessages('icon')
+const canSave = computed(() => true)
+const {
+	onFocusIn: onSlugSuggestionFocusIn,
+	onFocusOut: onSlugSuggestionFocusOut,
+	visible: showSlugSuggestions,
+} = useSlugSuggestionVisibility()
+const ownerUsername = computed(
+	() => (allMembers.value.find((member) => member.is_owner) ?? allMembers.value[0])?.user.username,
+)
+const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
+	title: () => current.value.title,
+	username: ownerUsername,
+	currentProjectId: () => project.value.id,
+	enabled: showSlugSuggestions,
+})
+
+async function save() {
+	if (!canSave.value) return
+	await saveForm()
+}
+
+function reset() {
+	resetForm()
+}
 
 const messages = defineMessages({
 	nameTitle: {
@@ -129,12 +172,19 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 			:original="saved"
 			:modified="current"
 			:saving="saving"
+			:can-save="canSave"
 			@reset="reset"
 			@save="save"
 		/>
 		<div class="base-card block">
 			<div class="group relative float-end ml-4">
 				<IconSelect v-model="current.icon" />
+				<ValidationMessage
+					:check="iconValidation"
+					:project-field="saved.icon"
+					:current-field="current.icon"
+					class="mt-2"
+				/>
 			</div>
 			<div>
 				<SettingsLabel
@@ -143,7 +193,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 					:description="messages.nameDescription"
 				/>
 				<div class="flex">
-					<StyledInput
+					<Input
 						id="project-name"
 						v-model="current.title"
 						:placeholder="formatMessage(placeholder.name)"
@@ -152,6 +202,12 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 						wrapper-class="flex-grow"
 					/>
 				</div>
+				<ValidationMessage
+					:check="titleValidation"
+					:project-field="saved.title"
+					:current-field="current.title"
+					class="mt-2"
+				/>
 			</div>
 			<div class="mt-4">
 				<SettingsLabel
@@ -159,7 +215,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 					:title="messages.taglineTitle"
 					:description="messages.taglineDescription"
 				/>
-				<StyledInput
+				<Input
 					id="project-tagline"
 					v-model="current.tagline"
 					:placeholder="formatMessage(placeholder.tagline)"
@@ -167,13 +223,32 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 					:maxlength="120"
 					wrapper-class="w-full"
 				/>
+				<ValidationMessage
+					:check="taglineValidation"
+					:project-field="saved.tagline"
+					:current-field="current.tagline"
+					class="mt-2"
+				/>
 			</div>
-			<div class="mt-4">
+			<div class="mt-4" @focusin="onSlugSuggestionFocusIn" @focusout="onSlugSuggestionFocusOut">
 				<SettingsLabel id="project-url" :title="messages.urlTitle" />
-				<div class="text-input-wrapper">
-					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
-					<StyledInput id="project-url" v-model="current.url" :maxlength="64" autocomplete="off" />
-				</div>
+				<Input
+					id="project-url"
+					v-model="current.url"
+					:maxlength="64"
+					autocomplete="off"
+					wrapper-class="w-full"
+				>
+					<template #prefix>
+						<span class="whitespace-nowrap">https://modrinth.com/project/</span>
+					</template>
+				</Input>
+				<SlugSuggestions
+					:selected="current.url"
+					:suggestions="slugSuggestions"
+					:visible="showSlugSuggestions"
+					@select="current.url = $event"
+				/>
 			</div>
 		</div>
 	</div>

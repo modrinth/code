@@ -16,6 +16,15 @@ export type GameInstance = {
 	loader_version?: string
 
 	group_ids: string[]
+	synced_options: {
+		resource_packs: boolean
+		data_packs: boolean
+		game_options: boolean
+		command_history: boolean
+		multiplayer_servers: boolean
+		creative_hotbars: boolean
+		screenshots: boolean
+	}
 
 	link?: InstanceLink | null
 	shared_instance?: SharedInstanceAttachment | null
@@ -37,6 +46,11 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+	visible_tabs: {
+		files: boolean
+		worlds: boolean
+		screenshots: boolean
+	}
 }
 
 export type IconBackground =
@@ -169,10 +183,7 @@ type MemorySettings = {
 	maximum: number
 }
 
-type WindowSize = {
-	width: number
-	height: number
-}
+type WindowSize = [number, number]
 
 type Hooks = {
 	pre_launch?: string
@@ -215,6 +226,11 @@ type AppSettings = {
 	worlds_in_home: boolean
 	sync_theme_across_devices: boolean
 	sync_behavior_across_devices: boolean
+	sync_features_across_devices: boolean
+	show_files_tab_in_instances: boolean
+	show_worlds_tab_in_instances: boolean
+	show_screenshots_tab_in_instances: boolean
+	show_skin_selector_in_sidebar: boolean
 
 	telemetry: boolean
 	discord_rpc: boolean

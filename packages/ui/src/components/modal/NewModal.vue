@@ -1,8 +1,15 @@
 <template>
 	<Teleport to="body">
-		<div v-if="open" class="modal-root">
+		<div
+			v-if="open"
+			class="modal-root"
+			data-modal-root
+			:data-modal-id="modalId"
+			:data-modal-depth="stackDepth"
+		>
 			<div
 				:class="{ shown: visible }"
+				:style="{ zIndex: stackTauriZ }"
 				class="tauri-overlay"
 				data-tauri-drag-region
 				@pointerdown="onTauriOverlayPointerDown"
@@ -17,9 +24,10 @@
 					},
 					computedFade,
 				]"
+				:style="{ zIndex: stackOverlayZ }"
 				@click="() => (closeOnClickOutside && closable ? hide() : {})"
 			/>
-			<div class="modal-container" :class="{ shown: visible }">
+			<div class="modal-container" :class="{ shown: visible }" :style="{ zIndex: stackContainerZ }">
 				<div
 					ref="modalBodyRef"
 					role="dialog"
@@ -267,6 +275,15 @@ function getFocusableElements(): HTMLElement[] {
 	return Array.from(modalBodyRef.value.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
 }
 
+function nextRenderedModalDepth(): number {
+	return Array.from(document.querySelectorAll<HTMLElement>('[data-modal-root]'))
+		.filter((root) => root.dataset.modalId !== modalId)
+		.reduce((nextDepth, root) => {
+			const depth = Number(root.dataset.modalDepth)
+			return Number.isFinite(depth) ? Math.max(nextDepth, depth + 1) : nextDepth + 1
+		}, 0)
+}
+
 function show(event?: MouseEvent) {
 	if (hideTimeout) {
 		clearTimeout(hideTimeout)
@@ -274,7 +291,7 @@ function show(event?: MouseEvent) {
 	}
 	props.onShow?.()
 	const wasEmpty = modalStackSize() === 0
-	stackDepth.value = modalStackSize()
+	stackDepth.value = Math.max(modalStackSize(), nextRenderedModalDepth())
 	open.value = true
 	previousFocusEl = document.activeElement
 	pushModal()
@@ -430,7 +447,6 @@ defineOptions({
 	left: 0;
 	width: 100%;
 	height: 100px;
-	z-index: v-bind(stackTauriZ);
 
 	&.shown {
 		opacity: 1;
@@ -441,7 +457,6 @@ defineOptions({
 .modal-overlay {
 	position: fixed;
 	inset: -5rem;
-	z-index: v-bind(stackOverlayZ);
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
@@ -499,7 +514,6 @@ defineOptions({
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	z-index: v-bind(stackContainerZ);
 	visibility: hidden;
 	pointer-events: none;
 	transform: translate(v-bind(mouseXOffset), v-bind(mouseYOffset));

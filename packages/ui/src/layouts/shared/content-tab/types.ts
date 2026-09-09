@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { RouteLocationRaw } from 'vue-router'
 
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 
 export type ContentCardProject = Pick<
 	Labrinth.Projects.v2.Project,
@@ -71,9 +71,11 @@ export interface ContentCardTableItem {
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
+	synced?: boolean
+	syncUpdatePending?: boolean
 	hideDelete?: boolean
 	hideSwitchVersion?: boolean
-	overflowOptions?: OverflowMenuOption[]
+	overflowOptions?: ButtonMenuOption[]
 }
 
 export type ContentCardTableSortColumn = 'project' | 'version'
@@ -92,6 +94,11 @@ export interface ContentItem extends Omit<
 	'id' | 'projectLink' | 'disabled' | 'overflowOptions'
 > {
 	id: string
+	synced_pack?: {
+		id: string
+		instance_ids: string[]
+		update_pending: boolean
+	} | null
 	file_name: string
 	file_path?: string
 	size?: number

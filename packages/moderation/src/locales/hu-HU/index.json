@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Szükséges egy leírás ami leírja a projekt célját és funkcióját."
+    "defaultMessage": "Egy olyan egyértelmű leírás megadása kötelező, amely bemutatja a projekt tartalmát, célját és vonzerejét."
   },
   "nags.add-description.title": {
     "defaultMessage": "Adj hozzá egy leírást"
@@ -18,22 +18,28 @@
     "defaultMessage": "Adj hozzá egy Java címet"
   },
   "nags.add-license-details.description": {
-    "defaultMessage": "Adjon meg az egyéni licenszének érvényes URL-címét és nevét, illetve SPDX-azonosítóját."
+    "defaultMessage": "Adj meg egy valós URL-t és nevet vagy egy SPDX azonosítót az egyedi licensedhez."
   },
   "nags.add-license-details.title": {
     "defaultMessage": "Add meg a license információit"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Adj hozzá bármilyen releváns linket ami a Modrinthon kívűl található, például a weboldalad, webshopod vagy egy discord meghívó."
+    "defaultMessage": "Add meg a projekthez kapcsolódó külső források, például webhely, áruház vagy állandó Discord-meghívó hivatkozásait."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Adj hozzá bármilyen releváns linket, amely a Modrinthon kívülre visz, mint például a forráskód, hibajelentő oldal vagy Discord meghívó."
+    "defaultMessage": "Add meg a projekthez kapcsolódó külső források, például forráskód, hibakövető vagy állandó Discord-meghívó hivatkozásait."
   },
   "nags.add-links.title": {
     "defaultMessage": "Adj hozzá külső linkeket"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Az azonos szintű fejlécek nem szerepelhetnek közvetlenül egymás mellett."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Távolítsd el a szomszédos fejléceket"
   },
   "nags.all-languages.description": {
     "defaultMessage": "Az összes elérhető nyelvi beállítást kiválasztottad. Kérlek, csak azokat a nyelveket sorold fel, amelyeket a szerver valóban támogat."
@@ -42,19 +48,46 @@
     "defaultMessage": "Válassza ki a megfelelő nyelveket"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Mind a {totalAvailableTags} elérhető címkét kiválasztottad. A címkék célja az, hogy segítsék a felhasználókat a megfelelő projektek megtalálásában. Kérjük, csak a projekthez releváns címkéket válaszd ki."
+    "defaultMessage": "Kiválasztottad az összes elérhető címkét ({totalAvailableTags, plural, one {# elérhető címke} other {# elérhető címke}}). A címkéknek segíteniük kell a felhasználóknak megtalálni a releváns projekteket. Csak releváns címkéket válassz."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
+  "nags.banned-link-usage.description": {
+    "defaultMessage": "A(z) \"{url}\"hivatkozás nem engedélyezett külső hivatkozásként."
+  },
+  "nags.banned-link-usage.title": {
+    "defaultMessage": "Távolítsd el a tiltott hivatkozásokat"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Ügyelj arra, hogy a felhasználók tisztában legyenek a fontos részletekkel: töltsd ki a {type} típusra vonatkozó tartalmi tájékoztatókat."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Közzétételek ellenőrzése"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "A projekt leírása nem végződhet olyan fejléccel, amelyet nem követ szöveg."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "Távolítsd el a záró fejlécet"
+  },
   "nags.description-too-short.description": {
-    "defaultMessage": "A jelenlegi leírás {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
+    "defaultMessage": "A projekt leírása túl rövid. Adj hozzá további részleteket, hogy egyértelműen bemutasd a projekt tartalmát, célját és vonzerejét."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Fejtsd ki a leírást"
   },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "A tartalmi tájékoztatók nem tartalmazhatnak HTML-kódot, mivel csak beágyazott Markdown-formázást és egyszerű szöveget tudnak megjeleníteni."
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "Javítsd a tartalmi tájékoztatók formázását"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Leírás szerkesztése"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "Galéria szerkesztése"
   },
   "nags.edit-license.title": {
     "defaultMessage": "Licensz szerkesztése"
@@ -66,7 +99,7 @@
     "defaultMessage": "Címkék szerkesztése"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "Cím szerkesztése"
+    "defaultMessage": "Név szerkesztése"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "A kiemelt kép gyakran az első benyomást kelti a projektről."
@@ -74,32 +107,38 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Emelj ki egy képet"
   },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "Az olyan nem szabványos szöveges karakterek, mint a „Fancy text” vagy a „Zalgo”, nem engedélyezettek a galériaképek címeiben vagy leírásaiban."
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "A galériaképek címei és leírásai nem tartalmazhatnak túlzott mennyiségű trágár kifejezést. Észlelt kifejezés: \"{value}\"."
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "A galériaképek címei és leírásai nem tartalmazhatnak sértő kifejezéseket. Észlelt kifejezés: \"{value}\"."
+  },
   "nags.gallery.title": {
     "defaultMessage": "Látogasd meg a Képek fület"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "A te {type} típusod egy licencet használ amelyhez szükséges a forráskód elérhetőségének megadása. Kérlek adj meg mindegyik verzióhoz a forráskódot, vagy válassz másik licence típust."
+    "defaultMessage": "A(z) {type} licencének feltétele, hogy a forráskód közzé legyen téve. Adj meg egy forráskódra mutató hivatkozást, adj hozzá forrásfájlokat, vagy válassz másik licencet."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Úgy tűnik, hogy néhány külső hivatkozásod megegyezik. Minden hivatkozást csak egyszer szabad megadni, és a megfelelő hivatkozástípussal kell ellátni."
+    "defaultMessage": "Néhány külső hivatkozásod azonosnak tűnik. Minden hivatkozást csak egyszer és a megfelelő hivatkozástípussal kell megadni."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Töröld az azonos linkeket"
+    "defaultMessage": "Távolítsd el az azonos hivatkozásokat"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "A leírásnak elegendő mennyiségű egyszerű szöveget vagy képhelyettesítő szöveget kell tartalmaznia, hogy a képernyőolvasókat használók vagy lassú internetkapcsolattal rendelkezők számára is hozzáférhető legyen."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Biztosítsa az akadálymentességet"
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "Módosítsd a galériakép szövegét"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "A licensz linkje érvénytelen."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "A licensz linkje a {domain} domainre mutat, ami nem megfelelő a licenszinformációkhoz. A licenszlinkeknek közvetlenül a licenszfájlra kell mutatniuk, nem pedig közösségi médiára, játékplatformokra stb."
+    "defaultMessage": "A licenced URL-je a(z) {domain} domainre mutat, amely nem megfelelő a licencinformációkhoz. A licenc URL-jének közvetlenül a licenc szövegére kell mutatnia."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Úgy tűnik, hogy a licensz linkje hibás. Adj meg egy érvényes linket a licensz szövegéhez."
@@ -107,11 +146,14 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "Adj meg egy érvényes licenszlinket"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Tilos linkrövidítők vagy más módszerek használata a külső linkek vagy licenszkapcsolatok céljának elrejtésére. Kérlek csak megfelelő, teljes hosszúságú linkeket használj."
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Módosítsd a leírást"
   },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Ne használj linkrövidítőket"
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "Módosítsd a projekt nevét"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "Módosítsd az összefoglalót"
   },
   "nags.long-headers.description": {
     "defaultMessage": "A leírásodban {count} fejléc túl hosszú. A fejlécek legyenek tömörek, és csak szakaszcímként szolgáljanak, ne teljes mondatként."
@@ -132,7 +174,7 @@
     "defaultMessage": "Adj hozzá helyettesítő szöveget"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "A Discord meghívók más típusú linkekhez nem használhatók. Kérlek a Discord linkedet csak a Discord meghívó link mezőbe írd be."
+    "defaultMessage": "A Discord-meghívók nem használhatók más hivatkozástípusokhoz. A Discord-hivatkozást csak a Discord-meghívó hivatkozás mezőjébe helyezd."
   },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Discord meghívó áthelyezése"
@@ -147,16 +189,82 @@
     "defaultMessage": "Visszajelzések áttekintése"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count} felbontáscímkét választottál ki ({tags}). A forráscsomagokhoz általában csak egy felbontáscímke szükséges, amely a fő felbontásukkal egyezik."
+    "defaultMessage": "{count, plural, one {# felbontáscímkét} other {# felbontáscímkét}} választottál ki ({tags}). Az erőforráscsomagoknak általában csak az elsődleges felbontásuknak megfelelő címkével kell rendelkezniük."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
+  "nags.project-description-banned-link.description": {
+    "defaultMessage": "A(z) {fullUrl} hivatkozás nem engedélyezett a projektleírásokban."
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "A projekted leírását angolul kell megadnod, vagy angol fordítást is kell tartalmaznia."
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "Fordítsd le a leírást"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "A projekted leírásában nem használhatsz túlzottan sok nem szabványos szöveges karaktert, például „Fancy text” vagy „Zalgo” karaktereket."
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "A projekted leírása nem tartalmazhat túlzott mennyiségű trágár kifejezést. Észlelt kifejezés: \"{value}\"."
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "A projekted leírása nem tartalmazhat sértő kifejezéseket. Észlelt kifejezés: \"{value}\"."
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "Ismétlődő karakterek, szavak vagy kifejezések nem használhatók a projekted leírásának kitöltésére."
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "Távolítsd el a leírásból a spamet"
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "A nem szabványos szöveges karakterek, például a \"Fancy text\" vagy a \"Zalgo\" nem engedélyezettek a projekt nevében."
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "A projekted neve nem tartalmazhat trágár kifejezéseket. Észlelt kifejezés: \"{value}\"."
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "A projekted neve nem tartalmazhat sértő kifejezéseket. Észlelt kifejezés: \"{value}\"."
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "Módosítsd a projekt nevét"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "Ellenőrizd az összefoglalót"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "Hivatkozások, URL-ek és IP-címek nem szerepelhetnek az összefoglalóban. Észlelt kifejezés: \"{value}\""
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "Távolítsd el az összefoglalóból a hivatkozásokat"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "A projekted összefoglalóját angolul kell megadnod, vagy angol fordítást is kell tartalmaznia."
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "Fordítsd le az összefoglalót"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "A nem szabványos szöveges karakterek, például a \"Fancy text\" vagy a \"Zalgo\" nem engedélyezettek az összefoglalóban."
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "A projekted összefoglalója nem tartalmazhat sértő kifejezéseket. Észlelt kifejezés: \"{value}\"."
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "A projekted összefoglalója nem tartalmazhat sértő kifejezéseket. Észlelt kifejezés: \"{value}\"."
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "Ismétlődő karakterek, szavak vagy kifejezések nem használhatók a projekted összefoglalójának kitöltésére."
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "Távolítsd el az összefoglalóból a spamet"
+  },
   "nags.review-permissions.description": {
-    "defaultMessage": "Győződj meg arról, hogy rendelkezésre áll-e az a bizonyíték, amely igazolja, hogy jogosult vagy a modcsomagodban szereplő bármely külső tartalom terjesztésére."
+    "defaultMessage": "Győződj meg róla, hogy igazoltad a Modpackodban található minden külső tartalom terjesztésére vonatkozó engedélyedet."
   },
   "nags.review-permissions.title": {
-    "defaultMessage": "Külső jogosultságok ellenőrzése"
+    "defaultMessage": "Ellenőrizd a tartalomra vonatkozó engedélyeket"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Válaszd ki, hogy a szervered mely verziókat támogatja, válassz egy modcsomagot, vagy tölts fel sajátot."
@@ -169,6 +277,12 @@
   },
   "nags.select-country.title": {
     "defaultMessage": "Régió választása"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "Add meg azt a környezetet, amelyben a projekted futtatható."
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "Válassz környezetet"
   },
   "nags.select-language.description": {
     "defaultMessage": "Add meg hogy milyen nyelvet vagy nyelveket támogat a szervered."
@@ -191,8 +305,8 @@
   "nags.server.title": {
     "defaultMessage": "Szerver beállítások megtekintése"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Látogasd meg a leírás beállításait"
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Nyilatkozat-beállítások meglátogatása"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Látogasd meg a licenszbeállításokat"
@@ -201,7 +315,7 @@
     "defaultMessage": "Látogasd meg a linkbeállításokat"
   },
   "nags.settings.permissions.title": {
-    "defaultMessage": "Jogosultságok kezelése"
+    "defaultMessage": "Engedélybeállítások megnyitása"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Látogasd meg a címke beállításokat"
@@ -209,29 +323,17 @@
   "nags.settings.title": {
     "defaultMessage": "Látogasd meg az általános beállításokat"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Az összegzés nem lehet azonos a projekt nevével. Fontos, hogy informatív és figyelemfelkeltő összegzést készíts."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Tedd az összegzést egyedivé"
+  "nags.settings.versions.title": {
+    "defaultMessage": "Verzió-beállítások meglátogatása"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Az összegzés nem tartalmazhat formázást, sortöréseket, speciális karaktereket vagy linkeket, mivel az összefoglalás csak sima szöveget jelenít meg."
+    "defaultMessage": "Az összefoglaló nem tartalmazhat Markdown- vagy HTML-formázást, mivel csak egyszerű szöveget tud megjeleníteni."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "Tisztítsd meg az összegzést"
-  },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "A jelenlegi összegzés {length} karakter hosszú. Egy informatív és figyelemfelkeltő összegzéshez legalább {minChars} karakter ajánlott."
+    "defaultMessage": "Javítsd az összefoglaló formázását"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Fejtsd ki az összegzést"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Ha a projekt neve egyszerű, az könnyebben megjegyezhető és könnyebben megtalálható lesz. A verzió- és a betöltőinformációk automatikusan megjelennek a projekt mellett."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "Tisztítsd meg a nevet"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "{languageCount} nyelvet választottál ki. Kérlek csak azokat a nyelveket válaszd ki, amelyeket a szerver aktívan támogat."
@@ -240,19 +342,25 @@
     "defaultMessage": "Válassza ki a megfelelő nyelveket"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy szervered biztosan megjelenjen a releváns keresési eredmények között."
+    "defaultMessage": "{tagCount, plural, one {# címkét} other {# címkét}} választottál. Csökkentsd a címkék számát {maxTagCount} vagy annál kevesebbre, hogy a projekted megjelenjen a releváns keresési találatok között."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy projekted biztosan megjelenjen a releváns keresési eredmények között."
+    "defaultMessage": "{tagCount, plural, one {# címkét} other {# címkét}} választottál. Csökkentsd a címkék számát {maxTagCount} vagy annál kevesebbre, hogy a projekted megjelenjen a releváns keresési találatok között."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Legalább egy kép megadása szükséged a te {type}-od alapján."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "A forráscsomag tartalmának bemutatásához legalább egy galériakép szükséges, kivéve a hang- vagy lokalizációs csomagokat. Ha a csomagod ebbe a kategóriába tartozik, kérjük, válaszd ki a megfelelő címkét."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Legalább három galériakép szükséges a shader tartalmának különféle helyzetekben és körülmények között történő bemutatásához."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tölts fel egy képet"
@@ -264,13 +372,22 @@
     "defaultMessage": "Tölts fel egy verziót"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "Néhány külső hivatkozásod olyan domainnevet használhat, amely nem megfelelő az adott típusú hivatkozáshoz."
+    "defaultMessage": "Néhány külső hivatkozásod olyan domainekre vezethet, amelyek nem megfelelőek az adott hivatkozástípushoz."
   },
   "nags.verify-external-links.title": {
-    "defaultMessage": "Ellenőrizd a külső linkeket"
+    "defaultMessage": "Ellenőrizd a külső hivatkozásokat"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "A projekted összefoglalójának egyedi információkat kell tartalmaznia, és nem ismételheti meg a projekt nevét."
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "Az összefoglalód túl rövid. Adj hozzá egy-két mondatot, amelyek bemutatják a projektedet."
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "A projektnevek nem tartalmazhatnak verziószámokat."
   }
 }
 

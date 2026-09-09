@@ -1,6 +1,24 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Sinulla ei ole oikeutta."
+  },
+  "affiliate.create.button": {
+    "defaultMessage": "Luo kumppanilinkki"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Luo uusi kumppanilinkki"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Anna kumppanilinkillesi nimi, jotta tiedät mistä käyttäjät tulevat!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Kumppanilinkin nimi"
+  },
   "affiliate.create.title.placeholder": {
     "defaultMessage": "esim. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Käyttäjän käyttäjänimi jolle luoda kumppanilinkki"
   },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "Anna käyttäjänimi..."
@@ -8,8 +26,20 @@
   "affiliate.createdBy": {
     "defaultMessage": "Luonut {user}"
   },
+  "affiliate.creating.button": {
+    "defaultMessage": "Luodaan kumppanilinkkiä..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Kumoa kumppanilinkki"
+  },
   "affiliate.viewAnalytics": {
     "defaultMessage": "Näytä analytiikat"
+  },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Palvelimen asetuksien lataus epäonnistui"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
   },
   "badge.beta": {
     "defaultMessage": "Beta"
@@ -20,8 +50,62 @@
   "badge.new": {
     "defaultMessage": "Uusi"
   },
+  "badge.release": {
+    "defaultMessage": "Julkaisu"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Takaisin"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Jaettua Prosessoria"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Olet aikomassa uudelleentilata palvelimen <server-name>{serverName}</server-name>. Tilauksesi uudelleenaktivoidaan ja palvelimesi jatkaa toimintaa ilman pysäytyksiä."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Uudelleentilaus epäonnistui. Tilaustietojen lataus epäonnistui."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Virhe"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Tilaustietojen lataus epäonnistui."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Suunnitelma"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Uudelleentilaa"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB Tallennustilaa"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Uudelleentilaa palvelimelle"
+  },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Hyväksy tallennetut valinnat"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Etsi {projectType}"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Hylkää"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Valittuja töitä ei vielä asennettu"
+  },
   "button.accept": {
     "defaultMessage": "Hyväksy"
+  },
+  "button.add-another": {
+    "defaultMessage": "Lisää uusi"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Kumppanilinkit"
   },
   "button.analytics": {
     "defaultMessage": "Analytiikat"
@@ -44,8 +128,17 @@
   "button.continue": {
     "defaultMessage": "Jatka"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Kopioi tiedoston nimi"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Kopioi tiedoston koko reitti"
+  },
   "button.copy-id": {
     "defaultMessage": "Kopioi ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Kopioi linkki"
   },
   "button.copy-permalink": {
     "defaultMessage": "Kopioi pysyvä linkki"
@@ -56,6 +149,9 @@
   "button.decline": {
     "defaultMessage": "Hylkää"
   },
+  "button.disable": {
+    "defaultMessage": "Estä"
+  },
   "button.download": {
     "defaultMessage": "Lataa"
   },
@@ -65,11 +161,20 @@
   "button.edit": {
     "defaultMessage": "Muokkaa"
   },
+  "button.enable": {
+    "defaultMessage": "Salli"
+  },
   "button.follow": {
     "defaultMessage": "Seuraa"
   },
   "button.hide-snapshots": {
     "defaultMessage": "Piilota snapshotit"
+  },
+  "button.i-understand": {
+    "defaultMessage": "Ymmärrän"
+  },
+  "button.install": {
+    "defaultMessage": "Asenna"
   },
   "button.max": {
     "defaultMessage": "Maksimi"

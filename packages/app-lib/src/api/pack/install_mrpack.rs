@@ -1,5 +1,6 @@
 use crate::State;
 use crate::api::instance::CONFIG_FILE_EXTENSIONS;
+use crate::api::instance::GameOptionsPackSource;
 use crate::event::emit::loading_try_for_each_concurrent;
 use crate::install::{
     InstallErrorContext, InstallJobEventKind, InstallPhaseDetails,
@@ -12,11 +13,10 @@ use crate::pack::install_from::{
 use crate::state::instances::ContentSourceKind;
 use crate::state::{
     CachedEntry, CachedFile, EditInstance, InstanceInstallStage, SideType,
-    cache_file_hash,
+    cache_file_hash_metadata,
 };
 use crate::util::fetch::{
-    DownloadMeta, DownloadReason, FetchProgressFn, fetch_mirrors_with_progress,
-    write,
+    DownloadMeta, DownloadReason, FetchProgressFn, fetch_file_mirrors,
 };
 use crate::util::io;
 use async_zip::base::read::seek::ZipFileReader as SeekZipFileReader;
@@ -142,6 +142,9 @@ impl MrpackZipReader {
                         ))
                     })?,
             )),
+            CreatePackFile::Downloaded(file) => {
+                Ok(Self::File(FsZipFileReader::new(file.path()).await?))
+            }
             CreatePackFile::Path(path) => Ok(Self::File(
                 FsZipFileReader::new(path).await.map_err(|_| {
                     crate::Error::from(crate::ErrorKind::InputError(
@@ -829,7 +832,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 };
                 let progress =
                     &mut report_download_progress as &mut FetchProgressFn<'_>;
-                let file = match fetch_mirrors_with_progress(
+                let file = match fetch_file_mirrors(
                     &project
                         .downloads
                         .iter()
@@ -861,14 +864,14 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                         return Err(error);
                     }
                 };
-                let downloaded_bytes = file.len() as u64;
+                let downloaded_bytes = file.size;
 
                 let path = target_path;
 				content_context
 					.reporter
 					.preserve_failure_context(
 						context.clone(),
-						write(&path, &file, &state.io_semaphore).await,
+						file.copy_to(&path, &state.io_semaphore).await,
 					)
 					.await?;
 				let modified_at_ns = crate::state::file_modified_at_ns(
@@ -881,15 +884,12 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                         .reporter
                         .preserve_failure_context(
                             context.clone(),
-                            cache_file_hash(
-                                file.clone(),
-                                &content_context.instance_path,
-                                project.path.as_str(),
+                            cache_file_hash_metadata(
+								&content_context.instance_path,
+								project.path.as_str(),
+								file.size,
 								modified_at_ns,
-                                project
-                                    .hashes
-                                    .get(&PackFileHash::Sha1)
-                                    .map(|x| &**x),
+								file.sha1.clone(),
                                 ProjectType::get_from_parent_folder(&path),
                                 None,
                                 &state.pool,
@@ -955,6 +955,19 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     )
     .await?;
 
+    let has_override =
+        |path: &str| {
+            zip_reader.file().entries().iter().any(|file| {
+                file.filename().as_str().unwrap_or_default() == path
+            })
+        };
+    let has_client_options_override =
+        has_override("client-overrides/options.txt");
+    let has_options_override = has_override("overrides/options.txt");
+    let has_client_yosbr_options_override =
+        has_override("client-overrides/config/yosbr/options.txt");
+    let has_yosbr_options_override =
+        has_override("overrides/config/yosbr/options.txt");
     let override_file_entries = zip_reader
         .file()
         .entries()
@@ -962,16 +975,37 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         .enumerate()
         .filter_map(|(index, file)| {
             let filename = file.filename().as_str().unwrap_or_default();
-            ((filename.starts_with("overrides/")
+            let is_override = (filename.starts_with("overrides/")
                 || filename.starts_with("client-overrides/"))
-                && !filename.ends_with('/'))
-            .then(|| (index, file.clone()))
+                && !filename.ends_with('/');
+            let shadowed_game_options = has_client_options_override
+                && filename == "overrides/options.txt";
+            let shadowed_yosbr_options = has_client_yosbr_options_override
+                && filename == "overrides/config/yosbr/options.txt";
+            (is_override && !shadowed_game_options && !shadowed_yosbr_options)
+                .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();
     let override_total_bytes = override_file_entries
         .iter()
         .map(|(_, file)| file.uncompressed_size())
         .sum::<u64>();
+    let has_servers_override = override_file_entries.iter().any(|(_, file)| {
+        let filename = file.filename().as_str().unwrap_or_default();
+        filename == "overrides/servers.dat"
+            || filename == "client-overrides/servers.dat"
+    });
+    let game_options_override_source = if has_client_options_override {
+        Some(GameOptionsPackSource::ClientOverrides)
+    } else if has_options_override {
+        Some(GameOptionsPackSource::Overrides)
+    } else if has_client_yosbr_options_override {
+        Some(GameOptionsPackSource::ClientOverridesYosbr)
+    } else if has_yosbr_options_override {
+        Some(GameOptionsPackSource::OverridesYosbr)
+    } else {
+        None
+    };
     let progress = (override_total_bytes > 0).then_some(InstallProgress {
         current: 0,
         total: override_total_bytes,
@@ -1027,8 +1061,8 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 file.filename().as_str().unwrap().to_string(),
             )?;
         let relative_override_file_path = relative_override_file_path
-            .strip_prefix("overrides")
-            .or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
+			.strip_prefix("overrides")
+			.or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
             .map_err(|_| {
                 crate::Error::from(crate::ErrorKind::OtherError(
                     format!("Failed to strip override prefix from override file path: {relative_override_file_path}")
@@ -1123,6 +1157,30 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         }
     }
 
+    if has_servers_override {
+        crate::api::instance::synced_servers::capture_modpack_servers(
+            &instance_id,
+        )
+        .await?;
+    } else {
+        crate::api::instance::synced_servers::clear_modpack_servers(
+            &instance_id,
+        )
+        .await?;
+    }
+    if let Err(error) = crate::api::instance::capture_game_options_pack_base(
+        &instance_id,
+        game_options_override_source,
+    )
+    .await
+    {
+        tracing::warn!(
+            "The modpack was installed, but its options.txt could not be captured for game-settings sync: {error}"
+        );
+    }
+    crate::api::instance::reconcile_instance_after_pack_update(&instance_id)
+        .await?;
+
     // If the icon doesn't exist, we expect icon.png to be a potential icon.
     // If it doesn't exist, and an override to icon.png exists, cache and use that
     let potential_icon = instance_full_path.join("icon.png");
@@ -1145,6 +1203,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
 fn pack_source_path(file: &CreatePackFile) -> String {
     match file {
         CreatePackFile::Bytes(_) => "downloaded mrpack bytes".to_string(),
+        CreatePackFile::Downloaded(_) => "downloaded mrpack file".to_string(),
         CreatePackFile::Path(path) => path.display().to_string(),
     }
 }
@@ -1278,8 +1337,11 @@ pub async fn remove_all_related_files(
             .map_err(|_| {
                 crate::Error::from(crate::ErrorKind::OtherError(
                     format!("Failed to strip override prefix from override file path: {relative_override_file_path}")
-                ))
-            })?;
+				))
+			})?;
+        if relative_override_file_path.as_str() == "options.txt" {
+            continue;
+        }
 
         // Remove this file if a corresponding one exists in the filesystem
         match io::remove_file(

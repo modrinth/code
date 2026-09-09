@@ -120,7 +120,7 @@ import { ref } from 'vue'
 import { cancelLogin, type ModrinthAuthFlow } from '@/helpers/mr_auth'
 
 const props = defineProps<{
-	requestAuth: (flow: ModrinthAuthFlow) => Promise<boolean>
+	requestAuth: (flow: ModrinthAuthFlow, addAccount?: boolean) => Promise<boolean>
 }>()
 
 const { formatMessage } = useVIntl()
@@ -130,6 +130,7 @@ const reopeningBrowser = ref(false)
 let resolveShow: ((signedIn: boolean) => void) | undefined
 let authenticationId = 0
 let activeAuthentication: Promise<void> | undefined
+let addingAccount = false
 
 function show(event?: MouseEvent) {
 	resetAuthentication(true)
@@ -143,9 +144,9 @@ function show(event?: MouseEvent) {
 	})
 }
 
-function showSigningIn(flow: ModrinthAuthFlow = 'sign-in', event?: MouseEvent) {
+function showSigningIn(flow: ModrinthAuthFlow = 'sign-in', addAccount = false, event?: MouseEvent) {
 	const result = show(event)
-	authenticate(flow)
+	authenticate(flow, addAccount)
 	return result
 }
 
@@ -154,13 +155,14 @@ function finish(signedIn: boolean) {
 	resolveShow = undefined
 }
 
-function authenticate(flow: ModrinthAuthFlow) {
+function authenticate(flow: ModrinthAuthFlow, addAccount = false) {
 	const id = ++authenticationId
 	authenticating.value = flow
+	addingAccount = addAccount
 
 	const authentication = (async () => {
 		try {
-			if ((await props.requestAuth(flow)) && authenticationId === id) {
+			if ((await props.requestAuth(flow, addAccount)) && authenticationId === id) {
 				authenticating.value = null
 				activeAuthentication = undefined
 				finish(true)
@@ -188,7 +190,7 @@ async function reopenBrowser() {
 	try {
 		await cancelLogin()
 		await previousAuthentication?.catch(() => undefined)
-		if (authenticating.value === flow) authenticate(flow)
+		if (authenticating.value === flow) authenticate(flow, addingAccount)
 	} finally {
 		reopeningBrowser.value = false
 	}

@@ -18,7 +18,11 @@ function getCallerLocation(): string {
 	}
 }
 
+const noop = () => {}
+
 export function useDebugLogger(namespace: string) {
+	if (process.env.NODE_ENV === 'production') return noop
+
 	// eslint-disable-next-line
 	return (...args: any[]) => {
 		const location = getCallerLocation()

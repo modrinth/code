@@ -4,15 +4,14 @@
 		:aria-label="formatMessage(messages.fileNavigation)"
 	>
 		<div v-if="!isEditing" class="flex items-center gap-2 @[800px]:hidden">
-			<StyledInput
+			<Input
 				:model-value="searchQuery"
 				:icon="SearchIcon"
 				type="search"
 				name="search"
 				autocomplete="off"
 				:placeholder="formatMessage(messages.searchFiles)"
-				class="!h-10"
-				input-class="!h-10"
+				size="medium"
 				wrapper-class="flex-1 min-w-0"
 				@update:model-value="$emit('update:searchQuery', $event)"
 			/>
@@ -95,7 +94,7 @@
 			</nav>
 
 			<div v-if="!isEditing" class="flex flex-shrink-0 items-center gap-2">
-				<StyledInput
+				<Input
 					id="search-folder"
 					:model-value="searchQuery"
 					:icon="SearchIcon"
@@ -103,8 +102,8 @@
 					name="search"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.searchFiles)"
-					class="!h-10 hidden @[800px]:inline-flex"
-					input-class="!h-10"
+					class="hidden @[800px]:inline-flex"
+					size="medium"
 					wrapper-class="w-full sm:w-[280px]"
 					@update:model-value="$emit('update:searchQuery', $event)"
 				/>
@@ -237,7 +236,7 @@ import {
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 

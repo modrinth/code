@@ -144,7 +144,9 @@
 							v-if="
 								projectV3 &&
 								currentMember &&
-								(projectV3.status === 'draft' || tags.rejectedStatuses.includes(projectV3.status))
+								(projectV3.status === 'draft' ||
+									projectV3.status === 'processing' ||
+									tags.rejectedStatuses.includes(projectV3.status))
 							"
 							:project="project"
 							:project-v3="projectV3"
@@ -153,6 +155,10 @@
 							:collapsed="collapsedChecklist"
 							:route-name="route.name"
 							:tags="tags"
+							:validation-nags="projectValidation?.nags ?? []"
+							:validation-loading="projectValidationLoading"
+							:validation-available="projectValidation !== null"
+							:refresh-validation="refreshProjectValidation"
 							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 							@set-processing="setProcessing"
 						/>
@@ -638,6 +644,7 @@ import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
+import { notifyCopied } from '~/composables/moderation.ts'
 import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
@@ -835,6 +842,14 @@ const messages = defineMessages({
 		id: 'project.notification.updated.message',
 		defaultMessage: 'Your project has been updated.',
 	},
+	projectReviewSaveFailed: {
+		id: 'project.notification.review-save-failed.title',
+		defaultMessage: 'Failed to save project in review',
+	},
+	projectReviewSaveFailedDescription: {
+		id: 'project.notification.review-save-failed.description',
+		defaultMessage: 'You cannot save edits to your project which result in failing validation.',
+	},
 	reviewEnvironmentSettings: {
 		id: 'project.environment.migration.review-button',
 		defaultMessage: 'Review environment settings',
@@ -842,14 +857,6 @@ const messages = defineMessages({
 	projectPage: {
 		id: 'project.actions.project-page',
 		defaultMessage: 'Project page',
-	},
-	backToProjectPage: {
-		id: 'project.actions.back-to-project-page',
-		defaultMessage: 'Back to project page',
-	},
-	backToAllProjects: {
-		id: 'project.actions.back-to-all-projects',
-		defaultMessage: 'Back to all projects',
 	},
 	reviewProject: {
 		id: 'project.actions.review-project',
@@ -1276,6 +1283,7 @@ const { data: thread } = useQuery({
 })
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
+useFavicon(() => (isSettings.value ? 'settings' : 'default'))
 
 // Jank modpack loaders fix
 const versionsRaw = computed(() => {
@@ -1377,6 +1385,30 @@ function mergeV3ProjectPatch(old, data) {
 	return merged
 }
 
+const PROJECT_REVIEW_VALIDATION_ERROR =
+	'project must have no required validation nags before or while under review'
+
+function addProjectMutationErrorNotification(error) {
+	const description =
+		error?.v1Error?.description ??
+		error?.responseData?.description ??
+		error?.data?.description ??
+		error?.message
+	const isProjectReviewValidationError = description === PROJECT_REVIEW_VALIDATION_ERROR
+
+	addNotification({
+		title: formatMessage(
+			isProjectReviewValidationError
+				? messages.projectReviewSaveFailed
+				: commonMessages.errorNotificationTitle,
+		),
+		text: isProjectReviewValidationError
+			? formatMessage(messages.projectReviewSaveFailedDescription)
+			: description,
+		type: 'error',
+	})
+}
+
 // Mutation for patching project data
 const patchProjectMutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
@@ -1412,11 +1444,7 @@ const patchProjectMutation = useMutation({
 		if (context?.previousV3) {
 			queryClient.setQueryData(['project', 'v3', context.projectId], context.previousV3)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1426,8 +1454,8 @@ const patchProjectMutation = useMutation({
 
 // Mutation for changing project status (setProcessing)
 const patchStatusMutation = useMutation({
-	mutationFn: async ({ projectId, status }) => {
-		await client.labrinth.projects_v2.edit(projectId, { status })
+	mutationFn: async (variables) => {
+		await client.labrinth.projects_v2.edit(variables.projectId, { status: variables.status })
 	},
 
 	onMutate: async ({ projectId, status }) => {
@@ -1443,15 +1471,17 @@ const patchStatusMutation = useMutation({
 		return { previousProject, projectId }
 	},
 
+	onSuccess: async (_data, { threadId }) => {
+		if (threadId) {
+			await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
+		}
+	},
+
 	onError: (err, _variables, context) => {
 		if (context?.previousProject) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1491,15 +1521,11 @@ const patchProjectV3Mutation = useMutation({
 		if (context?.previousV2) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousV2)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
-	onSettled: async () => {
-		await invalidateProject()
+	onSettled: () => {
+		void invalidateProject()
 	},
 })
 
@@ -1519,11 +1545,7 @@ const patchIconMutation = useMutation({
 	},
 
 	onError: (err) => {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1572,11 +1594,7 @@ const createGalleryItemMutation = useMutation({
 		if (context?.previousProject) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1625,11 +1643,7 @@ const editGalleryItemMutation = useMutation({
 		if (context?.previousProject) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1662,11 +1676,7 @@ const deleteGalleryItemMutation = useMutation({
 		if (context?.previousProject) {
 			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
 		}
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err.message,
-			type: 'error',
-		})
+		addProjectMutationErrorNotification(err)
 	},
 
 	onSettled: async () => {
@@ -1731,6 +1741,24 @@ const currentMember = computed(() => {
 
 	return val
 })
+
+const {
+	data: projectValidationResponse,
+	isFetching: projectValidationLoading,
+	refetch: refetchProjectValidation,
+} = useQuery({
+	queryKey: computed(() => ['project', projectId.value, 'validation', 'v3']),
+	queryFn: () => client.labrinth.projects_v3.validate(projectId.value),
+	staleTime: 0,
+	enabled: computed(() => !!projectId.value && !!currentMember.value?.accepted),
+})
+
+const projectValidation = computed(() => projectValidationResponse.value ?? null)
+
+async function refreshProjectValidation() {
+	const result = await refetchProjectValidation()
+	return result.data ?? null
+}
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
 
@@ -2079,8 +2107,8 @@ if (!route.name.startsWith('type-project-settings')) {
 		ogDescription: () => project.value?.description ?? PROJECT_NOT_FOUND_DESCRIPTION,
 		ogImage: () =>
 			project.value
-				? (project.value?.icon_url ?? 'https://cdn-raw.modrinth.com/placeholder-square.png')
-				: 'https://cdn-raw.modrinth.com/not-found-transparent.png',
+				? (project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder-square.png')
+				: 'https://cdn.modrinth.com/not-found.png',
 		ogUrl: createCanonicalUrl,
 		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
 	})
@@ -2139,7 +2167,11 @@ async function setProcessing() {
 
 	startLoading()
 	patchStatusMutation.mutate(
-		{ projectId: project.value.id, status: 'processing' },
+		{
+			projectId: project.value.id,
+			status: 'processing',
+			threadId: project.value.thread_id,
+		},
 		{ onSettled: () => stopLoading() },
 	)
 }
@@ -2260,7 +2292,7 @@ async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/project/${project.value.id}`)
 }
 
-const collapsedChecklist = ref(false)
+const collapsedChecklist = useLocalStorage(`project-checklist-collapsed-${project.value.id}`, false)
 
 const showModerationChecklist = ref(false)
 const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
@@ -2380,6 +2412,7 @@ function handleKeybinds(event) {
 	keybinds.value.handle(event, {
 		project: projectRaw.value,
 		scope: 'project',
+		notifyCopied,
 	})
 }
 
@@ -2434,6 +2467,8 @@ provideProjectPageContext({
 	currentMember,
 	allMembers,
 	organization,
+	projectValidation,
+	projectValidationLoading,
 	// Lazy version loading
 	versions,
 	versionsLoading,
@@ -2447,6 +2482,7 @@ provideProjectPageContext({
 
 	// Invalidate all project queries (auto-refetches active ones)
 	invalidate: invalidateProject,
+	refreshProjectValidation,
 
 	// Lazy loading
 	loadVersions,

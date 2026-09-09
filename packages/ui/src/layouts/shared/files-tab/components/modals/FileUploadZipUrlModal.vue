@@ -35,7 +35,7 @@
 				<div v-else class="text-sm text-secondary">
 					{{ formatMessage(messages.zipDescription) }}
 				</div>
-				<StyledInput
+				<Input
 					v-model="url"
 					v-tooltip="props.disabled ? props.disabledTooltip : undefined"
 					:icon="LinkIcon"
@@ -104,7 +104,7 @@ import {
 import { computed, nextTick, ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers/api-client'

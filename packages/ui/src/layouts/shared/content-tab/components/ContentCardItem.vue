@@ -2,6 +2,7 @@
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
+	Link2Icon,
 	LockIcon,
 	MoreVerticalIcon,
 	SpinnerIcon,
@@ -17,7 +18,7 @@ import type { RouteLocationRaw } from 'vue-router'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import ProgressSpinner from '#ui/components/base/ProgressSpinner.vue'
@@ -49,12 +50,22 @@ const messages = defineMessages({
 		id: 'content.card.frozen',
 		defaultMessage: 'This project is locked to its current version until unfrozen.',
 	},
+	synced: {
+		id: 'content.card.synced',
+		defaultMessage: 'Synced across instances',
+	},
+	syncUpdatePending: {
+		id: 'content.card.sync-update-pending',
+		defaultMessage:
+			'Some synced copies are waiting for changes. An instance may be running, have a frozen or incompatible version, or already contain its own copy.',
+	},
 })
 
 interface Props {
 	project: ContentCardProject
 	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
+	showVersion?: boolean
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	source?: ContentSource
@@ -66,8 +77,10 @@ interface Props {
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
+	synced?: boolean
+	syncUpdatePending?: boolean
 	hideSwitchVersion?: boolean
-	overflowOptions?: OverflowMenuOption[]
+	overflowOptions?: ButtonMenuOption[]
 	disabled?: boolean
 	disabledTooltip?: string | null
 	toggleDisabled?: boolean
@@ -82,6 +95,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
+	showVersion: true,
 	versionLink: undefined,
 	owner: undefined,
 	source: undefined,
@@ -93,6 +107,8 @@ const props = withDefaults(defineProps<Props>(), {
 	hasUpdate: false,
 	isClientOnly: false,
 	clientWarning: null,
+	synced: false,
+	syncUpdatePending: false,
 	hideSwitchVersion: false,
 	overflowOptions: undefined,
 	disabled: false,
@@ -128,6 +144,9 @@ const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
 const isToggleDisabled = computed(() => isDisabled.value || props.toggleDisabled)
+const syncStatusLabel = computed(() =>
+	formatMessage(props.syncUpdatePending ? messages.syncUpdatePending : messages.synced),
+)
 
 const clientWarningMessage = computed(() => {
 	switch (props.clientWarning) {
@@ -163,7 +182,9 @@ const installTooltip = computed(() => {
 		<div
 			class="flex min-w-0 items-center gap-4"
 			:class="
-				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
+				hideActions || !showVersion
+					? 'flex-1'
+					: 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 			"
 		>
 			<Checkbox
@@ -215,6 +236,16 @@ const installTooltip = computed(() => {
 							{{ project.title }}
 						</AutoLink>
 						<slot name="title-badges" />
+						<span
+							v-if="synced && hideActions"
+							v-tooltip="syncStatusLabel"
+							:aria-label="syncStatusLabel"
+							role="img"
+							class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue"
+							tabindex="0"
+						>
+							<Link2Icon class="size-5" aria-hidden="true" />
+						</span>
 						<span
 							v-if="isClientOnly"
 							v-tooltip="formatMessage(clientWarningMessage)"
@@ -275,7 +306,7 @@ const installTooltip = computed(() => {
 							<UploadIcon class="size-4 shrink-0" />
 							<span class="text-sm leading-5">{{ formatMessage(messages.uploaded) }}</span>
 						</span>
-						<template v-if="version && !external">
+						<template v-if="showVersion && version && !external">
 							<BulletDivider class="shrink-0 @[800px]:hidden" />
 							<AutoLink
 								:target="
@@ -296,6 +327,7 @@ const installTooltip = computed(() => {
 		</div>
 
 		<div
+			v-if="showVersion"
 			class="hidden flex-col gap-0.5 transition-[filter,opacity] duration-200 @[800px]:flex"
 			:class="[
 				hideActions ? 'flex-1' : 'flex-1 min-w-0',
@@ -338,6 +370,16 @@ const installTooltip = computed(() => {
 			class="flex min-w-[160px] shrink-0 items-center justify-end gap-2 transition-colors duration-200"
 		>
 			<slot name="additionalButtonsLeft" />
+			<span
+				v-if="synced"
+				v-tooltip="syncStatusLabel"
+				:aria-label="syncStatusLabel"
+				role="img"
+				tabindex="0"
+				class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
+			>
+				<Link2Icon class="size-5" aria-hidden="true" />
+			</span>
 
 			<!-- Fixed width container to reserve space for update/switch version button -->
 			<div

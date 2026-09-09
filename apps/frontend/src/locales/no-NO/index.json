@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Fortsett"
   },
-  "admin.billing.error.not-found": {
-    "message": "Bruker ikke funnet"
-  },
   "analytics.action.add": {
     "message": "Legg til"
   },
@@ -578,9 +575,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "Fødselsdato kreves"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Du oppfyller ikke aldersgrensa for å opprette en konto hos Modrinth."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Relevant kildekode"
   },
@@ -637,9 +631,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "Tofaktor-autentisering"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Skriv inn kode..."
   },
   "auth.sign-in.continue-with-email": {
     "message": "Fortsett med e-post"
@@ -796,9 +787,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Godkjenn med svar"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Lukk tråden"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Lukk med svar"
@@ -1751,9 +1739,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Hvilke CPU-typer kjører Modrinth Hosting-serverne på?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting-serverne kjører på AMD Ryzen 7900 and 7950X3D-like CPU-er med 5+ GH<, kombinert med DDR5-minne."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Hvilken valutta er prisene i?"
   },
@@ -2078,9 +2063,6 @@
   "layout.action.file-lookup": {
     "message": "Filoppslag"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Bla gjennom med email"
-  },
   "layout.action.manage-affiliates": {
     "message": "Hold styr på tilknytte lenker"
   },
@@ -2095,9 +2077,6 @@
   },
   "layout.action.new-project": {
     "message": "Nytt prosjekt"
-  },
-  "layout.action.new-server-project": {
-    "message": "Ny server"
   },
   "layout.action.publish": {
     "message": "Publiser"
@@ -3499,9 +3478,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Skriv inn tofaktor-kode"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Skriv inn kode..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Tofaktor-autentisering holder kontoen din beskytta med at du trenger ei anna enhet for å logge inn."

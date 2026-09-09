@@ -5,8 +5,20 @@
   "action.continue": {
     "message": "Nastavi"
   },
-  "admin.billing.error.not-found": {
-    "message": "Korisnik nije pronađen"
+  "ads-consent.accept": {
+    "message": "Prihvati sve"
+  },
+  "ads-consent.body": {
+    "message": "Reklame omogućavaju Modrinth i finansiraju isplate kreatorima. Naši partneri mogu da čuvaju ili pristupe kolačićima na websitu kako bi personalizovali reklame i merili performanse."
+  },
+  "ads-consent.manage": {
+    "message": "Upravljaj preferencijama"
+  },
+  "ads-consent.reject": {
+    "message": "Odbij sve"
+  },
+  "ads-consent.title": {
+    "message": "Vaša privatnost i kako reklame pomažu Modrinthu"
   },
   "analytics.action.add": {
     "message": "Dodaj"
@@ -128,8 +140,20 @@
   "analytics.chart.events.see-announcement": {
     "message": "Pogledaj obaveštenje"
   },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Pogledaj detalje monetizovane analitike"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Samo pregledi i preuzimanja obavljena putem Modrintha se računaju u monetizaciju, a za preuzimanja je potrebno da korisnici budu prijavljeni."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Detalji monetizovane analitike"
+  },
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name} (Pregled)"
+  },
+  "analytics.chart.render-limit.description": {
+    "message": "Prikazivanje svih izabranih redova iz tabele može pogoršati performanse stranice."
   },
   "analytics.chart.table-selection.all": {
     "message": "Pokazivanje {itemType, select, project {{count, plural, one {projekat} few {sve projekta} other {svih projekata}}} country {{count, plural, one {države} few {sve države} other {svih država}}} monetization {{count, plural, one {vrednosti monetizacije} other {svih vrednosti monetizacije}}} downloadSource {{count, plural, one {izvora preuzimanja} other {svih izvora preuzimanja}}} downloadReason {{count, plural, one {razloga za preuzimanje} other {svih razloga za preuzimanje}}} member {{count, plural, one {člana} other {svih članova}}} projectVersion {{count, plural, one {verzije projekta} few {sve verzije projekta} other {svih verzija projekta}}} loader {{count, plural, one {učitavača} other {svih učitavača}}} gameVersion {{count, plural, one {verzije igre} few {sve verzije igre} other {svih verzija igre}}} other {{count, plural, one {stvari} other {svih stvari}}}} iz tabele"
@@ -641,9 +665,6 @@
   "auth.reset-password.title.long": {
     "message": "Resetuj svoju lozinku"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Unesi kod..."
-  },
   "auth.sign-in.title": {
     "message": "Prijavi se"
   },
@@ -881,9 +902,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Na kakvim procesorima rade serveri of Modrinth hostiranja?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting serveri pokreću se pomoću procesora ekvivalentnih modelima AMD Ryzen 7900 i 7950X3D, koji rade na brzinama oko 5+ GHz i upareni su sa DDR5 radnom memorijom."
-  },
   "hosting-marketing.faq.ddos-protection": {
     "message": "Da li Modrinth Hosting serveri imaju DDoS zaštitu?"
   },
@@ -1003,9 +1021,6 @@
   },
   "layout.action.manage-server-notices": {
     "message": "Upravljaj obaveštenjima servera"
-  },
-  "layout.action.new-server-project": {
-    "message": "Novi server"
   },
   "layout.avatar.alt": {
     "message": "Tvoj avatar"

@@ -10,9 +10,10 @@
 		"intl:prune-local": "pnpm -w scripts i18n-icu-contract prune-local --scope packages/moderation"
 	},
 	"dependencies": {
+		"@modrinth/api-client": "workspace:*",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/utils": "workspace:*",
-		"@modrinth/api-client": "workspace:*",
+		"@tanstack/vue-query": "5.101.4",
 		"vue": "^3.5.13"
 	},
 	"devDependencies": {

@@ -19,37 +19,37 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 	{
 		href: 'https://discord.modrinth.com',
 		alt: 'Discord',
-		src: 'https://cdn-raw.modrinth.com/email/discord.png',
+		src: 'https://cdn.modrinth.com/email/discord.png',
 	},
 	{
 		href: 'https://bsky.app/profile/modrinth.com',
 		alt: 'Bluesky',
-		src: 'https://cdn-raw.modrinth.com/email/bluesky.png',
+		src: 'https://cdn.modrinth.com/email/bluesky.png',
 	},
 	{
 		href: 'https://floss.social/@modrinth',
 		alt: 'Mastodon',
-		src: 'https://cdn-raw.modrinth.com/email/mastodon.png',
+		src: 'https://cdn.modrinth.com/email/mastodon.png',
 	},
 	{
 		href: 'https://x.com/modrinth',
 		alt: 'X (Twitter)',
-		src: 'https://cdn-raw.modrinth.com/email/x.png',
+		src: 'https://cdn.modrinth.com/email/x.png',
 	},
 	{
 		href: 'https://www.instagram.com/modrinth/',
 		alt: 'Instagram',
-		src: 'https://cdn-raw.modrinth.com/email/instagram.png',
+		src: 'https://cdn.modrinth.com/email/instagram.png',
 	},
 	{
 		href: 'https://www.youtube.com/@modrinth',
 		alt: 'YouTube',
-		src: 'https://cdn-raw.modrinth.com/email/youtube.png',
+		src: 'https://cdn.modrinth.com/email/youtube.png',
 	},
 	{
 		href: 'https://github.com/modrinth',
 		alt: 'GitHub',
-		src: 'https://cdn-raw.modrinth.com/email/github.png',
+		src: 'https://cdn.modrinth.com/email/github.png',
 	},
 ])
 </script>

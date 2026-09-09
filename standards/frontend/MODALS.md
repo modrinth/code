@@ -305,8 +305,8 @@ const { formData } = injectMyModalContext()
 
 <template>
 	<div class="flex flex-col gap-4">
-		<StyledInput v-model="formData.name" label="Name" />
-		<StyledInput v-model="formData.description" label="Description" />
+		<Input v-model="formData.name" label="Name" />
+		<Input v-model="formData.description" label="Description" />
 	</div>
 </template>
 ```

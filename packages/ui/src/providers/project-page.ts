@@ -14,6 +14,8 @@ export interface ProjectPageContext {
 	currentMember: Ref<Labrinth.Projects.v3.TeamMember | null>
 	allMembers: Ref<Labrinth.Projects.v3.TeamMember[]>
 	organization: Ref<Labrinth.Projects.v3.Organization | null>
+	projectValidation: Ref<Labrinth.Projects.v3.ProjectValidationResponse | null>
+	projectValidationLoading: Ref<boolean>
 	// Lazy version loading (client-side only)
 	versions: Ref<Labrinth.Versions.v3.Version[] | null>
 	versionsLoading: Ref<boolean>
@@ -28,6 +30,7 @@ export interface ProjectPageContext {
 
 	// Invalidate all project queries (auto-refetches active ones)
 	invalidate: () => Promise<void>
+	refreshProjectValidation: () => Promise<Labrinth.Projects.v3.ProjectValidationResponse | null>
 
 	// Lazy loading
 	loadVersions: () => void

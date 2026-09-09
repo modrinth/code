@@ -5,9 +5,6 @@
   "action.continue": {
     "message": "Tiếp tục"
   },
-  "admin.billing.error.not-found": {
-    "message": "Không tìm thấy người dùng"
-  },
   "ads-consent.accept": {
     "message": "Chấp nhận tất cả"
   },
@@ -533,6 +530,9 @@
   "analytics.value.unknown": {
     "message": "Không rõ"
   },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "Không có siêu dữ liệu nào để xác định tệp tải xuống này thuộc về dự án phụ thuộc nào."
+  },
   "analytics.value.unmonetized": {
     "message": "Không kiếm tiền"
   },
@@ -746,11 +746,20 @@
   "auth.authorize.authorize-app-name": {
     "message": "Ủy quyền {appName}"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Thiếu các tham số truy vấn OAuth bắt buộc."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "Không tìm thấy vị trí chuyển hướng trong phản hồi"
   },
+  "auth.authorize.errro-title": {
+    "message": "Đã xảy ra lỗi"
+  },
   "auth.authorize.redirect-url": {
     "message": "Bạn sẽ được chuyển hướng đến <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Tiếp tục với {provider}"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Gửi email khôi phục"
@@ -784,9 +793,6 @@
   },
   "auth.reset-password.title.long": {
     "message": "Đặt lại mật khẩu của bạn"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Nhập mã..."
   },
   "auth.sign-in.title": {
     "message": "Đăng nhập"
@@ -898,9 +904,6 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Chấp thuận với phản hồi"
-  },
-  "conversation-thread.action.close-thread": {
-    "message": "Đóng luồng"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Đóng với phản hồi"
@@ -1982,9 +1985,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Những loại CPU nào được sử dụng trên Modrinth?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Máy chủ Modrinth được vận hành bởi dòng CPU tương đương với AMD Ryzen 7900 và 7950X3D với nhịp xung 5+ GHz, cùng với bộ nhớ DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Tiền tệ nào được sử dụng để liệt kê giá?"
   },
@@ -2309,9 +2309,6 @@
   "layout.action.file-lookup": {
     "message": "Tra cứu tệp"
   },
-  "layout.action.lookup-by-email": {
-    "message": "Tra cứu theo email"
-  },
   "layout.action.manage-affiliates": {
     "message": "Quản lý link affiliate"
   },
@@ -2326,9 +2323,6 @@
   },
   "layout.action.new-project": {
     "message": "Dự án mới"
-  },
-  "layout.action.new-server-project": {
-    "message": "Máy chủ mới"
   },
   "layout.action.publish": {
     "message": "Đăng tải"
@@ -3778,9 +3772,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Nhập mã xác thực hai yếu tố"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Nhập mã..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "Xác thực hai yếu tố giúp bảo mật tài khoản của bạn bằng cách yêu cầu quyền truy cập vào thiết bị thứ hai để đăng nhập."

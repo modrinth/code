@@ -10,6 +10,7 @@ import {
 	watch,
 } from 'vue'
 
+import { useDebugLogger } from '../debug-logger'
 import type {
 	SkinPreviewBounds,
 	SkinPreviewFitLock,
@@ -17,6 +18,8 @@ import type {
 	SkinPreviewFraming,
 	SkinPreviewTuple,
 } from './types'
+
+const debug = useDebugLogger('SkinPreviewFit')
 
 const FRAMING_PRESETS = {
 	page: {
@@ -456,7 +459,7 @@ export function useSkinPreviewFit({
 
 		entries.push(snapshot)
 		if (entries.length > 100) entries.splice(0, entries.length - 100)
-		console.log('[SkinPreviewDebug]', snapshot)
+		debug(snapshot)
 	}
 
 	function queueDebugSnapshot(reason: string) {

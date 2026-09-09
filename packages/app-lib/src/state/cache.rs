@@ -1,5 +1,5 @@
 use crate::state::{EmbeddedContentMetadata, ProjectType};
-use crate::util::fetch::{FetchSemaphore, fetch_json, sha1_async};
+use crate::util::fetch::{FetchSemaphore, fetch_json};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
@@ -490,6 +490,8 @@ pub struct Project {
     pub versions: Vec<String>,
 
     pub icon_url: Option<String>,
+    #[serde(default)]
+    pub raw_icon_url: Option<String>,
 
     pub issues_url: Option<String>,
     pub source_url: Option<String>,
@@ -1057,7 +1059,7 @@ impl CachedEntry {
 
             let now = Utc::now().timestamp();
             for row in query {
-                let parsed_data = if let Some(data) = row.data.clone() {
+                let parsed_data = if let Some(data) = row.data {
                     Some(Self::deserialize_cache_value(type_, data, &row.id)?)
                 } else {
                     None
@@ -1129,11 +1131,7 @@ impl CachedEntry {
             } else {
                 let values = res?;
 
-                Self::upsert_many(
-                    &values.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-                    pool,
-                )
-                .await?;
+                Self::upsert_many(values.iter().map(|x| &x.0), pool).await?;
 
                 if !values.is_empty() {
                     return_vals.append(
@@ -2034,7 +2032,7 @@ impl CachedEntry {
             id: &str,
             label: &str,
         ) -> crate::Result<T> {
-            serde_json::from_value::<T>(data.clone()).map_err(|err| {
+            T::deserialize(&data).map_err(|err| {
                 crate::ErrorKind::OtherError(format!(
                     "Failed to deserialize cache {label} for id {id}: {err}\n\ndata:\n{}",
                     serde_json::to_string_pretty(&data).unwrap(),
@@ -2113,12 +2111,12 @@ impl CachedEntry {
         Ok(value)
     }
 
-    pub(crate) async fn upsert_many(
-        items: &[Self],
+    pub(crate) async fn upsert_many<'a>(
+        items: impl IntoIterator<Item = &'a Self>,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let items = items
-            .iter()
+            .into_iter()
             .map(|item| {
                 let data = item
                     .data
@@ -2259,37 +2257,6 @@ impl CachedEntry {
 
         Ok(None)
     }
-}
-
-pub async fn cache_file_hash(
-    bytes: bytes::Bytes,
-    instance_id: &str,
-    path: &str,
-    modified_at_ns: u64,
-    known_hash: Option<&str>,
-    project_type: Option<ProjectType>,
-    known_modrinth_file: Option<KnownModrinthFile<'_>>,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-) -> crate::Result<()> {
-    let size = bytes.len();
-
-    let hash = if let Some(known_hash) = known_hash {
-        known_hash.to_string()
-    } else {
-        sha1_async(bytes).await?
-    };
-
-    cache_file_hash_metadata(
-        instance_id,
-        path,
-        size as u64,
-        modified_at_ns,
-        hash,
-        project_type,
-        known_modrinth_file,
-        exec,
-    )
-    .await
 }
 
 pub async fn cache_file_hash_metadata(

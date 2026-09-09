@@ -1,5 +1,7 @@
 use crate::database::models::report_item::ReportQueryResult as DBReport;
-use crate::models::ids::{ProjectId, ReportId, ThreadId, VersionId};
+use crate::models::ids::{
+    OrganizationId, ProjectId, ReportId, ThreadId, VersionId,
+};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
@@ -26,6 +28,7 @@ pub enum ItemType {
     Project,
     Version,
     User,
+    Organization,
     SharedInstance,
     Unknown,
 }
@@ -36,6 +39,7 @@ impl ItemType {
             ItemType::Project => "project",
             ItemType::Version => "version",
             ItemType::User => "user",
+            ItemType::Organization => "organization",
             ItemType::SharedInstance => "shared-instance",
             ItemType::Unknown => "unknown",
         }
@@ -57,6 +61,9 @@ impl From<DBReport> for Report {
         } else if let Some(user_id) = x.user_id {
             item_id = UserId::from(user_id).to_string();
             item_type = ItemType::User;
+        } else if let Some(organization_id) = x.organization_id {
+            item_id = OrganizationId::from(organization_id).to_string();
+            item_type = ItemType::Organization;
         } else if let Some(shared_instance_id) = x.shared_instance_id {
             item_id = to_base62(shared_instance_id.0 as u64);
             item_type = ItemType::SharedInstance;

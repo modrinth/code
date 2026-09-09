@@ -40,7 +40,12 @@ const instanceLink = computed(() => {
 	<div class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4">
 		<router-link :to="instanceLink" tabindex="-1" class="flex flex-col gap-4 text-primary">
 			<span class="flex items-center gap-2">
-				<Avatar :src="getInstanceIconUrl(instance.icon_path)" :alt="instance.name" size="48px" />
+				<Avatar
+					:src="getInstanceIconUrl(instance.icon_path)"
+					:alt="instance.name"
+					size="48px"
+					pad-transparent-corners
+				/>
 				<span class="flex flex-col gap-2">
 					<span class="font-extrabold bold text-contrast">
 						{{ instance.name }}

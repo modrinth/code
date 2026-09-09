@@ -1,4 +1,6 @@
-import { ref } from 'vue'
+import type { Labrinth } from '@modrinth/api-client'
+import { prepareThemeColorTransition } from '@modrinth/ui'
+import { ref, watch, watchEffect } from 'vue'
 
 import { useNativeTheme } from './native-theme.ts'
 import { usePreferredThemes } from './preferred-theme.ts'
@@ -46,6 +48,21 @@ export default defineNuxtPlugin({
 				$settings.preferred === 'system' ? getPreferredNativeTheme() : $settings.preferred
 		}
 
+		function applyAccountAppearance(appearance: Labrinth.Users.v3.AppearancePreferences) {
+			if (isDarkTheme(appearance.theme)) {
+				$preferredThemes.dark = appearance.theme
+			} else {
+				$preferredThemes.light = appearance.theme
+			}
+
+			$settings.preferred = appearance.auto ? 'system' : appearance.theme
+
+			const systemThemeIsUnknown =
+				import.meta.server && $settings.preferred === 'system' && $nativeTheme.value === 'unknown'
+
+			if (!systemThemeIsUnknown) syncTheme()
+		}
+
 		if (
 			import.meta.server &&
 			$settings.preferred === 'system' &&
@@ -57,12 +74,27 @@ export default defineNuxtPlugin({
 
 		if (import.meta.client) {
 			const $clientReady = ref(false)
+			let themeColorTransitionsEnabled = false
 
 			nuxtApp.hook('app:suspense:resolve', () => {
 				$clientReady.value = true
 			})
 
-			watchEffect(() => $clientReady.value && syncTheme())
+			watchEffect(() => {
+				if (!$clientReady.value) return
+				syncTheme()
+				themeColorTransitionsEnabled = true
+			})
+
+			watch(
+				$active,
+				(theme, previousTheme) => {
+					if (themeColorTransitionsEnabled && previousTheme && theme !== previousTheme) {
+						prepareThemeColorTransition()
+					}
+				},
+				{ flush: 'sync' },
+			)
 		}
 
 		function cycle() {
@@ -91,6 +123,7 @@ export default defineNuxtPlugin({
 					 */
 					native: $nativeTheme,
 					cycle,
+					applyAccountAppearance,
 				}),
 			},
 		}

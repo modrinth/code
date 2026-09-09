@@ -32,50 +32,19 @@
 		>
 			<MailIcon />
 		</ButtonLink>
-		<IconButton
-			v-tooltip="copied ? `Copied to clipboard` : `Copy link`"
-			:label="copied ? `Copied to clipboard` : `Copy link`"
-			:disabled="copied"
-			class="relative grid place-items-center overflow-hidden"
-			@click="copyToClipboard(url)"
-		>
-			<CheckIcon
-				class="absolute transition-all ease-in-out"
-				:class="copied ? 'translate-y-0' : 'translate-y-7'"
-			/>
-			<LinkIcon
-				class="absolute transition-all ease-in-out"
-				:class="copied ? '-translate-y-7' : 'translate-y-0'"
-			/>
-		</IconButton>
+		<CopyLinkButton :url="url" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import {
-	BlueskyIcon,
-	CheckIcon,
-	LinkIcon,
-	MailIcon,
-	MastodonIcon,
-	TwitterIcon,
-} from '@modrinth/assets'
-import { ButtonLink, IconButton } from '@modrinth/ui'
+import { BlueskyIcon, MailIcon, MastodonIcon, TwitterIcon } from '@modrinth/assets'
+import { ButtonLink, CopyLinkButton } from '@modrinth/ui'
 
 const props = defineProps<{
 	title?: string
 	url: string
 }>()
 
-const copied = ref(false)
 const encodedUrl = computed(() => encodeURIComponent(props.url))
 const encodedTitle = computed(() => (props.title ? encodeURIComponent(props.title) : undefined))
-
-async function copyToClipboard(text: string) {
-	await navigator.clipboard.writeText(text)
-	copied.value = true
-	setTimeout(() => {
-		copied.value = false
-	}, 3000)
-}
 </script>

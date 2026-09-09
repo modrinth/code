@@ -68,7 +68,13 @@
 						<span
 							class="flex min-w-0 max-w-full items-center gap-1.5 whitespace-nowrap rounded-xl font-semibold text-contrast"
 						>
-							<Avatar :src="instanceIcon" :alt="invite.instance_name" size="32px" no-shadow />
+							<Avatar
+								:src="instanceIcon"
+								:alt="invite.instance_name"
+								size="32px"
+								no-shadow
+								pad-transparent-corners
+							/>
 							<span class="min-w-0 truncate whitespace-nowrap">{{ invite.instance_name }}</span>
 						</span>
 					</div>
@@ -106,6 +112,18 @@
 				{{ formatMessage(messages.acceptInvite) }}
 			</Button>
 
+			<ButtonLink
+				v-if="isStaff && moderationUserId"
+				:to="`/admin/shared-instances/${moderationUserId}`"
+				target="_blank"
+				type="colored"
+				color="orange"
+			>
+				<ScaleIcon />
+				View shared instances
+				<ExternalIcon class="size-4" />
+			</ButtonLink>
+
 			<div class="flex w-full flex-col gap-2.5">
 				<span class="pl-3 font-medium text-primary">{{
 					formatMessage(messages.knowThisUser)
@@ -124,14 +142,17 @@
 <script setup lang="ts">
 import {
 	CircleAlertIcon,
+	ExternalIcon,
 	InviteBackgroundIllustration,
 	LoaderCircleIcon,
+	ScaleIcon,
 	UserPlusIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
 	Button,
+	ButtonLink,
 	defineMessages,
 	injectModrinthClient,
 	useVIntl,
@@ -189,6 +210,7 @@ const messages = defineMessages({
 })
 
 const route = useRoute()
+const auth = await useAuth()
 const client = injectModrinthClient()
 const inviteId = computed(() => String(route.params.inviteId))
 const openInAppModal = useTemplateRef('openInAppModal')
@@ -231,6 +253,11 @@ const inviterName = computed(() => inviter.value?.name ?? formatMessage(messages
 const inviterAvatar = computed(() => {
 	if (!inviter.value) return null
 	return inviter.value.type === 'user' ? inviter.value.avatar : inviter.value.icon
+})
+const moderationUserId = computed(() => (inviter.value?.type === 'user' ? inviter.value.id : null))
+const isStaff = computed(() => {
+	const role = auth.value.user?.role
+	return role === 'admin' || role === 'moderator'
 })
 
 function acceptInvite() {

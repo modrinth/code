@@ -43,7 +43,12 @@
 		<!-- Instance-specific: Icon upload -->
 		<div v-if="ctx.flowType === 'instance'" class="flex items-center gap-2.5">
 			<div class="group relative size-[7.75rem] shrink-0">
-				<Avatar :src="ctx.instanceIconUrl.value ?? undefined" size="100%" no-shadow />
+				<Avatar
+					:src="ctx.instanceIconUrl.value ?? undefined"
+					size="100%"
+					no-shadow
+					pad-transparent-corners
+				/>
 				<div
 					v-if="ctx.instanceIconUrl.value"
 					class="pointer-events-none absolute right-1.5 top-1.5 opacity-0 transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
@@ -83,7 +88,7 @@
 		<!-- Instance-specific: Name field -->
 		<div v-if="ctx.flowType === 'instance'" class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">{{ formatMessage(messages.nameLabel) }}</span>
-			<StyledInput
+			<Input
 				v-model="ctx.instanceName.value"
 				:placeholder="ctx.autoInstanceName.value || formatMessage(messages.instanceNamePlaceholder)"
 			/>
@@ -230,8 +235,8 @@ import Avatar from '../../../base/Avatar.vue'
 import Chips from '../../../base/Chips.vue'
 import Collapsible from '../../../base/Collapsible.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
+import Input from '../../../base/inputs/Input.vue'
 import PaperChannelBadge from '../../../base/PaperChannelBadge.vue'
-import StyledInput from '../../../base/StyledInput.vue'
 import type { LoaderVersionEntry, LoaderVersionType } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
 import { formatLoaderLabel } from '../shared'

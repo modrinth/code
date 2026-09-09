@@ -18,7 +18,7 @@ import SelectedProjectsLeaveModal from './components/SelectedProjectsLeaveModal.
 import { injectBrowseManager } from './providers/browse-manager'
 import type { BrowseInstallContext } from './types'
 
-const MEDAL_ICON_URL = 'https://cdn-raw.modrinth.com/medal_icon.webp'
+const MEDAL_ICON_URL = 'https://cdn.modrinth.com/medal_icon.webp'
 
 const router = useRouter()
 const props = defineProps<{
@@ -50,6 +50,8 @@ const iconSrc = computed(() => {
 	if (installContext.value?.isMedal) return MEDAL_ICON_URL
 	return fetchedIcon.value ?? installContext.value?.iconSrc ?? null
 })
+
+const isInstanceIcon = computed(() => !installContext.value?.serverId)
 
 const metadataItems = computed(() => {
 	const context = installContext.value
@@ -161,6 +163,7 @@ async function handleSelectedProjectsLeaveResult(
 					:alt="installContext.name"
 					size="48px"
 					class="shrink-0"
+					:pad-transparent-corners="isInstanceIcon"
 				/>
 			</template>
 

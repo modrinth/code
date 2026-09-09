@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT COALESCE(MAX(display_order) + 1, 0) AS 'display_order!: i64' FROM screenshot_groups",
+  "describe": {
+    "columns": [
+      {
+        "name": "display_order!: i64",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "fd2eb3ed33e2a0eaca507bbe156640acd542e91c99fa491b282542ec4c58032c"
+}

@@ -85,7 +85,7 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import type { OverflowMenuOption } from '#ui/components/base/buttons'
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { Button, SplitButton } from '#ui/components/base/buttons'
 
 import { useServerPowerAction } from './use-server-power-action'
@@ -113,7 +113,7 @@ const {
 	disabled: computed(() => props.disabled),
 })
 
-const stopMenuOptions = computed<OverflowMenuOption[]>(() => [
+const stopMenuOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'kill_server',
 		label: 'Kill server',

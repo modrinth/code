@@ -1,7 +1,4 @@
 {
-  "nags.add-description.description": {
-    "defaultMessage": "Projenin amacını ve işlevini açık bir şekilde ifade eden bir açıklama gerekmektedir."
-  },
   "nags.add-description.title": {
     "defaultMessage": "Açıklama ekle"
   },
@@ -23,14 +20,8 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Lisans detaylarını ekleyin"
   },
-  "nags.add-links-server.description": {
-    "defaultMessage": "Modrinth'in dışında herhangi ilgili bağlantı ekleyin, website, mağaza veya Discord daveti gibi."
-  },
   "nags.add-links-server.title": {
     "defaultMessage": "Dış bağlantı ekle"
-  },
-  "nags.add-links.description": {
-    "defaultMessage": "Modrinth'in dışına gönderen herhangi ilgili bağlantı ekle. Mesela kaynak kodu, hata takipçisi veya Discord daveti."
   },
   "nags.add-links.title": {
     "defaultMessage": "Dış bağlantı ekle"
@@ -41,14 +32,11 @@
   "nags.all-languages.title": {
     "defaultMessage": "Doğru dilleri seçin"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Bütün {totalAvailableTags} alınabilecek etiketi seçtin. Bu etiketlerin amacına uygun değil. Etiketler, kullanıcıların ilgili projeleri bulmasına yardımcı olmalıdır. Lütfen sadece projenle ilgili etiketleri seç."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Uygun etiketleri seç"
   },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Açıklamanız {length, plural, one {# okunabilir karakter} other {# okunabilir karakter}} uzunluğunda. Net ve bilgilendirici bir açıklama oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
+  "nags.check-disclosures.description": {
+    "defaultMessage": "{type} açıklamanızı oyuncuların tüm önemli detaylardan haberdar olabileceği şekilde doldurun."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Açıklamayı genişlet"
@@ -65,9 +53,6 @@
   "nags.edit-tags.title": {
     "defaultMessage": "Etiketleri düzenle"
   },
-  "nags.edit-title.title": {
-    "defaultMessage": "Başlığı düzenle"
-  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Öne çıkarılan galeri görseli, projenizin genellikle ilk izlenimini oluşturur."
   },
@@ -77,41 +62,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Galeriye göz at"
   },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Sizin kullandığınız {type} lisansı, kaynak kodunun erişilebilir olmasını gerektiriyor. Lütfen her ek sürüm için bir kaynak kod bağlantısı veya kaynak dosyası sağlayın ya da farklı bir lisans kullanmayı düşünün."
-  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Bazı dış bağlantılarınız aynı. Her bağlantı sadece bir kere doğru bağlantı türüyle girilmelidir."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Özdeş bağlantıları temizle"
-  },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "Açıklaman yeterli düz yazı veya resim açıklamalı içermeli ki ekran okuyucu veya patates internet kullananlar için erişilebilir olsun."
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "Erişilebilirlikte emin ol"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisans URL'i geçersiz."
-  },
-  "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Lisans URL'in, lisans bilgisi için uygun olmayan {domain} alan adına yönlendiriyor. Lisans URL'leri doğrudan lisans dosyana yönlendirmelidir. Herhangi sosyal medya, oyun platformuna vb. değil."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Lisans URL'in bozuk gibi görünüyor. Lütfen geçerli bir lisans URL'i gir."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Geçerli bir lisans bağlantısı ekle"
-  },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "Link kısaltma gibi yönlendirileceğin link gizleme yöntemlerine izin verilmiyor, lütfen sadece uygun tam linkler kullan."
-  },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "Bağlantı kısaltıcı kullanma"
   },
   "nags.long-headers.description": {
     "defaultMessage": "Açıklamandaki {count, plural, one {# başlık} other {# başlık}} fazla {count, plural, one {uzun} other {uzun}}. Başlıklar kısa olmalı ve tam cümleler değil, bölüm başlıkları olmalı."
@@ -126,13 +87,10 @@
     "defaultMessage": "Marka ihlalinden kaçının"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "Bazı resimlerinin alt yazısı eksik, erişebilirlik açısından özellikle görme engelli kişiler için alt yazı önemli."
+    "defaultMessage": "Bazı resimlerinin alt yazısı eksik, özellikle görme sorunu olan kullanıcılar için erişilebilirlik için bu çok önemli."
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Resim açıklaması ekle"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord davetleri diğer bağlantı türleri için kullanılamaz. Lütfen Discord bağlantınızı Discord Daveti bağlantısı kısmına koyun."
   },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Discord davetinin yerini değiştir"
@@ -141,22 +99,13 @@
     "defaultMessage": "Moderasyon kanalına göz at"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "Tekrar göndermeden önce moderasyon ekibinin dediği şeyleri gözden geçir"
+    "defaultMessage": "Tekrar göndermeden önce moderasyon ekibinin dediği şeyleri gözden geçir."
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Geri bildirimleri incele"
   },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count} çözünürlük etiketi şeçtiniz ({tags}). Kaynak paketlerinin genelde birincil çözünürlüklerine uyan bir çözünürlük etiketi olmalıdır."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
-  },
-  "nags.review-permissions.description": {
-    "defaultMessage": "Mod paketinizdeki harici içerikleri dağıtma izniniz olduğuna dair kanıt sağladığınızdan emin olun."
-  },
-  "nags.review-permissions.title": {
-    "defaultMessage": "Harici izinleri incele"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Sunucunuzun desteklediği sürümleri seçin ve bir Mod Paketi seçin ya da kendinizinkini yükleyin."
@@ -191,8 +140,8 @@
   "nags.server.title": {
     "defaultMessage": "Sunucu ayarlara göz at"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "Açıklama ayarlarına göz at"
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "İçerik açıklamalarını ziyaret et"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Lisans ayarlarına göz at"
@@ -200,38 +149,17 @@
   "nags.settings.links.title": {
     "defaultMessage": "Bağlantı ayarlarına göz at"
   },
-  "nags.settings.permissions.title": {
-    "defaultMessage": "İzinler panelini ziyaret et"
-  },
   "nags.settings.tags.title": {
     "defaultMessage": "Etiket ayarlarına göz at"
   },
   "nags.settings.title": {
     "defaultMessage": "Genel ayarlara göz at"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "Özetin proje adın ile aynı olamaz. Bilgilendirici ve ilgi çekici bir özet yazmak çok önemlidir."
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "Özetin özgün olsun"
-  },
-  "nags.summary-special-formatting.description": {
-    "defaultMessage": "Özetin düz yazı olarak gösterildiği için formatlama, yeni satırlar, özel karakterler veya bağlantılar içermemelidir."
-  },
-  "nags.summary-special-formatting.title": {
-    "defaultMessage": "Özetini düzenle"
-  },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Özetin {length} karakter. Bilgilendirici ve çekici bir özet için en az {minChars} karakter önerilir."
+  "nags.settings.versions.title": {
+    "defaultMessage": "Sürüm ayarlarını ziyaret et"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Özeti uzat"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Projenizin Adını temiz tutmak onu unutulmaz yapar ve bulunmasını kolaylaştırır. Sürüm ve yükleyici bilgileri projenizin yanında otomatik olarak görüntülenir."
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "İsmi düzenle"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "{languageCount, plural,one {# dil}other {# dil}} seçtiniz. Lütfen sadece sunucunuzun aktif olarak desteklediği dilleri seçiniz."
@@ -239,20 +167,20 @@
   "nags.too-many-languages.title": {
     "defaultMessage": "Doğru dilleri seçin"
   },
-  "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount,plural,one {#etiket}other {#etiketler}} etiket seçtiniz. Projenizin ilgili arama sonuçlarında görünmesini sağlamak için {maxTagCount} veya daha az etikete indirmeyi düşünün."
-  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Uygun etiketleri seç"
-  },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount} etiket seçtiniz. Projenizin ilgili arama sonuçlarında görünmesini sağlamak için {maxTagCount} veya daha az etikete indirmeyi düşünün."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Uygun etiketleri seç"
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "{type} içeriğinizi sergilemek için en az bir galeri görseli gereklidir."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Ses veya yerelleştirme paketleri hariç tutulmak üzere, kaynak paketinizin içeriğini sergilemek için en az bir galeri görseli eklemeniz gerekmektedir. Eğer paketiniz bu kategorilerden birine giriyorsa, lütfen ilgili etiketi seçin."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Shader'ınızdaki içeriği çeşitli şekillerde sergilemek için en az üç görsel gerekmektedir."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriye resim yükle"
@@ -262,12 +190,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Bir sürüm yükle"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Bazı dış bağlantıların o bağlantı türü için uygun olmayan domain kullanıyor gibi gözüküyor."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Dış bağlantıları doğrula"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bağlantı ayarlarına göz at"

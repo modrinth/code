@@ -104,12 +104,12 @@ import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
+	type ButtonMenuOption,
 	type CdnDownloadReason,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
-	type OverflowMenuOption,
 	ServersPromo,
 	SplitButton,
 	truncatedTooltip,
@@ -350,7 +350,7 @@ const showDependencyDownloadActions = computed(
 			hasRecommendedDownloadFiles.value),
 )
 
-const downloadWithRecommendedOptions = computed<OverflowMenuOption[]>(() => [
+const downloadWithRecommendedOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'download-with-recommended',
 		label: formatMessage(messages.downloadWithRecommended),

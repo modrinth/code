@@ -20,7 +20,7 @@
 				<label for="days" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Days to credit </span>
 				</label>
-				<StyledInput
+				<Input
 					id="days"
 					v-model="days"
 					wrapper-class="w-32"
@@ -36,12 +36,7 @@
 						<span class="text-lg font-semibold text-contrast"> Node hostnames </span>
 					</label>
 					<div class="flex items-center gap-2">
-						<StyledInput
-							id="node-input"
-							v-model="nodeInput"
-							wrapper-class="w-32"
-							autocomplete="off"
-						/>
+						<Input id="node-input" v-model="nodeInput" wrapper-class="w-32" autocomplete="off" />
 						<Button
 							type="quiet"
 							color="blue"
@@ -95,13 +90,7 @@
 					class="text-muted flex flex-col gap-2 rounded-lg border border-surface-5 bg-button-bg p-4"
 				>
 					<span>Hi {user.name},</span>
-					<StyledInput
-						id="message-batch"
-						v-model="message"
-						multiline
-						:rows="3"
-						input-class="!bg-surface-3"
-					/>
+					<Textarea id="message-batch" v-model="message" :rows="3" input-class="!bg-surface-3" />
 					<span>
 						To make up for it, we've added {{ days }} day{{ pluralize(days) }} to your Modrinth
 						Servers subscription.
@@ -134,9 +123,10 @@ import {
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
+	Input,
 	NewModal,
-	StyledInput,
 	TagItem,
+	Textarea,
 	Toggle,
 } from '@modrinth/ui'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'

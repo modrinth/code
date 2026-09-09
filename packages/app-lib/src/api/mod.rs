@@ -27,6 +27,7 @@ pub mod data {
         Hooks, InstanceIconBackground, InstanceIconConfig,
         InstanceInstallCandidate, InstanceInstallTarget,
         InstanceLaunchOverridesPatch, InstanceLink, InstanceMetadata,
+        InstanceSyncedOption, InstanceSyncedOptions, InstanceTabVisibility,
         JavaVersion, LinkedModpackInfo, MemorySettings, ModLoader,
         ModrinthCredentials, OnboardingChecklist, Organization, OwnerType,
         ProcessMetadata, Project, ProjectType, ProjectV3, SearchResult,

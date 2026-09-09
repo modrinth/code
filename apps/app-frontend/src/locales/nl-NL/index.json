@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Actieve downloads verbergen"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Verberg meer actieve instanties"
   },
@@ -110,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "Herlaadt om te updaten"
   },
+  "app.action-bar.show-downloads": {
+    "message": "Actieve downloads weergeven"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Toon meer actieve instanties"
   },
@@ -143,6 +149,12 @@
   "app.ads-consent.title": {
     "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Toon bibliotheek instanties in een compacte row lay-out"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Compacte modus"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Start"
   },
@@ -154,12 +166,6 @@
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Verberg nametag"
-  },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Toon recent gespeelde werelden in het Ga terug-gedeelte op de startpagina."
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Ga terug in werelden"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimaliseer de Modrinth-app zodra Minecraft opstart."
@@ -206,6 +212,15 @@
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Opstarten en navigeren"
   },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Gebruik dit thema overal waar je bent aangemeld. Schakel dit uit om een apart thema op dit apparaat te houden."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Log in op een Modrinth account om instellingen te synchroniseren."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Thema synchroniseren tussen apparaten"
+  },
   "app.browse.add-servers-to-instance": {
     "message": "Server toevoegen aan instantie"
   },
@@ -239,11 +254,29 @@
   "app.browse.hide-installed-modpacks": {
     "message": "Verberg al geïnstalleerd"
   },
+  "app.browse.project-actions.label": {
+    "message": "Projectacties"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Gegevenspakketten"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },
+  "app.browse.project-type.mods": {
+    "message": "Mods"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Bronpakketten"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Servers"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shaders"
+  },
   "app.browse.server-instance-content-warning": {
-    "message": "Het toevoegen van inhoud kan de compatibiliteit verstoren bij het verbinden met de server. Eventuele toegevoegde inhoud gaat bovendien verloren wanneer je de inhoud van de serverinstantie bijwerkt."
+    "message": "Als je inhoud toevoegt, kan dit ertoe leiden dat je geen toegang hebt tot deze server. Alle inhoud die je toevoegt, wordt verwijderd wanneer de beheerde inhoud van de server wordt bijgewerkt."
   },
   "app.browse.server.installing": {
     "message": "Installeren"
@@ -251,11 +284,20 @@
   "app.content-install.no-compatible-versions": {
     "message": "Er zijn geen beschikbare versies die overeenkomen met {compatibilityLabel}. Selecteer toch een versie om te installeren. Afhankelijkheden worden niet automatisch geïnstalleerd."
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Open back-up-map"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Voeg modpack beschrijving in..."
   },
   "app.export-modal.export-button": {
     "message": "Exporteer"
+  },
+  "app.export-modal.export-complete": {
+    "message": "Exporteren voltooid"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} is succesvol geëxporteerd."
   },
   "app.export-modal.header": {
     "message": "Exporteer modpack"
@@ -271,6 +313,45 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Instellingen voor instantie"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "Deze instantie is vergrendeld"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "Instantie is al open"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Meer opties"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Nog nooit gespeeld"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Nieuwe instantie"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "Sleep om formaat aan te passen"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "Spring erin"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "Bekijk instantie"
+  },
+  "app.hosting.update-required.description": {
+    "message": "Je moet bijwerken om Modrinth Hosting te gebruiken via de Modrinth App"
+  },
+  "app.hosting.update-required.download": {
+    "message": "Update aan het downloaden"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Opgewonden Modrinth-bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Update van Modrinth-app vereist"
   },
   "app.install.phase.downloading_content": {
     "message": "Inhoud aan het downloaden"
@@ -326,6 +407,48 @@
   "app.install.phase.running_loader_processors": {
     "message": "Loader-processors aan het uitvoeren"
   },
+  "app.instance.action.add-content": {
+    "message": "Inhoud toevoegen"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Pad kopiëren"
+  },
+  "app.instance.action.edit": {
+    "message": "Bewerken"
+  },
+  "app.instance.action.open-folder": {
+    "message": "Map openen"
+  },
+  "app.instance.action.play": {
+    "message": "Speel"
+  },
+  "app.instance.action.stop": {
+    "message": "Stop"
+  },
+  "app.instance.actions.label": {
+    "message": "Instellingen voor instantie"
+  },
+  "app.instance.add-server.add": {
+    "message": "Toevoegen"
+  },
+  "app.instance.add-server.added": {
+    "message": "Toegevoegd"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Toevoegen..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Annuleren"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "Deze server is mogelijk niet compatibel met alle instanties."
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "Zoek naar een instantie"
+  },
+  "app.instance.add-server.title": {
+    "message": "Voeg server toevoegen aan instantie"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Toegevoegd"
   },
@@ -356,17 +479,59 @@
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Controleren..."
   },
+  "app.instance.card.icon-alt": {
+    "message": "Instance pictogram"
+  },
+  "app.instance.card.installing": {
+    "message": "Installeren..."
+  },
+  "app.instance.card.loading": {
+    "message": "Instantie wordt geladen..."
+  },
+  "app.instance.card.never-played": {
+    "message": "Nog nooit gespeeld"
+  },
+  "app.instance.card.play": {
+    "message": "Speel"
+  },
+  "app.instance.card.played": {
+    "message": "Voor het laatst gespeeld {relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "Repareer"
+  },
+  "app.instance.card.stop": {
+    "message": "Stop"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Alle gegevens van je instantie worden definitief verwijderd, inclusief je werelden, configuraties en alle geïnstalleerde inhoud."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Deze actie kan niet ongedaan gemaakt worden"
   },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "Alle gegevens voor deze {count} instanties worden permanent verwijderd, inclusief hun werelden, configuraties en alle geïnstalleerde content."
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "{count} instanties verwijderen"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "{count} instanties verwijderen"
+  },
   "app.instance.confirm-delete.delete-button": {
     "message": "Verwijder instantie"
   },
   "app.instance.confirm-delete.header": {
     "message": "Verwijder instantie"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {Back-up} other {Back-ups ({count})}}"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Inhoud van modpack"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "Gedeelde inhoud"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "Deze modpakket is al in de <bold>{instanceName}</bold> instantie geïnstalleerd. Ben je zeker dat je het geen wil dupliceren?"
@@ -392,6 +557,9 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
+  "app.instance.mods.freeze-content": {
+    "message": "Creëer versies"
+  },
   "app.instance.mods.locked-content": {
     "message": "De inhoud van vergrendelde instanties kan niet worden gewijzigd."
   },
@@ -409,6 +577,12 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Succesvol geüpload"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "Ontgrendel versie"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "Terug naar de instantie"
   },
   "app.instance.share.empty.description": {
     "message": "Je kunt deze instantie met je vrienden delen!"
@@ -521,6 +695,30 @@
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "Je gebruikt het verkeerde Modrinth-account"
   },
+  "app.instance.shortcut.created": {
+    "message": "Snelkoppeling gemaakt"
+  },
+  "app.instance.shortcut.creation-error": {
+    "message": "Error creating shortcut"
+  },
+  "app.instance.tab.content": {
+    "message": "Inhoud"
+  },
+  "app.instance.tab.files": {
+    "message": "Bestanden"
+  },
+  "app.instance.tab.logs": {
+    "message": "Logs"
+  },
+  "app.instance.tab.screenshots": {
+    "message": "Schermafbeeldingen"
+  },
+  "app.instance.tab.share": {
+    "message": "Delen"
+  },
+  "app.instance.tab.worlds": {
+    "message": "Werelden"
+  },
   "app.instance.worlds.add-server": {
     "message": "Voeg server toe"
   },
@@ -620,6 +818,267 @@
   "app.java-selector.test-installation": {
     "message": "Java-installatie testen"
   },
+  "app.library.actions.label": {
+    "message": "Bibliotheek acties"
+  },
+  "app.library.context-menu.create-instance": {
+    "message": "Nieuwe instantie"
+  },
+  "app.library.filter.add": {
+    "message": "Filter toevoegen"
+  },
+  "app.library.filter.clear": {
+    "message": "Filters verwijderen"
+  },
+  "app.library.filter.game-version": {
+    "message": "Spel versie"
+  },
+  "app.library.filter.instance-type": {
+    "message": "Type instantie"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "Aangepast"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "Modpack"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "Server"
+  },
+  "app.library.filter.label": {
+    "message": "Filteren op"
+  },
+  "app.library.filter.loader": {
+    "message": "Lader"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "Aangepaste groep"
+  },
+  "app.library.group-by.game-version": {
+    "message": "Spel versie"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "Type instantie"
+  },
+  "app.library.group-by.label": {
+    "message": "Groeperen op"
+  },
+  "app.library.group-by.loader": {
+    "message": "Lader"
+  },
+  "app.library.group-by.none": {
+    "message": "Geen groepering"
+  },
+  "app.library.group.actions.label": {
+    "message": "Groepacties"
+  },
+  "app.library.group.collapse": {
+    "message": "Groep samenvouwen"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "Toevoegen aan groep"
+  },
+  "app.library.group.create": {
+    "message": "Groep aanmaken"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Annuleren"
+  },
+  "app.library.group.delete": {
+    "message": "Groep verwijderen"
+  },
+  "app.library.group.delete-description": {
+    "message": "Instanties in deze groep worden ongegroepeerd."
+  },
+  "app.library.group.edit-name": {
+    "message": "Groepsnaam bewerken"
+  },
+  "app.library.group.empty": {
+    "message": "Slepen om instanties toe te voegen."
+  },
+  "app.library.group.expand": {
+    "message": "Groep uitvouwen"
+  },
+  "app.library.group.favorites": {
+    "message": "Favorieten"
+  },
+  "app.library.group.instance.add": {
+    "message": "Toevoegen"
+  },
+  "app.library.group.instance.added": {
+    "message": "Toegevoegd"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Toevoegen"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Toegevoegd"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "Geen instanties gevonden"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "Zoek instantie"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "Voeg instanties toe aan \"{groupName}\""
+  },
+  "app.library.group.move-down": {
+    "message": "Verplaats groep omlaag"
+  },
+  "app.library.group.move-up": {
+    "message": "Verplaats groep omhoog"
+  },
+  "app.library.group.name": {
+    "message": "Groepsnaam"
+  },
+  "app.library.group.name-empty": {
+    "message": "Groepsnaam mag niet leeg zijn."
+  },
+  "app.library.group.name-placeholder": {
+    "message": "Voer groepsnaam in"
+  },
+  "app.library.group.name-reserved": {
+    "message": "\"Geen\" is gereserveerd en kan niet worden gebruikt als groepsnaam."
+  },
+  "app.library.group.name-too-long": {
+    "message": "Groepsnaam mag niet langer zijn dan {maxLength} tekens."
+  },
+  "app.library.group.new": {
+    "message": "Nieuwe groep"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "Geen instanties gevonden"
+  },
+  "app.library.group.rename-failed": {
+    "message": "Kan groep niet hernoemen"
+  },
+  "app.library.group.search-instance": {
+    "message": "Zoek instantie"
+  },
+  "app.library.group.ungrouped": {
+    "message": "Niet gegroepeerd"
+  },
+  "app.library.group.unknown": {
+    "message": "Onbekende groep"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "Inhoud toevoegen"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "Add to favorites"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "Pad kopiëren"
+  },
+  "app.library.instance.action.delete": {
+    "message": "Verwijderen"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "Instantie dupliceren"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "Map openen"
+  },
+  "app.library.instance.action.play": {
+    "message": "Speel"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "Verwijder uit favorieten"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "Uit groep verwijderen"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Stop"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "Bekijk instantie"
+  },
+  "app.library.instance.actions.label": {
+    "message": "Instellingen voor instantie"
+  },
+  "app.library.instance.deselect": {
+    "message": "Instantie verwijderen"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "Selecteer {name}"
+  },
+  "app.library.instance.installing": {
+    "message": "Installeren..."
+  },
+  "app.library.instance.loading": {
+    "message": "Instantie wordt geladen..."
+  },
+  "app.library.instance.new": {
+    "message": "Nieuwe instantie"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "Open {name}"
+  },
+  "app.library.instance.play": {
+    "message": "Speel"
+  },
+  "app.library.instance.repair": {
+    "message": "Repareer"
+  },
+  "app.library.instance.select": {
+    "message": "Selecteer instantie"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "Selecteer {name}"
+  },
+  "app.library.instance.stop": {
+    "message": "Stop"
+  },
+  "app.library.search.no-results.title": {
+    "message": "Geen talen komen overeen met je zoekopdracht."
+  },
+  "app.library.search.placeholder": {
+    "message": "Zoeken"
+  },
+  "app.library.selection.aria-label": {
+    "message": "Selecteer instantie"
+  },
+  "app.library.selection.deleting": {
+    "message": "Launcher-instanties aan het detecteren"
+  },
+  "app.library.selection.new-group": {
+    "message": "Nieuwe groep"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "Uit groep verwijderen"
+  },
+  "app.library.selection.selected-count": {
+    "message": "{count} geselecteerd"
+  },
+  "app.library.sort.date-created": {
+    "message": "Aangemaakt op"
+  },
+  "app.library.sort.date-modified": {
+    "message": "Datum gewijzigd"
+  },
+  "app.library.sort.game-version": {
+    "message": "Spelversie"
+  },
+  "app.library.sort.hours-played": {
+    "message": "Uren gespeeld"
+  },
+  "app.library.sort.label": {
+    "message": "Sorteer op"
+  },
+  "app.library.sort.last-played": {
+    "message": "Laatst afgespeeld"
+  },
+  "app.library.sort.loader": {
+    "message": "Lader"
+  },
+  "app.library.sort.name": {
+    "message": "Naam"
+  },
+  "app.library.title": {
+    "message": "Bibliotheek"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Aanvullende context"
   },
@@ -653,6 +1112,9 @@
   "app.modal.install-to-play.invite-warning-with-creator": {
     "message": "Deze uitnodiging is aangemaakt door <creator>{username}</creator>, niet door Modrinth. Accepteer alleen uitnodigingen van mensen die je vertrouwt."
   },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "Inhoud van modpack"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {# mod}other {# mods}}"
   },
@@ -681,7 +1143,7 @@
     "message": "Neem voor ondersteuningsverzoeken contact op met ons <support-link>ondersteuningsteam</support-link>. Voor bugmeldingen kun je een <github-link>GitHub-issue</github-link> aanmaken."
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "Een bestand wordt alleen beoordeeld als het op Modrinth wordt gepubliceerd, ongeacht het bestandsformaat (inclusief .mrpack)."
+    "message": "Bestanden die niet op Modrinth worden gepubliceerd, worden niet beoordeeld."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Gedeelde instantie"
@@ -731,11 +1193,17 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "Er is een update nodig om {name} te spelen. Werk het spel bij naar de nieuwste versie om het te kunnen starten."
   },
+  "app.nav.add-account": {
+    "message": "Account toevoegen"
+  },
   "app.nav.create-new-instance": {
     "message": "Nieuwe instantie aanmaken"
   },
   "app.nav.home": {
     "message": "Start"
+  },
+  "app.nav.loading-profile": {
+    "message": "Profiel wordt geladen..."
   },
   "app.nav.modrinth-account": {
     "message": "Modrinth-account"
@@ -743,20 +1211,50 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Meld je aan bij een Modrinth-account"
+  "app.nav.remove-account": {
+    "message": "Account verwijderen"
   },
-  "app.nav.signed-in-as": {
-    "message": "Aangemeld als <user>{username}</user>"
+  "app.nav.screenshots": {
+    "message": "Schermafbeeldingen"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Log in bij Modrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "Van account wisselen"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade naar Modrinth+"
+  },
+  "app.nav.view-profile": {
+    "message": "Profiel bekijken"
+  },
+  "app.navigation.go-back": {
+    "message": "Ga terug"
+  },
+  "app.navigation.go-forward": {
+    "message": "Volgende"
+  },
+  "app.navigation.home": {
+    "message": "Startpagina"
+  },
+  "app.navigation.next-image": {
+    "message": "Volgende afbeelding"
   },
   "app.news.title": {
     "message": "Nieuws"
   },
   "app.news.view-all": {
     "message": "Al het nieuws bekijken"
+  },
+  "app.notification.warning": {
+    "message": "Waarschuwing"
+  },
+  "app.project.actions.label": {
+    "message": "Projectacties"
+  },
+  "app.project.coming-soon": {
+    "message": "Binnenkort beschikbaar"
   },
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
@@ -770,6 +1268,21 @@
   "app.project.install-context.back-to-instance": {
     "message": "Terug naar de instantie"
   },
+  "app.project.load-error": {
+    "message": "Projectgegevens konden niet worden geladen."
+  },
+  "app.project.more-options": {
+    "message": "Meer opties"
+  },
+  "app.project.tab.description": {
+    "message": "Omschrijving"
+  },
+  "app.project.tab.gallery": {
+    "message": "Gallerij"
+  },
+  "app.project.tab.versions": {
+    "message": "Versies"
+  },
   "app.project.version.all-versions": {
     "message": "Alle versies"
   },
@@ -782,14 +1295,176 @@
   "app.project.versions.already-installed": {
     "message": "Al geïnstalleerd"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "Instellingen voor instantie"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "Sleep om recente instanties weer te geven"
   },
   "app.quick-instance-switcher.drag-tooltip": {
     "message": "Sleep om formaat aan te passen"
   },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "Deze instantie is vergrendeld"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "Bekijk instantie"
+  },
   "app.restarting": {
     "message": "Opnieuw opstarten..."
+  },
+  "app.screenshots.copied": {
+    "message": "Gekopieerd"
+  },
+  "app.screenshots.copy": {
+    "message": "Afbeelding kopiëren"
+  },
+  "app.screenshots.delete-description": {
+    "message": "{name}permanent verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+  },
+  "app.screenshots.delete-success": {
+    "message": "Schermafbeelding verwijderd"
+  },
+  "app.screenshots.delete-title": {
+    "message": "Schermafbeelding verwijderen"
+  },
+  "app.screenshots.deselect": {
+    "message": "Selecteer {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "Schermafbeelding bewerken"
+  },
+  "app.screenshots.empty-description": {
+    "message": "Schermafbeeldingen die je in het spel neemt worden hier getoond."
+  },
+  "app.screenshots.empty-heading": {
+    "message": "Nog geen schermafbeeldingen"
+  },
+  "app.screenshots.error-heading": {
+    "message": "Kan versies niet laden"
+  },
+  "app.screenshots.go-to-instance": {
+    "message": "Ga naar instantie"
+  },
+  "app.screenshots.group-by": {
+    "message": "Groeperen op"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "Alle schermafbeeldingen"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "Groep samenvouwen"
+  },
+  "app.screenshots.group.custom": {
+    "message": "Aangepaste groep"
+  },
+  "app.screenshots.group.date": {
+    "message": "Datum"
+  },
+  "app.screenshots.group.delete": {
+    "message": "Groep verwijderen"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "Instanties in deze groep worden ongegroepeerd."
+  },
+  "app.screenshots.group.edit": {
+    "message": "Groepsnaam bewerken"
+  },
+  "app.screenshots.group.empty": {
+    "message": "Slepen om instanties toe te voegen."
+  },
+  "app.screenshots.group.expand": {
+    "message": "Groep uitvouwen"
+  },
+  "app.screenshots.group.instance": {
+    "message": "Instantie"
+  },
+  "app.screenshots.group.new": {
+    "message": "Nieuwe groep"
+  },
+  "app.screenshots.group.none": {
+    "message": "Geen groepering"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "Deze maand"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "Deze week"
+  },
+  "app.screenshots.group.today": {
+    "message": "Vandaag"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "Niet gegroepeerd"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "Gisteren"
+  },
+  "app.screenshots.heading": {
+    "message": "Schermafbeeldingen"
+  },
+  "app.screenshots.more-actions": {
+    "message": "Meer acties"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "Probeer een andere zoekterm of filter."
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "Geen overeenkomende schermafbeeldingen"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "Zoeken"
+  },
+  "app.screenshots.select": {
+    "message": "Selecteer {name}"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "Geselecteerde schermafbeeldingen"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "Verwijder {count, plural, one {# screenshot} other {# screenshots}}Deze actie kan niet ongedaan worden gemaakt."
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural, one {# screenshot deleted} other {# screenshots deleted}}"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "Verwijder geselecteerde schermafbeeldingen"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "Exporteer ZIP"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Modrinth screenshots.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "{instance} screenshots.zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "Uit groep verwijderen"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "{count} geselecteerd"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "ZIP-archief"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "Toon in map"
+  },
+  "app.screenshots.sort-by": {
+    "message": "Sorteer op"
+  },
+  "app.screenshots.sort.name": {
+    "message": "Naam"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "Nieuwste"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "Oudste"
   },
   "app.settings.app-version": {
     "message": "Modrinth-app {version}"
@@ -818,6 +1493,9 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Hoogte"
   },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Java en geheugen"
+  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Argumenten die bij het starten van een instantie aan Java worden doorgegeven."
   },
@@ -826,6 +1504,9 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java-argumenten"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "Start haken"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximaal beschikbaar geheugen voor elke instantie."
@@ -859,6 +1540,9 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Breedte"
+  },
+  "app.settings.default-instance-options.window.title": {
+    "message": "Venster"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Commando gebruikt om het Minecraft proces te om wikkelen."
@@ -956,14 +1640,65 @@
   "app.settings.sidebar.label.instances": {
     "message": "Instanties"
   },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "Kies de instantie waarvan de opdrachtgeschiedenis de gedeelde kopie wordt."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "Kies de instantie waarvan de opdrachtgeschiedenis de gedeelde kopie wordt."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "Kies de instantie waarvan de opdrachtgeschiedenis de gedeelde kopie wordt."
+  },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "Geen instanties gevonden"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "Zoek instantie"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "Synchroniseer"
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "Opdrachtgeschiedenis desynchroniseren"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "Gebruik dezelfde opdrachtgeschiedenis voor al je instanties."
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "Opdrachtgeschiedenis desynchroniseren"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "Niet-gesynchroniseerde opgeslagen creatieve hotbars"
+  },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "Gebruik dezelfde opgeslagen creatieve hotbars tussen uw instanties."
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "Desynchroniseer multiplayerservers"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "Serveradres"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "Gebruik dezelfde opdrachtgeschiedenis voor al je instanties."
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "Gesynchroniseerde servers bewerken"
+  },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "Er zijn momenteel geen toegevoegde servers gesynchroniseerd."
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "Servernaam"
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "Nog geen servers gesynchroniseerd"
+  },
   "app.settings.tabs.appearance": {
     "message": "Uiterlijk"
   },
   "app.settings.tabs.behavior": {
     "message": "Gedrag"
-  },
-  "app.settings.tabs.default-instance-options": {
-    "message": "Standaard spelopties"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
@@ -976,6 +1711,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Bronnenbeheer"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "Gesynchroniseerde instellingen"
   },
   "app.sidebar.playing-as": {
     "message": "Spelen als"
@@ -997,6 +1735,15 @@
   },
   "app.skins.delete-modal.title": {
     "message": "Weet je zeker dat je deze skin wilt verwijderen?"
+  },
+  "app.skins.demo.apply-tooltip": {
+    "message": "Log in om skins toe te passen."
+  },
+  "app.skins.demo.description": {
+    "message": "Meld je aan bij je Minecraft-account om skins op te slaan en toe te passen!"
+  },
+  "app.skins.demo.title": {
+    "message": "Bewerken met een demo-account"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Kan het neergezette bestand niet lezen."
@@ -1030,6 +1777,9 @@
   },
   "app.skins.modal.cape-section": {
     "message": "Cape"
+  },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "Log in om skins toe te passen."
   },
   "app.skins.modal.edit-title": {
     "message": "Skin aan het aanpassen"
@@ -1119,7 +1869,7 @@
     "message": "Tiny Takeover"
   },
   "app.skins.sign-in.button": {
-    "message": "Inloggen"
+    "message": "Aanmelden bij Microsoft"
   },
   "app.skins.title": {
     "message": "Skinkiezer"
@@ -1175,8 +1925,29 @@
   "app.update.complete-toast.title": {
     "message": "Versie {version} is succesvol geïnstalleerd!"
   },
+  "app.update.download-error.missing-version": {
+    "message": "Update downloaden mislukt: geen versie beschikbaar"
+  },
   "app.user.project.install-to-instance": {
     "message": "Op instantie installeren"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "Nieuwe instantie aanmaken"
+  },
+  "app.welcome-screen.description": {
+    "message": "Klaar om te beginnen met spelen?"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "Importeren vanuit launcher"
+  },
+  "app.welcome-screen.import-prompt": {
+    "message": "Een andere lancering wordt ontwist?"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "Druk op <shortcut>N</shortcut> om snel een instantie te maken"
+  },
+  "app.welcome-screen.title": {
+    "message": "Welkom bij Modrinth"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "voorbeeld.modrinth.gg"
@@ -1192,6 +1963,9 @@
   },
   "app.world.world-item.offline": {
     "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "content.shared-instance.change-version-body": {
     "message": "Als je de versie wijzigt, wordt alleen je lokale kopie aangepast. Bij toekomstige updates van de gedeelde instantie kan deze weer worden teruggezet of opnieuw worden gewijzigd."
@@ -1249,6 +2023,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>Voeg vrienden toe</link> om te zien wat zij spelen!"
+  },
+  "friends.friend.actions.label": {
+    "message": "Vriend acties"
   },
   "friends.friend.cancel-request": {
     "message": "Annuleer verzoek"
@@ -1400,6 +2177,222 @@
   "instance.files.save-as": {
     "message": "Opslaan als..."
   },
+  "instance.icon-editor.background": {
+    "message": "Achtergrond"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "Blauw"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "Donkergrijs"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "Donkergroen"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Grijs"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "Groen"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "Lavendel"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "Lichtgrijs"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Limoen"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "Oranje"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Roze"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "Paars"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Rood"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "Roos"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "Geel"
+  },
+  "instance.icon-editor.description": {
+    "message": "Mix en match elementen om een aangepast icoon te maken."
+  },
+  "instance.icon-editor.recents": {
+    "message": "Recente"
+  },
+  "instance.icon-editor.save": {
+    "message": "Pictogram opslaan"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "Willekeurig"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "Symbool"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "Rugzak"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Baken"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Blauwe haai"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Boekenkast"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Bruine beer"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Taart"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "Kampvuur"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "Kist"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Tandwiel"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Opdrachtblok"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Kookpot"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "Bank"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Werkbank"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Moersleutel"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "Betoveringstafel"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "Enderkist"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "Enderdraak"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "Engine"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "Oven"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Wereldbol"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "Grasblok"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "Lantaarn"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Meneer Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "Zuurstofdistributeur"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "Pannenkoeken"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "Pikhouweel"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "Poke bal"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "Redstone-blok"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "Sculk sensor"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "Skelet"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "Koekepan"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "Slijmblok"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "Ruimte helm"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Kleefzuiger"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "Zwaard"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Kleine aardappel"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Band"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "Dynamiet"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Modrinth moersleutel"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "message": "Pictogram bewerker"
+  },
+  "instance.last-played": {
+    "message": "Laatst gespeeld"
+  },
   "instance.locked.delete-button": {
     "message": "Instantie verwijderen"
   },
@@ -1460,6 +2453,21 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Uitnodiging intrekken"
   },
+  "instance.settings.tabs.behavior.description": {
+    "message": "Kies welke tabbladen worden weergegeven op deze instantie."
+  },
+  "instance.settings.tabs.behavior.files": {
+    "message": "Bestandentabblad weergeven"
+  },
+  "instance.settings.tabs.behavior.screenshots": {
+    "message": "Tabblad schermafbeeldingen weergeven"
+  },
+  "instance.settings.tabs.behavior.screenshots.required": {
+    "message": "De schermafbeeldingen tab kan niet worden verborgen als de globale schermafbeeldingen pagina is uitgeschakeld."
+  },
+  "instance.settings.tabs.behavior.worlds": {
+    "message": "Bestandentabblad weergeven"
+  },
   "instance.settings.tabs.general": {
     "message": "Algemeen"
   },
@@ -1490,6 +2498,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "Pictogram aanpassen"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "Maak een pictogram"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "Wijzig icoon"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Verwijder pictogram"
   },
@@ -1498,6 +2512,9 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Selecteer pictogram"
+  },
+  "instance.settings.tabs.general.icon": {
+    "message": "Pictogram"
   },
   "instance.settings.tabs.general.name": {
     "message": "Naam"
@@ -1526,14 +2543,8 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecteer updatekanaal"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "Opstart haakjes"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Aangepaste opstart haakjes"
-  },
   "instance.settings.tabs.hooks.description": {
-    "message": "Haakjes maken het mogelijk voor gevorderde gebruikers om bepaalde systeemcommando's uit te voeren voor en na het opstarten van het spel."
+    "message": "Voer instance-specifieke systeemcommando's uit voor en na het starten van het spel."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Na het afsluiten"
@@ -1554,7 +2565,7 @@
     "message": "Voer commando voor het opstarten in..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Game opstart haakjes"
+    "message": "Aangepaste opstart haakjes"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks worden uitgevoerd in de werkfolder van de instantie, met de volgende variabelen:"
@@ -1595,20 +2606,17 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
   },
-  "instance.settings.tabs.java": {
-    "message": "Java en geheugen"
-  },
   "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Aangepaste omgevingsvariabelen"
+    "message": "Stel omgevingsvariabelen apart in voor deze instantie."
   },
   "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Aangepaste Java-argumenten"
+    "message": "Stel omgevingsvariabelen apart in voor deze instantie."
   },
   "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Aangepaste Java-installatie"
+    "message": "Kies een andere Java-installatie voor deze installatie."
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Aangepaste geheugentoewijzing"
+    "message": "Stel de geheugentoewijzing voor deze instantie afzonderlijk in."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Voer omgevingsvariabelen in…"
@@ -1617,31 +2625,82 @@
     "message": "Voer Java-argumenten in…"
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Environment variabelen"
+    "message": "Aangepaste omgevingsvariabelen"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Haakjes"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Java argumenten"
+    "message": "Aangepaste Java-argumenten"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Java installatie"
+    "message": "Aangepaste Java-installatie"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Voorgeschreven geheugen"
+    "message": "Aangepaste geheugentoewijzing"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "//pad/naar/java"
   },
+  "instance.settings.tabs.settings-overrides": {
+    "message": "Synchroniseer overschrijvingen"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Delen"
   },
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "Opdrachtgeschiedenis desynchroniseren"
+  },
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "Synchronisatie van opdrachtgeschiedenis is uitgeschakeld in app-instellingen."
+  },
+  "instance.settings.tabs.synced-options.command-history.override-description": {
+    "message": "Houd de commandogeschiedenis van deze instantie gescheiden van de gesynchroniseerde commandogeschiedenis."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "Niet-gesynchroniseerde opgeslagen creatieve hotbars"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "Synchronisatie van opdrachtgeschiedenis is uitgeschakeld in app-instellingen."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
+    "message": "Houd deze instantie de opgeslagen creatieve hotbars gescheiden van gesynchroniseerde hotbars."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
+    "message": "De versie die wordt vervangen zal worden geback-upt voordat er iets verandert."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "{instance} en je gesynchroniseerde versie hebben verschillende creatieve hotbars. Kies welke te gebruiken in jouw instanties."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.title": {
+    "message": "Kies creatieve hotbars"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
+    "message": "Andere overschrijven"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
+    "message": "Gebruik gesynchroniseerd"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "Desynchroniseer multiplayerservers"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "Synchronisatie van opdrachtgeschiedenis is uitgeschakeld in app-instellingen."
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
+    "message": "Houd de multiplayer servers van deze instantie gescheiden van gesynchroniseerde servers."
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "Beheer gesynchroniseerde instellingen"
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "Schakel een override in om een gesynchroniseerde instelling gescheiden te houden voor deze instantie."
+  },
   "instance.settings.tabs.window": {
-    "message": "Venster"
+    "message": "Aangepaste venster instellingen"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Aangepaste venster instellingen"
+    "message": "Configureer volledig scherm en lanceer de resolutie apart voor deze instantie."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Volledig scherm"
@@ -1727,6 +2786,9 @@
   "instance.worlds.a_minecraft_server": {
     "message": "Een Minecraft server"
   },
+  "instance.worlds.actions.label": {
+    "message": "Wereld acties"
+  },
   "instance.worlds.cant_connect": {
     "message": "Kan niet met server verbinden"
   },
@@ -1735,6 +2797,21 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "Snelkoppeling maken"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "Wil je deze server in andere gesynchroniseerde instanties houden, of deze uit deze bestanden verwijderen?"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "Behouden"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "Verwijderen"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "Desync server"
+  },
+  "instance.worlds.desync_server": {
+    "message": "Desynchronisatie"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Niet tonen op de startpagina"
@@ -1748,8 +2825,14 @@
   "instance.worlds.incompatible_server": {
     "message": "Server is niet compatibel"
   },
+  "instance.worlds.instance-locked": {
+    "message": "Deze instantie is vergrendeld"
+  },
   "instance.worlds.linked_server": {
     "message": "Beheerd door serverproject"
+  },
+  "instance.worlds.more-options": {
+    "message": "Meer opties"
   },
   "instance.worlds.no_contact": {
     "message": "Server kon niet worden bereikt"
@@ -1762,6 +2845,15 @@
   },
   "instance.worlds.play_instance": {
     "message": "Speel instantie"
+  },
+  "instance.worlds.play_world": {
+    "message": "Wereld spelen"
+  },
+  "instance.worlds.shortcut-created": {
+    "message": "Snelkoppeling gemaakt"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "Kan snelkoppeling niet maken"
   },
   "instance.worlds.view_instance": {
     "message": "Bekijk instantie"
@@ -1840,6 +2932,18 @@
   },
   "modal.modrinth-account-required.waiting-for-browser": {
     "message": "Wachten op bevestiging van de browser..."
+  },
+  "onboarding-checklist.create-instance": {
+    "message": "Nieuwe instantie aanmaken"
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "Meld je aan bij Minecraft"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "Bij Modrinth aanmelden"
+  },
+  "onboarding-checklist.title": {
+    "message": "Aan de slag"
   },
   "search.filter.locked.instance": {
     "message": "Aangeboden door de instantie"

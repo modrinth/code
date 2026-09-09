@@ -1,16 +1,19 @@
 import {
+	ArrowLeftRightIcon,
 	DownloadIcon,
 	ExternalIcon,
 	MoreVerticalIcon,
+	PlusIcon,
 	SettingsIcon,
 	TrashIcon,
+	XIcon,
 } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import TeleportOverflowMenu from '../../components/base/buttons/TeleportOverflowMenu.vue'
-import type { OverflowMenuOption } from '../../components/base/buttons/types'
+import type { ButtonMenuOption } from '../../components/base/buttons/types'
 
-const options: OverflowMenuOption[] = [
+const options: ButtonMenuOption[] = [
 	{
 		id: 'download',
 		label: 'Download',
@@ -100,5 +103,50 @@ export const QuietTrigger: Story = {
 export const Hoverable: Story = {
 	args: {
 		hoverable: true,
+	},
+}
+
+const optionsWithSubmenu: ButtonMenuOption[] = [
+	...options,
+	{ type: 'divider' },
+	{
+		id: 'switch-account',
+		label: 'Switch account',
+		icon: ArrowLeftRightIcon,
+		type: 'submenu',
+		options: [
+			{
+				id: 'account-jai',
+				label: 'Jai',
+				selected: true,
+				action: () => undefined,
+				trailingAction: {
+					label: 'Remove Jai',
+					icon: XIcon,
+					color: 'red',
+					action: () => undefined,
+				},
+			},
+			{
+				id: 'account-prospector',
+				label: 'Prospector',
+				selected: false,
+				action: () => undefined,
+				trailingAction: {
+					label: 'Remove Prospector',
+					icon: XIcon,
+					color: 'red',
+					action: () => undefined,
+				},
+			},
+			{ type: 'divider' },
+			{ id: 'add-account', label: 'Add account', icon: PlusIcon, action: () => undefined },
+		],
+	},
+]
+
+export const WithSubmenu: Story = {
+	args: {
+		options: optionsWithSubmenu,
 	},
 }

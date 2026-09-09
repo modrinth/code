@@ -4,8 +4,9 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
+	Input,
 	SettingsFormGroup,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
@@ -58,6 +59,11 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.derivative.note-label',
 		defaultMessage: 'Explain how your project is based on the original work',
 	},
+	notePlaceholder: {
+		id: 'project.settings.disclosures.derivative.note-placeholder',
+		defaultMessage:
+			'This is a fork that adds a few new biomes and ports it to newer Minecraft versions.',
+	},
 })
 
 function emptyDerivativeSource(): DerivativeSource {
@@ -106,6 +112,7 @@ function setOptionalField(
 		:icon="GitForkIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_6422cc821e"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
@@ -131,7 +138,7 @@ function setOptionalField(
 					:title-for="`derivative-name-${index}`"
 					class="max-w-[40rem]"
 				>
-					<StyledInput
+					<Input
 						:id="`derivative-name-${index}`"
 						:model-value="source.label"
 						:disabled="disabled"
@@ -146,7 +153,7 @@ function setOptionalField(
 					:title-for="`derivative-link-${index}`"
 					class="max-w-[40rem]"
 				>
-					<StyledInput
+					<Input
 						:id="`derivative-link-${index}`"
 						:model-value="source.link ?? undefined"
 						type="url"
@@ -160,12 +167,12 @@ function setOptionalField(
 					:title-for="`derivative-note-${index}`"
 					class="max-w-[40rem]"
 				>
-					<StyledInput
+					<Textarea
 						:id="`derivative-note-${index}`"
 						:model-value="source.note ?? undefined"
-						multiline
 						:rows="3"
 						:disabled="disabled"
+						:placeholder="formatMessage(messages.notePlaceholder)"
 						@update:model-value="(value) => setOptionalField(index, 'note', value)"
 					/>
 				</SettingsFormGroup>

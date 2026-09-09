@@ -92,6 +92,7 @@
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	ButtonLink,
+	getEnvironmentFilterValue,
 	injectModrinthClient,
 	injectProjectPageContext,
 	Pagination,
@@ -141,6 +142,7 @@ const filteredVersions = computed(() => {
 	const selectedGameVersions = getArrayOrString(route.query.g) ?? []
 	const selectedLoaders = getArrayOrString(route.query.l) ?? []
 	const selectedVersionTypes = getArrayOrString(route.query.c) ?? []
+	const selectedEnvironments = getArrayOrString(route.query.e) ?? []
 
 	return versions.value.filter(
 		(projectVersion) =>
@@ -151,7 +153,9 @@ const filteredVersions = computed(() => {
 			(selectedLoaders.length === 0 ||
 				selectedLoaders.some((loader) => getVersionLoaders(projectVersion).includes(loader))) &&
 			(selectedVersionTypes.length === 0 ||
-				selectedVersionTypes.includes(projectVersion.version_type)),
+				selectedVersionTypes.includes(projectVersion.version_type)) &&
+			(selectedEnvironments.length === 0 ||
+				selectedEnvironments.includes(getEnvironmentFilterValue(projectVersion.environment) ?? '')),
 	)
 })
 

@@ -444,7 +444,15 @@ impl From<LinkUrl> for Link {
 /// Scheduled - Project is scheduled to be released in the future
 /// Private - Project is approved, but is not viewable to the public
 #[derive(
-    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+    Serialize,
+    Deserialize,
+    Copy,
+    Clone,
+    Eq,
+    PartialEq,
+    Hash,
+    Debug,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectStatus {
@@ -572,8 +580,9 @@ impl ProjectStatus {
             ProjectStatus::Approved => true,
             ProjectStatus::Unlisted => true,
             ProjectStatus::Private => true,
-            ProjectStatus::Draft => true,
 
+            // `draft` used to be requestable for some reason, now considered a bug.
+            ProjectStatus::Draft => false,
             // `archived` is represented by a disclosure, not a status, so it
             // can no longer be requested or set as a status.
             ProjectStatus::Archived => false,

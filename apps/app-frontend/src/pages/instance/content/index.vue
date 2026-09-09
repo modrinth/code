@@ -1,7 +1,8 @@
 <template>
 	<ReadyTransition :pending="loading">
-		<ContentPageLayout>
+		<ContentPageLayout :highlighted-item-id="highlightedItemId">
 			<template #modals>
+				<SyncedContentModal ref="syncedContentModal" />
 				<UnknownFileWarningModal
 					ref="unknownFileWarningModal"
 					mode="mod"
@@ -92,6 +93,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, FolderOpenIcon, LockIcon, LockOpenIcon } from '@modrinth/assets'
 import {
 	type BulkOperationStatus,
+	type ButtonMenuOption,
 	commonMessages,
 	ConfirmDisableModal,
 	ConfirmModpackUpdateModal,
@@ -107,7 +109,6 @@ import {
 	type ManagedContentModalState,
 	type ManagedContentProject,
 	type ManagedContentVersion,
-	type OverflowMenuOption,
 	provideContentManager,
 	ReadyTransition,
 	summarizeManagedContent,
@@ -121,11 +122,13 @@ import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
+import SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
+import { useSyncedPackActions } from '@/composables/instances/use-synced-pack-actions'
 import { useAppEvent } from '@/composables/use-app-event'
 import { type FeatureFlag, useAppSettings } from '@/composables/use-app-settings.ts'
 import { trackEvent } from '@/helpers/analytics'
@@ -146,6 +149,7 @@ import {
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get as getSettings, set as setSettings } from '@/helpers/settings'
+import { set_synced_pack_enabled, syncedPackKeys } from '@/helpers/synced-packs'
 import type { CacheBehaviour } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { type AppEventPayload, injectAppEvents } from '@/providers/app-events'
@@ -231,6 +235,7 @@ const appEvents = injectAppEvents()
 const { installingItems, installRevisionByInstance, installFailureRevisionByInstance } =
 	injectContentInstall()
 const router = useRouter()
+const route = useRoute()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('Mods:ContentUpdate')
 const appSettings = useAppSettings()
@@ -296,6 +301,19 @@ const mergedProjects = computed<ContentItem[]>(() => {
 	const placeholders = pending.filter((item) => !realProjectIds.has(item.project?.id))
 	return placeholders.length > 0 ? [...displayProjects, ...placeholders] : displayProjects
 })
+
+const highlightedItemId = computed(() => {
+	const path = route.query.highlight
+	if (typeof path !== 'string') return undefined
+	return mergedProjects.value.find(matchesHighlightedFile)?.file_path ?? path
+})
+
+function matchesHighlightedFile(item: ContentItem) {
+	const path = route.query.highlight
+	return (
+		typeof path === 'string' && (item.file_path === path || item.file_path === `${path}.disabled`)
+	)
+}
 
 watch(
 	() => installFailureRevisionByInstance.value.get(instance.value.id) ?? 0,
@@ -390,6 +408,20 @@ const managedContentItems = computed(() => {
 	return dedupeManagedContentItems([...linkedContent, ...sourcedContent])
 })
 
+const highlightedManagedItemId = computed(() =>
+	mergedProjects.value.some(matchesHighlightedFile)
+		? undefined
+		: managedContentItems.value.find(matchesHighlightedFile)?.id,
+)
+
+watch(
+	[highlightedManagedItemId, managedContentModal],
+	([id, modal]) => {
+		if (id && modal) modal.show(managedContentItems.value, id)
+	},
+	{ flush: 'post' },
+)
+
 const managedContentSummary = computed(() =>
 	modpackContentQuery.isLoading.value && modpackContentQuery.data.value === undefined
 		? undefined
@@ -424,8 +456,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 				attachment?.server_manager_icon_url ??
 				linkedProject?.icon_url ??
 				undefined)
-			: (sharedManager?.avatarUrl ??
-				(instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : undefined))
+			: (sharedManager?.avatarUrl ?? getInstanceIconUrl(instance.value.icon_path) ?? undefined)
 		const managerLink = serverManaged
 			? linkedProject
 				? {
@@ -801,6 +832,14 @@ async function toggleDisableMod(
 	const originalFilePath = mod.file_path
 
 	try {
+		const packSyncOption = mod.project_type === 'resourcepack' ? 'resource_packs' : 'data_packs'
+		if (mod.synced_pack && instance.value.synced_options[packSyncOption]) {
+			await set_synced_pack_enabled(mod.synced_pack.id, desiredEnabled ?? !mod.enabled)
+			await refreshContentState('must_revalidate')
+			await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })
+			if (reconcileSharedState) await reconcileSharedInstancePublishState()
+			return
+		}
 		const newPath = await toggle_disable_project(instance.value.id, mod.file_path, desiredEnabled)
 		const newFileName = fileNameFromPath(newPath)
 		const enabled = !newPath.endsWith('.disabled')
@@ -846,8 +885,15 @@ async function removeMod(mod: ContentItem) {
 
 	try {
 		const removedPath = mod.file_path
-		await remove_project(instance.value.id, removedPath)
-		projects.value = projects.value.filter((x) => removedPath !== x.file_path)
+		if (!(await packActions.deleteSyncedItem(mod))) {
+			await remove_project(instance.value.id, removedPath)
+		}
+		if (mod.synced_pack) {
+			await refreshContentState('must_revalidate')
+			await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })
+		} else {
+			projects.value = projects.value.filter((x) => removedPath !== x.file_path)
+		}
 
 		trackEvent('InstanceProjectRemove', {
 			loader: instance.value.loader,
@@ -1473,8 +1519,13 @@ async function handleShareItems(
 	await shareModal.value?.show(text)
 }
 
-function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
-	const options: OverflowMenuOption[] = []
+const syncedContentModal = ref<InstanceType<typeof SyncedContentModal>>()
+const packActions = useSyncedPackActions(instance, syncedContentModal, canMutateContent, () =>
+	refreshContentState('must_revalidate'),
+)
+
+function getOverflowOptions(item: ContentItem): ButtonMenuOption[] {
+	const options: ButtonMenuOption[] = packActions.overflowOptions(item)
 
 	options.push({
 		id: 'show-file',
@@ -1582,7 +1633,7 @@ provideContentManager({
 	error: ref(null),
 	managedContent,
 	isPackLocked,
-	isBusy: isInstanceBusy,
+	isBusy: computed(() => isInstanceBusy.value || packActions.isPending.value),
 	disableAddContent: isQuarantined,
 	disableAddContentTooltip: formatMessage(messages.lockedContent),
 	isBulkOperating,
@@ -1612,6 +1663,8 @@ provideContentManager({
 	canToggleItem: canToggleContent,
 	getDeleteWarning: managedContentPolicy.deleteWarning,
 	getDisableWarning: managedContentPolicy.disableWarning,
+	confirmAction: packActions.confirmAction,
+	confirmDeleteItems: packActions.confirmDeleteItems,
 	getDeleteDependencyWarning,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
@@ -1664,6 +1717,8 @@ provideContentManager({
 			: undefined,
 		external: item.external ?? !item.project,
 		enabled: canMutateContent(item) ? item.enabled : undefined,
+		synced: !!item.synced_pack,
+		syncUpdatePending: item.synced_pack?.update_pending,
 		locked: item.locked,
 		installing: item.installing,
 		hideDelete: !canDeleteContent(item),

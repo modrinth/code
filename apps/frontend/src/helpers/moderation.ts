@@ -149,6 +149,7 @@ export async function enrichReportBatch(
 			const targetUser = cache.users.value.get(report.item_id)
 			if (targetUser) {
 				target = {
+					id: targetUser.id,
 					name: targetUser.username,
 					slug: targetUser.username,
 					avatar_url: targetUser.avatar_url,
@@ -172,6 +173,7 @@ export async function enrichReportBatch(
 
 			if (org) {
 				target = {
+					id: org.id,
 					name: org.name,
 					avatar_url: org.icon_url,
 					type: 'organization',
@@ -179,6 +181,7 @@ export async function enrichReportBatch(
 				}
 			} else if (owner) {
 				target = {
+					id: owner.user.id,
 					name: owner.user.username,
 					avatar_url: owner.user.avatar_url,
 					type: 'user',

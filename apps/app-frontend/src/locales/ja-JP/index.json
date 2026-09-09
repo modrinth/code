@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "ダウンロード"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "進行中のダウンロードを非表示"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "実行中のインスタンスの一部を非表示"
   },
@@ -72,7 +75,7 @@
     "message": "ローカルデータを更新できませんでした"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "マインクラフトのセットアップに失敗しました"
+    "message": "Minecraftのセットアップに失敗しました"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
     "message": "Modrinthに接続できませんでした"
@@ -110,6 +113,9 @@
   "app.action-bar.reload-to-update": {
     "message": "再読み込みしてアップデート"
   },
+  "app.action-bar.show-downloads": {
+    "message": "進行中のダウンロードを表示"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "実行中のインスタンスをさらに表示"
   },
@@ -132,7 +138,7 @@
     "message": "すべて受け入れる"
   },
   "app.ads-consent.body": {
-    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬も広告収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。"
+    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。"
   },
   "app.ads-consent.manage": {
     "message": "設定の管理"
@@ -142,6 +148,12 @@
   },
   "app.ads-consent.title": {
     "message": "プライバシーと広告がModrinthを支える仕組み"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "ライブラリをコンパクトに表示します。"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "コンパクトモード"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "ホーム"
@@ -155,14 +167,8 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "ネームタグを非表示にする"
   },
-  "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "ホーム画面の「Jump back in」セクションに、最近プレイしたワールドを表示します。"
-  },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "最近のワールドを表示"
-  },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minecraftを起動したときにランチャーを最小化します。"
+    "message": "Minecraftを起動したときにModrinth Appを最小化します。"
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "ランチャーを最小化"
@@ -206,6 +212,15 @@
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "起動とナビゲーション"
   },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "ログイン中のすべての端末で同じ設定を使用します。オフにすると、端末ごとに個別の設定を使用できます。"
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "設定を同期するには、Modrinthアカウントにログインしてください。"
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "端末間での設定の同期"
+  },
   "app.browse.add-servers-to-instance": {
     "message": "インスタンスにサーバーを追加中"
   },
@@ -234,16 +249,34 @@
     "message": "サーバーを探す"
   },
   "app.browse.hide-added-servers": {
-    "message": "既に追加済みのサーバーを非表示にする"
+    "message": "既に追加済みのサーバーを非表示"
   },
   "app.browse.hide-installed-modpacks": {
     "message": "インストール済みを非表示"
   },
+  "app.browse.project-actions.label": {
+    "message": "プロジェクトの操作"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "データパック"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modパック"
   },
+  "app.browse.project-type.mods": {
+    "message": "Mod"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "リソースパック"
+  },
+  "app.browse.project-type.servers": {
+    "message": "サーバー"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "シェーダー"
+  },
   "app.browse.server-instance-content-warning": {
-    "message": "コンテンツを追加すると、サーバーに参加する際に互換性が失われる可能性があります。また、追加されたコンテンツはインスタンスのコンテンツをアップデートした際に失われます。"
+    "message": "コンテンツを追加すると、このサーバーに参加できなくなる場合があります。追加したコンテンツは、サーバーで管理されているコンテンツが更新されると削除されます。"
   },
   "app.browse.server.installing": {
     "message": "インストール中"
@@ -251,11 +284,20 @@
   "app.content-install.no-compatible-versions": {
     "message": "{compatibilityLabel} に一致する利用可能なバージョンがありません。このままインストールしますか？依存関係は自動的にインストールされません。"
   },
+  "app.error.state-init.open-backups-folder": {
+    "message": "バックアップフォルダーを開く"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Modパックの説明を入力…"
   },
   "app.export-modal.export-button": {
     "message": "書き出し"
+  },
+  "app.export-modal.export-complete": {
+    "message": "エクスポートが完了しました"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} は正常にエクスポートされました。"
   },
   "app.export-modal.header": {
     "message": "Modパックを書き出す"
@@ -272,11 +314,50 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.home.jump-back-in.actions.label": {
+    "message": "インスタンスの操作"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "このインスタンスはロックされています"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "インスタンスは既に開いています"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "追加のオプション"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "未プレイ"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "新しいインスタンス"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "ドラッグしてサイズ変更"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "さっそく遊ぶ"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "インスタンスを表示"
+  },
+  "app.hosting.update-required.description": {
+    "message": "Modrinth Hostingを利用するには、Modrinth Appを更新してください"
+  },
+  "app.hosting.update-required.download": {
+    "message": "ダウンロードして更新"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "ワクワクしているModrinth Bot"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Modrinth Appの更新が必要です"
+  },
   "app.install.phase.downloading_content": {
     "message": "コンテンツをダウンロード中"
   },
   "app.install.phase.downloading_minecraft": {
-    "message": "マインクラフトをダウンロード中"
+    "message": "Minecraftをダウンロード中"
   },
   "app.install.phase.downloading_pack_file": {
     "message": "パックファイルをダウンロード中"
@@ -294,7 +375,7 @@
     "message": "Javaを準備中"
   },
   "app.install.phase.preparing_java.downloading": {
-    "message": "Java {version} をダウンロードしています"
+    "message": "Java {version} をダウンロード中"
   },
   "app.install.phase.preparing_java.extracting": {
     "message": "Java {version} を展開中"
@@ -315,7 +396,7 @@
     "message": "ローダーを解析中"
   },
   "app.install.phase.resolving_minecraft": {
-    "message": "マインクラフトを解析中"
+    "message": "Minecraftを解析中"
   },
   "app.install.phase.resolving_pack": {
     "message": "コンテンツを解析中"
@@ -325,6 +406,48 @@
   },
   "app.install.phase.running_loader_processors": {
     "message": "ローダーのプロセッサーを実行中"
+  },
+  "app.instance.action.add-content": {
+    "message": "コンテンツの追加"
+  },
+  "app.instance.action.copy-path": {
+    "message": "パスをコピー"
+  },
+  "app.instance.action.edit": {
+    "message": "編集"
+  },
+  "app.instance.action.open-folder": {
+    "message": "フォルダーを開く"
+  },
+  "app.instance.action.play": {
+    "message": "プレイ"
+  },
+  "app.instance.action.stop": {
+    "message": "停止"
+  },
+  "app.instance.actions.label": {
+    "message": "インスタンスの操作"
+  },
+  "app.instance.add-server.add": {
+    "message": "追加"
+  },
+  "app.instance.add-server.added": {
+    "message": "追加済"
+  },
+  "app.instance.add-server.adding": {
+    "message": "追加中…"
+  },
+  "app.instance.add-server.cancel": {
+    "message": "キャンセル"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "このサーバーはすべてのインスタンスと互換性があるとは限りません。"
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "インスタンスを検索"
+  },
+  "app.instance.add-server.title": {
+    "message": "インスタンスにサーバーを追加"
   },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "追加済"
@@ -356,17 +479,59 @@
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "審査中…"
   },
+  "app.instance.card.icon-alt": {
+    "message": "インスタンスのアイコン"
+  },
+  "app.instance.card.installing": {
+    "message": "インストール中…"
+  },
+  "app.instance.card.loading": {
+    "message": "インスタンスを読み込み中…"
+  },
+  "app.instance.card.never-played": {
+    "message": "未プレイ"
+  },
+  "app.instance.card.play": {
+    "message": "プレイ"
+  },
+  "app.instance.card.played": {
+    "message": "プレイ済み: {relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "修復"
+  },
+  "app.instance.card.stop": {
+    "message": "停止"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "インスタンス内のすべてのデータは、ワールド、設定、インストール済みのコンテンツを含め、完全に削除されます。"
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "この操作は取り消せません"
   },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "これら{count}個のインスタンスのすべてのデータは、ワールド、設定、およびインストールされているすべてのコンテンツを含めて完全に削除されます。"
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "{count}個のインスタンスを削除"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "{count}個のインスタンスを削除"
+  },
   "app.instance.confirm-delete.delete-button": {
     "message": "インスタンスを削除"
   },
   "app.instance.confirm-delete.header": {
     "message": "インスタンスを削除"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {インスタンス} other {インスタンス({count})}}"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Modパックのコンテンツ"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "共有されたコンテンツ"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "このModパックは既に <bold>{instanceName}</bold> インスタンスにインストール済みです。本当に複製しますか？"
@@ -392,8 +557,11 @@
   "app.instance.mods.content-type-project": {
     "message": "プロジェクト"
   },
+  "app.instance.mods.freeze-content": {
+    "message": "バージョンを凍結"
+  },
   "app.instance.mods.locked-content": {
-    "message": "ロックされた起動構成の内にあるコンテンツは変更できません。"
+    "message": "ロックされたインスタンス内のコンテンツは変更できません。"
   },
   "app.instance.mods.project-was-added": {
     "message": "「{name}」が追加されました"
@@ -409,6 +577,12 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "アップロードに成功しました"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "バージョンを解凍"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "インスタンスに戻る"
   },
   "app.instance.share.empty.description": {
     "message": "フレンドとこのインスタンスをシェアしましょう！"
@@ -486,22 +660,22 @@
     "message": "接続エラー"
   },
   "app.instance.share.unlink.body": {
-    "message": "この起動構成を共有するには、このmodpackのリンクを解除する必要があります"
+    "message": "インスタンスを共有するには、このModパックのリンクを解除する必要があります"
   },
   "app.instance.share.unlink.header": {
     "message": "共有にはリンクを解除する必要があります"
   },
   "app.instance.shared-instance-already-installed.body": {
-    "message": "この共有された起動構成はすでに<bold> {instanceName} </bold>としてインストールされています。別のコピーをインストールしてもよろしいですか？"
+    "message": "この共有インスタンスはすでに<bold> {instanceName} </bold>としてインストールされています。別のコピーをインストールしてもよろしいですか？"
   },
   "app.instance.shared-instance-already-installed.header": {
-    "message": "共有された起動構成はすでにインストールされています"
+    "message": "共有インスタンスはすでにインストールされています"
   },
   "app.instance.shared-instance-already-installed.install-anyway": {
     "message": "インストールを続行"
   },
   "app.instance.shared-instance-already-installed.instance": {
-    "message": "起動構成"
+    "message": "インスタンス"
   },
   "app.instance.shared-instance-wrong-account.fallback-username": {
     "message": "リンクされたアカウント"
@@ -521,6 +695,30 @@
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "Modrinthのアカウントが間違っています"
   },
+  "app.instance.shortcut.created": {
+    "message": "ショートカットを作成しました"
+  },
+  "app.instance.shortcut.creation-error": {
+    "message": "ショートカットの作成に失敗しました"
+  },
+  "app.instance.tab.content": {
+    "message": "コンテンツ"
+  },
+  "app.instance.tab.files": {
+    "message": "ファイル"
+  },
+  "app.instance.tab.logs": {
+    "message": "ログ"
+  },
+  "app.instance.tab.screenshots": {
+    "message": "スクリーンショット"
+  },
+  "app.instance.tab.share": {
+    "message": "共有"
+  },
+  "app.instance.tab.worlds": {
+    "message": "ワールド"
+  },
   "app.instance.worlds.add-server": {
     "message": "サーバーを追加"
   },
@@ -528,7 +726,7 @@
     "message": "サーバーを探す"
   },
   "app.instance.worlds.delete-world-modal.delete-button": {
-    "message": "ワールドを削除"
+    "message": "ワールドの削除"
   },
   "app.instance.worlds.delete-world-modal.title": {
     "message": "ワールドの削除"
@@ -537,7 +735,7 @@
     "message": "このワールドはインスタンスから完全に削除されます。この操作は取り消せません。"
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
-    "message": "{name} を削除します"
+    "message": "{name} を削除中"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Mod導入済み"
@@ -552,16 +750,16 @@
     "message": "バニラ"
   },
   "app.instance.worlds.no-worlds-description": {
-    "message": "サーバーを追加、またはブラウズして始める"
+    "message": "サーバーを追加、または参照して始める"
   },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "サーバー、ワールドは追加されていません"
+    "message": "サーバーやワールドが追加されていません"
   },
   "app.instance.worlds.refreshing": {
     "message": "更新中…"
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
-    "message": "サーバーを削除"
+    "message": "サーバーの削除"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "サーバーの削除"
@@ -620,6 +818,267 @@
   "app.java-selector.test-installation": {
     "message": "Javaのインストールをテスト"
   },
+  "app.library.actions.label": {
+    "message": "ライブラリの操作"
+  },
+  "app.library.context-menu.create-instance": {
+    "message": "新しいインスタンス"
+  },
+  "app.library.filter.add": {
+    "message": "フィルターを追加"
+  },
+  "app.library.filter.clear": {
+    "message": "フィルターを削除"
+  },
+  "app.library.filter.game-version": {
+    "message": "ゲームバージョン"
+  },
+  "app.library.filter.instance-type": {
+    "message": "インスタンスの種類"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "カスタム"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "Modパック"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "サーバー"
+  },
+  "app.library.filter.label": {
+    "message": "フィルター条件"
+  },
+  "app.library.filter.loader": {
+    "message": "ローダー"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "カスタムグループ"
+  },
+  "app.library.group-by.game-version": {
+    "message": "ゲームバージョン"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "インスタンスの種類"
+  },
+  "app.library.group-by.label": {
+    "message": "グループ化条件"
+  },
+  "app.library.group-by.loader": {
+    "message": "ローダー"
+  },
+  "app.library.group-by.none": {
+    "message": "グループ化なし"
+  },
+  "app.library.group.actions.label": {
+    "message": "グループ化の操作"
+  },
+  "app.library.group.collapse": {
+    "message": "グループを折りたたむ"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "グループに追加"
+  },
+  "app.library.group.create": {
+    "message": "グループの作成"
+  },
+  "app.library.group.create.cancel": {
+    "message": "キャンセル"
+  },
+  "app.library.group.delete": {
+    "message": "グループの削除"
+  },
+  "app.library.group.delete-description": {
+    "message": "このグループ内のインスタンスのグループ化が解除されます。"
+  },
+  "app.library.group.edit-name": {
+    "message": "グループ名の編集"
+  },
+  "app.library.group.empty": {
+    "message": "ドラッグ＆ドロップでインスタンスを追加します。"
+  },
+  "app.library.group.expand": {
+    "message": "グループを展開"
+  },
+  "app.library.group.favorites": {
+    "message": "お気に入り"
+  },
+  "app.library.group.instance.add": {
+    "message": "追加"
+  },
+  "app.library.group.instance.added": {
+    "message": "追加済み"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "追加"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "追加済み"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "インスタンスが見つかりません"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "インスタンスを検索"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "インスタンスを「{groupName}」に追加"
+  },
+  "app.library.group.move-down": {
+    "message": "グループを下に移動"
+  },
+  "app.library.group.move-up": {
+    "message": "グループを上に移動"
+  },
+  "app.library.group.name": {
+    "message": "グループ名"
+  },
+  "app.library.group.name-empty": {
+    "message": "グループ名を空欄にすることはできません。"
+  },
+  "app.library.group.name-placeholder": {
+    "message": "グループ名を入力"
+  },
+  "app.library.group.name-reserved": {
+    "message": "「None」は予約されているためグループ名として使用することはできません。"
+  },
+  "app.library.group.name-too-long": {
+    "message": "グループ名を{maxLength}文字を超えて設定することはできません。"
+  },
+  "app.library.group.new": {
+    "message": "新しいグループ"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "インスタンスが見つかりません"
+  },
+  "app.library.group.rename-failed": {
+    "message": "グループ名を変更できません"
+  },
+  "app.library.group.search-instance": {
+    "message": "インスタンスを検索"
+  },
+  "app.library.group.ungrouped": {
+    "message": "グループ分けなし"
+  },
+  "app.library.group.unknown": {
+    "message": "不明なグループ"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "コンテンツの追加"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "お気に入りに追加"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "パスをコピー"
+  },
+  "app.library.instance.action.delete": {
+    "message": "削除"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "インスタンスを複製"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "フォルダーを開く"
+  },
+  "app.library.instance.action.play": {
+    "message": "プレイ"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "お気に入りから削除"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "グループから削除"
+  },
+  "app.library.instance.action.stop": {
+    "message": "停止"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "インスタンスを表示"
+  },
+  "app.library.instance.actions.label": {
+    "message": "インスタンスの操作"
+  },
+  "app.library.instance.deselect": {
+    "message": "インスタンスの選択を解除"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "{name}の選択を解除"
+  },
+  "app.library.instance.installing": {
+    "message": "インストール中…"
+  },
+  "app.library.instance.loading": {
+    "message": "インスタンスを読み込み中…"
+  },
+  "app.library.instance.new": {
+    "message": "新しいインスタンス"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "{name}を開く"
+  },
+  "app.library.instance.play": {
+    "message": "プレイ"
+  },
+  "app.library.instance.repair": {
+    "message": "修復"
+  },
+  "app.library.instance.select": {
+    "message": "インスタンスを選択"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "{name}を選択"
+  },
+  "app.library.instance.stop": {
+    "message": "停止"
+  },
+  "app.library.search.no-results.title": {
+    "message": "該当するインスタンスがありません。"
+  },
+  "app.library.search.placeholder": {
+    "message": "検索"
+  },
+  "app.library.selection.aria-label": {
+    "message": "選択中のインスタンス"
+  },
+  "app.library.selection.deleting": {
+    "message": "選択したインスタンスを削除中"
+  },
+  "app.library.selection.new-group": {
+    "message": "新しいグループ"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "グループから削除"
+  },
+  "app.library.selection.selected-count": {
+    "message": "{count}件を選択済み"
+  },
+  "app.library.sort.date-created": {
+    "message": "作成日"
+  },
+  "app.library.sort.date-modified": {
+    "message": "更新日"
+  },
+  "app.library.sort.game-version": {
+    "message": "ゲームバージョン"
+  },
+  "app.library.sort.hours-played": {
+    "message": "プレイ時間"
+  },
+  "app.library.sort.label": {
+    "message": "並び替え"
+  },
+  "app.library.sort.last-played": {
+    "message": "最終プレイ"
+  },
+  "app.library.sort.loader": {
+    "message": "ローダー"
+  },
+  "app.library.sort.name": {
+    "message": "名前"
+  },
+  "app.library.title": {
+    "message": "ライブラリ"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "追加のコンテンツ"
   },
@@ -630,7 +1089,7 @@
     "message": "ユーザーをブロック"
   },
   "app.modal.install-to-play.content-you-are-reporting": {
-    "message": "起動構成を報告する"
+    "message": "通報したインスタンス"
   },
   "app.modal.install-to-play.delete-instance": {
     "message": "インスタンスを削除する"
@@ -653,6 +1112,9 @@
   "app.modal.install-to-play.invite-warning-with-creator": {
     "message": "この招待はModrinthではなく<creator>{username}</creator>によって作成されました。信頼できる人物からの招待のみ受諾してください。"
   },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "Modパックのコンテンツ"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {#個のMod}}"
   },
@@ -663,7 +1125,7 @@
     "message": "対応していない画像形式です"
   },
   "app.modal.install-to-play.report-image-too-large": {
-    "message": "ファイルのサイズが 1 MiBの制限を超えています"
+    "message": "ファイルが 1 MiBのサイズ制限を超えています"
   },
   "app.modal.install-to-play.report-legal-claims": {
     "message": "DMCA通知やその他の法的請求については、弊社の<copyright-link>著作権ポリシー</copyright-link>をご覧ください。"
@@ -672,25 +1134,25 @@
     "message": "この起動構成はどの規則に違反していますか？"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
-    "message": "共有された起動構成を通報する"
+    "message": "共有インスタンスを通報する"
   },
   "app.modal.install-to-play.report-submitted": {
-    "message": "通報は送信されました"
+    "message": "通報が送信されました"
   },
   "app.modal.install-to-play.report-support-and-bugs": {
     "message": "サポートに関するお問い合わせは、<support-link>サポートチーム</support-link>までご連絡ください。バグの報告は、<github-link>GitHubのIssue</github-link>を作成してください。"
   },
   "app.modal.install-to-play.reviewed-files": {
-    "message": "ファイル形式（.mrpackを含む）に関わらず、Modrinthに公開されているファイルのみが審査の対象となります。"
+    "message": "追加するファイルはModrinthの認証を受けていません。"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共有インスタンス"
   },
   "app.modal.install-to-play.shared-instance-content": {
-    "message": "共有された起動構成の内容"
+    "message": "共有インスタンスの内容"
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
-    "message": "この共有された起動構成には、Modrinthで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
+    "message": "この共有インスタンスには、Modrinthで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "このサーバーModパックには、Modrinthに公開されていないファイルが含まれています。信頼できるソースからのファイルのみをインストールすることを強く推奨します。"
@@ -723,7 +1185,7 @@
     "message": "削除済み"
   },
   "app.modal.update-to-play.shared-instance-unknown-files-description": {
-    "message": "この共有された起動構成のアップデートには、Modrinthで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
+    "message": "この共有インスタンスのアップデートには、Modrinthで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
   },
   "app.modal.update-to-play.update-required": {
     "message": "更新が必要です"
@@ -731,11 +1193,17 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}をプレイするにはアップデートが必要です。ゲームを起動するには最新バージョンにアップデートしてください。"
   },
+  "app.nav.add-account": {
+    "message": "アカウントを追加"
+  },
   "app.nav.create-new-instance": {
     "message": "新しいインスタンスを作成"
   },
   "app.nav.home": {
     "message": "ホーム"
+  },
+  "app.nav.loading-profile": {
+    "message": "プロフィールを読み込み中…"
   },
   "app.nav.modrinth-account": {
     "message": "Modrinthアカウント"
@@ -743,20 +1211,50 @@
   "app.nav.modrinth-hosting": {
     "message": "Modrinth Hosting"
   },
-  "app.nav.sign-in-to-modrinth-account": {
-    "message": "Modrinthアカウントにサインイン"
+  "app.nav.remove-account": {
+    "message": "アカウントを削除"
   },
-  "app.nav.signed-in-as": {
-    "message": "<user>{username}</user>としてサインイン中"
+  "app.nav.screenshots": {
+    "message": "スクリーンショット"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Modrinthへサインイン"
+  },
+  "app.nav.switch-account": {
+    "message": "アカウントの切り替え"
   },
   "app.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+にアップグレード"
+  },
+  "app.nav.view-profile": {
+    "message": "プロフィールを表示"
+  },
+  "app.navigation.go-back": {
+    "message": "戻る"
+  },
+  "app.navigation.go-forward": {
+    "message": "進む"
+  },
+  "app.navigation.home": {
+    "message": "ホーム"
+  },
+  "app.navigation.next-image": {
+    "message": "次の画像"
   },
   "app.news.title": {
     "message": "ニュース"
   },
   "app.news.view-all": {
     "message": "全てのニュースを見る"
+  },
+  "app.notification.warning": {
+    "message": "警告"
+  },
+  "app.project.actions.label": {
+    "message": "プロジェクトの操作"
+  },
+  "app.project.coming-soon": {
+    "message": "準備中"
   },
   "app.project.install-button.already-installed": {
     "message": "このプロジェクトは既にインストールされています"
@@ -770,6 +1268,21 @@
   "app.project.install-context.back-to-instance": {
     "message": "インスタンスに戻る"
   },
+  "app.project.load-error": {
+    "message": "プロジェクトデータを読み込めませんでした。"
+  },
+  "app.project.more-options": {
+    "message": "追加のオプション"
+  },
+  "app.project.tab.description": {
+    "message": "概要"
+  },
+  "app.project.tab.gallery": {
+    "message": "ギャラリー"
+  },
+  "app.project.tab.versions": {
+    "message": "バージョン"
+  },
   "app.project.version.all-versions": {
     "message": "すべてのバージョン"
   },
@@ -782,14 +1295,176 @@
   "app.project.versions.already-installed": {
     "message": "既にインストールされています"
   },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "インスタンスの操作"
+  },
   "app.quick-instance-switcher.drag-show-tooltip": {
     "message": "ドラッグして最近のインスタンスを表示"
   },
   "app.quick-instance-switcher.drag-tooltip": {
     "message": "ドラッグしてサイズ変更"
   },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "このインスタンスはロックされています"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "インスタンスを表示"
+  },
   "app.restarting": {
     "message": "再起動中..."
+  },
+  "app.screenshots.copied": {
+    "message": "コピーしました"
+  },
+  "app.screenshots.copy": {
+    "message": "画像をコピー"
+  },
+  "app.screenshots.delete-description": {
+    "message": "{name}を完全に削除しますか？この操作は元に戻せません。"
+  },
+  "app.screenshots.delete-success": {
+    "message": "スクリーンショットを削除しました"
+  },
+  "app.screenshots.delete-title": {
+    "message": "スクリーンショットを削除"
+  },
+  "app.screenshots.deselect": {
+    "message": "{name}の選択を解除"
+  },
+  "app.screenshots.edit": {
+    "message": "スクリーンショットを編集"
+  },
+  "app.screenshots.empty-description": {
+    "message": "ゲーム内で撮影したスクリーンショットがここに表示されます。"
+  },
+  "app.screenshots.empty-heading": {
+    "message": "スクリーンショットはまだありません"
+  },
+  "app.screenshots.error-heading": {
+    "message": "スクリーンショットの読み込みに失敗しました"
+  },
+  "app.screenshots.go-to-instance": {
+    "message": "インスタンスに移動"
+  },
+  "app.screenshots.group-by": {
+    "message": "グループ化条件"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "すべてのスクリーンショット"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "グループを折りたたむ"
+  },
+  "app.screenshots.group.custom": {
+    "message": "カスタムグループ"
+  },
+  "app.screenshots.group.date": {
+    "message": "日付"
+  },
+  "app.screenshots.group.delete": {
+    "message": "グループの削除"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "このグループ内のスクリーンショットのグループ化が解除されます。"
+  },
+  "app.screenshots.group.edit": {
+    "message": "グループ名の編集"
+  },
+  "app.screenshots.group.empty": {
+    "message": "ドラッグ＆ドロップでスクリーンショットを追加します。"
+  },
+  "app.screenshots.group.expand": {
+    "message": "グループを展開"
+  },
+  "app.screenshots.group.instance": {
+    "message": "インスタンス"
+  },
+  "app.screenshots.group.new": {
+    "message": "新しいグループ"
+  },
+  "app.screenshots.group.none": {
+    "message": "グループ化なし"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "今月"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "今週"
+  },
+  "app.screenshots.group.today": {
+    "message": "今日"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "グループ化なし"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "昨日"
+  },
+  "app.screenshots.heading": {
+    "message": "スクリーンショット"
+  },
+  "app.screenshots.more-actions": {
+    "message": "その他の操作"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "別の検索条件またはフィルターを試してください。"
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "該当するスクリーンショットがありません"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "検索"
+  },
+  "app.screenshots.select": {
+    "message": "{name}を選択"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "選択したスクリーンショット"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "{count, plural,other {#}}枚のスクリーンショットを削除しますか？この操作は元に戻せません。"
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural,other {#}}枚のスクリーンショットを削除しました"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "選択したスクリーンショットを削除"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "ZIPをエクスポート"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Modrinth screenshots.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "{instance} screenshots.zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "グループから削除"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "{count}件を選択済み"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "ZIPアーカイブ"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "フォルダーで表示"
+  },
+  "app.screenshots.sort-by": {
+    "message": "並び替え"
+  },
+  "app.screenshots.sort.name": {
+    "message": "名前順"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "新しい順"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "古い順"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -798,7 +1473,7 @@
     "message": "インスタンス起動時に設定される環境変数"
   },
   "app.settings.default-instance-options.environment-variables.placeholder": {
-    "message": "環境変数を入力..."
+    "message": "環境変数を入力…"
   },
   "app.settings.default-instance-options.environment-variables.title": {
     "message": "環境変数"
@@ -810,61 +1485,70 @@
     "message": "全画面"
   },
   "app.settings.default-instance-options.height.description": {
-    "message": "起動時のゲームウィンドウの高さ"
+    "message": "起動時のゲームウィンドウの高さです。"
   },
   "app.settings.default-instance-options.height.placeholder": {
-    "message": "高さを入力..."
+    "message": "高さを入力…"
   },
   "app.settings.default-instance-options.height.title": {
     "message": "高さ"
   },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Javaとメモリ"
+  },
   "app.settings.default-instance-options.java-arguments.description": {
-    "message": "インスタンス起動時にJavaへ渡される引数"
+    "message": "インスタンス起動時にJavaへ渡される引数です。"
   },
   "app.settings.default-instance-options.java-arguments.placeholder": {
-    "message": "Java引数を入力..."
+    "message": "Java引数を入力…"
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java引数"
   },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "起動フック"
+  },
   "app.settings.default-instance-options.memory-allocation.description": {
-    "message": "各インスタンスに割り当てる最大メモリ容量"
+    "message": "各インスタンスに割り当てる最大メモリ容量です。"
   },
   "app.settings.default-instance-options.memory-allocation.title": {
     "message": "メモリ割り当て"
   },
   "app.settings.default-instance-options.post-exit-hook.description": {
-    "message": "ゲーム終了後に実行"
+    "message": "ゲーム終了後に実行されます。"
   },
   "app.settings.default-instance-options.post-exit-hook.placeholder": {
-    "message": "終了後コマンドを入力..."
+    "message": "終了後コマンドを入力…"
   },
   "app.settings.default-instance-options.post-exit-hook.title": {
     "message": "終了後フック"
   },
   "app.settings.default-instance-options.pre-launch-hook.description": {
-    "message": "インスタンス起動前に実行"
+    "message": "インスタンスの起動前に実行されます。"
   },
   "app.settings.default-instance-options.pre-launch-hook.placeholder": {
-    "message": "起動前コマンドを入力..."
+    "message": "起動前コマンドを入力…"
   },
   "app.settings.default-instance-options.pre-launch-hook.title": {
     "message": "起動前フック"
   },
   "app.settings.default-instance-options.width.description": {
-    "message": "起動時のゲームウィンドウの幅"
+    "message": "起動時のゲームウィンドウの幅です。"
   },
   "app.settings.default-instance-options.width.placeholder": {
-    "message": "幅を入力..."
+    "message": "幅を入力…"
   },
   "app.settings.default-instance-options.width.title": {
     "message": "幅"
   },
+  "app.settings.default-instance-options.window.title": {
+    "message": "ウィンドウ"
+  },
   "app.settings.default-instance-options.wrapper-hook.description": {
-    "message": "Minecraftの起動プロセスをラップするためのコマンド"
+    "message": "Minecraftの起動プロセスをラップするためのコマンドです。"
   },
   "app.settings.default-instance-options.wrapper-hook.placeholder": {
-    "message": "ラッパーコマンドを入力..."
+    "message": "ラッパーコマンドを入力…"
   },
   "app.settings.default-instance-options.wrapper-hook.title": {
     "message": "ラッパーフック"
@@ -882,10 +1566,10 @@
     "message": "Java {version, number} の場所"
   },
   "app.settings.operating-system.macos": {
-    "message": "MacOS"
+    "message": "macOS"
   },
   "app.settings.privacy.ads-consent.intro": {
-    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬も広告収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。この機能は下のボタンから個別に拒否や許可または変更することができます。"
+    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬もその収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、アプリ内でCookieを保存・利用する場合があります。この機能は下のボタンから個別に拒否や許可または変更することができます。"
   },
   "app.settings.privacy.discord-rich-presence.description": {
     "message": "Discordの現在のプレイ中に Modrinth App を表示します。これはModによってインスタンスに追加されるRich Presenceには影響しません。適用にはアプリの再起動が必要です。"
@@ -930,7 +1614,7 @@
     "message": "アプリデータベースのバックアップ"
   },
   "app.settings.resource-management.app-directory.browse": {
-    "message": "アプリのディレクトリを参照..."
+    "message": "アプリのディレクトリを参照"
   },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth Appがインスタンスやその他のファイルを保存する場所です。変更はアプリの再起動後に反映されます。"
@@ -956,26 +1640,80 @@
   "app.settings.sidebar.label.instances": {
     "message": "インスタンス"
   },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "コマンド履歴が共有コピーとなるインスタンスを選択します。"
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "保存したクリエイティブホットバーが共有コピーになるインスタンスを選択します。"
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "マルチプレイヤーサーバーが共有コピーになるインスタンスを選択します。"
+  },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "インスタンスが見つかりません"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "インスタンスを検索"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "同期"
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "コマンド履歴を同期"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "コマンド履歴を複数のインスタンスで共通して使用できます。"
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "コマンド履歴の編集"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "保存したクリエイティブホットバーの同期"
+  },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "保存したクリエイティブホットバーを複数のインスタンスで共通して使用できます。"
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "マルチプレイヤーサーバーの同期"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "サーバーのアドレス"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "マルチプレイヤーサーバーを複数のインスタンスで共通して使用できます。"
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "同期済みサーバーの編集"
+  },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "現在同期されているユーザー追加のサーバーはありません。"
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "サーバー名"
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "まだ同期されているサーバーがありません"
+  },
   "app.settings.tabs.appearance": {
     "message": "表示設定"
   },
   "app.settings.tabs.behavior": {
     "message": "動作"
   },
-  "app.settings.tabs.default-instance-options": {
-    "message": "デフォルトのゲーム設定"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Javaのインストール設定"
   },
   "app.settings.tabs.language": {
-    "message": "言語"
+    "message": "言語設定"
   },
   "app.settings.tabs.privacy": {
     "message": "プライバシー設定"
   },
   "app.settings.tabs.resource-management": {
     "message": "リソース管理"
+  },
+  "app.settings.tabs.synced-options": {
+    "message": "同期済みの設定"
   },
   "app.sidebar.playing-as": {
     "message": "プレイ中のアカウント"
@@ -997,6 +1735,15 @@
   },
   "app.skins.delete-modal.title": {
     "message": "本当にこのスキンを削除しますか？"
+  },
+  "app.skins.demo.apply-tooltip": {
+    "message": "スキンを適用するにはサインインしてください。"
+  },
+  "app.skins.demo.description": {
+    "message": "スキンを保存して適用するにはMinecraftアカウントにサインインしてください！"
+  },
+  "app.skins.demo.title": {
+    "message": "デモアカウントで編集"
   },
   "app.skins.dropped-file-error.text": {
     "message": "ドロップされたファイルの読み込みに失敗しました。"
@@ -1031,6 +1778,9 @@
   "app.skins.modal.cape-section": {
     "message": "マント"
   },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "スキンを保存するにはサインインしてください。"
+  },
   "app.skins.modal.edit-title": {
     "message": "スキンを編集中"
   },
@@ -1044,7 +1794,7 @@
     "message": "無し"
   },
   "app.skins.modal.replace-texture-button": {
-    "message": "アップロード"
+    "message": "テクスチャを置き換え"
   },
   "app.skins.modal.save-skin-button": {
     "message": "スキンを保存する"
@@ -1080,13 +1830,13 @@
     "message": "ビルダーズ＆バイオーム"
   },
   "app.skins.section.chaos-cubed": {
-    "message": "Chaos Cubed"
+    "message": "カオス・キューブド"
   },
   "app.skins.section.chase-the-skies": {
     "message": "チェイス・ザ・スカイ"
   },
   "app.skins.section.default-skins": {
-    "message": "デフォルトのスキンたち"
+    "message": "デフォルトのスキン"
   },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
@@ -1119,7 +1869,7 @@
     "message": "タイニー・テイクオーバー"
   },
   "app.skins.sign-in.button": {
-    "message": "サイン審"
+    "message": "Microsoftにサインイン"
   },
   "app.skins.title": {
     "message": "スキンセレクター"
@@ -1164,7 +1914,7 @@
     "message": "ダウンロード完了"
   },
   "app.update-popup.reload": {
-    "message": "再度読み込みして更新"
+    "message": "再読み込みして更新"
   },
   "app.update-popup.title": {
     "message": "アップデートが利用可能です"
@@ -1175,8 +1925,29 @@
   "app.update.complete-toast.title": {
     "message": "バージョン {version} が正常にインストールされました！"
   },
+  "app.update.download-error.missing-version": {
+    "message": "更新のダウンロードに失敗しました: 利用可能なバージョンがありません"
+  },
   "app.user.project.install-to-instance": {
     "message": "インスタンスにインストール"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "インスタンスを作成"
+  },
+  "app.welcome-screen.description": {
+    "message": "プレイする準備はできましたか？"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "ランチャーからインポート"
+  },
+  "app.welcome-screen.import-prompt": {
+    "message": "別のランチャーから移行中ですか？"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "<shortcut>N</shortcut>を押してインスタンスをクイック作成"
+  },
+  "app.welcome-screen.title": {
+    "message": "Modrinthへようこそ"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -1193,44 +1964,47 @@
   "app.world.world-item.offline": {
     "message": "オフライン"
   },
+  "app.world.world-item.players-online": {
+    "message": "{count}人がオンライン"
+  },
   "content.shared-instance.change-version-body": {
-    "message": "バージョンの変更はローカルコピーにのみ影響します。今後共有された起動構成がアップデートされた際に、元の状態に戻ったり、別のバージョンに変更されたりする場合があります。"
+    "message": "バージョンの変更はローカルコピーにのみ影響します。今後共有インスタンスがアップデートされた際に、元の状態に戻ったり、別のバージョンに変更されたりする場合があります。"
   },
   "content.shared-instance.delete-bulk-body": {
-    "message": "選択された一部のプロジェクトは共有された起動構成の一部です。これらを削除してもローカルコピーのみが変更され、今後共有された起動構成がアップデートされた際に、再び復元されたり変更されたりする場合があります。"
+    "message": "選択された一部のプロジェクトは共有インスタンスの一部です。これらを削除してもローカルコピーのみが変更され、今後共有インスタンスがアップデートされた際に、再び復元されたり変更されたりする場合があります。"
   },
   "content.shared-instance.delete-button": {
-    "message": "とにかく削除する"
+    "message": "削除を続行"
   },
   "content.shared-instance.delete-many-button": {
-    "message": "それでも {count, number} のプロジェクトを削除する"
+    "message": "{count, number} 個のプロジェクトの削除を続行する"
   },
   "content.shared-instance.delete-single-body": {
-    "message": "削除はローカルコピーにのみ影響します。今後共有された起動構成がアップデートされた際に、元の状態に戻ったり、別のバージョンに変更されたりする場合があります。"
+    "message": "削除はローカルコピーにのみ影響します。今後共有インスタンスがアップデートされた際に、元の状態に戻ったり、別のバージョンに変更されたりする場合があります。"
   },
   "content.shared-instance.disable-bulk-body": {
-    "message": "選択された一部のプロジェクトは共有された起動構成の一部です。これらを無効化してもローカルコピーのみが変更され、今後共有された起動構成がアップデートされた際に、再び有効化されたり、復元されたり、変更されたりする場合があります。"
+    "message": "選択された一部のプロジェクトは共有インスタンスの一部です。これらを無効化してもローカルコピーのみが変更され、今後共有インスタンスがアップデートされた際に、再び有効化されたり、復元されたり、変更されたりする場合があります。"
   },
   "content.shared-instance.disable-button": {
-    "message": "とにかく無効化する"
+    "message": "無効化を続行"
   },
   "content.shared-instance.disable-many-button": {
-    "message": "それでも {count, number} のプロジェクトを無効化する"
+    "message": "{count, number} 個のプロジェクトの無効化を続行する"
   },
   "content.shared-instance.disable-single-body": {
-    "message": "無効化はローカルコピーにのみ影響します。今後共有された起動構成がアップデートされた際に、再び有効化されたり、元の状態に戻ったり、変更されたりする場合があります。"
+    "message": "無効化はローカルコピーにのみ影響します。今後共有インスタンスがアップデートされた際に、再び有効化されたり、元の状態に戻ったり、変更されたりする場合があります。"
   },
   "content.shared-instance.unlink-body": {
     "message": "リンク解除はローカルのコピーにのみ適用されます。将来的に共有インスタンスが更新されると、復元や変更が再度行われる可能性があります。"
   },
   "content.shared-instance.warning-header": {
-    "message": "これは共有された起動構成の一部です"
+    "message": "これは共有インスタンスの一部です"
   },
   "friends.action.add-friend": {
     "message": "フレンドを追加"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count}件の友達リクエスト"
+    "message": "{count}件のフレンドリクエスト"
   },
   "friends.add-friend.submit": {
     "message": "フレンド申請を送信"
@@ -1239,7 +2013,7 @@
     "message": "フレンドを追加中"
   },
   "friends.add-friend.username.description": {
-    "message": "これはMinecraftユーザー名とは異なる可能性があります！"
+    "message": "これはMinecraftのユーザー名とは異なる可能性があります！"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Modrinthユーザー名を入力…"
@@ -1249,6 +2023,9 @@
   },
   "friends.add-friends-to-share": {
     "message": "<link>友達を追加</link>して、彼らが何をしているか見てみよう！"
+  },
+  "friends.friend.actions.label": {
+    "message": "フレンドのアクション"
   },
   "friends.friend.cancel-request": {
     "message": "申請をキャンセル"
@@ -1290,13 +2067,13 @@
     "message": "<link>Modrinthアカウントにサインイン</link>して友達を追加し、彼らがプレイしているゲームをチェックしよう！"
   },
   "installation-settings.shared-instance.linked-title": {
-    "message": "リンク済の共有された起動構成"
+    "message": "リンク済の共有インスタンス"
   },
   "installation-settings.shared-instance.title": {
-    "message": "起動構成を非公開化"
+    "message": "インスタンスを非公開化"
   },
   "installation-settings.shared-instance.unlink-button": {
-    "message": "起動構成の共有を解除"
+    "message": "インスタンスの共有を解除"
   },
   "installation-settings.shared-instance.unlink-description": {
     "message": "このローカルインスタンスを今後の共有アップデートから切断します。"
@@ -1305,16 +2082,16 @@
     "message": "共有を解除中…"
   },
   "installation-settings.shared-instance.unpublish-button": {
-    "message": "共有された軌道構成を非公開にする"
+    "message": "共有インスタンスを非公開にする"
   },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "この共有インスタンスをModrinthから削除し、使用者へのアップデート送信を停止します。ローカルのインスタンスには影響しません。"
   },
   "installation-settings.shared-instance.unpublishing-button": {
-    "message": "非公開に設定中..."
+    "message": "非公開に設定中…"
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
-    "message": "これはローカルのインスタンスにのみ影響します。インストール済みのコンテンツはこのデバイスに残り、共有インスタンスやそれを使用している他のユーザーには影響しません。"
+    "message": "これはローカルインスタンスにのみ影響します。インストール済みのコンテンツはこのデバイスに残り、共有インスタンスやそれを使用している他のユーザーには影響しません。"
   },
   "installation-settings.unlink-shared-instance.modal.admonition-header": {
     "message": "共有インスタンスのリンク解除"
@@ -1332,16 +2109,16 @@
     "message": "共有インスタンスを非公開にする"
   },
   "instance.action.create-shortcut": {
-    "message": "ショートカット作成"
+    "message": "ショートカットを作成"
   },
   "instance.action.export-modpack": {
-    "message": "Modパックとしてエクスポート"
+    "message": "Modパックを書き出す"
   },
   "instance.action.launch-instance": {
     "message": "インスタンスを起動"
   },
   "instance.action.more-actions": {
-    "message": "その他"
+    "message": "その他の操作"
   },
   "instance.action.open-folder": {
     "message": "フォルダーを開く"
@@ -1362,7 +2139,7 @@
     "message": "追加してプレイ"
   },
   "instance.add-server.add-server": {
-    "message": "サーバーを追加する"
+    "message": "サーバーを追加"
   },
   "instance.add-server.resource-pack.disabled": {
     "message": "無効"
@@ -1399,6 +2176,222 @@
   },
   "instance.files.save-as": {
     "message": "名前をつけて保存…"
+  },
+  "instance.icon-editor.background": {
+    "message": "背景"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "青色"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "濃い灰色"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "濃い緑色"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "灰色"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "緑色"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "藍色"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "ラベンダー色"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "薄灰色"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "黄緑色"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "橙色"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "桃色"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "紫色"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "赤色"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "薔薇色"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "黄色"
+  },
+  "instance.icon-editor.description": {
+    "message": "要素を組み合わせてカスタムアイコンを作成しましょう。"
+  },
+  "instance.icon-editor.recents": {
+    "message": "最近使用した項目"
+  },
+  "instance.icon-editor.save": {
+    "message": "アイコンを保存"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "ランダム化"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "記号"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "バックパック"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "ビーコン"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "ブルーシャーク"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "本棚"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "ヒグマ"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "ケーキ"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "焚き火"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "チェスト"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "歯車"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "コマンドブロック"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "調理鍋"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "ソファー"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "作業台"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "レンチ"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "クリーパー"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "エンチャントテーブル"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "エンダーチェスト"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "エンダードラゴン"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "エンジン"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "かまど"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "地球"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "草ブロック"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "ランタン"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "ムーブルーム"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "オーブ"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "酸素分配機"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "パンケーキ"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "ツルハシ"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "モンスターボール"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "レッドストーンブロック"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "スカルクセンサー"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "スケルトン"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "フライパン"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "スライムブロック"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "宇宙ヘルメット"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "粘着ピストン"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "剣"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "ターミナル"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "小さなジャガイモ"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "タイヤ"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Modrinthのレンチ"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "ゾンビ"
+  },
+  "instance.icon-editor.title": {
+    "message": "アイコンエディター"
+  },
+  "instance.last-played": {
+    "message": "最終プレイ"
   },
   "instance.locked.delete-button": {
     "message": "インスタンスを削除"
@@ -1460,6 +2453,21 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "招待を取り消す"
   },
+  "instance.settings.tabs.behavior.description": {
+    "message": "このインスタンスに表示するタブを選択してください。"
+  },
+  "instance.settings.tabs.behavior.files": {
+    "message": "ファイルタブを表示"
+  },
+  "instance.settings.tabs.behavior.screenshots": {
+    "message": "スクリーンショットタブを表示"
+  },
+  "instance.settings.tabs.behavior.screenshots.required": {
+    "message": "グローバルなスクリーンショットページがオフの場合はスクリーンショットタブを非表示にすることができません。"
+  },
+  "instance.settings.tabs.behavior.worlds": {
+    "message": "ワールドタブを表示"
+  },
   "instance.settings.tabs.general": {
     "message": "一般"
   },
@@ -1490,6 +2498,12 @@
   "instance.settings.tabs.general.edit-icon": {
     "message": "アイコンを編集"
   },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "アイコンの作成"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "アイコンを編集"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "アイコンを削除"
   },
@@ -1498,6 +2512,9 @@
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "アイコンを選択"
+  },
+  "instance.settings.tabs.general.icon": {
+    "message": "アイコン"
   },
   "instance.settings.tabs.general.name": {
     "message": "名前"
@@ -1526,14 +2543,8 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "アップデートチャンネルを選択"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "起動フック"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "カスタム起動フック"
-  },
   "instance.settings.tabs.hooks.description": {
-    "message": "フックを使用して、ゲームの起動前後にシステムコマンドを実行するようにできます。"
+    "message": "ゲームを起動する前後にインスタンス固有のシステムコマンドを実行します。"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "終了後"
@@ -1554,10 +2565,10 @@
     "message": "起動前のコマンドを入力…"
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "ゲーム起動フック"
+    "message": "カスタムゲーム起動フック"
   },
   "instance.settings.tabs.hooks.variables.description": {
-    "message": "フックはインスタンスのカレントディレクトリで実行され、以下の環境変数が利用可能です："
+    "message": "フックはインスタンスの現在のディレクトリで実行され、以下の環境変数が利用可能です："
   },
   "instance.settings.tabs.hooks.variables.inst-dir.description": {
     "message": "$INST_DIR: インスタンスのフォルダへの絶対パス"
@@ -1595,20 +2606,17 @@
   "instance.settings.tabs.installation.locked": {
     "message": "このインスタンスがロックされている間は、インストール設定を利用できません。"
   },
-  "instance.settings.tabs.java": {
-    "message": "Javaとメモリ"
-  },
   "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "カスタム環境変数"
+    "message": "このインスタンス用に環境変数を個別に設定します。"
   },
   "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "カスタムJava引数"
+    "message": "このインスタンス用にJava引数を個別に設定します。"
   },
   "instance.settings.tabs.java.custom-java-installation": {
-    "message": "カスタムJavaインストール"
+    "message": "このインスタンス用に別のJavaインストールを選択します。"
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "カスタムメモリ割り当て"
+    "message": "このインスタンス用にメモリ割り当てを個別に設定します。"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "環境変数を入力…"
@@ -1617,31 +2625,82 @@
     "message": "Java引数を入力…"
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "環境変数"
+    "message": "カスタム環境変数"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "フック"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Javaコマンドライン引数"
+    "message": "カスタムJava引数"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Javaのインストール"
+    "message": "カスタムJavaインストール"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "メモリ割り当て"
+    "message": "カスタムメモリ割り当て"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
+  "instance.settings.tabs.settings-overrides": {
+    "message": "同期の上書き"
+  },
   "instance.settings.tabs.sharing": {
     "message": "共有設定"
   },
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "コマンド履歴の同期を解除"
+  },
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "アプリの設定でコマンド履歴の同期が無効になっています。"
+  },
+  "instance.settings.tabs.synced-options.command-history.override-description": {
+    "message": "このインスタンスのコマンド履歴は同期されたコマンド履歴とは別で保持されます。"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "保存したクリエイティブホットバーの同期を解除"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "アプリの設定で保存したクリエイティブホットバーの同期が無効になっています。"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
+    "message": "このインスタンスの保存したクリエイティブホットバーは同期されたホットバーとは別で保持されます。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
+    "message": "変更される前に置き換えられるバージョンはバックアップされます。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "{instance}と同期されたバージョンでは保存したクリエイティブホットバーが異なります。インスタンス間でどちらを使用かを選択してください。"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.title": {
+    "message": "クリエイティブホットバーの選択"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
+    "message": "他を上書き"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
+    "message": "同期を使用"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "マルチプレイヤーサーバーの同期を解除"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "アプリの設定でマルチプレイヤーサーバーの同期が無効になっています。"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
+    "message": "このインスタンスのマルチプレイヤーサーバーは同期されたサーバーとは別で保持されます。"
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "同期設定の管理"
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "このインスタンスに対して同期設定を個別に保持するための上書きを有効にします。"
+  },
   "instance.settings.tabs.window": {
-    "message": "ウィンドウ"
+    "message": "カスタムウィンドウの設定"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "カスタムウィンドウ設定"
+    "message": "このインスタンスではフルスクリーンと起動時の解像度を個別に設定します。"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "フルスクリーン"
@@ -1727,6 +2786,9 @@
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraftサーバー"
   },
+  "instance.worlds.actions.label": {
+    "message": "ワールドの操作"
+  },
   "instance.worlds.cant_connect": {
     "message": "サーバーに接続できません"
   },
@@ -1735,6 +2797,21 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "ショートカット作成"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "このサーバーを他のインスタンスでは保持しますか？それとも削除しますか？"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "保持"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "削除"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "サーバーの同期を解除"
+  },
+  "instance.worlds.desync_server": {
+    "message": "同期を解除"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "ホームに表示しない"
@@ -1748,8 +2825,14 @@
   "instance.worlds.incompatible_server": {
     "message": "サーバーに互換性がありません"
   },
+  "instance.worlds.instance-locked": {
+    "message": "このインスタンスはロックされています"
+  },
   "instance.worlds.linked_server": {
     "message": "サーバープロジェクトによる管理"
+  },
+  "instance.worlds.more-options": {
+    "message": "追加のオプション"
   },
   "instance.worlds.no_contact": {
     "message": "サーバーに接続できませんでした"
@@ -1762,6 +2845,15 @@
   },
   "instance.worlds.play_instance": {
     "message": "インスタンスを起動"
+  },
+  "instance.worlds.play_world": {
+    "message": "ワールドをプレイ"
+  },
+  "instance.worlds.shortcut-created": {
+    "message": "ショートカットを作成しました"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "ショートカットの作成に失敗しました"
   },
   "instance.worlds.view_instance": {
     "message": "インスタンスを表示する"
@@ -1788,10 +2880,10 @@
     "message": "Minecraftにサインイン"
   },
   "minecraft-required.description": {
-    "message": "Minecraft を起動してプレイするには、Minecraft を所有している Microsoft アカウントが必要です。"
+    "message": "Minecraftを起動してプレイするには、Minecraftを所有しているMicrosoftアカウントが必要です。"
   },
   "minecraft-required.description-header": {
-    "message": "Microsoft アカウントにサインインしてください"
+    "message": "Microsoftアカウントにサインインしてください"
   },
   "minecraft-required.dont-have-account": {
     "message": "まだアカウントを持っていませんか？"
@@ -1803,10 +2895,10 @@
     "message": "サポートを受ける"
   },
   "minecraft-required.header": {
-    "message": "Minecraft が必要です"
+    "message": "Minecraftが必要です"
   },
   "minecraft-required.sign-in": {
-    "message": "Microsoft にサインイン"
+    "message": "Microsoftにサインイン"
   },
   "modal.modrinth-account-required.browser-description": {
     "message": "サインイン用のタブが開きました。そちらでサインインを完了してから、アプリに戻ってください。"
@@ -1830,7 +2922,7 @@
     "message": "Modrinthへサインイン"
   },
   "modal.modrinth-account-required.sign-in-heading": {
-    "message": "Modrinth アカウントにサインインしてください"
+    "message": "Modrinthアカウントにサインインしてください"
   },
   "modal.modrinth-account-required.signing-in-header": {
     "message": "サインイン"
@@ -1840,6 +2932,18 @@
   },
   "modal.modrinth-account-required.waiting-for-browser": {
     "message": "ブラウザからの確認を待っています…"
+  },
+  "onboarding-checklist.create-instance": {
+    "message": "最初のインスタンスを作成"
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "Minecraftにサインイン"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "Modrinthへサインイン"
+  },
+  "onboarding-checklist.title": {
+    "message": "はじめる"
   },
   "search.filter.locked.instance": {
     "message": "インスタンスによる条件"

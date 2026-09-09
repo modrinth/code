@@ -6,8 +6,8 @@ import {
 	defineMessages,
 	IconButton,
 	injectNotificationManager,
+	Input,
 	IntlFormatted,
-	StyledInput,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -122,6 +122,11 @@ function addFriendFromModal() {
 	username.value = ''
 }
 
+function showAddFriendModal() {
+	username.value = ''
+	addFriendModal.value?.show()
+}
+
 function addFriend(friend: FriendWithUserData) {
 	acceptFriend(friend)
 }
@@ -129,6 +134,8 @@ function addFriend(friend: FriendWithUserData) {
 function removeFriend(friend: FriendWithUserData) {
 	removeFriendRecord(friend)
 }
+
+defineExpose({ showAddFriendModal })
 
 const messages = defineMessages({
 	addFriend: {
@@ -250,7 +257,7 @@ const messages = defineMessages({
 				{{ formatMessage(messages.usernameDescription) }}
 			</p>
 			<div class="flex items-center gap-2 mt-4">
-				<StyledInput
+				<Input
 					v-model="username"
 					:icon="UserIcon"
 					type="text"
@@ -280,14 +287,15 @@ const messages = defineMessages({
 			>
 				<UserPlusIcon />
 			</IconButton>
-			<StyledInput
+			<Input
 				v-model="search"
 				:icon="SearchIcon"
 				type="text"
+				appearance="transparent"
 				:placeholder="formatMessage(messages.searchFriends)"
 				clearable
-				input-class="!bg-transparent !border !border-solid !border-button-bg !text-primary !placeholder:text-primary"
-				wrapper-class="flex-1 [&>svg]:!text-primary [&>svg]:!opacity-100"
+				input-class="!text-primary !placeholder:text-primary"
+				wrapper-class="flex-1 !border-button-bg [&>span:first-child]:!text-primary [&>span:first-child]:!opacity-100"
 				@keyup.esc="search = ''"
 			/>
 		</template>

@@ -23,7 +23,7 @@
 					</div>
 
 					<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
-						<StyledInput
+						<Input
 							v-model="searchQuery"
 							:icon="SearchIcon"
 							:placeholder="formatMessage(analyticsTableMessages.searchPlaceholder)"
@@ -192,9 +192,9 @@
 import { DownloadIcon, DropdownIcon, SearchIcon, UserIcon } from '@modrinth/assets'
 import { TeleportOverflowMenu } from '@modrinth/ui'
 import {
-	type OverflowMenuOption,
+	type ButtonMenuOption,
+	Input,
 	Pagination,
-	StyledInput,
 	Table,
 	useFormatNumber,
 	useVIntl,
@@ -363,7 +363,7 @@ const displayedIncludeDateColumn = computed(() =>
 const groupByLabel = computed(() =>
 	getAnalyticsTableGroupByLabel(selectedGroupBy.value, formatMessage),
 )
-const csvExportOptions = computed<OverflowMenuOption[]>(() => {
+const csvExportOptions = computed<ButtonMenuOption[]>(() => {
 	if (showGraphDatasetSelection.value) {
 		return [
 			{

@@ -5,7 +5,7 @@ import {
 	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
-	StyledInput,
+	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -58,6 +58,7 @@ const messages = defineMessages({
 		v-model="model.enabled"
 		:icon="ArchiveIcon"
 		:title="formatMessage(messages.title)"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_76b62c699c"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<p>{{ formatMessage(messages.description1) }}</p>
@@ -68,10 +69,9 @@ const messages = defineMessages({
 				title-for="archived-disclosure-note"
 				optional
 			>
-				<StyledInput
+				<Textarea
 					id="archived-disclosure-note"
 					v-model="model.note"
-					multiline
 					:rows="3"
 					class="max-w-[40rem]"
 					:disabled="disabled"

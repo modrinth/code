@@ -1,13 +1,20 @@
 import { queryOptions } from '@tanstack/vue-query'
 
 import { get_project_v3 } from '@/helpers/cache.js'
-import { get as getInstance } from '@/helpers/instance'
+import {
+	get as getInstance,
+	list as listInstances,
+	list_instance_screenshots,
+	list_screenshot_groups,
+	list_synced_screenshots,
+} from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import { refreshWorlds } from '@/helpers/worlds'
 
 export const instanceKeys = {
 	all: ['instances'] as const,
+	list: () => [...instanceKeys.all, 'list'] as const,
 	detail: (instanceId: string) => [...instanceKeys.all, 'summary', instanceId] as const,
 	processes: (instanceId: string) => [...instanceKeys.all, 'processes', instanceId] as const,
 	content: (instanceId: string) => [...instanceKeys.all, 'content', instanceId] as const,
@@ -28,6 +35,45 @@ export const instanceKeys = {
 	sharedUpdatePreview: (instanceId: string, userId: string | null | undefined) =>
 		[...instanceKeys.detail(instanceId), 'shared-update-preview', userId] as const,
 	sharedMembers: (instanceId: string) => ['sharedInstanceUsers', instanceId] as const,
+}
+
+export const screenshotKeys = {
+	all: ['screenshots'] as const,
+	global: () => [...screenshotKeys.all, 'global'] as const,
+	instance: (instanceId: string) => [...screenshotKeys.all, 'instance', instanceId] as const,
+	groups: () => [...screenshotKeys.all, 'groups'] as const,
+}
+
+export function instanceListQueryOptions() {
+	return queryOptions({
+		queryKey: instanceKeys.list(),
+		queryFn: listInstances,
+		staleTime: 30_000,
+	})
+}
+
+export function syncedScreenshotsQueryOptions() {
+	return queryOptions({
+		queryKey: screenshotKeys.global(),
+		queryFn: list_synced_screenshots,
+		staleTime: 0,
+	})
+}
+
+export function instanceScreenshotsQueryOptions(instanceId: string) {
+	return queryOptions({
+		queryKey: screenshotKeys.instance(instanceId),
+		queryFn: () => list_instance_screenshots(instanceId),
+		staleTime: 0,
+	})
+}
+
+export function screenshotGroupsQueryOptions() {
+	return queryOptions({
+		queryKey: screenshotKeys.groups(),
+		queryFn: list_screenshot_groups,
+		staleTime: 0,
+	})
 }
 
 export function instanceDetailQueryOptions(instanceId: string) {

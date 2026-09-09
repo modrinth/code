@@ -15,7 +15,7 @@
 			<BookmarkIcon aria-hidden="true" :fill="saved ? 'currentColor' : 'none'" />
 		</template>
 		<template #panel>
-			<StyledInput
+			<Input
 				v-model="displayCollectionsSearch"
 				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
 				wrapper-class="menu-search"
@@ -60,7 +60,7 @@ import {
 	ButtonLink,
 	Checkbox,
 	commonMessages,
-	StyledInput,
+	Input,
 	TeleportPopoutMenu,
 	useVIntl,
 } from '@modrinth/ui'

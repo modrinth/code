@@ -724,6 +724,7 @@ async fn get_tremendous_payout_methods(
 
     for product in response.products {
         const BLACKLISTED_IDS: &[&str] = &[
+            // typos:off
             // physical visa
             "A2J05SWPI2QG",
             // crypto
@@ -756,6 +757,7 @@ async fn get_tremendous_payout_methods(
             "NL4JQ2G7UPRZ",
             "OEFTMSBA5ELH",
             "A3CQK6UHNV27",
+            // typos:on
         ];
         const SUPPORTED_METHODS: &[&str] = &[
             "merchant_cards",

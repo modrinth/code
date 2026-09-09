@@ -210,3 +210,34 @@ export function getEnvironmentTags(
 			return [{ label: ENVIRONMENT_TAG_LABELS.notApplicable, icon: null }]
 	}
 }
+
+export type EnvironmentFilterValue = 'client' | 'server' | 'client_and_server' | 'singleplayer'
+
+export const ENVIRONMENT_FILTER_VALUES: EnvironmentFilterValue[] = [
+	'client',
+	'server',
+	'client_and_server',
+	'singleplayer',
+]
+
+export function getEnvironmentFilterValue(
+	environment?: Labrinth.Projects.v3.Environment | null,
+): EnvironmentFilterValue | undefined {
+	switch (environment) {
+		case 'client_only':
+			return 'client'
+		case 'server_only':
+		case 'dedicated_server_only':
+			return 'server'
+		case 'client_and_server':
+		case 'client_only_server_optional':
+		case 'server_only_client_optional':
+		case 'client_or_server':
+		case 'client_or_server_prefers_both':
+			return 'client_and_server'
+		case 'singleplayer_only':
+			return 'singleplayer'
+		default:
+			return undefined
+	}
+}

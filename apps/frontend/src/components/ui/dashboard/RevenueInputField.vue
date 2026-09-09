@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center gap-2">
 			<div class="relative flex-1">
-				<StyledInput
+				<Input
 					ref="amountInput"
 					:model-value="modelValue"
 					type="number"
@@ -12,7 +12,7 @@
 					:disabled="isDisabled"
 					:placeholder="formatMessage(formFieldPlaceholders.amountPlaceholder)"
 					wrapper-class="w-full"
-					@update:model-value="handleStyledInput"
+					@update:model-value="handleInput"
 				/>
 			</div>
 			<Combobox
@@ -52,7 +52,7 @@ import {
 	Combobox,
 	commonMessages,
 	formFieldPlaceholders,
-	StyledInput,
+	Input,
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
@@ -81,7 +81,7 @@ const emit = defineEmits<{
 
 const { formatMessage } = useVIntl()
 const formatMoney = useFormatMoney()
-const amountInput = ref<InstanceType<typeof StyledInput> | null>(null)
+const amountInput = ref<InstanceType<typeof Input> | null>(null)
 
 const safeMaxAmount = computed(() => {
 	return Math.max(0, props.maxAmount)
@@ -106,7 +106,7 @@ function setMaxAmount() {
 	emit('update:modelValue', maxValue)
 }
 
-function handleStyledInput(val: string | number) {
+function handleInput(val: string | number) {
 	const value = String(val)
 
 	if (value && value.includes('.')) {

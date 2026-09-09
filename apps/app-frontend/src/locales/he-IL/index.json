@@ -8,26 +8,224 @@
   "app.action-bar.downloads": {
     "message": "הורדות"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "הסתר הורדות פעילות"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "החבא יותר התקנים רצים"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "הועתק"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "העתקת הפרטים"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "התעלם"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.action-bar.install.retry": {
+    "message": "נסה שוב"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "בוטל לאור סגירת האפליקציה"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "לא יכל לקרוא את חבילת המודים"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "ביטול"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "ניקיון נכשל"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "לא נתן להוריד את הקבצים"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "הקובץ המורד מושחת"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "לא נתן לשמור את הקבצים"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "הורדה נכשלה"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "התקנה לא נמצאה"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "נתיב הקובץ לא קיים"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "מידע חבילת המודים שגוים"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "נתוני סביבת קבצי חבילת המודים שגוים"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "כשל בהתקנת ג'אווה"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "הגדרת ה-Loader נכשלה."
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "לא ניתן היה לעדכן את הנתונים המקומיים."
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "הפעלת מיינקראפט נכשלה"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "לא ניתן להגיע ל"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "אין גישה לכתוב"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "לא ניתן היה להוריד את החבילה."
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "משהו הלך שגוי"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "אקסמפלר לא מוכר"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "מעדכן תוכן משותף"
+  },
+  "app.action-bar.installs": {
+    "message": "התקנות"
   },
   "app.action-bar.make-primary-instance": {
     "message": "הפוך למקרה ראשי"
   },
+  "app.action-bar.no-instances-running": {
+    "message": "אין אקסמפלרים פועלים"
+  },
   "app.action-bar.offline": {
     "message": "לא מקוון"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "אקסמפלר ראשי"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "יש לתרענן כדי לעדכן"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "הצג הורדות פעילות"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "הצג אקסמפלרים פועלים נוספים"
   },
   "app.action-bar.stop-instance": {
     "message": ""
   },
-  "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "חזרה לעולמות"
+  "app.action-bar.update": {
+    "message": "עדכן"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "לראות הורדות פעילות"
+  },
+  "app.action-bar.view-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.action-bar.view-logs": {
+    "message": "צפה בלוגים"
+  },
+  "app.ads-consent.accept": {
+    "message": "קבל הכל"
+  },
+  "app.ads-consent.body": {
+    "message": "פרסומות מאפשרות את הפעילות של Modrinth ואת הון התשלום ליוצרים. ייתכן כי השותפים שלנו ישמרו או יגשו לעוגיות באפליקציה על מנת להגיש פרסומות אישיות ולמדוד ביצועים."
+  },
+  "app.ads-consent.manage": {
+    "message": "ניהול העדפות"
+  },
+  "app.ads-consent.reject": {
+    "message": "דחה הכל"
+  },
+  "app.ads-consent.title": {
+    "message": "הפרטיות שלך ואיך פרסומות תומכות בModrinth"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "הצכ התקנות בפריסת שורות קומפקטית."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "מצב קומפקטי"
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "דף בית"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "ספרייה"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "הסתר את שם המשתמש שלך מעל התצוגה המוקדמת של סקין השחקן בעמוד בחירת הסקינים."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "הסתר שם משתמש"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "מזער את אפליקציית Modrinth בעת הפעלת Minecraft."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "הקטן אפליקציה"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "הצג את זמן המשחק בכל אקסמפלר."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "הצג זמן משחק"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "דלג על אישורים עבור פעולות בסיכון נמוך כגון התקנות כפולות, מחיקת תוכן רגיל, עדכונים מרוכזים, ביטול קישורים ותיקונים. אזהרות עבור פעולות מסוכנות מוצגות תמיד."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "דלג על אזהרות שאינן חיוניות"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "הסתר את סרגל הצד הימני כברירת מחדל והוסף לחצן להצגתו או להסתָרתו."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "הסתר את סרגל הצד הימני"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "הצג אזהרת בטיחות לפני התקנת חבילת Modrinth (.mrpack) שאינה מאורחת ב-Modrinth."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "הזהר אותי לפני התקנת חבילות תוכן לא מוכרות"
   },
   "app.auth-servers.unreachable.body": {
     "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. יש לבדוק את חיבור האינטרנט שלך ולנסות שוב מאוחר יותר."
   },
   "app.auth-servers.unreachable.header": {
     "message": "לא ניתן לגשת לשרתי האימות"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "אישורים"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "בית ותוכן"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "הפעלה וניווט"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "שתמש בהגדרות התנהגות אלו בכל מקום שבו אתה מחובר. כבה אפשרות זו כדי לשמור על הגדרות נפרדות במכשיר זה."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "התחבר לחשבון Modrinth כדי לסנכרן הגדרות."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "סנכרן התנהגות בין מכשירים"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "מוסיף שרת לאקסמפלר"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "הוסף לאקסמפלר"
   },
   "app.browse.add-to-instance": {
     "message": "הוספה להתקנה"
@@ -41,8 +239,53 @@
   "app.browse.already-added": {
     "message": "כבר נוסף"
   },
+  "app.browse.back-to-instance": {
+    "message": "חזרה לאקסמפלר"
+  },
+  "app.browse.discover-project-type": {
+    "message": "גלה {projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "גלה שרתים"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "הסתר שרתים שכבר נוספו"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "הסתר פריטים שכבר הותקנו"
+  },
+  "app.browse.project-actions.label": {
+    "message": "פעולות פרויקט"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "דאטה פאק"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "מוד פאק"
+  },
+  "app.browse.project-type.mods": {
+    "message": "מודים"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "טקסטורות"
+  },
+  "app.browse.project-type.servers": {
+    "message": "שרתים"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "שיידרס"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "הוספת תוכן עשויה למנוע ממך להצטרף לשרת זה. כל תוכן שתוסיף יוסר בעת עדכון התוכן המנוהל של השרת."
+  },
+  "app.browse.server.installing": {
+    "message": "מוריד"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "אין גרסאות זמינות התואמות ל-{compatibilityLabel}. בחר גרסה להתקנה בכל זאת. תלויות לא יותקנו באופן אוטומטי."
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "לפתוח תיקיית גיבויים"
   },
   "app.export-modal.description-placeholder": {
     "message": "הזן את תיאור חבילת המודים..."
@@ -50,8 +293,17 @@
   "app.export-modal.export-button": {
     "message": "יצוא"
   },
+  "app.export-modal.export-complete": {
+    "message": "הייצוא הושלם"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} ייוצא בהצלחה."
+  },
   "app.export-modal.header": {
     "message": "יצוא חבילת מודים"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "שם חבילת המודים"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "שם חבילת המודים"
@@ -62,17 +314,224 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.home.jump-back-in.actions.label": {
+    "message": "פעולות אקסמפלר"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "התקנה זאת ננעלה"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "התקנה זאת כבר פתוחה"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "אפשרויות נוספות"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "לא שוחק מעולם"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "אקסמפלר חדש"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "גרור כדי לשנות גודל"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "קפוץ פנימה"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "הצג התקנה"
+  },
+  "app.hosting.update-required.description": {
+    "message": "עליך לעדכן בכדי להשתמש ב- Modrinth Hosting דרך אפליקציית ה Modrinth"
+  },
+  "app.hosting.update-required.download": {
+    "message": "הורד על מנת לעדכן"
+  },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "רובוט Modrinth מתרגש"
+  },
+  "app.hosting.update-required.title": {
+    "message": "אפליקציית ה- Modrinth דורשת עדכון"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "מוריד תוכן"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "מוריד מיינקראפט"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "מוריד קובץ חבילה"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "מחלץ דריסות תוכן"
+  },
+  "app.install.phase.finalizing": {
+    "message": "מסיים"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "מחכה להתקנה"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "מכין את ג'אבה"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "מוריד את ג'אבה גרסה {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "מחלץ את ג'אבה גרסה {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "משאיל את ג'אבה גרסה {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "מכין את ג'אבה גרסה {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "מאמת את ג'אבה גרסה {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "קורא את מארז המאניפסט"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "מוצא פתרון לטוען"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "מוצא פתרון למיינקראפט"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "מוצא פתרון לתוכן"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "מגלגל אחורה"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "מריץ מעבדי טעינה"
+  },
+  "app.instance.action.add-content": {
+    "message": "להוסיף תוכן"
+  },
+  "app.instance.action.copy-path": {
+    "message": "להעתיק שביל"
+  },
+  "app.instance.action.edit": {
+    "message": "לערוך"
+  },
+  "app.instance.action.open-folder": {
+    "message": "לפתוח תיקייה"
+  },
+  "app.instance.action.play": {
+    "message": "להתחיל"
+  },
+  "app.instance.action.stop": {
+    "message": "להפסיק"
+  },
+  "app.instance.actions.label": {
+    "message": "פעולות"
+  },
+  "app.instance.add-server.add": {
+    "message": "להוסיף"
+  },
+  "app.instance.add-server.added": {
+    "message": "הוסף"
+  },
+  "app.instance.add-server.adding": {
+    "message": "מוסיף..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "ביטול"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "ייתכן והשרת הזה לא תואם לכל ההעתקים שלך."
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "חיפוש העתק"
+  },
+  "app.instance.add-server.title": {
+    "message": "הוספת שרת להעתק"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "הוסף"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "ההעתק המקומי שלך עוקף בגרסה את המשתמשים שאיתם שיתפת אותו."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "השינויים שלך עדיין לא נשמרו"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "קדם עדכון"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "מקדם..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "הוסר"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "קדם עדכון"
+  },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "תבקר את שינויי התוכן שישותפו עם כל מי שמשתמש בהעתק הזה."
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "בקר שינויים"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "מבקר..."
+  },
+  "app.instance.card.icon-alt": {
+    "message": "סמל התקנה"
+  },
+  "app.instance.card.installing": {
+    "message": "מוריד..."
+  },
+  "app.instance.card.loading": {
+    "message": "ההעתק שלך נטען..."
+  },
+  "app.instance.card.never-played": {
+    "message": "לעולם לא נפתח"
+  },
+  "app.instance.card.play": {
+    "message": "שחק"
+  },
+  "app.instance.card.played": {
+    "message": "שוחק בערך {relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "תיקון"
+  },
+  "app.instance.card.stop": {
+    "message": "עצור"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "כל הנתונים של ההתקנה שלך ימחקו לתמיד, זה כולל את העולמות שלך, ההגדרות וכל התוכן שהתקנת."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "הפעולה הזו לא ניתנת לביטול"
   },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "כל המידע עבור {count} מההעתקים הבאים ימחק, כולל כל העולמות, הגדרות וכל התוכן שבהם. השינוי הזה לא ניתן לביטול."
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "למחוק {count} העתקים"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "למחוק {count} העתקים"
+  },
   "app.instance.confirm-delete.delete-button": {
     "message": "מחק התקנה"
   },
   "app.instance.confirm-delete.header": {
     "message": "מחיקת התקנה"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {העתק} other {העתק ({count})}}"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "תוכן מארז המודים"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "תוכן משותף"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "חבילת המודים הזו כבר מותקנת בתוך ההתקנה <bold>{instanceName}</bold>. האם אתה בטוח שברצונך לשכפל אותה?"
@@ -86,8 +545,23 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "התקנה"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "מוריד {current, number}/{total, number} פרוייקטים..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "מסיים עדכון..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "מוצא פתרון לגרסה..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "פרויקט"
+  },
+  "app.instance.mods.freeze-content": {
+    "message": "הקפאת גרסה"
+  },
+  "app.instance.mods.locked-content": {
+    "message": "תוכן בהעתקים מוקפאים לא ניתן לשינוי."
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" נוסף"
@@ -104,11 +578,164 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "הועלה בהצלחה"
   },
+  "app.instance.mods.unfreeze-content": {
+    "message": "הפשרת הגרסה"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "חזרה להעתק"
+  },
+  "app.instance.share.empty.description": {
+    "message": "אתם יכולים לשתף את ההעתק עם חברכם!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "לא הוזמנו חברים"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "הזמנת חברים"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "שיתוף {name}"
+  },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "ההעתק הזה השיג את הגבלת {limit} המשתמשים."
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "אתם צריכים להירשם כ-"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "על מנת לקבל גישה לעמוד זה."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "המשתמש המקושר"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "לא מחובר"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "החלפת משתמש"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "משתמש לא נכון"
+  },
+  "app.instance.share.members.empty": {
+    "message": "עדיין שום משתמש נכנס"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "שום משתמש לא תואם לסינון שלך."
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "ההתקנה המשותפת הזו לא תקבל יותר עדכונים"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "כל עותק שכבר הותקן יישאר במכשיר שלהם"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "תוכלו להזמין אותם שוב מאוחר יותר"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "זהו המשתמש האחרון, ולאחר מכן השיתוף יכובה עבור התקנה זו"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "מה קורה?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "ביטול הגישה"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "ביטול הגישה"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "הדמות של {username}"
+  },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "אם תבטלו את הגישה של {username} להתקנה המשותפת הזו, תצטרכו להזמין אותם שוב לפני שהם יוכלו לקבל עדכונים."
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "התחברות"
+  },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "שירות ההתקנות המשותפות אינו זמין כרגע. נסו שוב מאוחר יותר"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "לא ניתן להתחבר"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "עליכם לבטל את הקישור לחבילת המודים הזו כדי לשתף את ההתקנה שלכם"
+  },
+  "app.instance.share.unlink.header": {
+    "message": "השיתוף דורש ביטול קישור"
+  },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "ההתקנה המשותפת הזו כבר מותקנת בשם <bold>{instanceName}</bold>. האם אתם בטוחים שברצונכם להתקין עותק נוסף?"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "ההתקנה המשותפת כבר מותקנת"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "התקן בכל זאת"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "התקנה"
+  },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "החשבון המקושר"
+  },
+  "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
+    "message": "כדי לנהל את ההתקנה המשותפת הזו. לא תוכלו לשלוח עדכונים למשתמשים."
+  },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "התחברו בתור"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "צריך להתחבר ל-Modrinth"
+  },
+  "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
+    "message": "כדי לקבל עדכונים עבור ההתקנה המשותפת הזו."
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "אתם משתמשים בחשבון Modrinth הלא נכון"
+  },
+  "app.instance.shortcut.created": {
+    "message": "קיצור הדרך נוצר"
+  },
+  "app.instance.shortcut.creation-error": {
+    "message": "שגיאה ביצירת קיצור הדרך"
+  },
+  "app.instance.tab.content": {
+    "message": "תוכן"
+  },
+  "app.instance.tab.files": {
+    "message": "קבצים"
+  },
+  "app.instance.tab.logs": {
+    "message": "יומני מערכת"
+  },
+  "app.instance.tab.screenshots": {
+    "message": "צילומי מסך"
+  },
+  "app.instance.tab.share": {
+    "message": "שיתוף"
+  },
+  "app.instance.tab.worlds": {
+    "message": "עולמות"
+  },
   "app.instance.worlds.add-server": {
     "message": "הוסף שרת"
   },
   "app.instance.worlds.browse-servers": {
     "message": "עיון בשרתים"
+  },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "מחיקת עולם"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "למחוק את העולם"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "העולם הזה ימחק מההעתק הזה. לא ניתן לבטל את השינוי הזה."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "מוחק {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "עם מודים"
@@ -128,8 +755,191 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "אין שרתים אן עולמות שנוספו"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "מרענן..."
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "הסר שרת"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "הסר שרת"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "השרת הזה יוסר מרשימת השרתים שלך וגם מרשימת השרתים במשחק. תוכלו להוסיף אותו שוב מאוחר יותר אם אתם יודעים את הכתובת."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "מסיר את {name}"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "חיפוש ב-{count} עולמות..."
+  },
+  "app.java-detection.cancel": {
+    "message": "ביטול"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "פעולות"
+  },
+  "app.java-detection.columns.path": {
+    "message": "מסלול"
+  },
+  "app.java-detection.columns.version": {
+    "message": "גרסה"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "לא נמצאה התקנה תקינה של ג'אבה."
+  },
+  "app.java-detection.select": {
+    "message": "בחירה"
+  },
+  "app.java-detection.selected": {
+    "message": "נבחר"
+  },
+  "app.java-detection.title": {
+    "message": "בחירה בהתקנת ג'אבה"
+  },
+  "app.java-selector.already-installed": {
+    "message": "כבר מותקן"
+  },
+  "app.java-selector.browse": {
+    "message": "עיון"
+  },
+  "app.java-selector.detect": {
+    "message": "זהה"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "הורד מומלץ"
+  },
+  "app.java-selector.installing": {
+    "message": "מתקין..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/path/to/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "בדוק את הגרסה המותקנת של ג'אבה"
+  },
+  "app.library.actions.label": {
+    "message": "פעולות ספרייה"
+  },
+  "app.library.context-menu.create-instance": {
+    "message": "העתק חדש"
+  },
+  "app.library.filter.add": {
+    "message": "הוספת מסנן"
+  },
+  "app.library.filter.clear": {
+    "message": "נקה מסננים"
+  },
+  "app.library.filter.game-version": {
+    "message": "גרסת משחק"
+  },
+  "app.library.filter.instance-type": {
+    "message": "סוג העתק"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "התאמה אישית"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "מארז מודים"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "שרת"
+  },
+  "app.library.filter.label": {
+    "message": "סנן לפי"
+  },
+  "app.library.filter.loader": {
+    "message": "מפעיל"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "קבוצה מותאמת אישית"
+  },
+  "app.library.group-by.game-version": {
+    "message": "גרסת משחק"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "סוג העתק"
+  },
+  "app.library.group-by.label": {
+    "message": "קבץ לפי"
+  },
+  "app.library.group-by.loader": {
+    "message": "מפעיל"
+  },
+  "app.library.group-by.none": {
+    "message": "אין קיבוץ"
+  },
+  "app.library.group.actions.label": {
+    "message": "פעולות קבוצתיות"
+  },
+  "app.library.group.collapse": {
+    "message": "צמצום קבוצה"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "הוסף לקבוצה"
+  },
+  "app.library.group.create": {
+    "message": "יצירת קבוצה"
+  },
+  "app.library.group.create.cancel": {
+    "message": "ביטול"
+  },
+  "app.library.group.delete": {
+    "message": "מחיקת הקבוצה"
+  },
+  "app.library.group.delete-description": {
+    "message": "ההעתקים בקבוצה הזאת יוצאו מהקבוצה."
+  },
+  "app.library.group.edit-name": {
+    "message": "שינוי שם הקבוצה"
+  },
+  "app.library.group.empty": {
+    "message": "גרור וזרוק את העכבר כדי להוסיף העתקים."
+  },
+  "app.library.group.expand": {
+    "message": "הרחבת הקבוצה"
+  },
+  "app.library.group.favorites": {
+    "message": "מועדפים"
+  },
+  "app.library.group.instance.add": {
+    "message": "הוספה"
+  },
+  "app.library.group.instance.added": {
+    "message": "נוסף"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "הוספה"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "נוסף"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "לא נמצאו התקנות"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "חיפוש התקנה"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "הוספת התקנות ל־\"{groupName}\""
+  },
+  "app.library.group.move-down": {
+    "message": "העברת הקבוצה למטה"
+  },
+  "app.library.group.move-up": {
+    "message": "העברת הקבוצה למעלה"
+  },
+  "app.library.group.name": {
+    "message": "שם הקבוצה"
+  },
+  "app.library.group.name-empty": {
+    "message": "שמות הקבוצות לא יכולים להיות ריקים."
+  },
+  "app.library.group.name-placeholder": {
+    "message": "הזן שם קבוצה"
+  },
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "כלול קישורים ותמונות אם אפשר ורלוונטי"
   },
   "app.modal.install-to-play.header": {
     "message": "צריך להתקין כדי לשחק"
@@ -317,6 +1127,114 @@
   "instance.files.save-as": {
     "message": "שמור כ..."
   },
+  "instance.icon-editor.background": {
+    "message": "רקע"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "כחול"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "אפור כהה"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "ירוק כהה"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "אפור"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "ירוק"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "אינדיגו"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "לבנדר"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "אפור בהיר"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "ירוק ליים"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "כתום"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "ורוד"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "סגול"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "אדום"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "רוז"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "צהוב"
+  },
+  "instance.icon-editor.description": {
+    "message": "בחר אלמנטים ליצירת סמל אישי."
+  },
+  "instance.icon-editor.recents": {
+    "message": "אחרונים"
+  },
+  "instance.icon-editor.save": {
+    "message": "שמור סמל"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "אקראי"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "סמל"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "תיק גב"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "כריש כחול"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "מדף ספרים"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "דוב חום"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "עוגה"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "מדורה"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "תיבה"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "בלוק פקודה"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "סיר בישול"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "ספה"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "שולחן מלאכה"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "קריפר"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "שולחן כישופים"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "תיבת אנדר"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "דרקון אנדר"
+  },
   "instance.server-modal.address": {
     "message": "כתובת"
   },
@@ -371,15 +1289,6 @@
   "instance.settings.tabs.general.name": {
     "message": "שם"
   },
-  "instance.settings.tabs.hooks": {
-    "message": "פעולות בעת הפעלה"
-  },
-  "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "פעולות בעת הפעלה מותאמות אישית"
-  },
-  "instance.settings.tabs.hooks.description": {
-    "message": "פעולות בעת הפעלה מאפשרות למשתמשים מתקדמים להריץ פקודות מערכת מסוימות לפני ואחרי שהמשחק מופעל."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "לאחר יציאה"
   },
@@ -398,9 +1307,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "הכנס פקודה לפני ההפעלה..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "פעולות הפעלה"
-  },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "מעטפת"
   },
@@ -416,29 +1322,8 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} גרסה"
   },
-  "instance.settings.tabs.java": {
-    "message": "ג'אווה וזיכרון"
-  },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "משתני סביבה"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "התחברויות"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "ארגומנטים של ג'אווה"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "התקנת Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "זיכרון מוקצה"
-  },
-  "instance.settings.tabs.window": {
-    "message": "חלון"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "הגדרות חלון מותאמות אישית"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "מסך מלא"

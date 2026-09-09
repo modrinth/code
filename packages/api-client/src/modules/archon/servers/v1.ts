@@ -31,6 +31,24 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Select the best currently available download method for a world
+	 * GET /v1/servers/:server_id/worlds/:world_id/select-download
+	 */
+	public async selectWorldDownload(
+		serverId: string,
+		worldId: string,
+	): Promise<Archon.Servers.v1.WorldDownloadMethod> {
+		return this.client.request<Archon.Servers.v1.WorldDownloadMethod>(
+			`/servers/${serverId}/worlds/${worldId}/select-download`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
 	 * Get available regions
 	 * GET /v1/regions
 	 */
@@ -65,5 +83,20 @@ export class ArchonServersV1Module extends AbstractModule {
 			version: 1,
 			method: 'POST',
 		})
+	}
+
+	/**
+	 * Roll SFTP credentials for a server
+	 * POST /v1/servers/:server_id/sftp/roll
+	 */
+	public async rollSftp(serverId: string): Promise<Archon.Servers.v1.SftpCredentials> {
+		return this.client.request<Archon.Servers.v1.SftpCredentials>(
+			`/servers/${serverId}/sftp/roll`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+			},
+		)
 	}
 }

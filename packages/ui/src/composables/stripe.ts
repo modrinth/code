@@ -1,11 +1,12 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { loadStripe, type Stripe as StripeJs, type StripeElements } from '@stripe/stripe-js'
+import type { Stripe as StripeJs, StripeElements } from '@stripe/stripe-js'
 import type { ContactOption } from '@stripe/stripe-js/dist/stripe-js/elements/address'
 import type Stripe from 'stripe'
 import { computed, type Ref, ref } from 'vue'
 
 import type { ServerBillingInterval } from '../components/billing/ModrinthServersPurchaseModal.vue'
 import { getPriceForInterval } from '../utils/product-utils'
+import { useDebugLogger } from './debug-logger'
 
 // export type CreateElements = (
 //   paymentMethods: Stripe.PaymentMethod[],
@@ -35,6 +36,8 @@ export const useStripe = (
 	onError: (err: Error) => void,
 	affiliateCode?: Ref<string | null>,
 ) => {
+	const debug = useDebugLogger('Stripe')
+
 	const stripe = ref<StripeJs | null>(null)
 
 	let elements: StripeElements | undefined = undefined
@@ -55,6 +58,7 @@ export const useStripe = (
 	const noPaymentRequired = ref<boolean>(false)
 
 	async function initialize() {
+		const { loadStripe } = await import('@stripe/stripe-js/pure')
 		stripe.value = await loadStripe(publishableKey)
 	}
 
@@ -188,7 +192,7 @@ export const useStripe = (
 			}
 		} catch (err) {
 			loadingFailed.value = String(err)
-			console.log(err)
+			console.error(err)
 		}
 	}
 
@@ -241,7 +245,7 @@ export const useStripe = (
 				total.value = result.total
 				noPaymentRequired.value = false
 
-				console.log(
+				debug(
 					`${paymentIntentId.value ? 'Updated' : 'Created'} payment intent: ${interval.value} for ${result.total}`,
 				)
 			}
@@ -392,8 +396,8 @@ export const useStripe = (
 	}
 
 	async function reloadPaymentIntent() {
-		console.log('selected:', selectedPaymentMethod.value)
-		console.log('token:', confirmationToken.value)
+		debug('selected:', selectedPaymentMethod.value)
+		debug('token:', confirmationToken.value)
 		if (selectedPaymentMethod.value) {
 			await refreshPaymentIntent(selectedPaymentMethod.value.id, false)
 		} else if (confirmationToken.value) {

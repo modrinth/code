@@ -165,6 +165,18 @@ pub enum VerificationResult {
 }
 
 impl VerificationResult {
+    #[must_use]
+    pub fn from_api_value(value: &str) -> Self {
+        match value {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "disposable" => Self::Disposable,
+            "catchall" => Self::CatchAll,
+            "unknown" => Self::Unknown,
+            value => Self::Unrecognized(value.to_owned()),
+        }
+    }
+
     pub fn as_str(&self) -> &str {
         match self {
             VerificationResult::Valid => "valid",
@@ -182,14 +194,7 @@ impl<'de> Deserialize<'de> for VerificationResult {
     where
         D: Deserializer<'de>,
     {
-        Ok(match String::deserialize(deserializer)?.as_str() {
-            "valid" => Self::Valid,
-            "invalid" => Self::Invalid,
-            "disposable" => Self::Disposable,
-            "catchall" => Self::CatchAll,
-            "unknown" => Self::Unknown,
-            value => Self::Unrecognized(value.to_owned()),
-        })
+        Ok(Self::from_api_value(&String::deserialize(deserializer)?))
     }
 }
 

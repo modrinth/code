@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "必须提供能清晰说明项目目的与功能的描述。"
+    "defaultMessage": "请描述您的项目。"
   },
   "nags.add-description.title": {
     "defaultMessage": "添加描述"
@@ -24,16 +24,22 @@
     "defaultMessage": "添加许可证详细信息"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "添加一些 Modrinth 站外的相关链接，例如一个网站、商店或 Discord 频道邀请。"
+    "defaultMessage": "添加外部的相关链接，例如网站、商店或者社区邀请链接。"
   },
   "nags.add-links-server.title": {
     "defaultMessage": "添加外部链接"
   },
   "nags.add-links.description": {
-    "defaultMessage": "添加一些 Modrinth 站外的相关链接，例如源代码仓库、问题追踪器或 Discord 频道邀请。"
+    "defaultMessage": "添加外部的相关链接，例如源代码仓库、工单系统或者社区邀请链接。"
   },
   "nags.add-links.title": {
     "defaultMessage": "添加外部链接"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "同级标题不应连续相邻使用。"
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "移除相邻的同级标题"
   },
   "nags.all-languages.description": {
     "defaultMessage": "你选择了所有可用的的语言选项，请仅列出你的服务器目前实际支持的语言。"
@@ -42,19 +48,37 @@
     "defaultMessage": "选择准确的语言"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "你已选择全部 {totalAvailableTags, plural, other {# 个可用标签}}。这违背了标签的初衷——帮助用户发现相关项目。请仅选择与你项目相关的标签。"
+    "defaultMessage": "您已选择所有 {totalAvailableTags, plural, other {# 可用标签}}标签应该用于帮助用户找到相关的项目。请只选择相关的标签。"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "选择准确的标签"
   },
+  "nags.banned-link-usage.description": {
+    "defaultMessage": "不允许将 {url} 作为外部链接。"
+  },
+  "nags.banned-link-usage.title": {
+    "defaultMessage": "移除违规链接"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "请通过填写适用于你 {type} 的内容披露信息，确保用户充分了解所有重要信息"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "您的项目描述不应以标题结尾。"
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "移除末尾标题"
+  },
   "nags.description-too-short.description": {
-    "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，让描述详尽清晰。"
+    "defaultMessage": "您的项目描述太简短。添加更多细节以清楚地描述项目的内容、目的和呼吁。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "扩展描述"
   },
   "nags.edit-description.title": {
     "defaultMessage": "编辑描述"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "编辑相册"
   },
   "nags.edit-license.title": {
     "defaultMessage": "编辑许可证"
@@ -66,7 +90,7 @@
     "defaultMessage": "编辑标签"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "编辑标题"
+    "defaultMessage": "编辑名称"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "精选展示图往往决定了玩家对你的项目的第一印象。"
@@ -74,11 +98,20 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "精选一张展示图"
   },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "标题和介绍中中不允许存在特殊字符。"
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "照片标题和描述中不允许包含詈语，发现：“{value}”。"
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "照片和描述中不允许包含攻击性词汇，发现：“{value}”。"
+  },
   "nags.gallery.title": {
     "defaultMessage": "前往图库页"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{type}使用了一个需要公开源代码的许可证。请为每个附加版本提供源代码链接或源代码文件，或者考虑使用不同的许可证。"
+    "defaultMessage": "你的{type}所使用的许可证要求公开源文件，请提供源文件链接、添加源文件或者更换许可证。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
@@ -87,19 +120,16 @@
     "defaultMessage": "你的一些外部链接似乎重复了。每个链接只应输入一次，并设置合适的链接类型。"
   },
   "nags.identical-links.title": {
-    "defaultMessage": "清除重复的链接"
+    "defaultMessage": "移除重复链接"
   },
-  "nags.image-heavy-description.description": {
-    "defaultMessage": "你的介绍描述应包含足够的纯文本或图片替代文本，确保使用屏幕阅读器的用户或网速较慢的用户也能正常访问。"
-  },
-  "nags.image-heavy-description.title": {
-    "defaultMessage": "确保无障碍体验"
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "修改相册图片文本"
   },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "许可证 URL 不可用。"
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你提供的许可证 URL 指向 {domain}，该地址不适合用于提供许可证信息。许可证 URL 应直接链接至你的许可证文件，而非社交媒体、游戏平台等无关网站。"
+    "defaultMessage": "你提供的许可证 URL 指向 {domain}，该地址不适合用于提供许可证信息。许可证 URL 应直接链接至你的许可证文件。"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "你提供的许可证 URL 格式有误。请提供一个指向许可证文本的有效的 URL 地址。"
@@ -107,11 +137,14 @@
   "nags.invalid-license-url.title": {
     "defaultMessage": "添加一个有效的许可证链接"
   },
-  "nags.link-shortener-usage.description": {
-    "defaultMessage": "禁止使用短链接或其他方式来隐藏外部链接或许可证的实际链接。请务必使用完整的原始链接。"
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "修改介绍"
   },
-  "nags.link-shortener-usage.title": {
-    "defaultMessage": "不要使用短链接"
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "修改项目名称"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "修改简介"
   },
   "nags.long-headers.description": {
     "defaultMessage": "描述中有 {count, plural, other {# 个标题}}过长。标题应简洁，用作章节名，不应是完整的句子。"
@@ -147,16 +180,82 @@
     "defaultMessage": "检查反馈"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你已选择 {count, plural, other {# 个分辨率标签}}（{tags}）。资源包通常应仅保留一个与其主要分辨率相匹配的标签。"
+    "defaultMessage": "你已选择 {count, plural, other {# 个分辨率标签}}（{tags}）。资源包通常应仅保留一个主要标签。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
+  },
+  "nags.project-description-banned-link.description": {
+    "defaultMessage": "描述中不允许存在 “{fullUrl}”。"
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "您的项目描述必须以英语编写或者包含英语翻译。"
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "翻译介绍文本"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "项目描述中不允许过度使用特殊字符。"
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "项目描述中不允许包含过多詈语，发现：“{value}”。"
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "项目描述中不允许存在攻击性词汇，发现：“{value}”。"
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "项目描述中不允许使用大量重复字符、单词或短语填充篇幅。"
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "移除冗余内容"
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "项目名中不允许存在特殊字符。"
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "项目名中不允许包含詈语，发现：“{value}”。"
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "项目名中不允许存在攻击性词汇，发现：“{value}”。"
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "修改项目名称"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "查看简介"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "检测到：“{value}”，简介中不应该包含链接和 IP 地址"
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "移除简介中的链接"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "您的项目简介必须以英语编写或者包含英语翻译。"
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "翻译简介文本"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "简介中不允许存在特殊字符。"
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "项目简介中不允许包含詈语，发现：“{value}”。"
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "项目简介中不允许存在攻击性词汇，发现：“{value}”。"
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "项目简介中不允许使用大量重复字符、单词或短语填充篇幅。"
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "移除简介中的重复字符"
   },
   "nags.review-permissions.description": {
     "defaultMessage": "请确保您已提供授权证明，证明您有权在您的整合包中分发任何外部内容。"
   },
   "nags.review-permissions.title": {
-    "defaultMessage": "核查外部授权"
+    "defaultMessage": "检查内容授权"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "选择你的服务器支持的版本；挑一个整合包，或者自行上传。"
@@ -169,6 +268,12 @@
   },
   "nags.select-country.title": {
     "defaultMessage": "选择地区"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "指定一个可以运行项目的环境。"
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "指定环境"
   },
   "nags.select-language.description": {
     "defaultMessage": "列出你的服务器支持的一个或多个语言。"
@@ -191,8 +296,8 @@
   "nags.server.title": {
     "defaultMessage": "访问服务器设置"
   },
-  "nags.settings.description.title": {
-    "defaultMessage": "访问描述设置"
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "访问权限设置"
   },
   "nags.settings.license.title": {
     "defaultMessage": "访问许可证设置"
@@ -201,7 +306,7 @@
     "defaultMessage": "访问链接设置"
   },
   "nags.settings.permissions.title": {
-    "defaultMessage": "前往权限管理面板"
+    "defaultMessage": "检查授权"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "访问标签设置"
@@ -209,29 +314,17 @@
   "nags.settings.title": {
     "defaultMessage": "访问通用设置"
   },
-  "nags.summary-same-as-title.description": {
-    "defaultMessage": "你的简介不能与项目名称相同。撰写一个兼具信息量与吸引力的简介是十分重要的。"
-  },
-  "nags.summary-same-as-title.title": {
-    "defaultMessage": "让你的简介与众不同"
+  "nags.settings.versions.title": {
+    "defaultMessage": "查看版本设置"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "你的简介不应包含任何格式、换行符、特殊字符或链接，因为简介仅会以纯文本形式展示。"
+    "defaultMessage": "摘要只能为纯文本。"
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "清除简介"
-  },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "你的简介包含 {length, plural, other {# 个字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，来让简介既丰富又引人入胜。"
+    "defaultMessage": "修改摘要格式"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "扩充你的简介"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "保持项目名称简洁，有助于玩家记忆与查找。版本和加载器信息会自动随你的项目一同显示。"
-  },
-  "nags.title-contains-technical-info.title": {
-    "defaultMessage": "清理名称"
   },
   "nags.too-many-languages.description": {
     "defaultMessage": "你选择了 {languageCount, plural, other {# 个语言}}，请仅列出你的服务器目前实际支持的语言。"
@@ -240,13 +333,13 @@
     "defaultMessage": "选择准确的语言"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。请将其数量减少到 {maxTagCount} 个或更少，以确保你的服务器能正常出现在相关搜索结果中。"
+    "defaultMessage": "您已选择 {tagCount, plural, other {# 个标签}}。请将其数量减少到 {maxTagCount} 个或更少，以确保您的项目能正常出现在相关搜索结果中。"
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "选择准确的标签"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。建议将其数量减少到 {maxTagCount} 个或更少，以确保你的项目能正常出现在相关搜索结果中。"
+    "defaultMessage": "您已选择 {tagCount, plural, other {# 个标签}}。请将其数量减少到 {maxTagCount} 个或更少，以确保您的项目能正常出现在相关搜索结果中。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "选择准确的标签"
@@ -273,10 +366,19 @@
     "defaultMessage": "你的部分外部链接可能与其所属类型不适配。"
   },
   "nags.verify-external-links.title": {
-    "defaultMessage": "验证外部链接"
+    "defaultMessage": "检查外部链接"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "访问链接设置"
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "您的项目简介应该提供独特的信息，不要重复项目的名称。"
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "您的简介太简短。添加一个或两个句子来描述您的项目。"
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "项目名称不应包含版本号。"
   }
 }
 

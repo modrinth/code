@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT EXISTS(SELECT 1 FROM instances WHERE id = ?)\n\t\t\tAS \"exists!: bool\"\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists!: bool",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "fc91a68aaf7e6762d3bddbd4fe4e461b77671619a65fb809bd9b8ed9ab71baaa"
+}

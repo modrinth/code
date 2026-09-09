@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\tINSERT INTO synced_server_state (singleton, revision)\n\t\t\tVALUES (1, 0)\n\t\t\tON CONFLICT(singleton) DO NOTHING\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "0c2570758978e370bc2b3240874001e6e09eaf922553d5bbfefd6d12c01eb98f"
+}

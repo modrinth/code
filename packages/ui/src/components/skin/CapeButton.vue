@@ -21,8 +21,6 @@ const props = withDefaults(
 	},
 )
 
-console.log(props)
-
 const highlighted = computed(() => props.selected ?? props.isEquipped)
 </script>
 

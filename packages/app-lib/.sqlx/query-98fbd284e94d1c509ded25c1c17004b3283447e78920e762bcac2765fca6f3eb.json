@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT instance_id FROM screenshots WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "instance_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "98fbd284e94d1c509ded25c1c17004b3283447e78920e762bcac2765fca6f3eb"
+}

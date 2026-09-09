@@ -644,6 +644,7 @@ import {
 	ModrinthServersPurchaseModal,
 	OptionGroup,
 	TagIcon,
+	useDebugLogger,
 	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'
@@ -658,6 +659,7 @@ import { products } from '~/generated/state.json'
 const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
+const debug = useDebugLogger('Hosting')
 
 const { setAffiliateCode, getAffiliateCode } = useAffiliates()
 
@@ -866,7 +868,7 @@ const messages = defineMessages({
 	faqCpuKindAnswer: {
 		id: 'hosting-marketing.faq.cpu-kind.answer',
 		defaultMessage:
-			'Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory.',
+			'Modrinth Hosting servers are powered by AMD Ryzen 7950X or 9950X equivalent, paired with DDR5 memory.',
 	},
 	faqBurstThreads: {
 		id: 'hosting-marketing.faq.burst-threads',
@@ -1199,7 +1201,7 @@ const selectProduct = async (product) => {
 	}
 
 	await refreshCapacity()
-	console.log(capacityStatuses.value)
+	debug(capacityStatuses.value)
 
 	if ((product === 'custom' && isCustomAtCapacity.value) || isAtCapacity.value) {
 		addNotification({
