@@ -25,6 +25,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showVersionEnvironmentColumn: false,
 	showAdsWithPlus: false,
 	alwaysShowChecklistAsPopup: true,
+	moderationReviewLayout: false,
 	testTaxForm: false,
 
 	// Feature toggles

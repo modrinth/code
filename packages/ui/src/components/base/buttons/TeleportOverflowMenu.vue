@@ -144,7 +144,17 @@ watch(isOpen, (openState, previousOpenState) => {
 const isClient = ref(false)
 onMounted(() => {
 	isClient.value = true
+
+	if (rootRef.value) {
+		// Returns the body of the window this element actually lives in
+		targetBody.value = (rootRef.value as any).ownerDocument.body
+	} else {
+		targetBody.value = document.body;
+	}
 })
+
+const rootRef = ref(null)
+const targetBody = ref<HTMLElement | null>(null)
 
 defineExpose({ open: openMenu, close: closeMenu })
 </script>
@@ -174,7 +184,11 @@ defineExpose({ open: openMenu, close: closeMenu })
 		<slot />
 	</component>
 
-	<Teleport v-if="isClient" to="body">
+	<div ref="rootRef">
+
+	</div>
+
+	<Teleport v-if="isClient && targetBody != null" :to="targetBody ?? body">
 		<ButtonMenuPanel
 			ref="panel"
 			:open="isOpen"

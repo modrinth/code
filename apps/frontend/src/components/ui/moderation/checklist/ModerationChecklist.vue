@@ -112,6 +112,25 @@
 					<BrushCleaningIcon v-else />
 				</IconButton>
 				<IconButton
+					v-if="reviewLayoutActive"
+					v-tooltip="
+						reviewLayout.checklistConnected.value
+							? `Disconnect checklist from tabs`
+							: `Reconnect checklist to tabs`
+					"
+					type="quiet"
+					:label="
+						reviewLayout.checklistConnected.value
+							? `Disconnect checklist from tabs`
+							: `Reconnect checklist to tabs`
+					"
+					class="!bg-button-bg !text-primary ![box-shadow:var(--shadow-button)]"
+					@click="reviewLayout.setChecklistConnected(!reviewLayout.checklistConnected.value)"
+				>
+					<LinkIcon v-if="reviewLayout.checklistConnected.value" />
+					<UnlinkIcon v-else />
+				</IconButton>
+				<IconButton
 					v-tooltip="`Exit moderation`"
 					type="quiet"
 					interaction="filled"
@@ -417,6 +436,7 @@ import {
 	ToggleLeftIcon,
 	ToggleRightIcon,
 	UndoIcon,
+	UnlinkIcon,
 	XIcon,
 } from '@modrinth/assets'
 import type { Priority } from '@modrinth/moderation'
@@ -489,6 +509,7 @@ import {
 	isEligibleQueueCandidate,
 	type QueueCandidateCheck,
 } from '~/services/moderation/queue-eligibility.ts'
+import { type ReviewTabId, useModerationReviewLayout } from '~/services/moderation/review-layout.ts'
 
 import { type LiveNode, STATE_KEY } from './checklist-context'
 
@@ -497,6 +518,32 @@ const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
 const keybinds = useModerationKeybinds()
 const settings = useModerationSettings()
+const flags = useFeatureFlags()
+const reviewLayout = useModerationReviewLayout()
+
+/** Whether the VS Code-style review shell is driving the page instead of routes. */
+const reviewLayoutActive = computed(() => flags.value.moderationReviewLayout)
+
+/** Map a stage's `.navigate('/…')` target to a review tab, or null when it has no tab. */
+function stageNavigateToTab(navigate: string | undefined): ReviewTabId | null {
+	if (navigate === undefined || navigate === '') return 'description'
+	if (navigate === '/gallery') return 'gallery'
+	if (navigate === '/versions') return 'versions'
+	if (navigate === '/moderation') return 'thread'
+	if (navigate.startsWith('/settings')) return 'settings'
+	return null
+}
+
+/** Open the review tab a stage points at, focusing the right Settings sub-section too. */
+function focusStageInReviewLayout(navigate: string | undefined) {
+	const tab = stageNavigateToTab(navigate)
+	if (!tab) return
+	if (tab === 'settings') {
+		const section = navigate?.replace(/^\/settings\/?/, '') || 'general'
+		reviewLayout.setSettingsSection(section)
+	}
+	reviewLayout.openTab(tab, { focus: true, fromChecklist: true })
+}
 
 const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
 
@@ -1145,6 +1192,10 @@ function syncStageUrl(stage: StageNode | undefined) {
 	const navigate = stage?._navigate
 	debug('syncStageUrl', { stageId: stage?.id, navigate, lastSyncedStageTarget })
 	if (navigate === undefined) return
+	if (reviewLayoutActive.value) {
+		focusStageInReviewLayout(navigate)
+		return
+	}
 	const target = `/${projectUrlType.value}/${projectV2.value.slug}${navigate}`
 	if (target === lastSyncedStageTarget) return
 	lastSyncedStageTarget = target
@@ -1175,6 +1226,10 @@ const stageNavigateLabel = computed(() => {
 })
 
 function navigateToStagePage() {
+	if (reviewLayoutActive.value) {
+		focusStageInReviewLayout(currentStageObj.value?._navigate)
+		return
+	}
 	if (stageNavigateTarget.value) router.push(stageNavigateTarget.value)
 }
 
@@ -1586,7 +1641,11 @@ async function generateMessage() {
 	loadingMessage.value = true
 	markStageVisited(currentStageObj.value.id)
 
-	router.push(`/${projectUrlType.value}/${projectV2.value.slug}/moderation`)
+	if (reviewLayoutActive.value) {
+		reviewLayout.openTab('thread', { focus: true, fromChecklist: true, important: true })
+	} else {
+		router.push(`/${projectUrlType.value}/${projectV2.value.slug}/moderation`)
+	}
 
 	try {
 		missingMdPaths.clear()

@@ -2,7 +2,7 @@
 	<div v-if="project.versions?.length > 0" class="flex flex-col gap-3">
 		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 		<section class="flex flex-col gap-2">
-			<h3 class="text-primary !font-normal text-base m-0">
+			<h3 v-if="!compactMode" class="text-primary !font-normal text-base m-0">
 				{{ formatMessage(messages.minecraftJava) }}
 			</h3>
 			<div class="flex flex-wrap gap-1">
@@ -15,7 +15,7 @@
 			</div>
 		</section>
 		<section v-if="project.project_type !== 'resourcepack'" class="flex flex-col gap-2">
-			<h3 class="text-primary !font-normal text-base m-0">
+			<h3 v-if="!compactMode" class="text-primary !font-normal text-base m-0">
 				{{ formatMessage(messages.platforms) }}
 			</h3>
 			<div class="flex flex-wrap gap-1">
@@ -38,7 +38,7 @@
 			</div>
 		</section>
 		<section v-if="showEnvironments" class="flex flex-col gap-2">
-			<h3 class="text-primary !font-normal text-base m-0">
+			<h3 v-if="!compactMode" class="text-primary !font-normal text-base m-0">
 				{{ formatMessage(messages.environments) }}
 			</h3>
 			<div class="flex flex-wrap gap-1">
@@ -53,7 +53,7 @@
 			"
 			class="flex flex-col gap-2"
 		>
-			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
+			<h3 v-if="!compactMode" class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
 			<div class="flex flex-wrap gap-1">
 				<TagItem
 					v-if="
@@ -121,22 +121,28 @@ type EnvironmentValue = 'optional' | 'required' | 'unsupported' | 'unknown'
 
 const TYPES_WITH_ENVS = ['mod', 'modpack'] as const
 
-const props = defineProps<{
-	project: {
-		actualProjectType: string
-		project_type: string
-		loaders: string[]
-		client_side: EnvironmentValue
-		server_side: EnvironmentValue
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		versions: any[]
-	}
-	tags: {
-		gameVersions: GameVersionTag[]
-		loaders: PlatformTag[]
-	}
-	projectV3?: Labrinth.Projects.v3.Project
-}>()
+const props = withDefaults(
+	defineProps<{
+		project: {
+			actualProjectType: string
+			project_type: string
+			loaders: string[]
+			client_side: EnvironmentValue
+			server_side: EnvironmentValue
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			versions: any[]
+		}
+		tags: {
+			gameVersions: GameVersionTag[]
+			loaders: PlatformTag[]
+		}
+		projectV3?: Labrinth.Projects.v3.Project
+		compactMode?: boolean
+	}>(),
+	{
+		compactMode: false,
+	},
+)
 
 const noModpackLoader = computed(
 	() =>
