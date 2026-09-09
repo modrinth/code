@@ -5,7 +5,7 @@
 			:title="formatMessage(messages.withdrawTitle)"
 			:description="formatMessage(messages.withdrawDescription)"
 			:proceed-label="formatMessage(messages.withdrawButton)"
-			:proceed-icon="UndoIcon"
+			:proceed-icon="XCircleIcon"
 			:markdown="false"
 			@proceed="handleWithdrawSubmission"
 		/>
@@ -108,15 +108,6 @@
 							</template>
 						</IntlFormatted>
 					</p>
-					<Button
-						v-if="canWithdrawSubmission"
-						class="mt-4 w-fit"
-						:disabled="withdrawingSubmission"
-						@click="withdrawModal?.show()"
-					>
-						<UndoIcon />
-						{{ formatMessage(messages.withdrawButton) }}
-					</Button>
 					<p
 						v-if="isApproved(project)"
 						class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
@@ -135,7 +126,18 @@
 				:auth="auth"
 				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
 				@update-thread="updateThread"
-			/>
+			>
+				<template #actions>
+					<Button
+						v-if="canWithdrawSubmission"
+						:disabled="withdrawingSubmission"
+						@click="withdrawModal?.show()"
+					>
+						<XCircleIcon />
+						{{ formatMessage(messages.withdrawButton) }}
+					</Button>
+				</template>
+			</ConversationThread>
 			<div
 				v-else
 				class="flex items-center justify-center gap-2 rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2 py-12"
@@ -152,7 +154,7 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { IssuesIcon, SpinnerIcon, UndoIcon } from '@modrinth/assets'
+import { IssuesIcon, SpinnerIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
@@ -204,7 +206,7 @@ const messages = defineMessages({
 	},
 	withdrawButton: {
 		id: 'project.moderation.withdraw.button',
-		defaultMessage: 'Withdraw from review',
+		defaultMessage: 'Unsubmit from review',
 	},
 	submissionWithdrawn: {
 		id: 'project-moderation-nags.submission-withdrawn',
