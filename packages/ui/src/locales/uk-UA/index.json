@@ -3467,9 +3467,6 @@
   "project.disclosure.ai-generated-content.use.content": {
     "defaultMessage": "вміст"
   },
-  "project.disclosure.ai-generated-content.use.functionality": {
-    "defaultMessage": "функціонал"
-  },
   "project.disclosure.ai-generated-content.use.text": {
     "defaultMessage": "текст"
   },
@@ -3862,9 +3859,6 @@
   },
   "project.settings.disclosures.ai.types-code": {
     "defaultMessage": "Код"
-  },
-  "project.settings.disclosures.ai.types-functionality": {
-    "defaultMessage": "Функціонал"
   },
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "Текст"

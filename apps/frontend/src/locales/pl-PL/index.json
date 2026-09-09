@@ -3845,17 +3845,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Musisz to włączyć, jeśli twój projekt zawiera reklamy, sponsorowanie lub promocje innych utworów."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Jeśli promocja nie ma bezpośredniej wartości pieniężnej <emphasis>i</emphasis> dla czegoś, co średnia osoba uzna za <italic>stosowne</italic> i <italic>za niełatwe</italic> (takie jak link do Twojego profilu Modrinth w rogu strony ustawień dla własnego modu), nie uważalibyśmy tego za reklamę."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "np. automatycznie dodaje serwer SMP Modrinth do listy serwerów."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Zawiera reklamy"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Aby uzyskać więcej informacji, zapoznaj się z sekcją 6 <rules>Reguły Treści</rules>."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Musisz to włączyć, jeśli ten projekt zawiera znaczną ilość kodu wygenerowanego przez AI, każdy\n\t\t\t\tFunkcjonowanie projektu opiera się na korzystaniu z\n\t\t\t\to charakterze generycznym, lub jeśli jakikolwiek element strony projektu, taki jak opis lub publikacja, opiera się na ogólnej AI."

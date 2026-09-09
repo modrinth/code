@@ -3863,17 +3863,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "이 프로젝트에 다른 콘텐츠의 광고, 스폰서십 또는 홍보가 포함된 경우 활성화해야 합니다."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "홍보를 통해 <emphasis>직접적인 수익이 발생하지 않으며</emphasis>, 일반적으로 <italic>관련성이 있으며</italic> <italic>눈에 거슬리지 않는다고</italic> 판단할 만한 대상에 대한 홍보인 경우(예: 자체 모드의 설정 페이지 한쪽 구석에 Modrinth 프로필 링크를 표시하는 경우), 광고로 간주하지 않습니다."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "예: 사용자의 서버 목록에 Modrinth SMP 서버를 추가합니다."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "광고 포함"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "<rules>Modrinth 콘텐츠 규칙</rules>의 6번 항목을 참고하십시오."
   },
   "project.settings.disclosures.ai.description": {
     "message": "이 프로젝트의 코드 상당 부분 또는 에셋이 AI로 생성되었거나, 프로젝트의 기능이 생성형 AI의 사용에 의존하거나, 설명이나 게시 등 프로젝트 페이지의 요소가 생성형 AI에 의존하는 경우 활성화해야 합니다."

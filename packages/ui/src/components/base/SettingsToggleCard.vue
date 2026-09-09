@@ -17,8 +17,11 @@ const enabled = defineModel<boolean>({ required: true })
 <template>
 	<ToggleCard v-model="enabled" :disabled="disabled" :toggle-disabled="toggleDisabled">
 		<h3 class="mb-1 mt-0 flex items-center gap-2 text-lg font-semibold text-contrast">
-			<component :is="icon" v-if="icon" class="size-5 shrink-0 text-primary" aria-hidden="true" />
-			{{ title }}
+			<slot name="title">
+				<component :is="icon" v-if="icon" class="size-5 shrink-0 text-primary" aria-hidden="true" />
+				{{ title }}
+				<slot name="title-suffix" />
+			</slot>
 		</h3>
 		<div v-if="description || $slots.default" class="flex flex-col gap-2 leading-normal [&>p]:m-0">
 			<p v-if="description">{{ description }}</p>

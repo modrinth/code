@@ -22,7 +22,7 @@ function findDisclosure<T extends DisclosureType>(
 	return disclosures.find((disclosure): disclosure is DisclosureOf<T> => disclosure.type === type)
 }
 
-type NoteDisclosureType = 'advertisements' | 'epilepsy_triggers' | 'archived'
+type NoteDisclosureType = 'ai_functionality' | 'advertisements' | 'epilepsy_triggers' | 'archived'
 
 function createNoteModel(
 	disclosures: ProjectDisclosureData[],
@@ -66,6 +66,7 @@ export function disclosuresToForm(disclosures: ProjectDisclosureData[]): Disclos
 			uses: ai ? [...(ai.uses ?? [])] : [],
 			note: ai?.note ?? '',
 		},
+		aiFunctionality: createNoteModel(disclosures, 'ai_functionality'),
 		advertising: createNoteModel(disclosures, 'advertisements'),
 		paidFeatures: {
 			enabled: isActiveDisclosure(paidFeatures),
@@ -110,6 +111,8 @@ export function formToDisclosure(
 				uses: [...form.ai.uses],
 				note: form.ai.note.trim() || null,
 			}
+		case 'ai_functionality':
+			return { type: 'ai_functionality', note: form.aiFunctionality.note.trim() || null }
 		case 'advertisements':
 			return { type: 'advertisements', note: form.advertising.note.trim() || null }
 		case 'paid_features':
@@ -150,6 +153,9 @@ export function formToDisclosures(form: DisclosureFormState): ProjectDisclosure[
 
 	if (form.ai.enabled) {
 		set.push(formToDisclosure(form, 'ai_content'))
+	}
+	if (form.aiFunctionality.enabled) {
+		set.push(formToDisclosure(form, 'ai_functionality'))
 	}
 	if (form.advertising.enabled) {
 		set.push(formToDisclosure(form, 'advertisements'))

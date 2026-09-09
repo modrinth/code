@@ -48,7 +48,7 @@ export default function () {
 								: ''
 						}),
 
-					toggle('non-english', 'Non-english')
+					toggle('non-english', 'Non-English')
 						.suggestedStatus('flagged')
 						.message(() => `non-english${project.value.minecraft_java_server ? '-server' : ''}`)
 						.shown(
