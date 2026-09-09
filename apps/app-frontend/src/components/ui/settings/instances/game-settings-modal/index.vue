@@ -29,9 +29,12 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { Component } from 'vue'
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
+import { type RouteLocationRaw, useRouter } from 'vue-router'
 
 import type { EditableGameSetting, GameSettingCategory } from '@/helpers/game-options'
+import { injectInstanceSettings } from '@/pages/instance/components/settings-modal/instance-settings-context'
+import { appSettingsModalContextKey } from '@/providers/app-settings-modal'
 
 import {
 	canonicalValueText,
@@ -40,7 +43,11 @@ import {
 	settingSearchText,
 } from './editors'
 import { minecraftKeybindConflictKey } from './keybinds'
-import { formatGameSettingDescription, gameSettingCategoryMessage } from './messages'
+import {
+	formatGameSettingDescription,
+	formatGameSettingLabel,
+	gameSettingCategoryMessage,
+} from './messages'
 import GameSettingRow from './row.vue'
 import { useGameSettingsEditor } from './use-editor'
 import { useGameSettingLabels } from './use-labels'
@@ -54,6 +61,9 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const router = useRouter()
+const appSettingsModal = inject(appSettingsModalContextKey, null)
+const instanceSettings = injectInstanceSettings(null)
 
 const messages = defineMessages({
 	title: {
@@ -159,7 +169,12 @@ const localeLabels = useGameSettingLabels(
 )
 
 function settingLabel(setting: EditableGameSetting) {
-	return localeLabels.value[setting.option_id]?.label ?? setting.raw_key ?? setting.option_id
+	if (setting.kind === 'external') {
+		return (
+			localeLabels.value[setting.option_id]?.label ?? formatGameSettingLabel(formatMessage, setting)
+		)
+	}
+	return formatGameSettingLabel(formatMessage, setting)
 }
 
 const categories = computed<GameSettingCategory[]>(() => {
@@ -201,7 +216,11 @@ const categorySettings = computed(() => {
 			!settingSearchText(
 				setting,
 				settingLabel(setting),
-				formatGameSettingDescription(formatMessage, setting),
+				setting.kind === 'external'
+					? (localeLabels.value[setting.option_id]?.source?.project?.title ??
+							localeLabels.value[setting.option_id]?.source?.file_name ??
+							'')
+					: formatGameSettingDescription(formatMessage, setting),
 			).includes(query)
 		)
 			return false
@@ -303,6 +322,18 @@ async function confirmDiscard() {
 	if (!discard) return
 	allowClose = true
 	modal.value?.hide()
+}
+
+async function openSource(location: RouteLocationRaw) {
+	if (isDirty.value || saving.value) return
+	if (appSettingsModal && !appSettingsModal.close()) return
+	allowClose = true
+	modal.value?.hide()
+	if (instanceSettings?.closeModal) {
+		instanceSettings.closeModal(() => void router.push(location))
+	} else {
+		await router.push(location)
+	}
 }
 
 function toggleVisibleSync() {
@@ -407,6 +438,8 @@ defineExpose({ show, hide })
 							:locale-label="localeLabels[setting.option_id]"
 							:keybind-conflicts="keybindConflicts.get(setting.option_id)"
 							:show-sync-toggle="!isLocalEditor"
+							:source-navigation-disabled="isDirty || saving"
+							@open-source="openSource"
 							@update:sync-enabled="setSyncEnabled([setting.option_id], $event)"
 							@update:canonical-value="setCanonicalValue(setting.option_id, $event)"
 						/>

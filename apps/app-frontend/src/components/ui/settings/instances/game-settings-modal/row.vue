@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { LinkIcon, UnknownIcon, UnlinkIcon } from '@modrinth/assets'
 import {
+	Avatar,
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
@@ -11,6 +12,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
+import { type RouteLocationRaw, RouterLink } from 'vue-router'
 
 import type {
 	EditableGameSetting,
@@ -30,7 +32,9 @@ import {
 import GameKeybindInput from './keybind-input.vue'
 import { minecraftLanguageOptions } from './languages'
 import {
+	formatGameSettingChoice,
 	formatGameSettingDescription,
+	formatGameSettingLabel,
 	formatGameSettingValidation,
 	presentationMessages,
 } from './messages'
@@ -42,17 +46,20 @@ const props = withDefaults(
 		keybindConflicts?: string[]
 		disabled?: boolean
 		showSyncToggle?: boolean
+		sourceNavigationDisabled?: boolean
 	}>(),
 	{
 		keybindConflicts: () => [],
 		disabled: false,
 		showSyncToggle: true,
+		sourceNavigationDisabled: false,
 	},
 )
 
 const emit = defineEmits<{
 	'update:sync-enabled': [enabled: boolean]
 	'update:canonical-value': [value: GameOptionCanonicalValue | null]
+	'open-source': [location: RouteLocationRaw]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -93,12 +100,29 @@ const messages = defineMessages({
 	},
 })
 
-const settingLabel = computed(
-	() => props.localeLabel?.label ?? props.setting.raw_key ?? props.setting.option_id,
-)
+const settingLabel = computed(() => {
+	if (props.setting.kind === 'external') {
+		return props.localeLabel?.label ?? formatGameSettingLabel(formatMessage, props.setting)
+	}
+	return formatGameSettingLabel(formatMessage, props.setting)
+})
 const settingDescription = computed(() =>
 	formatGameSettingDescription(formatMessage, props.setting),
 )
+const settingSource = computed(() =>
+	props.setting.kind === 'external' ? props.localeLabel?.source : undefined,
+)
+const sourceLocation = computed<RouteLocationRaw>(() => {
+	const source = settingSource.value
+	if (source?.project) {
+		return { path: `/project/${source.project.id}` }
+	}
+	return {
+		name: 'InstanceContent',
+		params: { id: source?.instance_id },
+		query: { highlight: source?.file_path },
+	}
+})
 const valueText = computed(() => canonicalValueText(props.setting))
 const languageOptions = computed<ComboboxOption<string>[]>(() => {
 	const value = valueText.value
@@ -110,7 +134,10 @@ const languageOptions = computed<ComboboxOption<string>[]>(() => {
 const enumOptions = computed<ComboboxOption<string>[]>(() =>
 	(props.setting.editor.choices ?? []).map((choice) => ({
 		value: choice.value,
-		label: props.localeLabel?.choices[choice.value] ?? choice.value,
+		label:
+			props.setting.kind === 'external'
+				? (props.localeLabel?.choices[choice.value] ?? choice.value)
+				: formatGameSettingChoice(formatMessage, props.setting.option_id, choice.value),
 	})),
 )
 const isNumber = computed(
@@ -235,7 +262,26 @@ function updateValue(value: string | number | boolean | undefined) {
 					<UnknownIcon class="size-4" aria-hidden="true" />
 				</span>
 			</div>
-			<p v-if="settingDescription" class="m-0 mt-0.5 text-primary">
+			<RouterLink v-if="settingSource" v-slot="{ href }" :to="sourceLocation" custom>
+				<a
+					:href="sourceNavigationDisabled ? undefined : href"
+					:aria-disabled="sourceNavigationDisabled || undefined"
+					class="mt-2 inline-flex max-w-full items-center gap-1.5 text-primary"
+					:class="sourceNavigationDisabled ? 'cursor-default' : 'hover:underline'"
+					@click.prevent="!sourceNavigationDisabled && emit('open-source', sourceLocation)"
+				>
+					<Avatar
+						v-if="settingSource.project"
+						:src="settingSource.project.icon_url"
+						size="1.25rem"
+						no-shadow
+					/>
+					<span class="truncate">{{
+						settingSource.project?.title ?? settingSource.file_name
+					}}</span>
+				</a>
+			</RouterLink>
+			<p v-else-if="settingDescription" class="m-0 mt-0.5 text-primary">
 				{{ settingDescription }}
 			</p>
 		</div>

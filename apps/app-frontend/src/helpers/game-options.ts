@@ -156,6 +156,18 @@ export type SaveGameSettingsResult = {
 export type GameSettingLocaleLabel = {
 	label: string
 	choices: Record<string, string>
+	source?: GameSettingSource | null
+}
+
+export type GameSettingSource = {
+	instance_id: string
+	file_name: string
+	file_path: string
+	project: {
+		id: string
+		title: string
+		icon_url: string | null
+	} | null
 }
 
 export async function get_game_setting_locale_labels(

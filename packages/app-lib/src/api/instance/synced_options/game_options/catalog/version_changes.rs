@@ -69,12 +69,13 @@ pub(in crate::api::instance) const AMBIENT_OCCLUSION_KEYS: &[VersionedKey] = &[
     },
 ];
 
-pub(in crate::api::instance) const FOV_KEYS: &[VersionedKey] = &[VersionedKey {
-	key: "fov",
-	since: "1.0",
-	until: "26.3",
-	mapping: GameOptionMappingKind::Direct,
-}];
+pub(in crate::api::instance) const FOV_KEYS: &[VersionedKey] =
+    &[VersionedKey {
+        key: "fov",
+        since: "1.0",
+        until: "26.3",
+        mapping: GameOptionMappingKind::Direct,
+    }];
 
 pub(in crate::api::instance) const CLOUD_KEYS: &[VersionedKey] = &[
     VersionedKey {
@@ -543,8 +544,8 @@ pub(in crate::api::instance) fn encode_value(
         (ValueEncoding::Fov, CanonicalValue::Integer(value))
             if (30..=110).contains(value) =>
         {
-			let normalized = (*value as f64 - 70.0) / 40.0;
-			Some(format_decimal(normalized))
+            let normalized = (*value as f64 - 70.0) / 40.0;
+            Some(format_decimal(normalized))
         }
         (ValueEncoding::GuiScale, CanonicalValue::Integer(value))
             if (0..=8).contains(value)
@@ -900,9 +901,9 @@ pub(in crate::api::instance) fn physical_representation_supported_for_target(
         };
     }
     if matches!(definition.encoding, ValueEncoding::Fov) {
-		return raw.parse::<f64>().is_ok_and(|value| {
-			value.is_finite() && (-1.0..=1.0).contains(&value)
-		});
+        return raw.parse::<f64>().is_ok_and(|value| {
+            value.is_finite() && (-1.0..=1.0).contains(&value)
+        });
     }
     if matches!(definition.encoding, ValueEncoding::ChatPreview) {
         return if target_version == (1, 19, 0) {

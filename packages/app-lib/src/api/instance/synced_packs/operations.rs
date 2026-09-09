@@ -293,17 +293,24 @@ pub(in crate::api::instance) async fn seed_from_instance(
         {
             continue;
         }
-		let candidate = match pack_from_item(item.clone(), metadata, state).await {
-			Ok(candidate) => candidate,
-			Err(error) if matches!(error.raw.as_ref(), crate::ErrorKind::JSONError(_)) => {
-				tracing::warn!(
-					"Skipping pack {} from instance {instance_id} while initializing pack sync because its JSON metadata could not be parsed: {error}",
-					item.file_path
-				);
-				continue;
-			}
-			Err(error) => return Err(error),
-		};
+        let candidate = match pack_from_item(item.clone(), metadata, state)
+            .await
+        {
+            Ok(candidate) => candidate,
+            Err(error)
+                if matches!(
+                    error.raw.as_ref(),
+                    crate::ErrorKind::JSONError(_)
+                ) =>
+            {
+                tracing::warn!(
+                    "Skipping pack {} from instance {instance_id} while initializing pack sync because its JSON metadata could not be parsed: {error}",
+                    item.file_path
+                );
+                continue;
+            }
+            Err(error) => return Err(error),
+        };
         candidates.push((item, candidate));
     }
 

@@ -240,6 +240,7 @@ fn main() {
                         "instance_set_global_synced_option",
                         "instance_list_game_options_sync_sources",
                         "instance_get_synced_game_options_config",
+                        "instance_get_game_setting_locale_labels",
                         "instance_preview_synced_game_option_changes",
                         "instance_save_synced_game_option_changes",
                         "instance_get_local_game_options_config",

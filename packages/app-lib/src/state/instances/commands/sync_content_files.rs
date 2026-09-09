@@ -146,7 +146,7 @@ pub(crate) async fn sync_instance_content_files(
 
     if content_changed {
         super::mark_shared_instance_stale(&instance.id, &state.pool).await?;
-		crate::api::instance::queue_game_locale_index();
+        crate::api::instance::queue_game_locale_index();
     }
 
     Ok(stored_files)

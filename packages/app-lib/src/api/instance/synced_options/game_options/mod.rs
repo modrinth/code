@@ -50,10 +50,12 @@ pub use local_settings_editor::{
     get_config as get_local_config, preview_changes as preview_local_changes,
     save_changes as save_local_changes,
 };
+pub(crate) use locales::{
+    GameLocaleIndexer, queue_game_locale_index, start_game_locale_indexer,
+};
+pub use locales::{GameSettingLocaleLabels, get_game_setting_locale_labels};
 pub use pack_updates::{GameOptionsPackSource, capture_pack_base};
 pub use settings_editor::{get_config, preview_changes, save_changes};
-pub use locales::{GameSettingLocaleLabels, get_game_setting_locale_labels};
-pub(crate) use locales::{GameLocaleIndexer, queue_game_locale_index, start_game_locale_indexer};
 pub use source_selection::list_sync_sources;
 
 pub(crate) use fullscreen::{
