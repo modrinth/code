@@ -9,6 +9,7 @@ mod description;
 mod disclosures;
 mod gallery;
 mod icon;
+mod language;
 mod license;
 mod links;
 mod moderation;
