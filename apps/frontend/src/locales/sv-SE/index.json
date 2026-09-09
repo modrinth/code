@@ -3515,17 +3515,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Du måste aktivera detta om ditt projekt innehåller annonser, sponsorer eller kampanjer för andra verk."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Om marknadsföringen inte har något direkt monetärt värde <emphasis>och</emphasis> det är för något som en normal person skulle anse vara <italic>relevant</italic> och <italic>icke påträngande</italic> (såsom en länk till din Modrinth-profil i hörnet av inställningarna för ditt modd), så skulle vi inte anse det som reklam."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "t.ex. Lägger automatiskt till Modrinth SMP-servern till din serverlista."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Innehåller marknadsföring"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Vänligen läs avsnitt 6 i <rules>Modrinths innehållsregler</rules> för mer information."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Du måste aktivera detta om projektet innehåller en betydande mängd AI-genererad kod, om det finns tillgångar som till stor del är AI-genererade, om projektets funktionalitet bygger på användning av generativ AI, eller om någon del av projektets sida som beskrivningen eller publiceringen bygger på generativ AI."

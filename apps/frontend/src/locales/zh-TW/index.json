@@ -3884,17 +3884,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "如果這個專案包含其他作品的廣告、贊助或宣傳，則必須啟用這個選項。"
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "如果該宣傳沒有直接的金錢價值，<emphasis>並且</emphasis>是一般人會認為「相關」且「不顯眼」的（例如在你自己所製作的模組的設定頁面角落，放置你的 Modrinth 個人檔案的連結），我們便不會將其視為廣告<italic></italic><italic></italic>。"
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "例如：Adds the Modrinth SMP server to your server list automatically."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "包含廣告宣傳"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "請參閱 Modrinth 的《<rules>內容規範</rules>》第 6 節以取得更多資訊。"
   },
   "project.settings.disclosures.ai.description": {
     "message": "如果這個專案包含大量由 AI 生成的程式碼、任何主要由 AI 生成的資源、專案的功能仰賴生成式 AI，或是專案頁面的任何元素（例如描述或發布）仰賴生成式 AI，則必須啟用這個選項。"
