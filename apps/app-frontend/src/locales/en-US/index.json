@@ -2943,7 +2943,7 @@
     "message": "Sync resource packs"
   },
   "app.settings.synced-options.resource-packs.description": {
-    "message": "Use the same resource packs across your instances"
+    "message": "Use the same resource packs across your instances."
   },
   "app.settings.synced-options.resource-packs.none-synced-yet": {
     "message": "You haven't synced any resource packs yet"
@@ -4276,6 +4276,9 @@
   },
   "instance.worlds.shortcut-creation-failed": {
     "message": "Failed to create shortcut"
+  },
+  "instance.worlds.synced_server": {
+    "message": "Synced across instances"
   },
   "instance.worlds.view_instance": {
     "message": "View instance"

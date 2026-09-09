@@ -2,7 +2,7 @@
 import {
 	ArrowLeftRightIcon,
 	DownloadIcon,
-	LinkIcon,
+	Link2Icon,
 	LockIcon,
 	MoreVerticalIcon,
 	SpinnerIcon,
@@ -241,10 +241,10 @@ const installTooltip = computed(() => {
 							v-tooltip="syncStatusLabel"
 							:aria-label="syncStatusLabel"
 							role="img"
-							class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
+							class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue"
 							tabindex="0"
 						>
-							<LinkIcon class="size-4 text-blue" aria-hidden="true" />
+							<Link2Icon class="size-5" aria-hidden="true" />
 						</span>
 						<span
 							v-if="isClientOnly"
@@ -376,9 +376,9 @@ const installTooltip = computed(() => {
 				:aria-label="syncStatusLabel"
 				role="img"
 				tabindex="0"
-				class="inline-flex size-9 shrink-0 cursor-help items-center justify-center rounded-xl text-blue focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
+				class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 			>
-				<LinkIcon class="size-5" aria-hidden="true" />
+				<Link2Icon class="size-5" aria-hidden="true" />
 			</span>
 
 			<!-- Fixed width container to reserve space for update/switch version button -->

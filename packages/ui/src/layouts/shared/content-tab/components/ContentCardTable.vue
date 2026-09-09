@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, getCurrentInstance, ref, toRef } from 'vue'
+import { computed, getCurrentInstance, ref, toRef, watch } from 'vue'
 
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useVIntl } from '#ui/composables/i18n'
@@ -19,6 +19,7 @@ const { formatMessage } = useVIntl()
 
 interface Props {
 	items: ContentCardTableItem[]
+	highlightedItemId?: string
 	showSelection?: boolean
 	sortable?: boolean
 	sortBy?: ContentCardTableSortColumn
@@ -89,14 +90,22 @@ const hasAnyActions = computed(() => {
 })
 
 // Virtualization
-const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
-	toRef(props, 'items'),
-	{
+const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems, scrollToIndex } =
+	useVirtualScroll(toRef(props, 'items'), {
 		itemHeight: 74,
 		bufferSize: 5,
 		initialItemCount: 20,
 		enabled: toRef(props, 'virtualized'),
+	})
+
+watch(
+	[() => props.items.findIndex((item) => item.id === props.highlightedItemId), listContainer],
+	([index, container], _, onCleanup) => {
+		if (index < 0 || !container) return
+		const frame = requestAnimationFrame(() => scrollToIndex(index))
+		onCleanup(() => cancelAnimationFrame(frame))
 	},
+	{ flush: 'post' },
 )
 
 // Expose for perf monitoring
@@ -274,7 +283,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				<ContentCardItem
 					v-for="(item, idx) in visibleItems"
 					:key="item.id"
-					data-content-card-item
+					:data-content-card-item="item.id"
 					:project="item.project"
 					:project-link="item.projectLink"
 					:version="item.version"
@@ -310,6 +319,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 								? 'bg-surface-1.5'
 								: 'bg-surface-2',
 						'border-0 border-t border-solid border-surface-4',
+						item.id === highlightedItemId
+							? 'outline outline-2 -outline-offset-2 outline-brand'
+							: '',
 						visibleRange.start + idx === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 					]"
 					@select="
@@ -345,7 +357,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 			<ContentCardItem
 				v-for="(item, index) in items"
 				:key="item.id"
-				data-content-card-item
+				:data-content-card-item="item.id"
 				:project="item.project"
 				:project-link="item.projectLink"
 				:version="item.version"
@@ -381,6 +393,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 							? 'bg-surface-1.5'
 							: 'bg-surface-2',
 					'border-0 border-t border-solid border-surface-4',
+					item.id === highlightedItemId ? 'outline outline-2 -outline-offset-2 outline-brand' : '',
 					index === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 				]"
 				@select="(val, event) => toggleItemSelection(item.id, val ?? false, index, event)"

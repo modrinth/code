@@ -54,6 +54,7 @@ const appSettings = reactive({
 	showWorldsTabInInstances: true,
 	showScreenshotsTabInInstances: false,
 	showSkinSelectorInSidebar: true,
+	nativeDecorations: false,
 	devMode: false,
 	featureFlags,
 	setBehaviorSyncAcrossDevices,
