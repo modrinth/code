@@ -449,8 +449,6 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const nativeDecorations = ref(false)
-
 const os = ref('')
 const isDevEnvironment = ref(false)
 
@@ -760,7 +758,7 @@ async function setupApp() {
 	const dev = await isDev()
 	isDevEnvironment.value = dev
 	const version = await getVersion()
-	nativeDecorations.value = native_decorations
+	appSettings.nativeDecorations = native_decorations
 	if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
 
 	appTheme.preferred = theme

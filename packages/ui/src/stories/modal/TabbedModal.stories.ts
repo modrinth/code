@@ -12,7 +12,7 @@ import {
 	WrenchIcon,
 } from '@modrinth/assets'
 import type { StoryObj } from '@storybook/vue3-vite'
-import { defineComponent, h, ref } from 'vue'
+import { defineAsyncComponent, defineComponent, h, ref } from 'vue'
 
 import { Button } from '../../components/base/buttons'
 import UnsavedChangesPopup from '../../components/base/UnsavedChangesPopup.vue'
@@ -31,6 +31,11 @@ function makeTabContent(label: string, lines = 3) {
 		},
 	})
 }
+
+const AsyncTabContent = defineAsyncComponent(async () => {
+	await new Promise<void>((resolve) => setTimeout(resolve, 2000))
+	return makeTabContent('Loaded content')
+})
 
 const meta = {
 	title: 'Modal/TabbedModal',
@@ -102,6 +107,29 @@ export const WithTitleSlot: StoryObj = {
 						</span>
 					</template>
 				</TabbedModal>
+			</div>
+		`,
+	}),
+}
+
+export const WithAsyncContent: StoryObj = {
+	render: () => ({
+		components: { TabbedModal, Button },
+		setup() {
+			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
+			const tabs = [
+				{
+					name: { id: 'async', defaultMessage: 'Async content' },
+					icon: InfoIcon,
+					content: AsyncTabContent,
+				},
+			]
+			return { modalRef, tabs }
+		},
+		template: /* html */ `
+			<div>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open async content</Button>
+				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs" />
 			</div>
 		`,
 	}),
