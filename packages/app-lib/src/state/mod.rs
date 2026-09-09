@@ -303,7 +303,8 @@ impl State {
             instance_screenshot_locks: DashMap::new(),
             shared_instance_locks: DashMap::new(),
             synced_options_lock: Mutex::new(()),
-            game_locale_indexer: Default::default(),
+            game_locale_indexer:
+                crate::api::instance::GameLocaleIndexer::default(),
             discord_rpc,
             process_manager,
             friends_socket,

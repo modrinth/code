@@ -87,7 +87,7 @@ pub(super) fn inspect(
     let mut file =
         std::fs::File::open(path).map_err(crate::util::io::IOError::from)?;
     let mut hasher = sha1_smol::Sha1::new();
-    let mut buffer = [0; 64 * 1024];
+    let mut buffer = vec![0; 64 * 1024].into_boxed_slice();
     loop {
         let count = file
             .read(&mut buffer)

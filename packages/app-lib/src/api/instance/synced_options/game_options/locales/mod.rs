@@ -415,7 +415,7 @@ async fn resolve_origin(
             };
             let mut english = english.clone();
             bundle.deprecated.apply(&mut english);
-            if !english.get(key).is_some_and(|s| plain_label(s).is_some()) {
+            if english.get(key).is_none_or(|s| plain_label(s).is_none()) {
                 continue;
             }
             return Ok(Some(Origin {
