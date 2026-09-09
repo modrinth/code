@@ -48,12 +48,7 @@
 				"BUILD_ENV",
 				"PREVIEW"
 			],
-			"passThroughEnv": [
-				"SCCACHE_*",
-				"RUSTC_WRAPPER",
-				"AWS_ACCESS_KEY_ID",
-				"AWS_SECRET_ACCESS_KEY"
-			]
+			"passThroughEnv": ["SCCACHE_*", "RUSTC_WRAPPER", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
 		},
 		"lint": {
 			"env": [
@@ -65,12 +60,7 @@
 				"FORCE_COLOR",
 				"NEXTEST_*"
 			],
-			"passThroughEnv": [
-				"SCCACHE_*",
-				"RUSTC_WRAPPER",
-				"AWS_ACCESS_KEY_ID",
-				"AWS_SECRET_ACCESS_KEY"
-			]
+			"passThroughEnv": ["SCCACHE_*", "RUSTC_WRAPPER", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
 		},
 		"lint:ancillary": {},
 		"//#i18n:coverage": {
@@ -110,12 +100,7 @@
 				"FORCE_COLOR",
 				"NEXTEST_*"
 			],
-			"passThroughEnv": [
-				"SCCACHE_*",
-				"RUSTC_WRAPPER",
-				"AWS_ACCESS_KEY_ID",
-				"AWS_SECRET_ACCESS_KEY"
-			]
+			"passThroughEnv": ["SCCACHE_*", "RUSTC_WRAPPER", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
 		},
 		"fix": {},
 		"fix:ancillary": {

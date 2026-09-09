@@ -782,6 +782,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Date de naissance"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "Vous ne remplissez pas le critère d'âge pour créer un compte sur Modrinth."
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Choisissez votre date de naissance"
   },
@@ -792,7 +795,7 @@
     "message": "Date de naissance requise"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Vous ne rencontrez pas les conditions d'âge requises pour créer un compte sur Modrinth."
+    "message": "Vous ne pouvez pas créer de compte Modrinth à moins que vous ayez plus de 13 ans."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Code source pertinent"
@@ -817,6 +820,18 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "Entrez un pseudo"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Entrez le code à 6 chiffres de votre application d'authentification, ou l'un de vos codes de récupération."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Authentification à double facteur"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Se connecter d'une autre manière"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Se connecter avec {provider}"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Envoyez un e-mail de récupération"
@@ -857,8 +872,8 @@
   "auth.sign-in.2fa.label": {
     "message": "Authentification à deux facteurs"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Saisir le code..."
+  "auth.sign-in.add-account": {
+    "message": "Ajouter un compte"
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continuer avec un E-mail"
@@ -874,6 +889,15 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Dernière utilisation"
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Aller sur Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Ouvrir Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Vous êtes connectés en tant que"
   },
   "auth.sign-in.no-account": {
     "message": "Vous n'avez pas de compte ?"
@@ -1024,6 +1048,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Approuver avec réponse"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Fermer le signalement"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Fermer avec réponse"
@@ -2300,9 +2327,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Sur quelle sorte de processeurs Modrinth Hosting exécute-t-il les serveurs ?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Les serveurs de Modrinth Hosting sont équipés de processeurs AMD Ryzen 7900 et 7950X3D équivalents cadencés à plus de 5 GHz, associés à une mémoire DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Dans quelle devise sont les prix ?"
   },
@@ -2661,7 +2685,7 @@
     "message": "Nouveau projet"
   },
   "layout.action.new-server-project": {
-    "message": "Nouveau serveur"
+    "message": "Nouveau projet de serveur"
   },
   "layout.action.publish": {
     "message": "Publier"
@@ -2870,6 +2894,9 @@
   "layout.nav.active-reports": {
     "message": "Signalements actifs"
   },
+  "layout.nav.add-account": {
+    "message": "Ajouter un compte"
+  },
   "layout.nav.discover": {
     "message": "Découvrir"
   },
@@ -2900,6 +2927,9 @@
   "layout.nav.projects": {
     "message": "Projets"
   },
+  "layout.nav.remove-account": {
+    "message": "Retirer le compte"
+  },
   "layout.nav.revenue": {
     "message": "Revenus"
   },
@@ -2908,6 +2938,9 @@
   },
   "layout.nav.search": {
     "message": "Rechercher"
+  },
+  "layout.nav.switch-account": {
+    "message": "Changer de compte"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Passer à Modrinth+"
@@ -3443,6 +3476,9 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.checking-modpack-archives": {
+    "message": "Vérification..."
+  },
   "project.actions.create-server": {
     "message": "Créer un serveur"
   },
@@ -3478,6 +3514,15 @@
   },
   "project.actions.view-modpacks": {
     "message": "Voir les modpacks"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "Vois les dépendances de {projectType}"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "L'utilisation d'images générées par l'IA pour représenter votre projet n'est pas autorisée. Tenter de contourner la détection peut entraîner la suspension de votre compte Modrinth."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "Voir la section 6 des <rules>règles du contenu de Modrinth</rules> pour plus d'information sur notre politique sur l'IA générative."
   },
   "project.ai-image-warning-modal.title": {
     "message": "Les images générées par IA ne sont pas autorisées"
@@ -3728,8 +3773,23 @@
   "project.moderation.title": {
     "message": "Modération"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "L'importation de ce .mrpack pourrait ne pas fonctionner."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "Ce modpack a été publié durant le bug d'exportation"
+  },
   "project.navigation.changelog": {
     "message": "Journal des modifications"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "Certains fichiers de ce modpack n'ont pas pu être décompressés"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "Aucun fichier .mrpack n'a été trouvé pour ce projet."
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {Le fichier modpack peut être décompressés.} other {Tous les # fichiers de modpack peuvent être décompressés.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "L'icône de votre projet a été mis à jour."
@@ -3755,11 +3815,20 @@
   "project.settings.delete-project.button": {
     "message": "Supprimer le projet"
   },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "Si vous continuez, toutes les informations de ce projet et toutes ses versions seront immédiatement supprimées de notre base de données. Rien de tout cela n'est récupérable plus tard si vous changez d'avis. Envisagez simplement de définir votre projet comme privé pour une option moins permanente."
+  },
   "project.settings.delete-project.confirmation.proceed-text": {
     "message": "Supprimer définitivement le projet"
   },
   "project.settings.delete-project.confirmation.title": {
     "message": "Êtes-vous sûr de vouloir supprimer ce projet ?"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "Supprime définitivement ce projet de Modrinth. Les projets supprimés <emphasis>ne peuvent pas être récupérés</emphasis> par le personnel ou le support de Modrinth."
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Les fichiers téléchargés sur ce projet qui sont activement utilisés dans les Modpacks hébergés sur Modrinth peuvent continuer d'exister."
   },
   "project.settings.delete-project.title": {
     "message": "Supprimer le projet"
@@ -3767,17 +3836,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Cette option doit être activée si votre projet contient des publicités, des partenariats ou des promotions pour d'autres contenus."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Si la promotion n'a aucune valeur monétaire directe <emphasis>et</emphasis> qu'elle concerne quelque chose que le grand public considérerait comme <italic>pertinent</italic> et <italic>discret</italic> (tel qu'un lien vers votre profil Modrinth dans un coin de la page des paramètres de votre propre mod), nous ne considérerions pas cela comme de la publicité."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
-    "message": "Par exemple : Ajoute automatiquement le serveur multijoueur Modrinth à votre liste de serveurs."
+    "message": "par exemple ajoute automatiquement le Modrinth SMP à votre liste de serveurs."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Contient des publicités"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Pour plus d'informations, veuillez vous reporter à la section 6 des <rules>Règles relatives au contenu de Modrinth</rules>."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Cette option doit être activée si ce projet contient une quantité importante de code généré par IA, si des\néléments sont en grande partie générés par IA, si des fonctionnalités du projet reposent sur l'utilisation d'une\nIA générative, ou si un élément quelconque de la page de votre projet, tel que la description ou la publication,\nrepose sur une IA générative."
@@ -3830,6 +3893,9 @@
   "project.settings.disclosures.derivative.title": {
     "message": "Contient du contenu dérivé"
   },
+  "project.settings.disclosures.description": {
+    "message": "Vous devez ajouter toute divulgation de contenu applicable à votre projet conformément aux <rules>Règles de Contenu Modrinth</rules>."
+  },
   "project.settings.disclosures.last-updated": {
     "message": "Dernière Mise à jour {date} par {user}"
   },
@@ -3874,6 +3940,9 @@
   },
   "project.settings.disclosures.system-interactions.title": {
     "message": "Interactions avec des systèmes externes"
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "Quelles données sont collectées ?"
   },
   "project.settings.disclosures.telemetry.title": {
     "message": "Contient de la télémétrie"
@@ -4214,11 +4283,20 @@
   "report.not-for.dmca.description": {
     "message": "Consultez notre <policy-link>Politique de droits d’auteur</policy-link>."
   },
+  "report.note.ai-images.1": {
+    "message": "Nous venons juste de mettre à jour nos règles pour prohiber les images générées par IA dans les icônes, les galeries et les descriptions. Nous donnons aux créateurs une période de grâce pour retirer ces images de vos projets avant que nous commencions à accepter les signalements à leur sujet."
+  },
+  "report.note.check-back-later": {
+    "message": "Vérifiez plus tard une fois que la période de grâce aura terminé. Les signalements de ce type ne sont actuellement pas acceptés."
+  },
   "report.note.copyright.1": {
     "message": "Veuillez noter que vous ne soumettez pas une demande de retrait DMCA, mais plutôt un signalement de contenu re-téléchargé."
   },
   "report.note.copyright.2": {
     "message": "Si vous souhaitiez déposer une demande de retrait DMCA (qui est une action légale), veuillez consulter notre <copyright-policy-link>Politique de droits d’auteur</copyright-policy-link>."
+  },
+  "report.note.fully-ai-generated.1": {
+    "message": "Nous venons juste de mettre à jour nos règles pour prohiber les projets entièrement générés par IA. Nous donnons aux créateurs une période pour mettre à jour ou complètement retirer ces derniers avant que nous commencions à accepter des signalements à leur sujet."
   },
   "report.note.malicious.1": {
     "message": "Les signalements de contenu malveillant ou trompeur doivent inclure des preuves substantielles du comportement, comme des exemples de code."
@@ -4822,9 +4900,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Saisir le code d’authentification à deux facteurs"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Saisir le code..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "L’authentification à deux facteurs protège votre compte en exigeant l’accès à un second appareil pour vous connecter."

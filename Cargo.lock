@@ -6253,6 +6253,7 @@ dependencies = [
  "serde",
  "thiserror 2.0.17",
  "tokio",
+ "utoipa",
 ]
 
 [[package]]
@@ -11445,6 +11446,7 @@ dependencies = [
  "enumset",
  "hyper 1.7.0",
  "hyper-util",
+ "image",
  "native-dialog",
  "objc2-app-kit",
  "paste",
@@ -11452,6 +11454,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
+ "sha2",
  "tauri",
  "tauri-build",
  "tauri-plugin-deep-link",

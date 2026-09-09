@@ -1,5 +1,8 @@
-import type { LoadingStateProvider } from '@modrinth/ui'
-import { createLoadingStateCore, provideLoadingState } from '@modrinth/ui'
+import {
+	createLoadingStateCore,
+	type LoadingStateProvider,
+	provideLoadingState,
+} from '@modrinth/ui'
 
 /**
  * Source of truth for the desktop app's loading state.

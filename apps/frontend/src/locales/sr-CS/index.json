@@ -665,9 +665,6 @@
   "auth.reset-password.title.long": {
     "message": "Resetuj svoju lozinku"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Unesi kod..."
-  },
   "auth.sign-in.title": {
     "message": "Prijavi se"
   },
@@ -905,9 +902,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Na kakvim procesorima rade serveri of Modrinth hostiranja?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth Hosting serveri pokreću se pomoću procesora ekvivalentnih modelima AMD Ryzen 7900 i 7950X3D, koji rade na brzinama oko 5+ GHz i upareni su sa DDR5 radnom memorijom."
-  },
   "hosting-marketing.faq.ddos-protection": {
     "message": "Da li Modrinth Hosting serveri imaju DDoS zaštitu?"
   },
@@ -1027,9 +1021,6 @@
   },
   "layout.action.manage-server-notices": {
     "message": "Upravljaj obaveštenjima servera"
-  },
-  "layout.action.new-server-project": {
-    "message": "Novi server"
   },
   "layout.avatar.alt": {
     "message": "Tvoj avatar"

@@ -18,9 +18,11 @@ import {
 	InlineEditableText,
 	NewModal,
 	TagItem,
+	useScrollViewport,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, inject, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
+import { useElementSize, useWindowSize } from '@vueuse/core'
+import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
@@ -36,12 +38,14 @@ const INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY = 500
 
 const props = withDefaults(
 	defineProps<{
+		animationsReady?: boolean
 		canDragReorder?: boolean
 		hideHeader?: boolean
 		instanceGroup: InstanceGroupType
 		selectionAnchorInstanceId?: string | null
 	}>(),
 	{
+		animationsReady: false,
 		canDragReorder: false,
 		hideHeader: false,
 		selectionAnchorInstanceId: null,
@@ -78,7 +82,119 @@ const groupAccordion = ref<InstanceType<typeof Accordion>>()
 const groupOptions = ref<InstanceType<typeof ContextMenu>>()
 const groupNameInput = ref<InstanceType<typeof InlineEditableText>>()
 const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
-const instanceGridContent = ref<HTMLElement>()
+const {
+	listContainer: instanceGridContent,
+	scrollTop,
+	containerOffset,
+	viewportHeight,
+	syncScrollState,
+} = useScrollViewport()
+const { width: gridWidth } = useElementSize(instanceGridContent)
+const { width: windowWidth } = useWindowSize()
+const focusedInstanceId = ref<string | null>(null)
+const enteringInstanceIds = ref(new Set<string>())
+const animateCardMoves = ref(false)
+let cardMoveTimer: ReturnType<typeof setTimeout> | undefined
+watch(
+	() => props.instanceGroup.instances.map((instance) => instance.id),
+	(ids, previousIds) => {
+		if (!props.animationsReady) return
+		if (ids.length === previousIds.length && ids.every((id, index) => id === previousIds[index]))
+			return
+		clearTimeout(cardMoveTimer)
+		animateCardMoves.value = true
+		cardMoveTimer = setTimeout(() => {
+			animateCardMoves.value = false
+		}, 250)
+		const previous = new Set(previousIds)
+		enteringInstanceIds.value = new Set(ids.filter((id) => !previous.has(id)))
+	},
+)
+watch(
+	gridWidth,
+	() => {
+		animateCardMoves.value = false
+		clearTimeout(cardMoveTimer)
+	},
+	{ flush: 'sync' },
+)
+const remSize = ref(16)
+const gap = computed(() => remSize.value * 0.75)
+const columnCount = computed(() => {
+	const minWidth = remSize.value * (compactMode.value ? 15 : windowWidth.value < 1280 ? 8 : 10)
+	return Math.max(1, Math.floor((gridWidth.value + gap.value) / (minWidth + gap.value)))
+})
+const cardWidth = computed(
+	() => (gridWidth.value - gap.value * (columnCount.value - 1)) / columnCount.value,
+)
+const cardHeight = computed(() =>
+	compactMode.value
+		? remSize.value * 3.875 + 2
+		: Math.max(0, cardWidth.value) + remSize.value * 3.375,
+)
+const gridHeight = computed(() =>
+	Math.max(
+		45,
+		Math.ceil(props.instanceGroup.instances.length / columnCount.value) *
+			(cardHeight.value + gap.value) -
+			gap.value,
+	),
+)
+const visibleInstances = computed(() => {
+	if (gridWidth.value <= 0) return []
+	if (!props.hideHeader && isSectionCollapsed(props.instanceGroup.id) && !isSearching.value)
+		return []
+	const top = scrollTop.value - containerOffset.value
+	const stride = cardHeight.value + gap.value
+	const first = Math.max(0, Math.floor((top - 300) / stride)) * columnCount.value
+	const end =
+		Math.max(0, Math.ceil((top + (viewportHeight.value || 800) + 300) / stride)) * columnCount.value
+	const dragging = activeInstanceGroupDrag.value
+	return props.instanceGroup.instances.flatMap((instance, index) => {
+		const inViewport = index >= first && index < end
+		const focused = focusedInstanceId.value === instance.id
+		const dragged =
+			dragging &&
+			(dragging.fromGroup ?? 'group:none') === props.instanceGroup.id &&
+			dragging.primaryInstanceId === instance.id
+		return inViewport || focused || dragged ? [{ instance, index }] : []
+	})
+})
+
+function instancePosition(index: number) {
+	return {
+		position: 'absolute' as const,
+		width: `${cardWidth.value}px`,
+		left: `${(index % columnCount.value) * (cardWidth.value + gap.value)}px`,
+		top: `${Math.floor(index / columnCount.value) * (cardHeight.value + gap.value)}px`,
+	}
+}
+
+const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+async function handleCardTab(event: KeyboardEvent, index: number) {
+	if (event.key !== 'Tab' || event.defaultPrevented) return
+	const card = event.currentTarget as HTMLElement
+	const controls = [...card.querySelectorAll<HTMLElement>(focusableSelector)]
+	const boundary = event.shiftKey ? controls[0] : controls.at(-1)
+	if (event.target !== boundary) return
+	const nextIndex = index + (event.shiftKey ? -1 : 1)
+	const nextInstance = props.instanceGroup.instances[nextIndex]
+	if (!nextInstance) return
+	event.preventDefault()
+	focusedInstanceId.value = nextInstance.id
+	await nextTick()
+	const nextCard = instanceGridContent.value?.querySelector(`[data-instance-index="${nextIndex}"]`)
+	const nextControls = [...(nextCard?.querySelectorAll<HTMLElement>(focusableSelector) ?? [])]
+	const target = event.shiftKey ? nextControls.at(-1) : nextControls[0]
+	target?.focus()
+}
+
+function handleCardBlur(event: FocusEvent, instanceId: string) {
+	if ((event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)) return
+	if (focusedInstanceId.value === instanceId) focusedInstanceId.value = null
+}
+
 const instanceGridHeight = ref<number>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
@@ -97,6 +213,7 @@ const isGroupToggleBlocked = computed(
 let shouldSkipGroupToggle = false
 let groupToggleEventToSkip: MouseEvent | undefined
 let instanceGridResizeObserver: ResizeObserver | undefined
+let libraryResizeObserver: ResizeObserver | undefined
 let instanceGridObserverActivationTimeout: ReturnType<typeof setTimeout> | undefined
 
 const emit = defineEmits<{
@@ -357,9 +474,21 @@ function startInstanceGridResizeObserver() {
 	}, INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY)
 }
 
-onActivated(startInstanceGridResizeObserver)
-onDeactivated(stopInstanceGridResizeObserver)
-onMounted(startInstanceGridResizeObserver)
+onUnmounted(() => {
+	clearTimeout(cardMoveTimer)
+	stopInstanceGridResizeObserver()
+	libraryResizeObserver?.disconnect()
+})
+onMounted(() => {
+	remSize.value = parseFloat(getComputedStyle(document.documentElement).fontSize)
+	startInstanceGridResizeObserver()
+	const library = groupDropTarget.value?.closest('[data-library-page-background]')
+	if (library) {
+		libraryResizeObserver = new ResizeObserver(syncScrollState)
+		libraryResizeObserver.observe(library)
+	}
+})
+watch([gridHeight, () => props.instanceGroup.instances], () => nextTick(syncScrollState))
 </script>
 
 <template>
@@ -475,24 +604,35 @@ onMounted(startInstanceGridResizeObserver)
 					height: instanceGridHeight === undefined ? undefined : `${instanceGridHeight}px`,
 				}"
 			>
-				<div ref="instanceGridContent">
+				<div ref="instanceGridContent" :style="{ height: `${gridHeight}px` }">
 					<TransitionGroup
 						tag="section"
-						class="grid min-h-[45px] w-full gap-3 overflow-y-auto scroll-smooth"
-						:class="
-							compactMode
-								? 'grid-cols-[repeat(auto-fill,minmax(min(15rem,100%),1fr))]'
-								: 'grid-cols-[repeat(auto-fill,minmax(min(10rem,100%),1fr))] max-xl:grid-cols-[repeat(auto-fill,minmax(min(8rem,100%),1fr))]'
+						:css="animationsReady"
+						class="relative min-h-[45px] w-full h-full"
+						:move-class="
+							animateCardMoves
+								? 'transition-transform duration-200 ease-out motion-reduce:transition-none'
+								: 'transition-none'
 						"
-						move-class="transition-transform duration-200 ease-out motion-reduce:transition-none"
 						enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
-						enter-from-class="opacity-0"
+						enter-from-class="data-[animate-entry=true]:opacity-0"
 						enter-to-class="opacity-100 scale-100"
+						@after-enter="
+							(element: Element) =>
+								enteringInstanceIds.delete(element.getAttribute('data-instance-id') ?? '')
+						"
 					>
 						<div
-							v-for="instance in instanceGroup.instances"
+							v-for="{ instance, index } in visibleInstances"
 							:key="instance.id"
+							:data-instance-index="index"
+							:data-instance-id="instance.id"
+							:data-animate-entry="enteringInstanceIds.has(instance.id)"
 							class="min-w-0 w-full"
+							:style="instancePosition(index)"
+							@focusin="focusedInstanceId = instance.id"
+							@focusout="handleCardBlur($event, instance.id)"
+							@keydown="handleCardTab($event, index)"
 						>
 							<InstanceCard
 								:ref="(component: unknown) => setInstanceComponent(instance.id, component)"

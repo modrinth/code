@@ -4,6 +4,7 @@ import {
 	GaugeIcon,
 	HeartHandshakeIcon,
 	LanguagesIcon,
+	LightBulbIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
 	RefreshCwIcon,
@@ -32,8 +33,9 @@ import SocialSettings from '@/components/ui/settings/account/SocialSettings.vue'
 import AppearanceSettings from '@/components/ui/settings/display/AppearanceSettings.vue'
 import BehaviorSettings from '@/components/ui/settings/display/BehaviorSettings.vue'
 import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSettings.vue'
+import FeaturesSettings from '@/components/ui/settings/display/FeaturesSettings.vue'
 import LanguageSettings from '@/components/ui/settings/display/LanguageSettings.vue'
-import InstancesSyncedSettings from '@/components/ui/settings/instances/InstancesSyncedSettings.vue'
+import InstancesSyncedSettings from '@/components/ui/settings/instances/instances-synced-settings/index.vue'
 import JavaSettings from '@/components/ui/settings/instances/JavaSettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/instances/ResourceManagementSettings.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -80,6 +82,15 @@ const tabs = [
 		category: tabCategories.display,
 		icon: PaintbrushIcon,
 		content: AppearanceSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.features',
+			defaultMessage: 'Features',
+		}),
+		category: tabCategories.display,
+		icon: LightBulbIcon,
+		content: FeaturesSettings,
 	},
 	{
 		name: defineMessage({

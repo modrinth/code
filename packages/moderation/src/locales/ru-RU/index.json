@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Необходимо чёткое описание цели и функции проекта."
+    "defaultMessage": "Необходимо чёткое описание содержимого, цели и особенностей проекта."
   },
   "nags.add-description.title": {
     "defaultMessage": "Добавьте описание"
@@ -24,28 +24,40 @@
     "defaultMessage": "Дополните лицензию"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Добавьте ссылки на внешние ресурсы, например на сайт, магазин или сервер Discord."
+    "defaultMessage": "Добавьте ссылки на внешние ресурсы: сайт, магазин и постоянное приглашение в Discord."
   },
   "nags.add-links-server.title": {
-    "defaultMessage": "Добавьте внешние ссылки"
+    "defaultMessage": "Добавьте ссылки"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Добавьте ссылки на внешние ресурсы, например на трекер проблем, исходный код или сервер Discord."
+    "defaultMessage": "Добавьте ссылки на внешние ресурсы: трекер проблем, исходный код и постоянное приглашение в Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Добавьте внешние ссылки"
   },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Заголовки одного уровня не должны быть рядом."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Разделите заголовки"
+  },
   "nags.all-languages.description": {
-    "defaultMessage": "Выбраны все доступные языки. Оставьте только те, которые сервер активно поддерживает."
+    "defaultMessage": "Выбраны все доступные языки. Укажите только те, которые сервер активно поддерживает."
   },
   "nags.all-languages.title": {
     "defaultMessage": "Оставьте активные языки"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Выбраны все {totalAvailableTags, plural, one {# тег} few {# тега} other {# тегов}}. Не достигается их цель помогать искать релевантные проекты. Оставьте только относящиеся к проекту теги."
+    "defaultMessage": "Выбраны все {totalAvailableTags, plural, one {# тег} few {# тега} other {# тегов}}. Теги должны помогать с поиском проектов. Оставьте только релевантные теги."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Оставьте ключевые теги"
+  },
+  "nags.banned-link-usage.description": {
+    "defaultMessage": "Ссылка «{url}» запрещена как внешняя ссылка."
+  },
+  "nags.banned-link-usage.title": {
+    "defaultMessage": "Измените ссылки"
   },
   "nags.check-disclosures.description": {
     "defaultMessage": "Предупредите о важных особенностях проекта, заполнив маркировку контента."
@@ -53,8 +65,29 @@
   "nags.check-disclosures.title": {
     "defaultMessage": "Проверьте маркировку"
   },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Описание проекта не должно оканчиваться заголовком."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "Очистите конец текста"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Описание слишком короткое. Напишите о содержимом, цели и особенностях подробнее."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Расширьте описание"
+  },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "HTML не поддерживается в маркировке. Используйте только строчный Markdown или простой текст."
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "Упростите маркировку"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Изменить описание"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "Изменить галерею"
   },
   "nags.edit-license.title": {
     "defaultMessage": "Изменить лицензию"
@@ -74,11 +107,20 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Выберите обложку"
   },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "Нестандартные символы, такие как «Fancy text» или «Zalgo», не допускаются в названиях или описаниях изображений в галерее."
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "Заголовки и описания изображений не должны содержать бранные слова. Обнаружено: «{value}»."
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "В названиях и описаниях изображений не должно быть оскорблений. Обнаружено: «{value}»."
+  },
   "nags.gallery.title": {
     "defaultMessage": "Перейти в галерею"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ваш {type} использует лицензию, требующую доступность исходного кода. Предоставьте ссылку на исходный код или файл с исходными кодами для каждой дополнительной версии, либо же выберите другую лицензию."
+    "defaultMessage": "Лицензия проекта требует публикации исходного кода. Укажите ссылку на исходный код, добавьте исходные файлы или смените лицензию."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Укажите исходный код"
@@ -89,17 +131,29 @@
   "nags.identical-links.title": {
     "defaultMessage": "Уберите повторения"
   },
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "Измените текст изображения"
+  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Ссылка на лицензию недействительна."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Домен {domain} не подходит для лицензий. Ссылка должна вести на файл лицензии, а не на соцсети, игровые платформы и т. п."
+    "defaultMessage": "Домен {domain} не подходит для лицензий. Ссылка должна вести на текст лицензии."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL лицензии имеет неверный формат. Укажите действительную ссылку на текст лицензии."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Исправьте URL лицензии"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Измените описание"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "Переименуйте проект"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "Измените сводку"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# заголовок} few {# заголовка} other {# заголовков}} в описании слишком {count, plural, one {длинный} other {длинные}}. Заголовки должны быть краткими названиями разделов, а не предложениями."
@@ -140,6 +194,72 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Укажите одно разрешение"
   },
+  "nags.project-description-banned-link.description": {
+    "defaultMessage": "Ссылка «{fullUrl}» запрещена в описаниях."
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "Описание проекта должно быть написано или переведено на английский."
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "Переведите описание"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "Чрезмерное использование нестандартных символов, например «Fancy text» или «Zalgo», не допускается в описании проекта."
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "Описание не должно содержать бранные слова. Обнаружено: «{value}»."
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "В описании проекта должно быть оскорблений. Обнаружено: «{value}»."
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "Нельзя заполнять описание повторением символов, слов или фраз."
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "Уберите спам в описании"
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "Нестандартные символы, такие как «Fancy text» или «Zalgo», не допускаются в названии проекта."
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "Название проекта не должно содержать бранные слова. Обнаружено: «{value}»."
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "В названии проекта не должно быть оскорблений. Обнаружено: «{value}»."
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "Переименуйте проект"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "Проверьте сводку"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "Ссылки, URL и IP-адреса не должны быть в сводке. Обнаружено: «{value}»."
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "Уберите ссылки в сводке"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "Сводка проекта должна быть написана или переведена на английский."
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "Переведите сводку"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "Нестандартные символы, такие как «Fancy text» или «Zalgo», не допускаются в сводке."
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "В сводке проекта не должно быть сквернословия. Обнаружено: «{value}»."
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "В сводке не должно быть оскорблений. Обнаружено: «{value}»."
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "Нельзя заполнять сводку повторением символов, слов или фраз."
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "Уберите спам в сводке"
+  },
   "nags.review-permissions.description": {
     "defaultMessage": "Предоставьте подтверждение на включение стороннего контента в свою сборку."
   },
@@ -157,6 +277,12 @@
   },
   "nags.select-country.title": {
     "defaultMessage": "Укажите регион"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "Укажите среду, в которой работает проект."
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "Укажите среду"
   },
   "nags.select-language.description": {
     "defaultMessage": "Выберите языки, которые поддерживает сервер."
@@ -201,7 +327,7 @@
     "defaultMessage": "Настроить версии"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "В сводке отображается простой текст. Она не должна содержать форматирование, переносы строк, ссылки и спецсимволы."
+    "defaultMessage": "HTML и Markdown не поддерживаются в сводке. Используйте только простой текст."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Упростите сводку"
@@ -210,13 +336,13 @@
     "defaultMessage": "Расширьте сводку"
   },
   "nags.too-many-languages.description": {
-    "defaultMessage": "{languageCount, plural, one {Выбран # язык} few {Выбрано # языка} other {Выбрано # языков}}. Оставьте только те, которые сервер активно поддерживает."
+    "defaultMessage": "{languageCount, plural, one {Выбран # язык} few {Выбрано # языка} other {Выбрано # языков}}. Укажите только те, которые сервер активно поддерживает."
   },
   "nags.too-many-languages.title": {
     "defaultMessage": "Оставьте активные языки"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "{tagCount, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}}. Оставьте не более {maxTagCount}, чтобы повысить релевантность сервера в поиске."
+    "defaultMessage": "{tagCount, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}}. Оставьте не более {maxTagCount}, чтобы повысить релевантность проекта в поиске."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Оставьте ключевые теги"
@@ -246,12 +372,22 @@
     "defaultMessage": "Загрузите версию"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "Возможно, одна из внешних ссылок использует домен, не подходящий для типа этой ссылки."
+    "defaultMessage": "Возможно, одна из внешних ссылок ведёт на домены, не подходящие для этого типа ссылки."
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Проверьте ссылки"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Настроить ссылки"
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "Сводка должна иметь уникальную информацию и не повторять название проекта."
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "Сводка слишком короткая. Добавьте одно-два предложения, описывающие ваш проект."
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "В названиях проектов не должно быть номеров версий."
   }
 }
+

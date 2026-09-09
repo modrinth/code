@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	ChevronRightIcon,
-	EyeIcon,
-	InfoIcon,
-	Settings2Icon,
-	UsersIcon,
-	WrenchIcon,
-} from '@modrinth/assets'
+import { ChevronRightIcon, InfoIcon, Settings2Icon, UsersIcon, WrenchIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	commonMessages,
@@ -26,7 +19,6 @@ import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 
-import BehaviorSettings from './behavior-settings.vue'
 import GeneralSettings from './general-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
@@ -49,9 +41,17 @@ const handleUnlinked = () => emit('unlinked')
 
 const instanceRef = computed(() => props.instance)
 const tabbedModal = ref<InstanceType<typeof TabbedModal> | null>(null)
+let onAfterClose: (() => void) | undefined
 
-function hide() {
-	tabbedModal.value?.hide()
+function hide(callback?: () => void) {
+	onAfterClose = callback
+	if (!tabbedModal.value?.hide()) onAfterClose = undefined
+}
+
+function handleAfterHide() {
+	const callback = onAfterClose
+	onAfterClose = undefined
+	callback?.()
 }
 
 provideInstanceSettings({
@@ -95,14 +95,6 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		}),
 		icon: WrenchIcon,
 		content: InstallationSettings,
-	},
-	{
-		name: defineMessage({
-			id: 'instance.settings.tabs.tab-visibility',
-			defaultMessage: 'Tabs',
-		}),
-		icon: EyeIcon,
-		content: BehaviorSettings,
 	},
 	{
 		name: defineMessage({
@@ -181,6 +173,7 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="tabbedModal"
 		:tabs="tabs"
+		:on-after-hide="handleAfterHide"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
 	>

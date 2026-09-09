@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { loadStripe, type Stripe as StripeJs, type StripeElements } from '@stripe/stripe-js'
+import type { Stripe as StripeJs, StripeElements } from '@stripe/stripe-js'
 import type { ContactOption } from '@stripe/stripe-js/dist/stripe-js/elements/address'
 import type Stripe from 'stripe'
 import { computed, type Ref, ref } from 'vue'
@@ -58,6 +58,7 @@ export const useStripe = (
 	const noPaymentRequired = ref<boolean>(false)
 
 	async function initialize() {
+		const { loadStripe } = await import('@stripe/stripe-js/pure')
 		stripe.value = await loadStripe(publishableKey)
 	}
 

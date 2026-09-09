@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/vue-query'
 
 import type { InstancePayload } from '@/generated/app-events/InstancePayload'
+import { syncedPackKeys } from '@/helpers/synced-packs'
 import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 import type { AppEvents } from '@/providers/app-events'
 
@@ -16,6 +17,7 @@ const INSTANCE_METADATA_EVENTS = new Set<InstancePayload['event']>([
 export function useInstanceMetadataRefresh(events: AppEvents) {
 	const queryClient = useQueryClient()
 	let refreshQueued = false
+	let packsRefreshQueued = false
 	let refreshPromise: Promise<void> | undefined
 
 	function queueRefresh() {
@@ -25,6 +27,8 @@ export function useInstanceMetadataRefresh(events: AppEvents) {
 				try {
 					do {
 						refreshQueued = false
+						const refreshPacks = packsRefreshQueued
+						packsRefreshQueued = false
 						const joinedExistingRequest =
 							queryClient.isFetching({ queryKey: instanceKeys.list(), exact: true }) > 0
 						const instances = await queryClient.fetchQuery({
@@ -34,6 +38,9 @@ export function useInstanceMetadataRefresh(events: AppEvents) {
 
 						for (const instance of instances) {
 							queryClient.setQueryData(instanceKeys.detail(instance.id), instance)
+						}
+						if (refreshPacks) {
+							await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })
 						}
 
 						if (joinedExistingRequest) {
@@ -52,6 +59,9 @@ export function useInstanceMetadataRefresh(events: AppEvents) {
 	useAppEvent(
 		'instance',
 		(event) => {
+			if (event.event === 'synced') {
+				packsRefreshQueued = true
+			}
 			if (INSTANCE_METADATA_EVENTS.has(event.event)) return queueRefresh()
 		},
 		events,

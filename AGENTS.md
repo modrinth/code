@@ -70,12 +70,14 @@ Each project may have its own file with detailed instructions:
 ## Code Guidelines
 
 ### Comments
+
 - DO NOT use "heading" comments like: `=== Helper methods ===`.
 - Use doc comments, but avoid inline comments unless ABSOLUTELY necessary for clarity. Code should aim to be self documenting!
 
 ## Bash Guidelines
 
 ### Output handling
+
 - DO NOT pipe output through `head`, `tail`, `less`, or `more`
 - NEVER use `| head -n X` or `| tail -n X` to truncate output
 - IMPORTANT: Run commands directly without pipes when possible
@@ -83,6 +85,7 @@ Each project may have its own file with detailed instructions:
 - ALWAYS read the full output — never pipe through filters
 
 ### General
+
 - Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to
 - For Frontend, when doing lint checks, only use the `prepr` commands, do not use `typecheck` or `tsc` etc.
 - Types in `@modrinth/utils` are considered highly outdated, if a component needs them, check if you can switch said component to use types from `packages/api-client`

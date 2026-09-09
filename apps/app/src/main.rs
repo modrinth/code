@@ -146,7 +146,7 @@ fn main() {
     #[cfg(target_os = "macos")]
     {
         builder = builder
-            .menu(|app| macos::menu::create(app))
+            .menu(macos::menu::create)
             .on_menu_event(macos::menu::handle_event);
     }
 

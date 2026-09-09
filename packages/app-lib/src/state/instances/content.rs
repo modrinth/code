@@ -22,6 +22,15 @@ pub struct ContentItem {
     pub date_added: Option<String>,
     pub source_kind: Option<ContentSourceKind>,
     pub embedded_metadata: Option<EmbeddedContentMetadata>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub synced_pack: Option<SyncedPackInfo>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SyncedPackInfo {
+    pub id: String,
+    pub instance_ids: Vec<String>,
+    pub update_pending: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]

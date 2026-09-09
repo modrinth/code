@@ -791,9 +791,6 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "Data de nascimento necessária"
   },
-  "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Você não atende ao requisito de idade para criar uma conta no Modrinth."
-  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Código-fonte relevante"
   },
@@ -856,9 +853,6 @@
   },
   "auth.sign-in.2fa.label": {
     "message": "Autenticação de dois fatores"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Insira o código..."
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar com e-mail"
@@ -2300,9 +2294,6 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Que tipo de CPUs os servidores do Modrinth Hosting utilizam?"
   },
-  "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Os servidores do Modrinth Hosting são equipados com CPUs AMD Ryzen 7900 e 7950X3D equivalentes a 5+ GHz, combinadas com memória DDR5."
-  },
   "hosting-marketing.faq.currency": {
     "message": "Em que moeda são os preços apresentados?"
   },
@@ -2659,9 +2650,6 @@
   },
   "layout.action.new-project": {
     "message": "Novo projeto"
-  },
-  "layout.action.new-server-project": {
-    "message": "Novo servidor"
   },
   "layout.action.publish": {
     "message": "Publicar"
@@ -3797,17 +3785,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Você deve habilitar isso se o seu projeto contém anúncios, patrocínios ou promoções de outras obras."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Se a promoção não tiver valor monetário direto <emphasis>e</emphasis> for para algo que a pessoa média consideraria <italic>relevante</italic> e <italic>discreto</italic> (como um link para o seu perfil do Modrinth no canto da página de configurações do seu próprio mod), não a consideraríamos uma propaganda."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "ex: Adiciona o servidor Modrinth SMP à sua lista de servidores automaticamente."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Contém propagandas"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Por favor, consulte a Seção 6 de <rules>Regras de conteúdo do Modrinth</rules> para obter mais informações."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Você deve habilitar esta opção se este projeto conter uma quantidade substancial de código gerado por IA, qualquer\n\t\t\t        ativo substancialmente gerado por IA, se a funcionalidade do projeto depende do uso de\n\t\t\t\tIA generativa, ou se qualquer elemento da página do seu projeto, como descrição ou publicação\n                                depender de IA generativa."
@@ -4840,9 +4822,6 @@
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Insira o código de dois fatores"
-  },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Insira o código..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "A autenticação de dois fatores mantém sua conta segura, exigindo o acesso a um segundo dispositivo para efetuar o login."

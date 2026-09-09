@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT scope, option_id, source_instance_id, source_game_version,\n\t\tbackfilled AS \"backfilled!: bool\", observation_json, origin_json\n\t\tFROM game_option_locale_origins\n\t\tWHERE (? IS NULL OR scope = ?)\n\t\tORDER BY scope, option_id",
+  "describe": {
+    "columns": [
+      {
+        "name": "scope",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "option_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "source_instance_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "source_game_version",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "backfilled!: bool",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "observation_json",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "origin_json",
+        "ordinal": 6,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "c4a7ef44cae3241d2afb444ea7819b83e3a6663fbd52b0198a0f2a5cd97c3961"
+}

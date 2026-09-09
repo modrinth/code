@@ -212,6 +212,33 @@ const messages = defineMessages({
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex min-w-0 flex-col gap-1">
 					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.javaMemory) }}
+					</h2>
+					<p class="m-0">{{ formatMessage(messages.customMemoryAllocation) }}</p>
+				</div>
+				<Toggle id="override-memory-allocation" v-model="overrideMemorySettings" />
+			</div>
+			<div class="pt-3">
+				<Slider
+					id="max-memory"
+					v-model="memory.maximum"
+					:disabled="!overrideMemorySettings"
+					:min="512"
+					:max="maxMemory"
+					:step="64"
+					:snap-points="snapPoints"
+					:snap-range="512"
+					min-label="512 MB"
+					:max-label="`${Number((maxMemory / 1024).toFixed(1))} GB`"
+					unit="MB"
+				/>
+			</div>
+		</section>
+
+		<section class="flex flex-col">
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex min-w-0 flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.javaInstallation) }}
 					</h2>
 					<p class="m-0">{{ formatMessage(messages.customJavaInstallation) }}</p>
@@ -300,31 +327,6 @@ const messages = defineMessages({
 						</div>
 					</div>
 				</div>
-			</div>
-		</section>
-
-		<section class="flex flex-col">
-			<div class="flex items-center justify-between gap-4">
-				<div class="flex min-w-0 flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.javaMemory) }}
-					</h2>
-					<p class="m-0">{{ formatMessage(messages.customMemoryAllocation) }}</p>
-				</div>
-				<Toggle id="override-memory-allocation" v-model="overrideMemorySettings" />
-			</div>
-			<div class="pt-3">
-				<Slider
-					id="max-memory"
-					v-model="memory.maximum"
-					:disabled="!overrideMemorySettings"
-					:min="512"
-					:max="maxMemory"
-					:step="64"
-					:snap-points="snapPoints"
-					:snap-range="512"
-					unit="MB"
-				/>
 			</div>
 		</section>
 

@@ -1,5 +1,6 @@
 export { default as AdvertisingDisclosureCard } from './AdvertisingDisclosureCard.vue'
 export { default as AiDisclosureCard } from './AiDisclosureCard.vue'
+export { default as AiFunctionalityDisclosureCard } from './AiFunctionalityDisclosureCard.vue'
 export { default as ArchivedDisclosureCard } from './ArchivedDisclosureCard.vue'
 export { default as DerivativeDisclosureCard } from './DerivativeDisclosureCard.vue'
 export { default as DisclosureToggleCard } from './DisclosureToggleCard.vue'

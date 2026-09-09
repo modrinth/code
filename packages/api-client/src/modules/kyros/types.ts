@@ -29,6 +29,10 @@ export namespace Kyros {
 
 	export namespace Files {
 		export namespace v1 {
+			export interface FullWorldDownloadAuthorization {
+				token: string
+			}
+
 			export type DescendantType = 'regular' | 'directory' | 'symlink' | 'other'
 
 			export interface FileStatRequest {

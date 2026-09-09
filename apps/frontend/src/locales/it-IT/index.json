@@ -705,7 +705,7 @@
     "message": "che tu abbia mai usato prima"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Screenshot di Modrinth App con un'istanza Cobblemon aperta sulla pagina 'Contenuto'."
+    "message": "Screenshot di Modrinth App con un'istanza di Cobblemon aperta sulla pagina \"Contenuto\"."
   },
   "app-marketing.hero.description": {
     "message": "Modrinth App è un launcher unico e open source che ti permette di giocare alle tue mod preferite e di tenerle aggiornate, il tutto in un unico e pratico pacchetto."
@@ -776,6 +776,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "Data di nascita"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "Non soddisfi i requisiti di età necessari per creare un account su Modrinth."
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Seleziona la tua data di nascita"
   },
@@ -786,7 +789,7 @@
     "message": "Data di nascita richiesta"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "Non soddisfi i requisiti di età necessari per creare un account su Modrinth."
+    "message": "Non puoi creare un account su Modrinth finché non avrai almeno 13 anni."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Codice sorgente pertinente"
@@ -811,6 +814,30 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "Inserisci il nome utente"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Inserisci il codice a 6 cifre dalla tua app di autenticazione, oppure uno dei tuoi codici di backup."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Autenticazione a due fattori"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Continua con passkey"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "L'ultimo accesso è stato effettuato tramite {method, select, password {password} passkey {passkey} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Riautentica"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Accedi in un altro modo"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Accedi con {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} deve essere riautenticato."
   },
   "auth.reset-password.method-choice.action": {
     "message": "Invia email di recupero"
@@ -846,13 +873,16 @@
     "message": "Reimposta la password"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Inserisci il codice a 6 cifre dalla tua app di autenticazione oppure uno dei tuoi codici di backup."
+    "message": "Inserisci il codice a 6 cifre dalla tua app di autenticazione, oppure uno dei tuoi codici di backup."
   },
   "auth.sign-in.2fa.label": {
     "message": "Autenticazione a due fattori"
   },
-  "auth.sign-in.2fa.placeholder": {
-    "message": "Inserisci il codice..."
+  "auth.sign-in.add-account": {
+    "message": "Aggiungi account"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Scegli un account da utilizzare su Modrinth App"
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continua con l'email"
@@ -868,6 +898,18 @@
   },
   "auth.sign-in.last-sign-in": {
     "message": "Ultimo utilizzo"
+  },
+  "auth.sign-in.launcher.complete.description": {
+    "message": "Presto ritornerai all'app. Se non accade nulla, premi il pulsante sotto."
+  },
+  "auth.sign-in.launcher.complete.go-to-website": {
+    "message": "Vai su Modrinth.com"
+  },
+  "auth.sign-in.launcher.complete.return-button": {
+    "message": "Apri Modrinth App"
+  },
+  "auth.sign-in.launcher.complete.title": {
+    "message": "Accesso effettuato"
   },
   "auth.sign-in.no-account": {
     "message": "Non hai un account?"
@@ -1018,6 +1060,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Approva con risposta"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Chiudi segnalazione"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Chiudi con risposta"
@@ -2180,6 +2225,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Accesso effettuato come:"
   },
+  "error.generic.401.switch-account": {
+    "message": "O passa a un altro account:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Impossibile cambiare account. Riprova più tardi."
+  },
   "error.generic.401.title": {
     "message": "Accesso non consentito"
   },
@@ -2190,7 +2241,7 @@
     "message": "Pagina non trovata"
   },
   "error.generic.451.subtitle": {
-    "message": "Questa pagina è stata bloccata per motivi legali, per esempio censura governativa o procedimenti legali in corso."
+    "message": "Questa pagina è stata bloccata per motivi legali, come censura governativa o altri procedimenti legali in corso."
   },
   "error.generic.451.title": {
     "message": "Contenuto non disponibile per motivi legali"
@@ -2292,7 +2343,7 @@
     "message": "Su quali CPU lavorano i server di Modrinth Hosting?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "I server di Modrinth Hosting sono alimentati da CPU a 5+ GHz equivalenti a AMD Ryzen 7900 e 7950X3D, assieme a memoria DDR5."
+    "message": "I server di Modrinth Hosting sono alimentati da AMD Ryzen 7950X o equivalenti a 9950X, assieme a memoria DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "In che valuta sono i prezzi?"
@@ -2666,6 +2717,9 @@
   "layout.action.tech-review": {
     "message": "Revisione tecnica"
   },
+  "layout.action.user-lookup": {
+    "message": "Utenti"
+  },
   "layout.avatar.alt": {
     "message": "La tua foto profilo"
   },
@@ -2861,6 +2915,9 @@
   "layout.nav.active-reports": {
     "message": "Segnalazioni attive"
   },
+  "layout.nav.add-account": {
+    "message": "Aggiungi account"
+  },
   "layout.nav.discover": {
     "message": "Esplora"
   },
@@ -2891,6 +2948,9 @@
   "layout.nav.projects": {
     "message": "Progetti"
   },
+  "layout.nav.remove-account": {
+    "message": "Rimuovi account"
+  },
   "layout.nav.revenue": {
     "message": "Guadagni"
   },
@@ -2899,6 +2959,12 @@
   },
   "layout.nav.search": {
     "message": "Cerca"
+  },
+  "layout.nav.switch-account": {
+    "message": "Cambia account"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Impossibile cambiare account. Riprova più tardi."
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Abbonati a Modrinth+"
@@ -2928,7 +2994,7 @@
     "message": "Modrinth App si aprirà automaticamente..."
   },
   "modal.shared-instance.open-in-app.title": {
-    "message": "Aprendo Modrinth App"
+    "message": "Apri Modrinth App"
   },
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Perché usare Modrinth App"
@@ -2938,6 +3004,9 @@
   },
   "moderation.moderate": {
     "message": "Modera"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "Oracolo di Delfi"
   },
   "moderation.page.external-projects": {
     "message": "Progetti esterni"
@@ -3341,6 +3410,9 @@
   "project-member-header.success-join": {
     "message": "Ora fai parte del team del progetto"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Il progetto è stato presentato per la revisione!"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Checklist di pubblicazione"
   },
@@ -3351,7 +3423,7 @@
     "message": "Ripresenta per la revisione"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Il tuo progetto è stato {status, select, rejected {rifiutato} withheld {sospeso} other {{status}}} dallo staff di Modrinth. Nella maggior parte dei casi puoi richiedere una revisione dopo aver risposto ai messaggi dello staff."
+    "message": "Il progetto è stato {status, select, rejected {rifiutato} withheld {sospeso} other {{status}}} dallo staff di Modrinth. Nella maggior parte dei casi puoi richiedere una revisione dopo aver risposto ai messaggi dello staff."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Devi completare i passaggi obbligatori nella checklist di pubblicazione!"
@@ -3758,6 +3830,12 @@
   "project.notification.icon-updated.title": {
     "message": "Icona progetto aggiornata"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "Non puoi salvare modifiche ai tuoi progetti che risultano in una validazione fallita."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Impossibile salvare il progetto durante la revisione"
+  },
   "project.notification.updated.message": {
     "message": "Il tuo progetto è stato aggiornato."
   },
@@ -3797,17 +3875,11 @@
   "project.settings.disclosures.advertising.description.1": {
     "message": "Abilita questa opzione se il progetto contiene annunci, sponsorizzazioni o altre pubblicità."
   },
-  "project.settings.disclosures.advertising.description.2": {
-    "message": "Se la promozione non ha un valore monetario diretto <emphasis>ed</emphasis> è per qualcosa che la persona media considererebbe <italic>rilevante</italic> e <italic>non invasiva</italic> (come un collegamento al tuo profilo Modrinth nell'angolo delle impostazioni per la tua stessa mod), allora non lo considereremo un annuncio."
-  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "es: Aggiunge automaticamente Modrinth SMP alla tua lista di server."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "Contiene annunci"
-  },
-  "project.settings.disclosures.ai.content-rules": {
-    "message": "Per ulteriori informazioni, consulta la sezione 6 delle <rules>Regole sui contenuti di Modrinth</rules>."
   },
   "project.settings.disclosures.ai.description": {
     "message": "Abilita questa opzione se il progetto contiene una parte sostanziale di codice generato dall'IA, se qualche\n\t\t\t\tasset è sostanzialmente generato dall'IA, se le funzionalità del progetto si basano sull'uso\n\t\t\t\tdell'IA generativa o se uno degli elementi della pagina del progetto, come la descrizione o la sua pubblicazione,\n\t\t\t\tsi basano sull'IA generativa."
@@ -4001,6 +4073,12 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.links.donation.duplicate-type": {
+    "message": "Hai già un link per {platform}."
+  },
+  "project.settings.links.donation.no-type": {
+    "message": "Seleziona una piattaforma per il link di donazione."
+  },
   "project.settings.monetization.description": {
     "message": "I progetti su Modrinth vengono automaticamente iscritti al <rewards-program-link>Programma Premi</rewards-program-link>. Se non vuoi guadagnare da questo progetto (o non puoi per motivi legali), puoi disattivarlo qui."
   },
@@ -4192,6 +4270,9 @@
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Carica una versione prima di aggiungere i tag"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Suggerimenti:"
   },
   "project.versions.copy-id-option": {
     "message": "Copia ID"
@@ -4892,9 +4973,6 @@
   "settings.account.two-factor.field.code.label": {
     "message": "Inserisci codice 2FA"
   },
-  "settings.account.two-factor.field.code.placeholder": {
-    "message": "Inserisci il codice..."
-  },
   "settings.account.two-factor.setup.intro": {
     "message": "L'autenticazione a due fattori (2FA) protegge il tuo account richiedendo un dispositivo secondario per effettuare l'accesso."
   },
@@ -5138,6 +5216,9 @@
   "settings.billing.plan.title": {
     "message": "Piano: {size}"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "Include una tassa di {amount}"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
@@ -5352,7 +5433,7 @@
     "message": "Ultime notizie da Modrinth"
   },
   "ui.latest-news-row.view-all": {
-    "message": "Leggi tutte le notizie"
+    "message": "Leggi altre notizie"
   },
   "ui.newsletter-button.subscribe": {
     "message": "Iscriviti"

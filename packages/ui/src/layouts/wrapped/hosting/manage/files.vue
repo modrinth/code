@@ -347,7 +347,7 @@ const createMutation = useMutation({
 // Extraction
 async function extractFile(path: string, override: boolean, dry: boolean) {
 	if (fileWriteDisabled.value) return
-	const target = path.slice(0, path.lastIndexOf('/')) || '/'
+	const target = path.replace(/\.zip$/i, '')
 	if (dry) {
 		return await client.kyros.files_v0.extractFile(path, override, true, target)
 	}

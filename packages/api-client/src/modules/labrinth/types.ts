@@ -1387,7 +1387,7 @@ export namespace Labrinth {
 
 			export type TelemetryConsent = 'opt_in' | 'opt_out' | 'always_active'
 
-			export type AiUsage = 'code' | 'assets' | 'text' | 'functionality'
+			export type AiUsage = 'code' | 'assets' | 'text'
 
 			export type DisclosureLockStatus = 'unlocked' | 'cannot_disable' | 'fully_locked'
 
@@ -1401,6 +1401,10 @@ export namespace Labrinth {
 				| {
 						type: 'ai_content'
 						uses: AiUsage[]
+						note?: string | null
+				  }
+				| {
+						type: 'ai_functionality'
 						note?: string | null
 				  }
 				| {
@@ -1812,6 +1816,11 @@ export namespace Labrinth {
 				show_play_time: boolean
 				hide_nametag: boolean
 				show_all_screenshots: boolean
+				show_files_tab_in_instances: boolean
+				show_worlds_tab_in_instances: boolean
+				show_screenshots_tab_in_instances: boolean
+				show_skin_selector_in_sidebar: boolean
+				quick_instance_count: number
 				warn_on_unknown_modpacks: boolean
 				skip_non_essential_warnings: boolean
 			}

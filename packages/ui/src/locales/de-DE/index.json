@@ -168,13 +168,16 @@
     "defaultMessage": "Version ändern"
   },
   "button.clear": {
-    "defaultMessage": "Eingabe löschen"
+    "defaultMessage": "Löschen"
   },
   "button.close": {
     "defaultMessage": "Schließen"
   },
   "button.continue": {
     "defaultMessage": "Weiter"
+  },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "In Zwischenablage kopiert"
   },
   "button.copy-filename": {
     "defaultMessage": "Dateinamen kopieren"
@@ -246,7 +249,7 @@
     "defaultMessage": "Im Browser öffnen"
   },
   "button.open-in-folder": {
-    "defaultMessage": "In Ordner öffnen"
+    "defaultMessage": "Im Ordner öffnen"
   },
   "button.open-in-modrinth": {
     "defaultMessage": "In Modrinth öffnen"
@@ -1412,6 +1415,27 @@
   "files.create-modal.placeholder-file": {
     "defaultMessage": "z. B. config.yml"
   },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "Eine Datei mit diesem Namen existiert bereits."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "Es konnte nicht geprüft werden, ob diese Datei bereits vorhanden ist."
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "ZIP-Datei erstellen"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "ZIP-Datei erstellen"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "Der Archivname muss ein einzelner Dateiname sein."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Archivname"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "Gebe einen Archivnamen ein."
+  },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "„{name}“ wird gelöscht"
   },
@@ -1523,6 +1547,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Dateioperationen sind während des Vorgangs deaktiviert."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "ZIP-Datei erstellen"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Fehler beim Testlauf"
   },
@@ -1604,6 +1631,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Aus .zip-URL hochladen"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "{progress}% komprimiert"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "{source} wird erstellt"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "{source} wurde erstellt"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "{source} konnte nicht erstellt werden"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Aktuelle Datei: {file}"
   },
@@ -1627,6 +1666,9 @@
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Neuer Name"
+  },
+  "files.row.create-zip": {
+    "defaultMessage": "ZIP-Datei erstellen"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# Element} other {# Elemente}}"
@@ -2017,6 +2059,108 @@
   },
   "icon-select.select": {
     "defaultMessage": "Icon auswählen"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Schließen"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Bearbeiten"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Farbe"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Zuschneiden zurücksetzen"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Ausgewählte Anmerkung löschen"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Fläche"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Element"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Radiermodus"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Werkzeuge zur Bildbearbeitung"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Weitere Speicheroptionen"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Überschreiben"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Wiederholen"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Kopie speichern"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Bild speichern"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Größe"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Pfeil"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Zensieren"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Zuschneiden"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Ellipse"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Radierer"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Markieren"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Stift"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Rechteck"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Auswählen"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Text"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Rückgängig"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Breite"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Anpassen"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "An Arbeitsbereich anpassen"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Vergrößern"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Verkleinern"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Nächstes Bild"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Vorheriges Bild"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Version suchen..."
@@ -2609,6 +2753,9 @@
   "label.yes": {
     "defaultMessage": "Ja"
   },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Konten werden gewechselt..."
+  },
   "locale.cs-CZ": {
     "defaultMessage": "Tschechisch"
   },
@@ -3113,6 +3260,9 @@
   "profile.button.set-affiliate": {
     "defaultMessage": "Als Partner festlegen"
   },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Geteilte Instanzen ansehen"
+  },
   "profile.button.unblock": {
     "defaultMessage": "Freigeben"
   },
@@ -3447,22 +3597,19 @@
     "defaultMessage": "Enthält Werbung"
   },
   "project.disclosure.ai-generated-content.title": {
-    "defaultMessage": "Enthält KI-generierte {types}"
+    "defaultMessage": "Enthält KI-generierte(n) {types}"
   },
   "project.disclosure.ai-generated-content.use.assets": {
-    "defaultMessage": "e Ressourcen"
+    "defaultMessage": "Ressourcen"
   },
   "project.disclosure.ai-generated-content.use.code": {
-    "defaultMessage": "en Code"
+    "defaultMessage": "Code"
   },
   "project.disclosure.ai-generated-content.use.content": {
-    "defaultMessage": "e Inhalte"
-  },
-  "project.disclosure.ai-generated-content.use.functionality": {
-    "defaultMessage": "e Funktionen"
+    "defaultMessage": "Inhalte"
   },
   "project.disclosure.ai-generated-content.use.text": {
-    "defaultMessage": "en Text"
+    "defaultMessage": "Text"
   },
   "project.disclosure.derivative-work.show-fewer": {
     "defaultMessage": "Weniger anzeigen"
@@ -3854,9 +4001,6 @@
   "project.settings.disclosures.ai.types-code": {
     "defaultMessage": "Code"
   },
-  "project.settings.disclosures.ai.types-functionality": {
-    "defaultMessage": "Funktionen"
-  },
   "project.settings.disclosures.ai.types-text": {
     "defaultMessage": "Text"
   },
@@ -4015,6 +4159,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Kanal"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "{count, number} ausgewählt"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Filter für {filter} umschalten"
@@ -5006,6 +5156,12 @@
   "servers.busy.installing": {
     "defaultMessage": "Server wird installiert"
   },
+  "servers.files.zip-created": {
+    "defaultMessage": "ZIP-Datei wurde erstellt"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "{destination} wurde erstellt"
+  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Auch eine Freundschaftsanfrage senden"
   },
@@ -5152,9 +5308,6 @@
   },
   "servers.listing.copy-id-label": {
     "defaultMessage": "ID kopieren"
-  },
-  "servers.listing.download-latest-backup-tooltip": {
-    "defaultMessage": "Neueste Sicherung herunterladen"
   },
   "servers.listing.manage-billing-label": {
     "defaultMessage": "Abrechnung verwalten"
@@ -5402,6 +5555,9 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Loslegen"
   },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Angetrieben von AMD Ryzen 7950X, 9950X oder einem gleichwertigen Prozessor mit DDR5-Speicher."
+  },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Groß"
   },
@@ -5518,6 +5674,27 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Was passiert?"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Die Werte rotieren"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Bitte versuche es später erneut."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "Fehlgeschlagen die SFTP Werte zu rotieren"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "Der vorherige Benutzername und das vorherige Passwort funktionieren danach nicht mehr."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Zugangsdaten rotieren"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Dein SFTP-Benutzername und Passwort wurden neu generiert."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "SFTP Werte wurden rotiert"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
@@ -6665,6 +6842,12 @@
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth-Team"
   },
+  "user.role.moderator": {
+    "defaultMessage": "Inhaltsmoderator"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Modrinth-Team"
+  },
   "version.content.name": {
     "defaultMessage": "Name"
   },
@@ -6675,7 +6858,7 @@
     "defaultMessage": "Dev-JAR"
   },
   "version.file-type.javadoc-jar": {
-    "defaultMessage": "Javadoc-JAR"
+    "defaultMessage": "Javadocs-JAR"
   },
   "version.file-type.optional-resource-pack": {
     "defaultMessage": "Optionales Ressourcenpaket"
@@ -6690,7 +6873,7 @@
     "defaultMessage": "Signaturdatei"
   },
   "version.file-type.sources-jar": {
-    "defaultMessage": "Quellen-JAR"
+    "defaultMessage": "Quell-JAR"
   },
   "version.file-type.unknown": {
     "defaultMessage": "Andere"
