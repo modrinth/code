@@ -77,30 +77,12 @@
 							{{ getFormattedMessage(nag.title) }}
 						</span>
 						<span>
-							<IntlFormatted
-								v-if="nag.id === 'submitted-for-review' && canWithdrawSubmission"
-								:message-id="messages.submittedForReviewWithWithdrawal"
-							>
-								<template #withdraw-link="{ children }">
-									<a
-										href="#"
-										class="text-link"
-										:class="{ 'cursor-wait opacity-50': withdrawingSubmission }"
-										:aria-disabled="withdrawingSubmission"
-										@click.prevent="handleWithdrawSubmission"
-									>
-										<component :is="() => normalizeChildren(children)" />
-									</a>
-								</template>
-							</IntlFormatted>
-							<template v-else>
-								<span
-									v-for="(segment, index) in getNagDescriptionSegments(nag)"
-									:key="index"
-									:class="{ 'break-all': segment.isUrl }"
-									v-text="segment.text"
-								/>
-							</template>
+							<span
+								v-for="(segment, index) in getNagDescriptionSegments(nag)"
+								:key="index"
+								:class="{ 'break-all': segment.isUrl }"
+								v-text="segment.text"
+							/>
 						</span>
 						<NuxtLink
 							v-if="nag.link && shouldShowLink(nag)"
@@ -157,12 +139,9 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	IntlFormatted,
 	type MessageDescriptor,
-	normalizeChildren,
 	useVIntl,
 } from '@modrinth/ui'
-import { isStaff } from '@modrinth/utils'
 import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -181,7 +160,6 @@ interface Props {
 	validationNags?: Labrinth.Projects.v3.ProjectNag[]
 	validationLoading?: boolean
 	validationAvailable?: boolean
-	withdrawSubmission?: () => Promise<boolean>
 	refreshValidation?: () => Promise<Labrinth.Projects.v3.ProjectValidationResponse | null>
 	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
@@ -214,16 +192,12 @@ const messages = defineMessages({
 	},
 	submittedForReviewDesc: {
 		id: 'project-moderation-nags.submitted-for-review-desc',
-		defaultMessage: 'Your project has been submitted for moderator review.',
-	},
-	submittedForReviewWithWithdrawal: {
-		id: 'project-moderation-nags.submitted-for-review-with-withdrawal',
 		defaultMessage:
-			'Your project has been submitted for review. If your project is not ready for review, you can <withdraw-link>withdraw your submission</withdraw-link>.',
+			"Your project has been submitted to be reviewed by Modrinth's moderation team.",
 	},
-	submissionWithdrawn: {
-		id: 'project-moderation-nags.submission-withdrawn',
-		defaultMessage: 'Your submission has been withdrawn. ',
+	visitModerationMessages: {
+		id: 'project-moderation-nags.visit-moderation-messages',
+		defaultMessage: 'Visit moderation messages',
 	},
 	resubmitForReview: {
 		id: 'project-moderation-nags.resubmit-for-review',
@@ -273,7 +247,6 @@ const props = withDefaults(defineProps<Props>(), {
 	validationLoading: false,
 	validationAvailable: true,
 	nags: undefined,
-	withdrawSubmission: undefined,
 	refreshValidation: undefined,
 })
 
@@ -423,31 +396,6 @@ const canSubmitForReview = computed(() => {
 	)
 })
 
-const withdrawingSubmission = ref(false)
-const canWithdrawSubmission = computed(
-	() =>
-		!!props.withdrawSubmission &&
-		(isStaff(props.currentMember?.user) ||
-			((props.currentMember?.permissions ?? 0) & (1 << 2)) !== 0),
-)
-
-async function handleWithdrawSubmission() {
-	if (!isProcessing.value || !canWithdrawSubmission.value || withdrawingSubmission.value) return
-
-	withdrawingSubmission.value = true
-	try {
-		if (!(await props.withdrawSubmission?.())) return
-		if (props.collapsed) emit('toggleCollapsed')
-		addNotification({
-			type: 'success',
-			title: formatMessage(commonMessages.successLabel),
-			text: formatMessage(messages.submissionWithdrawn),
-		})
-	} finally {
-		withdrawingSubmission.value = false
-	}
-}
-
 async function submitForReview() {
 	if (!canSubmitForReview.value) return
 	const validation = await props.refreshValidation?.()
@@ -494,6 +442,10 @@ const visibleNags = computed<Nag[]>(() => {
 			description: messages.submittedForReviewDesc,
 			status: 'special-submit-action',
 			shouldShow: (ctx) => ctx.project.status === 'processing',
+			link: {
+				...nagDestinations.moderation,
+				title: messages.visitModerationMessages,
+			},
 		})
 	}
 
