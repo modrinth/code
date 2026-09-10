@@ -1,15 +1,5 @@
 <template>
 	<div class="flex flex-col gap-6">
-		<Admonition v-if="needsUpdate && canSetup" type="warning" :header="formatMessage(messages.unpublished)" inline-actions>
-			{{ formatMessage(messages.unpublishedBody) }}
-			<template #actions>
-				<Button :disabled="actionsLocked" @click="showPreview()">
-					<SpinnerIcon v-if="previewQuery.isFetching.value || pendingAction === 'push'" class="animate-spin" />
-					<UploadIcon v-else />
-					{{ formatMessage(messages.pushUpdate) }}
-				</Button>
-			</template>
-		</Admonition>
 		<ServerPlayCard
 			:address="serverAddress"
 			:disabled="actionsLocked || !worldId || (!canSetup && !sharedInstanceId)"
@@ -75,6 +65,7 @@ import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
@@ -102,6 +93,8 @@ const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 const auth = injectAuth()
 const queryClient = useQueryClient()
+const route = useRoute()
+const router = useRouter()
 const { serverId, worldId, server, serverFull, busyReasons } = injectModrinthServerContext()
 const { canSetup } = useServerPermissions()
 const world = computed(() => serverFull.value?.worlds.find((world) => world.id === worldId.value))
@@ -128,6 +121,7 @@ const previewQuery = useQuery({
 	retry: false,
 })
 const actionMutation = useMutation({
+	mutationKey: ['servers', 'share-action', serverId],
 	mutationFn: async ({ action, targetWorldId, userId }: { action: Action; targetWorldId: string; userId: string | undefined }) => {
 		if (busyReasons.value.length) throw new Error(formatMessage(messages.busy))
 		if (auth.user.value?.id !== userId) return
@@ -192,6 +186,27 @@ async function showPreview(playAfter = false) {
 		handleError(result.error)
 	} else diffModal.value?.show()
 }
+const openingRequestedPreview = ref(false)
+watch(
+	[() => route.query.reviewShare, canSetup, sharedInstanceId, actionsLocked],
+	async ([requested, allowed, instanceId, locked]) => {
+		if (requested !== 'true' || !allowed || !instanceId || locked || openingRequestedPreview.value) return
+		openingRequestedPreview.value = true
+		const requestedPath = route.path
+		try {
+			await nextTick()
+			await showPreview()
+		} finally {
+			if (route.path === requestedPath && route.query.reviewShare === 'true') {
+				const query = { ...route.query }
+				delete query.reviewShare
+				await router.replace({ path: route.path, query, hash: route.hash })
+			}
+			openingRequestedPreview.value = false
+		}
+	},
+	{ immediate: true, flush: 'post' },
+)
 function changeMember(userId: string, remove: boolean) {
 	if (!sharedInstanceId.value || players.membershipMutation.isPending.value || !canSetup.value) return
 	players.membershipMutation.mutate({ id: sharedInstanceId.value, userId, remove }, { onError: (error) => handleError(error) })
@@ -219,8 +234,6 @@ watch([worldId, () => auth.user.value?.id], () => {
 })
 const messages = defineMessages({
 	invitedPlayersTitle: { id: 'servers.play.players.title', defaultMessage: 'Invited players' },
-	unpublished: { id: 'servers.play.unpublished', defaultMessage: 'Your changes haven’t been shared yet' },
-	unpublishedBody: { id: 'servers.play.unpublished-body', defaultMessage: 'Push an update to share your content changes with players.' },
 	pushUpdate: { id: 'servers.play.push-update', defaultMessage: 'Push update' },
 	pushAndPlay: { id: 'servers.play.push-and-play', defaultMessage: 'Push update and play' },
 	shareChanges: { id: 'servers.play.share-changes', defaultMessage: 'Share your changes' },
