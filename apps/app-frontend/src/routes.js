@@ -23,7 +23,7 @@ export default new createRouter({
 				{
 					path: 'play',
 					name: 'ServerManagePlay',
-					component: Hosting.Play,
+					component: () => import('@/pages/hosting/manage/Play.vue'),
 				},
 				{
 					path: '',
