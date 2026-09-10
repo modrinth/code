@@ -55,11 +55,11 @@ pub(super) async fn mod_projects(
 }
 
 pub(super) fn root(state: &State) -> PathBuf {
-    state
-        .directories
-        .metadata_dir()
-        .join("game-locales")
-        .join("v1")
+	state
+		.directories
+		.caches_dir()
+		.join("game-locales")
+		.join("v1")
 }
 
 pub(super) async fn write_json<T: Serialize>(

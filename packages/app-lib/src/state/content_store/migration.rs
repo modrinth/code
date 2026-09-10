@@ -34,6 +34,7 @@ pub(crate) async fn migrate(state: &State) -> crate::Result<()> {
             ("meta/java_versions", "store/java"),
             ("meta/install_job_backups", "store/install-backups"),
             ("caches", "store/cache"),
+			("meta/game-locales", "store/cache/game-locales"),
             ("icons", "store/icons"),
             ("synced-options", "store/synced-options"),
         ]
