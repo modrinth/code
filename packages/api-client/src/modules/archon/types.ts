@@ -284,6 +284,30 @@ export namespace Archon {
 
 	export namespace Content {
 		export namespace v1 {
+			export type ShareWorldContentResponse = {
+				shared_instance_id: string
+				version: number | null
+			}
+
+			export type SharedContentChange<T> =
+				| { kind: 'added'; after: T }
+				| { kind: 'removed'; before: T }
+				| { kind: 'updated'; before: T; after: T }
+
+			export type SharedContentDiffEntry =
+				| { type: 'project'; project_id: string; change: SharedContentChange<string> }
+				| { type: 'external_file'; file_type: string; file_name: string; kind: 'added' | 'removed' | 'updated' }
+				| { type: 'modpack' | 'game_version'; change: SharedContentChange<string> }
+				| { type: 'loader'; change: SharedContentChange<{ name: string; version: string | null }> }
+
+			export type SharedInstancePublishDiff = {
+				shared_instance_id: string
+				latest_version: number
+				local_updated_at: string
+				has_changes: boolean
+				diffs: SharedContentDiffEntry[]
+			}
+
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
 
 			export type ContentOwnerType = 'user' | 'organization'
@@ -835,6 +859,8 @@ export namespace Archon {
 			}
 
 			export type WorldContentInfo = {
+				shared_instance_id: string | null
+				shared_instance_needs_update: boolean
 				modloader: string
 				modloader_version: string
 				game_version: string
@@ -1139,6 +1165,13 @@ export namespace Archon {
 				content: WorldContentItem[]
 			}
 
+			export type WorldSharedInstanceUpdateEvent = {
+				type: 'world.shared_instance.update'
+				world_id: string
+				shared_instance_id: string
+				needs_update: boolean
+			}
+
 			export type SyncEvent =
 				| ProtocolResetEvent
 				| ProtocolInvalidEvent
@@ -1158,6 +1191,7 @@ export namespace Archon {
 				| WorldContentAddonPatchEvent
 				| WorldContentBaseUpdateEvent
 				| WorldContentUpdateEvent
+				| WorldSharedInstanceUpdateEvent
 		}
 	}
 

@@ -30,6 +30,21 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         Some(("server", id)) => {
             CommandPayload::InstallServer { id: id.to_string() }
         }
+		Some(("hosting", path)) => {
+			let (server_id, world_id) = path.split_once('/').ok_or_else(|| {
+				crate::ErrorKind::InputError("Missing hosting world ID".to_string())
+			})?;
+			let server_id = uuid::Uuid::parse_str(server_id).map_err(|_| {
+				crate::ErrorKind::InputError("Invalid hosting server ID".to_string())
+			})?;
+			let world_id = uuid::Uuid::parse_str(world_id).map_err(|_| {
+				crate::ErrorKind::InputError("Invalid hosting world ID".to_string())
+			})?;
+			CommandPayload::PlayHostingServer {
+				server_id: server_id.to_string(),
+				world_id: world_id.to_string(),
+			}
+		}
         // /share/{invite_id}
         Some(("share", raw)) => {
             let (raw, _) = raw.split_once('?').unwrap_or((raw, ""));
