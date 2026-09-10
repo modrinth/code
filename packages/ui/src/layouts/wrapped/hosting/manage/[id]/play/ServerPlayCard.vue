@@ -12,12 +12,14 @@
 				</p>
 			</div>
 			<div class="flex shrink-0 flex-col gap-2 md:w-[164px]">
-				<Button type="colored" color="brand" size="lg" class="w-full" @click="emit('play')">
-					<PlayIcon aria-hidden="true" />
+				<Button type="colored" color="brand" size="lg" class="w-full" :disabled="disabled" @click="emit('play')">
+					<SpinnerIcon v-if="pendingAction === 'play'" class="animate-spin" aria-hidden="true" />
+					<PlayIcon v-else aria-hidden="true" />
 					{{ formatMessage(messages.playServerButton) }}
 				</Button>
-				<Button size="lg" class="w-full" @click="emit('invite')">
-					<UserPlusIcon aria-hidden="true" />
+				<Button size="lg" class="w-full" :disabled="disabled || !canInvite" @click="emit('invite')">
+					<SpinnerIcon v-if="pendingAction === 'invite'" class="animate-spin" aria-hidden="true" />
+					<UserPlusIcon v-else aria-hidden="true" />
 					{{ formatMessage(messages.invitePlayersButton) }}
 				</Button>
 			</div>
@@ -34,41 +36,11 @@
 				</p>
 			</div>
 			<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-				<ButtonGroup class="shrink-0">
-					<ButtonLink
-						v-if="modpackDownloadUrl"
-						size="lg"
-						:href="modpackDownloadUrl"
-						:download="modpackFilename"
-					>
-						<DownloadIcon aria-hidden="true" />
-						{{ formatMessage(messages.downloadModpackButton) }}
-					</ButtonLink>
-					<Button v-else size="lg">
-						<DownloadIcon aria-hidden="true" />
-						{{ formatMessage(messages.downloadModpackButton) }}
-					</Button>
-					<ButtonLink
-						v-if="modpackDownloadUrl"
-						v-tooltip="formatMessage(messages.downloadModpackButton)"
-						size="lg"
-						class="!w-10 !px-0"
-						:href="modpackDownloadUrl"
-						:download="modpackFilename"
-						:aria-label="formatMessage(messages.downloadModpackButton)"
-					>
-						<ChevronDownIcon aria-hidden="true" />
-					</ButtonLink>
-					<IconButton
-						v-else
-						v-tooltip="formatMessage(messages.downloadModpackButton)"
-						size="lg"
-						:circular="false"
-						:label="formatMessage(messages.downloadModpackButton)"
-					>
-						<ChevronDownIcon aria-hidden="true" />
-					</IconButton>
-				</ButtonGroup>
+				<Button size="lg" :disabled="disabled" @click="emit('download')">
+					<SpinnerIcon v-if="pendingAction === 'download'" class="animate-spin" aria-hidden="true" />
+					<DownloadIcon v-else aria-hidden="true" />
+					{{ formatMessage(messages.downloadModpackButton) }}
+				</Button>
 				<div
 					class="flex h-10 min-w-0 items-center justify-between gap-3 rounded-xl bg-surface-2 px-4 sm:w-[313px]"
 				>
@@ -92,26 +64,28 @@
 <script setup lang="ts">
 import {
 	CheckIcon,
-	ChevronDownIcon,
 	CopyIcon,
 	DownloadIcon,
 	PlayIcon,
+	SpinnerIcon,
 	UserPlusIcon,
 } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import { Button, ButtonGroup, ButtonLink, IconButton } from '#ui/components/base/buttons'
+import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const props = defineProps<{
 	address: string
-	modpackDownloadUrl?: string
-	modpackFilename?: string
+	disabled?: boolean
+	canInvite?: boolean
+	pendingAction?: string
 }>()
 
 const emit = defineEmits<{
 	play: []
 	invite: []
+	download: []
 }>()
 
 const { formatMessage } = useVIntl()
