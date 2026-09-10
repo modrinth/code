@@ -40,13 +40,13 @@
 
 			<div
 				v-if="visibleSnapPoints.length"
-				class="pointer-events-none absolute inset-x-0 top-1/2 h-[18px] -translate-y-1/2"
+				class="snap-points pointer-events-none absolute inset-x-0 top-1/2 h-[18px] -translate-y-1/2"
 			>
 				<span
 					v-for="snapPoint in visibleSnapPoints"
 					:key="snapPoint"
 					class="absolute top-0 h-[18px] w-1.5 -translate-x-1/2 rounded-full"
-					:class="snapPoint <= currentValue ? 'bg-brand' : 'bg-surface-5'"
+					:class="snapPoint <= currentValue ? 'bg-brand brightness-on-hover' : 'bg-surface-5'"
 					:style="{ left: `${getPercentage(snapPoint)}%` }"
 				/>
 			</div>
@@ -241,6 +241,14 @@ function onInput(event: Event) {
 	&:focus-visible + .slider-track .slider-thumb {
 		outline: 3px solid var(--color-focus-ring);
 		outline-offset: 3px;
+	}
+
+	&:hover,
+	&:focus-visible {
+		& + .slider-track .filled-slider-track,
+		& ~ .snap-points .brightness-on-hover {
+			filter: brightness(var(--hover-brightness));
+		}
 	}
 }
 
