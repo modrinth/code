@@ -11,6 +11,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onScopeDispose, ref } from 'vue'
 
+import { gameSettingsKeys } from '@/helpers/game-options'
 import {
 	type GlobalSyncedOptions,
 	isSyncedOptionAvailable,
@@ -430,7 +431,10 @@ const globalOptionMutation = useMutation({
 	onSuccess: async (options, { option, enabled }) => {
 		queryClient.setQueryData(syncedOptionsKeys.global, options)
 		if (option === 'game_options') {
-			await refreshSettings()
+			await Promise.all([
+				refreshSettings(),
+				queryClient.invalidateQueries({ queryKey: gameSettingsKeys.synced }),
+			])
 		}
 		if (enabled && option === 'multiplayer_servers') {
 			await queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.servers })

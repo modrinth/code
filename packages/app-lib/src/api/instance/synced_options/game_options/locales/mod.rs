@@ -1,6 +1,7 @@
 //! Caches mod translations and remembers which JAR supplied each setting.
 
 mod archive;
+mod origins;
 mod sources;
 mod storage;
 
@@ -226,7 +227,7 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
     );
     instances.sort_by(|a, b| a.instance.id.cmp(&b.instance.id));
     let mut candidates = Vec::new();
-    let mut archives = HashMap::new();
+    let mut resolver = origins::OriginResolver::default();
     for metadata in instances {
         if super::super::sync_files_are_protected(&metadata) {
             tracing::info!(
@@ -263,13 +264,9 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
         tracing::info!(instance_id = metadata.instance.id, %snapshot_id, game_version = snapshot.game_version,
 			mods = snapshot.mods.len(),
 			"Game setting locales: snapshot loaded");
-        for source in &snapshot.mods {
-            if let Err(error) =
-                cached_archive(state, source, &mut archives).await
-            {
-                tracing::warn!(hash = source.hash, %error, "Game setting locales: archive indexing failed");
-            }
-        }
+        resolver
+            .index_snapshot(state, &snapshot_id, snapshot.clone())
+            .await?;
         let mut tx = state.pool.begin().await?;
         for (id, key) in &keys {
             let observation = Observation {
@@ -306,7 +303,7 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
         "Game setting locales: resolving translation origins"
     );
     let mut pinned = 0;
-    let mut unresolved = Vec::new();
+    let mut unresolved = 0;
     for row in rows {
         if row.origin.is_some() {
             continue;
@@ -348,14 +345,7 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
         let mut resolved = false;
         let observation_count = observations.len();
         for observation in observations {
-            match resolve_origin(
-                state,
-                &row.option_id,
-                &observation,
-                &mut archives,
-            )
-            .await
-            {
+            match resolver.resolve(state, &observation).await {
                 Ok(Some(origin)) => {
                     storage::pin(&state.pool, &row, &origin).await?;
                     resolved = true;
@@ -377,72 +367,23 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
                 backfilled = row.backfilled,
                 "Game setting locales: no matching translation origin"
             );
-            unresolved.push((row.scope, row.option_id));
+            unresolved += 1;
         }
     }
     tracing::info!(
         pinned,
-        ?unresolved,
+        unresolved,
         "Game setting locales: origin resolution finished"
     );
     Ok(())
 }
 
-async fn resolve_origin(
-    state: &State,
-    option_id: &str,
-    observation: &Observation,
-    archives: &mut HashMap<String, Arc<ArchiveIndex>>,
-) -> crate::Result<Option<Origin>> {
-    let snapshot = sources::load_snapshot(state, &observation.snapshot).await?;
-    if !option_id.starts_with("external:") {
-        return Ok(None);
-    }
-    let Some(key) = mod_translation_key(&observation.raw_key) else {
-        return Ok(None);
-    };
-    for source in &snapshot.mods {
-        let index = match cached_archive(state, source, archives).await {
-            Ok(index) => index,
-            Err(error) => {
-                tracing::warn!(%error, option_id, hash = source.hash, "Game setting locales: origin archive unavailable");
-                continue;
-            }
-        };
-        for bundle in &index.bundles {
-            let Some(english) = bundle.locales.get("en_us") else {
-                continue;
-            };
-            let mut english = english.clone();
-            bundle.deprecated.apply(&mut english);
-            if english.get(key).is_none_or(|s| plain_label(s).is_none()) {
-                continue;
-            }
-            return Ok(Some(Origin {
-                instance_id: snapshot.instance_id.clone(),
-                game_version: snapshot.game_version.clone(),
-                legacy_game_jar_hash: None,
-                archive: source.clone(),
-                nested_path: bundle.nested_path.clone(),
-                translation_key: key.to_owned(),
-                choices: BTreeMap::new(),
-            }));
-        }
-    }
-    tracing::debug!(
-        option_id,
-        raw_key = observation.raw_key,
-        key,
-        "Game setting locales: translation keys not found in source archives"
-    );
-    Ok(None)
+fn is_plain_label(value: &str) -> bool {
+    !value.trim().is_empty() && !value.contains('%') && !value.contains('§')
 }
 
 fn plain_label(value: &str) -> Option<String> {
-    if value.trim().is_empty() || value.contains('%') || value.contains('§') {
-        return None;
-    }
-    Some(value.to_owned())
+    is_plain_label(value).then(|| value.to_owned())
 }
 
 fn minecraft_locale(locale: &str) -> String {
