@@ -77,6 +77,9 @@ import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountR
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import HostingPlayHandler from '@/components/ui/hosting/HostingPlayHandler.vue'
+import { provideServerPlay } from '@modrinth/ui'
+
 import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import SurveyPopup from '@/components/ui/SurveyPopup.vue'
@@ -954,6 +957,13 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
+const hostingPlayHandler = ref()
+provideServerPlay({
+	async play(target) {
+		if (!hostingPlayHandler.value) throw new Error('Server play handler is not ready.')
+		await hostingPlayHandler.value.play(target)
+	},
+})
 const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
@@ -1539,6 +1549,8 @@ async function handleCommand(e) {
 		} else {
 			await run(e.id).catch(handleError)
 		}
+	} else if (e.event === 'PlayHostingServer') {
+		await hostingPlayHandler.value?.play({ serverId: e.server_id, worldId: e.world_id })
 	} else if (e.event === 'InstallSharedInstanceInvite') {
 		await sharedInstanceInviteHandler.value?.installFromInviteId(e.invite_id)
 	} else if (e.event === 'InstallServer') {
@@ -2274,6 +2286,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
+	<HostingPlayHandler ref="hostingPlayHandler" />
 	<SharedInstanceInviteHandler ref="sharedInstanceInviteHandler" />
 	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
 	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />
