@@ -62,7 +62,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils/parse'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
@@ -120,6 +120,7 @@ import {
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_user_many, get_version } from '@/helpers/cache.js'
+import { gameSettingsQueryOptions } from '@/helpers/game-options'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
 import {
 	can_current_user_use_shared_instances,
@@ -127,6 +128,7 @@ import {
 	run,
 	set_global_synced_option,
 } from '@/helpers/instance'
+import { maxMemoryQueryOptions } from '@/helpers/jre.js'
 import {
 	get as getCreds,
 	getAll as getAllCreds,
@@ -136,10 +138,22 @@ import {
 	setActive,
 } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
-import { appSettingsKeys, get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+import {
+	appSettingsKeys,
+	appSettingsQueryOptions,
+	get as getSettings,
+	set as setSettings,
+} from '@/helpers/settings.ts'
 import { debugStartup, traceStartupStep } from '@/helpers/startup-debug'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { globalSyncedOptionsQueryOptions, syncedOptionsKeys } from '@/helpers/synced-options'
+import {
+	gameOptionsSyncSourcesQueryOptions,
+	globalSyncedOptionsQueryOptions,
+	initializedSyncedOptionsQueryOptions,
+	syncedOptionsKeys,
+	syncedServersQueryOptions,
+} from '@/helpers/synced-options'
+import { syncedPackQueryOptions } from '@/helpers/synced-packs'
 import { hasActivePride26Midas, hasMidasBadge } from '@/helpers/user-campaigns.ts'
 import { get_user_preferences } from '@/helpers/user-preferences.ts'
 import { parse_modrinth_user_link } from '@/helpers/users'
@@ -458,6 +472,24 @@ const stateInitialized = ref(false)
 const globalSyncedOptionsQuery = useQuery({
 	...globalSyncedOptionsQueryOptions(),
 	enabled: computed(() => stateInitialized.value),
+})
+useQueries({
+	queries: computed(() =>
+		[
+			appSettingsQueryOptions(),
+			instanceListQueryOptions(),
+			maxMemoryQueryOptions(),
+			gameSettingsQueryOptions(),
+			initializedSyncedOptionsQueryOptions(),
+			gameOptionsSyncSourcesQueryOptions(),
+			syncedServersQueryOptions(),
+			syncedPackQueryOptions('resourcepack'),
+			syncedPackQueryOptions('datapack'),
+		].map((options) => ({
+			...options,
+			enabled: stateInitialized.value && options.enabled !== false,
+		})),
+	),
 })
 
 const criticalErrorMessage = ref()
