@@ -1,9 +1,11 @@
-import { computed, ref } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import { computed } from 'vue'
 
-import { get_max_memory } from '@/helpers/jre.js'
+import { maxMemoryQueryOptions } from '@/helpers/jre.js'
 
-export default async function () {
-	const maxMemory = ref(Math.floor((await get_max_memory()) / 1024))
+export default function () {
+	const memoryQuery = useQuery(maxMemoryQueryOptions())
+	const maxMemory = computed(() => Math.floor((memoryQuery.data.value ?? 0) / 1024))
 
 	const snapPoints = computed(() => {
 		let points = []
@@ -17,5 +19,5 @@ export default async function () {
 		return points
 	})
 
-	return { maxMemory, snapPoints }
+	return { maxMemory, snapPoints, memoryQuery }
 }

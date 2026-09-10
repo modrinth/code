@@ -161,17 +161,24 @@ pub(super) async fn archive_index(
     let path = root(state)
         .join("archives")
         .join(format!("{}.json", source.hash));
-    if let Ok(bytes) = io::read(&path).await
-        && let Ok(index) = serde_json::from_slice::<ArchiveIndex>(&bytes)
-        && (index.version >= 2 || !source.path.exists())
-    {
-        tracing::debug!(
-            hash = source.hash,
-            version = index.version,
-            bundles = index.bundles.len(),
-            "Game setting locales: archive cache hit"
-        );
-        return Ok(index);
+    if let Ok(bytes) = io::read(&path).await {
+        let source_path = source.path.clone();
+        let cached = tokio::task::spawn_blocking(move || {
+            serde_json::from_slice::<ArchiveIndex>(&bytes)
+                .ok()
+                .filter(|index| index.version >= 2 || !source_path.exists())
+        })
+        .await
+        .map_err(|error| input_error(error.to_string()))?;
+        if let Some(index) = cached {
+            tracing::debug!(
+                hash = source.hash,
+                version = index.version,
+                bundles = index.bundles.len(),
+                "Game setting locales: archive cache hit"
+            );
+            return Ok(index);
+        }
     }
     tracing::info!(
         hash = source.hash,
