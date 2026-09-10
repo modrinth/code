@@ -23,6 +23,7 @@ import { useRouter } from 'vue-router'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
+import { hostingInstanceMetadata, useHostingInstanceCache } from '@/composables/instances/use-hosting-instance'
 import { toError } from '@/helpers/errors'
 import { install_job_list, install_get_shared_instance_preview, install_get_shared_instance_update_preview, install_shared_instance, install_update_shared_instance, installJobInstanceId, wait_for_install_job } from '@/helpers/install'
 import { get, list } from '@/helpers/instance'
@@ -36,6 +37,7 @@ const client = injectModrinthClient()
 const appEvents = injectAppEvents()
 const queryClient = useQueryClient()
 const router = useRouter()
+const hostingInstances = useHostingInstanceCache()
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const accountModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
@@ -73,6 +75,7 @@ async function join(target: LaunchTarget, instanceId: string) {
 	if (!address) throw new Error(formatMessage(messages.noAddress))
 	await assertAccount(target)
 	await ensureManagedServerWorldExists(instanceId, target.name, address)
+	hostingInstances.value[instanceId] = hostingInstanceMetadata(server, target.worldId, target.sharedInstanceId, address)
 	await router.push(`/instance/${encodeURIComponent(instanceId)}`)
 	await start_join_server(instanceId, address)
 }
