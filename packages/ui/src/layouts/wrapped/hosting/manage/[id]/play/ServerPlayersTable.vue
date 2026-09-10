@@ -76,6 +76,8 @@
 			<template #cell-actions="{ row }">
 				<div class="flex items-center justify-end">
 					<IconButton
+						v-if="canManage"
+						:disabled="disabled"
 						v-tooltip="row.pending ? 'Revoke invite' : 'More actions'"
 						type="quiet"
 						interaction="none"
@@ -116,7 +118,7 @@ import type { ServerPlayerMethod, ServerPlayerRow } from './types'
 type MethodFilter = ServerPlayerMethod | 'all'
 type PlayerColumn = 'username' | 'lastPlayed' | 'joined' | 'method' | 'actions'
 
-const props = defineProps<{ rows: ServerPlayerRow[] }>()
+const props = defineProps<{ rows: ServerPlayerRow[]; canManage?: boolean; disabled?: boolean }>()
 const emit = defineEmits<{
 	remove: [row: ServerPlayerRow]
 	'open-actions': [row: ServerPlayerRow]

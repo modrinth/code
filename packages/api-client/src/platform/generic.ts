@@ -46,8 +46,9 @@ export class GenericModrinthClient extends XHRUploadClient {
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
 		try {
-			const response = await $fetch<T>(url, {
+			const response = await $fetch<T, 'json' | 'blob'>(url, {
 				method: options.method ?? 'GET',
+				responseType: options.responseType,
 				headers: options.headers,
 				body: options.body as BodyInit,
 				params: options.params as Record<string, string>,
@@ -55,7 +56,7 @@ export class GenericModrinthClient extends XHRUploadClient {
 				signal: options.signal,
 			})
 
-			return response
+			return response as T
 		} catch (error) {
 			// ofetch throws FetchError for HTTP errors
 			throw this.normalizeError(error)

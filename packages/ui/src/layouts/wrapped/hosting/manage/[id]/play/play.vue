@@ -1,245 +1,244 @@
 <template>
 	<div class="flex flex-col gap-6">
+		<Admonition v-if="needsUpdate && canSetup" type="warning" :header="formatMessage(messages.unpublished)" inline-actions>
+			{{ formatMessage(messages.unpublishedBody) }}
+			<template #actions>
+				<Button :disabled="actionsLocked" @click="showPreview()">
+					<SpinnerIcon v-if="previewQuery.isFetching.value || pendingAction === 'push'" class="animate-spin" />
+					<UploadIcon v-else />
+					{{ formatMessage(messages.pushUpdate) }}
+				</Button>
+			</template>
+		</Admonition>
 		<ServerPlayCard
 			:address="serverAddress"
-			:modpack-download-url="modpackDownload?.url"
-			:modpack-filename="modpackDownload?.filename"
-			@play="props.onPlayServer?.(serverAddress)"
-			@invite="showInvitePlayers"
+			:disabled="actionsLocked || !worldId || (!canSetup && !sharedInstanceId)"
+			:can-invite="canSetup"
+			:pending-action="pendingAction"
+			@play="perform('play')"
+			@invite="perform('invite')"
+			@download="perform('download')"
 		/>
-
 		<section class="flex flex-col gap-3">
-			<h1 class="m-0 text-2xl font-semibold text-contrast">
-				{{ formatMessage(messages.invitedPlayersTitle) }}
-			</h1>
-			<ServerPlayersTable
-				:rows="playersToDisplay"
-				@remove="removePlayer"
-				@open-actions="(player) => props.onOpenPlayerActions?.(player)"
-			/>
+			<h1 class="m-0 text-2xl font-semibold text-contrast">{{ formatMessage(messages.invitedPlayersTitle) }}</h1>
+			<div v-if="players.members.isLoading.value" class="flex justify-center p-8" role="status" :aria-label="formatMessage(messages.loading)">
+				<SpinnerIcon class="animate-spin" />
+			</div>
+			<Admonition v-else-if="players.members.isError.value" type="critical" :header="formatMessage(messages.playersError)">
+				<Button @click="players.members.refetch()">{{ formatMessage(messages.retry) }}</Button>
+			</Admonition>
+			<ServerPlayersTable v-else :rows="players.rows.value" :can-manage="canSetup" :disabled="players.membershipMutation.isPending.value || actionsLocked" @remove="confirmRemove" @open-actions="confirmRemove" />
 		</section>
-
 		<InvitePlayersModal
 			ref="invitePlayersModal"
-			:header="invitePlayersHeader"
-			:friends="dummyFriends"
-			:search-users="searchInviteUsers"
-			:link="dummyInviteLink"
-			:link-expires-at="dummyInviteLinkExpiresAt"
-			:link-max-uses="10"
+			:header="formatMessage(messages.inviteHeader, { name: server.name })"
+			:friends="players.candidates.value"
+			:search-users="players.search"
+			:link="players.link.value ? `${siteUrl}/share/${encodeURIComponent(players.link.value.id)}` : undefined"
+			:link-expires-at="players.link.value?.expiration"
+			:link-max-uses="players.link.value?.max_uses"
+			:link-max-uses-limit="players.remaining.value"
+			:update-invite-link="updateInviteLink"
+			:can-invite="canSetup && !actionsLocked && !players.membershipMutation.isPending.value && players.remaining.value > 0"
+			:invite-disabled-message="formatMessage(messages.invitesUnavailable)"
 			@invite="invitePlayer"
-			@cancel="cancelPlayerInvite"
+			@cancel="(user) => changeMember(user.id, true)"
 		/>
+		<ContentDiffModal
+			ref="diffModal"
+			:header="formatMessage(messages.pushUpdate)"
+			:admonition-header="formatMessage(messages.shareChanges)"
+			:description="formatMessage(messages.shareChangesBody)"
+			:diffs="previewQuery.data.value?.items ?? []"
+			:confirm-label="formatMessage(previewAction === 'play' ? messages.pushAndPlay : messages.pushUpdate)"
+			:confirm-icon="UploadIcon"
+			:confirm-disabled="actionsLocked || previewQuery.isError.value || !previewQuery.data.value"
+			:added-label="formatMessage(messages.added)"
+			:removed-label="formatMessage(messages.removed)"
+			@confirm="perform(previewAction, true)"
+			@cancel="previewOpen = false"
+		>
+			<template #additional-content>
+				<p v-if="previewQuery.isFetching.value" class="m-0 flex items-center gap-2"><SpinnerIcon class="animate-spin" />{{ formatMessage(messages.refreshingPreview) }}</p>
+				<Admonition v-else-if="previewQuery.isError.value" type="critical" :header="formatMessage(messages.previewError)">
+					<Button @click="previewQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
+				</Admonition>
+			</template>
+		</ContentDiffModal>
+		<ConfirmModal ref="removeModal" :title="formatMessage(messages.removePlayer)" :description="formatMessage(messages.removeDescription, { username: playerToRemove?.username ?? '' })" :proceed-label="formatMessage(messages.removePlayer)" @proceed="removePlayer" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import type { Archon } from '@modrinth/api-client'
+import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useStorage } from '@vueuse/core'
+import { computed, nextTick, ref, watch } from 'vue'
 
-import {
-	type InvitePlayersInvitePayload,
-	InvitePlayersModal,
-	type InvitePlayersSearchUser,
-	type InvitePlayersUser,
-} from '#ui/components/sharing'
+import Admonition from '#ui/components/base/Admonition.vue'
+import { Button } from '#ui/components/base/buttons'
+import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
+import { type InviteLinkSettings, type InvitePlayersInvitePayload, InvitePlayersModal } from '#ui/components/sharing'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
+import { useServerPermissions } from '#ui/composables/server-permissions'
+import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
+import { getHostingServerAddress, injectAuth, injectModrinthClient, injectModrinthServerContext, injectNotificationManager, type ServerPlayTarget } from '#ui/providers'
 
 import ServerPlayCard from './ServerPlayCard.vue'
 import ServerPlayersTable from './ServerPlayersTable.vue'
+import { resolveServerShareDiff } from './share-diff'
 import type { ServerPlayerRow } from './types'
+import { useServerPlayers } from './use-server-players'
 
+type Action = 'play' | 'invite' | 'download' | 'push'
 const props = defineProps<{
-	players?: ServerPlayerRow[]
-	onPlayServer?: (address: string) => void | Promise<void>
-	onInvitePlayers?: () => void | Promise<void>
-	onRemovePlayer?: (player: ServerPlayerRow) => void | Promise<void>
-	onOpenPlayerActions?: (player: ServerPlayerRow) => void | Promise<void>
+	onPlayServer: (target: ServerPlayTarget) => void | Promise<void>
+	onDownloadMrpack: (blob: Blob, filename: string) => Promise<void>
+	siteUrl: string
 }>()
-
 const { formatMessage } = useVIntl()
+const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
-const { server, serverFull } = injectModrinthServerContext()
-const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
-const dummyPlayers = ref<ServerPlayerRow[]>(createDummyPlayers())
-const dummyFriends = ref<InvitePlayersUser[]>(createDummyFriends())
-const dummySearchUsers = createDummySearchUsers()
-const dummyInviteLinkExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-const dummyInviteLink = 'https://modrinth.com/servers/invite/demo'
-
-const messages = defineMessages({
-	invitedPlayersTitle: {
-		id: 'servers.play.players.title',
-		defaultMessage: 'Invited players',
+const auth = injectAuth()
+const queryClient = useQueryClient()
+const { serverId, worldId, server, serverFull, busyReasons } = injectModrinthServerContext()
+const { canSetup } = useServerPermissions()
+const world = computed(() => serverFull.value?.worlds.find((world) => world.id === worldId.value))
+const sharedInstanceId = computed(() => world.value?.content?.shared_instance_id ?? null)
+const needsUpdate = computed(() => world.value?.content?.shared_instance_needs_update ?? false)
+const players = useServerPlayers(sharedInstanceId, canSetup)
+const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
+const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
+const removeModal = ref<InstanceType<typeof ConfirmModal>>()
+const playerToRemove = ref<ServerPlayerRow>()
+const previewOpen = ref(false)
+const previewAction = ref<'play' | 'push'>('push')
+const preferences = useStorage(`pyro-server-${serverId}-preferences`, {
+	reviewChangesBeforePlaying: false,
+})
+const serverAddress = computed(() => getHostingServerAddress(server.value.net, serverFull.value?.subdomain))
+const previewQuery = useQuery({
+	queryKey: computed(() => ['servers', 'share-diff', serverId, worldId.value, auth.user.value?.id]),
+	enabled: computed(() => previewOpen.value && !!worldId.value && !!sharedInstanceId.value),
+	queryFn: async () => {
+		const diff = await client.archon.content_v1.getShareDiff(serverId, worldId.value!)
+		return { diff, items: await resolveServerShareDiff(client, diff) }
 	},
+	retry: false,
 })
-
-const playersToDisplay = computed(() => props.players ?? dummyPlayers.value)
-const invitePlayersHeader = computed(() => `Invite players to ${server.value.name}`)
-
-const serverAddress = computed(() => {
-	const subdomain = server.value.net.domain || serverFull.value?.subdomain
-	if (subdomain) {
-		return subdomain.endsWith('.modrinth.gg') ? subdomain : `${subdomain}.modrinth.gg`
-	}
-
-	return server.value.net.ip || ''
+const actionMutation = useMutation({
+	mutationFn: async ({ action, targetWorldId, userId }: { action: Action; targetWorldId: string; userId: string | undefined }) => {
+		if (busyReasons.value.length) throw new Error(formatMessage(messages.busy))
+		if (auth.user.value?.id !== userId) return
+		const sameContext = () => worldId.value === targetWorldId && auth.user.value?.id === userId
+		let id = serverFull.value?.worlds.find((world) => world.id === targetWorldId)?.content?.shared_instance_id
+		if (canSetup.value) {
+			const shared = await client.archon.content_v1.share(serverId, targetWorldId)
+			id = shared.shared_instance_id
+			queryClient.setQueryData<Archon.Servers.v1.ServerFull>(['servers', 'v1', 'detail', serverId], (current) => current ? {
+				...current,
+				worlds: current.worlds.map((world) => world.id === targetWorldId && world.content ? {
+					...world, content: { ...world.content, shared_instance_id: shared.shared_instance_id },
+				} : world),
+			} : current)
+			await queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] })
+		} else if (action === 'invite' || action === 'push') {
+			throw new Error(formatMessage(messages.permission))
+		}
+		if (!id) throw new Error(formatMessage(messages.notShared))
+		if (!sameContext()) return
+		if (action === 'play') {
+			await props.onPlayServer({ serverId, worldId: targetWorldId })
+		} else if (action === 'invite') {
+			await nextTick()
+			await players.members.refetch({ throwOnError: true })
+			if (!sameContext()) return
+			await players.ensureLink(id)
+			if (sameContext()) invitePlayersModal.value?.show()
+		} else if (action === 'download') {
+			const latest = await client.sharedinstances.instances_v1.getLatestVersion(id)
+			if (!latest.ready) throw new Error(formatMessage(messages.notReady))
+			const blob = await client.sharedinstances.instances_v1.downloadMrpack(id, latest.version)
+			if (sameContext()) await props.onDownloadMrpack(blob, `${server.value.name.replace(/[\\/:*?"<>|]/g, '_')}.mrpack`)
+		} else {
+			previewOpen.value = false
+			await queryClient.invalidateQueries({ queryKey: ['servers', 'share-diff', serverId, targetWorldId] })
+		}
+	},
+	onError: (error) => handleError(error),
 })
-
-const modpackVersionId = computed(() =>
-	server.value.upstream?.kind === 'modpack' ? server.value.upstream.version_id : null,
-)
-
-const { data: modpackVersion } = useQuery({
-	queryKey: computed(() => ['servers', 'play', 'modpack-version', modpackVersionId.value]),
-	queryFn: () => client.labrinth.versions_v3.getVersion(modpackVersionId.value!),
-	enabled: computed(() => Boolean(modpackVersionId.value)),
-	staleTime: 5 * 60 * 1000,
-})
-
-const modpackDownload = computed(() => {
-	const version = modpackVersion.value
-	if (!version) return undefined
-	return version.files.find((file) => file.primary) ?? version.files[0]
-})
-
-function showInvitePlayers() {
-	invitePlayersModal.value?.show()
-	void props.onInvitePlayers?.()
-}
-
-async function searchInviteUsers(query: string): Promise<InvitePlayersSearchUser[]> {
-	const normalizedQuery = query.trim().toLowerCase()
-	const friendKeys = new Set(
-		dummyFriends.value.flatMap((friend) => [
-			friend.id.toLowerCase(),
-			friend.username.toLowerCase(),
-		]),
-	)
-
-	return dummySearchUsers.filter(
-		(user) =>
-			user.username.toLowerCase().startsWith(normalizedQuery) &&
-			!friendKeys.has(user.id.toLowerCase()) &&
-			!friendKeys.has(user.username.toLowerCase()),
-	)
-}
-
-function invitePlayer(payload: InvitePlayersInvitePayload) {
-	const existingFriend = dummyFriends.value.find((friend) => friend.id === payload.user.id)
-
-	if (existingFriend) {
-		existingFriend.status = 'pending'
-	} else {
-		dummyFriends.value.push({
-			...payload.user,
-			status: 'pending',
-		})
-	}
-
-	const existingPlayer = dummyPlayers.value.find((player) => player.id === payload.user.id)
-	if (existingPlayer) {
-		existingPlayer.pending = true
-		existingPlayer.method = 'direct'
+const pendingAction = computed(() => actionMutation.isPending.value ? actionMutation.variables.value?.action : undefined)
+const actionsLocked = computed(() => actionMutation.isPending.value || previewQuery.isFetching.value || players.linkMutation.isPending.value || busyReasons.value.length > 0)
+function perform(action: Action, reviewed = false) {
+	if (!worldId.value || actionsLocked.value) return
+	if (action === 'play' && !reviewed && canSetup.value && needsUpdate.value && preferences.value.reviewChangesBeforePlaying) {
+		void showPreview(true)
 		return
 	}
-
-	dummyPlayers.value.push({
-		id: payload.user.id,
-		username: payload.user.username,
-		avatarUrl: payload.user.avatarUrl ?? undefined,
-		lastPlayedAt: null,
-		joinedAt: null,
-		method: 'direct',
-		pending: true,
-	})
+	previewOpen.value = false
+	actionMutation.mutate({ action, targetWorldId: worldId.value, userId: auth.user.value?.id })
 }
-
-function cancelPlayerInvite(user: InvitePlayersUser) {
-	const friend = dummyFriends.value.find((candidate) => candidate.id === user.id)
-	if (friend) friend.status = 'available'
-
-	dummyPlayers.value = dummyPlayers.value.filter(
-		(player) => player.id !== user.id || !player.pending,
-	)
+async function showPreview(playAfter = false) {
+	if (actionsLocked.value) return
+	const target = worldId.value
+	previewAction.value = playAfter ? 'play' : 'push'
+	previewOpen.value = true
+	const result = await previewQuery.refetch()
+	if (target !== worldId.value) return
+	if (!previewOpen.value) return
+	if (result.error) {
+		previewOpen.value = false
+		handleError(result.error)
+	} else diffModal.value?.show()
 }
-
-function removePlayer(player: ServerPlayerRow) {
-	if (player.pending) {
-		cancelPlayerInvite({ id: player.id, username: player.username })
-	}
-
-	void props.onRemovePlayer?.(player)
+function changeMember(userId: string, remove: boolean) {
+	if (!sharedInstanceId.value || players.membershipMutation.isPending.value || !canSetup.value) return
+	players.membershipMutation.mutate({ id: sharedInstanceId.value, userId, remove }, { onError: (error) => handleError(error) })
 }
-
-function createDummyFriends(): InvitePlayersUser[] {
-	return [
-		{ id: 'coolbot', username: 'Coolbot', status: 'pending', online: true },
-		{ id: 'geometrically', username: 'Geometrically', status: 'added', online: true },
-		{ id: 'josh', username: 'Josh', status: 'added' },
-		{ id: 'prospector', username: 'Prospector', status: 'added' },
-		{ id: 'fetch', username: 'Fetch', status: 'available', online: true },
-		{ id: 'emma', username: 'Emma', status: 'available' },
-	]
+function invitePlayer(payload: InvitePlayersInvitePayload) {
+	changeMember(payload.user.id, false)
 }
-
-function createDummySearchUsers(): InvitePlayersSearchUser[] {
-	return [
-		{ id: 'paperclip', username: 'Paperclip' },
-		{ id: 'steve', username: 'Steve' },
-		{ id: 'alex', username: 'Alex' },
-	]
+function confirmRemove(player: ServerPlayerRow) {
+	playerToRemove.value = player
+	removeModal.value?.show()
 }
-
-function createDummyPlayers(): ServerPlayerRow[] {
-	const now = Date.now()
-	const daysAgo = (days: number) => new Date(now - days * 24 * 60 * 60 * 1000)
-
-	return [
-		{
-			id: 'coolbot',
-			username: 'Coolbot',
-			lastPlayedAt: null,
-			joinedAt: null,
-			method: 'direct',
-			pending: true,
-		},
-		{
-			id: 'geometrically',
-			username: 'Geometrically',
-			lastPlayedAt: daysAgo(0),
-			joinedAt: daysAgo(0),
-			method: 'link',
-		},
-		{
-			id: 'josh',
-			username: 'Josh',
-			lastPlayedAt: daysAgo(0),
-			joinedAt: daysAgo(0),
-			method: 'link',
-		},
-		{
-			id: 'boris',
-			username: 'Boris',
-			lastPlayedAt: daysAgo(4),
-			joinedAt: daysAgo(7),
-			method: 'direct',
-		},
-		{
-			id: 'prospector',
-			username: 'Prospector',
-			lastPlayedAt: daysAgo(4),
-			joinedAt: daysAgo(30),
-			method: 'direct',
-		},
-		{
-			id: 'imb',
-			username: 'IMB',
-			lastPlayedAt: daysAgo(14),
-			joinedAt: daysAgo(90),
-			method: 'direct',
-		},
-	]
+function removePlayer() {
+	if (playerToRemove.value) changeMember(playerToRemove.value.id, true)
 }
+async function updateInviteLink(settings: InviteLinkSettings) {
+	if (!sharedInstanceId.value || players.linkMutation.isPending.value) return
+	await players.linkMutation.mutateAsync({ id: sharedInstanceId.value, settings, replaceId: players.link.value?.id })
+}
+watch([worldId, () => auth.user.value?.id], () => {
+	invitePlayersModal.value?.hide()
+	diffModal.value?.hide()
+	removeModal.value?.hide()
+	previewOpen.value = false
+	playerToRemove.value = undefined
+})
+const messages = defineMessages({
+	invitedPlayersTitle: { id: 'servers.play.players.title', defaultMessage: 'Invited players' },
+	unpublished: { id: 'servers.play.unpublished', defaultMessage: 'Your changes haven’t been shared yet' },
+	unpublishedBody: { id: 'servers.play.unpublished-body', defaultMessage: 'Push an update to share your content changes with players.' },
+	pushUpdate: { id: 'servers.play.push-update', defaultMessage: 'Push update' },
+	pushAndPlay: { id: 'servers.play.push-and-play', defaultMessage: 'Push update and play' },
+	shareChanges: { id: 'servers.play.share-changes', defaultMessage: 'Share your changes' },
+	shareChangesBody: { id: 'servers.play.share-changes-body', defaultMessage: 'These changes will be available to players when they update their instance.' },
+	inviteHeader: { id: 'servers.play.invite-header', defaultMessage: 'Invite players to {name}' },
+	refreshingPreview: { id: 'servers.play.refreshing-preview', defaultMessage: 'Refreshing changes…' },
+	previewError: { id: 'servers.play.preview-error', defaultMessage: 'Could not refresh the changes. Retry before publishing.' },
+	loading: { id: 'servers.play.loading', defaultMessage: 'Loading players' },
+	playersError: { id: 'servers.play.players-error', defaultMessage: 'Could not load invited players' },
+	retry: { id: 'servers.play.retry', defaultMessage: 'Retry' },
+	invitesUnavailable: { id: 'servers.play.invites-unavailable', defaultMessage: 'Invitations are unavailable while an action is in progress or the player limit has been reached.' },
+	removePlayer: { id: 'servers.play.remove-player', defaultMessage: 'Remove player' },
+	removeDescription: { id: 'servers.play.remove-description', defaultMessage: 'Remove {username} from this shared instance? This does not ban them from the Minecraft server.' },
+	added: { id: 'servers.play.diff-added', defaultMessage: 'Added' },
+	removed: { id: 'servers.play.diff-removed', defaultMessage: 'Removed' },
+	busy: { id: 'servers.play.busy', defaultMessage: 'Wait for the current server operation to finish.' },
+	permission: { id: 'servers.play.permission', defaultMessage: 'You do not have permission to share this world.' },
+	notShared: { id: 'servers.play.not-shared', defaultMessage: 'An owner or editor needs to share this world first.' },
+	notReady: { id: 'servers.play.not-ready', defaultMessage: 'The shared content is not ready yet. Please try again shortly.' },
+})
 </script>
