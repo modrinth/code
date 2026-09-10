@@ -118,6 +118,17 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			case 'world.content.base.update':
 				handleWorldContentBaseUpdate(serverId, event)
 				break
+			case 'world.shared_instance.update':
+				patchServerFullWorld(serverId, event.world_id, (world) => world.content ? {
+					...world,
+					content: {
+						...world.content,
+						shared_instance_id: event.shared_instance_id,
+						shared_instance_needs_update: event.needs_update,
+					},
+				} : world)
+				void queryClient.invalidateQueries({ queryKey: ['servers', 'share-diff', serverId, event.world_id] })
+				break
 			case 'world.content.update':
 				handleWorldContentUpdate(serverId, event)
 				break
