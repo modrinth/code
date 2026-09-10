@@ -39,7 +39,7 @@ const messages = defineMessages({
 		:icon="BrainCogIcon"
 		:title="formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
-		info-link="https://support.modrinth.com/en/articles/16567675#h_4482fb3bf7"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_9be39a38e2"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>

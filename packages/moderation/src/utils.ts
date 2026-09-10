@@ -195,7 +195,7 @@ export function flattenStaticVariables(): Record<string, string> {
 	vars[`DISCLOSURES_FAQ_AI_ASSETS_LINK`] =
 		`https://support.modrinth.com/en/articles/16567675#h_e5f38e66a1`
 	vars[`DISCLOSURES_FAQ_AI_TEXT_LINK`] =
-		`https://support.modrinth.com/en/articles/16567675#h_6e56d3fe64`
+		`https://support.modrinth.com/en/articles/16567675#h_9be39a38e2`
 	vars[`DISCLOSURES_FAQ_AI_FUNCTIONALITY_LINK`] =
 		`https://support.modrinth.com/en/articles/16567675#h_4482fb3bf7`
 	vars[`DISCLOSURES_FAQ_ADS_LINK`] =
