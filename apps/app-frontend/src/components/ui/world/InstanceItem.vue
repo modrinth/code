@@ -102,10 +102,11 @@ const loader = computed(() => {
 
 const loading = ref(false)
 const playing = ref(false)
+const installing = computed(() => props.instance.install_stage.includes('installing'))
 
 const play = async (event: MouseEvent) => {
 	event?.stopPropagation()
-	if (props.instance.quarantined) return
+	if (playDisabled.value) return
 	loading.value = true
 	const launched = await run(props.instance.id)
 		.then(() => true)
@@ -153,7 +154,14 @@ onMounted(() => {
 
 const cardOptions = useTemplateRef('cardOptions')
 const showStop = computed(() => playing.value && !loading.value)
-const playDisabled = computed(() => props.instance.quarantined || playing.value || loading.value)
+const playDisabled = computed(
+	() => props.instance.quarantined || playing.value || loading.value || installing.value,
+)
+
+const seeInstance = async () => {
+	if (installing.value) return
+	await router.push(`/instance/${encodeURIComponent(props.instance.id)}`)
+}
 
 const overflowOptions = computed((): ButtonMenuOption[] => [
 	{
@@ -161,7 +169,8 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		label: formatMessage(messages.viewInstance),
 		icon: EyeIcon,
 		shown: !!props.instance.id,
-		action: () => router.push(encodeURI(`/instance/${props.instance.id}`)),
+		disabled: installing.value,
+		action: seeInstance,
 	},
 	{
 		id: 'open-folder',
@@ -182,8 +191,10 @@ const contextMenuOptions = computed((): ButtonMenuOption[] => [
 			}
 		: {
 				id: 'play',
-				label: formatMessage(commonMessages.playButton),
-				icon: PlayIcon,
+				label: formatMessage(
+					installing.value ? commonMessages.installingLabel : commonMessages.playButton,
+				),
+				icon: installing.value ? SpinnerIcon : PlayIcon,
 				tone: 'brand',
 				disabled: playDisabled.value,
 				tooltip: props.instance.quarantined
@@ -204,7 +215,7 @@ function openContextMenu(event: MouseEvent) {
 <template>
 	<div @contextmenu.prevent.stop="openContextMenu">
 		<SmartClickable class="[--active-scale:0.99]">
-			<template #clickable>
+			<template v-if="!installing" #clickable>
 				<router-link
 					class="no-click-animation"
 					:to="`/instance/${encodeURIComponent(instance.id)}`"
@@ -277,9 +288,11 @@ function openContextMenu(event: MouseEvent) {
 						color="green"
 						@click="play"
 					>
-						<SpinnerIcon v-if="loading" class="animate-spin" />
+						<SpinnerIcon v-if="loading || installing" class="animate-spin" />
 						<PlayIcon v-else aria-hidden="true" />
-						{{ formatMessage(commonMessages.playButton) }}
+						{{
+							formatMessage(installing ? commonMessages.installingLabel : commonMessages.playButton)
+						}}
 					</Button>
 					<TeleportOverflowMenu
 						type="quiet"
