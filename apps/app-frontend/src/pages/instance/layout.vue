@@ -116,13 +116,13 @@ import { computed, type ComputedRef, onUnmounted, ref, shallowRef, watch } from 
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
+import { useHostingInstance } from '@/composables/instances/use-hosting-instance'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import {
-	fetchCachedServerStatus,
-	getFreshCachedServerStatus,
+	getServerStatusQueryKey,
 } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -149,7 +149,7 @@ import {
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
-import type { ServerStatus } from '@/helpers/worlds'
+import { get_server_status, start_join_server } from '@/helpers/worlds'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectServerInstall } from '@/providers/server-install'
@@ -259,7 +259,8 @@ const linkedProjectQuery = useQuery(
 	})),
 )
 const linkedProjectV3 = computed(() => linkedProjectQuery.data.value ?? undefined)
-const isServerInstance = computed(() => linkedProjectV3.value?.minecraft_server != null)
+const hosting = useHostingInstance(instance, offline)
+const isServerInstance = computed(() => hosting.isHostingInstance.value || linkedProjectV3.value?.minecraft_server != null)
 const processesQuery = useQuery(
 	computed(() => ({
 		...instanceProcessesQueryOptions(instanceId.value),
@@ -338,13 +339,11 @@ const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useShared
 useLoadingBarToken(subpagePending)
 useLoadingBarToken(computed(() => instanceQuery.isPending.value && !instance.value))
 
-const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
+const minecraftServer = computed(() => hosting.isHostingInstance.value
+	? { region: hosting.region.value }
+	: linkedProjectV3.value?.minecraft_server,
+)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
-const liveServerStatusOnline = ref(false)
-const statusOnline = computed(() => liveServerStatusOnline.value || !!javaServerPingData.value)
-const playersOnline = ref<number | undefined>(undefined)
-const ping = ref<number | undefined>(undefined)
-const loadingServerPing = ref(false)
 const sharedInstanceState = createSharedInstanceContext(
 	instance,
 	offline,
@@ -373,53 +372,19 @@ const sharedInstanceUpdateAvailable = computed(
 		sharedInstanceUpdateKey.value !== hiddenSharedInstanceUpdateKey.value,
 )
 
-function applyServerStatus(status: ServerStatus) {
-	playersOnline.value = status.players?.online
-	ping.value = status.ping
-	liveServerStatusOnline.value = true
-	loadingServerPing.value = true
-}
-
-function resetServerStatus() {
-	ping.value = undefined
-	playersOnline.value = undefined
-	liveServerStatusOnline.value = false
-	loadingServerPing.value = false
-}
-
-const serverAddress = computed(() => linkedProjectV3.value?.minecraft_java_server?.address)
-watch(
-	[instanceId, serverAddress, isServerInstance],
-	([requestedInstanceId, address, serverInstance]) => {
-		resetServerStatus()
-		if (serverInstance && address) {
-			const cachedStatus = getFreshCachedServerStatus(queryClient, address)
-			if (cachedStatus) {
-				applyServerStatus(cachedStatus)
-			} else {
-				playersOnline.value = undefined
-				ping.value = undefined
-				loadingServerPing.value = false
-			}
-
-			fetchCachedServerStatus(queryClient, address)
-				.then((status) => {
-					if (instanceId.value !== requestedInstanceId || serverAddress.value !== address) return
-					applyServerStatus(status)
-				})
-				.catch((error) => {
-					console.error(`Failed to fetch server status for ${address}:`, error)
-				})
-				.finally(() => {
-					if (instanceId.value !== requestedInstanceId) return
-					loadingServerPing.value = true
-				})
-		} else {
-			loadingServerPing.value = true
-		}
-	},
-	{ immediate: true },
-)
+const serverAddress = computed(() => hosting.isHostingInstance.value ? hosting.address.value : linkedProjectV3.value?.minecraft_java_server?.address)
+const serverStatusQuery = useQuery({
+	queryKey: computed(() => getServerStatusQueryKey(serverAddress.value ?? '')),
+	queryFn: () => get_server_status(serverAddress.value!),
+	enabled: computed(() => isServerInstance.value && !!serverAddress.value && !offline.value),
+	staleTime: 30_000,
+	refetchInterval: 30_000,
+	retry: false,
+})
+const statusOnline = computed(() => !serverStatusQuery.isError.value && (!!serverStatusQuery.data.value || !!javaServerPingData.value))
+const playersOnline = computed(() => serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.players?.online)
+const ping = computed(() => serverStatusQuery.isError.value ? undefined : serverStatusQuery.data.value?.ping)
+const loadingServerPing = computed(() => serverStatusQuery.isFetched.value || offline.value)
 
 async function refreshInstance() {
 	await Promise.all([instanceQuery.refetch(), sharedInstanceState.refreshAvailability()])
@@ -538,12 +503,13 @@ watch(
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const launchInstance = async (context: string) => {
+const launchInstance = async (context: string, address?: string) => {
 	if (!instance.value || instance.value.quarantined) return
 	const currentInstance = instance.value
 	loading.value = true
 	try {
-		await run(currentInstance.id)
+		if (address) await start_join_server(currentInstance.id, address)
+		else await run(currentInstance.id)
 		queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [true])
 	} catch (err) {
 		handleSevereError(err, { instanceId: currentInstance.id })
@@ -597,7 +563,7 @@ function handleSharedInstanceUpdateComplete(successful: boolean) {
 	}
 }
 
-const startInstance = async (context: string) => {
+const startInstance = async (context: string, address?: string) => {
 	if (!instance.value || instance.value.quarantined) return
 	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
 
@@ -626,7 +592,7 @@ const startInstance = async (context: string) => {
 		if (preview?.updateAvailable && sharedInstanceUpdateModal.value) {
 			sharedInstanceUpdateModal.value.show(instance.value, preview, async () => {
 				await refreshInstance()
-				await launchInstance(context)
+				await launchInstance(context, address)
 			})
 			return
 		}
@@ -636,7 +602,7 @@ const startInstance = async (context: string) => {
 		if (isSharedInstanceMember) {
 			updateToPlayModal.value.show(instance.value, null, async () => {
 				await refreshInstance()
-				await launchInstance(context)
+				await launchInstance(context, address)
 			})
 		} else {
 			updateToPlayModal.value.show(instance.value)
@@ -644,7 +610,7 @@ const startInstance = async (context: string) => {
 		return
 	}
 
-	await launchInstance(context)
+	await launchInstance(context, address)
 }
 
 const stopInstance = async (context: string) => {
@@ -663,6 +629,10 @@ const stopInstance = async (context: string) => {
 }
 
 const handlePlayServer = async () => {
+	if (hosting.isHostingInstance.value) {
+		if (serverAddress.value) await startInstance('InstancePage', serverAddress.value)
+		return
+	}
 	if (!instance.value?.link?.project_id || instance.value.quarantined) return
 	loading.value = true
 	try {
