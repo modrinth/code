@@ -493,7 +493,6 @@ pub(crate) async fn resolve_embedded_content_metadata(
     files: &[(String, ContentFile)],
     state: &State,
 ) -> crate::Result<HashMap<String, EmbeddedContentMetadata>> {
-    let _lease = state.content_store.lease().await;
     let tracked = crate::state::instances::adapters::sqlite::content_rows::get_instance_files(&instance.id, &state.pool).await?;
     let mut candidates = HashMap::new();
     for (relative_path, file) in files {
@@ -559,7 +558,7 @@ pub(crate) async fn resolve_embedded_content_metadata(
     let inspected_metadata = stream::iter(pending)
         .map(|(hash, path)| async move {
             let inspection = tokio::task::spawn_blocking(move || {
-                inspect_content_file(&path, loader)
+                inspect_content_file(path.path(), loader)
             })
             .await;
             let (mut metadata, icon) = match inspection {

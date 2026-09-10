@@ -76,26 +76,26 @@ impl DirectoryInfo {
         self.store_dir().join("staging")
     }
 
-    pub fn install_backups_dir(&self) -> PathBuf {
-        self.store_dir().join("install-backups")
+    /// Get the Minecraft instance metadata directory
+    #[inline]
+    pub fn metadata_dir(&self) -> PathBuf {
+        self.config_dir.join(METADATA_FOLDER_NAME)
     }
 
-    /// Shared Minecraft downloads retain their upstream directory layouts.
-    #[inline]
-    pub fn minecraft_dir(&self) -> PathBuf {
-        self.store_dir().join("minecraft")
+    pub fn install_backups_dir(&self) -> PathBuf {
+        self.metadata_dir().join("install_job_backups")
     }
 
     /// Get the Minecraft java versions metadata directory
     #[inline]
     pub fn java_versions_dir(&self) -> PathBuf {
-        self.store_dir().join("java")
+        self.metadata_dir().join("java_versions")
     }
 
     /// Get the Minecraft versions metadata directory
     #[inline]
     pub fn versions_dir(&self) -> PathBuf {
-        self.minecraft_dir().join("versions")
+        self.metadata_dir().join("versions")
     }
 
     /// Get the metadata directory for a given version
@@ -107,13 +107,13 @@ impl DirectoryInfo {
     /// Get the Minecraft libraries metadata directory
     #[inline]
     pub fn libraries_dir(&self) -> PathBuf {
-        self.minecraft_dir().join("libraries")
+        self.metadata_dir().join("libraries")
     }
 
     /// Get the Minecraft assets metadata directory
     #[inline]
     pub fn assets_dir(&self) -> PathBuf {
-        self.minecraft_dir().join("assets")
+        self.metadata_dir().join("assets")
     }
 
     /// Get the assets index directory
@@ -137,19 +137,19 @@ impl DirectoryInfo {
     /// Get the Minecraft log config's directory
     #[inline]
     pub fn log_configs_dir(&self) -> PathBuf {
-        self.minecraft_dir().join("log_configs")
+        self.metadata_dir().join("log_configs")
     }
 
     /// Get the Minecraft legacy assets metadata directory
     #[inline]
     pub fn legacy_assets_dir(&self) -> PathBuf {
-        self.minecraft_dir().join("resources")
+        self.metadata_dir().join("resources")
     }
 
     /// Get the Minecraft legacy assets metadata directory
     #[inline]
     pub fn natives_dir(&self) -> PathBuf {
-        self.minecraft_dir().join("natives")
+        self.metadata_dir().join("natives")
     }
 
     /// Get the natives directory for a version of Minecraft
@@ -161,7 +161,7 @@ impl DirectoryInfo {
     /// Get the directory containing instance icons
     #[inline]
     pub fn icon_dir(&self) -> PathBuf {
-        self.store_dir().join("icons")
+        self.config_dir.join("icons")
     }
 
     /// Get the instances directory
@@ -172,7 +172,7 @@ impl DirectoryInfo {
 
     #[inline]
     pub fn synced_options_dir(&self) -> PathBuf {
-        self.store_dir().join(SYNCED_OPTIONS_FOLDER_NAME)
+        self.config_dir.join(SYNCED_OPTIONS_FOLDER_NAME)
     }
 
     /// Gets the logs dir for a given instance path
@@ -204,7 +204,7 @@ impl DirectoryInfo {
     /// Get the cache directory for Theseus
     #[inline]
     pub fn caches_dir(&self) -> PathBuf {
-        self.store_dir().join("cache")
+        self.config_dir.join(CACHES_FOLDER_NAME)
     }
 
     /// Get path from environment variable

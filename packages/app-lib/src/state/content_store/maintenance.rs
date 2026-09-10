@@ -1,4 +1,7 @@
-use super::{ContentStore, catalog, input, sync_directory};
+use super::{
+	BlobStatus, ContentProjectionStatus, ContentStore, FileContent,
+	MaterializationKind, catalog, content_file_path, input, sync_directory,
+};
 use crate::State;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use serde::Serialize;
@@ -9,7 +12,7 @@ use tokio::fs;
 pub struct StoreUsage {
     pub unique_bytes: u64,
 	pub shared_bytes: u64,
-    pub retained_unused_bytes: u64,
+	pub unused_cache_bytes: u64,
     pub estimated_saved_bytes: u64,
     pub private_copy_bytes: u64,
     pub object_count: usize,
@@ -37,8 +40,8 @@ impl ContentStore {
         source: &std::path::Path,
         state: &State,
     ) -> crate::Result<super::BlobLease> {
-        let _lease = self.lease().await;
-        let hash = super::hash_file(source).await?.0;
+		let staged = self.stage_file(source).await?;
+		let hash = staged.sha512.clone();
         let _files_lock = self.files_lock.lock().await;
         if let Some(blob) = self.catalog_blob(&hash).await? {
             if !self.is_healthy(&blob.blob, true).await? {
@@ -71,7 +74,7 @@ impl ContentStore {
                 }
             }
         }
-        self.ingest_file(source).await
+		self.publish_staged(staged, &[]).await
     }
 
     pub async fn usage(&self) -> crate::Result<StoreUsage> {
@@ -81,7 +84,7 @@ impl ContentStore {
             .await?
             .into_iter()
             .collect::<HashSet<_>>();
-        let placements = sqlx::query!("SELECT binding.blob_sha512, binding.materialization_kind, file.size FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.enabled = 1 AND file.missing = 0").fetch_all(&self.pool).await?;
+		let placements = sqlx::query!("SELECT binding.blob_sha512, binding.materialization_kind, file.size FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.missing = 0").fetch_all(&self.pool).await?;
         let installed = placements
             .iter()
             .map(|placement| placement.blob_sha512.as_str())
@@ -92,7 +95,10 @@ impl ContentStore {
             .sum::<u64>();
         let private_copy_bytes = placements
             .iter()
-            .filter(|placement| placement.materialization_kind == "copy")
+			.filter(|placement| {
+				placement.materialization_kind
+					== MaterializationKind::Copy.as_str()
+			})
             .map(|placement| placement.size.max(0) as u64)
             .sum::<u64>();
         let referenced_unique = blobs
@@ -102,7 +108,9 @@ impl ContentStore {
             .sum::<u64>();
 		let mut shared_placements = HashMap::new();
 		for placement in &placements {
-			if placement.materialization_kind == "symlink" {
+			if placement.materialization_kind
+				== MaterializationKind::Symlink.as_str()
+			{
 				*shared_placements
 					.entry(placement.blob_sha512.as_str())
 					.or_insert(0usize) += 1;
@@ -117,7 +125,7 @@ impl ContentStore {
 				})
 				.map(|blob| blob.size as u64)
 				.sum(),
-            retained_unused_bytes: blobs
+			unused_cache_bytes: blobs
                 .iter()
                 .filter(|blob| !roots.contains(&blob.sha512))
                 .map(|blob| blob.size as u64)
@@ -129,7 +137,7 @@ impl ContentStore {
             object_count: blobs.len(),
             damaged_objects: blobs
                 .iter()
-                .filter(|blob| blob.status == "quarantined")
+				.filter(|blob| blob.status == BlobStatus::Quarantined)
                 .count(),
             cache_limit_bytes: self.cache_limit().await?,
         })
@@ -186,7 +194,7 @@ impl ContentStore {
         };
         let mut reclaimed = 0;
         for blob in candidates {
-            if unused <= limit && blob.status != "deleting" {
+			if unused <= limit && blob.status != BlobStatus::Deleting {
                 continue;
             }
             if !purge_unused
@@ -197,7 +205,12 @@ impl ContentStore {
             {
                 continue;
             }
-            catalog::set_status(&self.pool, &blob.sha512, "deleting").await?;
+			catalog::set_status(
+				&self.pool,
+				&blob.sha512,
+				BlobStatus::Deleting,
+			)
+			.await?;
             let path = self.path(&blob)?;
             self.validate_object_parent(&path).await?;
             match fs::symlink_metadata(&path).await {
@@ -299,7 +312,7 @@ impl ContentStore {
                 if !sources.is_empty() {
                     let result = async {
 						let mirrors = sources.iter().map(String::as_str).collect::<Vec<_>>();
-						let downloaded = crate::util::fetch::fetch_file_mirrors(&mirrors, Some(&blob.sha1), None, None, &state.fetch_semaphore, &self.pool, None).await?;
+						let downloaded = crate::util::fetch::fetch_file_mirrors_in(&mirrors, Some(&blob.sha1), None, None, &state.fetch_semaphore, &self.pool, None, Some(&self.staging)).await?;
 						if downloaded.sha512 != blob.sha512 || downloaded.size != blob.size as u64 { return Err(input("Repair download has an unexpected hash or size")); }
 						let path = self.path(&blob)?;
 						if fs::symlink_metadata(&path).await.is_ok() {
@@ -307,7 +320,7 @@ impl ContentStore {
 							fs::create_dir_all(&quarantine).await?;
 							fs::rename(&path, quarantine.join(format!("{}-{}", blob.sha512, uuid::Uuid::new_v4()))).await?;
 						}
-						self.ingest_file_with_sources(downloaded.path(), &sources).await?;
+						self.publish_staged(downloaded.into_staged()?, &sources).await?;
 						Ok::<(), crate::Error>(())
 					}.await;
                     match result {
@@ -331,31 +344,49 @@ impl ContentStore {
         for instance in instance_rows::list_instances(&self.pool).await? {
             for mut file in crate::state::instances::adapters::sqlite::content_rows::get_instance_files(&instance.id, &self.pool).await? {
 				let Some(binding) = catalog::binding(&self.pool, &file.id).await? else { continue; };
-				let path = self.instance_path(&instance.path, &file.relative_path).await?;
-				let present = fs::symlink_metadata(&path).await.is_ok();
-				let matches = present && self.matches(&path, &binding.blob_sha512).await?;
-				let blob = self.file_blob(&file).await?;
-				if (file.enabled && matches && blob.is_some()) || (!file.enabled && !present) { continue; }
+				let projection = self.inspect_projection(&instance, &file, &binding).await?;
+				let content = self.file_content(&file).await?;
+				if projection == ContentProjectionStatus::Healthy
+					&& matches!(&content, FileContent::Stored(_))
+					&& !file.missing
+				{
+					continue;
+				}
 				let mut fixed = false;
-				if repair && file.enabled && !present {
-					if let Some(blob) = &blob {
-						let mode = self.materialize(blob, &path, binding.materialization_kind == "copy").await?;
+				if repair {
+					if let FileContent::Stored(blob) = &content
+						&& projection == ContentProjectionStatus::Missing
+					{
+						let path = self.instance_path(&instance.path, &content_file_path(&file)).await?;
+						let mode = self.materialize(blob, &path, binding.materialization_kind == MaterializationKind::Copy).await?;
 						let mut tx = self.pool.begin().await?;
 						file.missing = false;
 						crate::state::instances::adapters::sqlite::content_rows::upsert_instance_file(&file, &mut tx).await?;
-						catalog::bind(&mut tx, &file.id, &binding.blob_sha512, &mode).await?;
+						catalog::bind(&mut tx, &file.id, &binding.blob_sha512, mode).await?;
+						tx.commit().await?;
+						fixed = true;
+					} else if matches!(&content, FileContent::Stored(_))
+						&& projection == ContentProjectionStatus::Healthy
+						&& file.missing
+					{
+						let mut tx = self.pool.begin().await?;
+						file.missing = false;
+						crate::state::instances::adapters::sqlite::content_rows::upsert_instance_file(&file, &mut tx).await?;
 						tx.commit().await?;
 						fixed = true;
 					}
-				} else if repair && !file.enabled && matches {
-					self.unlink_owned(&file, &instance.path).await?;
-					fixed = true;
 				}
 				if fixed { report.repaired += 1; }
 				else {
+					let reason = match (&content, projection) {
+						(FileContent::Damaged(_), _) => "the stored content is missing or damaged",
+						(_, ContentProjectionStatus::Conflict) => "the instance path contains different content; preserve it and resolve the conflict",
+						(_, ContentProjectionStatus::Missing) => "the instance projection is missing",
+						(_, ContentProjectionStatus::Healthy) => "the instance projection metadata needs repair",
+					};
 					report.issues.push(StoreIssue {
 						sha512: binding.blob_sha512, instance_ids: vec![instance.id.clone()],
-						message: format!("{}: {}", file.relative_path, if present && !matches { "the instance path contains different content; preserve it and resolve the conflict" } else { "the instance projection is missing, disabled incorrectly, or needs repaired content" }),
+						message: format!("{}: {reason}", file.relative_path),
 					});
 				}
 			}

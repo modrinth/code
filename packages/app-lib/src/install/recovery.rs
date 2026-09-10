@@ -40,10 +40,8 @@ pub(super) async fn prepare_shared_instance_update_backup(
     let _content_lock =
         state.lock_instance_content(&metadata.instance.id).await;
     let _store_lock = state.content_store.files_lock.lock().await;
-    let staging_dir = state
-        .directories
-        .install_backups_dir()
-        .join(job_id.to_string());
+    let owner = job_id.to_string();
+    let staging_dir = shared_instance_update_backup_dir(job_id, state);
     if tokio::fs::try_exists(&staging_dir).await? {
         crate::util::io::remove_dir_all(&staging_dir).await?;
     }
@@ -65,24 +63,17 @@ pub(super) async fn prepare_shared_instance_update_backup(
             &metadata.instance.id,
         )
         .await?;
-        state
-            .content_store
-            .retain(
-                "rollback",
-                &job_id.to_string(),
-                &bindings
-                    .iter()
-                    .map(|binding| binding.blob_sha512.clone())
-                    .collect::<Vec<_>>(),
-            )
-            .await?;
         let skipped = files
             .iter()
             .filter(|file| {
                 bindings.iter().any(|binding| binding.file_id == file.id)
             })
-            .map(|file| file.relative_path.clone())
+			.map(crate::state::content_store::content_file_path)
             .collect();
+        let retained = bindings
+            .iter()
+            .map(|binding| binding.blob_sha512.clone())
+            .collect::<Vec<_>>();
         let snapshot = SharedInstanceUpdateRollback {
             files,
             entries,
@@ -104,6 +95,14 @@ pub(super) async fn prepare_shared_instance_update_backup(
             serde_json::to_vec(&snapshot)?,
         )
         .await?;
+        state
+            .content_store
+            .retain(
+                "rollback",
+                &owner,
+                &retained,
+            )
+            .await?;
 
         Ok::<(), crate::Error>(())
     }
@@ -111,9 +110,54 @@ pub(super) async fn prepare_shared_instance_update_backup(
 
     if result.is_err() {
         let _ = crate::util::io::remove_dir_all(&staging_dir).await;
+        let _ = state.content_store.release("rollback", &owner).await;
     }
     result?;
     Ok(staging_dir)
+}
+
+fn shared_instance_update_backup_dir(job_id: Uuid, state: &State) -> PathBuf {
+    state
+        .directories
+        .install_backups_dir()
+        .join(job_id.to_string())
+}
+
+async fn recover_unrecorded_shared_instance_update_backup(
+    job: &mut store::InstallJobRecord,
+    state: &State,
+) -> crate::Result<()> {
+    if job.state.paths.staging_dir.is_some()
+        || !matches!(
+            &job.state.request,
+            InstallRequest::UpdateSharedInstance { .. }
+        )
+    {
+        return Ok(());
+    }
+    let staging_dir = shared_instance_update_backup_dir(job.id, state);
+    if !tokio::fs::try_exists(&staging_dir).await? {
+        return Ok(());
+    }
+	let snapshot = match crate::util::io::read(
+		staging_dir.join(SHARED_INSTANCE_ROLLBACK_FILE),
+	)
+	.await
+	{
+		Ok(bytes) => serde_json::from_slice::<SharedInstanceUpdateRollback>(&bytes).ok(),
+		Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+		Err(error) => return Err(error.into()),
+	};
+	if snapshot.is_some() {
+        job.state.paths.staging_dir = Some(staging_dir);
+    } else {
+        crate::util::io::remove_dir_all(&staging_dir).await?;
+        state
+            .content_store
+            .release("rollback", &job.id.to_string())
+            .await?;
+    }
+    Ok(())
 }
 
 pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
@@ -363,6 +407,7 @@ async fn recover_interrupted_job(
     mut job: store::InstallJobRecord,
     state: &State,
 ) -> crate::Result<()> {
+    recover_unrecorded_shared_instance_update_backup(&mut job, state).await?;
     if job.state.display.is_none() {
         job.state.display = display_from_request(&job.state);
     }

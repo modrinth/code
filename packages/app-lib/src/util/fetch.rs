@@ -387,6 +387,7 @@ pub struct DownloadedFile {
     pub sha1: String,
     pub sha512: String,
     pub reused: bool,
+	archive: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -412,9 +413,32 @@ impl DownloadedFile {
             size: blob.blob.size as u64,
             sha1: blob.blob.sha1.clone(),
             sha512: blob.blob.sha512.clone(),
+			archive: blob.blob.relative_path.ends_with("/payload.jar"),
             path: DownloadedFilePath::Stored(blob),
         }
     }
+
+	pub(crate) fn into_staged(self) -> crate::Result<StagedDownload> {
+		let DownloadedFilePath::Temporary(path) = self.path else {
+			return Err(ErrorKind::InputError(
+				"Stored content cannot be staged again".to_string(),
+			)
+			.into());
+		};
+		let path = Arc::try_unwrap(path).map_err(|_| {
+			ErrorKind::InputError(
+				"Downloaded content is still in use and cannot be published"
+					.to_string(),
+			)
+		})?;
+		Ok(StagedDownload {
+			path,
+			size: self.size,
+			sha1: self.sha1,
+			sha512: self.sha512,
+			archive: self.archive,
+		})
+	}
 
     pub(crate) async fn store_blob(
         &self,
@@ -458,6 +482,15 @@ impl DownloadedFile {
     }
 }
 
+#[derive(Debug)]
+pub(crate) struct StagedDownload {
+	pub(crate) path: tempfile::TempPath,
+	pub(crate) size: u64,
+	pub(crate) sha1: String,
+	pub(crate) sha512: String,
+	pub(crate) archive: bool,
+}
+
 enum FetchBody {
     Memory(Bytes),
     File(DownloadedFile),
@@ -488,6 +521,7 @@ pub async fn fetch_file(
         &INSECURE_REQWEST_CLIENT,
         progress,
         true,
+		None,
     )
     .await?;
     match body {
@@ -503,7 +537,31 @@ pub async fn fetch_file_mirrors(
     uri_path: Option<&'static str>,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-    mut progress: Option<&mut FetchProgressFn<'_>>,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<DownloadedFile> {
+	fetch_file_mirrors_in(
+		mirrors,
+		sha1,
+		download_meta,
+		uri_path,
+		semaphore,
+		exec,
+		progress,
+		None,
+	)
+	.await
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn fetch_file_mirrors_in(
+	mirrors: &[&str],
+	sha1: Option<&str>,
+	download_meta: Option<&DownloadMeta>,
+	uri_path: Option<&'static str>,
+	semaphore: &FetchSemaphore,
+	exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+	mut progress: Option<&mut FetchProgressFn<'_>>,
+	staging: Option<&Path>,
 ) -> crate::Result<DownloadedFile> {
     if mirrors.is_empty() {
         return Err(
@@ -526,6 +584,7 @@ pub async fn fetch_file_mirrors(
             &REQWEST_CLIENT,
             progress.as_deref_mut(),
             true,
+			staging,
         )
         .await;
         match body {
@@ -543,10 +602,13 @@ pub async fn fetch_file_mirrors(
 async fn read_file_response(
     response: reqwest::Response,
     mut progress: Option<&mut FetchProgressFn<'_>>,
+	staging: Option<&Path>,
 ) -> crate::Result<DownloadedFile> {
     use futures::StreamExt;
-    let staging = crate::State::get_if_initialized()
-        .map(|state| state.directories.store_staging_dir());
+	let staging = staging.map(Path::to_path_buf).or_else(|| {
+		crate::State::get_if_initialized()
+			.map(|state| state.directories.store_staging_dir())
+	});
     let path = tokio::task::spawn_blocking(move || {
         match staging {
             Some(staging) => tempfile::NamedTempFile::new_in(staging),
@@ -561,8 +623,14 @@ async fn read_file_response(
     let mut hasher = sha1_smol::Sha1::new();
     let mut sha512 = Sha512::new();
     let mut size = 0_u64;
+	let mut prefix = [0_u8; 2];
+	let mut prefix_len = 0;
     while let Some(chunk) = stream.next().await {
         let chunk = chunk?;
+		let prefix_count = (prefix.len() - prefix_len).min(chunk.len());
+		prefix[prefix_len..prefix_len + prefix_count]
+			.copy_from_slice(&chunk[..prefix_count]);
+		prefix_len += prefix_count;
         file.write_all(&chunk).await?;
         hasher.update(&chunk);
         sha512.update(&chunk);
@@ -579,6 +647,7 @@ async fn read_file_response(
         size,
         sha1: hasher.hexdigest(),
         sha512: format!("{:x}", sha512.finalize()),
+		archive: prefix_len == prefix.len() && prefix == *b"PK",
     })
 }
 
@@ -591,7 +660,7 @@ pub(crate) async fn fetch_content_file(
     download_meta: Option<&DownloadMeta>,
     progress: Option<&mut FetchProgressFn<'_>>,
 ) -> crate::Result<DownloadedFile> {
-    let (blob, reused) = state
+    let acquired = state
         .content_store
         .acquire(
             mirrors,
@@ -603,7 +672,10 @@ pub(crate) async fn fetch_content_file(
             progress,
         )
         .await?;
-    Ok(DownloadedFile::from_blob(blob, reused))
+    Ok(DownloadedFile::from_blob(
+		acquired.blob,
+		acquired.reused,
+	))
 }
 
 async fn read_memory_response(
@@ -879,6 +951,7 @@ async fn fetch_advanced_with_client_and_progress(
         client,
         progress,
         false,
+		None,
     )
     .await?;
     match body {
@@ -902,6 +975,7 @@ async fn fetch_advanced_with_target(
     client: &reqwest::Client,
     mut progress: Option<&mut FetchProgressFn<'_>>,
     to_file: bool,
+	file_staging: Option<&Path>,
 ) -> crate::Result<FetchBody> {
     let _permit = semaphore.0.acquire().await?;
 
@@ -993,7 +1067,11 @@ async fn fetch_advanced_with_target(
                 }
 
                 let bytes = if to_file {
-                    read_file_response(resp, progress.as_deref_mut())
+					read_file_response(
+						resp,
+						progress.as_deref_mut(),
+						file_staging,
+					)
                         .await
                         .map(FetchBody::File)
                 } else {

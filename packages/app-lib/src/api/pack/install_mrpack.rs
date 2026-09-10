@@ -11,6 +11,9 @@ use crate::pack::install_from::{
     EnvType, PackFile, PackFileHash, set_instance_information,
 };
 use crate::state::instances::ContentSourceKind;
+use crate::state::instances::commands::{
+	ContentOrigin, InstallContent, install_content_blob,
+};
 use crate::state::{
     CachedEntry, CachedFile, EditInstance, InstanceInstallStage, SideType,
 };
@@ -883,12 +886,21 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     let blob = file.store_blob(state).await?;
                     content_context.reporter.preserve_failure_context(
 						context.clone(),
-						crate::state::instances::commands::install_content_blob(
-							&content_context.instance_id, &project_path, &blob, project_type,
-							modpack_source_kind(content_context.pack_version_id.as_deref()),
-							file_info.map(|file| file.project_id.as_str()),
-							file_info.map(|file| file.version_id.as_str()),
-							None, state,
+						install_content_blob(
+							&content_context.instance_id,
+							InstallContent {
+								requested_path: &project_path,
+								blob: &blob,
+								project_type,
+								source_kind: modpack_source_kind(content_context.pack_version_id.as_deref()),
+								origin: file_info.map(|file| ContentOrigin {
+									project_id: &file.project_id,
+									version_id: &file.version_id,
+								}),
+								enabled_override: None,
+								previous_path: None,
+							},
+							state,
 						).await,
 					).await?;
                 } else {
@@ -1130,18 +1142,20 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 reporter
                     .preserve_failure_context(
                         record_context,
-                        crate::state::instances::commands::install_content_blob(
-                            &instance_id,
-                            relative_override_file_path.as_str(),
-							&blob,
-                            project_type,
-                            modpack_source_kind(version_id.as_deref()),
-                            None,
-                            None,
-							None,
-                            state,
-                        )
-                        .await,
+						install_content_blob(
+							&instance_id,
+							InstallContent {
+								requested_path: relative_override_file_path.as_str(),
+								blob: &blob,
+								project_type,
+								source_kind: modpack_source_kind(version_id.as_deref()),
+								origin: None,
+								enabled_override: None,
+								previous_path: None,
+							},
+							state,
+						)
+						.await,
                     )
                     .await?;
             }

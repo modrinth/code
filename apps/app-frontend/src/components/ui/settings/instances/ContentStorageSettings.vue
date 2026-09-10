@@ -15,7 +15,7 @@ import { computed, ref } from 'vue'
 type StoreUsage = {
 	unique_bytes: number
 	shared_bytes: number
-	retained_unused_bytes: number
+	unused_cache_bytes: number
 	private_copy_bytes: number
 	object_count: number
 	cache_limit_bytes: number
@@ -99,11 +99,11 @@ const messages = defineMessages({
 	},
 	limit: {
 		id: 'app.settings.resource-management.store.cache-limit.label',
-		defaultMessage: 'Content storage size',
+		defaultMessage: 'Unused content cache limit',
 	},
 	limitDescription: {
 		id: 'app.settings.resource-management.store.cache-limit.description',
-		defaultMessage: 'Space allocated for storing content, including unused content.',
+		defaultMessage: 'Maximum space used for unused content that can be reused without downloading it again.',
 	},
 	limitUnit: {
 		id: 'app.settings.resource-management.store.cache-limit.unit',
@@ -137,7 +137,7 @@ const messages = defineMessages({
 })
 
 const categories = computed(() => {
-	const unused = storeUsage.value?.retained_unused_bytes ?? 0
+	const unused = storeUsage.value?.unused_cache_bytes ?? 0
 	const shared = storeUsage.value?.shared_bytes ?? 0
 	return [
 		{
@@ -267,7 +267,7 @@ async function saveCacheLimit() {
 			<Button
 				type="colored"
 				color="red"
-				:disabled="busy || storeUsage.retained_unused_bytes === 0"
+				:disabled="busy || storeUsage.unused_cache_bytes === 0"
 				:loading="activeAction === 'clear'"
 				@click="runAction('clear')"
 			>

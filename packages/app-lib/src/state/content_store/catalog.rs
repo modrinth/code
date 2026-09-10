@@ -1,9 +1,23 @@
-use super::{Binding, Blob};
+use super::{Binding, Blob, BlobStatus, MaterializationKind};
 use sqlx::{Sqlite, SqlitePool, Transaction};
 
 pub(super) async fn blobs(pool: &SqlitePool) -> crate::Result<Vec<Blob>> {
-    Ok(sqlx::query_as!(Blob, "SELECT sha512, sha1, size, relative_path, status, modified_at_ns, last_used_at, sources FROM store_blobs")
-		.fetch_all(pool).await?)
+	let rows = sqlx::query!("SELECT sha512, sha1, size, relative_path, status, modified_at_ns, last_used_at, sources FROM store_blobs")
+		.fetch_all(pool).await?;
+	rows.into_iter()
+		.map(|row| {
+			Ok(Blob {
+				sha512: row.sha512,
+				sha1: row.sha1,
+				size: row.size,
+				relative_path: row.relative_path,
+				status: BlobStatus::from_db(&row.status)?,
+				modified_at_ns: row.modified_at_ns,
+				last_used_at: row.last_used_at,
+				sources: row.sources,
+			})
+		})
+		.collect()
 }
 
 pub(super) async fn find(
@@ -11,8 +25,22 @@ pub(super) async fn find(
     sha512: Option<&str>,
     sha1: Option<&str>,
 ) -> crate::Result<Vec<Blob>> {
-    Ok(sqlx::query_as!(Blob, "SELECT sha512, sha1, size, relative_path, status, modified_at_ns, last_used_at, sources FROM store_blobs WHERE (? IS NOT NULL AND sha512 = ?) OR (? IS NULL AND sha1 = ?)", sha512, sha512, sha512, sha1)
-		.fetch_all(pool).await?)
+	let rows = sqlx::query!("SELECT sha512, sha1, size, relative_path, status, modified_at_ns, last_used_at, sources FROM store_blobs WHERE (? IS NOT NULL AND sha512 = ?) OR (? IS NULL AND sha1 = ?)", sha512, sha512, sha512, sha1)
+		.fetch_all(pool).await?;
+	rows.into_iter()
+		.map(|row| {
+			Ok(Blob {
+				sha512: row.sha512,
+				sha1: row.sha1,
+				size: row.size,
+				relative_path: row.relative_path,
+				status: BlobStatus::from_db(&row.status)?,
+				modified_at_ns: row.modified_at_ns,
+				last_used_at: row.last_used_at,
+				sources: row.sources,
+			})
+		})
+		.collect()
 }
 
 pub(super) async fn put(pool: &SqlitePool, blob: &Blob) -> crate::Result<()> {
@@ -38,8 +66,9 @@ pub(super) async fn touch(
 pub(super) async fn set_status(
     pool: &SqlitePool,
     sha512: &str,
-    status: &str,
+	status: BlobStatus,
 ) -> crate::Result<()> {
+	let status = status.as_str();
     sqlx::query!(
         "UPDATE store_blobs SET status = ? WHERE sha512 = ?",
         status,
@@ -54,23 +83,45 @@ pub(crate) async fn bindings(
     pool: &SqlitePool,
     instance_id: &str,
 ) -> crate::Result<Vec<Binding>> {
-    Ok(sqlx::query_as!(Binding, "SELECT binding.file_id, binding.blob_sha512, binding.materialization_kind FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.instance_id = ?", instance_id)
-		.fetch_all(pool).await?)
+	let rows = sqlx::query!("SELECT binding.file_id, binding.blob_sha512, binding.materialization_kind FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.instance_id = ?", instance_id)
+		.fetch_all(pool).await?;
+	rows.into_iter()
+		.map(|row| {
+			Ok(Binding {
+				file_id: row.file_id,
+				blob_sha512: row.blob_sha512,
+				materialization_kind: MaterializationKind::from_db(
+					&row.materialization_kind,
+				)?,
+			})
+		})
+		.collect()
 }
 
 pub(crate) async fn binding(
     pool: &SqlitePool,
     file_id: &str,
 ) -> crate::Result<Option<Binding>> {
-    Ok(sqlx::query_as!(Binding, "SELECT file_id, blob_sha512, materialization_kind FROM store_instance_files WHERE file_id = ?", file_id).fetch_optional(pool).await?)
+	let row = sqlx::query!("SELECT file_id, blob_sha512, materialization_kind FROM store_instance_files WHERE file_id = ?", file_id).fetch_optional(pool).await?;
+	row.map(|row| {
+		Ok(Binding {
+			file_id: row.file_id,
+			blob_sha512: row.blob_sha512,
+			materialization_kind: MaterializationKind::from_db(
+				&row.materialization_kind,
+			)?,
+		})
+	})
+	.transpose()
 }
 
 pub(super) async fn bind(
     tx: &mut Transaction<'_, Sqlite>,
     file_id: &str,
     sha512: &str,
-    mode: &str,
+	mode: MaterializationKind,
 ) -> crate::Result<()> {
+	let mode = mode.as_str();
     sqlx::query!("INSERT INTO store_instance_files (file_id, blob_sha512, materialization_kind) VALUES (?, ?, ?) ON CONFLICT(file_id) DO UPDATE SET blob_sha512 = excluded.blob_sha512, materialization_kind = excluded.materialization_kind", file_id, sha512, mode)
 		.execute(&mut **tx).await?;
     Ok(())

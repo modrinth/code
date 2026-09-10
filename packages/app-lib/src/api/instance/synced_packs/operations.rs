@@ -83,18 +83,14 @@ pub(super) async fn pack_from_item(
         )
         .into());
     }
-    let _lease = state.content_store.lease().await;
     let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &item.file_path, &state.pool).await?
 		.ok_or_else(|| crate::state::content_store::input("The pack is not registered"))?;
-    let bytes = Bytes::from(
-        io::read(
-            state
-                .content_store
-                .read_path(&file, &metadata.instance.path)
-                .await?,
-        )
-        .await?,
-    );
+	let source = state
+		.content_store
+		.read_path(&file, &metadata.instance.path)
+		.await?;
+	let bytes = Bytes::from(io::read(source.path()).await?);
+	drop(source);
     validate_pack(&bytes, item.project_type)?;
     let game_versions = if let Some(version) = &item.version {
         CachedEntry::get_version(

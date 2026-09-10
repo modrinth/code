@@ -110,11 +110,11 @@ pub(super) async fn cache_bytes(
     Ok(blob.blob.sha1.clone())
 }
 
-pub(super) async fn read_bytes(
-    pack: &SyncedPack,
-    state: &State,
-) -> crate::Result<Bytes> {
-    let blob = state
+pub(super) async fn read_blob(
+	pack: &SyncedPack,
+	state: &State,
+) -> crate::Result<crate::state::content_store::BlobLease> {
+	state
         .content_store
         .lookup(
             pack.blob_sha512.as_deref(),
@@ -126,19 +126,7 @@ pub(super) async fn read_bytes(
             input(
                 "The synced pack is missing or damaged; repair or re-import it",
             )
-        })?;
-    Ok(Bytes::from(io::read(&blob.path).await?))
-}
-
-pub(super) async fn read_cached_bytes(
-    sha1: &str,
-    state: &State,
-) -> crate::Result<Option<Bytes>> {
-    let Some(blob) = state.content_store.lookup(None, Some(sha1), None).await?
-    else {
-        return Ok(None);
-    };
-    Ok(Some(Bytes::from(io::read(&blob.path).await?)))
+		})
 }
 
 pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {

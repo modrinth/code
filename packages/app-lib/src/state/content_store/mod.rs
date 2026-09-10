@@ -4,14 +4,19 @@ pub(crate) mod migration;
 mod operations;
 
 pub use maintenance::{StoreUsage, StoreVerification};
+pub(crate) use operations::{
+	ContentProjectionStatus, PreparedProjection, content_file_path,
+	materialized_content_path,
+};
 
 use crate::state::{DirectoryInfo, InstanceFile, file_modified_at_ns};
 use crate::util::fetch::{self, DownloadMeta, FetchProgressFn, FetchSemaphore};
-use dashmap::DashMap;
 use fs4::tokio::AsyncFileExt;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 use sqlx::SqlitePool;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 use tokio::fs::{self, File};
@@ -24,7 +29,7 @@ pub(crate) struct Blob {
     pub sha1: String,
     pub size: i64,
     pub relative_path: String,
-    pub status: String,
+    pub status: BlobStatus,
     pub modified_at_ns: i64,
     pub last_used_at: i64,
     pub sources: String,
@@ -34,7 +39,58 @@ pub(crate) struct Blob {
 pub(crate) struct Binding {
     pub file_id: String,
     pub blob_sha512: String,
-    pub materialization_kind: String,
+    pub materialization_kind: MaterializationKind,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum MaterializationKind {
+	Symlink,
+	Copy,
+}
+
+impl MaterializationKind {
+	pub(crate) const fn as_str(self) -> &'static str {
+		match self {
+			Self::Symlink => "symlink",
+			Self::Copy => "copy",
+		}
+	}
+
+	fn from_db(value: &str) -> crate::Result<Self> {
+		match value {
+			"symlink" => Ok(Self::Symlink),
+			"copy" => Ok(Self::Copy),
+			_ => Err(input("Invalid content materialization kind")),
+		}
+	}
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum BlobStatus {
+	Ready,
+	Quarantined,
+	Deleting,
+}
+
+impl BlobStatus {
+	pub(crate) const fn as_str(self) -> &'static str {
+		match self {
+			Self::Ready => "ready",
+			Self::Quarantined => "quarantined",
+			Self::Deleting => "deleting",
+		}
+	}
+
+	fn from_db(value: &str) -> crate::Result<Self> {
+		match value {
+			"ready" => Ok(Self::Ready),
+			"quarantined" => Ok(Self::Quarantined),
+			"deleting" => Ok(Self::Deleting),
+			_ => Err(input("Invalid content object status")),
+		}
+	}
 }
 
 #[derive(Clone, Debug)]
@@ -44,13 +100,48 @@ pub(crate) struct BlobLease {
     _guard: Arc<OwnedRwLockReadGuard<()>>,
 }
 
+#[derive(Clone, Debug)]
+pub(crate) struct CatalogBlob {
+	pub blob: Blob,
+	pub path: PathBuf,
+	_guard: Arc<OwnedRwLockReadGuard<()>>,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) enum FileContent {
+	Unmanaged,
+	Stored(BlobLease),
+	Damaged(Binding),
+}
+
+#[derive(Clone, Debug)]
+pub(crate) enum ReadableContent {
+	Local(PathBuf),
+	Stored(BlobLease),
+}
+
+impl ReadableContent {
+	pub(crate) fn path(&self) -> &Path {
+		match self {
+			Self::Local(path) => path,
+			Self::Stored(blob) => &blob.path,
+		}
+	}
+}
+
+pub(crate) struct AcquireResult {
+	pub blob: BlobLease,
+	pub reused: bool,
+}
+
 pub struct ContentStore {
     pub(crate) root: PathBuf,
     pub(crate) staging: PathBuf,
     pub(crate) profiles: PathBuf,
     pub(crate) pool: SqlitePool,
     gate: Arc<RwLock<()>>,
-    acquisitions: DashMap<String, Arc<Mutex<()>>>,
+    acquisitions: [Mutex<()>; 64],
+	publications: [Mutex<()>; 64],
     pub(crate) files_lock: Mutex<()>,
     _process_lock: File,
     _content_process_lock: Option<File>,
@@ -96,7 +187,8 @@ impl ContentStore {
             profiles: fs::canonicalize(dirs.instances_dir()).await?,
             pool,
             gate: Arc::new(RwLock::new(())),
-            acquisitions: DashMap::new(),
+            acquisitions: std::array::from_fn(|_| Mutex::new(())),
+			publications: std::array::from_fn(|_| Mutex::new(())),
             files_lock: Mutex::new(()),
             _process_lock: process_lock,
             _content_process_lock: content_process_lock,
@@ -106,6 +198,18 @@ impl ContentStore {
     pub(crate) async fn lease(&self) -> Arc<OwnedRwLockReadGuard<()>> {
         Arc::new(self.gate.clone().read_owned().await)
     }
+
+	fn acquisition_lock(&self, key: &str) -> &Mutex<()> {
+		let mut hasher = DefaultHasher::new();
+		key.hash(&mut hasher);
+		&self.acquisitions[hasher.finish() as usize % self.acquisitions.len()]
+	}
+
+	fn publication_lock(&self, sha512: &str) -> &Mutex<()> {
+		let mut hasher = DefaultHasher::new();
+		sha512.hash(&mut hasher);
+		&self.publications[hasher.finish() as usize % self.publications.len()]
+	}
 
     fn path(&self, blob: &Blob) -> crate::Result<PathBuf> {
         validate_digest(&blob.sha512, 128)?;
@@ -135,6 +239,16 @@ impl ContentStore {
             validate_digest(hash, 40)?;
         }
         let guard = self.lease().await;
+		self.lookup_with_guard(sha512, sha1, size, guard).await
+	}
+
+	async fn lookup_with_guard(
+		&self,
+		sha512: Option<&str>,
+		sha1: Option<&str>,
+		size: Option<u64>,
+		guard: Arc<OwnedRwLockReadGuard<()>>,
+	) -> crate::Result<Option<BlobLease>> {
         let candidates = catalog::find(&self.pool, sha512, sha1)
             .await?
             .into_iter()
@@ -163,7 +277,7 @@ impl ContentStore {
         blob: &Blob,
         verify: bool,
     ) -> crate::Result<bool> {
-        if blob.status != "ready" && !verify {
+        if blob.status != BlobStatus::Ready && !verify {
             return Ok(false);
         }
         let path = self.path(blob)?;
@@ -171,13 +285,21 @@ impl ContentStore {
         let metadata = match fs::symlink_metadata(&path).await {
             Ok(metadata) if metadata.is_file() => metadata,
             Ok(_) => {
-                catalog::set_status(&self.pool, &blob.sha512, "quarantined")
-                    .await?;
+                catalog::set_status(
+					&self.pool,
+					&blob.sha512,
+					BlobStatus::Quarantined,
+				)
+				.await?;
                 return Ok(false);
             }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                catalog::set_status(&self.pool, &blob.sha512, "quarantined")
-                    .await?;
+                catalog::set_status(
+					&self.pool,
+					&blob.sha512,
+					BlobStatus::Quarantined,
+				)
+				.await?;
                 return Ok(false);
             }
             Err(error) => return Err(error.into()),
@@ -194,8 +316,12 @@ impl ContentStore {
             || hashes.1 != blob.sha1
             || hashes.2 != blob.size as u64
         {
-            catalog::set_status(&self.pool, &blob.sha512, "quarantined")
-                .await?;
+            catalog::set_status(
+				&self.pool,
+				&blob.sha512,
+				BlobStatus::Quarantined,
+			)
+			.await?;
             return Ok(false);
         }
         let mut verified = blob.clone();
@@ -213,21 +339,19 @@ impl ContentStore {
         download_meta: Option<&DownloadMeta>,
         semaphore: &FetchSemaphore,
         progress: Option<&mut FetchProgressFn<'_>>,
-    ) -> crate::Result<(BlobLease, bool)> {
+    ) -> crate::Result<AcquireResult> {
         let key = sha512
             .map(|hash| format!("sha512:{hash}"))
-            .or_else(|| sha1.map(|hash| format!("sha1:{hash}")))
-            .unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
-        let lock = self
-            .acquisitions
-            .entry(key)
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-        let _acquisition = lock.lock().await;
+            .or_else(|| sha1.map(|hash| format!("sha1:{hash}")));
+		let _acquisition = if let Some(key) = &key {
+			Some(self.acquisition_lock(key).lock().await)
+		} else {
+			None
+		};
         if let Some(blob) = self.lookup(sha512, sha1, size).await? {
-            return Ok((blob, true));
+			return Ok(AcquireResult { blob, reused: true });
         }
-        let download = fetch::fetch_file_mirrors(
+		let download = fetch::fetch_file_mirrors_in(
             mirrors,
             sha1,
             download_meta,
@@ -235,6 +359,7 @@ impl ContentStore {
             semaphore,
             &self.pool,
             progress,
+			Some(&self.staging),
         )
         .await?;
         if sha512.is_some_and(|expected| expected != download.sha512)
@@ -255,11 +380,13 @@ impl ContentStore {
                 .then(|| source.to_string())
             })
             .collect::<Vec<_>>();
-        Ok((
-            self.ingest_file_with_sources(download.path(), &sources)
-                .await?,
-            false,
-        ))
+		let blob = self
+			.publish_staged(download.into_staged()?, &sources)
+			.await?;
+		Ok(AcquireResult {
+			blob,
+			reused: false,
+		})
     }
 
     pub(crate) async fn ingest_file(
@@ -274,10 +401,17 @@ impl ContentStore {
         source: &Path,
         sources: &[String],
     ) -> crate::Result<BlobLease> {
-        let guard = self.lease().await;
         if let Some(blob) = self.owned_path(source).await? {
             return Ok(blob);
         }
+		let staged = self.stage_file(source).await?;
+		self.publish_staged(staged, sources).await
+	}
+
+	pub(super) async fn stage_file(
+		&self,
+		source: &Path,
+	) -> crate::Result<fetch::StagedDownload> {
         let mut input_file = File::open(source).await?;
         let before = input_file.metadata().await?;
         if !before.is_file() {
@@ -289,15 +423,17 @@ impl ContentStore {
         let mut sha1 = sha1_smol::Sha1::new();
         let mut buffer = vec![0; 256 * 1024];
         let mut size = 0_u64;
-        let mut archive = false;
+		let mut prefix = [0_u8; 2];
+		let mut prefix_len = 0;
         loop {
             let count = input_file.read(&mut buffer).await?;
             if count == 0 {
                 break;
             }
-            if size == 0 {
-                archive = buffer[..count].starts_with(b"PK");
-            }
+			let prefix_count = (prefix.len() - prefix_len).min(count);
+			prefix[prefix_len..prefix_len + prefix_count]
+				.copy_from_slice(&buffer[..prefix_count]);
+			prefix_len += prefix_count;
             output.write_all(&buffer[..count]).await?;
             sha512.update(&buffer[..count]);
             sha1.update(&buffer[..count]);
@@ -314,15 +450,39 @@ impl ContentStore {
                 "Content changed while it was being imported; try again after closing the instance",
             ));
         }
-        let hash = format!("{:x}", sha512.finalize());
-        let lock = self
-            .acquisitions
-            .entry(format!("publish:{hash}"))
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-        let _publication = lock.lock().await;
+		Ok(fetch::StagedDownload {
+			path: temporary,
+			size,
+			sha1: sha1.hexdigest(),
+			sha512: format!("{:x}", sha512.finalize()),
+			archive: prefix_len == prefix.len() && prefix == *b"PK",
+		})
+	}
+
+	pub(super) async fn publish_staged(
+		&self,
+		staged: fetch::StagedDownload,
+		sources: &[String],
+	) -> crate::Result<BlobLease> {
+		if staged.path.parent() != Some(self.staging.as_path()) {
+			return Err(input("Content was not staged in the shared store"));
+		}
+		let fetch::StagedDownload {
+			path: temporary,
+			size,
+			sha1,
+			sha512: hash,
+			archive,
+		} = staged;
+		let guard = self.lease().await;
+		let _publication = self.publication_lock(&hash).lock().await;
         if let Some(existing) =
-            self.lookup(Some(&hash), None, Some(size)).await?
+			self.lookup_with_guard(
+				Some(&hash),
+				None,
+				Some(size),
+				guard.clone(),
+			).await?
         {
             return Ok(existing);
         }
@@ -363,12 +523,12 @@ impl ContentStore {
         sync_directory(parent).await?;
         let blob = Blob {
             sha512: hash,
-            sha1: sha1.hexdigest(),
+			sha1,
             size: size
                 .try_into()
                 .map_err(|_| input("Content file is too large"))?,
             relative_path,
-            status: "ready".to_string(),
+			status: BlobStatus::Ready,
             modified_at_ns: file_modified_at_ns(
                 &fs::metadata(&destination).await?,
             )? as i64,
@@ -388,17 +548,31 @@ impl ContentStore {
         bytes: &[u8],
         expected_sha1: Option<&str>,
     ) -> crate::Result<BlobLease> {
+		let sha1 = sha1_smol::Sha1::from(bytes).hexdigest();
         if let Some(expected) = expected_sha1 {
             validate_digest(expected, 40)?;
-            if sha1_smol::Sha1::from(bytes).hexdigest() != expected {
+            if sha1 != expected {
                 return Err(input(
                     "Content bytes do not match the expected hash",
                 ));
             }
         }
         let temporary = self.temporary().await?;
-        fs::write(&temporary, bytes).await?;
-        self.ingest_file(&temporary).await
+		let mut file = File::create(&temporary).await?;
+		file.write_all(bytes).await?;
+		file.sync_all().await?;
+		drop(file);
+		self.publish_staged(
+			fetch::StagedDownload {
+				path: temporary,
+				size: bytes.len() as u64,
+				sha1,
+				sha512: format!("{:x}", Sha512::digest(bytes)),
+				archive: bytes.starts_with(b"PK"),
+			},
+			&[],
+		)
+		.await
     }
 
     pub(crate) async fn temporary(&self) -> crate::Result<tempfile::TempPath> {
@@ -442,42 +616,47 @@ impl ContentStore {
         Ok((blob.path == canonical).then_some(blob))
     }
 
-    pub(crate) async fn file_blob(
+    pub(crate) async fn file_content(
         &self,
         file: &InstanceFile,
-    ) -> crate::Result<Option<BlobLease>> {
+    ) -> crate::Result<FileContent> {
         let Some(binding) = catalog::binding(&self.pool, &file.id).await?
         else {
-            return Ok(None);
+			return Ok(FileContent::Unmanaged);
         };
-        self.lookup(Some(&binding.blob_sha512), None, Some(file.size))
-            .await
+		let blob = self
+			.lookup(Some(&binding.blob_sha512), None, Some(file.size))
+			.await?;
+		Ok(match blob {
+			Some(blob) => FileContent::Stored(blob),
+			None => FileContent::Damaged(binding),
+		})
     }
 
     pub(crate) async fn read_path(
         &self,
         file: &InstanceFile,
         instance_path: &str,
-    ) -> crate::Result<PathBuf> {
-        if let Some(binding) = catalog::binding(&self.pool, &file.id).await? {
-            return self
-                .lookup(Some(&binding.blob_sha512), None, Some(file.size))
-                .await?
-                .map(|blob| blob.path)
-                .ok_or_else(|| {
-                    input(format!(
-                        "{} needs repair or re-import",
-                        file.relative_path
-                    ))
-                });
+    ) -> crate::Result<ReadableContent> {
+		match self.file_content(file).await? {
+			FileContent::Stored(blob) => {
+				return Ok(ReadableContent::Stored(blob));
+			}
+			FileContent::Damaged(_) => {
+				return Err(input(format!(
+					"{} needs repair or re-import",
+					file.relative_path
+				)));
+			}
+			FileContent::Unmanaged => {}
         }
         let path = self
-            .instance_path(instance_path, &file.relative_path)
+			.instance_path(instance_path, &content_file_path(file))
             .await?;
         if fs::symlink_metadata(&path).await?.file_type().is_symlink() {
             return Err(input("Cannot read an unowned content symlink"));
         }
-        Ok(path)
+		Ok(ReadableContent::Local(path))
     }
 
     pub(crate) async fn instance_path(
@@ -546,7 +725,7 @@ impl ContentStore {
     pub(crate) async fn catalog_blob(
         &self,
         sha512: &str,
-    ) -> crate::Result<Option<BlobLease>> {
+    ) -> crate::Result<Option<CatalogBlob>> {
         let guard = self.lease().await;
         let Some(blob) = catalog::find(&self.pool, Some(sha512), None)
             .await?
@@ -557,7 +736,7 @@ impl ContentStore {
         };
         let path = self.path(&blob)?;
         self.validate_object_parent(&path).await?;
-        Ok(Some(BlobLease {
+        Ok(Some(CatalogBlob {
             blob,
             path,
             _guard: guard,

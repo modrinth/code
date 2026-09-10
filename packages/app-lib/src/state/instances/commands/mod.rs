@@ -42,6 +42,12 @@ pub(crate) use self::launch_context::*;
 mod apply_content_install;
 pub(crate) use self::apply_content_install::*;
 
+mod content_mutation;
+pub(crate) use self::content_mutation::{
+	ContentOrigin, InstallContent, install_content_blob, remove_project,
+	toggle_disable_project,
+};
+
 mod check_content_updates;
 pub(crate) use self::check_content_updates::refresh_content_updates;
 

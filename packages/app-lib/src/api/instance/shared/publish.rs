@@ -1068,7 +1068,6 @@ pub(super) async fn upload_external_files(
     uploads: &[ExternalFileResponse],
     state: &State,
 ) -> crate::Result<()> {
-    let _store_lease = state.content_store.lease().await;
     for upload in uploads {
         let candidate = candidates
             .iter()
@@ -1091,7 +1090,7 @@ pub(super) async fn upload_external_files(
                 state.content_store.read_path(&file, instance_path).await?
             }
             ExternalFileSource::ConfigBundle(path) => {
-                path.as_ref().to_path_buf()
+				crate::state::content_store::ReadableContent::Local(path.as_ref().to_path_buf())
             }
         };
         let upload_url = url::Url::parse(&upload.url).map_err(|error| {
@@ -1099,7 +1098,7 @@ pub(super) async fn upload_external_files(
                 "Invalid shared instance external file upload URL: {error}"
             ))
         })?;
-        let mut file = tokio::fs::File::open(&path).await?;
+		let mut file = tokio::fs::File::open(path.path()).await?;
         let mut hasher = sha2::Sha512::new();
         let mut buffer = vec![0_u8; 64 * 1024];
         let mut size = 0_u64;

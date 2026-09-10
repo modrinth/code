@@ -3,8 +3,8 @@ use crate::state::instances::{
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Dependency, DependencyType, KnownModrinthFile,
-    ModLoader, ProjectType, State, Version, cache_file_hash_metadata,
+    CacheBehaviour, CachedEntry, Dependency, DependencyType, ModLoader,
+    ProjectType, State, Version,
 };
 use crate::util::fetch::{self, DownloadMeta, DownloadReason};
 use crate::util::io;
@@ -16,6 +16,11 @@ use modrinth_content_management::{
     ResolvedContent,
 };
 use std::path::{Path, PathBuf};
+
+use super::content_mutation::{
+	ContentOrigin, InstallContent, install_content_blob, remove_project,
+	toggle_disable_project,
+};
 
 pub(crate) struct ContentScope {
     pub instance: Instance,
@@ -469,20 +474,24 @@ pub(crate) async fn add_downloaded_project_version_with_enabled(
         ));
     }
     let blob = downloaded.file.store_blob(state).await?;
-    install_content_blob_inner(
+    install_content_blob(
         instance_id,
-        &format!(
-            "{}/{}",
-            downloaded.project_type.get_folder(),
-            downloaded.file_name
-        ),
-        &blob,
-        downloaded.project_type,
-        source_kind,
-        Some(&downloaded.project_id),
-        Some(&downloaded.version_id),
-        enabled,
-        replace_path,
+        InstallContent {
+            requested_path: &format!(
+                "{}/{}",
+                downloaded.project_type.get_folder(),
+                downloaded.file_name
+            ),
+            blob: &blob,
+            project_type: downloaded.project_type,
+            source_kind,
+            origin: Some(ContentOrigin {
+                project_id: &downloaded.project_id,
+                version_id: &downloaded.version_id,
+            }),
+            enabled_override: enabled,
+            previous_path: replace_path,
+        },
         state,
     )
     .await
@@ -515,13 +524,15 @@ pub(crate) async fn add_project_from_path(
     let blob = state.content_store.ingest_local_file(path, state).await?;
     install_content_blob(
         instance_id,
-        &format!("{}/{}", project_type.get_folder(), file_name),
-        &blob,
-        project_type,
-        ContentSourceKind::Local,
-        None,
-        None,
-        None,
+        InstallContent {
+            requested_path: &format!("{}/{}", project_type.get_folder(), file_name),
+            blob: &blob,
+            project_type,
+            source_kind: ContentSourceKind::Local,
+            origin: None,
+            enabled_override: None,
+            previous_path: None,
+        },
         state,
     )
     .await
@@ -565,225 +576,23 @@ pub(crate) async fn add_project_bytes(
         .await?;
     install_content_blob(
         instance_id,
-        &format!("{}/{}", project_type.get_folder(), file_name),
-        &blob,
-        project_type,
-        source_kind,
-        project_id,
-        version_id,
-        None,
-        state,
-    )
-    .await
-}
-
-pub(crate) async fn install_content_blob(
-    instance_id: &str,
-    requested_path: &str,
-    blob: &crate::state::content_store::BlobLease,
-    project_type: ProjectType,
-    source_kind: ContentSourceKind,
-    project_id: Option<&str>,
-    version_id: Option<&str>,
-    enabled_override: Option<bool>,
-    state: &State,
-) -> crate::Result<String> {
-    install_content_blob_inner(
-        instance_id,
-        requested_path,
-        blob,
-        project_type,
-        source_kind,
-        project_id,
-        version_id,
-        enabled_override,
-        None,
-        state,
-    )
-    .await
-}
-
-async fn install_content_blob_inner(
-    instance_id: &str,
-    requested_path: &str,
-    blob: &crate::state::content_store::BlobLease,
-    project_type: ProjectType,
-    source_kind: ContentSourceKind,
-    project_id: Option<&str>,
-    version_id: Option<&str>,
-    enabled_override: Option<bool>,
-    previous_path: Option<&str>,
-    state: &State,
-) -> crate::Result<String> {
-    let _content_lock = state.lock_instance_content(instance_id).await;
-    let _store_lock = state.content_store.files_lock.lock().await;
-    let scope = resolve_content_scope(instance_id, None, state).await?;
-    require_stopped_for_content(instance_id, project_type, state).await?;
-    let relative_path = requested_path.trim_end_matches(".disabled");
-    if !crate::state::content_store::eligible(relative_path) {
-        return Err(crate::state::content_store::input(
-            "Unsupported content destination",
-        ));
-    }
-    let existing = content_rows::get_instance_file_by_relative_path(
-        instance_id,
-        previous_path.unwrap_or(relative_path),
-        &state.pool,
-    )
-    .await?;
-    if let Some(previous) = previous_path {
-        if existing.is_none() {
-            return Err(crate::state::content_store::input(
-                "Content changed while its update was downloading; refresh and try again",
-            ));
-        }
-        if previous != relative_path
-            && content_rows::get_instance_file_by_relative_path(
-                instance_id,
-                relative_path,
-                &state.pool,
-            )
-            .await?
-            .is_some()
-        {
-            return Err(crate::state::content_store::input(
-                "The updated filename belongs to another content item",
-            ));
-        }
-    }
-    let enabled = if previous_path.is_some() {
-        existing.as_ref().is_some_and(|file| file.enabled)
-    } else {
-        enabled_override.unwrap_or_else(|| {
-            !requested_path.ends_with(".disabled")
-                && existing.as_ref().is_none_or(|file| file.enabled)
-        })
-    };
-    let source_path =
-        instance_full_path(state, &scope.instance).join(requested_path);
-    let legacy_path = previous_path
-        .filter(|path| *path != relative_path)
-        .or_else(|| {
-            (requested_path != relative_path && source_path.exists())
-                .then_some(requested_path)
-        });
-    let mut operation = state
-        .content_store
-        .prepare(
-            &scope.instance,
-            relative_path,
-            Some(blob),
-            enabled,
-            legacy_path,
-        )
-        .await?;
-    operation.apply(&state.content_store).await?;
-    let result = async {
-        let file_name = Path::new(relative_path)
-            .file_name()
-            .and_then(|name| name.to_str())
-            .ok_or_else(|| {
-                crate::state::content_store::input("Invalid content filename")
-            })?;
-        let mut tx = state.pool.begin().await?;
-        if let Some(legacy_path) = legacy_path {
-            content_rows::rename_instance_file(
-                instance_id,
-                legacy_path,
-                relative_path,
-                file_name,
-                enabled,
-                &mut tx,
-            )
-            .await?;
-        }
-        let file = content_rows::upsert_instance_file_from_parts(
-            content_rows::UpsertInstanceFile {
-                instance_id,
-                relative_path,
-                file_name,
-                enabled,
-                sha1: &blob.blob.sha1,
-                size: blob.blob.size as u64,
-                missing: false,
-            },
-            &mut tx,
-        )
-        .await?;
-        upsert_entry_for_file(
-            &scope,
-            &file,
+        InstallContent {
+            requested_path: &format!("{}/{}", project_type.get_folder(), file_name),
+            blob: &blob,
             project_type,
-            project_id,
-            version_id,
             source_kind,
-            &mut tx,
-        )
-        .await?;
-        operation.commit(&mut tx, Some(&file.id)).await?;
-        tx.commit().await?;
-        Ok::<(), crate::Error>(())
-    }
-    .await;
-    if result.is_err() {
-        operation.rollback(&state.content_store).await?;
-    }
-    result?;
-    cache_file_hash_metadata(
-        instance_id,
-        relative_path,
-        blob.blob.size as u64,
-        blob.blob.modified_at_ns as u64,
-        blob.blob.sha1.clone(),
-        Some(project_type),
-        project_id.zip(version_id).map(|(project_id, version_id)| {
-            KnownModrinthFile {
-                project_id,
-                version_id,
-            }
-        }),
-        &state.pool,
-    )
-    .await?;
-    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
-    Ok(relative_path.to_string())
-}
-
-pub(crate) async fn record_project_file(
-    instance_id: &str,
-    relative_path: &str,
-    sha1: &str,
-    size: u64,
-    project_type: ProjectType,
-    source_kind: ContentSourceKind,
-    project_id: Option<&str>,
-    version_id: Option<&str>,
-    state: &State,
-) -> crate::Result<()> {
-    let scope = resolve_content_scope(instance_id, None, state).await?;
-    let path = state
-        .content_store
-        .instance_path(&scope.instance.path, relative_path)
-        .await?;
-    let blob = state.content_store.ingest_file(&path).await?;
-    if blob.blob.sha1 != sha1 || blob.blob.size as u64 != size {
-        return Err(crate::state::content_store::input(
-            "Installed content does not match its expected hash or size",
-        ));
-    }
-    install_content_blob(
-        instance_id,
-        relative_path,
-        &blob,
-        project_type,
-        source_kind,
-        project_id,
-        version_id,
-        None,
+            origin: project_id.zip(version_id).map(|(project_id, version_id)| {
+                ContentOrigin {
+                    project_id,
+                    version_id,
+                }
+            }),
+            enabled_override: None,
+            previous_path: None,
+        },
         state,
     )
-    .await?;
-    Ok(())
+    .await
 }
 
 pub(crate) async fn require_stopped_for_content(
@@ -799,162 +608,6 @@ pub(crate) async fn require_stopped_for_content(
             "Stop this instance before changing its mods",
         ));
     }
-    Ok(())
-}
-
-pub(crate) async fn toggle_disable_project(
-    instance_id: &str,
-    project_path: &str,
-    desired_enabled: Option<bool>,
-    state: &State,
-) -> crate::Result<String> {
-    let _content_lock = state.lock_instance_content(instance_id).await;
-    let _store_lock = state.content_store.files_lock.lock().await;
-    let scope = resolve_content_scope(instance_id, None, state).await?;
-    let canonical_path = project_path.trim_end_matches(".disabled");
-    let file = content_rows::get_instance_file_by_relative_path(
-        instance_id,
-        canonical_path,
-        &state.pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        crate::state::content_store::input(
-            "Content file is not registered; refresh the Content tab first",
-        )
-    })?;
-    let project_type = super::sync_content_files::project_type_for_file(&file)
-        .ok_or_else(|| {
-            crate::state::content_store::input("Unsupported content type")
-        })?;
-    require_stopped_for_content(instance_id, project_type, state).await?;
-    let enabled = desired_enabled.unwrap_or(!file.enabled);
-    let blob = match state.content_store.file_blob(&file).await? {
-        Some(blob) => blob,
-        None => {
-            if let Some(binding) =
-                crate::state::content_store::catalog::binding(
-                    &state.pool,
-                    &file.id,
-                )
-                .await?
-            {
-                if !enabled {
-                    state
-                        .content_store
-                        .catalog_blob(&binding.blob_sha512)
-                        .await?
-                        .ok_or_else(|| {
-                            crate::state::content_store::input(
-                                "Missing content catalog record",
-                            )
-                        })?
-                } else {
-                    return Err(crate::state::content_store::input(
-                        "Content needs repair or re-import before it can be enabled",
-                    ));
-                }
-            } else {
-                let path = state
-                    .content_store
-                    .instance_path(&scope.instance.path, canonical_path)
-                    .await?;
-                if tokio::fs::symlink_metadata(&path)
-                    .await?
-                    .file_type()
-                    .is_symlink()
-                {
-                    return Err(crate::state::content_store::input(
-                        "Cannot adopt an external symlink",
-                    ));
-                }
-                state.content_store.ingest_file(&path).await?
-            }
-        }
-    };
-    let mut operation = state
-        .content_store
-        .prepare(&scope.instance, canonical_path, Some(&blob), enabled, None)
-        .await?;
-    operation.apply(&state.content_store).await?;
-    let result = async {
-        let mut updated = file.clone();
-        updated.enabled = enabled;
-        updated.missing = false;
-        updated.modified_at = chrono::Utc::now();
-        let mut tx = state.pool.begin().await?;
-        content_rows::upsert_instance_file(&updated, &mut tx).await?;
-        content_rows::set_content_entry_enabled_for_file(
-            &scope.content_set_id,
-            &file.id,
-            enabled,
-            &mut tx,
-        )
-        .await?;
-        operation.commit(&mut tx, Some(&file.id)).await?;
-        tx.commit().await?;
-        Ok::<(), crate::Error>(())
-    }
-    .await;
-    if result.is_err() {
-        operation.rollback(&state.content_store).await?;
-    }
-    result?;
-    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
-    Ok(canonical_path.to_string())
-}
-
-pub(crate) async fn remove_project(
-    instance_id: &str,
-    project_path: &str,
-    state: &State,
-) -> crate::Result<()> {
-    let _content_lock = state.lock_instance_content(instance_id).await;
-    let _store_lock = state.content_store.files_lock.lock().await;
-    let scope = resolve_content_scope(instance_id, None, state).await?;
-    let relative_path = project_path.trim_end_matches(".disabled");
-    let project_type = ProjectType::get_from_parent_folder(relative_path)
-        .ok_or_else(|| {
-            crate::state::content_store::input("Unsupported content type")
-        })?;
-    require_stopped_for_content(instance_id, project_type, state).await?;
-    let file = content_rows::get_instance_file_by_relative_path(
-        instance_id,
-        relative_path,
-        &state.pool,
-    )
-    .await?;
-    let mut operation = state
-        .content_store
-        .prepare(&scope.instance, relative_path, None, false, None)
-        .await?;
-    operation.apply(&state.content_store).await?;
-    let result = async {
-        let mut tx = state.pool.begin().await?;
-        if let Some(file) = &file {
-            content_rows::remove_content_entries_for_file(
-                &scope.content_set_id,
-                &file.id,
-                &mut tx,
-            )
-            .await?;
-            content_rows::remove_instance_file_by_relative_path(
-                instance_id,
-                relative_path,
-                &mut tx,
-            )
-            .await?;
-        }
-        operation.commit(&mut tx, None).await?;
-        tx.commit().await?;
-        Ok::<(), crate::Error>(())
-    }
-    .await;
-    if result.is_err() {
-        operation.rollback(&state.content_store).await?;
-    }
-    result?;
-    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
     Ok(())
 }
 
@@ -1085,55 +738,7 @@ pub(crate) fn instance_full_path(
     state.directories.instances_dir().join(&instance.path)
 }
 
-async fn index_existing_file(
-    scope: &ContentScope,
-    relative_path: &str,
-    state: &State,
-    tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
-) -> crate::Result<InstanceFile> {
-    let full_path =
-        instance_full_path(state, &scope.instance).join(relative_path);
-    let (size, sha1) = fetch::sha1_file_async(&full_path).await?;
-    let file_name = Path::new(relative_path)
-        .file_name()
-        .unwrap_or_default()
-        .to_string_lossy()
-        .to_string();
-    let project_type = ProjectType::get_from_parent_folder(relative_path)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Unable to infer project type from {relative_path}"
-            ))
-        })?;
-
-    let file = content_rows::upsert_instance_file_from_parts(
-        content_rows::UpsertInstanceFile {
-            instance_id: &scope.instance.id,
-            relative_path,
-            file_name: &file_name,
-            enabled: !relative_path.ends_with(".disabled"),
-            sha1: &sha1,
-            size,
-            missing: false,
-        },
-        tx,
-    )
-    .await?;
-    upsert_entry_for_file(
-        scope,
-        &file,
-        project_type,
-        None,
-        None,
-        ContentSourceKind::Local,
-        tx,
-    )
-    .await?;
-
-    Ok(file)
-}
-
-async fn upsert_entry_for_file(
+pub(super) async fn upsert_entry_for_file(
     scope: &ContentScope,
     file: &InstanceFile,
     project_type: ProjectType,
