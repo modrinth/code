@@ -255,15 +255,13 @@ function onInput(event: Event) {
 	&:focus-visible::-webkit-slider-thumb {
 		box-shadow:
 			0 0 0 2px var(--surface-3),
-			0 0 0 4px var(--color-brand),
-			0 0 0 8px var(--color-brand-highlight);
+			0 0 0 4px var(--color-brand);
 	}
 
 	&:focus-visible::-moz-range-thumb {
 		box-shadow:
 			0 0 0 2px var(--surface-3),
-			0 0 0 4px var(--color-brand),
-			0 0 0 8px var(--color-brand-highlight);
+			0 0 0 4px var(--color-brand);
 	}
 
 	&:focus,
