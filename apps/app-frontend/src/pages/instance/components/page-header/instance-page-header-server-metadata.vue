@@ -4,14 +4,15 @@
 			<ServerOnlinePlayers :online="playersOnline" :status-online="statusOnline" hide-label />
 		</PageHeaderMetadataItem>
 		<PageHeaderMetadataItem
-			v-if="minecraftServer?.region || (loadingServerPing && ping !== undefined)"
+			v-if="minecraftServer?.region || loadingServerPing"
 		>
-			<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer.region" />
+			<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer.region" flag-only />
 			<ServerPing
-				v-if="loadingServerPing && ping !== undefined"
+				v-if="loadingServerPing"
 				:ping="ping"
 				:status-online="statusOnline"
 			/>
+			<SpinnerIcon v-else class="size-4 animate-spin" :aria-label="formatMessage(commonMessages.loadingLabel)" role="status" />
 		</PageHeaderMetadataItem>
 		<PageHeaderMetadataItem
 			v-if="showInstancePlayTime && playtimeLabel"
@@ -25,14 +26,18 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { TimerIcon } from '@modrinth/assets'
+import { SpinnerIcon, TimerIcon } from '@modrinth/assets'
 import {
+	commonMessages,
 	PageHeaderMetadata,
 	PageHeaderMetadataItem,
 	ServerOnlinePlayers,
 	ServerPing,
 	ServerRegion,
+	useVIntl,
 } from '@modrinth/ui'
+
+const { formatMessage } = useVIntl()
 
 defineProps<{
 	loadingServerPing?: boolean
