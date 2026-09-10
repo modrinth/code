@@ -326,7 +326,14 @@ fn main() {
                             }
                         }
 
-                        set_changelog_toast(Some(update.version.clone()));
+						let current_version = &app.package_info().version;
+						let mut version_parts = update.version.split('.');
+						let major = version_parts.next().and_then(|part| part.parse::<u64>().ok());
+						let minor = version_parts.next().and_then(|part| part.parse::<u64>().ok());
+						let is_major_update = major.zip(minor).is_some_and(|version| {
+							version > (current_version.major, current_version.minor)
+						});
+						set_changelog_toast(is_major_update.then(|| update.version.clone()));
                         let update = if should_restart {
                             (**update).clone()
                         } else {

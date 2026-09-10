@@ -102,7 +102,7 @@ watch(
 	{ deep: true },
 )
 
-const { maxMemory, snapPoints } = await useMemorySlider()
+const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
 
 const messages = defineMessages({
 	windowSectionTitle: {
@@ -327,6 +327,7 @@ const messages = defineMessages({
 						{{ formatMessage(messages.memoryAllocationTitle) }}
 					</h3>
 					<Slider
+						v-if="maxMemory"
 						id="max-memory"
 						v-model="settings.memory.maximum"
 						:aria-label="formatMessage(messages.memoryAllocationTitle)"
@@ -338,6 +339,15 @@ const messages = defineMessages({
 						min-label="512 MB"
 						:max-label="`${Number((maxMemory / 1024).toFixed(1))} GB`"
 						unit="MB"
+					/>
+					<Button v-else-if="memoryQuery.isError.value" @click="memoryQuery.refetch()">
+						{{ formatMessage(commonMessages.refreshButton) }}
+					</Button>
+					<div
+						v-else
+						role="status"
+						:aria-label="formatMessage(commonMessages.loadingLabel)"
+						class="h-10 animate-pulse rounded-lg bg-surface-3"
 					/>
 					<p class="m-0 mt-1 leading-tight">
 						{{ formatMessage(messages.memoryAllocationDescription) }}

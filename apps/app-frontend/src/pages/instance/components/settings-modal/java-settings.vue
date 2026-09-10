@@ -10,6 +10,7 @@ import {
 } from '@modrinth/assets'
 import {
 	Button,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	Input,
@@ -98,10 +99,7 @@ const envVars = ref(
 
 const overrideMemorySettings = ref(!!instance.value.memory)
 const memory = ref(instance.value.memory ?? { ...globalSettings.memory })
-const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) as unknown as {
-	maxMemory: number
-	snapPoints: number[]
-}
+const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
 
 watch(overrideJavaArgs, (enabled) => {
 	if (!enabled) {
@@ -220,6 +218,7 @@ const messages = defineMessages({
 			</div>
 			<div class="pt-3">
 				<Slider
+					v-if="maxMemory"
 					id="max-memory"
 					v-model="memory.maximum"
 					:disabled="!overrideMemorySettings"
@@ -231,6 +230,15 @@ const messages = defineMessages({
 					min-label="512 MB"
 					:max-label="`${Number((maxMemory / 1024).toFixed(1))} GB`"
 					unit="MB"
+				/>
+				<Button v-else-if="memoryQuery.isError.value" @click="memoryQuery.refetch()">
+					{{ formatMessage(commonMessages.refreshButton) }}
+				</Button>
+				<div
+					v-else
+					role="status"
+					:aria-label="formatMessage(commonMessages.loadingLabel)"
+					class="h-10 animate-pulse rounded-lg bg-surface-3"
 				/>
 			</div>
 		</section>
