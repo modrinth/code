@@ -7,12 +7,25 @@ export function useFullImageContextMenu() {
 		if (originalSrc === fullUrl) return
 
 		img.src = fullUrl
-		window.addEventListener(
-			'focus',
-			() => {
-				img.src = originalSrc
-			},
-			{ once: true },
-		)
+
+		let reverted = false
+		const revert = () => {
+			if (reverted) return
+			reverted = true
+			img.src = originalSrc
+			window.removeEventListener('focus', revert)
+			window.removeEventListener('pointerdown', revert, true)
+			window.removeEventListener('keydown', revert, true)
+			window.removeEventListener('pointermove', revert, true)
+			window.removeEventListener('wheel', revert, true)
+			window.removeEventListener('touchstart', revert, true)
+		}
+
+		window.addEventListener('focus', revert)
+		window.addEventListener('pointerdown', revert, true)
+		window.addEventListener('keydown', revert, true)
+		window.addEventListener('pointermove', revert, true)
+		window.addEventListener('wheel', revert, true)
+		window.addEventListener('touchstart', revert, true)
 	}
 }

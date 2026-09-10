@@ -3,6 +3,7 @@
 		<template #leading>
 			<Avatar
 				:src="user.avatar_url"
+				:raw-src="user.raw_avatar_url"
 				:alt="user.username"
 				:size="isModrinthUser ? '64px' : '96px'"
 				:tint-by="user.username"
