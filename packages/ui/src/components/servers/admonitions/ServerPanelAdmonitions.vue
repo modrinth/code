@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
+import { useIsFetching, useIsMutating } from '@tanstack/vue-query'
 import { computed, reactive, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
+import { Button } from '#ui/components/base/buttons'
 import StackedAdmonitions, {
 	type StackedAdmonitionItem,
 } from '#ui/components/base/StackedAdmonitions.vue'
@@ -25,7 +28,22 @@ const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const ctx = injectModrinthServerContext()
 const route = useRoute()
+const router = useRouter()
 const { canSetup, canManageBackups, permissionDeniedMessage } = useServerPermissions()
+const needsShareUpdate = computed(() =>
+	ctx.serverFull.value?.worlds.find((world) => world.id === ctx.worldId.value)
+		?.content?.shared_instance_needs_update ?? false,
+)
+const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', ctx.serverId] })
+const sharePreviews = useIsFetching({ queryKey: ['servers', 'share-diff', ctx.serverId] })
+const sharePending = computed(() => shareActions.value > 0 || sharePreviews.value > 0)
+
+function reviewShareUpdate() {
+	void router.push({
+		path: `/hosting/manage/${encodeURIComponent(ctx.serverId)}/play`,
+		query: { ...route.query, reviewShare: 'true' },
+	})
+}
 
 const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQueue(
 	computed(() => ctx.serverId),
@@ -33,6 +51,26 @@ const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQ
 )
 
 const messages = defineMessages({
+	unpublished: {
+		id: 'app.instance.admonitions.shared-instance.changes-header',
+		defaultMessage: "Your changes haven't been shared yet",
+	},
+	unpublishedBody: {
+		id: 'servers.play.unpublished-body',
+		defaultMessage: 'Push an update to share your server’s content changes with players.',
+	},
+	pushUpdate: {
+		id: 'app.instance.admonitions.shared-instance.publish-button',
+		defaultMessage: 'Push update',
+	},
+	publishing: {
+		id: 'app.instance.admonitions.shared-instance.publishing-button',
+		defaultMessage: 'Pushing...',
+	},
+	reviewing: {
+		id: 'app.instance.admonitions.shared-instance.reviewing-button',
+		defaultMessage: 'Reviewing...',
+	},
 	backgroundTaskRunning: {
 		id: 'servers.admonitions.background-task-running',
 		defaultMessage: 'Background task running',
@@ -139,6 +177,7 @@ type ServerAdmonitionItem = StackedAdmonitionItem & {
 		| { kind: 'backup'; entry: BackupAdmonitionEntry }
 		| { kind: 'busy-content' }
 		| { kind: 'busy-files' }
+		| { kind: 'share-update' }
 	)
 
 const showInstallingBanner = computed(() => {
@@ -242,6 +281,17 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 			dismissible: false,
 			kind: 'busy-files',
 			priority: p,
+			sortIndex: sortIndex++,
+		})
+	}
+
+	if (needsShareUpdate.value && canSetup.value) {
+		out.push({
+			id: 'share-update',
+			type: 'info',
+			dismissible: false,
+			kind: 'share-update',
+			priority: 3,
 			sortIndex: sortIndex++,
 		})
 	}
@@ -367,8 +417,29 @@ function onInstallationDismiss() {
 		@dismiss-all="onDismissAll"
 	>
 		<template #item="{ item, dismissible }">
+			<Admonition
+				v-if="item.kind === 'share-update'"
+				type="info"
+				:header="formatMessage(messages.unpublished)"
+				inline-actions
+			>
+				{{ formatMessage(messages.unpublishedBody) }}
+				<template #actions>
+					<Button
+						type="colored"
+						color="blue"
+						size="lg"
+						:disabled="sharePending || ctx.busyReasons.value.length > 0"
+						@click="reviewShareUpdate"
+					>
+						<SpinnerIcon v-if="sharePending" class="animate-spin" aria-hidden="true" />
+						<UploadIcon v-else aria-hidden="true" />
+						{{ formatMessage(shareActions > 0 ? messages.publishing : sharePreviews > 0 ? messages.reviewing : messages.pushUpdate) }}
+					</Button>
+				</template>
+			</Admonition>
 			<InstallingBanner
-				v-if="item.kind === 'installing'"
+				v-else-if="item.kind === 'installing'"
 				:retry-disabled="!canSetup"
 				:retry-disabled-tooltip="permissionDeniedMessage"
 				@dismiss="onInstallationDismiss"
