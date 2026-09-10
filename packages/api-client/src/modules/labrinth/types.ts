@@ -1883,6 +1883,7 @@ export namespace Labrinth {
 				id: string
 				username: string
 				avatar_url?: string
+				raw_avatar_url?: string
 				bio?: string
 				created: string
 				role: Role
