@@ -158,8 +158,8 @@ import { IssuesIcon, SpinnerIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
-	ConfirmModal,
 	commonMessages,
+	ConfirmModal,
 	defineMessage,
 	defineMessages,
 	injectModrinthClient,
@@ -197,16 +197,16 @@ type ModerationAdmonitionSection =
 const messages = defineMessages({
 	withdrawTitle: {
 		id: 'project.moderation.withdraw.title',
-		defaultMessage: 'Withdraw your project from review',
+		defaultMessage: 'Un-submit your project',
 	},
 	withdrawDescription: {
 		id: 'project.moderation.withdraw.description',
 		defaultMessage:
-			'If your project is not ready, you can withdraw it from moderation review. When you submit your project again, you will not retain your position in the moderation queue.',
+			'If your project is not ready, or you no longer want it to be reviewed, you can withdraw it from the review queue. When you submit your project again, you will not retain your current position in the moderation queue.',
 	},
 	withdrawButton: {
 		id: 'project.moderation.withdraw.button',
-		defaultMessage: 'Unsubmit from review',
+		defaultMessage: 'Un-submit from review',
 	},
 	submissionWithdrawn: {
 		id: 'project-moderation-nags.submission-withdrawn',

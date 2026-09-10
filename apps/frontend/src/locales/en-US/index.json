@@ -3465,13 +3465,13 @@
     "message": "Pending moderator review"
   },
   "project-moderation-nags.submitted-for-review-desc": {
-    "message": "Your project has been submitted for moderator review."
-  },
-  "project-moderation-nags.submitted-for-review-with-withdrawal": {
-    "message": "Your project has been submitted for review. If your project is not ready for review, you can <withdraw-link>withdraw your submission</withdraw-link>."
+    "message": "Your project has been submitted to be reviewed by Modrinth's moderation team."
   },
   "project-moderation-nags.suggestion": {
     "message": "Suggestion"
+  },
+  "project-moderation-nags.visit-moderation-messages": {
+    "message": "Visit moderation thread"
   },
   "project-moderation-nags.visit-moderation-page": {
     "message": "Visit moderation page"
@@ -3838,6 +3838,15 @@
   },
   "project.moderation.title": {
     "message": "Moderation"
+  },
+  "project.moderation.withdraw.button": {
+    "message": "Un-submit from review"
+  },
+  "project.moderation.withdraw.description": {
+    "message": "If your project is not ready, or you no longer want it to be reviewed, you can withdraw it from the review queue. When you submit your project again, you will not retain your current position in the moderation queue."
+  },
+  "project.moderation.withdraw.title": {
+    "message": "Un-submit your project"
   },
   "project.modpack-archive-warning.description": {
     "message": "Importing this .mrpack might be broken."

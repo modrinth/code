@@ -192,12 +192,11 @@ const messages = defineMessages({
 	},
 	submittedForReviewDesc: {
 		id: 'project-moderation-nags.submitted-for-review-desc',
-		defaultMessage:
-			"Your project has been submitted to be reviewed by Modrinth's moderation team.",
+		defaultMessage: "Your project has been submitted to be reviewed by Modrinth's moderation team.",
 	},
 	visitModerationMessages: {
 		id: 'project-moderation-nags.visit-moderation-messages',
-		defaultMessage: 'Visit moderation messages',
+		defaultMessage: 'Visit moderation thread',
 	},
 	resubmitForReview: {
 		id: 'project-moderation-nags.resubmit-for-review',
