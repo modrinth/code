@@ -11,6 +11,25 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-10T16:31:31+00:00`,
+		product: 'app',
+		version: '0.20.2',
+		body: `## Changed
+- Fixed slow loading issues when opening the app settings modal.
+- Fixed slow loading of the app on launch.
+- Fixed issue where the "New update" notification would keep showing up even if you've already seen it and dismissed it.
+- Updated design of slider elements`,
+	},
+	{
+		date: `2026-09-10T16:31:31+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated design of slider elements
+
+## Fixed
+- Fixed sign up page redirecting you to your profile when adding a new account.`,
+	},
+	{
 		date: `2026-09-09T22:47:33+00:00`,
 		product: 'app',
 		version: '0.20.1',
