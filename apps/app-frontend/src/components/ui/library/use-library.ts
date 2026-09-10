@@ -1273,7 +1273,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				? instanceGroupId
 				: null
 		const isFavorite = item.instance.group_ids.includes(FAVORITES_GROUP_ID)
-		const canAddContent = !item.instance.quarantined && !item.instance.link
+		const installing = item.instance.install_stage.includes('installing')
+		const canAddContent = !item.instance.quarantined && !item.instance.link && !installing
 
 		instanceOptions.value?.open(event, [
 			{
@@ -1289,6 +1290,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				label: formatMessage(instanceActionMessages.play),
 				icon: PlayIcon,
 				shown: !item.playing && !item.instance.quarantined,
+				disabled: installing,
 				tone: 'brand',
 				action: () => void item.play(null, 'InstanceGridContextMenu'),
 			},
@@ -1321,6 +1323,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				id: 'edit',
 				label: formatMessage(instanceActionMessages.viewInstance),
 				icon: EyeIcon,
+				disabled: installing,
 				action: () => void item.seeInstance(),
 			},
 			{

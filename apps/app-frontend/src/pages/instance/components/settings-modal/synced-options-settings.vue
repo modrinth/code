@@ -17,6 +17,7 @@ import GameSettingsModal from '@/components/ui/settings/instances/game-settings-
 import CommandHistoryModal from '@/components/ui/settings/instances/instances-synced-settings/command-history-modal.vue'
 import SyncedServersModal from '@/components/ui/settings/instances/instances-synced-settings/servers-modal.vue'
 import SyncedPacksModal from '@/components/ui/settings/instances/SyncedPacksModal.vue'
+import { gameSettingsKeys } from '@/helpers/game-options'
 import {
 	get_synced_option_join_preview,
 	get_synced_options_overview,
@@ -428,7 +429,10 @@ const mutation = useMutation({
 	},
 	onSettled: async (_data, _error, variables) => {
 		if (variables.option === 'game_options') {
-			await queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.gameSources })
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.gameSources }),
+				queryClient.invalidateQueries({ queryKey: gameSettingsKeys.synced }),
+			])
 		}
 		if (variables.option === 'multiplayer_servers') {
 			await queryClient.invalidateQueries({

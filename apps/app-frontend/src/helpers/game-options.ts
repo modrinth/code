@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 
 export type GameOptionCanonicalValue =
@@ -190,6 +191,21 @@ export async function list_game_options_sync_sources(): Promise<GameOptionsSourc
 
 export async function get_synced_game_options_config(): Promise<GameSettingsEditorState> {
 	return await invoke('plugin:instance|instance_get_synced_game_options_config')
+}
+
+export const gameSettingsKeys = {
+	synced: ['game-settings', 'synced'] as const,
+	local: (instanceId: string) => ['game-settings', 'local', instanceId] as const,
+}
+
+export function gameSettingsQueryOptions(instanceId?: string) {
+	return queryOptions({
+		queryKey: instanceId ? gameSettingsKeys.local(instanceId) : gameSettingsKeys.synced,
+		queryFn: () =>
+			instanceId ? get_local_game_options_config(instanceId) : get_synced_game_options_config(),
+		staleTime: 30_000,
+		retry: false,
+	})
 }
 
 export async function preview_synced_game_option_changes(
