@@ -20,7 +20,15 @@
 				:max="max"
 				:step="step"
 				class="slider absolute top-0 h-full min-h-0 appearance-none overflow-visible border-0 bg-transparent p-0 shadow-none outline-none"
-				:class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
+				:class="
+					disabled
+						? 'cursor-not-allowed'
+						: currentValue === min
+							? 'cursor-e-resize'
+							: currentValue === max
+								? 'cursor-w-resize'
+								: 'cursor-ew-resize'
+				"
 				:disabled="disabled"
 				:aria-label="ariaLabel"
 				@input="onInputWithSnap(($event.target as HTMLInputElement).value)"
