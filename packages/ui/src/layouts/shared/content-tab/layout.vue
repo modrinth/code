@@ -63,6 +63,7 @@ const debug = useDebugLogger('ContentPageLayout')
 const props = withDefaults(
 	defineProps<{
 		bottomPadding?: boolean
+		highlightedItemId?: string
 	}>(),
 	{
 		bottomPadding: true,
@@ -278,6 +279,17 @@ const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters 
 		showSharedContent: ctx.showSharedContentFilter,
 		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
 	})
+
+watch(
+	() => props.highlightedItemId,
+	(id) => {
+		if (!id) return
+		searchQuery.value = ''
+		selectedFilters.value = []
+		selectedMetadataFilters.value = {}
+	},
+	{ immediate: true },
+)
 
 const metadataFilterAuthors = computed(() => {
 	const authors = new Map<string, NonNullable<ContentItem['owner']>>()
@@ -1233,6 +1245,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							v-model:selected-ids="selectedIds"
 							class="mt-2"
 							:items="tableItems"
+							:highlighted-item-id="highlightedItemId"
 							:show-selection="true"
 							@update:enabled="handleToggleEnabledById"
 							@delete="handleDeleteById"

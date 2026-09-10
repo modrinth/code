@@ -4,7 +4,7 @@
 			v-if="currentValue !== null"
 			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
 		>
-			{{ min }}
+			{{ minLabel ?? min }}
 		</span>
 
 		<div
@@ -50,7 +50,7 @@
 			v-if="currentValue !== null"
 			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
 		>
-			{{ formatValue(max) }}
+			{{ maxLabel ?? formatValue(max) }}
 		</span>
 
 		<Input
@@ -67,7 +67,7 @@
 			:min="min"
 			:max="max"
 			:step="step"
-			@change="onInput(($event.target as HTMLInputElement).value)"
+			@change="onInput"
 		/>
 	</div>
 </template>
@@ -91,6 +91,8 @@ interface Props {
 	snapRange?: number
 	disabled?: boolean
 	unit?: string
+	minLabel?: string
+	maxLabel?: string
 	placeholder?: string
 	ariaLabel?: string
 }
@@ -186,8 +188,10 @@ function onInputWithSnap(value: string) {
 	}
 }
 
-function onInput(value: string) {
-	inputValueValid(Number.parseFloat(value))
+function onInput(event: Event) {
+	const target = event.target as HTMLInputElement
+	inputValueValid(target.valueAsNumber)
+	target.value = currentValue.value === null ? '' : String(currentValue.value)
 }
 </script>
 

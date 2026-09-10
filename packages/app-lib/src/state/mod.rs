@@ -89,6 +89,7 @@ pub struct State {
     shared_instance_locks: DashMap<String, Arc<Mutex<()>>>,
     /// Serializes canonical synced-option mutations and checkpoint updates.
     synced_options_lock: Mutex<()>,
+    pub(crate) game_locale_indexer: crate::api::instance::GameLocaleIndexer,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -174,6 +175,7 @@ impl State {
         }
 
         tokio::task::spawn(async move {
+            crate::api::instance::start_game_locale_indexer(Arc::clone(state));
             instances::watcher::watch_instances_init(
                 &state.file_watcher,
                 &state.directories,
@@ -301,6 +303,8 @@ impl State {
             instance_screenshot_locks: DashMap::new(),
             shared_instance_locks: DashMap::new(),
             synced_options_lock: Mutex::new(()),
+            game_locale_indexer:
+                crate::api::instance::GameLocaleIndexer::default(),
             discord_rpc,
             process_manager,
             friends_socket,

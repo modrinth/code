@@ -18,7 +18,7 @@ export default function () {
 							.children(
 								toggle('ai', 'AI Usage')
 									.suggestedStatus('flagged')
-									.message()
+									.message('ai/ai')
 									.children(
 										group()
 											.title('What kind of AI content is present?')
@@ -26,10 +26,13 @@ export default function () {
 												toggle('code', 'Code').message('ai-usages/code'),
 												toggle('assets', 'Assets').message('ai-usages/assets'),
 												toggle('text', 'Text').message('ai-usages/text'),
-												toggle('functionality', 'Functionality').message('ai-usages/functionality'),
 											),
 									)
 									.collect(undefined, 'ai/list-intro'),
+
+								toggle('ai-functionality', 'AI Functionality')
+									.suggestedStatus('flagged')
+									.message('ai/ai-functionality'),
 
 								toggle('ads', 'Advertisements').suggestedStatus('flagged').message(),
 
@@ -73,6 +76,7 @@ export default function () {
 					.collect(undefined, 'missing-disclosures/list-intro'),
 
 				toggle('misused', 'Misused').suggestedStatus('flagged').message(),
+				toggle('non-english', 'Non-English').suggestedStatus('flagged').message(),
 			),
 		)
 }

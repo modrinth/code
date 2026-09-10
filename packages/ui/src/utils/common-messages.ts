@@ -1244,10 +1244,6 @@ export const disclosureAiUsageMessages = defineMessages({
 		id: 'project.settings.disclosures.ai.types-text',
 		defaultMessage: 'Text',
 	},
-	functionality: {
-		id: 'project.settings.disclosures.ai.types-functionality',
-		defaultMessage: 'Functionality',
-	},
 })
 
 export const disclosureTelemetryConsentMessages = defineMessages({

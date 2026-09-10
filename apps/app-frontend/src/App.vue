@@ -449,8 +449,6 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const nativeDecorations = ref(false)
-
 const os = ref('')
 const isDevEnvironment = ref(false)
 
@@ -760,7 +758,7 @@ async function setupApp() {
 	const dev = await isDev()
 	isDevEnvironment.value = dev
 	const version = await getVersion()
-	nativeDecorations.value = native_decorations
+	appSettings.nativeDecorations = native_decorations
 	if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
 
 	appTheme.preferred = theme
@@ -2216,7 +2214,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<PlusIcon />
 			</NavButton>
-			<div class="flex flex-grow"></div>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
 				:to="() => appSettingsModal?.show()"
@@ -2549,7 +2546,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	display: grid;
 	grid-template: 'status status' 'nav dummy';
 	grid-template-columns: auto 1fr;
-	grid-template-rows: auto 1fr;
+	grid-template-rows: auto minmax(0, 1fr);
 	position: relative;
 	//z-index: 0;
 	background-color: var(--color-raised-bg);
@@ -2558,8 +2555,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 .app-grid-navbar {
 	grid-area: nav;
+	min-height: 0;
 	position: relative;
 	z-index: 2;
+
+	> :deep(*) {
+		flex-shrink: 0;
+	}
 }
 
 .app-grid-statusbar {

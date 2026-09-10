@@ -8,6 +8,7 @@ import { type Component, type ComponentPublicInstance, computed, nextTick, ref, 
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import { truncatedTooltip } from '../../utils/truncate'
+import LoadingIndicator from '../base/LoadingIndicator.vue'
 import NewModal from './NewModal.vue'
 export interface Tab {
 	name: MessageDescriptor
@@ -236,6 +237,9 @@ defineExpose({ show, hide, selectedTab, setTab })
 									:is="visibleTabs[selectedTab]?.content"
 									v-if="visibleTabs[selectedTab]?.content"
 								/>
+								<template #fallback>
+									<LoadingIndicator class="py-2" />
+								</template>
 							</Suspense>
 						</slot>
 					</div>

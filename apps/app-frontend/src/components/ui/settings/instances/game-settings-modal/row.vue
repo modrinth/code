@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { LinkIcon, UnknownIcon, UnlinkIcon } from '@modrinth/assets'
 import {
+	Avatar,
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
@@ -11,18 +12,25 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
+import { type RouteLocationRaw, RouterLink } from 'vue-router'
 
-import type { EditableGameSetting, GameOptionCanonicalValue } from '@/helpers/game-options'
+import type {
+	EditableGameSetting,
+	GameOptionCanonicalValue,
+	GameSettingLocaleLabel,
+} from '@/helpers/game-options'
 
 import GameSettingBooleanControl from './boolean-control.vue'
 import {
 	canonicalBooleanValue,
 	canonicalValueFromInput,
 	canonicalValueText,
+	gameSettingNumberScale,
 	isKeybindSetting,
 	settingCanBeEnabled,
 } from './editors'
 import GameKeybindInput from './keybind-input.vue'
+import { minecraftLanguageOptions } from './languages'
 import {
 	formatGameSettingChoice,
 	formatGameSettingDescription,
@@ -34,20 +42,24 @@ import {
 const props = withDefaults(
 	defineProps<{
 		setting: EditableGameSetting
+		localeLabel?: GameSettingLocaleLabel
 		keybindConflicts?: string[]
 		disabled?: boolean
 		showSyncToggle?: boolean
+		sourceNavigationDisabled?: boolean
 	}>(),
 	{
 		keybindConflicts: () => [],
 		disabled: false,
 		showSyncToggle: true,
+		sourceNavigationDisabled: false,
 	},
 )
 
 const emit = defineEmits<{
 	'update:sync-enabled': [enabled: boolean]
 	'update:canonical-value': [value: GameOptionCanonicalValue | null]
+	'open-source': [location: RouteLocationRaw]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -88,15 +100,44 @@ const messages = defineMessages({
 	},
 })
 
-const settingLabel = computed(() => formatGameSettingLabel(formatMessage, props.setting))
+const settingLabel = computed(() => {
+	if (props.setting.kind === 'external') {
+		return props.localeLabel?.label ?? formatGameSettingLabel(formatMessage, props.setting)
+	}
+	return formatGameSettingLabel(formatMessage, props.setting)
+})
 const settingDescription = computed(() =>
 	formatGameSettingDescription(formatMessage, props.setting),
 )
+const settingSource = computed(() =>
+	props.setting.kind === 'external' ? props.localeLabel?.source : undefined,
+)
+const sourceLocation = computed<RouteLocationRaw>(() => {
+	const source = settingSource.value
+	if (source?.project) {
+		return { path: `/project/${source.project.id}` }
+	}
+	return {
+		name: 'InstanceContent',
+		params: { id: source?.instance_id },
+		query: { highlight: source?.file_path },
+	}
+})
 const valueText = computed(() => canonicalValueText(props.setting))
+const languageOptions = computed<ComboboxOption<string>[]>(() => {
+	const value = valueText.value
+	if (value && !minecraftLanguageOptions.some((option) => option.value === value)) {
+		return [{ value, label: value }, ...minecraftLanguageOptions]
+	}
+	return minecraftLanguageOptions
+})
 const enumOptions = computed<ComboboxOption<string>[]>(() =>
 	(props.setting.editor.choices ?? []).map((choice) => ({
 		value: choice.value,
-		label: formatGameSettingChoice(formatMessage, props.setting.option_id, choice.value),
+		label:
+			props.setting.kind === 'external'
+				? (props.localeLabel?.choices[choice.value] ?? choice.value)
+				: formatGameSettingChoice(formatMessage, props.setting.option_id, choice.value),
 	})),
 )
 const isNumber = computed(
@@ -106,7 +147,7 @@ const isSlider = computed(
 	() => isNumber.value && props.setting.editor.min != null && props.setting.editor.max != null,
 )
 const booleanValue = computed(() => canonicalBooleanValue(props.setting))
-const numberScale = computed(() => (props.setting.editor.unit === 'percent' ? 100 : 1))
+const numberScale = computed(() => gameSettingNumberScale(props.setting))
 const inputMin = computed(() =>
 	props.setting.editor.min === null || props.setting.editor.min === undefined
 		? undefined
@@ -221,7 +262,26 @@ function updateValue(value: string | number | boolean | undefined) {
 					<UnknownIcon class="size-4" aria-hidden="true" />
 				</span>
 			</div>
-			<p v-if="settingDescription" class="m-0 mt-0.5 text-primary">
+			<RouterLink v-if="settingSource" v-slot="{ href }" :to="sourceLocation" custom>
+				<a
+					:href="sourceNavigationDisabled ? undefined : href"
+					:aria-disabled="sourceNavigationDisabled || undefined"
+					class="mt-2 inline-flex max-w-full items-center gap-1.5 text-primary"
+					:class="sourceNavigationDisabled ? 'cursor-default' : 'hover:underline'"
+					@click.prevent="!sourceNavigationDisabled && emit('open-source', sourceLocation)"
+				>
+					<Avatar
+						v-if="settingSource.project"
+						:src="settingSource.project.icon_url"
+						size="1.25rem"
+						no-shadow
+					/>
+					<span class="truncate">{{
+						settingSource.project?.title ?? settingSource.file_name
+					}}</span>
+				</a>
+			</RouterLink>
+			<p v-else-if="settingDescription" class="m-0 mt-0.5 text-primary">
 				{{ settingDescription }}
 			</p>
 		</div>
@@ -251,6 +311,20 @@ function updateValue(value: string | number | boolean | undefined) {
 				:off-label="formatMessage(messages.off)"
 				:placeholder="placeholder"
 				:disabled="editorDisabled"
+				@update:model-value="updateValue"
+			/>
+
+			<Combobox
+				v-else-if="setting.option_id === 'language'"
+				:model-value="valueText"
+				:options="languageOptions"
+				:placeholder="placeholder"
+				:disabled="editorDisabled"
+				:aria-label="settingLabel"
+				:search-input-attrs="{ 'aria-label': settingLabel }"
+				searchable
+				select-search-text-on-focus
+				class="min-w-0"
 				@update:model-value="updateValue"
 			/>
 

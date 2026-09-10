@@ -427,6 +427,7 @@ pub async fn complete_success(
     }
 
     transaction.commit().await?;
+    crate::api::instance::queue_game_locale_index();
     get_required(id, app_state).await.map(Some)
 }
 

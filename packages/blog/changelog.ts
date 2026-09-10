@@ -11,6 +11,39 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-09T22:47:33+00:00`,
+		product: 'app',
+		version: '0.20.1',
+		body: `## Added
+- Added source mod details beneath recognized keybindings in Game settings, with links to their Modrinth project or highlighted file in the Content tab.
+- Added searching by source mod name or filename in Game settings.
+
+## Changed
+- Updated mod keybindings in Game settings to display translated names from mod jars when available, using the Modrinth App's selected language.
+- Updated the Language option in Game settings to use a searchable dropdown with language names and regions.
+- Updated sync indicators with blue badges for resource packs in the Content tab and multiplayer servers in the Worlds tab.
+- Updated memory allocation sliders to show the minimum as 0MB and maximum in GB.
+- Added moddex.gg to the image proxy bypass to support their badges.
+
+## Fixed
+- Fixed resource pack sync setup failing when one pack contained malformed metadata, allowing the remaining packs to sync.
+- Fixed saved and synced Field of view values applying incorrectly in Minecraft 1.19 and newer.
+- Fixed Mouse sensitivity in Game settings displaying and saving percentages that did not match Minecraft's 0% to 200% range.
+- Fixed some mod keybindings appearing as text fields and being excluded from keybinding conflict warnings in Game settings.
+- Fixed settings slider number fields failing to update after a value was rounded or limited to the allowed range.
+- Fixed large memory allocation values being cut off in global and instance settings.
+- Fixed Quick instances overflowing the sidebar and pushing navigation buttons off-screen in smaller windows.
+- Fixed clipped bottom borders on compact instance cards in the Library.
+- Fixed sync source pickers showing loading or error screens when an instance list was already available.
+- Fixed the Screenshots page breadcrumb icon not matching its sidebar icon.`,
+	},
+	{
+		date: `2026-09-09T22:47:33+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added moddex.gg to the image proxy bypass to support their badges.`,
+	},
+	{
 		date: `2026-09-07T18:59:17+00:00`,
 		product: 'hosting',
 		body: `## Added
