@@ -1,5 +1,5 @@
 use super::storage::{
-    cache_bytes, read_bytes, read_cached_bytes, read_library, write_library,
+	cache_bytes, read_bytes, read_library, write_library,
 };
 use super::{
     PackLibrary, PackPlacement, SyncedPack, pack_option, pack_path, same_path,
@@ -153,10 +153,7 @@ async fn owns_file(
     if placement.path.is_empty() {
         return Ok(false);
     }
-    let path = instance_dir(metadata, state).join(&placement.path);
-    if !path.exists() {
-        return Ok(false);
-    }
+    let Some(file) = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &placement.path, &state.pool).await? else { return Ok(false); };
     let kind = commands::content_source_kind_for_project_path(
         &metadata.instance.id,
         &placement.path,
@@ -166,8 +163,22 @@ async fn owns_file(
     if kind.is_some_and(|kind| kind != ContentSourceKind::Local) {
         return Ok(false);
     }
-    let (_, hash) = fetch::sha1_file_async(&path).await?;
-    Ok(hash == placement.sha1)
+    if file.sha1 != placement.sha1 {
+        return Ok(false);
+    }
+    let Some(blob) = state.content_store.file_blob(&file).await? else {
+        return Ok(false);
+    };
+    if !file.enabled {
+        return Ok(true);
+    }
+    state
+        .content_store
+        .matches(
+            &instance_dir(metadata, state).join(&placement.path),
+            &blob.blob.sha512,
+        )
+        .await
 }
 
 async fn toggle_pack(
@@ -176,20 +187,6 @@ async fn toggle_pack(
     enabled: bool,
     state: &State,
 ) -> crate::Result<String> {
-    let path = format!(
-        "{}{}",
-        item.file_path.trim_end_matches(".disabled"),
-        if enabled { "" } else { ".disabled" },
-    );
-    if path != item.file_path
-        && instance_dir(metadata, state).join(&path).exists()
-    {
-        return Err(crate::ErrorKind::InputError(
-            "Another pack already uses this file name in the instance."
-                .to_string(),
-        )
-        .into());
-    }
     commands::toggle_disable_project(
         &metadata.instance.id,
         &item.file_path,
@@ -411,28 +408,20 @@ async fn apply_pack(
         }
     }
     let (bytes, sha1) = if let Some(file) = file {
-        let cached = if let Some(sha1) = file.hashes.get("sha1") {
-            read_cached_bytes(sha1, state)
-                .await?
-                .map(|bytes| (bytes, sha1.clone()))
-        } else {
-            None
-        };
-        if let Some(cached) = cached {
-            cached
-        } else {
-            let bytes = fetch::fetch(
-                &file.url,
-                file.hashes.get("sha1").map(String::as_str),
-                None,
-                None,
-                &state.fetch_semaphore,
-                &state.pool,
-            )
-            .await?;
-            let sha1 = cache_bytes(bytes.clone(), state).await?;
-            (bytes, sha1)
-        }
+        let downloaded = fetch::fetch_content_file(
+            state,
+            &[file.url.as_str()],
+            file.hashes.get("sha512").map(String::as_str),
+            file.hashes.get("sha1").map(String::as_str),
+            Some(u64::from(file.size)),
+            None,
+            None,
+        )
+        .await?;
+        let bytes =
+            bytes::Bytes::from(tokio::fs::read(downloaded.path()).await?);
+        let sha1 = cache_bytes(bytes.clone(), state).await?;
+        (bytes, sha1)
     } else {
         (read_bytes(pack, state).await?, pack.sha1.clone())
     };
@@ -479,24 +468,23 @@ async fn apply_pack(
             *items = commands::list_pack_content(instance_id, state).await?;
         }
     }
-    let file_name = if pack.item.enabled {
-        file_name.to_string()
-    } else {
-        format!("{file_name}.disabled")
-    };
     let size = bytes.len() as u64;
-    let path = commands::add_project_bytes(
+    let blob = state
+        .content_store
+        .ingest_bytes(&bytes, Some(&sha1))
+        .await?;
+    let path = commands::install_content_blob(
         instance_id,
-        &file_name,
-        bytes,
-        Some(&sha1),
-        Some(pack.item.project_type),
+        &target_path,
+        &blob,
+        pack.item.project_type,
         ContentSourceKind::Local,
         pack.item
             .project
             .as_ref()
             .map(|project| project.id.as_str()),
         version.as_ref().map(|version| version.id.as_str()),
+        Some(pack.item.enabled),
         state,
     )
     .await?;
@@ -510,7 +498,7 @@ async fn apply_pack(
     let mut installed = pack.item.clone();
     installed.id = sha1.clone();
     installed.file_path = path.clone();
-    installed.file_name = file_name;
+    installed.file_name = file_name.to_string();
     installed.size = size;
     installed.source_kind = Some(ContentSourceKind::Local);
     installed.version = version.as_ref().map(|version| ContentItemVersion {

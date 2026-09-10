@@ -11,8 +11,16 @@ pub(crate) async fn remove_instance(
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
-    let _content_lock = state.lock_instance_content(instance_id).await;
     let _synced_options_lock = state.lock_synced_options().await;
+    let _content_lock = state.lock_instance_content(instance_id).await;
+    let _store_lock = state.content_store.files_lock.lock().await;
+    let _store_lease = state.content_store.lease().await;
+    if crate::state::instance_has_running_process(instance_id, state).await? {
+        return Err(crate::state::content_store::input(
+            "Stop this instance before removing it",
+        ));
+    }
+    state.content_store.recover(Some(instance_id)).await?;
     crate::api::instance::remove_generated_instance_files(instance_id, state)
         .await?;
 

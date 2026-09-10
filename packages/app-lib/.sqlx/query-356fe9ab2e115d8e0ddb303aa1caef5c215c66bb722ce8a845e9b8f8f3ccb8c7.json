@@ -1,0 +1,12 @@
+{
+	"db_name": "SQLite",
+	"query": "INSERT INTO store_blobs (sha512, sha1, size, relative_path, status, modified_at_ns, sources) VALUES (?, ?, ?, ?, 'ready', ?, ?) ON CONFLICT(sha512) DO UPDATE SET status = 'ready', modified_at_ns = excluded.modified_at_ns, last_used_at = unixepoch(), verified_at = unixepoch(), sources = CASE WHEN excluded.sources = '[]' THEN store_blobs.sources ELSE excluded.sources END",
+	"describe": {
+		"columns": [],
+		"parameters": {
+			"Right": 6
+		},
+		"nullable": []
+	},
+	"hash": "356fe9ab2e115d8e0ddb303aa1caef5c215c66bb722ce8a845e9b8f8f3ccb8c7"
+}

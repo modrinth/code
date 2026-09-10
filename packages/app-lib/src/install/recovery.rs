@@ -27,6 +27,8 @@ const SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR: &str = "instance";
 struct SharedInstanceUpdateRollback {
     files: Vec<InstanceFile>,
     entries: Vec<ContentEntry>,
+    #[serde(default)]
+    bindings: Vec<crate::state::content_store::Binding>,
 }
 
 pub(super) async fn prepare_shared_instance_update_backup(
@@ -34,10 +36,13 @@ pub(super) async fn prepare_shared_instance_update_backup(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<PathBuf> {
+    let _lease = state.content_store.lease().await;
+    let _content_lock =
+        state.lock_instance_content(&metadata.instance.id).await;
+    let _store_lock = state.content_store.files_lock.lock().await;
     let staging_dir = state
         .directories
-        .metadata_dir()
-        .join("install_job_backups")
+        .install_backups_dir()
         .join(job_id.to_string());
     if tokio::fs::try_exists(&staging_dir).await? {
         crate::util::io::remove_dir_all(&staging_dir).await?;
@@ -55,7 +60,34 @@ pub(super) async fn prepare_shared_instance_update_backup(
             &state.pool,
         )
         .await?;
-        let snapshot = SharedInstanceUpdateRollback { files, entries };
+        let bindings = crate::state::content_store::catalog::bindings(
+            &state.pool,
+            &metadata.instance.id,
+        )
+        .await?;
+        state
+            .content_store
+            .retain(
+                "rollback",
+                &job_id.to_string(),
+                &bindings
+                    .iter()
+                    .map(|binding| binding.blob_sha512.clone())
+                    .collect::<Vec<_>>(),
+            )
+            .await?;
+        let skipped = files
+            .iter()
+            .filter(|file| {
+                bindings.iter().any(|binding| binding.file_id == file.id)
+            })
+            .map(|file| file.relative_path.clone())
+            .collect();
+        let snapshot = SharedInstanceUpdateRollback {
+            files,
+            entries,
+            bindings,
+        };
         let instance_path = state
             .directories
             .instances_dir()
@@ -63,6 +95,7 @@ pub(super) async fn prepare_shared_instance_update_backup(
         copy_directory(
             &instance_path,
             &staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR),
+            &skipped,
             state,
         )
         .await?;
@@ -94,6 +127,16 @@ pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
             path = %staging_dir.display(),
             "Failed to remove install rollback backup: {error}"
         );
+        return;
+    }
+    if let Some(state) = State::get_if_initialized()
+        && let Some(owner) =
+            staging_dir.file_name().and_then(|name| name.to_str())
+        && let Err(error) = state.content_store.release("rollback", owner).await
+    {
+        tracing::warn!(
+            "Could not release rollback content references: {error}"
+        );
     }
 }
 
@@ -102,6 +145,16 @@ async fn restore_shared_instance_update(
     rollback: &super::model::InstallRollbackState,
     state: &State,
 ) -> crate::Result<()> {
+    let instance_id = &rollback.instance.instance.id;
+    let _content_lock = state.lock_instance_content(instance_id).await;
+    let _store_lock = state.content_store.files_lock.lock().await;
+    let _lease = state.content_store.lease().await;
+    if crate::state::instance_has_running_process(instance_id, state).await? {
+        return Err(crate::state::content_store::input(
+            "Stop this instance before restoring its content",
+        ));
+    }
+    state.content_store.recover(Some(instance_id)).await?;
     let snapshot = serde_json::from_slice::<SharedInstanceUpdateRollback>(
         &crate::util::io::read(staging_dir.join(SHARED_INSTANCE_ROLLBACK_FILE))
             .await?,
@@ -116,6 +169,7 @@ async fn restore_shared_instance_update(
     copy_directory(
         &staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR),
         &instance_path,
+        &std::collections::HashSet::new(),
         state,
     )
     .await?;
@@ -127,6 +181,14 @@ async fn restore_shared_instance_update(
     )
     .await?;
     restore_instance_metadata(&rollback.instance, state).await?;
+    state
+        .content_store
+        .restore_bindings(
+            &rollback.instance.instance,
+            &snapshot.files,
+            &snapshot.bindings,
+        )
+        .await?;
 
     Ok(())
 }
@@ -206,6 +268,7 @@ async fn restore_instance_metadata(
 async fn copy_directory(
     source: &Path,
     target: &Path,
+    skipped: &std::collections::HashSet<String>,
     state: &State,
 ) -> crate::Result<()> {
     crate::util::io::create_dir_all(target).await?;
@@ -218,6 +281,14 @@ async fn copy_directory(
         })?;
         let entry_path = entry.path();
         let relative_path = entry_path.strip_prefix(source)?;
+        let relative = relative_path
+            .components()
+            .map(|part| part.as_os_str().to_string_lossy())
+            .collect::<Vec<_>>()
+            .join("/");
+        if skipped.contains(&relative) {
+            continue;
+        }
         let target_path = target.join(relative_path);
         let file_type = entry.file_type().await?;
         if file_type.is_dir() {
@@ -242,6 +313,20 @@ async fn copy_symlink(source: &Path, target: &Path) -> crate::Result<()> {
         crate::util::io::create_dir_all(parent).await?;
     }
     let link_target = tokio::fs::read_link(source).await?;
+    let absolute = crate::state::content_store::normalize(
+        &source
+            .parent()
+            .ok_or_else(|| {
+                crate::state::content_store::input("Invalid backup symlink")
+            })?
+            .join(link_target),
+    );
+    let link_target = crate::state::content_store::relative_link(
+        &absolute,
+        target.parent().ok_or_else(|| {
+            crate::state::content_store::input("Invalid backup target")
+        })?,
+    );
 
     #[cfg(unix)]
     tokio::fs::symlink(link_target, target).await?;

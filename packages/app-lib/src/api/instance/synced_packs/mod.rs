@@ -4,6 +4,8 @@ mod selection;
 mod selection_compatibility;
 mod storage;
 
+pub(crate) use storage::migrate_store;
+
 pub use operations::{
     desync_pack, get_pack_sync_preview, list_synced_packs, remove_synced_pack,
     set_synced_pack_enabled, sync_pack, upload_synced_pack,
@@ -38,6 +40,8 @@ struct PackLibrary {
 struct SyncedPack {
     item: ContentItem,
     sha1: String,
+    #[serde(default)]
+    blob_sha512: Option<String>,
     game_versions: Vec<String>,
     #[serde(default)]
     selected: Option<bool>,
@@ -124,10 +128,5 @@ fn same_path(left: &str, right: &str) -> bool {
 }
 
 fn pack_path(pack: &SyncedPack, file_name: &str) -> String {
-    format!(
-        "{}/{}{}",
-        pack.item.project_type.get_folder(),
-        file_name,
-        if pack.item.enabled { "" } else { ".disabled" },
-    )
+    format!("{}/{}", pack.item.project_type.get_folder(), file_name,)
 }

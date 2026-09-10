@@ -25,12 +25,36 @@ pub(crate) async fn sync_instance_content_files(
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
     let _content_lock = state.lock_instance_content(&instance.id).await;
-    let scanned = filesystem::scan_content_files(
+    let _store_lock = state.content_store.files_lock.lock().await;
+    state.content_store.recover(Some(&instance.id)).await?;
+    let existing =
+        sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
+            .await?;
+    let bindings = crate::state::content_store::catalog::bindings(
+        &state.pool,
+        &instance.id,
+    )
+    .await?
+    .into_iter()
+    .map(|binding| (binding.file_id.clone(), binding))
+    .collect::<HashMap<_, _>>();
+    let existing_by_path = existing
+        .iter()
+        .map(|file| (file.relative_path.clone(), file))
+        .collect::<HashMap<_, _>>();
+    let mut scanned = filesystem::scan_content_files(
         &state.directories.instances_dir(),
         &instance.path,
     )?;
+    scanned.retain(|file| {
+        let registered = existing_by_path
+            .get(&file.relative_path)
+            .is_some_and(|file| bindings.contains_key(&file.id));
+        registered || !file.is_symlink
+    });
     let cache_keys = scanned
         .iter()
+        .filter(|file| !file.is_symlink)
         .map(|file| file.hash_cache_key.as_str())
         .collect::<Vec<_>>();
     let hashes = CachedEntry::get_file_hash_many(
@@ -53,103 +77,122 @@ pub(crate) async fn sync_instance_content_files(
             )
         })
         .collect::<HashMap<_, _>>();
-    let existing_files =
-        sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
-            .await?;
-    let scanned_paths = scanned
+    let scanned_by_path = scanned
         .iter()
-        .map(|file| file.relative_path.clone())
-        .collect::<HashSet<_>>();
-    let missing_file_ids = existing_files
-        .iter()
-        .filter(|file| {
-            !file.missing && !scanned_paths.contains(&file.relative_path)
-        })
-        .map(|file| file.id.clone())
-        .collect::<Vec<_>>();
-    let existing_files_by_path = existing_files
-        .into_iter()
-        .map(|file| (file.relative_path.clone(), file))
+        .map(|file| (file.relative_path.as_str(), file))
         .collect::<HashMap<_, _>>();
-
-    let now = Utc::now();
+    let running =
+        crate::state::instance_has_running_process(&instance.id, state).await?;
     let mut files = Vec::new();
-    let mut present_without_hash_ids = Vec::new();
-    let mut restored_without_hash = false;
-
-    for file in scanned {
-        let hash_key = file.hash_cache_key.trim_end_matches(".disabled");
-        let existing_file = existing_files_by_path.get(&file.relative_path);
-        let Some(hash) = hashes_by_key.get(hash_key) else {
-            if let Some(existing_file) = existing_file {
-                present_without_hash_ids.push(existing_file.id.clone());
-                restored_without_hash |= existing_file.missing;
-            }
+    for previous in &existing {
+        let Some(binding) = bindings.get(&previous.id) else {
             continue;
         };
-
-        files.push(InstanceFile {
-            id: existing_file
+        let mut file = previous.clone();
+        let blob = state.content_store.file_blob(previous).await?;
+        let observed = scanned_by_path.get(file.relative_path.as_str());
+        let matches = if let Some(observed) = observed {
+            if observed.is_symlink {
+                let path = state
+                    .content_store
+                    .instance_path(&instance.path, &file.relative_path)
+                    .await?;
+                state
+                    .content_store
+                    .matches(&path, &binding.blob_sha512)
+                    .await?
+            } else {
+                hashes_by_key
+                    .get(observed.hash_cache_key.trim_end_matches(".disabled"))
+                    .is_some_and(|hash| hash.hash == file.sha1)
+            }
+        } else {
+            false
+        };
+        file.missing = file.enabled && (blob.is_none() || !matches);
+        if !file.enabled && observed.is_some() {
+            tracing::warn!(instance_id = %instance.id, path = %file.relative_path, "Disabled content has an external file at its reserved path");
+        }
+        if file.missing != previous.missing {
+            file.modified_at = Utc::now();
+        }
+        files.push(file);
+    }
+    for scanned in &scanned {
+        let previous = existing_by_path.get(&scanned.relative_path).copied();
+        if previous.is_some_and(|file| bindings.contains_key(&file.id)) {
+            continue;
+        }
+        let Some(hash) = hashes_by_key
+            .get(scanned.hash_cache_key.trim_end_matches(".disabled"))
+        else {
+            continue;
+        };
+        let mut file = InstanceFile {
+            id: previous
                 .map(|file| file.id.clone())
                 .unwrap_or_else(instance_file_id),
             instance_id: instance.id.clone(),
-            relative_path: file.relative_path,
-            file_name: file.file_name,
-            enabled: file.enabled,
+            relative_path: scanned.relative_path.clone(),
+            file_name: scanned.file_name.clone(),
+            enabled: scanned.enabled,
             sha1: hash.hash.clone(),
-            size: file.size,
+            size: scanned.size,
             missing: false,
-            added_at: existing_file.map(|file| file.added_at).unwrap_or(now),
-            modified_at: now,
-        });
-    }
-
-    let content_changed = !missing_file_ids.is_empty()
-        || restored_without_hash
-        || files.iter().any(|file| {
-            existing_files_by_path.get(&file.relative_path).is_none_or(
-                |existing| {
-                    existing.missing
-                        || existing.enabled != file.enabled
-                        || existing.sha1 != file.sha1
-                        || existing.size != file.size
-                },
+            added_at: previous
+                .map(|file| file.added_at)
+                .unwrap_or_else(Utc::now),
+            modified_at: Utc::now(),
+        };
+        if !running
+            && crate::state::content_store::eligible(&file.relative_path)
+        {
+            file = crate::state::content_store::migration::adopt_file(
+                instance, &file, state,
             )
+            .await?;
+        }
+        files.push(file);
+    }
+    let present_ids = files
+        .iter()
+        .map(|file| file.id.as_str())
+        .collect::<HashSet<_>>();
+    let missing = existing
+        .iter()
+        .filter(|file| !present_ids.contains(file.id.as_str()) && !file.missing)
+        .collect::<Vec<_>>();
+    let changed = !missing.is_empty()
+        || files.iter().any(|file| {
+            existing
+                .iter()
+                .find(|previous| previous.id == file.id)
+                .is_none_or(|previous| {
+                    previous.missing != file.missing
+                        || previous.enabled != file.enabled
+                        || previous.sha1 != file.sha1
+                        || previous.relative_path != file.relative_path
+                })
         });
-
     let mut tx = state.pool.begin().await?;
-    for file_id in missing_file_ids {
+    for file in missing {
         sqlite::content_rows::set_instance_file_missing(
-            &file_id, true, &mut tx,
+            &file.id, true, &mut tx,
         )
         .await?;
     }
-
-    let mut stored_files =
-        Vec::with_capacity(files.len() + present_without_hash_ids.len());
-    for file_id in present_without_hash_ids {
-        if let Some(file) = sqlite::content_rows::set_instance_file_missing(
-            &file_id, false, &mut tx,
-        )
-        .await?
-        {
-            stored_files.push(file);
-        }
-    }
-    for file in &files {
-        stored_files.push(
-            sqlite::content_rows::upsert_instance_file(file, &mut tx).await?,
+    let mut stored = Vec::new();
+    for file in files {
+        stored.push(
+            sqlite::content_rows::upsert_instance_file(&file, &mut tx).await?,
         );
     }
-
     tx.commit().await?;
-
-    if content_changed {
+    if changed {
         super::mark_shared_instance_stale(&instance.id, &state.pool).await?;
         crate::api::instance::queue_game_locale_index();
     }
-
-    Ok(stored_files)
+    Ok(stored)
 }
 
 pub(crate) fn project_type_for_file(

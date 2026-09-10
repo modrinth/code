@@ -134,6 +134,8 @@ pub enum InstallJobEventKind {
     ContentFileCompleted {
         path: String,
         bytes: u64,
+        #[serde(default)]
+        reused: bool,
     },
     Interrupted {
         reason: InstallInterruptReason,

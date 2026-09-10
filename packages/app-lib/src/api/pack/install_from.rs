@@ -11,7 +11,7 @@ use crate::state::{
     EditInstance, InstanceInstallStage, InstanceLink, SideType,
 };
 use crate::util::fetch::{
-    DownloadMeta, DownloadReason, FetchProgressFn, fetch, fetch_file,
+    DownloadMeta, DownloadReason, FetchProgressFn, fetch,
     sha1_file_async_with_progress,
 };
 use path_util::SafeRelativeUtf8UnixPathBuf;
@@ -423,13 +423,22 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         .version_id(version_id.clone())
         .build();
     reporter.set_context(context).await?;
-    let file = fetch_file(
-        &url,
+    let file = crate::util::fetch::fetch_content_file(
+		&state,
+        &[&url],
+        version
+            .files
+            .iter()
+            .find(|file| file.url == url)
+            .and_then(|file| file.hashes.get("sha512"))
+            .map(String::as_str),
         hash.map(|x| &**x),
+        version
+            .files
+            .iter()
+            .find(|file| file.url == url)
+            .map(|file| u64::from(file.size)),
         Some(&download_meta),
-        None,
-        &state.fetch_semaphore,
-        &state.pool,
         progress,
     )
     .await?;
@@ -495,8 +504,12 @@ pub async fn generate_pack_from_file(
     let source_filename =
         path.file_name().map(|x| x.to_string_lossy().to_string());
 
+    let state = State::get().await?;
+    let blob = state.content_store.ingest_file(&path).await?;
     Ok(CreatePack {
-        file: CreatePackFile::Path(path),
+        file: CreatePackFile::Downloaded(
+            crate::util::fetch::DownloadedFile::from_blob(blob, true),
+        ),
         description: CreatePackDescription {
             icon: None,
             override_title: None,

@@ -7,9 +7,33 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             settings_get,
             settings_set,
+            store_usage,
+            store_cleanup,
+            store_set_cache_limit,
+            store_verify,
             cancel_directory_change
         ])
         .build()
+}
+
+#[tauri::command]
+pub async fn store_usage() -> Result<settings::StoreUsage> {
+    Ok(settings::store_usage().await?)
+}
+
+#[tauri::command]
+pub async fn store_cleanup() -> Result<u64> {
+    Ok(settings::store_cleanup().await?)
+}
+
+#[tauri::command]
+pub async fn store_set_cache_limit(bytes: u64) -> Result<()> {
+    Ok(settings::store_set_cache_limit(bytes).await?)
+}
+
+#[tauri::command]
+pub async fn store_verify(repair: bool) -> Result<settings::StoreVerification> {
+    Ok(settings::store_verify(repair).await?)
 }
 
 // Get full settings

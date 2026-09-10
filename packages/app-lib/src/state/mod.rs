@@ -47,6 +47,8 @@ pub mod minecraft_skins;
 mod cache;
 pub use self::cache::*;
 
+pub mod content_store;
+
 mod friends;
 pub use self::friends::*;
 
@@ -67,10 +69,13 @@ pub mod server_join_log;
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
+static STATE_STARTUP_LOCK: Mutex<()> = Mutex::const_new(());
 const MAX_CONCURRENT_INSTALL_JOBS: usize = 3;
 pub struct State {
+    startup_complete: AtomicBool,
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
+    pub content_store: content_store::ContentStore,
 
     /// Semaphore used to limit concurrent network requests and avoid errors
     pub fetch_semaphore: FetchSemaphore,
@@ -164,15 +169,35 @@ impl State {
     }
 
     pub async fn init(app_identifier: String) -> crate::Result<()> {
+        let _startup = STATE_STARTUP_LOCK.lock().await;
         let state = LAUNCHER_STATE
             .get_or_try_init(move || Self::initialize_state(app_identifier))
             .await?;
 
-        if let Err(e) =
-            crate::install::recovery::recover_interrupted_jobs(state).await
+        if state
+            .startup_complete
+            .load(std::sync::atomic::Ordering::Acquire)
         {
-            tracing::error!("Error recovering interrupted install jobs: {e}");
+            return Ok(());
         }
+        state.content_store.recover(None).await?;
+        crate::install::recovery::recover_interrupted_jobs(state).await?;
+        content_store::migration::migrate(state).await?;
+        state
+            .startup_complete
+            .store(true, std::sync::atomic::Ordering::Release);
+        tokio::spawn(async move {
+            let mut interval =
+                tokio::time::interval(std::time::Duration::from_secs(600));
+            loop {
+                interval.tick().await;
+                if let Err(error) = state.content_store.cleanup(false).await {
+                    tracing::debug!(
+                        "Shared content cache cleanup deferred: {error}"
+                    );
+                }
+            }
+        });
 
         tokio::task::spawn(async move {
             crate::api::instance::start_game_locale_indexer(Arc::clone(state));
@@ -257,6 +282,15 @@ impl State {
         app_identifier: String,
     ) -> crate::Result<Arc<Self>> {
         tracing::info!("Connecting to app database");
+        let settings_dir =
+            DirectoryInfo::initial_settings_dir_path(&app_identifier)
+                .ok_or_else(|| {
+                    crate::ErrorKind::FSError(
+                        "Could not find the application directory".to_string(),
+                    )
+                })?;
+        let store_lock =
+            content_store::ContentStore::lock_process(&settings_dir).await?;
         let pool = db::connect(&app_identifier).await?;
 
         legacy_converter::migrate_legacy_data(&pool).await?;
@@ -282,6 +316,12 @@ impl State {
 
         let directories =
             DirectoryInfo::init(settings.custom_dir, &app_identifier).await?;
+        let content_store = content_store::ContentStore::new(
+            &directories,
+            pool.clone(),
+            store_lock,
+        )
+        .await?;
 
         let discord_rpc = DiscordGuard::init()?;
 
@@ -293,7 +333,9 @@ impl State {
         let friends_socket = FriendsSocket::new();
 
         Ok(Arc::new(Self {
+            startup_complete: AtomicBool::new(false),
             directories,
+            content_store,
             fetch_semaphore,
             io_semaphore,
             api_semaphore,

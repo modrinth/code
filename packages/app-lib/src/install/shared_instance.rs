@@ -730,7 +730,6 @@ pub(super) async fn remove_existing_shared_instance_content(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    let _content_lock = state.lock_instance_content(instance_id).await;
     let metadata = crate::state::instances::commands::get_instance_metadata(
         instance_id,
         &state.pool,
@@ -744,49 +743,23 @@ pub(super) async fn remove_existing_shared_instance_content(
         &state.pool,
     )
     .await?;
-    let files = content_rows::get_instance_files(instance_id, &state.pool)
-        .await?
+    let managed_ids = entries
         .into_iter()
-        .map(|file| (file.id.clone(), file))
-        .collect::<std::collections::HashMap<_, _>>();
-    let base = state
-        .directories
-        .instances_dir()
-        .join(&metadata.instance.path);
-
-    let mut removed_file_ids = HashSet::new();
-    for entry in entries {
-        if !entry.source_kind.is_shared_instance_managed() {
-            continue;
+        .filter(|entry| entry.source_kind.is_shared_instance_managed())
+        .filter_map(|entry| entry.file_id)
+        .collect::<HashSet<_>>();
+    for file in
+        content_rows::get_instance_files(instance_id, &state.pool).await?
+    {
+        if managed_ids.contains(&file.id) {
+            crate::state::instances::commands::remove_project(
+                instance_id,
+                &file.relative_path,
+                state,
+            )
+            .await?;
         }
-
-        let Some(file_id) = entry.file_id else {
-            continue;
-        };
-        if !removed_file_ids.insert(file_id.clone()) {
-            continue;
-        }
-
-        let Some(file) = files.get(&file_id) else {
-            continue;
-        };
-        crate::util::io::remove_file(base.join(&file.relative_path)).await?;
-        let mut tx = state.pool.begin().await?;
-        content_rows::remove_content_entries_for_file(
-            &metadata.applied_content_set.id,
-            &file.id,
-            &mut tx,
-        )
-        .await?;
-        content_rows::remove_instance_file_by_relative_path(
-            instance_id,
-            &file.relative_path,
-            &mut tx,
-        )
-        .await?;
-        tx.commit().await?;
     }
-
     Ok(())
 }
 

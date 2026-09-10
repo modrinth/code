@@ -1,0 +1,12 @@
+{
+	"db_name": "SQLite",
+	"query": "INSERT OR IGNORE INTO store_retained_refs (owner_kind, owner_id, blob_sha512) VALUES (?, ?, ?)",
+	"describe": {
+		"columns": [],
+		"parameters": {
+			"Right": 3
+		},
+		"nullable": []
+	},
+	"hash": "07e6734fde2a3a830147d7e5c67814010a07e230a635e56a5455cc606f40415f"
+}

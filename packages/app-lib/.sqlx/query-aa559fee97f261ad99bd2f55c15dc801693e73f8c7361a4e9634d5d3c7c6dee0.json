@@ -1,0 +1,12 @@
+{
+	"db_name": "SQLite",
+	"query": "DELETE FROM store_blobs WHERE sha512 = ? AND NOT EXISTS (SELECT 1 FROM store_instance_files WHERE blob_sha512 = ?) AND NOT EXISTS (SELECT 1 FROM store_retained_refs WHERE blob_sha512 = ?)",
+	"describe": {
+		"columns": [],
+		"parameters": {
+			"Right": 3
+		},
+		"nullable": []
+	},
+	"hash": "aa559fee97f261ad99bd2f55c15dc801693e73f8c7361a4e9634d5d3c7c6dee0"
+}

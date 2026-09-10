@@ -1,6 +1,6 @@
 use super::super::DesyncServerMode;
 use super::super::synced_options::{
-    get_global_options, instance_dir, instance_is_running,
+	get_global_options, instance_is_running,
     instance_option_enabled, option_can_apply_while_running,
     sync_files_are_protected,
 };
@@ -83,8 +83,17 @@ pub(super) async fn pack_from_item(
         )
         .into());
     }
+    let _lease = state.content_store.lease().await;
+    let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &item.file_path, &state.pool).await?
+		.ok_or_else(|| crate::state::content_store::input("The pack is not registered"))?;
     let bytes = Bytes::from(
-        io::read(instance_dir(metadata, state).join(&item.file_path)).await?,
+        io::read(
+            state
+                .content_store
+                .read_path(&file, &metadata.instance.path)
+                .await?,
+        )
+        .await?,
     );
     validate_pack(&bytes, item.project_type)?;
     let game_versions = if let Some(version) = &item.version {
@@ -132,6 +141,7 @@ pub(super) async fn pack_from_item(
     item.has_update = false;
     item.update_version_id = None;
     Ok(SyncedPack {
+        blob_sha512: None,
         item,
         sha1,
         game_versions,
@@ -555,6 +565,7 @@ pub async fn upload_synced_pack(
     library.packs.insert(
         id.clone(),
         SyncedPack {
+            blob_sha512: None,
             sha1,
             game_versions,
             selected: (project_type == ProjectType::ResourcePack)

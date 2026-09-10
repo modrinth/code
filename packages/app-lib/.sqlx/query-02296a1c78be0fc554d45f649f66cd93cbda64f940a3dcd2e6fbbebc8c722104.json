@@ -1,0 +1,12 @@
+{
+	"db_name": "SQLite",
+	"query": "UPDATE store_blobs SET last_used_at = unixepoch() WHERE sha512 = ?",
+	"describe": {
+		"columns": [],
+		"parameters": {
+			"Right": 1
+		},
+		"nullable": []
+	},
+	"hash": "02296a1c78be0fc554d45f649f66cd93cbda64f940a3dcd2e6fbbebc8c722104"
+}

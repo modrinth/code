@@ -1,0 +1,20 @@
+{
+	"db_name": "SQLite",
+	"query": "SELECT DISTINCT file.instance_id FROM instance_files file INNER JOIN store_instance_files binding ON binding.file_id = file.id WHERE binding.blob_sha512 = ?",
+	"describe": {
+		"columns": [
+			{
+				"name": "instance_id",
+				"ordinal": 0,
+				"type_info": "Text"
+			}
+		],
+		"parameters": {
+			"Right": 1
+		},
+		"nullable": [
+			false
+		]
+	},
+	"hash": "084d9630881ff0859dd4fdcadd78ac8e7eed1006101179cb1aeb5936f3ebed5b"
+}

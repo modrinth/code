@@ -13,6 +13,7 @@ use rand::Rng;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha512};
 use std::collections::{HashMap, VecDeque};
 use std::future::Future;
 use std::num::NonZeroU32;
@@ -381,14 +382,50 @@ pub type FetchProgressFn<'a> = dyn FnMut(
 
 #[derive(Clone, Debug)]
 pub struct DownloadedFile {
-    path: Arc<tempfile::TempPath>,
+    path: DownloadedFilePath,
     pub size: u64,
     pub sha1: String,
+    pub sha512: String,
+    pub reused: bool,
+}
+
+#[derive(Clone, Debug)]
+enum DownloadedFilePath {
+    Temporary(Arc<tempfile::TempPath>),
+    Stored(crate::state::content_store::BlobLease),
 }
 
 impl DownloadedFile {
     pub fn path(&self) -> &Path {
-        self.path.as_ref().as_ref()
+        match &self.path {
+            DownloadedFilePath::Temporary(path) => path.as_ref().as_ref(),
+            DownloadedFilePath::Stored(blob) => &blob.path,
+        }
+    }
+
+    pub(crate) fn from_blob(
+        blob: crate::state::content_store::BlobLease,
+        reused: bool,
+    ) -> Self {
+        Self {
+            reused,
+            size: blob.blob.size as u64,
+            sha1: blob.blob.sha1.clone(),
+            sha512: blob.blob.sha512.clone(),
+            path: DownloadedFilePath::Stored(blob),
+        }
+    }
+
+    pub(crate) async fn store_blob(
+        &self,
+        state: &crate::State,
+    ) -> crate::Result<crate::state::content_store::BlobLease> {
+        match &self.path {
+            DownloadedFilePath::Stored(blob) => Ok(blob.clone()),
+            DownloadedFilePath::Temporary(_) => {
+                state.content_store.ingest_file(self.path()).await
+            }
+        }
     }
 
     pub async fn copy_to(
@@ -508,31 +545,65 @@ async fn read_file_response(
     mut progress: Option<&mut FetchProgressFn<'_>>,
 ) -> crate::Result<DownloadedFile> {
     use futures::StreamExt;
-    let path = tokio::task::spawn_blocking(|| {
-        tempfile::NamedTempFile::new().map(|file| file.into_temp_path())
+    let staging = crate::State::get_if_initialized()
+        .map(|state| state.directories.store_staging_dir());
+    let path = tokio::task::spawn_blocking(move || {
+        match staging {
+            Some(staging) => tempfile::NamedTempFile::new_in(staging),
+            None => tempfile::NamedTempFile::new(),
+        }
+        .map(|file| file.into_temp_path())
     })
     .await??;
     let mut file = File::create(&path).await?;
     let total = response.content_length().unwrap_or(0);
     let mut stream = response.bytes_stream();
     let mut hasher = sha1_smol::Sha1::new();
+    let mut sha512 = Sha512::new();
     let mut size = 0_u64;
     while let Some(chunk) = stream.next().await {
         let chunk = chunk?;
         file.write_all(&chunk).await?;
         hasher.update(&chunk);
+        sha512.update(&chunk);
         size += chunk.len() as u64;
         if let Some(progress) = progress.as_mut() {
             progress(size, total).await?;
         }
     }
-    file.flush().await?;
+    file.sync_all().await?;
     drop(file);
     Ok(DownloadedFile {
-        path: Arc::new(path),
+        path: DownloadedFilePath::Temporary(Arc::new(path)),
+        reused: false,
         size,
         sha1: hasher.hexdigest(),
+        sha512: format!("{:x}", sha512.finalize()),
     })
+}
+
+pub(crate) async fn fetch_content_file(
+    state: &crate::State,
+    mirrors: &[&str],
+    sha512: Option<&str>,
+    sha1: Option<&str>,
+    size: Option<u64>,
+    download_meta: Option<&DownloadMeta>,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<DownloadedFile> {
+    let (blob, reused) = state
+        .content_store
+        .acquire(
+            mirrors,
+            sha512,
+            sha1,
+            size,
+            download_meta,
+            &state.fetch_semaphore,
+            progress,
+        )
+        .await?;
+    Ok(DownloadedFile::from_blob(blob, reused))
 }
 
 async fn read_memory_response(

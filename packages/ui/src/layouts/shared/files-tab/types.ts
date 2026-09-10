@@ -7,6 +7,7 @@ export interface FileItem {
 	size?: number
 	count?: number
 	target?: string
+	readOnly?: boolean
 }
 
 export interface EditingFile {

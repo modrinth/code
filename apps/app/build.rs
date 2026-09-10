@@ -311,6 +311,10 @@ fn main() {
                     .commands(&[
                         "settings_get",
                         "settings_set",
+                        "store_usage",
+                        "store_cleanup",
+                        "store_set_cache_limit",
+                        "store_verify",
                         "cancel_directory_change",
                     ])
                     .default_permission(
@@ -406,6 +410,12 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "file_extract_zip",
+                        "file_list",
+                        "file_read",
+                        "file_write",
+                        "file_create_directory",
+                        "file_rename",
+                        "file_delete",
                         "file_save_as",
                         "file_read_dragged_file",
                     ])

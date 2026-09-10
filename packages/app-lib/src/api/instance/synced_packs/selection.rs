@@ -45,7 +45,11 @@ async fn local_file(
     path: &str,
     state: &State,
 ) -> crate::Result<bool> {
-    if path.is_empty() || !instance_dir(metadata, state).join(path).exists() {
+    if path.is_empty() {
+        return Ok(false);
+    }
+    let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, path, &state.pool).await?;
+    if file.is_none_or(|file| file.missing) {
         return Ok(false);
     }
     let kind = commands::content_source_kind_for_project_path(
@@ -70,7 +74,6 @@ async fn can_capture(
         || placement.suspended
         || placement.pending
         || placement.error.is_some()
-        || placement.path.ends_with(".disabled")
         || placement.content_set_id != metadata.applied_content_set.id
     {
         return Ok(false);

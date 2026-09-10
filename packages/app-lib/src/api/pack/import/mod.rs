@@ -368,37 +368,175 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
     reporter: InstallProgressReporter,
     details: InstallPhaseDetails,
 ) -> crate::Result<()> {
-    let instance_path =
-        crate::api::instance::get_full_path(instance_id).await?;
+    let state = crate::State::get().await?;
+    let _lease = state.content_store.lease().await;
+    let source_root = tokio::fs::canonicalize(&dotminecraft).await?;
+    let profiles =
+        tokio::fs::canonicalize(state.directories.instances_dir()).await?;
+    let source_instance = if let Ok(path) = source_root.strip_prefix(&profiles)
+    {
+        crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(&path.to_string_lossy(), &state.pool).await?
+    } else {
+        None
+    };
+    let mut managed_paths = std::collections::HashSet::new();
+    if let Some(source) = &source_instance {
+        if crate::state::instance_has_running_process(&source.id, &state)
+            .await?
+        {
+            return Err(crate::state::content_store::input(
+                "Stop the source instance before duplicating it",
+            ));
+        }
+        let files = crate::state::instances::commands::sync_content_files(
+            &source.id, &state,
+        )
+        .await?;
+        let entries = if let Some(content_set) = &source.applied_content_set_id
+        {
+            crate::state::instances::adapters::sqlite::content_rows::get_content_entries(content_set, &state.pool).await?
+        } else {
+            Vec::new()
+        };
+        for file in files {
+            let Some(blob) = state.content_store.file_blob(&file).await? else {
+                if crate::state::content_store::catalog::binding(
+                    &state.pool,
+                    &file.id,
+                )
+                .await?
+                .is_some()
+                {
+                    return Err(crate::state::content_store::input(format!(
+                        "Repair {} before duplicating this instance",
+                        file.relative_path
+                    )));
+                }
+                continue;
+            };
+            managed_paths.insert(file.relative_path.clone());
+            let project_type =
+                crate::state::ProjectType::get_from_parent_folder(
+                    &file.relative_path,
+                )
+                .ok_or_else(|| {
+                    crate::state::content_store::input("Invalid content path")
+                })?;
+            let entry = entries.iter().find(|entry| {
+                entry.file_id.as_deref() == Some(file.id.as_str())
+            });
+            crate::state::instances::commands::install_content_blob(
+                instance_id,
+                &file.relative_path,
+                &blob,
+                project_type,
+                entry.map_or(crate::state::ContentSourceKind::Local, |entry| {
+                    entry.source_kind
+                }),
+                entry.and_then(|entry| entry.project_id.as_deref()),
+                entry.and_then(|entry| entry.version_id.as_deref()),
+                Some(file.enabled),
+                &state,
+            )
+            .await?;
+            if crate::state::instances::commands::is_project_locked(
+                &source.id,
+                &file.relative_path,
+                &state,
+            )
+            .await?
+            {
+                crate::state::instances::commands::set_project_locked(
+                    instance_id,
+                    &file.relative_path,
+                    true,
+                    &state,
+                )
+                .await?;
+            }
+        }
+    }
     let subfiles = get_all_subfiles(&dotminecraft, false).await?;
-    let total_subfiles = subfiles.len() as u64;
-
-    for (index, src_child) in subfiles.into_iter().enumerate() {
-        let dst_child =
-            src_child.strip_prefix(&dotminecraft).map_err(|_| {
-                crate::ErrorKind::InputError(format!(
-                    "Invalid file: {}",
-                    &src_child.display()
-                ))
-            })?;
-        let dst_child = instance_path.join(dst_child);
-
-        tokio::time::sleep(std::time::Duration::from_millis(1)).await;
-
-        fetch::copy(&src_child, &dst_child, io_semaphore).await?;
+    let total = subfiles.len() as u64;
+    for (index, source) in subfiles.into_iter().enumerate() {
+        let relative = source
+            .strip_prefix(&dotminecraft)?
+            .components()
+            .map(|part| part.as_os_str().to_string_lossy())
+            .collect::<Vec<_>>()
+            .join("/");
+        if managed_paths.contains(&relative) {
+            continue;
+        }
+        if tokio::fs::symlink_metadata(&source)
+            .await?
+            .file_type()
+            .is_symlink()
+        {
+            tracing::warn!(path = %source.display(), "Skipping an unmanaged symlink while importing an instance");
+            continue;
+        }
+        if crate::state::content_store::eligible(&relative) {
+            let blob = state.content_store.ingest_file(&source).await?;
+            let project_type =
+                crate::state::ProjectType::get_from_parent_folder(&relative)
+                    .ok_or_else(|| {
+                        crate::state::content_store::input(
+                            "Invalid imported content path",
+                        )
+                    })?;
+            crate::state::instances::commands::install_content_blob(
+                instance_id,
+                &relative,
+                &blob,
+                project_type,
+                crate::state::ContentSourceKind::Local,
+                None,
+                None,
+                Some(!relative.ends_with(".disabled")),
+                &state,
+            )
+            .await?;
+        } else {
+            let target_instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_id(instance_id, &state.pool).await?
+				.ok_or_else(|| crate::state::content_store::input("Unknown destination instance"))?;
+            let target = state
+                .content_store
+                .instance_path(&target_instance.path, &relative)
+                .await?;
+            if tokio::fs::symlink_metadata(&target)
+                .await
+                .is_ok_and(|metadata| metadata.file_type().is_symlink())
+            {
+                return Err(crate::state::content_store::input(
+                    "Import cannot overwrite a symbolic link",
+                ));
+            }
+            fetch::copy(&source, &target, io_semaphore).await?;
+        }
         reporter
             .update(
                 InstallPhaseId::PreparingInstance,
                 Some(InstallProgress {
                     current: (index + 1) as u64,
-                    total: total_subfiles,
+                    total,
                     secondary: None,
                 }),
                 details.clone(),
             )
             .await?;
     }
-
+    reporter
+        .update(
+            InstallPhaseId::PreparingInstance,
+            Some(InstallProgress {
+                current: total,
+                total,
+                secondary: None,
+            }),
+            details,
+        )
+        .await?;
     Ok(())
 }
 
@@ -437,7 +575,8 @@ pub async fn get_all_subfiles(
     src: &Path,
     include_empty_dirs: bool,
 ) -> crate::Result<Vec<PathBuf>> {
-    if !src.is_dir() {
+    let metadata = tokio::fs::symlink_metadata(src).await?;
+    if !metadata.is_dir() || metadata.file_type().is_symlink() {
         return Ok(vec![src.to_path_buf()]);
     }
 

@@ -146,7 +146,7 @@ const editorLanguage = computed(() => {
 	const ext = getFileExtension(props.file?.name ?? '')
 	return getEditorLanguage(ext)
 })
-const isEditorReadOnly = computed(() => ctx.isBusy?.value ?? false)
+const isEditorReadOnly = computed(() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file?.path ?? '') ?? false))
 
 watch(isEditorReadOnly, (readOnly) => {
 	editorInstance.value?.setReadOnly(readOnly)
@@ -240,7 +240,7 @@ function onEditorInit(editor: Ace.Editor) {
 
 async function saveFileContent(exit: boolean = false) {
 	if (!props.file) return
-	if (ctx.isBusy?.value) return
+	if (isEditorReadOnly.value) return
 
 	try {
 		const normalizedPath = props.file.path.startsWith('/') ? props.file.path : `/${props.file.path}`

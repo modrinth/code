@@ -12,8 +12,8 @@ use std::collections::{HashMap, HashSet};
 
 use super::apply_content_install::{
     DownloadedProjectVersion, add_downloaded_project_version,
-    add_project_from_version, download_project_version, remove_project,
-    rename_project_companion_file, toggle_disable_project,
+    add_downloaded_project_version_with_enabled, download_project_version,
+	rename_project_companion_file,
 };
 use super::check_content_updates::{ContentUpdate, check_content_updates};
 
@@ -92,21 +92,31 @@ async fn apply_content_update(
     update: &ContentUpdate,
     state: &State,
 ) -> crate::Result<String> {
-    let mut new_path = add_project_from_version(
+    let enabled = content_rows::get_instance_file_by_relative_path(
+        instance_id,
+        project_path,
+        &state.pool,
+    )
+    .await?
+    .is_none_or(|file| file.enabled);
+    let downloaded = download_project_version(
         instance_id,
         &update.update_version_id,
         DownloadReason::Update,
         Some(update.current_version_id.clone()),
-        ContentSourceKind::Local,
         state,
     )
     .await?;
 
-    if project_path.ends_with(".disabled") {
-        new_path =
-            toggle_disable_project(instance_id, &new_path, Some(false), state)
-                .await?;
-    }
+    let new_path = add_downloaded_project_version_with_enabled(
+        instance_id,
+        downloaded,
+        ContentSourceKind::Local,
+        Some(enabled),
+        Some(project_path),
+        state,
+    )
+    .await?;
 
     if new_path != project_path {
         rename_project_companion_file(
@@ -116,7 +126,6 @@ async fn apply_content_update(
             state,
         )
         .await?;
-        remove_project(instance_id, project_path, state).await?;
     }
 
     Ok(new_path)
@@ -151,23 +160,22 @@ pub(crate) async fn update_all_projects(
     for download in downloads {
         match download {
             DownloadedBulkProject::ProjectUpdate(update, downloaded) => {
-                let mut new_path = add_downloaded_project_version(
+                let enabled = content_rows::get_instance_file_by_relative_path(
+                    instance_id,
+                    &update.relative_path,
+                    &state.pool,
+                )
+                .await?
+                .is_none_or(|file| file.enabled);
+                let new_path = add_downloaded_project_version_with_enabled(
                     instance_id,
                     downloaded,
                     ContentSourceKind::Local,
+                    Some(enabled),
+                    Some(&update.relative_path),
                     state,
                 )
                 .await?;
-
-                if update.relative_path.ends_with(".disabled") {
-                    new_path = toggle_disable_project(
-                        instance_id,
-                        &new_path,
-                        Some(false),
-                        state,
-                    )
-                    .await?;
-                }
 
                 if new_path != update.relative_path {
                     rename_project_companion_file(
@@ -177,8 +185,6 @@ pub(crate) async fn update_all_projects(
                         state,
                     )
                     .await?;
-                    remove_project(instance_id, &update.relative_path, state)
-                        .await?;
                 }
 
                 changed.insert(update.relative_path, new_path);
