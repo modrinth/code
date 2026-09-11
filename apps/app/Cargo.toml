@@ -80,7 +80,6 @@ default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
 export-app-events = ["theseus/export-ts"]
 updater = []
-seed-production-data = ["theseus/seed-production-data"]
 
 [lints]
 workspace = true

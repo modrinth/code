@@ -91,7 +91,6 @@ const theme = useTheme()
 const doneLoading = ref(false)
 const loadingProgress = ref(0)
 const message = ref()
-const hasRealProgress = ref(false)
 
 const MIN_DISPLAY_MS = 500
 const mountedAt = Date.now()
@@ -135,9 +134,8 @@ watch(
 )
 
 function fakeLoadingIncrease() {
-	if (!hasRealProgress.value && loadingProgress.value < 95) {
+	if (loadingProgress.value < 95) {
 		setTimeout(() => {
-			if (hasRealProgress.value) return
 			loadingProgress.value += 2
 			fakeLoadingIncrease()
 		}, 5)
@@ -145,13 +143,7 @@ function fakeLoadingIncrease() {
 }
 
 useAppEvent('loading', (e) => {
-	if (e.event.type === 'config_change') {
-		hasRealProgress.value = true
-		loadingProgress.value = 100 * (e.fraction ?? 1)
-		message.value = e.message
-	}
 	if (e.event.type === 'directory_move') {
-		hasRealProgress.value = true
 		loadingProgress.value = 100 * (e.fraction ?? 1)
 		message.value = 'Updating app directory...'
 	}
