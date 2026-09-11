@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Úgy tűnik, hogy néhány külső hivatkozásod megegyezik. Minden hivatkozást csak egyszer szabad megadni, és a megfelelő hivatkozástípussal kell ellátni."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Töröld az azonos linkeket"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "A licensz linkje érvénytelen."
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Adj hozzá helyettesítő szöveget"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "A Discord meghívók más típusú linkekhez nem használhatók. Kérlek a Discord linkedet csak a Discord meghívó link mezőbe írd be."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Discord meghívó áthelyezése"
   },
   "nags.moderation.title": {
     "defaultMessage": "Látogasd meg a Moderáció fület"
@@ -244,12 +232,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Tölts fel egy verziót"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Néhány külső hivatkozásod olyan domainnevet használhat, amely nem megfelelő az adott típusú hivatkozáshoz."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Ellenőrizd a külső linkeket"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"

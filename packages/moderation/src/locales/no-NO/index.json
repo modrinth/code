@@ -71,12 +71,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Oppgi kildekode"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Noen av dine eksterne lenker ser ut til å være like. Hver link må bare legges inn én gang, og med riktig lenketype."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Fjern identiske lenker"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisens-URL er ugyldig."
   },
@@ -106,12 +100,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Legg til alternativ bildetekst"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord-invitasjoner kan ikke brukes som andre lenketyper. Legg Discord-lenken kun i feltet for Discord-invitasjon."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Flytt Discord-invitasjonen"
   },
   "nags.moderation.title": {
     "defaultMessage": "Gå til modereringstråden"
@@ -211,12 +199,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Gå til versjonssiden"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Noen av de eksterne lenkene dine bruker domener som ikke passer for denne typen len."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Bekreft eksterne lenker"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Gå til lisensinnstillinger"

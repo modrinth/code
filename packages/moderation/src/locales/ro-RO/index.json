@@ -62,9 +62,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Oferă codul sursă"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Unele dintre linkurile dvs. externe par a fi identice. Fiecare link trebuie introdus o singură dată și cu tipul de link corespunzător."
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL-ul licenței este invalid."
   },
@@ -94,12 +91,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Adaugă text alternativ imaginii"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Invitațiile Discord nu pot fi folosite pentru alte tipuri de link-uri. Te rugăm să-ți pui link-ul de Discord doar în câmpul dedicat invitațiilor de Discord."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Mută invitația de Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Vizitează discuția cu moderatorii"
@@ -187,12 +178,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Încarcă o versiune"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Unele dintre link-urile tale externe pot folosi domenii care nu sunt potrivite pentru acel tip de link."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Verifică link-urile externe"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Vizitează setările link-urilor"

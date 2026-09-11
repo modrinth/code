@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "你輸入的部分外部連結似乎完全相同。每個連結僅應輸入一次，並選擇正確的連結類型。"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "清理重複連結"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "授權條款網址無效。"
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "新增圖片替代文字"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord 邀請連結不可用於其他連結類型。請只將你的 Discord 連結放至 Discord 邀請連結欄位。"
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "移動 Discord 邀請連結"
   },
   "nags.moderation.title": {
     "defaultMessage": "前往審查討論串"
@@ -244,12 +232,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "上傳版本"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "你的部分外部連結可能使用了不適合該連結類型的網域。"
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "驗證外部連結"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "前往連結設定"

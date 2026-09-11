@@ -402,16 +402,15 @@ async function submitForReview() {
 const applicableNags = computed<Nag[]>(() => {
 	if (props.nags) return props.nags
 
-	const nagsByKind = new Map<
-		Labrinth.Projects.v3.NormalizedProjectNagKind,
-		Labrinth.Projects.v3.ProjectNag
-	>()
+	const nagsById = new Map<string, Nag>()
 	for (const nag of props.validationNags) {
 		const kind = normalizeProjectNagKind(nag.kind)
-		if (kind && !nagsByKind.has(kind)) nagsByKind.set(kind, nag)
+		if (!kind) continue
+		const mapped = toProjectNag(nag, props.project.project_type)
+		if (!nagsById.has(mapped.id)) nagsById.set(mapped.id, mapped)
 	}
 
-	return [...nagsByKind.values()].map((nag) => toProjectNag(nag, props.project.project_type))
+	return [...nagsById.values()]
 })
 
 function isNagComplete(nag: Nag): boolean {
@@ -491,7 +490,7 @@ watch(
 		const actionableNagKeys = new Set(
 			validationNags
 				.filter((nag) => nag.severity === 'required' || nag.severity === 'warning')
-				.map((nag) => `${nag.severity}:${nag.kind}`),
+				.map((nag) => `${nag.severity}:${nag.kind}:${JSON.stringify(nag.details)}`),
 		)
 		const previousNagKeys = previousActionableNagKeys
 		const hasNewActionableNag =

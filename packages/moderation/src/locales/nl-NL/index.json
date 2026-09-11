@@ -77,12 +77,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Sommige van je externe links lijken identiek te zijn, elke link moet maar een keer worden ingevuld met de juiste link type."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Identieke links opschonen"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licentie URL is ongeldig."
   },
@@ -112,12 +106,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Alt-tekst voor afbeelding toevoegen"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord-uitnodigingen kunnen niet worden gebruikt voor andere soorten links. Plaats je Discord-link alleen in het veld 'Discord-uitnodigingslink'."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Verplaats Discord uitnodiging"
   },
   "nags.moderation.title": {
     "defaultMessage": "Bekijk moderatie thread"
@@ -235,12 +223,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Upload een versie"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Sommige van je externe links gebruiken mogelijk domeinnamen die niet geschikt zijn voor dat soort links."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Verifieer externe links"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bezoek linkjes instellingen"

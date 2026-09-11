@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Деякі з ваших посилань, схоже, однакові. Кожне посилання слід вводити лише один раз й у відповідне для нього поле."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Приберіть однакові посилання"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Посилання на ліцензію неправильне."
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Додайте альтернативний текст до зображень"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Запрошення до Discord не можуть використовуватися для посилань інших типів. Уставте посилання лише в поле «Посилання на запрошення до Discord»."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Перемістіть запрошення до Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Відвідайте гілку модерації"
@@ -244,12 +232,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Завантажте версію"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Деякі з ваших зовнішніх посилань можуть використовувати домени, які не підходять для цього типу посилань."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Перевірте зовнішні посилання"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Відвідайте налаштування посилань"

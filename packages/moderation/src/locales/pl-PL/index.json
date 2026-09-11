@@ -77,12 +77,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Udostępnij kod źródłowy"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Niektóre z Twoich linków zewnętrznych są identyczne. Każdy link powinien być wprowadzony tylko raz i z odpowiednim typem linku."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Usuń identyczne linki"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Adres URL licencji jest nieprawidłowy."
   },
@@ -112,12 +106,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Dodaj alternatywny tekst do obrazka"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Zaproszenia Discord nie mogą być używane dla innych typów linków. Proszę umieść swój link Discord jedynie w polu Zaproszenie Discord."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Przenieś zaproszenie Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Odwiedź wątek moderacji"
@@ -229,12 +217,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Prześlij wersję"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Niektóre z Twoich zewnętrznych linków mogą używać domen, które nie są stosowne dla tego linku."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Zweryfikuj linki zewnętrzne"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Odwiedź ustawienia linków"

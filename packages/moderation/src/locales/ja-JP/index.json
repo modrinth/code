@@ -80,12 +80,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ソースコードのリンクの追加"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "まったく同じ外部リンクが複数あります。各リンクは適切な形式で１つだけ入力してください。"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "リンクの重複を整理"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "ライセンスのURLが無効です。"
   },
@@ -115,12 +109,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "画像の代替テキストを追加"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discordの招待リンクは、他のリンクタイプには使用できません。Discordのリンクは、Discord招待リンク欄にのみ入力してください。"
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Discordの招待リンクを移動する"
   },
   "nags.moderation.title": {
     "defaultMessage": "モデレーションスレッドを表示する"
@@ -238,12 +226,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "バージョンをアップロード"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "一部の外部リンクは、その種類のリンクに適さないドメインを使用している可能性があります。"
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "外部リンクの承認"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "リンク設定を表示"

@@ -12,7 +12,7 @@ use crate::models::exp::minecraft::Language;
 use crate::models::projects::Project;
 
 pub(super) use super::language::{
-	has_sufficient_english_blocks, is_likely_english_summary,
+    has_sufficient_english_blocks, is_likely_english_summary,
 };
 
 static WORD: LazyLock<Regex> =
@@ -53,9 +53,6 @@ static DESCRIPTION_LINK_FINDER: LazyLock<LinkFinder> = LazyLock::new(|| {
     finder.kinds(&[LinkKind::Url]).url_must_have_scheme(false);
     finder
 });
-
-const URL_SHORTENERS: &[&str] =
-    &["bit.ly", "adf.ly", "tinyurl.com", "short.io", "is.gd"];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum ProfanityKind {
@@ -129,46 +126,46 @@ pub(super) fn normalize_project_field_text(text: &str) -> String {
 }
 
 pub(super) fn project_text_similarity(left: &str, right: &str) -> f64 {
-	let left = normalized_for_similarity(left);
-	let right = normalized_for_similarity(right);
-	let longest_length = left.len().max(right.len());
-	if longest_length == 0 {
-		return 0.0;
-	}
+    let left = normalized_for_similarity(left);
+    let right = normalized_for_similarity(right);
+    let longest_length = left.len().max(right.len());
+    if longest_length == 0 {
+        return 0.0;
+    }
 
-	1.0 - levenshtein_distance(&left, &right) as f64 / longest_length as f64
+    1.0 - levenshtein_distance(&left, &right) as f64 / longest_length as f64
 }
 
 fn normalized_for_similarity(text: &str) -> Vec<char> {
-	normalize_project_field_text(text)
-		.to_lowercase()
-		.chars()
-		.filter(|character| !character.is_whitespace())
-		.collect()
+    normalize_project_field_text(text)
+        .to_lowercase()
+        .chars()
+        .filter(|character| !character.is_whitespace())
+        .collect()
 }
 
 fn levenshtein_distance(left: &[char], right: &[char]) -> usize {
-	if left.len() > right.len() {
-		return levenshtein_distance(right, left);
-	}
+    if left.len() > right.len() {
+        return levenshtein_distance(right, left);
+    }
 
-	let mut previous_row = (0..=left.len()).collect::<Vec<_>>();
-	for (right_index, right_character) in right.iter().enumerate() {
-		let mut current_row = Vec::with_capacity(left.len() + 1);
-		current_row.push(right_index + 1);
-		for (left_index, left_character) in left.iter().enumerate() {
-			current_row.push(
-				(current_row[left_index] + 1)
-					.min(previous_row[left_index + 1] + 1)
-					.min(
-						previous_row[left_index]
-							+ usize::from(left_character != right_character),
-					),
-			);
-		}
-		previous_row = current_row;
-	}
-	previous_row[left.len()]
+    let mut previous_row = (0..=left.len()).collect::<Vec<_>>();
+    for (right_index, right_character) in right.iter().enumerate() {
+        let mut current_row = Vec::with_capacity(left.len() + 1);
+        current_row.push(right_index + 1);
+        for (left_index, left_character) in left.iter().enumerate() {
+            current_row.push(
+                (current_row[left_index] + 1)
+                    .min(previous_row[left_index + 1] + 1)
+                    .min(
+                        previous_row[left_index]
+                            + usize::from(left_character != right_character),
+                    ),
+            );
+        }
+        previous_row = current_row;
+    }
+    previous_row[left.len()]
 }
 
 pub(super) fn js_string_length(text: &str) -> usize {
@@ -880,8 +877,8 @@ pub(super) fn find_link_or_ip(text: &str) -> Option<String> {
 pub(super) fn has_summary_formatting(summary: &str) -> bool {
     has_paired_html_formatting(summary)
         || MARKDOWN_LINK.is_match(summary)
-		|| Parser::new(summary)
-			.any(|event| matches!(event, Event::Start(Tag::Emphasis)))
+        || Parser::new(summary)
+            .any(|event| matches!(event, Event::Start(Tag::Emphasis)))
         || summary.lines().any(|line| {
             let line = line.trim_start();
             line.starts_with('#')
@@ -948,95 +945,95 @@ pub(super) fn extract_description_text(markdown: &str) -> String {
 }
 
 static LANGUAGE_CONFIG_ENTRY: LazyLock<Regex> = LazyLock::new(|| {
-	Regex::new(r"^([A-Za-z_][A-Za-z0-9_.-]*):(?:\s+(.*))?$").unwrap()
+    Regex::new(r"^([A-Za-z_][A-Za-z0-9_.-]*):(?:\s+(.*))?$").unwrap()
 });
 static LANGUAGE_IDENTIFIER: LazyLock<Regex> = LazyLock::new(|| {
-	Regex::new(r"\b[A-Za-z][A-Za-z0-9_-]*(?:\.[A-Za-z][A-Za-z0-9_-]*)+\b")
-		.unwrap()
+    Regex::new(r"\b[A-Za-z][A-Za-z0-9_-]*(?:\.[A-Za-z][A-Za-z0-9_-]*)+\b")
+        .unwrap()
 });
 static LANGUAGE_COMMAND: LazyLock<Regex> = LazyLock::new(|| {
-	Regex::new(r"(^|[\s|,(])/[A-Za-z][A-Za-z0-9_:./-]*").unwrap()
+    Regex::new(r"(^|[\s|,(])/[A-Za-z][A-Za-z0-9_:./-]*").unwrap()
 });
 static LANGUAGE_ARGUMENT: LazyLock<Regex> =
-	LazyLock::new(|| Regex::new(r"\[[A-Za-z][A-Za-z0-9_ /|.-]*\]").unwrap());
+    LazyLock::new(|| Regex::new(r"\[[A-Za-z][A-Za-z0-9_ /|.-]*\]").unwrap());
 
 /// Remove machine syntax before punctuation normalization turns identifiers into words.
 fn description_language_input(markdown: &str) -> String {
-	let readable = strip_description_markup(markdown);
-	let readable = text_without_explicit_links(&readable);
-	let mut in_yaml = false;
-	readable
-		.lines()
-		.map(|line| {
-			let trimmed = line.trim();
-			if matches!(trimmed, "yaml" | "yml") {
-				in_yaml = true;
-				return String::new();
-			}
-			if let Some(entry) = LANGUAGE_CONFIG_ENTRY.captures(trimmed) {
-				let value = entry.get(2).map_or("", |value| value.as_str());
-				let machine_value =
-					matches!(value, "true" | "false" | "null" | "~")
-						|| value.parse::<f64>().is_ok()
-						|| value.starts_with(['"', '\'']);
-				if in_yaml || entry[1].contains('_') || machine_value {
-					return String::new();
-				}
-			} else if !trimmed.is_empty() {
-				in_yaml = false;
-			}
-			let has_command = LANGUAGE_COMMAND.is_match(line);
-			let without_commands = LANGUAGE_COMMAND.replace_all(line, "$1");
-			let without_identifiers =
-				LANGUAGE_IDENTIFIER.replace_all(&without_commands, " ");
-			if has_command {
-				LANGUAGE_ARGUMENT
-					.replace_all(&without_identifiers, " ")
-					.into_owned()
-			} else {
-				without_identifiers.into_owned()
-			}
-		})
-		.collect::<Vec<_>>()
-		.join("\n")
+    let readable = strip_description_markup(markdown);
+    let readable = text_without_explicit_links(&readable);
+    let mut in_yaml = false;
+    readable
+        .lines()
+        .map(|line| {
+            let trimmed = line.trim();
+            if matches!(trimmed, "yaml" | "yml") {
+                in_yaml = true;
+                return String::new();
+            }
+            if let Some(entry) = LANGUAGE_CONFIG_ENTRY.captures(trimmed) {
+                let value = entry.get(2).map_or("", |value| value.as_str());
+                let machine_value =
+                    matches!(value, "true" | "false" | "null" | "~")
+                        || value.parse::<f64>().is_ok()
+                        || value.starts_with(['"', '\'']);
+                if in_yaml || entry[1].contains('_') || machine_value {
+                    return String::new();
+                }
+            } else if !trimmed.is_empty() {
+                in_yaml = false;
+            }
+            let has_command = LANGUAGE_COMMAND.is_match(line);
+            let without_commands = LANGUAGE_COMMAND.replace_all(line, "$1");
+            let without_identifiers =
+                LANGUAGE_IDENTIFIER.replace_all(&without_commands, " ");
+            if has_command {
+                LANGUAGE_ARGUMENT
+                    .replace_all(&without_identifiers, " ")
+                    .into_owned()
+            } else {
+                without_identifiers.into_owned()
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 pub(super) fn extract_description_blocks(markdown: &str) -> Vec<String> {
-	let readable = description_language_input(markdown);
-	let mut blocks = Vec::new();
-	let mut paragraph = Vec::new();
-	let mut heading_only = false;
-	let mut blank = false;
-	for line in readable.lines() {
-		let line = line.trim();
-		if line.is_empty() {
-			blank = true;
-			continue;
-		}
-		let heading = line.starts_with('#');
-		let metadata_list = line
-			.split_once(':')
-			.is_some_and(|(_, values)| values.matches(',').count() >= 3);
-		if (heading
-			|| metadata_list
-			|| (blank
-				&& !heading_only
-				&& (WORD.find_iter(&paragraph.join(" ")).count() >= 8
-					|| WORD.find_iter(line).count() >= 8)))
-			&& !paragraph.is_empty()
-		{
-			blocks.push(extract_description_text(&paragraph.join("\n")));
-			paragraph.clear();
-		}
-		paragraph.push(line);
-		heading_only = heading;
-		blank = false;
-	}
-	if !paragraph.is_empty() {
-		blocks.push(extract_description_text(&paragraph.join("\n")));
-	}
-	blocks.retain(|block| !block.is_empty());
-	blocks
+    let readable = description_language_input(markdown);
+    let mut blocks = Vec::new();
+    let mut paragraph = Vec::new();
+    let mut heading_only = false;
+    let mut blank = false;
+    for line in readable.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            blank = true;
+            continue;
+        }
+        let heading = line.starts_with('#');
+        let metadata_list = line
+            .split_once(':')
+            .is_some_and(|(_, values)| values.matches(',').count() >= 3);
+        if (heading
+            || metadata_list
+            || (blank
+                && !heading_only
+                && (WORD.find_iter(&paragraph.join(" ")).count() >= 8
+                    || WORD.find_iter(line).count() >= 8)))
+            && !paragraph.is_empty()
+        {
+            blocks.push(extract_description_text(&paragraph.join("\n")));
+            paragraph.clear();
+        }
+        paragraph.push(line);
+        heading_only = heading;
+        blank = false;
+    }
+    if !paragraph.is_empty() {
+        blocks.push(extract_description_text(&paragraph.join("\n")));
+    }
+    blocks.retain(|block| !block.is_empty());
+    blocks
 }
 
 pub(super) fn has_image_without_alt_text(markdown: &str) -> bool {
@@ -1052,34 +1049,6 @@ pub(super) fn has_image_without_alt_text(markdown: &str) -> bool {
                 })
                 .is_none_or(|alt| alt.as_str().trim().is_empty())
         })
-}
-
-pub(super) fn find_banned_description_link(markdown: &str) -> Option<String> {
-    DESCRIPTION_LINK_FINDER.links(markdown).find_map(|link| {
-        let raw = link.as_str();
-        let normalized = if raw.contains("://") {
-            raw.to_owned()
-        } else {
-            format!("http://{raw}")
-        };
-        Url::parse(&normalized)
-            .ok()
-            .filter(|url| {
-                url.host_str().is_some_and(|hostname| {
-                    URL_SHORTENERS
-                        .iter()
-                        .any(|domain| hostname_matches_domain(hostname, domain))
-                })
-            })
-            .map(|_| normalized)
-    })
-}
-
-fn hostname_matches_domain(hostname: &str, domain: &str) -> bool {
-    hostname.eq_ignore_ascii_case(domain)
-        || hostname
-            .to_ascii_lowercase()
-            .ends_with(&format!(".{domain}"))
 }
 
 pub(super) fn project_requires_english(project: &Project) -> bool {
@@ -1100,37 +1069,50 @@ pub(super) fn project_requires_english(project: &Project) -> bool {
 
 #[cfg(test)]
 mod tests {
-	use super::{has_summary_formatting, project_text_similarity};
+    use super::{has_summary_formatting, project_text_similarity};
 
-	#[test]
-	fn summary_detects_markdown_emphasis() {
-		for summary in ["*this*", "Adds *new features* to Minecraft", "*a*", "_this_"] {
-			assert!(has_summary_formatting(summary), "{summary:?}");
-		}
-	}
+    #[test]
+    fn summary_detects_markdown_emphasis() {
+        for summary in [
+            "*this*",
+            "Adds *new features* to Minecraft",
+            "*a*",
+            "_this_",
+        ] {
+            assert!(has_summary_formatting(summary), "{summary:?}");
+        }
+    }
 
-	#[test]
-	fn summary_allows_literal_asterisks() {
-		for summary in ["A single * asterisk", "2 * 3 * 4", r"\*this\*", "An unmatched *asterisk"] {
-			assert!(!has_summary_formatting(summary), "{summary:?}");
-		}
-	}
+    #[test]
+    fn summary_allows_literal_asterisks() {
+        for summary in [
+            "A single * asterisk",
+            "2 * 3 * 4",
+            r"\*this\*",
+            "An unmatched *asterisk",
+        ] {
+            assert!(!has_summary_formatting(summary), "{summary:?}");
+        }
+    }
 
-	#[test]
-	fn similarity_ignores_case_whitespace_and_unicode_composition() {
-		assert_eq!(project_text_similarity(" Café tools ", "CAFE\u{301}\nTOOLS"), 1.0);
-	}
+    #[test]
+    fn similarity_ignores_case_whitespace_and_unicode_composition() {
+        assert_eq!(
+            project_text_similarity(" Café tools ", "CAFE\u{301}\nTOOLS"),
+            1.0
+        );
+    }
 
-	#[test]
-	fn similarity_distinguishes_the_eighty_percent_boundary() {
-		assert!(project_text_similarity("abcde", "abcdx") >= 0.8);
-		assert!(project_text_similarity("abcde", "abcxy") < 0.8);
-	}
+    #[test]
+    fn similarity_distinguishes_the_eighty_percent_boundary() {
+        assert!(project_text_similarity("abcde", "abcdx") >= 0.8);
+        assert!(project_text_similarity("abcde", "abcxy") < 0.8);
+    }
 
-	#[test]
-	fn empty_fields_do_not_match() {
-		assert_eq!(project_text_similarity(" ", "\n"), 0.0);
-		assert_eq!(project_text_similarity("", "some text"), 0.0);
-		assert_eq!(project_text_similarity("some text", ""), 0.0);
-	}
+    #[test]
+    fn empty_fields_do_not_match() {
+        assert_eq!(project_text_similarity(" ", "\n"), 0.0);
+        assert_eq!(project_text_similarity("", "some text"), 0.0);
+        assert_eq!(project_text_similarity("some text", ""), 0.0);
+    }
 }

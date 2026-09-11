@@ -65,12 +65,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Sediakan kod sumber"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Sesetengah daripada pautan luaran anda kelihatan sama. Setiap pautan hendaklah dimasukkan sekali sahaja dan dengan jenis pautan yang sesuai."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Bersihkan pautan yang serupa"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL lesen tidak sah."
   },
@@ -100,12 +94,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Tambahkan teks alt gambar"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Jemputan Discord tidak boleh digunakan untuk jenis pautan lain. Sila letakkan pautan Discord anda dalam medan pautan Jemputan Discord sahaja."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Pindahkan pautan jemputan Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Kunjungi bebenang penyederhanaan"
@@ -199,12 +187,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Muat naik satu versi"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Sesetengah pautan luaran anda mungkin menggunakan domain yang tidak sesuai untuk jenis pautan tersebut."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Sahkan pautan luaran"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Kunjungi tetapan pautan"

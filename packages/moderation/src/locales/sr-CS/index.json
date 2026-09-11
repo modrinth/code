@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Navedi izvorni kod"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Neki od tvojih spoljnih linkova izgledaju identično. Svaki link treba uneti samo jednom i sa odgovarajućim tipom linka."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Počisti identične linkove"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL adresa licence je nevažeća."
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Dodajte alternativni tekst slike"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord pozivnice se ne mogu koristiti za druge tipove linkova. Molimo te da svoj Discord link uneseš samo u polje za Discord pozivnicu."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Premesti Discord pozivnicu"
   },
   "nags.moderation.title": {
     "defaultMessage": "Posjeti temu za moderaciju"
@@ -244,12 +232,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Postavi verziju"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Neki tvojih spoljne linkova imaju neprimerne domene za tip linka."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Proveri spoljne linkove"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Posjeti podešavanja linkova"

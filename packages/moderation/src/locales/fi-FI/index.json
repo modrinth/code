@@ -86,9 +86,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Lisää puuttuva vaihtoehtoinen teksti"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Siirrä Discord-kutsu"
-  },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Tarkista palaute"
   },
@@ -106,8 +103,5 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Valitse tagit"
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Vahvista ulkoiset linkit"
   }
 }

@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Uveďte zdrojový kód"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Některé z vašich externích odkazů se zdají být duplicitní. Každý odkaz by měl být zadán pouze jednou a s příslušným typem odkazu."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Odstraňte duplicitní odkazy"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL licence je neplatná."
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Přidejte popisek k obrázku"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Odkazy na Discord lze použít pouze ve vyhrazeném poli. Prosím, vložte odkaz na Discord do pole „Odkaz na Discord“, nikoli do jiných typů odkazů."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Přesuňte Discord pozvánku"
   },
   "nags.moderation.title": {
     "defaultMessage": "Přejděte do moderátorského vlákna"
@@ -241,12 +229,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Nahrajte verzi"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Některé z vašich externích odkazů mohou používat domény, které nejsou pro daný typ odkazu vhodné."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Ověřte externí odkazy"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Přejděte do nastavení odkazů"

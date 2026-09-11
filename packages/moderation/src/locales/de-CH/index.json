@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem richtigen Linktyp eingegeben werden."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Identische Links bereinigen"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lizenz-URL ist ungültig."
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Bild-Alternativtext hinzufügen"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Einladungslinks für Discord können nicht für andere Link-Typen verwendet werden. Bitte füge deinen Einladungslink nur in das Discord-Einladungslink\" Feld ein."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Verschiebe Discord-Einladungslink"
   },
   "nags.moderation.title": {
     "defaultMessage": "Moderationsseite ansehen"
@@ -244,12 +232,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Version hochladen"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Einige deiner externen Links verwenden möglicherweise Domains, welche für diese Art von Link ungeeignet sind."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Externe Links überprüfen"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Link-Einstellungen ansehen"

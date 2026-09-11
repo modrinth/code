@@ -77,12 +77,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ספק קוד מקור"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "חלק מהקישורים החיצוניים שלך נראים זהים. יש להזין כל קישור פעם אחת בלבד ועם סוג הקישור המתאים."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "תמחק קישורים זהים"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "כתובת ה-URL של הרישיון אינה חוקית."
   },
@@ -109,12 +103,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "הוסף טקסט חלופי לתמונה"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "הזמנות לדיסקורד אינן יכולות לשמש עבור סוגי קישורים אחרים. אנא הזן את קישור הדיסקורד שלך בשדה המיועד לקישורי הזמנה לדיסקורד בלבד."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "העבר את הזמנת הדיסקורד"
   },
   "nags.moderation.title": {
     "defaultMessage": "בקר בשרשור פיקוח ובקרה"
@@ -196,12 +184,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "העלה גרסה"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "חלק מהקישורים החיצוניים שלך עלולים לכלול דומיינים לא ראויים לסוג הקישור הזה."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "אשר קישורים חיצוניים"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "בקר בהגדרות הקישורים"

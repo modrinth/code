@@ -37,8 +37,16 @@ export interface ProjectPageContext {
 	loadDependencies: () => void
 
 	// Mutation functions
-	patchProject: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
-	patchProjectV3: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
+	patchProject: (
+		data: Record<string, unknown>,
+		quiet?: boolean,
+		throwOnError?: boolean,
+	) => Promise<boolean>
+	patchProjectV3: (
+		data: Record<string, unknown>,
+		quiet?: boolean,
+		throwOnError?: boolean,
+	) => Promise<boolean>
 	patchIcon: (icon: File) => Promise<boolean>
 	setProcessing: () => Promise<void>
 	createGalleryItem: (
@@ -47,6 +55,7 @@ export interface ProjectPageContext {
 		description?: string,
 		featured?: boolean,
 		ordering?: number,
+		throwOnError?: boolean,
 	) => Promise<boolean>
 	editGalleryItem: (
 		imageUrl: string,
@@ -54,6 +63,7 @@ export interface ProjectPageContext {
 		description?: string,
 		featured?: boolean,
 		ordering?: number,
+		throwOnError?: boolean,
 	) => Promise<boolean>
 	deleteGalleryItem: (imageUrl: string) => Promise<boolean>
 }

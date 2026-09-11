@@ -56,6 +56,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[derive(Error, Debug)]
 pub enum CreateError {
+    #[error(transparent)]
+    Request(crate::routes::ApiError),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
@@ -103,7 +105,11 @@ impl From<crate::routes::ApiError> for CreateError {
                 Self::CustomAuthenticationError(format!("{err:#}"))
             }
             crate::routes::ApiError::Request(err) => {
-                Self::InvalidInput(format!("{err:#}"))
+                if err.downcast_ref::<super::projects::validate::ProjectValidationError>().is_some() {
+					Self::Request(crate::routes::ApiError::Request(err))
+				} else {
+					Self::InvalidInput(format!("{err:#}"))
+				}
             }
             err => Self::DatabaseError(models::DatabaseError::SchemaError(
                 format!("{err:#}"),
@@ -115,6 +121,7 @@ impl From<crate::routes::ApiError> for CreateError {
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
+            CreateError::Request(error) => error.status_code(),
             CreateError::SqlxDatabaseError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
@@ -144,8 +151,12 @@ impl actix_web::ResponseError for CreateError {
     }
 
     fn error_response(&self) -> HttpResponse {
+        if let Self::Request(error) = self {
+            return error.error_response();
+        }
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
+                CreateError::Request(..) => "request_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
                 CreateError::DatabaseError(..) => "database_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
@@ -219,9 +230,6 @@ pub struct ProjectCreateData {
     /// An optional link to the project's license page
     pub license_url: Option<String>,
     /// An optional list of all donation links the project has
-    #[validate(custom(
-        function = "crate::util::validate::validate_url_hashmap_values"
-    ))]
     #[serde(default)]
     pub link_urls: HashMap<String, String>,
 
@@ -321,6 +329,14 @@ pub async fn project_create_internal(
     http: Data<HttpClient>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
+    let (current_user, create_data) = prepare_project_creation(
+        &req,
+        &mut payload,
+        &client,
+        &redis,
+        &session_queue,
+    )
+    .await?;
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
@@ -328,14 +344,14 @@ pub async fn project_create_internal(
         models::generate_project_id(&mut transaction).await?.into();
 
     let result = project_create_inner(
-        req,
+        current_user,
+        create_data,
         &mut payload,
         &mut transaction,
         &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
-        &session_queue,
         &http,
         project_id,
     )
@@ -388,20 +404,28 @@ pub async fn project_create_with_id(
     search_state: Data<SearchState>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<HttpResponse, CreateError> {
+    let (current_user, create_data) = prepare_project_creation(
+        &req,
+        &mut payload,
+        &client,
+        &redis,
+        &session_queue,
+    )
+    .await?;
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
     let (project_id,) = path.into_inner();
 
     let result = project_create_inner(
-        req,
+        current_user,
+        create_data,
         &mut payload,
         &mut transaction,
         &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
-        &session_queue,
         &http,
         project_id,
     )
@@ -462,22 +486,15 @@ Project Creation Steps:
     - Add project data to indexing queue
 */
 
-#[allow(clippy::too_many_arguments)]
-async fn project_create_inner(
-    req: HttpRequest,
+async fn prepare_project_creation(
+    req: &HttpRequest,
     payload: &mut Multipart,
-    transaction: &mut PgTransaction<'_>,
-    file_host: &dyn FileHost,
-    uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
-    http: &reqwest::Client,
-    project_id: ProjectId,
-) -> Result<HttpResponse, CreateError> {
-    // The currently logged in user
+) -> Result<(crate::models::users::User, ProjectCreateData), CreateError> {
     let (_, current_user) = get_user_from_headers(
-        &req,
+        req,
         pool,
         redis,
         session_queue,
@@ -492,6 +509,64 @@ async fn project_create_inner(
         return Err(CreateError::LimitReached);
     }
 
+    // The first multipart field must be named "data" and contain a
+    // JSON `ProjectCreateData` object.
+
+    let mut field = payload.next().await.map_or_else(
+        || {
+            Err(CreateError::MissingValueError(String::from(
+                "No `data` field in multipart upload",
+            )))
+        },
+        |m| m.map_err(CreateError::MultipartError),
+    )?;
+
+    let name = field.name().ok_or_else(|| {
+        CreateError::MissingValueError(String::from("Missing content name"))
+    })?;
+
+    if name != "data" {
+        return Err(CreateError::InvalidInput(String::from(
+            "`data` field must come before file fields",
+        )));
+    }
+
+    let mut data = Vec::new();
+    while let Some(chunk) = field.next().await {
+        data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+    }
+    let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
+
+    create_data.validate().map_err(|err| {
+        CreateError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
+
+    super::projects::validate::require_valid_project(
+        crate::validate::project::validate_link_input(
+            &create_data.link_urls,
+            &create_data.license_id,
+            create_data.license_url.as_deref(),
+            &create_data.description,
+        )
+        .await,
+    )?;
+
+    Ok((current_user, create_data))
+}
+
+#[allow(clippy::too_many_arguments)]
+async fn project_create_inner(
+    current_user: crate::models::users::User,
+    create_data: ProjectCreateData,
+    payload: &mut Multipart,
+    transaction: &mut PgTransaction<'_>,
+    file_host: &dyn FileHost,
+    uploaded_files: &mut Vec<UploadedFile>,
+    pool: &PgPool,
+    redis: &RedisPool,
+    http: &reqwest::Client,
+    project_id: ProjectId,
+) -> Result<HttpResponse, CreateError> {
     let all_loaders =
         models::loader_fields::Loader::list(&mut *transaction, redis).await?;
 
@@ -500,40 +575,6 @@ async fn project_create_inner(
     let mut versions_map = std::collections::HashMap::new();
     let mut gallery_urls = Vec::new();
     {
-        // The first multipart field must be named "data" and contain a
-        // JSON `ProjectCreateData` object.
-
-        let mut field = payload.next().await.map_or_else(
-            || {
-                Err(CreateError::MissingValueError(String::from(
-                    "No `data` field in multipart upload",
-                )))
-            },
-            |m| m.map_err(CreateError::MultipartError),
-        )?;
-
-        let name = field.name().ok_or_else(|| {
-            CreateError::MissingValueError(String::from("Missing content name"))
-        })?;
-
-        if name != "data" {
-            return Err(CreateError::InvalidInput(String::from(
-                "`data` field must come before file fields",
-            )));
-        }
-
-        let mut data = Vec::new();
-        while let Some(chunk) = field.next().await {
-            data.extend_from_slice(
-                &chunk.map_err(CreateError::MultipartError)?,
-            );
-        }
-        let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
-
-        create_data.validate().map_err(|err| {
-            CreateError::InvalidInput(validation_errors_to_string(err, None))
-        })?;
-
         let slug_project_id_option: Option<ProjectId> = serde_json::from_str(
             &format!("\"{}\"", create_data.slug.to_lowercase()),
         )
