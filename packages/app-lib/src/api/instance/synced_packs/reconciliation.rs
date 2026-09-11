@@ -87,7 +87,7 @@ async fn capture_items(
         {
             continue;
         }
-        if let Some(item) = current_item(&items, &pack, &placement) {
+        if let Some(item) = current_item(items, &pack, &placement) {
             if !local(item) {
                 continue;
             }
@@ -897,6 +897,7 @@ async fn apply_instance_inner(
         .get(&metadata.instance.id)
         .cloned()
         .unwrap_or_default();
+    let mut removed_ids = Vec::new();
     for (id, placement) in placements {
         if running
             || library.packs.contains_key(&id)
@@ -925,11 +926,7 @@ async fn apply_instance_inner(
             emit_instance(&metadata.instance.id, InstancePayloadType::Synced)
                 .await?;
         }
-        if let Some(placements) =
-            library.instances.get_mut(&metadata.instance.id)
-        {
-            placements.remove(&id);
-        }
+        removed_ids.push(id);
     }
     if has_packs {
         preparation
@@ -951,11 +948,21 @@ async fn apply_instance_inner(
         super::selection::apply(metadata, library, &previous_placements, state)
             .await
     };
-    if let Err(error) = selection_result {
-        tracing::warn!(
+    match selection_result {
+        Ok(true) => {
+            if let Some(placements) =
+                library.instances.get_mut(&metadata.instance.id)
+            {
+                for id in removed_ids {
+                    placements.remove(&id);
+                }
+            }
+        }
+        Ok(false) => {}
+        Err(error) => tracing::warn!(
             "Could not apply resource-pack selection for {}: {error}",
             metadata.instance.id
-        );
+        ),
     }
     Ok(())
 }

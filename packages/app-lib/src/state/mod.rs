@@ -306,7 +306,7 @@ impl State {
             synced_options_lock: Mutex::new(()),
             game_locale_indexer:
                 crate::api::instance::GameLocaleIndexer::default(),
-            pack_sync_worker: Default::default(),
+            pack_sync_worker: crate::api::instance::PackSyncWorker::default(),
             discord_rpc,
             process_manager,
             friends_socket,

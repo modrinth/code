@@ -347,14 +347,15 @@ pub(super) async fn capture(
     Ok((shared_changed || observation_changed).then_some(shared_changed))
 }
 
+/// Returns false when the selection update must be deferred.
 pub(super) async fn apply_removal(
     metadata: &InstanceMetadata,
     library: &mut PackLibrary,
     placement: Option<&PackPlacement>,
     state: &State,
-) -> crate::Result<()> {
+) -> crate::Result<bool> {
     let Some(placement) = placement else {
-        return Ok(());
+        return Ok(true);
     };
     if placement.excluded
         || placement.suspended
@@ -362,7 +363,7 @@ pub(super) async fn apply_removal(
         || !metadata.synced_options.resource_packs
         || !get_global_options().await?.get(SyncedOption::ResourcePacks)
     {
-        return Ok(());
+        return Ok(true);
     }
     let directory = instance_dir(metadata, state);
     let mut managed = BTreeSet::new();
@@ -388,23 +389,27 @@ pub(super) async fn apply_removal(
         library
             .resource_pack_incompatible_observations
             .remove(&metadata.instance.id);
-        merge_resource_pack_entries(metadata, &managed, &[], state).await?;
+        return Ok(matches!(
+            merge_resource_pack_entries(metadata, &managed, &[], state).await?,
+            ResourcePackOptionsUpdate::Applied(_)
+        ));
     }
-    Ok(())
+    Ok(true)
 }
 
+/// Returns false when the selection update must be deferred.
 pub(super) async fn apply(
     metadata: &InstanceMetadata,
     library: &mut PackLibrary,
     previous_placements: &BTreeMap<String, PackPlacement>,
     state: &State,
-) -> crate::Result<()> {
+) -> crate::Result<bool> {
     let directory = instance_dir(metadata, state);
     let global = get_global_options().await?;
     if !global.get(SyncedOption::ResourcePacks)
         || !metadata.synced_options.resource_packs
     {
-        return Ok(());
+        return Ok(true);
     }
     let sources = local_sources(metadata, state).await?;
     let mut managed = BTreeSet::new();
@@ -495,7 +500,7 @@ pub(super) async fn apply(
         tracked.push(id.clone());
     }
     if managed.is_empty() {
-        return Ok(());
+        return Ok(true);
     }
     let mut selected = Vec::new();
     for id in &library.resource_pack_order {
@@ -543,5 +548,5 @@ pub(super) async fn apply(
             }
         }
     }
-    Ok(())
+    Ok(!pending)
 }

@@ -10,13 +10,16 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::future::Future;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::Duration;
 use tokio::sync::{MutexGuard, oneshot};
+use tokio::time::Instant;
 use tracing_error::InstrumentError;
 
 #[derive(Default)]
 struct Queue {
     instances: BTreeSet<String>,
     waiters: BTreeMap<String, Vec<oneshot::Sender<crate::Result<()>>>>,
+    retry_at: BTreeMap<String, Instant>,
     all: bool,
     running: bool,
 }
@@ -35,14 +38,14 @@ pub(crate) fn queue_reconciliation(instance_id: &str) {
             .lock()
             .instances
             .insert(instance_id.to_owned());
-        start(state.clone());
+        start(state);
     }
 }
 
 pub(super) fn queue_all() {
     if let Some(state) = State::get_if_initialized() {
         state.pack_sync_worker.queue.lock().all = true;
-        start(state.clone());
+        start(state);
     }
 }
 
@@ -51,6 +54,16 @@ pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
     let (sender, receiver) = oneshot::channel();
     {
         let mut queue = state.pack_sync_worker.queue.lock();
+        if let Some(retry_at) = queue.retry_at.get(instance_id) {
+            let remaining = retry_at.saturating_duration_since(Instant::now());
+            if !remaining.is_zero() {
+                return Err(crate::ErrorKind::Ratelimited {
+                    retry_in_seconds: remaining.as_secs()
+                        + u64::from(remaining.subsec_nanos() != 0),
+                }
+                .into());
+            }
+        }
         queue.instances.insert(instance_id.to_owned());
         queue
             .waiters
@@ -99,13 +112,13 @@ fn start(state: Arc<State>) {
                     }
                 }
             }
-            let (instance_id, pending) = {
+            let (instance_id, mut pending) = {
                 let mut queue = state.pack_sync_worker.queue.lock();
                 let next = queue
                     .waiters
                     .keys()
-                    .next()
-                    .or_else(|| queue.instances.first())
+                    .chain(queue.instances.iter())
+                    .find(|id| !queue.retry_at.contains_key(*id))
                     .cloned();
                 let Some(instance_id) = next else {
                     if queue.all {
@@ -121,47 +134,60 @@ fn start(state: Arc<State>) {
             };
             let result =
                 super::reconciliation::run_queued(&instance_id, &state).await;
-            let retry = match &result {
-                Err(error) => match error.raw.as_ref() {
-                    crate::ErrorKind::PackSyncChanged => Some(0),
-                    crate::ErrorKind::Ratelimited { retry_in_seconds } => {
-                        Some((*retry_in_seconds).max(1))
-                    }
-                    _ => {
-                        tracing::warn!(
-                            "Could not reconcile synced packs for {instance_id}: {error}"
-                        );
-                        None
-                    }
-                },
-                Ok(()) => None,
-            };
-            if let Some(delay) = retry {
-                {
-                    let mut queue = state.pack_sync_worker.queue.lock();
-                    queue.instances.insert(instance_id.clone());
-                    if !pending.is_empty() {
-                        queue
-                            .waiters
-                            .entry(instance_id)
-                            .or_default()
-                            .extend(pending);
-                    }
-                }
-                if delay > 0 {
-                    tokio::time::sleep(std::time::Duration::from_secs(delay))
-                        .await;
-                }
-            } else {
-                for sender in pending {
-                    let result = result.as_ref().map(|_| ()).map_err(|error| {
-                        crate::Error {
-                            raw: error.raw.clone(),
-                            source: error.raw.clone().in_current_span(),
+            if let Err(error) = &result {
+                match error.raw.as_ref() {
+                    crate::ErrorKind::PackSyncChanged => {
+                        let mut queue = state.pack_sync_worker.queue.lock();
+                        queue.instances.insert(instance_id.clone());
+                        if !pending.is_empty() {
+                            queue
+                                .waiters
+                                .entry(instance_id)
+                                .or_default()
+                                .extend(pending);
                         }
-                    });
-                    let _ = sender.send(result);
+                        continue;
+                    }
+                    crate::ErrorKind::Ratelimited { retry_in_seconds } => {
+                        let retry_at = Instant::now()
+                            + Duration::from_secs((*retry_in_seconds).max(1));
+                        {
+                            let mut queue = state.pack_sync_worker.queue.lock();
+                            queue.instances.insert(instance_id.clone());
+                            queue
+                                .retry_at
+                                .insert(instance_id.clone(), retry_at);
+                            pending.extend(
+                                queue
+                                    .waiters
+                                    .remove(&instance_id)
+                                    .unwrap_or_default(),
+                            );
+                        }
+                        let state = state.clone();
+                        tokio::spawn(async move {
+                            tokio::time::sleep_until(retry_at).await;
+                            state
+                                .pack_sync_worker
+                                .queue
+                                .lock()
+                                .retry_at
+                                .remove(&instance_id);
+                            start(state);
+                        });
+                    }
+                    _ => tracing::warn!(
+                        "Could not reconcile synced packs for {instance_id}: {error}"
+                    ),
                 }
+            }
+            for sender in pending {
+                let result =
+                    result.as_ref().map(|_| ()).map_err(|error| crate::Error {
+                        raw: error.raw.clone(),
+                        source: error.raw.clone().in_current_span(),
+                    });
+                let _ = sender.send(result);
             }
         }
     });
