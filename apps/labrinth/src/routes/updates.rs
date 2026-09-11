@@ -1,3 +1,4 @@
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use std::cmp::Reverse;
@@ -9,7 +10,6 @@ use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
-use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::models::pats::Scopes;
@@ -61,7 +61,7 @@ pub async fn forge_updates(
         .wrap_api_err("fetching project from database")?
         .wrap_request_err_with(|| ERROR.to_string())?;
 
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -69,8 +69,8 @@ pub async fn forge_updates(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await

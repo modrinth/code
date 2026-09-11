@@ -1,4 +1,6 @@
 use crate::auth::checks::{is_visible_project, is_visible_version};
+use crate::auth::validate::get_maybe_user_from_headers;
+use crate::database;
 use crate::database::PgPool;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::Loader;
@@ -13,7 +15,6 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
-use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
 use quick_xml::escape::escape;
 use std::collections::HashSet;
@@ -94,7 +95,7 @@ pub async fn maven_metadata(
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -102,8 +103,8 @@ pub async fn maven_metadata(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
@@ -332,7 +333,7 @@ pub async fn version_file(
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -340,8 +341,8 @@ pub async fn version_file(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
@@ -419,7 +420,7 @@ pub async fn version_file_sha1(
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -427,8 +428,8 @@ pub async fn version_file_sha1(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
@@ -485,7 +486,7 @@ pub async fn version_file_sha512(
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -493,8 +494,8 @@ pub async fn version_file_sha512(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await

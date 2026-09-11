@@ -11,6 +11,16 @@ use actix_web::http::header::{AUTHORIZATION, HeaderValue};
 use chrono::Utc;
 use xredis::RedisPool;
 
+pub fn check_account_unlocked(
+    account_locked: bool,
+) -> Result<(), AuthenticationError> {
+    match account_locked {
+        true => Err(AuthenticationError::AccountLocked),
+        false => Ok(()),
+    }
+}
+
+/// Allows anonymous or invalid credentials, but rejects locked accounts.
 pub async fn get_maybe_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,
@@ -25,25 +35,21 @@ where
         return Ok(None);
     }
 
-    // Fetch DB user record and minos user from headers
-    let Some((scopes, db_user)) = get_user_record_from_bearer_token(
+    match get_user_from_headers(
         req,
-        None,
         executor,
         redis,
         session_queue,
-        false,
+        required_scopes,
     )
-    .await?
-    else {
-        return Ok(None);
-    };
-
-    if !scopes.contains(required_scopes) {
-        return Ok(None);
+    .await
+    {
+        Ok(user) => Ok(Some(user)),
+        Err(AuthenticationError::AccountLocked) => {
+            Err(AuthenticationError::AccountLocked)
+        }
+        Err(_) => Ok(None),
     }
-
-    Ok(Some((scopes, User::from_full(db_user))))
 }
 
 pub async fn get_full_user_from_headers<'a, E>(
@@ -57,6 +63,34 @@ where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let (scopes, db_user) = get_user_record_from_bearer_token(
+        req,
+        None,
+        executor,
+        redis,
+        session_queue,
+        false,
+    )
+    .await?
+    .ok_or(AuthenticationError::InvalidCredentials)?;
+    if !scopes.contains(required_scopes) {
+        return Err(AuthenticationError::InvalidCredentials);
+    }
+    Ok((scopes, db_user))
+}
+
+/// Authenticates without rejecting locked accounts. The caller must check
+/// `account_locked` before exposing private data or allowing other actions.
+pub async fn get_full_user_from_headers_allow_locked<'a, E>(
+    req: &HttpRequest,
+    executor: E,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<(Scopes, DBUser), AuthenticationError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+    let (scopes, db_user) = get_user_record_from_bearer_token_allow_locked(
         req,
         None,
         executor,
@@ -122,14 +156,40 @@ where
     Ok((scopes, User::from_full(db_user)))
 }
 
-pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
+pub async fn get_user_record_from_bearer_token<'a, E>(
     req: &HttpRequest,
     token: Option<&str>,
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
     allow_expired: bool,
-) -> Result<Option<(Scopes, user_item::DBUser)>, AuthenticationError>
+) -> Result<Option<(Scopes, DBUser)>, AuthenticationError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+    let user = get_user_record_from_bearer_token_allow_locked(
+        req,
+        token,
+        executor,
+        redis,
+        session_queue,
+        allow_expired,
+    )
+    .await?;
+    if let Some((_, user)) = &user {
+        check_account_unlocked(user.account_locked)?;
+    }
+    Ok(user)
+}
+
+async fn get_user_record_from_bearer_token_allow_locked<'a, E>(
+    req: &HttpRequest,
+    token: Option<&str>,
+    executor: E,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    allow_expired: bool,
+) -> Result<Option<(Scopes, DBUser)>, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {

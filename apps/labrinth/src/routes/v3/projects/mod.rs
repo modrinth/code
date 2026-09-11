@@ -1,3 +1,4 @@
+use crate::auth::validate::get_maybe_user_from_headers;
 use crate::util::error::ApiContext as _;
 use std::any::type_name;
 use std::cmp::Reverse;
@@ -259,7 +260,7 @@ pub async fn projects_get(
         .await
         .wrap_api_err("fetching requested projects")?;
 
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -267,8 +268,8 @@ pub async fn projects_get(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     let projects =
         filter_visible_projects(projects_data, &user_option, &pool, false)
@@ -306,7 +307,7 @@ pub async fn project_get_internal(
     let project_data = db_models::DBProject::get(&string, &**pool, &redis)
         .await
         .wrap_internal_err("failed to fetch project")?;
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -314,8 +315,8 @@ pub async fn project_get_internal(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|(_, user)| user)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|(_, user)| user);
 
     if let Some(data) = project_data
         && is_visible_project(&data.inner, &user_option, &pool, false)
@@ -1744,7 +1745,7 @@ pub async fn dependency_list_internal(
         .await
         .wrap_api_err("fetching project from database")?;
 
-    let user_option = get_user_from_headers(
+    let user_option = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1752,8 +1753,8 @@ pub async fn dependency_list_internal(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
 
     if let Some(project) = result {
         if !is_visible_project(&project.inner, &user_option, &pool, false)
@@ -3710,7 +3711,7 @@ pub async fn project_get_organization(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user = get_user_from_headers(
+    let current_user = get_maybe_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -3718,8 +3719,8 @@ pub async fn project_get_organization(
         Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ,
     )
     .await
-    .map(|x| x.1)
-    .ok();
+    .wrap_auth_err("authenticating API request")?
+    .map(|x| x.1);
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let string = info.into_inner().0;

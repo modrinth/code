@@ -58,6 +58,9 @@ impl OAuthError {
 impl actix_web::ResponseError for OAuthError {
     fn status_code(&self) -> StatusCode {
         match *self.error_type {
+            OAuthErrorType::AuthenticationError(
+                AuthenticationError::AccountLocked,
+            ) if self.valid_redirect_uri.is_none() => StatusCode::FORBIDDEN,
             OAuthErrorType::AuthenticationError(_)
             | OAuthErrorType::FailedScopeParse(_)
             | OAuthErrorType::ScopesTooBroad
@@ -174,6 +177,9 @@ impl OAuthErrorType {
         match self {
             Self::RedirectUriNotConfigured(_)
             | Self::ClientMissingRedirectURI { client_id: _ } => "invalid_uri",
+            Self::AuthenticationError(AuthenticationError::AccountLocked) => {
+                "access_denied"
+            }
             Self::AuthenticationError(_) | Self::InvalidAcceptFlowId => {
                 "server_error"
             }

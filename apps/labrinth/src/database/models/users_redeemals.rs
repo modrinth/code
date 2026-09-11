@@ -244,6 +244,7 @@ impl UserRedeemal {
 #[derive(Debug)]
 pub struct RedeemalLookupFields {
     pub user_id: DBUserId,
+    pub account_locked: bool,
     pub redeemal_status: Option<Status>,
 }
 
@@ -267,6 +268,7 @@ impl RedeemalLookupFields {
             r#"
             SELECT
                 users.id,
+				users.account_locked,
                 users_redeemals.status AS "status: Option<String>"
             FROM
                 users
@@ -290,6 +292,7 @@ impl RedeemalLookupFields {
 
         Ok(maybe_row.map(|row| RedeemalLookupFields {
             user_id: DBUserId(row.id),
+            account_locked: row.account_locked,
             redeemal_status: row
                 .status
                 .as_deref()

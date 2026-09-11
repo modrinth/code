@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\t\tUPDATE users SET account_locked = $1 WHERE id = $2\n\t\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8496416e98bbb63db17c89e0fe85b0b58a90a2e5252d4f54943fe640863c47a3"
+}
