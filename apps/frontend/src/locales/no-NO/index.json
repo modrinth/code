@@ -368,12 +368,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Lagre innhold du liker og motta oppdateringer med ett klikk."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Følg prosjekter"
-  },
   "app-marketing.features.importing.description": {
     "message": "Importer alle dine favorittprofiler fra launcheren du brukte tidligere, og kom i gang med Modrinth-appen på noen sekunder!"
   },
@@ -410,12 +404,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versjon"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Spill moddene dine, enten du er tilkoblet internett eller ikke."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offlinemodus"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinths launcher er helt åpen kildekode. Du kan se kildekoden på vår <github-link>GitHub</github-link>!"
   },
@@ -439,15 +427,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

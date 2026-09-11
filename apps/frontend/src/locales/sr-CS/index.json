@@ -479,9 +479,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.title": {
-    "message": "Prati projekte"
-  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
@@ -506,12 +503,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Verzija"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Igraj svoje modove, bez obzira da li si povezani na internet ili ne."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Oflajn režim"
-  },
   "app-marketing.features.open-source.title": {
     "message": "Otvoreni kod"
   },
@@ -529,15 +520,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth aplikacija"

@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "收藏你喜愛的內容，並一鍵接收更新。"
-  },
-  "app-marketing.features.follow.title": {
-    "message": "追蹤專案"
-  },
   "app-marketing.features.importing.description": {
     "message": "從你之前使用的啟動器匯入所有喜愛的設定檔，幾秒鐘內即可輕鬆上手 Modrinth App！"
   },
@@ -623,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "版本"
   },
-  "app-marketing.features.offline.description": {
-    "message": "無論你是否連線到網路，都能遊玩你的模組。"
-  },
-  "app-marketing.features.offline.title": {
-    "message": "離線模式"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth App 完全開源。你可以在我們的 <github-link>GitHub</github-link> 上查看原始碼！"
   },
@@ -652,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

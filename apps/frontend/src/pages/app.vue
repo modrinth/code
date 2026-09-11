@@ -144,7 +144,7 @@ const modManagementData = [
 	{
 		id: 'AANobbMI',
 		name: 'Sodium',
-		author: 'jellysquid3',
+		author: 'CaffeineMC',
 		version: 'mc1.20.1-0.5.0',
 		iconUrl: 'https://cdn.modrinth.com/data/AANobbMI/icon.png',
 	},
@@ -158,17 +158,16 @@ const modManagementData = [
 	{
 		id: 'gvQqBUqZ',
 		name: 'Lithium',
-		author: 'jellysquid3',
+		author: 'CaffeineMC',
 		version: 'mc1.20.1-0.11.2',
 		iconUrl: 'https://cdn.modrinth.com/data/gvQqBUqZ/icon.png',
 	},
 	{
 		id: 'mOgUt4GM',
 		name: 'Mod Menu',
-		author: 'Prospector',
+		author: 'TerraformersMC',
 		version: '7.2.1',
-		iconUrl:
-			'https://cdn.modrinth.com/data/mOgUt4GM/1bfe2006b38340e9d064700e41adf84a8abb1bd4_96.webp',
+		iconUrl: 'https://cdn.modrinth.com/data/mOgUt4GM/5a20ed1450a0e1e79a1fe04e61bb4e5878bf1d20.png',
 	},
 	{
 		id: '9s6osm5g',
@@ -356,10 +355,6 @@ const messages = defineMessages({
 		id: 'app-marketing.features.performance.small',
 		defaultMessage: 'Small',
 	},
-	lessThan150MB: {
-		id: 'app-marketing.features.performance.less-than-150mb',
-		defaultMessage: '< 150 MB',
-	},
 	googleChrome: {
 		id: 'app-marketing.features.performance.google-chrome',
 		defaultMessage: 'Google Chrome',
@@ -368,17 +363,9 @@ const messages = defineMessages({
 		id: 'app-marketing.features.performance.discord',
 		defaultMessage: 'Discord',
 	},
-	infiniteMB: {
-		id: 'app-marketing.features.performance.infinite-mb',
-		defaultMessage: '∞ MB',
-	},
 	oneBillionPercent: {
 		id: 'app-marketing.features.performance.one-billion-percent',
 		defaultMessage: '1 billion %',
-	},
-	infiniteTimesInfiniteMB: {
-		id: 'app-marketing.features.performance.infinite-times-infinite-mb',
-		defaultMessage: '∞ × ∞ MB',
 	},
 	performant: {
 		id: 'app-marketing.features.performance.title',
@@ -386,8 +373,7 @@ const messages = defineMessages({
 	},
 	performantDescription: {
 		id: 'app-marketing.features.performance.description',
-		defaultMessage:
-			'Modrinth App performs better than many of the leading mod managers, using just 150 MB of RAM!',
+		defaultMessage: 'Modrinth App performs better than many of the leading mod managers!',
 	},
 	websiteIntegration: {
 		id: 'app-marketing.features.website.title',
@@ -400,12 +386,12 @@ const messages = defineMessages({
 	},
 	profileImporting: {
 		id: 'app-marketing.features.importing.title',
-		defaultMessage: 'Profile importing',
+		defaultMessage: 'Instance importing',
 	},
 	profileImportingDescription: {
 		id: 'app-marketing.features.importing.description',
 		defaultMessage:
-			'Import all your favorite profiles from the launcher you were using before, and get started with Modrinth App in seconds!',
+			'Import all your existing game instances from the launcher you were using before, and get started with Modrinth App in seconds!',
 	},
 	openSource: {
 		id: 'app-marketing.features.open-source.title',
@@ -414,23 +400,23 @@ const messages = defineMessages({
 	openSourceDescription: {
 		id: 'app-marketing.features.open-source.description',
 		defaultMessage:
-			"Modrinth's launcher is fully open source. You can view the source code on our <github-link>GitHub</github-link>!",
+			'Modrinth App is fully open source. You can view the source code on our <github-link>GitHub</github-link>!',
 	},
-	offlineMode: {
-		id: 'app-marketing.features.offline.title',
-		defaultMessage: 'Offline mode',
+	settingsSync: {
+		id: 'app-marketing.features.settings-sync.title',
+		defaultMessage: 'Sync your settings',
 	},
-	offlineModeDescription: {
-		id: 'app-marketing.features.offline.description',
-		defaultMessage: 'Play your mods, whether you are connected to the internet, or not.',
+	settingsSyncDescription: {
+		id: 'app-marketing.features.settings-sync.description',
+		defaultMessage: 'Use the same options, resource packs, and more across all your instances.',
 	},
-	followProjects: {
-		id: 'app-marketing.features.follow.title',
-		defaultMessage: 'Follow projects',
+	manageSkins: {
+		id: 'app-marketing.features.manage-skins.title',
+		defaultMessage: 'Skin selector',
 	},
-	followProjectsDescription: {
-		id: 'app-marketing.features.follow.description',
-		defaultMessage: 'Save content you love and receive updates with one click.',
+	manageSkinsDescription: {
+		id: 'app-marketing.features.manage-skins.description',
+		defaultMessage: 'Switch between all of your Minecraft skins right from the app.',
 	},
 	downloadOptions: {
 		id: 'app-marketing.download.options-title',
@@ -559,7 +545,7 @@ useSeoMeta({
 					{{ formatMessage(messages.moreDownloadOptions) }}
 				</Button>
 			</div>
-			<img src="https://cdn.modrinth.com/app-landing/app-screenshot.webp" alt="" />
+			<img src="https://cdn.modrinth.com/app-landing/home-2026.webp" alt="" />
 			<div class="bottom-transition" />
 		</div>
 		<div class="features">
@@ -617,12 +603,12 @@ useSeoMeta({
 						<p>{{ formatMessage(messages.playWithFavoriteModsDescription) }}</p>
 					</div>
 					<img
-						src="https://cdn.modrinth.com/app-landing/cobblemon-launcher.webp"
+						src="https://cdn.modrinth.com/app-landing/instance-2026.webp"
 						:alt="formatMessage(messages.appScreenshotAlt)"
 						class="launcher"
 					/>
 					<img
-						src="https://cdn.modrinth.com/app-landing/cobblemon.webp"
+						src="https://cdn.modrinth.com/app-landing/cobblemon-2026.webp"
 						:alt="formatMessage(messages.minecraftScreenshotAlt)"
 						class="minecraft"
 					/>
@@ -634,37 +620,35 @@ useSeoMeta({
 							<div class="cell">
 								<Avatar
 									size="sm"
-									src="https://cdn.modrinth.com/data/3ufwT9JF/2a15f23b7ffa2d50fc6ae1c42029a728ce3e2847.jpeg"
+									src="https://cdn.modrinth.com/data/LNytGWDc/45c6a706e0e67669d3004f80eec443331fb33369.png"
 								/>
 							</div>
-							<div class="cell">Ad Astra</div>
+							<div class="cell">Create</div>
 							<div class="cell">
-								<div class="description">Live long and prosper, Ad Astra!</div>
+								<div class="description">Aesthetic Technology that empowers the Player</div>
 							</div>
 						</div>
 						<div class="row">
 							<div class="cell">
 								<Avatar
 									size="sm"
-									src="https://cdn.modrinth.com/data/b1LdOZlE/465598dc5d89f67fb8f8de6def21240fa35e3a54.png"
+									src="https://cdn.modrinth.com/data/fRiHVvU7/395fe5302b2bab612ef0623509f768f3c5a5ee0f.webp"
 								/>
 							</div>
-							<div class="cell">Spirit</div>
+							<div class="cell">EMI</div>
 							<div class="cell">
-								<div class="description">
-									A mod exploring soul magic in tools, blocks, weapons and more.
-								</div>
+								<div class="description">A featureful and accessible item and recipe viewer</div>
 							</div>
 						</div>
 						<div class="row">
 							<div class="cell">
 								<Avatar
 									size="sm"
-									src="https://cdn.modrinth.com/data/MI1LWe93/d42fb7a69f1e7a86584fa1ed43520af98acec065.png"
+									src="https://cdn.modrinth.com/data/R2OftAxM/8e7aa38ab94d94bb0a2894a218b69beb49002b34.png"
 								/>
 							</div>
-							<div class="cell">Creeper Overhaul</div>
-							<div class="cell">A mod which overhauls the vanilla creepers!</div>
+							<div class="cell">Farmer's Delight</div>
+							<div class="cell">A cozy expansion to farming and cooking!</div>
 						</div>
 					</div>
 					<h3>{{ formatMessage(messages.shareModpacks) }}</h3>
@@ -673,7 +657,7 @@ useSeoMeta({
 					</p>
 					<div class="export-card">
 						<Avatar
-							src="https://cdn.modrinth.com/data/mY0lOQFc/81c6eff2b86220e12e62a4ad0d2f364a605c42c4.png"
+							src="https://cdn.modrinth.com/data/FpghCeHO/376722213738f072a898cca84a468903444abe53.png"
 						/>
 						<div class="info">
 							<div class="exporting">
@@ -683,8 +667,8 @@ useSeoMeta({
 									<SendIcon />
 								</div>
 							</div>
-							<h4 class="name">All of Fabric | Orion</h4>
-							<div class="author">by AK</div>
+							<h4 class="name">Society: Sunlit Valley</h4>
+							<div class="author">by Chakyl</div>
 						</div>
 					</div>
 				</div>
@@ -697,20 +681,21 @@ useSeoMeta({
 						<div />
 						<div class="cell">{{ formatMessage(messages.processName) }}</div>
 						<div class="cell">{{ formatMessage(messages.cpuPercent) }}</div>
-						<div class="cell">{{ formatMessage(messages.ram) }}</div>
 					</div>
 					<div class="table">
 						<div class="row first">
 							<div class="cell">
 								<div>
 									<div class="icon-logo modrinth">
-										<LogoAnimated class="icon" />
+										<Avatar
+											src="https://cdn-raw.modrinth.com/app-landing/mr-app-icon.webp"
+											size="sm"
+										/>
 									</div>
 								</div>
 							</div>
 							<div class="cell important">{{ formatMessage(messages.modrinthApp) }}</div>
 							<div class="cell important">{{ formatMessage(messages.small) }}</div>
-							<div class="cell important">{{ formatMessage(messages.lessThan150MB) }}</div>
 						</div>
 						<div class="row">
 							<div class="cell">
@@ -720,7 +705,6 @@ useSeoMeta({
 							</div>
 							<div class="cell">{{ formatMessage(messages.googleChrome) }}</div>
 							<div class="cell">150%</div>
-							<div class="cell">{{ formatMessage(messages.infiniteMB) }}</div>
 						</div>
 						<div class="row">
 							<div class="cell">
@@ -730,7 +714,6 @@ useSeoMeta({
 							</div>
 							<div class="cell">{{ formatMessage(messages.discord) }}</div>
 							<div class="cell">{{ formatMessage(messages.oneBillionPercent) }}</div>
-							<div class="cell">{{ formatMessage(messages.infiniteTimesInfiniteMB) }}</div>
 						</div>
 					</div>
 					<h3>{{ formatMessage(messages.performant) }}</h3>
@@ -887,48 +870,26 @@ useSeoMeta({
 							viewBox="0 0 24 24"
 							fill="none"
 						>
-							<g clip-path="url(#clip0_897_3802)">
+							<g
+								transform="matrix(1,0,0,1,-1.056441,-1.066441)"
+								fill="url(#paint0_linear_897_3809)"
+							>
 								<path
-									d="M4.39313 8.58984C2.31984 9.28359 0.75 10.9266 0.75 13.5C0.75 16.5938 3.28125 18.75 6.375 18.75H15.0173M21.9291 17.7066C22.7456 17.0297 23.25 16.013 23.25 14.625C23.25 11.8209 20.7656 10.605 18.75 10.5C18.3333 6.30281 15.4219 3.75 12 3.75C10.7738 3.75 9.71297 4.07484 8.83125 4.60031"
-									stroke="url(#paint0_linear_897_3802)"
-									stroke-width="2.34783"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-								<path
-									d="M21 21L3 3"
-									stroke="url(#paint1_linear_897_3802)"
-									stroke-width="2.34783"
-									stroke-miterlimit="10"
-									stroke-linecap="round"
+									d="M9.199,13.599C8.869,13.157 8.959,12.53 9.401,12.199C9.843,11.869 10.47,11.959 10.801,12.401C11.555,13.41 12.744,14.005 14.004,14.005C15.065,14.005 16.083,13.583 16.833,12.833L19.825,9.841C20.542,9.096 20.944,8.101 20.944,7.066C20.944,4.872 19.138,3.066 16.944,3.066C15.909,3.066 14.913,3.468 14.168,4.186L12.455,5.889C12.064,6.278 11.43,6.276 11.041,5.885C10.652,5.494 10.654,4.86 11.045,4.471L12.765,2.761L12.775,2.751C13.894,1.671 15.389,1.066 16.944,1.066C20.235,1.066 22.944,3.775 22.944,7.066C22.944,8.621 22.339,10.116 21.259,11.235L21.247,11.247L18.247,14.247C17.122,15.372 15.595,16.005 14.004,16.005C12.114,16.005 10.331,15.112 9.199,13.599ZM14.801,10.401C15.131,10.843 15.041,11.47 14.599,11.801C14.157,12.131 13.53,12.041 13.199,11.599C12.445,10.59 11.256,9.995 9.996,9.995C8.935,9.995 7.917,10.417 7.167,11.167L4.175,14.159C3.458,14.904 3.056,15.899 3.056,16.934C3.056,19.128 4.862,20.934 7.056,20.934C8.091,20.934 9.086,20.532 9.831,19.815L11.533,18.113C11.923,17.723 12.557,17.723 12.947,18.113C13.337,18.503 13.337,19.137 12.947,19.527L11.237,21.237L11.225,21.249C10.106,22.329 8.611,22.934 7.056,22.934C3.765,22.934 1.056,20.225 1.056,16.934C1.056,15.379 1.661,13.884 2.741,12.765L2.753,12.753L5.753,9.753C6.878,8.628 8.405,7.995 9.996,7.995C11.886,7.995 13.669,8.888 14.801,10.401Z"
 								/>
 							</g>
 							<defs>
 								<linearGradient
-									id="paint0_linear_897_3802"
-									x1="12"
-									y1="3.75"
-									x2="12"
-									y2="18.75"
+									id="paint0_linear_897_3809"
+									x1="11.668"
+									y1="4.8125"
+									x2="11.668"
+									y2="19.1875"
 									gradientUnits="userSpaceOnUse"
 								>
 									<stop stop-color="#C1E1B1" />
 									<stop offset="1" stop-color="#A7BDE6" />
 								</linearGradient>
-								<linearGradient
-									id="paint1_linear_897_3802"
-									x1="12"
-									y1="3"
-									x2="12"
-									y2="21"
-									gradientUnits="userSpaceOnUse"
-								>
-									<stop stop-color="#C1E1B1" />
-									<stop offset="1" stop-color="#A7BDE6" />
-								</linearGradient>
-								<clipPath id="clip0_897_3802">
-									<rect width="24" height="24" fill="white" />
-								</clipPath>
 							</defs>
 						</svg>
 						<svg
@@ -939,38 +900,21 @@ useSeoMeta({
 							viewBox="0 0 26 24"
 							fill="none"
 						>
-							<path
-								d="M5.39313 8.58984C3.31984 9.28359 1.75 10.9266 1.75 13.5C1.75 16.5938 4.28125 18.75 7.375 18.75H16.0173M22.9291 17.7066C23.7456 17.0297 24.25 16.013 24.25 14.625C24.25 11.8209 21.7656 10.605 19.75 10.5C19.3333 6.30281 16.4219 3.75 13 3.75C11.7738 3.75 10.713 4.07484 9.83125 4.60031"
-								stroke="url(#paint0_linear_944_4973)"
-								stroke-width="2.34783"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-							<path
-								d="M22 21L4 3"
-								stroke="url(#paint1_linear_944_4973)"
-								stroke-width="2.34783"
-								stroke-miterlimit="10"
-								stroke-linecap="round"
-							/>
+							<g
+								transform="matrix(1,0,0,1,-1.056441,-1.066441)"
+								fill="url(#paint0_linear_944_4980)"
+							>
+								<path
+									d="M9.199,13.599C8.869,13.157 8.959,12.53 9.401,12.199C9.843,11.869 10.47,11.959 10.801,12.401C11.555,13.41 12.744,14.005 14.004,14.005C15.065,14.005 16.083,13.583 16.833,12.833L19.825,9.841C20.542,9.096 20.944,8.101 20.944,7.066C20.944,4.872 19.138,3.066 16.944,3.066C15.909,3.066 14.913,3.468 14.168,4.186L12.455,5.889C12.064,6.278 11.43,6.276 11.041,5.885C10.652,5.494 10.654,4.86 11.045,4.471L12.765,2.761L12.775,2.751C13.894,1.671 15.389,1.066 16.944,1.066C20.235,1.066 22.944,3.775 22.944,7.066C22.944,8.621 22.339,10.116 21.259,11.235L21.247,11.247L18.247,14.247C17.122,15.372 15.595,16.005 14.004,16.005C12.114,16.005 10.331,15.112 9.199,13.599ZM14.801,10.401C15.131,10.843 15.041,11.47 14.599,11.801C14.157,12.131 13.53,12.041 13.199,11.599C12.445,10.59 11.256,9.995 9.996,9.995C8.935,9.995 7.917,10.417 7.167,11.167L4.175,14.159C3.458,14.904 3.056,15.899 3.056,16.934C3.056,19.128 4.862,20.934 7.056,20.934C8.091,20.934 9.086,20.532 9.831,19.815L11.533,18.113C11.923,17.723 12.557,17.723 12.947,18.113C13.337,18.503 13.337,19.137 12.947,19.527L11.237,21.237L11.225,21.249C10.106,22.329 8.611,22.934 7.056,22.934C3.765,22.934 1.056,20.225 1.056,16.934C1.056,15.379 1.661,13.884 2.741,12.765L2.753,12.753L5.753,9.753C6.878,8.628 8.405,7.995 9.996,7.995C11.886,7.995 13.669,8.888 14.801,10.401Z"
+								/>
+							</g>
 							<defs>
 								<linearGradient
-									id="paint0_linear_944_4973"
-									x1="13"
-									y1="3.75"
-									x2="13"
-									y2="18.75"
-									gradientUnits="userSpaceOnUse"
-								>
-									<stop stop-color="#A7D0FF" />
-									<stop offset="0.414928" stop-color="#00BD3C" />
-								</linearGradient>
-								<linearGradient
-									id="paint1_linear_944_4973"
-									x1="13"
-									y1="3"
-									x2="13"
-									y2="21"
+									id="paint0_linear_944_4980"
+									x1="11.668"
+									y1="4.8125"
+									x2="11.668"
+									y2="19.1875"
 									gradientUnits="userSpaceOnUse"
 								>
 									<stop stop-color="#A7D0FF" />
@@ -978,10 +922,10 @@ useSeoMeta({
 								</linearGradient>
 							</defs>
 						</svg>
-						<h3>{{ formatMessage(messages.offlineMode) }}</h3>
+						<h3>{{ formatMessage(messages.settingsSync) }}</h3>
 					</div>
 					<div class="description">
-						{{ formatMessage(messages.offlineModeDescription) }}
+						{{ formatMessage(messages.settingsSyncDescription) }}
 					</div>
 				</div>
 				<div class="point">
@@ -995,7 +939,7 @@ useSeoMeta({
 							fill="none"
 						>
 							<path
-								d="M22.8533 11.7089C22.8205 11.6379 22.0264 9.94977 20.2611 8.25801C17.9089 6.00383 14.938 4.8125 11.668 4.8125C8.39796 4.8125 5.42702 6.00383 3.07483 8.25801C1.30952 9.94977 0.51171 11.6406 0.482647 11.7089C0.440003 11.8008 0.417969 11.9003 0.417969 12.0009C0.417969 12.1015 0.440003 12.201 0.482647 12.2929C0.51546 12.3639 1.30952 14.0511 3.07483 15.7429C5.42702 17.9962 8.39796 19.1875 11.668 19.1875C14.938 19.1875 17.9089 17.9962 20.2611 15.7429C22.0264 14.0511 22.8205 12.3639 22.8533 12.2929C22.8959 12.201 22.918 12.1015 22.918 12.0009C22.918 11.9003 22.8959 11.8008 22.8533 11.7089ZM11.668 17.75C8.78234 17.75 6.2614 16.7446 4.17452 14.7627C3.31825 13.9466 2.58976 13.0161 2.01171 12C2.58961 10.9838 3.31811 10.0532 4.17452 9.2373C6.2614 7.25535 8.78234 6.25 11.668 6.25C14.5536 6.25 17.0745 7.25535 19.1614 9.2373C20.0193 10.053 20.7494 10.9836 21.3289 12C20.653 13.2093 17.7083 17.75 11.668 17.75ZM11.668 7.6875C10.7779 7.6875 9.90792 7.94042 9.16789 8.41429C8.42787 8.88815 7.8511 9.56167 7.5105 10.3497C7.16991 11.1377 7.08079 12.0048 7.25443 12.8413C7.42806 13.6779 7.85664 14.4463 8.48598 15.0494C9.11532 15.6525 9.91714 16.0632 10.7901 16.2296C11.663 16.396 12.5678 16.3106 13.39 15.9842C14.2123 15.6578 14.9151 15.1051 15.4096 14.3959C15.904 13.6867 16.168 12.8529 16.168 12C16.1667 10.8566 15.6922 9.76041 14.8486 8.95192C14.0049 8.14342 12.8611 7.68869 11.668 7.6875ZM11.668 14.875C11.0746 14.875 10.4946 14.7064 10.0012 14.3905C9.5079 14.0746 9.12338 13.6256 8.89632 13.1002C8.66926 12.5749 8.60985 11.9968 8.7256 11.4391C8.84136 10.8814 9.12708 10.3691 9.54664 9.96707C9.9662 9.56499 10.5007 9.29117 11.0827 9.18024C11.6646 9.06931 12.2678 9.12624 12.816 9.34385C13.3642 9.56145 13.8327 9.92994 14.1624 10.4027C14.492 10.8755 14.668 11.4314 14.668 12C14.668 12.7625 14.3519 13.4938 13.7893 14.0329C13.2267 14.5721 12.4636 14.875 11.668 14.875Z"
+								d="M20.696,2.511C22.093,2.977 22.951,4.405 22.706,5.855L22.127,9.32L22.037,9.671L21.888,9.993C21.772,10.195 21.622,10.375 21.446,10.524C21.27,10.674 21.069,10.793 20.85,10.874L20.508,10.968L20.15,11L19,11L19,20C19,21.646 17.646,23 16,23L8,23C6.35,23 5,21.65 5,20L5,11L3.853,11C2.874,11.003 2.03,10.286 1.874,9.325L1.294,5.856C1.049,4.405 1.907,2.977 3.304,2.511L7.684,1.051C7.989,0.95 8.324,1.001 8.585,1.189C8.845,1.377 9,1.679 9,2C9,3.646 10.354,5 12,5C13.646,5 15,3.646 15,2C15,1.679 15.155,1.377 15.415,1.189C15.676,1.001 16.011,0.95 16.316,1.051L20.696,2.511ZM3.847,9L3.85,9L6,9C6.552,9 7,9.448 7,10L7,20C7,20.55 7.45,21 8,21L16,21C16.549,21 17,20.549 17,20L17,10C17,9.448 17.448,9 18,9L20.15,9C19.667,8.997 20.15,9 20.15,9L20.734,5.524C20.815,5.041 20.529,4.564 20.064,4.409L16.819,3.327C16.231,5.435 14.284,7 12,7C9.716,7 7.769,5.435 7.181,3.327L3.936,4.409C3.471,4.564 3.185,5.041 3.266,5.524L3.846,8.995L3.847,9Z"
 								fill="url(#paint0_linear_897_3809)"
 							/>
 							<defs>
@@ -1021,9 +965,10 @@ useSeoMeta({
 							fill="none"
 						>
 							<path
-								d="M22.8533 11.7089C22.8205 11.6379 22.0264 9.94977 20.2611 8.25801C17.9089 6.00383 14.938 4.8125 11.668 4.8125C8.39796 4.8125 5.42702 6.00383 3.07483 8.25801C1.30952 9.94977 0.51171 11.6406 0.482647 11.7089C0.440003 11.8008 0.417969 11.9003 0.417969 12.0009C0.417969 12.1015 0.440003 12.201 0.482647 12.2929C0.51546 12.3639 1.30952 14.0511 3.07483 15.7429C5.42702 17.9962 8.39796 19.1875 11.668 19.1875C14.938 19.1875 17.9089 17.9962 20.2611 15.7429C22.0264 14.0511 22.8205 12.3639 22.8533 12.2929C22.8959 12.201 22.918 12.1015 22.918 12.0009C22.918 11.9003 22.8959 11.8008 22.8533 11.7089ZM11.668 17.75C8.78234 17.75 6.2614 16.7446 4.17452 14.7627C3.31825 13.9466 2.58976 13.0161 2.01171 12C2.58961 10.9838 3.31811 10.0532 4.17452 9.2373C6.2614 7.25535 8.78234 6.25 11.668 6.25C14.5536 6.25 17.0745 7.25535 19.1614 9.2373C20.0193 10.053 20.7494 10.9836 21.3289 12C20.653 13.2093 17.7083 17.75 11.668 17.75ZM11.668 7.6875C10.7779 7.6875 9.90792 7.94042 9.16789 8.41429C8.42787 8.88815 7.8511 9.56167 7.5105 10.3497C7.16991 11.1377 7.08079 12.0048 7.25443 12.8413C7.42806 13.6779 7.85664 14.4463 8.48598 15.0494C9.11532 15.6525 9.91714 16.0632 10.7901 16.2296C11.663 16.396 12.5678 16.3106 13.39 15.9842C14.2123 15.6578 14.9151 15.1051 15.4096 14.3959C15.904 13.6867 16.168 12.8529 16.168 12C16.1667 10.8566 15.6922 9.76041 14.8486 8.95192C14.0049 8.14342 12.8611 7.68869 11.668 7.6875ZM11.668 14.875C11.0746 14.875 10.4946 14.7064 10.0012 14.3905C9.5079 14.0746 9.12338 13.6256 8.89632 13.1002C8.66926 12.5749 8.60985 11.9968 8.7256 11.4391C8.84136 10.8814 9.12708 10.3691 9.54664 9.96707C9.9662 9.56499 10.5007 9.29117 11.0827 9.18024C11.6646 9.06931 12.2678 9.12624 12.816 9.34385C13.3642 9.56145 13.8327 9.92994 14.1624 10.4027C14.492 10.8755 14.668 11.4314 14.668 12C14.668 12.7625 14.3519 13.4938 13.7893 14.0329C13.2267 14.5721 12.4636 14.875 11.668 14.875Z"
+								d="M20.696,2.511C22.093,2.977 22.951,4.405 22.706,5.855L22.127,9.32L22.037,9.671L21.888,9.993C21.772,10.195 21.622,10.375 21.446,10.524C21.27,10.674 21.069,10.793 20.85,10.874L20.508,10.968L20.15,11L19,11L19,20C19,21.646 17.646,23 16,23L8,23C6.35,23 5,21.65 5,20L5,11L3.853,11C2.874,11.003 2.03,10.286 1.874,9.325L1.294,5.856C1.049,4.405 1.907,2.977 3.304,2.511L7.684,1.051C7.989,0.95 8.324,1.001 8.585,1.189C8.845,1.377 9,1.679 9,2C9,3.646 10.354,5 12,5C13.646,5 15,3.646 15,2C15,1.679 15.155,1.377 15.415,1.189C15.676,1.001 16.011,0.95 16.316,1.051L20.696,2.511ZM3.847,9L3.85,9L6,9C6.552,9 7,9.448 7,10L7,20C7,20.55 7.45,21 8,21L16,21C16.549,21 17,20.549 17,20L17,10C17,9.448 17.448,9 18,9L20.15,9C19.667,8.997 20.15,9 20.15,9L20.734,5.524C20.815,5.041 20.529,4.564 20.064,4.409L16.819,3.327C16.231,5.435 14.284,7 12,7C9.716,7 7.769,5.435 7.181,3.327L3.936,4.409C3.471,4.564 3.185,5.041 3.266,5.524L3.846,8.995L3.847,9Z"
 								fill="url(#paint0_linear_944_4980)"
 							/>
+
 							<defs>
 								<linearGradient
 									id="paint0_linear_944_4980"
@@ -1038,9 +983,9 @@ useSeoMeta({
 								</linearGradient>
 							</defs>
 						</svg>
-						<h3>{{ formatMessage(messages.followProjects) }}</h3>
+						<h3>{{ formatMessage(messages.manageSkins) }}</h3>
 					</div>
-					<div class="description">{{ formatMessage(messages.followProjectsDescription) }}</div>
+					<div class="description">{{ formatMessage(messages.manageSkinsDescription) }}</div>
 				</div>
 			</div>
 		</div>

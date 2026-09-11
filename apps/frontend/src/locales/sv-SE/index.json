@@ -560,12 +560,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Spara innehåll du gillar och få uppdateringar med ett klick."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Följ projekt"
-  },
   "app-marketing.features.importing.description": {
     "message": "Importera alla dina favoritprofiler från ditt tidigare startprogram och kom igång med Modrinth App på ett ögonblick!"
   },
@@ -602,12 +596,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Spela dina moddar oavsett om du har en internetuppkoppling eller inte."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offlineläge"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinths startprogram har helt öppen källkod. Du kan se källkoden på vår <github-link>GitHub</github-link>!"
   },
@@ -631,15 +619,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

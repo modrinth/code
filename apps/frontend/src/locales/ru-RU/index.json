@@ -575,12 +575,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Сохраняйте понравившийся контент и узнавайте об обновлениях в один клик."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Отслеживайте проекты"
-  },
   "app-marketing.features.importing.description": {
     "message": "Перенесите любимые профили из старого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
   },
@@ -617,12 +611,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Версия"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Играйте с модами даже без подключения к интернету."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Офлайн-режим"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth App имеет полностью открытый исходный код, доступный на <github-link>GitHub</github-link>!"
   },
@@ -646,15 +634,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ МБ"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ · ∞ МБ"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 МБ"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
