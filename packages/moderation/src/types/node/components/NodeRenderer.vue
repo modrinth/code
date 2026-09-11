@@ -44,7 +44,17 @@ const props = defineProps<{
 	titleDepth?: number
 	appComponents?: Record<string, Component>
 	globalState?: Record<string, Record<string, NodeState>>
+	/**
+	 * `'full'` (default) renders every node, including the inline sub-tree of an active
+	 * toggle. `'buttons'` renders only group titles and toggle/click buttons — the extra
+	 * inputs an active toggle reveals are left out (the review view surfaces those in a
+	 * separate detached panel).
+	 */
+	mode?: 'full' | 'buttons',
+	stageId?: string
 }>()
+
+const buttonsOnly = computed(() => props.mode === 'buttons')
 
 type RenderableValueNode = AnyNode &
 	HasValue &
@@ -137,7 +147,7 @@ function getDropdownMinWidth(options: { label: string }[]): string {
 	return result
 }
 
-function componentProps(node: RenderableValueNode): Record<string, unknown> {
+function componentProps(node: RenderableValueNode): Record<string, any> {
 	const ctx: ComponentNodePropsContext = {
 		onImageUpload: props.onImageUpload,
 		toggleSetValue: (value) => toggleSetValue(node, value),
@@ -272,6 +282,8 @@ function updateValue(item: RenderableValueNode, v: unknown): void {
 const seenOnChangeValues = new Map<object, unknown>()
 
 watchEffect(() => {
+	// `buttons` mode is a read-only mirror of the same state — let the full renderer own onChange.
+	if (buttonsOnly.value) return
 	for (const node of props.nodes) {
 		if (typeof node !== 'object' || node === null) continue
 		if (!hasCap(node, '_onChange') || !(node as { _onChange: unknown })._onChange) continue
@@ -287,24 +299,25 @@ watchEffect(() => {
 </script>
 
 <template>
-	<div :class="[flex ? 'flex flex-wrap gap-2' : 'space-y-4', 'w-full']">
-		<template v-for="(item, idx) in nodes" :key="nodeKey(item, idx)">
+	<div :class="[flex ? 'flex flex-wrap gap-2' : 'space-y-4', mode ? 'contents' : 'w-full']">
+		<slot/>
+		<template v-for="(item, idx) in nodes" :key="nodeKey(item, idx)" :id="nodeKey(item, idx)">
 			<template v-if="typeof item !== 'object' || item === null">
 				<template v-if="typeof item === 'string'">{{ item }}</template>
-				<component :is="item" v-else />
+				<component :is="item" v-else-if="mode != 'buttons'"/>
 			</template>
 
 			<template v-else-if="isShown(item)">
 				<div
 					:class="
 						hasChildrenCap(item) && !hasValueCap(item)
-							? 'w-full'
+							? mode == 'buttons' ? 'contents' : 'w-full'
 							: !getTitle(item)
 								? 'contents'
 								: undefined
 					"
 				>
-					<div v-if="getTitle(item)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
+					<div v-if="getTitle(item) && mode != 'buttons'" class="mb-2" :class="titleClass(titleDepth ?? 0)">
 						<!-- eslint-disable vue/no-v-html -- title text is author-controlled (stage definitions), not user input -->
 						<span
 							v-html="renderString(getTitle(item)!).replace(/^<p>([\s\S]*)<\/p>\n?$/, '$1')"
@@ -320,20 +333,27 @@ watchEffect(() => {
 							:on-image-upload="onImageUpload"
 							:app-components="appComponents"
 							:global-state="globalState"
+							:mode="mode"
 							:flex="(item as any)._layout !== 'column'"
 							:title-depth="getTitle(item) !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
 						/>
 					</template>
 
-					<template v-else-if="hasValueCap(item) && hasIdCap(item)">
-						<component
-							:is="resolveComponent(item as RenderableValueNode)"
+					<template
+						v-else-if="
+							hasValueCap(item) &&
+							hasIdCap(item) &&
+							(!buttonsOnly || resolveComponent(item as RenderableValueNode) === ActionButton)
+						"
+					>
+						<ActionButton
 							v-if="resolveComponent(item as RenderableValueNode) === ActionButton"
 							v-bind="componentProps(item as RenderableValueNode)"
 							:[modelProp(item)]="
 								getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
 							"
 							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
+							size="xs"
 						/>
 						<component
 							:is="resolveComponent(item as RenderableValueNode)"
@@ -378,6 +398,7 @@ watchEffect(() => {
 		<template v-for="(item, idx) in nodes" :key="`children-${nodeKey(item, idx)}`">
 			<NodeRenderer
 				v-if="
+					!buttonsOnly &&
 					typeof item === 'object' &&
 					item !== null &&
 					isShown(item) &&
@@ -394,7 +415,6 @@ watchEffect(() => {
 				:app-components="appComponents"
 				:global-state="globalState"
 				:title-depth="getTitle(item) !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
-				class="w-full"
 			/>
 		</template>
 	</div>

@@ -1,6 +1,6 @@
 <template>
 	<div v-if="allTags.length > 0" class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
+		<h2 v-if="disableHeader == false" class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 		<div class="flex flex-wrap gap-1">
 			<TagItem
 				v-for="tag in allTags"
@@ -40,7 +40,8 @@ const props = defineProps<{
 		categories: string[]
 		additional_categories: string[]
 		actualProjectType?: string
-	}
+	},
+	disableHeader?: boolean
 }>()
 
 const { formatMessage } = useVIntl()

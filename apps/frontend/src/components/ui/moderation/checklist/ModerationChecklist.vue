@@ -9,7 +9,13 @@
 		proceed-label="Take over"
 		@proceed="confirmTakeOverOverride"
 	/>
+
+	<Teleport v-if="reviewLayoutActive" to="#moderation-review-outlet" defer>
+		<ModerationReviewLayout />
+	</Teleport>
+
 	<div
+		v-if="showFloatingWidget"
 		tabindex="0"
 		class="moderation-checklist flex max-h-[calc(100vh-2rem)] w-[600px] max-w-full flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
 		:class="{
@@ -488,6 +494,7 @@ import { computed, nextTick, provide, ref, toRaw, watch, watchEffect } from 'vue
 
 import LoaderPicker from '~/components/ui/create-project-version/components/LoaderPicker.vue'
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
+import ModerationReviewLayout from '~/components/ui/moderation/review/ModerationReviewLayout.vue'
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
@@ -511,7 +518,14 @@ import {
 } from '~/services/moderation/queue-eligibility.ts'
 import { type ReviewTabId, useModerationReviewLayout } from '~/services/moderation/review-layout.ts'
 
-import { type LiveNode, STATE_KEY } from './checklist-context'
+import {
+	type ChecklistElementKey,
+	elementForStage,
+	type LiveNode,
+	provideModerationChecklist,
+	STAGE_ELEMENT,
+	STATE_KEY,
+} from './checklist-context'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
@@ -524,25 +538,15 @@ const reviewLayout = useModerationReviewLayout()
 /** Whether the VS Code-style review shell is driving the page instead of routes. */
 const reviewLayoutActive = computed(() => flags.value.moderationReviewLayout)
 
-/** Map a stage's `.navigate('/…')` target to a review tab, or null when it has no tab. */
-function stageNavigateToTab(navigate: string | undefined): ReviewTabId | null {
-	if (navigate === undefined || navigate === '') return 'description'
-	if (navigate === '/gallery') return 'gallery'
-	if (navigate === '/versions') return 'versions'
-	if (navigate === '/moderation') return 'thread'
-	if (navigate.startsWith('/settings')) return 'settings'
-	return null
-}
-
-/** Open the review tab a stage points at, focusing the right Settings sub-section too. */
-function focusStageInReviewLayout(navigate: string | undefined) {
-	const tab = stageNavigateToTab(navigate)
-	if (!tab) return
-	if (tab === 'settings') {
-		const section = navigate?.replace(/^\/settings\/?/, '') || 'general'
-		reviewLayout.setSettingsSection(section)
-	}
-	reviewLayout.openTab(tab, { focus: true, fromChecklist: true })
+/**
+ * Open the review tab that hosts a stage. Phase 2 maps stages to tabs by id
+ * (`STAGE_ELEMENT`) rather than by `.navigate()` path — Tags/License/Links/Disclosures/
+ * Permissions are now their own top-level tabs. `global` stages have no tab.
+ */
+function focusStageInReviewLayout(stage: StageNode | undefined) {
+	const element = elementForStage(stage?.id)
+	if (!element || element === 'global') return
+	reviewLayout.openTab(element as ReviewTabId, { focus: true, fromChecklist: true })
 }
 
 const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
@@ -749,6 +753,8 @@ const persistedState = import.meta.client
 	: null
 nodeStates.value = persistedState?.state ?? {}
 const activatedStages = ref<Set<string>>(new Set(persistedState?.activatedStages ?? []))
+/** Every stage that has ever held a selection this project (drives the review summary). */
+const touchedStages = ref<Set<string>>(new Set(persistedState?.touchedStages ?? []))
 const visitedStages = ref<Set<string>>(
 	new Set(
 		import.meta.client
@@ -1193,7 +1199,8 @@ function syncStageUrl(stage: StageNode | undefined) {
 	debug('syncStageUrl', { stageId: stage?.id, navigate, lastSyncedStageTarget })
 	if (navigate === undefined) return
 	if (reviewLayoutActive.value) {
-		focusStageInReviewLayout(navigate)
+		// Project-wide stages have no on-screen element (they live in the checklist panel).
+		if (elementForStage(stage?.id) !== 'global') focusStageInReviewLayout(stage)
 		return
 	}
 	const target = `/${projectUrlType.value}/${projectV2.value.slug}${navigate}`
@@ -1227,7 +1234,7 @@ const stageNavigateLabel = computed(() => {
 
 function navigateToStagePage() {
 	if (reviewLayoutActive.value) {
-		focusStageInReviewLayout(currentStageObj.value?._navigate)
+		focusStageInReviewLayout(currentStageObj.value)
 		return
 	}
 	if (stageNavigateTarget.value) router.push(stageNavigateTarget.value)
@@ -1251,13 +1258,18 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 	const messageVal = message.value ?? undefined
 	const stateVal = Object.keys(rawState).length > 0 ? rawState : undefined
 	const activatedStagesVal = activatedStages.value.size > 0 ? [...activatedStages.value] : undefined
+	const touchedStagesVal = touchedStages.value.size > 0 ? [...touchedStages.value] : undefined
+	const touchedNodesArr = Object.values(touchedNodes.value)
+	const touchedNodesVal = touchedNodesArr.length > 0 ? touchedNodesArr : undefined
 	if (
 		!openVal &&
 		!reviewAnywayVal &&
 		!stageVal &&
 		!messageVal &&
 		!stateVal &&
-		!activatedStagesVal
+		!activatedStagesVal &&
+		!touchedStagesVal &&
+		!touchedNodesVal
 	) {
 		return clearChecklistState(checklistPersistenceProjectId)
 	}
@@ -1268,6 +1280,8 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 		...(messageVal && { message: messageVal }),
 		...(stateVal && { state: stateVal }),
 		...(activatedStagesVal && { activatedStages: activatedStagesVal }),
+		...(touchedStagesVal && { touchedStages: touchedStagesVal }),
+		...(touchedNodesVal && { touchedNodes: touchedNodesVal }),
 	})
 }
 
@@ -1557,21 +1571,133 @@ const stageState = computed(
 )
 const stageNodes = computed(() => resolveChildren(currentStageObj.value, stageState.value))
 
-const stageWriter: Writer = (id, value) => {
-	const stageId = currentStageObj.value.id
-	const existing = nodeStates.value[stageId]
-	const next: Record<string, NodeState> = existing ? { ...existing } : {}
-	if (value === undefined) Reflect.deleteProperty(next, id)
-	else next[id] = value
-	if (Object.keys(next).length === 0) {
-		if (existing !== undefined) Reflect.deleteProperty(nodeStates.value, stageId)
-	} else {
-		nodeStates.value[stageId] = next
+/** A `Writer` scoped to an arbitrary stage (not just the current one). */
+function writerForStage(stageId: string): Writer {
+	return (id, value) => {
+		const existing = nodeStates.value[stageId]
+		const next: Record<string, NodeState> = existing ? { ...existing } : {}
+		if (value === undefined) Reflect.deleteProperty(next, id)
+		else next[id] = value
+		if (Object.keys(next).length === 0) {
+			if (existing !== undefined) Reflect.deleteProperty(nodeStates.value, stageId)
+		} else {
+			nodeStates.value[stageId] = next
+		}
 	}
 }
 
+const stageWriter = computed<Writer>(() => writerForStage(currentStageObj.value.id))
+
 provide(CHECKLIST_META_KEY, stageMeta)
 provide(STATE_KEY, nodeStates)
+
+// Track every stage / issue-node that has ever been active (for the review summary module).
+interface TouchedNode {
+	statePath: string[]
+	stageId: string
+	label: string
+}
+const touchedNodes = ref<Record<string, TouchedNode>>(
+	Object.fromEntries((persistedState?.touchedNodes ?? []).map((n) => [n.statePath.join('/'), n])),
+)
+
+const activeNodePaths = computed(() => {
+	const set = new Set<string>()
+	for (const stage of resolvedStages.value) {
+		for (const a of checklistLive.value.get(stage)?.activeActions ?? []) {
+			set.add(a.statePath.join('/'))
+		}
+	}
+	return set
+})
+
+watch(
+	[nodeStates, checklistLive],
+	() => {
+		for (const [stageId, s] of Object.entries(nodeStates.value)) {
+			if (s && Object.keys(s).length > 0 && !touchedStages.value.has(stageId)) {
+				touchedStages.value.add(stageId)
+			}
+		}
+		for (const stage of resolvedStages.value) {
+			for (const a of checklistLive.value.get(stage)?.activeActions ?? []) {
+				const key = a.statePath.join('/')
+				if (!touchedNodes.value[key]) {
+					touchedNodes.value[key] = {
+						statePath: a.statePath,
+						stageId: stage.id,
+						label: String((a.node as { label?: unknown }).label ?? a.statePath.at(-1) ?? key),
+					}
+				}
+			}
+		}
+	},
+	{ deep: true, immediate: true },
+)
+
+watch(touchedNodes, persistState, { deep: true })
+
+/** Turn any node (identified by its full state path) on or off, pruning empty ancestors. */
+function setNodeActive(statePath: string[], active: boolean) {
+	const [stageId, ...rest] = statePath
+	if (!stageId || rest.length === 0) return
+
+	const stageState: Record<string, NodeState> = { ...(nodeStates.value[stageId] ?? {}) }
+	const chain: Record<string, NodeState>[] = [stageState]
+	let cursor = stageState
+	for (let i = 0; i < rest.length - 1; i++) {
+		const k = rest[i]
+		const existing = cursor[k]
+		const next: Record<string, NodeState> =
+			existing && typeof existing === 'object' && !(existing instanceof Set)
+				? { ...(existing as Record<string, NodeState>) }
+				: {}
+		cursor[k] = next
+		cursor = next
+		chain.push(next)
+	}
+	const leaf = rest[rest.length - 1]
+	if (active) cursor[leaf] = true
+	else Reflect.deleteProperty(cursor, leaf)
+
+	for (let i = chain.length - 1; i >= 1; i--) {
+		if (Object.keys(chain[i]).length === 0) {
+			Reflect.deleteProperty(chain[i - 1], rest[i - 1])
+		}
+	}
+
+	const nextStates = { ...nodeStates.value }
+	if (Object.keys(stageState).length === 0) Reflect.deleteProperty(nextStates, stageId)
+	else nextStates[stageId] = stageState
+	nodeStates.value = nextStates
+}
+
+function setStage(target: number | string) {
+	const index =
+		typeof target === 'number' ? target : resolvedStages.value.findIndex((s) => s.id === target)
+	if (index >= 0 && index < resolvedStages.value.length) {
+		clearGeneratedMessageState()
+		currentStage.value = index
+	}
+}
+
+function stagesForElement(key: ChecklistElementKey): StageNode[] {
+	return resolvedStages.value.filter((s) => STAGE_ELEMENT[s.id] === key && shouldShowStage(s))
+}
+
+function activeActionsForStage(stage: StageNode): ActiveAction[] {
+	return checklistLive.value.get(stage)?.activeActions ?? []
+}
+
+function focusStage(stage: StageNode | undefined) {
+	if (!stage) return
+	if (elementForStage(stage.id) === 'global') return
+	focusStageInReviewLayout(stage)
+}
+
+const engineActive = computed(
+	() => !isLockedByOther.value && (!alreadyReviewed.value || reviewedAnyway.value),
+)
 
 function shouldShowStage(stage: StageNode): boolean {
 	return checklistLive.value.get(stage)?.isVisible ?? false
@@ -1635,15 +1761,37 @@ function goBackToStages() {
 	}
 }
 
+/** Post a plain reply to the moderation thread (no status change). */
+async function postThreadReply(text: string, isPrivate = false): Promise<boolean> {
+	const threadId = projectV2.value?.thread_id
+	if (!threadId || !text.trim()) return false
+	try {
+		await useBaseFetch(`thread/${threadId}`, {
+			method: 'POST',
+			body: { body: { type: 'text', body: text, private: isPrivate } },
+		})
+		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
+		return true
+	} catch (error) {
+		console.error('Error posting thread reply:', error)
+		addNotification({
+			title: 'Error sending message',
+			text: 'Failed to send the thread reply. Please try again.',
+			type: 'error',
+		})
+		return false
+	}
+}
+
 async function generateMessage() {
 	if (loadingMessage.value) return
 
 	loadingMessage.value = true
 	markStageVisited(currentStageObj.value.id)
 
-	if (reviewLayoutActive.value) {
-		reviewLayout.openTab('thread', { focus: true, fromChecklist: true, important: true })
-	} else {
+	// In the review view the message lives in the right-hand checklist panel; only the
+	// legacy floating-widget path needs to navigate to the thread route.
+	if (!reviewLayoutActive.value) {
 		router.push(`/${projectUrlType.value}/${projectV2.value.slug}/moderation`)
 	}
 
@@ -1957,6 +2105,62 @@ const stageOptions = computed<StageOption[]>(() => {
 	})
 
 	return options
+})
+
+// --- Phase 2: expose the checklist engine to the redistributed review surfaces ---------
+
+const showFloatingWidget = computed(() => {
+	if (!reviewLayoutActive.value) return true
+	return settings.value.get(moderationSettings.General.ShowFloatingChecklistInReview) === true
+})
+
+provideModerationChecklist({
+	active: engineActive,
+	nodeStates,
+	resolvedStages,
+	checklistLive,
+	touchedStages,
+	touchedNodes,
+	activeNodePaths,
+	writerForStage,
+	setNodeActive,
+	appComponents: appComponentsByKey,
+	currentStage,
+	currentStageObj,
+	stageOptions,
+	setStage,
+	nextStage,
+	previousStage,
+	focusStage,
+	stagesForElement,
+	activeActionsForStage,
+	message,
+	generatedMessage,
+	loadingMessage,
+	useSimpleEditor,
+	generateMessage,
+	onUploadHandler,
+	moderationDecision,
+	loadingModerationDecision,
+	approveSendStatus,
+	sendMessage,
+	postThreadReply,
+	done,
+	hasNextProject,
+	resetProgress,
+	handleExit,
+	skipCurrentProject,
+	endChecklist,
+	reviewAnyway,
+	alreadyReviewed,
+	reviewedAnyway,
+	checklistHasState,
+	currentStageHasState,
+	isOnFirstStage,
+	lockStatus,
+	lockTimeRemaining,
+	isLockedByOther,
+	requestTakeOver: openTakeOverModal,
 })
 </script>
 

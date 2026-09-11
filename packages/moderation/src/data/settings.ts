@@ -20,6 +20,30 @@ const settings = {
 			description: 'Weather certain keybinds should work without the checklist visible.',
 			default: false,
 		}),
+		InlineChecklistMenu: setting.asToggle({
+			type: 'toggle',
+			id: 'inline-checklist-menu',
+			title: 'Right-click checklist menu',
+			description:
+				'In the review view, right-click a section to open its checklist buttons in a context menu.',
+			default: true,
+		}),
+		ShowChecklistWalkthrough: setting.asToggle({
+			type: 'toggle',
+			id: 'show-checklist-walkthrough',
+			title: 'Show the checklist walkthrough',
+			description:
+				'In the review view, show the collapsible stage-by-stage walkthrough helper at the bottom.',
+			default: true,
+		}),
+		ShowFloatingChecklistInReview: setting.asToggle({
+			type: 'toggle',
+			id: 'show-floating-checklist-in-review',
+			title: 'Keep the floating checklist in the review view',
+			description:
+				'Keep the original floating checklist widget available (collapsed) while the review view is active.',
+			default: false,
+		}),
 		PrivateMessageHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'private-message-highlight',

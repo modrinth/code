@@ -118,21 +118,8 @@
 				v-if="projectInstallContext && !isSettings"
 				:install-context="projectInstallContext"
 			/>
-			<ClientOnly v-if="reviewLayoutActive">
-				<ModerationReviewLayout
-					:project="project"
-					:project-v3="projectV3"
-					:organization="organization"
-					:members="members"
-					:creators-loading="creatorsLoading"
-					:is-server-project="isServerProject"
-					:server-data-loaded="serverDataLoaded"
-					:server-required-content="serverRequiredContent"
-					:server-recommended-version="serverRecommendedVersion"
-					:server-supported-versions="serverSupportedVersions"
-					:server-modpack-loaders="serverModpackLoaders"
-				/>
-			</ClientOnly>
+			<!-- Teleport outlet: ModerationChecklist renders the review shell here (Phase 2). -->
+			<div v-if="reviewLayoutActive" id="moderation-review-outlet" class="contents" />
 			<div
 				v-else
 				class="new-page sidebar"
@@ -652,10 +639,10 @@ import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } fro
 import { navigateTo } from '#app'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
+import { provideReviewLayoutData } from '~/components/ui/moderation/checklist/checklist-context'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
-import ModerationReviewLayout from '~/components/ui/moderation/review/ModerationReviewLayout.vue'
 import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
@@ -2524,6 +2511,21 @@ provideProjectPageContext({
 	createGalleryItem,
 	editGalleryItem,
 	deleteGalleryItem,
+})
+
+// Bridge local computeds to the review shell, which is teleported out of ModerationChecklist.
+provideReviewLayoutData({
+	project,
+	projectV3,
+	organization,
+	members,
+	creatorsLoading,
+	isServerProject,
+	serverDataLoaded,
+	serverRequiredContent,
+	serverRecommendedVersion,
+	serverSupportedVersions,
+	serverModpackLoaders,
 })
 </script>
 

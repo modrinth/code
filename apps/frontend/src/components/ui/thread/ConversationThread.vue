@@ -126,7 +126,7 @@
 					{{ formatMessage(messages.actionReopenThread) }}
 				</Button>
 			</div>
-			<template v-else-if="!report || !report.closed">
+			<template v-else-if="!hideActions && (!report || !report.closed)">
 				<div class="mx-4 mb-2 mt-2">
 					<MarkdownEditor
 						v-model="replyBody"
@@ -612,6 +612,11 @@ const props = defineProps({
 	auth: {
 		type: Object,
 		required: true,
+	},
+	/** Hide the built-in reply composer + action buttons (a host provides its own). */
+	hideActions: {
+		type: Boolean,
+		default: false,
 	},
 })
 

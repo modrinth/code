@@ -89,11 +89,19 @@
 			@download="emit('onDownload')"
 		/>
 		<div class="flex flex-col">
-			<BackToParentLink
+			<button v-if="props.onBackRoute"
+				v-tooltip="'Back to all versions'"
+				class="flex items-center gap-1 rounded px-2 py-1 text-sm text-secondary hover:bg-button-bg hover:text-contrast w-max"
+				@click="props.onBackRoute"
+			>
+				<LeftArrowIcon class="size-4" /> All versions
+			</button>
+			<BackToParentLink v-else
 				:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
 			>
 				{{ formatMessage(messages.allVersions) }}
 			</BackToParentLink>
+
 			<template v-if="version">
 				<Admonition
 					v-if="version.files_missing_attribution?.length"
@@ -497,6 +505,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	LeftArrowIcon,
 	BoxIcon,
 	ChevronLeftIcon,
 	ClipboardCopyIcon,
@@ -540,6 +549,7 @@ import {
 	useFormatDateTime,
 	useVIntl,
 	VersionPage,
+    type DependencyContext,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -598,9 +608,19 @@ const devInfoCollapsed = computed({
 	},
 })
 
+const props = defineProps<{
+	version?: Labrinth.Versions.v3.Version
+	onBackRoute?: () => void,
+	//enrichment?: Labrinth.Projects.v2.DependencyInfo
+	//enrichmentLoading?: boolean
+	//dependencyLinkCreator?: (context: DependencyContext) => string | undefined
+	//members?: Labrinth.Projects.v3.TeamMember[]
+	//userLinkCreator?: (user: Labrinth.Users.v3.User) => string | undefined
+}>()
+
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 
-const versionRouteParam = computed(() => route.params.version as string)
+const versionRouteParam = computed(() => props.version?.id ?? route.params.version as string)
 const isLatestRoute = computed(() => versionRouteParam.value === 'latest')
 
 function filterVersionsForLatestRoute(allVersions: Labrinth.Versions.v3.Version[]) {
@@ -651,27 +671,27 @@ const {
 
 const showVersionSkeleton = computed(() => import.meta.client && versionPending.value)
 
-onServerPrefetch(async () => {
-	if (!project.value.id) return
-
-	let lookupKey = versionRouteParam.value
-
-	if (isLatestRoute.value) {
-		loadVersions()
-		const versionsData = await queryClient.ensureQueryData(
-			projectQueryOptions.versionsV3(project.value.id, client),
-		)
-		const filtered = filterVersionsForLatestRoute(versionsData ?? [])
-		if (filtered.length === 0) return
-		lookupKey = filtered.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
-	}
-
-	if (!lookupKey || lookupKey === 'latest') return
-
-	await queryClient.ensureQueryData(
-		versionQueryOptions.fromProject(project.value.id, lookupKey, client),
-	)
-})
+// onServerPrefetch(async () => {
+// 	if (!project.value.id) return
+//
+// 	let lookupKey = versionRouteParam.value
+//
+// 	if (isLatestRoute.value) {
+// 		loadVersions()
+// 		const versionsData = await queryClient.ensureQueryData(
+// 			projectQueryOptions.versionsV3(project.value.id, client),
+// 		)
+// 		const filtered = filterVersionsForLatestRoute(versionsData ?? [])
+// 		if (filtered.length === 0) return
+// 		lookupKey = filtered.reduce((a, b) => (a.date_published > b.date_published ? a : b)).id
+// 	}
+//
+// 	if (!lookupKey || lookupKey === 'latest') return
+//
+// 	await queryClient.ensureQueryData(
+// 		versionQueryOptions.fromProject(project.value.id, lookupKey, client),
+// 	)
+// })
 
 watch(
 	versionError,

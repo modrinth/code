@@ -18,14 +18,16 @@
 			</button>
 		</div>
 
-		<Suspense>
-			<component :is="currentComponent" :key="activeId" />
-			<template #fallback>
-				<div class="flex items-center justify-center gap-2 py-12 text-secondary">
-					<SpinnerIcon class="size-5 animate-spin" /> Loading settings…
-				</div>
-			</template>
-		</Suspense>
+		<div class="min-h-0 flex-1 overflow-y-auto">
+			<Suspense>
+				<component :is="currentComponent" :key="activeId" />
+				<template #fallback>
+					<div class="flex items-center justify-center gap-2 py-12 text-secondary">
+						<SpinnerIcon class="size-5 animate-spin" /> Loading settings…
+					</div>
+				</template>
+			</Suspense>
+		</div>
 	</div>
 </template>
 
@@ -47,9 +49,12 @@ interface SettingsSection {
 	hideForServer?: boolean
 	serverOnly?: boolean
 	envOnly?: boolean
-	modpackOnly?: boolean
 }
 
+/**
+ * Tags / License / Links / Disclosures / Permissions were promoted to top-level review tabs
+ * (they carry checklist stages); this tab keeps the sections that don't.
+ */
 const ALL_SECTIONS: SettingsSection[] = [
 	{
 		id: 'general',
@@ -65,43 +70,12 @@ const ALL_SECTIONS: SettingsSection[] = [
 		hideForServer: true,
 	},
 	{
-		id: 'tags',
-		label: 'Tags',
-		component: defineAsyncComponent(() => import('~/pages/[type]/[project]/settings/tags.vue')),
-	},
-	{
-		id: 'license',
-		label: 'License',
-		component: defineAsyncComponent(() => import('~/pages/[type]/[project]/settings/license.vue')),
-		hideForServer: true,
-	},
-	{
-		id: 'links',
-		label: 'Links',
-		component: defineAsyncComponent(() => import('~/pages/[type]/[project]/settings/links.vue')),
-	},
-	{
 		id: 'environment',
 		label: 'Environment',
 		component: defineAsyncComponent(
 			() => import('~/pages/[type]/[project]/settings/environment.vue'),
 		),
 		envOnly: true,
-	},
-	{
-		id: 'permissions',
-		label: 'Permissions',
-		component: defineAsyncComponent(
-			() => import('~/pages/[type]/[project]/settings/permissions.vue'),
-		),
-		modpackOnly: true,
-	},
-	{
-		id: 'disclosures',
-		label: 'Disclosures',
-		component: defineAsyncComponent(
-			() => import('~/pages/[type]/[project]/settings/disclosures.vue'),
-		),
 	},
 	{
 		id: 'members',
@@ -128,14 +102,12 @@ const showEnv = computed(
 		projectTypes.value.some((t) => ['mod', 'modpack'].includes(t)) &&
 		isStaff(currentMember.value?.user),
 )
-const isModpack = computed(() => projectTypes.value.includes('modpack'))
 
 const sections = computed(() =>
 	ALL_SECTIONS.filter((s) => {
 		if (s.hideForServer && isServer.value) return false
 		if (s.serverOnly && !isServer.value) return false
 		if (s.envOnly && !showEnv.value) return false
-		if (s.modpackOnly && !isModpack.value) return false
 		return true
 	}),
 )

@@ -503,8 +503,8 @@ const formatBytes = useFormatBytes()
 const MAX_GAME_VERSION_TAGS = 5
 const MAX_PLATFORM_TAGS = 3
 
-type VersionWithDisplayUrlEnding = Labrinth.Versions.v3.Version & {
-	displayUrlEnding: string
+export type VersionWithDisplayUrlEnding = Labrinth.Versions.v3.Version & {
+	displayUrlEnding?: string
 }
 
 type DisplayVersion = VersionWithDisplayUrlEnding & {
@@ -536,7 +536,8 @@ const props = withDefaults(
 		currentMember?: boolean
 		loaders: Labrinth.Tags.v2.Loader[]
 		gameVersions: GameVersionTag[]
-		versionLink?: (version: Labrinth.Versions.v3.Version) => string
+		versionLink?: (version: VersionWithDisplayUrlEnding) => string
+		versionRowClick?: (version: Labrinth.Versions.v3.Version) => void
 		openModal?: () => void
 		createVersionButtonSecondary?: boolean
 	}>(),
@@ -754,6 +755,10 @@ function getVersionRowClass(): string {
 }
 
 function openVersionRow(version: VersionTableRow) {
+	if (props.versionRowClick) {
+		props.versionRowClick(version)
+		return;
+	}
 	const link = props.versionLink?.(version)
 	if (!link) return
 	router.push(link)

@@ -27,7 +27,7 @@
 			<ProjectPageVersions
 				v-if="versions?.length"
 				:project="project"
-				:versions="versions"
+				:versions="versions as VersionWithDisplayUrlEnding"
 				:show-files="flags.showVersionFilesInTable"
 				:show-environment-column="flags.showVersionEnvironmentColumn"
 				:current-member="!!currentMember"
@@ -41,6 +41,7 @@
 						}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`
 				"
 				:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
+				:versionRowClick="props.versionRowClick"
 			>
 				<template #actions="{ version }">
 					<ButtonLink
@@ -64,7 +65,7 @@
 						v-tooltip="`Open in Slicer`"
 						type="quiet"
 						target="_blank"
-						:href="`https://slicer.run/?url=${encodeURIComponent(createDownloadUrl(version))}`"
+						:href="`https://slicer.run/?url=${encodeURIComponent(createDownloadUrl(version) ?? 'UNKNOWN')}`"
 						class="!w-9 !rounded-full !px-0 hover:!bg-button-bg"
 						aria-label="Open in Slicer"
 					>
@@ -163,17 +164,20 @@
 								id: 'view-c2pa-info',
 								label: 'View C2PA info',
 								tone: 'orange',
-								action: () => projectC2paScanModal.openC2paModal(createDownloadUrl(version)),
+								action: () => {
+									const target = createDownloadUrl(version);
+									if (target) projectC2paScanModal!.openC2paModal(target);
+								},
 								shown: isStaff(auth.user),
 							},
-							{ type: 'divider', shown: currentMember || flags.developerMode },
+							{ type: 'divider', shown: currentMember != null || flags.developerMode },
 							{
 								id: 'copy-id',
 								label: 'Copy ID',
 								action: () => {
 									copyToClipboard(version.id)
 								},
-								shown: currentMember || flags.developerMode,
+								shown: currentMember != null || flags.developerMode,
 							},
 							{
 								id: 'copy-maven',
@@ -281,7 +285,7 @@
 	</section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
 	BoxIcon,
 	ClipboardCopyIcon,
@@ -306,7 +310,7 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	ProjectPageVersions,
-	TeleportOverflowMenu,
+	TeleportOverflowMenu, type VersionWithDisplayUrlEnding,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { onMounted, useTemplateRef, watch } from 'vue'
@@ -315,6 +319,11 @@ import CreateProjectVersionModal from '~/components/ui/create-project-version/Cr
 import ProjectC2paScanModal from '~/components/ui/moderation/ProjectC2paScanModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'
+import type { Labrinth } from '@modrinth/api-client'
+
+const props = defineProps<{
+	versionRowClick?: (version: Labrinth.Versions.v3.Version) => void,
+}>();
 
 const route = useRoute()
 
@@ -351,7 +360,7 @@ onMounted(() => {
 })
 
 const deleteVersionModal = ref()
-const selectedVersion = ref(null)
+const selectedVersion = ref<string | null>(null)
 const createProjectVersionModal = useTemplateRef('create-project-version-modal')
 const projectC2paScanModal = useTemplateRef('project-c2pa-scan-modal')
 
@@ -360,7 +369,7 @@ const handleOpenCreateVersionModal = () => {
 	createProjectVersionModal.value?.openCreateVersionModal()
 }
 
-const handleOpenEditVersionModal = (versionId, projectId, stageId) => {
+const handleOpenEditVersionModal = (versionId: string, projectId: string, stageId?: (string | null)) => {
 	if (!currentMember.value) return
 	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
 }
@@ -369,7 +378,7 @@ const emit = defineEmits(['onDownload', 'deleteVersion'])
 
 const baseDropdownId = useId()
 
-function getPrimaryFile(version) {
+function getPrimaryFile(version: Labrinth.Versions.v3.Version) {
 	return version.files?.find((x) => x.primary) || version.files?.[0]
 }
 
@@ -384,7 +393,7 @@ watch(
 	{ immediate: true },
 )
 
-function createDownloadUrl(version) {
+function createDownloadUrl(version: Labrinth.Versions.v3.Version) {
 	const file = getPrimaryFile(version)
 	if (!file?.url) return undefined
 
@@ -393,7 +402,7 @@ function createDownloadUrl(version) {
 	})
 }
 
-async function copyToClipboard(text) {
+async function copyToClipboard(text: string) {
 	await navigator.clipboard.writeText(text)
 }
 
@@ -411,7 +420,7 @@ async function deleteVersion() {
 			text: 'The version has been successfully deleted.',
 			type: 'success',
 		})
-	} catch (err) {
+	} catch (err: any) {
 		addNotification({
 			title: 'An error occurred',
 			text: err.data ? err.data.description : err,

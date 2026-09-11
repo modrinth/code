@@ -10,6 +10,10 @@ export interface PersistedChecklistState {
 	message?: string
 	state?: Record<string, Record<string, NodeState>>
 	activatedStages?: string[]
+	/** Every stage that has ever held a selection this project (drives the review summary). */
+	touchedStages?: string[]
+	/** Every issue node that has ever been active (drives the toggleable flagged-issue list). */
+	touchedNodes?: { statePath: string[]; stageId: string; label: string }[]
 }
 
 const STORE = 'checklist'

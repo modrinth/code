@@ -16,6 +16,11 @@ export type ReviewTabId =
 	| 'gallery'
 	| 'changelog'
 	| 'versions'
+	| 'tags'
+	| 'license'
+	| 'links'
+	| 'disclosures'
+	| 'permissions'
 	| 'thread'
 	| 'settings'
 export type ReviewDockId = 'main' | 'pip'
@@ -27,6 +32,11 @@ export const REVIEW_TAB_ORDER: readonly ReviewTabId[] = [
 	'gallery',
 	'changelog',
 	'versions',
+	'tags',
+	'license',
+	'links',
+	'disclosures',
+	'permissions',
 	'thread',
 	'settings',
 ]
@@ -50,6 +60,23 @@ interface ReviewLayoutState {
 	docks: Record<ReviewDockId, DockState>
 	/** Which sub-section the Settings tab shows. */
 	settingsSection: string
+	/** The version the "version" tab shows (opened by clicking a version in the Versions tab). */
+	selectedVersionId: string | null
+	/** Left project-info sidebar width in px (when not collapsed). */
+	sidebarWidth: number
+	/** Right checklist module width in px. */
+	checklistPanelWidth: number
+	/** Whether the bottom checklist walkthrough widget is collapsed to its slim bar. */
+	walkthroughCollapsed: boolean
+}
+
+export const SIDEBAR_WIDTH_MIN = 220
+export const SIDEBAR_WIDTH_MAX = 560
+export const CHECKLIST_PANEL_WIDTH_MIN = 280
+export const CHECKLIST_PANEL_WIDTH_MAX = 760
+
+function clamp(value: number, min: number, max: number): number {
+	return Math.min(Math.max(value, min), max)
 }
 
 const STORAGE_KEY = 'moderation-review-layout-v1'
@@ -69,6 +96,10 @@ function defaultState(): ReviewLayoutState {
 			pip: { tabs: [], active: [], weights: {}, splitDirection: 'row' },
 		},
 		settingsSection: 'general',
+		selectedVersionId: null,
+		sidebarWidth: 304,
+		checklistPanelWidth: 400,
+		walkthroughCollapsed: false,
 	}
 }
 
@@ -101,8 +132,16 @@ export interface ModerationReviewLayout {
 	toggleSplitDirection: (dock: ReviewDockId) => void
 	setSidebarCollapsed: (value: boolean) => void
 	toggleSidebar: () => void
+	sidebarWidth: ComputedRef<number>
+	setSidebarWidth: (px: number) => void
+	checklistPanelWidth: ComputedRef<number>
+	setChecklistPanelWidth: (px: number) => void
+	walkthroughCollapsed: ComputedRef<boolean>
+	toggleWalkthroughCollapsed: () => void
 	settingsSection: ComputedRef<string>
 	setSettingsSection: (section: string) => void
+	selectedVersionId: ComputedRef<string | null>
+	setSelectedVersion: (id: string | null) => void
 	setChecklistConnected: (value: boolean) => void
 	openPip: () => void
 	closePip: () => void
@@ -113,6 +152,16 @@ export interface ModerationReviewLayout {
 let singleton: ModerationReviewLayout | null = null
 
 function create(): ModerationReviewLayout {
+	const KNOWN_TABS = new Set<string>(REVIEW_TAB_ORDER)
+
+	function sanitizeDock(dock: DockState, fallback: ReviewTabId[]): DockState {
+		let tabs = dock.tabs.filter((t) => KNOWN_TABS.has(t))
+		if (tabs.length === 0) tabs = [...fallback]
+		let active = dock.active.filter((t) => tabs.includes(t))
+		if (active.length === 0 && tabs.length > 0) active = [tabs[tabs.length - 1]]
+		return { ...dock, tabs, active }
+	}
+
 	const state = useLocalStorage<ReviewLayoutState>(STORAGE_KEY, defaultState(), {
 		mergeDefaults: (storageValue, defaults) => {
 			const stored = storageValue as Partial<ReviewLayoutState> | null
@@ -120,8 +169,8 @@ function create(): ModerationReviewLayout {
 				...defaults,
 				...stored,
 				docks: {
-					main: { ...defaults.docks.main, ...stored?.docks?.main },
-					pip: { ...defaults.docks.pip, ...stored?.docks?.pip },
+					main: sanitizeDock({ ...defaults.docks.main, ...stored?.docks?.main }, ['description']),
+					pip: sanitizeDock({ ...defaults.docks.pip, ...stored?.docks?.pip }, []),
 				},
 			}
 		},
@@ -238,8 +287,28 @@ function create(): ModerationReviewLayout {
 		state.value.checklistConnected = value
 	}
 
+	function setSidebarWidth(px: number) {
+		state.value.sidebarWidth = clamp(Math.round(px), SIDEBAR_WIDTH_MIN, SIDEBAR_WIDTH_MAX)
+	}
+
+	function setChecklistPanelWidth(px: number) {
+		state.value.checklistPanelWidth = clamp(
+			Math.round(px),
+			CHECKLIST_PANEL_WIDTH_MIN,
+			CHECKLIST_PANEL_WIDTH_MAX,
+		)
+	}
+
+	function toggleWalkthroughCollapsed() {
+		state.value.walkthroughCollapsed = !state.value.walkthroughCollapsed
+	}
+
 	function setSettingsSection(section: string) {
 		state.value.settingsSection = section
+	}
+
+	function setSelectedVersion(id: string | null) {
+		state.value.selectedVersionId = id
 	}
 
 	function openPip() {
@@ -286,8 +355,16 @@ function create(): ModerationReviewLayout {
 		toggleSplitDirection,
 		setSidebarCollapsed,
 		toggleSidebar,
+		sidebarWidth: computed(() => state.value.sidebarWidth),
+		setSidebarWidth,
+		checklistPanelWidth: computed(() => state.value.checklistPanelWidth),
+		setChecklistPanelWidth,
+		walkthroughCollapsed: computed(() => state.value.walkthroughCollapsed),
+		toggleWalkthroughCollapsed,
 		settingsSection: computed(() => state.value.settingsSection),
 		setSettingsSection,
+		selectedVersionId: computed(() => state.value.selectedVersionId),
+		setSelectedVersion,
 		setChecklistConnected,
 		openPip,
 		closePip,

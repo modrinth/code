@@ -127,8 +127,10 @@
 						]"
 					/>
 				</div>
-				<div
-					class="min-h-0 min-w-0 overflow-y-auto"
+				<ModerationElementFrame
+					:element-key="elementKeyForTab(id)"
+					:auto-bars="id !== 'description'"
+					class="min-h-0 min-w-0"
 					:style="{ flexGrow: weightOf(id), flexShrink: 1, flexBasis: '0' }"
 				>
 					<div class="p-4">
@@ -141,13 +143,13 @@
 							</template>
 						</Suspense>
 					</div>
-				</div>
+				</ModerationElementFrame>
 			</template>
 		</div>
 		<div v-else class="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
 			<p class="m-0 text-secondary">No sections open in this panel.</p>
 			<div class="flex flex-wrap justify-center gap-2">
-				<Button v-for="id in REVIEW_TAB_ORDER" :key="id" @click="layout.openTab(id, { dock })">
+				<Button v-for="id in selectableTabs" :key="id" @click="layout.openTab(id, { dock })">
 					<component :is="tabDef(id).icon" />
 					{{ tabDef(id).label }}
 				</Button>
@@ -204,6 +206,7 @@ import { ExternalIcon, PlusIcon, SpinnerIcon, SplitIcon, WindowIcon, XIcon } fro
 import { Button, injectProjectPageContext } from '@modrinth/ui'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import type { ChecklistElementKey } from '~/components/ui/moderation/checklist/checklist-context'
 import {
 	REVIEW_TAB_ORDER,
 	type ReviewDockId,
@@ -211,13 +214,32 @@ import {
 	useModerationReviewLayout,
 } from '~/services/moderation/review-layout'
 
+import ModerationElementFrame from './ModerationElementFrame.vue'
 import { pipSupported } from './pip-window'
-import { reviewTab } from './review-tabs'
+import { reviewTab, selectableReviewTabs } from './review-tabs'
 
 const props = defineProps<{ dock: ReviewDockId }>()
 
+const ELEMENT_TABS = new Set<ReviewTabId>([
+	'description',
+	'gallery',
+	'versions',
+	'tags',
+	'license',
+	'links',
+	'disclosures',
+	'permissions',
+])
+
+function elementKeyForTab(id: ReviewTabId): ChecklistElementKey | null {
+	return ELEMENT_TABS.has(id) ? (id as ChecklistElementKey) : null
+}
+
 const layout = useModerationReviewLayout()
-const { loadVersions } = injectProjectPageContext()
+const { loadVersions, projectV3 } = injectProjectPageContext()
+
+const isModpack = computed(() => (projectV3.value?.project_types ?? []).includes('modpack'))
+const selectableTabs = computed(() => selectableReviewTabs(REVIEW_TAB_ORDER, isModpack.value))
 
 const isPip = computed(() => props.dock === 'pip')
 
@@ -256,7 +278,7 @@ const dockState = computed(() =>
 	props.dock === 'main' ? layout.mainDock.value : layout.pipDock.value,
 )
 const closedTabs = computed(() =>
-	REVIEW_TAB_ORDER.filter((id) => !dockState.value.tabs.includes(id)),
+	selectableTabs.value.filter((id) => !dockState.value.tabs.includes(id)),
 )
 /** Active tabs in tab-strip order (the split panels follow the strip, not REVIEW_TAB_ORDER). */
 const activeOrdered = computed(() =>

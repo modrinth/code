@@ -1,7 +1,8 @@
 <template>
 	<aside
-		class="flex shrink-0 flex-col overflow-hidden border-0 border-r border-solid border-divider bg-surface-1 transition-[width] duration-200 ease-in-out"
-		:class="collapsed ? 'w-12' : 'w-[19rem]'"
+		class="flex shrink-0 flex-col overflow-hidden border-0 border-r border-solid border-divider bg-surface-1"
+		:class="collapsed ? 'w-12 transition-[width] duration-200 ease-in-out' : ''"
+		:style="collapsed ? undefined : { width: `${width}px` }"
 	>
 		<!-- Collapsed rail -->
 		<template v-if="collapsed">
@@ -15,7 +16,7 @@
 			</button>
 			<div class="mt-1 h-px w-full bg-divider" />
 			<button
-				v-for="id in REVIEW_TAB_ORDER"
+				v-for="id in railTabs"
 				:key="id"
 				v-tooltip="reviewTab(id).label"
 				class="flex h-11 w-12 items-center justify-center"
@@ -62,23 +63,39 @@
 			</div>
 
 			<dl
-				class="m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 border-0 border-y border-solid border-divider px-3 py-2 text-sm"
+				class="m-0 grid grid-cols-2 gap-x-3 gap-y-1 border-0 border-y border-solid border-divider px-3 py-2 text-sm"
 			>
 				<template v-if="queuePosition">
 					<dt class="text-secondary">Queue</dt>
 					<dd class="m-0 text-contrast">{{ queuePosition }}</dd>
 				</template>
+
 				<dt class="text-secondary">Submitted</dt>
 				<dd class="m-0 text-contrast">{{ submittedRelative }}</dd>
+
 				<dt class="text-secondary">Created</dt>
 				<dd class="m-0 text-contrast">{{ createdRelative }}</dd>
+
 				<template v-if="project.updated">
 					<dt class="text-secondary">Updated</dt>
 					<dd class="m-0 text-contrast">{{ updatedRelative }}</dd>
 				</template>
+
+				<dt class="text-secondary">Applying for: </dt>
+				<dd class="m-0 text-contrast">{{ requestedStatus }}</dd>
 			</dl>
 
-			<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
+			<div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2">
+				<ChecklistStageButtons stage-id="title-slug">
+					<div class="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
+						<span class="text-xs font-semibold uppercase tracking-wide text-secondary">Title</span>
+						<span class="min-w-0 text-primary">{{ project.title || project.name || '—' }}</span>
+
+						<span class="text-xs font-semibold uppercase tracking-wide text-secondary">Slug</span>
+						<code class="min-w-0 break-all text-primary">{{ project.slug || '—' }}</code>
+					</div>
+				</ChecklistStageButtons>
+				<div class="my-1 h-px w-full bg-divider flex-shrink-0" />
 				<ProjectSidebarCreators
 					:organization="organization"
 					:members="members"
@@ -87,6 +104,7 @@
 					:user-link="(username) => `/user/${username}`"
 					class="flex-card-reduced"
 				/>
+				<div class="my-1 h-px w-full bg-divider flex-shrink-0" />
 				<ProjectSidebarServerInfo
 					v-if="isServerProject"
 					:loading="!serverDataLoaded"
@@ -99,21 +117,18 @@
 					:status-online="projectV3?.minecraft_java_server?.ping?.data != null"
 					class="flex-card-reduced"
 				/>
-				<ProjectSidebarCompatibility
-					v-if="!isServerProject"
-					:project="project"
-					:tags="tags"
-					:project-v3="projectV3"
-					:compact-mode="true"
-					class="flex-card-reduced"
-				/>
-				<ProjectSidebarLinks
-					:project="project"
-					:project-v3="projectV3"
-					link-target="_blank"
-					class="flex-card-reduced"
-				/>
-				<ProjectSidebarTags :project="project" class="flex-card-reduced" />
+				<div v-if="isServerProject" class="my-1 h-px w-full bg-divider flex-shrink-0" />
+
+				<ChecklistStageButtons stage-id="links" variant="inline" inline-node-mode="full" />
+
+				<div class="my-1 h-px w-full bg-divider flex-shrink-0" />
+
+				<ChecklistStageButtons stage-id="tags" variant="inline">
+					<ProjectSidebarTags :project="project" :disableHeader="true" class="flex-card-reduced" />
+				</ChecklistStageButtons>
+
+				<div class="my-1 h-px w-full bg-divider flex-shrink-0" />
+
 				<ProjectSidebarDetails
 					:project="project"
 					link-target="_blank"
@@ -140,12 +155,13 @@ import {
 	ProjectStatusBadge,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { computed } from 'vue'
+import {computed, ref} from 'vue'
 
 import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { REVIEW_TAB_ORDER, useModerationReviewLayout } from '~/services/moderation/review-layout'
 
-import { reviewTab } from './review-tabs'
+import ChecklistStageButtons from './ChecklistStageButtons.vue'
+import { reviewTab, selectableReviewTabs } from './review-tabs'
 
 type LooseProject = Labrinth.Projects.v2.Project & Record<string, unknown>
 
@@ -162,8 +178,10 @@ const props = withDefaults(
 		serverRecommendedVersion?: unknown
 		serverSupportedVersions?: unknown[]
 		serverModpackLoaders?: unknown[]
+		width?: number
 	}>(),
 	{
+		width: 304,
 		organization: null,
 		members: () => [],
 		creatorsLoading: false,
@@ -183,6 +201,13 @@ const tags = useGeneratedState()
 
 const collapsed = computed(() => layout.sidebarCollapsed.value)
 
+const railTabs = computed(() =>
+	selectableReviewTabs(
+		REVIEW_TAB_ORDER,
+		(props.projectV3?.project_types ?? []).includes('modpack'),
+	),
+)
+
 const projectPath = computed(
 	() => `/${props.project.project_type}/${props.project.slug ?? props.project.id}`,
 )
@@ -196,6 +221,10 @@ const createdRelative = computed(() =>
 )
 const updatedRelative = computed(() =>
 	props.project.updated ? formatRelativeTime(props.project.updated as string) : 'unknown',
+)
+
+const requestedStatus = computed(() =>
+	props.project.requested_status ?? 'unknown',
 )
 
 const queuePosition = computed(() => {
@@ -213,7 +242,7 @@ const queuePosition = computed(() => {
 	display: flex;
 	flex-direction: column;
 	gap: var(--gap-6);
-	padding: var(--gap-8);
+	padding: 0;
 	margin: 0;
 
 	:deep(h2) {

@@ -1,11 +1,11 @@
 <template>
-	<div v-if="project.versions?.length > 0" class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
-		<section class="flex flex-col gap-2">
+	<div v-if="project.versions?.length > 0" :class="compactMode ? 'flex flex-wrap gap-2' : 'flex flex-col gap-3'">
+		<h2 v-if="!compactMode" class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
+		<section :class="compactMode ? 'contents' : 'flex flex-col gap-2'">
 			<h3 v-if="!compactMode" class="text-primary !font-normal text-base m-0">
 				{{ formatMessage(messages.minecraftJava) }}
 			</h3>
-			<div class="flex flex-wrap gap-1">
+			<div :class="compactMode ? 'contents' : 'flex flex-wrap gap-1'">
 				<TagItem
 					v-for="version in getVersionsToDisplay(project, tags.gameVersions)"
 					:key="`version-tag-${version}`"
@@ -14,11 +14,11 @@
 				</TagItem>
 			</div>
 		</section>
-		<section v-if="project.project_type !== 'resourcepack'" class="flex flex-col gap-2">
+		<section v-if="project.project_type !== 'resourcepack'" :class="compactMode ? 'contents' : 'flex flex-col gap-2'">
 			<h3 v-if="!compactMode" class="text-primary !font-normal text-base m-0">
 				{{ formatMessage(messages.platforms) }}
 			</h3>
-			<div class="flex flex-wrap gap-1">
+			<div :class="compactMode ? 'contents' : 'flex flex-wrap gap-1'">
 				<template v-if="noModpackLoader">
 					<TagItem class="border !border-solid border-surface-5 hover:no-underline">
 						No mod loader
@@ -37,11 +37,11 @@
 				</template>
 			</div>
 		</section>
-		<section v-if="showEnvironments" class="flex flex-col gap-2">
+		<section v-if="showEnvironments" :class="compactMode ? 'contents' : 'flex flex-col gap-2'">
 			<h3 v-if="!compactMode" class="text-primary !font-normal text-base m-0">
 				{{ formatMessage(messages.environments) }}
 			</h3>
-			<div class="flex flex-wrap gap-1">
+			<div :class="compactMode ? 'contents' : 'flex flex-wrap gap-1'">
 				<EnvironmentTags :environment="primaryEnvironment" />
 			</div>
 		</section>
