@@ -617,6 +617,14 @@ async fn finish_project_install(
     .await?;
     tx.commit().await?;
     super::mark_shared_instance_stale(&scope.instance.id, &state.pool).await?;
+    if matches!(
+        project_type,
+        ProjectType::ResourcePack | ProjectType::DataPack
+    ) {
+        crate::api::instance::queue_synced_pack_reconciliation(
+            &scope.instance.id,
+        );
+    }
 
     Ok(())
 }

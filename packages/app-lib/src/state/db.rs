@@ -65,6 +65,32 @@ async fn open_app_db_pool(db_path: &Path) -> crate::Result<Pool<Sqlite>> {
 }
 
 async fn record_current_app_version(pool: &Pool<Sqlite>) -> crate::Result<()> {
+    let previous_version = sqlx::query_scalar!(
+        "SELECT value FROM app_metadata WHERE key = 'app_version'"
+    )
+    .fetch_optional(pool)
+    .await?;
+    let already_used_sync_update = previous_version
+        .as_deref()
+        .and_then(|version| {
+            let mut parts = version.split('.');
+            Some((
+                parts.next()?.parse::<u64>().ok()?,
+                parts.next()?.parse::<u64>().ok()?,
+            ))
+        })
+        .is_some_and(|version| version >= (0, 20));
+
+    if env!("CARGO_PKG_VERSION").starts_with("0.20.")
+        && already_used_sync_update
+    {
+        let mut settings = super::Settings::get(pool).await?;
+        if settings.pending_update_toast_for_version.is_some() {
+            settings.pending_update_toast_for_version = None;
+            settings.update(pool).await?;
+        }
+    }
+
     sqlx::query!(
         "
 		INSERT INTO app_metadata (key, value, updated_at)

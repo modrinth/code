@@ -23,11 +23,16 @@ pub(super) async fn write_library(
     state: &State,
 ) -> crate::Result<()> {
     io::create_dir_all(directory(state)).await?;
-    io::write(
-        directory(state).join("packs.json"),
-        serde_json::to_vec(library)?,
-    )
-    .await?;
+    let path = directory(state).join("packs.json");
+    let bytes = serde_json::to_vec(library)?;
+    if io::read(&path).await.is_ok_and(|current| current == bytes) {
+        return Ok(());
+    }
+    io::write(path, bytes).await?;
+    state
+        .pack_sync_worker
+        .revision
+        .fetch_add(1, std::sync::atomic::Ordering::Release);
     Ok(())
 }
 
