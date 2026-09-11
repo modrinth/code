@@ -77,12 +77,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Cung cấp mã nguồn"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Một số liên kết ngoài của bạn có vẻ giống hệt nhau. Mỗi liên kết chỉ nên được nhập một lần và với loại liên kết phù hợp."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Xóa các đường link giống nhau"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL giấy phép không hợp lệ."
   },
@@ -112,12 +106,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Thêm văn bản thay thế cho hình ảnh"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Liên kết mời Discord không thể được dùng cho các loại liên kết khác. Vui lòng chỉ đặt liên kết Discord của bạn trong trường Liên kết mời Discord."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Di chuyển liên kết mời Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Truy cập luồng kiểm duyệt"
@@ -226,12 +214,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Tải lên một phiên bản"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Một số liên kết bên ngoài của bạn có thể đang sử dụng tên miền không phù hợp với loại liên kết đó."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Xác minh các liên kết bên ngoài"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Truy cập cài đặt liên kết"

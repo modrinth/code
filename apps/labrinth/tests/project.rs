@@ -609,7 +609,7 @@ async fn test_edit_invalid_project_in_review_rolls_back() {
 }
 
 #[actix_rt::test]
-async fn test_leaving_review_skips_validation() {
+async fn test_leaving_review_still_validates_changed_fields() {
     with_test_environment(
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
@@ -645,13 +645,21 @@ async fn test_leaving_review_skips_validation() {
                         ADMIN_USER_PAT,
                     )
                     .await;
+                assert_status!(&response, StatusCode::BAD_REQUEST);
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({ "status": status }),
+                        ADMIN_USER_PAT,
+                    )
+                    .await;
                 assert_status!(&response, StatusCode::NO_CONTENT);
 
                 let project = api
                     .get_project_deserialized(project_slug, USER_USER_PAT)
                     .await;
                 assert_eq!(project.status, expected_status);
-                assert!(project.description.is_empty());
+                assert_eq!(project.description, original_project.description);
             }
         },
     )
@@ -660,7 +668,7 @@ async fn test_leaving_review_skips_validation() {
 
 #[actix_rt::test]
 async fn test_description_similarity_to_summary() {
-	with_test_environment(
+    with_test_environment(
 		None,
 		|test_env: TestEnvironment<ApiV3>| async move {
 			let api = &test_env.api;
@@ -688,15 +696,20 @@ async fn test_description_similarity_to_summary() {
 						USER_USER_PAT,
 					)
 					.await;
-				assert_status!(&response, StatusCode::NO_CONTENT);
-
-				let request = test::TestRequest::get()
-					.uri(&format!("/v3/project/{project_slug}/validate"))
-					.append_pat(USER_USER_PAT)
-					.to_request();
-				let response = api.call(request).await;
-				assert_status!(&response, StatusCode::OK);
-				let validation: serde_json::Value = test::read_body_json(response).await;
+				let validation: serde_json::Value = if expected_match || description.is_empty() {
+					assert_status!(&response, StatusCode::BAD_REQUEST);
+					let error: serde_json::Value = test::read_body_json(response).await;
+					error["details"].clone()
+				} else {
+					assert_status!(&response, StatusCode::NO_CONTENT);
+					let request = test::TestRequest::get()
+						.uri(&format!("/v3/project/{project_slug}/validate"))
+						.append_pat(USER_USER_PAT)
+						.to_request();
+					let response = api.call(request).await;
+					assert_status!(&response, StatusCode::OK);
+					test::read_body_json(response).await
+				};
 				let matching_nag = validation["nags"]
 					.as_array()
 					.unwrap()
@@ -1953,3 +1966,32 @@ async fn test_thread_deleted_with_project() {
 // Permissions:
 // TODO: permissions VIEW_PAYOUTS currently is unused. Add tests when it is used.
 // TODO: permissions VIEW_ANALYTICS currently is unused. Add tests when it is used.
+
+#[actix_rt::test]
+async fn test_draft_description_save_allows_required_nags() {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+		let api = &test_env.api;
+		let slug = &test_env.dummy.project_alpha.project_slug;
+		let response = api.edit_project(slug, json!({ "status": "draft" }), ADMIN_USER_PAT).await;
+		assert_status!(&response, StatusCode::NO_CONTENT);
+
+		let response = api.edit_project(slug, json!({ "description": "Too short" }), USER_USER_PAT).await;
+		assert_status!(&response, StatusCode::NO_CONTENT);
+		let after = api.get_project_deserialized(slug, USER_USER_PAT).await;
+		assert_eq!(after.description, "Too short");
+
+		let description = "Players can discover custom structures throughout their worlds, configure individual features to suit their play style, and follow the installation instructions to get started with their preferred loader.\n\n![](data:image/png;base64,AA==)";
+		let response = api.edit_project(slug, json!({ "description": description }), USER_USER_PAT).await;
+		assert_status!(&response, StatusCode::NO_CONTENT);
+		let after = api.get_project_deserialized(slug, USER_USER_PAT).await;
+		assert_eq!(after.description, description);
+		let request = test::TestRequest::get()
+			.uri(&format!("/v3/project/{slug}/validate"))
+			.append_pat(USER_USER_PAT)
+			.to_request();
+		let response = api.call(request).await;
+		assert_status!(&response, StatusCode::OK);
+		let validation: serde_json::Value = test::read_body_json(response).await;
+		assert!(validation["nags"].as_array().unwrap().iter().any(|nag| nag["kind"] == "missing_alt_text" && nag["severity"] == "warning"));
+	}).await;
+}

@@ -437,7 +437,7 @@ async fn invalid_review_submission_returns_validation_error() {
             let error: serde_json::Value = test::read_body_json(response).await;
             assert_eq!(
                 error["description"],
-                "project must have no required validation nags before or while under review"
+                "resolve required project validation messages before saving"
             );
         },
     )

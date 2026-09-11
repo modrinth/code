@@ -65,12 +65,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Magbigay ng source code"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Ang ilan sa iyong link palabas ay magkatulad. Bawat link ay dapat isahan lamang malagay at sa wastong uri ng link."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Ipaglinis ang mga magkaparehong link"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Di-wasto ang URL ng lisensiya."
   },
@@ -100,12 +94,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Magdagdag ng image alt text"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Hindi maaaring maglagay ng anyaya sa Discord para sa ibang uri ng link. Mangyaring ilagay ang anyaya sa Discord sa pang-anyaya sa Discord na patlang lamang."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Ilipat ang anyaya sa Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Bisitahin ang moderation thread"
@@ -199,12 +187,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Mag-upload ng bersiyon"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Ang ilan sa iyong mga link palabas ay maaaring gumagamit ng domain na hindi naaangkop sa uri ng link."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Patunayan ang mga link palabas"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bisitahin ang mga setting sa mga link"

@@ -1394,15 +1394,17 @@ function addProjectMutationErrorNotification(error) {
 		error?.responseData?.description ??
 		error?.data?.description ??
 		error?.message
-	const isProjectReviewValidationError = description === PROJECT_REVIEW_VALIDATION_ERROR
+	const response = error?.responseData ?? error?.data ?? error?.v1Error
+	const isProjectValidationError =
+		Array.isArray(response?.details?.nags) || description === PROJECT_REVIEW_VALIDATION_ERROR
 
 	addNotification({
 		title: formatMessage(
-			isProjectReviewValidationError
+			isProjectValidationError && project.value.status === 'processing'
 				? messages.projectReviewSaveFailed
 				: commonMessages.errorNotificationTitle,
 		),
-		text: isProjectReviewValidationError
+		text: isProjectValidationError
 			? formatMessage(messages.projectReviewSaveFailedDescription)
 			: description,
 		type: 'error',
@@ -1417,7 +1419,8 @@ const patchProjectMutation = useMutation({
 		return data
 	},
 
-	onMutate: async ({ projectId, data }) => {
+	onMutate: async ({ projectId, data, optimistic = true }) => {
+		if (!optimistic) return
 		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
 
@@ -1497,7 +1500,8 @@ const patchProjectV3Mutation = useMutation({
 		return data
 	},
 
-	onMutate: async ({ projectId, data }) => {
+	onMutate: async ({ projectId, data, optimistic = true }) => {
+		if (!optimistic) return
 		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
 		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
 
@@ -1524,8 +1528,8 @@ const patchProjectV3Mutation = useMutation({
 		addProjectMutationErrorNotification(err)
 	},
 
-	onSettled: () => {
-		void invalidateProject()
+	onSettled: async () => {
+		await invalidateProject()
 	},
 })
 
@@ -2176,12 +2180,12 @@ async function setProcessing() {
 	)
 }
 
-async function patchProject(resData, quiet = false) {
+async function patchProject(resData, quiet = false, throwOnError = false) {
 	startLoading()
 
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		patchProjectMutation.mutate(
-			{ projectId: project.value.id, data: resData },
+			{ projectId: project.value.id, data: resData, optimistic: !throwOnError },
 			{
 				onSuccess: async () => {
 					if (!quiet) {
@@ -2193,19 +2197,19 @@ async function patchProject(resData, quiet = false) {
 					}
 					resolve(true)
 				},
-				onError: () => resolve(false),
+				onError: (error) => (throwOnError ? reject(error) : resolve(false)),
 				onSettled: () => stopLoading(),
 			},
 		)
 	})
 }
 
-async function patchProjectV3(resData, quiet = false) {
+async function patchProjectV3(resData, quiet = false, throwOnError = false) {
 	startLoading()
 
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		patchProjectV3Mutation.mutate(
-			{ projectId: project.value.id, data: resData },
+			{ projectId: project.value.id, data: resData, optimistic: !throwOnError },
 			{
 				onSuccess: async () => {
 					if (!quiet) {
@@ -2217,7 +2221,7 @@ async function patchProjectV3(resData, quiet = false) {
 					}
 					resolve(true)
 				},
-				onError: () => resolve(false),
+				onError: (error) => (throwOnError ? reject(error) : resolve(false)),
 				onSettled: () => stopLoading(),
 			},
 		)
@@ -2239,30 +2243,58 @@ async function patchIcon(icon) {
 	})
 }
 
-async function createGalleryItem(file, title, description, featured, ordering) {
+async function createGalleryItem(
+	file,
+	title,
+	description,
+	featured,
+	ordering,
+	throwOnError = false,
+) {
 	startLoading()
 
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		createGalleryItemMutation.mutate(
-			{ projectId: project.value.id, file, title, description, featured, ordering },
+			{
+				projectId: project.value.id,
+				file,
+				title,
+				description,
+				featured,
+				ordering,
+			},
 			{
 				onSuccess: () => resolve(true),
-				onError: () => resolve(false),
+				onError: (error) => (throwOnError ? reject(error) : resolve(false)),
 				onSettled: () => stopLoading(),
 			},
 		)
 	})
 }
 
-async function editGalleryItem(imageUrl, title, description, featured, ordering) {
+async function editGalleryItem(
+	imageUrl,
+	title,
+	description,
+	featured,
+	ordering,
+	throwOnError = false,
+) {
 	startLoading()
 
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		editGalleryItemMutation.mutate(
-			{ projectId: project.value.id, imageUrl, title, description, featured, ordering },
+			{
+				projectId: project.value.id,
+				imageUrl,
+				title,
+				description,
+				featured,
+				ordering,
+			},
 			{
 				onSuccess: () => resolve(true),
-				onError: () => resolve(false),
+				onError: (error) => (throwOnError ? reject(error) : resolve(false)),
 				onSettled: () => stopLoading(),
 			},
 		)

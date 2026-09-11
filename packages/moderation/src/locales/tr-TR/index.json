@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Bazı dış bağlantılarınız aynı. Her bağlantı sadece bir kere doğru bağlantı türüyle girilmelidir."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Özdeş bağlantıları temizle"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisans URL'i geçersiz."
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Resim açıklaması ekle"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord davetleri diğer bağlantı türleri için kullanılamaz. Lütfen Discord bağlantınızı Discord Daveti bağlantısı kısmına koyun."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Discord davetinin yerini değiştir"
   },
   "nags.moderation.title": {
     "defaultMessage": "Moderasyon kanalına göz at"
@@ -241,12 +229,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Bir sürüm yükle"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Bazı dış bağlantıların o bağlantı türü için uygun olmayan domain kullanıyor gibi gözüküyor."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Dış bağlantıları doğrula"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bağlantı ayarlarına göz at"

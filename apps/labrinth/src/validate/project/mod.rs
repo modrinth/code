@@ -16,6 +16,9 @@ mod moderation;
 mod name;
 mod permissions;
 mod server_settings;
+mod save;
+
+pub use save::ProjectSaveValidation;
 mod summary;
 mod tags;
 mod text;
@@ -69,11 +72,10 @@ pub enum ProjectNagKind {
     ProjectDescriptionProfanity,
     ProjectDescriptionNonStandardText,
     ProjectDescriptionNonEnglish,
-	ProjectDescriptionMatchesSummary,
+    ProjectDescriptionMatchesSummary,
     AddDescription,
     DescriptionTooShort,
     ProjectDescriptionSpam,
-    ProjectDescriptionBannedLink,
     LongHeaders,
     DescriptionEndsWithHeader,
     AdjacentHeaders,
@@ -87,10 +89,7 @@ pub enum ProjectNagKind {
     // External links
     AddLinks,
     AddLinksServer,
-    IdenticalLinks,
-    VerifyExternalLinks,
-    MisusedDiscordLink,
-    BannedLinkUsage,
+    LinkValidation,
     GplLicenseSourceRequired,
 
     // Permissions
@@ -223,6 +222,63 @@ pub fn has_required_nags(project: &Project, versions: &[Version]) -> bool {
     validate(project, versions)
         .iter()
         .any(|nag| nag.severity == ProjectNagSeverity::Required)
+}
+
+pub async fn validate_link_network(project: &Project) -> Vec<ProjectNag> {
+    links::validate_network(project).await
+}
+
+#[derive(Clone, Copy, Default)]
+pub struct LinkValidationScope {
+    pub external: bool,
+    pub license: bool,
+    pub description: bool,
+}
+
+impl LinkValidationScope {
+    pub fn all() -> Self {
+        Self {
+            external: true,
+            license: true,
+            description: true,
+        }
+    }
+
+    fn includes(self, field: &str) -> bool {
+        match field {
+            "description" => self.description,
+            "license" => self.license,
+            _ => self.external,
+        }
+    }
+
+    fn includes_nag(self, nag: &ProjectNag) -> bool {
+        self.includes(nag.details["field"].as_str().unwrap_or_default())
+            || ((self.external || self.license)
+                && nag.details["reason"] == "duplicate")
+    }
+}
+
+pub async fn validate_link_fields(
+    project: &Project,
+    scope: LinkValidationScope,
+) -> Vec<ProjectNag> {
+    let mut nags = links::validate_static(project);
+    nags.extend(license::validate_custom_details(project));
+    nags.retain(|nag| scope.includes_nag(nag));
+    nags.extend(links::validate_network_fields(project, scope).await);
+    nags
+}
+
+pub async fn validate_link_input(
+    links: &std::collections::HashMap<String, String>,
+    license_id: &str,
+    license_url: Option<&str>,
+    description: &str,
+) -> Vec<ProjectNag> {
+    let mut nags = links::validate_input(links, license_url, description).await;
+    nags.extend(license::validate_custom_license(license_id, license_url));
+    nags
 }
 
 pub fn has_required_nags_with_context(

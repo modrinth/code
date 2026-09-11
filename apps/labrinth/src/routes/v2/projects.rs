@@ -624,6 +624,9 @@ pub async fn project_edit(
     // In v2, setting donation links resets all other donation links
     // (resetting to the new ones)
     if let Some(donation_urls) = v2_new_project.donation_urls {
+        crate::models::v2::projects::validate_donation_platforms(
+            &donation_urls,
+        )?;
         // Fetch current donation links from project so we know what to delete
         let fetched_example_project =
             project_item::DBProject::get(&info.0, &**pool, &redis)
@@ -842,6 +845,9 @@ pub async fn projects_edit(
     // If we are *setting* donation links, we will set every possible donation link to None, as
     // setting will delete all of them then 're-add' the ones we want to keep
     if let Some(donation_url) = bulk_edit_project.donation_urls {
+        crate::models::v2::projects::validate_donation_platforms(
+            &donation_url,
+        )?;
         let link_platforms = LinkPlatform::list(&**pool, &redis)
             .await
             .wrap_internal_err("fetching link platform from Redis")?;
@@ -858,6 +864,9 @@ pub async fn projects_edit(
 
     // For every delete, we will set the link to None
     if let Some(donation_url) = bulk_edit_project.remove_donation_urls {
+        crate::models::v2::projects::validate_donation_platforms(
+            &donation_url,
+        )?;
         for donation_url in donation_url {
             link_urls.insert(donation_url.id, None);
         }
@@ -865,6 +874,9 @@ pub async fn projects_edit(
 
     // For every add, we will set the link to the new url
     if let Some(donation_url) = bulk_edit_project.add_donation_urls {
+        crate::models::v2::projects::validate_donation_platforms(
+            &donation_url,
+        )?;
         for donation_url in donation_url {
             link_urls.insert(donation_url.id, Some(donation_url.url));
         }

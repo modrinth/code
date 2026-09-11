@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "你的一些外部链接似乎重复了。每个链接只应输入一次，并设置合适的链接类型。"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "清除重复的链接"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "许可证 URL 不可用。"
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "添加图片替代文本"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord 邀请链接不可用作其他类型的链接。请将你的 Discord 链接仅放置在 “Discord 邀请链接” 输入框中。"
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "移动 Discord 邀请链接位置"
   },
   "nags.moderation.title": {
     "defaultMessage": "访问审核页面"
@@ -244,12 +232,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "上传一个版本"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "你的部分外部链接可能与其所属类型不适配。"
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "验证外部链接"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "访问链接设置"

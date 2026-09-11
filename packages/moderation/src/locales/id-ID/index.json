@@ -77,12 +77,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Berikan kode sumber"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Beberapa tautan eksternal Anda tampaknya identik. Setiap tautan seharusnya dimasukkan hanya sekali dan dengan jenis tautan yang sesuai."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Bersihkan tautan identik"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "URL lisensi tidak sah."
   },
@@ -112,12 +106,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Tambahkan teks alt gambar"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Undangan Discord tidak dapat digunakan untuk jenis tautan lain. Mohon letakkan tautan Discord pada medan tautan undangan Discord saja."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Pindahkan tautan undangan Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Kunjungi utas moderasi"
@@ -226,12 +214,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Unggah versi"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Beberapa tautan eksternal Anda mungkin menggunakan domain yang tidak sesuai untuk jenis tautan tersebut."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Periksa tautan eksternal"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Kunjungi pengaturan tautan"

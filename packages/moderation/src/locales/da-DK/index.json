@@ -62,9 +62,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Angiv kilde kode"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Nogle af dine eksterne links ser ud til at være identiske. Hvert link skal kun indtastes en gang og med den korrekte linktype."
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licens-URL'en er ugyldig."
   },

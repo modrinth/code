@@ -280,15 +280,20 @@ pub async fn modify_project_disclosures(
         .wrap_internal_err("failed to remove project disclosure")?;
     }
 
-    if project.inner.status == ProjectStatus::Processing {
-        super::projects::validate::ensure_project_is_valid_for_review(
-            project.inner.id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
-        .await?;
-    }
+	if project.inner.status == ProjectStatus::Processing {
+		super::projects::validate::ensure_project_is_valid_for_save(
+			project.inner.id,
+			&pool,
+			&mut transaction,
+			&redis,
+			crate::validate::project::ProjectSaveValidation {
+				all: project.inner.status == ProjectStatus::Processing,
+				disclosures: true,
+				..Default::default()
+			},
+		)
+		.await?;
+	}
 
     transaction
         .commit()

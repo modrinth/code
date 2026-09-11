@@ -83,12 +83,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Forneça o código-fonte"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Alguns de seus links externos parecem ser iguais. Cada link só deve ser inserido uma vez e com o tipo de link apropriado."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Limpar links idênticos"
-  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "O URL de licença é inválido."
   },
@@ -118,12 +112,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Adicione texto alternativo às imagens"
-  },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Convites de Discord não podem ser usados ​​para outros tipos de link. Insira seu link do Discord apenas no campo destinado para ele."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Mova o convite do Discord"
   },
   "nags.moderation.title": {
     "defaultMessage": "Visitar tópico de moderação"
@@ -244,12 +232,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "Enviar versão"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Alguns dos seus links externos podem estar usando domínios inapropriados para esse tipo de link."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Verificar links externos"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visitar página de links"
