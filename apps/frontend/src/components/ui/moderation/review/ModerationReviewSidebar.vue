@@ -34,37 +34,20 @@
 
 		<!-- Expanded -->
 		<template v-else>
-			<div class="flex items-start gap-2 p-3">
-				<Avatar
-					:src="project.icon_url"
-					:raw-src="project.raw_icon_url"
-					:tint-by="project.id"
-					size="44px"
-				/>
-				<div class="min-w-0 flex-1">
-					<a
-						:href="projectPath"
-						target="_blank"
-						class="line-clamp-2 font-extrabold leading-tight text-contrast hover:underline"
-						>{{ project.title }}</a
-					>
-					<div class="mt-1 flex flex-wrap items-center gap-1">
-						<ProjectStatusBadge :status="projectV3.status" />
-					</div>
-				</div>
-				<button
-					v-tooltip="'Collapse sidebar'"
-					class="shrink-0 rounded p-1 text-secondary hover:bg-button-bg hover:text-contrast"
-					aria-label="Collapse sidebar"
-					@click="layout.toggleSidebar()"
-				>
-					<ChevronLeftIcon class="size-5" />
-				</button>
-			</div>
 
 			<dl
 				class="m-0 grid grid-cols-2 gap-x-3 gap-y-1 border-0 border-y border-solid border-divider px-3 py-2 text-sm"
 			>
+				<dt class="">
+					<Avatar
+						:src="project.icon_url"
+						:raw-src="project.raw_icon_url"
+						:tint-by="project.id"
+						size="88px"
+					/>
+				</dt>
+				<dd class="m-0 text-contrast"></dd>
+
 				<template v-if="queuePosition">
 					<dt class="text-secondary">Queue</dt>
 					<dd class="m-0 text-contrast">{{ queuePosition }}</dd>
@@ -82,7 +65,14 @@
 				</template>
 
 				<dt class="text-secondary">Applying for: </dt>
-				<dd class="m-0 text-contrast">{{ requestedStatus }}</dd>
+				<dd class="m-0 text-contrast">
+					<ProjectStatusBadge :status="requestedStatus" />
+				</dd>
+
+				<dt class="text-secondary">Status: </dt>
+				<dd class="m-0 text-contrast">
+					<ProjectStatusBadge :status="currentStatus" />
+				</dd>
 			</dl>
 
 			<div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2">
@@ -225,6 +215,10 @@ const updatedRelative = computed(() =>
 
 const requestedStatus = computed(() =>
 	props.project.requested_status ?? 'unknown',
+)
+
+const currentStatus = computed(() =>
+	props.project.status ?? 'unknown',
 )
 
 const queuePosition = computed(() => {
