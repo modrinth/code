@@ -62,7 +62,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils/parse'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { convertFileSrc, invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
@@ -99,6 +99,10 @@ import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import SurveyPopup from '@/components/ui/SurveyPopup.vue'
 import SyncInstancesUpdateModal from '@/components/ui/sync-instances-update-modal/index.vue'
+import {
+	markSyncInstancesUpdateNotificationShown,
+	shouldShowSyncInstancesUpdateNotification,
+} from '@/components/ui/sync-instances-update-modal/show-notification'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { useAppEvent } from '@/composables/use-app-event'
@@ -120,6 +124,7 @@ import {
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_user_many, get_version } from '@/helpers/cache.js'
+import { gameSettingsQueryOptions } from '@/helpers/game-options'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
 import {
 	can_current_user_use_shared_instances,
@@ -127,6 +132,7 @@ import {
 	run,
 	set_global_synced_option,
 } from '@/helpers/instance'
+import { maxMemoryQueryOptions } from '@/helpers/jre.js'
 import {
 	get as getCreds,
 	getAll as getAllCreds,
@@ -136,9 +142,22 @@ import {
 	setActive,
 } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
-import { appSettingsKeys, get as getSettings, set as setSettings } from '@/helpers/settings.ts'
+import {
+	appSettingsKeys,
+	appSettingsQueryOptions,
+	get as getSettings,
+	set as setSettings,
+} from '@/helpers/settings.ts'
+import { debugStartup, traceStartupStep } from '@/helpers/startup-debug'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { globalSyncedOptionsQueryOptions, syncedOptionsKeys } from '@/helpers/synced-options'
+import {
+	gameOptionsSyncSourcesQueryOptions,
+	globalSyncedOptionsQueryOptions,
+	initializedSyncedOptionsQueryOptions,
+	syncedOptionsKeys,
+	syncedServersQueryOptions,
+} from '@/helpers/synced-options'
+import { syncedPackQueryOptions } from '@/helpers/synced-packs'
 import { hasActivePride26Midas, hasMidasBadge } from '@/helpers/user-campaigns.ts'
 import { get_user_preferences } from '@/helpers/user-preferences.ts'
 import { parse_modrinth_user_link } from '@/helpers/users'
@@ -189,6 +208,7 @@ import {
 	appSettingsModalOpenSyncedOptionsKey,
 } from './providers/app-settings-modal'
 
+debugStartup('App setup entered')
 const appSettings = useAppSettings()
 const appTheme = useTheme()
 const quickInstances = useQuickInstanceLimit()
@@ -457,6 +477,24 @@ const globalSyncedOptionsQuery = useQuery({
 	...globalSyncedOptionsQueryOptions(),
 	enabled: computed(() => stateInitialized.value),
 })
+useQueries({
+	queries: computed(() =>
+		[
+			appSettingsQueryOptions(),
+			instanceListQueryOptions(),
+			maxMemoryQueryOptions(),
+			gameSettingsQueryOptions(),
+			initializedSyncedOptionsQueryOptions(),
+			gameOptionsSyncSourcesQueryOptions(),
+			syncedServersQueryOptions(),
+			syncedPackQueryOptions('resourcepack'),
+			syncedPackQueryOptions('datapack'),
+		].map((options) => ({
+			...options,
+			enabled: stateInitialized.value && options.enabled !== false,
+		})),
+	),
+})
 
 const criticalErrorMessage = ref()
 
@@ -724,7 +762,7 @@ function handleAdsConsentRequired(required) {
 
 async function setupApp() {
 	tags.initialize()
-	await onboardingChecklist.initialize()
+	await traceStartupStep('Initialize onboarding checklist', () => onboardingChecklist.initialize())
 
 	const {
 		native_decorations,
@@ -744,22 +782,30 @@ async function setupApp() {
 		developer_mode,
 		feature_flags,
 		pending_update_toast_for_version,
-	} = await getSettings()
+	} = await traceStartupStep('Read startup settings', getSettings)
 
 	// Initialize locale from saved settings
 	if (locale) {
-		await setLocale(locale)
+		await traceStartupStep('Apply startup locale', () => setLocale(locale))
 	}
 
 	Object.assign(appSettings.featureFlags, feature_flags)
-	isMaximized.value = await getCurrentWindow().isMaximized()
-	isFullscreen.value = await getCurrentWindow().isFullscreen()
-	os.value = await getOS()
-	const dev = await isDev()
+	isMaximized.value = await traceStartupStep('Read window maximized state', () =>
+		getCurrentWindow().isMaximized(),
+	)
+	isFullscreen.value = await traceStartupStep('Read window fullscreen state', () =>
+		getCurrentWindow().isFullscreen(),
+	)
+	os.value = await traceStartupStep('Read operating system', getOS)
+	const dev = await traceStartupStep('Read development mode', isDev)
 	isDevEnvironment.value = dev
-	const version = await getVersion()
+	const version = await traceStartupStep('Read app version', getVersion)
 	appSettings.nativeDecorations = native_decorations
-	if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
+	if (os.value !== 'MacOS') {
+		await traceStartupStep('Apply window decorations', () =>
+			getCurrentWindow().setDecorations(native_decorations),
+		)
+	}
 
 	appTheme.preferred = theme
 	appTheme.advancedRendering = advanced_rendering
@@ -774,19 +820,31 @@ async function setupApp() {
 	appSettings.showSkinSelectorInSidebar = show_skin_selector_in_sidebar
 	appSettings.devMode = developer_mode
 	stateInitialized.value = true
-	await nextTick()
+	debugStartup('App state initialized')
+	await traceStartupStep('Render initialized app', nextTick)
+	const isSyncUpdateVersion = version.startsWith('0.20.')
+	if (isSyncUpdateVersion && pending_update_toast_for_version !== version) {
+		markSyncInstancesUpdateNotificationShown()
+	}
 	if (
 		appSettings.getFeatureFlag('show_sync_instances_update_modal') ||
-		(pending_update_toast_for_version === version &&
-			(await queryClient.fetchQuery(instanceListQueryOptions())).length > 0)
+		(isSyncUpdateVersion &&
+			pending_update_toast_for_version === version &&
+			(
+				await traceStartupStep('Load instances for update notification', () =>
+					queryClient.fetchQuery(instanceListQueryOptions()),
+				)
+			).length > 0)
 	) {
 		showSyncInstancesUpdateNotification()
 	}
 
-	await getCurrentWindow().onResized(async () => {
-		isMaximized.value = await getCurrentWindow().isMaximized()
-		isFullscreen.value = await getCurrentWindow().isFullscreen()
-	})
+	await traceStartupStep('Register window resize listener', () =>
+		getCurrentWindow().onResized(async () => {
+			isMaximized.value = await getCurrentWindow().isMaximized()
+			isFullscreen.value = await getCurrentWindow().isFullscreen()
+		}),
+	)
 
 	if (telemetry) {
 		initAnalytics()
@@ -794,7 +852,7 @@ async function setupApp() {
 		trackEvent('Launched', { version, dev })
 	}
 
-	const osType = await type()
+	const osType = await traceStartupStep('Read operating system type', async () => type())
 	if (osType === 'macos') {
 		document.getElementsByTagName('html')[0].classList.add('mac')
 	} else {
@@ -830,20 +888,23 @@ async function setupApp() {
 			console.error('Failed to fetch news articles', error)
 		})
 
-	get_opening_command().then(handleCommand)
-	fetchCredentials()
+	traceStartupStep('Read opening command', get_opening_command).then(handleCommand)
+	traceStartupStep('Refresh startup credentials', fetchCredentials)
 
 	if (pending_update_toast_for_version !== null) {
-		const settings = await getSettings()
+		const settings = await traceStartupStep(
+			'Read settings to clear update notification',
+			getSettings,
+		)
 		settings.pending_update_toast_for_version = null
-		await setSettings(settings)
+		await traceStartupStep('Clear update notification', () => setSettings(settings))
 	}
 }
 
 const stateFailed = ref(false)
-initialize_state(appEventChannel)
+traceStartupStep('Initialize backend state', () => initialize_state(appEventChannel))
 	.then(() => {
-		setupApp().catch((err) => {
+		traceStartupStep('Initialize frontend state', setupApp).catch((err) => {
 			stateFailed.value = true
 			console.error(err)
 			error.showError(err, null, false, 'state_init')
@@ -860,9 +921,16 @@ const handleClose = async () => {
 	await getCurrentWindow().close()
 }
 
-const loading = setupLoadingStateProvider()
+const loading = setupLoadingStateProvider(() => ({
+	stateInitialized: stateInitialized.value,
+	stateFailed: stateFailed.value,
+	initialStatePending: !!initialLoadToken,
+	navigationPending: !!routerToken,
+	routeSuspensePending: !!suspenseToken,
+	route: route.path,
+}))
 loading.setEnabled(false)
-let initialLoadToken = loading.begin()
+let initialLoadToken = loading.begin('Initial app state')
 let routerToken = null
 let suspenseToken = null
 
@@ -875,12 +943,14 @@ const sidebarOverlayScrollbarsOptions = Object.freeze({
 	},
 })
 
-router.beforeEach(() => {
+router.beforeEach((to, from) => {
+	debugStartup('Route navigation started', { to: to.path, from: from.path })
 	suspensePending = false
 	if (routerToken) loading.end(routerToken)
-	routerToken = loading.begin()
+	routerToken = loading.begin(`Route navigation: ${to.path}`)
 })
 router.afterEach((to, from, failure) => {
+	debugStartup('Route navigation settled', { to: to.path, failed: !!failure })
 	updateHistoryNavigationState()
 	trackEvent('PageView', {
 		path: to.path,
@@ -888,6 +958,11 @@ router.afterEach((to, from, failure) => {
 		failed: failure,
 	})
 	setTimeout(() => {
+		debugStartup('Route loading release check', {
+			route: to.path,
+			suspensePending,
+			stateInitialized: stateInitialized.value,
+		})
 		if (!suspensePending && stateInitialized.value) {
 			if (initialLoadToken) {
 				loading.end(initialLoadToken)
@@ -902,12 +977,14 @@ router.afterEach((to, from, failure) => {
 })
 
 function onSuspensePending() {
+	debugStartup('Route Suspense pending', { route: route.path })
 	suspensePending = true
 	if (suspenseToken) loading.end(suspenseToken)
-	suspenseToken = loading.begin()
+	suspenseToken = loading.begin(`Route Suspense: ${route.path}`)
 }
 
 function onSuspenseResolve() {
+	debugStartup('Route Suspense resolved', { route: route.path })
 	if (suspenseToken) {
 		loading.end(suspenseToken)
 		suspenseToken = null
@@ -921,6 +998,7 @@ function onSuspenseResolve() {
 const queryClient = useQueryClient()
 
 watch(stateInitialized, (ready) => {
+	debugStartup('State readiness changed', { ready })
 	if (ready) {
 		if (initialLoadToken) {
 			loading.end(initialLoadToken)
@@ -1070,6 +1148,8 @@ function showSyncInstancesUpdateNotification() {
 	) {
 		return
 	}
+
+	if (!shouldShowSyncInstancesUpdateNotification()) return
 
 	const notification = addPopupNotification({
 		contentType: 'standard',
@@ -1266,12 +1346,15 @@ async function fetchCredentials() {
 	const refreshId = ++credentialsRefreshId
 	credentials.value = undefined
 
-	const creds = await getCreds().catch(handleError)
+	const creds = await traceStartupStep('Read stored credentials', getCreds).catch(handleError)
 	if (refreshId !== credentialsRefreshId) return
 	if (!creds && hadSession) clearLiveNotifications()
 
 	if (creds && creds.user_id) {
-		if (creds.session && !(await validateSession(creds.session))) {
+		if (
+			creds.session &&
+			!(await traceStartupStep('Validate stored session', () => validateSession(creds.session)))
+		) {
 			if (refreshId !== credentialsRefreshId) return
 
 			clearLiveNotifications()
@@ -1283,12 +1366,14 @@ async function fetchCredentials() {
 			await fetchStoredModrinthAccounts()
 			return
 		}
-		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
+		creds.user = await traceStartupStep('Fetch signed-in user', () =>
+			get_user(creds.user_id, 'bypass'),
+		).catch(handleError)
 		if (refreshId !== credentialsRefreshId) return
 	}
 	credentials.value = creds ?? null
 	liveNotificationsEnabled = !!creds?.session
-	await fetchStoredModrinthAccounts()
+	await traceStartupStep('Load stored account profiles', fetchStoredModrinthAccounts)
 }
 
 async function signIn(flow = 'sign-in', addAccount = false) {
@@ -2127,9 +2212,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</span>
 			</div>
 		</Transition>
-		<Suspense>
-			<AppSettingsModal ref="appSettingsModal" />
-		</Suspense>
+		<AppSettingsModal ref="appSettingsModal" />
 		<SyncInstancesUpdateModal ref="syncInstancesUpdateModal" />
 		<Suspense>
 			<ModrinthAccountRequiredModal ref="modrinthLoginModal" :request-auth="requestModrinthAuth" />

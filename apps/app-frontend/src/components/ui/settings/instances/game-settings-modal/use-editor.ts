@@ -1,12 +1,14 @@
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type MaybeRefOrGetter, nextTick, onScopeDispose, ref, toValue } from 'vue'
+import { computed, type MaybeRefOrGetter, nextTick, onScopeDispose, ref, toValue, watch } from 'vue'
 
 import {
 	type EditableGameSetting,
 	type GameOptionCanonicalValue,
 	type GameSettingChange,
 	type GameSettingsEditorState,
+	gameSettingsKeys,
+	gameSettingsQueryOptions,
 	get_local_game_options_config,
 	get_synced_game_options_config,
 	preview_local_game_option_changes,
@@ -17,12 +19,6 @@ import {
 } from '@/helpers/game-options'
 
 import { canonicalValuesEqual, cloneGameSettingsState, gameSettingChanges } from './editors'
-
-function editorQueryKey(instanceId?: string) {
-	return instanceId
-		? (['game-settings', 'local', instanceId] as const)
-		: (['game-settings', 'synced'] as const)
-}
 
 export function useGameSettingsEditor(
 	instanceId: MaybeRefOrGetter<string | undefined>,
@@ -71,18 +67,15 @@ export function useGameSettingsEditor(
 			) ?? false,
 	)
 	const stateQuery = useQuery(
-		computed(() => {
-			const instanceId = editorInstanceId.value
-			return {
-				queryKey: editorQueryKey(instanceId),
-				queryFn: () =>
-					instanceId ? get_local_game_options_config(instanceId) : get_synced_game_options_config(),
-				enabled: false,
-				retry: false,
-			}
-		}),
+		computed(() => ({
+			...gameSettingsQueryOptions(editorInstanceId.value),
+			enabled: false,
+		})),
 	)
-	const loading = computed(() => stateQuery.isPending.value || stateQuery.isFetching.value)
+	const loading = computed(
+		() => !draftState.value && (stateQuery.isPending.value || stateQuery.isFetching.value),
+	)
+	const loadError = computed(() => !draftState.value && stateQuery.isError.value)
 	const previewMutation = useMutation({
 		mutationFn: ({
 			instanceId,
@@ -100,21 +93,38 @@ export function useGameSettingsEditor(
 		onError: handleError,
 	})
 
+	function applyState(state: GameSettingsEditorState) {
+		baseState.value = cloneGameSettingsState(state)
+		draftState.value = cloneGameSettingsState(state)
+		touchedValueOptionIds.value = new Set()
+	}
+
+	watch(stateQuery.data, (state) => {
+		if (state && draftState.value && !isDirty.value && !saveMutation.isPending.value) {
+			applyState(state)
+		}
+	})
+
 	async function load() {
 		const generation = ++loadGeneration
 		cancelPreview()
 		editorInstanceId.value = toValue(instanceId)
+		const options = gameSettingsQueryOptions(editorInstanceId.value)
+		const cached = !editorInstanceId.value && queryClient.getQueryData(options.queryKey)
+		if (cached) {
+			applyState(cached)
+			void queryClient.prefetchQuery(options)
+			return true
+		}
 		await nextTick()
-		const result = await stateQuery.refetch()
+		const result = await stateQuery.refetch({ cancelRefetch: false })
 		if (generation !== loadGeneration) return false
 		if (result.isError) {
 			handleError(result.error)
 			return false
 		}
 		if (!result.data) return false
-		baseState.value = cloneGameSettingsState(result.data)
-		draftState.value = cloneGameSettingsState(result.data)
-		touchedValueOptionIds.value = new Set()
+		applyState(result.data)
 		return true
 	}
 
@@ -320,6 +330,9 @@ export function useGameSettingsEditor(
 		baseState.value = cloneGameSettingsState(optimisticState)
 		touchedValueOptionIds.value = new Set()
 		try {
+			await queryClient.cancelQueries({
+				queryKey: gameSettingsQueryOptions(targetInstanceId).queryKey,
+			})
 			const result = targetInstanceId
 				? await save_local_game_option_changes(targetInstanceId, request)
 				: await save_synced_game_option_changes(request)
@@ -328,7 +341,10 @@ export function useGameSettingsEditor(
 				(targetInstanceId
 					? await get_local_game_options_config(targetInstanceId)
 					: await get_synced_game_options_config())
-			queryClient.setQueryData(editorQueryKey(targetInstanceId), refreshed)
+			queryClient.setQueryData(gameSettingsQueryOptions(targetInstanceId).queryKey, refreshed)
+			if (targetInstanceId) {
+				void queryClient.invalidateQueries({ queryKey: gameSettingsKeys.synced })
+			}
 			if (result.conflicts?.length) {
 				if (generation !== saveGeneration || !draftState.value) return
 				previewGeneration++
@@ -396,7 +412,7 @@ export function useGameSettingsEditor(
 		isDirty,
 		hasBlockingDraft,
 		loading,
-		loadError: stateQuery.isError,
+		loadError,
 		saving: saveMutation.isPending,
 		load,
 		reset,

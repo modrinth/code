@@ -575,12 +575,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Lưu nội dung bạn yêu thích và nhận cập nhật chỉ với một cú nhấp chuột."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Theo dõi các dự án"
-  },
   "app-marketing.features.importing.description": {
     "message": "Nhập tất cả các hồ sơ yêu thích của bạn từ trình khởi chạy bạn đã sử dụng trước đó và bắt đầu với Modrinth App chỉ trong vài giây!"
   },
@@ -617,12 +611,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Phiên bản"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Chơi các mod của bạn, dù bạn có kết nối Internet hay không."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Chế độ ngoại tuyến"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Trình khởi chạy của Modrinth là mã nguồn mở hoàn toàn. Bạn có thể xem mã nguồn trên <github-link>GitHub</github-link> của chúng tôi!"
   },
@@ -646,15 +634,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "cânnặngmẹbạn MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Ứng dụng Modrinth"

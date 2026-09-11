@@ -45,6 +45,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                     let instance_ids = event_instance_ids.read().await;
                     let mut visited_instances = Vec::new();
                     let mut visited_screenshot_instances = Vec::new();
+                    let mut pack_instances = HashSet::new();
                     let mut synced_option_files =
                         HashMap::<String, HashSet<String>>::new();
 
@@ -79,6 +80,11 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 .skip_while(|x| x.as_os_str() != instance_path)
                                 .nth(1)
                                 .map(|x| x.as_os_str());
+                            if first_file_name.as_ref().is_some_and(|name| {
+                                *name == "resourcepacks" || *name == "datapacks"
+                            }) {
+                                pack_instances.insert(instance_id.clone());
+                            }
                             let is_screenshot_event = first_file_name
                                 .as_ref()
                                 .is_some_and(|name| *name == "screenshots");
@@ -211,11 +217,6 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                                 "Failed to sync instance content after filesystem change: {error}"
                                             );
 										}
-                                        if sync_content
-											&& let Err(error) = crate::api::instance::reconcile_synced_packs(&emit_instance_id).await
-										{
-											tracing::error!("Failed to reconcile synced packs after filesystem change: {error}");
-										}
                                         if reconcile_screenshots
                                             && let Err(error) =
                                                 crate::api::instance::reconcile_screenshots(
@@ -244,6 +245,11 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                         }
                     }
 
+                    for instance_id in pack_instances {
+                        crate::api::instance::queue_synced_pack_reconciliation(
+                            &instance_id,
+                        );
+                    }
                     for (instance_id, file_names) in synced_option_files {
                         tokio::spawn(async move {
                             for file_name in file_names {

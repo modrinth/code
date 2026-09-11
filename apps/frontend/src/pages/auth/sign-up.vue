@@ -100,7 +100,6 @@ useHead({
 	title: () => `${formatMessage(messages.title)} - Modrinth`,
 })
 
-const auth = await useAuth()
 const route = useNativeRoute()
 const pendingSignInOAuthProvider = useStorage(
 	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
@@ -118,10 +117,6 @@ const lastSignInOAuthProvider = useStorage(
 const redirectTarget = getQueryString(route.query.redirect)
 const showOtherOptions = ref(false)
 const isCreateAccountStep = ref(false)
-
-if (auth.value.user) {
-	await navigateTo(`/user/${auth.value.user.username}`)
-}
 
 const captcha = ref<{ reset?: () => void } | null>(null)
 const setCaptchaRef = (captchaRef: unknown) => {

@@ -36,8 +36,10 @@ import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { showInstanceInFolder } from '@/helpers/utils'
+import { injectServerInstall } from '@/providers/server-install'
 
 const { handleError } = injectNotificationManager()
+const { playServerProject } = injectServerInstall()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
@@ -102,26 +104,36 @@ const loader = computed(() => {
 
 const loading = ref(false)
 const playing = ref(false)
+const installing = computed(() => props.instance.install_stage.includes('installing'))
 
 const play = async (event: MouseEvent) => {
 	event?.stopPropagation()
-	if (props.instance.quarantined) return
+	if (playDisabled.value) return
 	loading.value = true
-	const launched = await run(props.instance.id)
-		.then(() => true)
-		.catch((err) => {
-			handleSevereError(err, { instanceId: props.instance.id })
-			return false
-		})
-		.finally(() => {
+	const instance = props.instance
+	const serverProjectId =
+		instance.link?.type === 'server_project' || instance.link?.type === 'server_project_modpack'
+			? (instance.link.project_id ?? instance.link.server_project_id)
+			: undefined
+	try {
+		if (serverProjectId) {
+			await playServerProject(serverProjectId)
+			const processes = await get_by_instance_id(instance.id)
+			if (processes.length > 0) emit('play')
+		} else {
+			await run(instance.id)
+			emit('play')
 			trackEvent('InstanceStart', {
-				loader: props.instance.loader,
-				game_version: props.instance.game_version,
+				loader: instance.loader,
+				game_version: instance.game_version,
 				source: 'InstanceItem',
 			})
-		})
-	if (launched) emit('play')
-	loading.value = false
+		}
+	} catch (err) {
+		handleSevereError(err, { instanceId: instance.id })
+	} finally {
+		loading.value = false
+	}
 }
 
 const stop = async (event: MouseEvent) => {
@@ -153,7 +165,14 @@ onMounted(() => {
 
 const cardOptions = useTemplateRef('cardOptions')
 const showStop = computed(() => playing.value && !loading.value)
-const playDisabled = computed(() => props.instance.quarantined || playing.value || loading.value)
+const playDisabled = computed(
+	() => props.instance.quarantined || playing.value || loading.value || installing.value,
+)
+
+const seeInstance = async () => {
+	if (installing.value) return
+	await router.push(`/instance/${encodeURIComponent(props.instance.id)}`)
+}
 
 const overflowOptions = computed((): ButtonMenuOption[] => [
 	{
@@ -161,7 +180,8 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		label: formatMessage(messages.viewInstance),
 		icon: EyeIcon,
 		shown: !!props.instance.id,
-		action: () => router.push(encodeURI(`/instance/${props.instance.id}`)),
+		disabled: installing.value,
+		action: seeInstance,
 	},
 	{
 		id: 'open-folder',
@@ -182,8 +202,10 @@ const contextMenuOptions = computed((): ButtonMenuOption[] => [
 			}
 		: {
 				id: 'play',
-				label: formatMessage(commonMessages.playButton),
-				icon: PlayIcon,
+				label: formatMessage(
+					installing.value ? commonMessages.installingLabel : commonMessages.playButton,
+				),
+				icon: installing.value ? SpinnerIcon : PlayIcon,
 				tone: 'brand',
 				disabled: playDisabled.value,
 				tooltip: props.instance.quarantined
@@ -204,7 +226,7 @@ function openContextMenu(event: MouseEvent) {
 <template>
 	<div @contextmenu.prevent.stop="openContextMenu">
 		<SmartClickable class="[--active-scale:0.99]">
-			<template #clickable>
+			<template v-if="!installing" #clickable>
 				<router-link
 					class="no-click-animation"
 					:to="`/instance/${encodeURIComponent(instance.id)}`"
@@ -277,9 +299,11 @@ function openContextMenu(event: MouseEvent) {
 						color="green"
 						@click="play"
 					>
-						<SpinnerIcon v-if="loading" class="animate-spin" />
+						<SpinnerIcon v-if="loading || installing" class="animate-spin" />
 						<PlayIcon v-else aria-hidden="true" />
-						{{ formatMessage(commonMessages.playButton) }}
+						{{
+							formatMessage(installing ? commonMessages.installingLabel : commonMessages.playButton)
+						}}
 					</Button>
 					<TeleportOverflowMenu
 						type="quiet"

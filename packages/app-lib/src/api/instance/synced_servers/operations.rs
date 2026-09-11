@@ -3,6 +3,7 @@ use super::super::synced_options::{
     instance_dir, instance_is_running, instance_option_enabled,
     instance_option_supported, sha1_bytes, sha1_file, sync_files_are_protected,
 };
+use crate::api::worlds::time_world_load;
 use crate::state::{InstanceMetadata, SyncedOption};
 use crate::{ErrorKind, State};
 use quartz_nbt::NbtCompound;
@@ -20,7 +21,7 @@ use super::modpack::{
 use super::storage::{
     begin_server_checkpoint, canonical_exists, commit_server_state,
     generated_path, load_local, load_projection_entries, read_canonical,
-    server_revision, write_local,
+    read_server_snapshot, server_revision, write_local,
 };
 use super::types::{
     CanonicalServer, DesyncServerMode, LocalServer, ProjectionEntry,
@@ -389,12 +390,29 @@ fn match_projection_entries<'a>(
         .collect()
 }
 
+#[tracing::instrument(name = "server_records", skip_all, fields(instance_id = %metadata.instance.id))]
 pub(crate) async fn list_server_records(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<Vec<ServerRecord>> {
-    let _guard = state.lock_synced_options().await;
-    list_server_records_locked(metadata, state).await
+    if time_world_load(
+        "server_sync_participation",
+        participating(metadata, state),
+    )
+    .await?
+    {
+        let (canonical, locals) = time_world_load(
+            "server_records_snapshot",
+            read_server_snapshot(&metadata.instance.id, state),
+        )
+        .await?;
+        return Ok(merge_server_records(canonical, locals));
+    }
+    time_world_load(
+        "read_local_server_records",
+        list_local_server_records(metadata, state),
+    )
+    .await
 }
 
 async fn list_server_records_locked(
@@ -404,6 +422,13 @@ async fn list_server_records_locked(
     if participating(metadata, state).await? {
         return compose_records(metadata, state).await;
     }
+    list_local_server_records(metadata, state).await
+}
+
+async fn list_local_server_records(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<Vec<ServerRecord>> {
     Ok(
         read_servers(&instance_dir(metadata, state).join(SERVERS_FILE))
             .await?
@@ -447,7 +472,19 @@ pub(crate) async fn ensure_managed_server(
             .position(ServerRecord::hidden)
             .unwrap_or(records.len())
     });
-    let data = existing.map(|record| record.data.clone()).unwrap_or(data);
+    let data = existing
+        .map(|record| {
+            let mut existing_data = record.data.clone();
+            if record.hidden() {
+                existing_data.insert(
+                    "name",
+                    data.get::<_, &str>("name").unwrap_or_default().to_string(),
+                );
+                existing_data.insert("hidden", 0_i8);
+            }
+            existing_data
+        })
+        .unwrap_or(data);
     let excluded_synced_server_id = existing
         .filter(|record| record.source == ServerSource::UserSynced)
         .map(|record| record.id.clone());
@@ -458,7 +495,7 @@ pub(crate) async fn ensure_managed_server(
     {
         let excluded_synced_server_id = excluded_synced_server_id
             .or_else(|| local.excluded_synced_server_id.clone());
-        if existing.is_some()
+        if existing.is_some_and(|record| record.data == data)
             && local.data == data
             && local.position == position as i64
             && local.excluded_synced_server_id == excluded_synced_server_id
@@ -483,12 +520,16 @@ pub(crate) async fn ensure_managed_server(
         if effective(metadata, state).await? {
             compose_instance(metadata, state).await?;
         }
-    } else if existing.is_none() {
+    } else if existing.is_none_or(|record| record.data != data) {
         let mut servers = records
             .into_iter()
             .map(|record| record.data)
             .collect::<Vec<_>>();
-        servers.insert(position, data);
+        if let Some(index) = existing_index {
+            servers[index] = data;
+        } else {
+            servers.insert(position, data);
+        }
         write_servers(&path, &servers).await?;
     }
     Ok(())
@@ -827,6 +868,13 @@ async fn compose_records(
 ) -> crate::Result<Vec<ServerRecord>> {
     let canonical = read_canonical(state).await?;
     let locals = load_local(&metadata.instance.id, state).await?;
+    Ok(merge_server_records(canonical, locals))
+}
+
+fn merge_server_records(
+    canonical: Vec<CanonicalServer>,
+    locals: Vec<LocalServer>,
+) -> Vec<ServerRecord> {
     let exclusions = locals
         .iter()
         .filter_map(|server| server.excluded_synced_server_id.as_deref())
@@ -855,7 +903,7 @@ async fn compose_records(
             },
         );
     }
-    Ok(records)
+    records
 }
 
 async fn regenerate_servers(state: &State) -> crate::Result<()> {
