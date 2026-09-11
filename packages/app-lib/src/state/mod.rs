@@ -90,6 +90,7 @@ pub struct State {
     /// Serializes canonical synced-option mutations and checkpoint updates.
     synced_options_lock: Mutex<()>,
     pub(crate) game_locale_indexer: crate::api::instance::GameLocaleIndexer,
+    pub(crate) pack_sync_worker: crate::api::instance::PackSyncWorker,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -305,6 +306,7 @@ impl State {
             synced_options_lock: Mutex::new(()),
             game_locale_indexer:
                 crate::api::instance::GameLocaleIndexer::default(),
+            pack_sync_worker: Default::default(),
             discord_rpc,
             process_manager,
             friends_socket,

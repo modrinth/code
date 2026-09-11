@@ -26,7 +26,9 @@ async fn connect_app_db(db_path: &Path) -> crate::Result<Pool<Sqlite>> {
     open_migrated_app_db(db_path).await
 }
 
-async fn open_migrated_app_db(db_path: &Path) -> crate::Result<Pool<Sqlite>> {
+pub(crate) async fn open_migrated_app_db(
+    db_path: &Path,
+) -> crate::Result<Pool<Sqlite>> {
     let pool = open_app_db_pool(db_path).await?;
 
     if let Err(err) = stale_data_cleanup(&pool).await {

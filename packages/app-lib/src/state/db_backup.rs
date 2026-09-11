@@ -113,7 +113,9 @@ pub(crate) async fn maybe_backup_existing_app_db(
     Ok(())
 }
 
-async fn open_read_only_db(db_path: &Path) -> crate::Result<SqliteConnection> {
+pub(crate) async fn open_read_only_db(
+    db_path: &Path,
+) -> crate::Result<SqliteConnection> {
     let conn_options = SqliteConnectOptions::new()
         .filename(db_path)
         .busy_timeout(Duration::from_secs(30))
@@ -241,7 +243,7 @@ fn sanitize_version_for_filename(version: &str) -> String {
     }
 }
 
-async fn create_sqlite_snapshot(
+pub(crate) async fn create_sqlite_snapshot(
     conn: &mut SqliteConnection,
     backup_path: &Path,
 ) -> crate::Result<()> {

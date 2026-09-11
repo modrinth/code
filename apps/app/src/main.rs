@@ -4,6 +4,9 @@
 )]
 #![recursion_limit = "256"]
 
+#[cfg(all(feature = "seed-production-data", feature = "updater"))]
+compile_error!("Production-seeded test builds must not enable the updater.");
+
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
 use std::sync::atomic::Ordering;
@@ -30,6 +33,9 @@ async fn initialize_state(
 ) -> api::Result<()> {
     tracing::info!("Initializing app event state...");
     theseus::EventState::init(app.clone(), events).await?;
+
+    #[cfg(all(target_os = "windows", feature = "seed-production-data"))]
+    theseus::seed_production_data_once(&app.config().identifier).await?;
 
     tracing::info!("Initializing app state...");
     State::init(app.config().identifier.clone()).await?;
@@ -136,6 +142,19 @@ fn main() {
     */
 
     let tauri_context = tauri::generate_context!();
+
+    #[cfg(all(target_os = "windows", feature = "seed-production-data"))]
+    if let Err(error) = theseus::validate_production_seed_target(
+        &tauri_context.config().identifier,
+    ) {
+        let _ = DialogBuilder::message()
+            .set_level(MessageLevel::Error)
+            .set_title("Cannot initialize test app")
+            .set_text(error.to_string())
+            .alert()
+            .show();
+        return;
+    }
 
     let _log_guard = theseus::start_logger(&tauri_context.config().identifier);
 

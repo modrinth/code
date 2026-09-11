@@ -135,6 +135,7 @@ windows-core = { workspace = true }
 winreg = { workspace = true }
 
 [features]
+seed-production-data = []
 cli = ["dep:indicatif"]
 export-ts = ["dep:postcard-bindgen", "dep:ts-rs"]
 tauri = ["dep:postcard", "dep:tauri"]

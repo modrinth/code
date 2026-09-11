@@ -18,6 +18,13 @@ mod launcher;
 mod logger;
 mod state;
 
+#[cfg(feature = "seed-production-data")]
+mod production_seed;
+#[cfg(feature = "seed-production-data")]
+pub use production_seed::{
+    seed_production_data_once, validate_production_seed_target,
+};
+
 pub use api::*;
 pub use error::*;
 #[cfg(feature = "export-ts")]

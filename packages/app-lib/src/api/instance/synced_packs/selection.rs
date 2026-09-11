@@ -6,7 +6,7 @@ use super::super::synced_options::{get_global_options, instance_dir};
 use super::reconciliation::participating;
 use super::selection_compatibility;
 use super::{PackLibrary, PackPlacement, SyncedPack};
-use crate::state::instances::commands;
+use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
     ContentSourceKind, InstanceMetadata, ProjectType, State, SyncedOption,
 };
@@ -40,29 +40,54 @@ fn target_entry(metadata: &InstanceMetadata, entry: String) -> String {
     }
 }
 
-async fn local_file(
+async fn local_sources(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<BTreeMap<String, ContentSourceKind>> {
+    let (files, entries) = tokio::try_join!(
+        content_rows::get_instance_files(&metadata.instance.id, &state.pool),
+        content_rows::get_content_entries(
+            &metadata.applied_content_set.id,
+            &state.pool
+        ),
+    )?;
+    let mut kinds = BTreeMap::new();
+    for entry in entries {
+        if let Some(id) = entry.file_id {
+            kinds.entry(id).or_insert(entry.source_kind);
+        }
+    }
+    Ok(files
+        .into_iter()
+        .filter_map(|file| {
+            kinds
+                .get(&file.id)
+                .copied()
+                .map(|kind| (file.relative_path, kind))
+        })
+        .collect())
+}
+
+fn local_file(
     metadata: &InstanceMetadata,
     path: &str,
     state: &State,
-) -> crate::Result<bool> {
-    if path.is_empty() || !instance_dir(metadata, state).join(path).exists() {
-        return Ok(false);
-    }
-    let kind = commands::content_source_kind_for_project_path(
-        &metadata.instance.id,
-        path,
-        state,
-    )
-    .await?;
-    Ok(kind.is_none_or(|kind| kind == ContentSourceKind::Local))
+    sources: &BTreeMap<String, ContentSourceKind>,
+) -> bool {
+    !path.is_empty()
+        && instance_dir(metadata, state).join(path).exists()
+        && sources
+            .get(path)
+            .is_none_or(|kind| *kind == ContentSourceKind::Local)
 }
 
-async fn can_capture(
+fn can_capture(
     metadata: &InstanceMetadata,
     pack: &SyncedPack,
     placement: &PackPlacement,
     state: &State,
-) -> crate::Result<bool> {
+    sources: &BTreeMap<String, ContentSourceKind>,
+) -> bool {
     if pack.item.project_type != ProjectType::ResourcePack
         || !pack.item.enabled
         || !placement.enabled
@@ -73,9 +98,9 @@ async fn can_capture(
         || placement.path.ends_with(".disabled")
         || placement.content_set_id != metadata.applied_content_set.id
     {
-        return Ok(false);
+        return false;
     }
-    local_file(metadata, &placement.path, state).await
+    local_file(metadata, &placement.path, state, sources)
 }
 
 pub(super) async fn selected_in_instance(
@@ -102,6 +127,7 @@ pub(super) async fn capture_source_order(
     else {
         return Ok(());
     };
+    let sources = local_sources(metadata, state).await?;
     let mut known_entries = BTreeMap::new();
     for (id, placement) in library
         .instances
@@ -114,7 +140,7 @@ pub(super) async fn capture_source_order(
         };
         if pack.selected != Some(true)
             || placement.resource_pack_selection_pending
-            || !can_capture(metadata, pack, placement, state).await?
+            || !can_capture(metadata, pack, placement, state, &sources)
         {
             continue;
         }
@@ -177,6 +203,7 @@ pub(super) async fn capture(
     else {
         return Ok(None);
     };
+    let sources = local_sources(metadata, state).await?;
     let entries = options.entries;
     let mut game_format = None;
     let previous = library
@@ -197,7 +224,7 @@ pub(super) async fn capture(
             continue;
         };
         if !participating(metadata, pack, global)
-            || !can_capture(metadata, pack, &placement, state).await?
+            || !can_capture(metadata, pack, &placement, state, &sources)
         {
             continue;
         }
@@ -379,6 +406,7 @@ pub(super) async fn apply(
     {
         return Ok(());
     }
+    let sources = local_sources(metadata, state).await?;
     let mut managed = BTreeSet::new();
     for placement in previous_placements.values() {
         if placement.excluded
@@ -428,7 +456,7 @@ pub(super) async fn apply(
             || placement.pending
             || placement.error.is_some()
             || placement.content_set_id != metadata.applied_content_set.id
-            || !local_file(metadata, &placement.path, state).await?
+            || !local_file(metadata, &placement.path, state, &sources)
         {
             continue;
         }

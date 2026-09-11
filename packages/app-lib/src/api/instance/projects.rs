@@ -41,7 +41,13 @@ pub async fn update_all_projects(
         &state,
     )
     .await?;
-    super::synced_packs::reconcile_after_content_change(instance_id).await;
+    if map
+        .keys()
+        .chain(map.values())
+        .any(|path| super::synced_packs::is_pack_path(path))
+    {
+        super::synced_packs::reconcile_after_content_change(instance_id).await;
+    }
     emit_loading(&loading_bar, 100.0, Some("Updated instance"))?;
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
@@ -68,7 +74,11 @@ pub async fn update_project(
         &state,
     )
     .await?;
-    super::synced_packs::reconcile_after_content_change(instance_id).await;
+    if super::synced_packs::is_pack_path(project_path)
+        || super::synced_packs::is_pack_path(&path)
+    {
+        super::synced_packs::reconcile_after_content_change(instance_id).await;
+    }
     if !skip_send_event.unwrap_or(false) {
         emit_instance(instance_id, InstancePayloadType::Edited).await?;
     }
@@ -218,7 +228,11 @@ pub async fn switch_project_version_with_dependencies(
             &state,
         )
         .await?;
-    super::synced_packs::reconcile_after_content_change(instance_id).await;
+    if super::synced_packs::is_pack_path(project_path)
+        || super::synced_packs::is_pack_path(&path)
+    {
+        super::synced_packs::reconcile_after_content_change(instance_id).await;
+    }
     emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
 
     Ok(path)
@@ -277,7 +291,9 @@ pub async fn toggle_disable_project(
         &state,
     )
     .await?;
-    super::synced_packs::reconcile_after_content_change(instance_id).await;
+    if super::synced_packs::is_pack_path(project) {
+        super::synced_packs::reconcile_after_content_change(instance_id).await;
+    }
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(res)
@@ -297,7 +313,9 @@ pub async fn remove_project(
         &state,
     )
     .await?;
-    super::synced_packs::reconcile_after_content_change(instance_id).await;
+    if super::synced_packs::is_pack_path(project) {
+        super::synced_packs::reconcile_after_content_change(instance_id).await;
+    }
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(())
