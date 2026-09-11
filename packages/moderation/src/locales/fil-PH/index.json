@@ -77,9 +77,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Magdagdag ng image alt text"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Ilipat ang anyaya sa Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Bisitahin ang moderation thread"
   },
@@ -162,4 +159,3 @@
     "defaultMessage": "Bisitahin ang mga setting sa mga link"
   }
 }
-

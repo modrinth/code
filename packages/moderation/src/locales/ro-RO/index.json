@@ -35,12 +35,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selectează etichete precise"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "Link-ul “{url}‷ nu este permis ca un link extern."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Șterge link-uri interzise"
-  },
   "nags.description-too-short.title": {
     "defaultMessage": "Extinde descrierea"
   },
@@ -73,9 +67,6 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Oferă codul sursă"
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Șterge link-urile identice"
   },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Modifică textul imagini galeriei"
@@ -116,9 +107,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Adaugă text alternativ imaginii"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Mută invitația de Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Vizitează discuția cu moderatorii"
   },
@@ -130,9 +118,6 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selectează rezoluția corectă"
-  },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "Link-ul \"{fullUrl}\" nu este permis în descripția proiectului."
   },
   "nags.project-description-spam.description": {
     "defaultMessage": "Caractere repetate, cuvinte, sau fraze nu pot fii folosite pentru a mări descripția proiectului tău."
@@ -279,4 +264,3 @@
     "defaultMessage": "Numele proiectelor nu ar trebui sa includă numere de versiune."
   }
 }
-

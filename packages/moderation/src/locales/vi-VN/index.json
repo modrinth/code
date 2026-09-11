@@ -89,9 +89,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Thêm văn bản thay thế cho hình ảnh"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Di chuyển liên kết mời Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Truy cập luồng kiểm duyệt"
   },
@@ -180,4 +177,3 @@
     "defaultMessage": "Truy cập cài đặt liên kết"
   }
 }
-

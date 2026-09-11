@@ -89,9 +89,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "הוסף טקסט חלופי לתמונה"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "העבר את הזמנת הדיסקורד"
-  },
   "nags.moderation.title": {
     "defaultMessage": "בקר בשרשור פיקוח ובקרה"
   },
@@ -217,12 +214,6 @@
   },
   "nags.upload-version.title": {
     "defaultMessage": "העלה גרסה"
-  },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "חלק מהקישורים החיצוניים שלך מובילים לדומיינים שאינם מתאימים לסוג הקישור הזה."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "ראה קישורים חיצוניים"
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "בקר בהגדרות הקישורים"

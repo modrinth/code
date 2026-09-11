@@ -92,9 +92,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "이미지 대체 텍스트 추가"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "디스코드 초대 이동"
-  },
   "nags.moderation.title": {
     "defaultMessage": "관리 스레드 방문"
   },
@@ -195,4 +192,3 @@
     "defaultMessage": "링크 설정 방문"
   }
 }
-

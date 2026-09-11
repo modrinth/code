@@ -77,9 +77,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Tambahkan teks alt gambar"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Pindahkan pautan jemputan Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Kunjungi bebenang penyederhanaan"
   },
@@ -162,4 +159,3 @@
     "defaultMessage": "Kunjungi tetapan pautan"
   }
 }
-

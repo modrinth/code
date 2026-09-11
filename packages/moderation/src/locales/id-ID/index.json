@@ -89,9 +89,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Tambahkan teks alt gambar"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Pindahkan tautan undangan Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Kunjungi utas moderasi"
   },
@@ -180,4 +177,3 @@
     "defaultMessage": "Kunjungi pengaturan tautan"
   }
 }
-

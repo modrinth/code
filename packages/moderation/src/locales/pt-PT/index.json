@@ -83,9 +83,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Adiciona texto alternativo à imagem"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Move o convite de Discord"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Visita o tópico de moderação"
   },
@@ -165,4 +162,3 @@
     "defaultMessage": "Vê as definições de links"
   }
 }
-

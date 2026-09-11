@@ -53,12 +53,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecteer relevante tags"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "De link \"{url}\" is niet toegestaan als externe link."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Verwijder verboden links"
-  },
   "nags.check-disclosures.description": {
     "defaultMessage": "Zorg ervoor dat gebruikers op de hoogte zijn van belangrijke details door bekendmakingen over inhoud die van toepassing is op uw {type} in te vullen."
   },
@@ -125,12 +119,6 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
-  "nags.identical-links.description": {
-    "defaultMessage": "Sommige van uw externe links lijken identiek te zijn. Elke link hoort maar één keer ingevuld te worden, met de juiste linksoort."
-  },
-  "nags.identical-links.title": {
-    "defaultMessage": "Identieke links opschonen"
-  },
   "nags.invalid-gallery-text.title": {
     "defaultMessage": "Wijzig galerijafbeelding tekst"
   },
@@ -173,12 +161,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Alt-tekst voor afbeelding toevoegen"
   },
-  "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord-uitnodigingen kunnen niet worden gebruikt voor andere soorten links. Plaats je Discord-link alleen in het veld 'Discord-uitnodigingslink'."
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Verplaats Discord uitnodiging"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Bekijk moderatie thread"
   },
@@ -193,9 +175,6 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecteer juiste resolutie"
-  },
-  "nags.project-description-banned-link.description": {
-    "defaultMessage": "De link \"{fullUrl}\" is niet toegestaan in projectbeschrijvingen."
   },
   "nags.project-description-non-english.description": {
     "defaultMessage": "Uw projectbeschrijvingen moeten in het Engels geschreven worden, of een Engelse vertaling hebben."
@@ -371,12 +350,6 @@
   "nags.upload-version.title": {
     "defaultMessage": "Upload een versie"
   },
-  "nags.verify-external-links.description": {
-    "defaultMessage": "Sommige van je externe links gebruiken mogelijk domeinnamen die niet geschikt zijn voor dat soort links."
-  },
-  "nags.verify-external-links.title": {
-    "defaultMessage": "Verifieer externe links"
-  },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bezoek linkjes instellingen"
   },
@@ -390,4 +363,3 @@
     "defaultMessage": "Projectnamen mogen geen versienummers bevatten."
   }
 }
-

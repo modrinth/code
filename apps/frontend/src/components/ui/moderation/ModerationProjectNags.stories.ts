@@ -120,7 +120,6 @@ const suggestionKinds = new Set<Labrinth.Projects.v3.NormalizedProjectNagKind>([
 
 const warningKinds = new Set<Labrinth.Projects.v3.NormalizedProjectNagKind>([
 	'missing-alt-text',
-	'verify-external-links',
 	'too-many-languages',
 	'too-many-tags',
 	'multiple-resolution-tags',

@@ -108,15 +108,6 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
             ProjectNagSeverity::Required,
         ));
     }
-    if let Some(url) = find_banned_description_link(&description_without_code) {
-        nags.push(
-            ProjectNag::new(
-                ProjectNagKind::ProjectDescriptionBannedLink,
-                ProjectNagSeverity::Required,
-            )
-            .with_details(json!({ "full_url": url })),
-        );
-    }
     let long_headers = markdown.long_header_count();
     if long_headers > 0 {
         nags.push(

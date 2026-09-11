@@ -53,12 +53,6 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Izaberi tačne oznake"
   },
-  "nags.banned-link-usage.description": {
-    "defaultMessage": "Link \"{url}\" nije dozvoljen kao eksterni link."
-  },
-  "nags.banned-link-usage.title": {
-    "defaultMessage": "Ukloni zabranjene linkove"
-  },
   "nags.check-disclosures.description": {
     "defaultMessage": "Uverite se da su korisnici svesni svih važnih detalja tako što ćete popuniti obaveštenja o sadržaju koja se odnose na vaš {type}."
   },
@@ -142,9 +136,6 @@
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Dodajte alternativni tekst slike"
-  },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Premesti Discord pozivnicu"
   },
   "nags.moderation.title": {
     "defaultMessage": "Posjeti temu za moderaciju"
@@ -246,4 +237,3 @@
     "defaultMessage": "Posjeti podešavanja linkova"
   }
 }
-

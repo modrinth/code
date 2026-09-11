@@ -83,9 +83,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Legg til alternativ bildetekst"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Flytt Discord-invitasjonen"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Gå til modereringstråden"
   },
@@ -165,4 +162,3 @@
     "defaultMessage": "Gå til lisensinnstillinger"
   }
 }
-

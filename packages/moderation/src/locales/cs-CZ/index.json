@@ -92,9 +92,6 @@
   "nags.missing-alt-text.title": {
     "defaultMessage": "Přidejte popisek k obrázku"
   },
-  "nags.misused-discord-link.title": {
-    "defaultMessage": "Přesuňte Discord pozvánku"
-  },
   "nags.moderation.title": {
     "defaultMessage": "Přejděte do moderátorského vlákna"
   },

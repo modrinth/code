@@ -347,15 +347,15 @@ pub struct EditProject {
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
+	#[validate(
+		custom(function = "crate::util::validate::validate_url"),
+		length(max = 2048)
+	)]
     pub license_url: Option<Option<String>>,
-    #[validate(custom(
-        function = "crate::util::validate::validate_url_hashmap_optional_values"
-    ))]
     // <name, url> (leave url empty to delete)
+	#[validate(custom(
+		function = "crate::util::validate::validate_url_hashmap_optional_values"
+	))]
     pub link_urls: Option<HashMap<String, Option<String>>>,
     pub license_id: Option<String>,
     #[validate(
@@ -508,6 +508,30 @@ pub async fn project_edit_internal(
     let validate_for_review = submit_for_review
         || (project_item.inner.status == ProjectStatus::Processing
             && !leave_review);
+    if (new_project.link_urls.is_some()
+        || new_project.license_id.is_some()
+        || new_project.license_url.is_some())
+        && !perms.contains(ProjectPermissions::EDIT_DETAILS)
+    {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to edit project links"
+        )));
+    }
+    if new_project.description.is_some()
+        && !perms.contains(ProjectPermissions::EDIT_BODY)
+    {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to edit the project description"
+        )));
+    }
+	if validate_for_review {
+		validate::validate_link_changes(
+			&Project::from(project_item.clone()),
+			&new_project,
+			validate_for_review,
+		)
+		.await?;
+	}
     if submit_for_review {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::Auth(eyre!(
@@ -520,6 +544,11 @@ pub async fn project_edit_internal(
             )));
         }
     }
+
+	let save_validation_scope = validate::save_validation_scope(
+		&Project::from(project_item.clone()),
+		&new_project,
+	);
 
     let mut transaction = pool
         .begin()
@@ -1344,6 +1373,22 @@ pub async fn project_edit_internal(
     .await
     .wrap_internal_err("failed to update components")?;
 
+	let reloaded_project = if validate_for_review {
+		validate::ensure_project_is_valid_for_save(
+			id,
+			&pool,
+			&mut transaction,
+			&redis,
+			crate::validate::project::ProjectSaveValidation {
+				all: validate_for_review,
+				..save_validation_scope
+			},
+		)
+		.await?
+	} else {
+		project_item.clone()
+	};
+
     // check new description and body for links to associated images
     // if they no longer exist in the description or body, delete them
     let checkable_strings: Vec<&str> =
@@ -1365,27 +1410,17 @@ pub async fn project_edit_internal(
     .await
     .wrap_api_err("deleting unused images")?;
 
-    if validate_for_review {
-        let reloaded_project = validate::ensure_project_is_valid_for_review(
-            id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
-        .await?;
-
-        if submit_for_review {
-            submit_project_for_review(
-                &reloaded_project,
-                &user,
-                team_member.as_ref().is_none_or(|member| !member.accepted),
-                sync_archival_disclosure,
-                &mut transaction,
-                &redis,
-            )
-            .await?;
-        }
-    }
+	if submit_for_review {
+		submit_project_for_review(
+			&reloaded_project,
+			&user,
+			team_member.as_ref().is_none_or(|member| !member.accepted),
+			sync_archival_disclosure,
+			&mut transaction,
+			&redis,
+		)
+	.await?;
+	}
 
     transaction
         .commit()
@@ -1983,13 +2018,9 @@ pub async fn projects_edit(
             .await
             .wrap_internal_err("fetching link platform from Redis")?;
 
-    let mut transaction = pool
-        .begin()
-        .await
-        .wrap_internal_err("starting database transaction")?;
     let mut changed_projects = Vec::new();
 
-    for project in projects_data {
+    for project in &projects_data {
         if !user.role.is_mod() {
             let team_member = team_members.iter().find(|x| {
                 x.team_id == project.inner.team_id
@@ -2038,6 +2069,26 @@ pub async fn projects_edit(
             };
         }
 
+        if let Some(links) = &bulk_edit_project.link_urls {
+            let mut candidate = Project::from(project.clone());
+            validate::apply_link_changes(&mut candidate, links);
+            let nags = crate::validate::project::validate_link_fields(
+                &candidate,
+                crate::validate::project::LinkValidationScope {
+                    external: true,
+                    ..Default::default()
+                },
+            )
+            .await;
+            validate::require_valid_project(nags)?;
+        }
+    }
+
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+    for project in projects_data {
         let mut reindex_versions = bulk_edit_project_categories(
             &categories,
             &project.categories,
@@ -2114,6 +2165,22 @@ pub async fn projects_edit(
                 }
             }
         }
+
+		if project.inner.status == ProjectStatus::Processing {
+			validate::ensure_project_is_valid_for_save(
+				project.inner.id,
+				&pool,
+				&mut transaction,
+				&redis,
+				crate::validate::project::ProjectSaveValidation {
+					all: project.inner.status == ProjectStatus::Processing,
+					tags: reindex_versions,
+					links: bulk_edit_project.link_urls.is_some(),
+					..Default::default()
+				},
+			)
+		.await?;
+		}
 
         changed_projects.push((
             project.inner.id,
@@ -2721,19 +2788,23 @@ pub async fn add_gallery_item_internal(
     .await
     .wrap_internal_err("inserting galleries into database")?;
 
-    let validation_error = match project_item.inner.status {
-        ProjectStatus::Processing => {
-            validate::ensure_project_is_valid_for_review(
-                project_item.inner.id,
-                &pool,
-                &mut transaction,
-                &redis,
-            )
-            .await
-            .err()
-        }
-        _ => None,
-    };
+	let validation_error = if project_item.inner.status == ProjectStatus::Processing {
+		validate::ensure_project_is_valid_for_save(
+			project_item.inner.id,
+			&pool,
+			&mut transaction,
+			&redis,
+			crate::validate::project::ProjectSaveValidation {
+				all: project_item.inner.status == ProjectStatus::Processing,
+				gallery_url: Some(upload_result.url.clone()),
+				..Default::default()
+			},
+		)
+		.await
+		.err()
+	} else {
+		None
+	};
     if let Some(error) = validation_error {
         delete_old_images(
             Some(upload_result.url),
@@ -2984,15 +3055,20 @@ pub async fn edit_gallery_item_internal(
         )?;
     }
 
-    if project_item.inner.status == ProjectStatus::Processing {
-        validate::ensure_project_is_valid_for_review(
-            project_item.inner.id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
-        .await?;
-    }
+	if project_item.inner.status == ProjectStatus::Processing {
+		validate::ensure_project_is_valid_for_save(
+			project_item.inner.id,
+			&pool,
+			&mut transaction,
+			&redis,
+			crate::validate::project::ProjectSaveValidation {
+				all: project_item.inner.status == ProjectStatus::Processing,
+				gallery_url: Some(item.url.clone()),
+				..Default::default()
+			},
+		)
+		.await?;
+	}
 
     transaction
         .commit()
