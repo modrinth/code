@@ -36,8 +36,10 @@ import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { showInstanceInFolder } from '@/helpers/utils'
+import { injectServerInstall } from '@/providers/server-install'
 
 const { handleError } = injectNotificationManager()
+const { playServerProject } = injectServerInstall()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
@@ -108,21 +110,30 @@ const play = async (event: MouseEvent) => {
 	event?.stopPropagation()
 	if (playDisabled.value) return
 	loading.value = true
-	const launched = await run(props.instance.id)
-		.then(() => true)
-		.catch((err) => {
-			handleSevereError(err, { instanceId: props.instance.id })
-			return false
-		})
-		.finally(() => {
+	const instance = props.instance
+	const serverProjectId =
+		instance.link?.type === 'server_project' || instance.link?.type === 'server_project_modpack'
+			? (instance.link.project_id ?? instance.link.server_project_id)
+			: undefined
+	try {
+		if (serverProjectId) {
+			await playServerProject(serverProjectId)
+			const processes = await get_by_instance_id(instance.id)
+			if (processes.length > 0) emit('play')
+		} else {
+			await run(instance.id)
+			emit('play')
 			trackEvent('InstanceStart', {
-				loader: props.instance.loader,
-				game_version: props.instance.game_version,
+				loader: instance.loader,
+				game_version: instance.game_version,
 				source: 'InstanceItem',
 			})
-		})
-	if (launched) emit('play')
-	loading.value = false
+		}
+	} catch (err) {
+		handleSevereError(err, { instanceId: instance.id })
+	} finally {
+		loading.value = false
+	}
 }
 
 const stop = async (event: MouseEvent) => {
