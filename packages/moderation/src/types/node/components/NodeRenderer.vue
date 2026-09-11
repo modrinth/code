@@ -50,7 +50,7 @@ const props = defineProps<{
 	 * inputs an active toggle reveals are left out (the review view surfaces those in a
 	 * separate detached panel).
 	 */
-	mode?: 'full' | 'buttons',
+	mode?: 'full' | 'buttons'
 	stageId?: string
 }>()
 
@@ -147,7 +147,7 @@ function getDropdownMinWidth(options: { label: string }[]): string {
 	return result
 }
 
-function componentProps(node: RenderableValueNode): Record<string, any> {
+function componentProps(node: RenderableValueNode): Record<string, unknown> {
 	const ctx: ComponentNodePropsContext = {
 		onImageUpload: props.onImageUpload,
 		toggleSetValue: (value) => toggleSetValue(node, value),
@@ -300,24 +300,30 @@ watchEffect(() => {
 
 <template>
 	<div :class="[flex ? 'flex flex-wrap gap-2' : 'space-y-4', mode ? 'contents' : 'w-full']">
-		<slot/>
-		<template v-for="(item, idx) in nodes" :key="nodeKey(item, idx)" :id="nodeKey(item, idx)">
+		<slot />
+		<template v-for="(item, idx) in nodes" :key="nodeKey(item, idx)">
 			<template v-if="typeof item !== 'object' || item === null">
 				<template v-if="typeof item === 'string'">{{ item }}</template>
-				<component :is="item" v-else-if="mode != 'buttons'"/>
+				<component :is="item" v-else-if="mode != 'buttons'" />
 			</template>
 
 			<template v-else-if="isShown(item)">
 				<div
 					:class="
 						hasChildrenCap(item) && !hasValueCap(item)
-							? mode == 'buttons' ? 'contents' : 'w-full'
+							? mode == 'buttons'
+								? 'contents'
+								: 'w-full'
 							: !getTitle(item)
 								? 'contents'
 								: undefined
 					"
 				>
-					<div v-if="getTitle(item) && mode != 'buttons'" class="mb-2" :class="titleClass(titleDepth ?? 0)">
+					<div
+						v-if="getTitle(item) && mode != 'buttons'"
+						class="mb-2"
+						:class="titleClass(titleDepth ?? 0)"
+					>
 						<!-- eslint-disable vue/no-v-html -- title text is author-controlled (stage definitions), not user input -->
 						<span
 							v-html="renderString(getTitle(item)!).replace(/^<p>([\s\S]*)<\/p>\n?$/, '$1')"
@@ -352,9 +358,31 @@ watchEffect(() => {
 							:[modelProp(item)]="
 								getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)
 							"
-							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
 							size="xs"
-						/>
+							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
+						>
+							<!-- Bars render top-level buttons only (no inline sub-tree), so a toggle
+							     with sub-options gets a hover menu instead — pick a reason without
+							     first clicking the toggle active. Full-mode already unfolds an
+							     active toggle's children inline, so it skips this. -->
+							<template
+								v-if="
+									buttonsOnly &&
+									hasChildrenCap(item) &&
+									resolveChildren(item, valueScope(item).state).length > 0
+								"
+								#menu
+							>
+								<NodeRenderer
+									:nodes="resolveChildren(item, valueScope(item).state)"
+									:state="valueScope(item).state"
+									:write="valueScope(item).write"
+									:on-image-upload="onImageUpload"
+									:app-components="appComponents"
+									:global-state="globalState"
+								/>
+							</template>
+						</ActionButton>
 						<component
 							:is="resolveComponent(item as RenderableValueNode)"
 							v-else

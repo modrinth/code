@@ -20,12 +20,16 @@ export function childWriter(
 ): Writer {
 	return (childId, value) => {
 		const existing = parentRead[containerId]
+		// Writing into a container that has never been touched at all (not even `false`) has to
+		// mark the container itself active (`value: true`) — otherwise the parent toggle reads
+		// back as inactive despite now holding child state, hiding/gating that very child (see
+		// `booleanValue`/`isNodeActive`). This is reachable whenever a child is set before its
+		// parent's own toggle has ever been clicked, e.g. picking a sub-option straight from a
+		// hover menu.
 		const container: Record<string, NodeState> =
 			existing && typeof existing === 'object' && !(existing instanceof Set)
 				? { ...(existing as Record<string, NodeState>) }
-				: existing !== undefined
-					? { value: existing }
-					: {}
+				: { value: existing !== undefined ? existing : true }
 		if (value === undefined) Reflect.deleteProperty(container, childId)
 		else container[childId] = value
 		parentWrite(containerId, Object.keys(container).length === 0 ? undefined : container)

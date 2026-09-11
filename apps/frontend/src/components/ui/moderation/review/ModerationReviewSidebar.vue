@@ -34,7 +34,6 @@
 
 		<!-- Expanded -->
 		<template v-else>
-
 			<dl
 				class="m-0 grid grid-cols-2 gap-x-3 gap-y-1 border-0 border-y border-solid border-divider px-3 py-2 text-sm"
 			>
@@ -64,12 +63,12 @@
 					<dd class="m-0 text-contrast">{{ updatedRelative }}</dd>
 				</template>
 
-				<dt class="text-secondary">Applying for: </dt>
+				<dt class="text-secondary">Applying for:</dt>
 				<dd class="m-0 text-contrast">
 					<ProjectStatusBadge :status="requestedStatus" />
 				</dd>
 
-				<dt class="text-secondary">Status: </dt>
+				<dt class="text-secondary">Status:</dt>
 				<dd class="m-0 text-contrast">
 					<ProjectStatusBadge :status="currentStatus" />
 				</dd>
@@ -85,7 +84,7 @@
 						<code class="min-w-0 break-all text-primary">{{ project.slug || '—' }}</code>
 					</div>
 				</ChecklistStageButtons>
-				<div class="my-1 h-px w-full bg-divider flex-shrink-0" />
+				<div class="my-1 h-px w-full flex-shrink-0 bg-divider" />
 				<ProjectSidebarCreators
 					:organization="organization"
 					:members="members"
@@ -94,7 +93,7 @@
 					:user-link="(username) => `/user/${username}`"
 					class="flex-card-reduced"
 				/>
-				<div class="my-1 h-px w-full bg-divider flex-shrink-0" />
+				<div class="my-1 h-px w-full flex-shrink-0 bg-divider" />
 				<ProjectSidebarServerInfo
 					v-if="isServerProject"
 					:loading="!serverDataLoaded"
@@ -107,17 +106,17 @@
 					:status-online="projectV3?.minecraft_java_server?.ping?.data != null"
 					class="flex-card-reduced"
 				/>
-				<div v-if="isServerProject" class="my-1 h-px w-full bg-divider flex-shrink-0" />
+				<div v-if="isServerProject" class="my-1 h-px w-full flex-shrink-0 bg-divider" />
 
 				<ChecklistStageButtons stage-id="links" variant="inline" inline-node-mode="full" />
 
-				<div class="my-1 h-px w-full bg-divider flex-shrink-0" />
+				<div class="my-1 h-px w-full flex-shrink-0 bg-divider" />
 
 				<ChecklistStageButtons stage-id="tags" variant="inline">
-					<ProjectSidebarTags :project="project" :disableHeader="true" class="flex-card-reduced" />
+					<ProjectSidebarTags :project="project" :disable-header="true" class="flex-card-reduced" />
 				</ChecklistStageButtons>
 
-				<div class="my-1 h-px w-full bg-divider flex-shrink-0" />
+				<div class="my-1 h-px w-full flex-shrink-0 bg-divider" />
 
 				<ProjectSidebarDetails
 					:project="project"
@@ -133,19 +132,17 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
+import { ChevronRightIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
-	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
 	ProjectStatusBadge,
 	useRelativeTime,
 } from '@modrinth/ui'
-import {computed, ref} from 'vue'
+import { computed } from 'vue'
 
 import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { REVIEW_TAB_ORDER, useModerationReviewLayout } from '~/services/moderation/review-layout'
@@ -198,10 +195,6 @@ const railTabs = computed(() =>
 	),
 )
 
-const projectPath = computed(
-	() => `/${props.project.project_type}/${props.project.slug ?? props.project.id}`,
-)
-
 const submittedRelative = computed(() => {
 	const date = (props.project.queued ?? props.project.published) as string | undefined
 	return date ? formatRelativeTime(date) : 'unknown'
@@ -213,13 +206,9 @@ const updatedRelative = computed(() =>
 	props.project.updated ? formatRelativeTime(props.project.updated as string) : 'unknown',
 )
 
-const requestedStatus = computed(() =>
-	props.project.requested_status ?? 'unknown',
-)
+const requestedStatus = computed(() => props.project.requested_status ?? 'unknown')
 
-const currentStatus = computed(() =>
-	props.project.status ?? 'unknown',
-)
+const currentStatus = computed(() => props.project.status ?? 'unknown')
 
 const queuePosition = computed(() => {
 	if (!moderationQueue.isQueueMode) return null

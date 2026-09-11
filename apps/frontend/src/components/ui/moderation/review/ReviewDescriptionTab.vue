@@ -3,8 +3,8 @@
 		<section>
 			<ChecklistStageButtons stage-id="summary">
 				<span class="min-w-0 whitespace-pre-wrap text-primary">{{
-						projectV2.description || '—'
-					}}</span>
+					projectV2.description || '—'
+				}}</span>
 			</ChecklistStageButtons>
 		</section>
 

@@ -462,6 +462,7 @@ import {
 	createTrackedPatch,
 	evalActiveAction,
 	evalSegment,
+	hasCap,
 	resolve,
 	resolveChildren,
 	setMessageProject,
@@ -1596,10 +1597,20 @@ interface TouchedNode {
 	statePath: string[]
 	stageId: string
 	label: string
+	/** Static tooltip text off the node itself, so the summary chip can show the same hint. */
+	tooltip?: string
 }
 const touchedNodes = ref<Record<string, TouchedNode>>(
 	Object.fromEntries((persistedState?.touchedNodes ?? []).map((n) => [n.statePath.join('/'), n])),
 )
+
+/** Only static (string) tooltips resolve here — function tooltips need live render-time state. */
+function resolveStaticTooltip(node: object): string | undefined {
+	if (!hasCap(node, '_tooltip')) return undefined
+	const tooltip = (node as { _tooltip?: unknown })._tooltip
+	if (tooltip === undefined || typeof tooltip === 'function') return undefined
+	return resolve(tooltip as never) || undefined
+}
 
 const activeNodePaths = computed(() => {
 	const set = new Set<string>()
@@ -1627,6 +1638,7 @@ watch(
 						statePath: a.statePath,
 						stageId: stage.id,
 						label: String((a.node as { label?: unknown }).label ?? a.statePath.at(-1) ?? key),
+						tooltip: resolveStaticTooltip(a.node as object),
 					}
 				}
 			}
@@ -1637,32 +1649,50 @@ watch(
 
 watch(touchedNodes, persistState, { deep: true })
 
-/** Turn any node (identified by its full state path) on or off, pruning empty ancestors. */
+/**
+ * A toggle-with-children stores its own on/off as a `value` key alongside its children's
+ * state (see `booleanValue.setBooleanValue`) — `{ value: true, someChild: true }`, not a bare
+ * `true`. Marking a path active has to preserve that shape for every ancestor segment, or the
+ * ancestor reads back as *inactive* (`getBooleanValue` finds no `value` key) even though we
+ * just wrote state under it — which hides its children entirely (`isNodeActive` gates them)
+ * and makes them look unclickable.
+ */
+function markAncestorActive(existing: NodeState | undefined): Record<string, NodeState> {
+	return existing && typeof existing === 'object' && !(existing instanceof Set)
+		? { ...(existing as Record<string, NodeState>), value: true }
+		: { value: true }
+}
+
 function setNodeActive(statePath: string[], active: boolean) {
 	const [stageId, ...rest] = statePath
 	if (!stageId || rest.length === 0) return
 
 	const stageState: Record<string, NodeState> = { ...(nodeStates.value[stageId] ?? {}) }
-	const chain: Record<string, NodeState>[] = [stageState]
 	let cursor = stageState
 	for (let i = 0; i < rest.length - 1; i++) {
 		const k = rest[i]
-		const existing = cursor[k]
-		const next: Record<string, NodeState> =
-			existing && typeof existing === 'object' && !(existing instanceof Set)
-				? { ...(existing as Record<string, NodeState>) }
-				: {}
+		const next = markAncestorActive(cursor[k])
 		cursor[k] = next
 		cursor = next
-		chain.push(next)
 	}
-	const leaf = rest[rest.length - 1]
-	if (active) cursor[leaf] = true
-	else Reflect.deleteProperty(cursor, leaf)
 
-	for (let i = chain.length - 1; i >= 1; i--) {
-		if (Object.keys(chain[i]).length === 0) {
-			Reflect.deleteProperty(chain[i - 1], rest[i - 1])
+	const leaf = rest[rest.length - 1]
+	if (active) {
+		const existing = cursor[leaf]
+		cursor[leaf] =
+			existing && typeof existing === 'object' && !(existing instanceof Set)
+				? { ...(existing as Record<string, NodeState>), value: true }
+				: true
+	} else {
+		// Mirror `booleanValue.setBooleanValue`: turning a toggle off keeps its children around
+		// (as `value: false`) instead of discarding them, so re-activating it restores them.
+		const existing = cursor[leaf]
+		if (existing && typeof existing === 'object' && !(existing instanceof Set)) {
+			const { value: _value, ...children } = existing as Record<string, NodeState>
+			if (Object.keys(children).length > 0) cursor[leaf] = { ...children, value: false }
+			else Reflect.deleteProperty(cursor, leaf)
+		} else {
+			Reflect.deleteProperty(cursor, leaf)
 		}
 	}
 
@@ -1670,6 +1700,23 @@ function setNodeActive(statePath: string[], active: boolean) {
 	if (Object.keys(stageState).length === 0) Reflect.deleteProperty(nextStates, stageId)
 	else nextStates[stageId] = stageState
 	nodeStates.value = nextStates
+}
+
+/** Forget every touched issue that isn't currently active — a "clean up" for the flagged-issue
+ *  summary, distinct from `resetProgress` (which clears the checklist's actual state). */
+function resetFlaggedIssues() {
+	const active = activeNodePaths.value
+	const nextTouched: Record<string, TouchedNode> = {}
+	for (const [key, node] of Object.entries(touchedNodes.value)) {
+		if (active.has(key)) nextTouched[key] = node
+	}
+	touchedNodes.value = nextTouched
+	touchedStages.value = new Set(
+		[...touchedStages.value].filter((stageId) => {
+			const state = nodeStates.value[stageId]
+			return state && Object.keys(state).length > 0
+		}),
+	)
 }
 
 function setStage(target: number | string) {
@@ -2124,6 +2171,7 @@ provideModerationChecklist({
 	activeNodePaths,
 	writerForStage,
 	setNodeActive,
+	resetFlaggedIssues,
 	appComponents: appComponentsByKey,
 	currentStage,
 	currentStageObj,

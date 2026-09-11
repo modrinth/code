@@ -203,6 +203,10 @@ function create(): ModerationReviewLayout {
 		if (d.active.length === 0 && d.tabs.length > 0) {
 			d.active = [d.tabs[d.tabs.length - 1]]
 		}
+		// A solo panel's stored split ratio is meaningless once nothing shares the row/column
+		// with it. Drop it here so the next time this dock splits, it starts from an even
+		// distribution instead of resuming whatever ratio was left over from an earlier split.
+		if (d.active.length <= 1) d.weights = {}
 	}
 
 	function removeFromDock(tab: ReviewTabId, id: ReviewDockId) {
@@ -245,6 +249,7 @@ function create(): ModerationReviewLayout {
 		if (!id) return
 		if (!state.value.docks[id].tabs.includes(tab)) return
 		state.value.docks[id].active = [tab]
+		normalizeActive(id)
 	}
 
 	function toggleActive(tab: ReviewTabId, dock: ReviewDockId) {
@@ -256,6 +261,7 @@ function create(): ModerationReviewLayout {
 			// Display order is derived from `tabs`, so membership is all that matters here.
 			d.active = [...d.active, tab]
 		}
+		normalizeActive(dock)
 	}
 
 	/** Apply a new tab order for a dock (from drag-and-drop). Missing tabs are appended. */

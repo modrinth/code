@@ -2,7 +2,7 @@
 	<Teleport to="body">
 		<div
 			ref="panelEl"
-			class="fixed z-[70] flex max-h-[70vh] w-[22rem] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-lg border border-solid border-divider bg-bg-raised text-sm shadow-xl"
+			class="fixed z-[70] flex max-h-[70vh] w-[28rem] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-lg border border-solid border-divider bg-bg-raised text-sm shadow-xl"
 			:style="{ left: `${pos.x}px`, top: `${pos.y}px` }"
 			@pointerenter="emit('hoverin')"
 			@pointerleave="emit('hoverout')"

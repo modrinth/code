@@ -71,6 +71,8 @@ export interface TouchedChecklistNode {
 	statePath: string[]
 	stageId: string
 	label: string
+	/** Static tooltip text off the node, shown when hovering its summary chip. */
+	tooltip?: string
 }
 
 export interface ChecklistLockStatus {
@@ -103,6 +105,9 @@ export interface ModerationChecklistEngine {
 	writerForStage: (stageId: string) => Writer
 	/** Toggle any node on/off by its full state path (`[stageId, ...groups, leafId]`). */
 	setNodeActive: (statePath: string[], active: boolean) => void
+	/** Drop every touched issue that isn't currently active — clears stale flagged-issue history
+	 *  without touching anything presently flagged. */
+	resetFlaggedIssues: () => void
 	/** App-component map (`loader-picker`, `game-version-picker`) for `NodeRenderer`. */
 	appComponents: Record<string, Component>
 

@@ -21,8 +21,9 @@
 				:flex="true"
 				:title-depth="3"
 			>
-				<button ref="anchorEl"
+				<button
 					v-if="!hideHeading"
+					ref="anchorEl"
 					v-tooltip="stage?._hint"
 					class="flex min-w-0 items-center gap-1 rounded px-1 text-left text-[0.7rem] font-semibold uppercase tracking-wide text-secondary hover:text-contrast"
 					@click="openStage"
@@ -34,12 +35,12 @@
 				</button>
 				<button
 					v-tooltip="
-				hideHeading && stage?._hint
-					? stage._hint
-					: panelOpen
-						? 'Hide checklist details'
-						: 'Show checklist details'
-			"
+						hideHeading && stage?._hint
+							? stage._hint
+							: panelOpen
+								? 'Hide checklist details'
+								: 'Show checklist details'
+					"
 					class="shrink-0 rounded p-0.5 hover:bg-button-bg"
 					:class="panelOpen ? 'text-brand' : 'text-secondary hover:text-contrast'"
 					:aria-label="`${heading} checklist details`"
@@ -56,7 +57,7 @@
 		</div>
 
 		<div v-if="$slots.default" class="py-2">
-			<slot/>
+			<slot />
 		</div>
 
 		<ChecklistDetailsPanel
@@ -64,7 +65,7 @@
 			:title="heading"
 			:anchor="anchorEl"
 			:pinned="pinned"
-			@set-pin="(value) => pinned = value"
+			@set-pin="(value) => (pinned = value)"
 			@toggle-pin="togglePin"
 			@close="closePanel"
 			@hoverin="onEnter"
@@ -86,9 +87,18 @@
 
 <script setup lang="ts">
 import { ChevronDownIcon } from '@modrinth/assets'
-import { resolveChildren } from '@modrinth/moderation/src/types/node'
+import { expandVariables } from '@modrinth/moderation'
+import type { ChecklistMetaContext } from '@modrinth/moderation/src/types/node'
+import {
+	CHECKLIST_META_KEY,
+	collectMessageNodes,
+	evalActiveAction,
+	resolveChildren,
+} from '@modrinth/moderation/src/types/node'
 import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { injectProjectPageContext } from '@modrinth/ui'
+import { renderHighlightedString } from '@modrinth/utils'
+import { computed, onBeforeUnmount, provide, ref, watchEffect } from 'vue'
 
 import {
 	elementForStage,
@@ -103,13 +113,14 @@ const props = withDefaults(
 		/** `bar` wraps the cluster in a bordered surface; `inline` sits flush next to content. */
 		variant?: 'bar' | 'inline'
 		/** Drop the label row (the host already shows the section name, e.g. sidebar cards). */
-		hideHeading?: boolean,
+		hideHeading?: boolean
 		inlineNodeMode?: 'buttons' | 'full'
 	}>(),
-	{ variant: 'inline', hideHeading: false },
+	{ variant: 'inline', hideHeading: false, inlineNodeMode: 'buttons' },
 )
 
 const engine = injectModerationChecklist()
+const { projectV2, projectV3 } = injectProjectPageContext()
 
 const stage = computed(() => engine.resolvedStages.value.find((s) => s.id === props.stageId))
 
@@ -123,6 +134,53 @@ const heading = computed(() => stage.value?.label ?? props.stageId)
 const stageState = computed(() => engine.nodeStates.value[props.stageId] ?? {})
 const writer = computed(() => engine.writerForStage(props.stageId))
 const topNodes = computed(() => (stage.value ? resolveChildren(stage.value, stageState.value) : []))
+
+/**
+ * The floating checklist widget only ever renders `currentStageObj`, so it can afford one
+ * global `CHECKLIST_META_KEY` scoped to whatever stage is current. Every element on the review
+ * page shows several stages' buttons at once, so each `ChecklistStageButtons` instance computes
+ * and provides its own — scoped to just its stage — for its bar *and* its detail panel. This is
+ * what gives a childless toggle's tooltip the message it would actually generate.
+ */
+const tooltipHtmlMap = ref(new Map<object, string>())
+
+watchEffect(async () => {
+	const s = stage.value
+	if (!s) {
+		tooltipHtmlMap.value = new Map()
+		return
+	}
+	const nodes = topNodes.value
+	const actions = collectMessageNodes(nodes, stageState.value, [s.id])
+
+	const newMap = new Map<object, string>()
+	await Promise.all(
+		actions.map(async (entry) => {
+			try {
+				const raw = await evalActiveAction(entry, actions, new Set())
+				const expanded = expandVariables(raw, projectV2.value, projectV3.value).trim()
+				newMap.set(
+					entry.node,
+					expanded
+						? `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(expanded)}</div>`
+						: '',
+				)
+			} catch {
+				newMap.set(entry.node, '')
+			}
+		}),
+	)
+	tooltipHtmlMap.value = newMap
+})
+
+provide(
+	CHECKLIST_META_KEY,
+	computed<ChecklistMetaContext>(() => ({
+		metaMap: new Map(),
+		attentionMap: new Map(),
+		tooltipHtml: tooltipHtmlMap.value,
+	})),
+)
 
 const anchorEl = ref<HTMLElement | null>(null)
 const pinned = ref(false)
