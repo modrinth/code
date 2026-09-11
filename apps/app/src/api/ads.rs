@@ -209,11 +209,11 @@ async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
 fn sync_webview_visibility_for_main_window<R: Runtime>(
     app: &tauri::AppHandle<R>,
     main_window: &tauri::Window<R>,
-	was_minimized: &mut bool,
+    was_minimized: &mut bool,
 ) {
-	let Ok(is_minimized) = main_window.is_minimized() else {
-		return;
-	};
+    let Ok(is_minimized) = main_window.is_minimized() else {
+        return;
+    };
 
     let ads_state = if is_minimized {
         None
@@ -238,11 +238,11 @@ fn sync_webview_visibility_for_main_window<R: Runtime>(
         webview.set_size(size).ok();
     }
 
-	if is_minimized == *was_minimized {
+    if is_minimized == *was_minimized {
         return;
     }
 
-	*was_minimized = is_minimized;
+    *was_minimized = is_minimized;
 
     let mut webviews = Vec::new();
     let mut seen_webviews = HashSet::new();
@@ -311,41 +311,41 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             });
 
             if let Some(main_window) = app.get_window("main") {
-				let (visibility_tx, mut visibility_rx) = mpsc::channel(1);
+                let (visibility_tx, mut visibility_rx) = mpsc::channel(1);
 
-				// WebView2 visibility changes can re-enter Tauri's focus handlers.
-				// Queue them off the event callback and serialize the delayed checks.
-				main_window.on_window_event(move |event| {
-					if matches!(
-						event,
-						tauri::WindowEvent::Resized(_)
-							| tauri::WindowEvent::ScaleFactorChanged { .. }
-							| tauri::WindowEvent::Focused(_)
-					) {
-						let _ = visibility_tx.try_send(());
-					}
-				});
+                // WebView2 visibility changes can re-enter Tauri's focus handlers.
+                // Queue them off the event callback and serialize the delayed checks.
+                main_window.on_window_event(move |event| {
+                    if matches!(
+                        event,
+                        tauri::WindowEvent::Resized(_)
+                            | tauri::WindowEvent::ScaleFactorChanged { .. }
+                            | tauri::WindowEvent::Focused(_)
+                    ) {
+                        let _ = visibility_tx.try_send(());
+                    }
+                });
 
-				let app_handle = app.clone();
-				tauri::async_runtime::spawn(async move {
-					let mut was_minimized = false;
+                let app_handle = app.clone();
+                tauri::async_runtime::spawn(async move {
+                    let mut was_minimized = false;
 
-					while visibility_rx.recv().await.is_some() {
-						sync_webview_visibility_for_main_window(
-							&app_handle,
-							&main_window,
-							&mut was_minimized,
-						);
+                    while visibility_rx.recv().await.is_some() {
+                        sync_webview_visibility_for_main_window(
+                            &app_handle,
+                            &main_window,
+                            &mut was_minimized,
+                        );
 
-						tokio::time::sleep(Duration::from_millis(100)).await;
+                        tokio::time::sleep(Duration::from_millis(100)).await;
 
-						sync_webview_visibility_for_main_window(
-							&app_handle,
-							&main_window,
-							&mut was_minimized,
-						);
-					}
-				});
+                        sync_webview_visibility_for_main_window(
+                            &app_handle,
+                            &main_window,
+                            &mut was_minimized,
+                        );
+                    }
+                });
             }
 
             #[cfg(any(windows, target_os = "macos"))]
