@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-09-11T16:02:39+00:00`,
+		product: 'app',
+		version: '0.20.3',
+		body: `## Fixed
+- Fixed issues with resource pack syncing causing delays when launching instances or the app.
+- Fixed issue with the "Sync your settings" notification appearing even though it's been dismissed already.`,
+	},
+	{
+		date: `2026-09-11T16:02:39+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed "Download files" action not being available for suspended Medal promo servers.`,
+	},
+	{
 		date: `2026-09-10T16:31:31+00:00`,
 		product: 'app',
 		version: '0.20.2',
