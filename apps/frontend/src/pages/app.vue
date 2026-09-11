@@ -170,13 +170,6 @@ const modManagementData = [
 		iconUrl: 'https://cdn.modrinth.com/data/mOgUt4GM/5a20ed1450a0e1e79a1fe04e61bb4e5878bf1d20.png',
 	},
 	{
-		id: '9s6osm5g',
-		name: 'Cloth Config API',
-		author: 'shedaniel',
-		version: '11.1.106+fabric',
-		iconUrl: 'https://cdn.modrinth.com/data/9s6osm5g/icon.png',
-	},
-	{
 		id: 'lhGA9TYQ',
 		name: 'Architectury API',
 		author: 'shedaniel',
@@ -189,6 +182,13 @@ const modManagementData = [
 		author: 'ThatGravyBoat',
 		version: '8.5.2023',
 		iconUrl: 'https://cdn.modrinth.com/data/nrJ2NpD0/4f21214db060ed4542b1f3983c4113d293480a1b.webp',
+	},
+	{
+		id: '9s6osm5g',
+		name: 'Cloth Config API',
+		author: 'shedaniel',
+		version: '11.1.106+fabric',
+		iconUrl: 'https://cdn.modrinth.com/data/9s6osm5g/icon.png',
 	},
 ]
 
