@@ -318,6 +318,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	PlayIcon,
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
@@ -776,6 +777,12 @@ watch(serverData, (data) => {
 })
 
 const navLinks = computed<Tab[]>(() => [
+	{
+		label: 'Play',
+		href: `/hosting/manage/${props.serverId}/play`,
+		icon: PlayIcon,
+		subpages: [],
+	},
 	{
 		label: 'Overview',
 		href: `/hosting/manage/${props.serverId}`,

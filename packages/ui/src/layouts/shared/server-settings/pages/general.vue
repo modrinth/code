@@ -206,6 +206,11 @@ const preferences = {
 		description: 'Show RAM usage in bytes instead of a percentage.',
 		implemented: true,
 	},
+	reviewChangesBeforePlaying: {
+		displayName: 'Review changes before playing',
+		description: 'Show pending shared content changes before Play server publishes them. Saved on this device.',
+		implemented: true,
+	},
 } as const
 
 type PreferenceKeys = keyof typeof preferences
@@ -218,11 +223,14 @@ const defaultPreferences: UserPreferences = {
 	hideSubdomainLabel: false,
 	// autoRestart: false,
 	ramAsNumber: false,
+	reviewChangesBeforePlaying: false,
 }
 
 const userPreferences = useStorage<UserPreferences>(
 	`pyro-server-${serverId}-preferences`,
 	defaultPreferences,
+	undefined,
+	{ mergeDefaults: true },
 )
 
 const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)))

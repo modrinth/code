@@ -827,12 +827,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Nu s-a putut șterge conținutul"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Nu s-a putut dezactiva conținutul"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Nu s-a putut activa conținutul"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Nu s-a putut actualiza conținutul"
   },
@@ -847,9 +841,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Nu s-a putut înlătura conținutul"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Nu s-a putut comuta {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Nu s-a putut nelinka pachetul de moduri"

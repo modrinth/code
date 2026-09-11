@@ -284,6 +284,30 @@ export namespace Archon {
 
 	export namespace Content {
 		export namespace v1 {
+			export type ShareWorldContentResponse = {
+				shared_instance_id: string
+				version: number | null
+			}
+
+			export type SharedContentChange<T> =
+				| { kind: 'added'; after: T }
+				| { kind: 'removed'; before: T }
+				| { kind: 'updated'; before: T; after: T }
+
+			export type SharedContentDiffEntry =
+				| { type: 'project'; project_id: string; change: SharedContentChange<string> }
+				| { type: 'external_file'; file_type: string; file_name: string; kind: 'added' | 'removed' | 'updated' }
+				| { type: 'modpack' | 'game_version'; change: SharedContentChange<string> }
+				| { type: 'loader'; change: SharedContentChange<{ name: string; version: string | null }> }
+
+			export type SharedInstancePublishDiff = {
+				shared_instance_id: string
+				latest_version: number
+				local_updated_at: string
+				has_changes: boolean
+				diffs: SharedContentDiffEntry[]
+			}
+
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
 
 			export type ContentOwnerType = 'user' | 'organization'
@@ -301,6 +325,25 @@ export namespace Archon {
 				environment?: Labrinth.Projects.v3.Environment | null
 			}
 
+			export type AddonManifestEnvironment =
+				| 'client_and_server'
+				| 'client_only'
+				| 'dedicated_server_only'
+
+			export type AddonManifestWarnings = {
+				multiple_mod_entries: number | null
+				malformed: boolean
+			}
+
+			export type AddonManifest = {
+				platform: Modloader
+				name: string | null
+				version: string | null
+				environment: AddonManifestEnvironment | null
+				icon_embedded: boolean
+				warnings: AddonManifestWarnings
+			}
+
 			export type AddonStatus =
 				| 'pending'
 				| 'installed'
@@ -316,6 +359,10 @@ export namespace Archon {
 				filesize: number
 				btime?: string
 				disabled: boolean
+				disabled_server: boolean
+				disabled_player: boolean
+				side_toggle_unlocked: boolean
+				manifest: AddonManifest | null
 				kind: AddonKind
 				from_modpack: boolean
 				status: AddonStatus
@@ -352,6 +399,14 @@ export namespace Archon {
 			export type RemoveAddonRequest = {
 				kind: AddonKind
 				filename: string
+			}
+
+			export type SetAddonEnabledRequest = RemoveAddonRequest & {
+				enabled: boolean
+			}
+
+			export type SetAddonSideToggleLockedRequest = RemoveAddonRequest & {
+				locked: boolean
 			}
 
 			export type UpdateAddonRequest = {
@@ -804,6 +859,8 @@ export namespace Archon {
 			}
 
 			export type WorldContentInfo = {
+				shared_instance_id: string | null
+				shared_instance_needs_update: boolean
 				modloader: string
 				modloader_version: string
 				game_version: string
@@ -1087,6 +1144,7 @@ export namespace Archon {
 				project_id: string | null
 				pack_client_retained: boolean
 				pack_client_depends: boolean
+				manifest?: Archon.Content.v1.AddonManifest | null
 				status: Archon.Content.v1.AddonStatus
 				filesize: number | null
 				name: string | null
@@ -1105,6 +1163,13 @@ export namespace Archon {
 					message: string
 				}
 				content: WorldContentItem[]
+			}
+
+			export type WorldSharedInstanceUpdateEvent = {
+				type: 'world.shared_instance.update'
+				world_id: string
+				shared_instance_id: string
+				needs_update: boolean
 			}
 
 			export type SyncEvent =
@@ -1126,6 +1191,7 @@ export namespace Archon {
 				| WorldContentAddonPatchEvent
 				| WorldContentBaseUpdateEvent
 				| WorldContentUpdateEvent
+				| WorldSharedInstanceUpdateEvent
 		}
 	}
 
