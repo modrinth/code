@@ -3446,6 +3446,9 @@
   "project-moderation-nags.resubmit-for-review-desc": {
     "message": "Your project has been {status, select, rejected {rejected} withheld {withheld} other {{status}}} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message."
   },
+  "project-moderation-nags.submission-withdrawn": {
+    "message": "Your submission has been withdrawn. "
+  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "You must complete the required steps in the publishing checklist!"
   },
@@ -3458,8 +3461,17 @@
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published."
   },
+  "project-moderation-nags.submitted-for-review": {
+    "message": "Pending moderator review"
+  },
+  "project-moderation-nags.submitted-for-review-desc": {
+    "message": "Your project has been submitted to be reviewed by Modrinth's moderation team."
+  },
   "project-moderation-nags.suggestion": {
     "message": "Suggestion"
+  },
+  "project-moderation-nags.visit-moderation-messages": {
+    "message": "Visit moderation thread"
   },
   "project-moderation-nags.visit-moderation-page": {
     "message": "Visit moderation page"
@@ -3826,6 +3838,15 @@
   },
   "project.moderation.title": {
     "message": "Moderation"
+  },
+  "project.moderation.withdraw.button": {
+    "message": "Un-submit from review"
+  },
+  "project.moderation.withdraw.description": {
+    "message": "If your project is not ready, or you no longer want it to be reviewed, you can withdraw it from the review queue. When you submit your project again, you will not retain your current position in the moderation queue."
+  },
+  "project.moderation.withdraw.title": {
+    "message": "Un-submit your project"
   },
   "project.modpack-archive-warning.description": {
     "message": "Importing this .mrpack might be broken."
@@ -5509,6 +5530,9 @@
   },
   "shared-instance.invite.unavailable.title": {
     "message": "This invite isn't available"
+  },
+  "thread-message.withdrew-from-review": {
+    "message": "withdrew the project from review"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Latest news from Modrinth"

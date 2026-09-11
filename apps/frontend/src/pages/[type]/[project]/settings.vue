@@ -36,6 +36,7 @@ const {
 	versions,
 	currentMember,
 	setProcessing,
+	withdrawSubmission,
 	projectValidation,
 	projectValidationLoading,
 	refreshProjectValidation,
@@ -183,6 +184,7 @@ const moderatorSeeUserUi = computed<boolean>({
 			:validation-loading="projectValidationLoading"
 			:validation-available="projectValidation !== null"
 			:refresh-validation="refreshProjectValidation"
+			:withdraw-submission="withdrawSubmission"
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"
 		/>

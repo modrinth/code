@@ -613,6 +613,8 @@ pub async fn project_edit_internal(
             if !(user.role.is_mod()
                 || !project_item.inner.status.is_approved()
                     && status == &ProjectStatus::Processing
+				|| project_item.inner.status == ProjectStatus::Processing
+					&& status == &ProjectStatus::Draft
                 || project_item.inner.status.is_approved()
                     && status.can_be_requested())
             {

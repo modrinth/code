@@ -96,6 +96,13 @@
 				<span v-if="message.body.new_status === 'processing'">
 					submitted the project for review.
 				</span>
+				<span
+					v-else-if="
+						message.body.old_status === 'processing' && message.body.new_status === 'draft'
+					"
+				>
+					{{ formatMessage(messages.withdrewFromReview) }}
+				</span>
 				<span v-else-if="message.body.old_status === 'processing'">
 					reviewed the project and set its status to <Badge :type="message.body.new_status" />.
 				</span>
@@ -166,13 +173,23 @@ import {
 	AutoLink,
 	Avatar,
 	Badge,
+	defineMessages,
 	TeleportOverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 
 import { isStaff } from '~/helpers/users.js'
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	withdrewFromReview: {
+		id: 'thread-message.withdrew-from-review',
+		defaultMessage: 'withdrew the project from review',
+	},
+})
 
 const props = defineProps({
 	message: {

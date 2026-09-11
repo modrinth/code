@@ -186,6 +186,18 @@ const messages = defineMessages({
 		id: 'project-moderation-nags.submit-for-review-button',
 		defaultMessage: 'Submit for review',
 	},
+	submittedForReview: {
+		id: 'project-moderation-nags.submitted-for-review',
+		defaultMessage: 'Pending moderator review',
+	},
+	submittedForReviewDesc: {
+		id: 'project-moderation-nags.submitted-for-review-desc',
+		defaultMessage: "Your project has been submitted to be reviewed by Modrinth's moderation team.",
+	},
+	visitModerationMessages: {
+		id: 'project-moderation-nags.visit-moderation-messages',
+		defaultMessage: 'Visit moderation thread',
+	},
 	resubmitForReview: {
 		id: 'project-moderation-nags.resubmit-for-review',
 		defaultMessage: 'Resubmit for review',
@@ -233,6 +245,8 @@ const props = withDefaults(defineProps<Props>(), {
 	validationNags: () => [],
 	validationLoading: false,
 	validationAvailable: true,
+	nags: undefined,
+	refreshValidation: undefined,
 })
 
 const emit = defineEmits<{
@@ -419,6 +433,20 @@ function isNagComplete(nag: Nag): boolean {
 
 const visibleNags = computed<Nag[]>(() => {
 	const finalNags = applicableNags.value.filter((nag) => !isNagComplete(nag))
+
+	if (isProcessing.value) {
+		finalNags.push({
+			id: 'submitted-for-review',
+			title: messages.submittedForReview,
+			description: messages.submittedForReviewDesc,
+			status: 'special-submit-action',
+			shouldShow: (ctx) => ctx.project.status === 'processing',
+			link: {
+				...nagDestinations.moderation,
+				title: messages.visitModerationMessages,
+			},
+		})
+	}
 
 	if (props.project.status === 'draft') {
 		finalNags.push({
