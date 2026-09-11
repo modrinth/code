@@ -121,12 +121,13 @@
 
 <script lang="ts">
 import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
-import { NewModal } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import type { ButtonColor } from '#ui/components/base/buttons'
 import { Button } from '#ui/components/base/buttons'
+
+import NewModal from '../modal/NewModal.vue'
 
 export interface StageButtonConfig {
 	label?: string

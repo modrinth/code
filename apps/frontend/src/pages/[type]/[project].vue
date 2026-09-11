@@ -270,9 +270,7 @@
 								"
 								theme="dismissable-prompt"
 								class="inline-flex"
-								:triggers="[]"
-								:shown="flags.showProjectPageCreateServersTooltip"
-								:auto-hide="false"
+								open
 								placement="bottom-start"
 							>
 								<ButtonLink
@@ -621,6 +619,7 @@ import {
 	provideProjectPageContext,
 	SelectedProjectsFloatingBar,
 	TeleportOverflowMenu,
+	Tooltip,
 	useDebugLogger,
 	useFormatPrice,
 	useRelativeTime,
@@ -630,7 +629,6 @@ import {
 import { formatProjectType, isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'

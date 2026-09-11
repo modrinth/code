@@ -1,4 +1,3 @@
-import 'floating-vue/dist/style.css'
 import '../../assets/styles/defaults.scss'
 // frontend css imports
 // import '../../../apps/frontend/src/assets/styles/global.scss'
@@ -14,11 +13,11 @@ import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
-import FloatingVue from 'floating-vue'
 import { computed, defineComponent, h, ref } from 'vue'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
+import TooltipDirective from '../src/components/floating/TooltipDirective.vue'
 import NotificationPanel from '../src/components/nav/NotificationPanel.vue'
 import PopupNotificationPanel from '../src/components/nav/PopupNotificationPanel.vue'
 import {
@@ -31,6 +30,7 @@ import {
 	AbstractWebNotificationManager,
 	I18N_INJECTION_KEY,
 	type I18nContext,
+	installTooltipDirective,
 	type NotificationPanelLocation,
 	type PopupNotification,
 	provideFilePicker,
@@ -156,6 +156,7 @@ const StorybookClientOnly = defineComponent({
 })
 
 setup((app) => {
+	installTooltipDirective(app)
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
@@ -188,21 +189,6 @@ setup((app) => {
 		},
 	}
 	app.provide(I18N_INJECTION_KEY, i18nContext)
-
-	app.use(FloatingVue, {
-		themes: {
-			'ribbit-popout': {
-				$extend: 'dropdown',
-				placement: 'bottom-end',
-				instantMove: true,
-				distance: 8,
-			},
-			'dismissable-prompt': {
-				$extend: 'dropdown',
-				placement: 'bottom-start',
-			},
-		},
-	})
 
 	// Create teleport target for components that use <Teleport to="#teleports">
 	if (typeof document !== 'undefined' && !document.getElementById('teleports')) {
@@ -262,9 +248,16 @@ const preview: Preview = {
 			defaultTheme: 'dark',
 		}),
 		(story) => ({
-			components: { story, StorybookProvider, NotificationPanel, PopupNotificationPanel },
+			components: {
+				story,
+				StorybookProvider,
+				NotificationPanel,
+				PopupNotificationPanel,
+				TooltipDirective,
+			},
 			template: /*html*/ `
 				<StorybookProvider>
+					<TooltipDirective />
 					<NotificationPanel />
 					<PopupNotificationPanel />
 					<story />

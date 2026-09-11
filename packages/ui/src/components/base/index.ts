@@ -116,7 +116,6 @@ export type {
 	PageHeaderTarget,
 } from './page-header/types'
 export { default as Pagination } from './Pagination.vue'
-export { default as PopoutMenu } from './PopoutMenu.vue'
 export { default as PreviewSelectButton } from './PreviewSelectButton.vue'
 export { default as ProgressBar } from './ProgressBar.vue'
 export { default as ProgressSpinner } from './ProgressSpinner.vue'

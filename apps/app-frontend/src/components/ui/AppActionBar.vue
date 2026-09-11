@@ -29,13 +29,11 @@
 					>
 						{{ selectedProcess.instance.name }}
 					</router-link>
-					<Dropdown
+					<FloatingMenu
 						v-if="currentProcesses.length > 1"
 						placement="bottom"
-						:triggers="['click']"
-						:hide-triggers="['click']"
-						@show="showInstances = true"
-						@hide="showInstances = false"
+						@open="showInstances = true"
+						@close="showInstances = false"
 					>
 						<IconButton
 							v-tooltip="
@@ -97,7 +95,7 @@
 								</div>
 							</div>
 						</template>
-					</Dropdown>
+					</FloatingMenu>
 				</div>
 				<button
 					v-tooltip="formatMessage(messages.stopInstance)"
@@ -135,6 +133,7 @@ import {
 import { IconButton } from '@modrinth/ui'
 import {
 	defineMessages,
+	FloatingMenu,
 	injectNotificationManager,
 	injectPopupNotificationManager,
 	type PopupNotificationProgressItem,
@@ -142,7 +141,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { Dropdown } from 'floating-vue'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 

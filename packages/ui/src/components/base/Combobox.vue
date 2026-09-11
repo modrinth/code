@@ -211,6 +211,7 @@ import {
 	watch,
 } from 'vue'
 
+import { dismissTooltip } from '../../providers/tooltip'
 import ButtonFrame from './buttons/ButtonFrame.vue'
 import type {
 	ButtonElementHandle,
@@ -735,6 +736,7 @@ async function openDropdown() {
 	if (props.disabled || isOpen.value || !hasMinimumSearchLength.value || !hasDropdownContent.value)
 		return
 
+	dismissTooltip()
 	previewOpenDirection()
 	isOpen.value = true
 	emit('open')

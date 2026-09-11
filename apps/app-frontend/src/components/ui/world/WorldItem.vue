@@ -32,6 +32,7 @@ import {
 	SmartClickable,
 	TagItem,
 	TeleportOverflowMenu,
+	Tooltip,
 	useFormatDateTime,
 	useFormatNumber,
 	useRelativeTime,
@@ -40,7 +41,6 @@ import {
 import { getPingLevel } from '@modrinth/utils/utils'
 import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import dayjs from 'dayjs'
-import { Tooltip } from 'floating-vue'
 import type { Component } from 'vue'
 import { computed, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'

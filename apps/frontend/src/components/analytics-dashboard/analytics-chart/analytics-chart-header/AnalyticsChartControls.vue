@@ -1,16 +1,12 @@
 <template>
-	<Menu
+	<FloatingMenu
 		theme="analytics-controls-menu"
 		placement="bottom-end"
-		:shown="isControlsMenuOpen"
-		:triggers="[]"
-		:popper-triggers="[]"
-		:aria-id="controlsMenuId"
-		no-auto-focus
-		@update:shown="isControlsMenuOpen = $event"
+		panel-class="!rounded-[14px] !p-0 !w-[228px] !max-w-[calc(100vw_-_2rem)] !overflow-hidden"
+		@open="isControlsMenuOpen = true"
+		@close="isControlsMenuOpen = false"
 	>
 		<button
-			ref="controlsMenuTrigger"
 			type="button"
 			:aria-expanded="isControlsMenuOpen"
 			:aria-controls="controlsMenuId"
@@ -20,7 +16,6 @@
 				})
 			"
 			class="btn-dropdown-animation inline-flex min-h-5 cursor-pointer items-center justify-between gap-2 rounded-xl border-0 bg-surface-4 px-3 py-2 text-left text-sm font-semibold text-button-text shadow-none transition-all duration-200 hover:brightness-[115%] focus-visible:brightness-[115%] active:brightness-[115%]"
-			@click="toggleControlsMenu"
 		>
 			<Settings2Icon class="size-4 text-secondary" aria-hidden="true" />
 			<span class="leading-tight text-primary">
@@ -32,14 +27,18 @@
 			>
 				{{ activeControlCount }}
 			</span>
-			<DropdownIcon class="size-4 text-secondary" aria-hidden="true" />
+			<DropdownIcon
+				class="size-4 text-secondary transition-transform duration-[125ms] ease-in-out"
+				:class="{ 'rotate-180': isControlsMenuOpen }"
+				aria-hidden="true"
+			/>
 		</button>
 		<template #popper>
 			<div
-				ref="controlsMenuPanel"
+				:id="controlsMenuId"
 				role="dialog"
 				:aria-label="formatMessage(analyticsChartMessages.controlsDialogAria)"
-				class="mt-1 flex w-[228px] max-w-[calc(100vw_-_2rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-4 bg-surface-3 text-sm shadow-2xl"
+				class="flex flex-col"
 			>
 				<div class="flex items-center justify-between gap-3 px-3 py-2.5 text-xs font-medium">
 					<span class="font-semibold text-primary">{{ activeControlCountLabel }}</span>
@@ -149,7 +148,7 @@
 				</div>
 			</div>
 		</template>
-	</Menu>
+	</FloatingMenu>
 </template>
 
 <script setup lang="ts">
@@ -160,8 +159,7 @@ import {
 	Settings2Icon,
 	TagCategoryFlagIcon,
 } from '@modrinth/assets'
-import { Toggle, useVIntl } from '@modrinth/ui'
-import { Menu } from 'floating-vue'
+import { FloatingMenu, Toggle, useVIntl } from '@modrinth/ui'
 
 import { analyticsChartMessages, analyticsMessages } from '../../analytics-messages'
 
@@ -193,8 +191,6 @@ const emit = defineEmits<{
 }>()
 
 const isControlsMenuOpen = ref(false)
-const controlsMenuTrigger = ref<HTMLElement | null>(null)
-const controlsMenuPanel = ref<HTMLElement | null>(null)
 const controlsMenuId = useId()
 const ratioModeToggleId = useId()
 const previousPeriodToggleId = useId()
@@ -253,10 +249,6 @@ const isResetDisabled = computed(
 		props.showChartEvents === props.defaultShowChartEvents,
 )
 
-function toggleControlsMenu() {
-	isControlsMenuOpen.value = !isControlsMenuOpen.value
-}
-
 function resetControls() {
 	if (isResetDisabled.value) return
 
@@ -265,33 +257,4 @@ function resetControls() {
 	showProjectEventsModel.value = props.defaultShowProjectEvents
 	showChartEventsModel.value = props.defaultShowChartEvents
 }
-
-function onDocumentPointerDown(event: PointerEvent) {
-	if (!isControlsMenuOpen.value || !(event.target instanceof Node)) return
-	if (controlsMenuTrigger.value?.contains(event.target)) return
-	if (controlsMenuPanel.value?.contains(event.target)) return
-	isControlsMenuOpen.value = false
-}
-
-onMounted(() => {
-	document.addEventListener('pointerdown', onDocumentPointerDown, true)
-})
-
-onBeforeUnmount(() => {
-	document.removeEventListener('pointerdown', onDocumentPointerDown, true)
-})
 </script>
-
-<style>
-.v-popper--theme-analytics-controls-menu .v-popper__inner {
-	overflow: visible !important;
-	background: transparent !important;
-	padding: 0 !important;
-	border: 0 !important;
-	box-shadow: none !important;
-}
-
-.v-popper--theme-analytics-controls-menu .v-popper__arrow-container {
-	display: none;
-}
-</style>

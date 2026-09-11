@@ -19,6 +19,12 @@ export * from './project-page-new'
 export * from './server-context'
 export * from './server-settings-modal'
 export * from './tags'
+export {
+	installTooltipDirective,
+	type TooltipDirective,
+	type TooltipPlacement,
+	type TooltipProps,
+} from './tooltip'
 export * from './user-country'
 export * from './user-preferences'
 export * from './web-notifications'

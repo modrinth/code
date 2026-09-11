@@ -16,7 +16,6 @@ import {
 	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
-	commonMessages,
 	CreationFlowModal,
 	defineMessages,
 	formatProjectTypeSentence,
@@ -30,6 +29,7 @@ import {
 	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
+import { commonMessages } from '@modrinth/ui/src/utils/common-messages'
 import { cycleValue } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'

@@ -1,5 +1,8 @@
 import { computed, type Ref, ref } from 'vue'
 
+import { dismissFloatingMenus } from '../providers/floating-menu'
+import { dismissTooltip } from '../providers/tooltip'
+
 const isClient = typeof window !== 'undefined'
 
 type ModalStackState = {
@@ -19,11 +22,23 @@ globalScope[MODAL_STACK_STATE_KEY] = modalStackState
 
 const { stack, stackSizeRef } = modalStackState
 
+export const MODAL_STACK_BASE_Z = 100
+export const MODAL_STACK_STEP_Z = 10
+export const MODAL_OVERLAY_Z_OFFSET = 19
+export const MODAL_TAURI_Z_OFFSET = 20
+export const MODAL_CONTAINER_Z_OFFSET = 21
+
+export function getModalStackZBase(stackDepth: number) {
+	return MODAL_STACK_BASE_Z + stackDepth * MODAL_STACK_STEP_Z
+}
+
 export function useModalStack() {
 	const id = Symbol()
 
 	function push() {
 		if (isClient && !stack.includes(id)) {
+			dismissTooltip()
+			dismissFloatingMenus()
 			stack.push(id)
 			stackSizeRef.value = stack.length
 		}
