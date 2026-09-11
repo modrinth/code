@@ -307,7 +307,7 @@ impl AuthProvider {
                 let client_id = &ENV.GOOGLE_CLIENT_ID;
 
                 format!(
-                    "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&state={}&scope={}&response_type=code&redirect_uri={}",
+                    "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&prompt=select_account&state={}&scope={}&response_type=code&redirect_uri={}",
                     client_id,
                     state,
                     urlencoding::encode(
