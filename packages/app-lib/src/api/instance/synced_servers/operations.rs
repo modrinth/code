@@ -472,7 +472,19 @@ pub(crate) async fn ensure_managed_server(
             .position(ServerRecord::hidden)
             .unwrap_or(records.len())
     });
-    let data = existing.map(|record| record.data.clone()).unwrap_or(data);
+    let data = existing
+        .map(|record| {
+            let mut existing_data = record.data.clone();
+            if record.hidden() {
+                existing_data.insert(
+                    "name",
+                    data.get::<_, &str>("name").unwrap_or_default().to_string(),
+                );
+                existing_data.insert("hidden", 0_i8);
+            }
+            existing_data
+        })
+        .unwrap_or(data);
     let excluded_synced_server_id = existing
         .filter(|record| record.source == ServerSource::UserSynced)
         .map(|record| record.id.clone());
@@ -483,7 +495,7 @@ pub(crate) async fn ensure_managed_server(
     {
         let excluded_synced_server_id = excluded_synced_server_id
             .or_else(|| local.excluded_synced_server_id.clone());
-        if existing.is_some()
+        if existing.is_some_and(|record| record.data == data)
             && local.data == data
             && local.position == position as i64
             && local.excluded_synced_server_id == excluded_synced_server_id
@@ -508,12 +520,16 @@ pub(crate) async fn ensure_managed_server(
         if effective(metadata, state).await? {
             compose_instance(metadata, state).await?;
         }
-    } else if existing.is_none() {
+    } else if existing.is_none_or(|record| record.data != data) {
         let mut servers = records
             .into_iter()
             .map(|record| record.data)
             .collect::<Vec<_>>();
-        servers.insert(position, data);
+        if let Some(index) = existing_index {
+            servers[index] = data;
+        } else {
+            servers.insert(position, data);
+        }
         write_servers(&path, &servers).await?;
     }
     Ok(())
