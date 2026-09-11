@@ -189,8 +189,36 @@ impl State {
         tokio::spawn(async move {
             let mut interval =
                 tokio::time::interval(std::time::Duration::from_secs(600));
+            interval.set_missed_tick_behavior(
+                tokio::time::MissedTickBehavior::Skip,
+            );
             loop {
                 interval.tick().await;
+                match instances::adapters::sqlite::instance_rows::list_instances(
+					&state.pool,
+				).await {
+					Ok(instances) => {
+						for instance in instances {
+							if let Err(error) = instances::commands::migrate_legacy_content(
+								&instance.id, state, true,
+							).await {
+								tracing::warn!(
+									instance_id = %instance.id,
+									"Legacy content migration deferred: {error}",
+								);
+							}
+						}
+					}
+					Err(error) => tracing::warn!(
+						"Could not list instances for content migration: {error}",
+					),
+				}
+                if let Err(error) =
+                    crate::api::instance::synced_packs::migrate_store(state)
+                        .await
+                {
+                    tracing::warn!("Synced-pack migration deferred: {error}");
+                }
                 if let Err(error) = state.content_store.cleanup(false).await {
                     tracing::debug!(
                         "Shared content cache cleanup deferred: {error}"

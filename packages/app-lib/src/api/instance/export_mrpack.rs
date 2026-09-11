@@ -332,12 +332,12 @@ where
         writer
             .start_file(format!("overrides/{relative_path}"), options)
             .map_err(std::io::Error::from)?;
-        let mut source = std::fs::File::open(&path)
-            .map_err(|error| IOError::with_path(error, &path))?;
+        let mut source = std::fs::File::open(path)
+            .map_err(|error| IOError::with_path(error, path))?;
         loop {
             let bytes_read = source
                 .read(&mut buffer)
-                .map_err(|error| IOError::with_path(error, &path))?;
+                .map_err(|error| IOError::with_path(error, path))?;
             if bytes_read == 0 {
                 break;
             }

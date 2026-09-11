@@ -1,12 +1,12 @@
 {
-	"db_name": "SQLite",
-	"query": "INSERT INTO store_operations (id, instance_id, payload) VALUES (?, ?, ?)",
-	"describe": {
-		"columns": [],
-		"parameters": {
-			"Right": 3
-		},
-		"nullable": []
-	},
-	"hash": "72a01b4b9932d95b81a67db574daf20e5659fdecca64ae53facb7fa1f45c8303"
+  "db_name": "SQLite",
+  "query": "INSERT INTO store_operations (id, instance_id, payload) VALUES (?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "72a01b4b9932d95b81a67db574daf20e5659fdecca64ae53facb7fa1f45c8303"
 }

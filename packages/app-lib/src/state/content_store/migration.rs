@@ -36,10 +36,6 @@ pub(crate) async fn migrate(state: &State) -> crate::Result<()> {
             .await?;
     }
     catalog::set_setting(&state.pool, "store_layout_version", "1").await?;
-    crate::api::instance::synced_packs::migrate_store(state).await?;
-    for owner in catalog::retained_owners(&state.pool, "synced-cache").await? {
-        store.release("synced-cache", &owner).await?;
-    }
     for owner in catalog::retained_owners(&state.pool, "rollback").await? {
         if uuid::Uuid::parse_str(&owner).is_ok()
             && !fs::try_exists(

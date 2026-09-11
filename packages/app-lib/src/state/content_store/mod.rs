@@ -15,7 +15,7 @@ use fs4::tokio::AsyncFileExt;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 use sqlx::SqlitePool;
-use std::collections::hash_map::DefaultHasher;
+use std::collections::{HashMap, hash_map::DefaultHasher};
 use std::hash::{Hash, Hasher};
 use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
@@ -143,6 +143,9 @@ pub struct ContentStore {
     acquisitions: [Mutex<()>; 64],
     publications: [Mutex<()>; 64],
     pub(crate) files_lock: Mutex<()>,
+    /// Background migration takes a reader per file; Play takes the writer to pause it.
+    pub(crate) legacy_migration_priority: RwLock<()>,
+    link_support: Mutex<HashMap<PathBuf, bool>>,
     _process_lock: File,
     _content_process_lock: Option<File>,
 }
@@ -190,6 +193,8 @@ impl ContentStore {
             acquisitions: std::array::from_fn(|_| Mutex::new(())),
             publications: std::array::from_fn(|_| Mutex::new(())),
             files_lock: Mutex::new(()),
+            legacy_migration_priority: RwLock::new(()),
+            link_support: Mutex::new(HashMap::new()),
             _process_lock: process_lock,
             _content_process_lock: content_process_lock,
         })
@@ -435,8 +440,27 @@ impl ContentStore {
         if let Some(blob) = self.owned_path(source).await? {
             return Ok(blob);
         }
+        let (sha512, sha1, size) = hash_file(source).await?;
+        if let Some(blob) =
+            self.lookup(Some(&sha512), Some(&sha1), Some(size)).await?
+        {
+            return Ok(blob);
+        }
+        self.require_staging_space(size)?;
         let staged = self.stage_file(source).await?;
         self.publish_staged(staged, sources).await
+    }
+
+    pub(crate) fn require_staging_space(&self, size: u64) -> crate::Result<()> {
+        if fs4::available_space(&self.staging)?
+            < size.saturating_add(64 * 1024 * 1024)
+        {
+            return Err(std::io::Error::new(
+				std::io::ErrorKind::StorageFull,
+				"There is not enough space to import this file into the shared content store",
+			).into());
+        }
+        Ok(())
     }
 
     pub(super) async fn stage_file(
@@ -677,11 +701,12 @@ impl ContentStore {
             }
             FileContent::Unmanaged => {}
         }
-        let path = self
-            .instance_path(instance_path, &content_file_path(file))
-            .await?;
-        if fs::symlink_metadata(&path).await?.file_type().is_symlink() {
-            return Err(input("Cannot read an unowned content symlink"));
+        validate_relative(instance_path)?;
+        let relative_path = content_file_path(file);
+        validate_relative(&relative_path)?;
+        let path = self.profiles.join(instance_path).join(relative_path);
+        if !fs::metadata(&path).await?.is_file() {
+            return Err(input("Only regular content files can be read"));
         }
         Ok(ReadableContent::Local(path))
     }

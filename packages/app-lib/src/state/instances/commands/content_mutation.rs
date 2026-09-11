@@ -48,6 +48,7 @@ pub(super) enum ContentMutation<'a> {
 pub(super) enum ContentMutationResult {
     File(InstanceFile),
     Removed,
+    Deferred { reason: String },
 }
 
 enum PreparedChange {
@@ -72,6 +73,15 @@ enum PreparedChange {
         file: InstanceFile,
         rename_from: Option<String>,
     },
+}
+
+fn adoption_can_be_deferred(error: &crate::Error) -> bool {
+    matches!(
+        error.raw.as_ref(),
+        crate::ErrorKind::StdIOError(_)
+            | crate::ErrorKind::IOError(_)
+            | crate::ErrorKind::InputError(_)
+    )
 }
 
 struct PreparedMutation {
@@ -109,6 +119,10 @@ impl<'a> ContentMutationExecutor<'a> {
         })
     }
 
+    pub(super) fn instance(&self) -> &crate::state::Instance {
+        &self.instance
+    }
+
     fn content_scope(&self) -> crate::Result<ContentScope> {
         Ok(ContentScope {
             instance: self.instance.clone(),
@@ -125,8 +139,48 @@ impl<'a> ContentMutationExecutor<'a> {
         &self,
         request: ContentMutation<'_>,
     ) -> crate::Result<ContentMutationResult> {
-        let mut prepared = self.prepare(request).await?;
-        prepared.projection.apply(&self.state.content_store).await?;
+        let adopting = matches!(&request, ContentMutation::Adopt { .. });
+        let mut prepared = match request {
+            ContentMutation::Adopt { file } => {
+                match self.prepare_adopt(file).await {
+                    Ok(Some(prepared)) => prepared,
+                    Ok(None) => return Ok(ContentMutationResult::Deferred {
+                        reason:
+                            "Content links are unavailable in this directory"
+                                .to_string(),
+                    }),
+                    Err(error) if adoption_can_be_deferred(&error) => {
+                        return Ok(ContentMutationResult::Deferred {
+                            reason: error.to_string(),
+                        });
+                    }
+                    Err(error) => return Err(error),
+                }
+            }
+            ContentMutation::Install(request) => {
+                self.prepare_install(request).await?
+            }
+            ContentMutation::Toggle {
+                project_path,
+                desired_enabled,
+            } => self.prepare_toggle(project_path, desired_enabled).await?,
+            ContentMutation::Remove { project_path } => {
+                self.prepare_remove(project_path).await?
+            }
+        };
+        if let Err(error) =
+            prepared.projection.apply(&self.state.content_store).await
+        {
+            if adopting
+                && prepared.projection.safe_to_defer
+                && adoption_can_be_deferred(&error)
+            {
+                return Ok(ContentMutationResult::Deferred {
+                    reason: error.to_string(),
+                });
+            }
+            return Err(error);
+        }
         let output = match self.commit(&prepared).await {
             Ok(output) => output,
             Err(error) => {
@@ -150,25 +204,6 @@ impl<'a> ContentMutationExecutor<'a> {
                 .await?;
         }
         Ok(output)
-    }
-
-    async fn prepare(
-        &self,
-        request: ContentMutation<'_>,
-    ) -> crate::Result<PreparedMutation> {
-        match request {
-            ContentMutation::Install(request) => {
-                self.prepare_install(request).await
-            }
-            ContentMutation::Toggle {
-                project_path,
-                desired_enabled,
-            } => self.prepare_toggle(project_path, desired_enabled).await,
-            ContentMutation::Remove { project_path } => {
-                self.prepare_remove(project_path).await
-            }
-            ContentMutation::Adopt { file } => self.prepare_adopt(file).await,
-        }
     }
 
     async fn prepare_install(
@@ -435,7 +470,7 @@ impl<'a> ContentMutationExecutor<'a> {
     async fn prepare_adopt(
         &self,
         file: &InstanceFile,
-    ) -> crate::Result<PreparedMutation> {
+    ) -> crate::Result<Option<PreparedMutation>> {
         let canonical = canonical_content_path(&file.relative_path);
         if !crate::state::content_store::eligible(canonical) {
             return Err(input("Unsupported managed content path"));
@@ -451,6 +486,14 @@ impl<'a> ContentMutationExecutor<'a> {
             .is_symlink()
         {
             return Err(input("External symlinks must be imported explicitly"));
+        }
+        if !self
+            .state
+            .content_store
+            .supports_content_links(&source_path)
+            .await?
+        {
+            return Ok(None);
         }
         let blob = self.state.content_store.ingest_file(&source_path).await?;
         let enabled = file.enabled && canonical == file.relative_path;
@@ -503,13 +546,13 @@ impl<'a> ContentMutationExecutor<'a> {
         adopted.modified_at = Utc::now();
         let rename_from = (file.relative_path != canonical)
             .then(|| file.relative_path.clone());
-        Ok(PreparedMutation {
+        Ok(Some(PreparedMutation {
             projection,
             change: PreparedChange::Adopt {
                 file: adopted,
                 rename_from,
             },
-        })
+        }))
     }
 
     async fn commit(

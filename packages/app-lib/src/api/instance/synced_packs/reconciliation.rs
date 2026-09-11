@@ -399,7 +399,7 @@ async fn apply_pack(
         if instance_dir(metadata, state).join(&path).exists() {
             let owned = if let Some(previous) = &previous {
                 same_path(&previous.path, &path)
-                    && previous.enabled == !path.ends_with(".disabled")
+                    && previous.enabled != path.ends_with(".disabled")
                     && owns_file(metadata, previous, state).await?
             } else {
                 false
@@ -412,7 +412,9 @@ async fn apply_pack(
             }
         }
     }
-    let blob = if let Some(file) = file {
+    let blob = if let Some(file) = file
+        && file.hashes.get("sha1") != Some(&pack.sha1)
+    {
         let downloaded = fetch::fetch_content_file(
             state,
             &[file.url.as_str()],
@@ -984,7 +986,8 @@ pub(in crate::api::instance) async fn decorate_content(
                     instance_ids: synced_instance_ids(
                         id, &library, &instances, global,
                     ),
-                    update_pending: placement.pending
+                    update_pending: pack.migration_error.is_some()
+                        || placement.pending
                         || item.enabled != pack.item.enabled
                         || placement.error.is_some(),
                 });

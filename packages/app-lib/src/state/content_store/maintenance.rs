@@ -43,35 +43,33 @@ impl ContentStore {
         let staged = self.stage_file(source).await?;
         let hash = staged.sha512.clone();
         let _files_lock = self.files_lock.lock().await;
-        if let Some(blob) = self.catalog_blob(&hash).await? {
-            if !self.is_healthy(&blob.blob, true).await? {
-                for instance in
-                    instance_rows::list_instances(&self.pool).await?
+        if let Some(blob) = self.catalog_blob(&hash).await?
+            && !self.is_healthy(&blob.blob, true).await?
+        {
+            for instance in instance_rows::list_instances(&self.pool).await? {
+                if crate::state::instance_has_running_process(
+                    &instance.id,
+                    state,
+                )
+                .await?
                 {
-                    if crate::state::instance_has_running_process(
-                        &instance.id,
-                        state,
-                    )
-                    .await?
-                    {
-                        return Err(input(
-                            "Stop Minecraft instances before re-importing damaged shared content",
-                        ));
-                    }
+                    return Err(input(
+                        "Stop Minecraft instances before re-importing damaged shared content",
+                    ));
                 }
-                if fs::symlink_metadata(&blob.path).await.is_ok() {
-                    let quarantine = self.root.join("quarantine");
-                    fs::create_dir_all(&quarantine).await?;
-                    fs::rename(
-                        &blob.path,
-                        quarantine.join(format!(
-                            "{}-{}",
-                            hash,
-                            uuid::Uuid::new_v4()
-                        )),
-                    )
-                    .await?;
-                }
+            }
+            if fs::symlink_metadata(&blob.path).await.is_ok() {
+                let quarantine = self.root.join("quarantine");
+                fs::create_dir_all(&quarantine).await?;
+                fs::rename(
+                    &blob.path,
+                    quarantine.join(format!(
+                        "{}-{}",
+                        hash,
+                        uuid::Uuid::new_v4()
+                    )),
+                )
+                .await?;
             }
         }
         self.publish_staged(staged, &[]).await
@@ -279,31 +277,30 @@ impl ContentStore {
             if repair {
                 let mut sources: Vec<String> =
                     serde_json::from_str(&blob.sources)?;
-                if sources.is_empty() {
-                    if let Ok(files) = crate::state::CachedEntry::get_file_many(
+                if sources.is_empty()
+                    && let Ok(files) = crate::state::CachedEntry::get_file_many(
                         &[blob.sha1.as_str()],
                         None,
                         &self.pool,
                         &state.api_semaphore,
                     )
                     .await
-                    {
-                        for file in files {
-                            if let Ok(Some(version)) =
-                                crate::state::CachedEntry::get_version(
-                                    &file.version_id,
-                                    None,
-                                    &self.pool,
-                                    &state.api_semaphore,
-                                )
-                                .await
-                            {
-                                for candidate in version.files {
-                                    if candidate.hashes.get("sha512")
-                                        == Some(&blob.sha512)
-                                    {
-                                        sources.push(candidate.url);
-                                    }
+                {
+                    for file in files {
+                        if let Ok(Some(version)) =
+                            crate::state::CachedEntry::get_version(
+                                &file.version_id,
+                                None,
+                                &self.pool,
+                                &state.api_semaphore,
+                            )
+                            .await
+                        {
+                            for candidate in version.files {
+                                if candidate.hashes.get("sha512")
+                                    == Some(&blob.sha512)
+                                {
+                                    sources.push(candidate.url);
                                 }
                             }
                         }

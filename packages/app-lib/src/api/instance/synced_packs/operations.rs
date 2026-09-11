@@ -137,6 +137,7 @@ pub(super) async fn pack_from_item(
     item.update_version_id = None;
     Ok(SyncedPack {
         blob_sha512: None,
+        migration_error: None,
         item,
         sha1,
         game_versions,
@@ -499,17 +500,18 @@ pub async fn list_synced_packs(
                 instance_ids: synced_instance_ids(
                     id, &library, &instances, global,
                 ),
-                update_pending: library
-                    .instances
-                    .values()
-                    .filter_map(|placements| placements.get(id))
-                    .any(|placement| {
-                        !placement.excluded
-                            && !placement.suspended
-                            && (placement.pending
-                                || placement.error.is_some()
-                                || placement.enabled != pack.item.enabled)
-                    }),
+                update_pending: pack.migration_error.is_some()
+                    || library
+                        .instances
+                        .values()
+                        .filter_map(|placements| placements.get(id))
+                        .any(|placement| {
+                            !placement.excluded
+                                && !placement.suspended
+                                && (placement.pending
+                                    || placement.error.is_some()
+                                    || placement.enabled != pack.item.enabled)
+                        }),
             });
             item
         })
@@ -561,6 +563,7 @@ pub async fn upload_synced_pack(
         id.clone(),
         SyncedPack {
             blob_sha512: None,
+            migration_error: None,
             sha1,
             game_versions,
             selected: (project_type == ProjectType::ResourcePack)

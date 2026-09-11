@@ -1,12 +1,12 @@
 {
-	"db_name": "SQLite",
-	"query": "DELETE FROM store_retained_refs WHERE owner_kind = ? AND owner_id = ?",
-	"describe": {
-		"columns": [],
-		"parameters": {
-			"Right": 2
-		},
-		"nullable": []
-	},
-	"hash": "b98a0f5ff9975d32f98230fcd40126b7638872f0a95a94c5845f24e7de3cd18f"
+  "db_name": "SQLite",
+  "query": "DELETE FROM store_retained_refs WHERE owner_kind = ? AND owner_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "b98a0f5ff9975d32f98230fcd40126b7638872f0a95a94c5845f24e7de3cd18f"
 }

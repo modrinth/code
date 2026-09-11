@@ -1122,7 +1122,7 @@ pub async fn launch_minecraft(
     let _store_lock = state.content_store.files_lock.lock().await;
     let _store_lease = state.content_store.lease().await;
     state.content_store.recover(Some(&instance.id)).await?;
-    state.content_store.validate_instance(&instance).await?;
+    state.content_store.validate_instance(instance).await?;
     if crate::state::instance_has_running_process(&instance.id, &state).await? {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Instance {} is already running",

@@ -288,6 +288,7 @@ impl DirectoryInfo {
             )
             .await?;
         }
+        drop(move_locks);
         Ok(())
     }
 }

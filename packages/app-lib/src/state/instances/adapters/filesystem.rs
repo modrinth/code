@@ -10,35 +10,26 @@ pub(crate) struct ScannedContentFile {
     pub size: u64,
     pub hash_cache_key: String,
     pub is_symlink: bool,
+    pub has_linked_parent: bool,
 }
 
 pub(crate) fn scan_content_files(
     instances_dir: &Path,
     instance_path: &str,
 ) -> crate::Result<Vec<ScannedContentFile>> {
+    crate::state::content_store::validate_relative(instance_path)?;
     let instance_full_path = instances_dir.join(instance_path);
-    if std::fs::symlink_metadata(&instance_full_path)
-        .is_ok_and(|metadata| metadata.file_type().is_symlink())
-    {
-        return Err(crate::ErrorKind::InputError(
-            "An instance directory must not be a symbolic link".to_string(),
-        )
-        .into());
-    }
     let instance_dir = io::canonicalize(instance_full_path)?;
+    let linked_instance =
+        instance_dir != io::canonicalize(instances_dir)?.join(instance_path);
     let mut files = Vec::new();
 
     for project_type in ProjectType::iterator() {
         let folder = project_type.get_folder();
         let folder_path = instance_dir.join(folder);
-        if std::fs::symlink_metadata(&folder_path)
-            .is_ok_and(|metadata| metadata.file_type().is_symlink())
-        {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Content directory {folder} must not be a symbolic link"
-            ))
-            .into());
-        }
+        let has_linked_parent = linked_instance
+            || std::fs::symlink_metadata(&folder_path)
+                .is_ok_and(|metadata| metadata.file_type().is_symlink());
 
         if !folder_path.exists() {
             continue;
@@ -74,6 +65,7 @@ pub(crate) fn scan_content_files(
             );
 
             files.push(ScannedContentFile {
+                has_linked_parent,
                 relative_path,
                 file_name: file_name.to_string(),
                 enabled: !file_name.ends_with(".disabled"),

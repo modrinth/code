@@ -54,9 +54,43 @@ pub(crate) struct PreparedProjection {
     journal: ProjectionJournal,
     pub(crate) blob: Option<BlobLease>,
     _before: Option<BlobLease>,
+    /// Set only after a failed apply has cleared its journal and preserved or restored the file.
+    pub(crate) safe_to_defer: bool,
 }
 
 impl ContentStore {
+    pub(crate) async fn supports_content_links(
+        &self,
+        source: &Path,
+    ) -> crate::Result<bool> {
+        let parent = source
+            .parent()
+            .ok_or_else(|| input("Content destination has no parent"))?;
+        let mut supported = self.link_support.lock().await;
+        if let Some(supported) = supported.get(parent) {
+            return Ok(*supported);
+        }
+        let temporary =
+            parent.join(format!(".modrinth-link-{}.tmp", uuid::Uuid::new_v4()));
+        let target = relative_link(source, parent);
+        #[cfg(unix)]
+        let result = fs::symlink(&target, &temporary).await;
+        #[cfg(windows)]
+        let result = fs::symlink_file(&target, &temporary).await;
+        match result {
+            Ok(()) => {
+                fs::remove_file(temporary).await?;
+                supported.insert(parent.to_path_buf(), true);
+                Ok(true)
+            }
+            Err(error) if link_unavailable(&error) => {
+                supported.insert(parent.to_path_buf(), false);
+                Ok(false)
+            }
+            Err(error) => Err(error.into()),
+        }
+    }
+
     pub(crate) async fn inspect_projection(
         &self,
         instance: &Instance,
@@ -222,10 +256,14 @@ impl ContentStore {
             )
             .await?;
         }
-        let source_relative = existing
-            .as_ref()
-            .map(content_file_path)
-            .unwrap_or_else(|| requested_source.to_string());
+        let source_relative = if known_source_blob.is_some() {
+            requested_source.to_string()
+        } else {
+            existing
+                .as_ref()
+                .map(content_file_path)
+                .unwrap_or_else(|| requested_source.to_string())
+        };
         let target_relative =
             materialized_content_path(canonical_path, enabled);
         let source =
@@ -246,6 +284,11 @@ impl ContentStore {
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
             Err(error) => return Err(error.into()),
         };
+        if known_source_blob.is_some() && metadata.is_none() {
+            return Err(input(
+                "Legacy content disappeared before it could be adopted",
+            ));
+        }
         let mut previous_lease = None;
         let before = if let Some(metadata) = &metadata {
             if metadata.file_type().is_symlink() {
@@ -337,6 +380,7 @@ impl ContentStore {
             journal,
             blob: blob.cloned(),
             _before: previous_lease,
+            safe_to_defer: false,
         })
     }
 
@@ -383,6 +427,7 @@ impl ContentStore {
             journal,
             blob: None,
             _before: None,
+            safe_to_defer: false,
         })
     }
 
@@ -418,9 +463,37 @@ impl ContentStore {
         instance_id: Option<&str>,
     ) -> crate::Result<()> {
         for payload in catalog::operations(&self.pool, instance_id).await? {
-            let journal: ProjectionJournal = serde_json::from_str(&payload)?;
-            self.rollback_journal(&journal).await?;
+            let journal: ProjectionJournal =
+                match serde_json::from_str(&payload) {
+                    Ok(journal) => journal,
+                    Err(error) if instance_id.is_none() => {
+                        tracing::warn!(
+                            "Invalid content recovery journal retained: {error}"
+                        );
+                        continue;
+                    }
+                    Err(error) => return Err(error.into()),
+                };
+            if let Err(error) = self.rollback_journal(&journal).await {
+                if instance_id.is_some() {
+                    return Err(error);
+                }
+                tracing::warn!(
+                    instance_id = %journal.instance_id, operation_id = %journal.id,
+                    "Content recovery deferred for this instance: {error}",
+                );
+            }
         }
+        Ok(())
+    }
+
+    async fn finish_journal(
+        &self,
+        journal: &ProjectionJournal,
+    ) -> crate::Result<()> {
+        let mut tx = self.pool.begin().await?;
+        catalog::finish(&mut tx, &journal.id).await?;
+        tx.commit().await?;
         Ok(())
     }
 
@@ -428,6 +501,42 @@ impl ContentStore {
         &self,
         journal: &ProjectionJournal,
     ) -> crate::Result<()> {
+        if let (Some(before), Some(after)) = (&journal.before, &journal.after)
+            && before.present
+            && after.present
+            && before.mode == MaterializationKind::Copy
+            && after.mode == MaterializationKind::Symlink
+            && before.relative_path == after.relative_path
+            && before.sha512 == after.sha512
+        {
+            let file = content_rows::get_instance_file_by_relative_path(
+                &journal.instance_id,
+                before.relative_path.trim_end_matches(".disabled"),
+                &self.pool,
+            )
+            .await?;
+            let unmanaged = match file {
+                Some(file) => {
+                    catalog::binding(&self.pool, &file.id).await?.is_none()
+                }
+                None => true,
+            };
+            let path = self
+                .instance_path(&journal.instance_path, &before.relative_path)
+                .await?;
+            if unmanaged
+                && fs::symlink_metadata(&path)
+                    .await
+                    .is_ok_and(|metadata| metadata.is_file())
+            {
+                tracing::debug!(
+                    instance_id = %journal.instance_id,
+                    path = %before.relative_path,
+                    "Preserving the legacy file and abandoning its interrupted adoption",
+                );
+                return self.finish_journal(journal).await;
+            }
+        }
         if journal_noop(journal) {
             let mut tx = self.pool.begin().await?;
             catalog::finish(&mut tx, &journal.id).await?;
@@ -611,14 +720,24 @@ impl PreparedProjection {
         &mut self,
         store: &ContentStore,
     ) -> crate::Result<()> {
-        let result = self.apply_inner(store).await;
+        let mut mutation_started = false;
+        let result = self.apply_inner(store, &mut mutation_started).await;
         if result.is_err() {
-            store.rollback_journal(&self.journal).await?;
+            if mutation_started {
+                store.rollback_journal(&self.journal).await?;
+            } else {
+                store.finish_journal(&self.journal).await?;
+            }
+            self.safe_to_defer = true;
         }
         result
     }
 
-    async fn apply_inner(&mut self, store: &ContentStore) -> crate::Result<()> {
+    async fn apply_inner(
+        &mut self,
+        store: &ContentStore,
+        mutation_started: &mut bool,
+    ) -> crate::Result<()> {
         if journal_noop(&self.journal) {
             return Ok(());
         }
@@ -645,6 +764,7 @@ impl PreparedProjection {
                     "The content toggle destination already exists",
                 ));
             }
+            *mutation_started = true;
             rename_projection(&source, &target).await?;
             return Ok(());
         }
@@ -655,13 +775,24 @@ impl PreparedProjection {
                     &before.relative_path,
                 )
                 .await?;
-            if fs::symlink_metadata(&path).await.is_ok() {
-                if !store.matches(&path, &before.sha512).await? {
-                    return Err(input(
-                        "Content changed before the operation could be applied",
-                    ));
+            match fs::symlink_metadata(&path).await {
+                Ok(_) => {
+                    if !store.matches(&path, &before.sha512).await? {
+                        return Err(input(
+                            "Content changed before the operation could be applied",
+                        ));
+                    }
+                    *mutation_started = true;
+                    remove_projection(&path).await?;
                 }
-                remove_projection(&path).await?;
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    if before.present {
+                        return Err(input(
+                            "Content disappeared before the operation could be applied",
+                        ));
+                    }
+                }
+                Err(error) => return Err(error.into()),
             }
         }
         if let Some(after) = &mut self.journal.after
@@ -677,6 +808,7 @@ impl PreparedProjection {
                     &after.relative_path,
                 )
                 .await?;
+            *mutation_started = true;
             after.mode = store.materialize(blob, &path, false).await?;
         }
         Ok(())

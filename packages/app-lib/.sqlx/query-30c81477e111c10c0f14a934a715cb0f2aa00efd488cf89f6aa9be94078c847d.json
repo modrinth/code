@@ -1,12 +1,12 @@
 {
-	"db_name": "SQLite",
-	"query": "UPDATE install_jobs SET state = jsonb(?) WHERE id = ?",
-	"describe": {
-		"columns": [],
-		"parameters": {
-			"Right": 2
-		},
-		"nullable": []
-	},
-	"hash": "30c81477e111c10c0f14a934a715cb0f2aa00efd488cf89f6aa9be94078c847d"
+  "db_name": "SQLite",
+  "query": "UPDATE install_jobs SET state = jsonb(?) WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "30c81477e111c10c0f14a934a715cb0f2aa00efd488cf89f6aa9be94078c847d"
 }
