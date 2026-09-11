@@ -48,6 +48,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        platform:
+          [
+            namespace-profile-medium-amd64-macos,
+            namespace-profile-medium-amd64-windows,
+            namespace-profile-medium-amd64,
+          ]
         include:
           - platform: namespace-profile-medium-amd64-macos
             artifact-target-name: universal-apple-darwin
@@ -184,18 +190,13 @@ jobs:
 
       - name: Build Windows app
         run: |
-          if ($env:SIGN_WINDOWS -eq 'true') {
-            [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
-            $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
-          }
+          [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
+          $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
           $env:JAVA_HOME = "$env:JAVA_HOME_17_X64"
           ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
-          $buildExitCode = $LASTEXITCODE
           Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
-          exit $buildExitCode
         if: contains(matrix.artifact-target-name, 'windows')
         env:
-          SIGN_WINDOWS: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.sign-windows-binaries }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           DIGICERT_ONE_SIGNER_API_KEY: ${{ secrets.DIGICERT_ONE_SIGNER_API_KEY }}
