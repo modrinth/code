@@ -2,7 +2,7 @@
 	<div class="flex w-full items-center gap-4">
 		<span
 			v-if="currentValue !== null"
-			class="min-w-10 shrink-0 whitespace-nowrap py-2 text-right text-sm leading-5 text-secondary"
+			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
 		>
 			{{ minLabel ?? min }}
 		</span>
@@ -12,6 +12,25 @@
 			class="relative mx-2 min-w-0 flex-1"
 			:class="[heightClass, disabled ? 'opacity-50' : '']"
 		>
+			<div
+				class="pointer-events-none absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-surface-5"
+			>
+				<div class="h-full rounded-full bg-brand" :style="{ width: `${currentPercentage}%` }" />
+			</div>
+
+			<div
+				v-if="visibleSnapPoints.length"
+				class="pointer-events-none absolute inset-x-0 top-1/2 h-4 -translate-y-1/2"
+			>
+				<span
+					v-for="snapPoint in visibleSnapPoints"
+					:key="snapPoint"
+					class="absolute top-0 h-4 w-1 -translate-x-1/2 rounded-full"
+					:class="snapPoint <= currentValue ? 'bg-brand' : 'bg-surface-5'"
+					:style="{ left: `${getPercentage(snapPoint)}%` }"
+				/>
+			</div>
+
 			<input
 				ref="input"
 				:value="currentValue"
@@ -20,49 +39,16 @@
 				:max="max"
 				:step="step"
 				class="slider absolute top-0 h-full min-h-0 appearance-none overflow-visible border-0 bg-transparent p-0 shadow-none outline-none"
-				:class="
-					disabled
-						? 'cursor-not-allowed'
-						: currentValue === min
-							? 'cursor-e-resize'
-							: currentValue === max
-								? 'cursor-w-resize'
-								: 'cursor-ew-resize'
-				"
+				:class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'"
 				:disabled="disabled"
 				:aria-label="ariaLabel"
 				@input="onInputWithSnap(($event.target as HTMLInputElement).value)"
 			/>
-			<div
-				class="slider-track pointer-events-none absolute inset-x-0 top-1/2 h-[6px] -translate-y-1/2 rounded-full bg-surface-5"
-			>
-				<div
-					class="filled-slider-track h-full rounded-full bg-brand relative"
-					:style="{ width: `${currentPercentage}%` }"
-				>
-					<div
-						class="slider-thumb absolute h-8 w-[10px] rounded-full bg-brand top-[-13px] right-[-5px]"
-					></div>
-				</div>
-			</div>
-
-			<div
-				v-if="visibleSnapPoints.length"
-				class="snap-points pointer-events-none absolute inset-x-0 top-1/2 h-[18px] -translate-y-1/2"
-			>
-				<span
-					v-for="snapPoint in visibleSnapPoints"
-					:key="snapPoint"
-					class="absolute top-0 h-[18px] w-1.5 -translate-x-1/2 rounded-full"
-					:class="snapPoint <= currentValue ? 'bg-brand brightness-on-hover' : 'bg-surface-5'"
-					:style="{ left: `${getPercentage(snapPoint)}%` }"
-				/>
-			</div>
 		</div>
 
 		<span
 			v-if="currentValue !== null"
-			class="min-w-10 shrink-0 whitespace-nowrap py-2 text-left text-sm leading-5 text-secondary"
+			class="shrink-0 whitespace-nowrap py-2 text-sm leading-5 text-secondary"
 		>
 			{{ maxLabel ?? formatValue(max) }}
 		</span>
@@ -72,7 +58,8 @@
 			type="number"
 			:size="size"
 			wrapper-class="slider-value shrink-0"
-			:style="{ width: currentValue === null ? '100%' : inputWidth }"
+			:class="currentValue === null ? 'w-full' : undefined"
+			:style="currentValue === null ? undefined : { '--value-chars': valueFieldChars }"
 			:input-class="currentValue === null ? undefined : 'text-center'"
 			:disabled="disabled"
 			:placeholder="placeholder"
@@ -86,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import Input from './inputs/Input.vue'
 import type { InputSize } from './inputs/types'
@@ -132,12 +119,13 @@ const heightClass = computed(
 			large: 'h-12',
 		})[props.size],
 )
-const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
-const inputWidth = computed(() => {
-	const digits = Math.max(String(props.min).length, String(props.max).length)
-	const padding = props.size === 'small' || props.size === 'standard' ? 1.5 : 2
-	return `max(65px, calc(${digits}ch + ${padding}rem + 2px))`
+const valueFieldChars = computed(() => {
+	const decimals = (String(props.step).split('.')[1] ?? '').length
+
+	return Math.max(props.min.toFixed(decimals).length, props.max.toFixed(decimals).length, 2)
 })
+const input = useTemplateRef<HTMLInputElement>('input')
+const currentValue = ref(props.modelValue === null ? null : normalizeValue(props.modelValue))
 const currentPercentage = computed(() => getPercentage(currentValue.value ?? props.min))
 const visibleSnapPoints = computed(() =>
 	props.snapPoints.filter((snapPoint) => snapPoint >= props.min && snapPoint <= props.max),
@@ -180,14 +168,24 @@ function inputValueValid(inputValue: number) {
 }
 
 function onInputWithSnap(value: string) {
-	let parsedValue = Number.parseFloat(value)
+	const parsedValue = Number.parseFloat(value)
+
+	let snappedValue = parsedValue
+	let closestDistance = props.snapRange
 
 	for (const snapPoint of props.snapPoints) {
 		const distance = Math.abs(snapPoint - parsedValue)
-		if (distance < props.snapRange) parsedValue = snapPoint
+		if (distance < closestDistance) {
+			closestDistance = distance
+			snappedValue = snapPoint
+		}
 	}
 
-	inputValueValid(parsedValue)
+	inputValueValid(snappedValue)
+
+	if (input.value && currentValue.value !== null) {
+		input.value.value = String(currentValue.value)
+	}
 }
 
 function onInput(event: Event) {
@@ -199,12 +197,8 @@ function onInput(event: Event) {
 
 <style lang="scss" scoped>
 .slider {
-	left: -0.625rem;
-	width: calc(100% + 1.25rem);
-
-	&:focus {
-		box-shadow: none;
-	}
+	left: -0.5rem;
+	width: calc(100% + 1rem);
 
 	&::-webkit-slider-runnable-track {
 		height: 0.25rem;
@@ -220,24 +214,58 @@ function onInput(event: Event) {
 	&::-webkit-slider-thumb {
 		-webkit-appearance: none;
 		appearance: none;
-		width: 1.25rem;
-		height: 1.25rem;
+		width: 1rem;
+		height: 1rem;
+		margin-top: -0.375rem;
 		border: 0;
-		background: transparent;
+		border-radius: 9999px;
+		background: var(--color-contrast);
+		box-shadow:
+			0 0 0 2px transparent,
+			0 0 0 4px transparent;
+		transition: box-shadow 0.15s ease-in-out;
 	}
 
 	&::-moz-range-thumb {
-		width: 1.25rem;
-		height: 1.25rem;
+		width: 1rem;
+		height: 1rem;
 		border: 0;
-		background: transparent;
+		border-radius: 9999px;
+		background: var(--color-contrast);
+		box-shadow:
+			0 0 0 2px transparent,
+			0 0 0 4px transparent;
+		transition: box-shadow 0.15s ease-in-out;
+	}
+
+	&:hover::-webkit-slider-thumb,
+	&:active::-webkit-slider-thumb {
+		box-shadow:
+			0 0 0 2px var(--surface-3),
+			0 0 0 4px var(--color-brand);
+	}
+
+	&:hover::-moz-range-thumb,
+	&:active::-moz-range-thumb {
+		box-shadow:
+			0 0 0 2px var(--surface-3),
+			0 0 0 4px var(--color-brand);
 	}
 
 	&:focus-visible::-webkit-slider-thumb {
-		box-shadow: none;
+		box-shadow:
+			0 0 0 2px var(--surface-3),
+			0 0 0 4px var(--color-brand);
 	}
 
 	&:focus-visible::-moz-range-thumb {
+		box-shadow:
+			0 0 0 2px var(--surface-3),
+			0 0 0 4px var(--color-brand);
+	}
+
+	&:focus,
+	&:focus-visible {
 		box-shadow: none;
 	}
 
@@ -245,35 +273,17 @@ function onInput(event: Event) {
 		pointer-events: none;
 		opacity: 1;
 	}
-
-	&:focus-visible + .slider-track .slider-thumb {
-		outline: 3px solid var(--color-focus-ring);
-		outline-offset: 3px;
-	}
-
-	&:hover,
-	&:focus-visible {
-		& + .slider-track .filled-slider-track,
-		& ~ .snap-points .brightness-on-hover {
-			filter: brightness(var(--hover-brightness));
-		}
-	}
 }
 
 .slider-value :deep(input[type='number']) {
 	-moz-appearance: textfield;
+	flex: none;
+	width: calc(var(--value-chars) * 1ch);
 
 	&::-webkit-inner-spin-button,
 	&::-webkit-outer-spin-button {
 		margin: 0;
 		-webkit-appearance: none;
-	}
-}
-
-.filled-slider-track {
-	transition: width 0.25s var(--ease-out-expo);
-	@media (prefers-reduced-motion) {
-		transition: none;
 	}
 }
 </style>
