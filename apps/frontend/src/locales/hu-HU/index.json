@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Mentsd el a kedvenc tartalmaidat, és egy kattintással kapj frissítéseket."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Projektek követése"
-  },
   "app-marketing.features.importing.description": {
     "message": "Importáld az összes kedvenc profilodat a korábban használt indítóból, és néhány másodperc alatt elindíthatod a Modrinth Appot!"
   },
@@ -623,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Verzió"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Játssz a modjaiddal, attól függetlenül, hogy kapcsolódva vagy-e az internethez, vagy sem."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline mód"
-  },
   "app-marketing.features.open-source.description": {
     "message": "A Modrinth inditója teljesen nyílt forráskódú. Ellenőrizheted a forráskódot a <github-link>GitHub</github-link> oldalunkon!"
   },
@@ -652,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

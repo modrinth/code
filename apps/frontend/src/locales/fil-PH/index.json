@@ -182,12 +182,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "I-save ang iyong minamahal na kontento at makapagtanggap ng mga update sa iisang pindot."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Sundan ang mga proyekto"
-  },
   "app-marketing.features.importing.description": {
     "message": "I-import ang lahat ng mga paboritong profile mo galing sa launcher na dating ginagamit mo, at magsimula na sa Modrinth App is iilang segundo!"
   },
@@ -224,12 +218,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Bersiyon"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Laruin ang iyong mga mod, kung mapakonekta ka man sa internet, o hindi."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline mode"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Buong naka-open-source ang launcher ng Modrinth. Maaari mong matingnan ang source code sa aming <github-link>GitHub</github-link>!"
   },
@@ -253,12 +241,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

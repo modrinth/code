@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Sevdiğiniz içerikleri kaydedin ve tek tuşla ilgili haberleri alın."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Proje takibi"
-  },
   "app-marketing.features.importing.description": {
     "message": "Sevdiğin profilleri önceden kullandığın başlatıcıdan buraya aktar, saniyeler içinde Modrinth App'i kullanmaya başla!"
   },
@@ -623,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Sürüm"
   },
-  "app-marketing.features.offline.description": {
-    "message": "İnternete bağlı kalmadan modlarınızla oynayın."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Çevrim dışı mod"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth'in başlatıcısı tamamen açık kaynak kodludur. <github-link>GitHub</github-link> sayfamızda kaynak kodunu inceleyebilirsin!"
   },
@@ -652,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

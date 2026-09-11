@@ -581,12 +581,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "마음에 드는 콘텐츠를 저장하고 한 번의 클릭으로 업데이트를 받아보세요."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "프로젝트 팔로우"
-  },
   "app-marketing.features.importing.description": {
     "message": "이전 런처에서 사용하던 모든 즐겨찾기 프로필을 가져오고, Modrinth App에서 바로 시작하세요!"
   },
@@ -623,12 +617,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "버전"
   },
-  "app-marketing.features.offline.description": {
-    "message": "인터넷에 연결되어 있든 아니든, 언제든지 모드를 플레이하세요."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "오프라인 모드"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth의 런처는 완전히 오픈 소스입니다. <github-link>Github</github-link>에서 소스 코드를 확인하세요!"
   },
@@ -652,15 +640,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

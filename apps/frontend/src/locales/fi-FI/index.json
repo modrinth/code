@@ -62,12 +62,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Tallenna sisältöä jota rakastat ja vastaanota päivityksiä yhdellä klikkauksella."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Seuraa projekteja"
-  },
   "app-marketing.features.importing.description": {
     "message": "Tuo kaikki lempi profiilisi launcherista jota käytit ennen, ja aloita Modrinth Appin käyttö sekunneissa!"
   },
@@ -104,12 +98,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versio"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Pelaa modeillasi, olit sitten yhdistettynä internettiin tai et."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Offline tila"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth launcherin lähdekoodi on täysin avointa. Voit lukea lähdekoodia meidän <github-link>Githubissa</github-link>!"
   },
@@ -133,12 +121,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MT"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MT"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

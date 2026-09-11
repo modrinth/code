@@ -263,12 +263,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Simpan konten yang Anda suka dan dapatkan pembaruan dengan satu klik saja."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Ikuti proyek"
-  },
   "app-marketing.features.importing.description": {
     "message": "Impor semua profil favorit Anda dari launcher yang telah Anda gunakan sebelumnya, dan mulai menggunakan Modrinth App dalam hitungan detik!"
   },
@@ -305,12 +299,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versi"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Mainkan mod Anda, baik saat daring maupun luring."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Mode luring"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Peluncur Modrinth sepenuhnya bersumber terbuka. Anda dapat melihat kode sumber pada <github-link>GitHub</github-link> kami!"
   },
@@ -334,12 +322,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"

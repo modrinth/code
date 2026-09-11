@@ -461,12 +461,6 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
-  "app-marketing.features.follow.description": {
-    "message": "Simpan kandungan yang anda suka dan terima kemas kini dengan sekali klik."
-  },
-  "app-marketing.features.follow.title": {
-    "message": "Ikuti projek"
-  },
   "app-marketing.features.importing.description": {
     "message": "Import semua profil kegemaran anda daripada pelancar yang anda gunakan sebelum ini, dan mula gunakan Modrinth App dalam beberapa saat!"
   },
@@ -503,12 +497,6 @@
   "app-marketing.features.mod-management.version": {
     "message": "Versi"
   },
-  "app-marketing.features.offline.description": {
-    "message": "Mainkan mod anda, sama ada anda disambungkan ke internet atau tidak."
-  },
-  "app-marketing.features.offline.title": {
-    "message": "Mod luar talian"
-  },
   "app-marketing.features.open-source.description": {
     "message": "Pelancar Modrinth adalah sumber terbuka sepenuhnya. Anda boleh melihat kod sumber pada laman <github-link>GitHub</github-link> kami!"
   },
@@ -532,15 +520,6 @@
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
-  },
-  "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ MB"
-  },
-  "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ × ∞ MB"
-  },
-  "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
