@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Megosztott tartalom frissítése"
   },
-  "app.action-bar.installs": {
-    "message": "Telepítések"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Beállítás elsődleges példányként"
   },

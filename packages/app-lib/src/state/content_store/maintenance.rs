@@ -1,6 +1,6 @@
 use super::{
-	BlobStatus, ContentProjectionStatus, ContentStore, FileContent,
-	MaterializationKind, catalog, content_file_path, input, sync_directory,
+    BlobStatus, ContentProjectionStatus, ContentStore, FileContent,
+    MaterializationKind, catalog, content_file_path, input, sync_directory,
 };
 use crate::State;
 use crate::state::instances::adapters::sqlite::instance_rows;
@@ -11,8 +11,8 @@ use tokio::fs;
 #[derive(Serialize)]
 pub struct StoreUsage {
     pub unique_bytes: u64,
-	pub shared_bytes: u64,
-	pub unused_cache_bytes: u64,
+    pub shared_bytes: u64,
+    pub unused_cache_bytes: u64,
     pub estimated_saved_bytes: u64,
     pub private_copy_bytes: u64,
     pub object_count: usize,
@@ -40,8 +40,8 @@ impl ContentStore {
         source: &std::path::Path,
         state: &State,
     ) -> crate::Result<super::BlobLease> {
-		let staged = self.stage_file(source).await?;
-		let hash = staged.sha512.clone();
+        let staged = self.stage_file(source).await?;
+        let hash = staged.sha512.clone();
         let _files_lock = self.files_lock.lock().await;
         if let Some(blob) = self.catalog_blob(&hash).await? {
             if !self.is_healthy(&blob.blob, true).await? {
@@ -74,7 +74,7 @@ impl ContentStore {
                 }
             }
         }
-		self.publish_staged(staged, &[]).await
+        self.publish_staged(staged, &[]).await
     }
 
     pub async fn usage(&self) -> crate::Result<StoreUsage> {
@@ -84,7 +84,7 @@ impl ContentStore {
             .await?
             .into_iter()
             .collect::<HashSet<_>>();
-		let placements = sqlx::query!("SELECT binding.blob_sha512, binding.materialization_kind, file.size FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.missing = 0").fetch_all(&self.pool).await?;
+        let placements = sqlx::query!("SELECT binding.blob_sha512, binding.materialization_kind, file.size FROM store_instance_files binding INNER JOIN instance_files file ON file.id = binding.file_id WHERE file.missing = 0").fetch_all(&self.pool).await?;
         let installed = placements
             .iter()
             .map(|placement| placement.blob_sha512.as_str())
@@ -95,10 +95,10 @@ impl ContentStore {
             .sum::<u64>();
         let private_copy_bytes = placements
             .iter()
-			.filter(|placement| {
-				placement.materialization_kind
-					== MaterializationKind::Copy.as_str()
-			})
+            .filter(|placement| {
+                placement.materialization_kind
+                    == MaterializationKind::Copy.as_str()
+            })
             .map(|placement| placement.size.max(0) as u64)
             .sum::<u64>();
         let referenced_unique = blobs
@@ -106,26 +106,30 @@ impl ContentStore {
             .filter(|blob| installed.contains(blob.sha512.as_str()))
             .map(|blob| blob.size as u64)
             .sum::<u64>();
-		let mut shared_placements = HashMap::new();
-		for placement in &placements {
-			if placement.materialization_kind
-				== MaterializationKind::Symlink.as_str()
-			{
-				*shared_placements
-					.entry(placement.blob_sha512.as_str())
-					.or_insert(0usize) += 1;
-			}
-		}
+        let mut shared_placements = HashMap::new();
+        for placement in &placements {
+            if placement.materialization_kind
+                == MaterializationKind::Symlink.as_str()
+            {
+                *shared_placements
+                    .entry(placement.blob_sha512.as_str())
+                    .or_insert(0usize) += 1;
+            }
+        }
         Ok(StoreUsage {
             unique_bytes: blobs.iter().map(|blob| blob.size as u64).sum(),
-			shared_bytes: blobs
-				.iter()
-				.filter(|blob| {
-					shared_placements.get(blob.sha512.as_str()).copied().unwrap_or(0) > 1
-				})
-				.map(|blob| blob.size as u64)
-				.sum(),
-			unused_cache_bytes: blobs
+            shared_bytes: blobs
+                .iter()
+                .filter(|blob| {
+                    shared_placements
+                        .get(blob.sha512.as_str())
+                        .copied()
+                        .unwrap_or(0)
+                        > 1
+                })
+                .map(|blob| blob.size as u64)
+                .sum(),
+            unused_cache_bytes: blobs
                 .iter()
                 .filter(|blob| !roots.contains(&blob.sha512))
                 .map(|blob| blob.size as u64)
@@ -137,7 +141,7 @@ impl ContentStore {
             object_count: blobs.len(),
             damaged_objects: blobs
                 .iter()
-				.filter(|blob| blob.status == BlobStatus::Quarantined)
+                .filter(|blob| blob.status == BlobStatus::Quarantined)
                 .count(),
             cache_limit_bytes: self.cache_limit().await?,
         })
@@ -194,7 +198,7 @@ impl ContentStore {
         };
         let mut reclaimed = 0;
         for blob in candidates {
-			if unused <= limit && blob.status != BlobStatus::Deleting {
+            if unused <= limit && blob.status != BlobStatus::Deleting {
                 continue;
             }
             if !purge_unused
@@ -205,12 +209,8 @@ impl ContentStore {
             {
                 continue;
             }
-			catalog::set_status(
-				&self.pool,
-				&blob.sha512,
-				BlobStatus::Deleting,
-			)
-			.await?;
+            catalog::set_status(&self.pool, &blob.sha512, BlobStatus::Deleting)
+                .await?;
             let path = self.path(&blob)?;
             self.validate_object_parent(&path).await?;
             match fs::symlink_metadata(&path).await {

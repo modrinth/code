@@ -18,8 +18,8 @@ use modrinth_content_management::{
 use std::path::{Path, PathBuf};
 
 use super::content_mutation::{
-	ContentOrigin, InstallContent, install_content_blob, remove_project,
-	toggle_disable_project,
+    ContentOrigin, InstallContent, install_content_blob, remove_project,
+    toggle_disable_project,
 };
 
 pub(crate) struct ContentScope {
@@ -525,7 +525,11 @@ pub(crate) async fn add_project_from_path(
     install_content_blob(
         instance_id,
         InstallContent {
-            requested_path: &format!("{}/{}", project_type.get_folder(), file_name),
+            requested_path: &format!(
+                "{}/{}",
+                project_type.get_folder(),
+                file_name
+            ),
             blob: &blob,
             project_type,
             source_kind: ContentSourceKind::Local,
@@ -577,16 +581,20 @@ pub(crate) async fn add_project_bytes(
     install_content_blob(
         instance_id,
         InstallContent {
-            requested_path: &format!("{}/{}", project_type.get_folder(), file_name),
+            requested_path: &format!(
+                "{}/{}",
+                project_type.get_folder(),
+                file_name
+            ),
             blob: &blob,
             project_type,
             source_kind,
-            origin: project_id.zip(version_id).map(|(project_id, version_id)| {
-                ContentOrigin {
+            origin: project_id.zip(version_id).map(
+                |(project_id, version_id)| ContentOrigin {
                     project_id,
                     version_id,
-                }
-            }),
+                },
+            ),
             enabled_override: None,
             previous_path: None,
         },

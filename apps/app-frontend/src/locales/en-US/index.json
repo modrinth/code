@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Updating shared content"
   },
-  "app.action-bar.installs": {
-    "message": "Installs"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Make primary instance"
   },
@@ -298,6 +295,75 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Turn on resource pack syncing in app settings first."
+  },
+  "app.download-manager.active": {
+    "message": "Active"
+  },
+  "app.download-manager.attention": {
+    "message": "Needs attention"
+  },
+  "app.download-manager.cancel": {
+    "message": "Cancel installation"
+  },
+  "app.download-manager.canceling": {
+    "message": "Canceling installation…"
+  },
+  "app.download-manager.complete": {
+    "message": "Complete"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Duplicated instance"
+  },
+  "app.download-manager.empty": {
+    "message": "No installation tasks"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Estimated download speed"
+  },
+  "app.download-manager.eta": {
+    "message": "Estimated time remaining for this download"
+  },
+  "app.download-manager.hide": {
+    "message": "Hide installation tasks"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Imported instance"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instance installation"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Modpack installation"
+  },
+  "app.download-manager.new-instance": {
+    "message": "New instance"
+  },
+  "app.download-manager.pause": {
+    "message": "Pause installation"
+  },
+  "app.download-manager.paused": {
+    "message": "Paused"
+  },
+  "app.download-manager.remove": {
+    "message": "Remove from history"
+  },
+  "app.download-manager.resume": {
+    "message": "Resume installation"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Shared instance"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Shared instance update"
+  },
+  "app.download-manager.show": {
+    "message": "Show installation tasks"
+  },
+  "app.download-manager.tasks": {
+    "message": "Tasks"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Open backups folder"
@@ -2723,6 +2789,69 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximum concurrent writes"
   },
+  "app.settings.resource-management.store.attention": {
+    "message": "Some files still need attention"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Maximum space used for unused content that can be reused without downloading it again."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Unused content cache limit"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Clear unused"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Freed {size} of disk space."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Clearing…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Save space by reusing mods and packs across your instances."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Install mods or packs to see your storage usage here."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "View {count, plural, one {# issue} other {# issues}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "No unused content to clear."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Verify and repair"
+  },
+  "app.settings.resource-management.store.repair.description": {
+    "message": "Check for missing or damaged files and repair them. Close running instances first."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Verifying and repairing…"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Shared"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Content storage"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} stored"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Unique"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Unused"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "Checked {checked, plural, one {# file} other {# files}} and made {repaired, plural, one {# repair} other {# repairs}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Verification complete"
+  },
   "app.settings.sidebar.label.instances": {
     "message": "Instances"
   },
@@ -3559,6 +3688,9 @@
   },
   "instance.files.adding-files": {
     "message": "Adding files ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Managed content is read-only here. Add, disable, update, or remove it from the Content tab."
   },
   "instance.files.save-as": {
     "message": "Save as..."

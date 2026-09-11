@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Oppdaterer delt innhold"
   },
-  "app.action-bar.installs": {
-    "message": "Installeringer"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Gjør om til primærtilfelle"
   },

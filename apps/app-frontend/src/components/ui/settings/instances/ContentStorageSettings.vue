@@ -95,7 +95,8 @@ const messages = defineMessages({
 	},
 	repairDescription: {
 		id: 'app.settings.resource-management.store.repair.description',
-		defaultMessage: 'Check for missing or damaged files and repair them. Close running instances first.',
+		defaultMessage:
+			'Check for missing or damaged files and repair them. Close running instances first.',
 	},
 	limit: {
 		id: 'app.settings.resource-management.store.cache-limit.label',
@@ -103,7 +104,8 @@ const messages = defineMessages({
 	},
 	limitDescription: {
 		id: 'app.settings.resource-management.store.cache-limit.description',
-		defaultMessage: 'Maximum space used for unused content that can be reused without downloading it again.',
+		defaultMessage:
+			'Maximum space used for unused content that can be reused without downloading it again.',
 	},
 	limitUnit: {
 		id: 'app.settings.resource-management.store.cache-limit.unit',
@@ -168,7 +170,9 @@ async function runAction(action: 'clear' | 'repair') {
 	clearedBytes.value = null
 	try {
 		if (action === 'repair') {
-			report.value = await invoke<StoreVerification>('plugin:settings|store_verify', { repair: true })
+			report.value = await invoke<StoreVerification>('plugin:settings|store_verify', {
+				repair: true,
+			})
 		} else {
 			clearedBytes.value = await invoke<number>('plugin:settings|store_cleanup')
 		}
@@ -288,7 +292,9 @@ async function saveCacheLimit() {
 				:header="formatMessage(report.issues.length ? messages.attention : messages.verified)"
 			>
 				<p class="m-0">
-					{{ formatMessage(messages.result, { checked: report.checked, repaired: report.repaired }) }}
+					{{
+						formatMessage(messages.result, { checked: report.checked, repaired: report.repaired })
+					}}
 				</p>
 				<details v-if="report.issues.length" class="mt-2">
 					<summary class="cursor-pointer font-semibold">

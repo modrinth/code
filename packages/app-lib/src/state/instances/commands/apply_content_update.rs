@@ -13,7 +13,7 @@ use std::collections::{HashMap, HashSet};
 use super::apply_content_install::{
     DownloadedProjectVersion, add_downloaded_project_version,
     add_downloaded_project_version_with_enabled, download_project_version,
-	rename_project_companion_file,
+    rename_project_companion_file,
 };
 use super::check_content_updates::{ContentUpdate, check_content_updates};
 

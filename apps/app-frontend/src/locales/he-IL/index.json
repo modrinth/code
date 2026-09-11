@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "מעדכן תוכן משותף"
   },
-  "app.action-bar.installs": {
-    "message": "התקנות"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "הפוך למקרה ראשי"
   },

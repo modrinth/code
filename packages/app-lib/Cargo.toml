@@ -139,5 +139,9 @@ cli = ["dep:indicatif"]
 export-ts = ["dep:postcard-bindgen", "dep:ts-rs"]
 tauri = ["dep:postcard", "dep:tauri"]
 
+[[example]]
+name = "export_app_events"
+required-features = ["export-ts"]
+
 [lints]
 workspace = true

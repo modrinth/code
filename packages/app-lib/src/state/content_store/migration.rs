@@ -32,12 +32,8 @@ pub(crate) async fn migrate(state: &State) -> crate::Result<()> {
         {
             remove_migrated_tree(&source).await?;
         }
-        catalog::set_setting(
-            &state.pool,
-            "game_locales_layout_version",
-            "1",
-        )
-        .await?;
+        catalog::set_setting(&state.pool, "game_locales_layout_version", "1")
+            .await?;
     }
     catalog::set_setting(&state.pool, "store_layout_version", "1").await?;
     crate::api::instance::synced_packs::migrate_store(state).await?;

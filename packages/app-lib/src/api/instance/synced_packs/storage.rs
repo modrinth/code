@@ -111,10 +111,10 @@ pub(super) async fn cache_bytes(
 }
 
 pub(super) async fn read_blob(
-	pack: &SyncedPack,
-	state: &State,
+    pack: &SyncedPack,
+    state: &State,
 ) -> crate::Result<crate::state::content_store::BlobLease> {
-	state
+    state
         .content_store
         .lookup(
             pack.blob_sha512.as_deref(),
@@ -126,7 +126,7 @@ pub(super) async fn read_blob(
             input(
                 "The synced pack is missing or damaged; repair or re-import it",
             )
-		})
+        })
 }
 
 pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {

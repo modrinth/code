@@ -44,8 +44,8 @@ pub(crate) use self::apply_content_install::*;
 
 mod content_mutation;
 pub(crate) use self::content_mutation::{
-	ContentOrigin, InstallContent, install_content_blob, remove_project,
-	toggle_disable_project,
+    ContentOrigin, InstallContent, install_content_blob, remove_project,
+    toggle_disable_project,
 };
 
 mod check_content_updates;

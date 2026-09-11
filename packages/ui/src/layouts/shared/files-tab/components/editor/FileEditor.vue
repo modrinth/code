@@ -146,7 +146,9 @@ const editorLanguage = computed(() => {
 	const ext = getFileExtension(props.file?.name ?? '')
 	return getEditorLanguage(ext)
 })
-const isEditorReadOnly = computed(() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file?.path ?? '') ?? false))
+const isEditorReadOnly = computed(
+	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file?.path ?? '') ?? false),
+)
 
 watch(isEditorReadOnly, (readOnly) => {
 	editorInstance.value?.setReadOnly(readOnly)

@@ -91,7 +91,9 @@
 									:is-last="visibleRange.start + idx === filteredItems.length - 1"
 									:selected="selectedItems.has(item.path)"
 									:write-disabled="isBusy || !!ctx.isReadOnly?.(item.path)"
-									:write-disabled-tooltip="ctx.isReadOnly?.(item.path) ? ctx.readOnlyReason?.value : busyTooltip"
+									:write-disabled-tooltip="
+										ctx.isReadOnly?.(item.path) ? ctx.readOnlyReason?.value : busyTooltip
+									"
 									@extract="() => handleExtractItem(item)"
 									@delete="() => showDeleteModal(item)"
 									@rename="() => showRenameModal(item)"
@@ -306,8 +308,12 @@ const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 
 const items = computed(() => ctx.items.value)
 const isEditing = computed(() => ctx.editingFile.value !== null)
-const isBusy = computed(() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentPath.value) ?? false))
-const busyTooltip = computed(() => ctx.isReadOnly?.(ctx.currentPath.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value)
+const isBusy = computed(
+	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentPath.value) ?? false),
+)
+const busyTooltip = computed(() =>
+	ctx.isReadOnly?.(ctx.currentPath.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,
+)
 
 const breadcrumbSegments = computed(() => {
 	const path = ctx.currentPath.value
@@ -336,7 +342,9 @@ const {
 	someSelected,
 } = useFileSelection(filteredItems)
 
-const selectionReadOnly = computed(() => [...selectedItems.value].some((path) => ctx.isReadOnly?.(path)))
+const selectionReadOnly = computed(() =>
+	[...selectedItems.value].some((path) => ctx.isReadOnly?.(path)),
+)
 
 const { recordOperation, onKeydown } = useFileUndoRedo(
 	(path, newName) => ctx.renameItem(path, newName),

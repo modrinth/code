@@ -170,6 +170,8 @@ fn main() {
                         "install_job_list",
                         "install_job_get",
                         "install_job_retry",
+                        "install_job_pause",
+                        "install_job_resume",
                         "install_job_cancel",
                         "install_job_dismiss",
                         "install_job_support_details",

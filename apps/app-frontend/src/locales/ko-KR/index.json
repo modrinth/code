@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "공유 콘텐츠 업데이트 중"
   },
-  "app.action-bar.installs": {
-    "message": "설치"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "기본 인스턴스로 지정"
   },

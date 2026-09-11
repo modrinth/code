@@ -1,55 +1,11 @@
-import { CheckIcon, CopyIcon, UpdatedIcon } from '@modrinth/assets'
-import {
-	defineMessages,
-	type PopupNotificationButton,
-	type PopupNotificationProgressItem,
-	type PopupNotificationProgressType,
-	useVIntl,
-} from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { computed, ref } from 'vue'
-import type { Router } from 'vue-router'
+import { defineMessages, useFormatNumber, useVIntl } from '@modrinth/ui'
+import { computed } from 'vue'
 
-import { useAppSettings } from '@/composables/use-app-settings.ts'
-import {
-	install_job_dismiss,
-	install_job_list,
-	install_job_retry,
-	install_job_support_details,
-	installJobInstanceId,
-	type InstallJobSnapshot,
-	type InstallJobStatus,
-	type InstallPhaseId,
-	type InstallProgress,
-} from '@/helpers/install'
-import { get_many as getInstances } from '@/helpers/instance'
-import { injectAppEvents } from '@/providers/app-events'
+import type { InstallJobSnapshot, InstallPhaseId, InstallProgress } from '@/helpers/install'
 
 const messages = defineMessages({
-	installs: {
-		id: 'app.action-bar.installs',
-		defaultMessage: 'Installs',
-	},
-	retry: {
-		id: 'app.action-bar.install.retry',
-		defaultMessage: 'Retry',
-	},
-	copyDetails: {
-		id: 'app.action-bar.install.copy-details',
-		defaultMessage: 'Copy details',
-	},
-	copied: {
-		id: 'app.action-bar.install.copied-details',
-		defaultMessage: 'Copied',
-	},
-	dismiss: {
-		id: 'app.action-bar.install.dismiss',
-		defaultMessage: 'Dismiss',
-	},
-	openInstance: {
-		id: 'app.action-bar.install.open-instance',
-		defaultMessage: 'Open instance',
-	},
+	paused: { id: 'app.download-manager.paused', defaultMessage: 'Paused' },
+	canceling: { id: 'app.download-manager.canceling', defaultMessage: 'Canceling installation…' },
 	unknownInstance: {
 		id: 'app.action-bar.install.unknown-instance',
 		defaultMessage: 'Unknown instance',
@@ -57,6 +13,35 @@ const messages = defineMessages({
 	updatingSharedContent: {
 		id: 'app.action-bar.install.updating-shared-content',
 		defaultMessage: 'Updating shared content',
+	},
+})
+
+const kindMessages = defineMessages({
+	create_instance: { id: 'app.download-manager.new-instance', defaultMessage: 'New instance' },
+	create_modpack_instance: { id: 'app.download-manager.modpack', defaultMessage: 'Modpack' },
+	create_shared_instance: {
+		id: 'app.download-manager.shared-instance',
+		defaultMessage: 'Shared instance',
+	},
+	import_instance: {
+		id: 'app.download-manager.imported-instance',
+		defaultMessage: 'Imported instance',
+	},
+	duplicate_instance: {
+		id: 'app.download-manager.duplicated-instance',
+		defaultMessage: 'Duplicated instance',
+	},
+	install_existing_instance: {
+		id: 'app.download-manager.instance-installation',
+		defaultMessage: 'Instance installation',
+	},
+	install_pack_to_existing_instance: {
+		id: 'app.download-manager.modpack-installation',
+		defaultMessage: 'Modpack installation',
+	},
+	update_shared_instance: {
+		id: 'app.download-manager.shared-instance-update',
+		defaultMessage: 'Shared instance update',
 	},
 })
 
@@ -221,47 +206,64 @@ const failureSummaryMessages = defineMessages({
 	},
 })
 
-const visibleJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'failed', 'interrupted'])
+export function useInstallJobDisplay() {
+	const { formatMessage, locale } = useVIntl()
+	const formatNumber = useFormatNumber()
+	const decimalFormat = computed(
+		() => new Intl.NumberFormat(locale.value, { maximumFractionDigits: 1 }),
+	)
+	const percentFormat = computed(() => new Intl.NumberFormat(locale.value, { style: 'percent' }))
+	const units = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte']
+	const byteFormats = computed(() =>
+		units.map(
+			(unit) =>
+				new Intl.NumberFormat(locale.value, {
+					style: 'unit',
+					unit,
+					unitDisplay: 'short',
+					maximumFractionDigits: 1,
+				}),
+		),
+	)
+	const rateFormats = computed(() =>
+		units.map(
+			(unit) =>
+				new Intl.NumberFormat(locale.value, {
+					style: 'unit',
+					unit: `${unit}-per-second`,
+					unitDisplay: 'short',
+					minimumSignificantDigits: 3,
+					maximumSignificantDigits: 3,
+				}),
+		),
+	)
+	const timeFormats = computed(() =>
+		['second', 'minute', 'hour'].map(
+			(unit) =>
+				new Intl.NumberFormat(locale.value, {
+					style: 'unit',
+					unit,
+					unitDisplay: 'narrow',
+					maximumFractionDigits: 0,
+				}),
+		),
+	)
 
-function getDisplayIconUrl(icon: string | null | undefined): string | null {
-	if (!icon) return null
-	if (/^(https?:|data:|blob:|asset:|tauri:)/.test(icon)) return icon
-	return convertFileSrc(icon)
-}
-
-export async function useInstallJobNotifications(opts: {
-	router: Router
-	handleError: (err: unknown) => void
-	onChange: () => void
-}) {
-	const appEvents = injectAppEvents()
-	const { formatMessage } = useVIntl()
-	const appSettings = useAppSettings()
-	const jobs = ref<InstallJobSnapshot[]>([])
-	const iconUrls = ref<Record<string, string | null>>({})
-	const instanceNames = ref<Record<string, string>>({})
-	const copiedJobIds = ref<Set<string>>(new Set())
-	const jobOrder = new Map<string, number>()
-	let refreshRequest = 0
-	let metadataRequest = 0
-	let nextJobOrder = 0
-	const copiedResetTimeouts = new Map<string, number>()
-
-	function getTitle(job: InstallJobSnapshot): string {
+	function getTitle(job: InstallJobSnapshot, instanceName?: string): string {
 		if (job.display?.title) return job.display.title
 		if (job.details.type === 'instance') return job.details.name
 		if (job.details.type === 'modpack' && job.details.title) return job.details.title
-		const instanceId = installJobInstanceId(job)
-		return (
-			(instanceId ? instanceNames.value[instanceId] : null) ??
-			formatMessage(messages.unknownInstance)
-		)
+		return instanceName ?? formatMessage(messages.unknownInstance)
 	}
 
 	function getText(job: InstallJobSnapshot): string {
+		if (job.status === 'succeeded') return formatMessage(kindMessages[job.kind])
+		if (job.status === 'canceled') return formatMessage(failureSummaryMessages.canceled)
 		if (job.status === 'failed' || job.status === 'interrupted') {
 			return getFailureSummary(job)
 		}
+		if (job.canceling) return formatMessage(messages.canceling)
+		if (job.paused) return formatMessage(messages.paused)
 		if (job.phase === 'preparing_java' && job.details.type === 'java') {
 			return formatMessage(javaStepMessages[job.details.step], {
 				version: job.details.major_version,
@@ -280,11 +282,11 @@ export async function useInstallJobNotifications(opts: {
 		if (code === 'app_closed' || (job.status === 'interrupted' && code === 'interrupted')) {
 			return formatMessage(failureSummaryMessages.appClosed)
 		}
-		if (code === 'canceled') {
-			return formatMessage(failureSummaryMessages.canceled)
-		}
 		if (job.rollback_error || code === 'rollback_error') {
 			return formatMessage(failureSummaryMessages.cleanupIncomplete)
+		}
+		if (code === 'canceled') {
+			return formatMessage(failureSummaryMessages.canceled)
 		}
 		if (hasPermissionError(job)) {
 			return formatMessage(failureSummaryMessages.noWritePermission)
@@ -371,7 +373,7 @@ export async function useInstallJobNotifications(opts: {
 		)
 	}
 
-	function getProgressType(job: InstallJobSnapshot): PopupNotificationProgressType | undefined {
+	function getProgressType(job: InstallJobSnapshot): 'bytes' | 'count' | 'percentage' | undefined {
 		if (!getEffectiveProgress(job)) return undefined
 		if (
 			job.phase === 'preparing_java' &&
@@ -410,246 +412,44 @@ export async function useInstallJobNotifications(opts: {
 		return Math.max(0, Math.min(1, progress.current / progress.total))
 	}
 
-	function isTerminalJob(job: InstallJobSnapshot): boolean {
-		return job.status === 'failed' || job.status === 'interrupted'
+	function getUnitIndex(bytes: number): number {
+		return Math.min(units.length - 1, Math.floor(Math.log10(Math.max(1, bytes)) / 3))
 	}
 
-	function getJobSortRank(job: InstallJobSnapshot): number {
-		if (isTerminalJob(job)) return 0
-		if (job.status === 'queued' || job.phase === 'preparing_instance') return 2
-		return 1
+	function getProgressLabel(job: InstallJobSnapshot): string {
+		const progress = getEffectiveProgress(job)
+		if (!progress || progress.total <= 0) return ''
+		const current = Math.max(0, Math.min(progress.current, progress.total))
+		if (getProgressType(job) === 'bytes') {
+			const unit = getUnitIndex(progress.total)
+			return `${decimalFormat.value.format(current / 1000 ** unit)} / ${byteFormats.value[unit].format(progress.total / 1000 ** unit)}`
+		}
+		if (getProgressType(job) === 'count') {
+			return `${formatNumber(current)} / ${formatNumber(progress.total)}`
+		}
+		return percentFormat.value.format(getProgress(job))
 	}
 
-	function shouldShowCopyDetails(job: InstallJobSnapshot): boolean {
-		return isTerminalJob(job) || appSettings.getFeatureFlag('always_show_copy_details')
+	function formatRate(bytesPerSecond: number | null): string {
+		if (bytesPerSecond == null || bytesPerSecond <= 0) return ''
+		const roundedRate = Number(bytesPerSecond.toPrecision(3))
+		const unit = getUnitIndex(roundedRate)
+		return rateFormats.value[unit].format(roundedRate / 1000 ** unit)
 	}
 
-	function isCopied(job: InstallJobSnapshot): boolean {
-		return copiedJobIds.value.has(job.job_id)
+	function formatEta(seconds: number | null): string {
+		if (seconds == null || seconds <= 0) return ''
+		const unit = seconds < 60 ? 0 : seconds < 3600 ? 1 : 2
+		return timeFormats.value[unit].format(Math.ceil(seconds / [1, 60, 3600][unit]))
 	}
-
-	function setCopied(job: InstallJobSnapshot) {
-		copiedJobIds.value = new Set([...copiedJobIds.value, job.job_id])
-		const existingTimeout = copiedResetTimeouts.get(job.job_id)
-		if (existingTimeout != null) {
-			window.clearTimeout(existingTimeout)
-		}
-		copiedResetTimeouts.set(
-			job.job_id,
-			window.setTimeout(() => {
-				copiedResetTimeouts.delete(job.job_id)
-				if (!copiedJobIds.value.has(job.job_id)) {
-					return
-				}
-				const nextCopiedJobIds = new Set(copiedJobIds.value)
-				nextCopiedJobIds.delete(job.job_id)
-				copiedJobIds.value = nextCopiedJobIds
-				opts.onChange()
-			}, 1_000),
-		)
-		opts.onChange()
-	}
-
-	async function copyJobDetails(job: InstallJobSnapshot) {
-		const details = await install_job_support_details(job.job_id).catch((error) => {
-			opts.handleError(error)
-			return null
-		})
-		if (!details) {
-			return
-		}
-		try {
-			await navigator.clipboard.writeText(details)
-			setCopied(job)
-		} catch (error) {
-			opts.handleError(error)
-		}
-	}
-
-	function getButtons(job: InstallJobSnapshot): PopupNotificationButton[] {
-		const buttons: PopupNotificationButton[] = []
-
-		if (isTerminalJob(job)) {
-			buttons.push({
-				label: formatMessage(messages.retry),
-				icon: UpdatedIcon,
-				color: 'brand',
-				keepOpen: true,
-				action: async () => {
-					await install_job_retry(job.job_id).catch(opts.handleError)
-					await refresh()
-				},
-			})
-		}
-
-		if (shouldShowCopyDetails(job)) {
-			const copied = isCopied(job)
-			buttons.push({
-				label: formatMessage(copied ? messages.copied : messages.copyDetails),
-				icon: copied ? CheckIcon : CopyIcon,
-				color: 'standard',
-				keepOpen: true,
-				action: async () => {
-					await copyJobDetails(job)
-				},
-			})
-		}
-
-		return buttons
-	}
-
-	function getDismissHandler(job: InstallJobSnapshot): (() => Promise<void>) | undefined {
-		if (isTerminalJob(job)) {
-			return async () => {
-				await install_job_dismiss(job.job_id).catch(opts.handleError)
-				await refresh()
-			}
-		}
-		return undefined
-	}
-
-	function setJobs(nextJobs: InstallJobSnapshot[]) {
-		for (const job of nextJobs) {
-			if (!jobOrder.has(job.job_id)) {
-				jobOrder.set(job.job_id, nextJobOrder++)
-			}
-		}
-
-		const visibleJobs = nextJobs.filter((job) => visibleJobStatuses.has(job.status))
-
-		jobs.value = visibleJobs.sort(
-			(a, b) =>
-				getJobSortRank(a) - getJobSortRank(b) ||
-				a.created.localeCompare(b.created) ||
-				(jobOrder.get(a.job_id) ?? 0) - (jobOrder.get(b.job_id) ?? 0),
-		)
-	}
-
-	const activeJobs = computed(() =>
-		jobs.value.filter((job) => job.status === 'queued' || job.status === 'running'),
-	)
-
-	const progressItems = computed<PopupNotificationProgressItem[]>(() =>
-		activeJobs.value.map((job) => {
-			const progress = getEffectiveProgress(job)
-
-			return {
-				id: job.job_id,
-				title: getTitle(job),
-				text: getText(job),
-				iconUrl: iconUrls.value[job.job_id] ?? null,
-				progress: getProgress(job),
-				waiting: !job.progress && job.status === 'running',
-				showProgress: job.status === 'running',
-				progressType: getProgressType(job),
-				progressCurrent: progress?.current,
-				progressTotal: progress?.total,
-				buttons: getButtons(job),
-			}
-		}),
-	)
-
-	const terminalNotifications = computed(() =>
-		jobs.value.filter(isTerminalJob).map((job) => ({
-			id: job.job_id,
-			title: getTitle(job),
-			text: getText(job),
-			type: job.status === 'failed' ? ('error' as const) : ('warning' as const),
-			buttons: getButtons(job),
-			onDismiss: getDismissHandler(job),
-		})),
-	)
-
-	async function refreshMetadata(notify = true) {
-		const request = ++metadataRequest
-		const sourceJobs = jobs.value
-		const instanceIds = Array.from(
-			new Set(
-				sourceJobs
-					.map((job) => installJobInstanceId(job))
-					.filter((instanceId): instanceId is string => !!instanceId),
-			),
-		)
-		const instances = instanceIds.length
-			? await getInstances(instanceIds).catch((error) => {
-					opts.handleError(error)
-					return []
-				})
-			: []
-
-		if (request !== metadataRequest) {
-			return
-		}
-
-		const instanceIconUrls = new Map(
-			instances.map((instance) => [instance.id, getDisplayIconUrl(instance.icon_path)]),
-		)
-		instanceNames.value = Object.fromEntries(
-			instances.map((instance) => [instance.id, instance.name]),
-		)
-		iconUrls.value = Object.fromEntries(
-			sourceJobs.map((job) => [
-				job.job_id,
-				getDisplayIconUrl(job.display?.icon) ??
-					instanceIconUrls.get(installJobInstanceId(job) ?? '') ??
-					null,
-			]),
-		)
-
-		if (notify) {
-			opts.onChange()
-		}
-	}
-
-	async function refresh(notify = true) {
-		const request = ++refreshRequest
-		const nextJobs = await install_job_list(false).catch((error) => {
-			opts.handleError(error)
-			return []
-		})
-
-		if (request !== refreshRequest) {
-			return
-		}
-
-		setJobs(nextJobs)
-		await refreshMetadata(false)
-
-		if (request !== refreshRequest) {
-			return
-		}
-
-		if (notify) {
-			opts.onChange()
-		}
-	}
-
-	function applyJobUpdate(job: InstallJobSnapshot) {
-		refreshRequest += 1
-		const existingJob = jobs.value.find((item) => item.job_id === job.job_id)
-		if (existingJob && existingJob.modified.localeCompare(job.modified) > 0) {
-			return
-		}
-
-		setJobs([...jobs.value.filter((item) => item.job_id !== job.job_id), job])
-		opts.onChange()
-		void refreshMetadata()
-	}
-
-	const unlisten = appEvents.on('install_job', applyJobUpdate)
-	await refresh(false)
 
 	return {
-		active: computed(() => activeJobs.value.length > 0),
-		title: computed(() => formatMessage(messages.installs)),
-		progressItems,
-		terminalNotifications,
-		refresh,
-		dispose: () => {
-			for (const timeout of copiedResetTimeouts.values()) {
-				window.clearTimeout(timeout)
-			}
-			unlisten()
-		},
+		getTitle,
+		getText,
+		getProgress,
+		getProgressLabel,
+		getEffectiveProgress,
+		formatRate,
+		formatEta,
 	}
 }

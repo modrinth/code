@@ -3,12 +3,12 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use io::IOError;
-use serde::{Deserialize, Serialize};
 use crate::state::content_store::{FileContent, content_file_path};
 use crate::state::instances::commands::{
-	ContentOrigin, InstallContent, install_content_blob,
+    ContentOrigin, InstallContent, install_content_blob,
 };
+use io::IOError;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     install::{
@@ -403,23 +403,23 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
             Vec::new()
         };
         for file in files {
-			if file.missing {
-				return Err(crate::state::content_store::input(format!(
-					"Restore or repair {} before duplicating this instance",
-					file.relative_path
-				)));
-			}
-			let blob = match state.content_store.file_content(&file).await? {
-				FileContent::Stored(blob) => blob,
-				FileContent::Unmanaged => continue,
-				FileContent::Damaged(_) => {
-					return Err(crate::state::content_store::input(format!(
-						"Repair {} before duplicating this instance",
-						file.relative_path
-					)));
-				}
-			};
-			managed_paths.insert(content_file_path(&file));
+            if file.missing {
+                return Err(crate::state::content_store::input(format!(
+                    "Restore or repair {} before duplicating this instance",
+                    file.relative_path
+                )));
+            }
+            let blob = match state.content_store.file_content(&file).await? {
+                FileContent::Stored(blob) => blob,
+                FileContent::Unmanaged => continue,
+                FileContent::Damaged(_) => {
+                    return Err(crate::state::content_store::input(format!(
+                        "Repair {} before duplicating this instance",
+                        file.relative_path
+                    )));
+                }
+            };
+            managed_paths.insert(content_file_path(&file));
             let project_type =
                 crate::state::ProjectType::get_from_parent_folder(
                     &file.relative_path,
@@ -430,21 +430,33 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
             let entry = entries.iter().find(|entry| {
                 entry.file_id.as_deref() == Some(file.id.as_str())
             });
-			install_content_blob(
-				instance_id,
-				InstallContent {
-					requested_path: &file.relative_path,
-					blob: &blob,
-					project_type,
-					source_kind: entry.map_or(crate::state::ContentSourceKind::Local, |entry| entry.source_kind),
-					origin: entry.and_then(|entry| entry.project_id.as_deref().zip(entry.version_id.as_deref()))
-						.map(|(project_id, version_id)| ContentOrigin { project_id, version_id }),
-					enabled_override: Some(file.enabled),
-					previous_path: None,
-				},
-				&state,
-			)
-			.await?;
+            install_content_blob(
+                instance_id,
+                InstallContent {
+                    requested_path: &file.relative_path,
+                    blob: &blob,
+                    project_type,
+                    source_kind: entry.map_or(
+                        crate::state::ContentSourceKind::Local,
+                        |entry| entry.source_kind,
+                    ),
+                    origin: entry
+                        .and_then(|entry| {
+                            entry
+                                .project_id
+                                .as_deref()
+                                .zip(entry.version_id.as_deref())
+                        })
+                        .map(|(project_id, version_id)| ContentOrigin {
+                            project_id,
+                            version_id,
+                        }),
+                    enabled_override: Some(file.enabled),
+                    previous_path: None,
+                },
+                &state,
+            )
+            .await?;
             if crate::state::instances::commands::is_project_locked(
                 &source.id,
                 &file.relative_path,
@@ -491,20 +503,20 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
                             "Invalid imported content path",
                         )
                     })?;
-			install_content_blob(
-				instance_id,
-				InstallContent {
-					requested_path: &relative,
-					blob: &blob,
-					project_type,
-					source_kind: crate::state::ContentSourceKind::Local,
-					origin: None,
-					enabled_override: Some(!relative.ends_with(".disabled")),
-					previous_path: None,
-				},
-				&state,
-			)
-			.await?;
+            install_content_blob(
+                instance_id,
+                InstallContent {
+                    requested_path: &relative,
+                    blob: &blob,
+                    project_type,
+                    source_kind: crate::state::ContentSourceKind::Local,
+                    origin: None,
+                    enabled_override: Some(!relative.ends_with(".disabled")),
+                    previous_path: None,
+                },
+                &state,
+            )
+            .await?;
         } else {
             let target_instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_id(instance_id, &state.pool).await?
 				.ok_or_else(|| crate::state::content_store::input("Unknown destination instance"))?;

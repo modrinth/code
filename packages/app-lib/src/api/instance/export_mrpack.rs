@@ -7,7 +7,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::content_store::{
-	FileContent, ReadableContent, content_file_path, eligible, input,
+    FileContent, ReadableContent, content_file_path, eligible, input,
 };
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
@@ -221,12 +221,13 @@ pub async fn export_mrpack(
         .map(|file| file.path.as_str().to_string())
         .collect::<HashSet<_>>();
 
-	let stored_files = content_rows::get_instance_files(instance_id, &state.pool)
-		.await?
-		.into_iter()
-		.map(|file| (content_file_path(&file), file))
-		.collect::<HashMap<_, _>>();
-	let mut override_files = Vec::new();
+    let stored_files =
+        content_rows::get_instance_files(instance_id, &state.pool)
+            .await?
+            .into_iter()
+            .map(|file| (content_file_path(&file), file))
+            .collect::<HashMap<_, _>>();
+    let mut override_files = Vec::new();
     let mut directories = vec![instance_base_path.clone()];
     while let Some(directory) = directories.pop() {
         let mut read_dir = io::read_dir(&directory).await?;
@@ -238,7 +239,7 @@ pub async fn export_mrpack(
             let path = entry.path();
             let relative_path =
                 pack_get_relative_path(&instance_base_path, &path)?;
-			if !is_path_exportable(&relative_path) {
+            if !is_path_exportable(&relative_path) {
                 continue;
             }
 
@@ -252,26 +253,26 @@ pub async fn export_mrpack(
                 }
                 continue;
             }
-			let logical_path = logical_content_path(&relative_path)?;
-			if (!file_type.is_file() && !file_type.is_symlink())
-				|| !export_selection.is_included(&logical_path)
-				|| packfile_paths.contains(relative_path.as_str())
-			{
-				continue;
-			}
-			let Some(content) = export_content(
-				&state,
-				stored_files.get(relative_path.as_str()),
-				&path,
-				file_type.is_symlink(),
-			)
-			.await?
-			else {
-				continue;
-			};
-			let size = tokio::fs::metadata(content.path()).await?.len();
-			ensure_standard_zip_file_size(size)?;
-			override_files.push((content, relative_path, size));
+            let logical_path = logical_content_path(&relative_path)?;
+            if (!file_type.is_file() && !file_type.is_symlink())
+                || !export_selection.is_included(&logical_path)
+                || packfile_paths.contains(relative_path.as_str())
+            {
+                continue;
+            }
+            let Some(content) = export_content(
+                &state,
+                stored_files.get(relative_path.as_str()),
+                &path,
+                file_type.is_symlink(),
+            )
+            .await?
+            else {
+                continue;
+            };
+            let size = tokio::fs::metadata(content.path()).await?.len();
+            ensure_standard_zip_file_size(size)?;
+            override_files.push((content, relative_path, size));
         }
     }
 
@@ -326,8 +327,8 @@ where
     let mut writer = ZipWriter::new(writer);
     let mut buffer = vec![0_u8; EXPORT_COPY_BUFFER_SIZE];
 
-	for (content, relative_path, _) in override_files {
-		let path = content.path();
+    for (content, relative_path, _) in override_files {
+        let path = content.path();
         writer
             .start_file(format!("overrides/{relative_path}"), options)
             .map_err(std::io::Error::from)?;
@@ -372,9 +373,9 @@ fn is_path_exportable(relative_path: &SafeRelativeUtf8UnixPathBuf) -> bool {
 pub async fn get_pack_export_candidates(
     instance_id: &str,
 ) -> crate::Result<Vec<PackExportCandidate>> {
-	let state = State::get().await?;
-	crate::state::instances::commands::sync_content_files(instance_id, &state)
-		.await?;
+    let state = State::get().await?;
+    crate::state::instances::commands::sync_content_files(instance_id, &state)
+        .await?;
     get_pack_export_candidates_for_parent(instance_id, None).await
 }
 
@@ -443,38 +444,38 @@ async fn build_pack_export_candidate(
         return Ok(None);
     }
 
-	let state = State::get().await?;
-	let metadata = tokio::fs::symlink_metadata(path)
-		.await
-		.map_err(|error| IOError::with_path(error, path))?;
-	let content = if metadata.is_dir() {
-		ReadableContent::Local(path.clone())
-	} else {
-		let logical_path = logical_content_path(&relative_path)?;
-		let file = content_rows::get_instance_file_by_relative_path(
-			instance_id,
-			logical_path.as_str(),
-			&state.pool,
-		)
-		.await?;
-		let Some(content) = export_content(
-			&state,
-			file.as_ref(),
-			path,
-			metadata.file_type().is_symlink(),
-		)
-		.await?
-		else {
-			return Ok(None);
-		};
-		content
-	};
-	let metadata = tokio::fs::metadata(content.path()).await?;
-	let relative_path = if metadata.is_file() {
-		logical_content_path(&relative_path)?
-	} else {
-		relative_path
-	};
+    let state = State::get().await?;
+    let metadata = tokio::fs::symlink_metadata(path)
+        .await
+        .map_err(|error| IOError::with_path(error, path))?;
+    let content = if metadata.is_dir() {
+        ReadableContent::Local(path.clone())
+    } else {
+        let logical_path = logical_content_path(&relative_path)?;
+        let file = content_rows::get_instance_file_by_relative_path(
+            instance_id,
+            logical_path.as_str(),
+            &state.pool,
+        )
+        .await?;
+        let Some(content) = export_content(
+            &state,
+            file.as_ref(),
+            path,
+            metadata.file_type().is_symlink(),
+        )
+        .await?
+        else {
+            return Ok(None);
+        };
+        content
+    };
+    let metadata = tokio::fs::metadata(content.path()).await?;
+    let relative_path = if metadata.is_file() {
+        logical_content_path(&relative_path)?
+    } else {
+        relative_path
+    };
     if !metadata.is_dir() && !metadata.is_file() {
         return Ok(None);
     }
@@ -504,46 +505,49 @@ async fn build_pack_export_candidate(
 }
 
 fn logical_content_path(
-	path: &SafeRelativeUtf8UnixPathBuf,
+    path: &SafeRelativeUtf8UnixPathBuf,
 ) -> crate::Result<SafeRelativeUtf8UnixPathBuf> {
-	if eligible(path.as_str()) {
-		Ok(SafeRelativeUtf8UnixPathBuf::try_from(
-			path.as_str().trim_end_matches(".disabled").to_string(),
-		)?)
-	} else {
-		Ok(path.clone())
-	}
+    if eligible(path.as_str()) {
+        Ok(SafeRelativeUtf8UnixPathBuf::try_from(
+            path.as_str().trim_end_matches(".disabled").to_string(),
+        )?)
+    } else {
+        Ok(path.clone())
+    }
 }
 
 async fn export_content(
-	state: &State,
-	file: Option<&crate::state::InstanceFile>,
-	path: &Path,
-	is_symlink: bool,
+    state: &State,
+    file: Option<&crate::state::InstanceFile>,
+    path: &Path,
+    is_symlink: bool,
 ) -> crate::Result<Option<ReadableContent>> {
-	if let Some(file) = file {
-		match state.content_store.file_content(file).await? {
-			FileContent::Stored(blob) => {
-				if file.missing
-					|| !state.content_store.matches(path, &blob.blob.sha512).await?
-				{
-					return Err(input(format!(
-						"{} was changed outside the app; resolve it before exporting",
-						file.relative_path
-					)));
-				}
-				return Ok(Some(ReadableContent::Stored(blob)));
-			}
-			FileContent::Damaged(_) => {
-				return Err(input(format!(
-					"Repair {} before exporting this instance",
-					file.relative_path
-				)));
-			}
-			FileContent::Unmanaged => {}
-		}
-	}
-	Ok((!is_symlink).then(|| ReadableContent::Local(path.to_path_buf())))
+    if let Some(file) = file {
+        match state.content_store.file_content(file).await? {
+            FileContent::Stored(blob) => {
+                if file.missing
+                    || !state
+                        .content_store
+                        .matches(path, &blob.blob.sha512)
+                        .await?
+                {
+                    return Err(input(format!(
+                        "{} was changed outside the app; resolve it before exporting",
+                        file.relative_path
+                    )));
+                }
+                return Ok(Some(ReadableContent::Stored(blob)));
+            }
+            FileContent::Damaged(_) => {
+                return Err(input(format!(
+                    "Repair {} before exporting this instance",
+                    file.relative_path
+                )));
+            }
+            FileContent::Unmanaged => {}
+        }
+    }
+    Ok((!is_symlink).then(|| ReadableContent::Local(path.to_path_buf())))
 }
 
 fn is_default_selected_export_candidate(

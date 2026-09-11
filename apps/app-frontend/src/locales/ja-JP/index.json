@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "シェアされたコンテンツをアップデートしました"
   },
-  "app.action-bar.installs": {
-    "message": "インストール数"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "デフォルトのインスタンスを作成"
   },

@@ -12,7 +12,7 @@ use crate::pack::install_from::{
 };
 use crate::state::instances::ContentSourceKind;
 use crate::state::instances::commands::{
-	ContentOrigin, InstallContent, install_content_blob,
+    ContentOrigin, InstallContent, install_content_blob,
 };
 use crate::state::{
     CachedEntry, CachedFile, EditInstance, InstanceInstallStage, SideType,
@@ -884,25 +884,35 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     let file_info =
                         content_context.file_infos_by_hash.get(&file.sha1);
                     let blob = file.store_blob(state).await?;
-                    content_context.reporter.preserve_failure_context(
-						context.clone(),
-						install_content_blob(
-							&content_context.instance_id,
-							InstallContent {
-								requested_path: &project_path,
-								blob: &blob,
-								project_type,
-								source_kind: modpack_source_kind(content_context.pack_version_id.as_deref()),
-								origin: file_info.map(|file| ContentOrigin {
-									project_id: &file.project_id,
-									version_id: &file.version_id,
-								}),
-								enabled_override: None,
-								previous_path: None,
-							},
-							state,
-						).await,
-					).await?;
+                    content_context
+                        .reporter
+                        .preserve_failure_context(
+                            context.clone(),
+                            install_content_blob(
+                                &content_context.instance_id,
+                                InstallContent {
+                                    requested_path: &project_path,
+                                    blob: &blob,
+                                    project_type,
+                                    source_kind: modpack_source_kind(
+                                        content_context
+                                            .pack_version_id
+                                            .as_deref(),
+                                    ),
+                                    origin: file_info.map(|file| {
+                                        ContentOrigin {
+                                            project_id: &file.project_id,
+                                            version_id: &file.version_id,
+                                        }
+                                    }),
+                                    enabled_override: None,
+                                    previous_path: None,
+                                },
+                                state,
+                            )
+                            .await,
+                        )
+                        .await?;
                 } else {
                     let destination = state
                         .content_store
@@ -1142,20 +1152,23 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 reporter
                     .preserve_failure_context(
                         record_context,
-						install_content_blob(
-							&instance_id,
-							InstallContent {
-								requested_path: relative_override_file_path.as_str(),
-								blob: &blob,
-								project_type,
-								source_kind: modpack_source_kind(version_id.as_deref()),
-								origin: None,
-								enabled_override: None,
-								previous_path: None,
-							},
-							state,
-						)
-						.await,
+                        install_content_blob(
+                            &instance_id,
+                            InstallContent {
+                                requested_path: relative_override_file_path
+                                    .as_str(),
+                                blob: &blob,
+                                project_type,
+                                source_kind: modpack_source_kind(
+                                    version_id.as_deref(),
+                                ),
+                                origin: None,
+                                enabled_override: None,
+                                previous_path: None,
+                            },
+                            state,
+                        )
+                        .await,
                     )
                     .await?;
             }

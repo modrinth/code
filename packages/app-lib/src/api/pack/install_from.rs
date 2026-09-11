@@ -424,7 +424,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         .build();
     reporter.set_context(context).await?;
     let file = crate::util::fetch::fetch_content_file(
-		&state,
+        &state,
         &[&url],
         version
             .files

@@ -95,9 +95,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "جارٍ تحديث المحتوى المشترك"
   },
-  "app.action-bar.installs": {
-    "message": "عمليات التثبيت"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "تعيين النسخة الأساسية"
   },

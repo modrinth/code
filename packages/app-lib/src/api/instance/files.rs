@@ -1,7 +1,7 @@
 use crate::State;
 use crate::state::content_store::{
-	FileContent, ReadableContent, catalog, content_file_path, input,
-	validate_relative,
+    FileContent, ReadableContent, catalog, content_file_path, input,
+    validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use serde::Serialize;
@@ -49,7 +49,7 @@ async fn resolve(
                 "The instance directory must not be a symbolic link",
             ));
         }
-		return Ok(ReadableContent::Local(base));
+        return Ok(ReadableContent::Local(base));
     }
     validate_relative(path)?;
     if writing {
@@ -68,9 +68,9 @@ async fn resolve(
             content_rows::get_instance_files(instance_id, &state.pool).await?;
         if files.iter().any(|file| {
             bindings.iter().any(|binding| binding.file_id == file.id)
-				&& (file.relative_path.eq_ignore_ascii_case(path)
-					|| content_file_path(file).eq_ignore_ascii_case(path)
-					|| file.relative_path.to_lowercase().starts_with(&prefix))
+                && (file.relative_path.eq_ignore_ascii_case(path)
+                    || content_file_path(file).eq_ignore_ascii_case(path)
+                    || file.relative_path.to_lowercase().starts_with(&prefix))
         }) {
             return Err(input(
                 "Managed content is read-only in Files. Use the Content tab",
@@ -91,19 +91,21 @@ async fn resolve(
         }
         let file = content_rows::get_instance_file_by_relative_path(
             instance_id,
-			path.trim_end_matches(".disabled"),
+            path.trim_end_matches(".disabled"),
             &state.pool,
         )
         .await?
         .ok_or_else(|| input("Files cannot read an unmanaged symbolic link"))?;
-		if content_file_path(&file) != path {
-			return Err(input("The content link is not at its registered path"));
-		}
-		let FileContent::Stored(blob) =
-			state.content_store.file_content(&file).await?
-		else {
-			return Err(input("Managed content needs repair"));
-		};
+        if content_file_path(&file) != path {
+            return Err(input(
+                "The content link is not at its registered path",
+            ));
+        }
+        let FileContent::Stored(blob) =
+            state.content_store.file_content(&file).await?
+        else {
+            return Err(input("Managed content needs repair"));
+        };
         if !state
             .content_store
             .matches(&destination, &blob.blob.sha512)
@@ -113,9 +115,9 @@ async fn resolve(
                 "The content link points to an unexpected target",
             ));
         }
-		return Ok(ReadableContent::Stored(blob));
+        return Ok(ReadableContent::Stored(blob));
     }
-	Ok(ReadableContent::Local(destination))
+    Ok(ReadableContent::Local(destination))
 }
 
 pub async fn list_instance_files(
@@ -124,7 +126,7 @@ pub async fn list_instance_files(
 ) -> crate::Result<Vec<InstanceFileItem>> {
     let state = State::get().await?;
     let directory = resolve(&state, instance_id, path, false).await?;
-	let mut entries = fs::read_dir(directory.path()).await?;
+    let mut entries = fs::read_dir(directory.path()).await?;
     let mut output = Vec::new();
     while let Some(entry) = entries.next_entry().await? {
         let name = entry.file_name().to_string_lossy().into_owned();
@@ -136,7 +138,7 @@ pub async fn list_instance_files(
         let file_type = entry.file_type().await?;
         let resolved = resolve(&state, instance_id, &relative, false).await;
         let metadata = match &resolved {
-			Ok(content) => fs::metadata(content.path()).await.ok(),
+            Ok(content) => fs::metadata(content.path()).await.ok(),
             Err(_) => None,
         };
         let read_only =
@@ -188,8 +190,8 @@ pub async fn read_instance_file(
     path: &str,
 ) -> crate::Result<Vec<u8>> {
     let state = State::get().await?;
-	let content = resolve(&state, instance_id, path, false).await?;
-	Ok(fs::read(content.path()).await?)
+    let content = resolve(&state, instance_id, path, false).await?;
+    Ok(fs::read(content.path()).await?)
 }
 
 pub async fn validate_instance_file_write(
@@ -197,10 +199,10 @@ pub async fn validate_instance_file_write(
     path: &str,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
-	Ok(resolve(&state, instance_id, path, true)
-		.await?
-		.path()
-		.to_path_buf())
+    Ok(resolve(&state, instance_id, path, true)
+        .await?
+        .path()
+        .to_path_buf())
 }
 
 pub async fn write_instance_file(
@@ -212,10 +214,10 @@ pub async fn write_instance_file(
     let state = State::get().await?;
     let _instance = state.lock_instance_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
-	let destination = resolve(&state, instance_id, path, true)
-		.await?
-		.path()
-		.to_path_buf();
+    let destination = resolve(&state, instance_id, path, true)
+        .await?
+        .path()
+        .to_path_buf();
     if create_only && fs::symlink_metadata(&destination).await.is_ok() {
         return Err(input("A file already exists at this path"));
     }
@@ -256,8 +258,8 @@ pub async fn create_instance_directory(
     let state = State::get().await?;
     let _instance = state.lock_instance_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
-	let destination = resolve(&state, instance_id, path, true).await?;
-	fs::create_dir(destination.path()).await?;
+    let destination = resolve(&state, instance_id, path, true).await?;
+    fs::create_dir(destination.path()).await?;
     Ok(())
 }
 
@@ -271,10 +273,10 @@ pub async fn rename_instance_file(
     let _files = state.content_store.files_lock.lock().await;
     let source = resolve(&state, instance_id, source, true).await?;
     let destination = resolve(&state, instance_id, destination, true).await?;
-	if fs::symlink_metadata(destination.path()).await.is_ok() {
+    if fs::symlink_metadata(destination.path()).await.is_ok() {
         return Err(input("The destination already exists"));
     }
-	fs::rename(source.path(), destination.path()).await?;
+    fs::rename(source.path(), destination.path()).await?;
     Ok(())
 }
 
@@ -287,14 +289,14 @@ pub async fn delete_instance_file(
     let _instance = state.lock_instance_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
     let path = resolve(&state, instance_id, path, true).await?;
-	if fs::symlink_metadata(path.path()).await?.is_dir() {
+    if fs::symlink_metadata(path.path()).await?.is_dir() {
         if recursive {
-			fs::remove_dir_all(path.path()).await?;
+            fs::remove_dir_all(path.path()).await?;
         } else {
-			fs::remove_dir(path.path()).await?;
+            fs::remove_dir(path.path()).await?;
         }
     } else {
-		fs::remove_file(path.path()).await?;
+        fs::remove_file(path.path()).await?;
     }
     Ok(())
 }
@@ -325,7 +327,7 @@ pub async fn save_instance_file_as(
     {
         return Err(input("Cannot save over a symbolic link"));
     }
-	let content = resolve(&state, instance_id, source, false).await?;
-	fs::copy(content.path(), destination).await?;
+    let content = resolve(&state, instance_id, source, false).await?;
+    fs::copy(content.path(), destination).await?;
     Ok(())
 }

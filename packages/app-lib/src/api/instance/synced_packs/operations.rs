@@ -1,8 +1,7 @@
 use super::super::DesyncServerMode;
 use super::super::synced_options::{
-	get_global_options, instance_is_running,
-    instance_option_enabled, option_can_apply_while_running,
-    sync_files_are_protected,
+    get_global_options, instance_is_running, instance_option_enabled,
+    option_can_apply_while_running, sync_files_are_protected,
 };
 use super::reconciliation::{
     apply_all, apply_removal, participating, synced_instance_ids,
@@ -85,12 +84,12 @@ pub(super) async fn pack_from_item(
     }
     let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &item.file_path, &state.pool).await?
 		.ok_or_else(|| crate::state::content_store::input("The pack is not registered"))?;
-	let source = state
-		.content_store
-		.read_path(&file, &metadata.instance.path)
-		.await?;
-	let bytes = Bytes::from(io::read(source.path()).await?);
-	drop(source);
+    let source = state
+        .content_store
+        .read_path(&file, &metadata.instance.path)
+        .await?;
+    let bytes = Bytes::from(io::read(source.path()).await?);
+    drop(source);
     validate_pack(&bytes, item.project_type)?;
     let game_versions = if let Some(version) = &item.version {
         CachedEntry::get_version(

@@ -245,85 +245,61 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         }
         return Err(error);
     }
+    let registration = super::control::register(job_id);
     emit_install_job(&record.snapshot()).await?;
-    spawn_job(job_id);
+    spawn_job(job_id, registration);
 
     Ok(record.snapshot())
 }
 
+pub async fn pause_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
+    set_job_paused(job_id, true).await
+}
+
+pub async fn resume_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
+    set_job_paused(job_id, false).await
+}
+
+async fn set_job_paused(
+    job_id: Uuid,
+    paused: bool,
+) -> crate::Result<InstallJobSnapshot> {
+    let state = State::get().await?;
+    let job = store::get_required(job_id, &state).await?;
+    if !job.snapshot().can_pause {
+        return Err(ErrorKind::InputError(
+            "Install job cannot be paused or resumed".to_string(),
+        )
+        .into());
+    }
+    let control = super::control::get(job_id).ok_or_else(|| {
+        ErrorKind::InputError("Install worker is unavailable".to_string())
+    })?;
+    control.set_paused(paused)?;
+    let snapshot = store::get_required(job_id, &state).await?.snapshot();
+    emit_install_job(&snapshot).await?;
+    Ok(snapshot)
+}
+
 pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
-    let mut job = store::get_required(job_id, &state).await?;
-
-    if job.status != InstallJobStatus::Queued {
-        return Err(crate::ErrorKind::InputError(
-            "Only queued install jobs can be canceled".to_string(),
+    let job = store::get_required(job_id, &state).await?;
+    if job.snapshot().canceling {
+        return Ok(job.snapshot());
+    }
+    if !job.snapshot().can_cancel {
+        return Err(ErrorKind::InputError(
+            "Install job cannot be canceled".to_string(),
         )
         .into());
     }
-
-    let canceled_phase = job.state.progress.phase;
-    job.state.error = Some(InstallErrorView::from_message(
-        "canceled",
-        canceled_phase,
-        "Install was canceled",
-    ));
-    job.state.record_event(InstallJobEventKind::JobCanceled {
-        phase: canceled_phase,
-    });
-    job.state
-        .record_event(InstallJobEventKind::RollbackStarted {
-            cleanup: job.state.cleanup.clone(),
-        });
-    let status_updated = store::update_status_if(
-        job_id,
-        InstallJobStatus::Queued,
-        InstallJobStatus::Running,
-        &job.state,
-        &state,
-    )
-    .await?
-    .is_some();
-    if !status_updated {
-        return Err(crate::ErrorKind::InputError(
-            "Install job is no longer queued".to_string(),
-        )
-        .into());
-    }
-    let cleanup_succeeded =
-        match recovery::apply_cleanup(&job.state, &state).await {
-            Ok(()) => {
-                job.state
-                    .record_event(InstallJobEventKind::RollbackCompleted);
-                clear_deleted_new_instance_id(&mut job.state);
-                true
-            }
-            Err(error) => {
-                job.state.rollback_error = Some(InstallErrorView::from_error(
-                    "rollback_error",
-                    InstallPhaseId::RollingBack,
-                    &error,
-                    None,
-                ));
-                job.state.record_event(InstallJobEventKind::RollbackFailed {
-                    message: error.to_string(),
-                });
-                false
-            }
-        };
-    let status = if cleanup_succeeded {
-        InstallJobStatus::Canceled
-    } else {
-        InstallJobStatus::Failed
-    };
-    let record =
-        store::update_status(job_id, status, &job.state, &state).await?;
-    if cleanup_succeeded {
-        recovery::clear_staging_dir(&job.state).await;
-    }
-    emit_install_job(&record.snapshot()).await?;
-
-    Ok(record.snapshot())
+    let control = super::control::get(job_id).ok_or_else(|| {
+        ErrorKind::InputError("Install worker is unavailable".to_string())
+    })?;
+    control.cancel()?;
+    let snapshot = store::get_required(job_id, &state).await?.snapshot();
+    emit_install_job(&snapshot).await?;
+    Ok(snapshot)
 }
 
 pub(crate) async fn cancel_jobs_for_instance_deletion(
@@ -423,8 +399,9 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
         }
         return Err(error);
     }
+    let registration = super::control::register(id);
     emit_install_job(&record.snapshot()).await?;
-    spawn_job(id);
+    spawn_job(id, registration);
     Ok(record.snapshot())
 }
 
@@ -613,9 +590,11 @@ async fn prepare_initial_instance(
     Ok(())
 }
 
-fn spawn_job(job_id: Uuid) {
+fn spawn_job(job_id: Uuid, registration: super::control::Registration) {
     tokio::spawn(async move {
-        if let Err(error) = Box::pin(run_job(job_id)).await {
+        if let Err(error) =
+            Box::pin(run_job(job_id, &registration.control)).await
+        {
             let failure = error.to_string();
             tracing::error!("Install job {job_id} terminated: {failure}");
             if let Err(error) = terminalize_stranded_job(job_id, failure).await
@@ -628,7 +607,10 @@ fn spawn_job(job_id: Uuid) {
     });
 }
 
-async fn run_job(job_id: Uuid) -> crate::Result<()> {
+async fn run_job(
+    job_id: Uuid,
+    control: &std::sync::Arc<super::control::InstallControl>,
+) -> crate::Result<()> {
     let state = State::get().await?;
     let mut job = store::get_required(job_id, &state).await?;
 
@@ -636,7 +618,14 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
         return Ok(());
     }
 
-    let _install_permit = state.install_job_semaphore.acquire().await?;
+    let _install_permit = if control.checkpoint().await.is_ok() {
+        tokio::select! {
+            permit = state.install_job_semaphore.acquire() => Some(permit?),
+            () = control.canceled() => None,
+        }
+    } else {
+        None
+    };
     job = store::get_required(job_id, &state).await?;
 
     if job.status != InstallJobStatus::Queued {
@@ -658,7 +647,24 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
     };
     emit_install_job(&record.snapshot()).await?;
 
-    let result = Box::pin(run_request(job_id, &mut job_state, &state)).await;
+    let mut result = match control.checkpoint().await {
+        Ok(()) => {
+            super::control::CURRENT_INSTALL
+                .scope(
+                    control.clone(),
+                    Box::pin(run_request(job_id, &mut job_state, &state)),
+                )
+                .await
+        }
+        Err(error) => Err(error),
+    };
+    if result.is_ok() {
+        if let Err(error) = control.finish_work().await {
+            result = Err(error);
+        }
+    } else {
+        control.finish_failed();
+    }
     if let Ok(record) = store::get_required(job_id, &state).await {
         let status = record.status;
         job_state = record.state;
@@ -717,11 +723,19 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
         }
         Err(error) => {
             tracing::error!("Install job {job_id} failed: {error}");
-            let error_view = install_error_view(
-                job_state.progress.phase,
-                &error,
-                job_state.context.clone(),
-            );
+            let error_view = if control.is_canceling() {
+                InstallErrorView::from_message(
+                    "canceled",
+                    job_state.progress.phase,
+                    "Install was canceled",
+                )
+            } else {
+                install_error_view(
+                    job_state.progress.phase,
+                    &error,
+                    job_state.context.clone(),
+                )
+            };
             terminalize_failed_job(job_id, job_state, error_view, &state)
                 .await?;
         }
@@ -758,11 +772,18 @@ async fn terminalize_failed_job(
     state: &State,
 ) -> crate::Result<()> {
     let failed_phase = job_state.progress.phase;
-    job_state.record_event(InstallJobEventKind::Failed {
-        phase: failed_phase,
-        code: error_view.code.clone(),
-        message: error_view.message.clone(),
-    });
+    let canceled = error_view.code == "canceled";
+    if canceled {
+        job_state.record_event(InstallJobEventKind::JobCanceled {
+            phase: failed_phase,
+        });
+    } else {
+        job_state.record_event(InstallJobEventKind::Failed {
+            phase: failed_phase,
+            code: error_view.code.clone(),
+            message: error_view.message.clone(),
+        });
+    }
     job_state.error = Some(error_view);
     job_state.rollback_error = None;
     job_state.progress.phase = InstallPhaseId::RollingBack;
@@ -798,7 +819,11 @@ async fn terminalize_failed_job(
 
     if let Some(record) = store::finish_active(
         job_id,
-        InstallJobStatus::Failed,
+        if canceled && cleanup_succeeded {
+            InstallJobStatus::Canceled
+        } else {
+            InstallJobStatus::Failed
+        },
         &job_state,
         state,
     )
@@ -1033,6 +1058,7 @@ async fn run_request(
         } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
             lock_instance(&instance_id, state).await?;
+            prepare_update_backup(job_id, job_state, state).await?;
             crate::api::instance::prepare_instance_update(&instance_id).await?;
             let disabled_project_ids = remove_existing_pack_content(
                 job_id,
@@ -1061,25 +1087,7 @@ async fn run_request(
         InstallRequest::UpdateSharedInstance { instance_id, data } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
             lock_instance(&instance_id, state).await?;
-            let rollback_instance = job_state
-                .rollback
-                .as_ref()
-                .map(|rollback| rollback.instance.clone())
-                .ok_or_else(|| {
-                    crate::ErrorKind::OtherError(
-                        "Shared instance update rollback state is missing"
-                            .to_string(),
-                    )
-                })?;
-            let staging_dir = recovery::prepare_shared_instance_update_backup(
-                job_id,
-                &rollback_instance,
-                state,
-            )
-            .await?;
-            job_state.paths.staging_dir = Some(staging_dir);
-            let record = store::update_state(job_id, job_state, state).await?;
-            emit_install_job(&record.snapshot()).await?;
+            prepare_update_backup(job_id, job_state, state).await?;
             let disabled_project_ids =
                 disabled_project_ids(&instance_id, state).await?;
             Box::pin(apply_shared_instance_update(
@@ -1419,6 +1427,29 @@ async fn prepare_existing_rollback(
     Ok(())
 }
 
+async fn prepare_update_backup(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+) -> crate::Result<()> {
+    super::control::checkpoint(job_id).await?;
+    let rollback = job_state.rollback.as_ref().ok_or_else(|| {
+        crate::ErrorKind::OtherError(
+            "Instance update rollback state is missing".to_string(),
+        )
+    })?;
+    let staging_dir = recovery::prepare_instance_update_backup(
+        job_id,
+        &rollback.instance,
+        state,
+    )
+    .await?;
+    job_state.paths.staging_dir = Some(staging_dir);
+    let record = store::update_state(job_id, job_state, state).await?;
+    emit_install_job(&record.snapshot()).await?;
+    super::control::checkpoint(job_id).await
+}
+
 async fn lock_install_target(
     job_state: &InstallJobState,
     state: &State,
@@ -1455,6 +1486,7 @@ pub(super) async fn update_progress(
     phase: InstallPhaseId,
     details: InstallPhaseDetails,
 ) -> crate::Result<()> {
+    super::control::checkpoint(job_id).await?;
     job_state.set_progress(phase, None, details);
     let record = store::update_state(job_id, job_state, state).await?;
     emit_install_job(&record.snapshot()).await?;
@@ -1468,6 +1500,7 @@ pub(super) async fn update_content_progress(
     current: u64,
     total: u64,
 ) -> crate::Result<()> {
+    super::control::checkpoint(job_id).await?;
     job_state.progress.phase = InstallPhaseId::DownloadingContent;
     job_state.progress.progress = Some(InstallProgress {
         current,

@@ -1,7 +1,7 @@
 use super::{
-	Binding, BlobLease, CatalogBlob, ContentStore, FileContent,
-	MaterializationKind, catalog, hash_file, input, normalize, relative_link,
-	sync_directory, writable_copy,
+    Binding, BlobLease, CatalogBlob, ContentStore, FileContent,
+    MaterializationKind, catalog, hash_file, input, normalize, relative_link,
+    sync_directory, writable_copy,
 };
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{Instance, InstanceFile};
@@ -38,7 +38,7 @@ struct Projection {
     relative_path: String,
     sha512: String,
     present: bool,
-	mode: MaterializationKind,
+    mode: MaterializationKind,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -63,17 +63,17 @@ impl ContentStore {
         file: &InstanceFile,
         binding: &super::Binding,
     ) -> crate::Result<ContentProjectionStatus> {
-		let opposite = self
-			.instance_path(
-				&instance.path,
-				&materialized_content_path(&file.relative_path, !file.enabled),
-			)
-			.await?;
-		match fs::symlink_metadata(&opposite).await {
-			Ok(_) => return Ok(ContentProjectionStatus::Conflict),
-			Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
-			Err(error) => return Err(error.into()),
-		}
+        let opposite = self
+            .instance_path(
+                &instance.path,
+                &materialized_content_path(&file.relative_path, !file.enabled),
+            )
+            .await?;
+        match fs::symlink_metadata(&opposite).await {
+            Ok(_) => return Ok(ContentProjectionStatus::Conflict),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
         let path = self
             .instance_path(&instance.path, &content_file_path(file))
             .await?;
@@ -109,32 +109,32 @@ impl ContentStore {
             else {
                 continue;
             };
-			if !file.enabled {
-				let active_path = self
-					.instance_path(
-						&instance.path,
-						&materialized_content_path(&file.relative_path, true),
-					)
-					.await?;
-				match fs::symlink_metadata(&active_path).await {
-					Ok(_) => {
-						return Err(input(format!(
-							"Disabled content {} has an unexpected active file",
-							file.relative_path
-						)));
-					}
-					Err(error)
-						if error.kind() == std::io::ErrorKind::NotFound => {}
-					Err(error) => return Err(error.into()),
-				}
-				continue;
-			}
-			let content = self.file_content(&file).await?;
-			let projection =
-				self.inspect_projection(instance, &file, &binding).await?;
-			if !matches!(content, FileContent::Stored(_))
-				|| projection != ContentProjectionStatus::Healthy
-			{
+            if !file.enabled {
+                let active_path = self
+                    .instance_path(
+                        &instance.path,
+                        &materialized_content_path(&file.relative_path, true),
+                    )
+                    .await?;
+                match fs::symlink_metadata(&active_path).await {
+                    Ok(_) => {
+                        return Err(input(format!(
+                            "Disabled content {} has an unexpected active file",
+                            file.relative_path
+                        )));
+                    }
+                    Err(error)
+                        if error.kind() == std::io::ErrorKind::NotFound => {}
+                    Err(error) => return Err(error.into()),
+                }
+                continue;
+            }
+            let content = self.file_content(&file).await?;
+            let projection =
+                self.inspect_projection(instance, &file, &binding).await?;
+            if !matches!(content, FileContent::Stored(_))
+                || projection != ContentProjectionStatus::Healthy
+            {
                 return Err(input(format!(
                     "{} needs repair or re-import before launching this instance",
                     file.relative_path
@@ -175,18 +175,18 @@ impl ContentStore {
                 }
                 remove_projection(&path).await?;
             }
-			let mode = self
-				.materialize(
-					&blob,
-					&path,
-					binding.materialization_kind == MaterializationKind::Copy,
-				)
-				.await?;
+            let mode = self
+                .materialize(
+                    &blob,
+                    &path,
+                    binding.materialization_kind == MaterializationKind::Copy,
+                )
+                .await?;
             restored.push((&binding.file_id, &binding.blob_sha512, mode));
         }
         let mut tx = self.pool.begin().await?;
         for (id, blob, mode) in restored {
-			catalog::bind(&mut tx, id, blob, mode).await?;
+            catalog::bind(&mut tx, id, blob, mode).await?;
         }
         tx.commit().await?;
         Ok(())
@@ -226,12 +226,12 @@ impl ContentStore {
             .as_ref()
             .map(content_file_path)
             .unwrap_or_else(|| requested_source.to_string());
-        let target_relative = materialized_content_path(canonical_path, enabled);
+        let target_relative =
+            materialized_content_path(canonical_path, enabled);
         let source =
             self.instance_path(&instance.path, &source_relative).await?;
-        let target = self
-            .instance_path(&instance.path, &target_relative)
-            .await?;
+        let target =
+            self.instance_path(&instance.path, &target_relative).await?;
         if source != target && fs::symlink_metadata(&target).await.is_ok() {
             return Err(input(format!(
                 "Both {source_relative} and {target_relative} exist; resolve the duplicate before continuing"
@@ -246,172 +246,172 @@ impl ContentStore {
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
             Err(error) => return Err(error.into()),
         };
-		let mut previous_lease = None;
-		let before = if let Some(metadata) = &metadata {
-			if metadata.file_type().is_symlink() {
-				let binding = binding.as_ref().ok_or_else(|| {
+        let mut previous_lease = None;
+        let before = if let Some(metadata) = &metadata {
+            if metadata.file_type().is_symlink() {
+                let binding = binding.as_ref().ok_or_else(|| {
 					input(
 						"The content symlink is unowned; import it explicitly before changing it",
 					)
 				})?;
-				if !self.matches(&source, &binding.blob_sha512).await? {
-					return Err(input(
-						"The content link was changed outside the app; resolve the conflict first",
-					));
-				}
-				self.catalog_blob(&binding.blob_sha512)
-					.await?
-					.ok_or_else(|| input("Managed content is missing from the catalog"))?;
-				Some(Projection {
-					relative_path: source_relative.clone(),
-					sha512: binding.blob_sha512.clone(),
-					present: true,
-					mode: MaterializationKind::Symlink,
-				})
-			} else if metadata.is_file() {
-				let previous = if let Some(known) = known_source_blob {
-					known.clone()
-				} else {
-					self.ingest_file(&source).await?
-				};
-				if let Some(file) = &existing
-					&& binding.is_some()
-					&& previous.blob.sha1 != file.sha1
-				{
-					return Err(input(
-						"The content file was changed outside the app; preserve or re-import it before continuing",
-					));
-				}
-				let projection = Projection {
-					relative_path: source_relative.clone(),
-					sha512: previous.blob.sha512.clone(),
-					present: true,
-					mode: MaterializationKind::Copy,
-				};
-				previous_lease = Some(previous);
-				Some(projection)
-			} else {
-				return Err(input(
-					"A managed content file was replaced by a directory",
-				));
-			}
-		} else if let Some(binding) = &binding {
-			self.catalog_blob(&binding.blob_sha512)
-				.await?
-				.ok_or_else(|| input("Managed content is missing from the catalog"))?;
-			Some(Projection {
-				relative_path: source_relative.clone(),
-				sha512: binding.blob_sha512.clone(),
-				present: false,
-				mode: binding.materialization_kind,
-			})
-		} else {
-			None
-		};
-		let after = blob.map(|blob| {
-			let mode = before
-				.as_ref()
-				.filter(|previous| {
-					previous.present
-						&& previous.sha512 == blob.blob.sha512
-						&& previous.relative_path != target_relative
-				})
-				.map(|previous| previous.mode)
-				.unwrap_or(MaterializationKind::Symlink);
-			Projection {
-				relative_path: target_relative,
-				sha512: blob.blob.sha512.clone(),
-				present: true,
-				mode,
-			}
-		});
-		let journal = ProjectionJournal {
-			id: uuid::Uuid::new_v4().to_string(),
-			instance_id: instance.id.clone(),
-			instance_path: instance.path.clone(),
-			before,
-			after,
-		};
-		self.save_journal(&journal).await?;
-		Ok(PreparedProjection {
-			journal,
-			blob: blob.cloned(),
-			_before: previous_lease,
-		})
-	}
+                if !self.matches(&source, &binding.blob_sha512).await? {
+                    return Err(input(
+                        "The content link was changed outside the app; resolve the conflict first",
+                    ));
+                }
+                self.catalog_blob(&binding.blob_sha512).await?.ok_or_else(
+                    || input("Managed content is missing from the catalog"),
+                )?;
+                Some(Projection {
+                    relative_path: source_relative.clone(),
+                    sha512: binding.blob_sha512.clone(),
+                    present: true,
+                    mode: MaterializationKind::Symlink,
+                })
+            } else if metadata.is_file() {
+                let previous = if let Some(known) = known_source_blob {
+                    known.clone()
+                } else {
+                    self.ingest_file(&source).await?
+                };
+                if let Some(file) = &existing
+                    && binding.is_some()
+                    && previous.blob.sha1 != file.sha1
+                {
+                    return Err(input(
+                        "The content file was changed outside the app; preserve or re-import it before continuing",
+                    ));
+                }
+                let projection = Projection {
+                    relative_path: source_relative.clone(),
+                    sha512: previous.blob.sha512.clone(),
+                    present: true,
+                    mode: MaterializationKind::Copy,
+                };
+                previous_lease = Some(previous);
+                Some(projection)
+            } else {
+                return Err(input(
+                    "A managed content file was replaced by a directory",
+                ));
+            }
+        } else if let Some(binding) = &binding {
+            self.catalog_blob(&binding.blob_sha512).await?.ok_or_else(
+                || input("Managed content is missing from the catalog"),
+            )?;
+            Some(Projection {
+                relative_path: source_relative.clone(),
+                sha512: binding.blob_sha512.clone(),
+                present: false,
+                mode: binding.materialization_kind,
+            })
+        } else {
+            None
+        };
+        let after = blob.map(|blob| {
+            let mode = before
+                .as_ref()
+                .filter(|previous| {
+                    previous.present
+                        && previous.sha512 == blob.blob.sha512
+                        && previous.relative_path != target_relative
+                })
+                .map(|previous| previous.mode)
+                .unwrap_or(MaterializationKind::Symlink);
+            Projection {
+                relative_path: target_relative,
+                sha512: blob.blob.sha512.clone(),
+                present: true,
+                mode,
+            }
+        });
+        let journal = ProjectionJournal {
+            id: uuid::Uuid::new_v4().to_string(),
+            instance_id: instance.id.clone(),
+            instance_path: instance.path.clone(),
+            before,
+            after,
+        };
+        self.save_journal(&journal).await?;
+        Ok(PreparedProjection {
+            journal,
+            blob: blob.cloned(),
+            _before: previous_lease,
+        })
+    }
 
-	pub(crate) async fn prepare_move(
-		&self,
-		instance: &Instance,
-		file: &InstanceFile,
-		binding: &Binding,
-		enabled: bool,
-	) -> crate::Result<PreparedProjection> {
-		self.recover(Some(&instance.id)).await?;
-		if binding.file_id != file.id || !super::eligible(&file.relative_path) {
-			return Err(input("Invalid managed content move"));
-		}
-		if self.inspect_projection(instance, file, binding).await?
-			!= ContentProjectionStatus::Healthy
-		{
-			return Err(input(
-				"Content cannot be toggled because its instance path is missing or changed",
-			));
-		}
-		let source_relative = content_file_path(file);
-		let target_relative =
-			materialized_content_path(&file.relative_path, enabled);
-		let journal = ProjectionJournal {
-			id: uuid::Uuid::new_v4().to_string(),
-			instance_id: instance.id.clone(),
-			instance_path: instance.path.clone(),
-			before: Some(Projection {
-				relative_path: source_relative,
-				sha512: binding.blob_sha512.clone(),
-				present: true,
-				mode: binding.materialization_kind,
-			}),
-			after: Some(Projection {
-				relative_path: target_relative,
-				sha512: binding.blob_sha512.clone(),
-				present: true,
-				mode: binding.materialization_kind,
-			}),
-		};
-		self.save_journal(&journal).await?;
-		Ok(PreparedProjection {
-			journal,
-			blob: None,
-			_before: None,
-		})
-	}
+    pub(crate) async fn prepare_move(
+        &self,
+        instance: &Instance,
+        file: &InstanceFile,
+        binding: &Binding,
+        enabled: bool,
+    ) -> crate::Result<PreparedProjection> {
+        self.recover(Some(&instance.id)).await?;
+        if binding.file_id != file.id || !super::eligible(&file.relative_path) {
+            return Err(input("Invalid managed content move"));
+        }
+        if self.inspect_projection(instance, file, binding).await?
+            != ContentProjectionStatus::Healthy
+        {
+            return Err(input(
+                "Content cannot be toggled because its instance path is missing or changed",
+            ));
+        }
+        let source_relative = content_file_path(file);
+        let target_relative =
+            materialized_content_path(&file.relative_path, enabled);
+        let journal = ProjectionJournal {
+            id: uuid::Uuid::new_v4().to_string(),
+            instance_id: instance.id.clone(),
+            instance_path: instance.path.clone(),
+            before: Some(Projection {
+                relative_path: source_relative,
+                sha512: binding.blob_sha512.clone(),
+                present: true,
+                mode: binding.materialization_kind,
+            }),
+            after: Some(Projection {
+                relative_path: target_relative,
+                sha512: binding.blob_sha512.clone(),
+                present: true,
+                mode: binding.materialization_kind,
+            }),
+        };
+        self.save_journal(&journal).await?;
+        Ok(PreparedProjection {
+            journal,
+            blob: None,
+            _before: None,
+        })
+    }
 
-	async fn save_journal(
-		&self,
-		journal: &ProjectionJournal,
-	) -> crate::Result<()> {
-		let mut tx = self.pool.begin().await?;
-		for projection in
-			[&journal.before, &journal.after].into_iter().flatten()
-		{
-			catalog::retain(
-				&mut tx,
-				"operation",
-				&journal.id,
-				&projection.sha512,
-			)
-			.await?;
-		}
-		catalog::operation(
-			&mut tx,
-			&journal.id,
-			&journal.instance_id,
-			&serde_json::to_string(journal)?,
-		)
-		.await?;
-		tx.commit().await?;
-		Ok(())
-	}
+    async fn save_journal(
+        &self,
+        journal: &ProjectionJournal,
+    ) -> crate::Result<()> {
+        let mut tx = self.pool.begin().await?;
+        for projection in
+            [&journal.before, &journal.after].into_iter().flatten()
+        {
+            catalog::retain(
+                &mut tx,
+                "operation",
+                &journal.id,
+                &projection.sha512,
+            )
+            .await?;
+        }
+        catalog::operation(
+            &mut tx,
+            &journal.id,
+            &journal.instance_id,
+            &serde_json::to_string(journal)?,
+        )
+        .await?;
+        tx.commit().await?;
+        Ok(())
+    }
 
     pub(crate) async fn recover(
         &self,
@@ -428,46 +428,44 @@ impl ContentStore {
         &self,
         journal: &ProjectionJournal,
     ) -> crate::Result<()> {
-		if journal_noop(journal) {
-			let mut tx = self.pool.begin().await?;
-			catalog::finish(&mut tx, &journal.id).await?;
-			tx.commit().await?;
-			return Ok(());
-		}
-		if let Some((before, after)) = journal_move(journal) {
-			let before_path = self
-				.instance_path(&journal.instance_path, &before.relative_path)
-				.await?;
-			let after_path = self
-				.instance_path(&journal.instance_path, &after.relative_path)
-				.await?;
-			match fs::symlink_metadata(&before_path).await {
-				Ok(_) => {
-					if !self.matches(&before_path, &before.sha512).await? {
-						return Err(input(format!(
-							"Cannot recover {}: its contents were changed outside the app",
-							before.relative_path
-						)));
-					}
-				}
-				Err(error)
-					if error.kind() == std::io::ErrorKind::NotFound =>
-				{
-					if !self.matches(&after_path, &after.sha512).await? {
-						return Err(input(format!(
-							"Cannot recover {}: the toggled content is missing or changed",
-							after.relative_path
-						)));
-					}
-					rename_projection(&after_path, &before_path).await?;
-				}
-				Err(error) => return Err(error.into()),
-			}
-			let mut tx = self.pool.begin().await?;
-			catalog::finish(&mut tx, &journal.id).await?;
-			tx.commit().await?;
-			return Ok(());
-		}
+        if journal_noop(journal) {
+            let mut tx = self.pool.begin().await?;
+            catalog::finish(&mut tx, &journal.id).await?;
+            tx.commit().await?;
+            return Ok(());
+        }
+        if let Some((before, after)) = journal_move(journal) {
+            let before_path = self
+                .instance_path(&journal.instance_path, &before.relative_path)
+                .await?;
+            let after_path = self
+                .instance_path(&journal.instance_path, &after.relative_path)
+                .await?;
+            match fs::symlink_metadata(&before_path).await {
+                Ok(_) => {
+                    if !self.matches(&before_path, &before.sha512).await? {
+                        return Err(input(format!(
+                            "Cannot recover {}: its contents were changed outside the app",
+                            before.relative_path
+                        )));
+                    }
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    if !self.matches(&after_path, &after.sha512).await? {
+                        return Err(input(format!(
+                            "Cannot recover {}: the toggled content is missing or changed",
+                            after.relative_path
+                        )));
+                    }
+                    rename_projection(&after_path, &before_path).await?;
+                }
+                Err(error) => return Err(error.into()),
+            }
+            let mut tx = self.pool.begin().await?;
+            catalog::finish(&mut tx, &journal.id).await?;
+            tx.commit().await?;
+            return Ok(());
+        }
         if let Some(after) = &journal.after {
             let path = self
                 .instance_path(&journal.instance_path, &after.relative_path)
@@ -496,9 +494,9 @@ impl ContentStore {
                         ));
                     }
                 } else {
-					match before.mode {
-						MaterializationKind::Symlink => {
-							let blob = self
+                    match before.mode {
+                        MaterializationKind::Symlink => {
+                            let blob = self
 								.catalog_blob(&before.sha512)
 								.await?
 								.ok_or_else(|| {
@@ -506,10 +504,10 @@ impl ContentStore {
 										"Recovery content is missing from the catalog",
 									)
 								})?;
-							materialize_catalog_symlink(&blob, &path).await?;
-						}
-						MaterializationKind::Copy => {
-							let blob = self
+                            materialize_catalog_symlink(&blob, &path).await?;
+                        }
+                        MaterializationKind::Copy => {
+                            let blob = self
 								.lookup(Some(&before.sha512), None, None)
 								.await?
 								.ok_or_else(|| {
@@ -517,9 +515,9 @@ impl ContentStore {
 										"Recovery content needs repair or re-import",
 									)
 								})?;
-							self.materialize(&blob, &path, true).await?;
-						}
-					}
+                            self.materialize(&blob, &path, true).await?;
+                        }
+                    }
                 }
             }
         }
@@ -575,7 +573,7 @@ impl ContentStore {
             parent.join(format!(".modrinth-{}.tmp", uuid::Uuid::new_v4()));
         let mode = if force_copy {
             writable_copy(&blob.path, &temporary).await?;
-			MaterializationKind::Copy
+            MaterializationKind::Copy
         } else {
             let source = relative_link(&blob.path, parent);
             #[cfg(unix)]
@@ -583,15 +581,15 @@ impl ContentStore {
             #[cfg(windows)]
             let result = fs::symlink_file(&source, &temporary).await;
             match result {
-				Ok(()) => MaterializationKind::Symlink,
+                Ok(()) => MaterializationKind::Symlink,
                 Err(error) if link_unavailable(&error) => {
                     writable_copy(&blob.path, &temporary).await?;
-					MaterializationKind::Copy
+                    MaterializationKind::Copy
                 }
                 Err(error) => return Err(error.into()),
             }
         };
-		if mode == MaterializationKind::Copy {
+        if mode == MaterializationKind::Copy {
             fs::File::options()
                 .write(true)
                 .open(&temporary)
@@ -604,9 +602,8 @@ impl ContentStore {
             return Err(error.into());
         }
         sync_directory(parent).await?;
-		Ok(mode)
+        Ok(mode)
     }
-
 }
 
 impl PreparedProjection {
@@ -622,33 +619,35 @@ impl PreparedProjection {
     }
 
     async fn apply_inner(&mut self, store: &ContentStore) -> crate::Result<()> {
-		if journal_noop(&self.journal) {
-			return Ok(());
-		}
-		if let Some((before, after)) = journal_move(&self.journal) {
-			let source = store
-				.instance_path(
-					&self.journal.instance_path,
-					&before.relative_path,
-				)
-				.await?;
-			let target = store
-				.instance_path(
-					&self.journal.instance_path,
-					&after.relative_path,
-				)
-				.await?;
-			if !store.matches(&source, &before.sha512).await? {
-				return Err(input(
-					"Content changed before the toggle could be applied",
-				));
-			}
-			if fs::symlink_metadata(&target).await.is_ok() {
-				return Err(input("The content toggle destination already exists"));
-			}
-			rename_projection(&source, &target).await?;
-			return Ok(());
-		}
+        if journal_noop(&self.journal) {
+            return Ok(());
+        }
+        if let Some((before, after)) = journal_move(&self.journal) {
+            let source = store
+                .instance_path(
+                    &self.journal.instance_path,
+                    &before.relative_path,
+                )
+                .await?;
+            let target = store
+                .instance_path(
+                    &self.journal.instance_path,
+                    &after.relative_path,
+                )
+                .await?;
+            if !store.matches(&source, &before.sha512).await? {
+                return Err(input(
+                    "Content changed before the toggle could be applied",
+                ));
+            }
+            if fs::symlink_metadata(&target).await.is_ok() {
+                return Err(input(
+                    "The content toggle destination already exists",
+                ));
+            }
+            rename_projection(&source, &target).await?;
+            return Ok(());
+        }
         if let Some(before) = &self.journal.before {
             let path = store
                 .instance_path(
@@ -689,7 +688,7 @@ impl PreparedProjection {
         file_id: Option<&str>,
     ) -> crate::Result<()> {
         if let (Some(file_id), Some(after)) = (file_id, &self.journal.after) {
-			catalog::bind(tx, file_id, &after.sha512, after.mode).await?;
+            catalog::bind(tx, file_id, &after.sha512, after.mode).await?;
         }
         catalog::finish(tx, &self.journal.id).await
     }
@@ -703,77 +702,77 @@ impl PreparedProjection {
 }
 
 fn journal_move(
-	journal: &ProjectionJournal,
+    journal: &ProjectionJournal,
 ) -> Option<(&Projection, &Projection)> {
-	let before = journal.before.as_ref()?;
-	let after = journal.after.as_ref()?;
-	(before.present
-		&& after.present
-		&& before.sha512 == after.sha512
-		&& before.mode == after.mode
-		&& before.relative_path != after.relative_path)
-		.then_some((before, after))
+    let before = journal.before.as_ref()?;
+    let after = journal.after.as_ref()?;
+    (before.present
+        && after.present
+        && before.sha512 == after.sha512
+        && before.mode == after.mode
+        && before.relative_path != after.relative_path)
+        .then_some((before, after))
 }
 
 fn journal_noop(journal: &ProjectionJournal) -> bool {
-	matches!(
-		(&journal.before, &journal.after),
-		(Some(before), Some(after))
-			if before.present == after.present
-				&& before.sha512 == after.sha512
-				&& before.mode == after.mode
-				&& before.relative_path == after.relative_path
-	)
+    matches!(
+        (&journal.before, &journal.after),
+        (Some(before), Some(after))
+            if before.present == after.present
+                && before.sha512 == after.sha512
+                && before.mode == after.mode
+                && before.relative_path == after.relative_path
+    )
 }
 
 async fn rename_projection(source: &Path, target: &Path) -> crate::Result<()> {
-	let metadata = fs::symlink_metadata(source).await?;
-	if metadata.is_dir() && !metadata.file_type().is_symlink() {
-		return Err(input("Refusing to move a directory as content"));
-	}
-	let parent = target
-		.parent()
-		.ok_or_else(|| input("Content destination has no parent"))?;
-	fs::create_dir_all(parent).await?;
-	if fs::symlink_metadata(target).await.is_ok() {
-		return Err(input("Content destination already exists"));
-	}
-	fs::rename(source, target).await?;
-	if let Some(source_parent) = source.parent() {
-		sync_directory(source_parent).await?;
-	}
-	if source.parent() != Some(parent) {
-		sync_directory(parent).await?;
-	}
-	Ok(())
+    let metadata = fs::symlink_metadata(source).await?;
+    if metadata.is_dir() && !metadata.file_type().is_symlink() {
+        return Err(input("Refusing to move a directory as content"));
+    }
+    let parent = target
+        .parent()
+        .ok_or_else(|| input("Content destination has no parent"))?;
+    fs::create_dir_all(parent).await?;
+    if fs::symlink_metadata(target).await.is_ok() {
+        return Err(input("Content destination already exists"));
+    }
+    fs::rename(source, target).await?;
+    if let Some(source_parent) = source.parent() {
+        sync_directory(source_parent).await?;
+    }
+    if source.parent() != Some(parent) {
+        sync_directory(parent).await?;
+    }
+    Ok(())
 }
 
 async fn materialize_catalog_symlink(
-	blob: &CatalogBlob,
-	target: &Path,
+    blob: &CatalogBlob,
+    target: &Path,
 ) -> crate::Result<()> {
-	let parent = target
-		.parent()
-		.ok_or_else(|| input("Content destination has no parent"))?;
-	fs::create_dir_all(parent).await?;
-	if fs::symlink_metadata(target).await.is_ok() {
-		return Err(input("Content destination already exists"));
-	}
-	let temporary =
-		parent.join(format!(".modrinth-{}.tmp", uuid::Uuid::new_v4()));
-	let source = relative_link(&blob.path, parent);
-	#[cfg(unix)]
-	let result = fs::symlink(&source, &temporary).await;
-	#[cfg(windows)]
-	let result = fs::symlink_file(&source, &temporary).await;
-	if let Err(error) = result {
-		return Err(error.into());
-	}
-	if let Err(error) = fs::rename(&temporary, target).await {
-		let _ = fs::remove_file(&temporary).await;
-		return Err(error.into());
-	}
-	sync_directory(parent).await
+    let parent = target
+        .parent()
+        .ok_or_else(|| input("Content destination has no parent"))?;
+    fs::create_dir_all(parent).await?;
+    if fs::symlink_metadata(target).await.is_ok() {
+        return Err(input("Content destination already exists"));
+    }
+    let temporary =
+        parent.join(format!(".modrinth-{}.tmp", uuid::Uuid::new_v4()));
+    let source = relative_link(&blob.path, parent);
+    #[cfg(unix)]
+    let result = fs::symlink(&source, &temporary).await;
+    #[cfg(windows)]
+    let result = fs::symlink_file(&source, &temporary).await;
+    if let Err(error) = result {
+        return Err(error.into());
+    }
+    if let Err(error) = fs::rename(&temporary, target).await {
+        let _ = fs::remove_file(&temporary).await;
+        return Err(error.into());
+    }
+    sync_directory(parent).await
 }
 
 pub(super) fn link_unavailable(error: &std::io::Error) -> bool {

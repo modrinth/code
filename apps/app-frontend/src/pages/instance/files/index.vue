@@ -31,7 +31,8 @@ const debug = useDebugLogger('Files')
 const messages = defineMessages({
 	readOnly: {
 		id: 'instance.files.managed-content-read-only',
-		defaultMessage: 'Managed content is read-only here. Add, disable, update, or remove it from the Content tab.',
+		defaultMessage:
+			'Managed content is read-only here. Add, disable, update, or remove it from the Content tab.',
 	},
 	saveAs: {
 		id: 'instance.files.save-as',
@@ -68,13 +69,18 @@ async function listDirectory(dirPath: string): Promise<FileItem[]> {
 
 function isReadOnly(path: string): boolean {
 	const normalized = path.startsWith('/') ? path.slice(1) : path
-	return normalized.split('/')[0].toLowerCase() === 'mods'
-		|| items.value.some((item) => item.path === normalized && item.readOnly === true)
+	return (
+		normalized.split('/')[0].toLowerCase() === 'mods' ||
+		items.value.some((item) => item.path === normalized && item.readOnly === true)
+	)
 }
 
 async function writeBytes(path: string, bytes: Uint8Array, createOnly = false) {
 	await invoke('plugin:files|file_write', {
-		instanceId: instanceId.value, path, bytes: Array.from(bytes), createOnly,
+		instanceId: instanceId.value,
+		path,
+		bytes: Array.from(bytes),
+		createOnly,
 	})
 }
 
@@ -131,7 +137,10 @@ async function handleCreateItem(name: string, type: 'file' | 'directory') {
 	const targetPath = currentPath.value ? `${currentPath.value}/${name}` : name
 	try {
 		if (type === 'directory') {
-			await invoke('plugin:files|file_create_directory', { instanceId: instanceId.value, path: targetPath })
+			await invoke('plugin:files|file_create_directory', {
+				instanceId: instanceId.value,
+				path: targetPath,
+			})
 		} else {
 			await writeBytes(targetPath, new Uint8Array(), true)
 		}
@@ -149,7 +158,11 @@ async function handleRenameItem(path: string, newName: string) {
 	const parentDir = path.includes('/') ? path.substring(0, path.lastIndexOf('/')) : ''
 	const newPath = parentDir ? `${parentDir}/${newName}` : newName
 	try {
-		await invoke('plugin:files|file_rename', { instanceId: instanceId.value, source: path, destination: newPath })
+		await invoke('plugin:files|file_rename', {
+			instanceId: instanceId.value,
+			source: path,
+			destination: newPath,
+		})
 		await refresh()
 	} catch (e) {
 		addNotification({
@@ -187,12 +200,18 @@ async function handleDeleteItem(path: string, recursive: boolean) {
 }
 
 async function handleReadFile(path: string): Promise<string> {
-	const bytes = await invoke<number[]>('plugin:files|file_read', { instanceId: instanceId.value, path })
+	const bytes = await invoke<number[]>('plugin:files|file_read', {
+		instanceId: instanceId.value,
+		path,
+	})
 	return new TextDecoder().decode(new Uint8Array(bytes))
 }
 
 async function handleReadFileAsBlob(path: string): Promise<Blob> {
-	const bytes = await invoke<number[]>('plugin:files|file_read', { instanceId: instanceId.value, path })
+	const bytes = await invoke<number[]>('plugin:files|file_read', {
+		instanceId: instanceId.value,
+		path,
+	})
 	return new Blob([new Uint8Array(bytes)])
 }
 
@@ -318,10 +337,10 @@ provideFileManager({
 <template>
 	<ReadyTransition :pending="firstPaintPending">
 		<div>
-		<p v-if="isReadOnly(currentPath)" class="m-0 mb-4 text-sm text-secondary">
-			{{ formatMessage(messages.readOnly) }}
-		</p>
-		<FilePageLayout :show-refresh-button="true" />
+			<p v-if="isReadOnly(currentPath)" class="m-0 mb-4 text-sm text-secondary">
+				{{ formatMessage(messages.readOnly) }}
+			</p>
+			<FilePageLayout :show-refresh-button="true" />
 		</div>
 	</ReadyTransition>
 </template>

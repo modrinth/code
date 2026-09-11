@@ -1,6 +1,6 @@
 use crate::State;
 use crate::state::content_store::{
-	ContentProjectionStatus, FileContent, content_file_path,
+    ContentProjectionStatus, FileContent, content_file_path,
 };
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
@@ -10,7 +10,7 @@ use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
 use super::content_mutation::{
-	ContentMutation, ContentMutationExecutor, ContentMutationResult,
+    ContentMutation, ContentMutationExecutor, ContentMutationResult,
 };
 
 pub(crate) async fn sync_content_files(
@@ -31,7 +31,7 @@ pub(crate) async fn sync_instance_content_files(
     instance: &Instance,
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
-	let executor = ContentMutationExecutor::lock(&instance.id, state).await?;
+    let executor = ContentMutationExecutor::lock(&instance.id, state).await?;
     let existing =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
             .await?;
@@ -46,11 +46,11 @@ pub(crate) async fn sync_instance_content_files(
     let existing_by_path = existing
         .iter()
         .map(|file| {
-			(
-				file.relative_path.trim_end_matches(".disabled").to_string(),
-				file,
-			)
-		})
+            (
+                file.relative_path.trim_end_matches(".disabled").to_string(),
+                file,
+            )
+        })
         .collect::<HashMap<_, _>>();
     let mut scanned = filesystem::scan_content_files(
         &state.directories.instances_dir(),
@@ -58,16 +58,16 @@ pub(crate) async fn sync_instance_content_files(
     )?;
     scanned.retain(|file| {
         let registered = existing.iter().any(|existing| {
-			bindings.contains_key(&existing.id)
-				&& content_file_path(existing) == file.relative_path
-		});
+            bindings.contains_key(&existing.id)
+                && content_file_path(existing) == file.relative_path
+        });
         registered || !file.is_symlink
     });
-	let running =
-		crate::state::instance_has_running_process(&instance.id, state).await?;
+    let running =
+        crate::state::instance_has_running_process(&instance.id, state).await?;
     let cache_keys = scanned
         .iter()
-		.filter(|scanned| running && !scanned.is_symlink)
+        .filter(|scanned| running && !scanned.is_symlink)
         .map(|file| file.hash_cache_key.as_str())
         .collect::<Vec<_>>();
     let hashes = CachedEntry::get_file_hash_many(
@@ -91,63 +91,64 @@ pub(crate) async fn sync_instance_content_files(
         })
         .collect::<HashMap<_, _>>();
     let mut files = Vec::new();
-	let mut stored_by_executor = HashSet::new();
+    let mut stored_by_executor = HashSet::new();
     for previous in &existing {
         let Some(binding) = bindings.get(&previous.id) else {
             continue;
         };
         let mut file = previous.clone();
-		let content = state.content_store.file_content(previous).await?;
-		let stored = matches!(content, FileContent::Stored(_));
-		let projection = state
-			.content_store
-			.inspect_projection(instance, previous, binding)
-			.await?;
-		file.missing = !stored
-			|| projection != ContentProjectionStatus::Healthy;
-		if !file.enabled
-			&& file.missing
-			&& stored
-			&& projection == ContentProjectionStatus::Missing
-			&& !running
-		{
-			file = match executor
-				.execute(ContentMutation::Toggle {
-					project_path: &file.relative_path,
-					desired_enabled: Some(false),
-				})
-				.await?
-			{
-				ContentMutationResult::File(file) => file,
-				_ => unreachable!("repair mutations return a content file"),
-			};
-			stored_by_executor.insert(file.id.clone());
-		}
+        let content = state.content_store.file_content(previous).await?;
+        let stored = matches!(content, FileContent::Stored(_));
+        let projection = state
+            .content_store
+            .inspect_projection(instance, previous, binding)
+            .await?;
+        file.missing =
+            !stored || projection != ContentProjectionStatus::Healthy;
+        if !file.enabled
+            && file.missing
+            && stored
+            && projection == ContentProjectionStatus::Missing
+            && !running
+        {
+            file = match executor
+                .execute(ContentMutation::Toggle {
+                    project_path: &file.relative_path,
+                    desired_enabled: Some(false),
+                })
+                .await?
+            {
+                ContentMutationResult::File(file) => file,
+                _ => unreachable!("repair mutations return a content file"),
+            };
+            stored_by_executor.insert(file.id.clone());
+        }
         if file.missing != previous.missing {
             file.modified_at = Utc::now();
         }
         files.push(file);
     }
     for scanned in &scanned {
-		let canonical_path = scanned.relative_path.trim_end_matches(".disabled");
-		let previous = existing_by_path.get(canonical_path).copied();
-		if let Some(file) = previous
-			&& bindings.contains_key(&file.id)
-		{
-			if content_file_path(file) != scanned.relative_path {
-				tracing::warn!(
-					instance_id = %instance.id,
-					path = %scanned.relative_path,
-					"Ignoring content at the inactive form of a managed path"
-				);
-			}
-			continue;
-		}
-		let hash = hashes_by_key
-			.get(scanned.hash_cache_key.trim_end_matches(".disabled"));
-		if running && hash.is_none() {
-			continue;
-		}
+        let canonical_path =
+            scanned.relative_path.trim_end_matches(".disabled");
+        let previous = existing_by_path.get(canonical_path).copied();
+        if let Some(file) = previous
+            && bindings.contains_key(&file.id)
+        {
+            if content_file_path(file) != scanned.relative_path {
+                tracing::warn!(
+                    instance_id = %instance.id,
+                    path = %scanned.relative_path,
+                    "Ignoring content at the inactive form of a managed path"
+                );
+            }
+            continue;
+        }
+        let hash = hashes_by_key
+            .get(scanned.hash_cache_key.trim_end_matches(".disabled"));
+        if running && hash.is_none() {
+            continue;
+        }
         let mut file = InstanceFile {
             id: previous
                 .map(|file| file.id.clone())
@@ -156,7 +157,7 @@ pub(crate) async fn sync_instance_content_files(
             relative_path: scanned.relative_path.clone(),
             file_name: scanned.file_name.clone(),
             enabled: scanned.enabled,
-			sha1: hash.map(|hash| hash.hash.clone()).unwrap_or_default(),
+            sha1: hash.map(|hash| hash.hash.clone()).unwrap_or_default(),
             size: scanned.size,
             missing: false,
             added_at: previous
@@ -167,20 +168,18 @@ pub(crate) async fn sync_instance_content_files(
         if !running
             && crate::state::content_store::eligible(&file.relative_path)
         {
-			file = match executor
-				.execute(ContentMutation::Adopt { file: &file })
-				.await?
-			{
-				ContentMutationResult::File(file) => file,
-				_ => unreachable!("adopt mutations return a content file"),
-			};
-			stored_by_executor.insert(file.id.clone());
-		} else {
-			file.relative_path = canonical_path.to_string();
-			file.file_name = scanned
-				.file_name
-				.trim_end_matches(".disabled")
-				.to_string();
+            file = match executor
+                .execute(ContentMutation::Adopt { file: &file })
+                .await?
+            {
+                ContentMutationResult::File(file) => file,
+                _ => unreachable!("adopt mutations return a content file"),
+            };
+            stored_by_executor.insert(file.id.clone());
+        } else {
+            file.relative_path = canonical_path.to_string();
+            file.file_name =
+                scanned.file_name.trim_end_matches(".disabled").to_string();
         }
         files.push(file);
     }
@@ -213,13 +212,14 @@ pub(crate) async fn sync_instance_content_files(
     }
     let mut stored = Vec::new();
     for file in files {
-		if stored_by_executor.contains(&file.id) {
-			stored.push(file);
-		} else {
-			stored.push(
-				sqlite::content_rows::upsert_instance_file(&file, &mut tx).await?,
-			);
-		}
+        if stored_by_executor.contains(&file.id) {
+            stored.push(file);
+        } else {
+            stored.push(
+                sqlite::content_rows::upsert_instance_file(&file, &mut tx)
+                    .await?,
+            );
+        }
     }
     tx.commit().await?;
     if changed {

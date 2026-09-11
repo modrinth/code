@@ -1,0 +1,20 @@
+<svg
+	preserveAspectRatio="none"
+	overflow="visible"
+	style="display: block;"
+	width="20"
+	height="20"
+	viewBox="0 0 20 20"
+	fill="none"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<g id="Icon / Spinner">
+		<path
+			id="Vector"
+			d="M10 2.5V5M10 15V17.5M17.5 10H15M5 10H2.5M15.3029 4.69727L13.5352 6.46503M6.46503 13.5352L4.69727 15.3029M15.3029 15.3029L13.5352 13.5352M6.46503 6.46503L4.69727 4.69727"
+			stroke="#B0BAC5"
+			stroke-width="1.5"
+			stroke-linecap="round"
+		/>
+	</g>
+</svg>

@@ -92,9 +92,6 @@
   "app.action-bar.install.updating-shared-content": {
     "message": "Ažuriranje deljenog sadržaja"
   },
-  "app.action-bar.installs": {
-    "message": "Instalacije"
-  },
   "app.action-bar.make-primary-instance": {
     "message": "Učini primarnom instancom"
   },

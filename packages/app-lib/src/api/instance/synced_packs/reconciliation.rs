@@ -1,13 +1,11 @@
-use super::storage::{
-	read_blob, read_library, write_library,
-};
+use super::storage::{read_blob, read_library, write_library};
 use super::{
     PackLibrary, PackPlacement, SyncedPack, pack_option, pack_path, same_path,
     version_compatible,
 };
 use crate::event::{InstancePayloadType, emit::emit_instance};
-use crate::state::instances::commands;
 use crate::state::content_store::materialized_content_path;
+use crate::state::instances::commands;
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentItem, ContentItemVersion,
     ContentSourceKind, InstanceMetadata, ProjectType, State, SyncedOption,
@@ -126,9 +124,12 @@ pub(super) async fn capture(
             placement.path = item.file_path.clone();
             placement.sha1 = item.id.clone();
             placement.enabled = item.enabled;
-		} else if !instance_dir(metadata, state)
-			.join(materialized_content_path(&placement.path, placement.enabled))
-			.exists()
+        } else if !instance_dir(metadata, state)
+            .join(materialized_content_path(
+                &placement.path,
+                placement.enabled,
+            ))
+            .exists()
         {
             placement.excluded = true;
         }
@@ -169,16 +170,16 @@ async fn owns_file(
     if file.sha1 != placement.sha1 {
         return Ok(false);
     }
-	let crate::state::content_store::FileContent::Stored(blob) =
-		state.content_store.file_content(&file).await?
-	else {
+    let crate::state::content_store::FileContent::Stored(blob) =
+        state.content_store.file_content(&file).await?
+    else {
         return Ok(false);
     };
     state
         .content_store
         .matches(
-			&instance_dir(metadata, state)
-				.join(crate::state::content_store::content_file_path(&file)),
+            &instance_dir(metadata, state)
+                .join(crate::state::content_store::content_file_path(&file)),
             &blob.blob.sha512,
         )
         .await
@@ -397,8 +398,8 @@ async fn apply_pack(
     for path in [target_base.to_string(), format!("{target_base}.disabled")] {
         if instance_dir(metadata, state).join(&path).exists() {
             let owned = if let Some(previous) = &previous {
-				same_path(&previous.path, &path)
-					&& previous.enabled == !path.ends_with(".disabled")
+                same_path(&previous.path, &path)
+                    && previous.enabled == !path.ends_with(".disabled")
                     && owns_file(metadata, previous, state).await?
             } else {
                 false
@@ -411,7 +412,7 @@ async fn apply_pack(
             }
         }
     }
-	let blob = if let Some(file) = file {
+    let blob = if let Some(file) = file {
         let downloaded = fetch::fetch_content_file(
             state,
             &[file.url.as_str()],
@@ -422,12 +423,12 @@ async fn apply_pack(
             None,
         )
         .await?;
-		downloaded.store_blob(state).await?
+        downloaded.store_blob(state).await?
     } else {
-		read_blob(pack, state).await?
+        read_blob(pack, state).await?
     };
-	let bytes = bytes::Bytes::from(tokio::fs::read(&blob.path).await?);
-	let sha1 = blob.blob.sha1.clone();
+    let bytes = bytes::Bytes::from(tokio::fs::read(&blob.path).await?);
+    let sha1 = blob.blob.sha1.clone();
     super::operations::validate_pack(&bytes, pack.item.project_type)?;
     let mut pending = previous.clone().unwrap_or_default();
     pending.pending = true;
@@ -472,24 +473,25 @@ async fn apply_pack(
         }
     }
     let size = bytes.len() as u64;
-	let path = commands::install_content_blob(
-		instance_id,
-		commands::InstallContent {
-			requested_path: &target_path,
-			blob: &blob,
-			project_type: pack.item.project_type,
-			source_kind: ContentSourceKind::Local,
-			origin: pack.item.project.as_ref().zip(version.as_ref())
-				.map(|(project, version)| commands::ContentOrigin {
-					project_id: &project.id,
-					version_id: &version.id,
-				}),
-			enabled_override: Some(pack.item.enabled),
-			previous_path: None,
-		},
-		state,
-	)
-	.await?;
+    let path = commands::install_content_blob(
+        instance_id,
+        commands::InstallContent {
+            requested_path: &target_path,
+            blob: &blob,
+            project_type: pack.item.project_type,
+            source_kind: ContentSourceKind::Local,
+            origin: pack.item.project.as_ref().zip(version.as_ref()).map(
+                |(project, version)| commands::ContentOrigin {
+                    project_id: &project.id,
+                    version_id: &version.id,
+                },
+            ),
+            enabled_override: Some(pack.item.enabled),
+            previous_path: None,
+        },
+        state,
+    )
+    .await?;
     if let Some(previous) = previous
         && previous.path != path
         && owns_file(metadata, &previous, state).await?
@@ -591,7 +593,10 @@ async fn apply_instance_inner(
                 || previous_placements.get(id).is_some_and(|placement| {
                     !placement.path.is_empty()
                         && instance_dir(metadata, state)
-							.join(materialized_content_path(&placement.path, placement.enabled))
+                            .join(materialized_content_path(
+                                &placement.path,
+                                placement.enabled,
+                            ))
                             .exists()
                 })
                 || items.iter().any(|item| {

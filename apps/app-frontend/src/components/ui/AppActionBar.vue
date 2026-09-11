@@ -1,5 +1,6 @@
 <template>
 	<div class="flex gap-2 items-center">
+		<DownloadManager />
 		<div v-if="downloadState.total > 0 || hasActiveLoadingBars" class="relative">
 			<IconButton
 				v-tooltip="downloadToggleLabel"
@@ -132,9 +133,9 @@ import {
 	TerminalSquareIcon,
 	UnplugIcon,
 } from '@modrinth/assets'
-import { IconButton } from '@modrinth/ui'
 import {
 	defineMessages,
+	IconButton,
 	injectNotificationManager,
 	injectPopupNotificationManager,
 	type PopupNotificationProgressItem,
@@ -147,10 +148,9 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AppUpdateButton from '@/components/ui/app-update-button/index.vue'
-import { useInstallJobNotifications } from '@/composables/browse/install-job-notifications'
+import DownloadManager from '@/components/ui/download-manager/index.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { trackEvent } from '@/helpers/analytics'
-import { toError } from '@/helpers/errors'
 import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
 import type { LoadingBar } from '@/helpers/state'
@@ -325,7 +325,6 @@ function goToTerminal(instanceId?: string) {
 const currentLoadingBars = ref<LoadingBar[]>([])
 const currentLoadingBarIconUrls = ref<Record<string, string | null>>({})
 const notificationId = ref<string | number | null>(null)
-const terminalNotificationIds = new Map<string, string | number>()
 const dismissed = ref(false)
 
 function getLoadingBarKey(loadingBar: LoadingBar): string {
@@ -373,79 +372,28 @@ function removeNotification(): void {
 	notificationId.value = null
 }
 
-function syncTerminalNotifications(): void {
-	const terminalNotifications = installJobNotifications.terminalNotifications.value
-	const currentJobIds = new Set(terminalNotifications.map((notification) => notification.id))
-
-	for (const terminal of terminalNotifications) {
-		const popupId = terminalNotificationIds.get(terminal.id)
-		let notification = popupId
-			? popupNotificationManager
-					.getNotifications()
-					.find(
-						(candidate): candidate is PopupNotificationStandard =>
-							candidate.id === popupId && candidate.contentType === 'standard',
-					)
-			: undefined
-
-		if (!notification) {
-			notification = popupNotificationManager.addPopupNotification({
-				contentType: 'standard',
-				title: terminal.title,
-				text: terminal.text,
-				type: terminal.type,
-				buttons: terminal.buttons,
-				onDismiss: terminal.onDismiss,
-				autoCloseMs: null,
-			})
-			terminalNotificationIds.set(terminal.id, notification.id)
-			continue
-		}
-
-		notification.title = terminal.title
-		notification.text = terminal.text
-		notification.type = terminal.type
-		notification.buttons = terminal.buttons
-		notification.onDismiss = terminal.onDismiss
-	}
-
-	for (const [jobId, popupId] of terminalNotificationIds) {
-		if (!currentJobIds.has(jobId)) {
-			popupNotificationManager.removeNotification(popupId)
-			terminalNotificationIds.delete(jobId)
-		}
-	}
-}
-
 function buildDownloadItems(): PopupNotificationProgressItem[] {
-	return [
-		...installJobNotifications.progressItems.value,
-		...currentLoadingBars.value.map<PopupNotificationProgressItem>((bar) => ({
-			id: getLoadingBarKey(bar),
-			title: bar.title ?? '',
-			text: getLoadingText(bar),
-			iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
-			progress: getLoadingProgress(bar),
-			waiting: !bar.total || bar.total <= 0,
-			progressType: bar.bar_type?.type === 'pack_import' ? 'bytes' : 'percentage',
-			progressCurrent: bar.current,
-			progressTotal: bar.total,
-		})),
-	]
+	return currentLoadingBars.value.map((bar) => ({
+		id: getLoadingBarKey(bar),
+		title: bar.title ?? '',
+		text: getLoadingText(bar),
+		iconUrl: currentLoadingBarIconUrls.value[getLoadingBarKey(bar)] ?? null,
+		progress: getLoadingProgress(bar),
+		waiting: !bar.total || bar.total <= 0,
+		progressType: bar.bar_type?.type === 'pack_import' ? 'bytes' : 'percentage',
+		progressCurrent: bar.current,
+		progressTotal: bar.total,
+	}))
 }
 
-const hasActiveLoadingBars = computed(
-	() => currentLoadingBars.value.length > 0 || installJobNotifications.active.value,
-)
+const hasActiveLoadingBars = computed(() => currentLoadingBars.value.length > 0)
 
 function updateNotification(resummon = false): void {
-	syncTerminalNotifications()
-
 	if (resummon) {
 		dismissed.value = false
 	}
 
-	if (currentLoadingBars.value.length === 0 && !installJobNotifications.active.value) {
+	if (currentLoadingBars.value.length === 0) {
 		removeNotification()
 		dismissed.value = false
 		return
@@ -464,9 +412,7 @@ function updateNotification(resummon = false): void {
 	const progressItems = buildDownloadItems()
 
 	if (notif) {
-		notif.title = installJobNotifications.active.value
-			? installJobNotifications.title.value
-			: formatMessage(messages.downloads)
+		notif.title = formatMessage(messages.downloads)
 		notif.text = undefined
 		notif.progressItems = progressItems
 		notif.progress = undefined
@@ -474,9 +420,7 @@ function updateNotification(resummon = false): void {
 	} else {
 		const notification = popupNotificationManager.addPopupNotification({
 			contentType: 'standard',
-			title: installJobNotifications.active.value
-				? installJobNotifications.title.value
-				: formatMessage(messages.downloads),
+			title: formatMessage(messages.downloads),
 			type: 'download',
 			autoCloseMs: null,
 			progressItems,
@@ -556,12 +500,6 @@ async function refreshLoadingBars() {
 	updateNotification()
 }
 
-const installJobNotifications = await useInstallJobNotifications({
-	router,
-	handleError: (error) => handleError(toError(error)),
-	onChange: updateNotification,
-})
-
 await refreshLoadingBars()
 
 useAppEvent('loading', async () => {
@@ -578,11 +516,8 @@ function selectProcess(process: RunningProcess) {
 
 onBeforeUnmount(() => {
 	removeNotification()
-	terminalNotificationIds.forEach((id) => popupNotificationManager.removeNotification(id))
-	terminalNotificationIds.clear()
 	dismissed.value = false
 	window.removeEventListener('offline', handleOffline)
 	window.removeEventListener('online', handleOnline)
-	installJobNotifications.dispose()
 })
 </script>

@@ -37,11 +37,11 @@ pub(crate) async fn infer_project_type_path(
 ) -> crate::Result<ProjectType> {
     let path = path.to_path_buf();
     tokio::task::spawn_blocking(move || {
-		let mut archive = ZipArchive::new(File::open(path)?).map_err(|_| {
-			crate::ErrorKind::InputError(
-				"Unable to infer project type for input file".to_string(),
-			)
-		})?;
+        let mut archive = ZipArchive::new(File::open(path)?).map_err(|_| {
+            crate::ErrorKind::InputError(
+                "Unable to infer project type for input file".to_string(),
+            )
+        })?;
         infer_project_type(&mut archive)
     })
     .await?
