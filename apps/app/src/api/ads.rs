@@ -1,10 +1,12 @@
 use std::collections::HashSet;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
 use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::{AppEvent, EventState, settings};
-use tokio::sync::{RwLock, mpsc};
+use tokio::sync::RwLock;
 
 pub struct AdsState {
     pub shown: bool,
@@ -209,11 +211,10 @@ async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
 fn sync_webview_visibility_for_main_window<R: Runtime>(
     app: &tauri::AppHandle<R>,
     main_window: &tauri::Window<R>,
-    was_minimized: &mut bool,
+    was_minimized: &AtomicBool,
 ) {
-    let Ok(is_minimized) = main_window.is_minimized() else {
-        return;
-    };
+    let is_minimized = main_window.is_minimized().unwrap_or(false);
+    let was = was_minimized.load(Ordering::SeqCst);
 
     let ads_state = if is_minimized {
         None
@@ -238,11 +239,11 @@ fn sync_webview_visibility_for_main_window<R: Runtime>(
         webview.set_size(size).ok();
     }
 
-    if is_minimized == *was_minimized {
+    if is_minimized == was {
         return;
     }
 
-    *was_minimized = is_minimized;
+    was_minimized.store(is_minimized, Ordering::SeqCst);
 
     let mut webviews = Vec::new();
     let mut seen_webviews = HashSet::new();
@@ -311,40 +312,30 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             });
 
             if let Some(main_window) = app.get_window("main") {
-                let (visibility_tx, mut visibility_rx) = mpsc::channel(1);
-
-                // WebView2 visibility changes can re-enter Tauri's focus handlers.
-                // Queue them off the event callback and serialize the delayed checks.
-                main_window.on_window_event(move |event| {
-                    if matches!(
-                        event,
-                        tauri::WindowEvent::Resized(_)
-                            | tauri::WindowEvent::ScaleFactorChanged { .. }
-                            | tauri::WindowEvent::Focused(_)
-                    ) {
-                        let _ = visibility_tx.try_send(());
-                    }
-                });
-
                 let app_handle = app.clone();
-                tauri::async_runtime::spawn(async move {
-                    let mut was_minimized = false;
+                let event_window = main_window.clone();
+                let was_minimized = Arc::new(AtomicBool::new(false));
 
-                    while visibility_rx.recv().await.is_some() {
-                        sync_webview_visibility_for_main_window(
-                            &app_handle,
-                            &main_window,
-                            &mut was_minimized,
-                        );
+                main_window.on_window_event(move |_| {
+                    sync_webview_visibility_for_main_window(
+                        &app_handle,
+                        &event_window,
+                        &was_minimized,
+                    );
 
+                    let delayed_app_handle = app_handle.clone();
+                    let delayed_event_window = event_window.clone();
+                    let delayed_was_minimized = was_minimized.clone();
+
+                    tauri::async_runtime::spawn(async move {
                         tokio::time::sleep(Duration::from_millis(100)).await;
 
                         sync_webview_visibility_for_main_window(
-                            &app_handle,
-                            &main_window,
-                            &mut was_minimized,
+                            &delayed_app_handle,
+                            &delayed_event_window,
+                            &delayed_was_minimized,
                         );
-                    }
+                    });
                 });
             }
 

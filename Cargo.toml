@@ -202,8 +202,8 @@ strum = "0.27.2"
 syn = { version = "2.0" }
 sysinfo = { version = "0.37.2", default-features = false }
 tar = "0.4.44"
-tauri = "2.8.5"
-tauri-build = "2.4.1"
+tauri = "2.11.5"
+tauri-build = "2.6.3"
 tauri-plugin-deep-link = "2.4.3"
 tauri-plugin-dialog = "2.4.0"
 tauri-plugin-fs = "2.4.5"
@@ -260,6 +260,17 @@ zip = { version = "6.0.0", default-features = false, features = [
   "zstd",
 ] }
 zxcvbn = "3.1.0"
+
+# Pin the upstream Tao 0.36 upgrade until a Tauri release includes the Windows input deadlock fix.
+# https://github.com/tauri-apps/tauri/pull/15307
+[patch.crates-io]
+tauri = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-build = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-codegen = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-macros = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-runtime = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-runtime-wry = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
 
 [workspace.lints.clippy]
 bool_to_int_with_if = "warn"
